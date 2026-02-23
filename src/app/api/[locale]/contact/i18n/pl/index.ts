@@ -172,6 +172,7 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Wystąpił konflikt podczas przetwarzania Twojego żądania",
     },
+    email_generation_failed: "Nie udało się wygenerować e-maila",
   },
 
   sms: {
@@ -338,6 +339,84 @@ export const translations: typeof enTranslations = {
   error: {
     general: {
       internal_server_error: "Wystąpił wewnętrzny błąd serwera",
+    },
+  },
+
+  emailTemplates: {
+    contactForm: {
+      meta: {
+        name: "Powiadomienie formularza kontaktowego",
+        description:
+          "E-mail wysyłany do kontaktu i zespołu firmy po przesłaniu formularza kontaktowego",
+        category: "Kontakt",
+      },
+      preview: {
+        name: {
+          label: "Imię i nazwisko nadawcy",
+          description:
+            "Pełne imię i nazwisko osoby przesyłającej formularz kontaktowy",
+        },
+        email: {
+          label: "E-mail nadawcy",
+          description: "Adres e-mail osoby przesyłającej formularz",
+        },
+        company: {
+          label: "Nazwa firmy",
+          description: "Opcjonalna nazwa firmy nadawcy",
+        },
+        subject: {
+          label: "Temat wiadomości",
+          description: "Temat wiadomości kontaktowej",
+        },
+        message: {
+          label: "Treść wiadomości",
+          description: "Główna treść wiadomości z formularza kontaktowego",
+        },
+        isForCompany: {
+          label: "Flaga e-maila firmowego",
+          description:
+            "Czy ten e-mail jest skierowany do firmy (admin) czy do nadawcy (potwierdzenie)",
+        },
+        userId: {
+          label: "ID użytkownika",
+          description: "Opcjonalne ID użytkownika do śledzenia",
+        },
+        leadId: {
+          label: "ID leada",
+          description: "Opcjonalne ID leada do śledzenia CRM",
+        },
+      },
+    },
+    adminContact: {
+      meta: {
+        name: "Powiadomienie admina o kontakcie",
+        description:
+          "Wewnętrzny e-mail powiadamiający adminów o nowym przesłaniu formularza kontaktowego",
+        category: "Admin",
+      },
+      preview: {
+        name: {
+          label: "Imię i nazwisko nadawcy",
+        },
+        email: {
+          label: "E-mail nadawcy",
+        },
+        subject: {
+          label: "Temat wiadomości",
+        },
+        message: {
+          label: "Treść wiadomości",
+        },
+        company: {
+          label: "Nazwa firmy",
+        },
+        userId: {
+          label: "ID użytkownika",
+        },
+        leadId: {
+          label: "ID leada",
+        },
+      },
     },
   },
 };

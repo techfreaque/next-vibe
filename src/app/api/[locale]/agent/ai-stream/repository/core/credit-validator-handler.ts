@@ -14,9 +14,12 @@ import {
   calculateCreditCost,
   type ModelOption,
 } from "@/app/api/[locale]/agent/models/models";
+import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { creditValidator } from "@/app/api/[locale]/credits/validator";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
+
+import type { AiStreamT } from "../../i18n";
 
 export class CreditValidatorHandler {
   static async validateCredits(params: {
@@ -26,13 +29,15 @@ export class CreditValidatorHandler {
     modelInfo: ModelOption;
     locale: CountryLanguage;
     logger: EndpointLogger;
+    t: AiStreamT;
   }): Promise<
     ResponseType<{
       effectiveLeadId: string | undefined;
       modelCost: number;
     }>
   > {
-    const { userId, leadId, ipAddress, modelInfo, locale, logger } = params;
+    const { userId, leadId, ipAddress, modelInfo, locale, logger, t } = params;
+    const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
 
     const modelCost = calculateCreditCost(
       modelInfo,
@@ -48,6 +53,8 @@ export class CreditValidatorHandler {
         modelInfo.id,
         modelCost,
         logger,
+        creditsT,
+        locale,
       );
     } else if (leadId) {
       validationResult = await creditValidator.validateLeadCredits(
@@ -55,6 +62,8 @@ export class CreditValidatorHandler {
         modelInfo.id,
         modelCost,
         logger,
+        creditsT,
+        locale,
       );
     } else if (ipAddress) {
       const leadByIpResult = await creditValidator.validateLeadByIp(
@@ -63,12 +72,12 @@ export class CreditValidatorHandler {
         modelCost,
         locale,
         logger,
+        creditsT,
       );
 
       if (!leadByIpResult.success) {
         return fail({
-          message:
-            "app.api.agent.chat.aiStream.route.errors.creditValidationFailed",
+          message: t("route.errors.creditValidationFailed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -81,15 +90,14 @@ export class CreditValidatorHandler {
     } else {
       logger.error("No user, lead, or IP address provided");
       return fail({
-        message: "app.api.agent.chat.aiStream.route.errors.noIdentifier",
+        message: t("route.errors.noIdentifier"),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
 
     if (!validationResult.success) {
       return fail({
-        message:
-          "app.api.agent.chat.aiStream.route.errors.creditValidationFailed",
+        message: t("route.errors.creditValidationFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -104,7 +112,7 @@ export class CreditValidatorHandler {
       });
 
       return fail({
-        message: "app.api.agent.chat.aiStream.route.errors.insufficientCredits",
+        message: t("route.errors.insufficientCredits"),
         errorType: ErrorResponseTypes.FORBIDDEN,
         messageParams: {
           cost: modelCost.toString(),

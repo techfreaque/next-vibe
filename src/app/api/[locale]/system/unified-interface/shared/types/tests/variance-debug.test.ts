@@ -44,7 +44,7 @@ const testEndpoint_field = objectField(
 
 type TestEndpoint = CreateApiEndpoint<
   Methods.POST,
-  readonly ["app.api.user.userRoles.enums.userRole.admin"],
+  readonly ["enums.userRole.admin"],
   string,
   typeof testEndpoint_field
 >;

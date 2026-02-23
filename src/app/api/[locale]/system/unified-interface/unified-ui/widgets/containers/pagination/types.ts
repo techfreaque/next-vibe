@@ -40,16 +40,12 @@ export function paginationField(config?: {
       },
       totalCount: {
         type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.credits.history.get.paginationInfo.total" as const,
         schema: totalCountSchema,
         usage: { response: true },
         schemaType: "primitive" as const,
       },
       pageCount: {
         type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.credits.history.get.paginationInfo.totalPages" as const,
         schema: pageCountSchema,
         usage: { response: true },
         schemaType: "primitive" as const,

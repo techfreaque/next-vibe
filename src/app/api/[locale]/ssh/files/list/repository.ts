@@ -23,6 +23,9 @@ import type {
   FilesListRequestOutput,
   FilesListResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 function resolvePath(inputPath?: string): string {
   const raw = inputPath ?? "~";
@@ -40,10 +43,11 @@ export class FilesListRepository {
   static async list(
     data: FilesListRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<FilesListResponseOutput>> {
     if (data.connectionId) {
       return fail({
-        message: "SSH backend not yet implemented for file listing",
+        message: t("errors.notImplemented.fileList"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
@@ -52,7 +56,7 @@ export class FilesListRepository {
 
     if (!isValidPath(dirPath)) {
       return fail({
-        message: "Invalid path: must be absolute without '..' segments",
+        message: t("errors.invalidPath"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
@@ -102,13 +106,13 @@ export class FilesListRepository {
       const err = error as NodeJS.ErrnoException;
       if (err.code === "ENOENT") {
         return fail({
-          message: "Directory not found",
+          message: t("errors.directoryNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
       logger.error("Failed to list directory", parseError(error));
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

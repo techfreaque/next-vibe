@@ -1,4 +1,15 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    localModeOnly: {
+      title: "Local Mode Only",
+    },
+    invalidUsername:
+      "Invalid username: must be lowercase alphanumeric + hyphen, starting with a letter",
+    userAlreadyExists: "User already exists",
+  },
+
   post: {
     title: "Create Linux User",
     description: "Create a new OS user account on the host",

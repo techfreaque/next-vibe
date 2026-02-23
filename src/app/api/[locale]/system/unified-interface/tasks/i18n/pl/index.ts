@@ -181,6 +181,22 @@ export const translations: typeof enTranslations = {
     executePulse: "Nie udało się wykonać Pulse",
     fetchPulseStatus: "Nie udało się pobrać statusu Pulse",
     pulseExecutionFailed: "Wykonanie Pulse nie powiodło się",
+    pulseInternalError: "Wewnętrzny błąd systemu Pulse",
+
+    // Repository errors
+    repositoryNotFound: "Zasób nie znaleziony",
+    repositoryInternalError: "Wystąpił błąd wewnętrzny",
+    repositoryGetTaskForbidden:
+      "Nie masz uprawnień do wyświetlenia tego zadania",
+    repositoryUpdateTaskForbidden:
+      "Nie masz uprawnień do aktualizacji tego zadania",
+    repositoryDeleteTaskForbidden:
+      "Nie masz uprawnień do usunięcia tego zadania",
+
+    // Task sync errors
+    taskSyncListFailed: "Nie udało się wylistować zadań do synchronizacji",
+    taskSyncSyncFailed:
+      "Nie udało się zsynchronizować zadań z zdalnego serwera",
   },
   common: {
     cronRepositoryTaskUpdateFailed: "Nie udało się zaktualizować zadania cron",
@@ -207,6 +223,254 @@ export const translations: typeof enTranslations = {
   },
   dbHealthCheck: {
     description: "Sprawdza stan połączenia z bazą danych co minutę",
+  },
+  dbHealth: {
+    tag: "Baza danych",
+    post: {
+      title: "Sprawdzenie zdrowia DB",
+      description: "Sprawdź połączenie z bazą danych",
+      container: {
+        title: "Zdrowie bazy danych",
+        description: "Sprawdź, czy połączenie z bazą danych jest zdrowe",
+      },
+      response: {
+        healthy: "Zdrowy",
+      },
+      errors: {
+        unauthorized: {
+          title: "Brak autoryzacji",
+          description: "Wymagane uwierzytelnienie",
+        },
+        forbidden: {
+          title: "Zabronione",
+          description: "Odmowa dostępu",
+        },
+        server: {
+          title: "Błąd serwera",
+          description: "Sprawdzenie zdrowia bazy danych nie powiodło się",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieoczekiwany błąd",
+        },
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe parametry żądania",
+        },
+      },
+      success: {
+        title: "DB zdrowa",
+        description: "Połączenie z bazą danych jest zdrowe",
+      },
+    },
+  },
+  claudeCode: {
+    tags: {
+      tasks: "Zadania",
+    },
+    run: {
+      post: {
+        title: "Uruchom Claude Code",
+        description:
+          "Uruchamia sesję Claude Code na Hermesie (lokalnej maszynie deweloperskiej). PREFERUJ headless:false (domyślnie) — otwiera pełną sesję Claude Code, w której Max może aktywnie uczestniczyć. headless:true tylko dla w pełni zautomatyzowanych zadań wsadowych bez udziału człowieka (np. cron-joby). W trybie interaktywnym sesja jest strumieniowana na żywo do terminala; w trybie wsadowym uruchamia `claude -p` i zwraca wynik po zakończeniu. Zawsze uruchamia z --dangerously-skip-permissions.",
+        fields: {
+          prompt: {
+            title: "Prompt",
+            description:
+              "Zadanie lub pytanie dla Claude Code. Bądź konkretny — podaj ścieżki plików, kontekst i oczekiwany format wyjścia.",
+          },
+          model: {
+            title: "Model",
+            description:
+              "ID modelu Claude (np. claude-sonnet-4-6, claude-opus-4-6). Domyślnie używa ustawień Claude Code.",
+          },
+          maxBudgetUsd: {
+            title: "Maks. budżet (USD)",
+            description:
+              "Maksymalny limit wydatków w USD. Zapobiega niekontrolowanym kosztom użycia narzędzi. Pomiń dla braku limitu.",
+          },
+          systemPrompt: {
+            title: "Prompt systemowy",
+            description:
+              "Opcjonalny prompt systemowy. Dla persony, ograniczeń lub kontekstu całej sesji.",
+          },
+          allowedTools: {
+            title: "Dozwolone narzędzia",
+            description:
+              "Rozdzielona przecinkami lista dozwolonych narzędzi (np. Read,Edit,Bash). Pomiń dla wszystkich domyślnych narzędzi.",
+          },
+          headless: {
+            title: "Headless (tryb wsadowy)",
+            description:
+              "PREFERUJ false (domyślnie). headless:false otwiera pełną interaktywną sesję Claude Code — Max widzi wyniki na żywo i może uczestniczyć. Ustaw true tylko dla w pełni zautomatyzowanych zadań wsadowych (cron-joby, pipeline'y) bez interakcji człowieka.",
+          },
+          workingDir: {
+            title: "Katalog roboczy",
+            description:
+              "Bezwzględna ścieżka dla procesu Claude Code. Domyślnie: bieżący katalog serwera.",
+          },
+          timeoutMs: {
+            title: "Timeout (ms)",
+            description:
+              "Maksymalny czas wykonania w milisekundach. Domyślnie: 600000 (10 minut).",
+          },
+          output: {
+            title: "Wyjście",
+            description: "Połączony stdout procesu Claude Code.",
+          },
+          exitCode: {
+            title: "Kod wyjścia",
+            description: "Kod wyjścia procesu. 0 = sukces, niezerowy = błąd.",
+          },
+          durationMs: {
+            title: "Czas trwania (ms)",
+            description: "Łączny czas działania procesu.",
+          },
+        },
+        errors: {
+          validation: {
+            title: "Błąd walidacji",
+            description:
+              "Nieprawidłowe parametry żądania — sprawdź prompt i pola",
+          },
+          unauthorized: {
+            title: "Brak autoryzacji",
+            description: "Wymagane uwierzytelnienie — potrzebna rola admina",
+          },
+          internal: {
+            title: "Wykonanie nie powiodło się",
+            description:
+              "Proces Claude Code nie mógł zostać uruchomiony lub uległ awarii",
+          },
+          forbidden: {
+            title: "Zabronione",
+            description: "Odmowa dostępu — niewystarczające uprawnienia",
+          },
+          notFound: {
+            title: "Nie znaleziono",
+            description: "Zasób lub katalog roboczy nie został znaleziony",
+          },
+          network: {
+            title: "Błąd sieci",
+            description: "Błąd sieci podczas komunikacji z Claude Code",
+          },
+          unknown: {
+            title: "Nieznany błąd",
+            description: "Nieoczekiwany błąd podczas wykonania",
+          },
+          unsaved: {
+            title: "Niezapisane zmiany",
+            description: "Wykryto konflikt niezapisanych zmian",
+          },
+          conflict: {
+            title: "Konflikt",
+            description:
+              "Konflikt wykonania — możliwe że inna sesja już działa",
+          },
+        },
+        success: {
+          title: "Claude Code zakończony",
+          description:
+            "Proces Claude Code zakończony — sprawdź exitCode dla sukcesu/błędu i output dla wyników",
+        },
+      },
+    },
+  },
+  taskSync: {
+    post: {
+      title: "Synchronizuj zadania",
+      description: "Synchronizuj zadania ze zdalnej instancji Thea",
+      errors: {
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe parametry żądania",
+        },
+        unauthorized: {
+          title: "Brak autoryzacji",
+          description: "Wymagane uwierzytelnienie",
+        },
+        internal: {
+          title: "Błąd wewnętrzny",
+          description: "Synchronizacja zadań nie powiodła się",
+        },
+        forbidden: {
+          title: "Zabronione",
+          description: "Odmowa dostępu",
+        },
+        notFound: {
+          title: "Nie znaleziono",
+          description: "Zasób nie znaleziony",
+        },
+        network: {
+          title: "Błąd sieci",
+          description: "Wystąpił błąd sieci",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieoczekiwany błąd",
+        },
+        unsaved: {
+          title: "Niezapisane zmiany",
+          description: "Wykryto niezapisane zmiany",
+        },
+        conflict: {
+          title: "Konflikt",
+          description: "Wystąpił konflikt",
+        },
+      },
+      success: {
+        title: "Zadania zsynchronizowane",
+        description: "Zadania zsynchronizowane pomyślnie",
+      },
+    },
+    pull: {
+      post: {
+        title: "Pobierz zadania",
+        description: "Pobierz zadania ze zdalnej instancji Thea",
+        errors: {
+          validation: {
+            title: "Błąd walidacji",
+            description: "Nieprawidłowe parametry żądania",
+          },
+          unauthorized: {
+            title: "Brak autoryzacji",
+            description: "Wymagane uwierzytelnienie",
+          },
+          internal: {
+            title: "Błąd wewnętrzny",
+            description: "Pobieranie zadań nie powiodło się",
+          },
+          forbidden: {
+            title: "Zabronione",
+            description: "Odmowa dostępu",
+          },
+          notFound: {
+            title: "Nie znaleziono",
+            description: "Zasób nie znaleziony",
+          },
+          network: {
+            title: "Błąd sieci",
+            description: "Wystąpił błąd sieci",
+          },
+          unknown: {
+            title: "Nieznany błąd",
+            description: "Wystąpił nieoczekiwany błąd",
+          },
+          unsaved: {
+            title: "Niezapisane zmiany",
+            description: "Wykryto niezapisane zmiany",
+          },
+          conflict: {
+            title: "Konflikt",
+            description: "Wystąpił konflikt",
+          },
+        },
+        success: {
+          title: "Zadania pobrane",
+          description: "Zadania pobrane pomyślnie",
+        },
+      },
+    },
   },
   csvProcessor: {
     description: "Przetwarza zadania importu CSV w partiach",

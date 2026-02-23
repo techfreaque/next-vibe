@@ -17,6 +17,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import { CampaignType } from "@/app/api/[locale]/emails/smtp-client/enum";
+import { scopedTranslation as smtpScopedTranslation } from "@/app/api/[locale]/emails/smtp-client/i18n";
 import { SmtpSendingRepository } from "@/app/api/[locale]/emails/smtp-client/sending/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -29,6 +30,7 @@ import { EmailProvider, LeadStatus } from "../../enum";
 import type { LeadWithEmailType } from "../../types";
 import { emailRendererService } from "../emails/services/renderer";
 import { campaignSchedulerService } from "../emails/services/scheduler";
+import type { scopedTranslation } from "./i18n";
 import type { EmailCampaignResultType } from "./types";
 import { createEmptyEmailCampaignResult } from "./types";
 
@@ -40,18 +42,22 @@ interface StageProcessOptions {
   dryRun: boolean;
 }
 
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+
 /**
  * Email Campaigns Repository Interface
  */
 export interface IEmailCampaignsRepository {
   bootstrapPendingLeads(
     batchSize: number,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<number>>;
 
   processStage(
     stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage],
     options: StageProcessOptions,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailCampaignResultType>>;
 }
@@ -68,6 +74,7 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
    */
   async bootstrapPendingLeads(
     batchSize: number,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<number>> {
     try {
@@ -131,8 +138,7 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
         error: parseError(error).message,
       });
       return fail({
-        message:
-          "app.api.leads.campaigns.emailCampaigns.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -141,6 +147,7 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
   async processStage(
     stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage],
     options: StageProcessOptions,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<EmailCampaignResultType>> {
     try {
@@ -199,7 +206,7 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
           // Build locale from lead's country + language
           const leadLocale =
             `${fullLead.country}-${fullLead.language}` as CountryLanguage;
-          const { t } = simpleT(leadLocale);
+          const { t: simpleLocalT } = simpleT(leadLocale);
 
           // Render the email template (returns JSX + subject)
           // fullLead.email is non-null here: getPendingEmails filters isNotNull(leads.email)
@@ -208,7 +215,6 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
             campaign.journeyVariant,
             campaign.stage,
             {
-              t,
               locale: leadLocale,
               companyName: "",
               companyEmail: "",
@@ -234,6 +240,7 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
           const html = await render(rendered.jsx);
 
           // Send via SMTP
+          const smtpT = smtpScopedTranslation.scopedT(leadLocale).t;
           const sendResult = await SmtpSendingRepository.sendEmail(
             {
               to: campaign.lead.email,
@@ -241,7 +248,7 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
               subject: rendered.subject,
               html,
               text: rendered.text,
-              senderName: t("config.appName"),
+              senderName: simpleLocalT("config.appName"),
               replyTo: contactClientRepository.getSupportEmail(leadLocale),
               selectionCriteria: {
                 campaignType: CampaignType.LEAD_CAMPAIGN,
@@ -254,6 +261,7 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
               campaignId: campaign.id,
             },
             logger,
+            smtpT,
           );
 
           if (!sendResult.success) {
@@ -312,8 +320,7 @@ export class EmailCampaignsRepositoryImpl implements IEmailCampaignsRepository {
         error: parseError(error).message,
       });
       return fail({
-        message:
-          "app.api.leads.campaigns.emailCampaigns.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

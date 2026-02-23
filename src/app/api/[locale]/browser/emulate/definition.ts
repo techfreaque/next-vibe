@@ -6,10 +6,10 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,16 +20,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["browser", "emulate"],
-  title: "app.api.browser.emulate.title",
-  description: "app.api.browser.emulate.description",
-  category: "app.api.browser.category",
+  title: "emulate.title",
+  description: "emulate.description",
+  category: "emulate.category",
   icon: "settings",
   tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.performanceAutomation",
+    "emulate.tags.browserAutomation",
+    "emulate.tags.performanceAutomation",
   ],
 
   allowedRoles: [
@@ -40,55 +43,45 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.browser.emulate.form.label",
-      description: "app.api.browser.emulate.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      networkConditions: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "emulate.form.label",
+    description: "emulate.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      networkConditions: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.browser.emulate.form.fields.networkConditions.label",
-        description:
-          "app.api.browser.emulate.form.fields.networkConditions.description",
-        placeholder:
-          "app.api.browser.emulate.form.fields.networkConditions.placeholder",
+        label: "emulate.form.fields.networkConditions.label",
+        description: "emulate.form.fields.networkConditions.description",
+        placeholder: "emulate.form.fields.networkConditions.placeholder",
         columns: 6,
         options: [
           {
             value: "No emulation",
-            label:
-              "app.api.browser.emulate.form.fields.networkConditions.options.noEmulation",
+            label: "emulate.form.fields.networkConditions.options.noEmulation",
           },
           {
             value: "Offline",
-            label:
-              "app.api.browser.emulate.form.fields.networkConditions.options.offline",
+            label: "emulate.form.fields.networkConditions.options.offline",
           },
           {
             value: "Slow 3G",
-            label:
-              "app.api.browser.emulate.form.fields.networkConditions.options.slow3g",
+            label: "emulate.form.fields.networkConditions.options.slow3g",
           },
           {
             value: "Fast 3G",
-            label:
-              "app.api.browser.emulate.form.fields.networkConditions.options.fast3g",
+            label: "emulate.form.fields.networkConditions.options.fast3g",
           },
           {
             value: "Slow 4G",
-            label:
-              "app.api.browser.emulate.form.fields.networkConditions.options.slow4g",
+            label: "emulate.form.fields.networkConditions.options.slow4g",
           },
           {
             value: "Fast 4G",
-            label:
-              "app.api.browser.emulate.form.fields.networkConditions.options.fast4g",
+            label: "emulate.form.fields.networkConditions.options.fast4g",
           },
         ],
         schema: z
@@ -105,14 +98,12 @@ const { POST } = createEndpoint({
             'Throttle network. Set to "No emulation" to disable. If omitted, conditions remain unchanged.',
           ),
       }),
-      cpuThrottlingRate: requestField({
+      cpuThrottlingRate: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.browser.emulate.form.fields.cpuThrottlingRate.label",
-        description:
-          "app.api.browser.emulate.form.fields.cpuThrottlingRate.description",
-        placeholder:
-          "app.api.browser.emulate.form.fields.cpuThrottlingRate.placeholder",
+        label: "emulate.form.fields.cpuThrottlingRate.label",
+        description: "emulate.form.fields.cpuThrottlingRate.description",
+        placeholder: "emulate.form.fields.cpuThrottlingRate.placeholder",
         columns: 6,
         schema: z
           .number()
@@ -125,16 +116,16 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.emulate.response.success",
+        content: "emulate.response.success",
         schema: z
           .boolean()
           .describe("Whether the emulation operation succeeded"),
       }),
-      result: responseField({
+      result: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.emulate.response.result",
+        content: "emulate.response.result",
         schema: z
           .object({
             applied: z
@@ -152,24 +143,24 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Result of the emulation operation"),
       }),
-      error: responseField({
+      error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.emulate.response.error",
+        content: "emulate.response.error",
         schema: z
           .string()
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: responseField({
+      executionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.emulate.response.executionId",
+        content: "emulate.response.executionId",
         schema: z
           .string()
           .optional()
           .describe("Unique identifier for this execution"),
       }),
     },
-  ),
+  }),
   examples: {
     requests: {
       default: { networkConditions: "Fast 3G", cpuThrottlingRate: 2 },
@@ -188,45 +179,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.browser.emulate.errors.validation.title",
-      description: "app.api.browser.emulate.errors.validation.description",
+      title: "emulate.errors.validation.title",
+      description: "emulate.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.browser.emulate.errors.network.title",
-      description: "app.api.browser.emulate.errors.network.description",
+      title: "emulate.errors.network.title",
+      description: "emulate.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.browser.emulate.errors.unauthorized.title",
-      description: "app.api.browser.emulate.errors.unauthorized.description",
+      title: "emulate.errors.unauthorized.title",
+      description: "emulate.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.browser.emulate.errors.forbidden.title",
-      description: "app.api.browser.emulate.errors.forbidden.description",
+      title: "emulate.errors.forbidden.title",
+      description: "emulate.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.browser.emulate.errors.notFound.title",
-      description: "app.api.browser.emulate.errors.notFound.description",
+      title: "emulate.errors.notFound.title",
+      description: "emulate.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.browser.emulate.errors.serverError.title",
-      description: "app.api.browser.emulate.errors.serverError.description",
+      title: "emulate.errors.serverError.title",
+      description: "emulate.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.browser.emulate.errors.unknown.title",
-      description: "app.api.browser.emulate.errors.unknown.description",
+      title: "emulate.errors.unknown.title",
+      description: "emulate.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.browser.emulate.errors.unsavedChanges.title",
-      description: "app.api.browser.emulate.errors.unsavedChanges.description",
+      title: "emulate.errors.unsavedChanges.title",
+      description: "emulate.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.browser.emulate.errors.conflict.title",
-      description: "app.api.browser.emulate.errors.conflict.description",
+      title: "emulate.errors.conflict.title",
+      description: "emulate.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.browser.emulate.success.title",
-    description: "app.api.browser.emulate.success.description",
+    title: "emulate.success.title",
+    description: "emulate.success.description",
   },
 });
 

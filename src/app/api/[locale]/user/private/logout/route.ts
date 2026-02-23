@@ -8,7 +8,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: logoutEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ user, logger, platform }) =>
-      LogoutRepository.logout(user, logger, platform),
+    handler: ({ user, logger, platform, locale, t }) =>
+      LogoutRepository.logout(user, logger, platform, locale, t),
   },
 });

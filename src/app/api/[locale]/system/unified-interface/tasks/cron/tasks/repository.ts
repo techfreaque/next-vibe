@@ -35,6 +35,9 @@ import type {
   CronTaskListResponseOutput,
   CronTaskResponseType,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Database error message pattern for unique constraint violations
@@ -98,12 +101,14 @@ export interface ICronTasksListRepository {
   getTasks(
     data: CronTaskListRequestOutput,
     user: JwtPayloadType,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskListResponseOutput>>;
 
   createTask(
     data: CronTaskCreateRequestOutput,
     user: JwtPayloadType,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskCreateResponseOutput>>;
 }
@@ -115,6 +120,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
   async getTasks(
     data: CronTaskListRequestOutput,
     user: JwtPayloadType,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskListResponseOutput>> {
     try {
@@ -199,8 +205,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       logger.error("Failed to retrieve cron tasks", parsedError);
 
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.internal.title",
+        message: t("errors.fetchCronTasks"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -209,6 +214,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
   async createTask(
     data: CronTaskCreateRequestOutput,
     user: JwtPayloadType,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskCreateResponseOutput>> {
     try {
@@ -253,8 +259,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       if (!createdTask) {
         logger.error("Failed to create task - no task returned");
         return fail({
-          message:
-            "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.internal.title",
+          message: t("errors.createCronTask"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -278,15 +283,13 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       // Check for unique constraint violation (system tasks with same routeId)
       if (parsedError.message?.includes(UNIQUE_CONSTRAINT_ERROR)) {
         return fail({
-          message:
-            "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.conflict.title",
+          message: t("errors.createCronTask"),
           errorType: ErrorResponseTypes.CONFLICT,
         });
       }
 
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.internal.title",
+        message: t("errors.createCronTask"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

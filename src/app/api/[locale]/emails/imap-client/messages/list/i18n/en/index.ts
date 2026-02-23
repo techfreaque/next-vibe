@@ -1,4 +1,5 @@
 export const translations = {
+  category: "IMAP Management",
   tag: "Messages List",
   get: {
     title: "List IMAP Messages",

@@ -11,6 +11,7 @@ import { OpenRouterModelsRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: openRouterEndpoints,
   [Methods.GET]: {
-    handler: ({ logger }) => OpenRouterModelsRepository.fetchModels(logger),
+    handler: ({ logger, t }) =>
+      OpenRouterModelsRepository.fetchModels(logger, t),
   },
 });

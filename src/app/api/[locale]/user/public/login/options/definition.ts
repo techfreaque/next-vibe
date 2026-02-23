@@ -9,12 +9,13 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
-  objectField,
-  requestField,
-  responseField,
-  responseArrayField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 
+import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../../user-roles/enum";
 import { SocialProviders } from "./enum";
 
@@ -32,272 +33,232 @@ import { SocialProviders } from "./enum";
  */
 
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["user", "public", "login", "options"],
-  title: "app.api.user.public.login.options.title",
-  description: "app.api.user.public.login.options.description",
+  title: "title",
+  description: "description",
   icon: "key",
-  category: "app.api.user.category",
-  tags: ["app.api.user.public.login.options.tag"],
+  category: "category",
+  tags: ["tag"],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.user.public.login.options.container.title",
-      description: "app.api.user.public.login.options.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "container.title",
+    description: "container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      email: requestField({
+      email: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
-        label: "app.api.user.public.login.options.fields.email.label",
-        description:
-          "app.api.user.public.login.options.fields.email.description",
-        placeholder:
-          "app.api.user.public.login.options.fields.email.placeholder",
+        label: "fields.email.label",
+        description: "fields.email.description",
+        placeholder: "fields.email.placeholder",
         schema: z.email().optional(),
       }),
 
       // === RESPONSE FIELDS ===
-      response: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.user.public.login.options.response.title",
-          description: "app.api.user.public.login.options.response.description",
-          layoutType: LayoutType.VERTICAL,
-        },
-        { response: true },
-        {
-          success: responseField({
+      response: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.title",
+        description: "response.description",
+        layoutType: LayoutType.VERTICAL,
+        usage: { response: true },
+        children: {
+          success: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.user.public.login.options.response.success.badge",
+            text: "response.success.badge",
             schema: z
               .boolean()
               .describe("Whether login options were retrieved successfully"),
           }),
-          message: responseField({
+          message: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.public.login.options.response.message.content",
+            content: "response.message.content",
             schema: z.string().describe("Human-readable status message"),
           }),
-          forUser: responseField({
+          forUser: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.public.login.options.response.forUser.content",
+            content: "response.forUser.content",
             schema: z
               .string()
               .optional()
               .describe("Email address these options are specific to"),
           }),
-          loginMethods: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.user.public.login.options.response.loginMethods.title",
-              description:
-                "app.api.user.public.login.options.response.loginMethods.description",
-              layoutType: LayoutType.VERTICAL,
-            },
-            { response: true },
-            {
-              password: objectField(
-                {
-                  type: WidgetType.CONTAINER,
-                  title:
-                    "app.api.user.public.login.options.response.loginMethods.password.title",
-                  description:
-                    "app.api.user.public.login.options.response.loginMethods.password.description",
-                  layoutType: LayoutType.HORIZONTAL,
-                },
-                { response: true },
-                {
-                  enabled: responseField({
+          loginMethods: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "response.loginMethods.title",
+            description: "response.loginMethods.description",
+            layoutType: LayoutType.VERTICAL,
+            usage: { response: true },
+            children: {
+              password: scopedObjectFieldNew(scopedTranslation, {
+                type: WidgetType.CONTAINER,
+                title: "response.loginMethods.password.title",
+                description: "response.loginMethods.password.description",
+                layoutType: LayoutType.HORIZONTAL,
+                usage: { response: true },
+                children: {
+                  enabled: scopedResponseField(scopedTranslation, {
                     type: WidgetType.BADGE,
-                    text: "app.api.user.public.login.options.response.loginMethods.password.enabled.badge",
+                    text: "response.loginMethods.password.enabled.badge",
                     schema: z
                       .boolean()
                       .describe("Whether password login is allowed"),
                   }),
-                  passwordDescription: responseField({
+                  passwordDescription: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.user.public.login.options.response.loginMethods.password.description",
+                    content: "response.loginMethods.password.description",
                     schema: z.string().describe("Human-readable description"),
                   }),
                 },
-              ),
-              social: objectField(
-                {
-                  type: WidgetType.CONTAINER,
-                  title:
-                    "app.api.user.public.login.options.response.loginMethods.social.title",
-                  description:
-                    "app.api.user.public.login.options.response.loginMethods.social.description",
-                  layoutType: LayoutType.VERTICAL,
-                },
-                { response: true },
-                {
-                  enabled: responseField({
+              }),
+              social: scopedObjectFieldNew(scopedTranslation, {
+                type: WidgetType.CONTAINER,
+                title: "response.loginMethods.social.title",
+                description: "response.loginMethods.social.description",
+                layoutType: LayoutType.VERTICAL,
+                usage: { response: true },
+                children: {
+                  enabled: scopedResponseField(scopedTranslation, {
                     type: WidgetType.BADGE,
-                    text: "app.api.user.public.login.options.response.loginMethods.social.enabled.badge",
+                    text: "response.loginMethods.social.enabled.badge",
                     schema: z
                       .boolean()
                       .describe("Whether social login is allowed"),
                   }),
-                  socialDescription: responseField({
+                  socialDescription: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.user.public.login.options.response.loginMethods.social.description",
+                    content: "response.loginMethods.social.description",
                     schema: z.string().describe("Human-readable description"),
                   }),
-                  providers: responseArrayField(
-                    {
+                  providers: scopedResponseArrayFieldNew(scopedTranslation, {
+                    type: WidgetType.CONTAINER,
+                    child: scopedObjectFieldNew(scopedTranslation, {
                       type: WidgetType.CONTAINER,
-                    },
-                    objectField(
-                      {
-                        type: WidgetType.CONTAINER,
-                        layoutType: LayoutType.HORIZONTAL,
-                      },
-                      { response: true },
-                      {
-                        name: responseField({
+                      layoutType: LayoutType.HORIZONTAL,
+                      usage: { response: true },
+                      children: {
+                        name: scopedResponseField(scopedTranslation, {
                           type: WidgetType.TEXT,
                           content:
-                            "app.api.user.public.login.options.response.loginMethods.social.providers.name.content",
+                            "response.loginMethods.social.providers.name.content",
                           schema: z
                             .string()
                             .describe(
                               "Provider display name (e.g., 'Google', 'GitHub')",
                             ),
                         }),
-                        id: responseField({
+                        id: scopedResponseField(scopedTranslation, {
                           type: WidgetType.TEXT,
                           content:
-                            "app.api.user.public.login.options.response.loginMethods.social.providers.id.content",
+                            "response.loginMethods.social.providers.id.content",
                           schema: z.string().describe("Provider identifier"),
                         }),
-                        enabled: responseField({
+                        enabled: scopedResponseField(scopedTranslation, {
                           type: WidgetType.BADGE,
-                          text: "app.api.user.public.login.options.response.loginMethods.social.providers.enabled.badge",
+                          text: "response.loginMethods.social.providers.enabled.badge",
                           schema: z
                             .boolean()
                             .describe("Whether this provider is available"),
                         }),
-                        description: responseField({
+                        description: scopedResponseField(scopedTranslation, {
                           type: WidgetType.TEXT,
                           content:
-                            "app.api.user.public.login.options.response.loginMethods.social.providers.description",
+                            "response.loginMethods.social.providers.description",
                           schema: z
                             .string()
                             .describe("Human-readable provider description"),
                         }),
                       },
-                    ),
-                  ),
+                    }),
+                  }),
                 },
-              ),
+              }),
             },
-          ),
-          security: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.user.public.login.options.response.security.title",
-              description:
-                "app.api.user.public.login.options.response.security.description",
-              layoutType: LayoutType.HORIZONTAL,
-            },
-            { response: true },
-            {
-              maxAttempts: responseField({
+          }),
+          security: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "response.security.title",
+            description: "response.security.description",
+            layoutType: LayoutType.HORIZONTAL,
+            usage: { response: true },
+            children: {
+              maxAttempts: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.user.public.login.options.response.security.maxAttempts.content",
+                content: "response.security.maxAttempts.content",
                 schema: z
                   .number()
                   .optional()
                   .describe("Maximum login attempts allowed"),
               }),
-              requireTwoFactor: responseField({
+              requireTwoFactor: scopedResponseField(scopedTranslation, {
                 type: WidgetType.BADGE,
-                text: "app.api.user.public.login.options.response.security.requireTwoFactor.badge",
+                text: "response.security.requireTwoFactor.badge",
                 schema: z
                   .boolean()
                   .optional()
                   .describe("Whether 2FA is required for this user"),
               }),
-              securityDescription: responseField({
+              securityDescription: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.user.public.login.options.response.security.description",
+                content: "response.security.description",
                 schema: z.string().describe("Security requirements summary"),
               }),
             },
-          ),
+          }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.user.public.login.options.errors.validation.title",
-      description:
-        "app.api.user.public.login.options.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.user.public.login.options.errors.unauthorized.title",
-      description:
-        "app.api.user.public.login.options.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.user.public.login.options.errors.server.title",
-      description:
-        "app.api.user.public.login.options.errors.server.description",
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.user.public.login.options.errors.unknown.title",
-      description:
-        "app.api.user.public.login.options.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.user.public.login.options.errors.network.title",
-      description:
-        "app.api.user.public.login.options.errors.network.description",
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.user.public.login.options.errors.forbidden.title",
-      description:
-        "app.api.user.public.login.options.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.user.public.login.options.errors.notFound.title",
-      description:
-        "app.api.user.public.login.options.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.user.public.login.options.errors.unsavedChanges.title",
-      description:
-        "app.api.user.public.login.options.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.user.public.login.options.errors.conflict.title",
-      description:
-        "app.api.user.public.login.options.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.user.public.login.options.success.title",
-    description: "app.api.user.public.login.options.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 
   // === EXAMPLES ===

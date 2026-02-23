@@ -21,7 +21,7 @@ export const translations: typeof enTranslations = {
   env: envTranslations,
   generateAll: generateAllTranslations,
   generateTrpcRouter: generateTrpcRouterTranslations,
-  "route-handlers": routeHandlersTranslations,
+  routeHandlers: routeHandlersTranslations,
   seeds: seedsTranslations,
   taskIndex: taskIndexTranslations,
 };

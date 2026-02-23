@@ -9,6 +9,7 @@ import { validateEnv } from "next-vibe/shared/utils/env-util";
 import type { z } from "zod";
 
 import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface/shared/env/validation-logger";
+import { defaultLocale } from "@/i18n/core/config";
 
 // Import client env modules
 import {
@@ -47,11 +48,9 @@ export const envClientModules = {
 export { platform };
 
 // Combined client schema
-export const envClientSchema = env_envClientSchema.merge(
-  contactClientEnvSchema,
-).merge(
-  paymentClientEnvSchema,
-);
+export const envClientSchema = env_envClientSchema
+  .merge(contactClientEnvSchema)
+  .merge(paymentClientEnvSchema);
 
 export type EnvClient = z.infer<typeof envClientSchema>;
 
@@ -63,6 +62,7 @@ export function validateAllClientEnv(): EnvClient {
     { ...process.env, platform },
     envClientSchema,
     envValidationLogger,
+    defaultLocale,
   );
 }
 

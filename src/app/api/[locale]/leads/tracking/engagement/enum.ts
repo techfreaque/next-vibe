@@ -5,15 +5,17 @@
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "./i18n";
+
 export const {
   enum: EngagementLevel,
   options: EngagementLevelOptions,
   Value: EngagementLevelValue,
-} = createEnumOptions({
-  HIGH: "app.api.leads.tracking.engagement.enums.engagementLevel.high",
-  MEDIUM: "app.api.leads.tracking.engagement.enums.engagementLevel.medium",
-  LOW: "app.api.leads.tracking.engagement.enums.engagementLevel.low",
-  NONE: "app.api.leads.tracking.engagement.enums.engagementLevel.none",
+} = createEnumOptions(scopedTranslation, {
+  HIGH: "enums.engagementLevel.high",
+  MEDIUM: "enums.engagementLevel.medium",
+  LOW: "enums.engagementLevel.low",
+  NONE: "enums.engagementLevel.none",
 });
 
 /**

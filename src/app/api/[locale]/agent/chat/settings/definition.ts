@@ -11,9 +11,9 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -26,61 +26,61 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { TtsVoiceDB, TtsVoiceOptions } from "../../text-to-speech/enum";
 import { ViewMode, ViewModeDB, ViewModeOptions } from "../enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Get Chat Settings Endpoint (GET)
  * Retrieves current user's chat settings
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["agent", "chat", "settings"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const,
 
-  title: "app.api.agent.chat.settings.get.title" as const,
-  description: "app.api.agent.chat.settings.get.description" as const,
+  title: "get.title" as const,
+  description: "get.description" as const,
   icon: "settings" as const,
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.settings" as const],
+  category: "category" as const,
+  tags: ["tags.settings" as const],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.STACKED,
-    },
-    { response: true },
-    {
-      selectedModel: responseField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    usage: { response: true },
+    children: {
+      selectedModel: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.enum(ModelId),
       }),
-      selectedCharacter: responseField({
+      selectedCharacter: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string(),
       }),
-      activeFavoriteId: responseField({
+      activeFavoriteId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string().nullable(),
       }),
-      ttsAutoplay: responseField({
+      ttsAutoplay: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.boolean(),
       }),
-      ttsVoice: responseField({
+      ttsVoice: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.enum(TtsVoiceDB),
       }),
-      viewMode: responseField({
+      viewMode: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.enum(ViewModeDB),
       }),
-      activeTools: responseField({
+      allowedTools: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z
@@ -92,7 +92,7 @@ const { GET } = createEndpoint({
           )
           .nullable(),
       }),
-      visibleTools: responseField({
+      pinnedTools: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z
@@ -106,67 +106,56 @@ const { GET } = createEndpoint({
       }),
 
       // Auto-compacting token threshold (null = use global default COMPACT_TRIGGER)
-      compactTrigger: responseField({
+      compactTrigger: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.number().int().nullable(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.agent.chat.settings.get.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.settings.get.errors.validation.description" as const,
+      title: "get.errors.validation.title" as const,
+      description: "get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.chat.settings.get.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.settings.get.errors.network.description" as const,
+      title: "get.errors.network.title" as const,
+      description: "get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.settings.get.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.settings.get.errors.unauthorized.description" as const,
+      title: "get.errors.unauthorized.title" as const,
+      description: "get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.agent.chat.settings.get.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.settings.get.errors.forbidden.description" as const,
+      title: "get.errors.forbidden.title" as const,
+      description: "get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.agent.chat.settings.get.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.settings.get.errors.notFound.description" as const,
+      title: "get.errors.notFound.title" as const,
+      description: "get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.chat.settings.get.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.settings.get.errors.server.description" as const,
+      title: "get.errors.server.title" as const,
+      description: "get.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.chat.settings.get.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.settings.get.errors.unknown.description" as const,
+      title: "get.errors.unknown.title" as const,
+      description: "get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.settings.get.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.chat.settings.get.errors.unsavedChanges.description" as const,
+      title: "get.errors.unsavedChanges.title" as const,
+      description: "get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.agent.chat.settings.get.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.settings.get.errors.conflict.description" as const,
+      title: "get.errors.conflict.title" as const,
+      description: "get.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.agent.chat.settings.get.success.title" as const,
-    description: "app.api.agent.chat.settings.get.success.description" as const,
+    title: "get.success.title" as const,
+    description: "get.success.description" as const,
   },
 
   examples: {
@@ -178,8 +167,8 @@ const { GET } = createEndpoint({
         ttsAutoplay: false,
         ttsVoice: TtsVoiceDB[0],
         viewMode: ViewMode.LINEAR,
-        activeTools: null,
-        visibleTools: null,
+        allowedTools: null,
+        pinnedTools: null,
         compactTrigger: null,
       },
     },
@@ -191,76 +180,73 @@ const { GET } = createEndpoint({
  * Creates or updates user's chat settings
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["agent", "chat", "settings"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const,
 
-  title: "app.api.agent.chat.settings.post.title" as const,
-  description: "app.api.agent.chat.settings.post.description" as const,
+  title: "post.title" as const,
+  description: "post.description" as const,
   icon: "settings" as const,
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.settings" as const],
+  category: "category" as const,
+  tags: ["tags.settings" as const],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.agent.chat.settings.post.container.title" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data" },
-    {
-      selectedModel: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.container.title" as const,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data" },
+    children: {
+      selectedModel: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.agent.chat.settings.post.selectedModel.label" as const,
+        label: "post.selectedModel.label" as const,
         options: ModelIdOptions,
         columns: 6,
         schema: z.enum(ModelId).optional(),
       }),
-      selectedCharacter: requestField({
+      selectedCharacter: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.agent.chat.settings.post.selectedCharacter.label" as const,
+        label: "post.selectedCharacter.label" as const,
         columns: 6,
         schema: z.string().optional(),
       }),
-      activeFavoriteId: requestField({
+      activeFavoriteId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.agent.chat.settings.post.activeFavoriteId.label" as const,
+        label: "post.activeFavoriteId.label" as const,
         columns: 6,
         schema: z.string().nullable().optional(),
       }),
-      ttsAutoplay: requestField({
+      ttsAutoplay: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.agent.chat.settings.post.ttsAutoplay.label" as const,
+        label: "post.ttsAutoplay.label" as const,
         columns: 12,
         schema: z.boolean().optional(),
       }),
-      ttsVoice: requestField({
+      ttsVoice: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.agent.chat.settings.post.ttsVoice.label" as const,
+        label: "post.ttsVoice.label" as const,
         options: TtsVoiceOptions,
         columns: 6,
         schema: z.enum(TtsVoiceDB).optional(),
       }),
-      viewMode: requestField({
+      viewMode: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.agent.chat.settings.post.viewMode.label" as const,
+        label: "post.viewMode.label" as const,
         options: ViewModeOptions,
         columns: 6,
         schema: z.enum(ViewModeDB).optional(),
       }),
-      activeTools: requestField({
+      allowedTools: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.agent.chat.settings.post.activeTools.label" as const,
+        label: "post.allowedTools.label" as const,
         columns: 12,
         schema: z
           .array(
@@ -272,10 +258,10 @@ const { POST } = createEndpoint({
           .nullable()
           .optional(),
       }),
-      visibleTools: requestField({
+      pinnedTools: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.agent.chat.settings.post.visibleTools.label" as const,
+        label: "post.pinnedTools.label" as const,
         columns: 12,
         schema: z
           .array(
@@ -290,72 +276,59 @@ const { POST } = createEndpoint({
 
       // Auto-compacting token threshold (null = use global default COMPACT_TRIGGER)
       // Hidden from default widget — rendered via CompactTriggerEdit in custom UI
-      compactTrigger: requestField({
+      compactTrigger: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.agent.chat.settings.post.compactTrigger.label" as const,
+        label: "post.compactTrigger.label" as const,
         hidden: true,
         columns: 6,
         schema: z.number().int().min(1000).max(200000).nullable().optional(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.settings.post.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.settings.post.errors.validation.description" as const,
+      title: "post.errors.validation.title" as const,
+      description: "post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.chat.settings.post.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.settings.post.errors.network.description" as const,
+      title: "post.errors.network.title" as const,
+      description: "post.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.settings.post.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.settings.post.errors.unauthorized.description" as const,
+      title: "post.errors.unauthorized.title" as const,
+      description: "post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.agent.chat.settings.post.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.settings.post.errors.forbidden.description" as const,
+      title: "post.errors.forbidden.title" as const,
+      description: "post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.agent.chat.settings.post.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.settings.post.errors.notFound.description" as const,
+      title: "post.errors.notFound.title" as const,
+      description: "post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.chat.settings.post.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.settings.post.errors.server.description" as const,
+      title: "post.errors.server.title" as const,
+      description: "post.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.chat.settings.post.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.settings.post.errors.unknown.description" as const,
+      title: "post.errors.unknown.title" as const,
+      description: "post.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.settings.post.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.chat.settings.post.errors.unsavedChanges.description" as const,
+      title: "post.errors.unsavedChanges.title" as const,
+      description: "post.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.agent.chat.settings.post.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.settings.post.errors.conflict.description" as const,
+      title: "post.errors.conflict.title" as const,
+      description: "post.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.agent.chat.settings.post.success.title" as const,
-    description:
-      "app.api.agent.chat.settings.post.success.description" as const,
+    title: "post.success.title" as const,
+    description: "post.success.description" as const,
   },
 
   examples: {
@@ -376,7 +349,7 @@ export type ChatSettingsUpdateRequestInput = typeof POST.types.RequestInput;
 export type ChatSettingsUpdateRequestOutput = typeof POST.types.RequestOutput;
 export type ChatSettingsUpdateResponseOutput = typeof POST.types.ResponseOutput;
 export type ToolConfigItem = NonNullable<
-  ChatSettingsUpdateRequestInput["activeTools"]
+  ChatSettingsUpdateRequestInput["allowedTools"]
 >[number];
 const definitions = { GET, POST };
 export default definitions;

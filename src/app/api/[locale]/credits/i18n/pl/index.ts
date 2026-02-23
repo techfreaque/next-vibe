@@ -3,6 +3,10 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Kredyty",
+  tags: {
+    credits: "kredyty",
+    balance: "saldo",
+  },
   purchase: purchaseTranslations,
   repository: {
     tts: "Tekst na mowę",
@@ -38,6 +42,45 @@ export const translations: typeof enTranslations = {
     },
   },
   expire: {
+    post: {
+      title: "Wygaś kredyty",
+      description:
+        "Wygasza stare kredyty subskrypcyjne (wywoływane przez cron)",
+      tag: "wygaśnięcie",
+      container: {
+        title: "Wygaś kredyty",
+        description: "Wyniki wygasania kredytów",
+      },
+      response: {
+        expiredCount: "Liczba wygasłych",
+      },
+      success: {
+        title: "Kredyty wygasły",
+        description: "Stare kredyty subskrypcyjne wygasły pomyślnie",
+      },
+      errors: {
+        unauthorized: {
+          title: "Nieautoryzowany",
+          description: "Wymagane uwierzytelnienie",
+        },
+        forbidden: {
+          title: "Zabronione",
+          description: "Odmowa dostępu",
+        },
+        server: {
+          title: "Błąd serwera",
+          description: "Nie udało się wygasić kredytów",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieoczekiwany błąd",
+        },
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe parametry żądania",
+        },
+      },
+    },
     task: {
       description: "Wygasa stare kredyty subskrypcyjne codziennie",
       error: "Nie udało się wygasić kredytów",

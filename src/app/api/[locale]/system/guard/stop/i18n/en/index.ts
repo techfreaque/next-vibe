@@ -1,4 +1,6 @@
 export const translations = {
+  category: "System Guard",
+
   title: "Stop Guard",
   description: "Stop guard environments for VSCode projects",
   tag: "guard",

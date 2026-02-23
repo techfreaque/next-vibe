@@ -15,7 +15,10 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type endpoints from "./definition";
+import type { scopedTranslation } from "./i18n";
 import { seedDatabase } from "./seed-manager";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 type RequestType = typeof endpoints.POST.types.RequestOutput;
 type SeedResponseType = typeof endpoints.POST.types.ResponseOutput;
@@ -27,6 +30,7 @@ export interface SeedRepositoryInterface {
   execute(
     data: RequestType,
     locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<SeedResponseType>>;
 }
@@ -38,6 +42,7 @@ export class SeedRepositoryImpl implements SeedRepositoryInterface {
   async execute(
     data: RequestType,
     locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<SeedResponseType>> {
     const startTime = Date.now();
@@ -93,7 +98,7 @@ export class SeedRepositoryImpl implements SeedRepositoryInterface {
         const error = parseError(seedError);
         logger.error("❌ seedDatabase function failed:", error);
         return fail({
-          message: "app.api.system.db.seed.post.errors.server.title",
+          message: t("post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: error.message },
         });
@@ -135,7 +140,7 @@ export class SeedRepositoryImpl implements SeedRepositoryInterface {
       parseError(error);
 
       return fail({
-        message: "app.api.system.db.seed.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

@@ -6,10 +6,10 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import {
-  requestResponseField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestResponseField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -26,22 +26,20 @@ import {
   PaymentMethodType,
   PaymentMethodTypeOptions,
 } from "./enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * GET endpoint for retrieving payment information
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["payment"],
-  title: "app.api.payment.get.title" as const,
-  description: "app.api.payment.get.description" as const,
+  title: "get.title" as const,
+  description: "get.description" as const,
   icon: "credit-card",
-  category: "app.api.payment.category" as const,
-  tags: [
-    "app.api.payment.tags.payment" as const,
-    "app.api.payment.tags.stripe" as const,
-    "app.api.payment.tags.info" as const,
-  ],
+  category: "category" as const,
+  tags: ["tags.payment" as const, "tags.stripe" as const, "tags.info" as const],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
@@ -49,128 +47,123 @@ const { GET } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
   ] as const,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.payment.form.title" as const,
-      description: "app.api.payment.form.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { response: true },
-    {
-      priceId: responseField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "form.title" as const,
+    description: "form.description" as const,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { response: true },
+    children: {
+      priceId: scopedResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.payment.priceId.label" as const,
-        description: "app.api.payment.priceId.description" as const,
-        placeholder: "app.api.payment.priceId.placeholder" as const,
+        label: "priceId.label" as const,
+        description: "priceId.description" as const,
+        placeholder: "priceId.placeholder" as const,
         columns: 12,
         schema: z.string().min(1),
       }),
-      mode: responseField({
+      mode: scopedResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.payment.mode.label" as const,
-        description: "app.api.payment.mode.description" as const,
+        label: "mode.label" as const,
+        description: "mode.description" as const,
         options: CheckoutModeOptions,
         columns: 12,
         schema: z.enum(CheckoutMode),
       }),
-      paymentMethodTypes: responseField({
+      paymentMethodTypes: scopedResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label: "app.api.payment.create.paymentMethodTypes.label" as const,
-        description:
-          "app.api.payment.create.paymentMethodTypes.description" as const,
+        label: "create.paymentMethodTypes.label" as const,
+        description: "create.paymentMethodTypes.description" as const,
         options: PaymentMethodTypeOptions,
         columns: 12,
         schema: z.array(z.enum(PaymentMethodType)).optional(),
       }),
-      successUrl: responseField({
+      successUrl: scopedResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.URL,
-        label: "app.api.payment.create.successUrl.label" as const,
-        description: "app.api.payment.create.successUrl.description" as const,
-        placeholder: "app.api.payment.create.successUrl.placeholder" as const,
+        label: "create.successUrl.label" as const,
+        description: "create.successUrl.description" as const,
+        placeholder: "create.successUrl.placeholder" as const,
         columns: 6,
         schema: z.string().url().optional(),
       }),
-      cancelUrl: responseField({
+      cancelUrl: scopedResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.URL,
-        label: "app.api.payment.create.cancelUrl.label" as const,
-        description: "app.api.payment.create.cancelUrl.description" as const,
-        placeholder: "app.api.payment.create.cancelUrl.placeholder" as const,
+        label: "create.cancelUrl.label" as const,
+        description: "create.cancelUrl.description" as const,
+        placeholder: "create.cancelUrl.placeholder" as const,
         columns: 6,
         schema: z.string().url().optional(),
       }),
-      customerEmail: responseField({
+      customerEmail: scopedResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
-        label: "app.api.payment.create.customerEmail.label" as const,
-        description:
-          "app.api.payment.create.customerEmail.description" as const,
-        placeholder:
-          "app.api.payment.create.customerEmail.placeholder" as const,
+        label: "create.customerEmail.label" as const,
+        description: "create.customerEmail.description" as const,
+        placeholder: "create.customerEmail.placeholder" as const,
         columns: 12,
         schema: z.string().email().optional(),
       }),
-      sessionUrl: responseField({
+      sessionUrl: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.payment.get.response.sessionUrl" as const,
+        content: "get.response.sessionUrl" as const,
         schema: z.string().url(),
       }),
-      sessionId: responseField({
+      sessionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.payment.get.response.sessionId" as const,
+        content: "get.response.sessionId" as const,
         schema: z.string(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.payment.errors.validation.title" as const,
-      description: "app.api.payment.errors.validation.description" as const,
+      title: "errors.validation.title" as const,
+      description: "errors.validation.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.payment.errors.notFound.title" as const,
-      description: "app.api.payment.errors.notFound.description" as const,
+      title: "errors.notFound.title" as const,
+      description: "errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.payment.errors.unauthorized.title" as const,
-      description: "app.api.payment.errors.unauthorized.description" as const,
+      title: "errors.unauthorized.title" as const,
+      description: "errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.payment.errors.forbidden.title" as const,
-      description: "app.api.payment.errors.forbidden.description" as const,
+      title: "errors.forbidden.title" as const,
+      description: "errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.payment.errors.server.title" as const,
-      description: "app.api.payment.errors.server.description" as const,
+      title: "errors.server.title" as const,
+      description: "errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.payment.errors.network.title" as const,
-      description: "app.api.payment.errors.network.description" as const,
+      title: "errors.network.title" as const,
+      description: "errors.network.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.payment.errors.unknown.title" as const,
-      description: "app.api.payment.errors.unknown.description" as const,
+      title: "errors.unknown.title" as const,
+      description: "errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.payment.errors.unsavedChanges.title" as const,
-      description: "app.api.payment.errors.unsavedChanges.description" as const,
+      title: "errors.unsavedChanges.title" as const,
+      description: "errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.payment.errors.conflict.title" as const,
-      description: "app.api.payment.errors.conflict.description" as const,
+      title: "errors.conflict.title" as const,
+      description: "errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.payment.success.title" as const,
-    description: "app.api.payment.success.description" as const,
+    title: "success.title" as const,
+    description: "success.description" as const,
   },
 
   examples: {
@@ -199,16 +192,17 @@ const { GET } = createEndpoint({
  * POST endpoint for creating payment session
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["payment"],
-  title: "app.api.payment.create.title" as const,
-  description: "app.api.payment.create.description" as const,
+  title: "create.title" as const,
+  description: "create.description" as const,
   icon: "shopping-cart",
-  category: "app.api.payment.category" as const,
+  category: "category" as const,
   tags: [
-    "app.api.payment.tags.payment" as const,
-    "app.api.payment.tags.stripe" as const,
-    "app.api.payment.tags.checkout" as const,
+    "tags.payment" as const,
+    "tags.stripe" as const,
+    "tags.checkout" as const,
   ],
   allowedRoles: [
     UserRole.CUSTOMER,
@@ -217,133 +211,128 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
   ] as const,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.payment.form.title" as const,
-      description: "app.api.payment.form.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      priceId: requestResponseField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "form.title" as const,
+    description: "form.description" as const,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      priceId: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.payment.priceId.label" as const,
-        description: "app.api.payment.priceId.description" as const,
-        placeholder: "app.api.payment.priceId.placeholder" as const,
+        label: "priceId.label" as const,
+        description: "priceId.description" as const,
+        placeholder: "priceId.placeholder" as const,
         columns: 12,
         schema: z.string().min(1),
       }),
-      mode: requestResponseField({
+      mode: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.payment.mode.label" as const,
-        description: "app.api.payment.mode.description" as const,
+        label: "mode.label" as const,
+        description: "mode.description" as const,
         options: CheckoutModeOptions,
         columns: 12,
         schema: z.enum(CheckoutMode),
       }),
-      paymentMethodTypes: requestResponseField({
+      paymentMethodTypes: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label: "app.api.payment.create.paymentMethodTypes.label" as const,
-        description:
-          "app.api.payment.create.paymentMethodTypes.description" as const,
+        label: "create.paymentMethodTypes.label" as const,
+        description: "create.paymentMethodTypes.description" as const,
         options: PaymentMethodTypeOptions,
         columns: 12,
         schema: z.array(z.enum(PaymentMethodType)).optional(),
       }),
-      successUrl: requestResponseField({
+      successUrl: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.URL,
-        label: "app.api.payment.create.successUrl.label" as const,
-        description: "app.api.payment.create.successUrl.description" as const,
-        placeholder: "app.api.payment.create.successUrl.placeholder" as const,
+        label: "create.successUrl.label" as const,
+        description: "create.successUrl.description" as const,
+        placeholder: "create.successUrl.placeholder" as const,
         columns: 6,
         schema: z.string().url().optional(),
       }),
-      cancelUrl: requestResponseField({
+      cancelUrl: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.URL,
-        label: "app.api.payment.create.cancelUrl.label" as const,
-        description: "app.api.payment.create.cancelUrl.description" as const,
-        placeholder: "app.api.payment.create.cancelUrl.placeholder" as const,
+        label: "create.cancelUrl.label" as const,
+        description: "create.cancelUrl.description" as const,
+        placeholder: "create.cancelUrl.placeholder" as const,
         columns: 6,
         schema: z.string().url().optional(),
       }),
-      customerEmail: requestResponseField({
+      customerEmail: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
-        label: "app.api.payment.create.customerEmail.label" as const,
-        description:
-          "app.api.payment.create.customerEmail.description" as const,
-        placeholder:
-          "app.api.payment.create.customerEmail.placeholder" as const,
+        label: "create.customerEmail.label" as const,
+        description: "create.customerEmail.description" as const,
+        placeholder: "create.customerEmail.placeholder" as const,
         columns: 12,
         schema: z.string().email().optional(),
       }),
-      sessionUrl: responseField({
+      sessionUrl: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.payment.get.response.sessionUrl" as const,
+        content: "get.response.sessionUrl" as const,
         schema: z.string().url(),
       }),
-      sessionId: responseField({
+      sessionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.payment.get.response.sessionId" as const,
+        content: "get.response.sessionId" as const,
         schema: z.string(),
       }),
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.payment.create.success.message" as const,
+        content: "create.success.message" as const,
         schema: z.string(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.payment.errors.validation.title" as const,
-      description: "app.api.payment.errors.validation.description" as const,
+      title: "errors.validation.title" as const,
+      description: "errors.validation.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.payment.errors.notFound.title" as const,
-      description: "app.api.payment.errors.notFound.description" as const,
+      title: "errors.notFound.title" as const,
+      description: "errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.payment.errors.unauthorized.title" as const,
-      description: "app.api.payment.errors.unauthorized.description" as const,
+      title: "errors.unauthorized.title" as const,
+      description: "errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.payment.errors.forbidden.title" as const,
-      description: "app.api.payment.errors.forbidden.description" as const,
+      title: "errors.forbidden.title" as const,
+      description: "errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.payment.errors.server.title" as const,
-      description: "app.api.payment.errors.server.description" as const,
+      title: "errors.server.title" as const,
+      description: "errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.payment.errors.network.title" as const,
-      description: "app.api.payment.errors.network.description" as const,
+      title: "errors.network.title" as const,
+      description: "errors.network.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.payment.errors.unknown.title" as const,
-      description: "app.api.payment.errors.unknown.description" as const,
+      title: "errors.unknown.title" as const,
+      description: "errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.payment.errors.unsavedChanges.title" as const,
-      description: "app.api.payment.errors.unsavedChanges.description" as const,
+      title: "errors.unsavedChanges.title" as const,
+      description: "errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.payment.errors.conflict.title" as const,
-      description: "app.api.payment.errors.conflict.description" as const,
+      title: "errors.conflict.title" as const,
+      description: "errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.payment.success.title" as const,
-    description: "app.api.payment.success.description" as const,
+    title: "success.title" as const,
+    description: "success.description" as const,
   },
 
   examples: {

@@ -13,8 +13,8 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, logger }) => {
-      return await leadSearchRepository.searchLeads(data, logger);
+    handler: async ({ data, t, logger, locale }) => {
+      return await leadSearchRepository.searchLeads(data, t, logger, locale);
     },
   },
 });

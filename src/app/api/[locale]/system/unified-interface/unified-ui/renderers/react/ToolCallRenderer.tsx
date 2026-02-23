@@ -53,6 +53,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { NavigationStackProvider } from "../../../react/hooks/use-navigation-stack";
+import { scopedTranslation as reactScopedTranslation } from "../../../react/i18n";
 import { EndpointRenderer } from "./EndpointRenderer";
 
 type ToolDecision =
@@ -118,7 +119,8 @@ export function ToolCallRenderer({
   decision,
   logger,
 }: ToolCallRendererProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = reactScopedTranslation.scopedT(locale);
+  const { t: globalT } = simpleT(locale);
   const { sendMessage } = useChatContext();
 
   // Determine if tool is waiting for user confirmation
@@ -341,7 +343,7 @@ export function ToolCallRenderer({
   const icon = definition?.icon;
   const credits = definition?.credits ?? toolCall.creditsUsed ?? 0;
   const creditsDisplay = credits
-    ? t(
+    ? globalT(
         credits === 1
           ? "app.chat.toolCall.creditsUsed_one"
           : "app.chat.toolCall.creditsUsed_other",
@@ -410,45 +412,33 @@ export function ToolCallRenderer({
               )}
               {hasError && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive">
-                  {t(
-                    "app.api.system.unifiedInterface.react.widgets.toolCall.status.error",
-                  )}
+                  {t("widgets.toolCall.status.error")}
                 </Span>
               )}
               {isWaitingForConfirmation && decision?.type === "confirmed" && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-500">
-                  {t(
-                    "app.api.system.unifiedInterface.react.widgets.toolCall.status.pendingConfirmation",
-                  )}
+                  {t("widgets.toolCall.status.pendingConfirmation")}
                 </Span>
               )}
               {isWaitingForConfirmation && decision?.type === "declined" && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-red-500/10 text-red-600 dark:text-red-500">
-                  {t(
-                    "app.api.system.unifiedInterface.react.widgets.toolCall.status.pendingCancellation",
-                  )}
+                  {t("widgets.toolCall.status.pendingCancellation")}
                 </Span>
               )}
               {isWaitingForConfirmation &&
                 (!decision || decision.type === "pending") && (
                   <Span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-500">
-                    {t(
-                      "app.api.system.unifiedInterface.react.widgets.toolCall.status.waitingForConfirmation",
-                    )}
+                    {t("widgets.toolCall.status.waitingForConfirmation")}
                   </Span>
                 )}
               {isLoading && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500">
-                  {t(
-                    "app.api.system.unifiedInterface.react.widgets.toolCall.status.executing",
-                  )}
+                  {t("widgets.toolCall.status.executing")}
                 </Span>
               )}
               {hasResult && !hasError && !isWaitingForConfirmation && (
                 <Span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-500">
-                  {t(
-                    "app.api.system.unifiedInterface.react.widgets.toolCall.status.complete",
-                  )}
+                  {t("widgets.toolCall.status.complete")}
                 </Span>
               )}
             </Div>
@@ -462,11 +452,7 @@ export function ToolCallRenderer({
             {isLoading && (
               <Div className="flex items-center gap-2 text-sm text-muted-foreground p-4">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                <Span>
-                  {t(
-                    "app.api.system.unifiedInterface.react.widgets.toolCall.messages.executingTool",
-                  )}
-                </Span>
+                <Span>{t("widgets.toolCall.messages.executingTool")}</Span>
               </Div>
             )}
 
@@ -479,13 +465,11 @@ export function ToolCallRenderer({
                   <Div className="rounded-md bg-destructive/10 border border-destructive/20 p-3">
                     <Div className="flex items-start gap-2">
                       <Span className="text-destructive text-sm font-medium">
-                        {t(
-                          "app.api.system.unifiedInterface.react.widgets.toolCall.messages.errorLabel",
-                        )}
+                        {t("widgets.toolCall.messages.errorLabel")}
                       </Span>
                       <Span className="text-destructive text-sm">
                         {toolCall.error
-                          ? t(
+                          ? globalT(
                               toolCall.error.message,
                               toolCall.error.messageParams as
                                 | Record<string, string | number>
@@ -606,9 +590,7 @@ export function ToolCallRenderer({
                     {isWaitingForConfirmation && isPendingConfirm && (
                       <Div className="rounded-md bg-green-500/10 border border-green-500/20 p-3">
                         <Span className="text-green-600 dark:text-green-500 text-sm font-medium">
-                          {t(
-                            "app.api.system.unifiedInterface.react.widgets.toolCall.status.pendingConfirmation",
-                          )}
+                          {t("widgets.toolCall.status.pendingConfirmation")}
                         </Span>
                       </Div>
                     )}
@@ -617,9 +599,7 @@ export function ToolCallRenderer({
                     {isWaitingForConfirmation && isPendingCancel && (
                       <Div className="rounded-md bg-red-500/10 border border-red-500/20 p-3">
                         <Span className="text-red-600 dark:text-red-500 text-sm font-medium">
-                          {t(
-                            "app.api.system.unifiedInterface.react.widgets.toolCall.status.pendingCancellation",
-                          )}
+                          {t("widgets.toolCall.status.pendingCancellation")}
                         </Span>
                       </Div>
                     )}
@@ -631,7 +611,7 @@ export function ToolCallRenderer({
                         <Div className="rounded-md bg-amber-500/10 border border-amber-500/20 p-3">
                           <Span className="text-amber-600 dark:text-amber-500 text-sm font-medium">
                             {t(
-                              "app.api.system.unifiedInterface.react.widgets.toolCall.messages.confirmationRequired",
+                              "widgets.toolCall.messages.confirmationRequired",
                             )}
                           </Span>
                         </Div>
@@ -642,7 +622,7 @@ export function ToolCallRenderer({
                       <Div className="rounded-md bg-destructive/10 border border-destructive/20 p-3">
                         <Span className="text-destructive text-sm font-medium">
                           {toolCall.error
-                            ? t(
+                            ? globalT(
                                 toolCall.error.message,
                                 toolCall.error.messageParams as
                                   | Record<string, string | number>

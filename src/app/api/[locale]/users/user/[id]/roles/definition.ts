@@ -7,11 +7,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  requestUrlPathParamsField,
-  responseField,
-  submitButton,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedRequestUrlPathParamsField,
+  scopedResponseField,
+  scopedSubmitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -27,137 +27,119 @@ import {
   UserRoleDB,
 } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * Add Role Endpoint Definition (POST)
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["users", "user", "[id]", "roles"],
-  title: "app.api.users.user.id.roles.post.title" as const,
-  description: "app.api.users.user.id.roles.post.description" as const,
+  title: "roles.post.title" as const,
+  description: "roles.post.description" as const,
   icon: "shield" as const,
-  category: "app.api.user.category" as const,
-  tags: ["app.api.users.user.tag" as const],
+  category: "category" as const,
+  tags: ["category" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.users.user.id.roles.post.container.title" as const,
-      description:
-        "app.api.users.user.id.roles.post.container.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data&urlPathParams", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "roles.post.container.title" as const,
+    description: "roles.post.container.description" as const,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data&urlPathParams", response: true },
+    children: {
       // === URL PARAMS ===
-      id: requestUrlPathParamsField({
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label: "app.api.users.user.id.roles.post.id.label" as const,
-        description: "app.api.users.user.id.roles.post.id.description" as const,
-        placeholder: "app.api.users.user.id.roles.post.id.placeholder" as const,
+        label: "roles.post.id.label" as const,
+        description: "roles.post.id.description" as const,
+        placeholder: "roles.post.id.placeholder" as const,
         columns: 12,
         schema: z.string().uuid("usersErrors.validation.id.invalid"),
       }),
 
       // === REQUEST BODY ===
-      role: requestField({
+      role: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.users.user.id.roles.post.role.label" as const,
-        description:
-          "app.api.users.user.id.roles.post.role.description" as const,
-        placeholder:
-          "app.api.users.user.id.roles.post.role.placeholder" as const,
+        label: "roles.post.role.label" as const,
+        description: "roles.post.role.description" as const,
+        placeholder: "roles.post.role.placeholder" as const,
         columns: 12,
         options: UserPermissionRoleOptions,
         schema: z.enum(UserRoleDB),
       }),
 
-      submitButton: submitButton({
-        label: "app.api.users.user.id.roles.post.submit.label" as const,
+      submitButton: scopedSubmitButton(scopedTranslation, {
+        label: "roles.post.submit.label" as const,
         inline: true,
         usage: { request: "data" },
       }),
 
       // === RESPONSE ===
-      roleId: responseField({
+      roleId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.users.user.id.roles.post.response.roleId.content" as const,
+        content: "roles.post.response.roleId.content" as const,
         schema: z.string().uuid().describe("Role assignment ID"),
       }),
-      userId: responseField({
+      userId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.users.user.id.roles.post.response.userId.content" as const,
+        content: "roles.post.response.userId.content" as const,
         schema: z.string().uuid().describe("User ID"),
       }),
-      assignedRole: responseField({
+      assignedRole: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.users.user.id.roles.post.response.assignedRole.content" as const,
+        content: "roles.post.response.assignedRole.content" as const,
         schema: z.string().describe("Assigned role"),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.users.user.id.roles.post.errors.unauthorized.title" as const,
-      description:
-        "app.api.users.user.id.roles.post.errors.unauthorized.description" as const,
+      title: "roles.post.errors.unauthorized.title" as const,
+      description: "roles.post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.users.user.id.roles.post.errors.validation.title" as const,
-      description:
-        "app.api.users.user.id.roles.post.errors.validation.description" as const,
+      title: "roles.post.errors.validation.title" as const,
+      description: "roles.post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.users.user.id.roles.post.errors.forbidden.title" as const,
-      description:
-        "app.api.users.user.id.roles.post.errors.forbidden.description" as const,
+      title: "roles.post.errors.forbidden.title" as const,
+      description: "roles.post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.users.user.id.roles.post.errors.notFound.title" as const,
-      description:
-        "app.api.users.user.id.roles.post.errors.notFound.description" as const,
+      title: "roles.post.errors.notFound.title" as const,
+      description: "roles.post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.users.user.id.roles.post.errors.conflict.title" as const,
-      description:
-        "app.api.users.user.id.roles.post.errors.conflict.description" as const,
+      title: "roles.post.errors.conflict.title" as const,
+      description: "roles.post.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.users.user.id.roles.post.errors.network.title" as const,
-      description:
-        "app.api.users.user.id.roles.post.errors.network.description" as const,
+      title: "roles.post.errors.network.title" as const,
+      description: "roles.post.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.users.user.id.roles.post.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.users.user.id.roles.post.errors.unsavedChanges.description" as const,
+      title: "roles.post.errors.unsavedChanges.title" as const,
+      description: "roles.post.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.users.user.id.roles.post.errors.server.title" as const,
-      description:
-        "app.api.users.user.id.roles.post.errors.server.description" as const,
+      title: "roles.post.errors.server.title" as const,
+      description: "roles.post.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.users.user.id.roles.post.errors.unknown.title" as const,
-      description:
-        "app.api.users.user.id.roles.post.errors.unknown.description" as const,
+      title: "roles.post.errors.unknown.title" as const,
+      description: "roles.post.errors.unknown.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.users.user.id.roles.post.success.title" as const,
-    description:
-      "app.api.users.user.id.roles.post.success.description" as const,
+    title: "roles.post.success.title" as const,
+    description: "roles.post.success.description" as const,
   },
 
   examples: {
@@ -188,125 +170,103 @@ const { POST } = createEndpoint({
  * Remove Role Endpoint Definition (DELETE)
  */
 const { DELETE } = createEndpoint({
+  scopedTranslation,
   method: Methods.DELETE,
   path: ["users", "user", "[id]", "roles"],
-  title: "app.api.users.user.id.roles.delete.title" as const,
-  description: "app.api.users.user.id.roles.delete.description" as const,
+  title: "roles.delete.title" as const,
+  description: "roles.delete.description" as const,
   icon: "shield" as const,
-  category: "app.api.user.category" as const,
-  tags: ["app.api.users.user.tag" as const],
+  category: "category" as const,
+  tags: ["category" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.users.user.id.roles.delete.container.title" as const,
-      description:
-        "app.api.users.user.id.roles.delete.container.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data&urlPathParams", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "roles.delete.container.title" as const,
+    description: "roles.delete.container.description" as const,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data&urlPathParams", response: true },
+    children: {
       // === URL PARAMS ===
-      id: requestUrlPathParamsField({
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label: "app.api.users.user.id.roles.delete.id.label" as const,
-        description:
-          "app.api.users.user.id.roles.delete.id.description" as const,
-        placeholder:
-          "app.api.users.user.id.roles.delete.id.placeholder" as const,
+        label: "roles.delete.id.label" as const,
+        description: "roles.delete.id.description" as const,
+        placeholder: "roles.delete.id.placeholder" as const,
         columns: 12,
         schema: z.string().uuid("usersErrors.validation.id.invalid"),
       }),
 
       // === REQUEST BODY ===
-      role: requestField({
+      role: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.users.user.id.roles.delete.role.label" as const,
-        description:
-          "app.api.users.user.id.roles.delete.role.description" as const,
-        placeholder:
-          "app.api.users.user.id.roles.delete.role.placeholder" as const,
+        label: "roles.delete.role.label" as const,
+        description: "roles.delete.role.description" as const,
+        placeholder: "roles.delete.role.placeholder" as const,
         columns: 12,
         options: UserPermissionRoleOptions,
         schema: z.enum(UserRoleDB),
       }),
 
-      submitButton: submitButton({
-        label: "app.api.users.user.id.roles.delete.submit.label" as const,
+      submitButton: scopedSubmitButton(scopedTranslation, {
+        label: "roles.delete.submit.label" as const,
         inline: true,
         usage: { request: "data" },
       }),
 
       // === RESPONSE ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        text: "app.api.users.user.id.roles.delete.response.success.content" as const,
+        text: "roles.delete.response.success.content" as const,
         schema: z.boolean().describe("Whether the role was removed"),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.users.user.id.roles.delete.errors.unauthorized.title" as const,
-      description:
-        "app.api.users.user.id.roles.delete.errors.unauthorized.description" as const,
+      title: "roles.delete.errors.unauthorized.title" as const,
+      description: "roles.delete.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.users.user.id.roles.delete.errors.validation.title" as const,
-      description:
-        "app.api.users.user.id.roles.delete.errors.validation.description" as const,
+      title: "roles.delete.errors.validation.title" as const,
+      description: "roles.delete.errors.validation.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.users.user.id.roles.delete.errors.forbidden.title" as const,
-      description:
-        "app.api.users.user.id.roles.delete.errors.forbidden.description" as const,
+      title: "roles.delete.errors.forbidden.title" as const,
+      description: "roles.delete.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.users.user.id.roles.delete.errors.notFound.title" as const,
-      description:
-        "app.api.users.user.id.roles.delete.errors.notFound.description" as const,
+      title: "roles.delete.errors.notFound.title" as const,
+      description: "roles.delete.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.users.user.id.roles.delete.errors.conflict.title" as const,
-      description:
-        "app.api.users.user.id.roles.delete.errors.conflict.description" as const,
+      title: "roles.delete.errors.conflict.title" as const,
+      description: "roles.delete.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.users.user.id.roles.delete.errors.network.title" as const,
-      description:
-        "app.api.users.user.id.roles.delete.errors.network.description" as const,
+      title: "roles.delete.errors.network.title" as const,
+      description: "roles.delete.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.users.user.id.roles.delete.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.users.user.id.roles.delete.errors.unsavedChanges.description" as const,
+      title: "roles.delete.errors.unsavedChanges.title" as const,
+      description: "roles.delete.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.users.user.id.roles.delete.errors.server.title" as const,
-      description:
-        "app.api.users.user.id.roles.delete.errors.server.description" as const,
+      title: "roles.delete.errors.server.title" as const,
+      description: "roles.delete.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.users.user.id.roles.delete.errors.unknown.title" as const,
-      description:
-        "app.api.users.user.id.roles.delete.errors.unknown.description" as const,
+      title: "roles.delete.errors.unknown.title" as const,
+      description: "roles.delete.errors.unknown.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.users.user.id.roles.delete.success.title" as const,
-    description:
-      "app.api.users.user.id.roles.delete.success.description" as const,
+    title: "roles.delete.success.title" as const,
+    description: "roles.delete.success.description" as const,
   },
 
   examples: {

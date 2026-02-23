@@ -20,7 +20,7 @@ export const translations = {
   env: envTranslations,
   generateAll: generateAllTranslations,
   generateTrpcRouter: generateTrpcRouterTranslations,
-  "route-handlers": routeHandlersTranslations, // Use kebab-case to match folder name
+  routeHandlers: routeHandlersTranslations,
   seeds: seedsTranslations,
   taskIndex: taskIndexTranslations,
 };

@@ -18,7 +18,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger }) => {
+    handler: async ({ data, locale, logger }) => {
       return await imapFoldersRepository.syncFolders(
         {
           accountId: data.accountId,
@@ -26,6 +26,7 @@ export const { POST, tools } = endpointsHandler({
           folderId: data.folderId,
         },
         logger,
+        locale,
       );
     },
   },

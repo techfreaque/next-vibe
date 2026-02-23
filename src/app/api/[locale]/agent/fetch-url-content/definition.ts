@@ -8,9 +8,9 @@ import { z } from "zod";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,21 +21,24 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 export const FETCH_URL_ALIAS = "fetch-url-content" as const;
 
 /**
  * GET /fetch_url_content - Fetch and convert URL content to markdown
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["agent", "fetch-url-content"],
-  title: "app.api.agent.chat.tools.fetchUrl.get.title" as const,
-  description: "app.api.agent.chat.tools.fetchUrl.get.description" as const,
-  category: "app.api.agent.chat.category" as const,
+  title: "get.title" as const,
+  description: "get.description" as const,
+  category: "category" as const,
   tags: [
-    "app.api.agent.chat.tools.fetchUrl.tags.scraping" as const,
-    "app.api.agent.chat.tools.fetchUrl.tags.web" as const,
-    "app.api.agent.chat.tools.fetchUrl.tags.content" as const,
+    "tags.scraping" as const,
+    "tags.web" as const,
+    "tags.content" as const,
   ],
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
@@ -58,141 +61,111 @@ const { GET } = createEndpoint({
   credits: FEATURE_COSTS.FETCH_URL_CONTENT, // 0.13 credits per fetch
   icon: "globe",
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      linkable: true,
-      title: "app.api.agent.chat.tools.fetchUrl.get.form.title" as const,
-      description:
-        "app.api.agent.chat.tools.fetchUrl.get.form.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    linkable: true,
+    title: "get.form.title" as const,
+    description: "get.form.description" as const,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      url: requestField({
+      url: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.agent.chat.tools.fetchUrl.get.fields.url.title" as const,
-        description:
-          "app.api.agent.chat.tools.fetchUrl.get.fields.url.description" as const,
-        placeholder:
-          "app.api.agent.chat.tools.fetchUrl.get.fields.url.placeholder" as const,
+        label: "get.fields.url.title" as const,
+        description: "get.fields.url.description" as const,
+        placeholder: "get.fields.url.placeholder" as const,
         columns: 12,
         schema: z.string().url().min(1),
       }),
 
       // === RESPONSE FIELDS ===
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.tools.fetchUrl.get.response.message.title" as const,
+        content: "get.response.message.title" as const,
         columns: 12,
         schema: z.string(),
       }),
 
-      fetchedUrl: responseField({
+      fetchedUrl: scopedResponseField(scopedTranslation, {
         type: WidgetType.LINK,
         href: "/{fetchedUrl}",
-        text: "app.api.agent.chat.tools.fetchUrl.get.response.url.title" as const,
+        text: "get.response.url.title" as const,
         external: true,
         columns: 12,
         schema: z.string(),
       }),
 
-      content: responseField({
+      content: scopedResponseField(scopedTranslation, {
         type: WidgetType.MARKDOWN,
-        label:
-          "app.api.agent.chat.tools.fetchUrl.get.response.content.title" as const,
-        description:
-          "app.api.agent.chat.tools.fetchUrl.get.response.content.description" as const,
+        label: "get.response.content.title" as const,
+        description: "get.response.content.description" as const,
         columns: 12,
         schema: z.string(),
       }),
 
-      statusCode: responseField({
+      statusCode: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.tools.fetchUrl.get.response.statusCode.title" as const,
+        content: "get.response.statusCode.title" as const,
         columns: 6,
         schema: z.number().optional(),
       }),
 
-      timeElapsed: responseField({
+      timeElapsed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.tools.fetchUrl.get.response.timeElapsed.title" as const,
+        content: "get.response.timeElapsed.title" as const,
         columns: 6,
         schema: z.number().optional(),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.tools.fetchUrl.get.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.tools.fetchUrl.get.errors.validation.description" as const,
+      title: "get.errors.validation.title" as const,
+      description: "get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
-      description:
-        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
+      title: "get.errors.internal.title" as const,
+      description: "get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
-      description:
-        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
+      title: "get.errors.internal.title" as const,
+      description: "get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
-      description:
-        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
+      title: "get.errors.internal.title" as const,
+      description: "get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
-      description:
-        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
+      title: "get.errors.internal.title" as const,
+      description: "get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
-      description:
-        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
+      title: "get.errors.internal.title" as const,
+      description: "get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.threads.search.get.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.chat.threads.search.get.errors.unsavedChanges.description" as const,
+      title: "get.errors.internal.title" as const,
+      description: "get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
-      description:
-        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
+      title: "get.errors.internal.title" as const,
+      description: "get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
-      description:
-        "app.api.agent.chat.tools.fetchUrl.get.errors.internal.description" as const,
+      title: "get.errors.internal.title" as const,
+      description: "get.errors.internal.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.agent.chat.tools.fetchUrl.get.success.title" as const,
-    description:
-      "app.api.agent.chat.tools.fetchUrl.get.success.description" as const,
+    title: "get.success.title" as const,
+    description: "get.success.description" as const,
   },
 
   // === EXAMPLES ===

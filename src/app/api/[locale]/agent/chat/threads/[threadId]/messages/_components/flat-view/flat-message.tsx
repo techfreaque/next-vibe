@@ -71,7 +71,6 @@ export function FlatMessage({
   onSetHoveredRef,
   onSetHoveredUserId,
   collapseState,
-  currentUserId,
   user,
 }: FlatMessageProps): JSX.Element {
   // Get callbacks and state from context
@@ -80,6 +79,7 @@ export function FlatMessage({
     retryMessage: onRetryMessage,
     answerAsAI: onAnswerAsModel,
     handleDeleteMessage: onDeleteMessage,
+    currentRootFolderId: rootFolderId,
   } = useChatContext();
   const { t } = simpleT(locale);
 
@@ -111,27 +111,24 @@ export function FlatMessage({
       : null;
   const modelDisplayName =
     modelData?.name || t("app.chat.flatView.assistantFallback");
-  // Get character name from characters map (fetched from server) and translate it
+  // Get character name from characters map
   const characterName = character.read?.data?.name;
   const characterDisplayName =
     (message.role === "user" || message.role === "assistant") &&
     message.character &&
     characterName
-      ? t(characterName)
+      ? characterName
       : t("app.chat.flatView.anonymous");
 
   // Determine display name for user messages
   let displayName: string;
   if (isUser) {
-    if (currentUserId && message.authorId === currentUserId) {
-      // Current user's messages show "You"
-      displayName = t("app.chat.flatView.youLabel");
-    } else if (message.authorName) {
-      // Other users show their name
-      displayName = message.authorName;
+    if (rootFolderId === "public" || rootFolderId === "shared") {
+      // Public/shared: show stored authorName or Anonymous — ID badge shown separately
+      displayName = message.authorName ?? t("app.chat.flatView.anonymous");
     } else {
-      // No author info - show "Anonymous"
-      displayName = t("app.chat.flatView.anonymous");
+      // Private/incognito/cron: always "You"
+      displayName = t("app.chat.flatView.youLabel");
     }
   } else {
     // AI messages show model name

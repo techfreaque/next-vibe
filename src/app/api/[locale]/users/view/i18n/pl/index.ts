@@ -1,6 +1,12 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Użytkownicy",
+  tags: {
+    user: "Użytkownik",
+    view: "Zobacz",
+  },
+
   badge: "Szczegóły użytkownika",
   get: {
     title: "Zobacz użytkownika",

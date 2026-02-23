@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Benutzerprofil",
+
   tag: "avatar",
   errors: {
     user_not_found: "Benutzer nicht gefunden",
@@ -45,6 +47,8 @@ export const translations: typeof enTranslations = {
         validation: {
           maxSize: "Dateigröße muss unter 5MB sein",
           imageOnly: "Nur Bilddateien sind erlaubt",
+          unsupportedFormat:
+            "Nicht unterstütztes Bildformat. Verwenden Sie JPEG, PNG, WebP oder GIF.",
         },
       },
     },

@@ -1,4 +1,8 @@
 export const translations = {
+  category: "IMAP Management",
+  tags: {
+    accounts: "Accounts",
+  },
   get: {
     title: "Get IMAP Account",
     description: "Retrieve a specific IMAP account by ID",

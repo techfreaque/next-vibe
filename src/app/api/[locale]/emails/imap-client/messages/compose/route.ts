@@ -14,6 +14,6 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger }) => sendComposedEmail(data, logger),
+    handler: ({ data, logger, t }) => sendComposedEmail(data, logger, t),
   },
 });

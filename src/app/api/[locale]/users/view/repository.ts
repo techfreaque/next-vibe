@@ -25,6 +25,7 @@ import {
 } from "@/app/api/[locale]/credits/db";
 import { CreditTransactionTypeDB } from "@/app/api/[locale]/credits/enum";
 import { newsletterSubscriptions } from "@/app/api/[locale]/newsletter/db";
+import { NewsletterSubscriptionStatus } from "@/app/api/[locale]/newsletter/enum";
 import {
   paymentRefunds,
   paymentTransactions,
@@ -40,8 +41,10 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { userRoles, users } from "@/app/api/[locale]/user/db";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { UserViewResponseOutput } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 export class UserViewRepository {
   /**
@@ -51,6 +54,7 @@ export class UserViewRepository {
     userId: string,
     requestingUser: JwtPrivatePayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<UserViewResponseOutput>> {
     try {
       logger.debug("Fetching user view data", {
@@ -66,8 +70,9 @@ export class UserViewRepository {
         .limit(1);
 
       if (!user) {
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.users.view.errors.notFound.title",
+          message: t("errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -127,8 +132,9 @@ export class UserViewRepository {
       });
     } catch (error) {
       logger.error("Error fetching user view data", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.users.view.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -415,7 +421,7 @@ export class UserViewRepository {
 
     return {
       isSubscribed:
-        newsletter.status === "app.api.newsletter.enum.status.subscribed",
+        newsletter.status === NewsletterSubscriptionStatus.SUBSCRIBED,
       subscribedAt: newsletter.subscriptionDate,
       confirmedAt: newsletter.confirmedAt,
       lastEmailSentAt: newsletter.lastEmailSentDate,

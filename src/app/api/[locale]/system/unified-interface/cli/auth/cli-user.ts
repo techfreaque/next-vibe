@@ -10,13 +10,18 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type {
+  JwtPayloadType,
+  JWTPublicPayloadType,
+} from "@/app/api/[locale]/user/auth/types";
 import {
   UserPermissionRole,
   type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
+
+import { scopedTranslation as cliScopedTranslation } from "../i18n";
 
 /**
  * Default CLI user configuration
@@ -49,13 +54,12 @@ export function createDefaultCliUser(): InferJwtPayloadTypeFromRoles<
  * Create a public CLI user payload
  * Used when VIBE_ADMIN_USER_EMAIL is not configured
  */
-export function createPublicCliUser(): InferJwtPayloadTypeFromRoles<
-  readonly UserRoleValue[]
-> {
+export function createPublicCliUser(): JWTPublicPayloadType {
   return {
     isPublic: true,
     leadId: DEFAULT_CLI_USER_ID,
-  } as InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>;
+    roles: [UserPermissionRole.PUBLIC],
+  };
 }
 
 /**
@@ -110,7 +114,7 @@ export async function getCliUser(
   // Step 1: Check for existing session from .vibe.session file
   try {
     const { readSessionFile } = await import("./session-file");
-    const sessionResult = await readSessionFile(logger);
+    const sessionResult = await readSessionFile(logger, locale);
 
     if (sessionResult.success && sessionResult.data) {
       // Verify the token is still valid
@@ -119,6 +123,7 @@ export async function getCliUser(
       const verifyResult = await AuthRepository.verifyJwt(
         sessionResult.data.token,
         logger,
+        locale,
       );
 
       if (verifyResult.success && verifyResult.data) {
@@ -173,7 +178,8 @@ export async function getCliUser(
         data: {
           isPublic: true,
           leadId: newLead.id,
-        } as InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
+          roles: [UserPermissionRole.PUBLIC],
+        } satisfies JWTPublicPayloadType,
       };
     } catch (error) {
       logger.error(
@@ -186,7 +192,8 @@ export async function getCliUser(
         data: {
           isPublic: true,
           leadId: DEFAULT_CLI_USER_ID,
-        } as InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
+          roles: [UserPermissionRole.PUBLIC],
+        } satisfies JWTPublicPayloadType,
       };
     }
   }
@@ -211,18 +218,20 @@ export async function getCliUser(
     }
 
     // User not found in database - this is expected for CLI_AUTH_BYPASS routes
+    const { t } = cliScopedTranslation.scopedT(locale);
     return {
       success: false,
-      message: "app.api.system.unifiedInterface.cli.auth.errors.userNotFound",
+      message: t("auth.errors.userNotFound"),
       errorType: ErrorResponseTypes.UNAUTHORIZED,
       messageParams: {
         email: cliUserEmail,
       },
     };
   } catch (error) {
+    const { t } = cliScopedTranslation.scopedT(locale);
     return {
       success: false,
-      message: "app.api.system.unifiedInterface.cli.auth.errors.databaseError",
+      message: t("auth.errors.databaseError"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: {
         error: parseError(error).message,

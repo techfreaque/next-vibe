@@ -15,9 +15,11 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
 import { smsEnv } from "./env";
+import { smsScopedT } from "./i18n";
 import { batchSendSms, sendSms } from "./send-sms";
 import type {
   ProviderBaseOptions,
@@ -29,7 +31,12 @@ import type {
 /**
  * Processes and handles SMS messages triggered by API responses
  */
-export async function handleSms<TRequest, TResponse, TUrlVariables>({
+export async function handleSms<
+  TRequest,
+  TResponse,
+  TUrlVariables,
+  TScopedTranslationKey extends string = TranslationKey,
+>({
   sms,
   user,
   responseData,
@@ -40,16 +47,19 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
   locale,
   logger,
 }: {
-  sms: SmsConfig<TRequest, TResponse, TUrlVariables> | undefined;
+  sms:
+    | SmsConfig<TRequest, TResponse, TUrlVariables, TScopedTranslationKey>
+    | undefined;
   user: JwtPayloadType;
   responseData: TResponse;
   urlPathParams: TUrlVariables;
   requestData: TRequest;
   options?: SmsHandlerOptions;
-  t: TFunction;
+  t: (key: TScopedTranslationKey, params?: TParams) => TranslatedKeyType;
   locale: CountryLanguage;
   logger: EndpointLogger;
 }): Promise<ResponseType<UndefinedType>> {
+  const { t: tSms } = smsScopedT(locale);
   const startTime = options?.logPerformance ? performance.now() : null;
   const errors: ErrorResponseType[] = [];
   let processedCount = 0;
@@ -80,7 +90,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
             if (!smsData.ignoreErrors) {
               errors.push(
                 fail({
-                  message: "app.api.sms.sms.error.rendering_failed",
+                  message: tSms("sms.error.rendering_failed"),
                   errorType: ErrorResponseTypes.SMS_ERROR,
                   messageParams: { error: result.message },
                 }),
@@ -125,13 +135,13 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
               return smsParams;
             });
 
-            const batchResult = await batchSendSms(messages, logger);
+            const batchResult = await batchSendSms(messages, logger, locale);
             processedCount += messages.length;
 
             if (!batchResult.success && !smsData.ignoreErrors) {
               errors.push(
                 fail({
-                  message: "app.api.sms.sms.error.batch_send_failed",
+                  message: tSms("sms.error.batch_send_failed"),
                   errorType: ErrorResponseTypes.SMS_ERROR,
                   messageParams: { error: batchResult.message },
                 }),
@@ -147,13 +157,13 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
                   : result.data.message,
             };
 
-            const smsResponse = await sendSms(smsParams, logger);
+            const smsResponse = await sendSms(smsParams, logger, locale);
             processedCount++;
 
             if (!smsData.ignoreErrors && !smsResponse.success) {
               errors.push(
                 fail({
-                  message: "app.api.sms.sms.error.send_failed",
+                  message: tSms("sms.error.send_failed"),
                   errorType: ErrorResponseTypes.SMS_ERROR,
                   messageParams: { error: smsResponse.message },
                 }),
@@ -167,7 +177,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
           if (!smsData.ignoreErrors) {
             errors.push(
               fail({
-                message: "app.api.sms.sms.error.rendering_failed",
+                message: tSms("sms.error.rendering_failed"),
                 errorType: ErrorResponseTypes.SMS_ERROR,
                 messageParams: { error: parsedError.message },
               }),
@@ -180,7 +190,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
     logger.error("Error sending SMS:", parseError(error));
     errors.push(
       fail({
-        message: "app.api.sms.sms.error.delivery_failed",
+        message: tSms("sms.error.delivery_failed"),
         errorType: ErrorResponseTypes.SMS_ERROR,
         messageParams: { error: parseError(error).message },
       }),
@@ -200,7 +210,7 @@ export async function handleSms<TRequest, TResponse, TUrlVariables>({
       errors: errors.map((e) => e.message),
     });
     return fail({
-      message: "app.api.sms.sms.error.delivery_failed",
+      message: tSms("sms.error.delivery_failed"),
       errorType: ErrorResponseTypes.SMS_ERROR,
       messageParams: { errorCount: errors.length },
     });

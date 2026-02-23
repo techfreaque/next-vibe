@@ -12,4 +12,11 @@ export const translations: typeof enTranslations = {
   sync: syncTranslations,
   compose: composeTranslations,
   bulk: bulkTranslations,
+  errors: {
+    server: { title: "Błąd serwera" },
+    notFound: { title: "Wiadomość nie znaleziona" },
+    accountNotFound: { title: "Konto nie znalezione" },
+    syncFailed: { title: "Synchronizacja nie powiodła się" },
+    syncSuccess: { message: "Wiadomości zsynchronizowane pomyślnie" },
+  },
 };

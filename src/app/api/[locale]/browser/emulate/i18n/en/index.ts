@@ -73,4 +73,9 @@ export const translations = {
     title: "Emulation Successful",
     description: "Device features were emulated successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    performanceAutomation: "Performance Automation",
+  },
 };

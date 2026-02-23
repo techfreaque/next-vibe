@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Users",
+
   title: "Validate Reset Password Token",
   description: "Validate password reset token endpoint",
   tag: "Password Reset Validation",
@@ -14,6 +16,9 @@ export const translations = {
       description: "Password reset token from email",
       placeholder: "Enter reset token",
       help: "Enter the token you received in your email",
+      validation: {
+        required: "Reset token is required",
+      },
     },
   },
   response: {

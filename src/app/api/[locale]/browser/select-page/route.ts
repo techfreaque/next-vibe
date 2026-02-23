@@ -14,7 +14,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: selectPageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger }) =>
+    handler: ({ data, t, logger }) =>
       executeSelectPage<SelectPageResponseOutput>(
         {
           toolName: "select-page",
@@ -22,6 +22,7 @@ export const { POST, tools } = endpointsHandler({
             pageIdx: data.pageIdx,
           }),
         },
+        t,
         logger,
       ),
   },

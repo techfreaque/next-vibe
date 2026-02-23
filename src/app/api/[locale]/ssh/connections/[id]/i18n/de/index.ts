@@ -1,4 +1,10 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    connectionNotFound: "Verbindung nicht gefunden",
+  },
+
   get: {
     title: "SSH-Verbindung",
     description: "SSH-Verbindungsdetails anzeigen",

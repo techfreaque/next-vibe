@@ -16,11 +16,14 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation as sendScopedTranslation } from "../emails/send/i18n";
 import { smsServiceRepository } from "../emails/sms-service/repository";
 import { CampaignType } from "../emails/smtp-client/enum";
 import type { ContactRequestOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * SMS Service Repository Interface for Contact Forms
@@ -31,6 +34,7 @@ export interface ContactSmsService {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>>;
 
   sendConfirmationSms(
@@ -38,6 +42,7 @@ export interface ContactSmsService {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>>;
 }
 
@@ -53,6 +58,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>> {
     try {
       // Get admin phone number from environment or config
@@ -75,10 +81,8 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         adminPhone,
       });
 
-      const message = this.generateAdminNotificationMessage(
-        contactData,
-        locale,
-      );
+      const message = this.generateAdminNotificationMessage(contactData, t);
+      const { t: sendT } = sendScopedTranslation.scopedT(locale);
 
       const smsResult = await smsServiceRepository.sendSms(
         {
@@ -89,11 +93,12 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         user ||
           ({ id: crypto.randomUUID(), isPublic: false } as JwtPayloadType),
         logger,
+        sendT,
       );
 
       if (!smsResult.success) {
         return fail({
-          message: "app.api.contact.error.general.internal_server_error",
+          message: t("error.general.internal_server_error"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           cause: smsResult,
         });
@@ -106,7 +111,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
     } catch (error) {
       logger.error("app.api.contact.sms.admin.send.error", parseError(error));
       return fail({
-        message: "app.api.contact.error.general.internal_server_error",
+        message: t("error.general.internal_server_error"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -120,6 +125,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<{ messageId: string; sent: boolean }>> {
     try {
       // Extract phone number from lead data or user profile
@@ -143,7 +149,8 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         userPhone,
       });
 
-      const message = this.generateConfirmationMessage(contactData, locale);
+      const message = this.generateConfirmationMessage(contactData, t);
+      const { t: sendT } = sendScopedTranslation.scopedT(locale);
 
       const smsResult = await smsServiceRepository.sendSms(
         {
@@ -153,11 +160,12 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         },
         user || ({ isPublic: true } as JwtPayloadType),
         logger,
+        sendT,
       );
 
       if (!smsResult.success) {
         return fail({
-          message: "app.api.contact.error.general.internal_server_error",
+          message: t("error.general.internal_server_error"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           cause: smsResult,
         });
@@ -173,7 +181,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         parseError(error),
       );
       return fail({
-        message: "app.api.contact.error.general.internal_server_error",
+        message: t("error.general.internal_server_error"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -184,13 +192,12 @@ export class ContactSmsServiceImpl implements ContactSmsService {
    */
   private generateAdminNotificationMessage(
     contactData: ContactRequestOutput,
-    locale: CountryLanguage,
+    t: ModuleT,
   ): string {
     const { name, email, subject } = contactData;
-    const { t } = simpleT(locale);
 
-    // Use i18n translations: app.api.contact.sms.admin.notification
-    return t("app.api.contact.sms.admin.notification", {
+    // Use i18n translations: sms.admin.notification
+    return t("sms.admin.notification", {
       name,
       email,
       subject,
@@ -202,13 +209,12 @@ export class ContactSmsServiceImpl implements ContactSmsService {
    */
   private generateConfirmationMessage(
     contactData: ContactRequestOutput,
-    locale: CountryLanguage,
+    t: ModuleT,
   ): string {
     const { name } = contactData;
-    const { t } = simpleT(locale);
 
-    // Use i18n translations: app.api.contact.sms.confirmation.message
-    return t("app.api.contact.sms.confirmation.message", {
+    // Use i18n translations: sms.confirmation.message
+    return t("sms.confirmation.message", {
       name,
     });
   }
@@ -227,12 +233,14 @@ export const sendAdminNotificationSms = async (
   user: JwtPayloadType,
   locale: CountryLanguage,
   logger: EndpointLogger,
+  t: ModuleT,
 ): Promise<ResponseType<{ messageId: string; sent: boolean }>> => {
   return await contactSmsService.sendAdminNotificationSms(
     contactData,
     user,
     locale,
     logger,
+    t,
   );
 };
 
@@ -241,11 +249,13 @@ export const sendConfirmationSms = async (
   user: JwtPayloadType,
   locale: CountryLanguage,
   logger: EndpointLogger,
+  t: ModuleT,
 ): Promise<ResponseType<{ messageId: string; sent: boolean }>> => {
   return await contactSmsService.sendConfirmationSms(
     contactData,
     user,
     locale,
     logger,
+    t,
   );
 };

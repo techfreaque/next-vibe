@@ -9,10 +9,10 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   backButton,
   customWidgetObject,
-  objectField,
-  requestField,
-  requestUrlPathParamsField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedRequestUrlPathParamsField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -24,6 +24,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { CsvImportJobStatus } from "../../enum";
+import { scopedTranslation } from "./i18n";
 import { ImportJobStatusContainer } from "./widget";
 
 /**
@@ -31,12 +32,13 @@ import { ImportJobStatusContainer } from "./widget";
  * Retrieves current status and progress of a specific import job
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["leads", "import", "jobs", ":jobId"],
-  title: "app.api.leads.import.jobs.jobId.get.title",
-  description: "app.api.leads.import.jobs.jobId.get.description",
-  category: "app.api.leads.category",
-  tags: ["app.api.leads.tags.leads", "app.api.leads.tags.management"],
+  title: "get.title",
+  description: "get.description",
+  category: "category",
+  tags: ["tags.leads", "tags.management"],
   allowedRoles: [UserRole.ADMIN],
   icon: "activity",
 
@@ -45,11 +47,11 @@ const { GET } = createEndpoint({
     usage: { request: "urlPathParams", response: true } as const,
     children: {
       // === URL PARAMETERS ===
-      jobId: requestUrlPathParamsField({
+      jobId: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label: "app.api.leads.import.jobs.jobId.get.jobId.label",
-        description: "app.api.leads.import.jobs.jobId.get.jobId.description",
+        label: "get.jobId.label",
+        description: "get.jobId.description",
         columns: 12,
         hidden: true,
         schema: z.uuid(),
@@ -61,231 +63,188 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      job: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.leads.import.jobs.jobId.get.response.title",
-          description:
-            "app.api.leads.import.jobs.jobId.get.response.description",
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
-          info: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.leads.import.jobs.jobId.get.response.info.title",
-              description:
-                "app.api.leads.import.jobs.jobId.get.response.info.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              id: responseField({
+      job: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.title",
+        description: "get.response.description",
+        layoutType: LayoutType.STACKED,
+        usage: { response: true },
+        children: {
+          info: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "get.response.info.title",
+            description: "get.response.info.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              id: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.get.response.id.content",
+                content: "get.response.id.content",
                 schema: z.uuid(),
               }),
-              fileName: responseField({
+              fileName: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.get.response.fileName.content",
+                content: "get.response.fileName.content",
                 schema: z.string(),
               }),
-              status: responseField({
+              status: scopedResponseField(scopedTranslation, {
                 type: WidgetType.BADGE,
-                text: "app.api.leads.import.jobs.jobId.get.response.status.content",
+                text: "get.response.status.content",
                 schema: z.enum(CsvImportJobStatus),
               }),
             },
-          ),
+          }),
 
-          progress: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.leads.import.jobs.jobId.get.response.progress.title",
-              description:
-                "app.api.leads.import.jobs.jobId.get.response.progress.description",
-              layoutType: LayoutType.GRID,
-              columns: 3,
-            },
-            { response: true },
-            {
-              totalRows: responseField({
+          progress: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "get.response.progress.title",
+            description: "get.response.progress.description",
+            layoutType: LayoutType.GRID,
+            columns: 3,
+            usage: { response: true },
+            children: {
+              totalRows: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.get.response.totalRows.content",
+                content: "get.response.totalRows.content",
                 schema: z.coerce.number().nullable(),
               }),
-              processedRows: responseField({
+              processedRows: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.get.response.processedRows.content",
+                content: "get.response.processedRows.content",
                 schema: z.coerce.number(),
               }),
-              successfulImports: responseField({
+              successfulImports: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.get.response.successfulImports.content",
+                content: "get.response.successfulImports.content",
                 schema: z.coerce.number(),
               }),
-              failedImports: responseField({
+              failedImports: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.get.response.failedImports.content",
+                content: "get.response.failedImports.content",
                 schema: z.coerce.number(),
               }),
-              duplicateEmails: responseField({
+              duplicateEmails: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.get.response.duplicateEmails.content",
+                content: "get.response.duplicateEmails.content",
                 schema: z.coerce.number(),
               }),
             },
-          ),
+          }),
 
-          configuration: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.leads.import.jobs.jobId.get.response.configuration.title",
-              description:
-                "app.api.leads.import.jobs.jobId.get.response.configuration.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              currentBatchStart: responseField({
+          configuration: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "get.response.configuration.title",
+            description: "get.response.configuration.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              currentBatchStart: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.get.response.currentBatchStart.content",
+                content: "get.response.currentBatchStart.content",
                 schema: z.coerce.number(),
               }),
-              batchSize: responseField({
+              batchSize: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.get.response.batchSize.content",
+                content: "get.response.batchSize.content",
                 schema: z.coerce.number(),
               }),
-              retryCount: responseField({
+              retryCount: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.get.response.retryCount.content",
+                content: "get.response.retryCount.content",
                 schema: z.coerce.number(),
               }),
-              maxRetries: responseField({
+              maxRetries: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.get.response.maxRetries.content",
+                content: "get.response.maxRetries.content",
                 schema: z.coerce.number(),
               }),
-              error: responseField({
+              error: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.get.response.error.content",
+                content: "get.response.error.content",
                 schema: z.string().nullable(),
               }),
             },
-          ),
+          }),
 
-          timestamps: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.leads.import.jobs.jobId.get.response.timestamps.title",
-              description:
-                "app.api.leads.import.jobs.jobId.get.response.timestamps.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              createdAt: responseField({
+          timestamps: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "get.response.timestamps.title",
+            description: "get.response.timestamps.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              createdAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.get.response.createdAt.content",
+                content: "get.response.createdAt.content",
                 schema: z.string(),
               }),
-              updatedAt: responseField({
+              updatedAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.get.response.updatedAt.content",
+                content: "get.response.updatedAt.content",
                 schema: z.string(),
               }),
-              startedAt: responseField({
+              startedAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.get.response.startedAt.content",
+                content: "get.response.startedAt.content",
                 schema: z.string().nullable(),
               }),
-              completedAt: responseField({
+              completedAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.get.response.completedAt.content",
+                content: "get.response.completedAt.content",
                 schema: z.string().nullable(),
               }),
             },
-          ),
+          }),
         },
-      ),
+      }),
     },
   }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.leads.import.jobs.jobId.get.errors.validation.title",
-      description:
-        "app.api.leads.import.jobs.jobId.get.errors.validation.description",
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.leads.import.jobs.jobId.get.errors.unauthorized.title",
-      description:
-        "app.api.leads.import.jobs.jobId.get.errors.unauthorized.description",
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.leads.import.jobs.jobId.get.errors.forbidden.title",
-      description:
-        "app.api.leads.import.jobs.jobId.get.errors.forbidden.description",
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.leads.import.jobs.jobId.get.errors.notFound.title",
-      description:
-        "app.api.leads.import.jobs.jobId.get.errors.notFound.description",
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.leads.import.jobs.jobId.get.errors.server.title",
-      description:
-        "app.api.leads.import.jobs.jobId.get.errors.server.description",
+      title: "get.errors.server.title",
+      description: "get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.leads.import.jobs.jobId.get.errors.unknown.title",
-      description:
-        "app.api.leads.import.jobs.jobId.get.errors.unknown.description",
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.leads.import.jobs.jobId.get.errors.network.title",
-      description:
-        "app.api.leads.import.jobs.jobId.get.errors.network.description",
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.leads.import.jobs.jobId.get.errors.unsavedChanges.title",
-      description:
-        "app.api.leads.import.jobs.jobId.get.errors.unsavedChanges.description",
+      title: "get.errors.unsavedChanges.title",
+      description: "get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.leads.import.jobs.jobId.get.errors.conflict.title",
-      description:
-        "app.api.leads.import.jobs.jobId.get.errors.conflict.description",
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.leads.import.jobs.jobId.get.success.title",
-    description: "app.api.leads.import.jobs.jobId.get.success.description",
+    title: "get.success.title",
+    description: "get.success.description",
   },
 
   examples: {
@@ -331,299 +290,246 @@ const { GET } = createEndpoint({
  * Updates job configuration settings
  */
 const { PATCH } = createEndpoint({
+  scopedTranslation,
   method: Methods.PATCH,
   path: ["leads", "import", "jobs", ":jobId"],
-  title: "app.api.leads.import.jobs.jobId.patch.title",
-  description: "app.api.leads.import.jobs.jobId.patch.description",
-  category: "app.api.leads.category",
-  tags: ["app.api.leads.tags.leads", "app.api.leads.tags.management"],
+  title: "patch.title",
+  description: "patch.description",
+  category: "category",
+  tags: ["tags.leads", "tags.management"],
   allowedRoles: [UserRole.ADMIN],
   icon: "upload",
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.leads.import.jobs.jobId.patch.form.title",
-      description: "app.api.leads.import.jobs.jobId.patch.form.description",
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data&urlPathParams", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "patch.form.title",
+    description: "patch.form.description",
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data&urlPathParams", response: true },
+    children: {
       // === URL PARAMETERS ===
-      jobId: requestUrlPathParamsField({
+      jobId: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label: "app.api.leads.import.jobs.jobId.patch.jobId.label",
-        description: "app.api.leads.import.jobs.jobId.patch.jobId.description",
+        label: "patch.jobId.label",
+        description: "patch.jobId.description",
         columns: 12,
         schema: z.uuid(),
       }),
 
       // === REQUEST FIELDS ===
-      settings: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.leads.import.jobs.jobId.patch.settings.title",
-          description:
-            "app.api.leads.import.jobs.jobId.patch.settings.description",
-          layoutType: LayoutType.GRID,
-          columns: 2,
-        },
-        { request: "data" },
-        {
-          batchSize: requestField({
+      settings: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "patch.settings.title",
+        description: "patch.settings.description",
+        layoutType: LayoutType.GRID,
+        columns: 2,
+        usage: { request: "data" },
+        children: {
+          batchSize: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
-            label: "app.api.leads.import.jobs.jobId.patch.batchSize.label",
-            description:
-              "app.api.leads.import.jobs.jobId.patch.batchSize.description",
-            placeholder:
-              "app.api.leads.import.jobs.jobId.patch.batchSize.placeholder",
+            label: "patch.batchSize.label",
+            description: "patch.batchSize.description",
+            placeholder: "patch.batchSize.placeholder",
             columns: 6,
             schema: z.coerce.number().min(10).max(1000).optional(),
           }),
-          maxRetries: requestField({
+          maxRetries: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
-            label: "app.api.leads.import.jobs.jobId.patch.maxRetries.label",
-            description:
-              "app.api.leads.import.jobs.jobId.patch.maxRetries.description",
-            placeholder:
-              "app.api.leads.import.jobs.jobId.patch.maxRetries.placeholder",
+            label: "patch.maxRetries.label",
+            description: "patch.maxRetries.description",
+            placeholder: "patch.maxRetries.placeholder",
             columns: 6,
             schema: z.coerce.number().min(0).max(10).optional(),
           }),
         },
-      ),
+      }),
 
       // === RESPONSE FIELDS ===
-      job: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.leads.import.jobs.jobId.patch.response.title",
-          description:
-            "app.api.leads.import.jobs.jobId.patch.response.description",
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
-          info: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.leads.import.jobs.jobId.patch.response.info.title",
-              description:
-                "app.api.leads.import.jobs.jobId.patch.response.info.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              id: responseField({
+      job: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "patch.response.title",
+        description: "patch.response.description",
+        layoutType: LayoutType.STACKED,
+        usage: { response: true },
+        children: {
+          info: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "patch.response.info.title",
+            description: "patch.response.info.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              id: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.patch.response.id.content",
+                content: "patch.response.id.content",
                 schema: z.uuid(),
               }),
-              fileName: responseField({
+              fileName: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.patch.response.fileName.content",
+                content: "patch.response.fileName.content",
                 schema: z.string(),
               }),
-              status: responseField({
+              status: scopedResponseField(scopedTranslation, {
                 type: WidgetType.BADGE,
-                text: "app.api.leads.import.jobs.jobId.patch.response.status.content",
+                text: "patch.response.status.content",
                 schema: z.enum(CsvImportJobStatus),
               }),
             },
-          ),
+          }),
 
-          progress: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.leads.import.jobs.jobId.patch.response.progress.title",
-              description:
-                "app.api.leads.import.jobs.jobId.patch.response.progress.description",
-              layoutType: LayoutType.GRID,
-              columns: 3,
-            },
-            { response: true },
-            {
-              totalRows: responseField({
+          progress: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "patch.response.progress.title",
+            description: "patch.response.progress.description",
+            layoutType: LayoutType.GRID,
+            columns: 3,
+            usage: { response: true },
+            children: {
+              totalRows: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.patch.response.totalRows.content",
+                content: "patch.response.totalRows.content",
                 schema: z.coerce.number().nullable(),
               }),
-              processedRows: responseField({
+              processedRows: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.patch.response.processedRows.content",
+                content: "patch.response.processedRows.content",
                 schema: z.coerce.number(),
               }),
-              successfulImports: responseField({
+              successfulImports: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.patch.response.successfulImports.content",
+                content: "patch.response.successfulImports.content",
                 schema: z.coerce.number(),
               }),
-              failedImports: responseField({
+              failedImports: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.patch.response.failedImports.content",
+                content: "patch.response.failedImports.content",
                 schema: z.coerce.number(),
               }),
-              duplicateEmails: responseField({
+              duplicateEmails: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.patch.response.duplicateEmails.content",
+                content: "patch.response.duplicateEmails.content",
                 schema: z.coerce.number(),
               }),
             },
-          ),
+          }),
 
-          configuration: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.leads.import.jobs.jobId.patch.response.configuration.title",
-              description:
-                "app.api.leads.import.jobs.jobId.patch.response.configuration.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              currentBatchStart: responseField({
+          configuration: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "patch.response.configuration.title",
+            description: "patch.response.configuration.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              currentBatchStart: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.patch.response.currentBatchStart.content",
+                content: "patch.response.currentBatchStart.content",
                 schema: z.coerce.number(),
               }),
-              batchSize: responseField({
+              batchSize: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.patch.response.batchSize.content",
+                content: "patch.response.batchSize.content",
                 schema: z.coerce.number(),
               }),
-              retryCount: responseField({
+              retryCount: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.patch.response.retryCount.content",
+                content: "patch.response.retryCount.content",
                 schema: z.coerce.number(),
               }),
-              maxRetries: responseField({
+              maxRetries: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.patch.response.maxRetries.content",
+                content: "patch.response.maxRetries.content",
                 schema: z.coerce.number(),
               }),
-              error: responseField({
+              error: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.patch.response.error.content",
+                content: "patch.response.error.content",
                 schema: z.string().nullable(),
               }),
             },
-          ),
+          }),
 
-          timestamps: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.leads.import.jobs.jobId.patch.response.timestamps.title",
-              description:
-                "app.api.leads.import.jobs.jobId.patch.response.timestamps.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              createdAt: responseField({
+          timestamps: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "patch.response.timestamps.title",
+            description: "patch.response.timestamps.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              createdAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.patch.response.createdAt.content",
+                content: "patch.response.createdAt.content",
                 schema: z.string(),
               }),
-              updatedAt: responseField({
+              updatedAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.patch.response.updatedAt.content",
+                content: "patch.response.updatedAt.content",
                 schema: z.string(),
               }),
-              startedAt: responseField({
+              startedAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.patch.response.startedAt.content",
+                content: "patch.response.startedAt.content",
                 schema: z.string().nullable(),
               }),
-              completedAt: responseField({
+              completedAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.leads.import.jobs.jobId.patch.response.completedAt.content",
+                content: "patch.response.completedAt.content",
                 schema: z.string().nullable(),
               }),
             },
-          ),
+          }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.leads.import.jobs.jobId.patch.errors.validation.title",
-      description:
-        "app.api.leads.import.jobs.jobId.patch.errors.validation.description",
+      title: "patch.errors.validation.title",
+      description: "patch.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.leads.import.jobs.jobId.patch.errors.unauthorized.title",
-      description:
-        "app.api.leads.import.jobs.jobId.patch.errors.unauthorized.description",
+      title: "patch.errors.unauthorized.title",
+      description: "patch.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.leads.import.jobs.jobId.patch.errors.forbidden.title",
-      description:
-        "app.api.leads.import.jobs.jobId.patch.errors.forbidden.description",
+      title: "patch.errors.forbidden.title",
+      description: "patch.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.leads.import.jobs.jobId.patch.errors.notFound.title",
-      description:
-        "app.api.leads.import.jobs.jobId.patch.errors.notFound.description",
+      title: "patch.errors.notFound.title",
+      description: "patch.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.leads.import.jobs.jobId.patch.errors.server.title",
-      description:
-        "app.api.leads.import.jobs.jobId.patch.errors.server.description",
+      title: "patch.errors.server.title",
+      description: "patch.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.leads.import.jobs.jobId.patch.errors.unknown.title",
-      description:
-        "app.api.leads.import.jobs.jobId.patch.errors.unknown.description",
+      title: "patch.errors.unknown.title",
+      description: "patch.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.leads.import.jobs.jobId.patch.errors.network.title",
-      description:
-        "app.api.leads.import.jobs.jobId.patch.errors.network.description",
+      title: "patch.errors.network.title",
+      description: "patch.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.leads.import.jobs.jobId.patch.errors.unsavedChanges.title",
-      description:
-        "app.api.leads.import.jobs.jobId.patch.errors.unsavedChanges.description",
+      title: "patch.errors.unsavedChanges.title",
+      description: "patch.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.leads.import.jobs.jobId.patch.errors.conflict.title",
-      description:
-        "app.api.leads.import.jobs.jobId.patch.errors.conflict.description",
+      title: "patch.errors.conflict.title",
+      description: "patch.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.leads.import.jobs.jobId.patch.success.title",
-    description: "app.api.leads.import.jobs.jobId.patch.success.description",
+    title: "patch.success.title",
+    description: "patch.success.description",
   },
 
   examples: {
@@ -638,7 +544,7 @@ const { PATCH } = createEndpoint({
         job: {
           info: {
             id: "550e8400-e29b-41d4-a716-446655440000",
-            fileName: "app.api.leads.csv",
+            fileName: "csv",
             status: CsvImportJobStatus.PROCESSING,
           },
           progress: {
@@ -672,114 +578,98 @@ const { PATCH } = createEndpoint({
  * Deletes a specific import job
  */
 const { DELETE } = createEndpoint({
+  scopedTranslation,
   method: Methods.DELETE,
   path: ["leads", "import", "jobs", ":jobId"],
-  title: "app.api.leads.import.jobs.jobId.delete.title",
-  description: "app.api.leads.import.jobs.jobId.delete.description",
-  category: "app.api.leads.category",
-  tags: ["app.api.leads.tags.leads", "app.api.leads.tags.management"],
+  title: "delete.title",
+  description: "delete.description",
+  category: "category",
+  tags: ["tags.leads", "tags.management"],
   allowedRoles: [UserRole.ADMIN],
   icon: "upload",
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.leads.import.jobs.jobId.delete.form.title",
-      description: "app.api.leads.import.jobs.jobId.delete.form.description",
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "urlPathParams", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "delete.form.title",
+    description: "delete.form.description",
+    layoutType: LayoutType.STACKED,
+    usage: { request: "urlPathParams", response: true },
+    children: {
       // === URL PARAMETERS ===
-      jobId: requestUrlPathParamsField({
+      jobId: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label: "app.api.leads.import.jobs.jobId.delete.jobId.label",
-        description: "app.api.leads.import.jobs.jobId.delete.jobId.description",
+        label: "delete.jobId.label",
+        description: "delete.jobId.description",
         columns: 12,
         schema: z.uuid(),
       }),
 
       // === RESPONSE FIELDS ===
-      result: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.leads.import.jobs.jobId.delete.response.title",
-          description:
-            "app.api.leads.import.jobs.jobId.delete.response.description",
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
-          success: responseField({
+      result: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "delete.response.title",
+        description: "delete.response.description",
+        layoutType: LayoutType.STACKED,
+        usage: { response: true },
+        children: {
+          success: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.leads.import.jobs.jobId.delete.response.success.content",
+            content: "delete.response.success.content",
             schema: z.boolean(),
           }),
-          message: responseField({
+          message: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.leads.import.jobs.jobId.delete.response.message.content",
+            content: "delete.response.message.content",
             schema: z.string(),
           }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.leads.import.jobs.jobId.delete.errors.validation.title",
-      description:
-        "app.api.leads.import.jobs.jobId.delete.errors.validation.description",
+      title: "delete.errors.validation.title",
+      description: "delete.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.leads.import.jobs.jobId.delete.errors.unauthorized.title",
-      description:
-        "app.api.leads.import.jobs.jobId.delete.errors.unauthorized.description",
+      title: "delete.errors.unauthorized.title",
+      description: "delete.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.leads.import.jobs.jobId.delete.errors.forbidden.title",
-      description:
-        "app.api.leads.import.jobs.jobId.delete.errors.forbidden.description",
+      title: "delete.errors.forbidden.title",
+      description: "delete.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.leads.import.jobs.jobId.delete.errors.notFound.title",
-      description:
-        "app.api.leads.import.jobs.jobId.delete.errors.notFound.description",
+      title: "delete.errors.notFound.title",
+      description: "delete.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.leads.import.jobs.jobId.delete.errors.server.title",
-      description:
-        "app.api.leads.import.jobs.jobId.delete.errors.server.description",
+      title: "delete.errors.server.title",
+      description: "delete.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.leads.import.jobs.jobId.delete.errors.unknown.title",
-      description:
-        "app.api.leads.import.jobs.jobId.delete.errors.unknown.description",
+      title: "delete.errors.unknown.title",
+      description: "delete.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.leads.import.jobs.jobId.delete.errors.network.title",
-      description:
-        "app.api.leads.import.jobs.jobId.delete.errors.network.description",
+      title: "delete.errors.network.title",
+      description: "delete.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.leads.import.jobs.jobId.delete.errors.unsavedChanges.title",
-      description:
-        "app.api.leads.import.jobs.jobId.delete.errors.unsavedChanges.description",
+      title: "delete.errors.unsavedChanges.title",
+      description: "delete.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.leads.import.jobs.jobId.delete.errors.conflict.title",
-      description:
-        "app.api.leads.import.jobs.jobId.delete.errors.conflict.description",
+      title: "delete.errors.conflict.title",
+      description: "delete.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.leads.import.jobs.jobId.delete.success.title",
-    description: "app.api.leads.import.jobs.jobId.delete.success.description",
+    title: "delete.success.title",
+    description: "delete.success.description",
   },
 
   examples: {

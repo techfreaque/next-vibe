@@ -8,7 +8,9 @@ import { parseError } from "next-vibe/shared/utils";
 import { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation as leadsScopedTranslation } from "../../i18n";
 import { leadId } from "../../types";
 import { LeadTrackingRepository } from "../repository";
 
@@ -33,6 +35,7 @@ export class PixelTrackingRepository {
   static handlePixelRequest(
     request: NextRequest,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Response {
     try {
       const { searchParams } = new URL(request.url);
@@ -73,11 +76,13 @@ export class PixelTrackingRepository {
       // This ensures the pixel loads quickly even if database is slow
       setImmediate(async () => {
         try {
+          const leadsT = leadsScopedTranslation.scopedT(locale).t;
           const result = await LeadTrackingRepository.handleTrackingPixel(
             leadId,
             campaignId,
             clientInfo,
             logger,
+            leadsT,
           );
 
           if (result.success) {

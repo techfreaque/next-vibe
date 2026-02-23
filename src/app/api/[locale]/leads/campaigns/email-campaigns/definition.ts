@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,145 +20,122 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["leads", "campaigns", "email-campaigns"],
-  title: "app.api.leads.campaigns.emailCampaigns.post.title",
-  description: "app.api.leads.campaigns.emailCampaigns.post.description",
-  category: "app.api.leads.category",
+  title: "post.title",
+  description: "post.description",
+  category: "category",
   icon: "mail",
-  tags: ["app.api.leads.campaigns.emailCampaigns.tag"],
+  tags: ["tag"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.leads.campaigns.emailCampaigns.post.container.title",
-      description:
-        "app.api.leads.campaigns.emailCampaigns.post.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      batchSize: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.container.title",
+    description: "post.container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      batchSize: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.leads.campaigns.emailCampaigns.post.fields.batchSize.label",
-        description:
-          "app.api.leads.campaigns.emailCampaigns.post.fields.batchSize.description",
+        label: "post.fields.batchSize.label",
+        description: "post.fields.batchSize.description",
         columns: 6,
         schema: z.coerce.number().min(1).max(100).default(100),
       }),
 
-      maxEmailsPerRun: requestField({
+      maxEmailsPerRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.leads.campaigns.emailCampaigns.post.fields.maxEmailsPerRun.label",
-        description:
-          "app.api.leads.campaigns.emailCampaigns.post.fields.maxEmailsPerRun.description",
+        label: "post.fields.maxEmailsPerRun.label",
+        description: "post.fields.maxEmailsPerRun.description",
         columns: 6,
         schema: z.coerce.number().min(1).max(1000).default(500),
       }),
 
-      dryRun: requestField({
+      dryRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.leads.campaigns.emailCampaigns.post.fields.dryRun.label",
-        description:
-          "app.api.leads.campaigns.emailCampaigns.post.fields.dryRun.description",
+        label: "post.fields.dryRun.label",
+        description: "post.fields.dryRun.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
-      emailsScheduled: responseField({
+      emailsScheduled: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.campaigns.emailCampaigns.post.response.emailsScheduled",
+        content: "post.response.emailsScheduled",
         schema: z.number(),
       }),
 
-      emailsSent: responseField({
+      emailsSent: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.campaigns.emailCampaigns.post.response.emailsSent",
+        content: "post.response.emailsSent",
         schema: z.number(),
       }),
 
-      emailsFailed: responseField({
+      emailsFailed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.campaigns.emailCampaigns.post.response.emailsFailed",
+        content: "post.response.emailsFailed",
         schema: z.number(),
       }),
 
-      leadsProcessed: responseField({
+      leadsProcessed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.campaigns.emailCampaigns.post.response.leadsProcessed",
+        content: "post.response.leadsProcessed",
         schema: z.number(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.leads.campaigns.emailCampaigns.post.errors.unauthorized.title",
-      description:
-        "app.api.leads.campaigns.emailCampaigns.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.leads.campaigns.emailCampaigns.post.errors.forbidden.title",
-      description:
-        "app.api.leads.campaigns.emailCampaigns.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.leads.campaigns.emailCampaigns.post.errors.server.title",
-      description:
-        "app.api.leads.campaigns.emailCampaigns.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.leads.campaigns.emailCampaigns.post.errors.unknown.title",
-      description:
-        "app.api.leads.campaigns.emailCampaigns.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.leads.campaigns.emailCampaigns.post.errors.validation.title",
-      description:
-        "app.api.leads.campaigns.emailCampaigns.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.leads.campaigns.emailCampaigns.post.errors.unknown.title",
-      description:
-        "app.api.leads.campaigns.emailCampaigns.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.leads.campaigns.emailCampaigns.post.errors.unknown.title",
-      description:
-        "app.api.leads.campaigns.emailCampaigns.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.leads.campaigns.emailCampaigns.post.errors.unknown.title",
-      description:
-        "app.api.leads.campaigns.emailCampaigns.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.leads.campaigns.emailCampaigns.post.errors.unknown.title",
-      description:
-        "app.api.leads.campaigns.emailCampaigns.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
   },
 
   successTypes: {
-    title: "app.api.leads.campaigns.emailCampaigns.post.success.title",
-    description:
-      "app.api.leads.campaigns.emailCampaigns.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   examples: {

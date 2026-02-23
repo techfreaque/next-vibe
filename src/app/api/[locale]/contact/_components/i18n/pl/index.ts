@@ -26,6 +26,8 @@ export const translations: typeof enTranslations = {
         discordDescription: "Uzyskaj pomoc od naszej społeczności i zespołu",
         twitter: "Śledź nas na Twitterze",
         website: "Strona internetowa",
+        supportEmail: "E-mail wsparcia",
+        websiteUrl: "Odwiedź naszą stronę",
       },
     },
   },

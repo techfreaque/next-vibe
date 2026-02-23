@@ -17,10 +17,11 @@ import {
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import type migrateSyncEndpoints from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 // Constants to avoid literal strings
 const SQL_FILE_EXTENSION = ".sql";
@@ -49,7 +50,7 @@ interface MigrationFile {
 export interface DatabaseMigrateSyncRepository {
   syncMigrations(
     data: MigrateSyncRequestType,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<MigrateSyncResponseType>>;
 }
@@ -60,11 +61,9 @@ export interface DatabaseMigrateSyncRepository {
 export class DatabaseMigrateSyncRepositoryImpl implements DatabaseMigrateSyncRepository {
   async syncMigrations(
     data: MigrateSyncRequestType,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<MigrateSyncResponseType>> {
-    const { t } = simpleT(locale);
-
     try {
       logger.info("Starting migration sync process", { options: data });
 
@@ -79,9 +78,7 @@ export class DatabaseMigrateSyncRepositoryImpl implements DatabaseMigrateSyncRep
 
         // Count migration files for dry run
         const migrationFiles = this.getMigrationFiles();
-        const output = t(
-          "app.api.system.db.migrateSync.messages.dryRunComplete",
-        );
+        const output = t("messages.dryRunComplete");
 
         return success({
           success: true,
@@ -115,7 +112,7 @@ export class DatabaseMigrateSyncRepositoryImpl implements DatabaseMigrateSyncRep
       await this.restoreOriginalMigrations(migrationFiles, logger);
       originalFilesRestored = true;
 
-      const output = t("app.api.system.db.migrateSync.messages.success");
+      const output = t("messages.success");
       logger.info("Migration sync completed successfully", {
         migrationsProcessed: migrationFiles.length,
       });
@@ -132,7 +129,7 @@ export class DatabaseMigrateSyncRepositoryImpl implements DatabaseMigrateSyncRep
     } catch (error) {
       logger.error("Migration sync failed", { error: String(error) });
       return fail({
-        message: "app.api.system.db.migrateSync.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: String(error) },
       });

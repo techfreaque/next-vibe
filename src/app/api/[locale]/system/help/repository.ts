@@ -7,7 +7,6 @@
 
 import "server-only";
 
-/* eslint-disable i18next/no-literal-string */
 import { confirm, select } from "@inquirer/prompts";
 import {
   ErrorResponseTypes,
@@ -18,13 +17,16 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
+import { scopedTranslation as systemScopedTranslation } from "@/app/api/[locale]/system/i18n";
+import {
+  enrichJsonSchemaFromFields,
+  zodSchemaToJsonSchema,
+} from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/endpoint-to-metadata";
 import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
-import type { JwtPayloadType } from "../../user/auth/types";
 import type { CliCompatiblePlatform } from "../unified-interface/cli/runtime/route-executor";
 import { RouteDelegationHandler } from "../unified-interface/cli/runtime/route-executor";
 import { definitionsRegistry } from "../unified-interface/shared/endpoints/definitions/registry";
@@ -40,6 +42,7 @@ import {
 import { SchemaUIHandler } from "../unified-interface/unified-ui/renderers/cli/response/schema-handler";
 import { getTranslatorFromEndpoint } from "../unified-interface/unified-ui/widgets/_shared/field-helpers";
 import type { HelpGetRequestOutput, HelpGetResponseOutput } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -75,7 +78,7 @@ const ALL_SEARCH_LOCALES: CountryLanguage[] = [
   "pl-PL",
 ] as const;
 const COMPACT_DEFAULT_PAGE_SIZE = 25;
-const HUMAN_DEFAULT_PAGE_SIZE = 200;
+const HUMAN_DEFAULT_PAGE_SIZE = 500;
 /** If a filtered result set is ≤ this many tools, auto-upgrade to full detail (params + examples) */
 const COMPACT_FULL_DETAIL_THRESHOLD = 5;
 
@@ -110,16 +113,22 @@ function getParameterSchema(
     if (Object.keys(combinedShape).length === 0) {
       return null;
     }
-    const schema = z.toJSONSchema(z.object(combinedShape), {
-      target: "draft-7",
-      io: "input",
-      unrepresentable: "any",
-      override: (ctx) => {
-        if (ctx.zodSchema._zod.def.type === "custom") {
-          ctx.jsonSchema.type = "object";
-        }
-      },
-    });
+    const schema = zodSchemaToJsonSchema(z.object(combinedShape));
+
+    // Flatten the top-level request fields for fieldType enrichment
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const topLevelFields: Record<string, any> = {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fieldsObj = endpoint.fields as any;
+    if (fieldsObj && typeof fieldsObj === "object" && "children" in fieldsObj) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const children = (fieldsObj as any).children;
+      if (children && typeof children === "object") {
+        Object.assign(topLevelFields, children);
+      }
+    }
+    enrichJsonSchemaFromFields(schema, topLevelFields);
+
     // Strip zod-internal ~standard field — not useful for AI consumers
     if (schema && "~standard" in schema) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -151,6 +160,7 @@ function serializeTool(
     category: tool.category,
     aliases: tool.aliases,
     requiresConfirmation: tool.requiresConfirmation,
+    credits: tool.credits,
     parameters,
     examples: includeExamples ? tool.examples : undefined,
   };
@@ -169,6 +179,7 @@ function serializeToolMinimal(
     toolName: tool.toolName,
     tags: tool.tags,
     description: tool.description,
+    credits: tool.credits,
   };
 }
 
@@ -246,9 +257,11 @@ class InteractiveSession {
     logger: EndpointLogger,
     platform: CliCompatiblePlatform,
   ): Promise<ResponseType<{ started: boolean }>> {
+    const { t } = scopedTranslation.scopedT(locale);
+    const { t: sysT } = systemScopedTranslation.scopedT(locale);
     if (!user) {
       return fail({
-        message: "app.api.system.help.interactive.errors.unauthorized.title",
+        message: t("interactive.errors.unauthorized.title"),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
@@ -267,15 +280,10 @@ class InteractiveSession {
 
       InteractiveSession.setupSignalHandlers();
 
-      const { t } = simpleT(locale);
       logger.info(`\n${"═".repeat(60)}`);
-      logger.info(
-        `  ${t("app.api.system.unifiedInterface.cli.vibe.interactive.welcome")}`,
-      );
+      logger.info(`  ${sysT("unifiedInterface.cli.vibe.interactive.welcome")}`);
       logger.info("═".repeat(60));
-      logger.info(
-        `  ${t("app.api.system.unifiedInterface.cli.vibe.help.description")}`,
-      );
+      logger.info(`  ${sysT("unifiedInterface.cli.vibe.help.description")}`);
       logger.info(`${"═".repeat(60)}\n`);
 
       const endpoints = definitionsRegistry.getEndpointsForUser(platform, user);
@@ -288,7 +296,7 @@ class InteractiveSession {
     } catch (error) {
       logger.error("Failed to start interactive mode", parseError(error));
       return fail({
-        message: "app.api.system.help.interactive.errors.server.title",
+        message: t("interactive.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -310,11 +318,9 @@ class InteractiveSession {
     nav: CliNavState,
     routes: CreateApiEndpointAny[],
   ): void {
-    const { t } = simpleT(nav.session.locale);
+    const { t: sysT } = systemScopedTranslation.scopedT(nav.session.locale);
     nav.routeTree = {
-      name: t(
-        "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.rootName",
-      ),
+      name: sysT("unifiedInterface.cli.vibe.interactive.navigation.rootName"),
       path: "/",
       type: "directory",
       children: [],
@@ -460,32 +466,30 @@ class InteractiveSession {
     if (!nav.currentNode) {
       return "exit";
     }
-    const { t } = simpleT(nav.session.locale);
+    const { t: sysT } = systemScopedTranslation.scopedT(nav.session.locale);
     const breadcrumbPath = nav.breadcrumbs.map((b) => b.name).join(" > ");
     logger.info(
-      `\n${t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.directoryIcon")} ${breadcrumbPath}`,
+      `\n${sysT("unifiedInterface.cli.vibe.interactive.navigation.directoryIcon")} ${breadcrumbPath}`,
     );
 
     const choices: Array<{ name: string; value: string }> = [];
     if (nav.currentNode.parent) {
       choices.push({
-        name: `${t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.upIcon")} ${t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.goUp")}`,
+        name: `${sysT("unifiedInterface.cli.vibe.interactive.navigation.upIcon")} ${sysT("unifiedInterface.cli.vibe.interactive.navigation.goUp")}`,
         value: InteractiveSession.UP_ACTION,
       });
     }
 
-    const dirIcon = t(
-      "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.directoryIcon",
+    const dirIcon = sysT(
+      "unifiedInterface.cli.vibe.interactive.navigation.directoryIcon",
     );
-    const routeIcon = t(
-      "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.routeIcon",
+    const routeIcon = sysT(
+      "unifiedInterface.cli.vibe.interactive.navigation.routeIcon",
     );
-    const routesText = t(
-      "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.routes",
+    const routesText = sysT(
+      "unifiedInterface.cli.vibe.interactive.navigation.routes",
     );
-    const noDesc = t(
-      "app.api.system.unifiedInterface.cli.vibe.errors.routeNotFound",
-    );
+    const noDesc = sysT("unifiedInterface.cli.vibe.errors.routeNotFound");
 
     for (const child of nav.currentNode.children ?? []) {
       if (child.type === "directory") {
@@ -517,21 +521,21 @@ class InteractiveSession {
       });
     }
     choices.push({
-      name: `📋 ${t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.viewAllRoutes")}`,
+      name: `📋 ${sysT("unifiedInterface.cli.vibe.interactive.navigation.viewAllRoutes")}`,
       value: "view_all",
     });
     choices.push({
-      name: `${t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.settingsIcon")} ${t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.settings")}`,
+      name: `${sysT("unifiedInterface.cli.vibe.interactive.navigation.settingsIcon")} ${sysT("unifiedInterface.cli.vibe.interactive.navigation.settings")}`,
       value: InteractiveSession.SETTINGS_ACTION,
     });
     choices.push({
-      name: `${t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.exitIcon")} ${t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.exit")}`,
+      name: `${sysT("unifiedInterface.cli.vibe.interactive.navigation.exitIcon")} ${sysT("unifiedInterface.cli.vibe.interactive.navigation.exit")}`,
       value: InteractiveSession.EXIT_ACTION,
     });
 
     return select({
-      message: t(
-        "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.navigate",
+      message: sysT(
+        "unifiedInterface.cli.vibe.interactive.navigation.navigate",
       ),
       choices,
       pageSize: 20,
@@ -539,7 +543,7 @@ class InteractiveSession {
   }
 
   private static async showAllRoutesMenu(nav: CliNavState): Promise<string> {
-    const { t } = simpleT(nav.session.locale);
+    const { t: sysT } = systemScopedTranslation.scopedT(nav.session.locale);
     const allRoutes = InteractiveSession.getAllRoutes(nav.routeTree);
     const byCategory = new Map<string, CreateApiEndpointAny[]>();
     for (const route of allRoutes) {
@@ -587,12 +591,12 @@ class InteractiveSession {
       value: "separator",
     });
     choices.push({
-      name: `⬅️  ${t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.backToNavigation")}`,
+      name: `⬅️  ${sysT("unifiedInterface.cli.vibe.interactive.navigation.backToNavigation")}`,
       value: "back",
     });
     return select({
-      message: t(
-        "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.selectRoute",
+      message: sysT(
+        "unifiedInterface.cli.vibe.interactive.navigation.selectRoute",
       ),
       choices,
       pageSize: 20,
@@ -604,26 +608,26 @@ class InteractiveSession {
     route: CreateApiEndpointAny,
     logger: EndpointLogger,
   ): Promise<void> {
-    const { t } = simpleT(nav.session.locale);
+    const { t: sysT } = systemScopedTranslation.scopedT(nav.session.locale);
     const routePath = Array.isArray(route.path)
       ? route.path.join("/")
       : route.path;
     const alias = route.aliases?.[0];
     logger.info(`\n${"─".repeat(60)}`);
     logger.info(
-      `  🚀 ${t("app.api.system.unifiedInterface.cli.vibe.executing")}: ${alias ?? routePath}`,
+      `  🚀 ${sysT("unifiedInterface.cli.vibe.executing")}: ${alias ?? routePath}`,
     );
     logger.info("─".repeat(60));
     logger.info(
-      `  ${t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.route")}: ${routePath}`,
+      `  ${sysT("unifiedInterface.cli.vibe.interactive.navigation.route")}: ${routePath}`,
     );
     logger.info(
-      `  ${t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.method")}: ${route.method}`,
+      `  ${sysT("unifiedInterface.cli.vibe.interactive.navigation.method")}: ${route.method}`,
     );
     if (route.description) {
       const { t: rt } = InteractiveSession.routeT(route, nav.session.locale);
       logger.info(
-        `  ${t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.description")}: ${rt(route.description)}`,
+        `  ${sysT("unifiedInterface.cli.vibe.interactive.navigation.description")}: ${rt(route.description)}`,
       );
     }
     logger.info(`${"─".repeat(60)}\n`);
@@ -632,16 +636,16 @@ class InteractiveSession {
       await InteractiveSession.generateDataDrivenForm(nav, route, logger);
     } catch (error) {
       logger.error(
-        t(
-          "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.executionFailed",
+        sysT(
+          "unifiedInterface.cli.vibe.interactive.navigation.executionFailed",
         ),
         parseError(error),
       );
     }
 
     const shouldContinue = await confirm({
-      message: t(
-        "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.executeAnother",
+      message: sysT(
+        "unifiedInterface.cli.vibe.interactive.navigation.executeAnother",
       ),
       default: true,
     });
@@ -659,7 +663,7 @@ class InteractiveSession {
       nav.session.locale,
     );
     nav.session.locale = selectedLocale;
-    const { t } = simpleT(selectedLocale);
+    const { t: sysT } = systemScopedTranslation.scopedT(selectedLocale);
 
     let requestData = {};
     if (
@@ -667,14 +671,12 @@ class InteractiveSession {
       !InteractiveSession.isEmptySchema(endpoint.requestSchema)
     ) {
       logger.info(
-        `\n📝 ${t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.requestData")}`,
+        `\n📝 ${sysT("unifiedInterface.cli.vibe.interactive.navigation.requestData")}`,
       );
       logger.info("─".repeat(60));
       requestData = await InteractiveSession.generateFormFromSchema(
         endpoint.requestSchema,
-        t(
-          "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.requestData",
-        ),
+        sysT("unifiedInterface.cli.vibe.interactive.navigation.requestData"),
         logger,
       );
     }
@@ -685,14 +687,12 @@ class InteractiveSession {
       !InteractiveSession.isEmptySchema(endpoint.requestUrlPathParamsSchema)
     ) {
       logger.info(
-        `\n🔗 ${t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.urlParameters")}`,
+        `\n🔗 ${sysT("unifiedInterface.cli.vibe.interactive.navigation.urlParameters")}`,
       );
       logger.info("─".repeat(60));
       urlPathParams = await InteractiveSession.generateFormFromSchema(
         endpoint.requestUrlPathParamsSchema,
-        t(
-          "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.urlParameters",
-        ),
+        sysT("unifiedInterface.cli.vibe.interactive.navigation.urlParameters"),
         logger,
       );
     }
@@ -703,23 +703,23 @@ class InteractiveSession {
     ) {
       logger.info(`\n${"═".repeat(60)}`);
       logger.info(
-        `  👀 ${t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.preview")}`,
+        `  👀 ${sysT("unifiedInterface.cli.vibe.interactive.navigation.preview")}`,
       );
       logger.info("═".repeat(60));
       if (Object.keys(requestData).length > 0) {
         logger.info(
-          `\n${t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.requestData")}:\n${JSON.stringify(requestData, null, 2)}`,
+          `\n${sysT("unifiedInterface.cli.vibe.interactive.navigation.requestData")}:\n${JSON.stringify(requestData, null, 2)}`,
         );
       }
       if (Object.keys(urlPathParams).length > 0) {
         logger.info(
-          `\n${t("app.api.system.unifiedInterface.cli.vibe.interactive.navigation.urlParameters")}:\n${JSON.stringify(urlPathParams, null, 2)}`,
+          `\n${sysT("unifiedInterface.cli.vibe.interactive.navigation.urlParameters")}:\n${JSON.stringify(urlPathParams, null, 2)}`,
         );
       }
       logger.info("");
       const shouldExecute = await confirm({
-        message: t(
-          "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.executeWithParams",
+        message: sysT(
+          "unifiedInterface.cli.vibe.interactive.navigation.executeWithParams",
         ),
         default: true,
       });
@@ -776,11 +776,11 @@ class InteractiveSession {
   private static async collectLocaleSelection(
     current: CountryLanguage,
   ): Promise<CountryLanguage> {
-    const { t } = simpleT(current);
+    const { t: sysT } = systemScopedTranslation.scopedT(current);
     const options = [
       {
-        name: t(
-          "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.englishGlobal",
+        name: sysT(
+          "unifiedInterface.cli.vibe.interactive.navigation.englishGlobal",
         ),
         value: "en-GLOBAL" as CountryLanguage,
       },
@@ -791,8 +791,8 @@ class InteractiveSession {
       ? current
       : undefined;
     return select({
-      message: t(
-        "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.selectLocale",
+      message: sysT(
+        "unifiedInterface.cli.vibe.interactive.navigation.selectLocale",
       ),
       choices: options,
       default: defaultLocale as (typeof options)[number]["value"] | undefined,
@@ -827,9 +827,11 @@ class InteractiveSession {
       process.stdout.write(`${result.formattedOutput}\n`);
     } catch (error) {
       logger.error(
-        simpleT(session.locale).t(
-          "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.executionFailed",
-        ),
+        systemScopedTranslation
+          .scopedT(session.locale)
+          .t(
+            "unifiedInterface.cli.vibe.interactive.navigation.executionFailed",
+          ),
         parseError(error),
       );
     }
@@ -844,7 +846,7 @@ class InteractiveSession {
         const action = await InteractiveSession.showNavigationMenu(nav, logger);
         if (action === InteractiveSession.EXIT_ACTION) {
           logger.info(
-            `\n${simpleT(nav.session.locale).t("app.api.system.unifiedInterface.cli.vibe.interactive.goodbye")}\n`,
+            `\n${systemScopedTranslation.scopedT(nav.session.locale).t("unifiedInterface.cli.vibe.interactive.goodbye")}\n`,
           );
           break;
         } else if (action === "separator") {
@@ -878,9 +880,11 @@ class InteractiveSession {
         }
       } catch (error) {
         logger.error(
-          simpleT(nav.session.locale).t(
-            "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.navigationError",
-          ),
+          systemScopedTranslation
+            .scopedT(nav.session.locale)
+            .t(
+              "unifiedInterface.cli.vibe.interactive.navigation.navigationError",
+            ),
           parseError(error),
         );
       }
@@ -914,34 +918,34 @@ class InteractiveSession {
     logger: EndpointLogger,
   ): Promise<void> {
     const session = nav.session;
-    const { t } = simpleT(session.locale);
+    const { t: sysT } = systemScopedTranslation.scopedT(session.locale);
     const CURR = InteractiveSession.CURRENT_PLACEHOLDER;
     const setting = await select({
-      message: t(
-        "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.chooseSettingToModify",
+      message: sysT(
+        "unifiedInterface.cli.vibe.interactive.navigation.chooseSettingToModify",
       ),
       choices: [
         {
-          name: t(
-            "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.outputFormatCurrent",
+          name: sysT(
+            "unifiedInterface.cli.vibe.interactive.navigation.outputFormatCurrent",
           ).replace(CURR, session.options?.output ?? "pretty"),
           value: "output",
         },
         {
-          name: t(
-            "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.verboseModeCurrent",
+          name: sysT(
+            "unifiedInterface.cli.vibe.interactive.navigation.verboseModeCurrent",
           ).replace(CURR, String(session.options?.verbose ?? false)),
           value: "verbose",
         },
         {
-          name: t(
-            "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.localeCurrent",
+          name: sysT(
+            "unifiedInterface.cli.vibe.interactive.navigation.localeCurrent",
           ).replace(CURR, session.locale),
           value: "locale",
         },
         {
-          name: t(
-            "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.backToMainMenu",
+          name: sysT(
+            "unifiedInterface.cli.vibe.interactive.navigation.backToMainMenu",
           ),
           value: "back",
         },
@@ -954,20 +958,24 @@ class InteractiveSession {
     switch (setting) {
       case "output": {
         const output = await select({
-          message: simpleT(session.locale).t(
-            "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.chooseOutputFormat",
-          ),
+          message: systemScopedTranslation
+            .scopedT(session.locale)
+            .t(
+              "unifiedInterface.cli.vibe.interactive.navigation.chooseOutputFormat",
+            ),
           choices: [
             {
-              name: simpleT(session.locale).t(
-                "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.prettyFormatted",
-              ),
+              name: systemScopedTranslation
+                .scopedT(session.locale)
+                .t(
+                  "unifiedInterface.cli.vibe.interactive.navigation.prettyFormatted",
+                ),
               value: "pretty",
             },
             {
-              name: simpleT(session.locale).t(
-                "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.jsonRaw",
-              ),
+              name: systemScopedTranslation
+                .scopedT(session.locale)
+                .t("unifiedInterface.cli.vibe.interactive.navigation.jsonRaw"),
               value: "json",
             },
           ],
@@ -981,9 +989,11 @@ class InteractiveSession {
       }
       case "verbose": {
         const verbose = await confirm({
-          message: simpleT(session.locale).t(
-            "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.enableVerboseOutput",
-          ),
+          message: systemScopedTranslation
+            .scopedT(session.locale)
+            .t(
+              "unifiedInterface.cli.vibe.interactive.navigation.enableVerboseOutput",
+            ),
           default: session.options?.verbose,
         });
         session.options = { ...session.options, verbose };
@@ -992,21 +1002,23 @@ class InteractiveSession {
       case "locale": {
         const localeChoices = [
           {
-            name: simpleT(session.locale).t(
-              "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.englishGlobal",
-            ),
+            name: systemScopedTranslation
+              .scopedT(session.locale)
+              .t(
+                "unifiedInterface.cli.vibe.interactive.navigation.englishGlobal",
+              ),
             value: "en-GLOBAL" as CountryLanguage,
           },
           {
-            name: simpleT(session.locale).t(
-              "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.german",
-            ),
+            name: systemScopedTranslation
+              .scopedT(session.locale)
+              .t("unifiedInterface.cli.vibe.interactive.navigation.german"),
             value: "de-DE" as CountryLanguage,
           },
           {
-            name: simpleT(session.locale).t(
-              "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.polish",
-            ),
+            name: systemScopedTranslation
+              .scopedT(session.locale)
+              .t("unifiedInterface.cli.vibe.interactive.navigation.polish"),
             value: "pl-PL" as CountryLanguage,
           },
         ];
@@ -1016,9 +1028,9 @@ class InteractiveSession {
           ? session.locale
           : undefined;
         session.locale = await select({
-          message: simpleT(session.locale).t(
-            "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.chooseLocale",
-          ),
+          message: systemScopedTranslation
+            .scopedT(session.locale)
+            .t("unifiedInterface.cli.vibe.interactive.navigation.chooseLocale"),
           choices: localeChoices,
           default: defaultLocale as
             | (typeof localeChoices)[number]["value"]
@@ -1028,9 +1040,9 @@ class InteractiveSession {
       }
     }
     logger.info(
-      simpleT(session.locale).t(
-        "app.api.system.unifiedInterface.cli.vibe.interactive.navigation.settingUpdated",
-      ),
+      systemScopedTranslation
+        .scopedT(session.locale)
+        .t("unifiedInterface.cli.vibe.interactive.navigation.settingUpdated"),
     );
   }
 }
@@ -1040,7 +1052,7 @@ class InteractiveSession {
 export class HelpRepository {
   static async getTools(
     data: HelpGetRequestOutput,
-    user: JwtPayloadType,
+    user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
     locale: CountryLanguage,
     platform: Platform,
     logger: EndpointLogger,

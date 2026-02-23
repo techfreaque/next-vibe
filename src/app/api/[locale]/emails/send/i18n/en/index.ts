@@ -177,6 +177,8 @@ export const translations = {
     },
     sms: {
       temporarilyUnavailable: "SMS service is temporarily unavailable",
+      invalidPhone: "Invalid phone number: {{phoneNumber}}",
+      sendFailed: "Failed to send SMS: {{error}}",
     },
     unauthorized: {
       title: "Unauthorized",

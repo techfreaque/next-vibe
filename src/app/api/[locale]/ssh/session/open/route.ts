@@ -7,6 +7,7 @@ import { SessionOpenRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger }) => SessionOpenRepository.open(data, logger),
+    handler: ({ data, logger, t }) =>
+      SessionOpenRepository.open(data, logger, t),
   },
 });

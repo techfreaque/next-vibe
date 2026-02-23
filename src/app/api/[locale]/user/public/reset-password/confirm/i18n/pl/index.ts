@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Użytkownicy",
+
   title: "Potwierdź resetowanie hasła",
   description: "Potwierdź resetowanie hasła nowym hasłem",
   tag: "Resetowanie hasła",
@@ -102,6 +104,7 @@ export const translations: typeof enTranslations = {
   },
   errors: {
     title: "Błąd resetowania hasła",
+    no_email: "Nie znaleziono konta z tym adresem e-mail",
     validation: {
       title: "Błąd walidacji",
       description: "Sprawdź swoje dane i spróbuj ponownie",
@@ -145,5 +148,26 @@ export const translations: typeof enTranslations = {
     description: "Twoje hasło zostało pomyślnie zresetowane",
     message: "Hasło zostało pomyślnie zresetowane",
     password_reset: "Twoje hasło zostało pomyślnie zresetowane",
+  },
+  actions: {
+    requestNewLink: "Poproś o nowy link resetowania",
+  },
+  emailTemplates: {
+    confirm: {
+      name: "E-mail z potwierdzeniem resetowania hasła",
+      description:
+        "E-mail wysyłany do użytkowników po pomyślnym zresetowaniu hasła",
+      category: "Uwierzytelnianie",
+      preview: {
+        publicName: {
+          label: "Nazwa publiczna",
+          description: "Publiczna nazwa wyświetlana użytkownika",
+        },
+        userId: {
+          label: "ID użytkownika",
+          description: "Unikalny identyfikator użytkownika",
+        },
+      },
+    },
   },
 };

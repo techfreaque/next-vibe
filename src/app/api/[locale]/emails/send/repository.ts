@@ -15,17 +15,18 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { Countries, Languages } from "@/i18n/core/config";
+import type { CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation as emailServiceScopedTranslation } from "../email-service/i18n";
 import { EmailServiceRepository } from "../email-service/repository";
 import { smsServiceRepository as smsService } from "../sms-service/repository";
 import type {
   EmailSendRequestOutput,
   EmailSendResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
 
-// Define the proper type for locale to match standardized patterns
-type CountryLanguage = `${Lowercase<Languages>}-${Countries}`;
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Email Send Repository Interface
@@ -34,8 +35,9 @@ export interface EmailSendRepository {
   sendEmail(
     data: EmailSendRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<EmailSendResponseOutput>>;
 }
 
@@ -46,8 +48,9 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
   async sendEmail(
     data: EmailSendRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<EmailSendResponseOutput>> {
     try {
       logger.info("Email send repository: Processing email send request", {
@@ -64,11 +67,11 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
           !data.smsNotifications.smsMessage)
       ) {
         return fail({
-          message: "app.api.emails.send.errors.validation.title",
+          message: t("errors.validation.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
-            field: "app.api.emails.send.errors.validation.smsFields",
-            message: "app.api.emails.send.errors.validation.smsRequired",
+            field: t("errors.validation.smsFields"),
+            message: t("errors.validation.smsRequired"),
           },
         });
       }
@@ -98,6 +101,7 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
         user,
         locale,
         logger,
+        emailServiceScopedTranslation.scopedT(locale).t,
       );
 
       if (!emailResult.success) {
@@ -150,10 +154,11 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
               message: data.smsNotifications.smsMessage,
               campaignType: data.campaignTracking?.campaignType,
               leadId: data.campaignTracking?.leadId,
-              templateName: "app.api.emails.send.sms.emailNotificationTemplate",
+              templateName: t("sms.emailNotificationTemplate"),
             },
             user,
             logger,
+            t,
           );
 
           if (smsResult.success) {
@@ -187,7 +192,7 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
           );
           response.response.smsResult = {
             success: false,
-            error: "app.api.emails.send.errors.sms.temporarilyUnavailable",
+            error: t("errors.sms.temporarilyUnavailable"),
           };
         }
       }
@@ -206,7 +211,7 @@ export class EmailSendRepositoryImpl implements EmailSendRepository {
         parsedError,
       );
       return fail({
-        message: "app.api.emails.send.errors.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });

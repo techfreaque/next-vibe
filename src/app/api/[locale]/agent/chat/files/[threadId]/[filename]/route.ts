@@ -18,16 +18,17 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async (props) => {
+    handler: async ({ urlPathParams, user, logger, t, locale }) => {
       const result = await ChatFileRepository.getFile(
-        props.urlPathParams,
-        props.user,
-        props.logger,
+        urlPathParams,
+        user,
+        logger,
+        locale,
       );
 
       if (result.buffer.length === 0) {
         return fail({
-          message: "app.api.agent.chat.files.get.errors.notFound.title",
+          message: t("get.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }

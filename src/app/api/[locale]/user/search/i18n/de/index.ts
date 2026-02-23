@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Benutzer",
+
   title: "Benutzersuche",
   description: "Nach Benutzern suchen",
   tag: "Benutzersuche",

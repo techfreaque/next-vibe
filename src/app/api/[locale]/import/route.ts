@@ -13,11 +13,11 @@ export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: () => importRepository.importCsv(),
+    handler: ({ t }) => importRepository.importCsv(t),
   },
   [Methods.GET]: {
     email: undefined,
-    handler: ({ data, user, logger }) =>
-      importRepository.listImportJobs(user.id, data, logger),
+    handler: ({ data, user, logger, t }) =>
+      importRepository.listImportJobs(user.id, data, logger, t),
   },
 });

@@ -61,6 +61,11 @@ export const translations: typeof enTranslations = {
         title: "Tool ausgeführt",
         description: "Das Tool wurde erfolgreich ausgeführt",
       },
+      widget: {
+        enterToolName: "Tool-Namen eingeben, um das Formular zu laden.",
+        resolving: "Endpunkt wird aufgelöst…",
+        unknownTool: "Unbekanntes Tool: {{toolName}}",
+      },
     },
   },
   tools: {

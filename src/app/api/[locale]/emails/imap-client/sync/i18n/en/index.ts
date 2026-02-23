@@ -1,4 +1,6 @@
 export const translations = {
+  category: "IMAP Client",
+
   title: "IMAP Sync",
   description: "IMAP synchronization service",
   container: {

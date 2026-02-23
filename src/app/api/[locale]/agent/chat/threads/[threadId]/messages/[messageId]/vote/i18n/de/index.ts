@@ -1,4 +1,8 @@
 export const translations = {
+  category: "Chat",
+  tags: {
+    messages: "Nachrichten",
+  },
   post: {
     title: "Nachricht bewerten",
     description: "Nachricht hoch- oder runterbewerten",

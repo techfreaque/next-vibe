@@ -10,7 +10,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useLogout } from "@/app/api/[locale]/user/private/logout/hooks";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "../../../i18n";
 
 interface UserMenuProps {
   user: JwtPayloadType;
@@ -19,7 +20,7 @@ interface UserMenuProps {
 }
 
 export function UserMenu({ user, locale, logger }: UserMenuProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const logout = useLogout(logger, user);
   return !user || user.isPublic ? (
     <Link href={`/${locale}/user/login`}>
@@ -30,7 +31,7 @@ export function UserMenu({ user, locale, logger }: UserMenuProps): JSX.Element {
         data-tour={TOUR_DATA_ATTRS.SIDEBAR_LOGIN}
       >
         <User className="h-3.5 w-3.5 mr-2" />
-        {t("app.api.agent.chat.components.sidebar.login")}
+        {t("components.sidebar.login")}
       </Button>
     </Link>
   ) : (
@@ -41,7 +42,7 @@ export function UserMenu({ user, locale, logger }: UserMenuProps): JSX.Element {
       onClick={logout}
     >
       <LogOut className="h-3.5 w-3.5 mr-2" />
-      {t("app.api.agent.chat.components.sidebar.logout")}
+      {t("components.sidebar.logout")}
     </Button>
   );
 }

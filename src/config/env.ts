@@ -118,7 +118,7 @@ export const {
     schema: (z.string() as z.Schema<CountryLanguage>)
       .optional()
       .default(defaultLocale),
-    example: "en-GLOBAL",
+    example: defaultLocale,
     comment: "CLI locale setting",
   },
 });

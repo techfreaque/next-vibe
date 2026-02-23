@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Benutzer",
+
   list: {
     title: "Meine Sitzungen",
     description: "Alle aktiven Sitzungen für Ihr Konto auflisten",

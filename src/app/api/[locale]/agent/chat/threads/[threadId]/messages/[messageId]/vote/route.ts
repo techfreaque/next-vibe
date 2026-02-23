@@ -13,7 +13,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ urlPathParams, data, user, locale, logger }) =>
-      voteRepository.voteMessage(urlPathParams, data, user, locale, logger),
+    handler: ({ urlPathParams, data, user, t, logger }) =>
+      voteRepository.voteMessage(urlPathParams, data, user, t, logger),
   },
 });

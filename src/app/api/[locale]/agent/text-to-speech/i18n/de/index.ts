@@ -5,6 +5,13 @@ import type { translations as enTranslations } from "../en";
  */
 
 export const translations: typeof enTranslations = {
+  category: "Agent",
+  tags: {
+    speech: "Sprache",
+    tts: "Text-zu-Sprache",
+    ai: "KI",
+  },
+
   post: {
     title: "Text zu Sprache",
     description:
@@ -80,6 +87,8 @@ export const translations: typeof enTranslations = {
         description: "Ein Konflikt ist aufgetreten",
       },
       apiKeyMissing: "Eden AI API-Schlüssel ist nicht konfiguriert",
+      notConfigured:
+        "{{label}} API-Schlüssel nicht konfiguriert. Fügen Sie {{envKey}}=<ihr-schlüssel> zu Ihrer .env-Datei hinzu. Holen Sie sich Ihren Schlüssel auf {{url}}",
       conversionFailed: "Sprachsynthese fehlgeschlagen: {{error}}",
       noText: "Kein Text angegeben",
       noAudioUrl: "Keine Audio-URL vom Anbieter erhalten",

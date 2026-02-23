@@ -22,11 +22,15 @@ import type {
   PulseHistoryRequestOutput,
   PulseHistoryResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 export class PulseHistoryRepository {
   static async getHistory(
     data: PulseHistoryRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<PulseHistoryResponseOutput>> {
     try {
       const limit =
@@ -133,7 +137,7 @@ export class PulseHistoryRepository {
     } catch (error) {
       logger.error("Failed to fetch pulse history", parseError(error));
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("errors.fetchCronTaskHistory"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

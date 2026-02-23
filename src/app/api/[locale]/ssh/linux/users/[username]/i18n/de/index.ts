@@ -1,4 +1,17 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    localModeOnly: {
+      title: "Nur im lokalen Modus verfügbar",
+    },
+    cannotDeleteCurrentUser:
+      "Der aktuelle Prozessbenutzer kann nicht gelöscht werden",
+    cannotDeleteSystemUser:
+      "Systembenutzer können nicht gelöscht werden (uid < 1000)",
+    userNotFound: "Benutzer nicht gefunden",
+  },
+
   delete: {
     title: "Linux-Benutzer löschen",
     description: "OS-Benutzerkonto vom Host löschen",

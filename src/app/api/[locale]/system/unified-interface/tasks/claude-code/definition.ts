@@ -1,15 +1,17 @@
 /**
  * Claude Code Run API Definition
- * POST endpoint that spawns `claude -p` CLI with a prompt, blocks until done, returns output.
+ * POST endpoint that spawns `claude` CLI.
+ * - headless:false (default) → interactive session (stdio inherited, user can participate)
+ * - headless:true → non-interactive -p print mode, output collected and returned
  */
 
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,65 +22,69 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "unified-interface", "tasks", "claude-code"],
-  title: "app.api.system.unifiedInterface.tasks.claudeCode.run.post.title",
-  description:
-    "app.api.system.unifiedInterface.tasks.claudeCode.run.post.description",
+  title: "claudeCode.run.post.title",
+  description: "claudeCode.run.post.description",
   icon: "terminal",
-  category: "app.api.system.category",
-  tags: [
-    "app.api.system.unifiedInterface.tasks.claudeCode.tags.tasks" as const,
-  ],
+  category: "category",
+  tags: ["claudeCode.tags.tasks" as const],
   allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // Request
-      prompt: requestField({
+      prompt: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         columns: 12,
         schema: z.string().min(1),
       }),
-      model: requestField({
+      model: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
         schema: z.string().optional(),
       }),
-      maxBudgetUsd: requestField({
+      maxBudgetUsd: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         columns: 6,
         schema: z.coerce.number().optional(),
       }),
-      systemPrompt: requestField({
+      systemPrompt: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         columns: 12,
         schema: z.string().optional(),
       }),
-      allowedTools: requestField({
+      allowedTools: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 12,
         schema: z.string().optional(),
       }),
-      workingDir: requestField({
+      workingDir: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
         schema: z.string().optional(),
       }),
-      timeoutMs: requestField({
+      headless: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
+      timeoutMs: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         columns: 6,
@@ -86,97 +92,90 @@ const { POST } = createEndpoint({
       }),
 
       // Response
-      output: responseField({
+      output: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
       }),
-      exitCode: responseField({
+      exitCode: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.number(),
       }),
-      durationMs: responseField({
+      durationMs: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.number(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.claudeCode.run.post.errors.validation.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.claudeCode.run.post.errors.validation.description",
+      title: "claudeCode.run.post.errors.validation.title",
+      description: "claudeCode.run.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.claudeCode.run.post.errors.unauthorized.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.claudeCode.run.post.errors.unauthorized.description",
+      title: "claudeCode.run.post.errors.unauthorized.title",
+      description: "claudeCode.run.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.claudeCode.run.post.errors.internal.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.claudeCode.run.post.errors.internal.description",
+      title: "claudeCode.run.post.errors.internal.title",
+      description: "claudeCode.run.post.errors.internal.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.claudeCode.run.post.errors.forbidden.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.claudeCode.run.post.errors.forbidden.description",
+      title: "claudeCode.run.post.errors.forbidden.title",
+      description: "claudeCode.run.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.claudeCode.run.post.errors.notFound.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.claudeCode.run.post.errors.notFound.description",
+      title: "claudeCode.run.post.errors.notFound.title",
+      description: "claudeCode.run.post.errors.notFound.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.claudeCode.run.post.errors.network.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.claudeCode.run.post.errors.network.description",
+      title: "claudeCode.run.post.errors.network.title",
+      description: "claudeCode.run.post.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.claudeCode.run.post.errors.unknown.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.claudeCode.run.post.errors.unknown.description",
+      title: "claudeCode.run.post.errors.unknown.title",
+      description: "claudeCode.run.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.claudeCode.run.post.errors.unsaved.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.claudeCode.run.post.errors.unsaved.description",
+      title: "claudeCode.run.post.errors.unsaved.title",
+      description: "claudeCode.run.post.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.claudeCode.run.post.errors.conflict.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.claudeCode.run.post.errors.conflict.description",
+      title: "claudeCode.run.post.errors.conflict.title",
+      description: "claudeCode.run.post.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title:
-      "app.api.system.unifiedInterface.tasks.claudeCode.run.post.success.title",
-    description:
-      "app.api.system.unifiedInterface.tasks.claudeCode.run.post.success.description",
+    title: "claudeCode.run.post.success.title",
+    description: "claudeCode.run.post.success.description",
   },
 
   examples: {
     requests: {
       default: {
-        prompt: "What is 2+2?",
-        timeoutMs: 600000,
+        prompt:
+          "Add a new feature to the claude-code endpoint that tracks how many times it has been called.",
+        headless: false,
+      },
+      batch: {
+        prompt:
+          "Read src/app/api/[locale]/system/unified-interface/tasks/claude-code/repository.ts and summarize what it does in 2 sentences.",
+        headless: true,
+        timeoutMs: 60000,
       },
     },
     responses: {
       default: {
-        output: "2+2 = 4",
+        output: "",
         exitCode: 0,
-        durationMs: 5000,
+        durationMs: 184200,
+      },
+      batch: {
+        output:
+          "The repository spawns a `claude` CLI process in either interactive or batch mode. Interactive mode inherits the terminal for live back-and-forth; batch mode uses `-p` print mode and collects all output before returning.",
+        exitCode: 0,
+        durationMs: 8342,
       },
     },
   },

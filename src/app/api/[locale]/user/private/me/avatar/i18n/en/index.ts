@@ -1,4 +1,6 @@
 export const translations = {
+  category: "User Profile",
+
   tag: "avatar",
   errors: {
     user_not_found: "User not found",
@@ -42,6 +44,8 @@ export const translations = {
         validation: {
           maxSize: "File size must be less than 5MB",
           imageOnly: "Only image files are allowed",
+          unsupportedFormat:
+            "Unsupported image format. Use JPEG, PNG, WebP, or GIF.",
         },
       },
     },

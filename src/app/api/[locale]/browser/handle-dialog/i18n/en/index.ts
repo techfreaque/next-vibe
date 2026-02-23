@@ -81,4 +81,9 @@ export const translations = {
     title: "Dialog Handling Successful",
     description: "The browser dialog was handled successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    dialogAutomation: "Dialog Automation",
+  },
 };

@@ -1,4 +1,6 @@
 export const translations = {
+  category: "SSH",
+
   get: {
     title: "Wylistuj połączenia SSH",
     description:

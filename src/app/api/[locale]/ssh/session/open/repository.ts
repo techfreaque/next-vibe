@@ -19,21 +19,24 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { SshSessionStatus } from "../../enum";
+import type { scopedTranslation } from "../../i18n";
 import { sessionPool } from "../pool";
 import type {
   SessionOpenRequestOutput,
   SessionOpenResponseOutput,
 } from "./definition";
 
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+
 export class SessionOpenRepository {
   static async open(
     data: SessionOpenRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SessionOpenResponseOutput>> {
     if (data.connectionId) {
       return fail({
-        message:
-          "SSH PTY sessions not yet implemented. Use ssh_exec_POST for remote commands.",
+        message: t("errors.notImplemented.session"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
@@ -91,7 +94,7 @@ export class SessionOpenRepository {
     } catch (error) {
       logger.error("Failed to open session", parseError(error));
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("session.open.post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

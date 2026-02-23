@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Generators",
+
   post: {
     title: "Seeds",
     description: "Seeds endpoint",

@@ -19,6 +19,9 @@ import type {
   ResetTaskManagementRequestOutput,
   ResetTaskManagementResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Task interface for internal operations
@@ -62,6 +65,7 @@ interface TaskResult {
 export interface ResetTaskManagementRepository {
   executeTaskOperation(
     data: ResetTaskManagementRequestOutput,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<ResetTaskManagementResponseOutput>>;
 
@@ -111,6 +115,7 @@ export class ResetTaskManagementRepositoryImpl implements ResetTaskManagementRep
    */
   async executeTaskOperation(
     data: ResetTaskManagementRequestOutput,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<ResetTaskManagementResponseOutput>> {
     try {
@@ -155,8 +160,7 @@ export class ResetTaskManagementRepositoryImpl implements ResetTaskManagementRep
           break;
         default:
           return fail({
-            message:
-              "app.api.system.db.reset.taskManagement.errors.validation.title",
+            message: t("errors.validation.title"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: { operation },
           });
@@ -183,7 +187,7 @@ export class ResetTaskManagementRepositoryImpl implements ResetTaskManagementRep
       logger.error("Task operation execution failed", parsedError);
 
       return fail({
-        message: "app.api.system.db.reset.taskManagement.errors.internal.title",
+        message: t("errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });

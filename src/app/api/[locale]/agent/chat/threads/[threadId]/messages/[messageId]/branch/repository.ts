@@ -12,15 +12,16 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { chatMessages, chatThreads } from "../../../../../db";
-import { validateNotIncognito } from "../../../../../validation";
 import type {
   BranchPostRequestOutput,
   BranchPostResponseOutput,
   BranchPostUrlVariablesOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type BranchT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Branch Message Repository
@@ -35,15 +36,14 @@ export const branchRepository = {
     urlPathParams: BranchPostUrlVariablesOutput,
     data: BranchPostRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: BranchT,
     logger: EndpointLogger,
   ): Promise<ResponseType<BranchPostResponseOutput>> {
     try {
       // Type guard to ensure user has id
       if (!user.id) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.unauthorized.title",
+          message: t("post.errors.unauthorized.title"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -64,20 +64,17 @@ export const branchRepository = {
 
       if (!thread) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.threadNotFound.title",
+          message: t("post.errors.threadNotFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       // Reject incognito threads
-      const incognitoError = validateNotIncognito(
-        thread.rootFolderId,
-        locale,
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post",
-      );
-      if (incognitoError) {
-        return incognitoError;
+      if (thread.rootFolderId === "incognito") {
+        return fail({
+          message: t("post.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
       }
 
       // Get the source message to branch from
@@ -94,8 +91,7 @@ export const branchRepository = {
 
       if (!sourceMessage) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.messageNotFound.title",
+          message: t("post.errors.messageNotFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -103,8 +99,7 @@ export const branchRepository = {
       // Cannot branch from root message (no parent)
       if (!sourceMessage.parentId) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.cannotBranchFromRoot.title",
+          message: t("post.errors.cannotBranchFromRoot.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -155,8 +150,7 @@ export const branchRepository = {
     } catch (error) {
       logger.error("Failed to create branch", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.createFailed.title",
+        message: t("post.errors.createFailed.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

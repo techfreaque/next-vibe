@@ -9,10 +9,10 @@ import { z } from "zod";
 import { leadId } from "@/app/api/[locale]/leads/types";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  objectUnionField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedObjectUnionField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -25,19 +25,21 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { UserRole } from "../../user-roles/enum";
 import { userRoleResponseSchema } from "../../user-roles/types";
+import { scopedTranslation } from "./i18n";
 
 /**
  * GET /me - Retrieve current user profile or JWT payload
  * Supports both authenticated users (full profile) and public users (JWT payload only)
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["user", "private", "me"],
-  title: "app.api.user.private.me.get.title" as const,
-  description: "app.api.user.private.me.get.description" as const,
+  title: "get.title" as const,
+  description: "get.description" as const,
   icon: "user",
-  category: "app.api.user.category" as const,
-  tags: ["app.api.user.private.me.tag" as const],
+  category: "category" as const,
+  tags: ["tag" as const],
   allowedRoles: [
     UserRole.PUBLIC,
     UserRole.CUSTOMER,
@@ -46,187 +48,169 @@ const { GET } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
     UserRole.REMOTE_SKILL,
   ] as const,
-  fields: objectUnionField(
+  fields: scopedObjectUnionField(
+    scopedTranslation,
     {
       type: WidgetType.CONTAINER,
-      title: "app.api.user.private.me.get.response.title" as const,
-      description: "app.api.user.private.me.get.response.description" as const,
       layoutType: LayoutType.STACKED,
     },
     { response: true },
     "isPublic",
     [
       // Public user variant (JWT payload only)
-      objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.user.private.me.get.response.user.title" as const,
-          description:
-            "app.api.user.private.me.get.response.user.description" as const,
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
-          isPublic: responseField({
+      scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.user.title" as const,
+        description: "get.response.user.description" as const,
+        layoutType: LayoutType.STACKED,
+        usage: { response: true },
+        children: {
+          isPublic: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.user.private.me.get.response.isPublic" as const,
+            text: "get.response.isPublic" as const,
             schema: z.literal(true),
           }),
-          leadId: responseField({
+          leadId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.user.private.me.get.response.leadId" as const,
+            content: "get.response.leadId" as const,
             schema: leadId,
           }),
         },
-      ),
+      }),
       // Private user variant (full profile)
-      objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.user.private.me.get.response.user.title" as const,
-          description:
-            "app.api.user.private.me.get.response.user.description" as const,
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
-          isPublic: responseField({
+      scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.user.title" as const,
+        description: "get.response.user.description" as const,
+        layoutType: LayoutType.STACKED,
+        usage: { response: true },
+        children: {
+          isPublic: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.user.private.me.get.response.isPublic" as const,
+            text: "get.response.isPublic" as const,
             schema: z.literal(false),
           }),
-          id: responseField({
+          id: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.user.private.me.get.response.id" as const,
+            content: "get.response.id" as const,
             schema: z.uuid(),
           }),
-          leadId: responseField({
+          leadId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.user.private.me.get.response.leadId" as const,
+            content: "get.response.leadId" as const,
             schema: leadId.nullable(),
           }),
-          email: responseField({
+          email: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.user.private.me.get.response.email" as const,
+            content: "get.response.email" as const,
             schema: z.email({
               message: "validationErrors.user.profile.email_invalid",
             }),
           }),
-          privateName: responseField({
+          privateName: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.private.me.get.response.privateName" as const,
+            content: "get.response.privateName" as const,
             schema: z.string(),
           }),
-          publicName: responseField({
+          publicName: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.user.private.me.get.response.publicName" as const,
+            content: "get.response.publicName" as const,
             schema: z.string(),
           }),
-          locale: responseField({
+          locale: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.user.private.me.get.response.locale" as const,
+            content: "get.response.locale" as const,
             schema: z.string() as z.ZodType<CountryLanguage>,
           }),
-          isActive: responseField({
+          isActive: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.user.private.me.get.response.isActive" as const,
+            text: "get.response.isActive" as const,
             schema: z.boolean().nullable(),
           }),
-          emailVerified: responseField({
+          emailVerified: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.user.private.me.get.response.emailVerified" as const,
+            text: "get.response.emailVerified" as const,
             schema: z.boolean().nullable(),
           }),
-          requireTwoFactor: responseField({
+          requireTwoFactor: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.user.private.me.get.response.requireTwoFactor" as const,
+            text: "get.response.requireTwoFactor" as const,
             schema: z.boolean(),
           }),
-          marketingConsent: responseField({
+          marketingConsent: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.user.private.me.get.response.marketingConsent" as const,
+            text: "get.response.marketingConsent" as const,
             schema: z.boolean(),
           }),
-          userRoles: responseField({
+          userRoles: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.user.private.me.get.response.userRoles" as const,
+            content: "get.response.userRoles" as const,
             schema: z.array(userRoleResponseSchema),
           }),
-          createdAt: responseField({
+          createdAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.user.private.me.get.response.createdAt" as const,
+            content: "get.response.createdAt" as const,
             schema: dateSchema,
           }),
-          updatedAt: responseField({
+          updatedAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.user.private.me.get.response.updatedAt" as const,
+            content: "get.response.updatedAt" as const,
             schema: dateSchema,
           }),
-          stripeCustomerId: responseField({
+          stripeCustomerId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.private.me.get.response.stripeCustomerId" as const,
+            content: "get.response.stripeCustomerId" as const,
             schema: z.string().nullable(),
           }),
         },
-      ),
+      }),
     ] as const,
   ),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.user.private.me.get.errors.validation.title" as const,
-      description:
-        "app.api.user.private.me.get.errors.validation.description" as const,
+      title: "get.errors.validation.title" as const,
+      description: "get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.user.private.me.get.errors.unauthorized.title" as const,
-      description:
-        "app.api.user.private.me.get.errors.unauthorized.description" as const,
+      title: "get.errors.unauthorized.title" as const,
+      description: "get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.user.private.me.get.errors.forbidden.title" as const,
-      description:
-        "app.api.user.private.me.get.errors.forbidden.description" as const,
+      title: "get.errors.forbidden.title" as const,
+      description: "get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.user.private.me.get.errors.notFound.title" as const,
-      description:
-        "app.api.user.private.me.get.errors.notFound.description" as const,
+      title: "get.errors.notFound.title" as const,
+      description: "get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.user.private.me.get.errors.conflict.title" as const,
-      description:
-        "app.api.user.private.me.get.errors.conflict.description" as const,
+      title: "get.errors.conflict.title" as const,
+      description: "get.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.user.private.me.get.errors.network.title" as const,
-      description:
-        "app.api.user.private.me.get.errors.network.description" as const,
+      title: "get.errors.network.title" as const,
+      description: "get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.user.private.me.get.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.user.private.me.get.errors.unsavedChanges.description" as const,
+      title: "get.errors.unsavedChanges.title" as const,
+      description: "get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.user.private.me.get.errors.internal.title" as const,
-      description:
-        "app.api.user.private.me.get.errors.internal.description" as const,
+      title: "get.errors.internal.title" as const,
+      description: "get.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.user.private.me.get.errors.unknown.title" as const,
-      description:
-        "app.api.user.private.me.get.errors.unknown.description" as const,
+      title: "get.errors.unknown.title" as const,
+      description: "get.errors.unknown.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.user.private.me.get.success.title" as const,
-    description: "app.api.user.private.me.get.success.description" as const,
+    title: "get.success.title" as const,
+    description: "get.success.description" as const,
   },
 
   // === EXAMPLES ===
@@ -262,13 +246,14 @@ const { GET } = createEndpoint({
  * POST /me - Update current user profile
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["user", "private", "me"],
-  title: "app.api.user.private.me.update.title" as const,
-  description: "app.api.user.private.me.update.description" as const,
+  title: "update.title" as const,
+  description: "update.description" as const,
   icon: "user-check" as const,
-  category: "app.api.user.category" as const,
-  tags: ["app.api.user.private.me.tag" as const],
+  category: "category" as const,
+  tags: ["tag" as const],
   allowedRoles: [
     UserRole.PUBLIC,
     UserRole.CUSTOMER,
@@ -276,263 +261,223 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
   ] as const,
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.user.private.me.update.title" as const,
-      description: "app.api.user.private.me.update.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "update.title" as const,
+    description: "update.description" as const,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data", response: true },
+    children: {
       // === BASIC INFORMATION ===
-      basicInfo: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.user.private.me.update.groups.basicInfo.title" as const,
-          description:
-            "app.api.user.private.me.update.groups.basicInfo.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 2,
-        },
-        { request: "data" },
-        {
-          privateName: requestField({
+      basicInfo: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "update.groups.basicInfo.title" as const,
+        description: "update.groups.basicInfo.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 2,
+        usage: { request: "data" },
+        children: {
+          privateName: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
-            label:
-              "app.api.user.private.me.update.fields.privateName.label" as const,
-            description:
-              "app.api.user.private.me.update.fields.privateName.description" as const,
-            placeholder:
-              "app.api.user.private.me.update.fields.privateName.placeholder" as const,
+            label: "update.fields.privateName.label" as const,
+            description: "update.fields.privateName.description" as const,
+            placeholder: "update.fields.privateName.placeholder" as const,
             columns: 6,
             schema: z
               .string()
               .min(2, {
-                message:
-                  "app.api.user.private.me.update.fields.privateName.validation.minLength",
+                message: "update.fields.privateName.validation.minLength",
               })
               .max(50, {
-                message:
-                  "app.api.user.private.me.update.fields.privateName.validation.maxLength",
+                message: "update.fields.privateName.validation.maxLength",
               })
               .optional(),
           }),
 
-          publicName: requestField({
+          publicName: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
-            label:
-              "app.api.user.private.me.update.fields.publicName.label" as const,
-            description:
-              "app.api.user.private.me.update.fields.publicName.description" as const,
-            placeholder:
-              "app.api.user.private.me.update.fields.publicName.placeholder" as const,
+            label: "update.fields.publicName.label" as const,
+            description: "update.fields.publicName.description" as const,
+            placeholder: "update.fields.publicName.placeholder" as const,
             columns: 6,
             schema: z
               .string()
               .min(2, {
-                message:
-                  "app.api.user.private.me.update.fields.publicName.validation.minLength",
+                message: "update.fields.publicName.validation.minLength",
               })
               .max(50, {
-                message:
-                  "app.api.user.private.me.update.fields.publicName.validation.maxLength",
+                message: "update.fields.publicName.validation.maxLength",
               })
               .optional(),
           }),
 
-          email: requestField({
+          email: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.EMAIL,
-            label: "app.api.user.private.me.update.fields.email.label" as const,
-            description:
-              "app.api.user.private.me.update.fields.email.description" as const,
-            placeholder:
-              "app.api.user.private.me.update.fields.email.placeholder" as const,
+            label: "update.fields.email.label" as const,
+            description: "update.fields.email.description" as const,
+            placeholder: "update.fields.email.placeholder" as const,
             columns: 12,
             schema: z
               .string()
               .email({
-                message:
-                  "app.api.user.private.me.update.fields.email.validation.invalid",
+                message: "update.fields.email.validation.invalid",
               })
               .optional(),
           }),
         },
-      ),
+      }),
 
       // === PRIVACY AND PREFERENCES ===
-      privacySettings: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.user.private.me.update.groups.privacySettings.title" as const,
-          description:
-            "app.api.user.private.me.update.groups.privacySettings.description" as const,
-          layoutType: LayoutType.VERTICAL,
-        },
-        { request: "data" },
-        {
-          marketingConsent: requestField({
+      privacySettings: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "update.groups.privacySettings.title" as const,
+        description: "update.groups.privacySettings.description" as const,
+        layoutType: LayoutType.VERTICAL,
+        usage: { request: "data" },
+        children: {
+          marketingConsent: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
-            label:
-              "app.api.user.private.me.update.fields.marketingConsent.label" as const,
-            description:
-              "app.api.user.private.me.update.fields.marketingConsent.description" as const,
+            label: "update.fields.marketingConsent.label" as const,
+            description: "update.fields.marketingConsent.description" as const,
             columns: 12,
             schema: z.boolean().optional(),
           }),
         },
-      ),
+      }),
 
       // === RESPONSE FIELD ===
-      response: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.user.private.me.update.response.title" as const,
-          description:
-            "app.api.user.private.me.update.response.description" as const,
-          layoutType: LayoutType.VERTICAL,
-        },
-        { response: true },
-        {
-          success: responseField({
+      response: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "update.response.title" as const,
+        description: "update.response.description" as const,
+        layoutType: LayoutType.VERTICAL,
+        usage: { response: true },
+        children: {
+          success: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.user.private.me.update.response.success" as const,
+            text: "update.response.success" as const,
             schema: z
               .boolean()
               .describe("Whether the profile update was successful"),
           }),
-          message: responseField({
+          message: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.user.private.me.update.response.message" as const,
+            content: "update.response.message" as const,
             schema: z.string().describe("Human-readable update status message"),
           }),
           // === USER FIELDS (FLATTENED) ===
-          id: responseField({
+          id: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.user.private.me.update.response.id" as const,
+            content: "update.response.id" as const,
             schema: z.uuid(),
           }),
-          leadId: responseField({
+          leadId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.user.private.me.update.response.leadId" as const,
+            content: "update.response.leadId" as const,
             schema: leadId.nullable(),
           }),
-          isPublic: responseField({
+          isPublic: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.user.private.me.update.response.isPublic" as const,
+            text: "update.response.isPublic" as const,
             schema: z.literal(false),
           }),
-          email: responseField({
+          email: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.user.private.me.update.response.email" as const,
+            content: "update.response.email" as const,
             schema: z.email({
               message: "validationErrors.user.profile.email_invalid",
             }),
           }),
-          privateName: responseField({
+          privateName: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.private.me.update.response.privateName" as const,
+            content: "update.response.privateName" as const,
             schema: z.string(),
           }),
-          publicName: responseField({
+          publicName: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.private.me.update.response.publicName" as const,
+            content: "update.response.publicName" as const,
             schema: z.string(),
           }),
-          locale: responseField({
+          locale: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.user.private.me.update.response.locale" as const,
+            content: "update.response.locale" as const,
             schema: z.string() as z.ZodType<CountryLanguage>,
           }),
-          isActive: responseField({
+          isActive: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.user.private.me.update.response.isActive" as const,
+            text: "update.response.isActive" as const,
             schema: z.boolean().nullable(),
           }),
-          emailVerified: responseField({
+          emailVerified: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.user.private.me.update.response.emailVerified" as const,
+            text: "update.response.emailVerified" as const,
             schema: z.boolean().nullable(),
           }),
-          requireTwoFactor: responseField({
+          requireTwoFactor: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.user.private.me.update.response.requireTwoFactor" as const,
+            text: "update.response.requireTwoFactor" as const,
             schema: z.boolean().optional(),
           }),
-          marketingConsent: responseField({
+          marketingConsent: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.user.private.me.update.response.marketingConsent" as const,
+            text: "update.response.marketingConsent" as const,
             schema: z.boolean().optional(),
           }),
-          userRoles: responseField({
+          userRoles: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.private.me.update.response.userRoles" as const,
+            content: "update.response.userRoles" as const,
             schema: z.array(userRoleResponseSchema),
           }),
-          createdAt: responseField({
+          createdAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.private.me.update.response.createdAt" as const,
+            content: "update.response.createdAt" as const,
             schema: dateSchema,
           }),
-          updatedAt: responseField({
+          updatedAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.private.me.update.response.updatedAt" as const,
+            content: "update.response.updatedAt" as const,
             schema: dateSchema,
           }),
-          stripeCustomerId: responseField({
+          stripeCustomerId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.private.me.update.response.stripeCustomerId" as const,
+            content: "update.response.stripeCustomerId" as const,
             schema: z.string().nullable(),
           }),
-          changesSummary: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.user.private.me.update.response.changesSummary.title" as const,
-              description:
-                "app.api.user.private.me.update.response.changesSummary.description" as const,
-              layoutType: LayoutType.GRID,
-              columns: 12,
-            },
-            { response: true },
-            {
-              totalChanges: responseField({
+          changesSummary: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "update.response.changesSummary.title" as const,
+            description: "update.response.changesSummary.description" as const,
+            layoutType: LayoutType.GRID,
+            columns: 12,
+            usage: { response: true },
+            children: {
+              totalChanges: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.user.private.me.update.response.changesSummary.totalChanges" as const,
+                content: "update.response.changesSummary.totalChanges" as const,
                 schema: z.coerce.number().describe("Number of fields updated"),
               }),
-              changedFields: responseField({
+              changedFields: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.user.private.me.update.response.changesSummary.changedFields" as const,
+                  "update.response.changesSummary.changedFields" as const,
                 schema: z
                   .array(z.string())
                   .describe("List of updated field names"),
               }),
-              verificationRequired: responseField({
+              verificationRequired: scopedResponseField(scopedTranslation, {
                 type: WidgetType.BADGE,
-                text: "app.api.user.private.me.update.response.changesSummary.verificationRequired" as const,
+                text: "update.response.changesSummary.verificationRequired" as const,
                 schema: z
                   .boolean()
                   .describe("Whether email verification is needed"),
               }),
-              lastUpdated: responseField({
+              lastUpdated: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.user.private.me.update.response.changesSummary.lastUpdated" as const,
+                content: "update.response.changesSummary.lastUpdated" as const,
                 schema: z
                   .string()
                   .describe(
@@ -540,75 +485,63 @@ const { POST } = createEndpoint({
                   ),
               }),
             },
-          ),
-          nextSteps: responseField({
+          }),
+          nextSteps: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.private.me.update.response.nextSteps" as const,
+            content: "update.response.nextSteps" as const,
             schema: z
               .array(z.string())
               .describe("Recommended actions after profile update"),
           }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.user.private.me.update.errors.validation.title" as const,
-      description:
-        "app.api.user.private.me.update.errors.validation.description" as const,
+      title: "update.errors.validation.title" as const,
+      description: "update.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.user.private.me.update.errors.unauthorized.title" as const,
-      description:
-        "app.api.user.private.me.update.errors.unauthorized.description" as const,
+      title: "update.errors.unauthorized.title" as const,
+      description: "update.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.user.private.me.update.errors.forbidden.title" as const,
-      description:
-        "app.api.user.private.me.update.errors.forbidden.description" as const,
+      title: "update.errors.forbidden.title" as const,
+      description: "update.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.user.private.me.update.errors.notFound.title" as const,
-      description:
-        "app.api.user.private.me.update.errors.notFound.description" as const,
+      title: "update.errors.notFound.title" as const,
+      description: "update.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.user.private.me.update.errors.conflict.title" as const,
-      description:
-        "app.api.user.private.me.update.errors.conflict.description" as const,
+      title: "update.errors.conflict.title" as const,
+      description: "update.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.user.private.me.update.errors.network.title" as const,
-      description:
-        "app.api.user.private.me.update.errors.network.description" as const,
+      title: "update.errors.network.title" as const,
+      description: "update.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.user.private.me.update.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.user.private.me.update.errors.unsavedChanges.description" as const,
+      title: "update.errors.unsavedChanges.title" as const,
+      description: "update.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.user.private.me.update.errors.internal.title" as const,
-      description:
-        "app.api.user.private.me.update.errors.internal.description" as const,
+      title: "update.errors.internal.title" as const,
+      description: "update.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.user.private.me.update.errors.unknown.title" as const,
-      description:
-        "app.api.user.private.me.update.errors.unknown.description" as const,
+      title: "update.errors.unknown.title" as const,
+      description: "update.errors.unknown.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.user.private.me.update.success.title" as const,
-    description: "app.api.user.private.me.update.success.description" as const,
+    title: "update.success.title" as const,
+    description: "update.success.description" as const,
   },
 
   // === EXAMPLES ===
@@ -712,13 +645,14 @@ const { POST } = createEndpoint({
  * DELETE /me - Delete current user account
  */
 const { DELETE } = createEndpoint({
+  scopedTranslation,
   method: Methods.DELETE,
   path: ["user", "private", "me"],
-  title: "app.api.user.private.me.delete.title" as const,
-  description: "app.api.user.private.me.delete.description" as const,
+  title: "delete.title" as const,
+  description: "delete.description" as const,
   icon: "user-x" as const,
-  category: "app.api.user.category" as const,
-  tags: ["app.api.user.private.me.tag" as const],
+  category: "category" as const,
+  tags: ["tag" as const],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
@@ -726,80 +660,66 @@ const { DELETE } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
     UserRole.AI_TOOL_OFF,
   ] as const,
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.user.private.me.delete.response.title" as const,
-      description:
-        "app.api.user.private.me.delete.response.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { response: true },
-    {
-      exists: responseField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "delete.response.title" as const,
+    description: "delete.response.description" as const,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { response: true },
+    children: {
+      exists: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.user.private.me.delete.response.title" as const,
+        content: "delete.response.title" as const,
         schema: z.boolean(),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.user.private.me.delete.errors.validation.title" as const,
-      description:
-        "app.api.user.private.me.delete.errors.validation.description" as const,
+      title: "delete.errors.validation.title" as const,
+      description: "delete.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.user.private.me.delete.errors.unauthorized.title" as const,
-      description:
-        "app.api.user.private.me.delete.errors.unauthorized.description" as const,
+      title: "delete.errors.unauthorized.title" as const,
+      description: "delete.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.user.private.me.delete.errors.forbidden.title" as const,
-      description:
-        "app.api.user.private.me.delete.errors.forbidden.description" as const,
+      title: "delete.errors.forbidden.title" as const,
+      description: "delete.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.user.private.me.delete.errors.notFound.title" as const,
-      description:
-        "app.api.user.private.me.delete.errors.notFound.description" as const,
+      title: "delete.errors.notFound.title" as const,
+      description: "delete.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.user.private.me.delete.errors.conflict.title" as const,
-      description:
-        "app.api.user.private.me.delete.errors.conflict.description" as const,
+      title: "delete.errors.conflict.title" as const,
+      description: "delete.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.user.private.me.delete.errors.network.title" as const,
-      description:
-        "app.api.user.private.me.delete.errors.network.description" as const,
+      title: "delete.errors.network.title" as const,
+      description: "delete.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.user.private.me.delete.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.user.private.me.delete.errors.unsavedChanges.description" as const,
+      title: "delete.errors.unsavedChanges.title" as const,
+      description: "delete.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.user.private.me.delete.errors.internal.title" as const,
-      description:
-        "app.api.user.private.me.delete.errors.internal.description" as const,
+      title: "delete.errors.internal.title" as const,
+      description: "delete.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.user.private.me.delete.errors.unknown.title" as const,
-      description:
-        "app.api.user.private.me.delete.errors.unknown.description" as const,
+      title: "delete.errors.unknown.title" as const,
+      description: "delete.errors.unknown.description" as const,
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.user.private.me.delete.success.title" as const,
-    description: "app.api.user.private.me.delete.success.description" as const,
+    title: "delete.success.title" as const,
+    description: "delete.success.description" as const,
   },
 
   // === EXAMPLES ===

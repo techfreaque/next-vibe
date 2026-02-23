@@ -13,8 +13,8 @@ import { dockerOperationsRepository as repository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, locale, logger }) => {
-      return repository.executeCommand(data, locale, logger);
+    handler: ({ data, t, logger }) => {
+      return repository.executeCommand(data, t, logger);
     },
   },
 });

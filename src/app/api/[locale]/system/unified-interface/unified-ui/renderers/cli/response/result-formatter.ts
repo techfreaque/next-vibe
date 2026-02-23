@@ -6,11 +6,10 @@
 import { parseError } from "next-vibe/shared/utils";
 import { createElement } from "react";
 
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { RouteExecutionResult } from "../../../../cli/runtime/route-executor";
-import type { InferJwtPayloadTypeFromRoles } from "../../../../shared/endpoints/route/handler";
 import type { EndpointLogger } from "../../../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import { Platform } from "../../../../shared/types/platform";
@@ -32,7 +31,7 @@ export class CliResultFormatter {
     verbose: boolean,
     logger: EndpointLogger,
     endpoint: CreateApiEndpointAny | null,
-    user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
+    user: JwtPayloadType,
   ): Promise<string> {
     if (!result.success) {
       return CliErrorFormatter.formatErrorResult(result, locale, verbose);
@@ -98,7 +97,7 @@ export class CliResultFormatter {
     endpoint: CreateApiEndpointAny,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
+    user: JwtPayloadType,
   ): Promise<string> {
     try {
       const perfStart = performance.now();

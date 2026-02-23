@@ -12,11 +12,12 @@ import { CreditRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: async ({ user, locale, logger }) => {
+    handler: async ({ user, locale, logger, t }) => {
       return await CreditRepository.getCreditBalanceForUser(
         user,
         locale,
         logger,
+        t,
       );
     },
   },

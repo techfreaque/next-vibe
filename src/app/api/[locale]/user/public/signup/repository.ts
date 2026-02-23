@@ -15,12 +15,15 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { LeadAuthRepository } from "@/app/api/[locale]/leads/auth/repository";
 import { LeadsRepository } from "@/app/api/[locale]/leads/repository";
+import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation as signupScopedTranslation } from "./i18n";
+import type { scopedTranslation } from "./i18n";
 
 import { AuthRepository } from "../../auth/repository";
 import type { JwtPayloadType, JwtPrivatePayloadType } from "../../auth/types";
@@ -41,6 +44,8 @@ import type {
 } from "./definition";
 import type { NewUser } from "../../db";
 
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+
 /**
  * Signup repository interface
  */
@@ -53,6 +58,7 @@ export interface SignupRepository {
    * @param logger - Logger instance for debugging and monitoring
    * @param request - Next.js request object (optional for CLI context)
    * @param platform - Platform context (web, cli, ai-tool, etc.)
+   * @param t - Scoped translation function
    * @returns Success or error result
    */
   registerUser(
@@ -62,6 +68,7 @@ export interface SignupRepository {
     logger: EndpointLogger,
     request: NextRequest | undefined,
     platform: Platform,
+    t: ModuleT,
   ): Promise<ResponseType<SignupPostResponseOutput>>;
 }
 
@@ -85,9 +92,8 @@ export class SignupRepositoryImpl implements SignupRepository {
     logger: EndpointLogger,
     request: NextRequest | undefined,
     platform: Platform,
+    t: ModuleT,
   ): Promise<ResponseType<SignupPostResponseOutput>> {
-    const { t } = simpleT(locale);
-
     try {
       // Extract fields from flat structure
       const email = data.email;
@@ -106,13 +112,11 @@ export class SignupRepositoryImpl implements SignupRepository {
           email,
         });
         return fail({
-          message: "app.api.user.auth.errors.validation_failed",
+          message: t("fields.confirmPassword.validation.mismatch"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             field: "confirmPassword",
-            message: t(
-              "app.api.user.public.signup.fields.confirmPassword.validation.mismatch",
-            ),
+            message: t("fields.confirmPassword.validation.mismatch"),
           },
         });
       }
@@ -128,11 +132,11 @@ export class SignupRepositoryImpl implements SignupRepository {
       }
       if (emailCheckResponse.data) {
         return fail({
-          message: "app.api.user.public.signup.errors.conflict.title",
+          message: t("errors.conflict.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             field: "email",
-            message: t("app.api.user.errors.emailAlreadyInUse"),
+            message: t("errors.conflict.description"),
           },
         });
       }
@@ -176,6 +180,7 @@ export class SignupRepositoryImpl implements SignupRepository {
           user.leadId,
           referralCode,
           logger,
+          locale,
         );
       }
 
@@ -184,14 +189,17 @@ export class SignupRepositoryImpl implements SignupRepository {
         userData.id,
         user.leadId,
         logger,
+        locale,
       );
 
       // Merge lead wallet into user wallet immediately (not lazy)
       // This ensures user gets their pre-signup credits right away
+      const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
       const mergeResult = await CreditRepository.mergePendingLeadWallets(
         userData.id,
         [user.leadId],
         logger,
+        creditsT,
       );
       let creditMergeFailed = false;
       if (!mergeResult.success) {
@@ -219,6 +227,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       const rolesResult = await UserRolesRepository.getUserRoles(
         userData.id,
         logger,
+        locale,
       );
       // Default to CUSTOMER role if roles fetch fails
       const roles = rolesResult.success
@@ -243,7 +252,11 @@ export class SignupRepositoryImpl implements SignupRepository {
       };
 
       // Sign JWT token
-      const tokenResponse = await AuthRepository.signJwt(tokenPayload, logger);
+      const tokenResponse = await AuthRepository.signJwt(
+        tokenPayload,
+        logger,
+        locale,
+      );
       if (!tokenResponse.success) {
         logger.error("Failed to sign JWT token after signup", {
           userId: userData.id,
@@ -258,7 +271,7 @@ export class SignupRepositoryImpl implements SignupRepository {
           token: tokenResponse.data,
           expiresAt,
         };
-        await SessionRepository.create(sessionData);
+        await SessionRepository.create(sessionData, locale);
 
         // Store auth token using platform-specific handler
         const storeResult = await AuthRepository.storeAuthTokenForPlatform(
@@ -267,6 +280,7 @@ export class SignupRepositoryImpl implements SignupRepository {
           leadIdResult.leadId,
           platform,
           logger,
+          locale,
         );
         if (storeResult.success) {
           logger.debug("Auth token stored successfully after signup", {
@@ -293,13 +307,13 @@ export class SignupRepositoryImpl implements SignupRepository {
 
       // Return simple message response
       return success<SignupPostResponseOutput>({
-        message: "app.api.user.public.signup.success.message",
+        message: "Registration successful",
       });
     } catch (error) {
       logger.error("Registration error", parseError(error));
       const parsedError = parseError(error);
       return fail({
-        message: "app.api.user.public.signup.errors.internal.title",
+        message: t("errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           email: data.email ?? "unknown",
@@ -357,6 +371,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       const userResponse = await UserRepository.createWithHashedPassword(
         userData,
         logger,
+        locale,
       );
       if (!userResponse.success) {
         return userResponse;
@@ -371,6 +386,7 @@ export class SignupRepositoryImpl implements SignupRepository {
             role,
           },
           logger,
+          locale,
         );
       } else {
         logger.debug(
@@ -395,6 +411,7 @@ export class SignupRepositoryImpl implements SignupRepository {
       const userRolesResult = await UserRolesRepository.getUserRoles(
         userResponse.data.id,
         logger,
+        locale,
       );
       const userRoles = userRolesResult.success
         ? userRolesResult.data
@@ -413,8 +430,9 @@ export class SignupRepositoryImpl implements SignupRepository {
       return success(userResponse.data);
     } catch (error) {
       logger.error("User creation error", parseError(error));
+      const { t: errT } = signupScopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.public.signup.errors.internal.title",
+        message: errT("errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           email: userInput.email,
@@ -445,8 +463,9 @@ export class SignupRepositoryImpl implements SignupRepository {
       return success(existingUserResponse.success); // true if email exists
     } catch (error) {
       logger.error("Error checking email registration", parseError(error));
+      const { t: checkErrT } = signupScopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.public.signup.emailCheck.errors.internal.title",
+        message: checkErrT("emailCheck.errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message, email },
       });
@@ -476,10 +495,12 @@ export class SignupRepositoryImpl implements SignupRepository {
       });
 
       // Convert lead with both email (for anonymous leads) and userId (for user relationship)
+      const { t: leadsT } = leadsScopedTranslation.scopedT(locale);
       const convertResult = await LeadsRepository.convertLead(
         leadId,
         { email, userId },
         logger,
+        leadsT,
       );
 
       if (convertResult.success) {

@@ -5,6 +5,7 @@
 
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { scopedTranslation as tasksScopedTranslation } from "@/app/api/[locale]/system/unified-interface/tasks/i18n";
 
 import { CronTasksRepository } from "../repository";
 import { endpoints } from "./definition";
@@ -12,16 +13,18 @@ import { endpoints } from "./definition";
 export const { GET, PUT, DELETE, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: async ({ urlPathParams, user, logger }) => {
+    handler: async ({ urlPathParams, user, locale, logger }) => {
+      const { t: tasksT } = tasksScopedTranslation.scopedT(locale);
       return await CronTasksRepository.getTaskById(
         urlPathParams.id,
         user,
+        tasksT,
         logger,
       );
     },
   },
   [Methods.PUT]: {
-    handler: async ({ data, urlPathParams, user, logger }) => {
+    handler: async ({ data, urlPathParams, user, locale, logger }) => {
       const updates: Partial<
         Parameters<typeof CronTasksRepository.updateTask>[1]
       > = {};
@@ -55,19 +58,23 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
       if (data.runOnce !== undefined) {
         updates.runOnce = data.runOnce;
       }
+      const { t: tasksT } = tasksScopedTranslation.scopedT(locale);
       return await CronTasksRepository.updateTask(
         urlPathParams.id,
         updates,
         user,
+        tasksT,
         logger,
       );
     },
   },
   [Methods.DELETE]: {
-    handler: async ({ urlPathParams, user, logger }) => {
+    handler: async ({ urlPathParams, user, locale, logger }) => {
+      const { t: tasksT } = tasksScopedTranslation.scopedT(locale);
       return await CronTasksRepository.deleteTask(
         urlPathParams.id,
         user,
+        tasksT,
         logger,
       );
     },

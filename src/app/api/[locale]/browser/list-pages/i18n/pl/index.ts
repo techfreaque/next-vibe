@@ -66,4 +66,9 @@ export const translations: typeof enTranslations = {
     title: "Strony pomyślnie wylistowane",
     description: "Otwarte strony zostały pomyślnie wylistowane",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    navigationAutomation: "Automatyzacja nawigacji",
+  },
 };

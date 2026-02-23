@@ -100,6 +100,11 @@ export const translations: typeof enTranslations = {
         title: "Coś poszło nie tak",
         description: "Nie mogliśmy ukończyć wyszukiwania. Spróbuj ponownie",
       },
+      notConfigured: {
+        title:
+          "Klucz API {{label}} nie jest skonfigurowany. Dodaj {{envKey}}=<twój-klucz> do pliku .env. Pobierz klucz na {{url}}",
+        description: "Skonfiguruj {{label}}, aby włączyć wyszukiwanie w sieci",
+      },
     },
     success: {
       title: "Wyszukiwanie zakończone sukcesem",

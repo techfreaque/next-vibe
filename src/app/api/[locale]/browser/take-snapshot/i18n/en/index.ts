@@ -70,4 +70,9 @@ export const translations = {
     title: "Snapshot Captured Successfully",
     description: "The snapshot was captured successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    captureAutomation: "Capture Automation",
+  },
 };

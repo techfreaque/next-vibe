@@ -20,6 +20,9 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import { BulkMessageAction } from "../../enum";
 import type { BulkMessageResponseOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 interface BulkActionData {
   ids: string[];
@@ -29,6 +32,7 @@ interface BulkActionData {
 export async function bulkUpdateMessages(
   data: BulkActionData,
   logger: EndpointLogger,
+  t: ModuleT,
 ): Promise<ResponseType<BulkMessageResponseOutput>> {
   try {
     logger.debug("Bulk updating messages", {
@@ -56,8 +60,7 @@ export async function bulkUpdateMessages(
         break;
       default:
         return fail({
-          message:
-            "app.api.emails.imapClient.messages.bulk.post.errors.validation.title",
+          message: t("post.errors.validation.title"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
           messageParams: { error: `Unknown action: ${data.action}` },
         });
@@ -79,8 +82,7 @@ export async function bulkUpdateMessages(
   } catch (err) {
     logger.error("Bulk update failed", parseError(err));
     return fail({
-      message:
-        "app.api.emails.imapClient.messages.bulk.post.errors.server.title",
+      message: t("post.errors.server.title"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: { error: parseError(err).message },
     });

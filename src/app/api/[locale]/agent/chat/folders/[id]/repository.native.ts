@@ -59,6 +59,8 @@ export class FolderRepository {
     _data: FolderUpdateRequestOutput & { id: string },
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
   ): Promise<ResponseType<FolderUpdateResponseOutput>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("updateFolder is not implemented on native");
@@ -71,6 +73,8 @@ export class FolderRepository {
     _data: { id: string },
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
   ): Promise<ResponseType<FolderDeleteResponseOutput>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("deleteFolder is not implemented on native");

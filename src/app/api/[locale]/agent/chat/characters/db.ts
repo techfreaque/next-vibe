@@ -19,8 +19,8 @@ import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum
 import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { users } from "@/app/api/[locale]/user/db";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type { ToolConfigItem } from "../settings/definition";
 import type {
   CharacterCategoryValue,
   CharacterOwnershipTypeValue,
@@ -40,9 +40,9 @@ export const customCharacters = pgTable("custom_characters", {
     .references(() => users.id, { onDelete: "cascade" }),
 
   // Character details
-  name: text("name").$type<TranslationKey>().notNull(),
-  description: text("description").$type<TranslationKey>().notNull(),
-  tagline: text("tagline").$type<TranslationKey>().notNull(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  tagline: text("tagline").notNull(),
   icon: text("icon").$type<IconKey>().notNull(),
   systemPrompt: text("system_prompt"),
 
@@ -63,6 +63,10 @@ export const customCharacters = pgTable("custom_characters", {
 
   // Auto-compacting token threshold (null = use global/settings default)
   compactTrigger: integer("compact_trigger"),
+
+  // Tool configuration — null = inherit from settings (default)
+  activeTools: jsonb("active_tools").$type<ToolConfigItem[] | null>(),
+  visibleTools: jsonb("visible_tools").$type<ToolConfigItem[] | null>(),
 
   // Timestamps
   createdAt: timestamp("created_at").defaultNow().notNull(),

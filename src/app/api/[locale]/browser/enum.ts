@@ -5,6 +5,8 @@
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * Chrome DevTools MCP Tool options
  */
@@ -12,44 +14,44 @@ export const {
   enum: BrowserTool,
   options: BrowserToolOptions,
   Value: BrowserToolValue,
-} = createEnumOptions({
+} = createEnumOptions(scopedTranslation, {
   // Input automation tools (8)
-  CLICK: "app.api.browser.tool.click",
-  DRAG: "app.api.browser.tool.drag",
-  FILL: "app.api.browser.tool.fill",
-  FILL_FORM: "app.api.browser.tool.fillForm",
-  HANDLE_DIALOG: "app.api.browser.tool.handleDialog",
-  HOVER: "app.api.browser.tool.hover",
-  PRESS_KEY: "app.api.browser.tool.pressKey",
-  UPLOAD_FILE: "app.api.browser.tool.uploadFile",
+  CLICK: "tool.click",
+  DRAG: "tool.drag",
+  FILL: "tool.fill",
+  FILL_FORM: "tool.fillForm",
+  HANDLE_DIALOG: "tool.handleDialog",
+  HOVER: "tool.hover",
+  PRESS_KEY: "tool.pressKey",
+  UPLOAD_FILE: "tool.uploadFile",
 
   // Navigation automation tools (6)
-  CLOSE_PAGE: "app.api.browser.tool.closePage",
-  LIST_PAGES: "app.api.browser.tool.listPages",
-  NAVIGATE_PAGE: "app.api.browser.tool.navigatePage",
-  NEW_PAGE: "app.api.browser.tool.newPage",
-  SELECT_PAGE: "app.api.browser.tool.selectPage",
-  WAIT_FOR: "app.api.browser.tool.waitFor",
+  CLOSE_PAGE: "tool.closePage",
+  LIST_PAGES: "tool.listPages",
+  NAVIGATE_PAGE: "tool.navigatePage",
+  NEW_PAGE: "tool.newPage",
+  SELECT_PAGE: "tool.selectPage",
+  WAIT_FOR: "tool.waitFor",
 
   // Emulation tools (2)
-  EMULATE: "app.api.browser.tool.emulate",
-  RESIZE_PAGE: "app.api.browser.tool.resizePage",
+  EMULATE: "tool.emulate",
+  RESIZE_PAGE: "tool.resizePage",
 
   // Performance tools (3)
-  PERFORMANCE_ANALYZE_INSIGHT: "app.api.browser.tool.performanceAnalyzeInsight",
-  PERFORMANCE_START_TRACE: "app.api.browser.tool.performanceStartTrace",
-  PERFORMANCE_STOP_TRACE: "app.api.browser.tool.performanceStopTrace",
+  PERFORMANCE_ANALYZE_INSIGHT: "tool.performanceAnalyzeInsight",
+  PERFORMANCE_START_TRACE: "tool.performanceStartTrace",
+  PERFORMANCE_STOP_TRACE: "tool.performanceStopTrace",
 
   // Network tools (2)
-  GET_NETWORK_REQUEST: "app.api.browser.tool.getNetworkRequest",
-  LIST_NETWORK_REQUESTS: "app.api.browser.tool.listNetworkRequests",
+  GET_NETWORK_REQUEST: "tool.getNetworkRequest",
+  LIST_NETWORK_REQUESTS: "tool.listNetworkRequests",
 
   // Debugging tools (5)
-  EVALUATE_SCRIPT: "app.api.browser.tool.evaluateScript",
-  GET_CONSOLE_MESSAGE: "app.api.browser.tool.getConsoleMessage",
-  LIST_CONSOLE_MESSAGES: "app.api.browser.tool.listConsoleMessages",
-  TAKE_SCREENSHOT: "app.api.browser.tool.takeScreenshot",
-  TAKE_SNAPSHOT: "app.api.browser.tool.takeSnapshot",
+  EVALUATE_SCRIPT: "tool.evaluateScript",
+  GET_CONSOLE_MESSAGE: "tool.getConsoleMessage",
+  LIST_CONSOLE_MESSAGES: "tool.listConsoleMessages",
+  TAKE_SCREENSHOT: "tool.takeScreenshot",
+  TAKE_SNAPSHOT: "tool.takeSnapshot",
 });
 
 // Create DB enum array for Drizzle
@@ -89,11 +91,11 @@ export const {
   enum: BrowserToolStatus,
   options: BrowserToolStatusOptions,
   Value: BrowserToolStatusValue,
-} = createEnumOptions({
-  PENDING: "app.api.browser.status.pending",
-  RUNNING: "app.api.browser.status.running",
-  COMPLETED: "app.api.browser.status.completed",
-  FAILED: "app.api.browser.status.failed",
+} = createEnumOptions(scopedTranslation, {
+  PENDING: "status.pending",
+  RUNNING: "status.running",
+  COMPLETED: "status.completed",
+  FAILED: "status.failed",
 });
 
 // Create DB enum array for Drizzle

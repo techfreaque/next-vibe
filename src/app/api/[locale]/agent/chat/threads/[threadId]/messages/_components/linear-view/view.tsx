@@ -17,7 +17,10 @@ import {
   chatProse,
   chatShadows,
 } from "@/app/[locale]/chat/lib/design-tokens";
-import { DebugSystemPrompt } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/debug-component";
+import {
+  DebugSystemPrompt,
+  DebugTrailingContext,
+} from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/debug-component";
 import { createMetadataSystemMessage } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/message-metadata";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole, ViewMode } from "@/app/api/[locale]/agent/chat/enum";
@@ -191,6 +194,21 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                 </Div>
               )}
 
+            {/* In debug mode: trailing system message + context appear before edit/retry,
+                because the AI receives history up to (not including) the edited message,
+                then trailing, then context — matching the actual messages array order. */}
+            {viewMode === ViewMode.DEBUG && (isEditing || isRetrying) && (
+              <DebugTrailingContext
+                locale={locale}
+                rootFolderId={rootFolderId}
+                subFolderId={subFolderId}
+                characterId={selectedCharacter}
+                selectedModel={selectedModel}
+                user={user}
+                logger={logger}
+              />
+            )}
+
             <ErrorBoundary locale={locale}>
               <Div className={cn(chatAnimations.slideIn, "group")}>
                 {isEditing ? (
@@ -358,6 +376,22 @@ export const LinearMessageView = React.memo(function LinearMessageView({
           </React.Fragment>
         );
       })}
+
+      {/* Trailing system message + upcoming context — shown after all messages when not editing/retrying.
+          When editing/retrying, it appears inline before the editor above. */}
+      {viewMode === ViewMode.DEBUG &&
+        !editingMessageId &&
+        !retryingMessageId && (
+          <DebugTrailingContext
+            locale={locale}
+            rootFolderId={rootFolderId}
+            subFolderId={subFolderId}
+            characterId={selectedCharacter}
+            selectedModel={selectedModel}
+            user={user}
+            logger={logger}
+          />
+        )}
     </>
   );
 });

@@ -1,6 +1,11 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Chat",
+  tags: {
+    favorites: "Ulubione",
+  },
+
   post: {
     title: "Utwórz ulubiony",
     description: "Utwórz nową ulubioną konfigurację postaci",
@@ -177,6 +182,11 @@ export const translations: typeof enTranslations = {
     },
     modifyCharacter: {
       label: "Modyfikuj postać",
+    },
+    character: {
+      name: "Nazwa",
+      tagline: "Slogan",
+      description: "Opis",
     },
   },
 };

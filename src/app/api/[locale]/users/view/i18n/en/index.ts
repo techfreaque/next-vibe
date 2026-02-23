@@ -1,4 +1,10 @@
 export const translations = {
+  category: "Users",
+  tags: {
+    user: "User",
+    view: "View",
+  },
+
   badge: "User Details",
   get: {
     title: "View User",

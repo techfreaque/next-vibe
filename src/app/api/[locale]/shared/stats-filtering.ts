@@ -9,17 +9,19 @@ import { z } from "zod";
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * Time Period Enum
  * Defines different time periods for historical data aggregation
  */
 export const { enum: TimePeriod, options: TimePeriodOptions } =
-  createEnumOptions({
-    DAY: "app.api.shared.stats.timePeriod.day",
-    WEEK: "app.api.shared.stats.timePeriod.week",
-    MONTH: "app.api.shared.stats.timePeriod.month",
-    QUARTER: "app.api.shared.stats.timePeriod.quarter",
-    YEAR: "app.api.shared.stats.timePeriod.year",
+  createEnumOptions(scopedTranslation, {
+    DAY: "stats.timePeriod.day",
+    WEEK: "stats.timePeriod.week",
+    MONTH: "stats.timePeriod.month",
+    QUARTER: "stats.timePeriod.quarter",
+    YEAR: "stats.timePeriod.year",
   });
 
 /**
@@ -27,21 +29,21 @@ export const { enum: TimePeriod, options: TimePeriodOptions } =
  * Common date range presets for quick filtering
  */
 export const { enum: DateRangePreset, options: DateRangePresetOptions } =
-  createEnumOptions({
-    TODAY: "app.api.shared.stats.dateRange.today",
-    YESTERDAY: "app.api.shared.stats.dateRange.yesterday",
-    LAST_7_DAYS: "app.api.shared.stats.dateRange.last7Days",
-    LAST_30_DAYS: "app.api.shared.stats.dateRange.last30Days",
-    LAST_90_DAYS: "app.api.shared.stats.dateRange.last90Days",
-    THIS_WEEK: "app.api.shared.stats.dateRange.thisWeek",
-    LAST_WEEK: "app.api.shared.stats.dateRange.lastWeek",
-    THIS_MONTH: "app.api.shared.stats.dateRange.thisMonth",
-    LAST_MONTH: "app.api.shared.stats.dateRange.lastMonth",
-    THIS_QUARTER: "app.api.shared.stats.dateRange.thisQuarter",
-    LAST_QUARTER: "app.api.shared.stats.dateRange.lastQuarter",
-    THIS_YEAR: "app.api.shared.stats.dateRange.thisYear",
-    LAST_YEAR: "app.api.shared.stats.dateRange.lastYear",
-    CUSTOM: "app.api.shared.stats.dateRange.custom",
+  createEnumOptions(scopedTranslation, {
+    TODAY: "stats.dateRange.today",
+    YESTERDAY: "stats.dateRange.yesterday",
+    LAST_7_DAYS: "stats.dateRange.last7Days",
+    LAST_30_DAYS: "stats.dateRange.last30Days",
+    LAST_90_DAYS: "stats.dateRange.last90Days",
+    THIS_WEEK: "stats.dateRange.thisWeek",
+    LAST_WEEK: "stats.dateRange.lastWeek",
+    THIS_MONTH: "stats.dateRange.thisMonth",
+    LAST_MONTH: "stats.dateRange.lastMonth",
+    THIS_QUARTER: "stats.dateRange.thisQuarter",
+    LAST_QUARTER: "stats.dateRange.lastQuarter",
+    THIS_YEAR: "stats.dateRange.thisYear",
+    LAST_YEAR: "stats.dateRange.lastYear",
+    CUSTOM: "stats.dateRange.custom",
   });
 
 /**
@@ -49,12 +51,13 @@ export const { enum: DateRangePreset, options: DateRangePresetOptions } =
  * Different chart visualization types
  */
 export const { enum: ChartType, options: ChartTypeOptions } = createEnumOptions(
+  scopedTranslation,
   {
-    LINE: "app.api.shared.stats.chartType.line",
-    BAR: "app.api.shared.stats.chartType.bar",
-    AREA: "app.api.shared.stats.chartType.area",
-    PIE: "app.api.shared.stats.chartType.pie",
-    DONUT: "app.api.shared.stats.chartType.donut",
+    LINE: "stats.chartType.line",
+    BAR: "stats.chartType.bar",
+    AREA: "stats.chartType.area",
+    PIE: "stats.chartType.pie",
+    DONUT: "stats.chartType.donut",
   },
 );
 

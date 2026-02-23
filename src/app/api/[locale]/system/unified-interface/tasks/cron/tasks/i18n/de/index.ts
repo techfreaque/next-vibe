@@ -5,6 +5,10 @@ export const translations: typeof enTranslations = {
   tags: {
     tasks: "Tasks",
   },
+  errors: {
+    fetchCronTasks: "Fehler beim Abrufen der Cron-Aufgaben",
+    createCronTask: "Fehler beim Erstellen der Cron-Aufgabe",
+  },
   list: {
     columns: {
       createdAt: "Erstellt am",

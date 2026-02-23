@@ -30,7 +30,8 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { ComponentType, JSX, ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "./i18n";
 
 interface EmailsAdminLayoutClientProps {
   children: ReactNode;
@@ -54,7 +55,7 @@ export function EmailsAdminLayoutClient({
   locale,
 }: EmailsAdminLayoutClientProps): JSX.Element {
   const pathname = usePathname();
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   const sections: SidebarSection[] = [
     {
@@ -64,14 +65,14 @@ export function EmailsAdminLayoutClient({
           key: "inbox",
           href: `/${locale}/admin/emails/imap/messages`,
           icon: Inbox,
-          label: t("app.admin.emails.imap.nav.messages"),
+          label: t("imap.nav.messages"),
           pattern: new RegExp(`^/${locale}/admin/emails/imap/messages`),
         },
         {
           key: "starred",
           href: `/${locale}/admin/emails/imap/messages?status=flagged`,
           icon: Star,
-          label: t("app.admin.emails.imap.nav.starred"),
+          label: t("imap.nav.starred"),
           pattern: new RegExp(
             `^/${locale}/admin/emails/imap/messages.*status=flagged`,
           ),
@@ -80,7 +81,7 @@ export function EmailsAdminLayoutClient({
           key: "sent",
           href: `/${locale}/admin/emails/imap/messages?specialUse=sent`,
           icon: Send,
-          label: t("app.admin.emails.imap.nav.sent"),
+          label: t("imap.nav.sent"),
           pattern: new RegExp(
             `^/${locale}/admin/emails/imap/messages.*specialUse=sent`,
           ),
@@ -89,7 +90,7 @@ export function EmailsAdminLayoutClient({
           key: "drafts",
           href: `/${locale}/admin/emails/imap/messages?specialUse=drafts`,
           icon: FileText,
-          label: t("app.admin.emails.imap.nav.drafts"),
+          label: t("imap.nav.drafts"),
           pattern: new RegExp(
             `^/${locale}/admin/emails/imap/messages.*specialUse=drafts`,
           ),
@@ -98,7 +99,7 @@ export function EmailsAdminLayoutClient({
           key: "spam",
           href: `/${locale}/admin/emails/imap/messages?specialUse=junk`,
           icon: Archive,
-          label: t("app.admin.emails.imap.nav.spam"),
+          label: t("imap.nav.spam"),
           pattern: new RegExp(
             `^/${locale}/admin/emails/imap/messages.*specialUse=junk`,
           ),
@@ -107,7 +108,7 @@ export function EmailsAdminLayoutClient({
           key: "trash",
           href: `/${locale}/admin/emails/imap/messages?specialUse=trash`,
           icon: Trash2,
-          label: t("app.admin.emails.imap.nav.trash"),
+          label: t("imap.nav.trash"),
           pattern: new RegExp(
             `^/${locale}/admin/emails/imap/messages.*specialUse=trash`,
           ),
@@ -120,14 +121,14 @@ export function EmailsAdminLayoutClient({
           key: "outbox",
           href: `/${locale}/admin/emails/list`,
           icon: Send,
-          label: t("app.admin.emails.components.nav.campaigns"),
+          label: t("nav.campaigns"),
           pattern: new RegExp(`^/${locale}/admin/emails/list`),
         },
         {
           key: "smtp-accounts",
           href: `/${locale}/admin/emails/smtp/accounts`,
           icon: Server,
-          label: t("app.admin.emails.smtp.list.title"),
+          label: t("smtp.list.title"),
           pattern: new RegExp(`^/${locale}/admin/emails/smtp`),
         },
       ],
@@ -138,14 +139,14 @@ export function EmailsAdminLayoutClient({
           key: "stats",
           href: `/${locale}/admin/emails/stats`,
           icon: BarChart3,
-          label: t("app.admin.emails.components.nav.overview"),
+          label: t("nav.overview"),
           pattern: new RegExp(`^/${locale}/admin/emails/stats`),
         },
         {
           key: "templates",
           href: `/${locale}/admin/emails/templates`,
           icon: FileText,
-          label: t("app.admin.emails.components.nav.templates"),
+          label: t("nav.templates"),
           pattern: new RegExp(`^/${locale}/admin/emails/templates`),
         },
       ],
@@ -157,7 +158,7 @@ export function EmailsAdminLayoutClient({
           key: "messaging-accounts",
           href: `/${locale}/admin/emails/messaging/accounts`,
           icon: MessageCircle,
-          label: t("app.admin.emails.components.nav.messagingAccounts"),
+          label: t("nav.messagingAccounts"),
           pattern: new RegExp(`^/${locale}/admin/emails/messaging`),
         },
       ],
@@ -168,28 +169,28 @@ export function EmailsAdminLayoutClient({
           key: "imap-accounts",
           href: `/${locale}/admin/emails/imap/accounts`,
           icon: Users,
-          label: t("app.admin.emails.imap.nav.accounts"),
+          label: t("imap.nav.accounts"),
           pattern: new RegExp(`^/${locale}/admin/emails/imap/accounts`),
         },
         {
           key: "imap-config",
           href: `/${locale}/admin/emails/imap/config`,
           icon: Settings,
-          label: t("app.admin.emails.imap.nav.config"),
+          label: t("imap.nav.config"),
           pattern: new RegExp(`^/${locale}/admin/emails/imap/config`),
         },
         {
           key: "imap-sync",
           href: `/${locale}/admin/emails/imap/sync`,
           icon: RefreshCw,
-          label: t("app.admin.emails.imap.nav.sync"),
+          label: t("imap.nav.sync"),
           pattern: new RegExp(`^/${locale}/admin/emails/imap/sync`),
         },
         {
           key: "imap-overview",
           href: `/${locale}/admin/emails/imap/overview`,
           icon: BarChart3,
-          label: t("app.admin.emails.imap.nav.overview"),
+          label: t("imap.nav.overview"),
           pattern: new RegExp(`^/${locale}/admin/emails/imap/overview`),
         },
       ],
@@ -203,9 +204,7 @@ export function EmailsAdminLayoutClient({
         {/* Logo / header */}
         <Div className="flex items-center gap-2 px-4 py-4 border-b">
           <Mail className="h-5 w-5 text-primary" />
-          <Span className="font-semibold text-sm">
-            {t("app.admin.emails.components.admin.title")}
-          </Span>
+          <Span className="font-semibold text-sm">{t("admin.title")}</Span>
         </Div>
 
         {/* Compose button */}
@@ -217,7 +216,7 @@ export function EmailsAdminLayoutClient({
               size="sm"
             >
               <Edit className="h-4 w-4" />
-              <Span>{t("app.admin.emails.imap.nav.compose")}</Span>
+              <Span>{t("imap.nav.compose")}</Span>
             </Button>
           </Link>
         </Div>

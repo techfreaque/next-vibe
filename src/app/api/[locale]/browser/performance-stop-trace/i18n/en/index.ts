@@ -58,4 +58,9 @@ export const translations = {
     title: "Performance Trace Stopped Successfully",
     description: "The performance trace was stopped successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    performanceAutomation: "Performance Automation",
+  },
 };

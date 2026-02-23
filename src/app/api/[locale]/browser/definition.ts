@@ -7,12 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  responseArrayOptionalField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
-import {
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayOptionalFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -24,23 +22,25 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { BrowserTool, BrowserToolOptions, BrowserToolStatus } from "./enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Browser tool execution endpoint
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["browser"],
-  title: "app.api.browser.title",
-  description: "app.api.browser.description",
-  category: "app.api.browser.category",
+  title: "title",
+  description: "description",
+  category: "category",
   icon: "monitor",
   tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.chromeDevTools",
-    "app.api.browser.tags.mcpTools",
-    "app.api.browser.tags.webDebugging",
-    "app.api.browser.tags.performanceAnalysis",
+    "tags.browserAutomation",
+    "tags.chromeDevTools",
+    "tags.mcpTools",
+    "tags.webDebugging",
+    "tags.performanceAnalysis",
   ],
   aliases: ["chrome"],
 
@@ -52,65 +52,61 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.browser.form.label",
-      description: "app.api.browser.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      tool: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "form.label",
+    description: "form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      tool: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.browser.form.fields.tool.label",
-        description: "app.api.browser.form.fields.tool.description",
-        placeholder: "app.api.browser.form.fields.tool.placeholder",
+        label: "form.fields.tool.label",
+        description: "form.fields.tool.description",
+        placeholder: "form.fields.tool.placeholder",
         options: BrowserToolOptions,
         columns: 12,
         schema: z.enum(BrowserTool),
       }),
-      arguments: requestField({
+      arguments: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
-        label: "app.api.browser.form.fields.arguments.label",
-        description: "app.api.browser.form.fields.arguments.description",
-        placeholder: "app.api.browser.form.fields.arguments.placeholder",
+        label: "form.fields.arguments.label",
+        description: "form.fields.arguments.description",
+        placeholder: "form.fields.arguments.placeholder",
         columns: 12,
         schema: z.string().optional(),
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.response.success",
+        content: "response.success",
         schema: z.boolean(),
       }),
-      result: responseField({
+      result: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.response.result",
+        content: "response.result",
         schema: z.unknown().optional(),
       }),
-      status: responseArrayOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.browser.response.status",
-        },
-        responseField({
+      status: scopedResponseArrayOptionalFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.status",
+        child: scopedResponseField(scopedTranslation, {
           type: WidgetType.BADGE,
-          text: "app.api.browser.response.statusItem",
+          text: "response.statusItem",
           schema: z.string(),
         }),
-      ),
-      executionId: responseField({
+      }),
+      executionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.response.executionId",
+        content: "response.executionId",
         schema: z.string().optional(),
       }),
     },
-  ),
+  }),
   examples: {
     requests: {
       navigate: {
@@ -179,45 +175,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.browser.errors.validation.title",
-      description: "app.api.browser.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.browser.errors.network.title",
-      description: "app.api.browser.errors.network.description",
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.browser.errors.unauthorized.title",
-      description: "app.api.browser.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.browser.errors.forbidden.title",
-      description: "app.api.browser.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.browser.errors.notFound.title",
-      description: "app.api.browser.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.browser.errors.serverError.title",
-      description: "app.api.browser.errors.serverError.description",
+      title: "errors.serverError.title",
+      description: "errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.browser.errors.unknown.title",
-      description: "app.api.browser.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.browser.errors.unsavedChanges.title",
-      description: "app.api.browser.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.browser.errors.conflict.title",
-      description: "app.api.browser.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.browser.success.title",
-    description: "app.api.browser.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 });
 

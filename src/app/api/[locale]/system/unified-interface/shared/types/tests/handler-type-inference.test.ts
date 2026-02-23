@@ -94,11 +94,7 @@ const testPublicOnlyEndpoint = createEndpoint({
     },
   },
   successTypes: { title: "test" as any, description: "test" as any },
-  examples: {
-    requests: {
-      default: {},
-    },
-  },
+  examples: {},
 });
 
 // Test endpoint with ADMIN-only role
@@ -155,11 +151,7 @@ const testAdminOnlyEndpoint = createEndpoint({
     },
   },
   successTypes: { title: "test" as any, description: "test" as any },
-  examples: {
-    requests: {
-      default: {},
-    },
-  },
+  examples: {},
 });
 
 // Test endpoint with mixed roles (PUBLIC + ADMIN)
@@ -216,13 +208,7 @@ const testMixedRolesEndpoint = createEndpoint({
     },
   },
   successTypes: { title: "test" as any, description: "test" as any },
-  examples: {
-    requests: {
-      default: {},
-    },
-    urlPathParams: undefined,
-    responses: undefined,
-  },
+  examples: {},
 });
 
 // Extract allowedRoles types to verify they're preserved correctly

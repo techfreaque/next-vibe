@@ -8,8 +8,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -19,16 +19,18 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 /**
  * Generate Expo Indexes Endpoint Definition
  */
 const { POST } = createEndpoint({
-  title: "app.api.system.unifiedInterface.reactNative.generate.post.title",
-  description:
-    "app.api.system.unifiedInterface.reactNative.generate.post.description",
+  scopedTranslation,
+  title: "generate.post.title",
+  description: "generate.post.description",
   icon: "mobile",
-  category: "app.api.system.category",
-  tags: ["app.api.system.unifiedInterface.reactNative.generate.post.title"],
+  category: "generate.post.title",
+  tags: ["generate.post.title"],
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF],
   aliases: ["generate:expo", "native:generate"],
   method: Methods.POST,
@@ -45,43 +47,36 @@ const { POST } = createEndpoint({
     },
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.unifiedInterface.reactNative.generate.post.title",
-      description:
-        "app.api.system.unifiedInterface.reactNative.generate.post.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "generate.post.title",
+    description: "generate.post.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { response: true },
+    children: {
       // === RESPONSE FIELDS ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.reactNative.generate.post.response.fields.success",
+        content: "generate.post.response.fields.success",
         schema: z.boolean(),
       }),
 
-      created: responseField({
+      created: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.reactNative.generate.post.response.fields.created",
+        content: "generate.post.response.fields.created",
         schema: z.array(z.string()),
       }),
 
-      skipped: responseField({
+      skipped: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.reactNative.generate.post.response.fields.skipped",
+        content: "generate.post.response.fields.skipped",
         schema: z.array(z.string()),
       }),
 
-      errors: responseField({
+      errors: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.reactNative.generate.post.response.fields.errors",
+        content: "generate.post.response.fields.errors",
         schema: z.array(
           z.object({
             file: z.string(),
@@ -90,79 +85,58 @@ const { POST } = createEndpoint({
         ),
       }),
 
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.reactNative.generate.post.response.fields.message",
+        content: "generate.post.response.fields.message",
         schema: z.string(),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.unifiedInterface.reactNative.generate.post.errors.validation.title",
-      description:
-        "app.api.system.unifiedInterface.reactNative.generate.post.errors.validation.description",
+      title: "generate.post.errors.validation.title",
+      description: "generate.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.unifiedInterface.reactNative.generate.post.errors.unauthorized.title",
-      description:
-        "app.api.system.unifiedInterface.reactNative.generate.post.errors.unauthorized.description",
+      title: "generate.post.errors.unauthorized.title",
+      description: "generate.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.reactNative.generate.post.errors.server.title",
-      description:
-        "app.api.system.unifiedInterface.reactNative.generate.post.errors.server.description",
+      title: "generate.post.errors.server.title",
+      description: "generate.post.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.reactNative.generate.post.errors.network.title",
-      description:
-        "app.api.system.unifiedInterface.reactNative.generate.post.errors.network.description",
+      title: "generate.post.errors.network.title",
+      description: "generate.post.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.unifiedInterface.reactNative.generate.post.errors.forbidden.title",
-      description:
-        "app.api.system.unifiedInterface.reactNative.generate.post.errors.forbidden.description",
+      title: "generate.post.errors.forbidden.title",
+      description: "generate.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.unifiedInterface.reactNative.generate.post.errors.notFound.title",
-      description:
-        "app.api.system.unifiedInterface.reactNative.generate.post.errors.notFound.description",
+      title: "generate.post.errors.notFound.title",
+      description: "generate.post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.reactNative.generate.post.errors.unknown.title",
-      description:
-        "app.api.system.unifiedInterface.reactNative.generate.post.errors.unknown.description",
+      title: "generate.post.errors.unknown.title",
+      description: "generate.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.unifiedInterface.reactNative.generate.post.errors.conflict.title",
-      description:
-        "app.api.system.unifiedInterface.reactNative.generate.post.errors.conflict.description",
+      title: "generate.post.errors.conflict.title",
+      description: "generate.post.errors.conflict.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.unifiedInterface.reactNative.generate.post.errors.conflict.title",
-      description:
-        "app.api.system.unifiedInterface.reactNative.generate.post.errors.conflict.description",
+      title: "generate.post.errors.conflict.title",
+      description: "generate.post.errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title:
-      "app.api.system.unifiedInterface.reactNative.generate.post.success.title",
-    description:
-      "app.api.system.unifiedInterface.reactNative.generate.post.success.description",
+    title: "generate.post.success.title",
+    description: "generate.post.success.description",
   },
 });
 

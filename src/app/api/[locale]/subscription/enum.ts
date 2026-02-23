@@ -5,6 +5,8 @@
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * Subscription plans available in the system
  */
@@ -12,8 +14,8 @@ export const {
   enum: SubscriptionPlan,
   options: SubscriptionPlanOptions,
   Value: SubscriptionPlanValue,
-} = createEnumOptions({
-  SUBSCRIPTION: "app.api.subscription.enums.plan.subscription",
+} = createEnumOptions(scopedTranslation, {
+  SUBSCRIPTION: "enums.plan.subscription",
 });
 
 /**
@@ -23,15 +25,15 @@ export const {
   enum: SubscriptionStatus,
   options: SubscriptionStatusOptions,
   Value: SubscriptionStatusValue,
-} = createEnumOptions({
-  INCOMPLETE: "app.api.subscription.enums.status.incomplete",
-  INCOMPLETE_EXPIRED: "app.api.subscription.enums.status.incompleteExpired",
-  TRIALING: "app.api.subscription.enums.status.trialing",
-  ACTIVE: "app.api.subscription.enums.status.active",
-  PAST_DUE: "app.api.subscription.enums.status.pastDue",
-  CANCELED: "app.api.subscription.enums.status.canceled",
-  UNPAID: "app.api.subscription.enums.status.unpaid",
-  PAUSED: "app.api.subscription.enums.status.paused",
+} = createEnumOptions(scopedTranslation, {
+  INCOMPLETE: "enums.status.incomplete",
+  INCOMPLETE_EXPIRED: "enums.status.incompleteExpired",
+  TRIALING: "enums.status.trialing",
+  ACTIVE: "enums.status.active",
+  PAST_DUE: "enums.status.pastDue",
+  CANCELED: "enums.status.canceled",
+  UNPAID: "enums.status.unpaid",
+  PAUSED: "enums.status.paused",
 });
 
 /**
@@ -41,9 +43,9 @@ export const {
   enum: BillingInterval,
   options: BillingIntervalOptions,
   Value: BillingIntervalValue,
-} = createEnumOptions({
-  MONTHLY: "app.api.subscription.enums.billing.monthly",
-  YEARLY: "app.api.subscription.enums.billing.yearly",
+} = createEnumOptions(scopedTranslation, {
+  MONTHLY: "enums.billing.monthly",
+  YEARLY: "enums.billing.yearly",
 });
 
 /**
@@ -53,12 +55,12 @@ export const {
   enum: CancellationReason,
   options: CancellationReasonOptions,
   Value: CancellationReasonValue,
-} = createEnumOptions({
-  TOO_EXPENSIVE: "app.api.subscription.enums.cancellation.tooExpensive",
-  MISSING_FEATURES: "app.api.subscription.enums.cancellation.missingFeatures",
-  SWITCHING_SERVICE: "app.api.subscription.enums.cancellation.switchingService",
-  TEMPORARY_PAUSE: "app.api.subscription.enums.cancellation.temporaryPause",
-  OTHER: "app.api.subscription.enums.cancellation.other",
+} = createEnumOptions(scopedTranslation, {
+  TOO_EXPENSIVE: "enums.cancellation.tooExpensive",
+  MISSING_FEATURES: "enums.cancellation.missingFeatures",
+  SWITCHING_SERVICE: "enums.cancellation.switchingService",
+  TEMPORARY_PAUSE: "enums.cancellation.temporaryPause",
+  OTHER: "enums.cancellation.other",
 });
 
 /**

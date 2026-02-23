@@ -1,6 +1,8 @@
 import { translations as taskManagementTranslations } from "../../task-management/i18n/en";
 
 export const translations = {
+  category: "Database Operations",
+
   tag: "migration",
   post: {
     title: "Database Migration",

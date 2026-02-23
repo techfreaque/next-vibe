@@ -1,4 +1,16 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    invalidWorkingDir:
+      "Nieprawidłowy katalog roboczy: musi być ścieżką bezwzględną bez segmentów '..'",
+    commandTimedOut: "Polecenie przekroczyło limit czasu",
+    notImplemented: {
+      local:
+        "Backend SSH jeszcze nie zaimplementowany. Zostaw connectionId puste aby uruchomić lokalnie.",
+    },
+  },
+
   post: {
     title: "Wykonaj polecenie",
     description: "Wykonaj polecenie powłoki na lokalnej maszynie lub przez SSH",
@@ -83,5 +95,6 @@ export const translations = {
     historyLabel: "Historia",
     noHistory: "Nie wykonano jeszcze żadnych poleceń",
     placeholder: "Wpisz polecenie...",
+    ctrlEnterHint: "Ctrl+Enter aby uruchomić",
   },
 };

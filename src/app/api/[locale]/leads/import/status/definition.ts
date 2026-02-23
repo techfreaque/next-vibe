@@ -9,11 +9,11 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   backButton,
   customWidgetObject,
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
-  widgetField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
+  scopedWidgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -29,6 +29,7 @@ import {
   CsvImportJobStatusDB,
   CsvImportJobStatusOptions,
 } from "../enum";
+import { scopedTranslation } from "../i18n";
 import { ImportStatusContainer } from "./widget";
 
 /**
@@ -36,16 +37,13 @@ import { ImportStatusContainer } from "./widget";
  * Lists all import jobs with optional filtering
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["leads", "import", "status"],
-  title: "app.api.leads.import.status.get.title",
-  description: "app.api.leads.import.status.get.description",
-  category: "app.api.leads.category",
-  tags: [
-    "app.api.leads.tags.import",
-    "app.api.leads.tags.jobs",
-    "app.api.leads.tags.list",
-  ],
+  title: "status.get.title",
+  description: "status.get.description",
+  category: "category",
+  tags: ["tags.import", "status.tags.jobs", "status.tags.list"],
   allowedRoles: [UserRole.ADMIN] as const,
   icon: "activity",
 
@@ -58,11 +56,10 @@ const { GET } = createEndpoint({
         inline: true,
       }),
 
-      submitButton: widgetField({
+      submitButton: scopedWidgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
-        text: "app.api.leads.import.status.get.actions.refresh" as const,
-        loadingText:
-          "app.api.leads.import.status.get.actions.refreshing" as const,
+        text: "status.get.actions.refresh",
+        loadingText: "status.get.actions.refreshing",
         icon: "refresh-cw",
         variant: "ghost",
         size: "sm",
@@ -71,240 +68,209 @@ const { GET } = createEndpoint({
       }),
 
       // === QUERY PARAMETERS ===
-      filters: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.leads.import.status.get.filters.title",
-          description: "app.api.leads.import.status.get.filters.description",
-          layoutType: LayoutType.GRID,
-          columns: 3,
-        },
-        { request: "data" },
-        {
-          status: requestField({
+      filters: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "status.get.filters.title",
+        description: "status.get.filters.description",
+        layoutType: LayoutType.GRID,
+        columns: 3,
+        usage: { request: "data" },
+        children: {
+          status: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label: "app.api.leads.import.status.get.status.label",
-            description: "app.api.leads.import.status.get.status.description",
-            placeholder: "app.api.leads.import.status.get.status.placeholder",
+            label: "status.get.status.label",
+            description: "status.get.status.description",
+            placeholder: "status.get.status.placeholder",
             columns: 4,
             options: CsvImportJobStatusOptions,
             schema: z.enum(CsvImportJobStatusDB).optional(),
           }),
-          limit: requestField({
+          limit: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
-            label: "app.api.leads.import.status.get.limit.label",
-            description: "app.api.leads.import.status.get.limit.description",
-            placeholder: "app.api.leads.import.status.get.limit.placeholder",
+            label: "status.get.limit.label",
+            description: "status.get.limit.description",
+            placeholder: "status.get.limit.placeholder",
             columns: 4,
             schema: z.coerce.number().min(1).max(100).default(50).optional(),
           }),
-          offset: requestField({
+          offset: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
-            label: "app.api.leads.import.status.get.offset.label",
-            description: "app.api.leads.import.status.get.offset.description",
-            placeholder: "app.api.leads.import.status.get.offset.placeholder",
+            label: "status.get.offset.label",
+            description: "status.get.offset.description",
+            placeholder: "status.get.offset.placeholder",
             columns: 4,
             schema: z.coerce.number().min(0).default(0).optional(),
           }),
         },
-      ),
+      }),
 
       // === RESPONSE FIELDS ===
-      jobs: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.leads.import.status.get.response.title",
-          description: "app.api.leads.import.status.get.response.description",
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
-          items: responseArrayField(
-            {
+      jobs: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "status.get.response.title",
+        description: "status.get.response.description",
+        layoutType: LayoutType.STACKED,
+        usage: { response: true },
+        children: {
+          items: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            groupBy: "status",
+            title: "status.get.response.items.title",
+            description: "status.get.response.items.title",
+            child: scopedObjectFieldNew(scopedTranslation, {
               type: WidgetType.CONTAINER,
-              groupBy: "status",
-              title: "app.api.leads.import.status.get.response.items.title",
-              description:
-                "app.api.leads.import.status.get.response.items.title",
-            },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                title: "app.api.leads.import.status.get.response.items.title",
-                layoutType: LayoutType.GRID,
-                columns: 12,
-              },
-              { response: true },
-              {
+              title: "status.get.response.items.title",
+              layoutType: LayoutType.GRID,
+              columns: 12,
+              usage: { response: true },
+              children: {
                 // Job Identity
-                id: responseField({
+                id: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.status.get.response.items.title",
+                  content: "status.get.response.items.title",
                   schema: z.uuid(),
                 }),
-                fileName: responseField({
+                fileName: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.status.get.response.items.title",
+                  content: "status.get.response.items.title",
                   schema: z.string(),
                 }),
-                status: responseField({
+                status: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  text: "app.api.leads.import.status.get.response.items.title",
+                  text: "status.get.response.items.title",
                   schema: z.enum(CsvImportJobStatusDB),
                 }),
 
                 // Progress Tracking
-                totalRows: responseField({
+                totalRows: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.status.get.response.items.title",
+                  content: "status.get.response.items.title",
                   schema: z.coerce.number().nullable(),
                 }),
-                processedRows: responseField({
+                processedRows: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.status.get.response.items.title",
+                  content: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
-                successfulImports: responseField({
+                successfulImports: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.status.get.response.items.title",
+                  content: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
-                failedImports: responseField({
+                failedImports: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.status.get.response.items.title",
+                  content: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
-                duplicateEmails: responseField({
+                duplicateEmails: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.status.get.response.items.title",
+                  content: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
 
                 // Batch Processing
-                currentBatchStart: responseField({
+                currentBatchStart: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.status.get.response.items.title",
+                  content: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
-                batchSize: responseField({
+                batchSize: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.status.get.response.items.title",
+                  content: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
 
                 // Error Handling
-                error: responseField({
+                error: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.status.get.response.items.title",
+                  content: "status.get.response.items.title",
                   schema: z.string().nullable(),
                 }),
-                retryCount: responseField({
+                retryCount: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.status.get.response.items.title",
+                  content: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
-                maxRetries: responseField({
+                maxRetries: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.status.get.response.items.title",
+                  content: "status.get.response.items.title",
                   schema: z.coerce.number(),
                 }),
 
                 // Timestamps
-                createdAt: responseField({
+                createdAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.status.get.response.items.title",
+                  content: "status.get.response.items.title",
                   schema: z.string(),
                 }),
-                updatedAt: responseField({
+                updatedAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.status.get.response.items.title",
+                  content: "status.get.response.items.title",
                   schema: z.string(),
                 }),
-                startedAt: responseField({
+                startedAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.status.get.response.items.title",
+                  content: "status.get.response.items.title",
                   schema: z.string().nullable(),
                 }),
-                completedAt: responseField({
+                completedAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.import.status.get.response.items.title",
+                  content: "status.get.response.items.title",
                   schema: z.string().nullable(),
                 }),
               },
-            ),
-          ),
+            }),
+          }),
         },
-      ),
+      }),
     },
   }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.leads.import.status.get.errors.validation.title",
-      description:
-        "app.api.leads.import.status.get.errors.validation.description",
+      title: "status.get.errors.validation.title",
+      description: "status.get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.leads.import.status.get.errors.unauthorized.title",
-      description:
-        "app.api.leads.import.status.get.errors.unauthorized.description",
+      title: "status.get.errors.unauthorized.title",
+      description: "status.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.leads.import.status.get.errors.forbidden.title",
-      description:
-        "app.api.leads.import.status.get.errors.forbidden.description",
+      title: "status.get.errors.forbidden.title",
+      description: "status.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.leads.import.status.get.errors.notFound.title",
-      description:
-        "app.api.leads.import.status.get.errors.notFound.description",
+      title: "status.get.errors.notFound.title",
+      description: "status.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.leads.import.status.get.errors.server.title",
-      description: "app.api.leads.import.status.get.errors.server.description",
+      title: "status.get.errors.server.title",
+      description: "status.get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.leads.import.status.get.errors.unknown.title",
-      description: "app.api.leads.import.status.get.errors.unknown.description",
+      title: "status.get.errors.unknown.title",
+      description: "status.get.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.leads.import.status.get.errors.network.title",
-      description: "app.api.leads.import.status.get.errors.network.description",
+      title: "status.get.errors.network.title",
+      description: "status.get.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.leads.import.status.get.errors.unsavedChanges.title",
-      description:
-        "app.api.leads.import.status.get.errors.unsavedChanges.description",
+      title: "status.get.errors.unsavedChanges.title",
+      description: "status.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.leads.import.status.get.errors.conflict.title",
-      description:
-        "app.api.leads.import.status.get.errors.conflict.description",
+      title: "status.get.errors.conflict.title",
+      description: "status.get.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.leads.import.status.get.success.title",
-    description: "app.api.leads.import.status.get.success.description",
+    title: "status.get.success.title",
+    description: "status.get.success.description",
   },
 
   examples: {
@@ -326,7 +292,7 @@ const { GET } = createEndpoint({
           items: [
             {
               id: "123e4567-e89b-12d3-a456-426614174000",
-              fileName: "app.api.leads.csv",
+              fileName: "csv",
               status: CsvImportJobStatus.PROCESSING,
               totalRows: 100,
               processedRows: 0,
@@ -351,7 +317,7 @@ const { GET } = createEndpoint({
           items: [
             {
               id: "123e4567-e89b-12d3-a456-426614174000",
-              fileName: "app.api.leads.csv",
+              fileName: "csv",
               status: CsvImportJobStatus.COMPLETED,
               totalRows: 100,
               processedRows: 100,

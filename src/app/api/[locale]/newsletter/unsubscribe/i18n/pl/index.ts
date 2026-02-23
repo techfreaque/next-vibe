@@ -36,6 +36,7 @@ export const translations: typeof enTranslations = {
     message: "Wiadomość o sukcesie",
   },
   errors: {
+    email_generation_failed: "Nie udało się wygenerować e-maila",
     internal: {
       title: "Błąd wewnętrzny",
       description:
@@ -81,6 +82,70 @@ export const translations: typeof enTranslations = {
   sync: {
     failed: "Synchronizacja wypisania z newslettera nie powiodła się",
     error: "Błąd synchronizacji wypisania z newslettera",
+    tag: "Synchronizacja newslettera",
+    post: {
+      title: "Synchronizuj wypisania z newslettera",
+      description: "Synchronizuj statusy leadów dla wypisań z newslettera",
+      container: {
+        title: "Konfiguracja synchronizacji",
+        description: "Skonfiguruj parametry synchronizacji",
+      },
+      fields: {
+        batchSize: {
+          label: "Rozmiar partii",
+          description: "Liczba rekordów do przetworzenia na partię",
+        },
+        dryRun: {
+          label: "Próbny przebieg",
+          description: "Uruchom bez wprowadzania zmian",
+        },
+      },
+      response: {
+        leadsProcessed: "Przetworzone leady",
+        leadsUpdated: "Zaktualizowane leady",
+        executionTimeMs: "Czas wykonania (ms)",
+      },
+      errors: {
+        unauthorized: {
+          title: "Nieautoryzowany",
+          description: "Wymagane uwierzytelnienie",
+        },
+        forbidden: {
+          title: "Zabroniony",
+          description: "Dostęp zabroniony",
+        },
+        server: {
+          title: "Błąd serwera",
+          description: "Wystąpił błąd podczas synchronizacji",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieznany błąd",
+        },
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe parametry żądania",
+        },
+      },
+      success: {
+        title: "Synchronizacja zakończona",
+        description:
+          "Wypisania z newslettera zostały pomyślnie zsynchronizowane",
+      },
+    },
+  },
+  emailTemplates: {
+    unsubscribe: {
+      name: "E-mail potwierdzający wypisanie z newslettera",
+      description: "E-mail potwierdzający wypisanie z newslettera",
+      category: "newsletter",
+      preview: {
+        email: {
+          label: "Adres e-mail",
+          description: "Adres e-mail, który ma zostać wypisany",
+        },
+      },
+    },
   },
   sms: {
     confirmation: {

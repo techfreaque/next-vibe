@@ -30,11 +30,11 @@ import BadgeWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/
 import TextWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { useTouchDevice } from "@/hooks/use-touch-device";
-import { simpleT } from "@/i18n/core/shared";
 
 import { cn } from "../../../shared/utils";
 import type definition from "./definition";
 import type { MemoriesListResponseOutput } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Props for custom widget
@@ -145,7 +145,7 @@ export function MemoriesListContainer({
   const children = field.children;
   const { push: navigate } = useWidgetNavigation();
   const locale = useWidgetLocale();
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const isTouch = useTouchDevice();
   const endpointMutations = useWidgetEndpointMutations();
   const isLoading = endpointMutations?.read?.isLoading ?? false;
@@ -225,7 +225,7 @@ export function MemoriesListContainer({
         <Div className="flex flex-row items-center gap-2">
           <Brain className="h-5 w-5 text-primary" />
           <Span className="text-sm font-semibold flex-1">
-            {t("app.api.agent.chat.memories.get.stats.title")}
+            {t("get.stats.title")}
           </Span>
         </Div>
 
@@ -234,13 +234,13 @@ export function MemoriesListContainer({
           <Div className="grid grid-cols-4 gap-2">
             <Div className="flex flex-col p-2 rounded-md bg-primary/10">
               <Span className="text-xs text-muted-foreground">
-                {t("app.api.agent.chat.memories.stats.total")}
+                {t("stats.total")}
               </Span>
               <Span className="text-lg font-semibold">{stats.total}</Span>
             </Div>
             <Div className="flex flex-col p-2 rounded-md bg-green-50 dark:bg-green-950/20">
               <Span className="text-xs text-muted-foreground">
-                {t("app.api.agent.chat.memories.stats.highPriority")}
+                {t("stats.highPriority")}
               </Span>
               <Span className="text-lg font-semibold text-green-600 dark:text-green-400">
                 {stats.highPriority}
@@ -248,7 +248,7 @@ export function MemoriesListContainer({
             </Div>
             <Div className="flex flex-col p-2 rounded-md bg-blue-50 dark:bg-blue-950/20">
               <Span className="text-xs text-muted-foreground">
-                {t("app.api.agent.chat.memories.stats.avgPriority")}
+                {t("stats.avgPriority")}
               </Span>
               <Span className="text-lg font-semibold text-blue-600 dark:text-blue-400">
                 {stats.avgPriority}
@@ -256,7 +256,7 @@ export function MemoriesListContainer({
             </Div>
             <Div className="flex flex-col p-2 rounded-md bg-orange-50 dark:bg-orange-950/20">
               <Span className="text-xs text-muted-foreground">
-                {t("app.api.agent.chat.memories.stats.size")}
+                {t("stats.size")}
               </Span>
               <Span className="text-lg font-semibold text-orange-600 dark:text-orange-400">
                 {stats.totalChars}
@@ -271,7 +271,7 @@ export function MemoriesListContainer({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
-              placeholder={t("app.api.agent.chat.memories.searchPlaceholder")}
+              placeholder={t("searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 pr-9"
@@ -321,7 +321,7 @@ export function MemoriesListContainer({
         {/* Filter results count */}
         {(searchQuery || selectedTag) && (
           <Span className="text-sm text-muted-foreground">
-            {t("app.api.agent.chat.memories.showing", {
+            {t("showing", {
               count: filteredMemories.length,
               total: memories.length,
             })}
@@ -373,8 +373,8 @@ export function MemoriesListContainer({
         ) : filteredMemories.length === 0 ? (
           <Div className="text-center text-muted-foreground py-8">
             {searchQuery || selectedTag
-              ? t("app.api.agent.chat.memories.get.emptySearch")
-              : t("app.api.agent.chat.memories.get.emptyState")}
+              ? t("get.emptySearch")
+              : t("get.emptyState")}
           </Div>
         ) : (
           <Div className="space-y-3 pt-4">

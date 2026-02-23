@@ -17,14 +17,15 @@ import {
 } from "@/app/api/[locale]/agent/chat/config";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation as chatScopedTranslation } from "../../i18n";
 import { FolderAccessModal } from "./folder-access-modal";
 
 interface RootFolderBarProps {
   activeFolderId: string | null;
   onSelectFolder: (folderId: string) => void;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   locale: CountryLanguage;
 }
 
@@ -81,15 +82,15 @@ export function RootFolderBar({
   activeFolderId,
   onSelectFolder,
   isAuthenticated,
+  isAdmin,
   locale,
 }: RootFolderBarProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = chatScopedTranslation.scopedT(locale);
 
-  // Get root folders from DEFAULT_FOLDER_CONFIGS (convert object to array, sorted by order)
-  // Show all folders to all users, but disable PRIVATE and SHARED for public users
-  const rootFolders = Object.values(DEFAULT_FOLDER_CONFIGS).toSorted(
-    (a, b) => a.order - b.order,
-  );
+  // Get root folders — hide cron for non-admins
+  const rootFolders = Object.values(DEFAULT_FOLDER_CONFIGS)
+    .filter((f) => f.id !== DefaultFolderId.CRON || isAdmin)
+    .toSorted((a, b) => a.order - b.order);
 
   // State for modal
   const [modalOpen, setModalOpen] = useState(false);
@@ -155,11 +156,7 @@ export function RootFolderBar({
                   />
                 </Div>
                 <Span className="text-[9px] font-medium leading-none opacity-80">
-                  {t(
-                    `app.api.agent.chat.config.foldersShort.${folderConfig.id}` as Parameters<
-                      typeof t
-                    >[0],
-                  )}
+                  {t(`config.foldersShort.${folderConfig.id}`)}
                 </Span>
               </Button>
             );

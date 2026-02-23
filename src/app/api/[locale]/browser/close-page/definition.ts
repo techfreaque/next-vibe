@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,17 +20,17 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["browser", "close-page"],
-  title: "app.api.browser.close-page.title",
-  description: "app.api.browser.close-page.description",
-  category: "app.api.browser.category",
+  title: "close-page.title",
+  description: "close-page.description",
+  category: "close-page.category",
   icon: "x-square",
-  tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.chromeDevTools",
-  ],
+  tags: ["close-page.tags.browserAutomation", "close-page.tags.chromeDevTools"],
 
   allowedRoles: [
     UserRole.PUBLIC,
@@ -41,24 +41,20 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.browser.close-page.form.label",
-      description: "app.api.browser.close-page.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      pageIdx: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "close-page.form.label",
+    description: "close-page.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      pageIdx: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.browser.close-page.form.fields.pageIdx.label",
-        description:
-          "app.api.browser.close-page.form.fields.pageIdx.description",
-        placeholder:
-          "app.api.browser.close-page.form.fields.pageIdx.placeholder",
+        label: "close-page.form.fields.pageIdx.label",
+        description: "close-page.form.fields.pageIdx.description",
+        placeholder: "close-page.form.fields.pageIdx.placeholder",
         columns: 6,
         schema: z
           .number()
@@ -68,16 +64,16 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.close-page.response.success",
+        content: "close-page.response.success",
         schema: z
           .boolean()
           .describe("Whether the page close operation succeeded"),
       }),
-      result: responseField({
+      result: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.close-page.response.result",
+        content: "close-page.response.result",
         schema: z
           .object({
             closed: z.boolean().describe("Whether the page was closed"),
@@ -89,24 +85,24 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Result of the close page operation"),
       }),
-      error: responseField({
+      error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.close-page.response.error",
+        content: "close-page.response.error",
         schema: z
           .string()
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: responseField({
+      executionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.close-page.response.executionId",
+        content: "close-page.response.executionId",
         schema: z
           .string()
           .optional()
           .describe("Unique identifier for this execution"),
       }),
     },
-  ),
+  }),
   examples: {
     requests: {
       default: {
@@ -126,46 +122,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.browser.close-page.errors.validation.title",
-      description: "app.api.browser.close-page.errors.validation.description",
+      title: "close-page.errors.validation.title",
+      description: "close-page.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.browser.close-page.errors.network.title",
-      description: "app.api.browser.close-page.errors.network.description",
+      title: "close-page.errors.network.title",
+      description: "close-page.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.browser.close-page.errors.unauthorized.title",
-      description: "app.api.browser.close-page.errors.unauthorized.description",
+      title: "close-page.errors.unauthorized.title",
+      description: "close-page.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.browser.close-page.errors.forbidden.title",
-      description: "app.api.browser.close-page.errors.forbidden.description",
+      title: "close-page.errors.forbidden.title",
+      description: "close-page.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.browser.close-page.errors.notFound.title",
-      description: "app.api.browser.close-page.errors.notFound.description",
+      title: "close-page.errors.notFound.title",
+      description: "close-page.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.browser.close-page.errors.serverError.title",
-      description: "app.api.browser.close-page.errors.serverError.description",
+      title: "close-page.errors.serverError.title",
+      description: "close-page.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.browser.close-page.errors.unknown.title",
-      description: "app.api.browser.close-page.errors.unknown.description",
+      title: "close-page.errors.unknown.title",
+      description: "close-page.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.browser.close-page.errors.unsavedChanges.title",
-      description:
-        "app.api.browser.close-page.errors.unsavedChanges.description",
+      title: "close-page.errors.unsavedChanges.title",
+      description: "close-page.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.browser.close-page.errors.conflict.title",
-      description: "app.api.browser.close-page.errors.conflict.description",
+      title: "close-page.errors.conflict.title",
+      description: "close-page.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.browser.close-page.success.title",
-    description: "app.api.browser.close-page.success.description",
+    title: "close-page.success.title",
+    description: "close-page.success.description",
   },
 });
 

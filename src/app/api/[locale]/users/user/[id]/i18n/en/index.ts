@@ -1,8 +1,11 @@
+import { translations as rolesTranslations } from "../../roles/i18n/en";
+
 export const translations = {
   category: "Users",
   tag: "User Management",
 
   id: {
+    roles: rolesTranslations.roles,
     get: {
       title: "Get User",
       description: "Retrieve detailed information about a specific user",

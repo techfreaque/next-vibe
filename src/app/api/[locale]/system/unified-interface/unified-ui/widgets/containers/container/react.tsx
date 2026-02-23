@@ -21,9 +21,9 @@ import { useWatch } from "react-hook-form";
 
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { simpleT } from "@/i18n/core/shared";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import { scopedTranslation as reactScopedTranslation } from "../../../../react/i18n";
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import { LayoutType } from "../../../../shared/types/enums";
 import {
@@ -144,7 +144,7 @@ export function ContainerWidget<
   const cancelButton = useWidgetCancelButton();
   const response = useWidgetResponse();
 
-  const { t: globalT } = simpleT(locale);
+  const { t: globalT } = reactScopedTranslation.scopedT(locale);
 
   const {
     layoutType: layoutTypeRaw = LayoutType.STACKED,
@@ -353,15 +353,11 @@ export function ContainerWidget<
 
   const buttonText = submitButtonConfig?.text
     ? t(submitButtonConfig.text)
-    : globalT(
-        "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submit",
-      );
+    : globalT("widgets.endpointRenderer.submit");
 
   const loadingText = submitButtonConfig?.loadingText
     ? t(submitButtonConfig.loadingText)
-    : globalT(
-        "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submitting",
-      );
+    : globalT("widgets.endpointRenderer.submitting");
 
   // Check if children are present for validation
   const hasChildren_ = childrenForRenderer !== undefined;
@@ -370,9 +366,7 @@ export function ContainerWidget<
     if (noCard) {
       return (
         <Div className={cn("text-muted-foreground italic", className)}>
-          {globalT(
-            "app.api.system.unifiedInterface.react.widgets.container.noContent",
-          )}
+          {globalT("widgets.container.noContent")}
         </Div>
       );
     }
@@ -381,9 +375,7 @@ export function ContainerWidget<
       <Card className={className}>
         <CardContent className="pt-6">
           <P className="italic text-muted-foreground">
-            {globalT(
-              "app.api.system.unifiedInterface.react.widgets.container.noContent",
-            )}
+            {globalT("widgets.container.noContent")}
           </P>
         </CardContent>
       </Card>
@@ -402,12 +394,8 @@ export function ContainerWidget<
     };
   }
 
-  const autoSubmitText = globalT(
-    "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submit",
-  );
-  const autoSubmitLoadingText = globalT(
-    "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submitting",
-  );
+  const autoSubmitText = globalT("widgets.endpointRenderer.submit");
+  const autoSubmitLoadingText = globalT("widgets.endpointRenderer.submitting");
 
   // If noCard is true, render without Card wrapper
   if (noCard) {
@@ -506,10 +494,8 @@ export function ContainerWidget<
                 className="flex-1"
               >
                 {cancelButton?.text
-                  ? globalT(cancelButton.text)
-                  : globalT(
-                      "app.api.system.unifiedInterface.react.widgets.endpointRenderer.cancel",
-                    )}
+                  ? t(cancelButton.text)
+                  : globalT("widgets.endpointRenderer.cancel")}
               </Button>
             )}
             <Button
@@ -672,9 +658,7 @@ export function ContainerWidget<
                 variant="outline"
                 className="flex-1"
               >
-                {globalT(
-                  "app.api.system.unifiedInterface.react.widgets.endpointRenderer.cancel",
-                )}
+                {globalT("widgets.endpointRenderer.cancel")}
               </Button>
             )}
             <Button

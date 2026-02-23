@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Database Operations",
+
   tag: "studio",
   post: {
     title: "Database Studio",

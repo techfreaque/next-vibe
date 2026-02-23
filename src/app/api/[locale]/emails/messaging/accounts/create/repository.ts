@@ -18,6 +18,9 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { messagingAccounts } from "../../db";
 import type { MessagingAccountCreatePOSTResponseOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type MessagingCreateT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 interface MessagingAccountCreateRepositoryInterface {
   createAccount(
@@ -33,6 +36,7 @@ interface MessagingAccountCreateRepositoryInterface {
     },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: MessagingCreateT,
   ): Promise<ResponseType<MessagingAccountCreatePOSTResponseOutput>>;
 }
 
@@ -50,6 +54,7 @@ class MessagingAccountCreateRepositoryImpl implements MessagingAccountCreateRepo
     },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: MessagingCreateT,
   ): Promise<ResponseType<MessagingAccountCreatePOSTResponseOutput>> {
     try {
       logger.debug("Creating messaging account", {
@@ -78,8 +83,7 @@ class MessagingAccountCreateRepositoryImpl implements MessagingAccountCreateRepo
 
       if (!newAccount) {
         return fail({
-          message:
-            "app.api.emails.messaging.accounts.create.errors.server.title",
+          message: t("errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error:
@@ -121,8 +125,7 @@ class MessagingAccountCreateRepositoryImpl implements MessagingAccountCreateRepo
 
       if (isUniqueViolation) {
         return fail({
-          message:
-            "app.api.emails.messaging.accounts.create.errors.conflict.title",
+          message: t("errors.conflict.title"),
           errorType: ErrorResponseTypes.CONFLICT,
           messageParams: {
             error:
@@ -132,7 +135,7 @@ class MessagingAccountCreateRepositoryImpl implements MessagingAccountCreateRepo
       }
 
       return fail({
-        message: "app.api.emails.messaging.accounts.create.errors.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMessage },
       });

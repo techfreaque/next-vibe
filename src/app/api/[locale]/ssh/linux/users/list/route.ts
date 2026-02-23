@@ -11,6 +11,6 @@ import { LinuxUsersListRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: ({ logger }) => LinuxUsersListRepository.list(logger),
+    handler: ({ logger, t }) => LinuxUsersListRepository.list(logger, t),
   },
 });

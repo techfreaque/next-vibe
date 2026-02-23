@@ -1,4 +1,9 @@
 export const translations = {
+  category: "Leads",
+  tags: {
+    campaigns: "Campaigns",
+    leads: "Leads",
+  },
   post: {
     title: "Test Mail",
     description: "Send test email with custom lead data",

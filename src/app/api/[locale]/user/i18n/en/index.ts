@@ -12,6 +12,7 @@ export const translations = {
   public: publicTranslations,
   search: searchTranslations,
   "session-cleanup": sessionCleanupTranslations,
+  sessionCleanup: sessionCleanupTranslations,
   userRoles: userRolesTranslations,
   profileVisibility: {
     public: "Public",

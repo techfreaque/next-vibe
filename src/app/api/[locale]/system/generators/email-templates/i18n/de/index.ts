@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Generatoren",
+
   post: {
     title: "E-Mail-Vorlagen generieren",
     description: "E-Mail-Vorlagen-Registry mit Lazy Loading generieren",

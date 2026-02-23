@@ -73,4 +73,9 @@ export const translations: typeof enTranslations = {
     title: "Operacja wypełniania pomyślna",
     description: "Element został pomyślnie wypełniony",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    inputAutomation: "Automatyzacja wprowadzania",
+  },
 };

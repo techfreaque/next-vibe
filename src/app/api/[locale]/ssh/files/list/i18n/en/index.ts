@@ -1,4 +1,14 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    invalidPath: "Invalid path: must be absolute without '..' segments",
+    directoryNotFound: "Directory not found",
+    notImplemented: {
+      fileList: "SSH backend not yet implemented for file listing",
+    },
+  },
+
   get: {
     title: "List Files",
     description: "List directory contents on the local machine or via SSH",

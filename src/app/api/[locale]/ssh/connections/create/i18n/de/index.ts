@@ -1,4 +1,14 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    sshSecretKeyNotSet:
+      "SSH_SECRET_KEY nicht gesetzt. Fügen Sie einen 32-Byte-Hex-Wert hinzu.",
+    encryptionFailed:
+      "Verschlüsselung fehlgeschlagen — SSH_SECRET_KEY möglicherweise ungültig",
+    noRowReturned: "Kein Datensatz von der Einfügung zurückgegeben",
+  },
+
   post: {
     title: "SSH-Verbindung erstellen",
     description: "Neue SSH-Verbindungskonfiguration speichern",

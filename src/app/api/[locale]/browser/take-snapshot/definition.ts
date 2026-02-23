@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,16 +20,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["browser", "take-snapshot"],
-  title: "app.api.browser.take-snapshot.title",
-  description: "app.api.browser.take-snapshot.description",
-  category: "app.api.browser.category",
+  title: "take-snapshot.title",
+  description: "take-snapshot.description",
+  category: "take-snapshot.category",
   icon: "file-text",
   tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.captureAutomation",
+    "take-snapshot.tags.browserAutomation",
+    "take-snapshot.tags.captureAutomation",
   ],
 
   allowedRoles: [
@@ -40,24 +43,20 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.browser.take-snapshot.form.label",
-      description: "app.api.browser.take-snapshot.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      verbose: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "take-snapshot.form.label",
+    description: "take-snapshot.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      verbose: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.browser.take-snapshot.form.fields.verbose.label",
-        description:
-          "app.api.browser.take-snapshot.form.fields.verbose.description",
-        placeholder:
-          "app.api.browser.take-snapshot.form.fields.verbose.placeholder",
+        label: "take-snapshot.form.fields.verbose.label",
+        description: "take-snapshot.form.fields.verbose.description",
+        placeholder: "take-snapshot.form.fields.verbose.placeholder",
         columns: 6,
         schema: z
           .boolean()
@@ -66,14 +65,12 @@ const { POST } = createEndpoint({
             "Whether to include all possible information available in the full a11y tree. Default is false.",
           ),
       }),
-      filePath: requestField({
+      filePath: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.browser.take-snapshot.form.fields.filePath.label",
-        description:
-          "app.api.browser.take-snapshot.form.fields.filePath.description",
-        placeholder:
-          "app.api.browser.take-snapshot.form.fields.filePath.placeholder",
+        label: "take-snapshot.form.fields.filePath.label",
+        description: "take-snapshot.form.fields.filePath.description",
+        placeholder: "take-snapshot.form.fields.filePath.placeholder",
         columns: 6,
         schema: z
           .string()
@@ -84,16 +81,16 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.take-snapshot.response.success",
+        content: "take-snapshot.response.success",
         schema: z
           .boolean()
           .describe("Whether the snapshot capture operation succeeded"),
       }),
-      result: responseField({
+      result: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.take-snapshot.response.result",
+        content: "take-snapshot.response.result",
         schema: z
           .object({
             captured: z.boolean().describe("Whether the snapshot was captured"),
@@ -110,24 +107,24 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Result of snapshot capture"),
       }),
-      error: responseField({
+      error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.take-snapshot.response.error",
+        content: "take-snapshot.response.error",
         schema: z
           .string()
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: responseField({
+      executionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.take-snapshot.response.executionId",
+        content: "take-snapshot.response.executionId",
         schema: z
           .string()
           .optional()
           .describe("Unique identifier for this execution"),
       }),
     },
-  ),
+  }),
   examples: {
     requests: {
       default: { filePath: "/path/to/file.txt" },
@@ -147,49 +144,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.browser.take-snapshot.errors.validation.title",
-      description:
-        "app.api.browser.take-snapshot.errors.validation.description",
+      title: "take-snapshot.errors.validation.title",
+      description: "take-snapshot.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.browser.take-snapshot.errors.network.title",
-      description: "app.api.browser.take-snapshot.errors.network.description",
+      title: "take-snapshot.errors.network.title",
+      description: "take-snapshot.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.browser.take-snapshot.errors.unauthorized.title",
-      description:
-        "app.api.browser.take-snapshot.errors.unauthorized.description",
+      title: "take-snapshot.errors.unauthorized.title",
+      description: "take-snapshot.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.browser.take-snapshot.errors.forbidden.title",
-      description: "app.api.browser.take-snapshot.errors.forbidden.description",
+      title: "take-snapshot.errors.forbidden.title",
+      description: "take-snapshot.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.browser.take-snapshot.errors.notFound.title",
-      description: "app.api.browser.take-snapshot.errors.notFound.description",
+      title: "take-snapshot.errors.notFound.title",
+      description: "take-snapshot.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.browser.take-snapshot.errors.serverError.title",
-      description:
-        "app.api.browser.take-snapshot.errors.serverError.description",
+      title: "take-snapshot.errors.serverError.title",
+      description: "take-snapshot.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.browser.take-snapshot.errors.unknown.title",
-      description: "app.api.browser.take-snapshot.errors.unknown.description",
+      title: "take-snapshot.errors.unknown.title",
+      description: "take-snapshot.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.browser.take-snapshot.errors.unsavedChanges.title",
-      description:
-        "app.api.browser.take-snapshot.errors.unsavedChanges.description",
+      title: "take-snapshot.errors.unsavedChanges.title",
+      description: "take-snapshot.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.browser.take-snapshot.errors.conflict.title",
-      description: "app.api.browser.take-snapshot.errors.conflict.description",
+      title: "take-snapshot.errors.conflict.title",
+      description: "take-snapshot.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.browser.take-snapshot.success.title",
-    description: "app.api.browser.take-snapshot.success.description",
+    title: "take-snapshot.success.title",
+    description: "take-snapshot.success.description",
   },
 });
 

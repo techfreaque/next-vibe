@@ -28,6 +28,9 @@ import {
   findFilesRecursively,
   writeGeneratedFile,
 } from "../shared/utils";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 // Type definitions
 interface ClientRoutesRequestType {
@@ -50,6 +53,7 @@ class ClientRoutesIndexGeneratorRepositoryImpl {
   async generateClientRoutesIndex(
     data: ClientRoutesRequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<BaseResponseType<ClientRoutesResponseType>> {
     const startTime = Date.now();
 
@@ -106,8 +110,9 @@ class ClientRoutesIndexGeneratorRepositoryImpl {
       });
 
       return fail({
-        message: `Failed to generate client routes index: ${errorMessage}`,
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: String(errorMessage) },
       });
     }
   }
@@ -210,9 +215,7 @@ class ClientRoutesIndexGeneratorRepositoryImpl {
  * @param path - The route path (e.g., "agent_chat_favorites_GET")
  * @returns The client route module or null if not found
  */
-export async function getClientRouteHandler(
-  path: string,
-): Promise<any | null> {
+export async function getClientRouteHandler(path: string): Promise<any | null> {
   switch (path) {
 ${cases.join("\n")}
     default:

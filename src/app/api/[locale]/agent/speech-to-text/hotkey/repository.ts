@@ -15,13 +15,19 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import type { scopedTranslation } from "@/app/api/[locale]/agent/i18n";
+import { scopedTranslation as sttScopedTranslation } from "@/app/api/[locale]/agent/speech-to-text/i18n";
 import { SpeechToTextRepository } from "@/app/api/[locale]/agent/speech-to-text/repository";
+import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { STT_COST_PER_SECOND } from "@/app/api/[locale]/products/repository-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { CreditRepository } from "../../../credits/repository";
+import {
+  CreditRepository,
+  type ModuleT as CreditModuleT,
+} from "../../../credits/repository";
 import { createAdapters } from "./adapters/factory";
 import type {
   SttHotkeyPostRequestOutput,
@@ -30,6 +36,8 @@ import type {
 import { HotkeyAction, RecordingStatus } from "./enum";
 import { createSession, type SpeechHotkeySession } from "./session";
 import { checkPlatformDependencies, platformDetector } from "./utils/platform";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Session store (in-memory for now, could be Redis in production)
@@ -56,6 +64,7 @@ export class SttHotkeyRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
     logger.info("Handling hotkey action", {
       action: data.action,
@@ -73,8 +82,7 @@ export class SttHotkeyRepository {
           missing: deps.missing.join(", "),
         });
         return fail({
-          message:
-            "app.api.agent.speechToText.hotkey.post.errors.dependenciesMissing",
+          message: t("speechToText.hotkey.post.errors.dependenciesMissing"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             missing: deps.missing.join(", "),
@@ -97,16 +105,32 @@ export class SttHotkeyRepository {
         sessions.set(sessionKey, session);
       }
 
+      const tCredits = creditsScopedTranslation.scopedT(locale).t;
+
       // Handle action
       switch (data.action) {
         case HotkeyAction.START:
-          return await SttHotkeyRepository.handleStart(session, logger);
+          return await SttHotkeyRepository.handleStart(session, logger, t);
 
         case HotkeyAction.STOP:
-          return await SttHotkeyRepository.handleStop(session, user, logger);
+          return await SttHotkeyRepository.handleStop(
+            session,
+            user,
+            logger,
+            t,
+            tCredits,
+            locale,
+          );
 
         case HotkeyAction.TOGGLE:
-          return await SttHotkeyRepository.handleToggle(session, user, logger);
+          return await SttHotkeyRepository.handleToggle(
+            session,
+            user,
+            logger,
+            t,
+            tCredits,
+            locale,
+          );
 
         case HotkeyAction.STATUS:
           return SttHotkeyRepository.handleStatus(session, logger);
@@ -114,8 +138,7 @@ export class SttHotkeyRepository {
         default:
           // No action provided - should not happen from CLI daemon mode
           return fail({
-            message:
-              "app.api.agent.speechToText.hotkey.post.errors.invalidAction",
+            message: t("speechToText.hotkey.post.errors.invalidAction"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
             messageParams: { action: "none" },
           });
@@ -147,7 +170,7 @@ export class SttHotkeyRepository {
       const errorMessage = parseError(error).message;
 
       return fail({
-        message: "app.api.agent.speechToText.hotkey.post.errors.actionFailed",
+        message: t("speechToText.hotkey.post.errors.actionFailed"),
         errorType: ErrorResponseTypes.UNKNOWN_ERROR,
         messageParams: { error: errorMessage },
       });
@@ -180,12 +203,14 @@ export class SttHotkeyRepository {
         type: "audio/wav",
       });
 
-      // Call existing STT repository
+      // Call existing STT repository (use stt-scoped t for correct key types)
+      const { t: sttT } = sttScopedTranslation.scopedT(locale);
       const result = await SpeechToTextRepository.transcribeAudio(
         audioFile,
         user,
         locale,
         logger,
+        sttT,
       );
 
       if (!result.success) {
@@ -215,12 +240,12 @@ export class SttHotkeyRepository {
   private static async handleStart(
     session: SpeechHotkeySession,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
     if (session.isRecording) {
       logger.warn("Recording already in progress");
       return fail({
-        message:
-          "app.api.agent.speechToText.hotkey.post.errors.alreadyRecording",
+        message: t("speechToText.hotkey.post.errors.alreadyRecording"),
         errorType: ErrorResponseTypes.CONFLICT,
       });
     }
@@ -244,11 +269,14 @@ export class SttHotkeyRepository {
     session: SpeechHotkeySession,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: ModuleT,
+    tCredits: CreditModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
     if (!session.isRecording) {
       logger.warn("No recording in progress");
       return fail({
-        message: "app.api.agent.speechToText.hotkey.post.errors.notRecording",
+        message: t("speechToText.hotkey.post.errors.notRecording"),
         errorType: ErrorResponseTypes.CONFLICT,
       });
     }
@@ -274,6 +302,8 @@ export class SttHotkeyRepository {
       cost,
       "stt-hotkey",
       logger,
+      tCredits,
+      locale,
     );
 
     return success({
@@ -294,11 +324,21 @@ export class SttHotkeyRepository {
     session: SpeechHotkeySession,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: ModuleT,
+    tCredits: CreditModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<SttHotkeyPostResponseOutput>> {
     if (session.isRecording) {
-      return await SttHotkeyRepository.handleStop(session, user, logger);
+      return await SttHotkeyRepository.handleStop(
+        session,
+        user,
+        logger,
+        t,
+        tCredits,
+        locale,
+      );
     }
-    return await SttHotkeyRepository.handleStart(session, logger);
+    return await SttHotkeyRepository.handleStart(session, logger, t);
   }
 
   /**

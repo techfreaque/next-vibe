@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,16 +20,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["browser", "resize-page"],
-  title: "app.api.browser.resize-page.title",
-  description: "app.api.browser.resize-page.description",
-  category: "app.api.browser.category",
+  title: "resize-page.title",
+  description: "resize-page.description",
+  category: "resize-page.category",
   icon: "maximize",
   tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.viewportAutomation",
+    "resize-page.tags.browserAutomation",
+    "resize-page.tags.viewportAutomation",
   ],
 
   allowedRoles: [
@@ -40,50 +43,44 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.browser.resize-page.form.label",
-      description: "app.api.browser.resize-page.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      width: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "resize-page.form.label",
+    description: "resize-page.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      width: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.browser.resize-page.form.fields.width.label",
-        description:
-          "app.api.browser.resize-page.form.fields.width.description",
-        placeholder:
-          "app.api.browser.resize-page.form.fields.width.placeholder",
+        label: "resize-page.form.fields.width.label",
+        description: "resize-page.form.fields.width.description",
+        placeholder: "resize-page.form.fields.width.placeholder",
         columns: 6,
         schema: z.coerce.number().describe("Page width"),
       }),
-      height: requestField({
+      height: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.browser.resize-page.form.fields.height.label",
-        description:
-          "app.api.browser.resize-page.form.fields.height.description",
-        placeholder:
-          "app.api.browser.resize-page.form.fields.height.placeholder",
+        label: "resize-page.form.fields.height.label",
+        description: "resize-page.form.fields.height.description",
+        placeholder: "resize-page.form.fields.height.placeholder",
         columns: 6,
         schema: z.coerce.number().describe("Page height"),
       }),
 
       // Response fields
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.resize-page.response.success",
+        content: "resize-page.response.success",
         schema: z
           .boolean()
           .describe("Whether the page resize operation succeeded"),
       }),
-      result: responseField({
+      result: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.resize-page.response.result",
+        content: "resize-page.response.result",
         schema: z
           .object({
             resized: z.boolean().describe("Whether the page was resized"),
@@ -93,24 +90,24 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Result of page resize operation"),
       }),
-      error: responseField({
+      error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.resize-page.response.error",
+        content: "resize-page.response.error",
         schema: z
           .string()
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: responseField({
+      executionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.resize-page.response.executionId",
+        content: "resize-page.response.executionId",
         schema: z
           .string()
           .optional()
           .describe("Unique identifier for this execution"),
       }),
     },
-  ),
+  }),
   examples: {
     requests: {
       default: { width: 1920, height: 1080 },
@@ -129,47 +126,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.browser.resize-page.errors.validation.title",
-      description: "app.api.browser.resize-page.errors.validation.description",
+      title: "resize-page.errors.validation.title",
+      description: "resize-page.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.browser.resize-page.errors.network.title",
-      description: "app.api.browser.resize-page.errors.network.description",
+      title: "resize-page.errors.network.title",
+      description: "resize-page.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.browser.resize-page.errors.unauthorized.title",
-      description:
-        "app.api.browser.resize-page.errors.unauthorized.description",
+      title: "resize-page.errors.unauthorized.title",
+      description: "resize-page.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.browser.resize-page.errors.forbidden.title",
-      description: "app.api.browser.resize-page.errors.forbidden.description",
+      title: "resize-page.errors.forbidden.title",
+      description: "resize-page.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.browser.resize-page.errors.notFound.title",
-      description: "app.api.browser.resize-page.errors.notFound.description",
+      title: "resize-page.errors.notFound.title",
+      description: "resize-page.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.browser.resize-page.errors.serverError.title",
-      description: "app.api.browser.resize-page.errors.serverError.description",
+      title: "resize-page.errors.serverError.title",
+      description: "resize-page.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.browser.resize-page.errors.unknown.title",
-      description: "app.api.browser.resize-page.errors.unknown.description",
+      title: "resize-page.errors.unknown.title",
+      description: "resize-page.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.browser.resize-page.errors.unsavedChanges.title",
-      description:
-        "app.api.browser.resize-page.errors.unsavedChanges.description",
+      title: "resize-page.errors.unsavedChanges.title",
+      description: "resize-page.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.browser.resize-page.errors.conflict.title",
-      description: "app.api.browser.resize-page.errors.conflict.description",
+      title: "resize-page.errors.conflict.title",
+      description: "resize-page.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.browser.resize-page.success.title",
-    description: "app.api.browser.resize-page.success.description",
+    title: "resize-page.success.title",
+    description: "resize-page.success.description",
   },
 });
 

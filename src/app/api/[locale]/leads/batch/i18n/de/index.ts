@@ -1,6 +1,12 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Leads",
+  tags: {
+    leads: "Leads",
+    batch: "Stapel",
+  },
+
   patch: {
     title: "Batch-Aktualisierung",
     description: "Leads basierend auf Filterkriterien in Stapeln aktualisieren",

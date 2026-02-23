@@ -14,50 +14,26 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type { PackageJson, ReleasePackage } from "../definition";
+import { scopedTranslation } from "../i18n";
 import { MESSAGES } from "./constants";
 import { parsePackageJson, safeJsonParse } from "./utils";
 
-// ============================================================================
-// Interface
-// ============================================================================
-
-export interface IPackageService {
-  /**
-   * Get package.json from a directory
-   */
+export class PackageService {
   getPackageJson(
     cwd: string,
     logger: EndpointLogger,
-  ): ResponseType<PackageJson>;
-
-  /**
-   * Update package version in package.json
-   */
-  updatePackageVersion(
-    pkg: ReleasePackage,
-    newVersion: string,
-    cwd: string,
-    originalCwd: string,
-    logger: EndpointLogger,
-  ): ResponseType<void>;
-}
-
-// ============================================================================
-// Implementation
-// ============================================================================
-
-export class PackageService implements IPackageService {
-  getPackageJson(
-    cwd: string,
-    logger: EndpointLogger,
+    locale: CountryLanguage,
   ): ResponseType<PackageJson> {
     const packageJsonPath = join(cwd, "package.json");
+    const { t } = scopedTranslation.scopedT(locale);
     if (!existsSync(packageJsonPath)) {
       logger.error(MESSAGES.PACKAGE_JSON_NOT_FOUND, { path: packageJsonPath });
       return fail({
-        message: "app.api.system.releaseTool.packageJson.notFound",
+        message: t("packageJson.notFound"),
         errorType: ErrorResponseTypes.NOT_FOUND,
         messageParams: { path: packageJsonPath },
       });
@@ -70,7 +46,7 @@ export class PackageService implements IPackageService {
       if (!parsedPkg) {
         logger.error(MESSAGES.PACKAGE_JSON_INVALID, { path: packageJsonPath });
         return fail({
-          message: "app.api.system.releaseTool.packageJson.invalidFormat",
+          message: t("packageJson.invalidFormat"),
           errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
           messageParams: { path: packageJsonPath },
         });
@@ -79,7 +55,7 @@ export class PackageService implements IPackageService {
     } catch (error) {
       logger.error(MESSAGES.PACKAGE_JSON_INVALID, parseError(error));
       return fail({
-        message: "app.api.system.releaseTool.packageJson.errorReading",
+        message: t("packageJson.errorReading"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: String(error) },
       });
@@ -92,13 +68,15 @@ export class PackageService implements IPackageService {
     cwd: string,
     originalCwd: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): ResponseType<void> {
     const packageJsonPath = join(cwd, "package.json");
+    const { t } = scopedTranslation.scopedT(locale);
 
     if (!existsSync(packageJsonPath)) {
       logger.error(MESSAGES.PACKAGE_JSON_NOT_FOUND, { path: packageJsonPath });
       return fail({
-        message: "app.api.system.releaseTool.packageJson.notFound",
+        message: t("packageJson.notFound"),
         errorType: ErrorResponseTypes.NOT_FOUND,
         messageParams: { path: packageJsonPath },
       });
@@ -116,7 +94,7 @@ export class PackageService implements IPackageService {
       ) {
         logger.error(MESSAGES.PACKAGE_JSON_INVALID, { path: packageJsonPath });
         return fail({
-          message: "app.api.system.releaseTool.packageJson.invalidFormat",
+          message: t("packageJson.invalidFormat"),
           errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
           messageParams: { path: packageJsonPath },
         });
@@ -157,7 +135,7 @@ export class PackageService implements IPackageService {
     } catch (error) {
       logger.error(MESSAGES.VERSION_BUMPED, parseError(error));
       return fail({
-        message: "app.api.system.releaseTool.packageJson.errorUpdatingVersion",
+        message: t("packageJson.errorUpdatingVersion"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { directory: pkg.directory, error: String(error) },
       });

@@ -11,6 +11,7 @@ import type { ReactElement } from "react";
 import { useMemo } from "react";
 import type { z } from "zod";
 
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { ReactRequestResponseWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
@@ -19,7 +20,6 @@ import {
   useWidgetLocale,
   useWidgetResponse,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { simpleT } from "@/i18n/core/shared";
 
 import type {
   CodeQualityListSchema,
@@ -70,7 +70,7 @@ export default function CodeQualityListWidget<
     value = field.value as CodeQualityListOutput | undefined;
   }
 
-  const { t } = simpleT(locale);
+  const { t } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
   // Get editor URI scheme from response data if field key is provided
   const editorUriScheme = useMemo(() => {
@@ -111,7 +111,7 @@ export default function CodeQualityListWidget<
   if (!value || value.length === 0) {
     return (
       <Div className="text-green-600">
-        {t("app.api.system.unifiedInterface.widgets.codeQualityList.noIssues")}
+        {t("widgets.codeQualityList.noIssues")}
       </Div>
     );
   }

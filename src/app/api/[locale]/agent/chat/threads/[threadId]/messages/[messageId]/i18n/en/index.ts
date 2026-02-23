@@ -2,6 +2,10 @@ import { translations as branchTranslations } from "../../branch/i18n/en";
 import { translations as voteTranslations } from "../../vote/i18n/en";
 
 export const translations = {
+  category: "Chat",
+  tags: {
+    messages: "Messages",
+  },
   get: {
     title: "Get Message",
     description: "Retrieve a specific message by ID",

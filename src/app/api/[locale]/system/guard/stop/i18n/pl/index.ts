@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Guard Systemu",
+
   title: "Zatrzymaj Guard",
   description: "Zatrzymaj środowiska guard dla projektów VSCode",
   tag: "guard",

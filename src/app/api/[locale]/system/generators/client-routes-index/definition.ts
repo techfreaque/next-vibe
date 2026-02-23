@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   FieldDataType,
@@ -18,13 +18,16 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "generators", "client-routes-index"],
-  title: "app.api.system.generators.clientRoutesIndex.post.title",
-  description: "app.api.system.generators.clientRoutesIndex.post.description",
-  category: "app.api.system.category",
-  tags: ["app.api.system.generators.clientRoutesIndex.post.title"],
+  title: "post.title",
+  description: "post.description",
+  category: "category",
+  tags: ["post.title"],
   icon: "file-code",
   allowedRoles: [
     UserRole.ADMIN,
@@ -33,22 +36,18 @@ const { POST } = createEndpoint({
     UserRole.PRODUCTION_OFF,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.generators.clientRoutesIndex.post.container.title",
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.container.title",
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      outputFile: requestField({
+      outputFile: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.system.generators.clientRoutesIndex.post.fields.outputFile.label",
-        description:
-          "app.api.system.generators.clientRoutesIndex.post.fields.outputFile.description",
+        label: "post.fields.outputFile.label",
+        description: "post.fields.outputFile.description",
         columns: 12,
         schema: z
           .string()
@@ -57,44 +56,38 @@ const { POST } = createEndpoint({
           ),
       }),
 
-      dryRun: requestField({
+      dryRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.generators.clientRoutesIndex.post.fields.dryRun.label",
-        description:
-          "app.api.system.generators.clientRoutesIndex.post.fields.dryRun.description",
+        label: "post.fields.dryRun.label",
+        description: "post.fields.dryRun.description",
         columns: 6,
         schema: z.boolean().optional().default(false),
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.generators.clientRoutesIndex.post.fields.success.title",
+        content: "post.fields.success.title",
         schema: z.boolean(),
       }),
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.generators.clientRoutesIndex.post.fields.message.title",
+        content: "post.fields.message.title",
         schema: z.string(),
       }),
-      routesFound: responseField({
+      routesFound: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.generators.clientRoutesIndex.post.fields.routesFound.title",
+        content: "post.fields.routesFound.title",
         schema: z.coerce.number(),
       }),
-      duration: responseField({
+      duration: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.generators.clientRoutesIndex.post.fields.duration.title",
+        content: "post.fields.duration.title",
         schema: z.coerce.number(),
       }),
     },
-  ),
+  }),
 
   examples: {
     requests: {
@@ -116,65 +109,46 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     validation_failed: {
-      title:
-        "app.api.system.generators.clientRoutesIndex.post.errors.validation.title",
-      description:
-        "app.api.system.generators.clientRoutesIndex.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     unauthorized: {
-      title:
-        "app.api.system.generators.clientRoutesIndex.post.errors.unauthorized.title",
-      description:
-        "app.api.system.generators.clientRoutesIndex.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     server_error: {
-      title:
-        "app.api.system.generators.clientRoutesIndex.post.errors.server.title",
-      description:
-        "app.api.system.generators.clientRoutesIndex.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     unknown_error: {
-      title:
-        "app.api.system.generators.clientRoutesIndex.post.errors.unknown.title",
-      description:
-        "app.api.system.generators.clientRoutesIndex.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     network_error: {
-      title:
-        "app.api.system.generators.clientRoutesIndex.post.errors.network.title",
-      description:
-        "app.api.system.generators.clientRoutesIndex.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     forbidden: {
-      title:
-        "app.api.system.generators.clientRoutesIndex.post.errors.forbidden.title",
-      description:
-        "app.api.system.generators.clientRoutesIndex.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     not_found: {
-      title:
-        "app.api.system.generators.clientRoutesIndex.post.errors.notFound.title",
-      description:
-        "app.api.system.generators.clientRoutesIndex.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     conflict: {
-      title:
-        "app.api.system.generators.clientRoutesIndex.post.errors.conflict.title",
-      description:
-        "app.api.system.generators.clientRoutesIndex.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
     unsaved_changes: {
-      title:
-        "app.api.system.generators.clientRoutesIndex.post.errors.conflict.title",
-      description:
-        "app.api.system.generators.clientRoutesIndex.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.system.generators.clientRoutesIndex.post.success.title",
-    description:
-      "app.api.system.generators.clientRoutesIndex.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 });
 

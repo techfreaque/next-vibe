@@ -15,8 +15,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: guardStatusEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger }) => {
-      return guardStatusRepository.getStatus(data, logger);
+    handler: ({ data, logger, t }) => {
+      return guardStatusRepository.getStatus(data, logger, t);
     },
   },
 });

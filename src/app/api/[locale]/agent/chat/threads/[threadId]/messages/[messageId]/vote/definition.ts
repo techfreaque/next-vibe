@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  requestUrlPathParamsField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedRequestUrlPathParamsField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,11 +21,14 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * Vote Message Endpoint (POST)
  * Upvote, downvote, or remove vote from a message
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: [
     "agent",
@@ -38,124 +41,91 @@ const { POST } = createEndpoint({
   ],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  title:
-    "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.title" as const,
-  description:
-    "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.description" as const,
+  title: "post.title" as const,
+  description: "post.description" as const,
   icon: "thumbs-up",
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.messages" as const],
+  category: "category" as const,
+  tags: ["tags.messages" as const],
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.validation.title",
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.network.title",
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.unauthorized.title",
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.forbidden.title",
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.notFound.title",
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.server.title",
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.unknown.title",
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.unsavedChanges.title",
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.unsavedChanges.description",
+      title: "post.errors.unsavedChanges.title",
+      description: "post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.conflict.title",
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.container.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.container.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data&urlPathParams", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.container.title" as const,
+    description: "post.container.description" as const,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data&urlPathParams", response: true },
+    children: {
       // === URL PARAMS ===
-      threadId: requestUrlPathParamsField({
+      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label:
-          "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.threadId.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.threadId.description" as const,
+        label: "post.threadId.label" as const,
+        description: "post.threadId.description" as const,
         schema: z.uuid(),
       }),
-      messageId: requestUrlPathParamsField({
+      messageId: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label:
-          "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.messageId.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.messageId.description" as const,
+        label: "post.messageId.label" as const,
+        description: "post.messageId.description" as const,
         schema: z.uuid(),
       }),
 
       // === REQUEST DATA ===
-      vote: requestField({
+      vote: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label:
-          "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.vote.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.vote.description" as const,
+        label: "post.vote.label" as const,
+        description: "post.vote.description" as const,
         options: [
           {
-            label:
-              "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.vote.options.upvote" as const,
+            label: "post.vote.options.upvote" as const,
             value: "up",
           },
           {
-            label:
-              "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.vote.options.downvote" as const,
+            label: "post.vote.options.downvote" as const,
             value: "down",
           },
           {
-            label:
-              "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.vote.options.remove" as const,
+            label: "post.vote.options.remove" as const,
             value: "remove",
           },
         ],
@@ -163,32 +133,27 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      upvotes: responseField({
+      upvotes: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.response.upvotes.content" as const,
+        content: "post.response.upvotes.content" as const,
         schema: z.coerce.number(),
       }),
-      downvotes: responseField({
+      downvotes: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.response.downvotes.content" as const,
+        content: "post.response.downvotes.content" as const,
         schema: z.coerce.number(),
       }),
-      userVote: responseField({
+      userVote: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.response.userVote.content" as const,
+        content: "post.response.userVote.content" as const,
         schema: z.enum(["up", "down", "none"]),
       }),
     },
-  ),
+  }),
 
   successTypes: {
-    title:
-      "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.success.title",
-    description:
-      "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   examples: {

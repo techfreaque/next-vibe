@@ -24,6 +24,7 @@ import {
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { users } from "../../../user/db";
 import { paymentInvoices, paymentTransactions } from "../../db";
@@ -41,6 +42,7 @@ import type {
   PaymentProvider,
   WebhookEvent,
 } from "../types";
+import { scopedTranslation } from "./i18n";
 
 /**
  * NOWPayments API Response Types
@@ -182,7 +184,9 @@ export class NOWPaymentsProvider implements PaymentProvider {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Required by PaymentProvider interface
     _name: string | null,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CustomerResult>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const [user] = await db
         .select({ id: users.id })
@@ -192,8 +196,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
 
       if (!user) {
         return fail({
-          message:
-            "app.api.payment.providers.nowpayments.errors.userNotFound.title",
+          message: t("errors.userNotFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { userId },
         });
@@ -213,8 +216,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         userId,
       });
       return fail({
-        message:
-          "app.api.payment.providers.nowpayments.errors.customerCreationFailed.title",
+        message: t("errors.customerCreationFailed.title"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: parseError(error).message, userId },
       });
@@ -231,7 +233,9 @@ export class NOWPaymentsProvider implements PaymentProvider {
     _customerId: string,
     logger: EndpointLogger,
     callbackToken: string,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CheckoutSessionResult>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Creating NOWPayments checkout session", {
         productId: params.productId,
@@ -249,8 +253,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
 
       if (!product) {
         return fail({
-          message:
-            "app.api.payment.providers.nowpayments.errors.productNotFound.title",
+          message: t("errors.productNotFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { productId: params.productId },
         });
@@ -265,8 +268,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
 
       if (!user?.email) {
         return fail({
-          message:
-            "app.api.payment.providers.nowpayments.errors.userEmailRequired.title",
+          message: t("errors.userEmailRequired.title"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
           messageParams: { userId: params.userId },
         });
@@ -290,8 +292,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         userId: params.userId,
       });
       return fail({
-        message:
-          "app.api.payment.providers.nowpayments.errors.checkoutCreationFailed.title",
+        message: t("errors.checkoutCreationFailed.title"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -307,6 +308,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
     logger: EndpointLogger,
     callbackToken: string,
   ): Promise<ResponseType<CheckoutSessionResult>> {
+    const { t } = scopedTranslation.scopedT(params.locale);
     // Get quantity from metadata (defaults to 1 if not provided)
     const quantity = parseInt(params.metadata.quantity || "1", 10);
     const totalAmount = product.price * quantity;
@@ -360,8 +362,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       // Provide specific error messages for common issues
       if (errorDetails.code === "INVALID_API_KEY" || response.status === 403) {
         return fail({
-          message:
-            "app.api.payment.providers.nowpayments.errors.invalidApiKey.title",
+          message: t("errors.invalidApiKey.title"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           messageParams: {
             error:
@@ -370,8 +371,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         });
       }
       return fail({
-        message:
-          "app.api.payment.providers.nowpayments.errors.invoiceCreationFailed.title",
+        message: t("errors.invoiceCreationFailed.title"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: errorText },
       });
@@ -451,6 +451,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
     email: string,
     logger: EndpointLogger,
   ): Promise<ResponseType<CheckoutSessionResult>> {
+    const { t } = scopedTranslation.scopedT(params.locale);
     // Convert interval to days
     const intervalDays = params.interval === "month" ? 30 : 365;
 
@@ -486,8 +487,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         error: parseError(fetchError),
       });
       return fail({
-        message:
-          "app.api.payment.providers.nowpayments.errors.planCreationFailed.title",
+        message: t("errors.planCreationFailed.title"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: parseError(fetchError).message },
       });
@@ -504,8 +504,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         headers: { "x-api-key": `${this.apiKey.slice(0, 10)}...` },
       });
       return fail({
-        message:
-          "app.api.payment.providers.nowpayments.errors.planCreationFailed.title",
+        message: t("errors.planCreationFailed.title"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: errorText },
       });
@@ -541,8 +540,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         error: errorText,
       });
       return fail({
-        message:
-          "app.api.payment.providers.nowpayments.errors.subscriptionCreationFailed.title",
+        message: t("errors.subscriptionCreationFailed.title"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: errorText },
       });
@@ -600,7 +598,9 @@ export class NOWPaymentsProvider implements PaymentProvider {
     body: string,
     signature: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<WebhookEvent>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Verifying NOWPayments webhook signature");
 
@@ -621,8 +621,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
           calculatedSignature: `${calculatedSignature.slice(0, 10)}...`,
         });
         return fail({
-          message:
-            "app.api.payment.providers.nowpayments.errors.webhookVerificationFailed.title",
+          message: t("errors.webhookVerificationFailed.title"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
           messageParams: { error: "Invalid signature" },
         });
@@ -704,8 +703,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         error: parseError(error),
       });
       return fail({
-        message:
-          "app.api.payment.providers.nowpayments.errors.webhookVerificationFailed.title",
+        message: t("errors.webhookVerificationFailed.title"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
         messageParams: { error: parseError(error).message },
       });
@@ -718,6 +716,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
   async retrieveSubscription(
     subscriptionId: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<
     ResponseType<{
       userId: string;
@@ -725,6 +724,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
       currentPeriodEnd?: number;
     }>
   > {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const response = await fetch(
         `${this.apiUrl}/subscriptions/${subscriptionId}`,
@@ -744,8 +744,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
           subscriptionId,
         });
         return fail({
-          message:
-            "app.api.payment.providers.nowpayments.errors.subscriptionRetrievalFailed.title",
+          message: t("errors.subscriptionRetrievalFailed.title"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           messageParams: { error: errorText },
         });
@@ -807,8 +806,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         subscriptionId,
       });
       return fail({
-        message:
-          "app.api.payment.providers.nowpayments.errors.subscriptionRetrievalFailed.title",
+        message: t("errors.subscriptionRetrievalFailed.title"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -821,7 +819,9 @@ export class NOWPaymentsProvider implements PaymentProvider {
   async cancelSubscription(
     subscriptionId: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const response = await fetch(
         `${this.apiUrl}/subscriptions/${subscriptionId}`,
@@ -841,8 +841,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
           subscriptionId,
         });
         return fail({
-          message:
-            "app.api.payment.providers.nowpayments.errors.subscriptionCancellationFailed.title",
+          message: t("errors.subscriptionCancellationFailed.title"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           messageParams: { error: errorText },
         });
@@ -857,8 +856,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         subscriptionId,
       });
       return fail({
-        message:
-          "app.api.payment.providers.nowpayments.errors.subscriptionCancellationFailed.title",
+        message: t("errors.subscriptionCancellationFailed.title"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -912,7 +910,9 @@ export class NOWPaymentsProvider implements PaymentProvider {
   async getPaymentStatus(
     paymentId: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<NOWPaymentsPaymentStatus>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const response = await fetch(`${this.apiUrl}/payment/${paymentId}`, {
         method: "GET",
@@ -928,8 +928,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
           error: errorText,
         });
         return fail({
-          message:
-            "app.api.payment.providers.nowpayments.errors.paymentStatusFailed.title",
+          message: t("errors.paymentStatusFailed.title"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           messageParams: { error: errorText },
         });
@@ -949,8 +948,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         paymentId,
       });
       return fail({
-        message:
-          "app.api.payment.providers.nowpayments.errors.paymentStatusFailed.title",
+        message: t("errors.paymentStatusFailed.title"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -969,7 +967,9 @@ export class NOWPaymentsProvider implements PaymentProvider {
       offset?: number;
     },
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<NOWPaymentsSubscription[]>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const queryParams = new URLSearchParams();
       if (filters.status) {
@@ -1008,8 +1008,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
           error: errorText,
         });
         return fail({
-          message:
-            "app.api.payment.providers.nowpayments.errors.subscriptionListFailed.title",
+          message: t("errors.subscriptionListFailed.title"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           messageParams: { error: errorText },
         });
@@ -1028,8 +1027,7 @@ export class NOWPaymentsProvider implements PaymentProvider {
         error: parseError(error),
       });
       return fail({
-        message:
-          "app.api.payment.providers.nowpayments.errors.subscriptionListFailed.title",
+        message: t("errors.subscriptionListFailed.title"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: parseError(error).message },
       });

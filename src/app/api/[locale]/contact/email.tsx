@@ -22,7 +22,7 @@ import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
+import { simpleT } from "@/i18n/core/shared";
 
 import { EmailTemplate } from "../emails/smtp-client/components/template.email";
 import {
@@ -30,6 +30,11 @@ import {
   type TrackingContext,
 } from "../emails/smtp-client/components/tracking_context.email";
 import type { ContactRequestOutput, ContactResponseOutput } from "./definition";
+import {
+  type ContactT,
+  type ContactTranslationKey,
+  scopedTranslation,
+} from "./i18n";
 import { contactClientRepository } from "./repository-client";
 
 // ============================================================================
@@ -57,16 +62,15 @@ function ContactFormEmail({
   tracking,
 }: {
   props: ContactFormProps;
-  t: TFunction;
+  t: ContactT;
   locale: CountryLanguage;
   recipientEmail: string;
   tracking: TrackingContext;
 }): ReactElement {
   return (
     <EmailTemplate
-      t={t}
       locale={locale}
-      title={t("app.api.contact.email.partner.greeting", {
+      title={t("email.partner.greeting", {
         name: props.name,
       })}
       previewText={props.subject}
@@ -81,7 +85,7 @@ function ContactFormEmail({
           marginBottom: "16px",
         }}
       >
-        {t("app.api.contact.email.partner.thankYou")}
+        {t("email.partner.thankYou")}
       </Span>
 
       {/* Contact Details Section */}
@@ -101,7 +105,7 @@ function ContactFormEmail({
             marginBottom: "12px",
           }}
         >
-          {t("app.api.contact.email.company.contactDetails")}
+          {t("email.company.contactDetails")}
         </Span>
 
         <Span
@@ -111,9 +115,7 @@ function ContactFormEmail({
             color: "#4b5563",
           }}
         >
-          <Span style={{ fontWeight: "700" }}>
-            {t("app.api.contact.email.company.name")}:
-          </Span>{" "}
+          <Span style={{ fontWeight: "700" }}>{t("email.company.name")}:</Span>{" "}
           {props.name}
         </Span>
 
@@ -124,9 +126,7 @@ function ContactFormEmail({
             color: "#4b5563",
           }}
         >
-          <Span style={{ fontWeight: "700" }}>
-            {t("app.api.contact.email.company.email")}:
-          </Span>{" "}
+          <Span style={{ fontWeight: "700" }}>{t("email.company.email")}:</Span>{" "}
           <Link href={`mailto:${props.email}`} style={{ color: "#4f46e5" }}>
             {props.email}
           </Link>
@@ -141,7 +141,7 @@ function ContactFormEmail({
             }}
           >
             <Span style={{ fontWeight: "700" }}>
-              {t("app.api.contact.email.company.company")}:
+              {t("email.company.company")}:
             </Span>{" "}
             {props.company}
           </Span>
@@ -155,7 +155,7 @@ function ContactFormEmail({
           }}
         >
           <Span style={{ fontWeight: "700" }}>
-            {t("app.api.contact.email.company.contactSubject")}:
+            {t("email.company.contactSubject")}:
           </Span>{" "}
           {props.subject}
         </Span>
@@ -170,7 +170,7 @@ function ContactFormEmail({
             marginBottom: "8px",
           }}
         >
-          {t("app.api.contact.email.partner.message")}
+          {t("email.partner.message")}
         </Span>
 
         <Span
@@ -197,7 +197,7 @@ function ContactFormEmail({
           marginBottom: "24px",
         }}
       >
-        {t("app.api.contact.email.partner.additionalInfo")}
+        {t("email.partner.additionalInfo")}
       </Span>
 
       {/* Admin Button for Company Emails */}
@@ -214,7 +214,7 @@ function ContactFormEmail({
               textDecoration: "none",
             }}
           >
-            {t("app.api.contact.email.company.viewDetails")}
+            {t("email.company.viewDetails")}
           </Button>
         </Section>
       )}
@@ -223,58 +223,51 @@ function ContactFormEmail({
 }
 
 // Template Definition Export
-const contactFormTemplate: EmailTemplateDefinition<ContactFormProps> = {
+const contactFormTemplate: EmailTemplateDefinition<
+  ContactFormProps,
+  typeof scopedTranslation
+> = {
+  scopedTranslation,
   meta: {
     id: "contact-form",
     version: "1.0.0",
-    name: "app.api.emails.templates.contact.form.meta.name",
-    description: "app.api.emails.templates.contact.form.meta.description",
-    category: "contact",
+    name: "emailTemplates.contactForm.meta.name",
+    description: "emailTemplates.contactForm.meta.description",
+    category: "emailTemplates.contactForm.meta.category",
     path: "/contact/email.tsx",
-    defaultSubject: (t) =>
-      t("app.api.contact.email.partner.subject", { subject: "" }),
+    defaultSubject: "email.partner.subject",
     previewFields: {
       name: {
         type: "text",
-        label:
-          "app.admin.emails.templates.templates.contact.form.preview.name.label",
-        description:
-          "app.admin.emails.templates.templates.contact.form.preview.name.description",
+        label: "emailTemplates.contactForm.preview.name.label",
+        description: "emailTemplates.contactForm.preview.name.description",
         defaultValue: "Max Mustermann",
         required: true,
       },
       email: {
         type: "email",
-        label:
-          "app.admin.emails.templates.templates.contact.form.preview.email.label",
-        description:
-          "app.admin.emails.templates.templates.contact.form.preview.email.description",
+        label: "emailTemplates.contactForm.preview.email.label",
+        description: "emailTemplates.contactForm.preview.email.description",
         defaultValue: "max@example.com",
         required: true,
       },
       company: {
         type: "text",
-        label:
-          "app.admin.emails.templates.templates.contact.form.preview.company.label",
-        description:
-          "app.admin.emails.templates.templates.contact.form.preview.company.description",
+        label: "emailTemplates.contactForm.preview.company.label",
+        description: "emailTemplates.contactForm.preview.company.description",
         defaultValue: "Musterfirma GmbH",
       },
       subject: {
         type: "text",
-        label:
-          "app.admin.emails.templates.templates.contact.form.preview.subject.label",
-        description:
-          "app.admin.emails.templates.templates.contact.form.preview.subject.description",
+        label: "emailTemplates.contactForm.preview.subject.label",
+        description: "emailTemplates.contactForm.preview.subject.description",
         defaultValue: "Anfrage zu Ihren Dienstleistungen",
         required: true,
       },
       message: {
         type: "textarea",
-        label:
-          "app.admin.emails.templates.templates.contact.form.preview.message.label",
-        description:
-          "app.admin.emails.templates.templates.contact.form.preview.message.description",
+        label: "emailTemplates.contactForm.preview.message.label",
+        description: "emailTemplates.contactForm.preview.message.description",
         defaultValue:
           "Ich hätte gerne weitere Informationen zu Ihren Premium-Services.",
         required: true,
@@ -282,26 +275,21 @@ const contactFormTemplate: EmailTemplateDefinition<ContactFormProps> = {
       },
       isForCompany: {
         type: "boolean",
-        label:
-          "app.admin.emails.templates.templates.contact.form.preview.isForCompany.label",
+        label: "emailTemplates.contactForm.preview.isForCompany.label",
         description:
-          "app.admin.emails.templates.templates.contact.form.preview.isForCompany.description",
+          "emailTemplates.contactForm.preview.isForCompany.description",
         defaultValue: true,
       },
       userId: {
         type: "text",
-        label:
-          "app.admin.emails.templates.templates.contact.form.preview.userId.label",
-        description:
-          "app.admin.emails.templates.templates.contact.form.preview.userId.description",
+        label: "emailTemplates.contactForm.preview.userId.label",
+        description: "emailTemplates.contactForm.preview.userId.description",
         defaultValue: "example-user-id-123",
       },
       leadId: {
         type: "text",
-        label:
-          "app.admin.emails.templates.templates.contact.form.preview.leadId.label",
-        description:
-          "app.admin.emails.templates.templates.contact.form.preview.leadId.description",
+        label: "emailTemplates.contactForm.preview.leadId.label",
+        description: "emailTemplates.contactForm.preview.leadId.description",
         defaultValue: "example-lead-id-456",
       },
     },
@@ -335,79 +323,81 @@ const adminContactPropsSchema = z.object({
 
 type AdminContactProps = z.infer<typeof adminContactPropsSchema>;
 
-export const adminContactFormTemplate: EmailTemplateDefinition<AdminContactProps> =
-  {
-    meta: {
-      id: "admin-contact-form-notification",
-      version: "1.0.0",
-      name: "app.api.emails.templates.admin.contact.meta.name",
-      description: "app.api.emails.templates.admin.contact.meta.description",
-      category: "admin",
-      path: "/contact/email.tsx",
-      defaultSubject: (t) =>
-        t("app.api.contact.email.partner.subject", { subject: "…" }),
-      previewFields: {
-        name: {
-          type: "text",
-          label: "app.api.emails.templates.admin.contact.preview.name",
-          defaultValue: "Max Mustermann",
-          required: true,
-        },
-        email: {
-          type: "email",
-          label: "app.api.emails.templates.admin.contact.preview.email",
-          defaultValue: "max@example.com",
-          required: true,
-        },
-        subject: {
-          type: "text",
-          label: "app.api.emails.templates.admin.contact.preview.subject",
-          defaultValue: "Question about pricing",
-          required: true,
-        },
-        message: {
-          type: "textarea",
-          label: "app.api.emails.templates.admin.contact.preview.message",
-          defaultValue:
-            "I would like to know more about your subscription plans.",
-          required: true,
-        },
-        company: {
-          type: "text",
-          label: "app.api.emails.templates.admin.contact.preview.company",
-          defaultValue: "Acme Corp",
-        },
-        userId: {
-          type: "text",
-          label: "app.api.emails.templates.admin.contact.preview.userId",
-          defaultValue: "example-user-id-123",
-        },
-        leadId: {
-          type: "text",
-          label: "app.api.emails.templates.admin.contact.preview.leadId",
-          defaultValue: "example-lead-id-456",
-        },
+export const adminContactFormTemplate: EmailTemplateDefinition<
+  AdminContactProps,
+  typeof scopedTranslation
+> = {
+  scopedTranslation,
+  meta: {
+    id: "admin-contact-form-notification",
+    version: "1.0.0",
+    name: "emailTemplates.adminContact.meta.name",
+    description: "emailTemplates.adminContact.meta.description",
+    category: "emailTemplates.adminContact.meta.category",
+    path: "/contact/email.tsx",
+    defaultSubject: "email.partner.subject",
+    previewFields: {
+      name: {
+        type: "text",
+        label: "emailTemplates.adminContact.preview.name.label",
+        defaultValue: "Max Mustermann",
+        required: true,
+      },
+      email: {
+        type: "email",
+        label: "emailTemplates.adminContact.preview.email.label",
+        defaultValue: "max@example.com",
+        required: true,
+      },
+      subject: {
+        type: "text",
+        label: "emailTemplates.adminContact.preview.subject.label",
+        defaultValue: "Question about pricing",
+        required: true,
+      },
+      message: {
+        type: "textarea",
+        label: "emailTemplates.adminContact.preview.message.label",
+        defaultValue:
+          "I would like to know more about your subscription plans.",
+        required: true,
+      },
+      company: {
+        type: "text",
+        label: "emailTemplates.adminContact.preview.company.label",
+        defaultValue: "Acme Corp",
+      },
+      userId: {
+        type: "text",
+        label: "emailTemplates.adminContact.preview.userId.label",
+        defaultValue: "example-user-id-123",
+      },
+      leadId: {
+        type: "text",
+        label: "emailTemplates.adminContact.preview.leadId.label",
+        defaultValue: "example-lead-id-456",
       },
     },
-    schema: adminContactPropsSchema,
-    component: ({ props, t, locale, recipientEmail, tracking }) =>
-      ContactFormEmail({
-        props: { ...props, isForCompany: true },
-        t,
-        locale,
-        recipientEmail,
-        tracking,
-      }),
-    exampleProps: {
-      name: "Max Mustermann",
-      email: "max@example.com",
-      subject: "Question about pricing",
-      message: "I would like to know more about your subscription plans.",
-      company: "Acme Corp",
-      userId: "example-user-id-123",
-      leadId: "example-lead-id-456",
-    },
-  };
+  },
+  schema: adminContactPropsSchema,
+  component: ({ props, t, locale, recipientEmail, tracking }) =>
+    ContactFormEmail({
+      props: { ...props, isForCompany: true },
+      t,
+      locale,
+      recipientEmail,
+      tracking,
+    }),
+  exampleProps: {
+    name: "Max Mustermann",
+    email: "max@example.com",
+    subject: "Question about pricing",
+    message: "I would like to know more about your subscription plans.",
+    company: "Acme Corp",
+    userId: "example-user-id-123",
+    leadId: "example-lead-id-456",
+  },
+};
 
 // ============================================================================
 // ADAPTERS (Business Logic - Maps endpoint data to template props)
@@ -420,8 +410,11 @@ export const adminContactFormTemplate: EmailTemplateDefinition<AdminContactProps
 export const renderCompanyMail: EmailFunctionType<
   ContactRequestOutput,
   ContactResponseOutput,
-  never
-> = ({ requestData, locale, t }) => {
+  never,
+  ContactTranslationKey
+> = ({ requestData, locale }) => {
+  const { t: contactT } = scopedTranslation.scopedT(locale);
+  const { t: globalT } = simpleT(locale);
   try {
     const templateProps: ContactFormProps = {
       name: requestData.name,
@@ -433,15 +426,15 @@ export const renderCompanyMail: EmailFunctionType<
 
     return success({
       toEmail: contactClientRepository.getSupportEmail(locale),
-      toName: t("config.appName"),
-      subject: t("app.api.contact.email.partner.subject", {
+      toName: globalT("config.appName"),
+      subject: contactT("email.partner.subject", {
         subject: requestData.subject,
       }),
       replyToEmail: requestData.email,
       replyToName: requestData.name,
       jsx: contactFormTemplate.component({
         props: templateProps,
-        t,
+        t: contactT,
         locale,
         recipientEmail: contactClientRepository.getSupportEmail(locale),
         tracking: createTrackingContext(locale),
@@ -449,7 +442,7 @@ export const renderCompanyMail: EmailFunctionType<
     });
   } catch {
     return fail({
-      message: "app.api.contact.error.general.internal_server_error",
+      message: contactT("errors.email_generation_failed"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
@@ -462,8 +455,10 @@ export const renderCompanyMail: EmailFunctionType<
 export const renderPartnerMail: EmailFunctionType<
   ContactRequestOutput,
   ContactResponseOutput,
-  never
-> = ({ requestData, locale, t, user }) => {
+  never,
+  ContactTranslationKey
+> = ({ requestData, locale, user }) => {
+  const { t: contactT } = scopedTranslation.scopedT(locale);
   try {
     const templateProps: ContactFormProps = {
       name: requestData.name,
@@ -474,18 +469,19 @@ export const renderPartnerMail: EmailFunctionType<
       userId: user?.id,
       leadId: user?.leadId,
     };
+    const { t: globalT } = simpleT(locale);
 
     return success({
       toEmail: requestData.email,
       toName: requestData.name,
-      subject: t("app.api.contact.email.partner.subject", {
+      subject: contactT("email.partner.subject", {
         subject: requestData.subject,
       }),
       replyToEmail: contactClientRepository.getSupportEmail(locale),
-      replyToName: t("config.appName"),
+      replyToName: globalT("config.appName"),
       jsx: contactFormTemplate.component({
         props: templateProps,
-        t,
+        t: contactT,
         locale,
         recipientEmail: requestData.email,
         tracking: createTrackingContext(locale, user?.leadId, user?.id),
@@ -493,7 +489,7 @@ export const renderPartnerMail: EmailFunctionType<
     });
   } catch {
     return fail({
-      message: "app.api.contact.error.general.internal_server_error",
+      message: contactT("errors.email_generation_failed"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }

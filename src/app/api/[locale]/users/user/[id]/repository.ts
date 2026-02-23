@@ -18,6 +18,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { users } from "@/app/api/[locale]/user/db";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { UserRolesRepository } from "../../../user/user-roles/repository";
 import type {
@@ -29,12 +30,14 @@ import type {
   UserPutResponseOutput,
   UserPutUrlParamsTypeOutput,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 export class UserByIdRepository {
   static async getUserById(
     urlPathParams: UserGetUrlParamsTypeOutput,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<UserGetResponseOutput>> {
     try {
       logger.debug("Getting user by ID", {
@@ -49,8 +52,9 @@ export class UserByIdRepository {
         .limit(1);
 
       if (!foundUser) {
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.users.user.errors.not_found.title",
+          message: t("id.get.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { userId: urlPathParams.id },
         });
@@ -61,6 +65,7 @@ export class UserByIdRepository {
       const userRolesResponse = await UserRolesRepository.findByUserId(
         foundUser.id,
         logger,
+        locale,
       );
 
       // Default to empty array if roles fetch fails
@@ -106,8 +111,9 @@ export class UserByIdRepository {
     } catch (error) {
       logger.error("Error getting user by ID", parseError(error));
       const parsedError = parseError(error);
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.users.user.errors.internal.title",
+        message: t("id.get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -119,6 +125,7 @@ export class UserByIdRepository {
     urlPathParams: UserPutUrlParamsTypeOutput,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<UserPutResponseOutput>> {
     try {
       logger.debug("Updating user", {
@@ -134,8 +141,9 @@ export class UserByIdRepository {
         .limit(1);
 
       if (!existingUser) {
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.users.user.errors.not_found.title",
+          message: t("id.put.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { userId: urlPathParams.id },
         });
@@ -171,8 +179,9 @@ export class UserByIdRepository {
         .returning();
 
       if (!updatedUser) {
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.users.user.errors.internal.title",
+          message: t("id.put.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -182,6 +191,7 @@ export class UserByIdRepository {
       const userRolesResponse = await UserRolesRepository.findByUserId(
         updatedUser.id,
         logger,
+        locale,
       );
 
       // Default to empty array if roles fetch fails
@@ -210,8 +220,9 @@ export class UserByIdRepository {
     } catch (error) {
       logger.error("Error updating user", parseError(error));
       const parsedError = parseError(error);
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.users.user.errors.internal.title",
+        message: t("id.put.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -222,6 +233,7 @@ export class UserByIdRepository {
     urlPathParams: UserDeleteUrlParamsTypeOutput,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<UserDeleteResponseOutput>> {
     try {
       logger.debug("Deleting user", {
@@ -237,8 +249,9 @@ export class UserByIdRepository {
         .limit(1);
 
       if (!existingUser) {
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.users.user.errors.not_found.title",
+          message: t("id.delete.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { userId: urlPathParams.id },
         });
@@ -251,14 +264,15 @@ export class UserByIdRepository {
 
       return success({
         success: true,
-        message: "app.api.users.user.delete.success.title",
+        message: "User deleted successfully",
         deletedAt: new Date(),
       });
     } catch (error) {
       logger.error("Error deleting user", parseError(error));
       const parsedError = parseError(error);
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.users.user.errors.internal.title",
+        message: t("id.delete.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });

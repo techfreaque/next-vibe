@@ -10,36 +10,35 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation as leadsScopedTranslation } from "../i18n";
 import { LeadsRepository } from "../repository";
 import type {
   LeadListGetRequestTypeOutput,
   LeadListGetResponseTypeOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
 
-/**
- * Repository interface for leads list operations
- */
-export interface LeadsListRepository {
-  listLeads(
-    data: LeadListGetRequestTypeOutput,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<LeadListGetResponseTypeOutput>>;
-}
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+type LeadsModuleT = ReturnType<typeof leadsScopedTranslation.scopedT>["t"];
 
 /**
  * Repository implementation for leads list operations
  */
-export class LeadsListRepositoryImpl implements LeadsListRepository {
+export class LeadsListRepositoryImpl {
   async listLeads(
     data: LeadListGetRequestTypeOutput,
+    t: ModuleT,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<LeadListGetResponseTypeOutput>> {
     logger.info("Listing leads with filters");
     logger.debug("Request data", data);
 
     // Pass data directly - it matches the structure expected by LeadsRepository
-    const result = await LeadsRepository.listLeads(data, logger);
+    const leadsT: LeadsModuleT = leadsScopedTranslation.scopedT(locale).t;
+    const result = await LeadsRepository.listLeads(data, logger, leadsT);
 
     if (result.success && result.data) {
       // Type-safe access to success response data
@@ -63,7 +62,7 @@ export class LeadsListRepositoryImpl implements LeadsListRepository {
     }
     logger.error("Failed to list leads", { message: result.message });
     return fail({
-      message: "app.api.leads.list.get.errors.server.title",
+      message: t("get.errors.server.title"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }

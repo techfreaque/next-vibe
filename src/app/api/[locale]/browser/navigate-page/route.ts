@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: navigatePageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger }) =>
+    handler: ({ data, t, logger }) =>
       executeMCPTool(
         {
           toolName: "navigate-page",
@@ -23,6 +23,7 @@ export const { POST, tools } = endpointsHandler({
             timeout: data.timeout,
           }),
         },
+        t,
         logger,
       ),
   },

@@ -13,10 +13,16 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { LeadSortField, SortOrder } from "../enum";
+import { scopedTranslation as leadsScopedTranslation } from "../i18n";
 import { LeadsRepository } from "../repository";
 import type { LeadSearchGetResponseOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+type LeadsModuleT = ReturnType<typeof leadsScopedTranslation.scopedT>["t"];
 
 /**
  * Search request interface - matches definition with defaults
@@ -33,25 +39,17 @@ interface SearchRequestType {
 type SearchResponseType = LeadSearchGetResponseOutput;
 
 /**
- * Lead Search Repository Interface
- */
-export interface LeadSearchRepository {
-  searchLeads(
-    data: SearchRequestType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<SearchResponseType>>;
-}
-
-/**
  * Lead Search Repository Implementation
  */
-class LeadSearchRepositoryImpl implements LeadSearchRepository {
+class LeadSearchRepositoryImpl {
   /**
    * Search leads using the main leads repository
    */
   async searchLeads(
     data: SearchRequestType,
+    t: ModuleT,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<SearchResponseType>> {
     logger.debug("Searching leads", {
       searchTerm: data.search,
@@ -62,6 +60,8 @@ class LeadSearchRepositoryImpl implements LeadSearchRepository {
     // Calculate pagination parameters
     const offset = data.offset ?? 0;
     const limit = data.limit ?? 10;
+
+    const leadsT: LeadsModuleT = leadsScopedTranslation.scopedT(locale).t;
 
     // Use the existing listLeads method with search filter
     const searchResult = await LeadsRepository.listLeads(
@@ -86,12 +86,13 @@ class LeadSearchRepositoryImpl implements LeadSearchRepository {
         },
       },
       logger,
+      leadsT,
     );
 
     if (!searchResult.success || !searchResult.data) {
       logger.error("Failed to search leads");
       return fail({
-        message: "app.api.leads.list.get.errors.server.title",
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

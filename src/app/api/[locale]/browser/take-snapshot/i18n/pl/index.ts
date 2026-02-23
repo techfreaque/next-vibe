@@ -72,4 +72,9 @@ export const translations: typeof enTranslations = {
     title: "Snapshot przechwycony pomyślnie",
     description: "Snapshot został pomyślnie przechwycony",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    captureAutomation: "Automatyzacja przechwytywania",
+  },
 };

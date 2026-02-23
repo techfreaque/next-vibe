@@ -11,6 +11,7 @@ import {
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import type { AiStreamT } from "../../i18n";
 import type { MessageDbWriter } from "../core/message-db-writer";
 
 export class TimeoutErrorHandler {
@@ -27,6 +28,7 @@ export class TimeoutErrorHandler {
     lastSequenceId: string | null;
     dbWriter: MessageDbWriter;
     logger: EndpointLogger;
+    t: AiStreamT;
   }): Promise<void> {
     const {
       maxDuration,
@@ -38,6 +40,7 @@ export class TimeoutErrorHandler {
       lastSequenceId,
       dbWriter,
       logger,
+      t,
     } = params;
 
     logger.error("[AI Stream] Stream timed out", {
@@ -49,7 +52,7 @@ export class TimeoutErrorHandler {
     });
 
     const timeoutError = fail({
-      message: "app.api.agent.chat.aiStream.errors.timeout" as const,
+      message: t("errors.timeout"),
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       messageParams: { maxDuration: maxDuration.toString() },
     });

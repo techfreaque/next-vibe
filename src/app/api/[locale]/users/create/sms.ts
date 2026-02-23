@@ -10,25 +10,28 @@ import { success } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
-import type { TFunction } from "@/i18n/core/static-types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { UserCreateResponseOutput } from "./definition";
+import { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Get localized SMS message templates using translation keys
  */
 function getSmsMessage(
   messageType: "welcome" | "verification",
-  t: TFunction,
+  t: ModuleT,
   params: Record<string, string> = {},
 ): string {
   const translationKey =
     messageType === "welcome"
-      ? "app.api.users.create.sms.welcome.message"
-      : "app.api.users.create.sms.verification.message";
+      ? "sms.welcome.message"
+      : "sms.verification.message";
 
   // Get the template from translation system
-  let template = t(translationKey);
+  let template: string = t(translationKey);
 
   // Replace parameters in template
   Object.entries(params).forEach(([key, value]) => {
@@ -109,8 +112,9 @@ export class UserCreateSmsServiceImpl implements UserCreateSmsService {
    */
   private generateWelcomeMessage(
     userData: UserCreateResponseOutput,
-    t: TFunction,
+    locale: CountryLanguage,
   ): string {
+    const { t } = scopedTranslation.scopedT(locale);
     return getSmsMessage("welcome", t, {
       privateName: userData.responsePrivateName,
       appUrl: env.NEXT_PUBLIC_APP_URL,
@@ -123,8 +127,9 @@ export class UserCreateSmsServiceImpl implements UserCreateSmsService {
   private generateVerificationMessage(
     userData: UserCreateResponseOutput,
     code: string,
-    t: TFunction,
+    locale: CountryLanguage,
   ): string {
+    const { t } = scopedTranslation.scopedT(locale);
     return getSmsMessage("verification", t, {
       privateName: userData.responsePrivateName,
       code: code,

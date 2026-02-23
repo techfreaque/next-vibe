@@ -17,10 +17,12 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Countries, Languages } from "@/i18n/core/config";
 import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
-import { simpleT } from "@/i18n/core/shared";
 
+import type { scopedTranslation } from "../../i18n";
 import { getTemplate } from "../../registry/generated";
 import { createTrackingContext } from "../../smtp-client/components/tracking_context.email";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 // Type definitions
 export interface PreviewRenderRequestType {
@@ -43,6 +45,7 @@ interface EmailPreviewRenderRepository {
   renderPreview(
     data: PreviewRenderRequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<BaseResponseType<PreviewRenderResponseType>>;
 }
 
@@ -53,6 +56,7 @@ class EmailPreviewRenderRepositoryImpl implements EmailPreviewRenderRepository {
   async renderPreview(
     data: PreviewRenderRequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<BaseResponseType<PreviewRenderResponseType>> {
     try {
       logger.debug("Rendering email preview", {
@@ -67,7 +71,7 @@ class EmailPreviewRenderRepositoryImpl implements EmailPreviewRenderRepository {
       if (!template) {
         logger.warn("Template not found", { templateId: data.templateId });
         return fail({
-          message: "app.api.emails.preview.sendTest.error.templateNotFound",
+          message: t("preview.sendTest.error.templateNotFound"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             templateId: data.templateId,
@@ -81,8 +85,8 @@ class EmailPreviewRenderRepositoryImpl implements EmailPreviewRenderRepository {
         data.country,
       );
 
-      // Get translation function
-      const { t } = simpleT(locale);
+      // Get scoped t for this template's own module scope
+      const { t: templateT } = template.scopedTranslation.scopedT(locale);
 
       // Validate and render the email component
       // TypeScript can't verify the props match because EmailTemplateDefinition uses generics
@@ -101,8 +105,9 @@ class EmailPreviewRenderRepositoryImpl implements EmailPreviewRenderRepository {
                 : "preview@example.com";
 
         jsx = template.component({
+          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: validatedProps/templateT types are unions from generic template loading, but we know they match the specific template because we loaded and parsed with template.schema
           props: validatedProps as never,
-          t,
+          t: templateT,
           locale,
           recipientEmail,
           tracking: createTrackingContext(locale),
@@ -114,7 +119,7 @@ class EmailPreviewRenderRepositoryImpl implements EmailPreviewRenderRepository {
           error: errorParsed,
         });
         return fail({
-          message: "app.api.emails.preview.sendTest.error.invalidProps",
+          message: t("preview.sendTest.error.invalidProps"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             error: errorParsed.message,
@@ -125,10 +130,7 @@ class EmailPreviewRenderRepositoryImpl implements EmailPreviewRenderRepository {
       // Render to HTML
       const html = await render(jsx);
 
-      // Get subject (handle both direct strings and functions)
-      const subjectRaw = template.meta.defaultSubject;
-      const subject =
-        typeof subjectRaw === "function" ? subjectRaw(t) : subjectRaw;
+      const subject = templateT(template.meta.defaultSubject);
 
       logger.info("Email preview rendered successfully", {
         templateId: data.templateId,
@@ -148,7 +150,7 @@ class EmailPreviewRenderRepositoryImpl implements EmailPreviewRenderRepository {
         templateId: data.templateId,
       });
       return fail({
-        message: "app.api.emails.preview.sendTest.error.sendFailed",
+        message: t("preview.sendTest.error.sendFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: errorParsed.message,

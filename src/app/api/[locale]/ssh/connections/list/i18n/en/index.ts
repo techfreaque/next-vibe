@@ -1,4 +1,6 @@
 export const translations = {
+  category: "SSH",
+
   get: {
     title: "List SSH Connections",
     description: "List all saved SSH connections for the current user",

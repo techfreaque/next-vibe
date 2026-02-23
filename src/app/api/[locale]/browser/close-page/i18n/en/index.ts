@@ -70,4 +70,9 @@ export const translations = {
     title: "Page Closed Successfully",
     description: "The page was closed successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    chromeDevTools: "Chrome DevTools",
+  },
 };

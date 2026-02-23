@@ -15,9 +15,14 @@ import { seedDatabase } from "@/app/api/[locale]/system/db/seed/seed-manager";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { scopedTranslation } from "./i18n";
 import { databaseMigrationRepository } from "../../db/migrate/repository";
+import { scopedTranslation as migrateScopedTranslation } from "../../db/migrate/i18n";
+import { scopedTranslation as builderScopedTranslation } from "../../builder/i18n";
 import { generateAllRepository } from "../../generators/generate-all/repository";
 import type endpoints from "./definition";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 type RequestType = typeof endpoints.POST.types.RequestOutput;
 type BuildResponseType = typeof endpoints.POST.types.ResponseOutput;
@@ -68,6 +73,7 @@ export interface BuildRepositoryInterface {
     data: RequestType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<BuildResponseType>>;
 }
 
@@ -79,6 +85,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
     data: RequestType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<BuildResponseType>> {
     const startTime = Date.now();
     const output: string[] = [];
@@ -91,12 +98,13 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
         // Build package using the builder with build.config.ts
         output.push(MESSAGES.PACKAGE_BUILD_START);
         const { builderRepository } = await import("../../builder/repository");
+        const { t: builderT } = builderScopedTranslation.scopedT(locale);
         const builderResult = await builderRepository.execute(
           {
             configPath: "build.config.ts",
           },
-          locale,
           logger,
+          builderT,
         );
         if (builderResult.success && builderResult.data) {
           output.push(builderResult.data.output);
@@ -131,6 +139,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
               skipTrpc: false,
             },
             logger,
+            locale,
           );
 
           if (generateResult.success) {
@@ -187,8 +196,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
 
           if (!data.force) {
             return fail({
-              message:
-                "app.api.system.server.build.post.errors.nextjs_build_failed.title",
+              message: t("post.errors.server.title"),
               errorType: ErrorResponseTypes.INTERNAL_ERROR,
               messageParams: {
                 error: parsedError.message,
@@ -203,6 +211,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
         output.push(MESSAGES.PROD_DB_START);
         try {
           if (data.migrate) {
+            const { t: migrateT } = migrateScopedTranslation.scopedT(locale);
             const migrateResult =
               await databaseMigrationRepository.runMigrations(
                 {
@@ -211,7 +220,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
                   redo: false,
                   schema: "public",
                 },
-                locale,
+                migrateT,
                 logger,
               );
 
@@ -219,7 +228,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
               errors.push(MESSAGES.FAILED_PROD_MIGRATIONS);
               if (!data.force) {
                 return fail({
-                  message: "app.api.shared.errorTypes.database_error",
+                  message: t("post.errors.server.title"),
                   errorType: ErrorResponseTypes.DATABASE_ERROR,
                   messageParams: { error: MESSAGES.FAILED_PROD_MIGRATIONS },
                   cause: migrateResult,
@@ -247,7 +256,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
           errors.push(errorMsg);
           if (!data.force) {
             return fail({
-              message: "app.api.shared.errorTypes.database_error",
+              message: t("post.errors.server.title"),
               errorType: ErrorResponseTypes.DATABASE_ERROR,
               messageParams: {
                 error: errorMsg,
@@ -278,7 +287,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
 
       // Return error response with proper structure
       return fail({
-        message: "app.api.shared.errorTypes.internal_error",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,

@@ -263,6 +263,32 @@ export const translations = {
       },
     },
   },
+  aiTools: {
+    modal: {
+      pinnedLabel: "pinned",
+      pinnedTooltip:
+        "Pinned tools are always in context — the AI sees them every turn",
+      enabledLabel: "allowed",
+      enabledTooltip:
+        "Allowed tools can be called on demand when help is enabled",
+      totalLabel: "total",
+      searchPlaceholder: "Search tools...",
+      expandAll: "Expand All",
+      collapseAll: "Collapse All",
+      deselectAll: "Deselect All",
+      selectAll: "Select All",
+      resetToDefault: "Reset to Default",
+      noToolsFound: "No tools match your search",
+      noToolsAvailable: "No AI tools available",
+      legendActive: "Always in context (pinned)",
+      legendConfirm: "Asks before running",
+      stats: "{{pinned}} of {{total}} tools pinned",
+      activeOn: "Pinned — always in context. Click to unpin",
+      activeOff: "Not pinned — AI can still call on demand. Click to pin",
+      confirmOn: "Asks for confirmation — click to disable",
+      confirmOff: "Runs automatically — click to require confirmation",
+    },
+  },
   list: {
     post: {
       title: "List Available Commands",

@@ -104,6 +104,18 @@ export const translations: typeof enTranslations = {
           },
         },
       },
+      unsubscribe: {
+        meta: {
+          name: "Newsletter-Abmelde-E-Mail",
+          description: "Bestätigungs-E-Mail beim Abmelden vom Newsletter",
+        },
+        preview: {
+          email: {
+            label: "E-Mail-Adresse",
+            description: "E-Mail-Adresse, die sich abgemeldet hat",
+          },
+        },
+      },
     },
     subscription: {
       success: {

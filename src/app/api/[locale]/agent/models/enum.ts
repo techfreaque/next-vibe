@@ -5,6 +5,8 @@
 
 import { createEnumOptions } from "next-vibe/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "../chat/i18n";
+
 // ============================================
 // MODEL UTILITY - What models are good at
 // ============================================
@@ -16,38 +18,38 @@ export const {
   enum: ModelUtility,
   options: ModelUtilityOptions,
   Value: ModelUtilityValue,
-} = createEnumOptions({
+} = createEnumOptions(scopedTranslation, {
   // Core capabilities
-  CHAT: "app.chat.modelUtilities.chat",
-  CODING: "app.chat.modelUtilities.coding",
-  CREATIVE: "app.chat.modelUtilities.creative",
-  ANALYSIS: "app.chat.modelUtilities.analysis",
-  REASONING: "app.chat.modelUtilities.reasoning",
-  ROLEPLAY: "app.chat.modelUtilities.roleplay",
+  CHAT: "modelUtilities.chat",
+  CODING: "modelUtilities.coding",
+  CREATIVE: "modelUtilities.creative",
+  ANALYSIS: "modelUtilities.analysis",
+  REASONING: "modelUtilities.reasoning",
+  ROLEPLAY: "modelUtilities.roleplay",
 
   // Performance traits
-  FAST: "app.chat.modelUtilities.fast",
-  SMART: "app.chat.modelUtilities.smart",
-  VISION: "app.chat.modelUtilities.vision",
-  IMAGE_GEN: "app.chat.modelUtilities.imageGen",
+  FAST: "modelUtilities.fast",
+  SMART: "modelUtilities.smart",
+  VISION: "modelUtilities.vision",
+  IMAGE_GEN: "modelUtilities.imageGen",
 
   // Content handling (what model CAN do)
-  POLITICAL_LEFT: "app.chat.modelUtilities.politicalLeft",
-  POLITICAL_RIGHT: "app.chat.modelUtilities.politicalRight",
-  CONTROVERSIAL: "app.chat.modelUtilities.controversial",
-  ADULT_IMPLIED: "app.chat.modelUtilities.adultImplied",
-  ADULT_EXPLICIT: "app.chat.modelUtilities.adultExplicit",
-  VIOLENCE: "app.chat.modelUtilities.violence",
-  HARMFUL: "app.chat.modelUtilities.harmful",
-  ILLEGAL_INFO: "app.chat.modelUtilities.illegalInfo",
-  MEDICAL_ADVICE: "app.chat.modelUtilities.medicalAdvice",
-  OFFENSIVE_LANGUAGE: "app.chat.modelUtilities.offensiveLanguage",
-  ROLEPLAY_DARK: "app.chat.modelUtilities.roleplayDark",
-  CONSPIRACY: "app.chat.modelUtilities.conspiracy",
+  POLITICAL_LEFT: "modelUtilities.politicalLeft",
+  POLITICAL_RIGHT: "modelUtilities.politicalRight",
+  CONTROVERSIAL: "modelUtilities.controversial",
+  ADULT_IMPLIED: "modelUtilities.adultImplied",
+  ADULT_EXPLICIT: "modelUtilities.adultExplicit",
+  VIOLENCE: "modelUtilities.violence",
+  HARMFUL: "modelUtilities.harmful",
+  ILLEGAL_INFO: "modelUtilities.illegalInfo",
+  MEDICAL_ADVICE: "modelUtilities.medicalAdvice",
+  OFFENSIVE_LANGUAGE: "modelUtilities.offensiveLanguage",
+  ROLEPLAY_DARK: "modelUtilities.roleplayDark",
+  CONSPIRACY: "modelUtilities.conspiracy",
 
   // Meta
-  LEGACY: "app.chat.modelUtilities.legacy",
-  UNCENSORED: "app.chat.modelUtilities.uncensored",
+  LEGACY: "modelUtilities.legacy",
+  UNCENSORED: "modelUtilities.uncensored",
 });
 
 /**

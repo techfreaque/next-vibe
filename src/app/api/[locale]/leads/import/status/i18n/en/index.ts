@@ -1,4 +1,11 @@
 export const translations = {
+  category: "Data Import",
+  tags: {
+    import: "Import",
+    jobs: "Jobs",
+    list: "List",
+  },
+
   get: {
     title: "Import Jobs Status",
     description: "List and monitor CSV import jobs",

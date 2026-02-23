@@ -13,10 +13,11 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { db } from "../index";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 // Import types from the endpoint definition
 import type resetEndpoints from "./definition";
 
@@ -29,7 +30,7 @@ type ResetResponseType = typeof resetEndpoints.POST.types.ResponseOutput;
 export interface DatabaseResetRepository {
   resetDatabase(
     data: ResetRequestType,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<ResetResponseType>>;
 }
@@ -40,7 +41,7 @@ export interface DatabaseResetRepository {
 export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
   async resetDatabase(
     data: ResetRequestType,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<ResetResponseType>> {
     const startTime = Date.now();
@@ -58,23 +59,21 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
 
     try {
       // Truncate operation
-      const truncateResult = await this.truncateTables(data.force, locale);
+      const truncateResult = await this.truncateTables(data.force, t);
       tablesAffected = truncateResult.count;
-
-      const { t } = simpleT(locale);
 
       if (!data.force && !data.dryRun) {
         operations.push({
           type: "truncate",
           status: "skipped",
-          details: t("app.api.system.db.reset.messages.truncateRequiresForce"),
+          details: t("messages.truncateRequiresForce"),
           count: 0,
         });
       } else if (data.dryRun) {
         operations.push({
           type: "truncate",
           status: "skipped",
-          details: t("app.api.system.db.reset.messages.dryRun"),
+          details: t("messages.dryRun"),
           count: tablesAffected,
         });
       } else {
@@ -83,76 +82,76 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
           status: truncateResult.count > 0 ? "success" : "skipped",
           details:
             truncateResult.count > 0
-              ? t("app.api.system.db.reset.messages.truncatedTables", {
+              ? t("messages.truncatedTables", {
                   count: truncateResult.count,
                 })
-              : t("app.api.system.db.reset.messages.noTablesToTruncate"),
+              : t("messages.noTablesToTruncate"),
           count: truncateResult.count,
         });
       }
 
       // Migration operation
       if (!data.skipMigrations && !data.dryRun && data.force) {
-        const migrationResult = await this.runMigrations(locale);
+        const migrationResult = await this.runMigrations(t);
         migrationsRun = migrationResult.count;
         operations.push({
           type: "migrate",
           status: "success",
-          details: t("app.api.system.db.reset.messages.runningMigrations"),
+          details: t("messages.runningMigrations"),
           count: migrationResult.count,
         });
       } else if (data.dryRun) {
         operations.push({
           type: "migrate",
           status: "skipped",
-          details: t("app.api.system.db.reset.messages.dryRun"),
+          details: t("messages.dryRun"),
           count: 24, // Placeholder count
         });
       } else if (data.skipMigrations) {
         operations.push({
           type: "migrate",
           status: "skipped",
-          details: t("app.api.system.db.reset.messages.runningMigrations"),
+          details: t("messages.runningMigrations"),
           count: 0,
         });
       } else {
         operations.push({
           type: "migrate",
           status: "pending",
-          details: t("app.api.system.db.reset.messages.runningMigrations"),
+          details: t("messages.runningMigrations"),
           count: 0,
         });
       }
 
       // Seed operation
       if (!data.skipSeeds && !data.dryRun && data.force) {
-        const seedResult = await this.runSeeds(locale);
+        const seedResult = await this.runSeeds(t);
         seedsRun = seedResult.count;
         operations.push({
           type: "seed",
           status: "success",
-          details: t("app.api.system.db.reset.messages.runningSeeds"),
+          details: t("messages.runningSeeds"),
           count: seedResult.count,
         });
       } else if (data.dryRun) {
         operations.push({
           type: "seed",
           status: "skipped",
-          details: t("app.api.system.db.reset.messages.dryRun"),
+          details: t("messages.dryRun"),
           count: 12, // Placeholder count
         });
       } else if (data.skipSeeds) {
         operations.push({
           type: "seed",
           status: "skipped",
-          details: t("app.api.system.db.reset.messages.runningSeeds"),
+          details: t("messages.runningSeeds"),
           count: 0,
         });
       } else {
         operations.push({
           type: "seed",
           status: "pending",
-          details: t("app.api.system.db.reset.messages.runningSeeds"),
+          details: t("messages.runningSeeds"),
           count: 0,
         });
       }
@@ -175,7 +174,7 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
       const parsedError = parseError(error);
 
       return fail({
-        message: "app.api.system.db.reset.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,
@@ -191,13 +190,12 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
    */
   private async truncateTables(
     force: boolean,
-    locale: CountryLanguage,
+    t: ModuleT,
   ): Promise<{ output: string; count: number }> {
-    const { t } = simpleT(locale);
     try {
       if (!force) {
         return {
-          output: t("app.api.system.db.reset.messages.truncateRequiresForce"),
+          output: t("messages.truncateRequiresForce"),
           count: 0,
         };
       }
@@ -213,7 +211,7 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
       const tableRows = tables.rows || [];
       if (tableRows.length === 0) {
         return {
-          output: t("app.api.system.db.reset.messages.noTablesToTruncate"),
+          output: t("messages.noTablesToTruncate"),
           count: 0,
         };
       }
@@ -227,14 +225,14 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
       }
 
       return {
-        output: t("app.api.system.db.reset.messages.truncatedTables", {
+        output: t("messages.truncatedTables", {
           count: tableRows.length,
         }),
         count: tableRows.length,
       };
     } catch (error) {
       return {
-        output: t("app.api.system.db.reset.messages.failedToTruncate", {
+        output: t("messages.failedToTruncate", {
           error: parseError(error).message,
         }),
         count: 0,
@@ -247,13 +245,12 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
    */
   private async dropAndRecreate(
     force: boolean,
-    locale: CountryLanguage,
+    t: ModuleT,
   ): Promise<{ output: string; count: number }> {
-    const { t } = simpleT(locale);
     try {
       if (!force) {
         return {
-          output: t("app.api.system.db.reset.messages.dropRequiresForce"),
+          output: t("messages.dropRequiresForce"),
           count: 0,
         };
       }
@@ -272,14 +269,14 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
       await db.execute(sql`CREATE SCHEMA public`);
 
       return {
-        output: t("app.api.system.db.reset.messages.droppedSchema", {
+        output: t("messages.droppedSchema", {
           count: tableCount,
         }),
         count: tableCount,
       };
     } catch (error) {
       return {
-        output: t("app.api.system.db.reset.messages.failedToDrop", {
+        output: t("messages.failedToDrop", {
           error: parseError(error).message,
         }),
         count: 0,
@@ -292,22 +289,21 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
    */
   private async initializeDatabase(
     force: boolean,
-    locale: CountryLanguage,
+    t: ModuleT,
   ): Promise<{ output: string; count: number }> {
-    const { t } = simpleT(locale);
     try {
       // This combines drop and recreate with full setup
-      const dropResult = await this.dropAndRecreate(force, locale);
+      const dropResult = await this.dropAndRecreate(force, t);
 
       return {
-        output: t("app.api.system.db.reset.messages.databaseInitialized", {
+        output: t("messages.databaseInitialized", {
           output: dropResult.output,
         }),
         count: dropResult.count,
       };
     } catch (error) {
       return {
-        output: t("app.api.system.db.reset.messages.failedToInitialize", {
+        output: t("messages.failedToInitialize", {
           error: parseError(error).message,
         }),
         count: 0,
@@ -319,13 +315,12 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
    * Run database migrations
    */
   private runMigrations(
-    locale: CountryLanguage,
+    t: ModuleT,
   ): Promise<{ output: string; count: number }> {
-    const { t } = simpleT(locale);
     // This would integrate with the migration repository
     // For now, returning realistic placeholder
     return Promise.resolve({
-      output: t("app.api.system.db.reset.messages.runningMigrations", {
+      output: t("messages.runningMigrations", {
         count: 24,
       }),
       count: 24,
@@ -335,14 +330,11 @@ export class DatabaseResetRepositoryImpl implements DatabaseResetRepository {
   /**
    * Run database seeds
    */
-  private runSeeds(
-    locale: CountryLanguage,
-  ): Promise<{ output: string; count: number }> {
-    const { t } = simpleT(locale);
+  private runSeeds(t: ModuleT): Promise<{ output: string; count: number }> {
     // This would integrate with the seed system
     // For now, returning realistic placeholder
     return Promise.resolve({
-      output: t("app.api.system.db.reset.messages.runningSeeds", {
+      output: t("messages.runningSeeds", {
         count: 12,
       }),
       count: 12,

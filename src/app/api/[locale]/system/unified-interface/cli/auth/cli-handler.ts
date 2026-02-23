@@ -1,5 +1,7 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import {
   type AuthContext,
@@ -37,7 +39,7 @@ export class CliAuthHandler extends BaseAuthHandler {
     }
 
     // Fall back to session file
-    const sessionResult = await readSessionFile(logger);
+    const sessionResult = await readSessionFile(logger, context.locale);
     if (sessionResult.success) {
       logger.debug("Found auth token in session file");
       return sessionResult.data.token;
@@ -55,7 +57,8 @@ export class CliAuthHandler extends BaseAuthHandler {
     userId: string,
     leadId: string,
     logger: EndpointLogger,
-    rememberMe = true, // Default to true (30 days)
+    locale: CountryLanguage,
+    rememberMe = true, // Default to true (X days)
   ): Promise<ResponseType<void>> {
     // Set session duration based on rememberMe flag
     // Remember me: 30 days, Regular session: 7 days
@@ -78,14 +81,17 @@ export class CliAuthHandler extends BaseAuthHandler {
       rememberMe,
       sessionType: rememberMe ? "persistent (30 days)" : "regular (7 days)",
     });
-    return await writeSessionFile(sessionData, logger);
+    return await writeSessionFile(sessionData, logger, locale);
   }
 
   /**
    * Clear authentication token by deleting .vibe.session file
    */
-  async clearAuthToken(logger: EndpointLogger): Promise<ResponseType<void>> {
-    return await deleteSessionFile(logger);
+  async clearAuthToken(
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<void>> {
+    return await deleteSessionFile(logger, locale);
   }
 }
 

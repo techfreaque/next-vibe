@@ -5,6 +5,8 @@
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "../i18n";
+
 /**
  * SMS Provider Enum
  * Defines available SMS providers
@@ -13,11 +15,11 @@ export const {
   enum: SmsProvider,
   options: SmsProviderOptions,
   Value: SmsProviderValue,
-} = createEnumOptions({
-  TWILIO: "app.api.emails.enums.smsProvider.twilio",
-  AWS_SNS: "app.api.emails.enums.smsProvider.awsSns",
-  MESSAGEBIRD: "app.api.emails.enums.smsProvider.messagebird",
-  PLIVO: "app.api.emails.enums.smsProvider.plivo",
+} = createEnumOptions(scopedTranslation, {
+  TWILIO: "enums.smsProvider.twilio",
+  AWS_SNS: "enums.smsProvider.awsSns",
+  MESSAGEBIRD: "enums.smsProvider.messagebird",
+  PLIVO: "enums.smsProvider.plivo",
 });
 
 /**
@@ -28,13 +30,13 @@ export const {
   enum: SmsStatus,
   options: SmsStatusOptions,
   Value: SmsStatusValue,
-} = createEnumOptions({
-  PENDING: "app.api.emails.enums.smsStatus.pending",
-  SENT: "app.api.emails.enums.smsStatus.sent",
-  DELIVERED: "app.api.emails.enums.smsStatus.delivered",
-  FAILED: "app.api.emails.enums.smsStatus.failed",
-  REJECTED: "app.api.emails.enums.smsStatus.rejected",
-  UNDELIVERED: "app.api.emails.enums.smsStatus.undelivered",
+} = createEnumOptions(scopedTranslation, {
+  PENDING: "enums.smsStatus.pending",
+  SENT: "enums.smsStatus.sent",
+  DELIVERED: "enums.smsStatus.delivered",
+  FAILED: "enums.smsStatus.failed",
+  REJECTED: "enums.smsStatus.rejected",
+  UNDELIVERED: "enums.smsStatus.undelivered",
 });
 
 /**
@@ -45,12 +47,12 @@ export const {
   enum: SmsTemplateType,
   options: SmsTemplateTypeOptions,
   Value: SmsTemplateTypeValue,
-} = createEnumOptions({
-  NOTIFICATION: "app.api.emails.enums.smsTemplateType.notification",
-  VERIFICATION: "app.api.emails.enums.smsTemplateType.verification",
-  MARKETING: "app.api.emails.enums.smsTemplateType.marketing",
-  ALERT: "app.api.emails.enums.smsTemplateType.alert",
-  REMINDER: "app.api.emails.enums.smsTemplateType.reminder",
+} = createEnumOptions(scopedTranslation, {
+  NOTIFICATION: "enums.smsTemplateType.notification",
+  VERIFICATION: "enums.smsTemplateType.verification",
+  MARKETING: "enums.smsTemplateType.marketing",
+  ALERT: "enums.smsTemplateType.alert",
+  REMINDER: "enums.smsTemplateType.reminder",
 });
 
 // DB enum exports for Drizzle

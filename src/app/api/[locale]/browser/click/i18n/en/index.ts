@@ -74,4 +74,9 @@ export const translations = {
     title: "Click Operation Successful",
     description: "The element was clicked successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    inputAutomation: "Input Automation",
+  },
 };

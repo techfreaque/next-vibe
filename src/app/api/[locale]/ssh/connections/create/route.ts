@@ -11,7 +11,7 @@ import { ConnectionCreateRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger, user }) =>
-      ConnectionCreateRepository.create(data, logger, user),
+    handler: ({ data, logger, user, t }) =>
+      ConnectionCreateRepository.create(data, logger, user, t),
   },
 });

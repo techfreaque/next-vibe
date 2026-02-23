@@ -82,4 +82,9 @@ export const translations = {
     title: "Navigation Successful",
     description: "The page was navigated successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    navigationAutomation: "Navigation Automation",
+  },
 };

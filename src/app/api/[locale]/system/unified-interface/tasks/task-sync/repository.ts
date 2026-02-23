@@ -21,7 +21,10 @@ import { env } from "@/config/env";
 
 import { cronTasks } from "../cron/db";
 import type { CronTaskPriorityDB } from "../enum";
+import type { scopedTranslation } from "../i18n";
 import type { JsonValue } from "../unified-runner/types";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 type CronTaskSelect = typeof cronTasks.$inferSelect;
 
@@ -127,8 +130,9 @@ export async function upsertRemoteTasks(params: {
  */
 export async function getUserCreatedTasks(params: {
   logger: EndpointLogger;
+  t: ModuleT;
 }): Promise<ResponseType<{ tasks: SyncedCronTask[] }>> {
-  const { logger } = params;
+  const { logger, t } = params;
 
   try {
     const tasks = await db
@@ -138,13 +142,12 @@ export async function getUserCreatedTasks(params: {
       .limit(100);
 
     return success({
-      tasks: tasks.map((t) => serializeForSync(t)),
+      tasks: tasks.map((task) => serializeForSync(task)),
     });
   } catch (error) {
     logger.error("Failed to get user-created tasks", parseError(error));
     return fail({
-      message:
-        "app.api.system.unifiedInterface.tasks.taskSync.errors.listFailed",
+      message: t("errors.taskSyncListFailed"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
@@ -169,6 +172,7 @@ function buildRemoteSyncHeaders(): Record<string, string> {
  */
 export async function pullFromRemote(
   logger: EndpointLogger,
+  t: ModuleT,
 ): Promise<ResponseType<{ pulled: number }>> {
   const remoteUrl = env.THEA_REMOTE_URL;
   const apiKey = env.THEA_REMOTE_API_KEY;
@@ -178,7 +182,7 @@ export async function pullFromRemote(
   }
 
   try {
-    const syncUrl = `${remoteUrl.replace(/\/$/, "")}/api/en-GLOBAL/system/unified-interface/tasks/task-sync`;
+    const syncUrl = `${remoteUrl}/api/en-GLOBAL/system/unified-interface/tasks/task-sync`;
 
     const response = await fetch(syncUrl, {
       method: "POST",
@@ -191,10 +195,10 @@ export async function pullFromRemote(
       logger.error("Pull from remote failed", {
         status: response.status,
         statusText: response.statusText,
+        syncUrl,
       });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.taskSync.errors.syncFailed",
+        message: t("errors.taskSyncSyncFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -210,8 +214,7 @@ export async function pullFromRemote(
     if (!result.success || !result.data) {
       logger.error("Pull from remote returned failure", { result });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.taskSync.errors.syncFailed",
+        message: t("errors.taskSyncSyncFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -236,8 +239,7 @@ export async function pullFromRemote(
   } catch (error) {
     logger.error("Pull from remote error", parseError(error));
     return fail({
-      message:
-        "app.api.system.unifiedInterface.tasks.taskSync.errors.syncFailed",
+      message: t("errors.taskSyncSyncFailed"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }

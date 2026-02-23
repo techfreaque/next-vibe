@@ -1,6 +1,13 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Import danych",
+  tags: {
+    import: "Importuj",
+    jobs: "Zadania",
+    list: "Lista",
+  },
+
   get: {
     title: "Status Zadań Importu",
     description: "Wyświetl i monitoruj zadania importu CSV",

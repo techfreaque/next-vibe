@@ -11,6 +11,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { Environment } from "../../../../shared/utils";
 import { generateAllRepository } from "../../../generators/generate-all/repository";
@@ -67,13 +68,7 @@ const devWatcherTaskRunner: TaskRunner = {
   enabled: env.NODE_ENV === Environment.DEVELOPMENT,
   priority: CronTaskPriority.MEDIUM,
 
-  async run({
-    logger,
-    signal,
-  }: {
-    logger: EndpointLogger;
-    signal: AbortSignal;
-  }): Promise<void> {
+  async run({ logger, signal, systemLocale }) {
     // Only run in development
     if (env.NODE_ENV !== Environment.DEVELOPMENT) {
       logger.debug("Dev watcher skipped (not in development mode)");
@@ -84,7 +79,7 @@ const devWatcherTaskRunner: TaskRunner = {
 
     try {
       // Use actual file system watching instead of polling
-      await startSmartFileWatcher(signal, logger);
+      await startSmartFileWatcher(signal, logger, systemLocale);
     } catch (error) {
       const errorMsg = parseError(error).message;
       logger.error(
@@ -93,7 +88,7 @@ const devWatcherTaskRunner: TaskRunner = {
       );
 
       // Fallback to polling if file watching fails
-      await startPollingWatcher(signal, logger);
+      await startPollingWatcher(signal, logger, systemLocale);
     }
   },
 
@@ -120,6 +115,7 @@ const devWatcherTaskRunner: TaskRunner = {
 const startSmartFileWatcher = async (
   signal: AbortSignal,
   logger: EndpointLogger,
+  locale: CountryLanguage,
 ): Promise<void> => {
   const fs = await import("node:fs");
 
@@ -151,6 +147,7 @@ const startSmartFileWatcher = async (
           skipTrpc: false,
         },
         logger,
+        locale,
       );
 
       logger.debug(`✅ Generators completed for change #${changeCount}`);
@@ -242,6 +239,7 @@ const startSmartFileWatcher = async (
 const startPollingWatcher = async (
   signal: AbortSignal,
   logger: EndpointLogger,
+  locale: CountryLanguage,
 ): Promise<void> => {
   logger.info("Using fallback polling watcher...");
 
@@ -265,6 +263,7 @@ const startPollingWatcher = async (
           skipTrpc: false,
         },
         logger,
+        locale,
       );
 
       logger.info(`✅ ${action} #${watchCount} completed`);

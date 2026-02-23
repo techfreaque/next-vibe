@@ -40,6 +40,7 @@ export const translations: typeof enTranslations = {
       "Ten adres e-mail jest już zapisany do naszego newslettera",
   },
   errors: {
+    email_generation_failed: "Nie udało się wygenerować e-maila",
     badRequest: {
       title: "Nieprawidłowe żądanie",
       description: "Podano nieprawidłowe parametry żądania",
@@ -129,6 +130,31 @@ export const translations: typeof enTranslations = {
   },
   route: {
     sms_failed_continuing: "Powiadomienia SMS nie powiodły się, kontynuowanie",
+  },
+  emailTemplates: {
+    welcome: {
+      name: "Newsletter Welcome Email",
+      description: "Welcome email sent to new newsletter subscribers",
+      category: "newsletter",
+      preview: {
+        email: {
+          label: "Adres e-mail",
+          description: "Adres e-mail subskrybenta",
+        },
+        name: {
+          label: "Imię subskrybenta",
+          description: "Imię subskrybenta (opcjonalne)",
+        },
+        leadId: {
+          label: "ID leada",
+          description: "Identyfikator śledzenia leada dla analityki",
+        },
+        userId: {
+          label: "ID użytkownika",
+          description: "Identyfikator konta użytkownika (opcjonalne)",
+        },
+      },
+    },
   },
   emailTemplate: {
     welcome: {

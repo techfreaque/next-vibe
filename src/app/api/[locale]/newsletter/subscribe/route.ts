@@ -23,7 +23,7 @@ export const { POST, tools } = endpointsHandler({
         ignoreErrors: false,
       },
     ],
-    handler: ({ data, user, locale, logger }) =>
-      NewsletterSubscribeRepository.subscribe(data, user, locale, logger),
+    handler: ({ data, user, locale, logger, t }) =>
+      NewsletterSubscribeRepository.subscribe(data, user, locale, logger, t),
   },
 });

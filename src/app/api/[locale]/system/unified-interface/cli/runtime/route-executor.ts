@@ -31,6 +31,7 @@ import type { Platform } from "../../shared/types/platform";
 import type { WidgetData } from "../../shared/widgets/widget-data";
 import { CliResultFormatter } from "../../unified-ui/renderers/cli/response/result-formatter";
 import { getCliUser } from "../auth/cli-user";
+import { scopedTranslation as cliScopedTranslation } from "../i18n";
 import {
   CliInputParser,
   type CliObject,
@@ -353,10 +354,10 @@ export class RouteDelegationHandler {
         command: resolvedCommand,
         error: parseError(error),
       });
+      const { t } = cliScopedTranslation.scopedT(options.locale);
       const errorResult: RouteExecutionResult = {
         success: false,
-        error:
-          "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
+        error: t("vibe.errors.executionFailed"),
         errorParams: {
           error: parseError(error).message,
         },

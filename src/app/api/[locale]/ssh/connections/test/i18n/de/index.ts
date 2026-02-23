@@ -1,4 +1,13 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    connectionNotFound: "Verbindung nicht gefunden",
+    notImplemented: {
+      test: "SSH-Backend noch nicht implementiert. Fernverbindungen können noch nicht getestet werden.",
+    },
+  },
+
   post: {
     title: "SSH-Verbindung testen",
     description: "Verbindung zu einem SSH-Server testen",

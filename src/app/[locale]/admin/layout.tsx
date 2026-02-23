@@ -32,6 +32,7 @@ export default async function AdminLayout({
     { id: minimalUser.id },
     minimalUser,
     logger,
+    locale,
   );
 
   if (!userResponse.success) {

@@ -27,6 +27,8 @@ export const translations: typeof enTranslations = {
           "Erhalten Sie Hilfe von unserer Community und unserem Team",
         twitter: "Folgen Sie uns auf Twitter",
         website: "Webseite",
+        supportEmail: "Support-E-Mail",
+        websiteUrl: "Unsere Webseite besuchen",
       },
     },
   },

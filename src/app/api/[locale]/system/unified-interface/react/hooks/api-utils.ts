@@ -8,12 +8,14 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { scopedTranslation as authScopedTranslation } from "@/app/api/[locale]/user/auth/i18n";
 import { authClientRepository } from "@/app/api/[locale]/user/auth/repository-client";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint-base";
+import { scopedTranslation as hooksTranslation } from "./i18n";
 
 /**
  * JSON-serializable value type for request/response data
@@ -184,7 +186,11 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
     // This allows React Native apps to authenticate using Bearer tokens stored in AsyncStorage
     // Web apps will continue to use httpOnly cookies automatically sent with credentials: "include"
     if (platform.isReactNative && endpoint.requiresAuthentication()) {
-      const storedToken = await authClientRepository.getAuthToken(logger);
+      const { t: authT } = authScopedTranslation.scopedT(locale);
+      const storedToken = await authClientRepository.getAuthToken(
+        logger,
+        authT,
+      );
       if (storedToken.success && storedToken.data) {
         headers.Authorization = `Bearer ${storedToken.data}`;
         logger.debug(
@@ -220,8 +226,9 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
 
       // Fallback error when server doesn't return proper error format
       return fail({
-        message:
-          "app.api.system.unifiedInterface.react.hooks.apiUtils.errors.http_error",
+        message: hooksTranslation
+          .scopedT(locale)
+          .t("apiUtils.errors.http_error"),
         errorType: ErrorResponseTypes.HTTP_ERROR,
         messageParams: {
           statusCode: response.status,
@@ -236,13 +243,15 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
         json.data,
         endpoint.responseSchema,
         logger,
+        locale,
       );
 
       if (!validationResponse.success) {
         // Fallback error when response validation fails
         return fail({
-          message:
-            "app.api.system.unifiedInterface.react.hooks.apiUtils.errors.validation_error",
+          message: hooksTranslation
+            .scopedT(locale)
+            .t("apiUtils.errors.validation_error"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             message: validationResponse.message,
@@ -263,8 +272,9 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
 
     // Fallback error when server returns success but no data
     return fail({
-      message:
-        "app.api.system.unifiedInterface.react.hooks.apiUtils.errors.internal_error",
+      message: hooksTranslation
+        .scopedT(locale)
+        .t("apiUtils.errors.internal_error"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: {
         url: endpointUrl,
@@ -273,8 +283,9 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
   } catch (error) {
     // Fallback error when request fails completely
     return fail({
-      message:
-        "app.api.system.unifiedInterface.react.hooks.apiUtils.errors.internal_error",
+      message: hooksTranslation
+        .scopedT(locale)
+        .t("apiUtils.errors.internal_error"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: {
         error: parseError(error).message,

@@ -83,4 +83,9 @@ export const translations: typeof enTranslations = {
     title: "Skript erfolgreich ausgewertet",
     description: "Das JavaScript wurde erfolgreich ausgeführt",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    scriptExecution: "Skriptausführung",
+  },
 };

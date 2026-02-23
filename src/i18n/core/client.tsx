@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next-vibe-ui/hooks";
 import { setCookie } from "next-vibe-ui/lib/cookies";
 import { storage } from "next-vibe-ui/lib/storage";
 import type { JSX, ReactNode } from "react";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 import { LOCALE_COOKIE_NAME } from "@/config/constants";
 
@@ -60,13 +60,7 @@ export const TranslationContext = createContext<TranslationContextType>({
   locale: `${defaultLocaleConfig.language}-${defaultLocaleConfig.country}`,
   setLanguage: defaultSetLanguage,
   setCountry: defaultSetCountry,
-  t: (<K extends TranslationKey>(
-    key: K,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    params?: TranslationValue<TranslationKey> extends string
-      ? Record<string, string | number>
-      : never,
-  ) => key) as TFunction,
+  t: (key: TranslationKey) => key,
   isRTL: false,
   countries: availableCountries,
   currentCountry: globalCountryInfo,

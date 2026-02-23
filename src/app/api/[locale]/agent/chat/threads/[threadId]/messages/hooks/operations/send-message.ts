@@ -47,8 +47,8 @@ export interface SendMessageDeps {
   settings: {
     selectedModel: ModelId;
     selectedCharacter: string;
-    activeTools: ToolConfigItem[] | null;
-    visibleTools: ToolConfigItem[] | null;
+    allowedTools: ToolConfigItem[] | null;
+    pinnedTools: ToolConfigItem[] | null;
     ttsAutoplay: boolean;
     ttsVoice: typeof TtsVoiceValue;
   };

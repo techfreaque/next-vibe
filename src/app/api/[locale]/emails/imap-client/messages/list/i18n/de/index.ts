@@ -1,6 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "IMAP Management",
   tag: "Nachrichten Liste",
   get: {
     title: "IMAP-Nachrichten auflisten",

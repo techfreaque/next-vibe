@@ -24,10 +24,13 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { scopedTranslation } from "../i18n";
 import type {
   RouteExecuteRequestOutput,
   RouteExecuteResponseInput,
 } from "./definition";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 export class RouteExecuteRepository {
   static async execute(
@@ -35,6 +38,7 @@ export class RouteExecuteRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<RouteExecuteResponseInput>> {
     try {
       const { toolName, input } = data;
@@ -60,8 +64,7 @@ export class RouteExecuteRepository {
       const msg = parseError(error).message;
       logger.error("[RouteExecute] Failed", { error: msg });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.ai.executeTool.post.errors.unknown.title",
+        message: t("executeTool.post.errors.unknown.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: msg },
       });

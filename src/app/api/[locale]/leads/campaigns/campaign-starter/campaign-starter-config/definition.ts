@@ -9,9 +9,9 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   backButton,
   customWidgetObject,
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -26,195 +26,151 @@ import {
   CronTaskPriorityOptions,
 } from "../../../../system/unified-interface/tasks/enum";
 import { UserRole } from "../../../../user/user-roles/enum";
+import { scopedTranslation } from "./i18n";
 import { CampaignStarterConfigContainer } from "./widget";
 
 /**
  * Get Campaign Starter Configuration Endpoint (GET)
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["leads", "campaigns", "campaign-starter", "campaign-starter-config"],
   allowedRoles: [UserRole.ADMIN],
   icon: "rocket",
 
-  title:
-    "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.title" as const,
-  description:
-    "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.description" as const,
-  category: "app.api.leads.category" as const,
-  tags: [
-    "app.api.leads.tags.leads" as const,
-    "app.api.leads.tags.campaigns" as const,
-  ],
+  title: "get.title",
+  description: "get.description",
+  category: "category",
+  tags: ["tags.leads", "tags.campaigns"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.form.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.form.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "get.form.title",
+    description: "get.form.description",
+    layoutType: LayoutType.STACKED,
+    usage: { response: true },
+    children: {
       // Campaign settings
-      dryRun: responseField({
+      dryRun: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.dryRun" as const,
+        content: "get.response.dryRun",
         schema: z.boolean(),
       }),
-      minAgeHours: responseField({
+      minAgeHours: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.minAgeHours" as const,
+        content: "get.response.minAgeHours",
         schema: z.coerce.number().min(0).max(168),
       }),
-      enabledDays: responseField({
+      enabledDays: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledDays" as const,
+        content: "get.response.enabledDays",
         schema: z.array(z.coerce.number().min(1).max(7)),
       }),
-      enabledHours: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
-          layoutType: LayoutType.GRID,
-          columns: 2,
-        },
-        { response: true },
-        {
-          start: responseField({
+      enabledHours: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.enabledHours",
+        layoutType: LayoutType.GRID,
+        columns: 2,
+        usage: { response: true },
+        children: {
+          start: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
+            content: "get.response.enabledHours",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number().min(0).max(23),
           }),
-          end: responseField({
+          end: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabledHours" as const,
+            content: "get.response.enabledHours",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number().min(0).max(23),
           }),
         },
-      ),
-      leadsPerWeek: responseField({
+      }),
+      leadsPerWeek: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.leadsPerWeek" as const,
-        label:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.leadsPerWeek.label" as const,
-        description:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.leadsPerWeek.description" as const,
+        content: "get.response.leadsPerWeek",
+        label: "post.leadsPerWeek.label",
+        description: "post.leadsPerWeek.description",
         schema: z.record(z.string(), z.coerce.number().min(1)),
       }),
       // Cron settings
-      schedule: responseField({
+      schedule: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.schedule" as const,
+        content: "get.response.schedule",
         schema: z.string().min(1),
       }),
-      enabled: responseField({
+      enabled: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.enabled" as const,
+        content: "get.response.enabled",
         schema: z.boolean().default(true),
       }),
-      priority: responseField({
+      priority: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.priority" as const,
+        content: "get.response.priority",
         schema: z.enum(CronTaskPriority).default(CronTaskPriority.MEDIUM),
       }),
-      timeout: responseField({
+      timeout: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.timeout" as const,
+        content: "get.response.timeout",
         schema: z.coerce.number().min(1000).max(3600000).default(300000),
       }),
-      retries: responseField({
+      retries: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.retries" as const,
+        content: "get.response.retries",
         schema: z.coerce.number().min(0).max(10).default(3),
       }),
-      retryDelay: responseField({
+      retryDelay: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.response.retryDelay" as const,
+        content: "get.response.retryDelay",
         schema: z.coerce.number().min(1000).max(300000).default(30000),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.validation.description" as const,
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.unauthorized.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.unauthorized.description" as const,
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.server.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.server.description" as const,
+      title: "get.errors.server.title",
+      description: "get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.unknown.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.unknown.description" as const,
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.network.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.network.description" as const,
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.forbidden.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.forbidden.description" as const,
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.notFound.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.notFound.description" as const,
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.unsavedChanges.description" as const,
+      title: "get.errors.unsavedChanges.title",
+      description: "get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.conflict.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.errors.conflict.description" as const,
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title:
-      "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.success.title" as const,
-    description:
-      "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.get.success.description" as const,
+    title: "get.success.title",
+    description: "get.success.description",
   },
   examples: {
     responses: {
@@ -246,20 +202,16 @@ const { GET } = createEndpoint({
  * Update Campaign Starter Configuration Endpoint (PUT)
  */
 const { PUT } = createEndpoint({
+  scopedTranslation,
   method: Methods.PUT,
   path: ["leads", "campaigns", "campaign-starter", "campaign-starter-config"],
   allowedRoles: [UserRole.ADMIN],
   icon: "rocket",
 
-  title:
-    "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.title" as const,
-  description:
-    "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.description" as const,
-  category: "app.api.leads.category" as const,
-  tags: [
-    "app.api.leads.tags.leads" as const,
-    "app.api.leads.tags.campaigns" as const,
-  ],
+  title: "post.title",
+  description: "post.description",
+  category: "category",
+  tags: ["tags.leads", "tags.campaigns"],
 
   fields: customWidgetObject({
     render: CampaignStarterConfigContainer,
@@ -267,164 +219,129 @@ const { PUT } = createEndpoint({
     children: {
       backButton: backButton({ usage: { response: true } }),
       // Request fields
-      dryRun: requestField({
+      dryRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.dryRun.label" as const,
-        description:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.dryRun.description" as const,
+        label: "post.dryRun.label",
+        description: "post.dryRun.description",
         schema: z.boolean(),
       }),
-      minAgeHours: requestField({
+      minAgeHours: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.minAgeHours.label" as const,
-        description:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.minAgeHours.description" as const,
+        label: "post.minAgeHours.label",
+        description: "post.minAgeHours.description",
         schema: z.coerce.number().min(0).max(168),
       }),
-      enabledDays: requestField({
+      enabledDays: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.label" as const,
-        description:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.description" as const,
+        label: "post.enabledDays.label",
+        description: "post.enabledDays.description",
         options: [
           {
             value: "1",
-            label:
-              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.monday" as const,
+            label: "post.enabledDays.monday",
           },
           {
             value: "2",
-            label:
-              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.tuesday" as const,
+            label: "post.enabledDays.tuesday",
           },
           {
             value: "3",
-            label:
-              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.wednesday" as const,
+            label: "post.enabledDays.wednesday",
           },
           {
             value: "4",
-            label:
-              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.thursday" as const,
+            label: "post.enabledDays.thursday",
           },
           {
             value: "5",
-            label:
-              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.friday" as const,
+            label: "post.enabledDays.friday",
           },
           {
             value: "6",
-            label:
-              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.saturday" as const,
+            label: "post.enabledDays.saturday",
           },
           {
             value: "7",
-            label:
-              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledDays.sunday" as const,
+            label: "post.enabledDays.sunday",
           },
         ],
         schema: z.array(z.coerce.number().min(1).max(7)),
       }),
-      enabledHours: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.label" as const,
-          description:
-            "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 2,
-        },
-        { request: "data" },
-        {
-          start: requestField({
+      enabledHours: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "post.enabledHours.label",
+        description: "post.enabledHours.description",
+        layoutType: LayoutType.GRID,
+        columns: 2,
+        usage: { request: "data" },
+        children: {
+          start: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
-            label:
-              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.start.label" as const,
-            description:
-              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.start.description" as const,
+            label: "post.enabledHours.start.label",
+            description: "post.enabledHours.start.description",
             schema: z.coerce.number().min(0).max(23),
           }),
-          end: requestField({
+          end: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
-            label:
-              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.end.label" as const,
-            description:
-              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabledHours.end.description" as const,
+            label: "post.enabledHours.end.label",
+            description: "post.enabledHours.end.description",
             schema: z.coerce.number().min(0).max(23),
           }),
         },
-      ),
-      schedule: requestField({
+      }),
+      schedule: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.schedule.label" as const,
-        description:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.schedule.description" as const,
+        label: "post.schedule.label",
+        description: "post.schedule.description",
         schema: z.string().min(1),
       }),
-      enabled: requestField({
+      enabled: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabled.label" as const,
-        description:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.enabled.description" as const,
+        label: "post.enabled.label",
+        description: "post.enabled.description",
         schema: z.boolean().default(true),
       }),
-      priority: requestField({
+      priority: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.priority.label" as const,
-        description:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.priority.description" as const,
+        label: "post.priority.label",
+        description: "post.priority.description",
         options: CronTaskPriorityOptions,
         schema: z.enum(CronTaskPriority).default(CronTaskPriority.MEDIUM),
       }),
-      timeout: requestField({
+      timeout: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.timeout.label" as const,
-        description:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.timeout.description" as const,
+        label: "post.timeout.label",
+        description: "post.timeout.description",
         schema: z.coerce.number().min(1000).max(3600000).default(300000),
       }),
-      retries: requestField({
+      retries: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.retries.label" as const,
-        description:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.retries.description" as const,
+        label: "post.retries.label",
+        description: "post.retries.description",
         schema: z.coerce.number().min(0).max(10).default(3),
       }),
-      retryDelay: requestField({
+      retryDelay: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.retryDelay.label" as const,
-        description:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.retryDelay.description" as const,
+        label: "post.retryDelay.label",
+        description: "post.retryDelay.description",
         schema: z.coerce.number().min(1000).max(300000).default(30000),
       }),
-      leadsPerWeek: requestField({
+      leadsPerWeek: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
-        label:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.leadsPerWeek.label" as const,
-        description:
-          "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.leadsPerWeek.description" as const,
+        label: "post.leadsPerWeek.label",
+        description: "post.leadsPerWeek.description",
         schema: z.record(z.string(), z.coerce.number().min(1)),
       }),
     },
@@ -432,66 +349,46 @@ const { PUT } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.errors.validation.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.errors.validation.description" as const,
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.errors.unauthorized.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.errors.unauthorized.description" as const,
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.errors.server.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.errors.server.description" as const,
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.errors.unknown.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.errors.unknown.description" as const,
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.errors.network.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.errors.network.description" as const,
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.errors.forbidden.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.errors.forbidden.description" as const,
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.errors.notFound.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.errors.notFound.description" as const,
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.errors.unsavedChanges.description" as const,
+      title: "post.errors.unsavedChanges.title",
+      description: "post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.errors.conflict.title" as const,
-      description:
-        "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.errors.conflict.description" as const,
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title:
-      "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.success.title" as const,
-    description:
-      "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.success.description" as const,
+    title: "post.success.title",
+    description: "post.success.description",
   },
   examples: {
     requests: {
@@ -515,9 +412,6 @@ const { PUT } = createEndpoint({
         retries: 3,
         retryDelay: 30000,
       },
-    },
-    responses: {
-      default: {},
     },
   },
 });

@@ -13,7 +13,9 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation } from "../i18n";
 import { imapSyncRepository } from "../sync-service/repository";
 import type {
   ExecuteImapSyncRequestOutput,
@@ -23,30 +25,18 @@ import type {
 } from "./types";
 
 /**
- * IMAP Sync Task Repository Interface
- */
-export interface ImapSyncTaskRepository {
-  executeImapSync(
-    data: ExecuteImapSyncRequestOutput,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<ExecuteImapSyncResponseOutput>>;
-
-  validateImapSync(
-    logger: EndpointLogger,
-  ): ResponseType<ValidateImapSyncResponseOutput>;
-}
-
-/**
  * IMAP Sync Task Repository Implementation
  */
-export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
+export class ImapSyncTaskRepositoryImpl {
   /**
    * Execute IMAP sync task
    */
   async executeImapSync(
     data: ExecuteImapSyncRequestOutput,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ExecuteImapSyncResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     logger.info("tasks.imap_sync.start", {
       maxAccountsPerRun: data.config.maxAccountsPerRun ?? 0,
       enableFolderSync: data.config.enableFolderSync ?? false,
@@ -57,7 +47,10 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
     try {
       // For now, we'll execute a simplified sync all accounts operation
       // In a real implementation, this would get specific accounts based on config
-      const syncResult = await imapSyncRepository.syncAllAccounts(logger);
+      const syncResult = await imapSyncRepository.syncAllAccounts(
+        logger,
+        locale,
+      );
 
       if (syncResult.success) {
         const result: TaskResultType = {
@@ -90,7 +83,7 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
         error: syncResult.message,
       });
       return fail({
-        message: "app.api.emails.error.default",
+        message: t("imap.sync.errors.default"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         cause: syncResult,
       });
@@ -103,7 +96,7 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
       });
 
       return fail({
-        message: "app.api.emails.error.default",
+        message: t("imap.sync.errors.default"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -114,7 +107,9 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
    */
   validateImapSync(
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): ResponseType<ValidateImapSyncResponseOutput> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       // Basic validation - check if IMAP sync service is available
       // For now, we'll just return true since we don't have a health check method
@@ -126,7 +121,7 @@ export class ImapSyncTaskRepositoryImpl implements ImapSyncTaskRepository {
         error instanceof Error ? error.message : String(error),
       );
       return fail({
-        message: "app.api.emails.error.default",
+        message: t("imap.sync.errors.default"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

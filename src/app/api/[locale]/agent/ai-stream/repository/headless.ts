@@ -20,7 +20,6 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { NO_CHARACTER_ID } from "../../chat/characters/config";
 import {
@@ -35,6 +34,7 @@ import { ChatMessageRole } from "../../chat/enum";
 import { chatFavorites } from "../../chat/favorites/db";
 import { ensureThread } from "../../chat/threads/repository";
 import type { AiStreamPostRequestOutput } from "../definition";
+import type { AiStreamT } from "../i18n";
 import { AiStreamRepository } from "./index";
 
 /* eslint-disable i18next/no-literal-string */
@@ -79,11 +79,14 @@ export interface HeadlessAiStreamParams {
     requiresConfirmation: boolean;
   }> | null;
   /**
-   * Active tools — permission layer controlling which tools the model may execute.
+   * Allowed tools — permission layer controlling which tools the model may execute.
    * null/undefined = all tools permitted.
    * Array = restrict execution to listed toolIds.
    */
-  activeTools?: Array<{ toolId: string; requiresConfirmation: boolean }> | null;
+  allowedTools?: Array<{
+    toolId: string;
+    requiresConfirmation: boolean;
+  }> | null;
   /**
    * Extra text injected into the headless system prompt section.
    * Use this to prime the model with task-specific context:
@@ -111,6 +114,8 @@ export interface HeadlessAiStreamParams {
   locale: CountryLanguage;
   /** Logger instance */
   logger: EndpointLogger;
+  /** Translation function for ai-stream module */
+  t: AiStreamT;
 }
 
 export interface HeadlessAiStreamResult {
@@ -118,6 +123,8 @@ export interface HeadlessAiStreamResult {
   lastAiMessageId: string;
   /** Thread ID — undefined when threadMode is "none" */
   threadId?: string;
+  /** Final text content — populated in memory even for incognito (no DB read needed) */
+  lastAiMessageContent: string | null;
 }
 
 /**
@@ -135,6 +142,7 @@ async function resolveFavorite(
   userId: string,
   user: JwtPayloadType,
   logger: EndpointLogger,
+  locale: CountryLanguage,
 ): Promise<{ model: ModelId; character: string } | null> {
   const [favorite] = await db
     .select()
@@ -153,8 +161,11 @@ async function resolveFavorite(
 
   // Resolve model from modelSelection
   const sel = favorite.modelSelection;
-  if (sel && isManualSelection(sel)) {
-    return { model: sel.manualModelId as ModelId, character };
+  if (sel && isManualSelection(sel) && "manualModelId" in sel) {
+    return {
+      model: sel.manualModelId as ModelId,
+      character,
+    };
   }
   if (sel && isFiltersSelection(sel)) {
     const best = CharactersRepositoryClient.getBestModelForCharacter(sel);
@@ -171,6 +182,7 @@ async function resolveFavorite(
       { id: character },
       user,
       logger,
+      locale,
     );
     if (characterResult.success) {
       const charSel = characterResult.data.modelSelection;
@@ -203,7 +215,7 @@ export async function runHeadlessAiStream(
     character: characterOverride,
     prompt,
     availableTools,
-    activeTools,
+    allowedTools,
     headlessInstructions,
     threadMode,
     threadId: existingThreadId,
@@ -213,9 +225,8 @@ export async function runHeadlessAiStream(
     user,
     locale,
     logger,
+    t: aiStreamT,
   } = params;
-
-  const { t } = simpleT(locale);
 
   try {
     // ── Resolve model + character ─────────────────────────────────────────────
@@ -230,10 +241,11 @@ export async function runHeadlessAiStream(
           userId,
           user,
           logger,
+          locale,
         );
         if (!resolved) {
           return fail({
-            message: "app.api.agent.aiStream.headless.errors.favoriteNotFound",
+            message: aiStreamT("headless.errors.favoriteNotFound"),
             errorType: ErrorResponseTypes.NOT_FOUND,
           });
         }
@@ -245,8 +257,7 @@ export async function runHeadlessAiStream(
 
     if (!model || !character) {
       return fail({
-        message:
-          "app.api.agent.aiStream.headless.errors.missingModelOrCharacter",
+        message: aiStreamT("headless.errors.missingModelOrCharacter"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
@@ -267,7 +278,7 @@ export async function runHeadlessAiStream(
 
     if (preCalls && preCalls.length > 0 && !isIncognito) {
       // Ensure the thread exists first
-      const userId = "id" in user ? (user.id as string) : undefined;
+      const userId = user.isPublic ? undefined : user.id;
       await ensureThread({
         threadId: effectiveThreadId,
         rootFolderId,
@@ -278,6 +289,7 @@ export async function runHeadlessAiStream(
         isIncognito: false,
         logger,
         user,
+        locale,
       });
 
       // Write the user message first
@@ -359,7 +371,7 @@ export async function runHeadlessAiStream(
       role: ChatMessageRole.USER,
       model,
       character,
-      activeTools: activeTools ?? null,
+      allowedTools: allowedTools ?? null,
       tools: availableTools ?? null,
       toolConfirmations: null,
       messageHistory: [] as AiStreamPostRequestOutput["messageHistory"],
@@ -376,7 +388,7 @@ export async function runHeadlessAiStream(
       logger,
       user,
       request: undefined,
-      t,
+      t: aiStreamT,
       headless: true,
       extraInstructions: headlessInstructions,
     });
@@ -385,7 +397,7 @@ export async function runHeadlessAiStream(
       return result;
     }
 
-    const { threadId, lastAiMessageId } = result.data;
+    const { threadId, lastAiMessageId, lastAiMessageContent } = result.data;
 
     logger.info("[Headless AI] Execution complete", {
       model,
@@ -398,6 +410,7 @@ export async function runHeadlessAiStream(
       success: true,
       data: {
         lastAiMessageId,
+        lastAiMessageContent,
         threadId: threadMode !== "none" ? threadId : undefined,
       },
     };
@@ -410,7 +423,7 @@ export async function runHeadlessAiStream(
     });
 
     return fail({
-      message: errorMsg,
+      message: aiStreamT("errors.unexpectedError"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: { error: errorMsg },
     });

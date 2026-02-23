@@ -8,13 +8,13 @@ import { z } from "zod";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  objectField,
-  requestField,
-  requestResponseField,
-  requestUrlPathParamsResponseField,
-  responseField,
+  scopedBackButton,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedRequestResponseField,
+  scopedRequestUrlPathParamsResponseField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -45,199 +45,183 @@ import {
   SmtpSecurityType,
   SmtpSecurityTypeOptions,
 } from "../../enum";
+import { scopedTranslation } from "./i18n";
 import { SmtpEditContainer } from "./widget";
 
 /**
  * GET endpoint for retrieving SMTP account by ID
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["emails", "smtp-client", "edit", "[id]"],
-  title: "app.api.emails.smtpClient.edit.id.get.title",
-  description: "app.api.emails.smtpClient.edit.id.get.description",
-  category: "app.api.emails.category",
+  title: "get.title",
+  description: "get.description",
+  category: "category",
   icon: "server",
-  tags: ["app.api.emails.smtpClient.tag"],
+  tags: ["tag"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.emails.smtpClient.edit.id.get.container.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.get.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "urlPathParams", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "get.container.title",
+    description: "get.container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "urlPathParams", response: true },
+    children: {
       // === URL PARAMETER ===
-      id: requestUrlPathParamsResponseField({
+      id: scopedRequestUrlPathParamsResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.smtpClient.edit.id.fields.id.label",
-        description: "app.api.emails.smtpClient.edit.id.fields.id.description",
+        label: "fields.id.label",
+        description: "fields.id.description",
         columns: 12,
         schema: z.uuid(),
       }),
 
-      name: responseField({
+      name: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.smtpClient.edit.id.response.account.name",
+        content: "response.account.name",
         schema: z.string(),
       }),
-      description: responseField({
+      description: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.smtpClient.edit.id.response.account.fields.description",
+        content: "response.account.fields.description",
         schema: z.string().optional(),
       }),
-      host: responseField({
+      host: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.smtpClient.edit.id.response.account.host",
+        content: "response.account.host",
         schema: z.string(),
       }),
-      port: responseField({
+      port: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.smtpClient.edit.id.response.account.port",
+        content: "response.account.port",
         schema: z.coerce.number().int(),
       }),
-      securityType: responseField({
+      securityType: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        text: "app.api.emails.smtpClient.edit.id.response.account.securityType",
+        text: "response.account.securityType",
         schema: z.enum(SmtpSecurityType),
       }),
-      username: responseField({
+      username: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.smtpClient.edit.id.response.account.username",
+        content: "response.account.username",
         schema: z.string(),
       }),
-      fromEmail: responseField({
+      fromEmail: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.smtpClient.edit.id.response.account.fromEmail",
+        content: "response.account.fromEmail",
         schema: z.email(),
       }),
-      status: responseField({
+      status: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        text: "app.api.emails.smtpClient.edit.id.response.account.status",
+        text: "response.account.status",
         schema: z.enum(SmtpAccountStatus),
       }),
-      healthCheckStatus: responseField({
+      healthCheckStatus: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        text: "app.api.emails.smtpClient.edit.id.response.account.healthCheckStatus",
+        text: "response.account.healthCheckStatus",
         schema: z.enum(SmtpHealthStatus).nullable(),
       }),
-      priority: responseField({
+      priority: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.smtpClient.edit.id.response.account.priority",
+        content: "response.account.priority",
         schema: z.coerce.number().int().optional(),
       }),
-      totalEmailsSent: responseField({
+      totalEmailsSent: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.smtpClient.edit.id.response.account.totalEmailsSent",
+        content: "response.account.totalEmailsSent",
         schema: z.coerce.number().int(),
       }),
-      lastUsedAt: responseField({
+      lastUsedAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.smtpClient.edit.id.response.account.lastUsedAt",
+        content: "response.account.lastUsedAt",
         schema: dateSchema.nullable(),
       }),
-      createdAt: responseField({
+      createdAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.smtpClient.edit.id.response.account.createdAt",
+        content: "response.account.createdAt",
         schema: dateSchema,
       }),
-      updatedAt: responseField({
+      updatedAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.smtpClient.edit.id.response.account.updatedAt",
+        content: "response.account.updatedAt",
         schema: dateSchema,
       }),
-      campaignTypes: responseField({
+      campaignTypes: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.smtpClient.edit.id.response.account.campaignTypes",
+        content: "response.account.campaignTypes",
         schema: z.array(z.enum(CampaignType)).optional(),
       }),
-      emailJourneyVariants: responseField({
+      emailJourneyVariants: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.smtpClient.edit.id.response.account.emailJourneyVariants",
+        content: "response.account.emailJourneyVariants",
         schema: z.array(z.enum(EmailJourneyVariant)).optional(),
       }),
-      emailCampaignStages: responseField({
+      emailCampaignStages: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.smtpClient.edit.id.response.account.emailCampaignStages",
+        content: "response.account.emailCampaignStages",
         schema: z.array(z.enum(EmailCampaignStage)).optional(),
       }),
-      countries: responseField({
+      countries: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.smtpClient.edit.id.response.account.countries",
+        content: "response.account.countries",
         schema: z.array(z.enum(Countries)).optional(),
       }),
-      languages: responseField({
+      languages: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.smtpClient.edit.id.response.account.languages",
+        content: "response.account.languages",
         schema: z.array(z.enum(Languages)).optional(),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.emails.smtpClient.edit.id.errors.validation.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.emails.smtpClient.edit.id.errors.unauthorized.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.emails.smtpClient.edit.id.errors.forbidden.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.emails.smtpClient.edit.id.errors.notFound.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.emails.smtpClient.edit.id.errors.conflict.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.emails.smtpClient.edit.id.errors.server.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.server.description",
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.emails.smtpClient.edit.id.errors.networkError.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.networkError.description",
+      title: "errors.networkError.title",
+      description: "errors.networkError.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.emails.smtpClient.edit.id.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.emails.smtpClient.edit.id.errors.unknown.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.emails.smtpClient.edit.id.success.title",
-    description: "app.api.emails.smtpClient.edit.id.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 
   // === EXAMPLES ===
@@ -273,203 +257,176 @@ const { GET } = createEndpoint({
  * PUT endpoint for updating SMTP account
  */
 const { PUT } = createEndpoint({
+  scopedTranslation,
   method: Methods.PUT,
   path: ["emails", "smtp-client", "edit", "[id]"],
-  title: "app.api.emails.smtpClient.edit.id.put.title",
-  description: "app.api.emails.smtpClient.edit.id.put.description",
-  category: "app.api.emails.category",
+  title: "put.title",
+  description: "put.description",
+  category: "category",
   icon: "server",
-  tags: ["app.api.emails.smtpClient.tag"],
+  tags: ["tag"],
   allowedRoles: [UserRole.ADMIN],
 
   fields: customWidgetObject({
     render: SmtpEditContainer,
     usage: { request: "data&urlPathParams", response: true } as const,
     children: {
-      backButton: backButton({ usage: { request: "data", response: true } }),
+      backButton: scopedBackButton(scopedTranslation, {
+        usage: { request: "data", response: true },
+      }),
 
       // === URL PARAMETER ===
-      id: requestUrlPathParamsResponseField({
+      id: scopedRequestUrlPathParamsResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.smtpClient.edit.id.fields.id.label",
-        description: "app.api.emails.smtpClient.edit.id.fields.id.description",
+        label: "fields.id.label",
+        description: "fields.id.description",
         columns: 12,
         schema: z.uuid(),
       }),
 
-      name: requestResponseField({
+      name: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.smtpClient.edit.id.fields.name.label",
-        description:
-          "app.api.emails.smtpClient.edit.id.fields.name.description",
-        placeholder:
-          "app.api.emails.smtpClient.edit.id.fields.name.placeholder",
+        label: "fields.name.label",
+        description: "fields.name.description",
+        placeholder: "fields.name.placeholder",
         columns: 6,
         schema: z.string().min(1).optional(),
       }),
 
-      description: requestResponseField({
+      description: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
-        label: "app.api.emails.smtpClient.edit.id.fields.description.label",
-        description:
-          "app.api.emails.smtpClient.edit.id.fields.description.description",
-        placeholder:
-          "app.api.emails.smtpClient.edit.id.fields.description.placeholder",
+        label: "fields.description.label",
+        description: "fields.description.description",
+        placeholder: "fields.description.placeholder",
         columns: 12,
         schema: z.string().optional(),
       }),
 
-      host: requestResponseField({
+      host: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.smtpClient.edit.id.fields.host.label",
-        description:
-          "app.api.emails.smtpClient.edit.id.fields.host.description",
-        placeholder:
-          "app.api.emails.smtpClient.edit.id.fields.host.placeholder",
+        label: "fields.host.label",
+        description: "fields.host.description",
+        placeholder: "fields.host.placeholder",
         columns: 6,
         schema: z.string().min(1).optional(),
       }),
 
-      port: requestResponseField({
+      port: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.smtpClient.edit.id.fields.port.label",
-        description:
-          "app.api.emails.smtpClient.edit.id.fields.port.description",
-        placeholder:
-          "app.api.emails.smtpClient.edit.id.fields.port.placeholder",
+        label: "fields.port.label",
+        description: "fields.port.description",
+        placeholder: "fields.port.placeholder",
         columns: 6,
         schema: z.coerce.number().min(1).max(65535).optional(),
       }),
 
-      securityType: requestResponseField({
+      securityType: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.emails.smtpClient.edit.id.fields.securityType.label",
-        description:
-          "app.api.emails.smtpClient.edit.id.fields.securityType.description",
-        placeholder:
-          "app.api.emails.smtpClient.edit.id.fields.securityType.placeholder",
+        label: "fields.securityType.label",
+        description: "fields.securityType.description",
+        placeholder: "fields.securityType.placeholder",
         columns: 6,
         options: SmtpSecurityTypeOptions,
         schema: z.enum(SmtpSecurityType).optional(),
       }),
 
-      username: requestResponseField({
+      username: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.smtpClient.edit.id.fields.username.label",
-        description:
-          "app.api.emails.smtpClient.edit.id.fields.username.description",
-        placeholder:
-          "app.api.emails.smtpClient.edit.id.fields.username.placeholder",
+        label: "fields.username.label",
+        description: "fields.username.description",
+        placeholder: "fields.username.placeholder",
         columns: 6,
         schema: z.string().min(1).optional(),
       }),
 
-      password: requestField({
+      password: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
-        label: "app.api.emails.smtpClient.edit.id.fields.password.label",
-        description:
-          "app.api.emails.smtpClient.edit.id.fields.password.description",
-        placeholder:
-          "app.api.emails.smtpClient.edit.id.fields.password.placeholder",
+        label: "fields.password.label",
+        description: "fields.password.description",
+        placeholder: "fields.password.placeholder",
         columns: 6,
         // Password is optional - leave empty to keep current password, or enter new one to change it
         schema: z.string().optional(),
       }),
 
-      fromEmail: requestResponseField({
+      fromEmail: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
-        label: "app.api.emails.smtpClient.edit.id.fields.fromEmail.label",
-        description:
-          "app.api.emails.smtpClient.edit.id.fields.fromEmail.description",
-        placeholder:
-          "app.api.emails.smtpClient.edit.id.fields.fromEmail.placeholder",
+        label: "fields.fromEmail.label",
+        description: "fields.fromEmail.description",
+        placeholder: "fields.fromEmail.placeholder",
         columns: 6,
         schema: z.email().optional(),
       }),
 
-      priority: requestResponseField({
+      priority: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.smtpClient.edit.id.fields.priority.label",
-        description:
-          "app.api.emails.smtpClient.edit.id.fields.priority.description",
-        placeholder:
-          "app.api.emails.smtpClient.edit.id.fields.priority.placeholder",
+        label: "fields.priority.label",
+        description: "fields.priority.description",
+        placeholder: "fields.priority.placeholder",
         columns: 6,
         schema: z.coerce.number().int().min(1).max(100).optional(),
       }),
 
-      campaignTypes: requestResponseField({
+      campaignTypes: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label: "app.api.emails.smtpClient.edit.id.fields.campaignTypes.label",
-        description:
-          "app.api.emails.smtpClient.edit.id.fields.campaignTypes.description",
-        placeholder:
-          "app.api.emails.smtpClient.edit.id.fields.campaignTypes.placeholder",
+        label: "fields.campaignTypes.label",
+        description: "fields.campaignTypes.description",
+        placeholder: "fields.campaignTypes.placeholder",
         columns: 6,
         options: CampaignTypeOptions,
         schema: z.array(z.enum(CampaignType)).optional(),
       }),
 
-      emailJourneyVariants: requestResponseField({
+      emailJourneyVariants: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label:
-          "app.api.emails.smtpClient.edit.id.fields.emailJourneyVariants.label",
-        description:
-          "app.api.emails.smtpClient.edit.id.fields.emailJourneyVariants.description",
-        placeholder:
-          "app.api.emails.smtpClient.edit.id.fields.emailJourneyVariants.placeholder",
+        label: "fields.emailJourneyVariants.label",
+        description: "fields.emailJourneyVariants.description",
+        placeholder: "fields.emailJourneyVariants.placeholder",
         columns: 6,
         options: EmailJourneyVariantOptions,
         schema: z.array(z.enum(EmailJourneyVariant)).optional(),
       }),
 
-      emailCampaignStages: requestResponseField({
+      emailCampaignStages: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label:
-          "app.api.emails.smtpClient.edit.id.fields.emailCampaignStages.label",
-        description:
-          "app.api.emails.smtpClient.edit.id.fields.emailCampaignStages.description",
-        placeholder:
-          "app.api.emails.smtpClient.edit.id.fields.emailCampaignStages.placeholder",
+        label: "fields.emailCampaignStages.label",
+        description: "fields.emailCampaignStages.description",
+        placeholder: "fields.emailCampaignStages.placeholder",
         columns: 6,
         options: EmailCampaignStageOptions,
         schema: z.array(z.enum(EmailCampaignStage)).optional(),
       }),
 
-      countries: requestResponseField({
+      countries: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label: "app.api.emails.smtpClient.edit.id.fields.countries.label",
-        description:
-          "app.api.emails.smtpClient.edit.id.fields.countries.description",
-        placeholder:
-          "app.api.emails.smtpClient.edit.id.fields.countries.placeholder",
+        label: "fields.countries.label",
+        description: "fields.countries.description",
+        placeholder: "fields.countries.placeholder",
         columns: 6,
         options: CountriesOptions,
         schema: z.array(z.enum(["GLOBAL", "DE", "PL", "US"])).optional(),
       }),
 
-      languages: requestResponseField({
+      languages: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label: "app.api.emails.smtpClient.edit.id.fields.languages.label",
-        description:
-          "app.api.emails.smtpClient.edit.id.fields.languages.description",
-        placeholder:
-          "app.api.emails.smtpClient.edit.id.fields.languages.placeholder",
+        label: "fields.languages.label",
+        description: "fields.languages.description",
+        placeholder: "fields.languages.placeholder",
         columns: 6,
         options: LanguagesOptions,
         schema: z.array(z.enum(Languages)).optional(),
@@ -480,56 +437,47 @@ const { PUT } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.emails.smtpClient.edit.id.errors.validation.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.emails.smtpClient.edit.id.errors.unauthorized.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.emails.smtpClient.edit.id.errors.forbidden.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.emails.smtpClient.edit.id.errors.notFound.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.emails.smtpClient.edit.id.errors.conflict.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.emails.smtpClient.edit.id.errors.server.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.server.description",
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.emails.smtpClient.edit.id.errors.networkError.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.networkError.description",
+      title: "errors.networkError.title",
+      description: "errors.networkError.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.emails.smtpClient.edit.id.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.emails.smtpClient.edit.id.errors.unknown.title",
-      description:
-        "app.api.emails.smtpClient.edit.id.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.emails.smtpClient.edit.id.success.title",
-    description: "app.api.emails.smtpClient.edit.id.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 
   // === EXAMPLES ===

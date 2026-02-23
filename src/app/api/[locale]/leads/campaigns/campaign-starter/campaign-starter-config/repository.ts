@@ -24,6 +24,9 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../../user/auth/types";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 import { type CampaignStarterConfig, campaignStarterConfigs } from "./db";
 import {
   type CronSettings,
@@ -194,6 +197,7 @@ export class CampaignStarterConfigRepository {
    */
   static async getConfig(
     user: JwtPayloadType,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CampaignStarterConfigGetResponseOutput>> {
     try {
@@ -228,7 +232,7 @@ export class CampaignStarterConfigRepository {
     } catch (error) {
       logger.error("Error fetching campaign starter config", parseError(error));
       return fail({
-        message: "app.api.leads.leadsErrors.leads.get.error.server.title",
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -241,7 +245,7 @@ export class CampaignStarterConfigRepository {
   static async updateConfig(
     data: CampaignStarterConfigGetResponseOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CampaignStarterConfigPutResponseOutput>> {
     try {
@@ -251,7 +255,6 @@ export class CampaignStarterConfigRepository {
       logger.info("Updating campaign starter config", {
         environment,
         userId: user.id,
-        locale,
         dryRun: data.dryRun,
         enabled: data.enabled,
       });
@@ -303,7 +306,7 @@ export class CampaignStarterConfigRepository {
     } catch (error) {
       logger.error("Error updating campaign starter config", parseError(error));
       return fail({
-        message: "app.api.leads.leadsErrors.leads.get.error.server.title",
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

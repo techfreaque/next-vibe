@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  objectField,
-  responseField,
+  scopedBackButton,
+  scopedObjectFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,6 +21,7 @@ import {
 
 import { UserRole } from "../../../user/user-roles/enum";
 import { ImapHealthStatus } from "../enum";
+import { scopedTranslation } from "./i18n";
 import { ImapHealthContainer } from "./widget";
 
 /**
@@ -28,120 +29,104 @@ import { ImapHealthContainer } from "./widget";
  * Retrieves current IMAP server health status and metrics
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["emails", "imap-client", "health"],
   allowedRoles: [UserRole.ADMIN],
 
-  title: "app.api.emails.imapClient.health.health.get.title",
-  description: "app.api.emails.imapClient.health.health.get.description",
-  category: "app.api.emails.category",
+  title: "health.get.title",
+  description: "health.get.description",
+  category: "category",
   icon: "activity",
-  tags: [
-    "app.api.emails.imapClient.tags.health",
-    "app.api.emails.imapClient.tags.monitoring",
-  ],
+  tags: ["tags.health", "tags.monitoring"],
 
   fields: customWidgetObject({
     render: ImapHealthContainer,
     usage: { response: true } as const,
     children: {
-      backButton: backButton({ usage: { response: true } }),
+      backButton: scopedBackButton(scopedTranslation, {
+        usage: { response: true },
+      }),
 
       // === RESPONSE FIELDS ===
-      accountsHealthy: responseField({
+      accountsHealthy: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.health.health.get.response.data.accountsHealthy",
+        content: "health.get.response.data.accountsHealthy",
         schema: z.coerce.number().int(),
       }),
-      accountsTotal: responseField({
+      accountsTotal: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.health.health.get.response.data.accountsTotal",
+        content: "health.get.response.data.accountsTotal",
         schema: z.coerce.number().int(),
       }),
-      connectionsActive: responseField({
+      connectionsActive: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.health.health.get.response.data.connectionsActive",
+        content: "health.get.response.data.connectionsActive",
         schema: z.coerce.number().int(),
       }),
-      connectionErrors: responseField({
+      connectionErrors: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.health.health.get.response.data.connectionErrors",
+        content: "health.get.response.data.connectionErrors",
         schema: z.coerce.number().int(),
       }),
-      lastSyncAt: responseField({
+      lastSyncAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.health.health.get.response.data.lastSyncAt",
+        content: "health.get.response.data.lastSyncAt",
         schema: z.string().nullable(),
       }),
-      status: responseField({
+      status: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        text: "app.api.emails.imapClient.health.health.get.response.data.status",
+        text: "health.get.response.data.status",
         schema: z.enum(ImapHealthStatus),
       }),
-      syncStats: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.emails.imapClient.health.health.get.response.data.syncStats.title",
-          description:
-            "app.api.emails.imapClient.health.health.get.response.data.syncStats.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          totalSyncs: responseField({
+      syncStats: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "health.get.response.data.syncStats.title",
+        description: "health.get.response.data.syncStats.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          totalSyncs: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.emails.imapClient.health.health.get.response.data.syncStats.totalSyncs",
+            content: "health.get.response.data.syncStats.totalSyncs",
             schema: z.coerce.number().int(),
           }),
-          lastSyncTime: responseField({
+          lastSyncTime: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.emails.imapClient.health.health.get.response.data.syncStats.lastSyncTime",
+            content: "health.get.response.data.syncStats.lastSyncTime",
             schema: z.string().nullable(),
           }),
         },
-      ),
-      serverStatus: responseField({
+      }),
+      serverStatus: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        text: "app.api.emails.imapClient.health.health.get.response.data.serverStatus",
+        text: "health.get.response.data.serverStatus",
         schema: z.string(),
       }),
-      uptime: responseField({
+      uptime: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.health.health.get.response.data.uptime",
+        content: "health.get.response.data.uptime",
         schema: z.string(),
       }),
-      syncedAccounts: responseField({
+      syncedAccounts: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.health.health.get.response.data.syncedAccounts",
+        content: "health.get.response.data.syncedAccounts",
         schema: z.coerce.number().int(),
       }),
-      totalAccounts: responseField({
+      totalAccounts: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.health.health.get.response.data.totalAccounts",
+        content: "health.get.response.data.totalAccounts",
         schema: z.coerce.number().int(),
       }),
-      activeConnections: responseField({
+      activeConnections: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.health.health.get.response.data.activeConnections",
+        content: "health.get.response.data.activeConnections",
         schema: z.coerce.number().int(),
       }),
-      avgResponseTime: responseField({
+      avgResponseTime: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.health.health.get.response.data.performanceMetrics.avgResponseTime",
+        content: "health.get.response.data.performanceMetrics.avgResponseTime",
         schema: z.coerce.number(),
       }),
     },
@@ -149,62 +134,46 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.emails.imapClient.health.health.get.errors.unauthorized.title",
-      description:
-        "app.api.emails.imapClient.health.health.get.errors.unauthorized.description",
+      title: "health.get.errors.unauthorized.title",
+      description: "health.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.emails.imapClient.health.health.get.errors.validation.title",
-      description:
-        "app.api.emails.imapClient.health.health.get.errors.validation.description",
+      title: "health.get.errors.validation.title",
+      description: "health.get.errors.validation.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.emails.imapClient.health.health.get.errors.server.title",
-      description:
-        "app.api.emails.imapClient.health.health.get.errors.server.description",
+      title: "health.get.errors.server.title",
+      description: "health.get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.emails.imapClient.health.health.get.errors.unknown.title",
-      description:
-        "app.api.emails.imapClient.health.health.get.errors.unknown.description",
+      title: "health.get.errors.unknown.title",
+      description: "health.get.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.emails.imapClient.health.health.get.errors.network.title",
-      description:
-        "app.api.emails.imapClient.health.health.get.errors.network.description",
+      title: "health.get.errors.network.title",
+      description: "health.get.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.emails.imapClient.health.health.get.errors.forbidden.title",
-      description:
-        "app.api.emails.imapClient.health.health.get.errors.forbidden.description",
+      title: "health.get.errors.forbidden.title",
+      description: "health.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.emails.imapClient.health.health.get.errors.notFound.title",
-      description:
-        "app.api.emails.imapClient.health.health.get.errors.notFound.description",
+      title: "health.get.errors.notFound.title",
+      description: "health.get.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.emails.imapClient.health.health.get.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.imapClient.health.health.get.errors.unsavedChanges.description",
+      title: "health.get.errors.unsavedChanges.title",
+      description: "health.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.emails.imapClient.health.health.get.errors.conflict.title",
-      description:
-        "app.api.emails.imapClient.health.health.get.errors.conflict.description",
+      title: "health.get.errors.conflict.title",
+      description: "health.get.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.emails.imapClient.health.health.get.success.title",
-    description:
-      "app.api.emails.imapClient.health.health.get.success.description",
+    title: "health.get.success.title",
+    description: "health.get.success.description",
   },
 
   examples: {

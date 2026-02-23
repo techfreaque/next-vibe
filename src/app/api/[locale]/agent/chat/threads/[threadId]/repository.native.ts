@@ -61,6 +61,8 @@ export class ThreadByIdRepository {
     // oxlint-disable-next-line no-unused-vars
     _user: JwtPayloadType,
     // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+    // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
   ): Promise<ResponseType<ThreadPatchResponseOutput>> {
     // oxlint-disable-next-line restricted-syntax
@@ -72,6 +74,8 @@ export class ThreadByIdRepository {
     _threadId: string,
     // oxlint-disable-next-line no-unused-vars
     _user: JwtPayloadType,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
   ): Promise<ResponseType<ThreadDeleteResponseOutput>> {

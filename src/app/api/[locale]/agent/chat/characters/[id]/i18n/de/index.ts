@@ -1,6 +1,11 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "KI-Werkzeuge",
+  tags: {
+    characters: "Charaktere",
+  },
+
   get: {
     title: "Charakter abrufen",
     description: "Eine bestimmte Charakter anhand der ID abrufen",

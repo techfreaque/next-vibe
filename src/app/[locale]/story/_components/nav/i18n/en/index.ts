@@ -4,6 +4,11 @@ export const translations = {
   enableLightMode: "Enable light mode",
   enableDarkMode: "Enable dark mode",
   notifications: "Notifications",
+  welcomeNotification: {
+    title: "Welcome to {{appName}}!",
+    description:
+      "Get started by exploring the AI models and creating your first conversation.",
+  },
   company: "Company",
   about: {
     title: "About Us",

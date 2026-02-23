@@ -15,6 +15,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import { db } from "../../../../system/db";
 import { chatMessages } from "../../../chat/db";
+import type { AiStreamT } from "../../i18n";
 
 export class FileAttachmentHandler {
   /**
@@ -27,6 +28,7 @@ export class FileAttachmentHandler {
     userMessageId: string;
     userId: string | undefined;
     logger: EndpointLogger;
+    t: AiStreamT;
   }): Promise<
     ResponseType<
       Array<{
@@ -38,7 +40,7 @@ export class FileAttachmentHandler {
       }>
     >
   > {
-    const { attachments, threadId, userMessageId, userId, logger } = params;
+    const { attachments, threadId, userMessageId, userId, logger, t } = params;
 
     const { getStorageAdapter } = await import("../../../chat/storage");
     const { isAllowedFileType } =
@@ -66,7 +68,7 @@ export class FileAttachmentHandler {
         });
         return fail({
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          message: "app.api.shared.errorTypes.validation_error",
+          message: t("route.errors.invalidRequestData"),
           messageParams: {
             issue: `File type not allowed: ${file.type}`,
           },

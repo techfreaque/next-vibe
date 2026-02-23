@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Generators",
+
   post: {
     title: "Generate Client Routes Index",
     description: "Automatically generate the client routes index file",

@@ -16,10 +16,12 @@ import Stripe from "stripe";
 import { productsRepository } from "@/app/api/[locale]/products/repository-client";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { users } from "../../../user/db";
 import { paymentInvoices, paymentTransactions } from "../../db";
 import {
+  CheckoutMode,
   InvoiceStatus,
   PaymentProvider as PaymentProviderEnum,
   PaymentStatus,
@@ -33,6 +35,7 @@ import type {
   WebhookData,
   WebhookEvent,
 } from "../types";
+import { scopedTranslation } from "./i18n";
 
 // Singleton Stripe instance for direct access (legacy webhook support)
 export const stripe = new Stripe(paymentEnv.STRIPE_SECRET_KEY, {
@@ -47,7 +50,9 @@ export class StripeProvider implements PaymentProvider {
     email: string,
     name: string | null,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ) {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const [user] = await db
         .select({ stripeCustomerId: users.stripeCustomerId })
@@ -57,7 +62,7 @@ export class StripeProvider implements PaymentProvider {
 
       if (!user) {
         return fail({
-          message: "app.api.payment.providers.stripe.errors.userNotFound.title",
+          message: t("errors.userNotFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { userId },
         });
@@ -94,8 +99,7 @@ export class StripeProvider implements PaymentProvider {
           } else {
             // Other errors (network, etc.) should be returned as failure
             return fail({
-              message:
-                "app.api.payment.providers.stripe.errors.customerRetrievalFailed.title",
+              message: t("errors.customerRetrievalFailed.title"),
               errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
               messageParams: { error: error.message, userId },
             });
@@ -129,8 +133,7 @@ export class StripeProvider implements PaymentProvider {
         userId,
       });
       return fail({
-        message:
-          "app.api.payment.providers.stripe.errors.customerCreationFailed.title",
+        message: t("errors.customerCreationFailed.title"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: parseError(error).message, userId },
       });
@@ -142,6 +145,7 @@ export class StripeProvider implements PaymentProvider {
     customerId: string,
     logger: EndpointLogger,
     callbackToken: string,
+    locale: CountryLanguage,
   ) {
     try {
       logger.debug("Creating checkout session", {
@@ -218,8 +222,8 @@ export class StripeProvider implements PaymentProvider {
           provider: PaymentProviderEnum.STRIPE,
           mode:
             mode === "payment"
-              ? "app.api.payment.enums.checkoutMode.payment"
-              : "app.api.payment.enums.checkoutMode.subscription",
+              ? CheckoutMode.PAYMENT
+              : CheckoutMode.SUBSCRIPTION,
           metadata: params.metadata,
         });
 
@@ -275,16 +279,21 @@ export class StripeProvider implements PaymentProvider {
         error: parseError(error),
         userId: params.userId,
       });
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message:
-          "app.api.payment.providers.stripe.errors.checkoutCreationFailed.title",
+        message: t("errors.checkoutCreationFailed.title"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: parseError(error).message },
       });
     }
   }
 
-  async verifyWebhook(body: string, signature: string, logger: EndpointLogger) {
+  async verifyWebhook(
+    body: string,
+    signature: string,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ) {
     try {
       const event = stripe.webhooks.constructEvent(
         body,
@@ -378,16 +387,20 @@ export class StripeProvider implements PaymentProvider {
       logger.error("Failed to verify Stripe webhook", {
         error: parseError(error),
       });
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message:
-          "app.api.payment.providers.stripe.errors.webhookVerificationFailed.title",
+        message: t("errors.webhookVerificationFailed.title"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
         messageParams: { error: parseError(error).message },
       });
     }
   }
 
-  async retrieveSubscription(subscriptionId: string, logger: EndpointLogger) {
+  async retrieveSubscription(
+    subscriptionId: string,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ) {
     try {
       const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
@@ -449,16 +462,20 @@ export class StripeProvider implements PaymentProvider {
         error: parseError(error),
         subscriptionId,
       });
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message:
-          "app.api.payment.providers.stripe.errors.subscriptionRetrievalFailed.title",
+        message: t("errors.subscriptionRetrievalFailed.title"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: parseError(error).message },
       });
     }
   }
 
-  async cancelSubscription(subscriptionId: string, logger: EndpointLogger) {
+  async cancelSubscription(
+    subscriptionId: string,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ) {
     try {
       await stripe.subscriptions.cancel(subscriptionId);
 
@@ -470,9 +487,9 @@ export class StripeProvider implements PaymentProvider {
         error: parseError(error),
         subscriptionId,
       });
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message:
-          "app.api.payment.providers.stripe.errors.subscriptionCancellationFailed.title",
+        message: t("errors.subscriptionCancellationFailed.title"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: parseError(error).message },
       });

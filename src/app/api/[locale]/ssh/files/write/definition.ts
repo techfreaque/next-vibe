@@ -8,8 +8,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -19,108 +19,108 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { scopedTranslation } from "../../i18n";
+import { scopedTranslation } from "./i18n";
 import { FilesWriteContainer } from "./widget";
 
 export const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["ssh", "files", "write"],
-  title: "files.write.post.title",
-  description: "files.write.post.description",
+  title: "post.title",
+  description: "post.description",
   icon: "file",
   category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["type"],
+  tags: ["category" as const],
 
   fields: customWidgetObject({
     render: FilesWriteContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      connectionId: requestField({
+      connectionId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "files.write.post.fields.connectionId.label",
-        description: "files.write.post.fields.connectionId.description",
-        placeholder: "files.write.post.fields.connectionId.placeholder",
+        label: "post.fields.connectionId.label",
+        description: "post.fields.connectionId.description",
+        placeholder: "post.fields.connectionId.placeholder",
         schema: z.string().uuid().optional(),
       }),
-      path: requestField({
+      path: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "files.write.post.fields.path.label",
-        description: "files.write.post.fields.path.description",
-        placeholder: "files.write.post.fields.path.placeholder",
+        label: "post.fields.path.label",
+        description: "post.fields.path.description",
+        placeholder: "post.fields.path.placeholder",
         schema: z.string().min(1),
       }),
-      content: requestField({
+      content: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "files.write.post.fields.content.label",
-        description: "files.write.post.fields.content.description",
-        placeholder: "files.write.post.fields.content.placeholder",
+        label: "post.fields.content.label",
+        description: "post.fields.content.description",
+        placeholder: "post.fields.content.placeholder",
         schema: z.string(),
       }),
-      createDirs: requestField({
+      createDirs: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "files.write.post.fields.createDirs.label",
-        description: "files.write.post.fields.createDirs.description",
+        label: "post.fields.createDirs.label",
+        description: "post.fields.createDirs.description",
         schema: z.boolean().optional(),
       }),
-      ok: responseField({
+      ok: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "files.write.post.response.ok.title",
+        content: "post.response.ok.title",
         schema: z.boolean(),
       }),
-      bytesWritten: responseField({
+      bytesWritten: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "files.write.post.response.bytesWritten.title",
+        content: "post.response.bytesWritten.title",
         schema: z.number(),
       }),
     },
   }),
 
   successTypes: {
-    title: "files.write.post.success.title",
-    description: "files.write.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "files.write.post.errors.validation.title",
-      description: "files.write.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "files.write.post.errors.unauthorized.title",
-      description: "files.write.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "files.write.post.errors.forbidden.title",
-      description: "files.write.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "files.write.post.errors.server.title",
-      description: "files.write.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "files.write.post.errors.notFound.title",
-      description: "files.write.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "files.write.post.errors.unknown.title",
-      description: "files.write.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "files.write.post.errors.unsavedChanges.title",
-      description: "files.write.post.errors.unsavedChanges.description",
+      title: "post.errors.unsavedChanges.title",
+      description: "post.errors.unsavedChanges.title",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "files.write.post.errors.conflict.title",
-      description: "files.write.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "files.write.post.errors.network.title",
-      description: "files.write.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
   },
 

@@ -1067,6 +1067,7 @@ export const translations: typeof enTranslations = {
     you: "Ty",
     user: "Użytkownik",
     anonymous: "Anonim",
+    authorWithId: "{{name}} [{{id}}]",
     edited: "edytowano",
     error: "Błąd",
     postNumber: "Nr.{{number}}",
@@ -1200,6 +1201,18 @@ export const translations: typeof enTranslations = {
         "Dolphin Llama 3 70B - Niecenzurowany duży model językowy oparty na Llama 3",
       dolphin3_0_r1_mistral_24b:
         "Dolphin 3.0 R1 Mistral 24B - Niecenzurowany duży model językowy oparty na Mistral",
+      claudeOpus45:
+        "Claude Opus 4.5 - Najpotężniejszy model Claude z wyjątkowym rozumowaniem i zdolnościami kreatywnymi",
+      claudeOpus46:
+        "Claude Opus 4.6 - Najnowszy i najpotężniejszy model Claude z wyjątkowym rozumowaniem i zdolnościami kreatywnymi",
+      claudeSonnet46:
+        "Claude Sonnet 4.6 - Najbardziej zaawansowany model Sonnet firmy Anthropic z najwyższą wydajnością w kodowaniu, agentach i pracy zawodowej",
+      gemini3Pro:
+        "Google Gemini 3 Pro - Zaawansowany multimodalny model AI z dużym oknem kontekstu i potężnymi możliwościami rozumowania",
+      gemini3Flash:
+        "Google Gemini 3 Flash - Szybki, wydajny multimodalny model AI zoptymalizowany pod kątem szybkich odpowiedzi",
+      deepseekV32:
+        "DeepSeek V3.2 - Wysokowydajny model rozumowania z zaawansowanymi możliwościami kodowania",
     },
   },
   tones: {
@@ -1395,6 +1408,7 @@ export const translations: typeof enTranslations = {
     today: "Dzisiaj",
     lastWeek: "Ostatnie 7 dni",
     lastMonth: "Ostatnie 30 dni",
+    older: "Starsze",
     folderNotFound: "Nie znaleziono folderu",
     emptyFolder: "Brak czatów lub folderów",
     createSubfolder: "Utwórz podfolder",
@@ -1529,6 +1543,7 @@ export const translations: typeof enTranslations = {
     assistantFallback: "Asystent",
     youLabel: "Ty",
     anonymous: "Anonimowy",
+    authorWithId: "{{name}} [{{id}}]",
   },
   flatView: {
     postNumber: "Post #{{number}}",

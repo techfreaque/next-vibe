@@ -1,11 +1,18 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Agent",
+  tags: {
+    streaming: "Streaming",
+    chat: "Chat",
+    ai: "KI",
+  },
+
   run: {
     post: {
       title: "KI-Agent ausführen",
       description:
-        "Vorausrufe ausführen, dann einen KI-Prompt headless ausführen und die Antwort zurückgeben.",
+        "Vorausrufe ausführen, dann einen KI-Prompt headless ausführen und die Antwort zurückgeben. Credits werden je nach verwendetem Modell verbraucht.",
       container: {
         title: "KI-Agent-Ausführung",
         description: "Vorausrufe und Prompt konfigurieren",
@@ -37,22 +44,32 @@ export const translations: typeof enTranslations = {
           },
           args: { label: "Argumente", description: "Flache Argumente" },
         },
-        activeTools: {
-          label: "Aktive Tools",
-          description: "Tools, die die KI ausführen darf",
-          toolId: { label: "Tool-ID", description: "Tool-Bezeichner" },
+        allowedTools: {
+          label: "Ausführbar (Berechtigungsschicht)",
+          description:
+            "Legt fest, welche Tools die KI tatsächlich ausführen darf. null = alle erlaubt. Array = nur diese Tools erlaubt. Standard-Setup: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool führt beliebige Endpunkte aus, system_help_GET ermöglicht Tool-Entdeckung.",
+          toolId: {
+            label: "Tool-ID",
+            description:
+              "Alias oder vollständiger Name des erlaubten Tools (z.B. 'execute-tool', 'system_help_GET')",
+          },
           requiresConfirmation: {
             label: "Bestätigung erforderlich",
-            description: "Ob Bestätigung nötig ist",
+            description:
+              "Bei true wartet die Ausführung auf Benutzerbestätigung. Für destruktive Aktionen verwenden.",
           },
         },
         tools: {
-          label: "Sichtbare Tools",
-          description: "Tools im KI-Kontext",
-          toolId: { label: "Tool-ID", description: "Tool-Bezeichner" },
+          label: "Im Kontext (KI sieht diese)",
+          description:
+            "Tools im Kontext der KI — was das Modell kennt und verwenden kann. null = Standard-Tool-Set des Benutzers (empfohlen). Array nur für fokussierten Kontext. Hinweis: allowedTools steuert die tatsächliche Ausführung.",
+          toolId: {
+            label: "Tool-ID",
+            description: "Alias oder vollständiger Name des Tools im Kontext",
+          },
           requiresConfirmation: {
             label: "Bestätigung erforderlich",
-            description: "Ob Bestätigung nötig ist",
+            description: "Ob Bestätigung vor Ausführung nötig ist",
           },
         },
         maxTurns: { label: "Max. Runden", description: "Maximale Tool-Runden" },
@@ -80,7 +97,12 @@ export const translations: typeof enTranslations = {
         lastAiMessageId: "ID der letzten KI-Nachricht",
         threadTitle: "Thread-Titel",
         threadCreatedAt: "Erstellungszeitpunkt des Threads",
-        preCallResults: "Ergebnisse der Vorausrufe",
+        preCallResults: {
+          title: "Vorausruf-Ergebnisse",
+          routeId: "Routen-ID",
+          succeeded: "Erfolgreich",
+          errorMessage: "Fehler",
+        },
       },
       errors: {
         validation: {
@@ -227,21 +249,21 @@ export const translations: typeof enTranslations = {
         "KI erlauben, das Web nach aktuellen Informationen zu durchsuchen",
     },
     activeTool: {
-      label: "Aktive Tools",
+      label: "Ausführbar",
       description:
-        "Tools, die das Modell ausführen darf. Null bedeutet alle Tools sind erlaubt.",
+        "Ausführungs-Berechtigungsschicht — welche Tools die KI tatsächlich ausführen darf. null = alle erlaubt. Array = nur diese Tools.",
       toolId: {
         label: "Tool-ID",
-        description: "Eindeutige Kennung für das KI-Tool",
+        description: "Alias oder vollständiger Name des erlaubten Tools",
       },
     },
     tools: {
-      label: "Sichtbare Tools",
+      label: "Im Kontext (KI sieht diese)",
       description:
-        "Tools, die in das KI-Kontextfenster geladen werden. Das Modell kann diese direkt aufrufen.",
+        "Tools im Kontextfenster des Modells — was die KI kennt. null = Standard-Set des Benutzers. allowedTools steuert die tatsächliche Ausführung.",
       toolId: {
         label: "Tool-ID",
-        description: "Eindeutige Kennung für das KI-Tool",
+        description: "Alias oder vollständiger Name des Tools im Kontext",
       },
       requiresConfirmation: {
         label: "Benötigt Bestätigung",
@@ -399,6 +421,10 @@ export const translations: typeof enTranslations = {
         "Bitte melden Sie sich an, um persistente Ordner zu verwenden. Verwenden Sie den Inkognito-Modus für anonyme Chats.",
       noResponseBody: "Kein Antworttext vom Stream erhalten",
     },
+  },
+  debugView: {
+    systemPromptTitle: "System-Prompt",
+    copied: "Kopiert!",
   },
   errorTypes: {
     streamError: "Stream-Fehler",

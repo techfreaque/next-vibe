@@ -115,7 +115,7 @@ const test4_2: Test4_2_ObjectFieldGeneric = "PASS";
 // ============================================================================
 
 // Test 5.1: Specific UserRoleValue literal extends UserRoleValue
-type SpecificRole = "app.api.user.userRoles.enums.userRole.admin";
+type SpecificRole = "enums.userRole.admin";
 type Test5_1_SpecificRoleExtendsUnion = SpecificRole extends UserRoleValue
   ? "PASS"
   : "FAIL";

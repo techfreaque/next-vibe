@@ -158,4 +158,17 @@ export const translations = {
 
   // General error message
   error: "An error occurred during checkout",
+
+  // Subscription plan labels
+  plans: {
+    starter: {
+      title: "Starter",
+    },
+  },
+
+  // Billing interval labels
+  billing: {
+    monthly: "Monthly",
+    yearly: "Yearly",
+  },
 };

@@ -1,6 +1,10 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Uwierzytelnianie",
+  search: {
+    tag: "Auth",
+  },
   authClient: {
     errors: {
       status_save_failed: "Nie udało się zapisać statusu uwierzytelniania",

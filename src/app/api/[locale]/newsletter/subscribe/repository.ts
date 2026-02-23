@@ -15,12 +15,12 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { getNewsletterSubscriptionStatus } from "@/app/api/[locale]/leads/enum";
+import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
 import { LeadsRepository } from "@/app/api/[locale]/leads/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { newsletterSubscriptions } from "../db";
 import { NewsletterSubscriptionStatus } from "../enum";
@@ -28,6 +28,9 @@ import type {
   SubscribePostRequestOutput,
   SubscribePostResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 export class NewsletterSubscribeRepository {
   static async subscribe(
@@ -35,9 +38,8 @@ export class NewsletterSubscribeRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SubscribePostResponseOutput>> {
-    const { t } = simpleT(locale);
-
     try {
       // Get leadId from user prop (JWT payload) - always present
       const leadId = user.leadId;
@@ -59,7 +61,12 @@ export class NewsletterSubscribeRepository {
           },
         );
 
-        const leadResult = await LeadsRepository.getLeadById(leadId, logger);
+        const leadsT = leadsScopedTranslation.scopedT(locale).t;
+        const leadResult = await LeadsRepository.getLeadById(
+          leadId,
+          logger,
+          leadsT,
+        );
         if (leadResult.success) {
           logger.debug("app.api.newsletter.subscribe.repository.lead_found", {
             leadId,
@@ -93,6 +100,7 @@ export class NewsletterSubscribeRepository {
             leadId,
             updateData,
             logger,
+            leadsT,
           );
 
           if (updateResult.success) {
@@ -154,9 +162,7 @@ export class NewsletterSubscribeRepository {
           );
           return success({
             success: true,
-            message: t(
-              "app.api.newsletter.subscribe.response.alreadySubscribed",
-            ),
+            message: t("response.alreadySubscribed"),
             leadId,
             subscriptionId: existingSubscription.id,
             userId: existingSubscription.userId || undefined,
@@ -181,7 +187,7 @@ export class NewsletterSubscribeRepository {
 
         return success({
           success: true,
-          message: t("app.api.newsletter.subscribe.response.success"),
+          message: t("response.success"),
           leadId,
           subscriptionId: existingSubscription.id,
           userId: existingSubscription.userId || undefined,
@@ -226,7 +232,7 @@ export class NewsletterSubscribeRepository {
 
       return success({
         success: true,
-        message: t("app.api.newsletter.subscribe.response.success"),
+        message: t("response.success"),
         leadId,
         subscriptionId: newSubscription[0].id,
         userId: newSubscription[0].userId || undefined,
@@ -242,7 +248,7 @@ export class NewsletterSubscribeRepository {
       );
 
       return fail({
-        message: "app.api.newsletter.subscribe.errors.internal.title",
+        message: t("errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });

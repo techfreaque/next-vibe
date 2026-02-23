@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Users",
+
   list: {
     title: "My Sessions",
     description: "List all active sessions for your account",

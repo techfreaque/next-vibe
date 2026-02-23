@@ -14,53 +14,30 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type { ReleaseConfig } from "../definition";
+import { scopedTranslation } from "../i18n";
 import { DEFAULT_CONFIG_PATH, MESSAGES } from "./constants";
 import { isReleaseConfigModule } from "./utils";
 
-// ============================================================================
-// Interface
-// ============================================================================
-
-export interface IConfigLoader {
-  /**
-   * Load release configuration from file
-   */
-  load(
-    logger: EndpointLogger,
-    configPath?: string,
-  ): Promise<ResponseType<ReleaseConfig>>;
-
-  /**
-   * Get the default config path
-   */
-  getDefaultPath(): string;
-
-  /**
-   * Check if config file exists
-   */
-  exists(configPath?: string): boolean;
-}
-
-// ============================================================================
-// Implementation
-// ============================================================================
-
-export class ConfigLoader implements IConfigLoader {
+export class ConfigLoader {
   /**
    * Load release configuration from file
    */
   async load(
     logger: EndpointLogger,
+    locale: CountryLanguage,
     configPath: string = DEFAULT_CONFIG_PATH,
   ): Promise<ResponseType<ReleaseConfig>> {
     const resolvedConfigPath = resolve(process.cwd(), configPath);
+    const { t } = scopedTranslation.scopedT(locale);
 
     if (!existsSync(resolvedConfigPath)) {
       logger.error(MESSAGES.CONFIG_NOT_FOUND, { path: resolvedConfigPath });
       return fail({
-        message: "app.api.system.releaseTool.config.fileNotFound",
+        message: t("config.fileNotFound"),
         errorType: ErrorResponseTypes.NOT_FOUND,
         messageParams: { path: resolvedConfigPath },
       });
@@ -74,7 +51,7 @@ export class ConfigLoader implements IConfigLoader {
       if (!isReleaseConfigModule(importedModule)) {
         logger.error(MESSAGES.CONFIG_INVALID, { path: resolvedConfigPath });
         return fail({
-          message: "app.api.system.releaseTool.config.invalidFormat",
+          message: t("config.invalidFormat"),
           errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
         });
       }
@@ -87,7 +64,7 @@ export class ConfigLoader implements IConfigLoader {
         path: resolvedConfigPath,
       });
       return fail({
-        message: "app.api.system.releaseTool.config.errorLoading",
+        message: t("config.errorLoading"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: String(error) },
       });

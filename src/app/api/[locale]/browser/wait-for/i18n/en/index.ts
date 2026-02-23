@@ -75,4 +75,9 @@ export const translations = {
     title: "Wait Operation Successful",
     description: "The specified text appeared on the page",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    waitAutomation: "Wait Automation",
+  },
 };

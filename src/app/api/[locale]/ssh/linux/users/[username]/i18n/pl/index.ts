@@ -1,4 +1,16 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    localModeOnly: {
+      title: "Tylko w trybie lokalnym",
+    },
+    cannotDeleteCurrentUser: "Nie można usunąć bieżącego użytkownika procesu",
+    cannotDeleteSystemUser:
+      "Nie można usunąć użytkowników systemowych (uid < 1000)",
+    userNotFound: "Użytkownik nie znaleziony",
+  },
+
   delete: {
     title: "Usuń użytkownika Linux",
     description: "Usuń konto użytkownika OS z hosta",

@@ -33,7 +33,7 @@ export default function ErrorPage({
 
   const { locale }: { locale: CountryLanguage } = useParams();
   const { t } = simpleT(locale);
-  const digest = useErrorHandler(error);
+  const digest = useErrorHandler(error, locale);
 
   return (
     <Div className="flex flex-col items-center justify-center min-h-[70vh] text-center px-4">

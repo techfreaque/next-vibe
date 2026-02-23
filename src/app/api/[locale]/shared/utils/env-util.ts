@@ -1,6 +1,7 @@
 import type { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { validateData } from "./validation";
 
@@ -15,6 +16,7 @@ export function validateEnv<TSchema extends z.ZodType>(
   },
   envSchema: TSchema,
   logger: EndpointLogger,
+  locale: CountryLanguage,
 ): z.infer<TSchema> {
   // Treat empty strings as undefined so optional schemas work correctly
   // when Docker passes unset build args as empty strings
@@ -26,6 +28,7 @@ export function validateEnv<TSchema extends z.ZodType>(
     normalizedEnv as z.input<TSchema>,
     envSchema,
     logger,
+    locale,
   );
   if (!validationResult.success) {
     const errors = validationResult.messageParams?.["error"] as

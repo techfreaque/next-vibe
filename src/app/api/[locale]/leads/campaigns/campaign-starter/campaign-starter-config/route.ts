@@ -18,17 +18,17 @@ export const { GET, PUT, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined, // No emails for GET requests
-    handler: async ({ user, logger }) => {
-      return await CampaignStarterConfigRepository.getConfig(user, logger);
+    handler: async ({ user, t, logger }) => {
+      return await CampaignStarterConfigRepository.getConfig(user, t, logger);
     },
   },
   [Methods.PUT]: {
     email: undefined,
-    handler: async ({ data, user, locale, logger }) => {
+    handler: async ({ data, user, t, logger }) => {
       return await CampaignStarterConfigRepository.updateConfig(
         data,
         user,
-        locale,
+        t,
         logger,
       );
     },

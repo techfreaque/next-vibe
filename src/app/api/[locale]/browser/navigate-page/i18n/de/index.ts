@@ -89,4 +89,9 @@ export const translations: typeof enTranslations = {
     title: "Navigation erfolgreich",
     description: "Die Seite wurde erfolgreich navigiert",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    navigationAutomation: "Navigations-Automatisierung",
+  },
 };

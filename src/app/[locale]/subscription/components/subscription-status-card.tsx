@@ -18,8 +18,10 @@ import { MotionDiv } from "next-vibe-ui/ui/motion";
 import type { JSX } from "react";
 
 import { PaymentProvider } from "@/app/api/[locale]/payment/enum";
+import { scopedTranslation as paymentScopedTranslation } from "@/app/api/[locale]/payment/i18n";
 import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
+import { scopedTranslation as subscriptionScopedTranslation } from "@/app/api/[locale]/subscription/i18n";
 import { useTranslation } from "@/i18n/core/client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -35,6 +37,8 @@ export function SubscriptionStatusCard({
   initialSubscription,
 }: SubscriptionStatusCardProps): JSX.Element {
   const { t } = useTranslation();
+  const { t: subscriptionT } = subscriptionScopedTranslation.scopedT(locale);
+  const { t: paymentT } = paymentScopedTranslation.scopedT(locale);
 
   // Check if subscription is fully canceled
   const isCanceled = initialSubscription.status === SubscriptionStatus.CANCELED;
@@ -50,9 +54,9 @@ export function SubscriptionStatusCard({
 
   const getProviderName = (provider?: string): string => {
     if (provider === PaymentProvider.NOWPAYMENTS) {
-      return t("app.api.payment.enums.paymentProvider.nowpayments");
+      return paymentT(PaymentProvider.NOWPAYMENTS);
     }
-    return t("app.api.payment.enums.paymentProvider.stripe");
+    return paymentT(PaymentProvider.STRIPE);
   };
 
   const handleManageSubscription = async (): Promise<void> => {
@@ -117,10 +121,10 @@ export function SubscriptionStatusCard({
                 }
               >
                 {isCanceled
-                  ? t(initialSubscription.status)
+                  ? subscriptionT(initialSubscription.status)
                   : isCanceling
-                    ? t("app.api.subscription.enums.status.canceling")
-                    : t(initialSubscription.status)}
+                    ? subscriptionT("enums.status.canceling")
+                    : subscriptionT(initialSubscription.status)}
               </Badge>
               <Badge variant="outline" className="flex items-center gap-1">
                 {getProviderIcon(initialSubscription.provider)}
@@ -164,7 +168,7 @@ export function SubscriptionStatusCard({
                   {t("app.subscription.subscription.billingInterval")}
                 </Div>
                 <Div className="text-lg font-semibold capitalize">
-                  {t(initialSubscription.billingInterval)}
+                  {subscriptionT(initialSubscription.billingInterval)}
                 </Div>
               </Div>
               <Div className="p-4 rounded-lg bg-accent border">

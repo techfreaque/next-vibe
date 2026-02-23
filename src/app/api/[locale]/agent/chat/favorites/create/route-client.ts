@@ -16,7 +16,7 @@ import definitions from "./definition";
 export const { POST } = clientEndpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: ({ data, logger }) =>
-      ChatFavoritesRepositoryClient.createFavorite(data, logger),
+    handler: ({ data, logger, locale }) =>
+      ChatFavoritesRepositoryClient.createFavorite(data, logger, locale),
   },
 });

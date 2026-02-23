@@ -1,4 +1,15 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    invalidPath: "Ungültiger Pfad: Muss absolut sein ohne '..' Segmente",
+    fileNotFound: "Datei nicht gefunden",
+    permissionDenied: "Zugriff verweigert",
+    notImplemented: {
+      fileRead: "SSH-Backend noch nicht für Dateilesen implementiert",
+    },
+  },
+
   get: {
     title: "Datei lesen",
     description: "Textdatei vom lokalen Rechner oder via SSH lesen",

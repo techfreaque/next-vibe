@@ -4,8 +4,7 @@
  */
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { type CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { EmailCampaignStage, EmailJourneyVariant } from "../../enum";
 import { LeadTrackingRepository } from "../../tracking/repository";
@@ -33,7 +32,6 @@ export class EmailService {
     journeyVariant: EmailJourneyVariantValues,
     stage: EmailCampaignStageValues,
     context: {
-      t: TFunction;
       locale: CountryLanguage;
       companyName: string;
       companyEmail: string;
@@ -101,13 +99,13 @@ export class EmailService {
    */
   getJourneyInfo(
     journeyVariant: EmailJourneyVariantValues,
-    t: TFunction,
+    locale: CountryLanguage,
   ): {
     name: string;
     description: string;
     availableStages: EmailCampaignStageValues[];
   } {
-    return emailRendererService.getJourneyInfo(journeyVariant, t);
+    return emailRendererService.getJourneyInfo(journeyVariant, locale);
   }
 
   /**
@@ -117,7 +115,6 @@ export class EmailService {
     journeyVariant: EmailJourneyVariantValues,
     stage: EmailCampaignStageValues,
     context: {
-      t: TFunction;
       locale: CountryLanguage;
       companyName: string;
       companyEmail: string;

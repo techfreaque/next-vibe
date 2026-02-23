@@ -5,6 +5,8 @@
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * CSV Import Job Status
  * Represents the current state of an import job
@@ -13,13 +15,13 @@ export const {
   enum: CsvImportJobStatus,
   options: CsvImportJobStatusOptions,
   Value: CsvImportJobStatusValues,
-} = createEnumOptions({
-  PENDING: "app.api.import.enum.status.pending.label",
-  PROCESSING: "app.api.import.enum.status.processing.label",
-  COMPLETED: "app.api.import.enum.status.completed.label",
-  FAILED: "app.api.import.enum.status.failed.label",
-  CANCELLED: "app.api.import.enum.status.cancelled.label",
-  PAUSED: "app.api.import.enum.status.paused.label",
+} = createEnumOptions(scopedTranslation, {
+  PENDING: "enum.status.pending.label",
+  PROCESSING: "enum.status.processing.label",
+  COMPLETED: "enum.status.completed.label",
+  FAILED: "enum.status.failed.label",
+  CANCELLED: "enum.status.cancelled.label",
+  PAUSED: "enum.status.paused.label",
 });
 
 /**
@@ -42,13 +44,13 @@ export const {
   enum: ImportDomain,
   options: ImportDomainOptions,
   Value: ImportDomainValues,
-} = createEnumOptions({
-  LEADS: "app.api.import.enum.domain.leads.label",
-  CONTACTS: "app.api.import.enum.domain.contacts.label",
-  BUSINESS_DATA: "app.api.import.enum.domain.businessData.label",
-  EMAILS: "app.api.import.enum.domain.emails.label",
-  USERS: "app.api.import.enum.domain.users.label",
-  TEMPLATES: "app.api.import.enum.domain.templates.label",
+} = createEnumOptions(scopedTranslation, {
+  LEADS: "enum.domain.leads.label",
+  CONTACTS: "enum.domain.contacts.label",
+  BUSINESS_DATA: "enum.domain.businessData.label",
+  EMAILS: "enum.domain.emails.label",
+  USERS: "enum.domain.users.label",
+  TEMPLATES: "enum.domain.templates.label",
 });
 
 /**
@@ -71,11 +73,11 @@ export const {
   enum: ImportFileFormat,
   options: ImportFileFormatOptions,
   Value: ImportFileFormatValues,
-} = createEnumOptions({
-  CSV: "app.api.import.enum.format.csv.label",
-  XLSX: "app.api.import.enum.format.xlsx.label",
-  JSON: "app.api.import.enum.format.json.label",
-  TSV: "app.api.import.enum.format.tsv.label",
+} = createEnumOptions(scopedTranslation, {
+  CSV: "enum.format.csv.label",
+  XLSX: "enum.format.xlsx.label",
+  JSON: "enum.format.json.label",
+  TSV: "enum.format.tsv.label",
 });
 
 /**
@@ -86,10 +88,10 @@ export const {
   enum: ImportProcessingMode,
   options: ImportProcessingModeOptions,
   Value: ImportProcessingModeValues,
-} = createEnumOptions({
-  IMMEDIATE: "app.api.import.enum.processing.immediate.label",
-  BACKGROUND: "app.api.import.enum.processing.background.label",
-  SCHEDULED: "app.api.import.enum.processing.scheduled.label",
+} = createEnumOptions(scopedTranslation, {
+  IMMEDIATE: "enum.processing.immediate.label",
+  BACKGROUND: "enum.processing.background.label",
+  SCHEDULED: "enum.processing.scheduled.label",
 });
 
 /**
@@ -100,12 +102,12 @@ export const {
   enum: ImportErrorType,
   options: ImportErrorTypeOptions,
   Value: ImportErrorTypeValues,
-} = createEnumOptions({
-  VALIDATION_ERROR: "app.api.import.enum.errorType.validation.label",
-  DUPLICATE_ERROR: "app.api.import.enum.errorType.duplicate.label",
-  FORMAT_ERROR: "app.api.import.enum.errorType.format.label",
-  PROCESSING_ERROR: "app.api.import.enum.errorType.processing.label",
-  SYSTEM_ERROR: "app.api.import.enum.errorType.system.label",
+} = createEnumOptions(scopedTranslation, {
+  VALIDATION_ERROR: "enum.errorType.validation.label",
+  DUPLICATE_ERROR: "enum.errorType.duplicate.label",
+  FORMAT_ERROR: "enum.errorType.format.label",
+  PROCESSING_ERROR: "enum.errorType.processing.label",
+  SYSTEM_ERROR: "enum.errorType.system.label",
 });
 
 /**
@@ -116,11 +118,11 @@ export const {
   enum: BatchSize,
   options: BatchSizeOptions,
   Value: BatchSizeValues,
-} = createEnumOptions({
-  SMALL: "app.api.import.enum.batchSize.small.label",
-  MEDIUM: "app.api.import.enum.batchSize.medium.label",
-  LARGE: "app.api.import.enum.batchSize.large.label",
-  XLARGE: "app.api.import.enum.batchSize.xlarge.label",
+} = createEnumOptions(scopedTranslation, {
+  SMALL: "enum.batchSize.small.label",
+  MEDIUM: "enum.batchSize.medium.label",
+  LARGE: "enum.batchSize.large.label",
+  XLARGE: "enum.batchSize.xlarge.label",
 });
 
 // Numeric values for batch sizes

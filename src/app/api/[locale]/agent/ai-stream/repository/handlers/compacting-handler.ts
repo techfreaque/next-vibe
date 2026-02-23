@@ -12,6 +12,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { v4 as uuidv4 } from "uuid";
 
+import type { scopedTranslation } from "@/app/api/[locale]/agent/ai-stream/i18n";
 import {
   calculateCreditCost,
   getModelById,
@@ -19,6 +20,8 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+
+type AiStreamModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage } from "../../../chat/db";
@@ -82,6 +85,7 @@ export class CompactingHandler {
     timezone: string;
     rootFolderId?: DefaultFolderId;
     compactingMessageCreatedAt: Date;
+    t: AiStreamModuleT;
   }): Promise<
     | {
         success: true;
@@ -112,6 +116,7 @@ export class CompactingHandler {
       timezone,
       rootFolderId,
       compactingMessageCreatedAt,
+      t,
     } = params;
 
     const compactingMessageId = uuidv4();
@@ -121,6 +126,7 @@ export class CompactingHandler {
       logger,
       timezone,
       rootFolderId,
+      ctx.locale,
     );
 
     const { formatAbsoluteTimestamp } =
@@ -258,8 +264,7 @@ export class CompactingHandler {
 
           ctx.dbWriter.emitError(
             fail({
-              message:
-                "app.api.agent.chat.aiStream.errors.compactingStreamError" as const,
+              message: t("errors.compactingStreamError"),
               errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
               messageParams: { error: errorObj.message },
             }),
@@ -280,8 +285,7 @@ export class CompactingHandler {
 
       ctx.dbWriter.emitError(
         fail({
-          message:
-            "app.api.agent.chat.aiStream.errors.compactingException" as const,
+          message: t("errors.compactingException"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           messageParams: { error: errorObj.message },
         }),

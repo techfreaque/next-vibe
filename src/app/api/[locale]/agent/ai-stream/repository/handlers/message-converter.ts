@@ -9,7 +9,7 @@ import type { ModelMessage } from "ai";
 import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import { parseError } from "@/app/api/[locale]/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { defaultLocale } from "@/i18n/core/config";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { DefaultFolderId } from "../../../chat/config";
@@ -36,6 +36,7 @@ export class MessageConverter {
   static async toAiSdkMessage(
     message: ChatMessage | { role: ChatMessageRole; content: string },
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ModelMessage | ModelMessage[] | null> {
     switch (message.role) {
       case ChatMessageRole.USER: {
@@ -163,12 +164,13 @@ export class MessageConverter {
             // Message 1: ASSISTANT message with tool-call (the request)
             // Message 2: TOOL message with tool-result (the response)
 
-            // Translate error messages recursively for AI (using default locale for consistency)
+            // Translate error messages recursively for AI using the caller's locale
             const output = toolCall.error
               ? {
                   type: "error-text" as const,
                   value: MessageConverter.translateErrorRecursive(
                     toolCall.error,
+                    locale,
                   ),
                 }
               : { type: "json" as const, value: toolCall.result ?? null };
@@ -237,7 +239,10 @@ export class MessageConverter {
           const errorData = JSON.parse(message.content) as ErrorResponseType;
 
           return {
-            content: MessageConverter.translateErrorRecursive(errorData),
+            content: MessageConverter.translateErrorRecursive(
+              errorData,
+              locale,
+            ),
             role: "assistant",
           };
         } catch (error) {
@@ -266,7 +271,8 @@ export class MessageConverter {
     messages: ChatMessage[],
     logger: EndpointLogger,
     timezone: string,
-    rootFolderId?: DefaultFolderId,
+    rootFolderId: DefaultFolderId | undefined,
+    locale: CountryLanguage,
   ): Promise<ModelMessage[]> {
     const result: ModelMessage[] = [];
 
@@ -333,6 +339,7 @@ export class MessageConverter {
                   type: "error-text" as const,
                   value: MessageConverter.translateErrorRecursive(
                     toolCall.error,
+                    locale,
                   ),
                 }
               : { type: "json" as const, value: toolCall.result ?? null };
@@ -409,7 +416,11 @@ export class MessageConverter {
 
       // Convert and add the actual message
       // toAiSdkMessage can return a single message, an array of messages, or null
-      const converted = await MessageConverter.toAiSdkMessage(msg, logger);
+      const converted = await MessageConverter.toAiSdkMessage(
+        msg,
+        logger,
+        locale,
+      );
       if (converted !== null) {
         // If it's an array, flatten it into the result
         if (Array.isArray(converted)) {
@@ -425,13 +436,17 @@ export class MessageConverter {
   /**
    * Recursively translate error messages including nested causes
    */
-  private static translateErrorRecursive(error: ErrorResponseType): string {
-    const { t } = simpleT(defaultLocale);
+  private static translateErrorRecursive(
+    error: ErrorResponseType,
+    locale: CountryLanguage,
+  ): string {
+    const { t } = simpleT(locale);
     const mainMessage = t(error.message, error.messageParams);
 
     if (error.cause) {
       const causeMessage = MessageConverter.translateErrorRecursive(
         error.cause,
+        locale,
       );
       return `${mainMessage}\n\nCause: ${causeMessage}`;
     }

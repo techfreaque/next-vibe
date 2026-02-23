@@ -276,7 +276,10 @@ export class CampaignSchedulerService {
   async scheduleNextStage(
     leadId: string,
     campaignType: typeof CampaignTypeValue,
-    currentStage: SchedulableStage,
+    currentStage: Exclude<
+      typeof EmailCampaignStageValues,
+      (typeof EmailCampaignStage)["NOT_STARTED"]
+    >,
     journeyVariant: typeof EmailJourneyVariantValues,
     logger: EndpointLogger,
   ): Promise<string | null> {
@@ -290,7 +293,8 @@ export class CampaignSchedulerService {
         return null;
       }
 
-      const nextRule = SCHEDULING_RULES[rule.nextStage];
+      const nextStage = rule.nextStage;
+      const nextRule = SCHEDULING_RULES[nextStage];
       const nextScheduledAt = new Date(
         Date.now() + (nextRule?.delay ?? rule.delay),
       );
@@ -300,7 +304,7 @@ export class CampaignSchedulerService {
           leadId,
           campaignType,
           journeyVariant,
-          stage: rule.nextStage,
+          stage: nextStage,
           scheduledAt: nextScheduledAt,
         },
         logger,

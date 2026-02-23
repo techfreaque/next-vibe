@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Email Communication",
+  tag: "SMTP",
   title: "SMTP Accounts",
   description: "Get paginated list of SMTP accounts with filtering options",
 

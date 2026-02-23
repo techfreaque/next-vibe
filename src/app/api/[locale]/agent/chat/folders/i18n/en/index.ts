@@ -8,6 +8,19 @@ import { translations as rootPermissionsTranslations } from "../../root-permissi
 export const translations = {
   id: idTranslations,
   rootPermissions: rootPermissionsTranslations,
+  category: "Chat",
+  tags: {
+    folders: "Folders",
+  },
+  config: {
+    folders: {
+      private: "Private Chats",
+      shared: "Shared Chats",
+      public: "Public Chats",
+      incognito: "Incognito Chats",
+      cron: "Cron Threads",
+    },
+  },
   get: {
     title: "List Folders",
     description: "Retrieve all folders for the current user",

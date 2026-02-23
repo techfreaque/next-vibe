@@ -62,4 +62,9 @@ export const translations = {
     title: "Key Press Operation Successful",
     description: "The key was pressed successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    inputAutomation: "Input Automation",
+  },
 };

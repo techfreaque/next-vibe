@@ -16,8 +16,8 @@ import {
 import type { JSX, ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
 
+import { scopedTranslation } from "../i18n";
 import { TrackedLink } from "./tracked_link.email";
 import { TrackedPixel } from "./tracked_pixel.email";
 import type { TrackingContext } from "./tracking_context.email";
@@ -27,7 +27,6 @@ interface CampaignEmailLayoutProps {
   children: ReactNode;
   locale: CountryLanguage;
   unsubscribeUrl: string;
-  t: TFunction;
   tracking: TrackingContext;
 }
 
@@ -36,9 +35,9 @@ export function CampaignEmailLayout({
   children,
   locale,
   unsubscribeUrl,
-  t,
   tracking,
 }: CampaignEmailLayoutProps): JSX.Element {
+  const { t: st } = scopedTranslation.scopedT(locale);
   return (
     <Html lang={locale.split("-")[0]}>
       <Head />
@@ -85,9 +84,7 @@ export function CampaignEmailLayout({
                 color: "#9ca3af",
               }}
             >
-              {t(
-                "app.api.leads.campaigns.emails.journeys.emailJourneys.components.footer.unsubscribeText",
-              )}{" "}
+              {st("components.email.footer.unsubscribeText")}{" "}
               <TrackedLink
                 href={unsubscribeUrl}
                 tracking={tracking}
@@ -96,9 +93,7 @@ export function CampaignEmailLayout({
                   textDecoration: "underline",
                 }}
               >
-                {t(
-                  "app.api.leads.campaigns.emails.journeys.emailJourneys.components.footer.unsubscribeLink",
-                )}
+                {st("components.email.footer.unsubscribeLink")}
               </TrackedLink>
             </div>
           </Section>

@@ -1,3 +1,5 @@
+import { translations as leadsTranslations } from "../../../api/[locale]/leads/i18n/de";
+import { translations as productsTranslations } from "../../../api/[locale]/products/i18n/de";
 import { translations as componentsTranslations } from "../../_components/i18n/de";
 import { translations as notFoundTranslations } from "../../[...notFound]/i18n/de";
 import { translations as adminTranslations } from "../../admin/i18n/de";
@@ -14,6 +16,10 @@ export const translations: typeof enTranslations = {
   story: siteTranslations,
   notFound: notFoundTranslations,
   admin: adminTranslations,
+  api: {
+    leads: leadsTranslations,
+    products: productsTranslations,
+  },
   chat: chatTranslations,
   help: helpTranslations,
   subscription: subscriptionTranslations,
@@ -300,6 +306,11 @@ export const translations: typeof enTranslations = {
     filter: "Filtern",
     refresh: "Aktualisieren",
     notAvailable: "N/V",
+    errors: {
+      noEndpoint:
+        "Diese Funktion ist noch nicht verfügbar. Bitte versuchen Sie es später erneut",
+      unknown: "Ein unbekannter Fehler ist aufgetreten",
+    },
     weekday: {
       monday: "Montag",
       tuesday: "Dienstag",
@@ -344,17 +355,6 @@ export const translations: typeof enTranslations = {
     noOptionsFound: "Keine Optionen gefunden",
     useCustomValue: "Benutzerdefinierten Wert verwenden",
     cancel: "Abbrechen",
-    countries: {
-      global: "Global",
-      de: "Deutschland",
-      pl: "Polen",
-      us: "Vereinigte Staaten",
-    },
-    languages: {
-      en: "Englisch",
-      de: "Deutsch",
-      pl: "Polnisch",
-    },
     error: {
       title: "Fehler",
       message: "Etwas ist schief gelaufen",
@@ -362,34 +362,13 @@ export const translations: typeof enTranslations = {
       tryAgain: "Erneut versuchen",
       sending_sms: "SMS konnte nicht gesendet werden",
       boundary: {
-        stackTrace: "Stack Trace",
+        stackTrace: "Stack-Trace",
         componentStack: "Komponenten-Stack",
         errorDetails: "Fehlerdetails",
         name: "Name:",
         errorMessage: "Nachricht:",
         cause: "Ursache:",
       },
-    },
-    errors: {
-      noEndpoint:
-        "Diese Funktion ist noch nicht verfügbar. Bitte versuchen Sie es später erneut",
-      unknown: "Ein unbekannter Fehler ist aufgetreten",
-    },
-    api: {
-      notifications: {
-        welcome: {
-          title: "Willkommen!",
-          description:
-            "Danke, dass Sie sich uns angeschlossen haben. Lassen Sie uns beginnen!",
-        },
-      },
-    },
-  },
-  shared: {
-    error: {
-      title: "Fehler",
-      userError: "Benutzerfehler aufgetreten",
-      invalidToken: "Ungültiges oder abgelaufenes Token",
     },
   },
   ui: {
@@ -418,54 +397,13 @@ export const translations: typeof enTranslations = {
         ui: "UI & Steuerung",
       },
     },
-    countries: {
-      global: "Global",
-      de: "Deutschland",
-      pl: "Polen",
-      us: "Vereinigte Staaten",
-    },
-    languages: {
-      en: "Englisch",
-      de: "Deutsch",
-      pl: "Polnisch",
-    },
-    error: {
-      title: "Fehler",
-      message: "Etwas ist schief gelaufen",
-      description: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
-      tryAgain: "Erneut versuchen",
-      sending_sms: "SMS konnte nicht gesendet werden",
-      boundary: {
-        stackTrace: "Stack-Trace",
-        componentStack: "Komponenten-Stack",
-        errorDetails: "Fehlerdetails",
-        name: "Name:",
-        errorMessage: "Nachricht:",
-        cause: "Ursache:",
-      },
-    },
-    errors: {
-      unknown: "Ein unbekannter Fehler ist aufgetreten",
-    },
-    success: {
-      title: "Erfolg",
-      message: "Vorgang erfolgreich abgeschlossen",
-      description: "Ihre Aktion wurde erfolgreich abgeschlossen.",
-    },
+
     info: {
       title: "Information",
       message: "Bitte beachten",
       description: "Hier sind einige Informationen für Sie.",
     },
-    api: {
-      notifications: {
-        welcome: {
-          title: "Willkommen!",
-          description:
-            "Danke, dass Sie sich uns angeschlossen haben. Lassen Sie uns beginnen!",
-        },
-      },
-    },
+
     footer: {
       description:
         "Verwandeln Sie Ihre Social-Media-Präsenz mit professioneller Content-Erstellung und strategischem Management.",

@@ -20,6 +20,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { getChromeMCPConfig } from "./config";
 import type { BrowserRequestOutput, BrowserResponseOutput } from "./definition";
 import { BrowserTool, BrowserToolStatus } from "./enum";
+import type { BrowserT } from "./i18n";
 
 /**
  * Map translation keys to MCP tool names
@@ -60,11 +61,13 @@ export interface BrowserRepository {
   /**
    * Execute a Chrome DevTools MCP tool
    * @param data - Request data (tool and arguments)
+   * @param t - Translation function for i18n messages
    * @param logger - Logger instance for debugging and monitoring
    * @returns Tool execution result
    */
   executeTool(
     data: BrowserRequestOutput,
+    t: BrowserT,
     logger: EndpointLogger,
   ): Promise<ResponseType<BrowserResponseOutput>>;
 }
@@ -115,6 +118,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
    */
   async executeTool(
     data: BrowserRequestOutput,
+    t: BrowserT,
     logger: EndpointLogger,
   ): Promise<ResponseType<BrowserResponseOutput>> {
     logger.info("[Browser Repository] Executing Chrome DevTools tool", {
@@ -127,7 +131,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
       const serverReady = await this.ensureMCPServer(logger);
       if (!serverReady) {
         return fail({
-          message: "app.api.browser.repository.mcp.connect.failedToInitialize",
+          message: t("repository.mcp.connect.failedToInitialize"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -154,8 +158,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
                 : String(parseError),
           });
           return fail({
-            message:
-              "app.api.browser.repository.mcp.tool.call.invalidJsonArguments",
+            message: t("repository.mcp.tool.call.invalidJsonArguments"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
@@ -191,7 +194,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       return fail({
-        message: "app.api.browser.repository.mcp.tool.call.executionFailed",
+        message: t("repository.mcp.tool.call.executionFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMessage },
       });

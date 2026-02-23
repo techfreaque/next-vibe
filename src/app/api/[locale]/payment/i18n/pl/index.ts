@@ -228,6 +228,8 @@ export const translations: typeof enTranslations = {
     },
     customerCreationFailed: "Nie udało się utworzyć klienta Stripe",
     customerNotFound: "Nie znaleziono klienta Stripe",
+    localMode: "Płatność jest wyłączona w lokalnym trybie deweloperskim",
+    webhookVerificationFailed: "Weryfikacja podpisu webhooka nie powiodła się",
   },
 
   // Top-level success

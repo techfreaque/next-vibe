@@ -11,6 +11,6 @@ import { runClaudeCode } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger }) => runClaudeCode(data, logger),
+    handler: ({ data, logger, t }) => runClaudeCode(data, logger, t),
   },
 });

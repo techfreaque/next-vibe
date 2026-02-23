@@ -1,4 +1,10 @@
 export const translations = {
+  category: "Leads",
+  tags: {
+    leads: "Leads",
+    export: "Export",
+  },
+
   get: {
     title: "Export Leads",
     description: "Export leads data to file",

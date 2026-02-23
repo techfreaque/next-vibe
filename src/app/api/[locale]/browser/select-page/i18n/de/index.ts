@@ -65,4 +65,9 @@ export const translations: typeof enTranslations = {
     title: "Seite erfolgreich ausgewählt",
     description: "Die Seite wurde erfolgreich ausgewählt",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    navigationAutomation: "Navigations-Automatisierung",
+  },
 };

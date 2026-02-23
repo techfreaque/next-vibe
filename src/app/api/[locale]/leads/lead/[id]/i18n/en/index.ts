@@ -1,4 +1,10 @@
 export const translations = {
+  category: "Leads",
+  tags: {
+    leads: "Leads",
+    management: "Management",
+  },
+
   get: {
     title: "Get Lead Details",
     description: "Retrieve detailed information about a specific lead",

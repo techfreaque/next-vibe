@@ -9,6 +9,7 @@ import { ReferralRepository } from "@/app/api/[locale]/referral/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import SignUpForm from "@/app/api/[locale]/user/public/signup/_components/sign-up-form";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
+import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
@@ -67,6 +68,9 @@ export default async function SignUpPage({
   params,
 }: Props): Promise<JSX.Element> {
   const { locale } = await params;
+  if (env.NEXT_PUBLIC_LOCAL_MODE) {
+    redirect(`/${locale}/user/login`);
+  }
   const { t } = simpleT(locale);
 
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -83,6 +87,7 @@ export default async function SignUpPage({
     const referralResult = await ReferralRepository.getLatestLeadReferralCode(
       user.data.leadId,
       logger,
+      locale,
     );
     if (referralResult.success && referralResult.data.referralCode) {
       initialReferralCode = referralResult.data.referralCode;

@@ -1,4 +1,15 @@
 export const translations = {
+  category: "Zarządzanie zadaniami",
+
+  tags: {
+    pulse: "Pulse",
+    monitoring: "Monitorowanie",
+  },
+
+  errors: {
+    fetchCronTaskHistory: "Nie udało się pobrać historii wykonań pulse",
+  },
+
   get: {
     title: "Historia wykonań Pulse",
     description: "Przeglądaj historyczne cykle wykonań Pulse",

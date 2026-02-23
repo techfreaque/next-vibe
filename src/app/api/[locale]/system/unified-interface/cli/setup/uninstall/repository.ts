@@ -19,14 +19,14 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-
 import type { JwtPayloadType } from "../../../../../user/auth/types";
 import type {
   UninstallRequestOutput,
   UninstallResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Setup Uninstall Repository Interface
@@ -35,7 +35,7 @@ export interface SetupUninstallRepository {
   uninstallCli(
     data: UninstallRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: ModuleT,
   ): Promise<ResponseType<UninstallResponseOutput>>;
 }
 
@@ -46,20 +46,15 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
   async uninstallCli(
     data: UninstallRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: ModuleT,
   ): Promise<ResponseType<UninstallResponseOutput>> {
-    const { t } = simpleT(locale);
-
     // Validate user permissions for CLI uninstallation
     if (!user?.id) {
       return fail({
-        message:
-          "app.api.system.unifiedInterface.cli.setup.uninstall.post.errors.unauthorized.title",
+        message: t("post.errors.unauthorized.title"),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
         messageParams: {
-          error: t(
-            "app.api.system.unifiedInterface.cli.setup.uninstall.post.errors.unauthorized.description",
-          ),
+          error: t("post.errors.unauthorized.description"),
         },
       });
     }
@@ -72,9 +67,7 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
         return success({
           success: true,
           installed: false,
-          message: t(
-            "app.api.system.unifiedInterface.cli.setup.uninstall.post.description",
-          ),
+          message: t("post.description"),
         });
       }
 
@@ -92,19 +85,14 @@ class SetupUninstallRepositoryImpl implements SetupUninstallRepository {
         success: !newStatus.installed,
         installed: newStatus.installed,
         message: newStatus.installed
-          ? t(
-              "app.api.system.unifiedInterface.cli.setup.uninstall.post.errors.server.description",
-            )
-          : t(
-              "app.api.system.unifiedInterface.cli.setup.uninstall.post.success.description",
-            ),
+          ? t("post.errors.server.description")
+          : t("post.success.description"),
         output: data.verbose ? output : undefined,
       });
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message:
-          "app.api.system.unifiedInterface.cli.setup.uninstall.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,

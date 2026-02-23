@@ -1,4 +1,6 @@
 export const translations = {
+  category: "User Profile",
+
   title: "Change Password",
   description: "Update your account password securely",
   tag: "password-change",

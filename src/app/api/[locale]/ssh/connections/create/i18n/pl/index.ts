@@ -1,4 +1,14 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    sshSecretKeyNotSet:
+      "SSH_SECRET_KEY nie jest ustawiony. Dodaj 32-bajtową wartość hex.",
+    encryptionFailed:
+      "Szyfrowanie nie powiodło się — SSH_SECRET_KEY może być nieprawidłowy",
+    noRowReturned: "Brak wiersza zwróconego z wstawienia",
+  },
+
   post: {
     title: "Utwórz połączenie SSH",
     description: "Zapisz nową konfigurację połączenia SSH",

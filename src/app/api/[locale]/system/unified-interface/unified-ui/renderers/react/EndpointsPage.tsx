@@ -70,7 +70,7 @@ export interface EndpointsPageProps<
   /** Options for useEndpoint hook */
   endpointOptions?: UseEndpointOptions<T>;
   /** Submit button configuration (backward compatibility - prefer using endpoint definition) */
-  submitButton?: SubmitButtonConfig;
+  submitButton?: SubmitButtonConfig<string>;
   /** Enable debug logging (if not provided, reads from endpoint.debug) */
   debug?: boolean;
   /** Custom className for outer wrapper */
@@ -744,7 +744,7 @@ function StackEntryLayer({
   entry: NavigationStackEntry;
   index: number;
   className?: string;
-  submitButton?: SubmitButtonConfig;
+  submitButton?: SubmitButtonConfig<string>;
   debug?: boolean;
   user: JwtPayloadType;
   locale: CountryLanguage;

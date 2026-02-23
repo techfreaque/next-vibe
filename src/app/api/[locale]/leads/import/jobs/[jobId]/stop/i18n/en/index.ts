@@ -1,4 +1,10 @@
 export const translations = {
+  category: "Data Import",
+  tags: {
+    leads: "Leads",
+    management: "Management",
+  },
+
   post: {
     title: "Stop Import Job",
     description: "Stop a running import job",

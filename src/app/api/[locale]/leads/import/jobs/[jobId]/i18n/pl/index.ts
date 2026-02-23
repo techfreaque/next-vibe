@@ -3,6 +3,137 @@ import { translations as stopTranslations } from "../../stop/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Import danych",
+  tags: {
+    leads: "Leady",
+    management: "Zarządzanie",
+  },
+
+  get: {
+    title: "Pobierz zadanie importu",
+    description: "Pobierz szczegóły konkretnego zadania importu",
+    jobId: {
+      label: "ID zadania",
+      description: "Unikalny identyfikator zadania importu",
+    },
+    form: {
+      title: "Status zadania importu",
+      description: "Bieżący status i postęp zadania importu",
+    },
+    response: {
+      title: "Informacje o zadaniu",
+      description: "Bieżące szczegóły zadania importu",
+      info: {
+        title: "Informacje o zadaniu",
+        description: "Podstawowe szczegóły zadania",
+      },
+      id: {
+        content: "ID zadania",
+      },
+      fileName: {
+        content: "Nazwa pliku",
+      },
+      status: {
+        content: "Status zadania",
+      },
+      progress: {
+        title: "Postęp importu",
+        description: "Bieżący postęp importu i statystyki",
+      },
+      totalRows: {
+        content: "Łączna liczba wierszy",
+      },
+      processedRows: {
+        content: "Przetworzone wiersze",
+      },
+      successfulImports: {
+        content: "Udane importy",
+      },
+      failedImports: {
+        content: "Nieudane importy",
+      },
+      duplicateEmails: {
+        content: "Zduplikowane e-maile",
+      },
+      configuration: {
+        title: "Konfiguracja zadania",
+        description: "Bieżące ustawienia konfiguracji zadania",
+      },
+      currentBatchStart: {
+        content: "Start bieżącej partii",
+      },
+      batchSize: {
+        content: "Rozmiar partii",
+      },
+      retryCount: {
+        content: "Liczba ponowień",
+      },
+      maxRetries: {
+        content: "Maksymalna liczba ponowień",
+      },
+      error: {
+        content: "Komunikat błędu",
+      },
+      timestamps: {
+        title: "Znaczniki czasu zadania",
+        description: "Znaczniki czasu cyklu życia zadania",
+      },
+      createdAt: {
+        content: "Utworzono",
+      },
+      updatedAt: {
+        content: "Zaktualizowano",
+      },
+      startedAt: {
+        content: "Rozpoczęto",
+      },
+      completedAt: {
+        content: "Ukończono",
+      },
+    },
+    errors: {
+      validation: {
+        title: "Błąd walidacji",
+        description: "Podane ID zadania jest nieprawidłowe",
+      },
+      unauthorized: {
+        title: "Nieautoryzowany",
+        description: "Wymagane uwierzytelnienie do przeglądania zadań",
+      },
+      forbidden: {
+        title: "Dostęp zabroniony",
+        description: "Nie masz uprawnień do przeglądania tego zadania",
+      },
+      notFound: {
+        title: "Zadanie nie znalezione",
+        description: "Nie znaleziono zadania importu o podanym ID",
+      },
+      server: {
+        title: "Błąd serwera",
+        description: "Wystąpił błąd podczas pobierania zadania",
+      },
+      unknown: {
+        title: "Nieznany błąd",
+        description: "Wystąpił nieoczekiwany błąd",
+      },
+      network: {
+        title: "Błąd sieci",
+        description: "Nie można połączyć się z serwerem",
+      },
+      unsavedChanges: {
+        title: "Niezapisane zmiany",
+        description: "Masz niezapisane zmiany",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Wystąpił konflikt podczas pobierania zadania",
+      },
+    },
+    success: {
+      title: "Sukces",
+      description: "Zadanie importu zostało pomyślnie pobrane",
+    },
+  },
   patch: {
     title: "Zaktualizuj zadanie importu",
     description: "Zaktualizuj ustawienia konfiguracji zadania importu",

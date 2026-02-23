@@ -6,6 +6,11 @@ export const translations: typeof enTranslations = {
   enableLightMode: "Hellen Modus aktivieren",
   enableDarkMode: "Dunklen Modus aktivieren",
   notifications: "Benachrichtigungen",
+  welcomeNotification: {
+    title: "Willkommen bei {{appName}}!",
+    description:
+      "Starten Sie damit, die KI-Modelle zu erkunden und Ihr erstes Gespräch zu erstellen.",
+  },
   company: "Unternehmen",
   about: {
     title: "Über uns",

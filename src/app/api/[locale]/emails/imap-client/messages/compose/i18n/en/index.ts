@@ -1,4 +1,6 @@
 export const translations = {
+  category: "IMAP Client",
+
   post: {
     title: "Compose Email",
     description: "Send a new email via SMTP",

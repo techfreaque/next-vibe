@@ -8,9 +8,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,35 +21,33 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "unified-interface", "tasks", "task-sync"],
-  title: "app.api.system.unifiedInterface.tasks.taskSync.post.title",
-  description:
-    "app.api.system.unifiedInterface.tasks.taskSync.post.description",
+  title: "taskSync.post.title",
+  description: "taskSync.post.description",
   icon: "refresh-cw",
-  category: "app.api.system.category",
-  tags: [
-    "app.api.system.unifiedInterface.tasks.claudeCode.tags.tasks" as const,
-  ],
+  category: "category",
+  tags: ["claudeCode.tags.tasks" as const],
   allowedRoles: [UserRole.PUBLIC],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // Request
-      apiKey: requestField({
+      apiKey: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 12,
         schema: z.string().min(1),
       }),
-      completionsJson: requestField({
+      completionsJson: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         columns: 12,
@@ -57,82 +55,63 @@ const { POST } = createEndpoint({
       }),
 
       // Response
-      tasksJson: responseField({
+      tasksJson: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
       }),
-      synced: responseField({
+      synced: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.number(),
       }),
-      completionsProcessed: responseField({
+      completionsProcessed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.number(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.taskSync.post.errors.validation.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.taskSync.post.errors.validation.description",
+      title: "taskSync.post.errors.validation.title",
+      description: "taskSync.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.taskSync.post.errors.unauthorized.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.taskSync.post.errors.unauthorized.description",
+      title: "taskSync.post.errors.unauthorized.title",
+      description: "taskSync.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.taskSync.post.errors.internal.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.taskSync.post.errors.internal.description",
+      title: "taskSync.post.errors.internal.title",
+      description: "taskSync.post.errors.internal.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.taskSync.post.errors.forbidden.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.taskSync.post.errors.forbidden.description",
+      title: "taskSync.post.errors.forbidden.title",
+      description: "taskSync.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.taskSync.post.errors.notFound.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.taskSync.post.errors.notFound.description",
+      title: "taskSync.post.errors.notFound.title",
+      description: "taskSync.post.errors.notFound.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.taskSync.post.errors.network.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.taskSync.post.errors.network.description",
+      title: "taskSync.post.errors.network.title",
+      description: "taskSync.post.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.taskSync.post.errors.unknown.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.taskSync.post.errors.unknown.description",
+      title: "taskSync.post.errors.unknown.title",
+      description: "taskSync.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.taskSync.post.errors.unsaved.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.taskSync.post.errors.unsaved.description",
+      title: "taskSync.post.errors.unsaved.title",
+      description: "taskSync.post.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.taskSync.post.errors.conflict.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.taskSync.post.errors.conflict.description",
+      title: "taskSync.post.errors.conflict.title",
+      description: "taskSync.post.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.system.unifiedInterface.tasks.taskSync.post.success.title",
-    description:
-      "app.api.system.unifiedInterface.tasks.taskSync.post.success.description",
+    title: "taskSync.post.success.title",
+    description: "taskSync.post.success.description",
   },
 
   examples: {

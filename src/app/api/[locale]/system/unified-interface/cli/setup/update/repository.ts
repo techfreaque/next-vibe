@@ -14,13 +14,13 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-
 import type { JwtPayloadType } from "../../../../../user/auth/types";
 import { setupInstallRepository } from "../install/repository";
 import { setupUninstallRepository } from "../uninstall/repository";
 import type { UpdateRequestOutput, UpdateResponseOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Setup Update Repository Interface
@@ -29,7 +29,7 @@ export interface SetupUpdateRepository {
   updateCli(
     data: UpdateRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: ModuleT,
   ): Promise<ResponseType<UpdateResponseOutput>>;
 }
 
@@ -41,27 +41,22 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
   async updateCli(
     data: UpdateRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: ModuleT,
   ): Promise<ResponseType<UpdateResponseOutput>> {
-    const { t } = simpleT(locale);
-
     try {
       // First uninstall existing CLI
       const uninstallResult = await setupUninstallRepository.uninstallCli(
         { verbose: data.verbose },
         user,
-        locale,
+        t,
       );
 
       if (!uninstallResult.success) {
         return fail({
-          message:
-            "app.api.system.unifiedInterface.cli.setup.update.post.errors.server.title",
+          message: t("post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
-            error: t(
-              "app.api.system.unifiedInterface.cli.setup.update.post.errors.server.description",
-            ),
+            error: t("post.errors.server.description"),
           },
           cause: uninstallResult,
         });
@@ -71,7 +66,7 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
       const installResult = await setupInstallRepository.installCli(
         { force: true, verbose: data.verbose },
         user,
-        locale,
+        t,
       );
 
       if (installResult.success && installResult.data) {
@@ -80,24 +75,19 @@ class SetupUpdateRepositoryImpl implements SetupUpdateRepository {
           installed: true,
           version: installResult.data.version,
           path: installResult.data.path,
-          message: t(
-            "app.api.system.unifiedInterface.cli.setup.update.post.success.description",
-          ),
+          message: t("post.success.description"),
           output: installResult.data.output,
         });
       }
       return success({
         success: false,
         installed: false,
-        message: t(
-          "app.api.system.unifiedInterface.cli.setup.update.post.errors.server.description",
-        ),
+        message: t("post.errors.server.description"),
       });
     } catch (err) {
       const parsedError = parseError(err);
       return fail({
-        message:
-          "app.api.system.unifiedInterface.cli.setup.update.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,

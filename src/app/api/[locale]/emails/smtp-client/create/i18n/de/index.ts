@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Email Communication",
+  tag: "SMTP",
   title: "SMTP-Konto erstellen",
   description: "Ein neues SMTP-Konto für den E-Mail-Versand erstellen",
 

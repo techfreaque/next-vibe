@@ -1,5 +1,6 @@
 import type { ApiFormReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/types";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { useTranslation } from "@/i18n/core/client";
 
 import {
   type EnhancedMutationResult,
@@ -20,7 +21,8 @@ export function useUploadAvatar(
   logger: EndpointLogger,
   user: JwtPayloadType,
 ): ApiFormReturn<AvatarPostRequestOutput, AvatarPostResponseOutput, never> {
-  return useApiForm(avatarEndpoints.POST, logger, user);
+  const { locale } = useTranslation();
+  return useApiForm(avatarEndpoints.POST, logger, user, locale);
 }
 
 /**

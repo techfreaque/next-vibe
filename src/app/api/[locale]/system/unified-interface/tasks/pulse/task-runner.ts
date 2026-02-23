@@ -54,7 +54,7 @@ const pulseTaskRunner: TaskRunner = {
     );
 
     // Import once outside the loop — dynamic to avoid circular dependencies at module load time
-    const { pulseHealthRepository } = await import("../pulse/repository");
+    const { PulseHealthRepository } = await import("../pulse/repository");
 
     let pulseCount = 0;
 
@@ -64,13 +64,14 @@ const pulseTaskRunner: TaskRunner = {
         logger.debug(`Pulse #${pulseCount} - Triggering task execution...`);
 
         // Execute pulse with minimal configuration
-        const pulseResult = await pulseHealthRepository.executePulse(
+        const pulseResult = await PulseHealthRepository.executePulse(
           {
             dryRun: false,
             force: false,
             systemLocale,
           },
           logger,
+          props.systemLocale,
         );
 
         if (pulseResult.success) {

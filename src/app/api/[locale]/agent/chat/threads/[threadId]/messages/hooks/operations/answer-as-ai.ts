@@ -28,8 +28,8 @@ export interface AnswerAsAIDeps {
   settings: {
     selectedModel: ModelId;
     selectedCharacter: string;
-    activeTools: ToolConfigItem[] | null;
-    visibleTools: ToolConfigItem[] | null;
+    allowedTools: ToolConfigItem[] | null;
+    pinnedTools: ToolConfigItem[] | null;
   };
   deductCredits: (creditCost: number, feature: string) => void;
 }
@@ -103,13 +103,13 @@ export async function answerAsAI(
         role: ChatMessageRole.ASSISTANT,
         model: settings.selectedModel,
         character: settings.selectedCharacter ?? null,
-        activeTools:
-          settings.activeTools?.map((t) => ({
+        allowedTools:
+          settings.allowedTools?.map((t) => ({
             toolId: t.toolId,
             requiresConfirmation: t.requiresConfirmation ?? false,
           })) ?? null,
         tools:
-          settings.visibleTools?.map((t) => ({
+          settings.pinnedTools?.map((t) => ({
             toolId: t.toolId,
             requiresConfirmation: t.requiresConfirmation ?? false,
           })) ?? null,

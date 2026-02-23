@@ -20,6 +20,9 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import { ExecBackend, SshCommandStatus } from "../enum";
 import type { SshExecRequestOutput, SshExecResponseOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 const execAsync = promisify(exec);
 
@@ -59,6 +62,7 @@ export class SshExecRepository {
   static async exec(
     data: SshExecRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SshExecResponseOutput>> {
     const timeoutMs = data.timeoutMs ?? LOCAL_DEFAULT_TIMEOUT_MS;
     const command = data.command;
@@ -66,8 +70,7 @@ export class SshExecRepository {
     // Validate workingDir if provided
     if (data.workingDir && !isValidWorkingDir(data.workingDir)) {
       return fail({
-        message:
-          "Invalid working directory: must be absolute path without '..' segments",
+        message: t("errors.invalidWorkingDir"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
@@ -75,8 +78,7 @@ export class SshExecRepository {
     if (data.connectionId) {
       // SSH backend — not yet implemented
       return fail({
-        message:
-          "SSH backend not yet implemented. Leave connectionId empty to run locally.",
+        message: t("errors.notImplemented.local"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
@@ -135,7 +137,7 @@ export class SshExecRepository {
       ) {
         logger.warn(`Command timed out after ${durationMs}ms`);
         return fail({
-          message: `Command timed out after ${timeoutMs}ms`,
+          message: t("errors.commandTimedOut"),
           errorType: ErrorResponseTypes.UNKNOWN_ERROR,
         });
       }

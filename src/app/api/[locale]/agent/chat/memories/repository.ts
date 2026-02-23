@@ -14,8 +14,11 @@ import {
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import type { scopedTranslation as idScopedTranslation } from "./[id]/i18n";
 import { memories, type Memory } from "./db";
 import { formatMemorySummary } from "./formatter";
+
+type MemoriesT = ReturnType<typeof idScopedTranslation.scopedT>["t"];
 
 /**
  * Memory configuration
@@ -125,15 +128,16 @@ export async function updateMemory(params: {
   priority?: number;
   userId: string;
   logger: EndpointLogger;
+  t: MemoriesT;
 }): Promise<ResponseType<{ success: true }>> {
-  const { memoryNumber, content, tags, priority, userId, logger } = params;
+  const { memoryNumber, content, tags, priority, userId, logger, t } = params;
 
   const updateData: Partial<typeof memories.$inferInsert> = {
     updatedAt: new Date(),
   };
 
-  // Filter out empty strings - treat as undefined
-  if (content !== undefined && content !== "") {
+  // Never overwrite content with empty or whitespace-only strings
+  if (content !== undefined && content.trim() !== "") {
     updateData.content = content;
   }
   if (tags !== undefined) {
@@ -153,7 +157,7 @@ export async function updateMemory(params: {
 
   if (!updated) {
     return fail({
-      message: "app.api.agent.chat.memories.id.patch.errors.notFound.title",
+      message: t("patch.errors.notFound.title"),
       errorType: ErrorResponseTypes.NOT_FOUND,
     });
   }
@@ -169,8 +173,9 @@ export async function deleteMemory(params: {
   memoryNumber: number;
   userId: string;
   logger: EndpointLogger;
+  t: MemoriesT;
 }): Promise<ResponseType<{ success: true }>> {
-  const { memoryNumber, userId, logger } = params;
+  const { memoryNumber, userId, logger, t } = params;
 
   const result = await db
     .delete(memories)
@@ -181,7 +186,7 @@ export async function deleteMemory(params: {
 
   if (result.length === 0) {
     return fail({
-      message: "app.api.agent.chat.memories.id.delete.errors.notFound.title",
+      message: t("delete.errors.notFound.title"),
       errorType: ErrorResponseTypes.NOT_FOUND,
     });
   }

@@ -3,6 +3,7 @@
  * Individual job operations (update, delete)
  */
 
+import { scopedTranslation as importScopedTranslation } from "@/app/api/[locale]/import/i18n";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
@@ -15,7 +16,8 @@ import definitions from "./definition";
 export const { PATCH, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.PATCH]: {
-    handler: async ({ user, data, urlPathParams, logger }) => {
+    handler: async ({ user, data, urlPathParams, logger, locale }) => {
+      const { t } = importScopedTranslation.scopedT(locale);
       return await leadsImportRepository.updateImportJobFormatted(
         user.id,
         {
@@ -23,15 +25,18 @@ export const { PATCH, DELETE, tools } = endpointsHandler({
           ...data.settings,
         },
         logger,
+        t,
       );
     },
   },
   [Methods.DELETE]: {
-    handler: async ({ user, urlPathParams, logger }) => {
+    handler: async ({ user, urlPathParams, logger, locale }) => {
+      const { t } = importScopedTranslation.scopedT(locale);
       return await leadsImportRepository.deleteImportJobFormatted(
         user.id,
         urlPathParams.jobId,
         logger,
+        t,
       );
     },
   },

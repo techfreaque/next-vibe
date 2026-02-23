@@ -9,11 +9,14 @@ import {
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import type { scopedTranslation } from "../../i18n";
 import { sessionPool } from "../pool";
 import type {
   SessionReadRequestOutput,
   SessionReadResponseOutput,
 } from "./definition";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => {
@@ -25,11 +28,12 @@ export class SessionReadRepository {
   static async read(
     data: SessionReadRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SessionReadResponseOutput>> {
     const entry = sessionPool.get(data.sessionId);
     if (!entry) {
       return fail({
-        message: "Session not found",
+        message: t("errors.sessionNotFound"),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }

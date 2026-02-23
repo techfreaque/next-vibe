@@ -8,7 +8,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import type z from "zod";
 
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import {
@@ -83,7 +83,7 @@ export function ChartWidget<
   const fieldName = "fieldName" in props ? props.fieldName : undefined;
   const locale = useWidgetLocale();
   const t = useWidgetTranslation();
-  const { t: globalT } = simpleT(locale);
+  const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
   const form = useWidgetForm();
   const {
     chartType = "line",
@@ -158,9 +158,7 @@ export function ChartWidget<
             }}
           >
             <Span className={cn("text-muted-foreground", emptyTextSizeClass)}>
-              {globalT(
-                "app.api.system.unifiedInterface.widgets.chart.noDataAvailable",
-              )}
+              {widgetT("widgets.chart.noDataAvailable")}
             </Span>
           </Div>
         </CardContent>
@@ -216,9 +214,7 @@ export function ChartWidget<
             }}
           >
             <Span className={cn("text-muted-foreground", emptyTextSizeClass)}>
-              {globalT(
-                "app.api.system.unifiedInterface.widgets.chart.noDataToDisplay",
-              )}
+              {widgetT("widgets.chart.noDataToDisplay")}
             </Span>
           </Div>
         );

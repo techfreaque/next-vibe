@@ -1,4 +1,5 @@
 export const translations = {
+  category: "IMAP Management",
   tag: "Bulk Actions",
   post: {
     title: "Bulk Update Messages",

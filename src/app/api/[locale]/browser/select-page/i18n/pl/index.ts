@@ -63,4 +63,9 @@ export const translations: typeof enTranslations = {
     title: "Strona pomyślnie wybrana",
     description: "Strona została pomyślnie wybrana",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    navigationAutomation: "Automatyzacja nawigacji",
+  },
 };

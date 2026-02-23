@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,16 +20,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["browser", "handle-dialog"],
-  title: "app.api.browser.handle-dialog.title",
-  description: "app.api.browser.handle-dialog.description",
-  category: "app.api.browser.category",
+  title: "handle-dialog.title",
+  description: "handle-dialog.description",
+  category: "handle-dialog.category",
   icon: "message-square",
   tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.dialogAutomation",
+    "handle-dialog.tags.browserAutomation",
+    "handle-dialog.tags.dialogAutomation",
   ],
 
   allowedRoles: [
@@ -40,34 +43,28 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.browser.handle-dialog.form.label",
-      description: "app.api.browser.handle-dialog.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      action: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "handle-dialog.form.label",
+    description: "handle-dialog.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      action: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.browser.handle-dialog.form.fields.action.label",
-        description:
-          "app.api.browser.handle-dialog.form.fields.action.description",
-        placeholder:
-          "app.api.browser.handle-dialog.form.fields.action.placeholder",
+        label: "handle-dialog.form.fields.action.label",
+        description: "handle-dialog.form.fields.action.description",
+        placeholder: "handle-dialog.form.fields.action.placeholder",
         columns: 6,
         options: [
           {
-            label:
-              "app.api.browser.handle-dialog.form.fields.action.options.accept" as const,
+            label: "handle-dialog.form.fields.action.options.accept" as const,
             value: "accept",
           },
           {
-            label:
-              "app.api.browser.handle-dialog.form.fields.action.options.dismiss" as const,
+            label: "handle-dialog.form.fields.action.options.dismiss" as const,
             value: "dismiss",
           },
         ],
@@ -75,14 +72,12 @@ const { POST } = createEndpoint({
           .enum(["accept", "dismiss"])
           .describe("Whether to dismiss or accept the dialog"),
       }),
-      promptText: requestField({
+      promptText: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.browser.handle-dialog.form.fields.promptText.label",
-        description:
-          "app.api.browser.handle-dialog.form.fields.promptText.description",
-        placeholder:
-          "app.api.browser.handle-dialog.form.fields.promptText.placeholder",
+        label: "handle-dialog.form.fields.promptText.label",
+        description: "handle-dialog.form.fields.promptText.description",
+        placeholder: "handle-dialog.form.fields.promptText.placeholder",
         columns: 6,
         schema: z
           .string()
@@ -91,16 +86,16 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.handle-dialog.response.success",
+        content: "handle-dialog.response.success",
         schema: z
           .boolean()
           .describe("Whether the dialog handling operation succeeded"),
       }),
-      result: responseField({
+      result: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.handle-dialog.response.result",
+        content: "handle-dialog.response.result",
         schema: z
           .object({
             handled: z.boolean().describe("Whether the dialog was handled"),
@@ -109,24 +104,24 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Result of the dialog handling"),
       }),
-      error: responseField({
+      error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.handle-dialog.response.error",
+        content: "handle-dialog.response.error",
         schema: z
           .string()
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: responseField({
+      executionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.handle-dialog.response.executionId",
+        content: "handle-dialog.response.executionId",
         schema: z
           .string()
           .optional()
           .describe("Unique identifier for this execution"),
       }),
     },
-  ),
+  }),
   examples: {
     requests: {
       default: { action: "accept" },
@@ -144,49 +139,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.browser.handle-dialog.errors.validation.title",
-      description:
-        "app.api.browser.handle-dialog.errors.validation.description",
+      title: "handle-dialog.errors.validation.title",
+      description: "handle-dialog.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.browser.handle-dialog.errors.network.title",
-      description: "app.api.browser.handle-dialog.errors.network.description",
+      title: "handle-dialog.errors.network.title",
+      description: "handle-dialog.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.browser.handle-dialog.errors.unauthorized.title",
-      description:
-        "app.api.browser.handle-dialog.errors.unauthorized.description",
+      title: "handle-dialog.errors.unauthorized.title",
+      description: "handle-dialog.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.browser.handle-dialog.errors.forbidden.title",
-      description: "app.api.browser.handle-dialog.errors.forbidden.description",
+      title: "handle-dialog.errors.forbidden.title",
+      description: "handle-dialog.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.browser.handle-dialog.errors.notFound.title",
-      description: "app.api.browser.handle-dialog.errors.notFound.description",
+      title: "handle-dialog.errors.notFound.title",
+      description: "handle-dialog.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.browser.handle-dialog.errors.serverError.title",
-      description:
-        "app.api.browser.handle-dialog.errors.serverError.description",
+      title: "handle-dialog.errors.serverError.title",
+      description: "handle-dialog.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.browser.handle-dialog.errors.unknown.title",
-      description: "app.api.browser.handle-dialog.errors.unknown.description",
+      title: "handle-dialog.errors.unknown.title",
+      description: "handle-dialog.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.browser.handle-dialog.errors.unsavedChanges.title",
-      description:
-        "app.api.browser.handle-dialog.errors.unsavedChanges.description",
+      title: "handle-dialog.errors.unsavedChanges.title",
+      description: "handle-dialog.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.browser.handle-dialog.errors.conflict.title",
-      description: "app.api.browser.handle-dialog.errors.conflict.description",
+      title: "handle-dialog.errors.conflict.title",
+      description: "handle-dialog.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.browser.handle-dialog.success.title",
-    description: "app.api.browser.handle-dialog.success.description",
+    title: "handle-dialog.success.title",
+    description: "handle-dialog.success.description",
   },
 });
 

@@ -20,9 +20,10 @@ import {
   createEndpointLogger,
   type EndpointLogger,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { defaultLocale } from "@/i18n/core/config";
+import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
 import type endpoints from "./definition";
+import { scopedTranslation } from "./i18n";
 
 type RequestType = typeof endpoints.POST.types.RequestOutput;
 type GenerateAllResponseType = typeof endpoints.POST.types.ResponseOutput;
@@ -34,6 +35,7 @@ interface GenerateAllRepository {
   generateAll(
     data: RequestType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<BaseResponseType<GenerateAllResponseType>>;
 }
 
@@ -44,6 +46,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
   async generateAll(
     data: RequestType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<BaseResponseType<GenerateAllResponseType>> {
     const GENERATING_VIBE = "🚀 Generating some vibe...";
     const RUNNING_GENERATORS = "Step 1: Running all generators in parallel...";
@@ -70,6 +73,9 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               const { endpointsIndexGeneratorRepository } =
                 await import("../endpoints-index/repository");
 
+              const { scopedTranslation: endpointsIndexI18n } =
+                await import("../endpoints-index/i18n");
+              const { t: subT } = endpointsIndexI18n.scopedT(locale);
               const result =
                 await endpointsIndexGeneratorRepository.generateEndpointsIndex(
                   {
@@ -78,6 +84,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                     dryRun: false,
                   },
                   logger,
+                  subT,
                 );
 
               if (result.success) {
@@ -110,6 +117,9 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               const { endpointGeneratorRepository } =
                 await import("../endpoint/repository");
 
+              const { scopedTranslation: endpointI18n } =
+                await import("../endpoint/i18n");
+              const { t: subT } = endpointI18n.scopedT(locale);
               const result = await endpointGeneratorRepository.generateEndpoint(
                 {
                   outputFile:
@@ -117,6 +127,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                   dryRun: false,
                 },
                 logger,
+                subT,
               );
 
               if (result.success) {
@@ -149,6 +160,9 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               const { routeHandlersGeneratorRepository } =
                 await import("../route-handlers/repository");
 
+              const { scopedTranslation: routeHandlersI18n } =
+                await import("../route-handlers/i18n");
+              const { t: subT } = routeHandlersI18n.scopedT(locale);
               const result =
                 await routeHandlersGeneratorRepository.generateRouteHandlers(
                   {
@@ -157,6 +171,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                     dryRun: false,
                   },
                   logger,
+                  subT,
                 );
 
               if (result.success) {
@@ -189,6 +204,9 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               const { ClientRoutesIndexGeneratorRepository } =
                 await import("../client-routes-index/repository");
 
+              const { scopedTranslation: clientRoutesI18n } =
+                await import("../client-routes-index/i18n");
+              const { t: subT } = clientRoutesI18n.scopedT(locale);
               const result =
                 await ClientRoutesIndexGeneratorRepository.generateClientRoutesIndex(
                   {
@@ -197,6 +215,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                     dryRun: false,
                   },
                   logger,
+                  subT,
                 );
 
               if (result.success) {
@@ -229,6 +248,9 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               const { seedsGeneratorRepository } =
                 await import("../seeds/repository");
 
+              const { scopedTranslation: seedsI18n } =
+                await import("../seeds/i18n");
+              const { t: subT } = seedsI18n.scopedT(locale);
               const result = await seedsGeneratorRepository.generateSeeds(
                 {
                   outputDir: "src/app/api/[locale]/system/generated",
@@ -237,6 +259,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                   dryRun: false,
                 },
                 logger,
+                subT,
               );
 
               if (result.success) {
@@ -269,6 +292,9 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
               const { taskIndexGeneratorRepository } =
                 await import("../task-index/repository");
 
+              const { scopedTranslation: taskIndexI18n } =
+                await import("../task-index/i18n");
+              const { t: subT } = taskIndexI18n.scopedT(locale);
               const result =
                 await taskIndexGeneratorRepository.generateTaskIndex(
                   {
@@ -277,6 +303,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                     dryRun: false,
                   },
                   logger,
+                  subT,
                 );
 
               if (result.success) {
@@ -322,6 +349,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                     excludePatterns: [],
                   },
                   logger,
+                  locale,
                 );
 
               if (result.success && result.data) {
@@ -356,6 +384,9 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
             const { emailTemplateGeneratorRepository } =
               await import("../email-templates/repository");
 
+            const { scopedTranslation: emailTemplatesI18n } =
+              await import("../email-templates/i18n");
+            const { t: subT } = emailTemplatesI18n.scopedT(locale);
             const result =
               await emailTemplateGeneratorRepository.generateEmailTemplates(
                 {
@@ -364,6 +395,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                   dryRun: false,
                 },
                 logger,
+                subT,
               );
 
             if (result.success) {
@@ -394,6 +426,8 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
             const { envGeneratorRepository } =
               await import("../env/repository");
 
+            const { scopedTranslation: envI18n } = await import("../env/i18n");
+            const { t: subT } = envI18n.scopedT(locale);
             const result = await envGeneratorRepository.generateEnv(
               {
                 outputDir: "src/app/api/[locale]/system/generated",
@@ -401,6 +435,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                 dryRun: false,
               },
               logger,
+              subT,
             );
 
             if (result.success) {
@@ -452,10 +487,9 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       // Generation failed
       const errorMessage = parseError(error);
       outputLines.push(`❌ Generation failed: ${errorMessage}`);
-
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message:
-          "app.api.system.generators.generateAll.post.errors.internal.title",
+        message: t("post.errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMessage.message },
       });
@@ -478,6 +512,7 @@ if (import.meta.main) {
         outputDir: "src/app/api/[locale]/system/generated",
       },
       logger,
+      defaultLocale,
     )
     .then((result) => {
       if (result.success && result.data) {

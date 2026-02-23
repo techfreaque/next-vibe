@@ -421,6 +421,7 @@ export const chatMessages = pgTable(
 
     // Author information (for multi-user support)
     authorId: text("author_id"), // User ID or "local"
+    authorName: text("author_name"), // Snapshot of display name at message creation time (null for anonymous/incognito)
     isAI: boolean("is_ai").default(false).notNull(),
 
     // AI-specific fields

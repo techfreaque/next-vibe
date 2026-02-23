@@ -3,6 +3,12 @@ import { translations as statusTranslations } from "../../status/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  tags: {
+    import: "Importieren",
+    leads: "Leads",
+    csv: "CSV",
+  },
+
   category: "Datenimport",
   post: {
     title: "Leads importieren",
@@ -161,6 +167,65 @@ export const translations: typeof enTranslations = {
       importErrorsTitle: "{{count}} Importfehler",
       errorRowLabel: "Zeile {{row}}",
       findLeadButton: "Lead suchen",
+    },
+  },
+  process: {
+    tag: "Importverarbeitung",
+    post: {
+      title: "Importaufträge verarbeiten",
+      description: "Ausstehende CSV-Importaufträge verarbeiten",
+      container: {
+        title: "Importverarbeitungskonfiguration",
+        description: "Importverarbeitungsparameter konfigurieren",
+      },
+      fields: {
+        maxJobsPerRun: {
+          label: "Max. Aufträge pro Durchlauf",
+          description:
+            "Maximale Anzahl der zu verarbeitenden Aufträge pro Durchlauf",
+        },
+        maxRetriesPerJob: {
+          label: "Max. Wiederholungen pro Auftrag",
+          description: "Maximale Anzahl der Wiederholungen pro Auftrag",
+        },
+        dryRun: {
+          label: "Testlauf",
+          description: "Ausführen ohne Änderungen vorzunehmen",
+        },
+      },
+      response: {
+        jobsProcessed: "Verarbeitete Aufträge",
+        totalRowsProcessed: "Verarbeitete Zeilen gesamt",
+        successfulImports: "Erfolgreiche Importe",
+        failedImports: "Fehlgeschlagene Importe",
+      },
+      errors: {
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Authentifizierung erforderlich",
+        },
+        forbidden: {
+          title: "Verboten",
+          description: "Zugriff verweigert",
+        },
+        server: {
+          title: "Serverfehler",
+          description:
+            "Beim Verarbeiten der Importe ist ein Fehler aufgetreten",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unbekannter Fehler ist aufgetreten",
+        },
+        validation: {
+          title: "Validierungsfehler",
+          description: "Ungültige Anfrageparameter",
+        },
+      },
+      success: {
+        title: "Importverarbeitung abgeschlossen",
+        description: "Importaufträge erfolgreich verarbeitet",
+      },
     },
   },
   jobs: jobsTranslations,

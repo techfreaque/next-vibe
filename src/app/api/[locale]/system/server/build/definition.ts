@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -19,14 +19,16 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "server", "build"],
-  title: "app.api.system.server.build.post.title",
-  description: "app.api.system.server.build.post.description",
-  category: "app.api.system.category",
-  tags: ["app.api.system.server.build.tags.build"],
+  title: "post.title",
+  description: "post.description",
+  category: "category",
+  tags: ["tags.build"],
   icon: "package",
   allowedRoles: [
     UserRole.ADMIN,
@@ -36,168 +38,150 @@ const { POST } = createEndpoint({
   ],
   aliases: ["build", "b"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.server.build.post.form.title",
-      description: "app.api.system.server.build.post.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.form.title",
+    description: "post.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      package: requestField({
+      package: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.build.post.fields.package.title",
-        description:
-          "app.api.system.server.build.post.fields.package.description",
+        label: "post.fields.package.title",
+        description: "post.fields.package.description",
         schema: z.boolean().default(false),
       }),
 
-      generate: requestField({
+      generate: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.build.post.fields.generate.title",
-        description:
-          "app.api.system.server.build.post.fields.generate.description",
+        label: "post.fields.generate.title",
+        description: "post.fields.generate.description",
         schema: z.boolean().default(true),
       }),
 
-      generateEndpoints: requestField({
+      generateEndpoints: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.server.build.post.fields.generateEndpoints.title",
-        description:
-          "app.api.system.server.build.post.fields.generateEndpoints.description",
+        label: "post.fields.generateEndpoints.title",
+        description: "post.fields.generateEndpoints.description",
         schema: z.boolean().default(true),
       }),
 
-      generateSeeds: requestField({
+      generateSeeds: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.build.post.fields.generateSeeds.title",
-        description:
-          "app.api.system.server.build.post.fields.generateSeeds.description",
+        label: "post.fields.generateSeeds.title",
+        description: "post.fields.generateSeeds.description",
         schema: z.boolean().default(true),
       }),
 
-      nextBuild: requestField({
+      nextBuild: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.build.post.fields.nextBuild.title",
-        description:
-          "app.api.system.server.build.post.fields.nextBuild.description",
+        label: "post.fields.nextBuild.title",
+        description: "post.fields.nextBuild.description",
         schema: z.boolean().default(true),
       }),
 
-      migrate: requestField({
+      migrate: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.build.post.fields.migrate.title",
-        description:
-          "app.api.system.server.build.post.fields.migrate.description",
+        label: "post.fields.migrate.title",
+        description: "post.fields.migrate.description",
         schema: z.boolean().default(true),
       }),
 
-      seed: requestField({
+      seed: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.build.post.fields.seed.title",
-        description: "app.api.system.server.build.post.fields.seed.description",
+        label: "post.fields.seed.title",
+        description: "post.fields.seed.description",
         schema: z.boolean().default(true),
       }),
 
-      force: requestField({
+      force: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.build.post.fields.force.title",
-        description:
-          "app.api.system.server.build.post.fields.force.description",
+        label: "post.fields.force.title",
+        description: "post.fields.force.description",
         schema: z.boolean().default(false),
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.server.build.post.fields.success.title",
+        content: "post.fields.success.title",
         schema: z.boolean(),
       }),
 
-      output: responseField({
+      output: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.server.build.post.fields.output.title",
+        content: "post.fields.output.title",
         schema: z.string(),
       }),
 
-      duration: responseField({
+      duration: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.server.build.post.fields.duration.title",
+        content: "post.fields.duration.title",
         schema: z.coerce.number(),
       }),
 
-      errors: responseField({
+      errors: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.server.build.post.fields.errors.title",
+        content: "post.fields.errors.title",
         schema: z.array(z.string()).optional(),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.server.build.post.errors.validation.title",
-      description:
-        "app.api.system.server.build.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.server.build.post.errors.network.title",
-      description:
-        "app.api.system.server.build.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.server.build.post.errors.unauthorized.title",
-      description:
-        "app.api.system.server.build.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.server.build.post.errors.forbidden.title",
-      description:
-        "app.api.system.server.build.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.server.build.post.errors.notFound.title",
-      description:
-        "app.api.system.server.build.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.server.build.post.errors.server.title",
-      description: "app.api.system.server.build.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.server.build.post.errors.unknown.title",
-      description:
-        "app.api.system.server.build.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.server.build.post.errors.unknown.title",
-      description:
-        "app.api.system.server.build.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.server.build.post.errors.conflict.title",
-      description:
-        "app.api.system.server.build.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.system.server.build.post.success.title",
-    description: "app.api.system.server.build.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   // === EXAMPLES ===

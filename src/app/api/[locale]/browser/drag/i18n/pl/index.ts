@@ -76,4 +76,9 @@ export const translations: typeof enTranslations = {
     title: "Operacja przeciągania pomyślna",
     description: "Element został pomyślnie przeciągnięty",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    inputAutomation: "Automatyzacja wprowadzania",
+  },
 };

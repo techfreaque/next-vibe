@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "IMAP-Client",
+
   title: "IMAP-Nachrichten synchronisieren",
   description: "Nachrichten aus IMAP-Kontoordnern synchronisieren",
 

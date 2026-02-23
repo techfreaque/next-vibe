@@ -2,7 +2,9 @@
  * German translations for Email Send endpoint
  */
 
-export const translations = {
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   title: "E-Mail senden",
   description: "E-Mails mit optionalen SMS-Benachrichtigungen senden",
   category: "E-Mail-Kommunikation",
@@ -180,6 +182,8 @@ export const translations = {
     },
     sms: {
       temporarilyUnavailable: "SMS-Dienst ist vorübergehend nicht verfügbar",
+      invalidPhone: "Ungültige Telefonnummer: {{phoneNumber}}",
+      sendFailed: "SMS konnte nicht gesendet werden: {{error}}",
     },
     unauthorized: {
       title: "Nicht autorisiert",

@@ -6,10 +6,10 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,17 +20,17 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["browser", "drag"],
-  title: "app.api.browser.drag.title",
-  description: "app.api.browser.drag.description",
-  category: "app.api.browser.category",
+  title: "drag.title",
+  description: "drag.description",
+  category: "drag.category",
   icon: "move",
-  tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.inputAutomation",
-  ],
+  tags: ["drag.tags.browserAutomation", "drag.tags.inputAutomation"],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -40,44 +40,42 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.browser.drag.form.label",
-      description: "app.api.browser.drag.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      from_uid: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "drag.form.label",
+    description: "drag.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      from_uid: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.browser.drag.form.fields.from_uid.label",
-        description: "app.api.browser.drag.form.fields.from_uid.description",
-        placeholder: "app.api.browser.drag.form.fields.from_uid.placeholder",
+        label: "drag.form.fields.from_uid.label",
+        description: "drag.form.fields.from_uid.description",
+        placeholder: "drag.form.fields.from_uid.placeholder",
         columns: 6,
         schema: z.string().describe("The uid of the element to drag"),
       }),
-      to_uid: requestField({
+      to_uid: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.browser.drag.form.fields.to_uid.label",
-        description: "app.api.browser.drag.form.fields.to_uid.description",
-        placeholder: "app.api.browser.drag.form.fields.to_uid.placeholder",
+        label: "drag.form.fields.to_uid.label",
+        description: "drag.form.fields.to_uid.description",
+        placeholder: "drag.form.fields.to_uid.placeholder",
         columns: 6,
         schema: z.string().describe("The uid of the element to drop into"),
       }),
 
       // Response fields
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.drag.response.success",
+        content: "drag.response.success",
         schema: z.boolean().describe("Whether the drag operation succeeded"),
       }),
-      result: responseField({
+      result: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.drag.response.result",
+        content: "drag.response.result",
         schema: z
           .object({
             dragged: z
@@ -89,24 +87,24 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Result of the drag operation"),
       }),
-      error: responseField({
+      error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.drag.response.error",
+        content: "drag.response.error",
         schema: z
           .string()
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: responseField({
+      executionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.drag.response.executionId",
+        content: "drag.response.executionId",
         schema: z
           .string()
           .optional()
           .describe("Unique identifier for this execution"),
       }),
     },
-  ),
+  }),
   examples: {
     requests: {
       dragDrop: {
@@ -124,45 +122,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.browser.drag.errors.validation.title",
-      description: "app.api.browser.drag.errors.validation.description",
+      title: "drag.errors.validation.title",
+      description: "drag.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.browser.drag.errors.network.title",
-      description: "app.api.browser.drag.errors.network.description",
+      title: "drag.errors.network.title",
+      description: "drag.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.browser.drag.errors.unauthorized.title",
-      description: "app.api.browser.drag.errors.unauthorized.description",
+      title: "drag.errors.unauthorized.title",
+      description: "drag.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.browser.drag.errors.forbidden.title",
-      description: "app.api.browser.drag.errors.forbidden.description",
+      title: "drag.errors.forbidden.title",
+      description: "drag.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.browser.drag.errors.notFound.title",
-      description: "app.api.browser.drag.errors.notFound.description",
+      title: "drag.errors.notFound.title",
+      description: "drag.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.browser.drag.errors.serverError.title",
-      description: "app.api.browser.drag.errors.serverError.description",
+      title: "drag.errors.serverError.title",
+      description: "drag.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.browser.drag.errors.unknown.title",
-      description: "app.api.browser.drag.errors.unknown.description",
+      title: "drag.errors.unknown.title",
+      description: "drag.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.browser.drag.errors.unsavedChanges.title",
-      description: "app.api.browser.drag.errors.unsavedChanges.description",
+      title: "drag.errors.unsavedChanges.title",
+      description: "drag.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.browser.drag.errors.conflict.title",
-      description: "app.api.browser.drag.errors.conflict.description",
+      title: "drag.errors.conflict.title",
+      description: "drag.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.browser.drag.success.title",
-    description: "app.api.browser.drag.success.description",
+    title: "drag.success.title",
+    description: "drag.success.description",
   },
 });
 

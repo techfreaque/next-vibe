@@ -7,12 +7,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
+  scopedBackButton,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -23,6 +23,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
 import { ImapSyncContainer } from "./widget";
 
 /**
@@ -30,185 +31,172 @@ import { ImapSyncContainer } from "./widget";
  * Triggers manual synchronization of IMAP accounts
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["emails", "imap-client", "sync"],
-  title: "app.api.emails.imapClient.sync.title",
-  description: "app.api.emails.imapClient.sync.description",
-  category: "app.api.emails.category",
+  title: "title",
+  description: "description",
+  category: "category",
   icon: "refresh-cw",
-  tags: ["app.api.emails.imapClient.tag"],
+  tags: ["category" as const],
   allowedRoles: [UserRole.ADMIN],
 
   fields: customWidgetObject({
     render: ImapSyncContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({ usage: { request: "data", response: true } }),
+      backButton: scopedBackButton(scopedTranslation, {
+        usage: { request: "data", response: true },
+      }),
 
       // === REQUEST FIELDS ===
-      accountIds: requestField({
+      accountIds: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT_ARRAY,
-        label: "app.api.emails.imapClient.sync.accountIds.label",
-        description: "app.api.emails.imapClient.sync.accountIds.description",
+        label: "accountIds.label",
+        description: "accountIds.description",
         columns: 12,
         schema: z.array(z.string()),
       }),
 
-      force: requestField({
+      force: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.emails.imapClient.sync.force.label",
-        description: "app.api.emails.imapClient.sync.force.description",
+        label: "force.label",
+        description: "force.description",
         columns: 4,
         schema: z.boolean().default(false),
       }),
 
-      dryRun: requestField({
+      dryRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.emails.imapClient.sync.dryRun.label",
-        description: "app.api.emails.imapClient.sync.dryRun.description",
+        label: "dryRun.label",
+        description: "dryRun.description",
         columns: 4,
         schema: z.boolean().default(false),
       }),
 
-      maxMessages: requestField({
+      maxMessages: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.imapClient.sync.maxMessages.label",
-        description: "app.api.emails.imapClient.sync.maxMessages.description",
-        placeholder: "app.api.emails.imapClient.sync.maxMessages.placeholder",
+        label: "maxMessages.label",
+        description: "maxMessages.description",
+        placeholder: "maxMessages.placeholder",
         columns: 4,
         schema: z.coerce.number().min(1).max(10000).default(1000),
       }),
 
       // === RESPONSE FIELDS ===
 
-      accountsProcessed: responseField({
+      accountsProcessed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.sync.post.response.result.accountsProcessed",
+        content: "post.response.result.accountsProcessed",
         schema: z.coerce.number(),
       }),
-      foldersProcessed: responseField({
+      foldersProcessed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.sync.post.response.result.foldersProcessed",
+        content: "post.response.result.foldersProcessed",
         schema: z.coerce.number(),
       }),
-      messagesProcessed: responseField({
+      messagesProcessed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.sync.post.response.result.messagesProcessed",
+        content: "post.response.result.messagesProcessed",
         schema: z.coerce.number(),
       }),
-      messagesAdded: responseField({
+      messagesAdded: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.sync.post.response.result.messagesAdded",
+        content: "post.response.result.messagesAdded",
         schema: z.coerce.number(),
       }),
-      messagesUpdated: responseField({
+      messagesUpdated: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.sync.post.response.result.messagesUpdated",
+        content: "post.response.result.messagesUpdated",
         schema: z.coerce.number(),
       }),
-      messagesDeleted: responseField({
+      messagesDeleted: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.sync.post.response.result.messagesDeleted",
+        content: "post.response.result.messagesDeleted",
         schema: z.coerce.number(),
       }),
-      duration: responseField({
+      duration: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.sync.post.response.result.duration",
+        content: "post.response.result.duration",
         schema: z.coerce.number(),
       }),
 
-      errors: responseArrayField(
-        {
+      errors: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        groupBy: "code",
+        sortBy: "message",
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-          groupBy: "code",
-          sortBy: "message",
-        },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            title:
-              "app.api.emails.imapClient.sync.post.response.errors.error.title",
-            description:
-              "app.api.emails.imapClient.sync.post.response.errors.error.description",
-            layoutType: LayoutType.GRID,
-            columns: 12,
-          },
-          { response: true },
-          {
-            code: responseField({
+          title: "post.response.errors.error.title",
+          description: "post.response.errors.error.description",
+          layoutType: LayoutType.GRID,
+          columns: 12,
+          usage: { response: true },
+          children: {
+            code: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              text: "app.api.emails.imapClient.sync.post.response.errors.error.code",
+              text: "post.response.errors.error.code",
               schema: z.string(),
             }),
-            message: responseField({
+            message: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.sync.post.response.errors.error.message",
+              content: "post.response.errors.error.message",
               schema: z.string(),
             }),
           },
-        ),
-      ),
+        }),
+      }),
     },
   }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.emails.imapClient.sync.errors.validation.title",
-      description:
-        "app.api.emails.imapClient.sync.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.emails.imapClient.sync.errors.unauthorized.title",
-      description:
-        "app.api.emails.imapClient.sync.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.emails.imapClient.sync.errors.forbidden.title",
-      description:
-        "app.api.emails.imapClient.sync.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.emails.imapClient.sync.errors.server.title",
-      description: "app.api.emails.imapClient.sync.errors.server.description",
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.emails.imapClient.sync.errors.unknown.title",
-      description: "app.api.emails.imapClient.sync.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.emails.imapClient.sync.errors.unknown.title",
-      description: "app.api.emails.imapClient.sync.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.emails.imapClient.sync.errors.unknown.title",
-      description: "app.api.emails.imapClient.sync.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.emails.imapClient.sync.errors.unknown.title",
-      description: "app.api.emails.imapClient.sync.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.emails.imapClient.sync.errors.unknown.title",
-      description: "app.api.emails.imapClient.sync.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.emails.imapClient.sync.success.title",
-    description: "app.api.emails.imapClient.sync.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 
   // === EXAMPLES ===

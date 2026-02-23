@@ -1,4 +1,65 @@
 export const translations = {
+  category: "Benutzer",
+
+  post: {
+    title: "Sitzungsbereinigung",
+    description: "Abgelaufene Benutzersitzungen und Token bereinigen",
+    tag: "Sitzungsbereinigung",
+    container: {
+      title: "Sitzungsbereinigung",
+      description: "Sitzungsbereinigung konfigurieren und ausführen",
+    },
+    fields: {
+      sessionRetentionDays: {
+        label: "Sitzungsaufbewahrungstage",
+        description: "Anzahl der Tage zur Aufbewahrung von Sitzungen",
+      },
+      tokenRetentionDays: {
+        label: "Token-Aufbewahrungstage",
+        description: "Anzahl der Tage zur Aufbewahrung von Token",
+      },
+      batchSize: {
+        label: "Stapelgröße",
+        description: "Anzahl der Datensätze pro Stapel",
+      },
+      dryRun: {
+        label: "Probelauf",
+        description: "Ohne tatsächliches Löschen ausführen",
+      },
+    },
+    response: {
+      sessionsDeleted: "Gelöschte Sitzungen",
+      tokensDeleted: "Gelöschte Token",
+      totalProcessed: "Gesamt verarbeitet",
+      executionTimeMs: "Ausführungszeit (ms)",
+    },
+    errors: {
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Sie müssen Administrator sein",
+      },
+      forbidden: {
+        title: "Verboten",
+        description: "Zugriff verweigert",
+      },
+      server: {
+        title: "Serverfehler",
+        description: "Interner Serverfehler",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unbekannter Fehler ist aufgetreten",
+      },
+      validation: {
+        title: "Validierungsfehler",
+        description: "Ungültige Bereinigungskonfiguration",
+      },
+    },
+    success: {
+      title: "Sitzungsbereinigung abgeschlossen",
+      description: "Sitzungen und Token erfolgreich bereinigt",
+    },
+  },
   task: {
     description:
       "Abgelaufene Benutzersitzungen bereinigen, um die Systemsicherheit zu gewährleisten",

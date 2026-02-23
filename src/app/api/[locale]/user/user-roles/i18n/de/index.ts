@@ -78,6 +78,7 @@ export const translations: typeof enTranslations = {
       cliAuthBypass: "CLI Auth Bypass",
       aiToolOff: "KI-Tool Deaktiviert",
       webOff: "Web Deaktiviert",
+      mcpOff: "MCP Deaktiviert",
       mcpVisible: "MCP Sichtbar",
       productionOff: "Produktion Deaktiviert",
       remoteSkill: "Remote-Skill",

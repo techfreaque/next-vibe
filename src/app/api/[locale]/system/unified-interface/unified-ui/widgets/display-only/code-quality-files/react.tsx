@@ -10,6 +10,7 @@ import { H3 } from "next-vibe-ui/ui/typography";
 import type { ReactElement } from "react";
 import type { z } from "zod";
 
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { ReactRequestResponseWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
@@ -17,7 +18,6 @@ import {
   useWidgetForm,
   useWidgetLocale,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { simpleT } from "@/i18n/core/shared";
 
 import type {
   CodeQualityFilesSchema,
@@ -57,7 +57,7 @@ export default function CodeQualityFilesWidget<
     value = field.value;
   }
 
-  const { t } = simpleT(locale);
+  const { t } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
   if (!Array.isArray(value) || value.length === 0) {
     return <></>;
@@ -66,9 +66,7 @@ export default function CodeQualityFilesWidget<
   return (
     <Div className="mt-4 space-y-2">
       <H3 className="text-sm font-semibold">
-        {t(
-          "app.api.system.unifiedInterface.widgets.codeQualityFiles.affectedFiles",
-        )}
+        {t("widgets.codeQualityFiles.affectedFiles")}
       </H3>
       <Div className="space-y-1">
         {value.map((fileEntry, idx) => {

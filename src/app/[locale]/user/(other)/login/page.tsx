@@ -11,6 +11,7 @@ import {
   DEV_SEED_USERS,
 } from "@/app/api/[locale]/user/dev-seed-users";
 import { LoginForm } from "@/app/api/[locale]/user/public/login/_components/login-form";
+import { scopedTranslation as loginScopedTranslation } from "@/app/api/[locale]/user/public/login/i18n";
 import { LoginRepository } from "@/app/api/[locale]/user/public/login/repository";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -76,6 +77,7 @@ export default async function LoginPage({
   const { locale } = await params;
   const { callbackUrl } = await searchParams;
   const { t } = simpleT(locale);
+  const { t: loginT } = loginScopedTranslation.scopedT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
 
   // Check if user is already logged in using repository-first pattern
@@ -105,6 +107,7 @@ export default async function LoginPage({
   const loginOptionsResponse = await LoginRepository.getLoginOptions(
     logger,
     locale,
+    loginT,
   );
   if (!loginOptionsResponse.success) {
     return (

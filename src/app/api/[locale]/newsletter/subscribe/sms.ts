@@ -16,11 +16,12 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation as sendScopedTranslation } from "../../emails/send/i18n";
 import { smsServiceRepository } from "../../emails/sms-service/repository";
 import { CampaignType } from "../../emails/smtp-client/enum";
 import { smsEnv } from "../../sms/env";
+import { scopedTranslation } from "../i18n";
 import type { SubscribePostRequestOutput as NewsletterSubscriptionType } from "./definition";
 
 /**
@@ -78,6 +79,7 @@ export class NewsletterSubscribeSmsServiceImpl implements NewsletterSubscribeSms
       });
 
       const message = this.generateWelcomeMessage(subscriptionData, locale);
+      const { t: sendT } = sendScopedTranslation.scopedT(locale);
 
       const smsResult = await smsServiceRepository.sendSms(
         {
@@ -87,11 +89,13 @@ export class NewsletterSubscribeSmsServiceImpl implements NewsletterSubscribeSms
         },
         user,
         logger,
+        sendT,
       );
 
       if (!smsResult.success) {
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.newsletter.error.general.internal_server_error",
+          message: t("error.general.internal_server_error"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -101,9 +105,10 @@ export class NewsletterSubscribeSmsServiceImpl implements NewsletterSubscribeSms
         sent: true,
       });
     } catch (error) {
+      const { t } = scopedTranslation.scopedT(locale);
       logger.error("Error sending newsletter welcome SMS", parseError(error));
       return fail({
-        message: "app.api.newsletter.error.general.internal_server_error",
+        message: t("error.general.internal_server_error"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -148,6 +153,7 @@ export class NewsletterSubscribeSmsServiceImpl implements NewsletterSubscribeSms
         subscriptionData,
         locale,
       );
+      const { t: sendT } = sendScopedTranslation.scopedT(locale);
 
       const smsResult = await smsServiceRepository.sendSms(
         {
@@ -157,11 +163,13 @@ export class NewsletterSubscribeSmsServiceImpl implements NewsletterSubscribeSms
         },
         user,
         logger,
+        sendT,
       );
 
       if (!smsResult.success) {
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.newsletter.error.general.internal_server_error",
+          message: t("error.general.internal_server_error"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -171,9 +179,10 @@ export class NewsletterSubscribeSmsServiceImpl implements NewsletterSubscribeSms
         sent: true,
       });
     } catch (error) {
+      const { t } = scopedTranslation.scopedT(locale);
       logger.error("Error sending admin notification SMS", parseError(error));
       return fail({
-        message: "app.api.newsletter.error.general.internal_server_error",
+        message: t("error.general.internal_server_error"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -187,8 +196,8 @@ export class NewsletterSubscribeSmsServiceImpl implements NewsletterSubscribeSms
     locale: CountryLanguage,
   ): string {
     const name = subscriptionData.name || "there";
-    const { t } = simpleT(locale);
-    return t("app.api.newsletter.subscribe.sms.welcome.message", {
+    const { t } = scopedTranslation.scopedT(locale);
+    return t("subscribe.sms.welcome.message", {
       name,
     });
   }
@@ -202,8 +211,8 @@ export class NewsletterSubscribeSmsServiceImpl implements NewsletterSubscribeSms
   ): string {
     const { name, email } = subscriptionData;
     const displayName = name || email;
-    const { t } = simpleT(locale);
-    return t("app.api.newsletter.subscribe.sms.admin_notification.message", {
+    const { t } = scopedTranslation.scopedT(locale);
+    return t("subscribe.sms.admin_notification.message", {
       displayName,
       email,
     });

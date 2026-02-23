@@ -9,10 +9,12 @@ import "server-only";
 import type { NextRequest } from "next/server";
 import type { z } from "zod";
 
+import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { emailHandlingRepository } from "@/app/api/[locale]/emails/smtp-client/email-handling/repository";
 import type { EmailHandleRequestOutput } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
+import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
 import {
   ErrorResponseTypes,
   type FileResponse,
@@ -32,8 +34,8 @@ import type {
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-import type { TFunction } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
@@ -108,17 +110,37 @@ export type InferJwtPayloadTypeFromRoles<
 /**
  * Email handler configuration
  */
-export interface EmailHandler<TRequest, TResponse, TUrlVariables> {
+export interface EmailHandler<
+  TRequest,
+  TResponse,
+  TUrlVariables,
+  TScopedTranslationKey extends string = TranslationKey,
+> {
   readonly ignoreErrors?: boolean;
-  readonly render: EmailFunctionType<TRequest, TResponse, TUrlVariables>;
+  readonly render: EmailFunctionType<
+    TRequest,
+    TResponse,
+    TUrlVariables,
+    TScopedTranslationKey
+  >;
 }
 
 /**
  * SMS handler configuration
  */
-export interface SMSHandler<TRequest, TResponse, TUrlVariables> {
+export interface SMSHandler<
+  TRequest,
+  TResponse,
+  TUrlVariables,
+  TScopedTranslationKey extends string = TranslationKey,
+> {
   readonly ignoreErrors?: boolean;
-  readonly render: SmsFunctionType<TRequest, TResponse, TUrlVariables>;
+  readonly render: SmsFunctionType<
+    TRequest,
+    TResponse,
+    TUrlVariables,
+    TScopedTranslationKey
+  >;
 }
 
 /**
@@ -129,6 +151,7 @@ export interface ApiHandlerProps<
   TUrlVariablesOutput,
   TUserRoleValue extends readonly UserRoleValue[],
   TPlatform extends Platform = Platform,
+  TScopedTranslationKey extends string = TranslationKey,
 > {
   /** Request data (validated by Zod schema) */
   data: TRequestOutput;
@@ -139,8 +162,8 @@ export interface ApiHandlerProps<
   /** Authenticated user - type inferred from endpoint roles */
   user: InferJwtPayloadTypeFromRoles<TUserRoleValue>;
 
-  /** Server translation function */
-  t: TFunction;
+  /** Scoped translation function - keys inferred from endpoint's scopedTranslation */
+  t: (key: TScopedTranslationKey, params?: TParams) => TranslatedKeyType;
 
   /** Locale */
   locale: CountryLanguage;
@@ -171,12 +194,14 @@ export type ApiHandlerFunction<
   TUrlVariablesOutput,
   TUserRoleValue extends readonly UserRoleValue[],
   TPlatform extends Platform,
+  TScopedTranslationKey extends string = TranslationKey,
 > = (
   props: ApiHandlerProps<
     TRequestOutput,
     TUrlVariablesOutput,
     TUserRoleValue,
-    TPlatform
+    TPlatform,
+    TScopedTranslationKey
   >,
 ) =>
   | Promise<ResponseType<TResponseOutput> | StreamingResponse | FileResponse>
@@ -195,16 +220,28 @@ export interface MethodHandlerConfig<
   TUrlVariablesOutput,
   TUserRoleValue extends readonly UserRoleValue[],
   TPlatform extends Platform = Platform,
+  TScopedTranslationKey extends string = TranslationKey,
 > {
   handler: ApiHandlerFunction<
     TRequestOutput,
     TResponseOutput,
     TUrlVariablesOutput,
     TUserRoleValue,
-    TPlatform
+    TPlatform,
+    TScopedTranslationKey
   >;
-  email?: EmailHandler<TRequestOutput, TResponseOutput, TUrlVariablesOutput>[];
-  sms?: SMSHandler<TRequestOutput, TResponseOutput, TUrlVariablesOutput>[];
+  email?: EmailHandler<
+    TRequestOutput,
+    TResponseOutput,
+    TUrlVariablesOutput,
+    TScopedTranslationKey
+  >[];
+  sms?: SMSHandler<
+    TRequestOutput,
+    TResponseOutput,
+    TUrlVariablesOutput,
+    TScopedTranslationKey
+  >[];
 }
 
 export interface ApiHandlerOptions<
@@ -214,6 +251,7 @@ export interface ApiHandlerOptions<
   TUserRoleValue extends readonly UserRoleValue[],
   TEndpoint extends CreateApiEndpointAny,
   TPlatform extends Platform = Platform,
+  TScopedTranslationKey extends string = TranslationKey,
 > {
   endpoint: TEndpoint;
   handler: ApiHandlerFunction<
@@ -221,14 +259,16 @@ export interface ApiHandlerOptions<
     TResponseOutput,
     TUrlVariablesOutput,
     TUserRoleValue,
-    TPlatform
+    TPlatform,
+    TScopedTranslationKey
   >;
   email?:
     | {
         afterHandlerEmails?: EmailHandler<
           TRequestOutput,
           TResponseOutput,
-          TUrlVariablesOutput
+          TUrlVariablesOutput,
+          TScopedTranslationKey
         >[];
       }
     | undefined;
@@ -236,7 +276,8 @@ export interface ApiHandlerOptions<
     afterHandlerSms?: SMSHandler<
       TRequestOutput,
       TResponseOutput,
-      TUrlVariablesOutput
+      TUrlVariablesOutput,
+      TScopedTranslationKey
     >[];
   };
 }
@@ -281,7 +322,9 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     T["types"]["ResponseOutput"],
     T["types"]["UrlVariablesOutput"],
     T["allowedRoles"],
-    T
+    T,
+    Platform,
+    T["types"]["ScopedTranslationKey"]
   >,
 ): GenericHandlerReturnType<
   T["types"]["RequestOutput"],
@@ -304,7 +347,8 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     | StreamingResponse
     | FileResponse
   > => {
-    const { t } = simpleT(locale);
+    const { t } = endpoint.scopedTranslation.scopedT(locale);
+    const { t: tCredits } = creditsScopedTranslation.scopedT(locale);
 
     // 1. Authenticate user - call authRepository directly if user not provided
     let user: InferJwtPayloadTypeFromRoles<T["allowedRoles"]>;
@@ -320,7 +364,9 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       if (!authUser) {
         return {
           success: false,
-          message: ErrorResponseTypes.UNAUTHORIZED.errorKey,
+          message: sharedScopedTranslation
+            .scopedT(locale)
+            .t("errorTypes.unauthorized"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
           messageParams: { error: "User authentication failed" },
         };
@@ -372,6 +418,8 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
           : { leadId: user.leadId },
         endpoint.credits,
         logger,
+        tCredits,
+        locale,
       );
 
       if (!hasSufficient) {
@@ -382,7 +430,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
         });
         return {
           success: false,
-          message: "app.api.credits.errors.insufficientCredits",
+          message: tCredits("errors.insufficientCredits"),
           errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
           messageParams: { cost: endpoint.credits },
         };
@@ -393,6 +441,8 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
         endpoint.credits,
         t(endpoint.title),
         logger,
+        tCredits,
+        locale,
       );
 
       if (!deductResult.success) {
@@ -403,7 +453,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
         });
         return {
           success: false,
-          message: "app.api.credits.errors.deductionFailed",
+          message: tCredits("errors.deductionFailed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { cost: endpoint.credits },
         };
@@ -442,7 +492,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     // 7. Validate response data using request validator
     const responseValidation = validateResponseData<
       T["types"]["ResponseOutput"]
-    >(result.data, endpoint.responseSchema, logger);
+    >(result.data, endpoint.responseSchema, logger, locale);
 
     if (!responseValidation.success) {
       return responseValidation;
@@ -452,7 +502,8 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       await emailHandlingRepository.handleEmails<
         T["types"]["RequestOutput"],
         T["types"]["ResponseOutput"],
-        T["types"]["UrlVariablesOutput"]
+        T["types"]["UrlVariablesOutput"],
+        T["types"]["ScopedTranslationKey"]
       >(
         {
           email,
@@ -467,7 +518,8 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
         } satisfies EmailHandleRequestOutput<
           T["types"]["RequestOutput"],
           T["types"]["ResponseOutput"],
-          T["types"]["UrlVariablesOutput"]
+          T["types"]["UrlVariablesOutput"],
+          T["types"]["ScopedTranslationKey"]
         >,
         logger,
       );
@@ -477,7 +529,8 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       await handleSms<
         T["types"]["RequestOutput"],
         T["types"]["ResponseOutput"],
-        T["types"]["UrlVariablesOutput"]
+        T["types"]["UrlVariablesOutput"],
+        T["types"]["ScopedTranslationKey"]
       >({
         sms,
         user,

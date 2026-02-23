@@ -80,4 +80,21 @@ export const translations = {
       description: "An internal server error occurred",
     },
   },
+  utils: {
+    parseJsonWithComments: {
+      errors: {
+        invalid_json: "Invalid JSON format",
+      },
+    },
+    time: {
+      errors: {
+        invalid_time_format: {
+          title: "Invalid time format",
+        },
+        invalid_time_range: {
+          title: "Time value out of range",
+        },
+      },
+    },
+  },
 };

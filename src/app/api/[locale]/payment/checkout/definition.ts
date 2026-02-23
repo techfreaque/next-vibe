@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -26,21 +26,23 @@ import {
   PaymentProviderDB,
   PaymentProviderOptions,
 } from "../enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * POST endpoint for creating subscription checkout sessions
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["payment", "checkout"],
-  title: "app.api.subscription.checkout.title" as const,
-  description: "app.api.subscription.checkout.description" as const,
-  category: "app.api.payment.category" as const,
+  title: "title" as const,
+  description: "description" as const,
+  category: "category" as const,
   icon: "credit-card" as const,
   tags: [
-    "app.api.subscription.checkout.tags.subscription" as const,
-    "app.api.subscription.checkout.tags.checkout" as const,
-    "app.api.subscription.checkout.tags.stripe" as const,
+    "tags.subscription" as const,
+    "tags.checkout" as const,
+    "tags.stripe" as const,
   ],
   allowedRoles: [
     UserRole.CUSTOMER,
@@ -49,112 +51,98 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.subscription.checkout.form.title" as const,
-      description: "app.api.subscription.checkout.form.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "form.title" as const,
+    description: "form.description" as const,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // REQUEST FIELDS
-      planId: requestField({
+      planId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label:
-          "app.api.subscription.checkout.form.fields.planId.label" as const,
-        description:
-          "app.api.subscription.checkout.form.fields.planId.description" as const,
-        placeholder:
-          "app.api.subscription.checkout.form.fields.planId.placeholder" as const,
+        label: "form.fields.planId.label" as const,
+        description: "form.fields.planId.description" as const,
+        placeholder: "form.fields.planId.placeholder" as const,
         columns: 6,
         options: [
           {
             value: SubscriptionPlan.SUBSCRIPTION,
-            label: "app.api.subscription.plans.starter.title" as const,
+            label: "plans.starter.title" as const,
           },
         ],
         schema: z.literal(SubscriptionPlan.SUBSCRIPTION),
       }),
 
-      billingInterval: requestField({
+      billingInterval: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label:
-          "app.api.subscription.checkout.form.fields.billingInterval.label" as const,
-        description:
-          "app.api.subscription.checkout.form.fields.billingInterval.description" as const,
-        placeholder:
-          "app.api.subscription.checkout.form.fields.billingInterval.placeholder" as const,
+        label: "form.fields.billingInterval.label" as const,
+        description: "form.fields.billingInterval.description" as const,
+        placeholder: "form.fields.billingInterval.placeholder" as const,
         columns: 6,
         options: [
           {
             value: BillingInterval.MONTHLY,
-            label: "app.api.subscription.billing.monthly" as const,
+            label: "billing.monthly" as const,
           },
           {
             value: BillingInterval.YEARLY,
-            label: "app.api.subscription.billing.yearly" as const,
+            label: "billing.yearly" as const,
           },
         ],
         schema: z.enum(BillingInterval).default(BillingInterval.MONTHLY),
       }),
 
-      provider: requestField({
+      provider: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label:
-          "app.api.subscription.checkout.form.fields.provider.label" as const,
-        description:
-          "app.api.subscription.checkout.form.fields.provider.description" as const,
-        placeholder:
-          "app.api.subscription.checkout.form.fields.provider.placeholder" as const,
+        label: "form.fields.provider.label" as const,
+        description: "form.fields.provider.description" as const,
+        placeholder: "form.fields.provider.placeholder" as const,
         columns: 12,
         options: PaymentProviderOptions,
         schema: z.enum(PaymentProviderDB).default(PaymentProvider.STRIPE),
       }),
 
-      metadata: requestField({
+      metadata: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
-        label:
-          "app.api.subscription.checkout.form.fields.metadata.label" as const,
-        description:
-          "app.api.subscription.checkout.form.fields.metadata.description" as const,
-        placeholder:
-          "app.api.subscription.checkout.form.fields.metadata.placeholder" as const,
+        label: "form.fields.metadata.label" as const,
+        description: "form.fields.metadata.description" as const,
+        placeholder: "form.fields.metadata.placeholder" as const,
         columns: 12,
         schema: z.record(z.string(), z.string()).optional(),
       }),
 
       // RESPONSE FIELDS
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.checkout.response.success" as const,
+        content: "response.success" as const,
         schema: z.boolean(),
       }),
 
-      sessionId: responseField({
+      sessionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.checkout.response.sessionId" as const,
+        content: "response.sessionId" as const,
         schema: z.string(),
       }),
 
-      checkoutUrl: responseField({
+      checkoutUrl: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.checkout.response.checkoutUrl" as const,
+        content: "response.checkoutUrl" as const,
         schema: z.string().url(),
       }),
 
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.checkout.response.message" as const,
+        content: "response.message" as const,
         schema: z.string().optional(),
       }),
     },
-  ),
+  }),
 
   examples: {
     requests: {
@@ -197,56 +185,46 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.subscription.checkout.errors.validation.title" as const,
-      description:
-        "app.api.subscription.checkout.errors.validation.description" as const,
+      title: "errors.validation.title" as const,
+      description: "errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.subscription.checkout.errors.network.title" as const,
-      description:
-        "app.api.subscription.checkout.errors.network.description" as const,
+      title: "errors.network.title" as const,
+      description: "errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.subscription.checkout.errors.unauthorized.title" as const,
-      description:
-        "app.api.subscription.checkout.errors.unauthorized.description" as const,
+      title: "errors.unauthorized.title" as const,
+      description: "errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.subscription.checkout.errors.forbidden.title" as const,
-      description:
-        "app.api.subscription.checkout.errors.forbidden.description" as const,
+      title: "errors.forbidden.title" as const,
+      description: "errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.subscription.checkout.errors.notFound.title" as const,
-      description:
-        "app.api.subscription.checkout.errors.notFound.description" as const,
+      title: "errors.notFound.title" as const,
+      description: "errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.subscription.checkout.errors.serverError.title" as const,
-      description:
-        "app.api.subscription.checkout.errors.serverError.description" as const,
+      title: "errors.serverError.title" as const,
+      description: "errors.serverError.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.subscription.checkout.errors.unknown.title" as const,
-      description:
-        "app.api.subscription.checkout.errors.unknown.description" as const,
+      title: "errors.unknown.title" as const,
+      description: "errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.subscription.checkout.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.subscription.checkout.errors.unsavedChanges.description" as const,
+      title: "errors.unsavedChanges.title" as const,
+      description: "errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.subscription.checkout.errors.conflict.title" as const,
-      description:
-        "app.api.subscription.checkout.errors.conflict.description" as const,
+      title: "errors.conflict.title" as const,
+      description: "errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.subscription.checkout.success.title" as const,
-    description: "app.api.subscription.checkout.success.description" as const,
+    title: "success.title" as const,
+    description: "success.description" as const,
   },
 });
 

@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,16 +20,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["browser", "navigate-page"],
-  title: "app.api.browser.navigate-page.title",
-  description: "app.api.browser.navigate-page.description",
-  category: "app.api.browser.category",
+  title: "navigate-page.title",
+  description: "navigate-page.description",
+  category: "navigate-page.category",
   icon: "navigation",
   tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.navigationAutomation",
+    "navigate-page.tags.browserAutomation",
+    "navigate-page.tags.navigationAutomation",
   ],
 
   allowedRoles: [
@@ -40,44 +43,36 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.browser.navigate-page.form.label",
-      description: "app.api.browser.navigate-page.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      type: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "navigate-page.form.label",
+    description: "navigate-page.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      type: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.browser.navigate-page.form.fields.type.label",
-        description:
-          "app.api.browser.navigate-page.form.fields.type.description",
-        placeholder:
-          "app.api.browser.navigate-page.form.fields.type.placeholder",
+        label: "navigate-page.form.fields.type.label",
+        description: "navigate-page.form.fields.type.description",
+        placeholder: "navigate-page.form.fields.type.placeholder",
         columns: 6,
         options: [
           {
-            label:
-              "app.api.browser.navigate-page.form.fields.type.options.url" as const,
+            label: "navigate-page.form.fields.type.options.url" as const,
             value: "url",
           },
           {
-            label:
-              "app.api.browser.navigate-page.form.fields.type.options.back" as const,
+            label: "navigate-page.form.fields.type.options.back" as const,
             value: "back",
           },
           {
-            label:
-              "app.api.browser.navigate-page.form.fields.type.options.forward" as const,
+            label: "navigate-page.form.fields.type.options.forward" as const,
             value: "forward",
           },
           {
-            label:
-              "app.api.browser.navigate-page.form.fields.type.options.reload" as const,
+            label: "navigate-page.form.fields.type.options.reload" as const,
             value: "reload",
           },
         ],
@@ -88,39 +83,33 @@ const { POST } = createEndpoint({
             "Navigate the page by URL, back or forward in history, or reload.",
           ),
       }),
-      url: requestField({
+      url: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.browser.navigate-page.form.fields.url.label",
-        description:
-          "app.api.browser.navigate-page.form.fields.url.description",
-        placeholder:
-          "app.api.browser.navigate-page.form.fields.url.placeholder",
+        label: "navigate-page.form.fields.url.label",
+        description: "navigate-page.form.fields.url.description",
+        placeholder: "navigate-page.form.fields.url.placeholder",
         columns: 6,
         schema: z.string().optional().describe("Target URL (only type=url)"),
       }),
-      ignoreCache: requestField({
+      ignoreCache: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.browser.navigate-page.form.fields.ignoreCache.label",
-        description:
-          "app.api.browser.navigate-page.form.fields.ignoreCache.description",
-        placeholder:
-          "app.api.browser.navigate-page.form.fields.ignoreCache.placeholder",
+        label: "navigate-page.form.fields.ignoreCache.label",
+        description: "navigate-page.form.fields.ignoreCache.description",
+        placeholder: "navigate-page.form.fields.ignoreCache.placeholder",
         columns: 6,
         schema: z
           .boolean()
           .optional()
           .describe("Whether to ignore cache on reload."),
       }),
-      timeout: requestField({
+      timeout: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.browser.navigate-page.form.fields.timeout.label",
-        description:
-          "app.api.browser.navigate-page.form.fields.timeout.description",
-        placeholder:
-          "app.api.browser.navigate-page.form.fields.timeout.placeholder",
+        label: "navigate-page.form.fields.timeout.label",
+        description: "navigate-page.form.fields.timeout.description",
+        placeholder: "navigate-page.form.fields.timeout.placeholder",
         columns: 6,
         schema: z
           .number()
@@ -131,16 +120,16 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.navigate-page.response.success",
+        content: "navigate-page.response.success",
         schema: z
           .boolean()
           .describe("Whether the navigation operation succeeded"),
       }),
-      result: responseField({
+      result: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.navigate-page.response.result",
+        content: "navigate-page.response.result",
         schema: z
           .object({
             navigated: z.boolean().describe("Whether the page was navigated"),
@@ -156,24 +145,24 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Result of the navigation"),
       }),
-      error: responseField({
+      error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.navigate-page.response.error",
+        content: "navigate-page.response.error",
         schema: z
           .string()
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: responseField({
+      executionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.navigate-page.response.executionId",
+        content: "navigate-page.response.executionId",
         schema: z
           .string()
           .optional()
           .describe("Unique identifier for this execution"),
       }),
     },
-  ),
+  }),
   examples: {
     requests: {
       default: { type: "url", url: "https://example.com" },
@@ -192,49 +181,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.browser.navigate-page.errors.validation.title",
-      description:
-        "app.api.browser.navigate-page.errors.validation.description",
+      title: "navigate-page.errors.validation.title",
+      description: "navigate-page.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.browser.navigate-page.errors.network.title",
-      description: "app.api.browser.navigate-page.errors.network.description",
+      title: "navigate-page.errors.network.title",
+      description: "navigate-page.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.browser.navigate-page.errors.unauthorized.title",
-      description:
-        "app.api.browser.navigate-page.errors.unauthorized.description",
+      title: "navigate-page.errors.unauthorized.title",
+      description: "navigate-page.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.browser.navigate-page.errors.forbidden.title",
-      description: "app.api.browser.navigate-page.errors.forbidden.description",
+      title: "navigate-page.errors.forbidden.title",
+      description: "navigate-page.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.browser.navigate-page.errors.notFound.title",
-      description: "app.api.browser.navigate-page.errors.notFound.description",
+      title: "navigate-page.errors.notFound.title",
+      description: "navigate-page.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.browser.navigate-page.errors.serverError.title",
-      description:
-        "app.api.browser.navigate-page.errors.serverError.description",
+      title: "navigate-page.errors.serverError.title",
+      description: "navigate-page.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.browser.navigate-page.errors.unknown.title",
-      description: "app.api.browser.navigate-page.errors.unknown.description",
+      title: "navigate-page.errors.unknown.title",
+      description: "navigate-page.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.browser.navigate-page.errors.unsavedChanges.title",
-      description:
-        "app.api.browser.navigate-page.errors.unsavedChanges.description",
+      title: "navigate-page.errors.unsavedChanges.title",
+      description: "navigate-page.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.browser.navigate-page.errors.conflict.title",
-      description: "app.api.browser.navigate-page.errors.conflict.description",
+      title: "navigate-page.errors.conflict.title",
+      description: "navigate-page.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.browser.navigate-page.success.title",
-    description: "app.api.browser.navigate-page.success.description",
+    title: "navigate-page.success.title",
+    description: "navigate-page.success.description",
   },
 });
 

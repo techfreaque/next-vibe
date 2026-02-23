@@ -9,10 +9,10 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   backButton,
   customWidgetObject,
-  objectField,
-  responseArrayField,
-  responseField,
-  widgetField,
+  scopedObjectFieldNew,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
+  scopedWidgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -46,6 +46,7 @@ import {
   leadsSortingOptionsContainer,
   leadsStatusFiltersContainer,
 } from "../shared-filter-fields";
+import { scopedTranslation } from "./i18n";
 import { LeadsListContainer } from "./widget";
 
 /**
@@ -53,26 +54,24 @@ import { LeadsListContainer } from "./widget";
  * Retrieves a paginated list of leads with filtering
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["leads", "list"],
   allowedRoles: [UserRole.ADMIN],
 
-  title: "app.api.leads.list.get.title" as const,
-  description: "app.api.leads.list.get.description" as const,
-  category: "app.api.leads.category" as const,
-  tags: [
-    "app.api.leads.tags.leads" as const,
-    "app.api.leads.tags.management" as const,
-  ],
+  title: "get.title",
+  description: "get.description",
+  category: "category",
+  tags: ["tags.leads", "tags.management"],
   icon: "list",
 
   fields: customWidgetObject({
     render: LeadsListContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      title: widgetField({
+      title: scopedWidgetField(scopedTranslation, {
         type: WidgetType.TITLE,
-        content: "app.api.leads.list.get.title" as const,
+        content: "get.title",
         getCount: (responseData: {
           data?: { paginationInfo?: { total?: number } };
         }) => responseData?.data?.paginationInfo?.total,
@@ -86,10 +85,10 @@ const { GET } = createEndpoint({
         inline: true,
       }),
 
-      submitButton: widgetField({
+      submitButton: scopedWidgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
-        text: "app.api.leads.list.get.actions.refresh" as const,
-        loadingText: "app.api.leads.list.get.actions.refreshing" as const,
+        text: "get.actions.refresh",
+        loadingText: "get.actions.refreshing",
         icon: "refresh-cw",
         variant: "ghost",
         size: "sm",
@@ -98,7 +97,7 @@ const { GET } = createEndpoint({
       }),
 
       // Separator between buttons and content
-      separator: widgetField({
+      separator: scopedWidgetField(scopedTranslation, {
         type: WidgetType.SEPARATOR,
         spacingTop: SpacingSize.RELAXED,
         spacingBottom: SpacingSize.RELAXED,
@@ -115,166 +114,158 @@ const { GET } = createEndpoint({
       sortingOptions: leadsSortingOptionsContainer,
 
       // === FORM ALERT (shows validation and API errors) ===
-      formAlert: widgetField({
+      formAlert: scopedWidgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
         order: 3.5,
         usage: { request: "data" },
       }),
 
       // === RESPONSE FIELDS ===
-      response: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.leads.list.get.response.title" as const,
-          description: "app.api.leads.list.get.response.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-          order: 4,
-        },
-        { response: true },
-        {
-          leads: responseArrayField(
-            {
+      response: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.title",
+        description: "get.response.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        order: 4,
+        usage: { response: true },
+        children: {
+          leads: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            columns: 12,
+            child: scopedObjectFieldNew(scopedTranslation, {
               type: WidgetType.CONTAINER,
+              layoutType: LayoutType.GRID,
               columns: 12,
-            },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                layoutType: LayoutType.GRID,
-                columns: 12,
-              },
-              { response: true },
-              {
-                email: responseField({
+              usage: { response: true },
+              children: {
+                email: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.string().nullable(),
                 }),
-                businessName: responseField({
+                businessName: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.string(),
                 }),
-                contactName: responseField({
+                contactName: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.string().nullable(),
                 }),
-                country: responseField({
+                country: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  label:
-                    "app.api.leads.list.get.response.leads.country" as const,
+                  label: "get.response.leads.country",
                   enumOptions: CountriesOptions,
                   schema: z.enum(Countries),
                 }),
-                language: responseField({
+                language: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  label:
-                    "app.api.leads.list.get.response.leads.language" as const,
+                  label: "get.response.leads.language",
                   enumOptions: LanguagesOptions,
                   schema: z.enum(Languages),
                 }),
-                status: responseField({
+                status: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  label:
-                    "app.api.leads.list.get.response.leads.status" as const,
+                  label: "get.response.leads.status",
                   enumOptions: LeadStatusOptions,
                   schema: z.enum(LeadStatus),
                 }),
-                source: responseField({
+                source: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  label:
-                    "app.api.leads.list.get.response.leads.source" as const,
+                  label: "get.response.leads.source",
                   enumOptions: LeadSourceOptions,
                   schema: z.enum(LeadSource).nullable(),
                 }),
-                currentCampaignStage: responseField({
+                currentCampaignStage: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  label:
-                    "app.api.leads.list.get.response.leads.currentCampaignStage" as const,
+                  label: "get.response.leads.currentCampaignStage",
                   enumOptions: EmailCampaignStageOptions,
                   schema: z.enum(EmailCampaignStage).nullable(),
                 }),
-                createdAt: responseField({
+                createdAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
                   schema: z.coerce.date(),
                 }),
-                phone: responseField({
+                phone: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.string().nullable(),
                 }),
-                website: responseField({
+                website: scopedResponseField(scopedTranslation, {
                   type: WidgetType.LINK,
                   schema: z.string().nullable(),
                 }),
-                notes: responseField({
+                notes: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.string().nullable(),
                 }),
-                convertedUserId: responseField({
+                convertedUserId: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.string().nullable(),
                 }),
-                convertedAt: responseField({
+                convertedAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
                   schema: z.coerce.date().nullable(),
                 }),
-                signedUpAt: responseField({
+                signedUpAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
                   schema: z.coerce.date().nullable(),
                 }),
-                subscriptionConfirmedAt: responseField({
-                  type: WidgetType.TEXT,
-                  fieldType: FieldDataType.DATETIME,
-                  schema: z.coerce.date().nullable(),
-                }),
-                emailsSent: responseField({
+                subscriptionConfirmedAt: scopedResponseField(
+                  scopedTranslation,
+                  {
+                    type: WidgetType.TEXT,
+                    fieldType: FieldDataType.DATETIME,
+                    schema: z.coerce.date().nullable(),
+                  },
+                ),
+                emailsSent: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.coerce.number(),
                 }),
-                lastEmailSentAt: responseField({
+                lastEmailSentAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
                   schema: z.coerce.date().nullable(),
                 }),
-                unsubscribedAt: responseField({
+                unsubscribedAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
                   schema: z.coerce.date().nullable(),
                 }),
-                emailsOpened: responseField({
+                emailsOpened: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.coerce.number(),
                 }),
-                emailsClicked: responseField({
+                emailsClicked: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.coerce.number(),
                 }),
-                lastEngagementAt: responseField({
+                lastEngagementAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
                   schema: z.coerce.date().nullable(),
                 }),
-                metadata: responseField({
+                metadata: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.record(z.string(), z.any()),
                 }),
-                updatedAt: responseField({
+                updatedAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
                   schema: z.coerce.date(),
                 }),
-                id: responseField({
+                id: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   hidden: true,
                   schema: z.string(),
                 }),
               },
-            ),
-          ),
+            }),
+          }),
         },
-      ),
+      }),
 
       // === PAGINATION INFO (Editable controls + display in one row) ===
       paginationInfo: paginationField({
@@ -285,52 +276,46 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.leads.list.get.errors.unauthorized.title" as const,
-      description:
-        "app.api.leads.list.get.errors.unauthorized.description" as const,
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.leads.list.get.errors.validation.title" as const,
-      description:
-        "app.api.leads.list.get.errors.validation.description" as const,
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.leads.list.get.errors.server.title" as const,
-      description: "app.api.leads.list.get.errors.server.description" as const,
+      title: "get.errors.server.title",
+      description: "get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.leads.list.get.errors.unknown.title" as const,
-      description: "app.api.leads.list.get.errors.unknown.description" as const,
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.leads.list.get.errors.network.title" as const,
-      description: "app.api.leads.list.get.errors.network.description" as const,
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.leads.list.get.errors.forbidden.title" as const,
-      description:
-        "app.api.leads.list.get.errors.forbidden.description" as const,
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.leads.list.get.errors.notFound.title" as const,
-      description:
-        "app.api.leads.list.get.errors.notFound.description" as const,
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.leads.list.get.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.leads.list.get.errors.unsavedChanges.description" as const,
+      title: "get.errors.unsavedChanges.title",
+      description: "get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.leads.list.get.errors.conflict.title" as const,
-      description:
-        "app.api.leads.list.get.errors.conflict.description" as const,
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.leads.list.get.success.title" as const,
-    description: "app.api.leads.list.get.success.description" as const,
+    title: "get.success.title",
+    description: "get.success.description",
   },
   examples: {
     requests: {

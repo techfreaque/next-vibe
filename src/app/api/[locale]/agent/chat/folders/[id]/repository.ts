@@ -14,7 +14,6 @@ import {
   canUpdateFolder,
   canViewFolder,
 } from "@/app/api/[locale]/agent/chat/permissions/permissions";
-import { validateNoCircularReference } from "@/app/api/[locale]/agent/chat/validation";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -26,6 +25,7 @@ import type {
   FolderUpdateRequestOutput,
   FolderUpdateResponseOutput,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Folder Repository - Static class pattern
@@ -39,9 +39,9 @@ export class FolderRepository {
     user: JwtPayloadType,
     data: { id: string },
     logger: EndpointLogger,
-    // oxlint-disable-next-line no-unused-vars
     locale: CountryLanguage,
   ): Promise<ResponseType<FolderGetResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const [folder] = await db
         .select()
@@ -51,15 +51,15 @@ export class FolderRepository {
 
       if (!folder) {
         return fail({
-          message: "app.api.agent.chat.folders.id.get.errors.notFound.title",
+          message: t("get.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       // Check if user can read this folder
-      if (!(await canViewFolder(user, folder, logger))) {
+      if (!(await canViewFolder(user, folder, logger, locale))) {
         return fail({
-          message: "app.api.agent.chat.folders.id.get.errors.forbidden.title",
+          message: t("get.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -88,7 +88,7 @@ export class FolderRepository {
       });
     } catch {
       return fail({
-        message: "app.api.agent.chat.folders.id.get.errors.server.title",
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -101,7 +101,9 @@ export class FolderRepository {
     user: JwtPayloadType,
     data: FolderUpdateRequestOutput & { id: string },
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<FolderUpdateResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const { id, updates } = data;
 
@@ -114,28 +116,25 @@ export class FolderRepository {
 
       if (!existingFolder) {
         return fail({
-          message: "app.api.agent.chat.folders.id.patch.errors.notFound.title",
+          message: t("patch.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       // Check if user can update this folder (moderators can rename)
-      if (!(await canUpdateFolder(user, existingFolder, logger))) {
+      if (!(await canUpdateFolder(user, existingFolder, logger, locale))) {
         return fail({
-          message: "app.api.agent.chat.folders.id.patch.errors.forbidden.title",
+          message: t("patch.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
 
       // Prevent circular parent references
-      const circularError = validateNoCircularReference(
-        id,
-        updates.parentId,
-        "app.api.agent.chat.folders.id.patch.errors.validation.title" as const,
-        "app.api.agent.chat.folders.id.patch.errors.validation.circularReference" as const,
-      );
-      if (circularError) {
-        return circularError;
+      if (updates.parentId === id) {
+        return fail({
+          message: t("patch.errors.validation.circularReference"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
       }
 
       // Update the folder
@@ -195,7 +194,7 @@ export class FolderRepository {
 
       if (!updatedFolder) {
         return fail({
-          message: "app.api.agent.chat.folders.id.patch.errors.server.title",
+          message: t("patch.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -224,7 +223,7 @@ export class FolderRepository {
       });
     } catch {
       return fail({
-        message: "app.api.agent.chat.folders.id.patch.errors.server.title",
+        message: t("patch.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -237,7 +236,9 @@ export class FolderRepository {
     user: JwtPayloadType,
     data: { id: string },
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<FolderDeleteResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const { id } = data;
 
@@ -250,7 +251,7 @@ export class FolderRepository {
 
       if (!existingFolder) {
         return fail({
-          message: "app.api.agent.chat.folders.id.delete.errors.notFound.title",
+          message: t("delete.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -266,10 +267,17 @@ export class FolderRepository {
       );
 
       // Check if user can delete this folder
-      if (!(await canDeleteFolder(user, existingFolder, logger, foldersMap))) {
+      if (
+        !(await canDeleteFolder(
+          user,
+          existingFolder,
+          logger,
+          locale,
+          foldersMap,
+        ))
+      ) {
         return fail({
-          message:
-            "app.api.agent.chat.folders.id.delete.errors.forbidden.title",
+          message: t("delete.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -285,7 +293,7 @@ export class FolderRepository {
       });
     } catch {
       return fail({
-        message: "app.api.agent.chat.folders.id.delete.errors.server.title",
+        message: t("delete.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

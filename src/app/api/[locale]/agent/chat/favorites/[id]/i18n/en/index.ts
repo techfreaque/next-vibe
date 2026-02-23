@@ -1,4 +1,9 @@
 export const translations = {
+  category: "Chat",
+  tags: {
+    favorites: "Favorites",
+  },
+
   get: {
     title: "Get Favorite",
     description: "Retrieve a specific favorite configuration",

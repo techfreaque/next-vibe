@@ -14,7 +14,8 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
-import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
+import { PROVIDER_SETUP_INSTRUCTIONS } from "@/app/api/[locale]/agent/env-availability";
+import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
@@ -30,6 +31,9 @@ import type {
   TextToSpeechPostResponseOutput,
 } from "./definition";
 import { TtsVoice } from "./enum";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Eden AI TTS response structure
@@ -82,6 +86,7 @@ export class TextToSpeechRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<TextToSpeechPostResponseOutput>> {
     // Server-side configuration
     const provider = "openai";
@@ -98,12 +103,14 @@ export class TextToSpeechRepository {
 
     // Check API key - show setup instructions in LOCAL_MODE
     if (!agentEnv.EDEN_AI_API_KEY) {
-      logger.warn("Eden AI API key not configured (voice/TTS unavailable)");
+      const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.voice;
       return fail({
-        message: buildMissingKeyMessage("voice"),
+        message: t("post.errors.notConfigured", { label, envKey, url }),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
+
+    const tCredits = creditsScopedTranslation.scopedT(locale).t;
 
     // Check minimum balance upfront (cost of ~50 characters)
     const balanceResult = await CreditRepository.getBalance(
@@ -113,6 +120,8 @@ export class TextToSpeechRepository {
           ? { userId: user.id, leadId: user.leadId }
           : { leadId: user.leadId! },
       logger,
+      tCredits,
+      locale,
     );
 
     if (!balanceResult.success) {
@@ -120,7 +129,7 @@ export class TextToSpeechRepository {
         error: balanceResult.message,
       });
       return fail({
-        message: "app.api.agent.textToSpeech.post.errors.balanceCheckFailed",
+        message: t("post.errors.balanceCheckFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -131,7 +140,7 @@ export class TextToSpeechRepository {
         minimum: TTS_MINIMUM_BALANCE,
       });
       return fail({
-        message: "app.api.agent.textToSpeech.post.errors.insufficientCredits",
+        message: t("post.errors.insufficientCredits"),
         errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
         messageParams: {
           balance: balanceResult.data.total.toString(),
@@ -184,7 +193,7 @@ export class TextToSpeechRepository {
           error: errorText,
         });
         return fail({
-          message: "app.api.agent.textToSpeech.post.errors.conversionFailed",
+          message: t("post.errors.conversionFailed"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           messageParams: {
             error: errorText,
@@ -210,7 +219,7 @@ export class TextToSpeechRepository {
           errorType: providerResult.error?.type,
         });
         return fail({
-          message: "app.api.agent.textToSpeech.post.errors.providerError",
+          message: t("post.errors.providerError"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           messageParams: {
             error: errorMessage,
@@ -226,7 +235,7 @@ export class TextToSpeechRepository {
           responseKeys: Object.keys(responseData),
         });
         return fail({
-          message: "app.api.agent.textToSpeech.post.errors.noAudioUrl",
+          message: t("post.errors.noAudioUrl"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
@@ -241,7 +250,7 @@ export class TextToSpeechRepository {
           audioUrl: audioResourceUrl,
         });
         return fail({
-          message: "app.api.agent.textToSpeech.post.errors.audioFetchFailed",
+          message: t("post.errors.audioFetchFailed"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
@@ -276,6 +285,7 @@ export class TextToSpeechRepository {
         creditsNeeded,
         logger,
         locale,
+        tCredits,
       );
 
       if (!deductResult.success) {
@@ -284,7 +294,7 @@ export class TextToSpeechRepository {
           characterCount,
         });
         return fail({
-          message: "app.api.agent.textToSpeech.post.errors.creditsFailed",
+          message: t("post.errors.creditsFailed"),
           errorType: ErrorResponseTypes.PAYMENT_ERROR,
         });
       }
@@ -311,7 +321,7 @@ export class TextToSpeechRepository {
       });
 
       return fail({
-        message: "app.api.agent.textToSpeech.post.errors.conversionFailed",
+        message: t("post.errors.conversionFailed"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: {
           error: errorMessage,

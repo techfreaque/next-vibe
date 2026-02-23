@@ -8,10 +8,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  objectOptionalField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedObjectOptionalField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -22,15 +22,17 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../user/user-roles/enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Database Utils Endpoint Definition
  */
 const { GET } = createEndpoint({
-  title: "app.api.system.db.utils.title",
-  description: "app.api.system.db.utils.description",
-  category: "app.api.system.category",
-  tags: ["app.api.system.db.utils.tag"],
+  scopedTranslation,
+  title: "title",
+  description: "description",
+  category: "category",
+  tags: ["tag"],
   icon: "database",
   allowedRoles: [
     UserRole.ADMIN,
@@ -72,154 +74,148 @@ const { GET } = createEndpoint({
     },
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.db.utils.title",
-      description: "app.api.system.db.utils.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "title",
+    description: "description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      includeDetails: requestField({
+      includeDetails: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.db.utils.includeDetails.title",
-        description: "app.api.system.db.utils.includeDetails.description",
+        label: "includeDetails.title",
+        description: "includeDetails.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
-      checkConnections: requestField({
+      checkConnections: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.db.utils.checkConnections.title",
-        description: "app.api.system.db.utils.checkConnections.description",
+        label: "checkConnections.title",
+        description: "checkConnections.description",
         columns: 6,
         schema: z.boolean().default(true),
       }),
 
       // === RESPONSE FIELDS ===
-      status: responseField({
+      status: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.utils.status.title",
+        content: "status.title",
         schema: z.enum(["healthy", "degraded", "unhealthy"]),
       }),
 
-      timestamp: responseField({
+      timestamp: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.utils.timestamp.title",
+        content: "timestamp.title",
         schema: z.string(),
       }),
 
-      connections: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.system.db.utils.connections.title",
-          layoutType: LayoutType.GRID,
-          columns: 2,
-        },
-        { response: true },
-        {
-          primary: responseField({
+      connections: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "connections.title",
+        layoutType: LayoutType.GRID,
+        columns: 2,
+        usage: { response: true },
+        children: {
+          primary: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.system.db.utils.connections.primary",
+            content: "connections.primary",
             fieldType: FieldDataType.BOOLEAN,
             schema: z.boolean(),
           }),
-          replica: responseField({
+          replica: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.system.db.utils.connections.replica",
+            content: "connections.replica",
             fieldType: FieldDataType.BOOLEAN,
             schema: z.boolean().optional(),
           }),
         },
-      ),
+      }),
 
-      details: objectOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.system.db.utils.details.title",
-          layoutType: LayoutType.GRID,
-          columns: 2,
-        },
-        { response: true },
-        {
-          version: responseField({
+      details: scopedObjectOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "details.title",
+        layoutType: LayoutType.GRID,
+        columns: 2,
+        usage: { response: true },
+        children: {
+          version: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.system.db.utils.details.version",
+            content: "details.version",
             fieldType: FieldDataType.TEXT,
             schema: z.string().optional(),
           }),
-          uptime: responseField({
+          uptime: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.system.db.utils.details.uptime",
+            content: "details.uptime",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number().optional(),
           }),
-          activeConnections: responseField({
+          activeConnections: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.system.db.utils.details.activeConnections",
+            content: "details.activeConnections",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number().optional(),
           }),
-          maxConnections: responseField({
+          maxConnections: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.system.db.utils.details.maxConnections",
+            content: "details.maxConnections",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number().optional(),
           }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.db.utils.errors.validation.title",
-      description: "app.api.system.db.utils.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.db.utils.errors.unauthorized.title",
-      description: "app.api.system.db.utils.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.db.utils.errors.unauthorized.title",
-      description: "app.api.system.db.utils.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.db.utils.errors.internal.title",
-      description: "app.api.system.db.utils.errors.internal.description",
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.db.utils.errors.internal.title",
-      description: "app.api.system.db.utils.errors.internal.description",
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.db.utils.errors.internal.title",
-      description: "app.api.system.db.utils.errors.internal.description",
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.db.utils.errors.internal.title",
-      description: "app.api.system.db.utils.errors.internal.description",
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.db.utils.errors.internal.title",
-      description: "app.api.system.db.utils.errors.internal.description",
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.db.utils.errors.internal.title",
-      description: "app.api.system.db.utils.errors.internal.description",
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.system.db.utils.success.title",
-    description: "app.api.system.db.utils.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 });
 

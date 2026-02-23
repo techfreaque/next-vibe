@@ -7,6 +7,7 @@ import { SessionWriteRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger }) => SessionWriteRepository.write(data, logger),
+    handler: ({ data, logger, t }) =>
+      SessionWriteRepository.write(data, logger, t),
   },
 });

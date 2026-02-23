@@ -14,7 +14,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: resizePageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger }) =>
+    handler: ({ data, t, logger }) =>
       executeResizePage<ResizePageResponseOutput>(
         {
           toolName: "resize-page",
@@ -23,6 +23,7 @@ export const { POST, tools } = endpointsHandler({
             height: data.height,
           }),
         },
+        t,
         logger,
       ),
   },

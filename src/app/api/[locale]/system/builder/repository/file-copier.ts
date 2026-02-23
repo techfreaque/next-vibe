@@ -7,7 +7,10 @@ import { existsSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { TFunction } from "@/i18n/core/static-types";
+
+import type { scopedTranslation } from "../i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 import type { CopyConfig } from "../definition";
 import { ROOT_DIR } from "./constants";
@@ -26,7 +29,7 @@ export interface IFileCopier {
     output: string[],
     filesCopied: string[],
     logger: EndpointLogger,
-    t: TFunction,
+    t: ModuleT,
     dryRun?: boolean,
   ): Promise<void>;
 
@@ -46,13 +49,11 @@ export class FileCopier implements IFileCopier {
     output: string[],
     filesCopied: string[],
     logger: EndpointLogger,
-    t: TFunction,
+    t: ModuleT,
     dryRun?: boolean,
   ): Promise<void> {
     output.push(
-      outputFormatter.formatSection(
-        t("app.api.system.builder.messages.copyingAdditionalFiles"),
-      ),
+      outputFormatter.formatSection(t("messages.copyingAdditionalFiles")),
     );
     logger.info("Copying files", { count: filesToCopy.length });
 

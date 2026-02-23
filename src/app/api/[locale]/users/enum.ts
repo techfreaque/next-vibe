@@ -1,5 +1,7 @@
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * User Sort Fields Enum
  */
@@ -7,12 +9,12 @@ export const {
   enum: UserSortField,
   options: UserSortFieldOptions,
   Value: UserSortFieldValue,
-} = createEnumOptions({
-  CREATED_AT: "app.api.users.list.enums.userSortField.createdAt",
-  UPDATED_AT: "app.api.users.list.enums.userSortField.updatedAt",
-  EMAIL: "app.api.users.list.enums.userSortField.email",
-  PRIVATE_NAME: "app.api.users.list.enums.userSortField.privateName",
-  PUBLIC_NAME: "app.api.users.list.enums.userSortField.publicName",
+} = createEnumOptions(scopedTranslation, {
+  CREATED_AT: "list.enums.userSortField.createdAt",
+  UPDATED_AT: "list.enums.userSortField.updatedAt",
+  EMAIL: "list.enums.userSortField.email",
+  PRIVATE_NAME: "list.enums.userSortField.privateName",
+  PUBLIC_NAME: "list.enums.userSortField.publicName",
 });
 export const UserSortFieldDB = [
   UserSortField.CREATED_AT,
@@ -29,9 +31,9 @@ export const {
   enum: SortOrder,
   options: SortOrderOptions,
   Value: SortOrderValue,
-} = createEnumOptions({
-  ASC: "app.api.users.list.enums.sortOrder.asc",
-  DESC: "app.api.users.list.enums.sortOrder.desc",
+} = createEnumOptions(scopedTranslation, {
+  ASC: "list.enums.sortOrder.asc",
+  DESC: "list.enums.sortOrder.desc",
 });
 export const SortOrderDB = [SortOrder.ASC, SortOrder.DESC] as const;
 
@@ -42,14 +44,14 @@ export const {
   enum: UserStatusFilter,
   options: UserStatusFilterOptions,
   Value: UserStatusFilterValue,
-} = createEnumOptions({
-  ALL: "app.api.users.list.enums.userStatusFilter.all",
-  ACTIVE: "app.api.users.list.enums.userStatusFilter.active",
-  INACTIVE: "app.api.users.list.enums.userStatusFilter.inactive",
-  PENDING: "app.api.users.list.enums.userStatusFilter.pending",
-  SUSPENDED: "app.api.users.list.enums.userStatusFilter.suspended",
-  EMAIL_VERIFIED: "app.api.users.list.enums.userStatusFilter.emailVerified",
-  EMAIL_UNVERIFIED: "app.api.users.list.enums.userStatusFilter.emailUnverified",
+} = createEnumOptions(scopedTranslation, {
+  ALL: "list.enums.userStatusFilter.all",
+  ACTIVE: "list.enums.userStatusFilter.active",
+  INACTIVE: "list.enums.userStatusFilter.inactive",
+  PENDING: "list.enums.userStatusFilter.pending",
+  SUSPENDED: "list.enums.userStatusFilter.suspended",
+  EMAIL_VERIFIED: "list.enums.userStatusFilter.emailVerified",
+  EMAIL_UNVERIFIED: "list.enums.userStatusFilter.emailUnverified",
 });
 export const UserStatusFilterDB = [
   UserStatusFilter.ALL,
@@ -68,11 +70,11 @@ export const {
   enum: UserStatus,
   options: UserStatusOptions,
   Value: UserStatusValue,
-} = createEnumOptions({
-  ACTIVE: "app.api.users.list.enums.userStatus.active",
-  INACTIVE: "app.api.users.list.enums.userStatus.inactive",
-  PENDING: "app.api.users.list.enums.userStatus.pending",
-  SUSPENDED: "app.api.users.list.enums.userStatus.suspended",
+} = createEnumOptions(scopedTranslation, {
+  ACTIVE: "list.enums.userStatus.active",
+  INACTIVE: "list.enums.userStatus.inactive",
+  PENDING: "list.enums.userStatus.pending",
+  SUSPENDED: "list.enums.userStatus.suspended",
 });
 export const UserStatusDB = [
   UserStatus.ACTIVE,
@@ -88,16 +90,16 @@ export const {
   enum: UserRoleFilter,
   Value: UserRoleFilterValue,
   options: UserRoleFilterOptions,
-} = createEnumOptions({
-  ALL: "app.api.users.list.enums.userRoleFilter.all",
-  USER: "app.api.users.list.enums.userRoleFilter.user",
-  PUBLIC: "app.api.users.list.enums.userRoleFilter.public",
-  CUSTOMER: "app.api.users.list.enums.userRoleFilter.customer",
-  MODERATOR: "app.api.users.list.enums.userRoleFilter.moderator",
-  PARTNER_ADMIN: "app.api.users.list.enums.userRoleFilter.partnerAdmin",
-  PARTNER_EMPLOYEE: "app.api.users.list.enums.userRoleFilter.partnerEmployee",
-  ADMIN: "app.api.users.list.enums.userRoleFilter.admin",
-  SUPER_ADMIN: "app.api.users.list.enums.userRoleFilter.superAdmin",
+} = createEnumOptions(scopedTranslation, {
+  ALL: "list.enums.userRoleFilter.all",
+  USER: "list.enums.userRoleFilter.user",
+  PUBLIC: "list.enums.userRoleFilter.public",
+  CUSTOMER: "list.enums.userRoleFilter.customer",
+  MODERATOR: "list.enums.userRoleFilter.moderator",
+  PARTNER_ADMIN: "list.enums.userRoleFilter.partnerAdmin",
+  PARTNER_EMPLOYEE: "list.enums.userRoleFilter.partnerEmployee",
+  ADMIN: "list.enums.userRoleFilter.admin",
+  SUPER_ADMIN: "list.enums.userRoleFilter.superAdmin",
 });
 export const UserRoleFilterDB = [
   UserRoleFilter.ALL,
@@ -118,16 +120,15 @@ export const {
   enum: SubscriptionStatusFilter,
   options: SubscriptionStatusFilterOptions,
   Value: SubscriptionStatusFilterValue,
-} = createEnumOptions({
-  ALL: "app.api.users.stats.enums.subscriptionStatusFilter.all",
-  ACTIVE: "app.api.users.stats.enums.subscriptionStatusFilter.active",
-  TRIALING: "app.api.users.stats.enums.subscriptionStatusFilter.trialing",
-  PAST_DUE: "app.api.users.stats.enums.subscriptionStatusFilter.pastDue",
-  CANCELED: "app.api.users.stats.enums.subscriptionStatusFilter.canceled",
-  UNPAID: "app.api.users.stats.enums.subscriptionStatusFilter.unpaid",
-  PAUSED: "app.api.users.stats.enums.subscriptionStatusFilter.paused",
-  NO_SUBSCRIPTION:
-    "app.api.users.stats.enums.subscriptionStatusFilter.noSubscription",
+} = createEnumOptions(scopedTranslation, {
+  ALL: "stats.enums.subscriptionStatusFilter.all",
+  ACTIVE: "stats.enums.subscriptionStatusFilter.active",
+  TRIALING: "stats.enums.subscriptionStatusFilter.trialing",
+  PAST_DUE: "stats.enums.subscriptionStatusFilter.pastDue",
+  CANCELED: "stats.enums.subscriptionStatusFilter.canceled",
+  UNPAID: "stats.enums.subscriptionStatusFilter.unpaid",
+  PAUSED: "stats.enums.subscriptionStatusFilter.paused",
+  NO_SUBSCRIPTION: "stats.enums.subscriptionStatusFilter.noSubscription",
 });
 export const SubscriptionStatusFilterDB = [
   SubscriptionStatusFilter.ALL,
@@ -147,17 +148,16 @@ export const {
   enum: PaymentMethodFilter,
   options: PaymentMethodFilterOptions,
   Value: PaymentMethodFilterValue,
-} = createEnumOptions({
-  ALL: "app.api.users.stats.enums.paymentMethodFilter.all",
-  CARD: "app.api.users.stats.enums.paymentMethodFilter.card",
-  BANK_TRANSFER: "app.api.users.stats.enums.paymentMethodFilter.bankTransfer",
-  PAYPAL: "app.api.users.stats.enums.paymentMethodFilter.paypal",
-  APPLE_PAY: "app.api.users.stats.enums.paymentMethodFilter.applePay",
-  GOOGLE_PAY: "app.api.users.stats.enums.paymentMethodFilter.googlePay",
-  SEPA_DEBIT: "app.api.users.stats.enums.paymentMethodFilter.sepaDebit",
-  CRYPTO: "app.api.users.stats.enums.paymentMethodFilter.crypto",
-  NO_PAYMENT_METHOD:
-    "app.api.users.stats.enums.paymentMethodFilter.noPaymentMethod",
+} = createEnumOptions(scopedTranslation, {
+  ALL: "stats.enums.paymentMethodFilter.all",
+  CARD: "stats.enums.paymentMethodFilter.card",
+  BANK_TRANSFER: "stats.enums.paymentMethodFilter.bankTransfer",
+  PAYPAL: "stats.enums.paymentMethodFilter.paypal",
+  APPLE_PAY: "stats.enums.paymentMethodFilter.applePay",
+  GOOGLE_PAY: "stats.enums.paymentMethodFilter.googlePay",
+  SEPA_DEBIT: "stats.enums.paymentMethodFilter.sepaDebit",
+  CRYPTO: "stats.enums.paymentMethodFilter.crypto",
+  NO_PAYMENT_METHOD: "stats.enums.paymentMethodFilter.noPaymentMethod",
 });
 export const PaymentMethodFilterDB = [
   PaymentMethodFilter.ALL,

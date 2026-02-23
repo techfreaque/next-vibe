@@ -5,6 +5,8 @@ import type { translations as enTranslations } from "../en";
  */
 
 export const translations: typeof enTranslations = {
+  category: "Agent",
+
   hotkey: {
     post: {
       title: "Hotkey mowy na tekst",
@@ -95,6 +97,9 @@ export const translations: typeof enTranslations = {
       },
     },
     tags: {
+      ai: "AI",
+      transcription: "Transkrypcja",
+      speech: "Mowa",
       hotkey: "Hotkey",
       cli: "CLI",
     },

@@ -4,6 +4,10 @@
 
 export const translations = {
   category: "Credits",
+  tags: {
+    credits: "credits",
+    balance: "balance",
+  },
   repository: {
     tts: "Text-to-Speech",
     stt: "Speech-to-Text",
@@ -38,6 +42,44 @@ export const translations = {
     },
   },
   expire: {
+    post: {
+      title: "Expire Credits",
+      description: "Expire old subscription credits (called by cron)",
+      tag: "expire",
+      container: {
+        title: "Expire Credits",
+        description: "Credits expiration results",
+      },
+      response: {
+        expiredCount: "Expired Count",
+      },
+      success: {
+        title: "Credits Expired",
+        description: "Old subscription credits expired successfully",
+      },
+      errors: {
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+        forbidden: {
+          title: "Forbidden",
+          description: "Access denied",
+        },
+        server: {
+          title: "Server Error",
+          description: "Failed to expire credits",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unexpected error occurred",
+        },
+        validation: {
+          title: "Validation Error",
+          description: "Invalid request parameters",
+        },
+      },
+    },
     task: {
       description: "Expires old subscription credits daily",
       error: "Failed to expire credits",

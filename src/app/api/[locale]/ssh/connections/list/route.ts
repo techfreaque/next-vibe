@@ -11,6 +11,7 @@ import { ConnectionsListRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: ({ logger, user }) => ConnectionsListRepository.list(logger, user),
+    handler: ({ logger, user, t }) =>
+      ConnectionsListRepository.list(logger, user, t),
   },
 });

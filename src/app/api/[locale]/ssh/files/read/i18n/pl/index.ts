@@ -1,4 +1,16 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    invalidPath:
+      "Nieprawidłowa ścieżka: musi być bezwzględna bez segmentów '..'",
+    fileNotFound: "Plik nie znaleziony",
+    permissionDenied: "Odmowa dostępu",
+    notImplemented: {
+      fileRead: "Backend SSH jeszcze nie zaimplementowany dla czytania plików",
+    },
+  },
+
   get: {
     title: "Odczytaj plik",
     description: "Odczytaj plik tekstowy z lokalnej maszyny lub przez SSH",

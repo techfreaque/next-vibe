@@ -55,6 +55,7 @@ import type {
   LeadsStatsRequestOutput,
   LeadsStatsResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
 
 // Constants for metric types to avoid literal strings
 const METRIC_TYPES = {
@@ -116,12 +117,15 @@ const mapLeadStatusToActivityType = (
   }
 };
 
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+
 export class LeadStatsRepository {
   /**
    * Get comprehensive leads statistics
    */
   static async getLeadsStats(
     query: LeadsStatsRequestOutput,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadsStatsResponseOutput>> {
     // Initialize date variables for error handling scope
@@ -193,7 +197,7 @@ export class LeadStatsRepository {
         },
       });
       return fail({
-        message: "app.api.leads.stats.errors.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

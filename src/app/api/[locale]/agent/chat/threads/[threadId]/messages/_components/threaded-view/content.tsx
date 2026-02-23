@@ -9,6 +9,7 @@ import type { JSX } from "react";
 import React from "react";
 
 import { Logo } from "@/app/[locale]/_components/logo";
+import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { getModelById } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -16,7 +17,6 @@ import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/wid
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { ErrorMessageBubble } from "../error-message-bubble";
 import type { useCollapseState } from "../hooks/use-collapse-state";
@@ -36,7 +36,8 @@ interface ThreadedMessageContentProps {
     position: { x: number; y: number } | null,
   ) => void;
   logger: EndpointLogger;
-  characterName: TranslationKey | null;
+  characterName: string | null;
+  rootFolderId: DefaultFolderId;
 }
 
 export function ThreadedMessageContent({
@@ -46,10 +47,10 @@ export function ThreadedMessageContent({
   locale,
   user,
   collapseState,
-  currentUserId,
   onUserIdHover,
   logger,
   characterName,
+  rootFolderId,
 }: ThreadedMessageContentProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -113,11 +114,22 @@ export function ThreadedMessageContent({
                 />
               )}
               {message.role === "user"
-                ? currentUserId && message.authorId === currentUserId
-                  ? t("app.chat.threadedView.youLabel")
-                  : message.authorId
-                    ? message.authorId.slice(-8)
-                    : t("app.chat.threadedView.anonymous")
+                ? rootFolderId === "public" || rootFolderId === "shared"
+                  ? (() => {
+                      const name =
+                        message.authorName ??
+                        t("app.chat.threadedView.anonymous");
+                      const idSlice = message.authorId
+                        ? message.authorId.slice(0, 8)
+                        : null;
+                      return idSlice
+                        ? t("app.chat.threadedView.authorWithId", {
+                            name,
+                            id: idSlice,
+                          })
+                        : name;
+                    })()
+                  : t("app.chat.threadedView.youLabel")
                 : message.role === "assistant" && message.model
                   ? getModelById(message.model).name
                   : t("app.chat.threadedView.assistantFallback")}
@@ -128,9 +140,7 @@ export function ThreadedMessageContent({
           {message.role === "assistant" && characterName && (
             <>
               <Span>•</Span>
-              <Span className="text-muted-foreground/80">
-                {t(characterName)}
-              </Span>
+              <Span className="text-muted-foreground/80">{characterName}</Span>
             </>
           )}
 

@@ -189,6 +189,7 @@ export const translations: typeof enTranslations = {
         },
       },
       errors: {
+        default: "Synchronizacja IMAP nie powiodła się",
         account_failed: "Synchronizacja konta nie powiodła się",
         folder_sync_failed: "Synchronizacja folderu nie powiodła się",
         message_sync_error: "Błąd synchronizacji wiadomości",
@@ -197,6 +198,12 @@ export const translations: typeof enTranslations = {
     },
   },
   enums: {
+    loggingLevel: {
+      error: "Błąd",
+      warn: "Ostrzeżenie",
+      info: "Info",
+      debug: "Debug",
+    },
     syncStatus: {
       pending: "Oczekujący",
       syncing: "Synchronizacja",

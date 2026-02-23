@@ -27,10 +27,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { PreviewFieldConfig } from "@/app/api/[locale]/emails/registry/types";
 import { useTranslation } from "@/i18n/core/client";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 interface PreviewPropsFormProps {
-  previewFields?: Record<string, PreviewFieldConfig>;
+  previewFields?: Record<string, PreviewFieldConfig<string>>;
   defaultProps: Record<string, string | number | boolean>;
   onPropsChange: (props: Record<string, string | number | boolean>) => void;
 }
@@ -65,13 +64,13 @@ export function PreviewPropsForm({
   }, [defaultProps, onPropsChange]);
 
   const renderField = useCallback(
-    (fieldName: string, config: PreviewFieldConfig) => {
+    (fieldName: string, config: PreviewFieldConfig<string>) => {
       const fieldValue = props[fieldName];
       const fieldId = `preview-field-${fieldName}`;
 
-      const labelText = t(config.label as TranslationKey);
+      const labelText = t(config.label);
       const descriptionText = config.description
-        ? t(config.description as TranslationKey)
+        ? t(config.description)
         : undefined;
 
       switch (config.type) {
@@ -238,14 +237,14 @@ export function PreviewPropsForm({
                 <SelectTrigger id={fieldId}>
                   <SelectValue
                     placeholder={t(
-                      "app.admin.emails.templates.preview.form.select_option" as TranslationKey,
+                      "app.admin.emails.templates.preview.form.select_option",
                     )}
                   />
                 </SelectTrigger>
                 <SelectContent>
                   {config.options?.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
-                      {t(option.label as TranslationKey)}
+                      {t(option.label)}
                     </SelectItem>
                   ))}
                 </SelectContent>

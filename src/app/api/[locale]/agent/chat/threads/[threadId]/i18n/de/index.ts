@@ -4,6 +4,10 @@ import { translations as shareLinksTranslations } from "../../share-links/i18n/d
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Chat",
+  tags: {
+    threads: "Threads",
+  },
   messages: messagesTranslations,
   permissions: permissionsTranslations,
   shareLinks: shareLinksTranslations,

@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,206 +21,161 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * Pulse Execute Endpoint (POST)
  * Executes pulse health check cycles
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "unified-interface", "tasks", "pulse", "execute"],
   allowedRoles: [UserRole.ADMIN],
 
-  title: "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.title",
-  description:
-    "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.description",
+  title: "post.title",
+  description: "post.description",
   icon: "activity",
-  category: "app.api.system.category",
-  tags: [
-    "app.api.system.unifiedInterface.tasks.pulseSystem.execute.tags.execute",
-  ],
+  category: "category",
+  tags: ["tags.execute"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.container.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.container.title",
+    description: "post.container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST DATA FIELDS ===
-      dryRun: requestField({
+      dryRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.dryRun.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.dryRun.description",
+        label: "post.fields.dryRun.label",
+        description: "post.fields.dryRun.description",
         columns: 6,
         schema: z.boolean().optional().default(false),
       }),
 
-      taskNames: requestField({
+      taskNames: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label:
-          "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.taskNames.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.taskNames.description",
+        label: "post.fields.taskNames.label",
+        description: "post.fields.taskNames.description",
         columns: 6,
         options: [],
         schema: z.array(z.string()).optional(),
       }),
 
-      force: requestField({
+      force: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.force.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.force.description",
+        label: "post.fields.force.label",
+        description: "post.fields.force.description",
         columns: 6,
         schema: z.boolean().optional().default(false),
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.success.title",
+        content: "post.fields.success.title",
         schema: z.boolean(),
       }),
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.fields.message.title",
+        content: "post.fields.message.title",
         schema: z.string(),
       }),
-      executedAt: responseField({
+      executedAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.response.executedAt",
+        content: "post.response.executedAt",
         schema: z.string(),
       }),
-      tasksExecuted: responseField({
+      tasksExecuted: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.response.tasksExecuted",
+        content: "post.response.tasksExecuted",
         schema: z.coerce.number(),
       }),
-      results: responseArrayField(
-        {
+      results: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "post.response.results",
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.response.results",
-        },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            title:
-              "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.response.results",
-            description:
-              "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.response.resultsDescription",
-            layoutType: LayoutType.GRID,
-            columns: 4,
-          },
-          { response: true },
-          {
-            taskName: responseField({
+          title: "post.response.results",
+          description: "post.response.resultsDescription",
+          layoutType: LayoutType.GRID,
+          columns: 4,
+          usage: { response: true },
+          children: {
+            taskName: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.response.taskName",
+              content: "post.response.taskName",
               schema: z.string(),
             }),
-            success: responseField({
+            success: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.response.success",
+              content: "post.response.success",
               schema: z.boolean(),
             }),
-            duration: responseField({
+            duration: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.response.duration",
+              content: "post.response.duration",
               schema: z.coerce.number(),
             }),
-            message: responseField({
+            message: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.response.message",
+              content: "post.response.message",
               schema: z.string().optional(),
             }),
           },
-        ),
-      ),
+        }),
+      }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.validation.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unauthorized.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.forbidden.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.internal.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.internal.description",
+      title: "post.errors.internal.title",
+      description: "post.errors.internal.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.network.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unknown.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.conflict.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.notFound.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unsaved.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.unsaved.description",
+      title: "post.errors.unsaved.title",
+      description: "post.errors.unsaved.description",
     },
   },
 
   successTypes: {
-    title:
-      "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.success.title",
-    description:
-      "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   examples: {

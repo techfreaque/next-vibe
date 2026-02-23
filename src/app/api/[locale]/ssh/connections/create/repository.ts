@@ -25,6 +25,9 @@ import type {
   ConnectionCreateRequestOutput,
   ConnectionCreateResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 function getSecretKey(): Buffer | null {
   const raw = process.env["SSH_SECRET_KEY"];
@@ -72,12 +75,12 @@ export class ConnectionCreateRepository {
     data: ConnectionCreateRequestOutput,
     logger: EndpointLogger,
     user: JwtPayloadType,
+    t: ModuleT,
   ): Promise<ResponseType<ConnectionCreateResponseOutput>> {
     const secretKey = getSecretKey();
     if (!secretKey) {
       return fail({
-        message:
-          "SSH_SECRET_KEY env var not set. Add a 32-byte hex value to enable SSH mode.",
+        message: t("errors.sshSecretKeyNotSet"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
@@ -95,7 +98,7 @@ export class ConnectionCreateRepository {
       const encryptedSecretOrNull = encryptSecret(rawSecret);
       if (!encryptedSecretOrNull) {
         return fail({
-          message: "Encryption failed — SSH_SECRET_KEY may be invalid",
+          message: t("errors.encryptionFailed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -122,7 +125,7 @@ export class ConnectionCreateRepository {
 
       if (!row) {
         return fail({
-          message: "No row returned from insert",
+          message: t("errors.noRowReturned"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -132,7 +135,7 @@ export class ConnectionCreateRepository {
     } catch (error) {
       logger.error("Failed to create SSH connection", parseError(error));
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

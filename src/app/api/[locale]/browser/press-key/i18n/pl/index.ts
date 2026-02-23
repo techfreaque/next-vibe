@@ -66,4 +66,9 @@ export const translations: typeof enTranslations = {
     title: "Operacja naciśnięcia klawisza pomyślna",
     description: "Klawisz został pomyślnie naciśnięty",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    inputAutomation: "Automatyzacja wprowadzania",
+  },
 };

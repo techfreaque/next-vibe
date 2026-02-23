@@ -1,6 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "System",
   get: {
     title: "Pobierz zadanie Cron",
     description: "Pobierz pojedyncze zadanie cron według ID",

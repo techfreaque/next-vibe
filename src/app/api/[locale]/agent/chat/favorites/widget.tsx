@@ -26,7 +26,7 @@ import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useState } from "react";
 
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/components/model-credit-display";
 import {
@@ -50,6 +50,7 @@ import { useTourState } from "../_components/welcome-tour/tour-state-context";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import type definition from "./definition";
 import type { FavoriteCard, FavoritesListResponseOutput } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Props for custom widget
@@ -259,7 +260,6 @@ export function FavoritesListContainer({
   const { push: navigate } = useWidgetNavigation();
   const context = useWidgetContext();
   const { logger, locale, user } = context;
-  const t = useMemo(() => simpleT(locale).t, [locale]);
 
   const [dragOverride, setDragOverride] = useState<FavoriteCard[] | null>(null);
 
@@ -402,7 +402,7 @@ export function FavoritesListContainer({
           </DndContext>
         ) : (
           <Div className="text-center text-muted-foreground py-8">
-            {t("app.api.agent.chat.favorites.get.emptyState")}
+            {scopedTranslation.scopedT(locale).t("get.emptyState")}
           </Div>
         )}
       </Div>
@@ -434,9 +434,6 @@ function EditFavoriteButton({
         data: {
           characterId: item.characterId ?? undefined,
           icon: item.icon,
-          name: item.name,
-          description: item.description,
-          tagline: item.tagline,
         },
         prefillFromGet: true,
         getEndpoint: favoriteDetailDefinitions.default.GET,

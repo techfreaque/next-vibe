@@ -113,7 +113,7 @@ export function responseField<
  */
 export function requestResponseField<
   TSchema extends z.ZodTypeAny,
-  TConfig extends Omit<
+  const TConfig extends Omit<
     FormFieldWidgetConfig<TranslationKey, TSchema, { request: "data" }>,
     "usage" | "schemaType"
   >,
@@ -137,7 +137,7 @@ export function requestResponseField<
  */
 export function requestUrlPathParamsField<
   TSchema extends z.ZodTypeAny,
-  TConfig extends Omit<
+  const TConfig extends Omit<
     FormFieldWidgetConfig<
       TranslationKey,
       TSchema,
@@ -165,7 +165,7 @@ export function requestUrlPathParamsField<
  */
 export function requestUrlPathParamsResponseField<
   TSchema extends z.ZodTypeAny,
-  TConfig extends Omit<
+  const TConfig extends Omit<
     FormFieldWidgetConfig<
       TranslationKey,
       TSchema,
@@ -198,7 +198,7 @@ export function requestUrlPathParamsResponseField<
 export function scopedRequestField<
   TScopedTranslation extends ScopedTranslationType<string>,
   TSchema extends z.ZodTypeAny,
-  TConfig extends Omit<
+  const TConfig extends Omit<
     FormFieldWidgetConfig<
       string,
       TSchema,
@@ -230,7 +230,7 @@ export function scopedRequestField<
 export function scopedResponseField<
   TScopedTranslation extends ScopedTranslationType<string>,
   TSchema extends z.ZodTypeAny,
-  TConfig extends Omit<
+  const TConfig extends Omit<
     RequestResponseWidgetConfig<
       string,
       TSchema,
@@ -251,6 +251,88 @@ export function scopedResponseField<
   return {
     ...config,
     usage: { response: true },
+    schemaType: "primitive" as const,
+  };
+}
+
+/**
+ * Scoped request+response field creator for scoped translations
+ */
+export function scopedRequestResponseField<
+  TScopedTranslation extends ScopedTranslationType<string>,
+  TSchema extends z.ZodTypeAny,
+  const TConfig extends Omit<
+    FormFieldWidgetConfig<string, TSchema, { request: "data" }>,
+    "usage" | "schemaType"
+  >,
+>(
+  scopedTranslation: TScopedTranslation,
+  config: TConfig,
+): TConfig & {
+  usage: { request: "data"; response: true };
+  schemaType: "primitive";
+} {
+  // scopedTranslation is only used for type inference
+  void scopedTranslation;
+  return {
+    ...config,
+    usage: { request: "data", response: true },
+    schemaType: "primitive" as const,
+  };
+}
+
+/**
+ * Scoped request URL path params field creator for scoped translations
+ */
+export function scopedRequestUrlPathParamsField<
+  TScopedTranslation extends ScopedTranslationType<string>,
+  TSchema extends z.ZodTypeAny,
+  const TConfig extends Omit<
+    FormFieldWidgetConfig<
+      string,
+      TSchema,
+      { request: "urlPathParams"; response?: never }
+    >,
+    "usage" | "schemaType"
+  >,
+>(
+  scopedTranslation: TScopedTranslation,
+  config: TConfig,
+): TConfig & {
+  usage: { request: "urlPathParams"; response?: never };
+  schemaType: "primitive";
+} {
+  // scopedTranslation is only used for type inference
+  void scopedTranslation;
+  return {
+    ...config,
+    usage: { request: "urlPathParams" },
+    schemaType: "primitive" as const,
+  };
+}
+
+/**
+ * Scoped request URL path params + response field creator for scoped translations
+ */
+export function scopedRequestUrlPathParamsResponseField<
+  TScopedTranslation extends ScopedTranslationType<string>,
+  TSchema extends z.ZodTypeAny,
+  const TConfig extends Omit<
+    FormFieldWidgetConfig<string, TSchema, { request: "urlPathParams" }>,
+    "usage" | "schemaType"
+  >,
+>(
+  scopedTranslation: TScopedTranslation,
+  config: TConfig,
+): TConfig & {
+  usage: { request: "urlPathParams"; response: true };
+  schemaType: "primitive";
+} {
+  // scopedTranslation is only used for type inference
+  void scopedTranslation;
+  return {
+    ...config,
+    usage: { request: "urlPathParams", response: true },
     schemaType: "primitive" as const,
   };
 }
@@ -300,7 +382,7 @@ export function scopedResponseArrayOptionalField<
     TScopedTranslation["ScopedTranslationKey"],
     ConstrainedChildUsage<{ request?: never; response: true }>
   >,
-  TConfig extends Omit<
+  const TConfig extends Omit<
     ArrayWidgetConfig<
       TScopedTranslation["ScopedTranslationKey"],
       { request?: never; response: true },
@@ -332,18 +414,8 @@ export function scopedResponseArrayOptionalField<
 /**
  * Type-safe object field creator with child constraints (NEW FLAT API)
  *
- * This is the new version where the config includes everything (usage + children),
- * similar to how primitive fields include schema in their config.
- *
- * Each ObjectWidgetConfig variant can specify what children it expects, and the value type is fully
- * inferred from the children (similar to how primitive fields work with schemas).
- *
- * Key differences from old objectField:
- * - Flat API: single config parameter includes usage and children
- * - Widget configs can enforce child field names and types via their own type definitions
- * - Value type is inferred from children, not WidgetData (any)
- * - Full type safety from config -> children -> value
- *
+ * Single config param includes usage + children — the preferred new pattern.
+ * Use scopedObjectFieldNew for scoped translations.
  */
 export function objectFieldNew<
   TKey extends string,
@@ -361,6 +433,230 @@ export function objectFieldNew<
   return {
     ...config,
     schemaType: "object" as const,
+  };
+}
+
+/**
+ * Scoped object field creator (NEW FLAT API)
+ * Single config param includes usage + children. First param is scopedTranslation for type inference.
+ */
+export function scopedObjectFieldNew<
+  TScopedTranslation extends ScopedTranslationType<string>,
+  TUsage extends FieldUsageConfig,
+  const TConfig extends Omit<
+    ObjectWidgetConfig<
+      TScopedTranslation["ScopedTranslationKey"],
+      TUsage,
+      "object",
+      ObjectChildrenConstraint<
+        TScopedTranslation["ScopedTranslationKey"],
+        FieldUsageConfig
+      >
+    >,
+    "schemaType"
+  >,
+>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
+  _scopedTranslation: TScopedTranslation,
+  config: TConfig,
+): TConfig & { schemaType: "object" } {
+  return {
+    ...config,
+    schemaType: "object" as const,
+  };
+}
+
+/**
+ * Response array field (NEW FLAT API)
+ * Single config param includes child. Usage is fixed to response-only.
+ */
+export function responseArrayFieldNew<
+  TKey extends string,
+  TChild extends ArrayChildConstraint<
+    TKey,
+    ConstrainedChildUsage<{ request?: never; response: true }>
+  >,
+  const TConfig extends Omit<
+    ArrayWidgetConfig<
+      TKey,
+      { request?: never; response: true },
+      "array",
+      TChild
+    >,
+    "schemaType" | "usage"
+  >,
+>(
+  config: TConfig,
+): TConfig & {
+  schemaType: "array";
+  usage: { request?: never; response: true };
+} {
+  return {
+    ...config,
+    schemaType: "array" as const,
+    usage: { response: true },
+  };
+}
+
+/**
+ * Scoped response array field (NEW FLAT API)
+ */
+export function scopedResponseArrayFieldNew<
+  TScopedTranslation extends ScopedTranslationType<string>,
+  TChild extends ArrayChildConstraint<
+    TScopedTranslation["ScopedTranslationKey"],
+    ConstrainedChildUsage<{ request?: never; response: true }>
+  >,
+  const TConfig extends Omit<
+    ArrayWidgetConfig<
+      TScopedTranslation["ScopedTranslationKey"],
+      { request?: never; response: true },
+      "array",
+      TChild
+    >,
+    "schemaType" | "usage"
+  >,
+>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
+  _scopedTranslation: TScopedTranslation,
+  config: TConfig,
+): TConfig & {
+  schemaType: "array";
+  usage: { request?: never; response: true };
+} {
+  return {
+    ...config,
+    schemaType: "array" as const,
+    usage: { response: true },
+  };
+}
+
+/**
+ * Request data array field (NEW FLAT API)
+ * Single config param includes child. Usage is fixed to request-data-only.
+ */
+export function requestDataArrayFieldNew<
+  TKey extends string,
+  TChild extends ArrayChildConstraint<
+    TKey,
+    ConstrainedChildUsage<{ request: "data"; response?: never }>
+  >,
+  const TConfig extends Omit<
+    ArrayWidgetConfig<
+      TKey,
+      { request: "data"; response?: never },
+      "array",
+      TChild
+    >,
+    "schemaType" | "usage"
+  >,
+>(
+  config: TConfig,
+): TConfig & {
+  schemaType: "array";
+  usage: { request: "data"; response?: never };
+} {
+  return {
+    ...config,
+    schemaType: "array" as const,
+    usage: { request: "data" },
+  };
+}
+
+/**
+ * Scoped request data array field (NEW FLAT API)
+ */
+export function scopedRequestDataArrayFieldNew<
+  TScopedTranslation extends ScopedTranslationType<string>,
+  TChild extends ArrayChildConstraint<
+    TScopedTranslation["ScopedTranslationKey"],
+    ConstrainedChildUsage<{ request: "data"; response?: never }>
+  >,
+  const TConfig extends Omit<
+    ArrayWidgetConfig<
+      TScopedTranslation["ScopedTranslationKey"],
+      { request: "data"; response?: never },
+      "array",
+      TChild
+    >,
+    "schemaType" | "usage"
+  >,
+>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
+  _scopedTranslation: TScopedTranslation,
+  config: TConfig,
+): TConfig & {
+  schemaType: "array";
+  usage: { request: "data"; response?: never };
+} {
+  return {
+    ...config,
+    schemaType: "array" as const,
+    usage: { request: "data" },
+  };
+}
+
+/**
+ * Response array optional field (NEW FLAT API)
+ */
+export function responseArrayOptionalFieldNew<
+  TKey extends string,
+  TChild extends ArrayChildConstraint<
+    TKey,
+    ConstrainedChildUsage<{ request?: never; response: true }>
+  >,
+  const TConfig extends Omit<
+    ArrayWidgetConfig<
+      TKey,
+      { request?: never; response: true },
+      "array-optional",
+      TChild
+    >,
+    "schemaType" | "usage"
+  >,
+>(
+  config: TConfig,
+): TConfig & {
+  schemaType: "array-optional";
+  usage: { request?: never; response: true };
+} {
+  return {
+    ...config,
+    schemaType: "array-optional" as const,
+    usage: { response: true },
+  };
+}
+
+/**
+ * Scoped response array optional field (NEW FLAT API)
+ */
+export function scopedResponseArrayOptionalFieldNew<
+  TScopedTranslation extends ScopedTranslationType<string>,
+  TChild extends ArrayChildConstraint<
+    TScopedTranslation["ScopedTranslationKey"],
+    ConstrainedChildUsage<{ request?: never; response: true }>
+  >,
+  const TConfig extends Omit<
+    ArrayWidgetConfig<
+      TScopedTranslation["ScopedTranslationKey"],
+      { request?: never; response: true },
+      "array-optional",
+      TChild
+    >,
+    "schemaType" | "usage"
+  >,
+>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
+  _scopedTranslation: TScopedTranslation,
+  config: TConfig,
+): TConfig & {
+  schemaType: "array-optional";
+  usage: { request?: never; response: true };
+} {
+  return {
+    ...config,
+    schemaType: "array-optional" as const,
+    usage: { response: true },
   };
 }
 
@@ -443,8 +739,11 @@ export function customRequestField<
 }
 
 export {
+  arrayField,
+  arrayOptionalField,
   backButton,
   deleteButton,
+  editButton,
   navigateButtonField,
   objectField,
   objectOptionalField,
@@ -454,7 +753,21 @@ export {
   requestDataRangeField,
   responseArrayField,
   responseArrayOptionalField,
+  scopedArrayField,
+  scopedBackButton,
+  scopedDeleteButton,
+  scopedEditButton,
+  scopedNavigateButtonField,
+  scopedObjectOptionalField,
+  scopedObjectUnionField,
+  scopedRequestDataArrayField,
+  scopedRequestDataArrayOptionalField,
+  scopedResponseArrayField,
+  scopedSubmitButton,
+  scopedWidgetField,
   submitButton,
   widgetField,
   widgetObjectField,
 } from "./utils";
+
+export { scopedObjectFieldNew as scopedWidgetObjectField };

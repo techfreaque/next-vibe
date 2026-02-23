@@ -8,6 +8,8 @@ import { validateEnv } from "next-vibe/shared/utils/env-util";
 import type { z } from "zod";
 import { z as zod } from "zod";
 
+import { defaultLocale } from "@/i18n/core/config";
+
 import { envValidationLogger } from "./validation-logger";
 
 interface FieldDef<T extends z.ZodTypeAny = z.ZodTypeAny> {
@@ -114,6 +116,7 @@ export function defineEnv(
       process.env,
       discriminatedUnionSchema,
       envValidationLogger,
+      defaultLocale,
     );
 
     // Create a mergeable object schema by combining all fields from all variants
@@ -167,7 +170,12 @@ export function defineEnv(
     });
   }
   const schema = zod.object(schemaShape);
-  const env = validateEnv(process.env, schema, envValidationLogger);
+  const env = validateEnv(
+    process.env,
+    schema,
+    envValidationLogger,
+    defaultLocale,
+  );
   return { env, schema, examples };
 }
 

@@ -14,8 +14,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -26,6 +26,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { TOOL_HELP_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 import { HelpToolsWidget } from "./widget";
 
 // Serializable tool metadata returned in response
@@ -41,6 +42,8 @@ const aiToolMetadataSchema = z.object({
   aliases: z.array(z.string()).optional(),
   // Only present in detail mode (toolName param)
   requiresConfirmation: z.boolean().optional(),
+  /** Credit cost — only present when > 0 */
+  credits: z.number().optional(),
   parameters: z.record(z.string(), z.unknown()).optional(),
   examples: z
     .object({
@@ -55,6 +58,7 @@ const aiToolMetadataSchema = z.object({
 });
 
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["system", "help"],
   aliases: [
@@ -66,11 +70,11 @@ const { GET } = createEndpoint({
     "list",
     "ls",
   ],
-  title: "app.api.system.help.get.title" as const,
-  description: "app.api.system.help.get.description" as const,
+  title: "get.title" as const,
+  description: "get.description" as const,
   icon: "help-circle",
-  category: "app.api.system.category" as const,
-  tags: ["app.api.system.help.get.tags.tools" as const],
+  category: "category" as const,
+  tags: ["get.tags.tools" as const],
   allowedRoles: [
     UserRole.PUBLIC,
     UserRole.CUSTOMER,
@@ -78,6 +82,8 @@ const { GET } = createEndpoint({
     UserRole.MCP_VISIBLE,
     UserRole.CLI_AUTH_BYPASS,
   ] as const,
+
+  allowedLocalModeRoles: [] as const,
 
   cli: {
     firstCliArgKey: "query",
@@ -88,43 +94,39 @@ const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
-      query: requestField({
+      query: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.help.get.fields.query.label" as const,
-        description:
-          "app.api.system.help.get.fields.query.description" as const,
-        placeholder:
-          "app.api.system.help.get.fields.query.placeholder" as const,
+        label: "get.fields.query.label" as const,
+        description: "get.fields.query.description" as const,
+        placeholder: "get.fields.query.placeholder" as const,
         columns: 8,
         schema: z.string().optional(),
       }),
 
-      category: requestField({
+      category: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.help.get.fields.category.label" as const,
-        description:
-          "app.api.system.help.get.fields.category.description" as const,
+        label: "get.fields.category.label" as const,
+        description: "get.fields.category.description" as const,
         columns: 4,
         schema: z.string().optional(),
       }),
 
-      toolName: requestField({
+      toolName: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.help.get.fields.toolName.label" as const,
-        description:
-          "app.api.system.help.get.fields.toolName.description" as const,
+        label: "get.fields.toolName.label" as const,
+        description: "get.fields.toolName.description" as const,
         columns: 4,
         schema: z.string().optional(),
       }),
 
-      page: requestField({
+      page: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.system.help.get.fields.page.label" as const,
-        description: "app.api.system.help.get.fields.page.description" as const,
+        label: "get.fields.page.label" as const,
+        description: "get.fields.page.description" as const,
         columns: 3,
         schema: z
           .number()
@@ -133,12 +135,11 @@ const { GET } = createEndpoint({
           .transform((v) => (v && v >= 1 ? v : undefined)),
       }),
 
-      pageSize: requestField({
+      pageSize: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.system.help.get.fields.pageSize.label" as const,
-        description:
-          "app.api.system.help.get.fields.pageSize.description" as const,
+        label: "get.fields.pageSize.label" as const,
+        description: "get.fields.pageSize.description" as const,
         columns: 3,
         schema: z
           .number()
@@ -149,54 +150,53 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      tools: responseField({
+      tools: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.help.get.fields.tools.title" as const,
+        content: "get.fields.tools.title" as const,
         schema: z.array(aiToolMetadataSchema),
       }),
 
-      totalCount: responseField({
+      totalCount: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.help.get.fields.totalCount.title" as const,
+        content: "get.fields.totalCount.title" as const,
         schema: z.number(),
       }),
 
-      matchedCount: responseField({
+      matchedCount: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.help.get.fields.matchedCount.title" as const,
+        content: "get.fields.matchedCount.title" as const,
         schema: z.number(),
       }),
 
-      categories: responseField({
+      categories: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.help.get.fields.categories.title" as const,
+        content: "get.fields.categories.title" as const,
         schema: z
           .array(z.object({ name: z.string(), count: z.number() }))
           .optional(),
       }),
 
-      hint: responseField({
+      hint: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.help.get.fields.hint.title" as const,
+        content: "get.fields.hint.title" as const,
         schema: z.string().optional(),
       }),
 
-      currentPage: responseField({
+      currentPage: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.help.get.fields.currentPage.title" as const,
+        content: "get.fields.currentPage.title" as const,
         schema: z.number().optional(),
       }),
 
-      effectivePageSize: responseField({
+      effectivePageSize: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.help.get.fields.effectivePageSize.title" as const,
+        content: "get.fields.effectivePageSize.title" as const,
         schema: z.number().optional(),
       }),
 
-      totalPages: responseField({
+      totalPages: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.help.get.fields.totalPages.title" as const,
+        content: "get.fields.totalPages.title" as const,
         schema: z.number().optional(),
       }),
     },
@@ -204,54 +204,46 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.help.get.errors.validation.title" as const,
-      description:
-        "app.api.system.help.get.errors.validation.description" as const,
+      title: "get.errors.validation.title" as const,
+      description: "get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.help.get.errors.network.title" as const,
-      description:
-        "app.api.system.help.get.errors.network.description" as const,
+      title: "get.errors.network.title" as const,
+      description: "get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.help.get.errors.unauthorized.title" as const,
-      description:
-        "app.api.system.help.get.errors.unauthorized.description" as const,
+      title: "get.errors.unauthorized.title" as const,
+      description: "get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.help.get.errors.forbidden.title" as const,
-      description:
-        "app.api.system.help.get.errors.forbidden.description" as const,
+      title: "get.errors.forbidden.title" as const,
+      description: "get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.help.get.errors.notFound.title" as const,
-      description:
-        "app.api.system.help.get.errors.notFound.description" as const,
+      title: "get.errors.notFound.title" as const,
+      description: "get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.help.get.errors.server.title" as const,
-      description: "app.api.system.help.get.errors.server.description" as const,
+      title: "get.errors.server.title" as const,
+      description: "get.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.help.get.errors.unknown.title" as const,
-      description:
-        "app.api.system.help.get.errors.unknown.description" as const,
+      title: "get.errors.unknown.title" as const,
+      description: "get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.help.get.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.system.help.get.errors.unsavedChanges.description" as const,
+      title: "get.errors.unsavedChanges.title" as const,
+      description: "get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.help.get.errors.conflict.title" as const,
-      description:
-        "app.api.system.help.get.errors.conflict.description" as const,
+      title: "get.errors.conflict.title" as const,
+      description: "get.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.system.help.get.success.title" as const,
-    description: "app.api.system.help.get.success.description" as const,
+    title: "get.success.title" as const,
+    description: "get.success.description" as const,
   },
 
   examples: {

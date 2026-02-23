@@ -29,12 +29,14 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { ActivityType, UserAssociation } from "../../../leads/enum";
 import { EngagementLevel } from "../../../leads/tracking/engagement/enum";
 import type { JwtPayloadType } from "../../../user/auth/types";
 import { emails } from "../db";
+import type { scopedTranslation } from "./i18n";
+
+type StatsModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 import {
   EmailProvider,
   EmailStatus,
@@ -71,6 +73,7 @@ interface EmailStatsRepository {
     data: EmailStatsGetRequestTypeOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: StatsModuleT,
   ): Promise<ResponseType<EmailStatsGetResponseTypeOutput>>;
 }
 
@@ -85,6 +88,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
     data: EmailStatsGetRequestTypeOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: StatsModuleT,
   ): Promise<ResponseType<EmailStatsGetResponseTypeOutput>> {
     logger.debug("Getting email stats", {
       userId: user.isPublic ? "public" : user.id,
@@ -155,8 +159,8 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       // Generate comprehensive email statistics
       const results = await Promise.all([
         this.generateCurrentPeriodStats(whereClause),
-        this.generateHistoricalData(timePeriod, whereClause),
-        this.generateGroupedStats(whereClause),
+        this.generateHistoricalData(timePeriod, whereClause, t),
+        this.generateGroupedStats(whereClause, t),
         this.generateRecentActivity(whereClause),
         this.generateTopPerformingTemplates(whereClause),
         this.generateTopPerformingProviders(whereClause),
@@ -197,7 +201,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
     } catch (error) {
       logger.error("Error generating email stats", parseError(error));
       return fail({
-        message: "app.api.emails.messages.stats.get.errors.server.title",
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -417,6 +421,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
   private async generateHistoricalData(
     timePeriodParam: TimePeriod,
     whereClause: SQL | undefined,
+    t: StatsModuleT,
   ): Promise<HistoricalDataType> {
     const timePeriod = this.getPostgresTimePeriod(timePeriodParam);
 
@@ -445,7 +450,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
     return {
       series: [
         {
-          name: "app.api.emails.messages.stats.get.response.metrics.totalEmails" as const satisfies TranslationKey,
+          name: t("get.response.metrics.totalEmails"),
           data: this.transformToHistoricalData(
             historicalResults,
             "totalEmails",
@@ -454,13 +459,13 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           type: ChartType.LINE,
         },
         {
-          name: "app.api.emails.messages.stats.get.response.metrics.sentEmails" as const satisfies TranslationKey,
+          name: t("get.response.metrics.sentEmails"),
           data: this.transformToHistoricalData(historicalResults, "sentEmails"),
           color: "#10b981",
           type: ChartType.LINE,
         },
         {
-          name: "app.api.emails.messages.stats.get.response.metrics.deliveredEmails" as const satisfies TranslationKey,
+          name: t("get.response.metrics.deliveredEmails"),
           data: this.transformToHistoricalData(
             historicalResults,
             "deliveredEmails",
@@ -469,7 +474,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           type: ChartType.LINE,
         },
         {
-          name: "app.api.emails.messages.stats.get.response.metrics.openedEmails" as const satisfies TranslationKey,
+          name: t("get.response.metrics.openedEmails"),
           data: this.transformToHistoricalData(
             historicalResults,
             "openedEmails",
@@ -478,7 +483,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           type: ChartType.LINE,
         },
         {
-          name: "app.api.emails.messages.stats.get.response.metrics.clickedEmails" as const satisfies TranslationKey,
+          name: t("get.response.metrics.clickedEmails"),
           data: this.transformToHistoricalData(
             historicalResults,
             "clickedEmails",
@@ -487,7 +492,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           type: ChartType.LINE,
         },
         {
-          name: "app.api.emails.messages.stats.get.response.metrics.bouncedEmails" as const satisfies TranslationKey,
+          name: t("get.response.metrics.bouncedEmails"),
           data: this.transformToHistoricalData(
             historicalResults,
             "bouncedEmails",
@@ -496,7 +501,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           type: ChartType.LINE,
         },
         {
-          name: "app.api.emails.messages.stats.get.response.metrics.failedEmails" as const satisfies TranslationKey,
+          name: t("get.response.metrics.failedEmails"),
           data: this.transformToHistoricalData(
             historicalResults,
             "failedEmails",
@@ -505,7 +510,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           type: ChartType.LINE,
         },
         {
-          name: "app.api.emails.messages.stats.get.response.metrics.deliveryRate" as const satisfies TranslationKey,
+          name: t("get.response.metrics.deliveryRate"),
           data: historicalResults.map(
             (item): HistoricalDataPointType => ({
               date: new Date(item.period),
@@ -520,7 +525,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           type: ChartType.LINE,
         },
         {
-          name: "app.api.emails.messages.stats.get.response.metrics.openRate" as const satisfies TranslationKey,
+          name: t("get.response.metrics.openRate"),
           data: historicalResults.map(
             (item): HistoricalDataPointType => ({
               date: new Date(item.period),
@@ -535,7 +540,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           type: ChartType.LINE,
         },
         {
-          name: "app.api.emails.messages.stats.get.response.metrics.clickRate" as const satisfies TranslationKey,
+          name: t("get.response.metrics.clickRate"),
           data: historicalResults.map(
             (item): HistoricalDataPointType => ({
               date: new Date(item.period),
@@ -550,7 +555,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           type: ChartType.LINE,
         },
         {
-          name: "app.api.emails.messages.stats.get.response.metrics.bounceRate" as const satisfies TranslationKey,
+          name: t("get.response.metrics.bounceRate"),
           data: historicalResults.map(
             (item): HistoricalDataPointType => ({
               date: new Date(item.period),
@@ -563,7 +568,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           type: ChartType.LINE,
         },
         {
-          name: "app.api.emails.messages.stats.get.response.metrics.failureRate" as const satisfies TranslationKey,
+          name: t("get.response.metrics.failureRate"),
           data: historicalResults.map(
             (item): HistoricalDataPointType => ({
               date: new Date(item.period),
@@ -576,7 +581,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           type: ChartType.LINE,
         },
         {
-          name: "app.api.emails.messages.stats.get.response.metrics.emails_with_errors" as const satisfies TranslationKey,
+          name: t("get.response.metrics.emails_with_errors"),
           data: this.transformToHistoricalData(
             historicalResults,
             "emailsWithErrors",
@@ -585,7 +590,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           type: ChartType.LINE,
         },
         {
-          name: "app.api.emails.messages.stats.get.response.metrics.average_retry_count" as const satisfies TranslationKey,
+          name: t("get.response.metrics.average_retry_count"),
           data: this.transformToHistoricalData(
             historicalResults,
             "averageRetryCount",
@@ -594,7 +599,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           type: ChartType.LINE,
         },
         {
-          name: "app.api.emails.messages.stats.get.response.metrics.average_processing_time" as const satisfies TranslationKey,
+          name: t("get.response.metrics.average_processing_time"),
           data: this.transformToHistoricalData(
             historicalResults,
             "averageProcessingTime",
@@ -603,7 +608,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
           type: ChartType.LINE,
         },
         {
-          name: "app.api.emails.messages.stats.get.response.metrics.average_delivery_time" as const satisfies TranslationKey,
+          name: t("get.response.metrics.average_delivery_time"),
           data: this.transformToHistoricalData(
             historicalResults,
             "averageDeliveryTime",
@@ -620,6 +625,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
    */
   private async generateGroupedStats(
     whereClause: SQL | undefined,
+    t: StatsModuleT,
   ): Promise<GroupedStatsType> {
     // Get total count for percentage calculations
     const [{ totalEmails }] = await db
@@ -696,7 +702,7 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
       clickRate:
         item.openedEmails > 0 ? item.clickedEmails / item.openedEmails : 0,
       historicalData: {
-        name: "app.api.emails.messages.stats.get.response.metrics.provider_historical" as const satisfies TranslationKey,
+        name: t("get.response.metrics.provider_historical"),
         data: [{ date: new Date().toISOString(), value: item.count }],
         color: "#8b5cf6",
         type: ChartType.LINE,
@@ -782,15 +788,13 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         range: RetryRange.NO_RETRIES,
         count: noRetriesCount[0]?.count || 0,
         color: "#10b981",
-        translationKey:
-          "app.api.emails.messages.stats.get.response.retry.no_retries" as const satisfies TranslationKey,
+        translationKey: t("get.response.retry.no_retries"),
       },
       {
         range: RetryRange.ONE_TO_TWO,
         count: withRetriesCount[0]?.count || 0,
         color: "#f59e0b",
-        translationKey:
-          "app.api.emails.messages.stats.get.response.retry.with_retries" as const satisfies TranslationKey,
+        translationKey: t("get.response.retry.with_retries"),
       },
     ];
 
@@ -830,29 +834,25 @@ class EmailStatsRepositoryImpl implements EmailStatsRepository {
         type: UserAssociation.WITH_USER,
         count: userAssociationStats.withUser,
         color: "#3b82f6",
-        translationKey:
-          "app.api.emails.messages.stats.get.response.association.with_user" as const satisfies TranslationKey,
+        translationKey: t("get.response.association.with_user"),
       },
       {
         type: UserAssociation.WITH_LEAD,
         count: userAssociationStats.withLead,
         color: "#10b981",
-        translationKey:
-          "app.api.emails.messages.stats.get.response.association.with_lead" as const satisfies TranslationKey,
+        translationKey: t("get.response.association.with_lead"),
       },
       {
         type: UserAssociation.WITH_BOTH,
         count: userAssociationStats.withBoth,
         color: "#8b5cf6",
-        translationKey:
-          "app.api.emails.messages.stats.get.response.association.with_both" as const satisfies TranslationKey,
+        translationKey: t("get.response.association.with_both"),
       },
       {
         type: UserAssociation.STANDALONE,
         count: userAssociationStats.withNeither,
         color: "#6b7280",
-        translationKey:
-          "app.api.emails.messages.stats.get.response.association.with_neither" as const satisfies TranslationKey,
+        translationKey: t("get.response.association.with_neither"),
       },
     ];
 

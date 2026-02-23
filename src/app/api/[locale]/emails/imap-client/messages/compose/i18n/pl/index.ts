@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Klient IMAP",
+
   post: {
     title: "Utwórz e-mail",
     description: "Wyślij nowy e-mail przez SMTP",

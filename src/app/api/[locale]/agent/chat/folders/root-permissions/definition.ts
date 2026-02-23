@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,124 +21,98 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { DefaultFolderId } from "../../config";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Get Root Folder Permissions Endpoint (GET)
  * Computes permissions for a root folder
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["agent", "chat", "folders", "root-permissions"],
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  title: "app.api.agent.chat.folders.rootPermissions.get.title" as const,
-  description:
-    "app.api.agent.chat.folders.rootPermissions.get.description" as const,
+  title: "get.title" as const,
+  description: "get.description" as const,
   icon: "shield",
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.folders" as const],
+  category: "category" as const,
+  tags: ["tags.folders" as const],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.agent.chat.folders.rootPermissions.get.container.title" as const,
-      description:
-        "app.api.agent.chat.folders.rootPermissions.get.container.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "get.container.title" as const,
+    description: "get.container.description" as const,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST ===
-      rootFolderId: requestField({
+      rootFolderId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.agent.chat.folders.rootPermissions.get.rootFolderId.label" as const,
-        description:
-          "app.api.agent.chat.folders.rootPermissions.get.rootFolderId.description" as const,
+        label: "get.rootFolderId.label" as const,
+        description: "get.rootFolderId.description" as const,
         columns: 12,
         schema: z.enum(DefaultFolderId),
       }),
 
       // === RESPONSE ===
-      canCreateThread: responseField({
+      canCreateThread: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.folders.rootPermissions.get.response.canCreateThread.content" as const,
+        content: "get.response.canCreateThread.content" as const,
         schema: z.boolean(),
       }),
-      canCreateFolder: responseField({
+      canCreateFolder: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.folders.rootPermissions.get.response.canCreateFolder.content" as const,
+        content: "get.response.canCreateFolder.content" as const,
         schema: z.boolean(),
       }),
     },
-  ),
+  }),
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.agent.chat.folders.rootPermissions.get.success.title",
-    description:
-      "app.api.agent.chat.folders.rootPermissions.get.success.description",
+    title: "get.success.title",
+    description: "get.success.description",
   },
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.folders.rootPermissions.get.errors.validation.title",
-      description:
-        "app.api.agent.chat.folders.rootPermissions.get.errors.validation.description",
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.folders.rootPermissions.get.errors.network.title",
-      description:
-        "app.api.agent.chat.folders.rootPermissions.get.errors.network.description",
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.folders.rootPermissions.get.errors.unauthorized.title",
-      description:
-        "app.api.agent.chat.folders.rootPermissions.get.errors.unauthorized.description",
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.folders.rootPermissions.get.errors.forbidden.title",
-      description:
-        "app.api.agent.chat.folders.rootPermissions.get.errors.forbidden.description",
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.folders.rootPermissions.get.errors.notFound.title",
-      description:
-        "app.api.agent.chat.folders.rootPermissions.get.errors.notFound.description",
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.folders.rootPermissions.get.errors.server.title",
-      description:
-        "app.api.agent.chat.folders.rootPermissions.get.errors.server.description",
+      title: "get.errors.server.title",
+      description: "get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.folders.rootPermissions.get.errors.unknown.title",
-      description:
-        "app.api.agent.chat.folders.rootPermissions.get.errors.unknown.description",
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.folders.rootPermissions.get.errors.unsavedChanges.title",
-      description:
-        "app.api.agent.chat.folders.rootPermissions.get.errors.unsavedChanges.description",
+      title: "get.errors.unsavedChanges.title",
+      description: "get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.folders.rootPermissions.get.errors.conflict.title",
-      description:
-        "app.api.agent.chat.folders.rootPermissions.get.errors.conflict.description",
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
     },
   },
 

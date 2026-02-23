@@ -3,6 +3,11 @@
  */
 
 export const translations = {
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    inputAutomation: "Input Automation",
+  },
   title: "Fill Form",
   description: "Fill out multiple form elements at once",
 

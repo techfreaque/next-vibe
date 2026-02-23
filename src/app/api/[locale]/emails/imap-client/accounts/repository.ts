@@ -19,6 +19,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import { withTransaction } from "@/app/api/[locale]/system/db/utils/repository-helpers";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ImapAccount, NewImapAccount } from "../db";
 import { imapAccounts } from "../db";
@@ -41,6 +42,8 @@ import type {
   ImapAccountCreatePostRequestOutput,
   ImapAccountCreatePostResponseOutput,
 } from "./create/definition";
+import type { ImapAccountsT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 import type {
   ImapAccountsListRequestOutput,
   ImapAccountsListResponseOutput,
@@ -64,36 +67,43 @@ export interface ImapAccountsRepository {
     data: ImapAccountCreateRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapAccountCreateResponseOutput>>;
 
   listAccounts(
     data: ImapAccountListRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapAccountListResponseOutput>>;
 
   getAccountById(
     data: { id: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapAccountGetResponseOutput>>;
 
   updateAccount(
-    data: ImapAccountUpdateRequestOutput & { id: string },
+    data: ImapAccountUpdateRequestOutput,
+    urlPathParams: { id: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapAccountPutResponseOutput>>;
 
   deleteAccount(
     data: { id: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<{ success: boolean; message: string }>>;
 
   testAccountConnection(
     data: { id: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapAccountTestResponseOutput>>;
 }
 
@@ -253,7 +263,9 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     data: ImapAccountCreateRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapAccountCreateResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Creating IMAP account", {
         email: data.basicInfo?.email,
@@ -288,8 +300,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
 
       if (existingAccount.length > 0) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.accounts.post.error.duplicate.title",
+          message: t("create.errors.conflict.title"),
           errorType: ErrorResponseTypes.CONFLICT,
         });
       }
@@ -332,8 +343,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     } catch (error) {
       logger.error("Error creating IMAP account", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.accounts.post.error.server.title",
+        message: t("create.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -347,7 +357,9 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     data: ImapAccountListRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapAccountListResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Listing IMAP accounts", { ...data, userId: user.id });
 
@@ -443,8 +455,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     } catch (error) {
       logger.error("Error listing IMAP accounts", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.accounts.get.error.server.title",
+        message: t("list.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -458,7 +469,9 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     data: { id: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapAccountGetResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Getting IMAP account by ID", {
         id: data.id,
@@ -473,8 +486,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
 
       if (!account) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.accounts.get.error.not_found.title",
+          message: t("id.get.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -485,8 +497,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     } catch (error) {
       logger.error("Error getting IMAP account by ID", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.accounts.get.error.server.title",
+        message: t("id.get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -497,13 +508,16 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
    * Update IMAP account
    */
   async updateAccount(
-    data: ImapAccountUpdateRequestOutput & { id: string },
+    data: ImapAccountUpdateRequestOutput,
+    urlPathParams: { id: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapAccountPutResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Updating IMAP account", {
-        id: data.id,
+        id: urlPathParams.id,
         userId: user.id,
       });
 
@@ -511,13 +525,12 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
       const [existingAccount] = await db
         .select()
         .from(imapAccounts)
-        .where(eq(imapAccounts.id, data.id))
+        .where(eq(imapAccounts.id, urlPathParams.id))
         .limit(1);
 
       if (!existingAccount) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.accounts.put.error.not_found.title",
+          message: t("id.post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -530,15 +543,14 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
           .where(
             and(
               eq(imapAccounts.email, data.email.toLowerCase().trim()),
-              ne(imapAccounts.id, data.id),
+              ne(imapAccounts.id, urlPathParams.id),
             ),
           )
           .limit(1);
 
         if (emailConflict.length > 0) {
           return fail({
-            message:
-              "app.api.emails.imapClient.imapErrors.accounts.put.error.duplicate.title",
+            message: t("id.post.errors.conflict.title"),
             errorType: ErrorResponseTypes.CONFLICT,
           });
         }
@@ -565,7 +577,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
       const [updatedAccount] = await db
         .update(imapAccounts)
         .set(updateData as Partial<ImapAccount>)
-        .where(eq(imapAccounts.id, data.id))
+        .where(eq(imapAccounts.id, urlPathParams.id))
         .returning();
 
       logger.debug("IMAP account updated successfully", {
@@ -579,8 +591,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     } catch (error) {
       logger.error("Error updating IMAP account", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.accounts.put.error.server.title",
+        message: t("id.post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -594,7 +605,9 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     data: { id: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<{ success: boolean; message: string }>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Deleting IMAP account", {
         id: data.id,
@@ -609,8 +622,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
 
       if (!existingAccount) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.accounts.delete.error.not_found.title",
+          message: t("id.delete.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -624,14 +636,12 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
 
       return success({
         success: true,
-        message:
-          "app.api.emails.imapClient.imapErrors.accounts.delete.success.title",
+        message: t("id.delete.success.title"),
       });
     } catch (error) {
       logger.error("Error deleting IMAP account", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.accounts.delete.error.server.title",
+        message: t("id.delete.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -645,7 +655,9 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     data: { id: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapAccountTestResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Testing IMAP account connection", {
         accountId: data.id,
@@ -660,20 +672,22 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
 
       if (!account) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.accounts.get.error.not_found.title",
+          message: t("id.get.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       // Test IMAP connection inline
-      const connectionResult = await this.testImapConnection(account, logger);
+      const connectionResult = await this.testImapConnection(
+        account,
+        logger,
+        t,
+      );
       return connectionResult;
     } catch (error) {
       logger.error("Error testing IMAP account connection", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.connection.timeout.title",
+        message: t("connection.test.timeout"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -686,6 +700,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
   private async testImapConnection(
     account: ImapAccount,
     logger: EndpointLogger,
+    t: ImapAccountsT,
   ): Promise<ResponseType<ImapAccountTestResponseOutput>> {
     const startTime = Date.now();
 
@@ -707,8 +722,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
           error: "Missing required configuration",
         });
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.validation.account.username.required",
+          message: t("connection.validation.usernameRequired"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -720,8 +734,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
           port: account.port,
         });
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.validation.account.port.invalid",
+          message: t("connection.validation.portInvalid"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -733,8 +746,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
           host: account.host,
         });
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.validation.account.host.invalid",
+          message: t("connection.validation.hostInvalid"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -774,8 +786,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
             resolveOnce(
               success({
                 success: true,
-                message:
-                  "app.api.emails.imapClient.imap.connection.test.success",
+                message: t("connection.test.success"),
                 connectionStatus: ImapConnectionStatus.CONNECTED,
                 details: {
                   host: account.host,
@@ -803,8 +814,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
 
             resolveOnce(
               fail({
-                message:
-                  "app.api.emails.imapClient.imapErrors.connection.test.failed",
+                message: t("connection.test.failed"),
                 errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
                 messageParams: { error: parseError(error).message },
               }),
@@ -815,8 +825,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
           setTimeout(() => {
             resolveOnce(
               fail({
-                message:
-                  "app.api.emails.imapClient.imap.connection.test.timeout",
+                message: t("connection.test.timeout"),
                 errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
               }),
             );
@@ -828,7 +837,7 @@ class ImapAccountsRepositoryImpl implements ImapAccountsRepository {
     } catch (error) {
       logger.error("IMAP connection test failed", parseError(error));
       return fail({
-        message: "app.api.emails.imapClient.imap.connection.test.failed",
+        message: t("connection.test.failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

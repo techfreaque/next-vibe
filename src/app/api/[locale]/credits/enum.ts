@@ -5,16 +5,17 @@
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * Credit type identifier for tracking which credit pool is being used
  */
 export const {
   enum: CreditTypeIdentifier,
   options: CreditTypeIdentifierOptions,
-} = createEnumOptions({
-  USER_SUBSCRIPTION:
-    "app.api.agent.chat.credits.enums.creditType.userSubscription",
-  LEAD_FREE: "app.api.agent.chat.credits.enums.creditType.leadFree",
+} = createEnumOptions(scopedTranslation, {
+  USER_SUBSCRIPTION: "enums.creditType.userSubscription",
+  LEAD_FREE: "enums.creditType.leadFree",
 });
 
 /**
@@ -24,17 +25,17 @@ export const {
   enum: CreditTransactionType,
   options: CreditTransactionTypeOptions,
   Value: CreditTransactionTypeValue,
-} = createEnumOptions({
-  FREE_GRANT: "app.api.credits.enums.transactionType.freeGrant",
-  PURCHASE: "app.api.credits.enums.transactionType.purchase",
-  SUBSCRIPTION: "app.api.credits.enums.transactionType.subscription",
-  USAGE: "app.api.credits.enums.transactionType.usage",
-  EXPIRY: "app.api.credits.enums.transactionType.expiry",
-  REFUND: "app.api.credits.enums.transactionType.refund",
-  TRANSFER: "app.api.credits.enums.transactionType.transfer",
-  OTHER_DEVICES: "app.api.credits.enums.transactionType.otherDevices",
-  REFERRAL_EARNING: "app.api.credits.enums.transactionType.referralEarning",
-  REFERRAL_PAYOUT: "app.api.credits.enums.transactionType.referralPayout",
+} = createEnumOptions(scopedTranslation, {
+  FREE_GRANT: "enums.transactionType.freeGrant",
+  PURCHASE: "enums.transactionType.purchase",
+  SUBSCRIPTION: "enums.transactionType.subscription",
+  USAGE: "enums.transactionType.usage",
+  EXPIRY: "enums.transactionType.expiry",
+  REFUND: "enums.transactionType.refund",
+  TRANSFER: "enums.transactionType.transfer",
+  OTHER_DEVICES: "enums.transactionType.otherDevices",
+  REFERRAL_EARNING: "enums.transactionType.referralEarning",
+  REFERRAL_PAYOUT: "enums.transactionType.referralPayout",
 });
 
 /**
@@ -44,11 +45,11 @@ export const {
   enum: CreditPackType,
   options: CreditPackTypeOptions,
   Value: CreditPackTypeValue,
-} = createEnumOptions({
-  SUBSCRIPTION: "app.api.credits.enums.packType.subscription",
-  PERMANENT: "app.api.credits.enums.packType.permanent",
-  BONUS: "app.api.credits.enums.packType.bonus",
-  EARNED: "app.api.credits.enums.packType.earned",
+} = createEnumOptions(scopedTranslation, {
+  SUBSCRIPTION: "enums.packType.subscription",
+  PERMANENT: "enums.packType.permanent",
+  BONUS: "enums.packType.bonus",
+  EARNED: "enums.packType.earned",
 });
 
 export const CreditPackTypeDB = [

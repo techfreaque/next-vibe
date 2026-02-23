@@ -31,7 +31,10 @@ import { UserRolesRepository } from "./user-roles/repository";
 /**
  * Helper function to create user seed data
  */
-function createUserSeed(overrides?: Partial<NewUser>): NewUser {
+function createUserSeed(
+  locale: CountryLanguage,
+  overrides?: Partial<NewUser>,
+): NewUser {
   return {
     email: `user${Math.floor(Math.random() * 1000)}@example.com`,
     password: env.VIBE_ADMIN_USER_PASSWORD ?? DEV_SEED_PASSWORD, // Plain text password - will be hashed by createWithHashedPassword
@@ -40,7 +43,7 @@ function createUserSeed(overrides?: Partial<NewUser>): NewUser {
     emailVerified: true,
     isActive: true,
     marketingConsent: false,
-    locale: "en-GLOBAL",
+    locale,
 
     ...overrides,
   };
@@ -55,7 +58,7 @@ export async function dev(
 ): Promise<void> {
   // Create all dev seed users from shared constants
   const allUsers = DEV_SEED_USERS.map((seedUser, index) =>
-    createUserSeed({
+    createUserSeed(locale, {
       // Admin user (index 0): override email from env if set
       email:
         index === 0 && env.VIBE_ADMIN_USER_EMAIL
@@ -75,6 +78,7 @@ export async function dev(
       const emailExistsResponse = await UserRepository.emailExists(
         user.email,
         logger,
+        locale,
       );
       if (emailExistsResponse.success && emailExistsResponse.data) {
         logger.debug(
@@ -124,6 +128,7 @@ export async function dev(
       const newUserResponse = await UserRepository.createWithHashedPassword(
         user,
         logger,
+        locale,
       );
       if (!newUserResponse.success) {
         logger.error(
@@ -221,6 +226,7 @@ export async function dev(
                 role,
               },
               logger,
+              locale,
             );
             rolesCreated.push({ userId: adminUserId, role });
           } catch (roleError) {
@@ -241,6 +247,7 @@ export async function dev(
               role: UserRole.CUSTOMER,
             },
             logger,
+            locale,
           );
           rolesCreated.push({
             userId: createdUsers[1].id,
@@ -264,6 +271,7 @@ export async function dev(
                 role: UserRole.CUSTOMER,
               },
               logger,
+              locale,
             );
             rolesCreated.push({
               userId: createdUsers[i].id,
@@ -322,6 +330,7 @@ export async function dev(
           },
         },
         logger,
+        locale,
       );
 
       if (!referralResult.success) {
@@ -339,7 +348,7 @@ export async function dev(
       // Create CLI token
       const cliTokenResponse = await AuthRepository.createCliToken(
         adminUserId,
-        "en-GLOBAL",
+        locale,
         logger,
       );
       if (cliTokenResponse.success) {
@@ -347,12 +356,15 @@ export async function dev(
         const sessionExpiresAt = new Date(
           Date.now() + 365 * 24 * 60 * 60 * 1000,
         ); // 1 year
-        const sessionResult = await SessionRepository.create({
-          userId: adminUserId,
-          token: cliTokenResponse.data,
-          expiresAt: sessionExpiresAt,
-          createdAt: new Date(),
-        });
+        const sessionResult = await SessionRepository.create(
+          {
+            userId: adminUserId,
+            token: cliTokenResponse.data,
+            expiresAt: sessionExpiresAt,
+            createdAt: new Date(),
+          },
+          locale,
+        );
 
         if (!sessionResult.success) {
           logger.error("Failed to create CLI session");
@@ -373,15 +385,18 @@ export async function dev(
 /**
  * Test seed function for auth module
  */
-export async function test(logger: EndpointLogger): Promise<void> {
+export async function test(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   // Create test users
   const testUsers = [
-    createUserSeed({
+    createUserSeed(locale, {
       email: "test1@example.com",
       privateName: "Test User1",
       publicName: "Test1 Company",
     }),
-    createUserSeed({
+    createUserSeed(locale, {
       email: "test2@example.com",
       privateName: "Test User2",
       publicName: "Test2 Company",
@@ -396,7 +411,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
         const existingUser = await UserRepository.getUserByEmail(
           user.email,
           UserDetailLevel.STANDARD,
-          "en-GLOBAL",
+          locale,
           logger,
         );
         if (existingUser.success) {
@@ -409,6 +424,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
         const userResponse = await UserRepository.createWithHashedPassword(
           user,
           logger,
+          locale,
         );
         if (!userResponse.success) {
           logger.error(`Failed to create user: ${userResponse.message}`);
@@ -420,7 +436,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
             privateName: "",
             publicName: "",
             email: "",
-            locale: "en-GLOBAL",
+            locale,
             emailVerified: false,
             isActive: false,
             requireTwoFactor: false,
@@ -441,7 +457,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
           privateName: "",
           publicName: "",
           email: "",
-          locale: "en-GLOBAL",
+          locale,
           emailVerified: false,
           isActive: false,
           requireTwoFactor: false,
@@ -465,6 +481,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
           role: UserRole.ADMIN,
         },
         logger,
+        locale,
       );
       logger.debug(`Created admin role for test user ${createdUsers[0].id}`);
 
@@ -475,6 +492,7 @@ export async function test(logger: EndpointLogger): Promise<void> {
           role: UserRole.CUSTOMER,
         },
         logger,
+        locale,
       );
       logger.debug(`Created customer role for test user ${createdUsers[1].id}`);
     } catch (roleError) {
@@ -512,7 +530,7 @@ export async function prod(
   logger.debug("🌱 Seeding auth data for production environment");
 
   // Create admin user — use env email if set, fallback to support email
-  const adminUser = createUserSeed({
+  const adminUser = createUserSeed(locale, {
     email:
       env.VIBE_ADMIN_USER_EMAIL ??
       contactClientRepository.getSupportEmail(locale),
@@ -527,7 +545,7 @@ export async function prod(
     const existingAdmin = await UserRepository.getUserByEmail(
       adminUser.email,
       UserDetailLevel.STANDARD,
-      "en-GLOBAL",
+      locale,
       logger,
     );
     if (existingAdmin.success && existingAdmin.data) {
@@ -551,6 +569,7 @@ export async function prod(
       const adminResponse = await UserRepository.createWithHashedPassword(
         adminUser,
         logger,
+        locale,
       );
       if (!adminResponse.success) {
         logger.error(
@@ -572,6 +591,7 @@ export async function prod(
           role: UserRole.ADMIN,
         },
         logger,
+        locale,
       );
       logger.debug(`Created admin role for user ${createdAdmin.id}`);
     } catch (roleError) {

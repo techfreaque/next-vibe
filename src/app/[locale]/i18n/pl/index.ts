@@ -1,3 +1,5 @@
+import { translations as leadsTranslations } from "../../../api/[locale]/leads/i18n/pl";
+import { translations as productsTranslations } from "../../../api/[locale]/products/i18n/pl";
 import { translations as componentsTranslations } from "../../_components/i18n/pl";
 import { translations as notFoundTranslations } from "../../[...notFound]/i18n/pl";
 import { translations as adminTranslations } from "../../admin/i18n/pl";
@@ -14,6 +16,10 @@ export const translations: typeof enTranslations = {
   story: siteTranslations,
   notFound: notFoundTranslations,
   admin: adminTranslations,
+  api: {
+    leads: leadsTranslations,
+    products: productsTranslations,
+  },
   chat: chatTranslations,
   help: helpTranslations,
   subscription: subscriptionTranslations,
@@ -38,7 +44,7 @@ export const translations: typeof enTranslations = {
     spanish: "Hiszpański",
     italian: "Włoski",
     portuguese: "Portugalski",
-    dutch: "Holenderski",
+    dutch: "Niderlandzki",
     russian: "Rosyjski",
     chinese: "Chiński",
     japanese: "Japoński",
@@ -74,10 +80,10 @@ export const translations: typeof enTranslations = {
   },
   timezone: {
     utc: "UTC",
-    eastern: "Eastern Time (ET)",
-    central: "Central Time (CT)",
-    mountain: "Mountain Time (MT)",
-    pacific: "Pacific Time (PT)",
+    eastern: "Czas wschodni (ET)",
+    central: "Czas centralny (CT)",
+    mountain: "Czas górski (MT)",
+    pacific: "Czas pacyficzny (PT)",
     london: "Londyn (GMT)",
     paris: "Paryż (CET)",
     berlin: "Berlin (CET)",
@@ -90,7 +96,7 @@ export const translations: typeof enTranslations = {
     seoul: "Seul (KST)",
     sydney: "Sydney (AEDT)",
     auckland: "Auckland (NZDT)",
-    mumbai: "Mumbai (IST)",
+    mumbai: "Mumbaj (IST)",
   },
   newsletter: {
     title: "Bądź na bieżąco",
@@ -241,10 +247,11 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+
   constants: {
     languages: {
-      en: "English",
-      de: "Deutsch",
+      en: "Angielski",
+      de: "Niemiecki",
       pl: "Polski",
     },
   },
@@ -299,6 +306,11 @@ export const translations: typeof enTranslations = {
     filter: "Filtruj",
     refresh: "Odśwież",
     notAvailable: "N/D",
+    errors: {
+      noEndpoint:
+        "Ta funkcja nie jest jeszcze dostępna. Spróbuj ponownie później",
+      unknown: "Wystąpił nieznany błąd",
+    },
     weekday: {
       monday: "Poniedziałek",
       tuesday: "Wtorek",
@@ -343,17 +355,6 @@ export const translations: typeof enTranslations = {
     noOptionsFound: "Nie znaleziono opcji",
     useCustomValue: "Użyj wartości niestandardowej",
     cancel: "Anuluj",
-    countries: {
-      global: "Globalny",
-      de: "Niemcy",
-      pl: "Polska",
-      us: "Stany Zjednoczone",
-    },
-    languages: {
-      en: "Angielski",
-      de: "Niemiecki",
-      pl: "Polski",
-    },
     error: {
       title: "Błąd",
       message: "Coś poszło nie tak",
@@ -369,27 +370,8 @@ export const translations: typeof enTranslations = {
         cause: "Przyczyna:",
       },
     },
-    errors: {
-      noEndpoint:
-        "Ta funkcja nie jest jeszcze dostępna. Spróbuj ponownie później",
-      unknown: "Wystąpił nieznany błąd",
-    },
-    api: {
-      notifications: {
-        welcome: {
-          title: "Witaj!",
-          description: "Dziękujemy za dołączenie. Zaczynajmy!",
-        },
-      },
-    },
   },
-  shared: {
-    error: {
-      title: "Błąd",
-      userError: "Wystąpił błąd użytkownika",
-      invalidToken: "Nieprawidłowy lub wygasły token",
-    },
-  },
+
   ui: {
     iconPicker: {
       title: "Wybierz ikonę",
@@ -416,53 +398,13 @@ export const translations: typeof enTranslations = {
         ui: "UI i Sterowanie",
       },
     },
-    countries: {
-      global: "Globalny",
-      de: "Niemcy",
-      pl: "Polska",
-      us: "Stany Zjednoczone",
-    },
-    languages: {
-      en: "Angielski",
-      de: "Niemiecki",
-      pl: "Polski",
-    },
-    error: {
-      title: "Błąd",
-      message: "Coś poszło nie tak",
-      description: "Wystąpił błąd. Spróbuj ponownie.",
-      tryAgain: "Spróbuj ponownie",
-      sending_sms: "Nie udało się wysłać SMS-a",
-      boundary: {
-        stackTrace: "Ślad stosu",
-        componentStack: "Stos komponentów",
-        errorDetails: "Szczegóły błędu",
-        name: "Nazwa:",
-        errorMessage: "Wiadomość:",
-        cause: "Przyczyna:",
-      },
-    },
-    errors: {
-      unknown: "Wystąpił nieznany błąd",
-    },
-    success: {
-      title: "Sukces",
-      message: "Operacja zakończona pomyślnie",
-      description: "Twoja akcja została pomyślnie zakończona.",
-    },
+
     info: {
       title: "Informacja",
       message: "Proszę zauważyć",
       description: "Oto kilka informacji dla Ciebie.",
     },
-    api: {
-      notifications: {
-        welcome: {
-          title: "Witamy!",
-          description: "Dziękujemy za dołączenie do nas. Zaczynajmy!",
-        },
-      },
-    },
+
     footer: {
       description:
         "Przekształć swoją obecność w mediach społecznościowych dzięki profesjonalnemu tworzeniu treści i strategicznemu zarządzaniu.",

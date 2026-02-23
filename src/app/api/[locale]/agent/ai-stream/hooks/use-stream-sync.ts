@@ -5,7 +5,9 @@
 
 import { useEffect } from "react";
 
-import type { TFunction } from "@/i18n/core/static-types";
+import type { scopedTranslation } from "../i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 import type {
   StreamingMessage,
@@ -25,7 +27,7 @@ interface StreamSyncDeps {
   addMessage: (message: ChatMessage) => void;
   updateMessage: (messageId: string, updates: Partial<ChatMessage>) => void;
   addThread: (thread: ChatThread) => void;
-  t: TFunction;
+  t: ModuleT;
 }
 
 /**
@@ -78,9 +80,7 @@ export function useStreamSync(deps: StreamSyncDeps): void {
                 ? { finishReason: streamMsg.finishReason }
                 : {}),
             },
-            errorType: streamMsg.error
-              ? t("app.api.agent.chat.aiStream.errorTypes.streamError")
-              : null,
+            errorType: streamMsg.error ? t("errorTypes.streamError") : null,
             errorMessage: streamMsg.error || null,
           });
         }
@@ -96,9 +96,7 @@ export function useStreamSync(deps: StreamSyncDeps): void {
           isAI: streamMsg.role === ChatMessageRole.ASSISTANT,
           model: streamMsg.model || null,
           character: streamMsg.character || null,
-          errorType: streamMsg.error
-            ? t("app.api.agent.chat.aiStream.errorTypes.streamError")
-            : null,
+          errorType: streamMsg.error ? t("errorTypes.streamError") : null,
           errorMessage: streamMsg.error || null,
           errorCode: null,
           metadata: {

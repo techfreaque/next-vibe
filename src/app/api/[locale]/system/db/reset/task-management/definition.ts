@@ -7,11 +7,10 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -22,46 +21,18 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-/**
- * Task Operation Types
- */
-export const { enum: TaskOperationType, options: TaskOperationTypeOptions } =
-  createEnumOptions({
-    RUN_SAFETY_CHECK:
-      "app.api.system.db.reset.taskManagement.operations.runSafetyCheck",
-    START_AUTO_RESET:
-      "app.api.system.db.reset.taskManagement.operations.startAutoReset",
-    START_BACKUP_VERIFICATION:
-      "app.api.system.db.reset.taskManagement.operations.startBackupVerification",
-    STOP_AUTO_RESET:
-      "app.api.system.db.reset.taskManagement.operations.stopAutoReset",
-    STOP_BACKUP_VERIFICATION:
-      "app.api.system.db.reset.taskManagement.operations.stopBackupVerification",
-    GET_STATUS: "app.api.system.db.reset.taskManagement.operations.getStatus",
-    LIST_TASKS: "app.api.system.db.reset.taskManagement.operations.listTasks",
-  } as const);
-
-/**
- * Task Priority Types
- */
-export const { enum: TaskPriority, options: TaskPriorityOptions } =
-  createEnumOptions({
-    LOW: "app.api.system.db.reset.taskManagement.priority.low",
-    MEDIUM: "app.api.system.db.reset.taskManagement.priority.medium",
-    HIGH: "app.api.system.db.reset.taskManagement.priority.high",
-  } as const);
+import { TaskOperationType, TaskOperationTypeOptions } from "./enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Database Reset Task Management Endpoint Definition
  */
 const { POST } = createEndpoint({
-  title: "app.api.system.db.reset.taskManagement.title",
-  description: "app.api.system.db.reset.taskManagement.description",
-  category: "app.api.system.category",
-  tags: [
-    "app.api.system.db.reset.taskManagement.tags.tasks",
-    "app.api.system.db.reset.taskManagement.tags.management",
-  ],
+  scopedTranslation,
+  title: "title",
+  description: "description",
+  category: "category",
+  tags: ["tags.tasks", "tags.management"],
   icon: "rotate-ccw",
   allowedRoles: [
     UserRole.ADMIN,
@@ -156,26 +127,21 @@ const { POST } = createEndpoint({
       },
     },
   },
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.db.reset.taskManagement.container.title",
-      description:
-        "app.api.system.db.reset.taskManagement.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "container.title",
+    description: "container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      operation: requestField({
+      operation: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label: "app.api.system.db.reset.taskManagement.fields.operation.label",
-        description:
-          "app.api.system.db.reset.taskManagement.fields.operation.description",
-        placeholder:
-          "app.api.system.db.reset.taskManagement.fields.operation.placeholder",
+        label: "fields.operation.label",
+        description: "fields.operation.description",
+        placeholder: "fields.operation.placeholder",
         options: TaskOperationTypeOptions,
         columns: 12,
         schema: z
@@ -183,14 +149,12 @@ const { POST } = createEndpoint({
           .min(1)
           .describe("Task operations to execute"),
       }),
-      options: requestField({
+      options: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
-        label: "app.api.system.db.reset.taskManagement.fields.options.label",
-        description:
-          "app.api.system.db.reset.taskManagement.fields.options.description",
-        placeholder:
-          "app.api.system.db.reset.taskManagement.fields.options.placeholder",
+        label: "fields.options.label",
+        description: "fields.options.description",
+        placeholder: "fields.options.placeholder",
         columns: 12,
         schema: z
           .object({
@@ -211,38 +175,36 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.db.reset.taskManagement.response.success.label",
+        content: "response.success.label",
         schema: z
           .boolean()
           .describe("Whether the task operation was successful"),
       }),
-      taskName: responseField({
+      taskName: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.db.reset.taskManagement.response.taskName.label",
+        content: "response.taskName.label",
         schema: z.string().describe("Name of the task that was operated on"),
       }),
-      status: responseField({
+      status: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.reset.taskManagement.response.status.label",
+        content: "response.status.label",
         schema: z.string().describe("Current status of the task"),
       }),
-      output: responseField({
+      output: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.reset.taskManagement.response.output.label",
+        content: "response.output.label",
         schema: z.string().optional().describe("Task execution output"),
       }),
-      error: responseField({
+      error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.reset.taskManagement.response.error.label",
+        content: "response.error.label",
         schema: z.string().optional().describe("Error message if task failed"),
       }),
-      result: responseField({
+      result: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.reset.taskManagement.response.result.label",
+        content: "response.result.label",
         schema: z
           .object({
             success: z.boolean(),
@@ -253,62 +215,52 @@ const { POST } = createEndpoint({
           .describe("Detailed task result"),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.db.reset.taskManagement.errors.validation.title",
-      description:
-        "app.api.system.db.reset.taskManagement.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.db.reset.taskManagement.errors.unauthorized.title",
-      description:
-        "app.api.system.db.reset.taskManagement.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.db.reset.taskManagement.errors.forbidden.title",
-      description:
-        "app.api.system.db.reset.taskManagement.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.db.reset.taskManagement.errors.internal.title",
-      description:
-        "app.api.system.db.reset.taskManagement.errors.internal.description",
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.db.reset.taskManagement.errors.conflict.title",
-      description:
-        "app.api.system.db.reset.taskManagement.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.db.reset.taskManagement.errors.networkError.title",
-      description:
-        "app.api.system.db.reset.taskManagement.errors.networkError.description",
+      title: "errors.networkError.title",
+      description: "errors.networkError.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.db.reset.taskManagement.errors.notFound.title",
-      description:
-        "app.api.system.db.reset.taskManagement.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.db.reset.taskManagement.errors.unknownError.title",
-      description:
-        "app.api.system.db.reset.taskManagement.errors.unknownError.description",
+      title: "errors.unknownError.title",
+      description: "errors.unknownError.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.db.reset.taskManagement.errors.unsavedChanges.title",
-      description:
-        "app.api.system.db.reset.taskManagement.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.system.db.reset.taskManagement.success.title",
-    description: "app.api.system.db.reset.taskManagement.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 });
 

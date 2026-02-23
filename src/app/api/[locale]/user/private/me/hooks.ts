@@ -32,6 +32,7 @@ import meEndpoints, {
   type MePostRequestOutput,
   type MePostResponseOutput,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 /****************************
  * STATE KEYS
@@ -131,19 +132,20 @@ export function useUpdateProfile(
   user: JwtPayloadType,
 ): EnhancedMutationResult<MePostResponseOutput, MePostRequestOutput, never> {
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = scopedTranslation.scopedT(locale);
 
   return useApiMutation(meEndpoints.POST, logger, user, {
     onSuccess: async () => {
       toast({
-        title: t("app.api.user.notifications.profileUpdated.title"),
-        description: t("app.api.user.notifications.profileUpdated.description"),
+        title: t("update.success.title"),
+        description: t("update.success.description"),
         variant: "default",
       });
     },
     onError: ({ error }) => {
       toast({
-        title: t("app.api.user.notifications.updateFailed.title"),
+        title: t("update.errors.unknown.title"),
         description: error.message,
         variant: "destructive",
       });
@@ -169,13 +171,14 @@ export function useDeleteAccount(
   never
 > {
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = scopedTranslation.scopedT(locale);
 
   return useApiMutation(meEndpoints.DELETE, logger, user, {
     onSuccess: () => {
       toast({
-        title: t("app.api.user.private.me.delete.success.title"),
-        description: t("app.api.user.private.me.delete.success.description"),
+        title: t("delete.success.title"),
+        description: t("delete.success.description"),
         variant: "default",
       });
 
@@ -183,7 +186,7 @@ export function useDeleteAccount(
     },
     onError: ({ error }) => {
       toast({
-        title: t("app.api.user.private.me.delete.errors.unknown.title"),
+        title: t("delete.errors.unknown.title"),
         description: error.message,
         variant: "destructive",
       });

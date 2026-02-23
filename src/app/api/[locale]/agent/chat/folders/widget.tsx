@@ -41,9 +41,11 @@ import { NewFolderDialog } from "@/app/api/[locale]/agent/chat/threads/_componen
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { simpleT } from "@/i18n/core/shared";
 
 import { useWidgetContext } from "../../../system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { scopedTranslation as chatScopedTranslation } from "../i18n";
 import threadsDefinition from "../threads/definition";
 import type definition from "./definition";
 import type { FolderListResponseOutput } from "./definition";
@@ -108,23 +110,25 @@ function RootFolderBar({
   activeRootFolderId,
   onSelectFolder,
   isAuthenticated,
+  isAdmin,
 }: {
   activeRootFolderId: DefaultFolderId;
   onSelectFolder: (folderId: DefaultFolderId) => void;
   isAuthenticated: boolean;
+  isAdmin: boolean;
 }): React.JSX.Element {
   const { locale } = useWidgetContext();
-  const { t } = simpleT(locale);
+  const { t } = chatScopedTranslation.scopedT(locale);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
 
   const rootFolders = useMemo(
     () =>
-      Object.values(DEFAULT_FOLDER_CONFIGS).toSorted(
-        (a, b) => a.order - b.order,
-      ),
-    [],
+      Object.values(DEFAULT_FOLDER_CONFIGS)
+        .filter((f) => f.id !== DefaultFolderId.CRON || isAdmin)
+        .toSorted((a, b) => a.order - b.order),
+    [isAdmin],
   );
 
   const isFolderAccessible = (folderId: string): boolean => {
@@ -181,11 +185,7 @@ function RootFolderBar({
                   />
                 </Div>
                 <Span className="text-[9px] font-medium leading-none opacity-80">
-                  {t(
-                    `app.api.agent.chat.config.foldersShort.${folderConfig.id}` as Parameters<
-                      typeof t
-                    >[0],
-                  )}
+                  {t(`config.foldersShort.${folderConfig.id}`)}
                 </Span>
               </Button>
             );
@@ -234,6 +234,16 @@ export function FoldersListContainer({
 
   const isAuthenticated = useMemo(
     () => user !== undefined && !user.isPublic,
+    [user],
+  );
+  const isAdmin = useMemo(
+    () =>
+      user !== undefined &&
+      !user.isPublic &&
+      "roles" in user &&
+      (user as { roles?: string[] }).roles?.includes(
+        UserPermissionRole.ADMIN,
+      ) === true,
     [user],
   );
 
@@ -379,6 +389,7 @@ export function FoldersListContainer({
         activeRootFolderId={activeRootFolderId}
         onSelectFolder={handleSelectRootFolder}
         isAuthenticated={isAuthenticated}
+        isAdmin={isAdmin}
       />
 
       {/* Action bar: New chat + New folder */}

@@ -3,6 +3,7 @@
  * Static class for formatting errors and error chains
  */
 
+import { scopedTranslation as cliScopedTranslation } from "@/app/api/[locale]/system/unified-interface/cli/i18n";
 import type { RouteExecutionResult } from "@/app/api/[locale]/system/unified-interface/cli/runtime/route-executor";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -21,10 +22,10 @@ export class CliErrorFormatter {
     verbose: boolean,
   ): string {
     const { t } = simpleT(locale);
+    const { t: cliT } = cliScopedTranslation.scopedT(locale);
 
     let errorMessage = t(
-      result.error ||
-        "app.api.system.unifiedInterface.cli.vibe.errors.unknownError",
+      result.error ?? cliT("vibe.errors.unknownError", result.errorParams),
       result.errorParams,
     );
 
@@ -40,8 +41,16 @@ export class CliErrorFormatter {
       }
     }
 
+    const unknownErrorKey = cliT("vibe.errors.unknownError");
+
     // Handle error cause chain
-    const causeChain = this.formatErrorCauseChain(result, t, verbose);
+    const causeChain = this.formatErrorCauseChain(
+      result,
+      t,
+      verbose,
+      0,
+      unknownErrorKey,
+    );
     if (causeChain) {
       detailedError += causeChain;
     }
@@ -62,6 +71,7 @@ export class CliErrorFormatter {
     t: TFunction,
     verbose: boolean,
     depth = 0,
+    unknownErrorKey?: TranslationKey,
   ): string {
     if (!result.cause || depth > 10) {
       // Prevent infinite recursion (increased limit for deep error chains)
@@ -73,8 +83,7 @@ export class CliErrorFormatter {
 
     // Format cause error message - ErrorResponseType uses 'message' field
     const causeTranslationKey: TranslationKey =
-      result.cause.message ||
-      "app.api.system.unifiedInterface.cli.vibe.errors.unknownError";
+      result.cause.message || unknownErrorKey!;
 
     const causeMessage = t(causeTranslationKey, result.cause.messageParams);
 
@@ -105,7 +114,13 @@ export class CliErrorFormatter {
         success: false,
         cause: result.cause.cause,
       };
-      output += this.formatErrorCauseChain(nestedResult, t, verbose, depth + 1);
+      output += this.formatErrorCauseChain(
+        nestedResult,
+        t,
+        verbose,
+        depth + 1,
+        unknownErrorKey,
+      );
     }
 
     return output;

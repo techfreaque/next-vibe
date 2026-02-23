@@ -263,6 +263,33 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  aiTools: {
+    modal: {
+      pinnedLabel: "przypięte",
+      pinnedTooltip:
+        "Przypięte narzędzia są zawsze w kontekście — AI widzi je przy każdym kroku",
+      enabledLabel: "dozwolone",
+      enabledTooltip:
+        "Dozwolone narzędzia mogą być wywoływane na żądanie, gdy pomoc jest włączona",
+      totalLabel: "łącznie",
+      searchPlaceholder: "Szukaj narzędzi...",
+      expandAll: "Rozwiń wszystkie",
+      collapseAll: "Zwiń wszystkie",
+      deselectAll: "Odznacz wszystkie",
+      selectAll: "Zaznacz wszystkie",
+      resetToDefault: "Przywróć domyślne",
+      noToolsFound: "Nie znaleziono narzędzi",
+      noToolsAvailable: "Brak dostępnych narzędzi AI",
+      legendActive: "Zawsze w kontekście (przypięte)",
+      legendConfirm: "Pyta przed uruchomieniem",
+      stats: "{{pinned}} z {{total}} narzędzi przypiętych",
+      activeOn: "Przypięte — zawsze w kontekście. Kliknij aby odpiąć",
+      activeOff:
+        "Nieprzypięte — AI może wywoływać na żądanie. Kliknij aby przypiąć",
+      confirmOn: "Prosi o potwierdzenie — kliknij aby wyłączyć",
+      confirmOff: "Uruchamia automatycznie — kliknij aby wymagać potwierdzenia",
+    },
+  },
   list: {
     post: {
       title: "Lista dostępnych poleceń",

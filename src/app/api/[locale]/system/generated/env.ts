@@ -11,6 +11,7 @@ import { validateEnv } from "next-vibe/shared/utils/env-util";
 import type { z } from "zod";
 
 import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface/shared/env/validation-logger";
+import { defaultLocale } from "@/i18n/core/config";
 
 // Import env modules
 import {
@@ -74,6 +75,7 @@ export function validateAllEnv(): Env {
     { ...process.env, platform },
     envSchema,
     envValidationLogger,
+    defaultLocale,
   );
 }
 

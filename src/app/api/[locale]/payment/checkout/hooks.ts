@@ -34,6 +34,7 @@ import type {
   CheckoutResponseOutput,
 } from "./definition";
 import checkoutEndpoints from "./definition";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Hook for subscription checkout
@@ -141,6 +142,8 @@ export function useCheckout(
   error: ErrorResponseType | null;
 } {
   const endpoint = useSubscriptionCheckout(logger, user);
+  const { locale } = useTranslation();
+  const { t: tCheckout } = scopedTranslation.scopedT(locale);
 
   const createCheckout = (
     planId: typeof SubscriptionPlanValue,
@@ -150,7 +153,7 @@ export function useCheckout(
     if (!endpoint.create) {
       return Promise.resolve(
         fail({
-          message: "app.api.subscription.checkout.error",
+          message: tCheckout("error"),
           errorType: ErrorResponseTypes.UNKNOWN_ERROR,
         }),
       );
@@ -176,7 +179,7 @@ export function useCheckout(
           onError: ({ error }) => {
             resolve(
               fail({
-                message: error.message ?? "app.api.subscription.checkout.error",
+                message: error.message ?? tCheckout("error"),
                 errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
                 messageParams: error.messageParams,
               }),
@@ -187,7 +190,7 @@ export function useCheckout(
         if (error instanceof Error) {
           resolve(
             fail({
-              message: "app.api.subscription.checkout.error",
+              message: tCheckout("error"),
               errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
               messageParams: { error: error.message },
             }),
@@ -195,7 +198,7 @@ export function useCheckout(
         } else {
           resolve(
             fail({
-              message: "app.api.subscription.checkout.error",
+              message: tCheckout("error"),
               errorType: ErrorResponseTypes.UNKNOWN_ERROR,
             }),
           );

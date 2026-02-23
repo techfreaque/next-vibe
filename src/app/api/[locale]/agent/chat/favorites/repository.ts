@@ -17,12 +17,19 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CharactersRepository } from "../characters/repository";
+import { chatSettings } from "../settings/db";
+import { scopedTranslation as settingsScopedTranslation } from "../settings/i18n";
 import { ChatSettingsRepository } from "../settings/repository";
 import { chatFavorites } from "./db";
 import type { FavoritesListResponseOutput } from "./definition";
+import { formatFavoritesSummary } from "./favorites-formatter";
+import type { scopedTranslation } from "./i18n";
 import { ChatFavoritesRepositoryClient } from "./repository-client";
+
+type FavoritesT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Chat Favorites Repository
@@ -34,8 +41,11 @@ export class ChatFavoritesRepository {
   static async getFavorites(
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
+    t: FavoritesT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<FavoritesListResponseOutput>> {
     const userId = user.id;
+    const { t: settingsT } = settingsScopedTranslation.scopedT(locale);
 
     try {
       logger.debug("Fetching favorites", { userId });
@@ -44,6 +54,7 @@ export class ChatFavoritesRepository {
       const settingsResult = await ChatSettingsRepository.getSettings(
         user,
         logger,
+        settingsT,
       );
       const activeFavoriteId = settingsResult.success
         ? settingsResult.data.activeFavoriteId
@@ -71,6 +82,7 @@ export class ChatFavoritesRepository {
               { id: favorite.characterId },
               user,
               logger,
+              locale,
             );
             if (characterResult.success) {
               characterModelSelection = characterResult.data.modelSelection;
@@ -108,9 +120,63 @@ export class ChatFavoritesRepository {
     } catch (error) {
       logger.error("Failed to fetch favorites", parseError(error));
       return fail({
-        message: "app.api.agent.chat.favorites.get.errors.server.title",
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
+  }
+}
+
+/**
+ * Generate favorites summary for system prompt (server-side)
+ * Fetches favorites from database and formats them using shared formatter
+ */
+export async function generateFavoritesSummary(params: {
+  userId: string;
+  logger: EndpointLogger;
+}): Promise<string> {
+  const { userId, logger } = params;
+
+  try {
+    const [settingsRow] = await db
+      .select({ activeFavoriteId: chatSettings.activeFavoriteId })
+      .from(chatSettings)
+      .where(eq(chatSettings.userId, userId))
+      .limit(1);
+
+    const activeFavoriteId = settingsRow?.activeFavoriteId ?? null;
+
+    const rows = await db
+      .select()
+      .from(chatFavorites)
+      .where(eq(chatFavorites.userId, userId))
+      .orderBy(asc(chatFavorites.position));
+
+    if (rows.length === 0) {
+      return "";
+    }
+
+    const items = rows.map((row) => ({
+      id: row.id,
+      name: row.customName ?? row.characterId,
+      characterId: row.characterId,
+      modelId: null as string | null, // model resolved client-side; not stored server-side
+      modelInfo: "",
+      isActive: row.id === activeFavoriteId,
+      position: row.position,
+      useCount: row.useCount,
+      lastUsedAt: row.lastUsedAt,
+    }));
+
+    logger.debug("Generated favorites summary", {
+      userId,
+      count: items.length,
+      activeFavoriteId,
+    });
+
+    return formatFavoritesSummary(items);
+  } catch (error) {
+    logger.error("Failed to generate favorites summary", parseError(error));
+    return "";
   }
 }

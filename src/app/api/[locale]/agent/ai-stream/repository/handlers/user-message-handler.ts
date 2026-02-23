@@ -16,6 +16,7 @@ import { UserRepository } from "@/app/api/[locale]/user/repository";
 
 import type { ChatMessageRole } from "../../../chat/enum";
 import { createUserMessage } from "../../../chat/threads/[threadId]/messages/repository";
+import type { AiStreamT } from "../../i18n";
 import { FileAttachmentHandler } from "./file-attachment-handler";
 
 export class UserMessageHandler {
@@ -35,6 +36,7 @@ export class UserMessageHandler {
     userId: string | undefined;
     attachments?: File[];
     logger: EndpointLogger;
+    t: AiStreamT;
   }): Promise<
     ResponseType<{
       userMessageId: string | null;
@@ -72,6 +74,7 @@ export class UserMessageHandler {
       userId,
       attachments,
       logger,
+      t,
     } = params;
 
     // For "answer-as-ai", we don't create a user message
@@ -108,7 +111,7 @@ export class UserMessageHandler {
     if (!userMessageId) {
       logger.error("userMessageId is required for user message creation");
       return fail({
-        message: "app.api.agent.chat.aiStream.route.errors.invalidJson",
+        message: t("route.errors.invalidJson"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
@@ -170,6 +173,7 @@ export class UserMessageHandler {
           userMessageId,
           userId,
           logger,
+          t,
         }).then(async (result) => {
           if (result.success) {
             // Update message with permanent URLs only (no base64 in DB)

@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Generators",
+
   post: {
     title: "Generate Task Index",
     description: "Generate task index files",

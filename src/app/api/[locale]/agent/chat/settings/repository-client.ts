@@ -80,8 +80,8 @@ export class ChatSettingsRepositoryClient {
       ttsAutoplay: false,
       ttsVoice: DEFAULT_TTS_VOICE,
       viewMode: ViewMode.LINEAR,
-      activeTools: null,
-      visibleTools: null,
+      allowedTools: null,
+      pinnedTools: null,
       compactTrigger: COMPACT_TRIGGER,
     };
   }
@@ -116,14 +116,14 @@ export class ChatSettingsRepositoryClient {
         ttsAutoplay: overrides.ttsAutoplay ?? defaults.ttsAutoplay,
         ttsVoice: overrides.ttsVoice ?? defaults.ttsVoice,
         viewMode: overrides.viewMode ?? defaults.viewMode,
-        activeTools:
-          "activeTools" in overrides
-            ? overrides.activeTools
-            : defaults.activeTools,
-        visibleTools:
-          "visibleTools" in overrides
-            ? overrides.visibleTools
-            : defaults.visibleTools,
+        allowedTools:
+          "allowedTools" in overrides
+            ? overrides.allowedTools
+            : defaults.allowedTools,
+        pinnedTools:
+          "pinnedTools" in overrides
+            ? overrides.pinnedTools
+            : defaults.pinnedTools,
         compactTrigger: overrides.compactTrigger ?? defaults.compactTrigger,
       };
     } catch {
@@ -162,16 +162,16 @@ export class ChatSettingsRepositoryClient {
       overrides.viewMode = settings.viewMode;
     }
     if (
-      JSON.stringify(settings.activeTools) !==
-      JSON.stringify(defaults.activeTools)
+      JSON.stringify(settings.allowedTools) !==
+      JSON.stringify(defaults.allowedTools)
     ) {
-      overrides.activeTools = settings.activeTools;
+      overrides.allowedTools = settings.allowedTools;
     }
     if (
-      JSON.stringify(settings.visibleTools) !==
-      JSON.stringify(defaults.visibleTools)
+      JSON.stringify(settings.pinnedTools) !==
+      JSON.stringify(defaults.pinnedTools)
     ) {
-      overrides.visibleTools = settings.visibleTools;
+      overrides.pinnedTools = settings.pinnedTools;
     }
     if (settings.compactTrigger !== defaults.compactTrigger) {
       overrides.compactTrigger = settings.compactTrigger;
@@ -204,14 +204,14 @@ export class ChatSettingsRepositoryClient {
           : current.ttsAutoplay,
       ttsVoice: updates.ttsVoice ?? current.ttsVoice,
       viewMode: updates.viewMode ?? current.viewMode,
-      activeTools:
-        updates.activeTools !== undefined
-          ? updates.activeTools
-          : current.activeTools,
-      visibleTools:
-        updates.visibleTools !== undefined
-          ? updates.visibleTools
-          : current.visibleTools,
+      allowedTools:
+        updates.allowedTools !== undefined
+          ? updates.allowedTools
+          : current.allowedTools,
+      pinnedTools:
+        updates.pinnedTools !== undefined
+          ? updates.pinnedTools
+          : current.pinnedTools,
       compactTrigger:
         updates.compactTrigger !== undefined
           ? updates.compactTrigger

@@ -18,16 +18,17 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: ({ data, urlPathParams, user, logger }) =>
+    handler: ({ data, urlPathParams, user, logger, locale }) =>
       FolderRepository.updateFolder(
         user,
         { ...data, id: urlPathParams.id },
         logger,
+        locale,
       ),
   },
   [Methods.DELETE]: {
     email: undefined,
-    handler: ({ user, urlPathParams, logger }) =>
-      FolderRepository.deleteFolder(user, urlPathParams, logger),
+    handler: ({ user, urlPathParams, logger, locale }) =>
+      FolderRepository.deleteFolder(user, urlPathParams, logger, locale),
   },
 });

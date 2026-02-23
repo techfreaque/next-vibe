@@ -23,12 +23,16 @@ import type {
   MessagingAccountsListGETRequestOutput,
   MessagingAccountsListGETResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 export class MessagingAccountsListRepository {
   static async listAccounts(
     data: MessagingAccountsListGETRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<MessagingAccountsListGETResponseOutput>> {
     try {
       logger.info("Getting messaging accounts", { data, userId: user.id });
@@ -85,7 +89,7 @@ export class MessagingAccountsListRepository {
     } catch (error) {
       logger.error("Error getting messaging accounts", parseError(error));
       return fail({
-        message: "app.api.emails.messaging.accounts.list.errors.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

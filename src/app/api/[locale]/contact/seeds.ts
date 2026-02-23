@@ -6,10 +6,11 @@
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { defaultLocale } from "@/i18n/core/config";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { NewContact } from "./db";
 import { ContactStatus } from "./enum";
+import { scopedTranslation } from "./i18n";
 import { ContactRepository } from "./repository";
 
 /**
@@ -31,7 +32,10 @@ function createContactSeed(overrides?: Partial<NewContact>): NewContact {
 /**
  * Development seed function for contact module
  */
-export async function dev(logger: EndpointLogger): Promise<void> {
+export async function dev(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   logger.debug("app.api.contact.seeds.dev.start");
 
   try {
@@ -69,11 +73,8 @@ export async function dev(logger: EndpointLogger): Promise<void> {
     let createdCount = 0;
     for (const contact of contactSubmissions) {
       try {
-        const result = await ContactRepository.create(
-          contact,
-          defaultLocale,
-          logger,
-        );
+        const { t } = scopedTranslation.scopedT(locale);
+        const result = await ContactRepository.create(contact, logger, t);
         if (result.success) {
           createdCount++;
         } else {
@@ -103,7 +104,10 @@ export async function dev(logger: EndpointLogger): Promise<void> {
 /**
  * Test seed function for contact module
  */
-export async function test(logger: EndpointLogger): Promise<void> {
+export async function test(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
   logger.debug("app.api.contact.seeds.test.start");
 
   try {
@@ -116,11 +120,8 @@ export async function test(logger: EndpointLogger): Promise<void> {
       status: ContactStatus.NEW,
     });
 
-    const result = await ContactRepository.create(
-      testContact,
-      defaultLocale,
-      logger,
-    );
+    const { t } = scopedTranslation.scopedT(locale);
+    const result = await ContactRepository.create(testContact, logger, t);
     if (result.success) {
       logger.debug("app.api.contact.seeds.test.submission.created");
     } else {

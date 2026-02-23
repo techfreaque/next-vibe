@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "System Server",
+
   tag: "Gesundheit",
   get: {
     title: "Gesundheitsprüfung",

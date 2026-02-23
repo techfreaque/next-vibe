@@ -16,6 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import { CampaignType } from "@/app/api/[locale]/emails/smtp-client/enum";
+import { scopedTranslation as smtpScopedTranslation } from "@/app/api/[locale]/emails/smtp-client/i18n";
 import { SmtpSendingRepository } from "@/app/api/[locale]/emails/smtp-client/sending/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -29,6 +30,7 @@ import type {
   TestEmailRequestOutput,
   TestEmailResponseOutput,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Test Email Repository Class
@@ -80,6 +82,8 @@ export class TestEmailRepository {
     user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<TestEmailResponseOutput>> {
+    const emailLocale: CountryLanguage = `${data.leadData.language}-${data.leadData.country}`;
+    const scopedT = scopedTranslation.scopedT(emailLocale).t;
     try {
       logger.info("test.email.send.start", {
         emailJourneyVariant: data.emailJourneyVariant,
@@ -95,8 +99,7 @@ export class TestEmailRepository {
         )
       ) {
         return fail({
-          message:
-            "app.api.leads.campaigns.emails.testMail.post.errors.templateNotFound.title",
+          message: scopedT("post.errors.templateNotFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: {
             emailJourneyVariant: data.emailJourneyVariant,
@@ -106,17 +109,15 @@ export class TestEmailRepository {
       }
 
       const mockLead = this.createMockLead(data, data.testEmail);
-      const emailLocale: CountryLanguage = `${data.leadData.language}-${data.leadData.country}`;
-      const { t } = simpleT(emailLocale);
+      const { t: simpleLocalT } = simpleT(emailLocale);
 
       const emailContent = await emailService.renderEmail(
         mockLead,
         data.emailJourneyVariant,
         data.emailCampaignStage,
         {
-          t,
           locale: emailLocale,
-          companyName: t("config.appName"),
+          companyName: simpleLocalT("config.appName"),
           companyEmail: contactClientRepository.getSupportEmail(emailLocale),
           campaignId: "test-campaign-id",
           baseUrl: env.NEXT_PUBLIC_APP_URL,
@@ -126,8 +127,7 @@ export class TestEmailRepository {
 
       if (!emailContent) {
         return fail({
-          message:
-            "app.api.leads.campaigns.emails.testMail.post.errors.templateNotFound.title",
+          message: scopedT("post.errors.templateNotFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: {
             emailJourneyVariant: data.emailJourneyVariant,
@@ -153,6 +153,7 @@ export class TestEmailRepository {
         // Render JSX to HTML for SMTP service
         const html = await render(emailContent.jsx);
 
+        const smtpT = smtpScopedTranslation.scopedT(emailLocale).t;
         const emailResponse = await SmtpSendingRepository.sendEmail(
           {
             to: data.testEmail,
@@ -161,10 +162,11 @@ export class TestEmailRepository {
             html,
             replyTo: contactClientRepository.getSupportEmail(emailLocale),
             unsubscribeUrl,
-            senderName: t("config.appName"),
+            senderName: simpleLocalT("config.appName"),
             selectionCriteria,
           },
           logger,
+          smtpT,
         );
 
         if (!emailResponse.success) {
@@ -175,15 +177,12 @@ export class TestEmailRepository {
             errorParams: emailResponse.messageParams,
           });
           return fail({
-            message:
-              "app.api.leads.campaigns.emails.testMail.post.errors.sendingFailed.title",
+            message: scopedT("post.errors.sendingFailed.title"),
             errorType: ErrorResponseTypes.EMAIL_ERROR,
             messageParams: {
               recipient: data.testEmail,
               subject: emailContent.subject,
-              error:
-                emailResponse.message ||
-                "app.api.leads.leadsErrors.testEmail.error.sendingFailed.description",
+              error: emailResponse.message,
             },
             cause: emailResponse,
           });
@@ -216,8 +215,7 @@ export class TestEmailRepository {
       } catch (error) {
         logger.error("test.email.send.error", parseError(error));
         return fail({
-          message:
-            "app.api.leads.campaigns.emails.testMail.post.errors.sendingFailed.title",
+          message: scopedT("post.errors.sendingFailed.title"),
           errorType: ErrorResponseTypes.EMAIL_ERROR,
           messageParams: {
             recipient: data.testEmail,
@@ -229,8 +227,7 @@ export class TestEmailRepository {
     } catch (error) {
       logger.error("test.email.send.server.error", parseError(error));
       return fail({
-        message:
-          "app.api.leads.campaigns.emails.testMail.post.errors.server.title",
+        message: scopedT("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

@@ -46,8 +46,8 @@ import { cn } from "../../../shared/utils";
 import { Icon } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
 import { useTourState } from "../_components/welcome-tour/tour-state-context";
+import { useAddToFavorites } from "../favorites/create/hooks";
 import { useChatFavorites } from "../favorites/hooks";
-import { useAddToFavorites } from "../favorites/use-add-to-favorites";
 import { useSelectorOnboardingContext } from "../threads/_components/chat-input/selector/selector-onboarding/context";
 import characterDetailDefinitions from "./[id]/definition";
 import { COMPANION_CHARACTERS } from "./config";
@@ -817,9 +817,6 @@ function EditFavBeforeAddButton({
         data: {
           characterId: char.id,
           icon: fullChar.icon ?? undefined,
-          name: fullChar.name,
-          tagline: fullChar.tagline,
-          description: fullChar.description,
           voice: fullChar.voice ?? DEFAULT_TTS_VOICE,
           modelSelection: null,
         },
@@ -1101,9 +1098,6 @@ function CharacterFavoriteActions({
       data: {
         characterId: char.id,
         icon: fullChar.icon ?? undefined,
-        name: fullChar.name,
-        tagline: fullChar.tagline,
-        description: fullChar.description,
         voice: fullChar.voice ?? DEFAULT_TTS_VOICE,
         modelSelection: null,
       },

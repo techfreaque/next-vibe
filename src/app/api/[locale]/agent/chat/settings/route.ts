@@ -13,12 +13,12 @@ export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ user, logger }) =>
-      ChatSettingsRepository.getSettings(user, logger),
+    handler: ({ user, logger, t }) =>
+      ChatSettingsRepository.getSettings(user, logger, t),
   },
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, logger }) =>
-      ChatSettingsRepository.upsertSettings(data, user, logger),
+    handler: ({ data, user, logger, t }) =>
+      ChatSettingsRepository.upsertSettings(data, user, logger, t),
   },
 });

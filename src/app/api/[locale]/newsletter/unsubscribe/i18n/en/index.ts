@@ -35,6 +35,7 @@ export const translations = {
     message: "Success Message",
   },
   errors: {
+    email_generation_failed: "Failed to generate email",
     internal: {
       title: "Internal Error",
       description:
@@ -80,6 +81,70 @@ export const translations = {
   sync: {
     failed: "Newsletter unsubscribe sync failed",
     error: "Newsletter unsubscribe sync error",
+    tag: "Newsletter Sync",
+    post: {
+      title: "Newsletter Unsubscribe Sync",
+      description: "Sync lead statuses for newsletter unsubscribes",
+      container: {
+        title: "Unsubscribe Sync Configuration",
+        description: "Configure unsubscribe sync parameters",
+      },
+      fields: {
+        batchSize: {
+          label: "Batch Size",
+          description: "Number of records to process per batch",
+        },
+        dryRun: {
+          label: "Dry Run",
+          description: "Run without making changes",
+        },
+      },
+      response: {
+        leadsProcessed: "Leads Processed",
+        leadsUpdated: "Leads Updated",
+        executionTimeMs: "Execution Time (ms)",
+      },
+      errors: {
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+        forbidden: {
+          title: "Forbidden",
+          description: "Access forbidden",
+        },
+        server: {
+          title: "Server Error",
+          description: "An error occurred while syncing unsubscribes",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unknown error occurred",
+        },
+        validation: {
+          title: "Validation Error",
+          description: "Invalid request parameters",
+        },
+      },
+      success: {
+        title: "Sync Complete",
+        description: "Newsletter unsubscribe sync completed successfully",
+      },
+    },
+  },
+  emailTemplates: {
+    unsubscribe: {
+      name: "Newsletter Unsubscribe Email",
+      description:
+        "Confirmation email sent to users who unsubscribe from newsletter",
+      category: "newsletter",
+      preview: {
+        email: {
+          label: "Email Address",
+          description: "The email address being unsubscribed",
+        },
+      },
+    },
   },
   sms: {
     confirmation: {

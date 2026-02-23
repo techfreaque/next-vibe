@@ -74,12 +74,9 @@ export async function requireUser(
     }
 
     // Fetch complete user details
-    const userResult = await UserRepository.getUserById(
-      minimalUser.id ?? "",
-      UserDetailLevel.COMPLETE,
-      locale,
-      logger,
-    );
+    const userResult = await UserRepository.getUserById<
+      typeof UserDetailLevel.COMPLETE
+    >(minimalUser.id ?? "", UserDetailLevel.COMPLETE, locale, logger);
 
     if (!userResult.success) {
       redirect(

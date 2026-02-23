@@ -2,7 +2,8 @@ import { spawn } from "node:child_process";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "./i18n";
 
 /**
  * Docker log patterns to hide in development mode
@@ -42,7 +43,7 @@ export function executeDockerCommand(
     locale,
   } = options;
 
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   return new Promise((resolve) => {
     const logger = createEndpointLogger(false, Date.now(), locale);
@@ -51,7 +52,7 @@ export function executeDockerCommand(
       logger.debug(description);
     } else {
       logger.debug(
-        t("app.api.system.db.utils.docker.executing_command", {
+        t("docker.executing_command", {
           command,
         }),
       );
@@ -78,7 +79,7 @@ export function executeDockerCommand(
         child.kill("SIGTERM");
         reject(
           new Error(
-            t("app.api.system.db.utils.docker.command_timeout", {
+            t("docker.command_timeout", {
               timeout,
               command,
             }),
@@ -136,7 +137,7 @@ export function executeDockerCommand(
 
       if (!success && error) {
         logger.error(
-          t("app.api.system.db.utils.docker.command_failed", {
+          t("docker.command_failed", {
             code: code ?? 0,
             command,
           }),
@@ -159,7 +160,7 @@ export function executeDockerCommand(
       resolved = true;
       clearTimeout(timeoutId);
       logger.error(
-        t("app.api.system.db.utils.docker.execution_failed", {
+        t("docker.execution_failed", {
           command,
         }),
         err,
@@ -182,7 +183,7 @@ export function executeDockerCommand(
       timeoutPromise,
     ]).catch((err: Error) => {
       logger.error(
-        t("app.api.system.db.utils.docker.command_error", {
+        t("docker.command_error", {
           error: err.message,
         }),
       );
@@ -203,14 +204,14 @@ export async function dockerComposeDown(
   timeout = 30000,
   locale: CountryLanguage,
 ): Promise<boolean> {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const result = await executeDockerCommand(
     // eslint-disable-next-line i18next/no-literal-string
     `docker compose -f ${composeFile} down`,
     {
       timeout,
       hideStandardLogs: true,
-      description: t("app.api.system.db.utils.docker.stopping_containers"),
+      description: t("docker.stopping_containers"),
       locale,
     },
   );
@@ -226,14 +227,14 @@ export async function dockerComposeUp(
   timeout = 60000,
   locale: CountryLanguage,
 ): Promise<boolean> {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const result = await executeDockerCommand(
     // eslint-disable-next-line i18next/no-literal-string
     `docker compose -f ${composeFile} up -d`,
     {
       timeout,
       hideStandardLogs: true,
-      description: t("app.api.system.db.utils.docker.starting_containers"),
+      description: t("docker.starting_containers"),
       locale,
     },
   );

@@ -13,6 +13,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { parseError } from "../../../shared/utils/parse-error";
 import { parseJsonWithComments } from "../../../shared/utils/parse-json";
@@ -61,6 +62,7 @@ export interface ConfigRepositoryInterface {
   generateVSCodeSettings(
     logger: EndpointLogger,
     config: CheckConfig,
+    locale: CountryLanguage,
   ): Promise<{ success: boolean; settingsPath: string; error?: string }>;
 
   createDefaultCheckConfig(
@@ -550,6 +552,7 @@ export default checkConfig.eslint?.buildFlatConfig?.(
   async generateVSCodeSettings(
     logger: EndpointLogger,
     config: CheckConfig,
+    locale: CountryLanguage,
   ): Promise<{ success: boolean; settingsPath: string; error?: string }> {
     const settingsPath = resolve(process.cwd(), ".vscode", "settings.json");
 
@@ -568,7 +571,10 @@ export default checkConfig.eslint?.buildFlatConfig?.(
 
       await fs.mkdir(dirname(settingsPath), { recursive: true });
 
-      const existingSettings = await this.loadExistingSettings(settingsPath);
+      const existingSettings = await this.loadExistingSettings(
+        settingsPath,
+        locale,
+      );
       const newSettings: JsonObject = { ...existingSettings };
 
       // Apply all settings using static helpers
@@ -813,13 +819,14 @@ export default checkConfig.eslint?.buildFlatConfig?.(
 
   private async loadExistingSettings(
     settingsPath: string,
+    locale: CountryLanguage,
   ): Promise<JsonObject> {
     if (!existsSync(settingsPath)) {
       return {};
     }
     try {
       const content = await fs.readFile(settingsPath, "utf8");
-      const parseResult = parseJsonWithComments(content);
+      const parseResult = parseJsonWithComments(content, locale);
       if (parseResult.success && typeof parseResult.data === "object") {
         return parseResult.data as JsonObject;
       }

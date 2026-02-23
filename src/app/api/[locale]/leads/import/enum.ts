@@ -5,6 +5,8 @@
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * CSV Import Job Status Enum
  * Defines the possible states of a CSV import job
@@ -13,21 +15,21 @@ export const {
   enum: CsvImportJobStatus,
   options: CsvImportJobStatusOptions,
   Value: CsvImportJobStatusValue,
-} = createEnumOptions({
-  PENDING: "app.api.leads.import.enums.csvImportJobStatus.pending",
-  PROCESSING: "app.api.leads.import.enums.csvImportJobStatus.processing",
-  COMPLETED: "app.api.leads.import.enums.csvImportJobStatus.completed",
-  FAILED: "app.api.leads.import.enums.csvImportJobStatus.failed",
+} = createEnumOptions(scopedTranslation, {
+  PENDING: "enums.csvImportJobStatus.pending",
+  PROCESSING: "enums.csvImportJobStatus.processing",
+  COMPLETED: "enums.csvImportJobStatus.completed",
+  FAILED: "enums.csvImportJobStatus.failed",
 });
 
 export const {
   enum: CsvImportJobAction,
   options: CsvImportJobActionOptions,
   Value: CsvImportJobActionValue,
-} = createEnumOptions({
-  RETRY: "app.api.leads.import.enums.csvImportJobAction.retry",
-  DELETE: "app.api.leads.import.enums.csvImportJobAction.delete",
-  STOP: "app.api.leads.import.enums.csvImportJobAction.stop",
+} = createEnumOptions(scopedTranslation, {
+  RETRY: "enums.csvImportJobAction.retry",
+  DELETE: "enums.csvImportJobAction.delete",
+  STOP: "enums.csvImportJobAction.stop",
 });
 
 /**
@@ -38,11 +40,11 @@ export const {
   enum: ImportMode,
   options: ImportModeOptions,
   Value: ImportModeValue,
-} = createEnumOptions({
-  CREATE_ONLY: "app.api.leads.import.enums.importMode.createOnly",
-  UPDATE_ONLY: "app.api.leads.import.enums.importMode.updateOnly",
-  CREATE_OR_UPDATE: "app.api.leads.import.enums.importMode.createOrUpdate",
-  SKIP_DUPLICATES: "app.api.leads.import.enums.importMode.skipDuplicates",
+} = createEnumOptions(scopedTranslation, {
+  CREATE_ONLY: "enums.importMode.createOnly",
+  UPDATE_ONLY: "enums.importMode.updateOnly",
+  CREATE_OR_UPDATE: "enums.importMode.createOrUpdate",
+  SKIP_DUPLICATES: "enums.importMode.skipDuplicates",
 });
 
 /**
@@ -53,10 +55,10 @@ export const {
   enum: ImportFormat,
   options: ImportFormatOptions,
   Value: ImportFormatValue,
-} = createEnumOptions({
-  CSV: "app.api.leads.import.enums.importFormat.csv",
-  TSV: "app.api.leads.import.enums.importFormat.tsv",
-  JSON: "app.api.leads.import.enums.importFormat.json",
+} = createEnumOptions(scopedTranslation, {
+  CSV: "enums.importFormat.csv",
+  TSV: "enums.importFormat.tsv",
+  JSON: "enums.importFormat.json",
 });
 
 /**
@@ -67,10 +69,10 @@ export const {
   enum: ImportProcessingType,
   options: ImportProcessingTypeOptions,
   Value: ImportProcessingTypeValue,
-} = createEnumOptions({
-  IMMEDIATE: "app.api.leads.import.enums.importProcessingType.immediate",
-  CHUNKED: "app.api.leads.import.enums.importProcessingType.chunked",
-  SCHEDULED: "app.api.leads.import.enums.importProcessingType.scheduled",
+} = createEnumOptions(scopedTranslation, {
+  IMMEDIATE: "enums.importProcessingType.immediate",
+  CHUNKED: "enums.importProcessingType.chunked",
+  SCHEDULED: "enums.importProcessingType.scheduled",
 });
 
 /**
@@ -81,16 +83,13 @@ export const {
   enum: ImportErrorType,
   options: ImportErrorTypeOptions,
   Value: ImportErrorTypeValue,
-} = createEnumOptions({
-  VALIDATION_ERROR:
-    "app.api.leads.import.enums.importErrorType.validationError",
-  DUPLICATE_EMAIL: "app.api.leads.import.enums.importErrorType.duplicateEmail",
-  INVALID_FORMAT: "app.api.leads.import.enums.importErrorType.invalidFormat",
-  MISSING_REQUIRED_FIELD:
-    "app.api.leads.import.enums.importErrorType.missingRequiredField",
-  PROCESSING_ERROR:
-    "app.api.leads.import.enums.importErrorType.processingError",
-  SYSTEM_ERROR: "app.api.leads.import.enums.importErrorType.systemError",
+} = createEnumOptions(scopedTranslation, {
+  VALIDATION_ERROR: "enums.importErrorType.validationError",
+  DUPLICATE_EMAIL: "enums.importErrorType.duplicateEmail",
+  INVALID_FORMAT: "enums.importErrorType.invalidFormat",
+  MISSING_REQUIRED_FIELD: "enums.importErrorType.missingRequiredField",
+  PROCESSING_ERROR: "enums.importErrorType.processingError",
+  SYSTEM_ERROR: "enums.importErrorType.systemError",
 });
 
 /**
@@ -101,12 +100,12 @@ export const {
   enum: BatchProcessingStatus,
   options: BatchProcessingStatusOptions,
   Value: BatchProcessingStatusValue,
-} = createEnumOptions({
-  PENDING: "app.api.leads.import.enums.batchProcessingStatus.pending",
-  PROCESSING: "app.api.leads.import.enums.batchProcessingStatus.processing",
-  COMPLETED: "app.api.leads.import.enums.batchProcessingStatus.completed",
-  FAILED: "app.api.leads.import.enums.batchProcessingStatus.failed",
-  RETRYING: "app.api.leads.import.enums.batchProcessingStatus.retrying",
+} = createEnumOptions(scopedTranslation, {
+  PENDING: "enums.batchProcessingStatus.pending",
+  PROCESSING: "enums.batchProcessingStatus.processing",
+  COMPLETED: "enums.batchProcessingStatus.completed",
+  FAILED: "enums.batchProcessingStatus.failed",
+  RETRYING: "enums.batchProcessingStatus.retrying",
 });
 
 /**
@@ -117,11 +116,11 @@ export const {
   enum: ImportPriority,
   options: ImportPriorityOptions,
   Value: ImportPriorityValue,
-} = createEnumOptions({
-  LOW: "app.api.leads.import.enums.importPriority.low",
-  NORMAL: "app.api.leads.import.enums.importPriority.normal",
-  HIGH: "app.api.leads.import.enums.importPriority.high",
-  URGENT: "app.api.leads.import.enums.importPriority.urgent",
+} = createEnumOptions(scopedTranslation, {
+  LOW: "enums.importPriority.low",
+  NORMAL: "enums.importPriority.normal",
+  HIGH: "enums.importPriority.high",
+  URGENT: "enums.importPriority.urgent",
 });
 
 /**
@@ -132,11 +131,11 @@ export const {
   enum: ImportSource,
   options: ImportSourceOptions,
   Value: ImportSourceValue,
-} = createEnumOptions({
-  WEB_UPLOAD: "app.api.leads.import.enums.importSource.webUpload",
-  API_UPLOAD: "app.api.leads.import.enums.importSource.apiUpload",
-  SCHEDULED_IMPORT: "app.api.leads.import.enums.importSource.scheduledImport",
-  BULK_OPERATION: "app.api.leads.import.enums.importSource.bulkOperation",
+} = createEnumOptions(scopedTranslation, {
+  WEB_UPLOAD: "enums.importSource.webUpload",
+  API_UPLOAD: "enums.importSource.apiUpload",
+  SCHEDULED_IMPORT: "enums.importSource.scheduledImport",
+  BULK_OPERATION: "enums.importSource.bulkOperation",
 });
 
 /**
@@ -147,11 +146,11 @@ export const {
   enum: CsvDelimiter,
   options: CsvDelimiterOptions,
   Value: CsvDelimiterValue,
-} = createEnumOptions({
-  COMMA: "app.api.leads.import.enums.csvDelimiter.comma",
-  SEMICOLON: "app.api.leads.import.enums.csvDelimiter.semicolon",
-  TAB: "app.api.leads.import.enums.csvDelimiter.tab",
-  PIPE: "app.api.leads.import.enums.csvDelimiter.pipe",
+} = createEnumOptions(scopedTranslation, {
+  COMMA: "enums.csvDelimiter.comma",
+  SEMICOLON: "enums.csvDelimiter.semicolon",
+  TAB: "enums.csvDelimiter.tab",
+  PIPE: "enums.csvDelimiter.pipe",
 });
 
 /**
@@ -162,10 +161,10 @@ export const {
   enum: ImportValidationLevel,
   options: ImportValidationLevelOptions,
   Value: ImportValidationLevelValue,
-} = createEnumOptions({
-  STRICT: "app.api.leads.import.enums.importValidationLevel.strict",
-  MODERATE: "app.api.leads.import.enums.importValidationLevel.moderate",
-  LENIENT: "app.api.leads.import.enums.importValidationLevel.lenient",
+} = createEnumOptions(scopedTranslation, {
+  STRICT: "enums.importValidationLevel.strict",
+  MODERATE: "enums.importValidationLevel.moderate",
+  LENIENT: "enums.importValidationLevel.lenient",
 });
 
 /**
@@ -176,11 +175,11 @@ export const {
   enum: ImportNotificationType,
   options: ImportNotificationTypeOptions,
   Value: ImportNotificationTypeValue,
-} = createEnumOptions({
-  EMAIL: "app.api.leads.import.enums.importNotificationType.email",
-  IN_APP: "app.api.leads.import.enums.importNotificationType.inApp",
-  WEBHOOK: "app.api.leads.import.enums.importNotificationType.webhook",
-  NONE: "app.api.leads.import.enums.importNotificationType.none",
+} = createEnumOptions(scopedTranslation, {
+  EMAIL: "enums.importNotificationType.email",
+  IN_APP: "enums.importNotificationType.inApp",
+  WEBHOOK: "enums.importNotificationType.webhook",
+  NONE: "enums.importNotificationType.none",
 });
 
 /**

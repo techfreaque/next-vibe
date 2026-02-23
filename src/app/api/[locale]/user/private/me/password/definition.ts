@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,15 +20,17 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../user-roles/enum";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["user", "private", "me", "password"],
-  title: "app.api.user.private.me.password.title" as const,
-  description: "app.api.user.private.me.password.description" as const,
+  title: "title",
+  description: "description",
   icon: "lock",
-  category: "app.api.user.category" as const,
-  tags: ["app.api.user.private.me.password.tag" as const],
+  category: "category",
+  tags: ["tag"],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
@@ -36,213 +38,165 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
     UserRole.AI_TOOL_OFF,
   ] as const,
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.user.private.me.password.title" as const,
-      description: "app.api.user.private.me.password.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "title",
+    description: "description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === CURRENT PASSWORD VERIFICATION ===
-      currentCredentials: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.user.private.me.password.groups.currentCredentials.title" as const,
-          description:
-            "app.api.user.private.me.password.groups.currentCredentials.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { request: "data" },
-        {
-          currentPassword: requestField({
+      currentCredentials: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "groups.currentCredentials.title",
+        description: "groups.currentCredentials.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { request: "data" },
+        children: {
+          currentPassword: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.PASSWORD,
-            label:
-              "app.api.user.private.me.password.currentPassword.label" as const,
-            description:
-              "app.api.user.private.me.password.currentPassword.description" as const,
-            placeholder:
-              "app.api.user.private.me.password.currentPassword.placeholder" as const,
+            label: "currentPassword.label",
+            description: "currentPassword.description",
+            placeholder: "currentPassword.placeholder",
             columns: 12,
-            helpText:
-              "app.api.user.private.me.password.currentPassword.description" as const,
+            helpText: "currentPassword.description",
             schema: z.string().min(8, {
-              message:
-                "app.api.user.private.me.password.validation.currentPassword.minLength",
+              message: "validation.currentPassword.minLength",
             }),
           }),
         },
-      ),
+      }),
 
       // === NEW PASSWORD SETUP ===
-      newCredentials: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.user.private.me.password.groups.newCredentials.title" as const,
-          description:
-            "app.api.user.private.me.password.groups.newCredentials.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { request: "data" },
-        {
-          newPassword: requestField({
+      newCredentials: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "groups.newCredentials.title",
+        description: "groups.newCredentials.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { request: "data" },
+        children: {
+          newPassword: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.PASSWORD,
-            label:
-              "app.api.user.private.me.password.newPassword.label" as const,
-            description:
-              "app.api.user.private.me.password.newPassword.description" as const,
-            placeholder:
-              "app.api.user.private.me.password.newPassword.placeholder" as const,
+            label: "newPassword.label",
+            description: "newPassword.description",
+            placeholder: "newPassword.placeholder",
             columns: 12,
-            helpText:
-              "app.api.user.private.me.password.newPassword.description" as const,
+            helpText: "newPassword.description",
             schema: z.string().min(8, {
-              message:
-                "app.api.user.private.me.password.validation.newPassword.minLength",
+              message: "validation.newPassword.minLength",
             }),
           }),
 
-          confirmPassword: requestField({
+          confirmPassword: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.PASSWORD,
-            label:
-              "app.api.user.private.me.password.confirmPassword.label" as const,
-            description:
-              "app.api.user.private.me.password.confirmPassword.description" as const,
-            placeholder:
-              "app.api.user.private.me.password.confirmPassword.placeholder" as const,
+            label: "confirmPassword.label",
+            description: "confirmPassword.description",
+            placeholder: "confirmPassword.placeholder",
             columns: 12,
-            helpText:
-              "app.api.user.private.me.password.confirmPassword.description" as const,
+            helpText: "confirmPassword.description",
             schema: z.string().min(8, {
-              message:
-                "app.api.user.private.me.password.validation.confirmPassword.minLength",
+              message: "validation.confirmPassword.minLength",
             }),
           }),
         },
-      ),
+      }),
 
       // === TWO-FACTOR AUTHENTICATION (OPTIONAL) ===
-      twoFactorCode: requestField({
+      twoFactorCode: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.user.private.me.password.twoFactorCode.label" as const,
-        description:
-          "app.api.user.private.me.password.twoFactorCode.description" as const,
-        placeholder:
-          "app.api.user.private.me.password.twoFactorCode.placeholder" as const,
+        label: "twoFactorCode.label",
+        description: "twoFactorCode.description",
+        placeholder: "twoFactorCode.placeholder",
         columns: 12,
-        helpText:
-          "app.api.user.private.me.password.twoFactorCode.description" as const,
+        helpText: "twoFactorCode.description",
         schema: z.string().length(6).optional(),
       }),
 
       // === RESPONSE FIELD ===
-      response: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.user.private.me.password.response.title" as const,
-          description:
-            "app.api.user.private.me.password.response.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          success: responseField({
+      response: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.title",
+        description: "response.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          success: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.private.me.password.response.success" as const,
+            content: "response.success",
             schema: z.boolean(),
           }),
-          message: responseField({
+          message: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.private.me.password.response.message" as const,
+            content: "response.message",
             schema: z.string(),
           }),
-          securityTip: responseField({
+          securityTip: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.private.me.password.response.securityTip" as const,
+            content: "response.securityTip",
             schema: z.string().optional(),
           }),
-          nextSteps: responseField({
+          nextSteps: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.private.me.password.response.nextSteps.item" as const,
+            content: "response.nextSteps.item",
             schema: z.array(z.string()),
           }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.user.private.me.password.errors.validation.title" as const,
-      description:
-        "app.api.user.private.me.password.errors.validation.description" as const,
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.user.private.me.password.errors.unauthorized.title" as const,
-      description:
-        "app.api.user.private.me.password.errors.unauthorized.description" as const,
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.user.private.me.password.errors.server.title" as const,
-      description:
-        "app.api.user.private.me.password.errors.server.description" as const,
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.user.private.me.password.errors.unknown.title" as const,
-      description:
-        "app.api.user.private.me.password.errors.unknown.description" as const,
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.user.private.me.password.errors.network.title" as const,
-      description:
-        "app.api.user.private.me.password.errors.network.description" as const,
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.user.private.me.password.errors.forbidden.title" as const,
-      description:
-        "app.api.user.private.me.password.errors.forbidden.description" as const,
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.user.private.me.password.errors.notFound.title" as const,
-      description:
-        "app.api.user.private.me.password.errors.notFound.description" as const,
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.user.private.me.password.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.user.private.me.password.errors.unsavedChanges.description" as const,
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.user.private.me.password.errors.conflict.title" as const,
-      description:
-        "app.api.user.private.me.password.errors.conflict.description" as const,
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.user.private.me.password.success.title" as const,
-    description:
-      "app.api.user.private.me.password.success.description" as const,
+    title: "success.title",
+    description: "success.description",
   },
 
   // === EXAMPLES ===

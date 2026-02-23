@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedBackButton,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -26,15 +26,17 @@ import {
   LanguagesOptions,
 } from "@/i18n/core/config";
 
+import { scopedTranslation } from "../../i18n";
 import { EmailPreviewRenderContainer } from "./widget";
 
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["emails", "preview", "render"],
-  title: "app.api.emails.preview.render.post.title" as const,
-  description: "app.api.emails.preview.render.post.description" as const,
-  category: "app.api.emails.category" as const,
-  tags: ["app.api.emails.preview.render.post.title" as const],
+  title: "preview.render.post.title" as const,
+  description: "preview.render.post.description" as const,
+  category: "category" as const,
+  tags: ["preview.render.post.title" as const],
   icon: "mail",
   allowedRoles: [UserRole.ADMIN] as const,
 
@@ -42,50 +44,46 @@ const { POST } = createEndpoint({
     render: EmailPreviewRenderContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({ usage: { request: "data", response: true } }),
+      backButton: scopedBackButton(scopedTranslation, {
+        usage: { request: "data", response: true },
+      }),
 
       // === REQUEST FIELDS ===
-      templateId: requestField({
+      templateId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.emails.preview.render.post.fields.templateId.label" as const,
+        label: "preview.render.post.fields.templateId.label" as const,
         description:
-          "app.api.emails.preview.render.post.fields.templateId.description" as const,
+          "preview.render.post.fields.templateId.description" as const,
         columns: 12,
         schema: z.string(),
       }),
 
-      language: requestField({
+      language: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label:
-          "app.api.emails.preview.render.post.fields.language.label" as const,
-        description:
-          "app.api.emails.preview.render.post.fields.language.description" as const,
+        label: "preview.render.post.fields.language.label" as const,
+        description: "preview.render.post.fields.language.description" as const,
         columns: 6,
         options: LanguagesOptions,
         schema: z.enum(LanguagesArr),
       }),
 
-      country: requestField({
+      country: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label:
-          "app.api.emails.preview.render.post.fields.country.label" as const,
-        description:
-          "app.api.emails.preview.render.post.fields.country.description" as const,
+        label: "preview.render.post.fields.country.label" as const,
+        description: "preview.render.post.fields.country.description" as const,
         columns: 6,
         options: CountriesOptions,
         schema: z.enum(CountriesArr),
       }),
 
-      props: requestField({
+      props: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
-        label: "app.api.emails.preview.render.post.fields.props.label" as const,
-        description:
-          "app.api.emails.preview.render.post.fields.props.description" as const,
+        label: "preview.render.post.fields.props.label" as const,
+        description: "preview.render.post.fields.props.description" as const,
         columns: 12,
         schema: z.record(
           z.string(),
@@ -94,24 +92,21 @@ const { POST } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      html: responseField({
+      html: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.preview.render.post.fields.html.title" as const,
+        content: "preview.render.post.fields.html.title" as const,
         schema: z.string(),
       }),
 
-      subject: responseField({
+      subject: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.preview.render.post.fields.subject.title" as const,
+        content: "preview.render.post.fields.subject.title" as const,
         schema: z.string(),
       }),
 
-      templateVersion: responseField({
+      templateVersion: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.preview.render.post.fields.templateVersion.title" as const,
+        content: "preview.render.post.fields.templateVersion.title" as const,
         schema: z.string(),
       }),
     },
@@ -144,62 +139,48 @@ const { POST } = createEndpoint({
   },
 
   successTypes: {
-    title: "app.api.emails.preview.render.post.success.title" as const,
-    description:
-      "app.api.emails.preview.render.post.success.description" as const,
+    title: "preview.render.post.success.title" as const,
+    description: "preview.render.post.success.description" as const,
   },
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.emails.preview.render.post.errors.validation.title" as const,
-      description:
-        "app.api.emails.preview.render.post.errors.validation.description" as const,
+      title: "preview.render.post.errors.validation.title" as const,
+      description: "preview.render.post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.emails.preview.render.post.errors.network.title" as const,
-      description:
-        "app.api.emails.preview.render.post.errors.network.description" as const,
+      title: "preview.render.post.errors.network.title" as const,
+      description: "preview.render.post.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.emails.preview.render.post.errors.unauthorized.title" as const,
+      title: "preview.render.post.errors.unauthorized.title" as const,
       description:
-        "app.api.emails.preview.render.post.errors.unauthorized.description" as const,
+        "preview.render.post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.emails.preview.render.post.errors.forbidden.title" as const,
-      description:
-        "app.api.emails.preview.render.post.errors.forbidden.description" as const,
+      title: "preview.render.post.errors.forbidden.title" as const,
+      description: "preview.render.post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.emails.preview.render.post.errors.notFound.title" as const,
-      description:
-        "app.api.emails.preview.render.post.errors.notFound.description" as const,
+      title: "preview.render.post.errors.notFound.title" as const,
+      description: "preview.render.post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.emails.preview.render.post.errors.server.title" as const,
-      description:
-        "app.api.emails.preview.render.post.errors.server.description" as const,
+      title: "preview.render.post.errors.server.title" as const,
+      description: "preview.render.post.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.emails.preview.render.post.errors.unknown.title" as const,
-      description:
-        "app.api.emails.preview.render.post.errors.unknown.description" as const,
+      title: "preview.render.post.errors.unknown.title" as const,
+      description: "preview.render.post.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.emails.preview.render.post.errors.unsavedChanges.title" as const,
+      title: "preview.render.post.errors.unsavedChanges.title" as const,
       description:
-        "app.api.emails.preview.render.post.errors.unsavedChanges.description" as const,
+        "preview.render.post.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.emails.preview.render.post.errors.conflict.title" as const,
-      description:
-        "app.api.emails.preview.render.post.errors.conflict.description" as const,
+      title: "preview.render.post.errors.conflict.title" as const,
+      description: "preview.render.post.errors.conflict.description" as const,
     },
   },
 });

@@ -10,14 +10,13 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 import {
-  objectField,
-  objectOptionalField,
-  requestDataArrayOptionalField,
-  requestField,
   responseArrayOptionalField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedObjectOptionalField,
+  scopedRequestDataArrayOptionalField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -30,65 +29,22 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
   BuildProfileEnum,
+  BuildProfileOptions,
+  BuildTypeOptions,
   BunBuildTypeEnum,
   BunTargetEnum,
+  BunTargetOptions,
   OutputFormatEnum,
+  OutputFormatOptions,
   SourcemapModeEnum,
+  SourcemapModeOptions,
   StepStatusEnum,
   ViteBuildTypeEnum,
   ViteLibFormatEnum,
+  ViteLibFormatOptions,
+  ViteMinifyOptions,
 } from "./enum";
-
-// ============================================================================
-// Enum Options for UI - Created with createEnumOptions
-// ============================================================================
-
-export const { options: BuildProfileOptions } = createEnumOptions({
-  DEVELOPMENT: "app.api.system.builder.enums.profile.development",
-  PRODUCTION: "app.api.system.builder.enums.profile.production",
-} as const);
-
-export const { options: BuildTypeOptions } = createEnumOptions({
-  REACT_TAILWIND: "app.api.system.builder.enums.buildType.reactTailwind",
-  REACT: "app.api.system.builder.enums.buildType.react",
-  VANILLA: "app.api.system.builder.enums.buildType.vanilla",
-  EXECUTABLE: "app.api.system.builder.enums.buildType.executable",
-} as const);
-
-export const { options: BunTargetOptions } = createEnumOptions({
-  BUN: "app.api.system.builder.enums.bunTarget.bun",
-  NODE: "app.api.system.builder.enums.bunTarget.node",
-  BROWSER: "app.api.system.builder.enums.bunTarget.browser",
-} as const);
-
-export const { options: SourcemapModeOptions } = createEnumOptions({
-  EXTERNAL: "app.api.system.builder.enums.sourcemap.external",
-  INLINE: "app.api.system.builder.enums.sourcemap.inline",
-  NONE: "app.api.system.builder.enums.sourcemap.none",
-} as const);
-
-export const { options: OutputFormatOptions } = createEnumOptions({
-  ESM: "app.api.system.builder.enums.format.esm",
-  CJS: "app.api.system.builder.enums.format.cjs",
-  IIFE: "app.api.system.builder.enums.format.iife",
-} as const);
-
-export const { options: ViteMinifyOptions } = createEnumOptions({
-  ESBUILD: "app.api.system.builder.enums.viteMinify.esbuild",
-  TERSER: "app.api.system.builder.enums.viteMinify.terser",
-  FALSE: "app.api.system.builder.enums.viteMinify.false",
-} as const);
-
-export const { options: ViteLibFormatOptions } = createEnumOptions({
-  ES: "app.api.system.builder.enums.viteLibFormat.es",
-  CJS: "app.api.system.builder.enums.viteLibFormat.cjs",
-  UMD: "app.api.system.builder.enums.viteLibFormat.umd",
-  IIFE: "app.api.system.builder.enums.viteLibFormat.iife",
-} as const);
-
-// ============================================================================
-// Complex Type Schemas
-// ============================================================================
+import { scopedTranslation } from "./i18n";
 
 /**
  * Package.json exports field schema
@@ -111,16 +67,13 @@ const PackageExportConditionSchema: z.ZodType<PackageExportCondition> = z.lazy(
 // ============================================================================
 
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "builder"],
-  title: "app.api.system.builder.post.title",
-  description: "app.api.system.builder.post.description",
-  category: "app.api.system.category",
-  tags: [
-    "app.api.system.builder.tags.build",
-    "app.api.system.builder.tags.npm",
-    "app.api.system.builder.tags.vite",
-  ],
+  title: "post.title",
+  description: "post.description",
+  category: "category",
+  tags: ["tags.build", "tags.npm", "tags.vite"],
   icon: "package",
   allowedRoles: [
     UserRole.ADMIN,
@@ -130,27 +83,23 @@ const { POST } = createEndpoint({
   ],
   aliases: ["builder", "package", "bundle", "build"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.builder.post.form.title",
-      description: "app.api.system.builder.post.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.form.title",
+    description: "post.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // ========================================================================
       // CONFIG FILE PATH
       // ========================================================================
-      configPath: requestField({
+      configPath: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.builder.post.fields.configPath.title",
-        description:
-          "app.api.system.builder.post.fields.configPath.description",
-        placeholder:
-          "app.api.system.builder.post.fields.configPath.placeholder",
+        label: "post.fields.configPath.title",
+        description: "post.fields.configPath.description",
+        placeholder: "post.fields.configPath.placeholder",
         icon: "file-code",
         colSpan: 12,
         schema: z.string().optional().default("build.config.ts"),
@@ -159,29 +108,25 @@ const { POST } = createEndpoint({
       // ========================================================================
       // CONFIG OBJECT - Full inline build configuration
       // ========================================================================
-      configObject: objectOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.system.builder.post.fields.configObject.title",
-          description:
-            "app.api.system.builder.post.fields.configObject.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
-          optional: true,
-          icon: "settings",
-          defaultExpanded: true,
-        },
-        { request: "data" },
-        {
+      configObject: scopedObjectOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "post.fields.configObject.title",
+        description: "post.fields.configObject.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        optional: true,
+        icon: "settings",
+        defaultExpanded: true,
+        usage: { request: "data" },
+        children: {
           // ==================================================================
           // RUNTIME OPTIONS SECTION
           // ==================================================================
-          profile: requestField({
+          profile: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label: "app.api.system.builder.post.fields.profile.title",
-            description:
-              "app.api.system.builder.post.fields.profile.description",
+            label: "post.fields.profile.title",
+            description: "post.fields.profile.description",
             options: BuildProfileOptions,
             optional: true,
             icon: "layers",
@@ -189,83 +134,77 @@ const { POST } = createEndpoint({
             schema: z.enum(BuildProfileEnum).optional(),
           }),
 
-          dryRun: requestField({
+          dryRun: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
-            label: "app.api.system.builder.post.fields.dryRun.title",
-            description:
-              "app.api.system.builder.post.fields.dryRun.description",
+            label: "post.fields.dryRun.title",
+            description: "post.fields.dryRun.description",
             optional: true,
             icon: "eye",
             colSpan: 4,
             schema: z.boolean().optional(),
           }),
 
-          verbose: requestField({
+          verbose: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
-            label: "app.api.system.builder.post.fields.verbose.title",
-            description:
-              "app.api.system.builder.post.fields.verbose.description",
+            label: "post.fields.verbose.title",
+            description: "post.fields.verbose.description",
             optional: true,
             icon: "terminal",
             colSpan: 4,
             schema: z.boolean().optional(),
           }),
 
-          analyze: requestField({
+          analyze: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
-            label: "app.api.system.builder.post.fields.analyze.title",
-            description:
-              "app.api.system.builder.post.fields.analyze.description",
+            label: "post.fields.analyze.title",
+            description: "post.fields.analyze.description",
             optional: true,
             icon: "bar-chart-2",
             colSpan: 3,
             schema: z.boolean().optional(),
           }),
 
-          watch: requestField({
+          watch: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
-            label: "app.api.system.builder.post.fields.watch.title",
-            description: "app.api.system.builder.post.fields.watch.description",
+            label: "post.fields.watch.title",
+            description: "post.fields.watch.description",
             optional: true,
             icon: "refresh-cw",
             colSpan: 3,
             schema: z.boolean().optional(),
           }),
 
-          parallel: requestField({
+          parallel: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
-            label: "app.api.system.builder.post.fields.parallel.title",
-            description:
-              "app.api.system.builder.post.fields.parallel.description",
+            label: "post.fields.parallel.title",
+            description: "post.fields.parallel.description",
             optional: true,
             icon: "git-branch",
             colSpan: 3,
             schema: z.boolean().optional(),
           }),
 
-          report: requestField({
+          report: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
-            label: "app.api.system.builder.post.fields.report.title",
-            description:
-              "app.api.system.builder.post.fields.report.description",
+            label: "post.fields.report.title",
+            description: "post.fields.report.description",
             optional: true,
             icon: "file-text",
             colSpan: 3,
             schema: z.boolean().optional(),
           }),
 
-          minify: requestField({
+          minify: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
-            label: "app.api.system.builder.post.fields.minify.title",
-            description:
-              "app.api.system.builder.post.fields.minify.description",
+            label: "post.fields.minify.title",
+            description: "post.fields.minify.description",
             optional: true,
             icon: "minimize-2",
             colSpan: 3,
@@ -275,14 +214,12 @@ const { POST } = createEndpoint({
           // ==================================================================
           // FOLDERS TO CLEAN
           // ==================================================================
-          foldersToClean: requestField({
+          foldersToClean: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TAGS,
-            label: "app.api.system.builder.post.fields.foldersToClean.title",
-            description:
-              "app.api.system.builder.post.fields.foldersToClean.description",
-            placeholder:
-              "app.api.system.builder.post.fields.foldersToClean.placeholder",
+            label: "post.fields.foldersToClean.title",
+            description: "post.fields.foldersToClean.description",
+            placeholder: "post.fields.foldersToClean.placeholder",
             optional: true,
             icon: "trash-2",
             colSpan: 12,
@@ -292,59 +229,52 @@ const { POST } = createEndpoint({
           // ==================================================================
           // FILES TO COMPILE
           // ==================================================================
-          filesToCompile: requestDataArrayOptionalField(
+          filesToCompile: scopedRequestDataArrayOptionalField(
+            scopedTranslation,
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.system.builder.post.fields.filesToCompile.title",
-              description:
-                "app.api.system.builder.post.fields.filesToCompile.description",
+              title: "post.fields.filesToCompile.title",
+              description: "post.fields.filesToCompile.description",
               layoutType: LayoutType.GRID,
               columns: 12,
               optional: true,
               icon: "code" as const,
             },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                title: "app.api.system.builder.post.fields.fileToCompile.title",
-                layoutType: LayoutType.GRID,
-                columns: 12,
-                icon: "file",
-              },
-              { request: "data" },
-              {
-                input: requestField({
+            scopedObjectFieldNew(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              title: "post.fields.fileToCompile.title",
+              layoutType: LayoutType.GRID,
+              columns: 12,
+              icon: "file",
+              usage: { request: "data" },
+              children: {
+                input: scopedRequestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
-                  label: "app.api.system.builder.post.fields.input.title",
-                  description:
-                    "app.api.system.builder.post.fields.input.description",
-                  placeholder:
-                    "app.api.system.builder.post.fields.input.placeholder",
+                  label: "post.fields.input.title",
+                  description: "post.fields.input.description",
+                  placeholder: "post.fields.input.placeholder",
                   icon: "file-input",
                   colSpan: 6,
                   schema: z.string(),
                 }),
 
-                output: requestField({
+                output: scopedRequestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
-                  label: "app.api.system.builder.post.fields.output.title",
-                  description:
-                    "app.api.system.builder.post.fields.output.description",
-                  placeholder:
-                    "app.api.system.builder.post.fields.output.placeholder",
+                  label: "post.fields.output.title",
+                  description: "post.fields.output.description",
+                  placeholder: "post.fields.output.placeholder",
                   icon: "file-output",
                   colSpan: 6,
                   schema: z.string(),
                 }),
 
-                type: requestField({
+                type: scopedRequestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.SELECT,
-                  label: "app.api.system.builder.post.fields.type.title",
-                  description:
-                    "app.api.system.builder.post.fields.type.description",
+                  label: "post.fields.type.title",
+                  description: "post.fields.type.description",
                   options: BuildTypeOptions,
                   icon: "box",
                   colSpan: 6,
@@ -354,15 +284,12 @@ const { POST } = createEndpoint({
                   ]),
                 }),
 
-                modulesToExternalize: requestField({
+                modulesToExternalize: scopedRequestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TAGS,
-                  label:
-                    "app.api.system.builder.post.fields.modulesToExternalize.title",
-                  description:
-                    "app.api.system.builder.post.fields.modulesToExternalize.description",
-                  placeholder:
-                    "app.api.system.builder.post.fields.modulesToExternalize.placeholder",
+                  label: "post.fields.modulesToExternalize.title",
+                  description: "post.fields.modulesToExternalize.description",
+                  placeholder: "post.fields.modulesToExternalize.placeholder",
                   optional: true,
                   icon: "package",
                   colSpan: 6,
@@ -370,24 +297,22 @@ const { POST } = createEndpoint({
                 }),
 
                 // Vite-specific options
-                inlineCss: requestField({
+                inlineCss: scopedRequestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.BOOLEAN,
-                  label: "app.api.system.builder.post.fields.inlineCss.title",
-                  description:
-                    "app.api.system.builder.post.fields.inlineCss.description",
+                  label: "post.fields.inlineCss.title",
+                  description: "post.fields.inlineCss.description",
                   optional: true,
                   icon: "paintbrush",
                   colSpan: 4,
                   schema: z.boolean().optional(),
                 }),
 
-                bundleReact: requestField({
+                bundleReact: scopedRequestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.BOOLEAN,
-                  label: "app.api.system.builder.post.fields.bundleReact.title",
-                  description:
-                    "app.api.system.builder.post.fields.bundleReact.description",
+                  label: "post.fields.bundleReact.title",
+                  description: "post.fields.bundleReact.description",
                   optional: true,
                   icon: "atom",
                   colSpan: 4,
@@ -395,83 +320,65 @@ const { POST } = createEndpoint({
                 }),
 
                 // Package config for library builds
-                packageConfig: objectOptionalField(
-                  {
-                    type: WidgetType.CONTAINER,
-                    title:
-                      "app.api.system.builder.post.fields.packageConfig.title",
-                    description:
-                      "app.api.system.builder.post.fields.packageConfig.description",
-                    layoutType: LayoutType.GRID,
-                    columns: 12,
-                    optional: true,
-                    icon: "package",
-                  },
-                  { request: "data" },
-                  {
-                    isPackage: requestField({
+                packageConfig: scopedObjectOptionalField(scopedTranslation, {
+                  type: WidgetType.CONTAINER,
+                  title: "post.fields.packageConfig.title",
+                  description: "post.fields.packageConfig.description",
+                  layoutType: LayoutType.GRID,
+                  columns: 12,
+                  optional: true,
+                  icon: "package",
+                  usage: { request: "data" },
+                  children: {
+                    isPackage: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.BOOLEAN,
-                      label:
-                        "app.api.system.builder.post.fields.isPackage.title",
-                      description:
-                        "app.api.system.builder.post.fields.isPackage.description",
+                      label: "post.fields.isPackage.title",
+                      description: "post.fields.isPackage.description",
                       colSpan: 4,
                       schema: z.literal(true),
                     }),
 
-                    dtsInclude: requestField({
+                    dtsInclude: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TAGS,
-                      label:
-                        "app.api.system.builder.post.fields.dtsInclude.title",
-                      description:
-                        "app.api.system.builder.post.fields.dtsInclude.description",
-                      placeholder:
-                        "app.api.system.builder.post.fields.dtsInclude.placeholder",
+                      label: "post.fields.dtsInclude.title",
+                      description: "post.fields.dtsInclude.description",
+                      placeholder: "post.fields.dtsInclude.placeholder",
                       icon: "file-type",
                       colSpan: 8,
                       schema: z.array(z.string()),
                     }),
 
-                    dtsEntryRoot: requestField({
+                    dtsEntryRoot: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label:
-                        "app.api.system.builder.post.fields.dtsEntryRoot.title",
-                      description:
-                        "app.api.system.builder.post.fields.dtsEntryRoot.description",
-                      placeholder:
-                        "app.api.system.builder.post.fields.dtsEntryRoot.placeholder",
+                      label: "post.fields.dtsEntryRoot.title",
+                      description: "post.fields.dtsEntryRoot.description",
+                      placeholder: "post.fields.dtsEntryRoot.placeholder",
                       icon: "folder",
                       colSpan: 12,
                       schema: z.string(),
                     }),
                   },
-                ),
+                }),
 
                 // Bun-specific options
-                bunOptions: objectOptionalField(
-                  {
-                    type: WidgetType.CONTAINER,
-                    title:
-                      "app.api.system.builder.post.fields.bunOptions.title",
-                    description:
-                      "app.api.system.builder.post.fields.bunOptions.description",
-                    layoutType: LayoutType.GRID,
-                    columns: 12,
-                    optional: true,
-                    icon: "zap",
-                  },
-                  { request: "data" },
-                  {
-                    target: requestField({
+                bunOptions: scopedObjectOptionalField(scopedTranslation, {
+                  type: WidgetType.CONTAINER,
+                  title: "post.fields.bunOptions.title",
+                  description: "post.fields.bunOptions.description",
+                  layoutType: LayoutType.GRID,
+                  columns: 12,
+                  optional: true,
+                  icon: "zap",
+                  usage: { request: "data" },
+                  children: {
+                    target: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.SELECT,
-                      label:
-                        "app.api.system.builder.post.fields.bunTarget.title",
-                      description:
-                        "app.api.system.builder.post.fields.bunTarget.description",
+                      label: "post.fields.bunTarget.title",
+                      description: "post.fields.bunTarget.description",
                       options: BunTargetOptions,
                       optional: true,
                       icon: "target",
@@ -479,26 +386,22 @@ const { POST } = createEndpoint({
                       schema: z.enum(BunTargetEnum).optional(),
                     }),
 
-                    minify: requestField({
+                    minify: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.BOOLEAN,
-                      label:
-                        "app.api.system.builder.post.fields.bunMinify.title",
-                      description:
-                        "app.api.system.builder.post.fields.bunMinify.description",
+                      label: "post.fields.bunMinify.title",
+                      description: "post.fields.bunMinify.description",
                       optional: true,
                       icon: "minimize-2",
                       colSpan: 4,
                       schema: z.boolean().optional(),
                     }),
 
-                    sourcemap: requestField({
+                    sourcemap: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.SELECT,
-                      label:
-                        "app.api.system.builder.post.fields.sourcemap.title",
-                      description:
-                        "app.api.system.builder.post.fields.sourcemap.description",
+                      label: "post.fields.sourcemap.title",
+                      description: "post.fields.sourcemap.description",
                       options: SourcemapModeOptions,
                       optional: true,
                       icon: "map",
@@ -506,54 +409,46 @@ const { POST } = createEndpoint({
                       schema: z.enum(SourcemapModeEnum).optional(),
                     }),
 
-                    external: requestField({
+                    external: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TAGS,
-                      label:
-                        "app.api.system.builder.post.fields.external.title",
-                      description:
-                        "app.api.system.builder.post.fields.external.description",
-                      placeholder:
-                        "app.api.system.builder.post.fields.external.placeholder",
+                      label: "post.fields.external.title",
+                      description: "post.fields.external.description",
+                      placeholder: "post.fields.external.placeholder",
                       optional: true,
                       icon: "external-link",
                       colSpan: 12,
                       schema: z.array(z.string()).optional(),
                     }),
 
-                    define: requestField({
+                    define: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.JSON,
-                      label: "app.api.system.builder.post.fields.define.title",
-                      description:
-                        "app.api.system.builder.post.fields.define.description",
-                      placeholder:
-                        "app.api.system.builder.post.fields.define.placeholder",
+                      label: "post.fields.define.title",
+                      description: "post.fields.define.description",
+                      placeholder: "post.fields.define.placeholder",
                       optional: true,
                       icon: "code",
                       colSpan: 12,
                       schema: z.record(z.string(), z.string()).optional(),
                     }),
 
-                    splitting: requestField({
+                    splitting: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.BOOLEAN,
-                      label:
-                        "app.api.system.builder.post.fields.splitting.title",
-                      description:
-                        "app.api.system.builder.post.fields.splitting.description",
+                      label: "post.fields.splitting.title",
+                      description: "post.fields.splitting.description",
                       optional: true,
                       icon: "git-branch",
                       colSpan: 4,
                       schema: z.boolean().optional(),
                     }),
 
-                    format: requestField({
+                    format: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.SELECT,
-                      label: "app.api.system.builder.post.fields.format.title",
-                      description:
-                        "app.api.system.builder.post.fields.format.description",
+                      label: "post.fields.format.title",
+                      description: "post.fields.format.description",
                       options: OutputFormatOptions,
                       optional: true,
                       icon: "file-code",
@@ -561,41 +456,35 @@ const { POST } = createEndpoint({
                       schema: z.enum(OutputFormatEnum).optional(),
                     }),
 
-                    bytecode: requestField({
+                    bytecode: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.BOOLEAN,
-                      label:
-                        "app.api.system.builder.post.fields.bytecode.title",
-                      description:
-                        "app.api.system.builder.post.fields.bytecode.description",
+                      label: "post.fields.bytecode.title",
+                      description: "post.fields.bytecode.description",
                       optional: true,
                       icon: "binary",
                       colSpan: 4,
                       schema: z.boolean().optional(),
                     }),
 
-                    banner: requestField({
+                    banner: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXTAREA,
-                      label: "app.api.system.builder.post.fields.banner.title",
-                      description:
-                        "app.api.system.builder.post.fields.banner.description",
-                      placeholder:
-                        "app.api.system.builder.post.fields.banner.placeholder",
+                      label: "post.fields.banner.title",
+                      description: "post.fields.banner.description",
+                      placeholder: "post.fields.banner.placeholder",
                       optional: true,
                       icon: "chevron-up",
                       colSpan: 6,
                       schema: z.string().optional(),
                     }),
 
-                    footer: requestField({
+                    footer: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXTAREA,
-                      label: "app.api.system.builder.post.fields.footer.title",
-                      description:
-                        "app.api.system.builder.post.fields.footer.description",
-                      placeholder:
-                        "app.api.system.builder.post.fields.footer.placeholder",
+                      label: "post.fields.footer.title",
+                      description: "post.fields.footer.description",
+                      placeholder: "post.fields.footer.placeholder",
                       optional: true,
                       icon: "chevron-down",
                       colSpan: 6,
@@ -603,24 +492,21 @@ const { POST } = createEndpoint({
                     }),
 
                     // Advanced Bun options (passthrough to Bun.build)
-                    publicPath: requestField({
+                    publicPath: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label:
-                        "app.api.system.builder.post.fields.publicPath.label",
-                      description:
-                        "app.api.system.builder.post.fields.publicPath.description",
+                      label: "post.fields.publicPath.label",
+                      description: "post.fields.publicPath.description",
                       optional: true,
                       colSpan: 6,
                       schema: z.string().optional(),
                     }),
 
-                    naming: requestField({
+                    naming: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.JSON,
-                      label: "app.api.system.builder.post.fields.naming.label",
-                      description:
-                        "app.api.system.builder.post.fields.naming.description",
+                      label: "post.fields.naming.label",
+                      description: "post.fields.naming.description",
                       optional: true,
                       colSpan: 6,
                       schema: z
@@ -635,35 +521,31 @@ const { POST } = createEndpoint({
                         .optional(),
                     }),
 
-                    root: requestField({
+                    root: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label: "app.api.system.builder.post.fields.root.label",
-                      description:
-                        "app.api.system.builder.post.fields.root.description",
+                      label: "post.fields.root.label",
+                      description: "post.fields.root.description",
                       optional: true,
                       colSpan: 6,
                       schema: z.string().optional(),
                     }),
 
-                    conditions: requestField({
+                    conditions: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.JSON,
-                      label:
-                        "app.api.system.builder.post.fields.conditions.label",
-                      description:
-                        "app.api.system.builder.post.fields.conditions.description",
+                      label: "post.fields.conditions.label",
+                      description: "post.fields.conditions.description",
                       optional: true,
                       colSpan: 6,
                       schema: z.array(z.string()).optional(),
                     }),
 
-                    loader: requestField({
+                    loader: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.JSON,
-                      label: "app.api.system.builder.post.fields.loader.label",
-                      description:
-                        "app.api.system.builder.post.fields.loader.description",
+                      label: "post.fields.loader.label",
+                      description: "post.fields.loader.description",
                       optional: true,
                       colSpan: 6,
                       schema: z
@@ -685,43 +567,35 @@ const { POST } = createEndpoint({
                         .optional(),
                     }),
 
-                    drop: requestField({
+                    drop: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.JSON,
-                      label: "app.api.system.builder.post.fields.drop.label",
-                      description:
-                        "app.api.system.builder.post.fields.drop.description",
+                      label: "post.fields.drop.label",
+                      description: "post.fields.drop.description",
                       optional: true,
                       colSpan: 6,
                       schema: z.array(z.string()).optional(),
                     }),
                   },
-                ),
+                }),
 
                 // Vite advanced options
-                viteOptions: objectOptionalField(
-                  {
-                    type: WidgetType.CONTAINER,
-                    title:
-                      "app.api.system.builder.post.fields.viteOptions.title",
-                    description:
-                      "app.api.system.builder.post.fields.viteOptions.description",
-                    layoutType: LayoutType.GRID,
-                    columns: 12,
-                    optional: true,
-                    icon: "bot",
-                  },
-                  { request: "data" },
-                  {
-                    target: requestField({
+                viteOptions: scopedObjectOptionalField(scopedTranslation, {
+                  type: WidgetType.CONTAINER,
+                  title: "post.fields.viteOptions.title",
+                  description: "post.fields.viteOptions.description",
+                  layoutType: LayoutType.GRID,
+                  columns: 12,
+                  optional: true,
+                  icon: "bot",
+                  usage: { request: "data" },
+                  children: {
+                    target: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TAGS,
-                      label:
-                        "app.api.system.builder.post.fields.viteTarget.title",
-                      description:
-                        "app.api.system.builder.post.fields.viteTarget.description",
-                      placeholder:
-                        "app.api.system.builder.post.fields.viteTarget.placeholder",
+                      label: "post.fields.viteTarget.title",
+                      description: "post.fields.viteTarget.description",
+                      placeholder: "post.fields.viteTarget.placeholder",
                       optional: true,
                       icon: "target",
                       colSpan: 6,
@@ -730,106 +604,93 @@ const { POST } = createEndpoint({
                         .optional(),
                     }),
 
-                    outDir: requestField({
+                    outDir: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label:
-                        "app.api.system.builder.post.fields.viteOutDir.title",
-                      description:
-                        "app.api.system.builder.post.fields.viteOutDir.description",
-                      placeholder:
-                        "app.api.system.builder.post.fields.viteOutDir.placeholder",
+                      label: "post.fields.viteOutDir.title",
+                      description: "post.fields.viteOutDir.description",
+                      placeholder: "post.fields.viteOutDir.placeholder",
                       optional: true,
                       icon: "folder-output",
                       colSpan: 6,
                       schema: z.string().optional(),
                     }),
 
-                    assetsDir: requestField({
+                    assetsDir: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label:
-                        "app.api.system.builder.post.fields.viteAssetsDir.title",
-                      description:
-                        "app.api.system.builder.post.fields.viteAssetsDir.description",
-                      placeholder:
-                        "app.api.system.builder.post.fields.viteAssetsDir.placeholder",
+                      label: "post.fields.viteAssetsDir.title",
+                      description: "post.fields.viteAssetsDir.description",
+                      placeholder: "post.fields.viteAssetsDir.placeholder",
                       optional: true,
                       icon: "folder",
                       colSpan: 4,
                       schema: z.string().optional(),
                     }),
 
-                    assetsInlineLimit: requestField({
+                    assetsInlineLimit: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.NUMBER,
-                      label:
-                        "app.api.system.builder.post.fields.viteAssetsInlineLimit.title",
+                      label: "post.fields.viteAssetsInlineLimit.title",
                       description:
-                        "app.api.system.builder.post.fields.viteAssetsInlineLimit.description",
+                        "post.fields.viteAssetsInlineLimit.description",
                       placeholder:
-                        "app.api.system.builder.post.fields.viteAssetsInlineLimit.placeholder",
+                        "post.fields.viteAssetsInlineLimit.placeholder",
                       optional: true,
                       icon: "file-image",
                       colSpan: 4,
                       schema: z.number().optional(),
                     }),
 
-                    chunkSizeWarningLimit: requestField({
-                      type: WidgetType.FORM_FIELD,
-                      fieldType: FieldDataType.NUMBER,
-                      label:
-                        "app.api.system.builder.post.fields.viteChunkSizeWarningLimit.title",
-                      description:
-                        "app.api.system.builder.post.fields.viteChunkSizeWarningLimit.description",
-                      placeholder:
-                        "app.api.system.builder.post.fields.viteChunkSizeWarningLimit.placeholder",
-                      optional: true,
-                      icon: "alert-triangle",
-                      colSpan: 4,
-                      schema: z.number().optional(),
-                    }),
+                    chunkSizeWarningLimit: scopedRequestField(
+                      scopedTranslation,
+                      {
+                        type: WidgetType.FORM_FIELD,
+                        fieldType: FieldDataType.NUMBER,
+                        label: "post.fields.viteChunkSizeWarningLimit.title",
+                        description:
+                          "post.fields.viteChunkSizeWarningLimit.description",
+                        placeholder:
+                          "post.fields.viteChunkSizeWarningLimit.placeholder",
+                        optional: true,
+                        icon: "alert-triangle",
+                        colSpan: 4,
+                        schema: z.number().optional(),
+                      },
+                    ),
 
-                    cssCodeSplit: requestField({
+                    cssCodeSplit: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.BOOLEAN,
-                      label:
-                        "app.api.system.builder.post.fields.viteCssCodeSplit.title",
-                      description:
-                        "app.api.system.builder.post.fields.viteCssCodeSplit.description",
+                      label: "post.fields.viteCssCodeSplit.title",
+                      description: "post.fields.viteCssCodeSplit.description",
                       optional: true,
                       icon: "scissors",
                       colSpan: 4,
                       schema: z.boolean().optional(),
                     }),
 
-                    sourcemap: requestField({
+                    sourcemap: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.SELECT,
-                      label:
-                        "app.api.system.builder.post.fields.viteSourcemap.title",
-                      description:
-                        "app.api.system.builder.post.fields.viteSourcemap.description",
+                      label: "post.fields.viteSourcemap.title",
+                      description: "post.fields.viteSourcemap.description",
                       options: [
                         {
                           value: "true",
-                          label:
-                            "app.api.system.builder.enums.viteSourcemap.true",
+                          label: "enums.viteSourcemap.true",
                         },
                         {
                           value: "false",
-                          label:
-                            "app.api.system.builder.enums.viteSourcemap.false",
+                          label: "enums.viteSourcemap.false",
                         },
                         {
                           value: "inline",
-                          label:
-                            "app.api.system.builder.enums.viteSourcemap.inline",
+                          label: "enums.viteSourcemap.inline",
                         },
                         {
                           value: "hidden",
-                          label:
-                            "app.api.system.builder.enums.viteSourcemap.hidden",
+                          label: "enums.viteSourcemap.hidden",
                         },
                       ],
                       optional: true,
@@ -844,13 +705,11 @@ const { POST } = createEndpoint({
                         .optional(),
                     }),
 
-                    minify: requestField({
+                    minify: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.SELECT,
-                      label:
-                        "app.api.system.builder.post.fields.viteMinify.title",
-                      description:
-                        "app.api.system.builder.post.fields.viteMinify.description",
+                      label: "post.fields.viteMinify.title",
+                      description: "post.fields.viteMinify.description",
                       options: ViteMinifyOptions,
                       optional: true,
                       icon: "minimize-2",
@@ -864,39 +723,37 @@ const { POST } = createEndpoint({
                         .optional(),
                     }),
 
-                    emptyOutDir: requestField({
+                    emptyOutDir: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.BOOLEAN,
-                      label:
-                        "app.api.system.builder.post.fields.viteEmptyOutDir.title",
-                      description:
-                        "app.api.system.builder.post.fields.viteEmptyOutDir.description",
+                      label: "post.fields.viteEmptyOutDir.title",
+                      description: "post.fields.viteEmptyOutDir.description",
                       optional: true,
                       icon: "trash",
                       colSpan: 4,
                       schema: z.boolean().optional(),
                     }),
 
-                    reportCompressedSize: requestField({
-                      type: WidgetType.FORM_FIELD,
-                      fieldType: FieldDataType.BOOLEAN,
-                      label:
-                        "app.api.system.builder.post.fields.viteReportCompressedSize.title",
-                      description:
-                        "app.api.system.builder.post.fields.viteReportCompressedSize.description",
-                      optional: true,
-                      icon: "archive",
-                      colSpan: 4,
-                      schema: z.boolean().optional(),
-                    }),
+                    reportCompressedSize: scopedRequestField(
+                      scopedTranslation,
+                      {
+                        type: WidgetType.FORM_FIELD,
+                        fieldType: FieldDataType.BOOLEAN,
+                        label: "post.fields.viteReportCompressedSize.title",
+                        description:
+                          "post.fields.viteReportCompressedSize.description",
+                        optional: true,
+                        icon: "archive",
+                        colSpan: 4,
+                        schema: z.boolean().optional(),
+                      },
+                    ),
 
-                    manifest: requestField({
+                    manifest: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.BOOLEAN,
-                      label:
-                        "app.api.system.builder.post.fields.viteManifest.title",
-                      description:
-                        "app.api.system.builder.post.fields.viteManifest.description",
+                      label: "post.fields.viteManifest.title",
+                      description: "post.fields.viteManifest.description",
                       optional: true,
                       icon: "list",
                       colSpan: 4,
@@ -904,29 +761,22 @@ const { POST } = createEndpoint({
                     }),
 
                     // Library mode options
-                    lib: objectOptionalField(
-                      {
-                        type: WidgetType.CONTAINER,
-                        title:
-                          "app.api.system.builder.post.fields.viteLib.title",
-                        description:
-                          "app.api.system.builder.post.fields.viteLib.description",
-                        layoutType: LayoutType.GRID,
-                        columns: 12,
-                        optional: true,
-                        icon: "library",
-                      },
-                      { request: "data" },
-                      {
-                        entry: requestField({
+                    lib: scopedObjectOptionalField(scopedTranslation, {
+                      type: WidgetType.CONTAINER,
+                      title: "post.fields.viteLib.title",
+                      description: "post.fields.viteLib.description",
+                      layoutType: LayoutType.GRID,
+                      columns: 12,
+                      optional: true,
+                      icon: "library",
+                      usage: { request: "data" },
+                      children: {
+                        entry: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
-                          label:
-                            "app.api.system.builder.post.fields.viteLibEntry.title",
-                          description:
-                            "app.api.system.builder.post.fields.viteLibEntry.description",
-                          placeholder:
-                            "app.api.system.builder.post.fields.viteLibEntry.placeholder",
+                          label: "post.fields.viteLibEntry.title",
+                          description: "post.fields.viteLibEntry.description",
+                          placeholder: "post.fields.viteLibEntry.placeholder",
                           icon: "file-input",
                           colSpan: 6,
                           schema: z.union([
@@ -936,28 +786,23 @@ const { POST } = createEndpoint({
                           ]),
                         }),
 
-                        name: requestField({
+                        name: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
-                          label:
-                            "app.api.system.builder.post.fields.viteLibName.title",
-                          description:
-                            "app.api.system.builder.post.fields.viteLibName.description",
-                          placeholder:
-                            "app.api.system.builder.post.fields.viteLibName.placeholder",
+                          label: "post.fields.viteLibName.title",
+                          description: "post.fields.viteLibName.description",
+                          placeholder: "post.fields.viteLibName.placeholder",
                           optional: true,
                           icon: "tag",
                           colSpan: 6,
                           schema: z.string().optional(),
                         }),
 
-                        formats: requestField({
+                        formats: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.MULTISELECT,
-                          label:
-                            "app.api.system.builder.post.fields.viteLibFormats.title",
-                          description:
-                            "app.api.system.builder.post.fields.viteLibFormats.description",
+                          label: "post.fields.viteLibFormats.title",
+                          description: "post.fields.viteLibFormats.description",
                           options: ViteLibFormatOptions,
                           optional: true,
                           icon: "file-code",
@@ -965,98 +810,93 @@ const { POST } = createEndpoint({
                           schema: z.array(z.enum(ViteLibFormatEnum)).optional(),
                         }),
 
-                        fileName: requestField({
+                        fileName: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
-                          label:
-                            "app.api.system.builder.post.fields.viteLibFileName.title",
+                          label: "post.fields.viteLibFileName.title",
                           description:
-                            "app.api.system.builder.post.fields.viteLibFileName.description",
+                            "post.fields.viteLibFileName.description",
                           placeholder:
-                            "app.api.system.builder.post.fields.viteLibFileName.placeholder",
+                            "post.fields.viteLibFileName.placeholder",
                           optional: true,
                           icon: "file",
                           colSpan: 6,
                           schema: z.string().optional(),
                         }),
                       },
-                    ),
+                    }),
 
                     // Rollup options subset
-                    rollupOptions: objectOptionalField(
+                    rollupOptions: scopedObjectOptionalField(
+                      scopedTranslation,
                       {
                         type: WidgetType.CONTAINER,
-                        title:
-                          "app.api.system.builder.post.fields.viteRollupOptions.title",
+                        title: "post.fields.viteRollupOptions.title",
                         description:
-                          "app.api.system.builder.post.fields.viteRollupOptions.description",
+                          "post.fields.viteRollupOptions.description",
                         layoutType: LayoutType.GRID,
                         columns: 12,
                         optional: true,
                         icon: "package",
-                      },
-                      { request: "data" },
-                      {
-                        external: requestField({
-                          type: WidgetType.FORM_FIELD,
-                          fieldType: FieldDataType.TAGS,
-                          label:
-                            "app.api.system.builder.post.fields.rollupExternal.title",
-                          description:
-                            "app.api.system.builder.post.fields.rollupExternal.description",
-                          placeholder:
-                            "app.api.system.builder.post.fields.rollupExternal.placeholder",
-                          optional: true,
-                          icon: "external-link",
-                          colSpan: 12,
-                          schema: z
-                            .union([z.string(), z.array(z.string())])
-                            .optional(),
-                        }),
+                        usage: { request: "data" },
+                        children: {
+                          external: scopedRequestField(scopedTranslation, {
+                            type: WidgetType.FORM_FIELD,
+                            fieldType: FieldDataType.TAGS,
+                            label: "post.fields.rollupExternal.title",
+                            description:
+                              "post.fields.rollupExternal.description",
+                            placeholder:
+                              "post.fields.rollupExternal.placeholder",
+                            optional: true,
+                            icon: "external-link",
+                            colSpan: 12,
+                            schema: z
+                              .union([z.string(), z.array(z.string())])
+                              .optional(),
+                          }),
 
-                        treeshake: requestField({
-                          type: WidgetType.FORM_FIELD,
-                          fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.builder.post.fields.rollupTreeshake.title",
-                          description:
-                            "app.api.system.builder.post.fields.rollupTreeshake.description",
-                          optional: true,
-                          icon: "tree",
-                          colSpan: 6,
-                          schema: z
-                            .union([
-                              z.boolean(),
-                              z.object({
-                                moduleSideEffects: z.boolean().optional(),
-                              }),
-                            ])
-                            .optional(),
-                        }),
+                          treeshake: scopedRequestField(scopedTranslation, {
+                            type: WidgetType.FORM_FIELD,
+                            fieldType: FieldDataType.BOOLEAN,
+                            label: "post.fields.rollupTreeshake.title",
+                            description:
+                              "post.fields.rollupTreeshake.description",
+                            optional: true,
+                            icon: "tree",
+                            colSpan: 6,
+                            schema: z
+                              .union([
+                                z.boolean(),
+                                z.object({
+                                  moduleSideEffects: z.boolean().optional(),
+                                }),
+                              ])
+                              .optional(),
+                          }),
 
-                        output: requestField({
-                          type: WidgetType.FORM_FIELD,
-                          fieldType: FieldDataType.JSON,
-                          label:
-                            "app.api.system.builder.post.fields.rollupOutput.label",
-                          description:
-                            "app.api.system.builder.post.fields.rollupOutput.description",
-                          optional: true,
-                          icon: "file-output",
-                          colSpan: 12,
-                          schema: z.record(z.string(), z.unknown()).optional(),
-                        }),
+                          output: scopedRequestField(scopedTranslation, {
+                            type: WidgetType.FORM_FIELD,
+                            fieldType: FieldDataType.JSON,
+                            label: "post.fields.rollupOutput.label",
+                            description: "post.fields.rollupOutput.description",
+                            optional: true,
+                            icon: "file-output",
+                            colSpan: 12,
+                            schema: z
+                              .record(z.string(), z.unknown())
+                              .optional(),
+                          }),
+                        },
                       },
                     ),
 
                     // Raw plugins passthrough (for programmatic config files)
-                    plugins: requestField({
+                    plugins: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.JSON,
-                      label:
-                        "app.api.system.builder.post.fields.vitePlugins.label",
-                      description:
-                        "app.api.system.builder.post.fields.vitePlugins.description",
+                      label: "post.fields.vitePlugins.label",
+                      description: "post.fields.vitePlugins.description",
                       optional: true,
                       icon: "plug",
                       colSpan: 12,
@@ -1064,217 +904,184 @@ const { POST } = createEndpoint({
                     }),
 
                     // Raw build options passthrough
-                    build: requestField({
+                    build: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.JSON,
-                      label:
-                        "app.api.system.builder.post.fields.viteBuild.label",
-                      description:
-                        "app.api.system.builder.post.fields.viteBuild.description",
+                      label: "post.fields.viteBuild.label",
+                      description: "post.fields.viteBuild.description",
                       optional: true,
                       icon: "settings",
                       colSpan: 12,
                       schema: z.record(z.string(), z.unknown()).optional(),
                     }),
                   },
-                ),
+                }),
               },
-            ),
+            }),
           ),
 
           // ==================================================================
           // FILES/FOLDERS TO COPY
           // ==================================================================
-          filesOrFoldersToCopy: requestDataArrayOptionalField(
+          filesOrFoldersToCopy: scopedRequestDataArrayOptionalField(
+            scopedTranslation,
             {
               type: WidgetType.CONTAINER,
-              title:
-                "app.api.system.builder.post.fields.filesOrFoldersToCopy.title",
-              description:
-                "app.api.system.builder.post.fields.filesOrFoldersToCopy.description",
+              title: "post.fields.filesOrFoldersToCopy.title",
+              description: "post.fields.filesOrFoldersToCopy.description",
               layoutType: LayoutType.GRID,
               columns: 12,
               optional: true,
               icon: "copy" as const,
             },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                title: "app.api.system.builder.post.fields.copyConfig.title",
-                layoutType: LayoutType.GRID,
-                columns: 12,
-                icon: "copy",
-              },
-              { request: "data" },
-              {
-                input: requestField({
+            scopedObjectFieldNew(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              title: "post.fields.copyConfig.title",
+              layoutType: LayoutType.GRID,
+              columns: 12,
+              icon: "copy",
+              usage: { request: "data" },
+              children: {
+                input: scopedRequestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
-                  label: "app.api.system.builder.post.fields.copyInput.title",
-                  description:
-                    "app.api.system.builder.post.fields.copyInput.description",
-                  placeholder:
-                    "app.api.system.builder.post.fields.copyInput.placeholder",
+                  label: "post.fields.copyInput.title",
+                  description: "post.fields.copyInput.description",
+                  placeholder: "post.fields.copyInput.placeholder",
                   icon: "file-input",
                   colSpan: 5,
                   schema: z.string(),
                 }),
 
-                output: requestField({
+                output: scopedRequestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
-                  label: "app.api.system.builder.post.fields.copyOutput.title",
-                  description:
-                    "app.api.system.builder.post.fields.copyOutput.description",
-                  placeholder:
-                    "app.api.system.builder.post.fields.copyOutput.placeholder",
+                  label: "post.fields.copyOutput.title",
+                  description: "post.fields.copyOutput.description",
+                  placeholder: "post.fields.copyOutput.placeholder",
                   icon: "file-output",
                   colSpan: 5,
                   schema: z.string(),
                 }),
 
-                pattern: requestField({
+                pattern: scopedRequestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
-                  label: "app.api.system.builder.post.fields.copyPattern.title",
-                  description:
-                    "app.api.system.builder.post.fields.copyPattern.description",
-                  placeholder:
-                    "app.api.system.builder.post.fields.copyPattern.placeholder",
+                  label: "post.fields.copyPattern.title",
+                  description: "post.fields.copyPattern.description",
+                  placeholder: "post.fields.copyPattern.placeholder",
                   optional: true,
                   icon: "filter",
                   colSpan: 2,
                   schema: z.string().optional(),
                 }),
               },
-            ),
+            }),
           ),
 
           // ==================================================================
           // NPM PACKAGE CONFIGURATION
           // ==================================================================
-          npmPackage: objectOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.system.builder.post.fields.npmPackage.title",
-              description:
-                "app.api.system.builder.post.fields.npmPackage.description",
-              layoutType: LayoutType.GRID,
-              columns: 12,
-              optional: true,
-              icon: "package",
-              defaultExpanded: false,
-            },
-            { request: "data" },
-            {
-              name: requestField({
+          npmPackage: scopedObjectOptionalField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "post.fields.npmPackage.title",
+            description: "post.fields.npmPackage.description",
+            layoutType: LayoutType.GRID,
+            columns: 12,
+            optional: true,
+            icon: "package",
+            defaultExpanded: false,
+            usage: { request: "data" },
+            children: {
+              name: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
-                label: "app.api.system.builder.post.fields.packageName.title",
-                description:
-                  "app.api.system.builder.post.fields.packageName.description",
-                placeholder:
-                  "app.api.system.builder.post.fields.packageName.placeholder",
+                label: "post.fields.packageName.title",
+                description: "post.fields.packageName.description",
+                placeholder: "post.fields.packageName.placeholder",
                 icon: "package",
                 colSpan: 6,
                 schema: z.string(),
               }),
 
-              version: requestField({
+              version: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
-                label:
-                  "app.api.system.builder.post.fields.packageVersion.title",
-                description:
-                  "app.api.system.builder.post.fields.packageVersion.description",
-                placeholder:
-                  "app.api.system.builder.post.fields.packageVersion.placeholder",
+                label: "post.fields.packageVersion.title",
+                description: "post.fields.packageVersion.description",
+                placeholder: "post.fields.packageVersion.placeholder",
                 optional: true,
                 icon: "tag",
                 colSpan: 6,
                 schema: z.string().optional(),
               }),
 
-              description: requestField({
+              description: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXTAREA,
-                label:
-                  "app.api.system.builder.post.fields.packageDescription.title",
-                description:
-                  "app.api.system.builder.post.fields.packageDescription.description",
-                placeholder:
-                  "app.api.system.builder.post.fields.packageDescription.placeholder",
+                label: "post.fields.packageDescription.title",
+                description: "post.fields.packageDescription.description",
+                placeholder: "post.fields.packageDescription.placeholder",
                 optional: true,
                 icon: "text",
                 colSpan: 12,
                 schema: z.string().optional(),
               }),
 
-              main: requestField({
+              main: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
-                label: "app.api.system.builder.post.fields.packageMain.title",
-                description:
-                  "app.api.system.builder.post.fields.packageMain.description",
-                placeholder:
-                  "app.api.system.builder.post.fields.packageMain.placeholder",
+                label: "post.fields.packageMain.title",
+                description: "post.fields.packageMain.description",
+                placeholder: "post.fields.packageMain.placeholder",
                 optional: true,
                 icon: "file-code",
                 colSpan: 4,
                 schema: z.string().optional(),
               }),
 
-              module: requestField({
+              module: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
-                label: "app.api.system.builder.post.fields.packageModule.title",
-                description:
-                  "app.api.system.builder.post.fields.packageModule.description",
-                placeholder:
-                  "app.api.system.builder.post.fields.packageModule.placeholder",
+                label: "post.fields.packageModule.title",
+                description: "post.fields.packageModule.description",
+                placeholder: "post.fields.packageModule.placeholder",
                 optional: true,
                 icon: "file-code-2",
                 colSpan: 4,
                 schema: z.string().optional(),
               }),
 
-              types: requestField({
+              types: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
-                label: "app.api.system.builder.post.fields.packageTypes.title",
-                description:
-                  "app.api.system.builder.post.fields.packageTypes.description",
-                placeholder:
-                  "app.api.system.builder.post.fields.packageTypes.placeholder",
+                label: "post.fields.packageTypes.title",
+                description: "post.fields.packageTypes.description",
+                placeholder: "post.fields.packageTypes.placeholder",
                 optional: true,
                 icon: "file-type",
                 colSpan: 4,
                 schema: z.string().optional(),
               }),
 
-              bin: requestField({
+              bin: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.JSON,
-                label: "app.api.system.builder.post.fields.packageBin.title",
-                description:
-                  "app.api.system.builder.post.fields.packageBin.description",
-                placeholder:
-                  "app.api.system.builder.post.fields.packageBin.placeholder",
+                label: "post.fields.packageBin.title",
+                description: "post.fields.packageBin.description",
+                placeholder: "post.fields.packageBin.placeholder",
                 optional: true,
                 icon: "terminal",
                 colSpan: 12,
                 schema: z.record(z.string(), z.string()).optional(),
               }),
 
-              exports: requestField({
+              exports: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.JSON,
-                label:
-                  "app.api.system.builder.post.fields.packageExports.title",
-                description:
-                  "app.api.system.builder.post.fields.packageExports.description",
-                placeholder:
-                  "app.api.system.builder.post.fields.packageExports.placeholder",
+                label: "post.fields.packageExports.title",
+                description: "post.fields.packageExports.description",
+                placeholder: "post.fields.packageExports.placeholder",
                 optional: true,
                 icon: "share-2",
                 colSpan: 12,
@@ -1283,89 +1090,72 @@ const { POST } = createEndpoint({
                   .optional(),
               }),
 
-              dependencies: requestField({
+              dependencies: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.JSON,
-                label:
-                  "app.api.system.builder.post.fields.packageDependencies.title",
-                description:
-                  "app.api.system.builder.post.fields.packageDependencies.description",
-                placeholder:
-                  "app.api.system.builder.post.fields.packageDependencies.placeholder",
+                label: "post.fields.packageDependencies.title",
+                description: "post.fields.packageDependencies.description",
+                placeholder: "post.fields.packageDependencies.placeholder",
                 optional: true,
                 icon: "package",
                 colSpan: 6,
                 schema: z.record(z.string(), z.string()).optional(),
               }),
 
-              peerDependencies: requestField({
+              peerDependencies: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.JSON,
-                label:
-                  "app.api.system.builder.post.fields.packagePeerDependencies.title",
-                description:
-                  "app.api.system.builder.post.fields.packagePeerDependencies.description",
-                placeholder:
-                  "app.api.system.builder.post.fields.packagePeerDependencies.placeholder",
+                label: "post.fields.packagePeerDependencies.title",
+                description: "post.fields.packagePeerDependencies.description",
+                placeholder: "post.fields.packagePeerDependencies.placeholder",
                 optional: true,
                 icon: "users",
                 colSpan: 6,
                 schema: z.record(z.string(), z.string()).optional(),
               }),
 
-              files: requestField({
+              files: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TAGS,
-                label: "app.api.system.builder.post.fields.packageFiles.title",
-                description:
-                  "app.api.system.builder.post.fields.packageFiles.description",
-                placeholder:
-                  "app.api.system.builder.post.fields.packageFiles.placeholder",
+                label: "post.fields.packageFiles.title",
+                description: "post.fields.packageFiles.description",
+                placeholder: "post.fields.packageFiles.placeholder",
                 optional: true,
                 icon: "folder",
                 colSpan: 6,
                 schema: z.array(z.string()).optional(),
               }),
 
-              keywords: requestField({
+              keywords: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TAGS,
-                label:
-                  "app.api.system.builder.post.fields.packageKeywords.title",
-                description:
-                  "app.api.system.builder.post.fields.packageKeywords.description",
-                placeholder:
-                  "app.api.system.builder.post.fields.packageKeywords.placeholder",
+                label: "post.fields.packageKeywords.title",
+                description: "post.fields.packageKeywords.description",
+                placeholder: "post.fields.packageKeywords.placeholder",
                 optional: true,
                 icon: "hash",
                 colSpan: 6,
                 schema: z.array(z.string()).optional(),
               }),
 
-              license: requestField({
+              license: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
-                label:
-                  "app.api.system.builder.post.fields.packageLicense.title",
-                description:
-                  "app.api.system.builder.post.fields.packageLicense.description",
-                placeholder:
-                  "app.api.system.builder.post.fields.packageLicense.placeholder",
+                label: "post.fields.packageLicense.title",
+                description: "post.fields.packageLicense.description",
+                placeholder: "post.fields.packageLicense.placeholder",
                 optional: true,
                 icon: "scale",
                 colSpan: 6,
                 schema: z.string().optional(),
               }),
 
-              repository: requestField({
+              repository: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
-                label:
-                  "app.api.system.builder.post.fields.packageRepository.title",
-                description:
-                  "app.api.system.builder.post.fields.packageRepository.description",
-                placeholder:
-                  "app.api.system.builder.post.fields.packageRepository.placeholder",
+                label: "post.fields.packageRepository.title",
+                description: "post.fields.packageRepository.description",
+                placeholder: "post.fields.packageRepository.placeholder",
                 optional: true,
                 icon: "github",
                 colSpan: 6,
@@ -1377,32 +1167,32 @@ const { POST } = createEndpoint({
                   .optional(),
               }),
             },
-          ),
+          }),
         },
-      ),
+      }),
 
       // ========================================================================
       // RESPONSE FIELDS
       // ========================================================================
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.STATUS_INDICATOR,
         status: "success",
-        label: "app.api.system.builder.post.fields.success.title",
+        label: "post.fields.success.title",
         icon: "check-circle",
         schema: z.boolean(),
       }),
 
-      output: responseField({
+      output: scopedResponseField(scopedTranslation, {
         type: WidgetType.CODE_OUTPUT,
-        content: "app.api.system.builder.post.fields.buildOutput.title",
+        content: "post.fields.buildOutput.title",
         language: "plaintext",
         icon: "terminal",
         schema: z.string(),
       }),
 
-      duration: responseField({
+      duration: scopedResponseField(scopedTranslation, {
         type: WidgetType.STAT,
-        content: "app.api.system.builder.post.fields.duration.title",
+        content: "post.fields.duration.title",
         icon: "clock",
         suffix: "ms",
         schema: z.coerce.number(),
@@ -1415,9 +1205,9 @@ const { POST } = createEndpoint({
           optional: true,
           icon: "check-circle",
         },
-        responseField({
+        scopedResponseField(scopedTranslation, {
           type: WidgetType.TEXT,
-          content: "app.api.system.builder.post.fields.filesBuilt.item",
+          content: "post.fields.filesBuilt.item",
           schema: z.string(),
         }),
       ),
@@ -1429,33 +1219,33 @@ const { POST } = createEndpoint({
           optional: true,
           icon: "copy",
         },
-        responseField({
+        scopedResponseField(scopedTranslation, {
           type: WidgetType.TEXT,
-          content: "app.api.system.builder.post.fields.filesCopied.item",
+          content: "post.fields.filesCopied.item",
           schema: z.string(),
         }),
       ),
 
-      packageJson: responseField({
+      packageJson: scopedResponseField(scopedTranslation, {
         type: WidgetType.CODE_OUTPUT,
-        content: "app.api.system.builder.post.fields.packageJson.title",
+        content: "post.fields.packageJson.title",
         language: "json",
         optional: true,
         icon: "file-json",
         schema: z.string().optional(),
       }),
 
-      profileUsed: responseField({
+      profileUsed: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        content: "app.api.system.builder.post.fields.profileUsed.title",
+        content: "post.fields.profileUsed.title",
         optional: true,
         icon: "layers",
         schema: z.enum(BuildProfileEnum).optional(),
       }),
 
-      reportPath: responseField({
+      reportPath: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.builder.post.fields.reportPath.title",
+        content: "post.fields.reportPath.title",
         schema: z.string().optional(),
       }),
 
@@ -1465,93 +1255,88 @@ const { POST } = createEndpoint({
           optional: true,
           icon: "list",
         },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.GRID,
-            columns: 12,
-          },
-          { response: true },
-          {
-            step: responseField({
+        scopedObjectFieldNew(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.GRID,
+          columns: 12,
+          usage: { response: true },
+          children: {
+            step: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.system.builder.post.fields.stepTimings.step",
+              content: "post.fields.stepTimings.step",
               icon: "chevron-right",
               schema: z.string(),
             }),
-            duration: responseField({
+            duration: scopedResponseField(scopedTranslation, {
               type: WidgetType.STAT,
-              label: "app.api.system.builder.post.fields.stepTimings.duration",
+              label: "post.fields.stepTimings.duration",
               icon: "clock",
               suffix: "ms",
               schema: z.coerce.number(),
             }),
-            status: responseField({
+            status: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              label: "app.api.system.builder.post.fields.stepTimings.status",
+              label: "post.fields.stepTimings.status",
               icon: "activity",
               schema: z.enum(StepStatusEnum),
             }),
-            filesAffected: responseField({
+            filesAffected: scopedResponseField(scopedTranslation, {
               type: WidgetType.STAT,
-              label:
-                "app.api.system.builder.post.fields.stepTimings.filesAffected",
+              label: "post.fields.stepTimings.filesAffected",
               optional: true,
               icon: "folder",
               schema: z.coerce.number().optional(),
             }),
           },
-        ),
+        }),
       ),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.builder.post.errors.validation.title",
-      description: "app.api.system.builder.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.builder.post.errors.network.title",
-      description: "app.api.system.builder.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.builder.post.errors.unauthorized.title",
-      description:
-        "app.api.system.builder.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.builder.post.errors.forbidden.title",
-      description: "app.api.system.builder.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.builder.post.errors.notFound.title",
-      description: "app.api.system.builder.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.builder.post.errors.server.title",
-      description: "app.api.system.builder.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.builder.post.errors.unknown.title",
-      description: "app.api.system.builder.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.builder.post.errors.conflict.title",
-      description: "app.api.system.builder.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.builder.post.errors.unsavedChanges.title",
-      description:
-        "app.api.system.builder.post.errors.unsavedChanges.description",
+      title: "post.errors.unsavedChanges.title",
+      description: "post.errors.unsavedChanges.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.system.builder.post.success.title",
-    description: "app.api.system.builder.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   // === EXAMPLES ===

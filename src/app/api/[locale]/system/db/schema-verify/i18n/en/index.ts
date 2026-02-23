@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Database Operations",
+
   tag: "schema-verify",
   post: {
     title: "Schema Verify",

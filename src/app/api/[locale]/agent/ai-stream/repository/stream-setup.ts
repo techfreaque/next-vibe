@@ -27,7 +27,20 @@ import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/to
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import { simpleT } from "@/i18n/core/shared";
+import type { TParams } from "@/i18n/core/static-types";
+
+import type { AiStreamTranslationKey } from "../i18n";
+
+type AiStreamModuleT = (
+  key: AiStreamTranslationKey,
+  params?: TParams,
+) => TranslatedKeyType;
+
+import type { scopedTranslation as sttScopedTranslation } from "../../speech-to-text/i18n";
+
+type SttModuleT = ReturnType<typeof sttScopedTranslation.scopedT>["t"];
 
 import { customCharacters } from "../../chat/characters/db";
 import type { ToolCall } from "../../chat/db";
@@ -52,6 +65,22 @@ import { ToolConfirmationProcessor } from "./handlers/tool-confirmation-processo
 import { UserMessageHandler } from "./handlers/user-message-handler";
 import { buildSystemPrompt } from "./system-prompt/builder";
 
+/** Normalize DB tool config items — ensures requiresConfirmation is always boolean */
+function normalizeToolConfig(
+  items:
+    | Array<{ toolId: string; requiresConfirmation?: boolean | null }>
+    | null
+    | undefined,
+): Array<{ toolId: string; requiresConfirmation: boolean }> | null {
+  if (!items) {
+    return null;
+  }
+  return items.map((item) => ({
+    toolId: item.toolId,
+    requiresConfirmation: item.requiresConfirmation ?? false,
+  }));
+}
+
 export interface StreamSetupResult {
   userId: string | undefined;
   leadId: string | undefined;
@@ -70,6 +99,10 @@ export interface StreamSetupResult {
   aiMessageCreatedAt: Date;
   messages: ModelMessage[];
   systemPrompt: string;
+  trailingSystemMessage: string;
+  memorySummary: string;
+  tasksSummary: string;
+  favoritesSummary: string;
   toolConfirmationResults: Array<{
     messageId: string;
     sequenceId: string;
@@ -140,13 +173,25 @@ export async function setupAiStream(params: {
   userId: string | undefined;
   leadId: string | undefined;
   ipAddress: string | undefined;
-  t: TFunction;
+  aiStreamT: AiStreamModuleT;
+  sttT: SttModuleT;
   maxDuration: number;
   request: NextRequest | undefined;
   extraInstructions?: string;
   headless?: boolean;
 }): Promise<ResponseType<StreamSetupResult>> {
-  const { data, locale, logger, user, userId, leadId, ipAddress, t } = params;
+  const {
+    data,
+    locale,
+    logger,
+    user,
+    userId,
+    leadId,
+    ipAddress,
+    aiStreamT,
+    sttT,
+  } = params;
+  const { t } = simpleT(locale);
   const isIncognito = data.rootFolderId === "incognito";
 
   // File upload promise for server threads (captured for SSE event emission)
@@ -191,6 +236,7 @@ export async function setupAiStream(params: {
       locale,
       logger,
       user,
+      t: aiStreamT,
     });
 
     if (!confirmationResult.success) {
@@ -208,8 +254,7 @@ export async function setupAiStream(params: {
       rootFolderId: data.rootFolderId,
     });
     return fail({
-      message:
-        "app.api.agent.chat.aiStream.route.errors.authenticationRequired",
+      message: aiStreamT("route.errors.authenticationRequired"),
       errorType: ErrorResponseTypes.AUTH_ERROR,
     });
   }
@@ -244,8 +289,9 @@ export async function setupAiStream(params: {
   if (providerKeyMissing) {
     logger.warn("AI provider API key not configured", { model: data.model });
     return fail({
-      message: providerKeyMissing,
+      message: aiStreamT("route.errors.invalidRequestData"),
       errorType: ErrorResponseTypes.BAD_REQUEST,
+      messageParams: { issue: providerKeyMissing },
     });
   }
 
@@ -256,6 +302,7 @@ export async function setupAiStream(params: {
     modelInfo: modelConfig,
     locale,
     logger,
+    t: aiStreamT,
   });
 
   if (!creditValidation.success) {
@@ -271,6 +318,7 @@ export async function setupAiStream(params: {
     user,
     locale,
     logger,
+    sttT,
   });
 
   if (!operationResult.success) {
@@ -297,6 +345,7 @@ export async function setupAiStream(params: {
       isIncognito,
       logger,
       user,
+      locale,
     });
   } catch (error) {
     logger.error("Failed to ensure thread - RAW ERROR", parseError(error), {
@@ -312,13 +361,13 @@ export async function setupAiStream(params: {
 
     if (errorMessage === "PERMISSION_DENIED") {
       return fail({
-        message: "app.api.agent.chat.aiStream.post.errors.forbidden.title",
+        message: aiStreamT("post.errors.forbidden.title"),
         errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
 
     return fail({
-      message: "app.api.agent.chat.aiStream.post.errors.notFound.title",
+      message: aiStreamT("post.errors.notFound.title"),
       errorType: ErrorResponseTypes.NOT_FOUND,
     });
   }
@@ -340,7 +389,7 @@ export async function setupAiStream(params: {
       data.userMessageId,
     );
     return fail({
-      message: "app.api.agent.chat.aiStream.route.errors.invalidJson",
+      message: aiStreamT("route.errors.invalidJson"),
       errorType: ErrorResponseTypes.BAD_REQUEST,
     });
   }
@@ -365,6 +414,7 @@ export async function setupAiStream(params: {
       userId,
       attachments: data.attachments ?? undefined,
       logger,
+      t: aiStreamT,
     });
 
   if (!userMessageResult.success) {
@@ -443,8 +493,107 @@ export async function setupAiStream(params: {
     userId,
   });
 
+  // Resolve tool config cascade: favorite → character → settings → client-provided → null (all allowed)
+  // null means "no restriction" — model can call any tool
+  const resolvedToolConfig = await (async (): Promise<{
+    activeTools: Array<{
+      // Internal name kept for ToolsSetupHandler compatibility (permission gate)
+      toolId: string;
+      requiresConfirmation: boolean;
+    }> | null;
+    visibleTools: Array<{
+      // Internal name kept for ToolsSetupHandler compatibility (context window set)
+      toolId: string;
+      requiresConfirmation: boolean;
+    }> | null;
+  }> => {
+    if (!userId) {
+      return { activeTools: null, visibleTools: null };
+    }
+
+    // 1. Load user settings once (used for activeFavoriteId + tool overrides)
+    const [userSettings] = await db
+      .select({
+        activeFavoriteId: chatSettings.activeFavoriteId,
+        activeTools: chatSettings.activeTools,
+        visibleTools: chatSettings.visibleTools,
+      })
+      .from(chatSettings)
+      .where(eq(chatSettings.userId, userId))
+      .limit(1);
+
+    // 1a. Check active favorite tool config
+    if (userSettings?.activeFavoriteId) {
+      const [fav] = await db
+        .select({
+          activeTools: chatFavorites.activeTools,
+          visibleTools: chatFavorites.visibleTools,
+        })
+        .from(chatFavorites)
+        .where(eq(chatFavorites.id, userSettings.activeFavoriteId))
+        .limit(1);
+
+      if (fav && (fav.activeTools !== null || fav.visibleTools !== null)) {
+        logger.debug("[Setup] Tool config resolved from active favorite", {
+          activeFavoriteId: userSettings.activeFavoriteId,
+        });
+        return {
+          activeTools: normalizeToolConfig(fav.activeTools),
+          visibleTools: normalizeToolConfig(fav.visibleTools),
+        };
+      }
+    }
+
+    // 2. Check character tool config (custom characters only — UUIDs)
+    if (data.character) {
+      const uuidPattern =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (uuidPattern.test(data.character)) {
+        const [char] = await db
+          .select({
+            activeTools: customCharacters.activeTools,
+            visibleTools: customCharacters.visibleTools,
+          })
+          .from(customCharacters)
+          .where(eq(customCharacters.id, data.character))
+          .limit(1);
+
+        if (char && (char.activeTools !== null || char.visibleTools !== null)) {
+          logger.debug("[Setup] Tool config resolved from character", {
+            characterId: data.character,
+          });
+          return {
+            activeTools: normalizeToolConfig(char.activeTools),
+            visibleTools: normalizeToolConfig(char.visibleTools),
+          };
+        }
+      }
+    }
+
+    // 3. Check user's personal settings (customised tool config)
+    if (
+      userSettings &&
+      (userSettings.activeTools !== null || userSettings.visibleTools !== null)
+    ) {
+      logger.debug("[Setup] Tool config resolved from user settings");
+      return {
+        activeTools: normalizeToolConfig(userSettings.activeTools),
+        visibleTools: normalizeToolConfig(userSettings.visibleTools),
+      };
+    }
+
+    // 4. Fall back to null (all tools allowed / default visible set)
+    return { activeTools: null, visibleTools: null };
+  })();
+
   // Build complete system prompt from character and formatting instructions
-  const systemPrompt = await buildSystemPrompt({
+  const {
+    systemPrompt: builtSystemPrompt,
+    trailingSystemMessage,
+    memorySummary,
+    tasksSummary,
+    favoritesSummary,
+  } = await buildSystemPrompt({
     characterId: data.character,
     user,
     logger,
@@ -455,11 +604,19 @@ export async function setupAiStream(params: {
     callMode: data.voiceMode?.enabled,
     extraInstructions: params.extraInstructions,
     headless: params.headless,
+    voiceTranscription: voiceTranscription
+      ? {
+          wasTranscribed: voiceTranscription.wasTranscribed,
+          confidence: voiceTranscription.confidence,
+        }
+      : null,
   });
 
   logger.debug("System prompt built", {
-    systemPromptLength: systemPrompt.length,
+    systemPromptLength: builtSystemPrompt.length,
     hasCharacter: !!data.character,
+    hasMemories: !!memorySummary,
+    hasTasks: !!tasksSummary,
   });
 
   // Generate AI message ID and timestamp BEFORE building context
@@ -478,6 +635,7 @@ export async function setupAiStream(params: {
     operation: data.operation,
     threadId: effectiveThreadId,
     parentMessageId: data.parentMessageId,
+    locale,
     content: effectiveContent,
     role: effectiveRole,
     userId,
@@ -494,6 +652,7 @@ export async function setupAiStream(params: {
     upcomingAssistantMessageId: aiMessageId,
     upcomingAssistantMessageCreatedAt: aiMessageCreatedAt,
     modelConfig,
+    trailingSystemMessage,
   });
 
   const {
@@ -503,12 +662,13 @@ export async function setupAiStream(params: {
     systemPrompt: updatedSystemPrompt,
   } = await ToolsSetupHandler.setupStreamingTools({
     modelConfig,
-    visibleTools: data.tools,
-    activeTools: data.activeTools,
+    // Tool config cascade: cascade-resolved (favorite/character) takes precedence over client-provided
+    visibleTools: resolvedToolConfig.visibleTools ?? data.tools,
+    activeTools: resolvedToolConfig.activeTools ?? data.allowedTools,
     user,
     locale,
     logger,
-    systemPrompt,
+    systemPrompt: builtSystemPrompt,
     toolConfirmationResults,
   });
 
@@ -522,7 +682,7 @@ export async function setupAiStream(params: {
     hasTools: !!tools,
     toolCount: tools ? Object.keys(tools).length : 0,
     visibleTools: data.tools,
-    activeTools: data.activeTools,
+    activeTools: data.allowedTools,
     supportsTools: modelConfig?.supportsTools,
   });
 
@@ -555,6 +715,10 @@ export async function setupAiStream(params: {
       aiMessageCreatedAt,
       messages,
       systemPrompt: updatedSystemPrompt,
+      trailingSystemMessage,
+      memorySummary,
+      tasksSummary,
+      favoritesSummary,
       toolConfirmationResults,
       voiceMode: data.voiceMode
         ? {

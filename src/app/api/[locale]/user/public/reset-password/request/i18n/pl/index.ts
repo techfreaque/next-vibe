@@ -2,10 +2,15 @@ import type { translations as enTranslations } from "../en";
 import { translations as componentsTranslations } from "../../_components/i18n/pl";
 
 export const translations: typeof enTranslations = {
+  category: "Użytkownicy",
+
   _components: componentsTranslations,
   title: "Żądanie resetowania hasła",
   description: "Żądanie resetowania hasła",
   tag: "Reset hasła",
+  actions: {
+    submitting: "Wysyłanie...",
+  },
   email: {
     title: "Zresetuj swoje hasło {{appName}}",
     subject: "Żądanie resetowania hasła - {{appName}}",
@@ -103,6 +108,8 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Wystąpił konflikt danych",
     },
+    no_email: "Nie znaleziono konta z tym adresem e-mail",
+    email_generation_failed: "Nie udało się wygenerować e-maila",
   },
   success: {
     title: "Żądanie wysłane",
@@ -156,6 +163,28 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Sukces",
       description: "Operacja zakończona pomyślnie",
+    },
+  },
+  emailTemplates: {
+    request: {
+      name: "E-mail z żądaniem resetowania hasła",
+      description:
+        "E-mail wysyłany do użytkowników z linkiem do resetowania hasła",
+      category: "Uwierzytelnianie",
+      preview: {
+        publicName: {
+          label: "Nazwa publiczna",
+          description: "Publiczna nazwa wyświetlana użytkownika",
+        },
+        userId: {
+          label: "ID użytkownika",
+          description: "Unikalny identyfikator użytkownika",
+        },
+        passwordResetUrl: {
+          label: "URL resetowania hasła",
+          description: "Adres URL do resetowania hasła",
+        },
+      },
     },
   },
 };

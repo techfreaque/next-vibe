@@ -8,8 +8,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -19,108 +19,106 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { scopedTranslation } from "../../i18n";
+import { scopedTranslation } from "./i18n";
 import { ConnectionTestContainer } from "./widget";
 
 export const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["ssh", "connections", "test"],
-  title: "connections.test.post.title",
-  description: "connections.test.post.description",
+  title: "post.title",
+  description: "post.description",
   icon: "wifi",
   category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["type"],
+  tags: ["category" as const],
 
   fields: customWidgetObject({
     render: ConnectionTestContainer,
     usage: { request: "data", response: true } as const,
     children: {
       // REQUEST
-      connectionId: requestField({
+      connectionId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "connections.test.post.fields.connectionId.label",
-        description: "connections.test.post.fields.connectionId.description",
-        placeholder: "connections.test.post.fields.connectionId.placeholder",
+        label: "post.fields.connectionId.label",
+        description: "post.fields.connectionId.description",
+        placeholder: "post.fields.connectionId.placeholder",
         schema: z.string().uuid(),
       }),
-      acknowledgeNewFingerprint: requestField({
+      acknowledgeNewFingerprint: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "connections.test.post.fields.acknowledgeNewFingerprint.label",
-        description:
-          "connections.test.post.fields.acknowledgeNewFingerprint.description",
-        placeholder:
-          "connections.test.post.fields.acknowledgeNewFingerprint.placeholder",
+        label: "post.fields.acknowledgeNewFingerprint.label",
+        description: "post.fields.acknowledgeNewFingerprint.description",
+        placeholder: "post.fields.acknowledgeNewFingerprint.placeholder",
         schema: z.boolean().optional(),
       }),
 
       // RESPONSE
-      ok: responseField({
+      ok: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "connections.test.post.response.ok.title",
+        content: "post.response.ok.title",
         schema: z.boolean(),
       }),
-      latencyMs: responseField({
+      latencyMs: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "connections.test.post.response.latencyMs.title",
+        content: "post.response.latencyMs.title",
         schema: z.number(),
       }),
-      fingerprint: responseField({
+      fingerprint: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "connections.test.post.response.fingerprint.title",
+        content: "post.response.fingerprint.title",
         schema: z.string().nullable(),
       }),
-      fingerprintChanged: responseField({
+      fingerprintChanged: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "connections.test.post.response.fingerprintChanged.title",
+        content: "post.response.fingerprintChanged.title",
         schema: z.boolean().optional(),
       }),
     },
   }),
 
   successTypes: {
-    title: "connections.test.post.success.title",
-    description: "connections.test.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "connections.test.post.errors.validation.title",
-      description: "connections.test.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "connections.test.post.errors.unauthorized.title",
-      description: "connections.test.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "connections.test.post.errors.forbidden.title",
-      description: "connections.test.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "connections.test.post.errors.server.title",
-      description: "connections.test.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "connections.test.post.errors.notFound.title",
-      description: "connections.test.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "connections.test.post.errors.unknown.title",
-      description: "connections.test.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "connections.test.post.errors.unsavedChanges.title",
-      description: "connections.test.post.errors.unsavedChanges.description",
+      title: "post.errors.unsavedChanges.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "connections.test.post.errors.conflict.title",
-      description: "connections.test.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "connections.test.post.errors.network.title",
-      description: "connections.test.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
   },
 

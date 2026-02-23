@@ -14,10 +14,11 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 
+import { scopedTranslation } from "../i18n";
 import { UserRole } from "../../../user-roles/enum";
 import { ResetPasswordConfirmContainer } from "./widget";
 
@@ -25,82 +26,65 @@ import { ResetPasswordConfirmContainer } from "./widget";
  * POST /reset-password/confirm - Confirm password reset
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["user", "public", "reset-password", "confirm"],
-  title: "app.api.user.public.resetPassword.confirm.title" as const,
-  description: "app.api.user.public.resetPassword.confirm.description" as const,
+  title: "confirm.title",
+  description: "confirm.description",
   icon: "lock",
-  category: "app.api.user.category" as const,
-  tags: ["app.api.user.public.resetPassword.confirm.tag" as const],
+  category: "confirm.category",
+  tags: ["confirm.tag"],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
   fields: customWidgetObject({
     render: ResetPasswordConfirmContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      token: requestField({
+      token: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.user.public.resetPassword.confirm.fields.token.label" as const,
-        description:
-          "app.api.user.public.resetPassword.confirm.fields.token.description" as const,
-        placeholder:
-          "app.api.user.public.resetPassword.confirm.fields.token.placeholder" as const,
-        helpText:
-          "app.api.user.public.resetPassword.confirm.fields.token.help" as const,
+        label: "confirm.fields.token.label",
+        description: "confirm.fields.token.description",
+        placeholder: "confirm.fields.token.placeholder",
+        helpText: "confirm.fields.token.help",
         schema: z.string().min(1, {
-          message:
-            "app.api.user.public.resetPassword.confirm.fields.token.validation.required",
+          message: "confirm.fields.token.validation.required",
         }),
       }),
-      email: requestField({
+      email: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
-        label:
-          "app.api.user.public.resetPassword.confirm.fields.email.label" as const,
-        description:
-          "app.api.user.public.resetPassword.confirm.fields.email.description" as const,
-        placeholder:
-          "app.api.user.public.resetPassword.confirm.fields.email.placeholder" as const,
+        label: "confirm.fields.email.label",
+        description: "confirm.fields.email.description",
+        placeholder: "confirm.fields.email.placeholder",
         schema: z
           .email({
-            message:
-              "app.api.user.public.resetPassword.confirm.fields.email.validation.invalid",
+            message: "confirm.fields.email.validation.invalid",
           })
           .transform((val) => val.toLowerCase().trim()),
       }),
-      password: requestField({
+      password: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
-        label:
-          "app.api.user.public.resetPassword.confirm.fields.password.label" as const,
-        description:
-          "app.api.user.public.resetPassword.confirm.fields.password.description" as const,
-        placeholder:
-          "app.api.user.public.resetPassword.confirm.fields.password.placeholder" as const,
-        helpText:
-          "app.api.user.public.resetPassword.confirm.fields.password.help" as const,
+        label: "confirm.fields.password.label",
+        description: "confirm.fields.password.description",
+        placeholder: "confirm.fields.password.placeholder",
+        helpText: "confirm.fields.password.help",
         schema: z.string().min(8, {
-          message:
-            "app.api.user.public.resetPassword.confirm.fields.password.validation.minLength",
+          message: "confirm.fields.password.validation.minLength",
         }),
       }),
-      confirmPassword: requestField({
+      confirmPassword: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
-        label:
-          "app.api.user.public.resetPassword.confirm.fields.confirmPassword.label" as const,
-        description:
-          "app.api.user.public.resetPassword.confirm.fields.confirmPassword.description" as const,
-        placeholder:
-          "app.api.user.public.resetPassword.confirm.fields.confirmPassword.placeholder" as const,
+        label: "confirm.fields.confirmPassword.label",
+        description: "confirm.fields.confirmPassword.description",
+        placeholder: "confirm.fields.confirmPassword.placeholder",
         schema: z.string().min(8, {
-          message:
-            "app.api.user.public.resetPassword.confirm.fields.confirmPassword.validation.minLength",
+          message: "confirm.fields.confirmPassword.validation.minLength",
         }),
       }),
 
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.ALERT,
         schema: z.string().describe("Human-readable status message"),
       }),
@@ -110,66 +94,47 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.user.public.resetPassword.confirm.errors.validation.title" as const,
-      description:
-        "app.api.user.public.resetPassword.confirm.errors.validation.description" as const,
+      title: "confirm.errors.validation.title",
+      description: "confirm.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.user.public.resetPassword.confirm.errors.unauthorized.title" as const,
-      description:
-        "app.api.user.public.resetPassword.confirm.errors.unauthorized.description" as const,
+      title: "confirm.errors.unauthorized.title",
+      description: "confirm.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.user.public.resetPassword.confirm.errors.internal.title" as const,
-      description:
-        "app.api.user.public.resetPassword.confirm.errors.internal.description" as const,
+      title: "confirm.errors.internal.title",
+      description: "confirm.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.user.public.resetPassword.confirm.errors.unknown.title" as const,
-      description:
-        "app.api.user.public.resetPassword.confirm.errors.unknown.description" as const,
+      title: "confirm.errors.unknown.title",
+      description: "confirm.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.user.public.resetPassword.confirm.errors.network.title" as const,
-      description:
-        "app.api.user.public.resetPassword.confirm.errors.network.description" as const,
+      title: "confirm.errors.network.title",
+      description: "confirm.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.user.public.resetPassword.confirm.errors.forbidden.title" as const,
-      description:
-        "app.api.user.public.resetPassword.confirm.errors.forbidden.description" as const,
+      title: "confirm.errors.forbidden.title",
+      description: "confirm.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.user.public.resetPassword.confirm.errors.notFound.title" as const,
-      description:
-        "app.api.user.public.resetPassword.confirm.errors.notFound.description" as const,
+      title: "confirm.errors.notFound.title",
+      description: "confirm.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.user.public.resetPassword.confirm.errors.unsaved.title" as const,
-      description:
-        "app.api.user.public.resetPassword.confirm.errors.unsaved.description" as const,
+      title: "confirm.errors.unsaved.title",
+      description: "confirm.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.user.public.resetPassword.confirm.errors.conflict.title" as const,
-      description:
-        "app.api.user.public.resetPassword.confirm.errors.conflict.description" as const,
+      title: "confirm.errors.conflict.title",
+      description: "confirm.errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.user.public.resetPassword.confirm.success.title" as const,
-    description:
-      "app.api.user.public.resetPassword.confirm.success.description" as const,
+    title: "confirm.success.title",
+    description: "confirm.success.description",
   },
 
   // === EXAMPLES ===

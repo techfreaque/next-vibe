@@ -2,8 +2,9 @@
  * Messaging Channel Enums
  * Enums for multi-channel messaging (SMS, WhatsApp, Telegram, Email)
  */
-
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
+
+import { scopedTranslation } from "./i18n";
 
 /**
  * Message Channel Enum
@@ -13,11 +14,11 @@ export const {
   enum: MessageChannel,
   options: MessageChannelOptions,
   Value: MessageChannelValue,
-} = createEnumOptions({
-  EMAIL: "app.api.emails.messaging.enums.channel.email",
-  SMS: "app.api.emails.messaging.enums.channel.sms",
-  WHATSAPP: "app.api.emails.messaging.enums.channel.whatsapp",
-  TELEGRAM: "app.api.emails.messaging.enums.channel.telegram",
+} = createEnumOptions(scopedTranslation, {
+  EMAIL: "enums.channel.email",
+  SMS: "enums.channel.sms",
+  WHATSAPP: "enums.channel.whatsapp",
+  TELEGRAM: "enums.channel.telegram",
 });
 
 export const MessageChannelDB = [
@@ -34,12 +35,12 @@ export const {
   enum: MessageChannelFilter,
   options: MessageChannelFilterOptions,
   Value: MessageChannelFilterValue,
-} = createEnumOptions({
-  ANY: "app.api.emails.messaging.enums.channelFilter.any",
-  EMAIL: "app.api.emails.messaging.enums.channel.email",
-  SMS: "app.api.emails.messaging.enums.channel.sms",
-  WHATSAPP: "app.api.emails.messaging.enums.channel.whatsapp",
-  TELEGRAM: "app.api.emails.messaging.enums.channel.telegram",
+} = createEnumOptions(scopedTranslation, {
+  ANY: "enums.channelFilter.any",
+  EMAIL: "enums.channel.email",
+  SMS: "enums.channel.sms",
+  WHATSAPP: "enums.channel.whatsapp",
+  TELEGRAM: "enums.channel.telegram",
 });
 
 /**
@@ -49,13 +50,13 @@ export const {
   enum: MessagingProvider,
   options: MessagingProviderOptions,
   Value: MessagingProviderValue,
-} = createEnumOptions({
-  TWILIO: "app.api.emails.messaging.enums.provider.twilio",
-  AWS_SNS: "app.api.emails.messaging.enums.provider.awsSns",
-  MESSAGEBIRD: "app.api.emails.messaging.enums.provider.messagebird",
-  HTTP: "app.api.emails.messaging.enums.provider.http",
-  WHATSAPP_BUSINESS: "app.api.emails.messaging.enums.provider.whatsappBusiness",
-  TELEGRAM_BOT: "app.api.emails.messaging.enums.provider.telegramBot",
+} = createEnumOptions(scopedTranslation, {
+  TWILIO: "enums.provider.twilio",
+  AWS_SNS: "enums.provider.awsSns",
+  MESSAGEBIRD: "enums.provider.messagebird",
+  HTTP: "enums.provider.http",
+  WHATSAPP_BUSINESS: "enums.provider.whatsappBusiness",
+  TELEGRAM_BOT: "enums.provider.telegramBot",
 });
 
 export const MessagingProviderDB = [
@@ -74,11 +75,11 @@ export const {
   enum: MessagingAccountStatus,
   options: MessagingAccountStatusOptions,
   Value: MessagingAccountStatusValue,
-} = createEnumOptions({
-  ACTIVE: "app.api.emails.messaging.enums.accountStatus.active",
-  INACTIVE: "app.api.emails.messaging.enums.accountStatus.inactive",
-  ERROR: "app.api.emails.messaging.enums.accountStatus.error",
-  TESTING: "app.api.emails.messaging.enums.accountStatus.testing",
+} = createEnumOptions(scopedTranslation, {
+  ACTIVE: "enums.accountStatus.active",
+  INACTIVE: "enums.accountStatus.inactive",
+  ERROR: "enums.accountStatus.error",
+  TESTING: "enums.accountStatus.testing",
 });
 
 export const MessagingAccountStatusDB = [

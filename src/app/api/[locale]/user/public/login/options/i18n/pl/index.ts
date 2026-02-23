@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Użytkownicy",
+
   title: "Opcje Logowania",
   description: "Opcje konfiguracji logowania",
   tag: "opcje-logowania",

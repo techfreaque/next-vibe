@@ -8,14 +8,12 @@ import { z } from "zod";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  responseArrayOptionalField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  requestField,
-  requestResponseField,
-  requestUrlPathParamsField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedRequestResponseField,
+  scopedRequestUrlPathParamsField,
+  scopedResponseArrayOptionalFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -26,188 +24,154 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * GET endpoint - List all share links for a thread
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["agent", "chat", "threads", "[threadId]", "share-links"],
-  title: "app.api.agent.chat.threads.threadId.shareLinks.get.title" as const,
-  description:
-    "app.api.agent.chat.threads.threadId.shareLinks.get.description" as const,
+  title: "get.title" as const,
+  description: "get.description" as const,
   icon: "share",
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.sharing" as const],
+  category: "category" as const,
+  tags: ["tags.sharing" as const],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   debug: true,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "urlPathParams", response: true },
-    {
-      threadId: requestUrlPathParamsField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "urlPathParams", response: true },
+    children: {
+      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label:
-          "app.api.agent.chat.threads.threadId.shareLinks.shareLink.label" as const,
+        label: "shareLink.label" as const,
         schema: z.string().uuid(),
       }),
-      shareLinks: responseArrayOptionalField(
-        {
+      shareLinks: scopedResponseArrayOptionalFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        emptyTitle: "shareLinks.emptyTitle" as const,
+        emptyDescription: "shareLinks.emptyDescription" as const,
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-          emptyTitle:
-            "app.api.agent.chat.threads.threadId.shareLinks.shareLinks.emptyTitle" as const,
-          emptyDescription:
-            "app.api.agent.chat.threads.threadId.shareLinks.shareLinks.emptyDescription" as const,
-        },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.STACKED,
-          },
-          { response: true },
-          {
-            id: responseField({
+          layoutType: LayoutType.STACKED,
+          usage: { response: true },
+          children: {
+            id: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.threads.threadId.shareLinks.empty" as const,
+              content: "empty" as const,
               order: 999,
               schema: z.string().uuid(),
             }),
-            token: responseField({
+            token: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.threads.threadId.shareLinks.empty" as const,
+              content: "empty" as const,
               order: 999,
               schema: z.string(),
             }),
-            label: responseField({
+            label: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.threads.threadId.shareLinks.shareLink.label" as const,
+              content: "shareLink.label" as const,
               order: 1,
               schema: z.string().nullable(),
             }),
-            shareUrl: responseField({
+            shareUrl: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.threads.threadId.shareLinks.shareLink.shareUrl" as const,
+              content: "shareLink.shareUrl" as const,
               order: 2,
               schema: z.string(),
             }),
-            active: responseField({
+            active: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              text: "app.api.agent.chat.threads.threadId.shareLinks.shareLink.active" as const,
+              text: "shareLink.active" as const,
               variant: "default" as const,
               order: 3,
               schema: z.boolean(),
             }),
-            allowPosting: responseField({
+            allowPosting: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              text: "app.api.agent.chat.threads.threadId.shareLinks.shareLink.allowPosting" as const,
+              text: "shareLink.allowPosting" as const,
               variant: "info" as const,
               order: 4,
               schema: z.boolean(),
             }),
-            requireAuth: responseField({
+            requireAuth: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              text: "app.api.agent.chat.threads.threadId.shareLinks.shareLink.requireAuth" as const,
+              text: "shareLink.requireAuth" as const,
               variant: "info" as const,
               order: 5,
               schema: z.boolean(),
             }),
-            accessCount: responseField({
+            accessCount: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.threads.threadId.shareLinks.shareLink.accessCount" as const,
+              content: "shareLink.accessCount" as const,
               order: 6,
               schema: z.number(),
             }),
-            lastAccessedAt: responseField({
+            lastAccessedAt: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.threads.threadId.shareLinks.shareLink.lastAccessedAt" as const,
+              content: "shareLink.lastAccessedAt" as const,
               order: 7,
               schema: dateSchema.nullable(),
             }),
-            createdAt: responseField({
+            createdAt: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.threads.threadId.shareLinks.shareLink.createdAt" as const,
+              content: "shareLink.createdAt" as const,
               order: 8,
               schema: dateSchema,
             }),
           },
-        ),
-      ),
+        }),
+      }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.validation.description" as const,
+      title: "get.errors.validation.title" as const,
+      description: "get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.unauthorized.description" as const,
+      title: "get.errors.unauthorized.title" as const,
+      description: "get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.forbidden.description" as const,
+      title: "get.errors.forbidden.title" as const,
+      description: "get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.notFound.description" as const,
+      title: "get.errors.notFound.title" as const,
+      description: "get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.server.description" as const,
+      title: "get.errors.server.title" as const,
+      description: "get.errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.network.description" as const,
+      title: "get.errors.network.title" as const,
+      description: "get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.unknown.description" as const,
+      title: "get.errors.unknown.title" as const,
+      description: "get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.unsavedChanges.description" as const,
+      title: "get.errors.unsavedChanges.title" as const,
+      description: "get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.get.errors.conflict.description" as const,
+      title: "get.errors.conflict.title" as const,
+      description: "get.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title:
-      "app.api.agent.chat.threads.threadId.shareLinks.get.success.title" as const,
-    description:
-      "app.api.agent.chat.threads.threadId.shareLinks.get.success.description" as const,
+    title: "get.success.title" as const,
+    description: "get.success.description" as const,
   },
 
   examples: {
@@ -228,137 +192,105 @@ const { GET } = createEndpoint({
  * POST endpoint - Create a new share link
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["agent", "chat", "threads", "[threadId]", "share-links"],
-  title: "app.api.agent.chat.threads.threadId.shareLinks.post.title" as const,
-  description:
-    "app.api.agent.chat.threads.threadId.shareLinks.post.description" as const,
+  title: "post.title" as const,
+  description: "post.description" as const,
   icon: "plus",
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.sharing" as const],
+  category: "category" as const,
+  tags: ["tags.sharing" as const],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   debug: true,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data&urlPathParams", response: true },
-    {
-      threadId: requestUrlPathParamsField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data&urlPathParams", response: true },
+    children: {
+      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label:
-          "app.api.agent.chat.threads.threadId.shareLinks.shareLink.label" as const,
+        label: "shareLink.label" as const,
         schema: z.string().uuid(),
       }),
-      label: requestResponseField({
+      label: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.agent.chat.threads.threadId.shareLinks.label.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.shareLinks.label.description" as const,
-        placeholder:
-          "app.api.agent.chat.threads.threadId.shareLinks.label.placeholder" as const,
+        label: "label.label" as const,
+        description: "label.description" as const,
+        placeholder: "label.placeholder" as const,
         schema: z.string().nullable().optional(),
       }),
-      allowPosting: requestResponseField({
+      allowPosting: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.agent.chat.threads.threadId.shareLinks.allowPosting.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.shareLinks.allowPosting.description" as const,
+        label: "allowPosting.label" as const,
+        description: "allowPosting.description" as const,
         schema: z.boolean().default(false),
       }),
-      requireAuth: requestResponseField({
+      requireAuth: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.agent.chat.threads.threadId.shareLinks.requireAuth.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.shareLinks.requireAuth.description" as const,
+        label: "requireAuth.label" as const,
+        description: "requireAuth.description" as const,
         schema: z.boolean().default(false),
       }),
-      id: responseField({
+      id: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.threads.threadId.shareLinks.empty" as const,
+        content: "empty" as const,
         schema: z.string().uuid(),
       }),
-      token: responseField({
+      token: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.threads.threadId.shareLinks.empty" as const,
+        content: "empty" as const,
         schema: z.string(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.post.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.post.errors.validation.description" as const,
+      title: "post.errors.validation.title" as const,
+      description: "post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.post.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.post.errors.unauthorized.description" as const,
+      title: "post.errors.unauthorized.title" as const,
+      description: "post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.post.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.post.errors.forbidden.description" as const,
+      title: "post.errors.forbidden.title" as const,
+      description: "post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.post.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.post.errors.notFound.description" as const,
+      title: "post.errors.notFound.title" as const,
+      description: "post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.post.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.post.errors.server.description" as const,
+      title: "post.errors.server.title" as const,
+      description: "post.errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.post.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.post.errors.network.description" as const,
+      title: "post.errors.network.title" as const,
+      description: "post.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.post.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.post.errors.unknown.description" as const,
+      title: "post.errors.unknown.title" as const,
+      description: "post.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.post.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.post.errors.unsavedChanges.description" as const,
+      title: "post.errors.unsavedChanges.title" as const,
+      description: "post.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.post.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.post.errors.conflict.description" as const,
+      title: "post.errors.conflict.title" as const,
+      description: "post.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title:
-      "app.api.agent.chat.threads.threadId.shareLinks.post.success.title" as const,
-    description:
-      "app.api.agent.chat.threads.threadId.shareLinks.post.success.description" as const,
+    title: "post.success.title" as const,
+    description: "post.success.description" as const,
   },
 
   examples: {
@@ -390,138 +322,106 @@ const { POST } = createEndpoint({
  * PATCH endpoint - Update an existing share link
  */
 const { PATCH } = createEndpoint({
+  scopedTranslation,
   method: Methods.PATCH,
   path: ["agent", "chat", "threads", "[threadId]", "share-links"],
-  title: "app.api.agent.chat.threads.threadId.shareLinks.patch.title" as const,
-  description:
-    "app.api.agent.chat.threads.threadId.shareLinks.patch.description" as const,
+  title: "patch.title" as const,
+  description: "patch.description" as const,
   icon: "edit",
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.sharing" as const],
+  category: "category" as const,
+  tags: ["tags.sharing" as const],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   debug: true,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data&urlPathParams", response: true },
-    {
-      threadId: requestUrlPathParamsField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data&urlPathParams", response: true },
+    children: {
+      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label:
-          "app.api.agent.chat.threads.threadId.shareLinks.shareLink.label" as const,
+        label: "shareLink.label" as const,
         schema: z.string().uuid(),
       }),
-      linkId: requestField({
+      linkId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.agent.chat.threads.threadId.shareLinks.linkId.label" as const,
+        label: "linkId.label" as const,
         schema: z.string().uuid(),
       }),
-      label: requestResponseField({
+      label: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.agent.chat.threads.threadId.shareLinks.label.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.shareLinks.label.description" as const,
-        placeholder:
-          "app.api.agent.chat.threads.threadId.shareLinks.label.placeholder" as const,
+        label: "label.label" as const,
+        description: "label.description" as const,
+        placeholder: "label.placeholder" as const,
         schema: z.string().nullable().optional(),
       }),
-      allowPosting: requestResponseField({
+      allowPosting: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.agent.chat.threads.threadId.shareLinks.allowPosting.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.shareLinks.allowPosting.description" as const,
+        label: "allowPosting.label" as const,
+        description: "allowPosting.description" as const,
         schema: z.boolean().default(false),
       }),
-      requireAuth: requestResponseField({
+      requireAuth: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.agent.chat.threads.threadId.shareLinks.requireAuth.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.shareLinks.requireAuth.description" as const,
+        label: "requireAuth.label" as const,
+        description: "requireAuth.description" as const,
         schema: z.boolean().default(false),
       }),
-      id: responseField({
+      id: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.threads.threadId.shareLinks.empty" as const,
+        content: "empty" as const,
         schema: z.string().uuid(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.validation.description" as const,
+      title: "patch.errors.validation.title" as const,
+      description: "patch.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.unauthorized.description" as const,
+      title: "patch.errors.unauthorized.title" as const,
+      description: "patch.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.forbidden.description" as const,
+      title: "patch.errors.forbidden.title" as const,
+      description: "patch.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.notFound.description" as const,
+      title: "patch.errors.notFound.title" as const,
+      description: "patch.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.server.description" as const,
+      title: "patch.errors.server.title" as const,
+      description: "patch.errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.network.description" as const,
+      title: "patch.errors.network.title" as const,
+      description: "patch.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.unknown.description" as const,
+      title: "patch.errors.unknown.title" as const,
+      description: "patch.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.unsavedChanges.description" as const,
+      title: "patch.errors.unsavedChanges.title" as const,
+      description: "patch.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.conflict.description" as const,
+      title: "patch.errors.conflict.title" as const,
+      description: "patch.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title:
-      "app.api.agent.chat.threads.threadId.shareLinks.patch.success.title" as const,
-    description:
-      "app.api.agent.chat.threads.threadId.shareLinks.patch.success.description" as const,
+    title: "patch.success.title" as const,
+    description: "patch.success.description" as const,
   },
 
   examples: {
@@ -553,109 +453,84 @@ const { PATCH } = createEndpoint({
  * DELETE endpoint - Revoke a share link
  */
 const { DELETE } = createEndpoint({
+  scopedTranslation,
   method: Methods.DELETE,
   path: ["agent", "chat", "threads", "[threadId]", "share-links"],
-  title: "app.api.agent.chat.threads.threadId.shareLinks.delete.title" as const,
-  description:
-    "app.api.agent.chat.threads.threadId.shareLinks.delete.description" as const,
+  title: "delete.title" as const,
+  description: "delete.description" as const,
   icon: "trash",
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.sharing" as const],
+  category: "category" as const,
+  tags: ["tags.sharing" as const],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   debug: true,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data&urlPathParams", response: true },
-    {
-      threadId: requestUrlPathParamsField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data&urlPathParams", response: true },
+    children: {
+      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label:
-          "app.api.agent.chat.threads.threadId.shareLinks.shareLink.label" as const,
+        label: "shareLink.label" as const,
         schema: z.string().uuid(),
       }),
-      linkId: requestField({
+      linkId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.agent.chat.threads.threadId.shareLinks.linkId.label" as const,
+        label: "linkId.label" as const,
         schema: z.string().uuid(),
       }),
-      id: responseField({
+      id: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.agent.chat.threads.threadId.shareLinks.empty" as const,
+        content: "empty" as const,
         schema: z.string().uuid(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.validation.description" as const,
+      title: "delete.errors.validation.title" as const,
+      description: "delete.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.unauthorized.description" as const,
+      title: "delete.errors.unauthorized.title" as const,
+      description: "delete.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.forbidden.description" as const,
+      title: "delete.errors.forbidden.title" as const,
+      description: "delete.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.notFound.description" as const,
+      title: "delete.errors.notFound.title" as const,
+      description: "delete.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.server.description" as const,
+      title: "delete.errors.server.title" as const,
+      description: "delete.errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.network.description" as const,
+      title: "delete.errors.network.title" as const,
+      description: "delete.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.unknown.description" as const,
+      title: "delete.errors.unknown.title" as const,
+      description: "delete.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.unsavedChanges.description" as const,
+      title: "delete.errors.unsavedChanges.title" as const,
+      description: "delete.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.conflict.description" as const,
+      title: "delete.errors.conflict.title" as const,
+      description: "delete.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title:
-      "app.api.agent.chat.threads.threadId.shareLinks.delete.success.title" as const,
-    description:
-      "app.api.agent.chat.threads.threadId.shareLinks.delete.success.description" as const,
+    title: "delete.success.title" as const,
+    description: "delete.success.description" as const,
   },
 
   examples: {

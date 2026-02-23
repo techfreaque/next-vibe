@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,16 +20,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["browser", "get-console-message"],
-  title: "app.api.browser.get-console-message.title",
-  description: "app.api.browser.get-console-message.description",
-  category: "app.api.browser.category",
+  title: "get-console-message.title",
+  description: "get-console-message.description",
+  category: "get-console-message.category",
   icon: "terminal",
   tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.debugging",
+    "get-console-message.tags.browserAutomation",
+    "get-console-message.tags.debugging",
   ],
 
   allowedRoles: [
@@ -40,24 +43,20 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.browser.get-console-message.form.label",
-      description: "app.api.browser.get-console-message.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      msgid: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "get-console-message.form.label",
+    description: "get-console-message.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      msgid: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.browser.get-console-message.form.fields.msgid.label",
-        description:
-          "app.api.browser.get-console-message.form.fields.msgid.description",
-        placeholder:
-          "app.api.browser.get-console-message.form.fields.msgid.placeholder",
+        label: "get-console-message.form.fields.msgid.label",
+        description: "get-console-message.form.fields.msgid.description",
+        placeholder: "get-console-message.form.fields.msgid.placeholder",
         columns: 6,
         schema: z
           .number()
@@ -67,18 +66,18 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.get-console-message.response.success",
+        content: "get-console-message.response.success",
         schema: z
           .boolean()
           .describe(
             "Whether the console message retrieval operation succeeded",
           ),
       }),
-      result: responseField({
+      result: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.get-console-message.response.result",
+        content: "get-console-message.response.result",
         schema: z
           .object({
             found: z.boolean().describe("Whether the message was found"),
@@ -94,24 +93,24 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Result of the console message retrieval"),
       }),
-      error: responseField({
+      error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.get-console-message.response.error",
+        content: "get-console-message.response.error",
         schema: z
           .string()
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: responseField({
+      executionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.get-console-message.response.executionId",
+        content: "get-console-message.response.executionId",
         schema: z
           .string()
           .optional()
           .describe("Unique identifier for this execution"),
       }),
     },
-  ),
+  }),
   examples: {
     requests: {
       default: { msgid: 123 },
@@ -133,54 +132,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.browser.get-console-message.errors.validation.title",
-      description:
-        "app.api.browser.get-console-message.errors.validation.description",
+      title: "get-console-message.errors.validation.title",
+      description: "get-console-message.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.browser.get-console-message.errors.network.title",
-      description:
-        "app.api.browser.get-console-message.errors.network.description",
+      title: "get-console-message.errors.network.title",
+      description: "get-console-message.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.browser.get-console-message.errors.unauthorized.title",
-      description:
-        "app.api.browser.get-console-message.errors.unauthorized.description",
+      title: "get-console-message.errors.unauthorized.title",
+      description: "get-console-message.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.browser.get-console-message.errors.forbidden.title",
-      description:
-        "app.api.browser.get-console-message.errors.forbidden.description",
+      title: "get-console-message.errors.forbidden.title",
+      description: "get-console-message.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.browser.get-console-message.errors.notFound.title",
-      description:
-        "app.api.browser.get-console-message.errors.notFound.description",
+      title: "get-console-message.errors.notFound.title",
+      description: "get-console-message.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.browser.get-console-message.errors.serverError.title",
-      description:
-        "app.api.browser.get-console-message.errors.serverError.description",
+      title: "get-console-message.errors.serverError.title",
+      description: "get-console-message.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.browser.get-console-message.errors.unknown.title",
-      description:
-        "app.api.browser.get-console-message.errors.unknown.description",
+      title: "get-console-message.errors.unknown.title",
+      description: "get-console-message.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.browser.get-console-message.errors.unsavedChanges.title",
-      description:
-        "app.api.browser.get-console-message.errors.unsavedChanges.description",
+      title: "get-console-message.errors.unsavedChanges.title",
+      description: "get-console-message.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.browser.get-console-message.errors.conflict.title",
-      description:
-        "app.api.browser.get-console-message.errors.conflict.description",
+      title: "get-console-message.errors.conflict.title",
+      description: "get-console-message.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.browser.get-console-message.success.title",
-    description: "app.api.browser.get-console-message.success.description",
+    title: "get-console-message.success.title",
+    description: "get-console-message.success.description",
   },
 });
 

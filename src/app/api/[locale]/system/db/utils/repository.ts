@@ -16,76 +16,24 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation as resetScopedTranslation } from "../reset/i18n";
 // Logger will be provided by the route handler
 import type { DbUtilsRequestOutput, DbUtilsResponseOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
 
-/**
- * Database Utils Repository Interface
- */
-export interface IDbUtilsRepository {
-  /**
-   * Check database health and connectivity
-   */
-  checkHealth(
-    request: DbUtilsRequestOutput,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<DbUtilsResponseOutput>>;
-
-  /**
-   * Test database connection
-   */
-  testConnection(logger: EndpointLogger): Promise<ResponseType<boolean>>;
-
-  /**
-   * Get database statistics
-   */
-  getStats(logger: EndpointLogger): Promise<
-    ResponseType<{
-      activeConnections: number;
-      maxConnections: number;
-      version: string;
-    }>
-  >;
-
-  /**
-   * Check if Docker is available
-   */
-  isDockerAvailable(logger: EndpointLogger): Promise<ResponseType<boolean>>;
-
-  /**
-   * Manage the database (reset or initialize)
-   */
-  manageDatabase(
-    options: {
-      runMigrations?: boolean;
-      initialize?: boolean;
-      hard?: boolean;
-      fastDbReset?: boolean;
-    },
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<ResponseType<boolean>>;
-
-  /**
-   * Reset the database by truncating all tables
-   */
-  resetDatabase(
-    runMigrations: boolean,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<boolean>>;
-}
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Database Utils Repository Implementation
  */
-class DbUtilsRepositoryImpl implements IDbUtilsRepository {
+class DbUtilsRepositoryImpl {
   /**
    * Check database health and connectivity
    */
   async checkHealth(
     request: DbUtilsRequestOutput,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<DbUtilsResponseOutput>> {
     try {
@@ -95,7 +43,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
       let status: "healthy" | "degraded" | "unhealthy" = "healthy";
 
       // Test primary connection
-      const primaryHealthy = await this.testConnection(logger);
+      const primaryHealthy = await this.testConnection(t, logger);
       if (!primaryHealthy.success) {
         status = "unhealthy";
         logger.error("Primary database connection failed");
@@ -116,7 +64,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
         | undefined;
       if (request.includeDetails) {
         logger.debug("Including detailed health information");
-        const statsResult = await this.getStats(logger);
+        const statsResult = await this.getStats(t, logger);
         if (statsResult.success) {
           details = {
             version: statsResult.data.version,
@@ -139,7 +87,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
     } catch (error) {
       logger.error("Database health check failed:", parseError(error));
       return fail({
-        message: "app.api.system.db.utils.errors.health_check_failed",
+        message: t("errors.health_check_failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -149,7 +97,10 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
   /**
    * Test database connection
    */
-  async testConnection(logger: EndpointLogger): Promise<ResponseType<boolean>> {
+  async testConnection(
+    t: ModuleT,
+    logger: EndpointLogger,
+  ): Promise<ResponseType<boolean>> {
     try {
       logger.debug("Testing database connection...");
       // Simple query to test connection
@@ -160,7 +111,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
     } catch (error) {
       logger.error("Database connection test failed:", parseError(error));
       return fail({
-        message: "app.api.system.db.utils.errors.connection_failed",
+        message: t("errors.connection_failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -170,7 +121,10 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
   /**
    * Get database statistics
    */
-  async getStats(logger: EndpointLogger): Promise<
+  async getStats(
+    t: ModuleT,
+    logger: EndpointLogger,
+  ): Promise<
     ResponseType<{
       activeConnections: number;
       maxConnections: number;
@@ -199,7 +153,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
         parseError(error),
       );
       return fail({
-        message: "app.api.system.db.utils.errors.stats_failed",
+        message: t("errors.stats_failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -210,6 +164,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
    * Check if Docker is available
    */
   async isDockerAvailable(
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<boolean>> {
     try {
@@ -230,7 +185,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
       });
     } catch (error) {
       return fail({
-        message: "app.api.system.db.utils.errors.docker_check_failed",
+        message: t("errors.docker_check_failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -248,6 +203,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
       fastDbReset?: boolean;
     } = {},
     logger: EndpointLogger,
+    t: ModuleT,
     locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
     try {
@@ -268,6 +224,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
       try {
         // Import reset functionality from the reset subdomain
         const { databaseResetRepository } = await import("../reset/repository");
+        const { t: resetT } = resetScopedTranslation.scopedT(locale);
 
         const resetResult = await databaseResetRepository.resetDatabase(
           {
@@ -276,7 +233,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
             skipSeeds: false,
             dryRun: false,
           },
-          "en-GLOBAL",
+          resetT,
           logger,
         );
 
@@ -284,13 +241,10 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
           logger.info(`Database ${operation.toLowerCase()} completed`);
           return success(true);
         }
-        const { t } = simpleT(locale);
-        const errorMessage = t(
-          "app.api.system.db.utils.errors.reset_operation_failed",
-        );
+        const errorMessage = t("errors.reset_operation_failed");
         logger.error("Failed to reset database:", errorMessage);
         return fail({
-          message: "app.api.system.db.utils.errors.reset_failed",
+          message: t("errors.reset_failed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: errorMessage },
           cause: resetResult,
@@ -298,7 +252,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
       } catch (error) {
         logger.error("Failed to reset database:", parseError(error));
         return fail({
-          message: "app.api.system.db.utils.errors.reset_failed",
+          message: t("errors.reset_failed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: parseError(error).message },
         });
@@ -306,7 +260,7 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
     } catch (error) {
       logger.error("Failed to manage database:", parseError(error));
       return fail({
-        message: "app.api.system.db.utils.errors.manage_failed",
+        message: t("errors.manage_failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -320,8 +274,10 @@ class DbUtilsRepositoryImpl implements IDbUtilsRepository {
   async resetDatabase(
     runMigrations = false,
     logger: EndpointLogger,
+    t: ModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
-    return await this.manageDatabase({ runMigrations }, logger, "en-GLOBAL");
+    return await this.manageDatabase({ runMigrations }, logger, t, locale);
   }
 }
 

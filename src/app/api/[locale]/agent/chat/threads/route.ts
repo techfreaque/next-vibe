@@ -3,18 +3,9 @@
  * Handles GET (list) and POST (create) requests for threads
  */
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-
-import type { ApiHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import type {
-  ThreadCreateRequestOutput,
-  ThreadCreateResponseOutput,
-  ThreadListRequestOutput,
-  ThreadListResponseOutput,
-} from "./definition";
 import definitions from "./definition";
 import { ThreadsRepository } from "./repository";
 
@@ -22,34 +13,19 @@ export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async (
-      props: ApiHandlerProps<
-        ThreadListRequestOutput,
-        Record<string, never>,
-        typeof definitions.GET.allowedRoles
-      >,
-    ): Promise<ResponseType<ThreadListResponseOutput>> => {
-      return await ThreadsRepository.listThreads(
-        props.data,
-        props.user,
-        props.logger,
-      );
+    handler: async ({ data, user, t, logger, locale }) => {
+      return await ThreadsRepository.listThreads(data, user, t, logger, locale);
     },
   },
   [Methods.POST]: {
     email: undefined,
-    handler: async (
-      props: ApiHandlerProps<
-        ThreadCreateRequestOutput,
-        Record<string, never>,
-        typeof definitions.POST.allowedRoles
-      >,
-    ): Promise<ResponseType<ThreadCreateResponseOutput>> => {
+    handler: async ({ data, user, t, logger, locale }) => {
       return await ThreadsRepository.createThread(
-        props.data,
-        props.user,
-        props.locale,
-        props.logger,
+        data,
+        user,
+        t,
+        logger,
+        locale,
       );
     },
   },

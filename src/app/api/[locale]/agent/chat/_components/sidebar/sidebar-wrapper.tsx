@@ -10,13 +10,13 @@ import { useEffect, useState } from "react";
 import { SidebarFooter } from "@/app/api/[locale]/agent/chat/_components/sidebar/footer/sidebar-footer";
 import foldersDefinition from "@/app/api/[locale]/agent/chat/folders/definition";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { scopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 import { ChatSidebar } from "@/app/api/[locale]/agent/chat/threads/_components/sidebar";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import { platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 /**
  * Feature flag: set to true to use the new widget-based sidebar (no useChatContext).
@@ -84,7 +84,7 @@ export function SidebarWrapper({
   children,
 }: SidebarWrapperProps): JSX.Element {
   const { sidebarCollapsed: collapsed, setSidebarCollapsed } = useChatContext();
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   const [isMobile, setIsMobile] = useState(false);
 
@@ -133,7 +133,7 @@ export function SidebarWrapper({
           <Div
             className="fixed inset-0 bg-black/50 z-30"
             onClick={() => setSidebarCollapsed(!collapsed)}
-            aria-label={t("app.chat.common.closeSidebar")}
+            aria-label={t("common.close")}
           />
         )}
 

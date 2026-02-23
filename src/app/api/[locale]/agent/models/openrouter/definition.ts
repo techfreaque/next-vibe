@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  responseArrayField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -19,13 +19,16 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["agent", "models", "openrouter"],
-  title: "app.api.agent.models.openrouter.get.title" as const,
-  description: "app.api.agent.models.openrouter.get.description" as const,
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.models.openrouter.tags.models" as const],
+  title: "get.title" as const,
+  description: "get.description" as const,
+  category: "category" as const,
+  tags: ["tags.models" as const],
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.PRODUCTION_OFF,
@@ -35,252 +38,203 @@ const { GET } = createEndpoint({
   aliases: ["update-openrouter-models"],
   icon: "database",
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      linkable: true,
-      title: "app.api.agent.models.openrouter.get.form.title" as const,
-      layoutType: LayoutType.STACKED,
-      columns: 12,
-    },
-    { response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    linkable: true,
+    title: "get.form.title" as const,
+    layoutType: LayoutType.STACKED,
+    columns: 12,
+    usage: { response: true },
+    children: {
       // Summary statistics section
-      summary: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.agent.models.openrouter.get.response.summary.title" as const,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          totalModels: responseField({
+      summary: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.summary.title" as const,
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          totalModels: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.agent.models.openrouter.get.response.summary.totalModels" as const,
+            label: "get.response.summary.totalModels" as const,
             columns: 3,
             schema: z.number(),
           }),
-          modelsFound: responseField({
+          modelsFound: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.agent.models.openrouter.get.response.summary.modelsFound" as const,
+            label: "get.response.summary.modelsFound" as const,
             columns: 3,
             schema: z.number(),
           }),
-          modelsUpdated: responseField({
+          modelsUpdated: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.agent.models.openrouter.get.response.summary.modelsUpdated" as const,
+            label: "get.response.summary.modelsUpdated" as const,
             columns: 3,
             schema: z.number(),
           }),
-          fileUpdated: responseField({
+          fileUpdated: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            label:
-              "app.api.agent.models.openrouter.get.response.summary.fileUpdated" as const,
+            label: "get.response.summary.fileUpdated" as const,
             columns: 3,
             schema: z.boolean(),
           }),
         },
-      ),
+      }),
 
       // Updated models section
-      models: responseArrayField(
-        {
+      models: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.models.title" as const,
+        cardTitle: "name",
+        cardSubtitle: "id",
+        columns: 12,
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.agent.models.openrouter.get.response.models.title" as const,
-          cardTitle: "name",
-          cardSubtitle: "id",
+          layoutType: LayoutType.GRID,
           columns: 12,
-        },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.GRID,
-            columns: 12,
-          },
-          { response: true },
-          {
-            id: responseField({
+          usage: { response: true },
+          children: {
+            id: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              label:
-                "app.api.agent.models.openrouter.get.response.models.model.id" as const,
+              label: "get.response.models.model.id" as const,
               columns: 6,
               schema: z.string(),
             }),
-            name: responseField({
+            name: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              label:
-                "app.api.agent.models.openrouter.get.response.models.model.name" as const,
+              label: "get.response.models.model.name" as const,
               columns: 6,
               schema: z.string(),
             }),
-            contextLength: responseField({
+            contextLength: scopedResponseField(scopedTranslation, {
               type: WidgetType.STAT,
-              label:
-                "app.api.agent.models.openrouter.get.response.models.model.contextLength" as const,
+              label: "get.response.models.model.contextLength" as const,
               columns: 4,
               schema: z.number(),
             }),
-            inputTokenCost: responseField({
+            inputTokenCost: scopedResponseField(scopedTranslation, {
               type: WidgetType.STAT,
-              label:
-                "app.api.agent.models.openrouter.get.response.models.model.inputTokenCost" as const,
+              label: "get.response.models.model.inputTokenCost" as const,
               columns: 4,
               schema: z.number(),
             }),
-            outputTokenCost: responseField({
+            outputTokenCost: scopedResponseField(scopedTranslation, {
               type: WidgetType.STAT,
-              label:
-                "app.api.agent.models.openrouter.get.response.models.model.outputTokenCost" as const,
+              label: "get.response.models.model.outputTokenCost" as const,
               columns: 4,
               schema: z.number(),
             }),
           },
-        ),
-      ),
+        }),
+      }),
 
       // Missing OpenRouter models section
-      missingOpenRouterModels: responseArrayField(
-        {
+      missingOpenRouterModels: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.missingOpenRouterModels.title" as const,
+        columns: 12,
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.agent.models.openrouter.get.response.missingOpenRouterModels.title" as const,
+          layoutType: LayoutType.GRID,
           columns: 12,
-        },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.GRID,
-            columns: 12,
-          },
-          { response: true },
-          {
-            modelId: responseField({
+          usage: { response: true },
+          children: {
+            modelId: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label:
-                "app.api.agent.models.openrouter.get.response.missingOpenRouterModels.model.modelId" as const,
+                "get.response.missingOpenRouterModels.model.modelId" as const,
               columns: 4,
               schema: z.string(),
             }),
-            openRouterId: responseField({
+            openRouterId: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label:
-                "app.api.agent.models.openrouter.get.response.missingOpenRouterModels.model.openRouterId" as const,
+                "get.response.missingOpenRouterModels.model.openRouterId" as const,
               columns: 4,
               schema: z.string(),
             }),
-            suggestion: responseField({
+            suggestion: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
               label:
-                "app.api.agent.models.openrouter.get.response.missingOpenRouterModels.model.suggestion" as const,
+                "get.response.missingOpenRouterModels.model.suggestion" as const,
               columns: 4,
               schema: z.string(),
             }),
           },
-        ),
-      ),
+        }),
+      }),
 
       // Non-OpenRouter models section
-      nonOpenRouterModels: responseArrayField(
-        {
+      nonOpenRouterModels: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.nonOpenRouterModels.title" as const,
+        columns: 12,
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-          title:
-            "app.api.agent.models.openrouter.get.response.nonOpenRouterModels.title" as const,
+          layoutType: LayoutType.GRID,
           columns: 12,
-        },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.GRID,
-            columns: 12,
-          },
-          { response: true },
-          {
-            modelId: responseField({
+          usage: { response: true },
+          children: {
+            modelId: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              label:
-                "app.api.agent.models.openrouter.get.response.nonOpenRouterModels.model.modelId" as const,
+              label: "get.response.nonOpenRouterModels.model.modelId" as const,
               columns: 6,
               schema: z.string(),
             }),
-            provider: responseField({
+            provider: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              label:
-                "app.api.agent.models.openrouter.get.response.nonOpenRouterModels.model.provider" as const,
+              label: "get.response.nonOpenRouterModels.model.provider" as const,
               columns: 6,
               schema: z.string(),
             }),
           },
-        ),
-      ),
+        }),
+      }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.models.openrouter.get.errors.server.title" as const,
-      description:
-        "app.api.agent.models.openrouter.get.errors.server.description" as const,
+      title: "get.errors.server.title" as const,
+      description: "get.errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.models.openrouter.get.errors.network.title" as const,
-      description:
-        "app.api.agent.models.openrouter.get.errors.network.description" as const,
+      title: "get.errors.network.title" as const,
+      description: "get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.models.openrouter.get.errors.unknown.title" as const,
-      description:
-        "app.api.agent.models.openrouter.get.errors.unknown.description" as const,
+      title: "get.errors.unknown.title" as const,
+      description: "get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.models.openrouter.get.errors.validation.title" as const,
-      description:
-        "app.api.agent.models.openrouter.get.errors.validation.description" as const,
+      title: "get.errors.validation.title" as const,
+      description: "get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.models.openrouter.get.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.models.openrouter.get.errors.unauthorized.description" as const,
+      title: "get.errors.unauthorized.title" as const,
+      description: "get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.models.openrouter.get.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.models.openrouter.get.errors.forbidden.description" as const,
+      title: "get.errors.forbidden.title" as const,
+      description: "get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.models.openrouter.get.errors.notFound.title" as const,
-      description:
-        "app.api.agent.models.openrouter.get.errors.notFound.description" as const,
+      title: "get.errors.notFound.title" as const,
+      description: "get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.models.openrouter.get.errors.conflict.title" as const,
-      description:
-        "app.api.agent.models.openrouter.get.errors.conflict.description" as const,
+      title: "get.errors.conflict.title" as const,
+      description: "get.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.models.openrouter.get.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.models.openrouter.get.errors.unsavedChanges.description" as const,
+      title: "get.errors.unsavedChanges.title" as const,
+      description: "get.errors.unsavedChanges.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.agent.models.openrouter.get.success.title" as const,
-    description:
-      "app.api.agent.models.openrouter.get.success.description" as const,
+    title: "get.success.title" as const,
+    description: "get.success.description" as const,
   },
 
   examples: {

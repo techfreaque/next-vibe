@@ -36,6 +36,7 @@ import {
   LeadSource,
   LeadStatus,
 } from "../enum";
+import type { scopedTranslation } from "../i18n";
 import { LeadsRepository } from "../repository";
 import type {
   ClickTrackingRequestOutput,
@@ -46,6 +47,8 @@ import type {
 
 // Type alias for EngagementTypes enum values
 type EngagementType = (typeof EngagementTypes)[keyof typeof EngagementTypes];
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Client information extracted from request
@@ -162,6 +165,7 @@ export class LeadTrackingRepository {
       metadata?: Record<string, string | number | boolean>;
     },
     clientInfo: ClientInfo | undefined,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadEngagementResponseOutput>> {
     try {
@@ -180,12 +184,13 @@ export class LeadTrackingRepository {
           },
         },
         logger,
+        t,
       );
 
       if (!result.success || !result.data) {
         return result.success
           ? fail({
-              message: "app.api.leads.tracking.errors.default",
+              message: t("tracking.errors.default"),
               errorType: ErrorResponseTypes.INTERNAL_ERROR,
             })
           : result;
@@ -223,7 +228,7 @@ export class LeadTrackingRepository {
       const action = actionMap[data.engagementType];
       if (action) {
         try {
-          await this.transitionLeadStatus(data.leadId, action, logger, {
+          await this.transitionLeadStatus(data.leadId, action, t, logger, {
             engagementId: engagementData.id,
             ...(data.campaignId && { campaignId: data.campaignId }),
           });
@@ -254,7 +259,7 @@ export class LeadTrackingRepository {
         parseError(error).message,
       );
       return fail({
-        message: "app.api.leads.tracking.errors.default",
+        message: t("tracking.errors.default"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -326,6 +331,7 @@ export class LeadTrackingRepository {
    */
   static async trackSubscriptionConfirmation(
     leadId: string,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ leadStatusUpdated: boolean }>> {
     try {
@@ -338,6 +344,7 @@ export class LeadTrackingRepository {
           subscriptionConfirmedAt: new Date(),
         },
         logger,
+        t,
       );
 
       return success({
@@ -349,7 +356,7 @@ export class LeadTrackingRepository {
         parseError(error).message,
       );
       return fail({
-        message: "app.api.leads.tracking.errors.default",
+        message: t("tracking.errors.default"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -362,6 +369,7 @@ export class LeadTrackingRepository {
     clientInfo: ClientInfo,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<{ leadId: string }>> {
     try {
       logger.debug("app.api.leads.tracking.anonymous.creating", {
@@ -429,7 +437,7 @@ export class LeadTrackingRepository {
           locale,
         });
         return fail({
-          message: "app.api.leads.tracking.errors.default",
+          message: t("tracking.errors.default"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -445,7 +453,7 @@ export class LeadTrackingRepository {
         parseError(error).message,
       );
       return fail({
-        message: "app.api.leads.tracking.errors.default",
+        message: t("tracking.errors.default"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -488,6 +496,7 @@ export class LeadTrackingRepository {
       | "signup"
       | "contact"
       | "newsletter",
+    t: ModuleT,
     logger: EndpointLogger,
     metadata?: Record<string, string | number | boolean>,
   ): Promise<
@@ -508,10 +517,11 @@ export class LeadTrackingRepository {
       const leadResult = await LeadsRepository.getLeadByIdInternal(
         leadId,
         logger,
+        t,
       );
       if (!leadResult.success || !leadResult.data) {
         return fail({
-          message: "app.api.leads.tracking.errors.default",
+          message: t("tracking.errors.default"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -593,6 +603,7 @@ export class LeadTrackingRepository {
                 metadata: updatedMetadata,
               },
               logger,
+              t,
             );
 
             if (!updateResult.success) {
@@ -604,7 +615,7 @@ export class LeadTrackingRepository {
                 error: updateResult.message,
               });
               return fail({
-                message: "app.api.leads.tracking.errors.default",
+                message: t("tracking.errors.default"),
                 errorType: ErrorResponseTypes.INTERNAL_ERROR,
                 cause: updateResult,
               });
@@ -651,7 +662,7 @@ export class LeadTrackingRepository {
         action,
       });
       return fail({
-        message: "app.api.leads.tracking.errors.default",
+        message: t("tracking.errors.default"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -665,6 +676,7 @@ export class LeadTrackingRepository {
     data: LeadEngagementRequestOutput,
     clientInfo: ClientInfo,
     locale: CountryLanguage,
+    t: ModuleT,
     user: JwtPayloadType,
     logger: EndpointLogger,
   ): Promise<ResponseType<LeadEngagementResponseOutput>> {
@@ -688,6 +700,7 @@ export class LeadTrackingRepository {
         const leadResult = await LeadsRepository.getLeadByIdInternal(
           leadId,
           logger,
+          t,
         );
         if (!leadResult.success) {
           logger.debug("app.api.leads.tracking.engagement.invalidLeadId", {
@@ -704,6 +717,7 @@ export class LeadTrackingRepository {
           clientInfo,
           locale,
           logger,
+          t,
         );
 
         if (anonymousLeadResult.success && anonymousLeadResult.data) {
@@ -714,7 +728,7 @@ export class LeadTrackingRepository {
           });
         } else {
           return fail({
-            message: "app.api.leads.tracking.errors.default",
+            message: t("tracking.errors.default"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
           });
         }
@@ -723,7 +737,7 @@ export class LeadTrackingRepository {
       // If we still don't have a leadId, return error
       if (!leadId) {
         return fail({
-          message: "app.api.leads.tracking.errors.default",
+          message: t("tracking.errors.default"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -738,6 +752,7 @@ export class LeadTrackingRepository {
           const leadResult = await LeadsRepository.getLeadByIdInternal(
             leadId,
             logger,
+            t,
           );
 
           if (
@@ -756,6 +771,7 @@ export class LeadTrackingRepository {
                 email: "", // Email will be fetched from user record during conversion
               },
               logger,
+              t,
             );
             if (convertResult.success) {
               relationshipEstablished = true;
@@ -848,6 +864,7 @@ export class LeadTrackingRepository {
           metadata: flatMetadata,
         },
         clientInfo,
+        t,
         logger,
       );
 
@@ -865,7 +882,7 @@ export class LeadTrackingRepository {
         error: parseError(error),
       });
       return fail({
-        message: "app.api.leads.tracking.errors.default",
+        message: t("tracking.errors.default"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -879,6 +896,7 @@ export class LeadTrackingRepository {
     campaignId: string | undefined,
     clientInfo: ClientInfo,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<TrackingPixelResult>> {
     try {
       let engagementRecorded = false;
@@ -896,6 +914,7 @@ export class LeadTrackingRepository {
             },
           },
           clientInfo,
+          t,
           logger,
         );
 
@@ -920,7 +939,7 @@ export class LeadTrackingRepository {
         parseError(error).message,
       );
       return fail({
-        message: "app.api.leads.tracking.errors.default",
+        message: t("tracking.errors.default"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -935,8 +954,9 @@ export class LeadTrackingRepository {
   static async handleClickTracking(
     data: ClickTrackingRequestOutput,
     user: JwtPayloadType,
-    locale: string,
+    locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<ClickTrackingResponseOutput>> {
     try {
       const { id: trackingLeadId, campaignId, url, ref } = data;
@@ -953,6 +973,7 @@ export class LeadTrackingRepository {
             currentLeadId,
             ref,
             logger,
+            locale,
           );
           if (referralResult.success) {
             logger.debug("app.api.leads.tracking.click.referralLinked", {
@@ -1010,6 +1031,7 @@ export class LeadTrackingRepository {
               currentLeadId,
               "track_page",
               logger,
+              t,
             );
             leadsLinked = true;
             logger.debug("app.api.leads.tracking.click.leadLinked", {
@@ -1043,6 +1065,7 @@ export class LeadTrackingRepository {
             },
           },
           clientInfo,
+          t,
           logger,
         );
         engagementRecorded = clickResult.success;
@@ -1054,12 +1077,14 @@ export class LeadTrackingRepository {
           const leadResult = await LeadsRepository.getLeadByIdInternal(
             trackingLeadId,
             logger,
+            t,
           );
           if (leadResult.success) {
             await LeadsRepository.updateLeadInternal(
               trackingLeadId,
               { status: LeadStatus.SIGNED_UP },
               logger,
+              t,
             );
             leadStatusUpdated = true;
           }
@@ -1085,7 +1110,7 @@ export class LeadTrackingRepository {
         error: error instanceof Error ? error.message : String(error),
       });
       return fail({
-        message: "app.api.leads.tracking.errors.default",
+        message: t("tracking.errors.default"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

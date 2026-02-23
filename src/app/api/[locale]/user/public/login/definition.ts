@@ -14,119 +14,113 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
-  objectField,
-  requestField,
-  responseField,
-  widgetField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
+  scopedWidgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 
+import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../user-roles/enum";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["user", "public", "login"],
-  title: "app.api.user.public.login.title",
-  description: "app.api.user.public.login.description",
+  title: "title",
+  description: "description",
   icon: "log-in",
-  category: "app.api.user.category",
-  tags: ["app.api.user.public.login.tag"],
+  category: "category",
+  tags: ["tag"],
   allowedRoles: [
     UserRole.PUBLIC,
     UserRole.AI_TOOL_OFF,
     UserRole.REMOTE_SKILL,
   ] as const,
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.STACKED,
-      gap: "4",
-    },
-    { request: "data", response: true },
-    {
-      title: widgetField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    gap: "4",
+    usage: { request: "data", response: true },
+    children: {
+      title: scopedWidgetField(scopedTranslation, {
         type: WidgetType.TITLE,
-        content: "app.api.user.public.login.title",
+        content: "title",
         order: 0,
         usage: { request: "data", response: true },
       }),
-      subtitle: widgetField({
+      subtitle: scopedWidgetField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.user.public.login.description",
+        content: "description",
         variant: "body-lg",
         order: 1,
         usage: { request: "data", response: true },
       }),
-      email: requestField({
+      email: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
-        label: "app.api.user.public.login.fields.email.label",
-        description: "app.api.user.public.login.fields.email.description",
-        placeholder: "app.api.user.public.login.fields.email.placeholder",
+        label: "fields.email.label",
+        description: "fields.email.description",
+        placeholder: "fields.email.placeholder",
         columns: 12,
         theme: {
           style: "none",
         },
-        helpText: "app.api.user.public.login.fields.email.description",
+        helpText: "fields.email.description",
         order: 2,
         schema: z
           .string({
-            error:
-              "app.api.user.public.login.fields.email.validation.required" satisfies TranslationKey,
+            error: "fields.email.validation.required",
           })
           .min(1, {
-            message:
-              "app.api.user.public.login.fields.email.validation.required" satisfies TranslationKey,
+            message: "fields.email.validation.required",
           })
           .email({
-            message:
-              "app.api.user.public.login.fields.email.validation.invalid" satisfies TranslationKey,
+            message: "fields.email.validation.invalid",
           })
           .transform((val) => val.toLowerCase().trim()),
       }),
 
-      password: requestField({
+      password: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
-        label: "app.api.user.public.login.fields.password.label",
-        description: "app.api.user.public.login.fields.password.description",
-        placeholder: "app.api.user.public.login.fields.password.placeholder",
+        label: "fields.password.label",
+        description: "fields.password.description",
+        placeholder: "fields.password.placeholder",
         columns: 12,
-        helpText: "app.api.user.public.login.fields.password.description",
+        helpText: "fields.password.description",
         order: 3,
         theme: {
           style: "none",
         },
         schema: z
           .string({
-            error:
-              "app.api.user.public.login.fields.password.validation.required" satisfies TranslationKey,
+            error: "fields.password.validation.required",
           })
           .min(1, {
-            message:
-              "app.api.user.public.login.fields.password.validation.required" satisfies TranslationKey,
+            message: "fields.password.validation.required",
           }),
       }),
 
-      rememberMe: requestField({
+      rememberMe: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.user.public.login.fields.rememberMe.label",
+        label: "fields.rememberMe.label",
         columns: 12,
-        helpText: "app.api.user.public.login.fields.rememberMe.description",
+        helpText: "fields.rememberMe.label",
         order: 4,
         schema: z.boolean().optional().default(true), // Default to true (30 days)
       }),
 
       // === FORM ALERT (shows validation and API errors) ===
-      formAlert: widgetField({
+      formAlert: scopedWidgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
         order: 5,
         usage: { request: "data" },
       }),
 
       // === RESPONSE ALERT (outside card) ===
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.ALERT,
         variant: "default",
         order: 6,
@@ -134,10 +128,10 @@ const { POST } = createEndpoint({
       }),
 
       // === SUBMIT BUTTON (inside card) ===
-      submitButton: widgetField({
+      submitButton: scopedWidgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
-        text: "app.api.user.public.login.actions.submit",
-        loadingText: "app.api.user.public.login.actions.submitting",
+        text: "actions.submit",
+        loadingText: "actions.submitting",
         icon: "log-in",
         variant: "default",
         size: "default",
@@ -147,9 +141,9 @@ const { POST } = createEndpoint({
 
       // === FOOTER LINKS (inside card, below button) ===
 
-      forgotPassword: widgetField({
+      forgotPassword: scopedWidgetField(scopedTranslation, {
         type: WidgetType.LINK,
-        text: "app.api.user.public.login.footer.forgotPassword",
+        text: "footer.forgotPassword",
         href: "/user/reset-password",
         textAlign: "center",
         external: false,
@@ -157,9 +151,9 @@ const { POST } = createEndpoint({
         columns: 12,
         usage: { request: "data" },
       }),
-      createAccount: widgetField({
+      createAccount: scopedWidgetField(scopedTranslation, {
         type: WidgetType.LINK,
-        text: "app.api.user.public.login.footer.createAccount",
+        text: "footer.createAccount",
         href: "/user/signup",
         textAlign: "center",
         external: false,
@@ -168,52 +162,52 @@ const { POST } = createEndpoint({
         usage: { request: "data" },
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.user.public.login.errors.validation.title",
-      description: "app.api.user.public.login.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.user.public.login.errors.unauthorized.title",
-      description: "app.api.user.public.login.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.user.public.login.errors.server.title",
-      description: "app.api.user.public.login.errors.server.description",
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.user.public.login.errors.unknown.title",
-      description: "app.api.user.public.login.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.user.public.login.errors.network.title",
-      description: "app.api.user.public.login.errors.network.description",
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.user.public.login.errors.forbidden.title",
-      description: "app.api.user.public.login.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.user.public.login.errors.notFound.title",
-      description: "app.api.user.public.login.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.user.public.login.errors.unsaved.title",
-      description: "app.api.user.public.login.errors.unsaved.description",
+      title: "errors.unsaved.title",
+      description: "errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.user.public.login.errors.conflict.title",
-      description: "app.api.user.public.login.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.user.public.login.success.title",
-    description: "app.api.user.public.login.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 
   // === EXAMPLES ===

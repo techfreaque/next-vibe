@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,14 +20,16 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../user/user-roles/enum";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "db", "schema-verify"],
-  title: "app.api.system.db.schemaVerify.post.title",
-  description: "app.api.system.db.schemaVerify.post.description",
-  category: "app.api.system.category",
-  tags: ["app.api.system.db.schemaVerify.tag"],
+  title: "post.title",
+  description: "post.description",
+  category: "category",
+  tags: ["tag"],
   icon: "database",
   allowedRoles: [
     UserRole.ADMIN,
@@ -37,122 +39,110 @@ const { POST } = createEndpoint({
   ],
   aliases: ["schema-verify", "db:schema-verify"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.db.schemaVerify.post.form.title",
-      description: "app.api.system.db.schemaVerify.post.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.form.title",
+    description: "post.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      fixIssues: requestField({
+      fixIssues: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.db.schemaVerify.fields.fixIssues.title",
-        description:
-          "app.api.system.db.schemaVerify.fields.fixIssues.description",
+        label: "fields.fixIssues.title",
+        description: "fields.fixIssues.description",
         columns: 6,
         schema: z.boolean().optional().default(false),
       }),
 
-      silent: requestField({
+      silent: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.db.schemaVerify.fields.silent.title",
-        description: "app.api.system.db.schemaVerify.fields.silent.description",
+        label: "fields.silent.title",
+        description: "fields.silent.description",
         columns: 6,
         schema: z.boolean().optional().default(false),
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.schemaVerify.fields.success.title",
+        content: "fields.success.title",
         schema: z.boolean(),
       }),
 
-      valid: responseField({
+      valid: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.schemaVerify.fields.valid.title",
+        content: "fields.valid.title",
         schema: z.boolean(),
       }),
 
-      output: responseField({
+      output: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.schemaVerify.fields.output.title",
+        content: "fields.output.title",
         schema: z.string(),
       }),
 
-      issues: responseField({
+      issues: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.schemaVerify.fields.issues.title",
+        content: "fields.issues.title",
         schema: z.array(z.string()).optional(),
       }),
 
-      fixedIssues: responseField({
+      fixedIssues: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.schemaVerify.fields.fixedIssues.title",
+        content: "fields.fixedIssues.title",
         schema: z.array(z.string()).optional(),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.db.schemaVerify.post.errors.validation.title",
-      description:
-        "app.api.system.db.schemaVerify.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.db.schemaVerify.post.errors.network.title",
-      description:
-        "app.api.system.db.schemaVerify.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.db.schemaVerify.post.errors.unauthorized.title",
-      description:
-        "app.api.system.db.schemaVerify.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.db.schemaVerify.post.errors.forbidden.title",
-      description:
-        "app.api.system.db.schemaVerify.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.db.schemaVerify.post.errors.server.title",
-      description:
-        "app.api.system.db.schemaVerify.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.db.schemaVerify.post.errors.notFound.title",
-      description:
-        "app.api.system.db.schemaVerify.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.db.schemaVerify.post.errors.conflict.title",
-      description:
-        "app.api.system.db.schemaVerify.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.db.schemaVerify.post.errors.unknown.title",
-      description:
-        "app.api.system.db.schemaVerify.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.db.schemaVerify.post.errors.server.title",
-      description:
-        "app.api.system.db.schemaVerify.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.system.db.schemaVerify.post.success.title",
-    description: "app.api.system.db.schemaVerify.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   // === EXAMPLES ===

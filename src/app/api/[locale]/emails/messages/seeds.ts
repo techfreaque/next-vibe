@@ -197,7 +197,7 @@ export async function dev(
     for (const email of emails) {
       if (email.userId) {
         try {
-          const result = await emailRepository.create(email, logger);
+          const result = await emailRepository.create(email, logger, locale);
           if (result.success) {
             logger.debug(`✅ Created email message: ${email.subject}`);
           } else {
@@ -262,7 +262,7 @@ export async function test(
         },
       });
 
-      const result = await emailRepository.create(testEmail, logger);
+      const result = await emailRepository.create(testEmail, logger, locale);
       if (result.success) {
         logger.debug("✅ Created test email message");
       } else {

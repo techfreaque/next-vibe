@@ -7,7 +7,12 @@ import { ConnectionDetailRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: ({ logger, user, urlPathParams }) =>
-      ConnectionDetailRepository.get(logger, user, urlPathParams?.["id"] ?? ""),
+    handler: ({ logger, user, urlPathParams, t }) =>
+      ConnectionDetailRepository.get(
+        logger,
+        user,
+        urlPathParams?.["id"] ?? "",
+        t,
+      ),
   },
 });

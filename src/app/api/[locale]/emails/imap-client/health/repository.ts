@@ -16,6 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../user/auth/types";
 import { imapAccountsRepository } from "../accounts/repository";
@@ -28,6 +29,7 @@ import {
   SortOrder,
 } from "../enum";
 import type { ImapHealthGetResponseOutput } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 /**
  * IMAP Health Repository Interface
@@ -36,6 +38,7 @@ export interface ImapHealthRepository {
   getHealthStatus(
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapHealthGetResponseOutput>>;
 }
 
@@ -49,7 +52,9 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
   async getHealthStatus(
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapHealthGetResponseOutput>> {
+    const t = scopedTranslation.scopedT(locale).t;
     try {
       logger.debug("Getting IMAP health status", { userId: user.id });
 
@@ -64,12 +69,12 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
         },
         user,
         logger,
+        locale,
       );
 
       if (!accountsResponse.success) {
         return fail({
-          message:
-            "app.api.emails.imapClient.health.health.get.errors.server.title",
+          message: t("health.get.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: accountsResponse.message },
           cause: accountsResponse,
@@ -111,8 +116,7 @@ class ImapHealthRepositoryImpl implements ImapHealthRepository {
       const parsedError = parseError(error);
       logger.error("Error getting IMAP health status", parsedError);
       return fail({
-        message:
-          "app.api.emails.imapClient.health.health.get.errors.server.title",
+        message: t("health.get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });

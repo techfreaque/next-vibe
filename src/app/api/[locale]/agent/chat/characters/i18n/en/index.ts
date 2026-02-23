@@ -2,6 +2,10 @@ import { translations as idTranslations } from "../../[id]/i18n/en";
 
 export const translations = {
   id: idTranslations,
+  category: "Chat",
+  tags: {
+    characters: "Characters",
+  },
   separator: {
     or: "or",
   },
@@ -39,8 +43,49 @@ export const translations = {
       male: "Male voice",
       female: "Female voice",
     },
+    mode: {
+      auto: "Auto",
+      manual: "Manual",
+    },
+    selectionType: {
+      characterBased: "Based on Character",
+      manual: "Specific Model",
+      filters: "Filter Criteria",
+    },
+    intelligence: {
+      quick: "Quick",
+      smart: "Smart",
+      brilliant: "Brilliant",
+    },
+    price: {
+      cheap: "Cheap",
+      standard: "Standard",
+      premium: "Premium",
+    },
+    content: {
+      mainstream: "Mainstream",
+      open: "Open",
+      uncensored: "Uncensored",
+    },
+    speed: {
+      fast: "Fast",
+      balanced: "Balanced",
+      thorough: "Thorough",
+    },
   },
-  tags: {
+  modelSelection: {
+    sort: {
+      intelligence: "Intelligence",
+      price: "Price",
+      speed: "Speed",
+      content: "Content",
+    },
+    sortDirection: {
+      asc: "Ascending",
+      desc: "Descending",
+    },
+  },
+  characterTags: {
     general: "General",
     helpful: "Helpful",
     companion: "Companion",

@@ -1,6 +1,14 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Aufgabenverwaltung",
+
+  errors: {
+    cronTaskNotFound: "Cron-Aufgabe nicht gefunden",
+    repositoryInternalError: "Ein interner Fehler ist aufgetreten",
+    fetchCronTaskHistory: "Fehler beim Abrufen der Cron-Aufgabenhistorie",
+  },
+
   get: {
     tags: {
       tasks: "Aufgaben",

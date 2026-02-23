@@ -80,4 +80,9 @@ export const translations: typeof enTranslations = {
     title: "Klickvorgang erfolgreich",
     description: "Das Element wurde erfolgreich geklickt",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    inputAutomation: "Eingabe-Automatisierung",
+  },
 };

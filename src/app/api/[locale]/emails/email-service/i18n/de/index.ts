@@ -2,7 +2,9 @@
  * German translations for Email Service endpoint
  */
 
-export const translations = {
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
   category: "E-Mail-Verwaltung",
   tag: "E-Mail-Service",
 
@@ -116,7 +118,6 @@ export const translations = {
     response: {
       accountInfo: {
         title: "Kontoinformationen",
-        description: "Details über das verwendete E-Mail-Konto",
       },
       deliveryStatus: {
         title: "Zustellstatus",
@@ -210,5 +211,18 @@ export const translations = {
       title: "E-Mail erfolgreich gesendet",
       description: "Ihre E-Mail wurde erfolgreich gesendet",
     },
+  },
+  emailServicePriority: {
+    low: "Niedrig",
+    normal: "Normal",
+    high: "Hoch",
+    urgent: "Dringend",
+  },
+  emailServiceStatus: {
+    idle: "Inaktiv",
+    processing: "Verarbeitung",
+    completed: "Abgeschlossen",
+    failed: "Fehlgeschlagen",
+    retrying: "Wiederholen",
   },
 };

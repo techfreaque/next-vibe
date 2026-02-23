@@ -2,6 +2,8 @@ import { translations as dockerOperationsTranslations } from "../../docker-opera
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Datenbankoperationen",
+
   dockerOperations: dockerOperationsTranslations,
   title: "Datenbank-Utilities",
   description: "Hilfsfunktionen für Datenbankoperationen",

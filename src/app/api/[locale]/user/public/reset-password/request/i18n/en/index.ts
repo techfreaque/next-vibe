@@ -1,10 +1,15 @@
 import { translations as componentsTranslations } from "../../_components/i18n/en";
 
 export const translations = {
+  category: "Users",
+
   _components: componentsTranslations,
   title: "Reset Password Request",
   description: "Request password reset",
   tag: "Password Reset",
+  actions: {
+    submitting: "Sending...",
+  },
   email: {
     title: "Reset Your {{appName}} Password",
     subject: "Password Reset Request - {{appName}}",
@@ -101,6 +106,8 @@ export const translations = {
       title: "Conflict",
       description: "Data conflict occurred",
     },
+    no_email: "No account found with that email address",
+    email_generation_failed: "Failed to generate email",
   },
   success: {
     title: "Request Sent",
@@ -154,6 +161,27 @@ export const translations = {
     success: {
       title: "Success",
       description: "Operation completed successfully",
+    },
+  },
+  emailTemplates: {
+    request: {
+      name: "Password Reset Request Email",
+      description: "Email sent to users with a link to reset their password",
+      category: "Authentication",
+      preview: {
+        publicName: {
+          label: "Public Name",
+          description: "The user's public display name",
+        },
+        userId: {
+          label: "User ID",
+          description: "The user's unique identifier",
+        },
+        passwordResetUrl: {
+          label: "Password Reset URL",
+          description: "The URL for resetting the password",
+        },
+      },
     },
   },
 };

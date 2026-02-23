@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestUrlPathParamsField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestUrlPathParamsField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,15 +20,17 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../user-roles/enum";
+import { scopedTranslation } from "../i18n";
 
 const { DELETE } = createEndpoint({
+  scopedTranslation,
   method: Methods.DELETE,
   path: ["user", "private", "sessions", "[id]"],
-  title: "app.api.user.private.sessions.revoke.title" as const,
-  description: "app.api.user.private.sessions.revoke.description" as const,
+  title: "revoke.title",
+  description: "revoke.description",
   icon: "trash",
-  category: "app.api.user.category" as const,
-  tags: ["app.api.user.private.sessions.revoke.tag" as const],
+  category: "category",
+  tags: ["revoke.tag"],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
@@ -36,91 +38,68 @@ const { DELETE } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
     UserRole.REMOTE_SKILL,
   ] as const,
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.user.private.sessions.revoke.title" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "urlPathParams", response: true } as const,
-    {
-      id: requestUrlPathParamsField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "revoke.title",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "urlPathParams", response: true } as const,
+    children: {
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label: "app.api.user.private.sessions.revoke.title" as const,
-        description:
-          "app.api.user.private.sessions.revoke.description" as const,
+        label: "revoke.title",
+        description: "revoke.description",
         schema: z.string().uuid(),
       }),
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.ALERT,
-        content:
-          "app.api.user.private.sessions.revoke.response.message" as const,
+        content: "revoke.response.message",
         schema: z.string(),
       }),
     },
-  ),
+  }),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.user.private.sessions.revoke.errors.unauthorized.title" as const,
-      description:
-        "app.api.user.private.sessions.revoke.errors.unauthorized.description" as const,
+      title: "revoke.errors.unauthorized.title",
+      description: "revoke.errors.unauthorized.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.user.private.sessions.revoke.errors.unauthorized.title" as const,
-      description:
-        "app.api.user.private.sessions.revoke.errors.unauthorized.description" as const,
+      title: "revoke.errors.unauthorized.title",
+      description: "revoke.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.user.private.sessions.revoke.errors.server.title" as const,
-      description:
-        "app.api.user.private.sessions.revoke.errors.server.description" as const,
+      title: "revoke.errors.server.title",
+      description: "revoke.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.user.private.sessions.revoke.errors.unknown.title" as const,
-      description:
-        "app.api.user.private.sessions.revoke.errors.unknown.description" as const,
+      title: "revoke.errors.unknown.title",
+      description: "revoke.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.user.private.sessions.revoke.errors.network.title" as const,
-      description:
-        "app.api.user.private.sessions.revoke.errors.network.description" as const,
+      title: "revoke.errors.network.title",
+      description: "revoke.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.user.private.sessions.revoke.errors.forbidden.title" as const,
-      description:
-        "app.api.user.private.sessions.revoke.errors.forbidden.description" as const,
+      title: "revoke.errors.forbidden.title",
+      description: "revoke.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.user.private.sessions.revoke.errors.notFound.title" as const,
-      description:
-        "app.api.user.private.sessions.revoke.errors.notFound.description" as const,
+      title: "revoke.errors.notFound.title",
+      description: "revoke.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.user.private.sessions.revoke.errors.conflict.title" as const,
-      description:
-        "app.api.user.private.sessions.revoke.errors.conflict.description" as const,
+      title: "revoke.errors.conflict.title",
+      description: "revoke.errors.conflict.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.user.private.sessions.revoke.errors.conflict.title" as const,
-      description:
-        "app.api.user.private.sessions.revoke.errors.conflict.description" as const,
+      title: "revoke.errors.conflict.title",
+      description: "revoke.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.user.private.sessions.revoke.success.title" as const,
-    description:
-      "app.api.user.private.sessions.revoke.success.description" as const,
+    title: "revoke.success.title",
+    description: "revoke.success.description",
   },
   examples: {
     urlPathParams: {
@@ -128,7 +107,7 @@ const { DELETE } = createEndpoint({
     },
     responses: {
       default: {
-        message: "app.api.user.private.sessions.revoke.response.message",
+        message: "revoke.response.message",
       },
     },
   },

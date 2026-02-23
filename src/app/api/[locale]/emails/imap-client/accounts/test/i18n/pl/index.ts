@@ -1,6 +1,10 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "IMAP Management",
+  tags: {
+    accounts: "Accounts",
+  },
   title: "Testuj konto IMAP",
   description: "Test połączenia z kontem IMAP",
   container: {

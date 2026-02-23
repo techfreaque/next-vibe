@@ -12,7 +12,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { parseError } from "../../../shared/utils";
 import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
@@ -41,6 +41,7 @@ import type {
   FavoriteCreateResponseOutput,
 } from "./create/definition";
 import type { FavoriteCard, FavoritesListResponseOutput } from "./definition";
+import { scopedTranslation } from "./i18n";
 import type { FavoritesReorderRequestOutput } from "./reorder/definition";
 
 /**
@@ -66,7 +67,9 @@ export class ChatFavoritesRepositoryClient {
    */
   static async getFavorites(
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<FavoritesListResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const settings = ChatSettingsRepositoryClient.loadLocalSettings();
       const activeFavoriteId = settings.activeFavoriteId;
@@ -98,7 +101,7 @@ export class ChatFavoritesRepositoryClient {
     } catch (error) {
       logger.error("Failed to load favorites", parseError(error));
       return fail({
-        message: "Failed to load favorites from storage",
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -110,7 +113,9 @@ export class ChatFavoritesRepositoryClient {
   static async createFavorite(
     data: FavoriteCreateRequestOutput,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<FavoriteCreateResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const id = `local-${Date.now()}`;
       const currentConfigs = this.loadAllLocalFavorites();
@@ -128,13 +133,13 @@ export class ChatFavoritesRepositoryClient {
       logger.debug("Created favorite", { id });
 
       return success({
-        success: "app.api.agent.chat.favorites.post.success.title",
+        success: t("post.success.title"),
         id,
       });
     } catch (error) {
       logger.error("Failed to create favorite", parseError(error));
       return fail({
-        message: "Failed to create favorite",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -146,12 +151,14 @@ export class ChatFavoritesRepositoryClient {
   static async getFavoriteById(
     id: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<FavoriteGetResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const config = this.loadLocalFavorite(id);
       if (!config) {
         return fail({
-          message: "Favorite not found",
+          message: t("id.get.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -161,7 +168,7 @@ export class ChatFavoritesRepositoryClient {
     } catch (error) {
       logger.error("Failed to get favorite", { ...parseError(error), id });
       return fail({
-        message: "Failed to load favorite",
+        message: t("id.get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -174,12 +181,14 @@ export class ChatFavoritesRepositoryClient {
     id: string,
     data: FavoriteUpdateRequestOutput,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<FavoriteUpdateResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const existing = this.loadLocalFavorite(id);
       if (!existing) {
         return fail({
-          message: "Favorite not found",
+          message: t("id.patch.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -213,7 +222,7 @@ export class ChatFavoritesRepositoryClient {
     } catch (error) {
       logger.error("Failed to update favorite", { ...parseError(error), id });
       return fail({
-        message: "Failed to update favorite",
+        message: t("id.patch.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -225,7 +234,9 @@ export class ChatFavoritesRepositoryClient {
   static async deleteFavorite(
     id: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<never>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       this.deleteLocalFavorite(id);
       logger.debug("Deleted favorite", { id });
@@ -233,7 +244,7 @@ export class ChatFavoritesRepositoryClient {
     } catch (error) {
       logger.error("Failed to delete favorite", { ...parseError(error), id });
       return fail({
-        message: "Failed to delete favorite",
+        message: t("id.delete.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -245,7 +256,9 @@ export class ChatFavoritesRepositoryClient {
   static async reorderFavorites(
     data: FavoritesReorderRequestOutput,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<{ success: boolean }>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const allFavorites = this.loadAllLocalFavorites();
 
@@ -264,7 +277,7 @@ export class ChatFavoritesRepositoryClient {
     } catch (error) {
       logger.error("Failed to reorder favorites", parseError(error));
       return fail({
-        message: "Failed to reorder favorites",
+        message: t("reorder.post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -285,9 +298,9 @@ export class ChatFavoritesRepositoryClient {
       | undefined
       | null,
     characterIcon: IconKey | null,
-    characterName: TranslationKey | null,
-    characterTagline: TranslationKey | null,
-    characterDescription: TranslationKey | null,
+    characterName: string | null,
+    characterTagline: string | null,
+    characterDescription: string | null,
     activeFavoriteId: string | null,
     characterVoice?: typeof TtsVoiceValue | null,
   ): FavoriteCard {

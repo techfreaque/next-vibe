@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
-  widgetField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
+  scopedWidgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,14 +21,16 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../user/user-roles/enum";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "check", "typecheck"],
-  title: "app.api.system.check.typecheck.title",
-  description: "app.api.system.check.typecheck.description",
-  category: "app.api.system.category",
-  tags: ["app.api.system.check.typecheck.tag"],
+  title: "title",
+  description: "description",
+  category: "category",
+  tags: ["tag"],
   icon: "check-circle",
   allowedRoles: [
     UserRole.ADMIN,
@@ -42,105 +44,99 @@ const { POST } = createEndpoint({
     firstCliArgKey: "path",
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      title: widgetField({
+      title: scopedWidgetField(scopedTranslation, {
         type: WidgetType.TITLE,
-        content: "app.api.system.check.typecheck.container.title",
+        content: "container.title",
         level: 1,
         columns: 12,
         usage: { request: "data" },
       }),
 
-      path: requestField({
+      path: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.check.typecheck.fields.path.label",
-        description: "app.api.system.check.typecheck.fields.path.description",
-        placeholder: "app.api.system.check.typecheck.fields.path.placeholder",
+        label: "fields.path.label",
+        description: "fields.path.description",
+        placeholder: "fields.path.placeholder",
         columns: 6,
         schema: z.union([z.string(), z.array(z.string())]).optional(),
       }),
 
-      disableFilter: requestField({
+      disableFilter: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.check.typecheck.fields.disableFilter.label",
-        description:
-          "app.api.system.check.typecheck.fields.disableFilter.description",
+        label: "fields.disableFilter.label",
+        description: "fields.disableFilter.description",
         columns: 4,
         schema: z.boolean().default(false),
       }),
 
-      timeout: requestField({
+      timeout: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.system.check.typecheck.fields.timeout.label",
-        description:
-          "app.api.system.check.typecheck.fields.timeout.description",
+        label: "fields.timeout.label",
+        description: "fields.timeout.description",
         columns: 4,
         schema: z.coerce.number().min(1).max(3600).default(900),
       }),
 
-      limit: requestField({
+      limit: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.system.check.typecheck.fields.limit.label",
-        description: "app.api.system.check.typecheck.fields.limit.description",
+        label: "fields.limit.label",
+        description: "fields.limit.description",
         columns: 4,
         schema: z.coerce.number().min(1).optional().default(200),
       }),
 
-      page: requestField({
+      page: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.system.check.typecheck.fields.page.label",
-        description: "app.api.system.check.typecheck.fields.page.description",
+        label: "fields.page.label",
+        description: "fields.page.description",
         columns: 4,
         schema: z.coerce.number().min(1).optional().default(1),
       }),
 
-      skipSorting: requestField({
+      skipSorting: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.check.typecheck.fields.skipSorting.label",
-        description:
-          "app.api.system.check.typecheck.fields.skipSorting.description",
+        label: "fields.skipSorting.label",
+        description: "fields.skipSorting.description",
         columns: 3,
         schema: z.boolean().default(false),
       }),
 
       // Filter issues by file path, message, or rule
-      filter: requestField({
+      filter: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.check.typecheck.fields.filter.label",
-        description: "app.api.system.check.typecheck.fields.filter.description",
-        placeholder: "app.api.system.check.typecheck.fields.filter.placeholder",
+        label: "fields.filter.label",
+        description: "fields.filter.description",
+        placeholder: "fields.filter.placeholder",
         columns: 8,
         schema: z.union([z.string(), z.array(z.string())]).optional(),
       }),
 
       // Only return summary stats, omit items and files lists
-      summaryOnly: requestField({
+      summaryOnly: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.check.typecheck.fields.summaryOnly.label",
-        description:
-          "app.api.system.check.typecheck.fields.summaryOnly.description",
+        label: "fields.summaryOnly.label",
+        description: "fields.summaryOnly.description",
         columns: 4,
         schema: z.boolean().default(false),
       }),
 
       // === RESPONSE FIELDS ===
-      items: responseField({
+      items: scopedResponseField(scopedTranslation, {
         type: WidgetType.CODE_QUALITY_LIST,
         schema: z
           .array(
@@ -156,7 +152,7 @@ const { POST } = createEndpoint({
           .optional(),
       }),
 
-      files: responseField({
+      files: scopedResponseField(scopedTranslation, {
         type: WidgetType.CODE_QUALITY_FILES,
         schema: z
           .array(
@@ -170,7 +166,7 @@ const { POST } = createEndpoint({
           .optional(),
       }),
 
-      summary: responseField({
+      summary: scopedResponseField(scopedTranslation, {
         type: WidgetType.CODE_QUALITY_SUMMARY,
         schema: z.object({
           totalIssues: z.number(),
@@ -186,53 +182,50 @@ const { POST } = createEndpoint({
         }),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.check.typecheck.errors.validation.title",
-      description:
-        "app.api.system.check.typecheck.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.check.typecheck.errors.internal.title",
-      description: "app.api.system.check.typecheck.errors.internal.description",
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.check.typecheck.errors.unauthorized.title",
-      description:
-        "app.api.system.check.typecheck.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.check.typecheck.errors.forbidden.title",
-      description:
-        "app.api.system.check.typecheck.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.check.typecheck.errors.notFound.title",
-      description: "app.api.system.check.typecheck.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.check.typecheck.errors.server.title",
-      description: "app.api.system.check.typecheck.errors.server.description",
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.check.typecheck.errors.unknown.title",
-      description: "app.api.system.check.typecheck.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.check.typecheck.errors.unsaved.title",
-      description: "app.api.system.check.typecheck.errors.unsaved.description",
+      title: "errors.unsaved.title",
+      description: "errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.check.typecheck.errors.conflict.title",
-      description: "app.api.system.check.typecheck.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.system.check.typecheck.success.title",
-    description: "app.api.system.check.typecheck.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 
   examples: {

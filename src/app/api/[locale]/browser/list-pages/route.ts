@@ -12,12 +12,13 @@ export const { POST, tools } = endpointsHandler({
   endpoint: listPagesEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ logger }) => {
+    handler: ({ t, logger }) => {
       return executeMCPTool(
         {
           toolName: "list-pages",
           args: filterUndefinedArgs({}),
         },
+        t,
         logger,
       );
     },

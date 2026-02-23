@@ -20,6 +20,7 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
+import { scopedTranslation as smtpScopedTranslation } from "../../../emails/smtp-client/i18n";
 import { SmtpRepository } from "../../../emails/smtp-client/repository";
 import { leads } from "../../db";
 import {
@@ -27,10 +28,13 @@ import {
   isStatusTransitionAllowed,
   LeadStatus,
 } from "../../enum";
+import type { scopedTranslation } from "./i18n";
 import type {
   CampaignStarterConfigType,
   CampaignStarterResultType,
 } from "./types";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 const INVALID_TRANSITION_ERROR = "Invalid status transition for campaign start";
 
@@ -45,16 +49,19 @@ export interface ICampaignStarterRepository {
     config: CampaignStarterConfigType,
     result: CampaignStarterResultType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<void>>;
 
   getFailedLeadsCount(
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<number>>;
 
   markFailedLeadsAsProcessed(
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<void>>;
 }
 
@@ -69,6 +76,7 @@ export class CampaignStarterRepository {
     config: CampaignStarterConfigType,
     result: CampaignStarterResultType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<void>> {
     try {
       logger.debug("Processing locale leads for campaign starter", {
@@ -83,6 +91,7 @@ export class CampaignStarterRepository {
       // Get current SMTP sending capacity to determine optimal queue size
       // Use system/public user context for cron job
       const SYSTEM_LEAD_ID = "00000000-0000-0000-0000-000000000000";
+      const smtpT = smtpScopedTranslation.scopedT(locale).t;
       const capacityResult = await SmtpRepository.getTotalSendingCapacity(
         {},
         {
@@ -90,6 +99,7 @@ export class CampaignStarterRepository {
           leadId: SYSTEM_LEAD_ID,
           roles: [UserPermissionRole.PUBLIC],
         },
+        smtpT,
         logger,
       );
       const totalRemainingCapacity = capacityResult.success
@@ -241,8 +251,7 @@ export class CampaignStarterRepository {
         locale,
       });
       return fail({
-        message:
-          "app.api.leads.leadsErrors.campaigns.common.error.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -251,6 +260,7 @@ export class CampaignStarterRepository {
   static async getFailedLeadsCount(
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<number>> {
     try {
       logger.debug("Getting failed leads count for rebalancing", { locale });
@@ -307,8 +317,7 @@ export class CampaignStarterRepository {
         locale,
       });
       return fail({
-        message:
-          "app.api.leads.leadsErrors.campaigns.common.error.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -317,6 +326,7 @@ export class CampaignStarterRepository {
   static async markFailedLeadsAsProcessed(
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<void>> {
     try {
       logger.debug("Marking failed leads as processed for rebalancing", {
@@ -372,8 +382,7 @@ export class CampaignStarterRepository {
         locale,
       });
       return fail({
-        message:
-          "app.api.leads.leadsErrors.campaigns.common.error.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

@@ -1,4 +1,8 @@
 export const translations = {
+  category: "Email Communication",
+  tags: {
+    messaging: "Messaging",
+  },
   get: {
     title: "Messaging Account",
     description: "View messaging account details",

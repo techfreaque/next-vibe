@@ -2,7 +2,10 @@ import "server-only";
 
 import { z } from "zod";
 
-import { zodSchemaToJsonSchema } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/endpoint-to-metadata";
+import {
+  enrichJsonSchemaFromFields,
+  zodSchemaToJsonSchema,
+} from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/endpoint-to-metadata";
 import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -282,8 +285,14 @@ export function endpointToMCPTool(
   const descriptionKey = endpoint.description || endpoint.title;
   const translatedDescription = descriptionKey ? t(descriptionKey) : "";
 
+  // Append credit cost if > 0
+  const creditSuffix =
+    endpoint.credits && endpoint.credits > 0
+      ? ` [Cost: ${endpoint.credits} credits]`
+      : "";
+
   // Compact description - just the translated text, no verbose paths
-  const description = translatedDescription || toolName;
+  const description = (translatedDescription || toolName) + creditSuffix;
 
   // Generate Zod schema from endpoint fields with translated descriptions
   const zodSchema = generateInputSchema(endpoint, locale);
@@ -291,6 +300,20 @@ export function endpointToMCPTool(
   // Convert to JSON Schema using shared utility
   // z.toJSONSchema automatically handles transforms and includes descriptions
   const jsonSchema = zodSchemaToJsonSchema(zodSchema);
+
+  // Enrich with fieldType metadata for accurate types (int vs number, uuid format, etc.)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const topLevelFields: Record<string, any> = {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const fieldsObj = endpoint.fields as any;
+  if (fieldsObj && typeof fieldsObj === "object" && "children" in fieldsObj) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const children = (fieldsObj as any).children;
+    if (children && typeof children === "object") {
+      Object.assign(topLevelFields, children);
+    }
+  }
+  enrichJsonSchemaFromFields(jsonSchema, topLevelFields);
 
   return {
     name: toolName,

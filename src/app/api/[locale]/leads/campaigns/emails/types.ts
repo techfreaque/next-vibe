@@ -7,11 +7,9 @@ import type { JSX } from "react";
 
 import type { CampaignTypeValue } from "@/app/api/[locale]/emails/smtp-client/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import type { TrackingContext } from "../../../emails/smtp-client/components/tracking_context.email";
 import type {
-  EmailCampaignStage,
   EmailCampaignStageValues,
   EmailJourneyVariantValues,
   LeadSourceValues,
@@ -66,12 +64,8 @@ export interface EmailTemplateData {
   };
 }
 
-/**
- * Email Render Context
- */
 export interface EmailRenderContext {
   data: EmailTemplateData;
-  t: TFunction;
   locale: CountryLanguage;
   tracking: TrackingContext;
 }
@@ -96,12 +90,9 @@ export type EmailTemplateFunction = (
 /**
  * Journey Template Map
  * Maps campaign stages to template functions for each journey
+ * Uses Record<string, ...> to allow computed property keys from enum values
  */
-export type JourneyTemplateMap = {
-  [K in typeof EmailCampaignStageValues]?: EmailTemplateFunction;
-} & {
-  [K in typeof EmailCampaignStage.INITIAL]: EmailTemplateFunction;
-};
+export type JourneyTemplateMap = Record<string, EmailTemplateFunction>;
 
 /**
  * A/B Test Configuration

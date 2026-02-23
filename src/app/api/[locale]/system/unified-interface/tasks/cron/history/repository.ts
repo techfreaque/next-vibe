@@ -18,8 +18,6 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { cronTaskExecutions, cronTasks } from "../../cron/db";
 import { CronTaskPriority, CronTaskStatus } from "../../enum";
@@ -27,6 +25,9 @@ import type {
   CronHistoryRequestOutput,
   CronHistoryResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Repository implementation
@@ -35,11 +36,9 @@ export class CronHistoryRepository {
   static async getTaskHistory(
     data: CronHistoryRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronHistoryResponseOutput>> {
-    const { t } = simpleT(locale);
-
     try {
       logger.debug("Fetching task execution history", { filters: data });
 
@@ -181,12 +180,7 @@ export class CronHistoryRepository {
           : 0;
 
       logger.info(
-        t(
-          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.log.fetchSuccess",
-          {
-            count: executions.length.toString(),
-          },
-        ),
+        `Fetched ${executions.length.toString()} cron task execution records`,
       );
 
       // Database already returns correct enum types, no parsing needed
@@ -195,11 +189,7 @@ export class CronHistoryRepository {
           const execution: CronHistoryResponseOutput["executions"][number] = {
             id: exec.id,
             taskId: exec.taskId,
-            taskName:
-              exec.taskName ??
-              t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.history.get.unknownTask",
-              ),
+            taskName: exec.taskName ?? t("errors.cronTaskNotFound"),
             status: exec.status,
             priority: exec.priority ?? CronTaskPriority.MEDIUM,
             startedAt: exec.startedAt.toISOString(),
@@ -208,8 +198,7 @@ export class CronHistoryRepository {
             error: exec.error
               ? fail({
                   message:
-                    exec.error?.message ??
-                    "app.api.system.unifiedInterface.tasks.cronSystem.history.get.unknownError",
+                    exec.error?.message ?? t("errors.repositoryInternalError"),
                   messageParams: exec.error?.messageParams,
                   errorType:
                     exec.error?.errorType ?? ErrorResponseTypes.INTERNAL_ERROR,
@@ -245,8 +234,7 @@ export class CronHistoryRepository {
       });
 
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.cronSystem.history.get.errors.internal.title",
+        message: t("errors.fetchCronTaskHistory"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,

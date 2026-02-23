@@ -7,12 +7,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  objectField,
-  requestField,
-  requestUrlPathParamsField,
-  responseField,
+  scopedBackButton,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedRequestUrlPathParamsField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -23,19 +23,21 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../../user/user-roles/enum";
+import { scopedTranslation } from "./i18n";
 import { ImapMessageDetailContainer } from "./widget";
 
 /**
  * GET endpoint for IMAP message by ID
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["emails", "imap-client", "messages", "[id]"],
-  title: "app.api.emails.imapClient.messages.id.get.title",
-  description: "app.api.emails.imapClient.messages.id.get.description",
-  category: "app.api.emails.category",
+  title: "get.title",
+  description: "get.description",
+  category: "category",
   icon: "message-square",
-  tags: ["app.api.emails.imapClient.messages.id.tag"],
+  tags: ["tag"],
 
   allowedRoles: [UserRole.ADMIN],
 
@@ -43,257 +45,241 @@ const { GET } = createEndpoint({
     render: ImapMessageDetailContainer,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
-      backButton: backButton({
+      backButton: scopedBackButton(scopedTranslation, {
         usage: { request: "urlPathParams", response: true },
       }),
 
       // === URL PARAM FIELDS ===
-      id: requestUrlPathParamsField({
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.imapClient.messages.id.get.id.label",
-        description: "app.api.emails.imapClient.messages.id.get.id.description",
-        placeholder: "app.api.emails.imapClient.messages.id.get.id.placeholder",
+        label: "get.id.label",
+        description: "get.id.description",
+        placeholder: "get.id.placeholder",
         schema: z.uuid(),
       }),
 
       // === RESPONSE FIELDS ===
-      message: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.emails.imapClient.messages.id.get.response.title",
-          description:
-            "app.api.emails.imapClient.messages.id.get.response.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          id: responseField({
+      message: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.title",
+        description: "get.response.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          id: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.id.tag",
+            content: "tag",
             schema: z.uuid(),
           }),
-          subject: responseField({
+          subject: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string(),
           }),
-          recipientEmail: responseField({
+          recipientEmail: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string(),
           }),
-          recipientName: responseField({
+          recipientName: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().nullable(),
           }),
-          senderEmail: responseField({
+          senderEmail: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string(),
           }),
-          senderName: responseField({
+          senderName: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().nullable(),
           }),
-          imapUid: responseField({
+          imapUid: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.coerce.number().optional(),
           }),
-          imapMessageId: responseField({
+          imapMessageId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().optional(),
           }),
-          imapFolderId: responseField({
+          imapFolderId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.uuid().optional(),
           }),
-          accountId: responseField({
+          accountId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.tags.accounts",
+            content: "tags.accounts",
             schema: z.uuid().optional(),
           }),
-          bodyText: responseField({
+          bodyText: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().optional(),
           }),
-          bodyHtml: responseField({
+          bodyHtml: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().optional(),
           }),
-          headers: responseField({
+          headers: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.record(z.string(), z.string()).optional(),
           }),
-          isRead: responseField({
+          isRead: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.imapClient.messages.tag",
+            text: "messages.tag",
             schema: z.boolean(),
           }),
-          isFlagged: responseField({
+          isFlagged: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.imapClient.messages.tag",
+            text: "messages.tag",
             schema: z.boolean(),
           }),
-          isDeleted: responseField({
+          isDeleted: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.imapClient.messages.tag",
+            text: "messages.tag",
             schema: z.boolean().optional(),
           }),
-          isDraft: responseField({
+          isDraft: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.imapClient.messages.tag",
+            text: "messages.tag",
             schema: z.boolean().optional(),
           }),
-          isAnswered: responseField({
+          isAnswered: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.imapClient.messages.tag",
+            text: "messages.tag",
             schema: z.boolean().optional(),
           }),
-          inReplyTo: responseField({
+          inReplyTo: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().nullable().optional(),
           }),
-          references: responseField({
+          references: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().nullable().optional(),
           }),
-          threadId: responseField({
+          threadId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().optional(),
           }),
-          messageSize: responseField({
+          messageSize: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.coerce.number().optional(),
           }),
-          hasAttachments: responseField({
+          hasAttachments: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.imapClient.messages.tag",
+            text: "messages.tag",
             schema: z.boolean(),
           }),
-          attachmentCount: responseField({
+          attachmentCount: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.coerce.number().optional(),
           }),
-          lastSyncAt: responseField({
+          lastSyncAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().optional(),
           }),
-          syncStatus: responseField({
+          syncStatus: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.imapClient.messages.tag",
+            text: "messages.tag",
             schema: z.string().optional(),
           }),
-          syncError: responseField({
+          syncError: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().nullable().optional(),
           }),
-          sentAt: responseField({
+          sentAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().nullable(),
           }),
-          receivedAt: responseField({
+          receivedAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().nullable(),
           }),
-          createdAt: responseField({
+          createdAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().optional(),
           }),
-          updatedAt: responseField({
+          updatedAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().optional(),
           }),
-          folderName: responseField({
+          folderName: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.imapClient.messages.tag",
+            text: "messages.tag",
             schema: z.string(),
           }),
-          size: responseField({
+          size: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.coerce.number().optional(),
           }),
         },
-      ),
+      }),
     },
   }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.emails.imapClient.messages.id.get.errors.validation.title",
-      description:
-        "app.api.emails.imapClient.messages.id.get.errors.validation.description",
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.emails.imapClient.messages.id.get.errors.notFound.title",
-      description:
-        "app.api.emails.imapClient.messages.id.get.errors.notFound.description",
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.emails.imapClient.messages.id.get.errors.unauthorized.title",
-      description:
-        "app.api.emails.imapClient.messages.id.get.errors.unauthorized.description",
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.emails.imapClient.messages.id.get.errors.forbidden.title",
-      description:
-        "app.api.emails.imapClient.messages.id.get.errors.forbidden.description",
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.emails.imapClient.messages.id.get.errors.server.title",
-      description:
-        "app.api.emails.imapClient.messages.id.get.errors.server.description",
+      title: "get.errors.server.title",
+      description: "get.errors.server.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.emails.imapClient.messages.id.get.errors.conflict.title",
-      description:
-        "app.api.emails.imapClient.messages.id.get.errors.conflict.description",
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.emails.imapClient.messages.id.get.errors.network.title",
-      description:
-        "app.api.emails.imapClient.messages.id.get.errors.network.description",
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.emails.imapClient.messages.id.get.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.imapClient.messages.id.get.errors.unsavedChanges.description",
+      title: "get.errors.unsavedChanges.title",
+      description: "get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.emails.imapClient.messages.id.get.errors.unknown.title",
-      description:
-        "app.api.emails.imapClient.messages.id.get.errors.unknown.description",
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
     },
   },
 
   successTypes: {
-    title: "app.api.emails.imapClient.messages.id.get.success.title",
-    description:
-      "app.api.emails.imapClient.messages.id.get.success.description",
+    title: "get.success.title",
+    description: "get.success.description",
   },
 
   examples: {
@@ -352,309 +338,282 @@ const { GET } = createEndpoint({
  * PATCH endpoint for updating IMAP message
  */
 const { PATCH } = createEndpoint({
+  scopedTranslation,
   method: Methods.PATCH,
   path: ["emails", "imap-client", "messages", "[id]"],
-  title: "app.api.emails.imapClient.messages.id.patch.title",
-  description: "app.api.emails.imapClient.messages.id.patch.description",
-  category: "app.api.emails.category",
+  title: "patch.title",
+  description: "patch.description",
+  category: "category",
   icon: "message-square",
-  tags: ["app.api.emails.imapClient.messages.id.tag"],
+  tags: ["tag"],
 
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.emails.imapClient.messages.id.patch.container.title",
-      description:
-        "app.api.emails.imapClient.messages.id.patch.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data&urlPathParams", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "patch.container.title",
+    description: "patch.container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data&urlPathParams", response: true },
+    children: {
       // === URL PARAM FIELDS ===
-      id: requestUrlPathParamsField({
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.imapClient.messages.id.patch.id.label",
-        description:
-          "app.api.emails.imapClient.messages.id.patch.id.description",
-        placeholder:
-          "app.api.emails.imapClient.messages.id.patch.id.placeholder",
+        label: "patch.id.label",
+        description: "patch.id.description",
+        placeholder: "patch.id.placeholder",
         schema: z.uuid(),
       }),
 
       // === REQUEST DATA FIELDS ===
-      isRead: requestField({
+      isRead: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.emails.imapClient.messages.id.patch.isRead.label",
-        description:
-          "app.api.emails.imapClient.messages.id.patch.isRead.description",
+        label: "patch.isRead.label",
+        description: "patch.isRead.description",
         schema: z.boolean().optional(),
       }),
 
-      isFlagged: requestField({
+      isFlagged: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.emails.imapClient.messages.id.patch.isFlagged.label",
-        description:
-          "app.api.emails.imapClient.messages.id.patch.isFlagged.description",
+        label: "patch.isFlagged.label",
+        description: "patch.isFlagged.description",
         schema: z.boolean().optional(),
       }),
 
-      subject: requestField({
+      subject: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.imapClient.messages.id.patch.subject.label",
-        description:
-          "app.api.emails.imapClient.messages.id.patch.subject.description",
-        placeholder:
-          "app.api.emails.imapClient.messages.id.patch.subject.placeholder",
+        label: "patch.subject.label",
+        description: "patch.subject.description",
+        placeholder: "patch.subject.placeholder",
         schema: z.string().min(1).max(255).optional(),
       }),
 
       // === RESPONSE FIELDS ===
-      message: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.emails.imapClient.messages.id.patch.response.title",
-          description:
-            "app.api.emails.imapClient.messages.id.patch.response.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          id: responseField({
+      message: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "patch.response.title",
+        description: "patch.response.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          id: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.id.tag",
+            content: "tag",
             schema: z.uuid(),
           }),
-          subject: responseField({
+          subject: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string(),
           }),
-          recipientEmail: responseField({
+          recipientEmail: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string(),
           }),
-          recipientName: responseField({
+          recipientName: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().nullable(),
           }),
-          senderEmail: responseField({
+          senderEmail: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string(),
           }),
-          senderName: responseField({
+          senderName: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().nullable(),
           }),
-          imapUid: responseField({
+          imapUid: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.coerce.number().optional(),
           }),
-          imapMessageId: responseField({
+          imapMessageId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().optional(),
           }),
-          imapFolderId: responseField({
+          imapFolderId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.uuid().optional(),
           }),
-          accountId: responseField({
+          accountId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.tags.accounts",
+            content: "tags.accounts",
             schema: z.uuid().optional(),
           }),
-          bodyText: responseField({
+          bodyText: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().optional(),
           }),
-          bodyHtml: responseField({
+          bodyHtml: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().optional(),
           }),
-          headers: responseField({
+          headers: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.record(z.string(), z.string()).optional(),
           }),
-          isRead: responseField({
+          isRead: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.imapClient.messages.tag",
+            text: "messages.tag",
             schema: z.boolean(),
           }),
-          isFlagged: responseField({
+          isFlagged: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.imapClient.messages.tag",
+            text: "messages.tag",
             schema: z.boolean(),
           }),
-          isDeleted: responseField({
+          isDeleted: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.imapClient.messages.tag",
+            text: "messages.tag",
             schema: z.boolean().optional(),
           }),
-          isDraft: responseField({
+          isDraft: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.imapClient.messages.tag",
+            text: "messages.tag",
             schema: z.boolean().optional(),
           }),
-          isAnswered: responseField({
+          isAnswered: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.imapClient.messages.tag",
+            text: "messages.tag",
             schema: z.boolean().optional(),
           }),
-          inReplyTo: responseField({
+          inReplyTo: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().nullable().optional(),
           }),
-          references: responseField({
+          references: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().nullable().optional(),
           }),
-          threadId: responseField({
+          threadId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().optional(),
           }),
-          messageSize: responseField({
+          messageSize: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.coerce.number().optional(),
           }),
-          hasAttachments: responseField({
+          hasAttachments: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.imapClient.messages.tag",
+            text: "messages.tag",
             schema: z.boolean(),
           }),
-          attachmentCount: responseField({
+          attachmentCount: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.coerce.number().optional(),
           }),
-          lastSyncAt: responseField({
+          lastSyncAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().optional(),
           }),
-          syncStatus: responseField({
+          syncStatus: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.imapClient.messages.tag",
+            text: "messages.tag",
             schema: z.string().optional(),
           }),
-          syncError: responseField({
+          syncError: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().nullable().optional(),
           }),
-          sentAt: responseField({
+          sentAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().nullable(),
           }),
-          receivedAt: responseField({
+          receivedAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().nullable(),
           }),
-          createdAt: responseField({
+          createdAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().optional(),
           }),
-          updatedAt: responseField({
+          updatedAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.string().optional(),
           }),
-          folderName: responseField({
+          folderName: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.imapClient.messages.tag",
+            text: "messages.tag",
             schema: z.string(),
           }),
-          size: responseField({
+          size: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.imapClient.messages.tag",
+            content: "messages.tag",
             schema: z.coerce.number().optional(),
           }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.emails.imapClient.messages.id.patch.errors.validation.title",
-      description:
-        "app.api.emails.imapClient.messages.id.patch.errors.validation.description",
+      title: "patch.errors.validation.title",
+      description: "patch.errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.emails.imapClient.messages.id.patch.errors.notFound.title",
-      description:
-        "app.api.emails.imapClient.messages.id.patch.errors.notFound.description",
+      title: "patch.errors.notFound.title",
+      description: "patch.errors.notFound.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.emails.imapClient.messages.id.patch.errors.unauthorized.title",
-      description:
-        "app.api.emails.imapClient.messages.id.patch.errors.unauthorized.description",
+      title: "patch.errors.unauthorized.title",
+      description: "patch.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.emails.imapClient.messages.id.patch.errors.forbidden.title",
-      description:
-        "app.api.emails.imapClient.messages.id.patch.errors.forbidden.description",
+      title: "patch.errors.forbidden.title",
+      description: "patch.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.emails.imapClient.messages.id.patch.errors.server.title",
-      description:
-        "app.api.emails.imapClient.messages.id.patch.errors.server.description",
+      title: "patch.errors.server.title",
+      description: "patch.errors.server.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.emails.imapClient.messages.id.patch.errors.conflict.title",
-      description:
-        "app.api.emails.imapClient.messages.id.patch.errors.conflict.description",
+      title: "patch.errors.conflict.title",
+      description: "patch.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.emails.imapClient.messages.id.patch.errors.network.title",
-      description:
-        "app.api.emails.imapClient.messages.id.patch.errors.network.description",
+      title: "patch.errors.network.title",
+      description: "patch.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.emails.imapClient.messages.id.patch.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.imapClient.messages.id.patch.errors.unsavedChanges.description",
+      title: "patch.errors.unsavedChanges.title",
+      description: "patch.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.emails.imapClient.messages.id.patch.errors.unknown.title",
-      description:
-        "app.api.emails.imapClient.messages.id.patch.errors.unknown.description",
+      title: "patch.errors.unknown.title",
+      description: "patch.errors.unknown.description",
     },
   },
 
   successTypes: {
-    title: "app.api.emails.imapClient.messages.id.patch.success.title",
-    description:
-      "app.api.emails.imapClient.messages.id.patch.success.description",
+    title: "patch.success.title",
+    description: "patch.success.description",
   },
 
   examples: {

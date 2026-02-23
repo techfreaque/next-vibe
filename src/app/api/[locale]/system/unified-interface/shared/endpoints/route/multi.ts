@@ -13,6 +13,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { NextHandlerReturnType } from "../../../next-api/handler";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import { Methods } from "../../types/enums";
+import type { Platform } from "../../types/platform";
 import type { GenericHandlerReturnType, MethodHandlerConfig } from "./handler";
 import { endpointHandler } from "./single";
 
@@ -39,7 +40,9 @@ export type EndpointHandlerConfig<T extends EndpointDefinitionsConstraint> = {
           T[K]["types"]["RequestOutput"],
           T[K]["types"]["ResponseOutput"],
           T[K]["types"]["UrlVariablesOutput"],
-          T[K]["allowedRoles"]
+          T[K]["allowedRoles"],
+          Platform,
+          T[K]["types"]["ScopedTranslationKey"]
         >
       : never
     : never;

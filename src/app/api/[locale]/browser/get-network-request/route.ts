@@ -17,7 +17,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: getNetworkRequestEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger }) =>
+    handler: ({ data, t, logger }) =>
       executeGetNetworkRequest<GetNetworkRequestResponseOutput>(
         {
           toolName: "get-network-request",
@@ -25,6 +25,7 @@ export const { POST, tools } = endpointsHandler({
             reqid: data.reqid,
           }),
         },
+        t,
         logger,
       ),
   },

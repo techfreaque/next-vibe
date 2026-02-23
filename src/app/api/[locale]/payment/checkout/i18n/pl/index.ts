@@ -161,4 +161,17 @@ export const translations: typeof enTranslations = {
 
   // General error message
   error: "Wystąpił błąd podczas płatności",
+
+  // Subscription plan labels
+  plans: {
+    starter: {
+      title: "Starter",
+    },
+  },
+
+  // Billing interval labels
+  billing: {
+    monthly: "Miesięcznie",
+    yearly: "Rocznie",
+  },
 };

@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Generators",
+
   post: {
     title: "Generate Email Templates",
     description: "Generate email template registry with lazy loading",

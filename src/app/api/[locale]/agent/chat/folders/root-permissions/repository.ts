@@ -40,7 +40,6 @@ export class RootFolderPermissionsRepository {
   static async getRootFolderPermissions(
     data: RootPermissionsGetRequestOutput,
     user: JwtPayloadType,
-    // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<RootPermissionsGetResponseOutput>> {
@@ -73,7 +72,7 @@ export class RootFolderPermissionsRepository {
     const userId = user.id;
     if (userId) {
       const { isAdmin } = await import("../../permissions/permissions");
-      const isAdminUser = await isAdmin(userId, logger);
+      const isAdminUser = await isAdmin(userId, logger, locale);
       if (isAdminUser) {
         return success({
           canCreateThread: true,
@@ -98,6 +97,7 @@ export class RootFolderPermissionsRepository {
         user,
         rootConfig.rolesCreateThread,
         logger,
+        locale,
       );
     }
 
@@ -107,6 +107,7 @@ export class RootFolderPermissionsRepository {
       user,
       rootFolderId,
       logger,
+      locale,
       null, // No parent folder for root level
     );
 

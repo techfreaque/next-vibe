@@ -7,7 +7,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  responseField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -16,27 +16,27 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { scopedTranslation } from "../../../i18n";
+import { scopedTranslation } from "./i18n";
 import { LinuxUsersListContainer } from "./widget";
 
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["ssh", "linux", "users", "list"],
-  title: "linux.users.list.get.title",
-  description: "linux.users.list.get.description",
+  title: "get.title",
+  description: "get.description",
   icon: "users",
   category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["type"],
+  tags: ["category" as const],
 
   fields: customWidgetObject({
     render: LinuxUsersListContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      users: responseField({
+      users: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "linux.users.list.get.response.users.title",
+        content: "get.response.users.title",
         schema: z.array(
           z.object({
             username: z.string(),
@@ -53,50 +53,50 @@ export const { GET } = createEndpoint({
   }),
 
   successTypes: {
-    title: "linux.users.list.get.success.title",
-    description: "linux.users.list.get.success.description",
+    title: "get.success.title",
+    description: "get.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "linux.users.list.get.errors.validation.title",
-      description: "linux.users.list.get.errors.validation.description",
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "linux.users.list.get.errors.unauthorized.title",
-      description: "linux.users.list.get.errors.unauthorized.description",
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "linux.users.list.get.errors.forbidden.title",
-      description: "linux.users.list.get.errors.forbidden.description",
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "linux.users.list.get.errors.server.title",
-      description: "linux.users.list.get.errors.server.description",
+      title: "get.errors.server.title",
+      description: "get.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "linux.users.list.get.errors.notFound.title",
-      description: "linux.users.list.get.errors.notFound.description",
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "linux.users.list.get.errors.unknown.title",
-      description: "linux.users.list.get.errors.unknown.description",
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "linux.users.list.get.errors.unsavedChanges.title",
-      description: "linux.users.list.get.errors.unsavedChanges.description",
+      title: "get.errors.unsavedChanges.title",
+      description: "get.errors.unsavedChanges.title",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "linux.users.list.get.errors.conflict.title",
-      description: "linux.users.list.get.errors.conflict.description",
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "linux.users.list.get.errors.network.title",
-      description: "linux.users.list.get.errors.network.description",
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
     },
   },
 
   examples: {
-    requests: { default: {} },
+    requests: undefined,
     responses: {
       default: {
         users: [

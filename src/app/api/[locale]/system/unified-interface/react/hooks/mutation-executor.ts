@@ -9,6 +9,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
+import { scopedTranslation as reactNativeScopedTranslation } from "@/app/api/[locale]/system/unified-interface/react-native/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Methods as MethodsEnum } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { EndpointErrorTypes } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -134,9 +135,9 @@ export async function executeMutation<TEndpoint extends CreateApiEndpointAny>({
           pathParamsFullObject: pathParams,
         });
 
+        const { t: rnT } = reactNativeScopedTranslation.scopedT(locale);
         const errorResponse = fail({
-          message:
-            "app.api.system.unifiedInterface.reactNative.errors.missingUrlParam",
+          message: rnT("errors.missingUrlParam"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { paramName, endpoint: endpoint.path.join("/") },
         });

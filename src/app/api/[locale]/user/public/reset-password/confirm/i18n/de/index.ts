@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Benutzer",
+
   title: "Passwort-Reset bestätigen",
   description: "Bestätigen Sie Ihr Passwort-Reset mit einem neuen Passwort",
   tag: "Passwort-Reset",
@@ -103,6 +105,7 @@ export const translations: typeof enTranslations = {
   },
   errors: {
     title: "Fehler beim Zurücksetzen des Passworts",
+    no_email: "Kein Konto mit dieser E-Mail-Adresse gefunden",
     validation: {
       title: "Validierungsfehler",
       description:
@@ -148,5 +151,26 @@ export const translations: typeof enTranslations = {
     description: "Ihr Passwort wurde erfolgreich zurückgesetzt",
     message: "Passwort wurde erfolgreich zurückgesetzt",
     password_reset: "Ihr Passwort wurde erfolgreich zurückgesetzt",
+  },
+  actions: {
+    requestNewLink: "Neuen Reset-Link anfordern",
+  },
+  emailTemplates: {
+    confirm: {
+      name: "E-Mail zur Passwort-Reset-Bestätigung",
+      description:
+        "E-Mail, die an Benutzer gesendet wird, nachdem ihr Passwort erfolgreich zurückgesetzt wurde",
+      category: "Authentifizierung",
+      preview: {
+        publicName: {
+          label: "Öffentlicher Name",
+          description: "Der öffentliche Anzeigename des Benutzers",
+        },
+        userId: {
+          label: "Benutzer-ID",
+          description: "Die eindeutige Kennung des Benutzers",
+        },
+      },
+    },
   },
 };

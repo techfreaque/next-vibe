@@ -14,9 +14,9 @@ import { imapConfigRepository as repository } from "./repository";
 export const { GET, POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: ({ logger }) => repository.getConfig(logger),
+    handler: ({ logger, t }) => repository.getConfig(logger, t),
   },
   [Methods.POST]: {
-    handler: ({ data, logger }) => repository.updateConfig(data, logger),
+    handler: ({ data, logger, t }) => repository.updateConfig(data, logger, t),
   },
 });

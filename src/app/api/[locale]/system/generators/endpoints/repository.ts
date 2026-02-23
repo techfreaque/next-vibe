@@ -17,8 +17,10 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type endpoints from "./definition";
-// Import options utilities from the consolidated options repository
+import type { scopedTranslation } from "./i18n";
 import { applyOptionDefaults, defineOptions } from "./options-repository";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 // ===== TYPES =====
 
@@ -39,21 +41,10 @@ export interface FunctionalGeneratorOptions {
 type RequestType = typeof endpoints.POST.types.RequestOutput;
 type ResponseOutputType = typeof endpoints.POST.types.ResponseOutput;
 
-export interface FunctionalGeneratorsRepository {
-  runGenerators(
-    data: RequestType,
-    logger: EndpointLogger,
-  ): Promise<BaseResponseType<ResponseOutputType>>;
-
-  validateOptions(
-    options: FunctionalGeneratorOptions,
-  ): Promise<BaseResponseType<boolean>>;
-}
-
 /**
  * Functional Generators Repository Implementation
  */
-export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsRepository {
+export class FunctionalGeneratorsRepositoryImpl {
   private readonly optionDefinitions =
     defineOptions<FunctionalGeneratorOptions>({
       skipEndpoints: {
@@ -108,6 +99,7 @@ export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsR
   async runGenerators(
     data: RequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<BaseResponseType<ResponseOutputType>> {
     try {
       const startTime = Date.now();
@@ -207,7 +199,7 @@ export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsR
       });
     } catch (error) {
       return fail({
-        message: "app.api.system.generators.endpoints.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -219,13 +211,13 @@ export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsR
    */
   async validateOptions(
     options: FunctionalGeneratorOptions,
+    t: ModuleT,
   ): Promise<BaseResponseType<boolean>> {
     try {
       // Basic validation - could be expanded
       if (options.rootDir && !options.rootDir.trim()) {
         return fail({
-          message:
-            "app.api.system.generators.endpoints.post.errors.validation.title",
+          message: t("post.errors.validation.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { error: "Root directory cannot be empty" },
         });
@@ -234,7 +226,7 @@ export class FunctionalGeneratorsRepositoryImpl implements FunctionalGeneratorsR
       return success(true);
     } catch (error) {
       return fail({
-        message: "app.api.system.generators.endpoints.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -330,8 +322,9 @@ export const endpointsGeneratorRepository = {
   generateEndpoints: (
     data: RequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<BaseResponseType<ResponseOutputType>> =>
-    functionalGeneratorsRepository.runGenerators(data, logger),
+    functionalGeneratorsRepository.runGenerators(data, logger, t),
 };
 
 // Export the main function for backward compatibility

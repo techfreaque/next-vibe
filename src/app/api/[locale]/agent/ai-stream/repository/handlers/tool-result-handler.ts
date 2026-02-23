@@ -15,6 +15,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { parseError } from "../../../../shared/utils";
 import { type ToolCall, type ToolCallResult } from "../../../chat/db";
+import type { AiStreamT } from "../../i18n";
 import type { MessageDbWriter } from "../core/message-db-writer";
 
 /**
@@ -123,6 +124,7 @@ export class ToolResultHandler {
     dbWriter: MessageDbWriter;
     logger: EndpointLogger;
     emittedToolResultIds?: Set<string>;
+    t: AiStreamT;
   }): Promise<{
     currentParentId: string | null;
     currentDepth: number;
@@ -140,6 +142,7 @@ export class ToolResultHandler {
       dbWriter,
       logger,
       emittedToolResultIds,
+      t,
     } = params;
 
     if (!pendingToolMessage) {
@@ -164,8 +167,7 @@ export class ToolResultHandler {
             ? String(output.message)
             : JSON.stringify(output);
       toolError = fail({
-        message:
-          "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
+        message: t("errors.toolExecutionError"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: errorMessage },
       });

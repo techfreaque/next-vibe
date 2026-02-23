@@ -9,6 +9,7 @@ import React from "react";
 import { CampaignEmailLayout } from "@/app/api/[locale]/emails/smtp-client/components/campaign_email_layout.email";
 import { HumanCTAButton } from "@/app/api/[locale]/emails/smtp-client/components/human_cta_button.email";
 import { HumanText } from "@/app/api/[locale]/emails/smtp-client/components/human_text.email";
+import { simpleT } from "@/i18n/core/shared";
 
 import { EmailCampaignStage } from "../../../enum";
 import type {
@@ -16,77 +17,63 @@ import type {
   EmailTemplateFunction,
   JourneyTemplateMap,
 } from "../types";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Uncensored Convert - Initial Contact
  */
 export const uncensoredConvertInitialEmail: EmailTemplateFunction = ({
   data,
-  t,
   locale,
   tracking,
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
-
+  const t = scopedTranslation.scopedT(locale).t;
+  const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
       previewText={t(
-        "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.initial.previewText",
+        "emailJourneys.leads.journeys.uncensoredConvert.initial.previewText",
       )}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
-      t={t}
       tracking={tracking}
     >
       <HumanText variant="greeting">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.initial.greeting",
-        )}
+        {t("emailJourneys.leads.journeys.uncensoredConvert.initial.greeting")}
+      </HumanText>
+
+      <HumanText variant="body">
+        {t("emailJourneys.leads.journeys.uncensoredConvert.initial.opening")}
+      </HumanText>
+
+      <HumanText variant="body">
+        {t("emailJourneys.leads.journeys.uncensoredConvert.initial.discovery")}
+      </HumanText>
+
+      <HumanText variant="body">
+        {t("emailJourneys.leads.journeys.uncensoredConvert.initial.whatItDoes")}
       </HumanText>
 
       <HumanText variant="body">
         {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.initial.opening",
-        )}
-      </HumanText>
-
-      <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.initial.discovery",
-        )}
-      </HumanText>
-
-      <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.initial.whatItDoes",
-        )}
-      </HumanText>
-
-      <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.initial.affiliateDisclosure",
+          "emailJourneys.leads.journeys.uncensoredConvert.initial.affiliateDisclosure",
         )}
       </HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
-        text={t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.initial.ctaText",
-        )}
+        text={globalT("config.appName")}
         variant="primary"
         tracking={tracking}
       />
 
       <HumanText variant="signature">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.initial.signature",
-        )}
+        {t("emailJourneys.leads.journeys.uncensoredConvert.initial.signature")}
       </HumanText>
 
       <HumanText variant="ps">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.initial.postScript",
-        )}
+        {t("emailJourneys.leads.journeys.uncensoredConvert.initial.postScript")}
       </HumanText>
     </CampaignEmailLayout>
   );
@@ -94,7 +81,7 @@ export const uncensoredConvertInitialEmail: EmailTemplateFunction = ({
   return {
     to: lead.email,
     subject: t(
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.initial.subject",
+      "emailJourneys.leads.journeys.uncensoredConvert.initial.subject",
     ),
     jsx: emailContent,
   };
@@ -105,64 +92,55 @@ export const uncensoredConvertInitialEmail: EmailTemplateFunction = ({
  */
 export const uncensoredConvertFollowup1Email: EmailTemplateFunction = ({
   data,
-  t,
   locale,
   tracking,
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
-
+  const t = scopedTranslation.scopedT(locale).t;
+  const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
       previewText={t(
-        "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup1.previewText",
+        "emailJourneys.leads.journeys.uncensoredConvert.followup1.previewText",
       )}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
-      t={t}
       tracking={tracking}
     >
       <HumanText variant="greeting">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup1.greeting",
-        )}
+        {t("emailJourneys.leads.journeys.uncensoredConvert.followup1.greeting")}
+      </HumanText>
+
+      <HumanText variant="body">
+        {t("emailJourneys.leads.journeys.uncensoredConvert.followup1.recap")}
+      </HumanText>
+
+      <HumanText variant="body">
+        {t("emailJourneys.leads.journeys.uncensoredConvert.followup1.useCases")}
       </HumanText>
 
       <HumanText variant="body">
         {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup1.recap",
-        )}
-      </HumanText>
-
-      <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup1.useCases",
-        )}
-      </HumanText>
-
-      <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup1.differentFromOthers",
+          "emailJourneys.leads.journeys.uncensoredConvert.followup1.differentFromOthers",
         )}
       </HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
-        text={t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup1.ctaText",
-        )}
+        text={globalT("config.appName")}
         variant="primary"
         tracking={tracking}
       />
 
       <HumanText variant="signature">
         {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup1.signature",
+          "emailJourneys.leads.journeys.uncensoredConvert.followup1.signature",
         )}
       </HumanText>
 
       <HumanText variant="ps">
         {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup1.postScript",
+          "emailJourneys.leads.journeys.uncensoredConvert.followup1.postScript",
         )}
       </HumanText>
     </CampaignEmailLayout>
@@ -171,7 +149,7 @@ export const uncensoredConvertFollowup1Email: EmailTemplateFunction = ({
   return {
     to: lead.email,
     subject: t(
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup1.subject",
+      "emailJourneys.leads.journeys.uncensoredConvert.followup1.subject",
     ),
     jsx: emailContent,
   };
@@ -182,58 +160,52 @@ export const uncensoredConvertFollowup1Email: EmailTemplateFunction = ({
  */
 export const uncensoredConvertFollowup2Email: EmailTemplateFunction = ({
   data,
-  t,
   locale,
   tracking,
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
+  const t = scopedTranslation.scopedT(locale).t;
+  const { t: globalT } = simpleT(locale);
 
   const emailContent = (
     <CampaignEmailLayout
       previewText={t(
-        "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup2.previewText",
+        "emailJourneys.leads.journeys.uncensoredConvert.followup2.previewText",
       )}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
-      t={t}
       tracking={tracking}
     >
       <HumanText variant="greeting">
+        {t("emailJourneys.leads.journeys.uncensoredConvert.followup2.greeting")}
+      </HumanText>
+
+      <HumanText variant="body">
         {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup2.greeting",
+          "emailJourneys.leads.journeys.uncensoredConvert.followup2.specificExample",
         )}
       </HumanText>
 
       <HumanText variant="body">
         {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup2.specificExample",
+          "emailJourneys.leads.journeys.uncensoredConvert.followup2.comparison",
         )}
       </HumanText>
 
       <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup2.comparison",
-        )}
-      </HumanText>
-
-      <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup2.nudge",
-        )}
+        {t("emailJourneys.leads.journeys.uncensoredConvert.followup2.nudge")}
       </HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
-        text={t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup2.ctaText",
-        )}
+        text={globalT("config.appName")}
         variant="primary"
         tracking={tracking}
       />
 
       <HumanText variant="signature">
         {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup2.signature",
+          "emailJourneys.leads.journeys.uncensoredConvert.followup2.signature",
         )}
       </HumanText>
     </CampaignEmailLayout>
@@ -242,7 +214,7 @@ export const uncensoredConvertFollowup2Email: EmailTemplateFunction = ({
   return {
     to: lead.email,
     subject: t(
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup2.subject",
+      "emailJourneys.leads.journeys.uncensoredConvert.followup2.subject",
     ),
     jsx: emailContent,
   };
@@ -253,52 +225,46 @@ export const uncensoredConvertFollowup2Email: EmailTemplateFunction = ({
  */
 export const uncensoredConvertFollowup3Email: EmailTemplateFunction = ({
   data,
-  t,
   locale,
   tracking,
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
+  const t = scopedTranslation.scopedT(locale).t;
+  const { t: globalT } = simpleT(locale);
 
   const emailContent = (
     <CampaignEmailLayout
       previewText={t(
-        "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup3.previewText",
+        "emailJourneys.leads.journeys.uncensoredConvert.followup3.previewText",
       )}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
-      t={t}
       tracking={tracking}
     >
       <HumanText variant="greeting">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup3.greeting",
-        )}
+        {t("emailJourneys.leads.journeys.uncensoredConvert.followup3.greeting")}
       </HumanText>
 
       <HumanText variant="body">
         {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup3.lastPitch",
+          "emailJourneys.leads.journeys.uncensoredConvert.followup3.lastPitch",
         )}
       </HumanText>
 
       <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup3.honesty",
-        )}
+        {t("emailJourneys.leads.journeys.uncensoredConvert.followup3.honesty")}
       </HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
-        text={t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup3.ctaText",
-        )}
+        text={globalT("config.appName")}
         variant="secondary"
         tracking={tracking}
       />
 
       <HumanText variant="signature">
         {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup3.signature",
+          "emailJourneys.leads.journeys.uncensoredConvert.followup3.signature",
         )}
       </HumanText>
     </CampaignEmailLayout>
@@ -307,7 +273,7 @@ export const uncensoredConvertFollowup3Email: EmailTemplateFunction = ({
   return {
     to: lead.email,
     subject: t(
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.followup3.subject",
+      "emailJourneys.leads.journeys.uncensoredConvert.followup3.subject",
     ),
     jsx: emailContent,
   };
@@ -318,53 +284,45 @@ export const uncensoredConvertFollowup3Email: EmailTemplateFunction = ({
  */
 export const uncensoredConvertNurtureEmail: EmailTemplateFunction = ({
   data,
-  t,
   locale,
   tracking,
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
+  const t = scopedTranslation.scopedT(locale).t;
+  const { t: globalT } = simpleT(locale);
 
   const emailContent = (
     <CampaignEmailLayout
       previewText={t(
-        "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.nurture.previewText",
+        "emailJourneys.leads.journeys.uncensoredConvert.nurture.previewText",
       )}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
-      t={t}
       tracking={tracking}
     >
       <HumanText variant="greeting">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.nurture.greeting",
-        )}
+        {t("emailJourneys.leads.journeys.uncensoredConvert.nurture.greeting")}
+      </HumanText>
+
+      <HumanText variant="body">
+        {t("emailJourneys.leads.journeys.uncensoredConvert.nurture.newFeature")}
       </HumanText>
 
       <HumanText variant="body">
         {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.nurture.newFeature",
-        )}
-      </HumanText>
-
-      <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.nurture.stillRelevant",
+          "emailJourneys.leads.journeys.uncensoredConvert.nurture.stillRelevant",
         )}
       </HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
-        text={t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.nurture.ctaText",
-        )}
+        text={globalT("config.appName")}
         variant="secondary"
         tracking={tracking}
       />
 
       <HumanText variant="signature">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.nurture.signature",
-        )}
+        {t("emailJourneys.leads.journeys.uncensoredConvert.nurture.signature")}
       </HumanText>
     </CampaignEmailLayout>
   );
@@ -372,7 +330,7 @@ export const uncensoredConvertNurtureEmail: EmailTemplateFunction = ({
   return {
     to: lead.email,
     subject: t(
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.nurture.subject",
+      "emailJourneys.leads.journeys.uncensoredConvert.nurture.subject",
     ),
     jsx: emailContent,
   };
@@ -383,52 +341,50 @@ export const uncensoredConvertNurtureEmail: EmailTemplateFunction = ({
  */
 export const uncensoredConvertReactivationEmail: EmailTemplateFunction = ({
   data,
-  t,
   locale,
   tracking,
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
+  const t = scopedTranslation.scopedT(locale).t;
+  const { t: globalT } = simpleT(locale);
 
   const emailContent = (
     <CampaignEmailLayout
       previewText={t(
-        "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.reactivation.previewText",
+        "emailJourneys.leads.journeys.uncensoredConvert.reactivation.previewText",
       )}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
-      t={t}
       tracking={tracking}
     >
       <HumanText variant="greeting">
         {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.reactivation.greeting",
+          "emailJourneys.leads.journeys.uncensoredConvert.reactivation.greeting",
         )}
       </HumanText>
 
       <HumanText variant="body">
         {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.reactivation.checkIn",
+          "emailJourneys.leads.journeys.uncensoredConvert.reactivation.checkIn",
         )}
       </HumanText>
 
       <HumanText variant="body">
         {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.reactivation.update",
+          "emailJourneys.leads.journeys.uncensoredConvert.reactivation.update",
         )}
       </HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
-        text={t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.reactivation.ctaText",
-        )}
+        text={globalT("config.appName")}
         variant="primary"
         tracking={tracking}
       />
 
       <HumanText variant="signature">
         {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.reactivation.signature",
+          "emailJourneys.leads.journeys.uncensoredConvert.reactivation.signature",
         )}
       </HumanText>
     </CampaignEmailLayout>
@@ -437,7 +393,7 @@ export const uncensoredConvertReactivationEmail: EmailTemplateFunction = ({
   return {
     to: lead.email,
     subject: t(
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.uncensoredConvert.reactivation.subject",
+      "emailJourneys.leads.journeys.uncensoredConvert.reactivation.subject",
     ),
     jsx: emailContent,
   };

@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: handleDialogEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger }) =>
+    handler: ({ data, t, logger }) =>
       executeMCPTool(
         {
           toolName: "handle-dialog",
@@ -21,6 +21,7 @@ export const { POST, tools } = endpointsHandler({
             promptText: data.promptText,
           }),
         },
+        t,
         logger,
       ),
   },

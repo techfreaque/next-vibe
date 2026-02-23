@@ -9,10 +9,10 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   backButton,
   customWidgetObject,
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -38,6 +38,7 @@ import {
   LeadStatusOptions,
 } from "../enum";
 import type { CsvImportJobStatus } from "./enum";
+import { scopedTranslation } from "./i18n";
 import { LeadsImportContainer } from "./widget";
 
 /**
@@ -45,16 +46,13 @@ import { LeadsImportContainer } from "./widget";
  * Imports leads from CSV file upload
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["leads", "import"],
-  title: "app.api.leads.import.post.title" as const,
-  description: "app.api.leads.import.post.description" as const,
-  category: "app.api.leads.category" as const,
-  tags: [
-    "app.api.leads.tags.import" as const,
-    "app.api.leads.tags.csv" as const,
-    "app.api.leads.tags.leads" as const,
-  ],
+  title: "post.title",
+  description: "post.description",
+  category: "category",
+  tags: ["tags.import", "tags.csv", "tags.leads"],
   allowedRoles: [UserRole.ADMIN] as const,
   icon: "arrow-up",
   aliases: ["leads-import", "import-leads"] as const,
@@ -69,224 +67,206 @@ const { POST } = createEndpoint({
     children: {
       backButton: backButton({ usage: { response: true } }),
       // === REQUEST FIELDS ===
-      file: requestField({
+      file: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.FILE,
-        label: "app.api.leads.import.post.file.label" as const,
-        description: "app.api.leads.import.post.file.description" as const,
-        helpText: "app.api.leads.import.post.file.helpText" as const,
+        label: "post.file.label",
+        description: "post.file.description",
+        helpText: "post.file.helpText",
         accept: ".csv,text/csv",
         columns: 12,
         schema: z.string().min(1),
       }),
-      fileName: requestField({
+      fileName: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.leads.import.post.fileName.label" as const,
-        description: "app.api.leads.import.post.fileName.description" as const,
-        placeholder: "app.api.leads.import.post.fileName.placeholder" as const,
-        helpText: "app.api.leads.import.post.fileName.helpText" as const,
+        label: "post.fileName.label",
+        description: "post.fileName.description",
+        placeholder: "post.fileName.placeholder",
+        helpText: "post.fileName.helpText",
         columns: 12,
         schema: z.string().optional(),
       }),
-      skipDuplicates: requestField({
+      skipDuplicates: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.import.post.skipDuplicates.label" as const,
-        description:
-          "app.api.leads.import.post.skipDuplicates.description" as const,
-        helpText: "app.api.leads.import.post.skipDuplicates.helpText" as const,
+        label: "post.skipDuplicates.label",
+        description: "post.skipDuplicates.description",
+        helpText: "post.skipDuplicates.helpText",
         columns: 6,
         schema: z.boolean().default(true),
       }),
-      updateExisting: requestField({
+      updateExisting: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.import.post.updateExisting.label" as const,
-        description:
-          "app.api.leads.import.post.updateExisting.description" as const,
-        helpText: "app.api.leads.import.post.updateExisting.helpText" as const,
+        label: "post.updateExisting.label",
+        description: "post.updateExisting.description",
+        helpText: "post.updateExisting.helpText",
         columns: 6,
         schema: z.boolean().default(false),
       }),
-      defaultCountry: requestField({
+      defaultCountry: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.import.post.defaultCountry.label" as const,
-        description:
-          "app.api.leads.import.post.defaultCountry.description" as const,
-        helpText: "app.api.leads.import.post.defaultCountry.helpText" as const,
+        label: "post.defaultCountry.label",
+        description: "post.defaultCountry.description",
+        helpText: "post.defaultCountry.helpText",
         columns: 6,
         options: CountriesOptions,
         schema: z.enum(Countries),
       }),
-      defaultLanguage: requestField({
+      defaultLanguage: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.import.post.defaultLanguage.label" as const,
-        description:
-          "app.api.leads.import.post.defaultLanguage.description" as const,
-        helpText: "app.api.leads.import.post.defaultLanguage.helpText" as const,
+        label: "post.defaultLanguage.label",
+        description: "post.defaultLanguage.description",
+        helpText: "post.defaultLanguage.helpText",
         columns: 6,
         options: LanguagesOptions,
         schema: z.enum(Languages),
       }),
-      defaultStatus: requestField({
+      defaultStatus: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.import.post.defaultStatus.label" as const,
-        description:
-          "app.api.leads.import.post.defaultStatus.description" as const,
-        helpText: "app.api.leads.import.post.defaultStatus.helpText" as const,
+        label: "post.defaultStatus.label",
+        description: "post.defaultStatus.description",
+        helpText: "post.defaultStatus.helpText",
         columns: 6,
         options: LeadStatusOptions,
         schema: z.enum(LeadStatus).default(LeadStatus.NEW),
       }),
-      defaultCampaignStage: requestField({
+      defaultCampaignStage: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.import.post.defaultCampaignStage.label" as const,
-        description:
-          "app.api.leads.import.post.defaultCampaignStage.description" as const,
-        helpText:
-          "app.api.leads.import.post.defaultCampaignStage.helpText" as const,
+        label: "post.defaultCampaignStage.label",
+        description: "post.defaultCampaignStage.description",
+        helpText: "post.defaultCampaignStage.helpText",
         columns: 6,
         options: EmailCampaignStageOptions,
         schema: z
           .enum(EmailCampaignStage)
           .default(EmailCampaignStage.NOT_STARTED),
       }),
-      defaultSource: requestField({
+      defaultSource: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.import.post.defaultSource.label" as const,
-        description:
-          "app.api.leads.import.post.defaultSource.description" as const,
-        helpText: "app.api.leads.import.post.defaultSource.helpText" as const,
+        label: "post.defaultSource.label",
+        description: "post.defaultSource.description",
+        helpText: "post.defaultSource.helpText",
         columns: 6,
         options: LeadSourceOptions,
         schema: z.enum(LeadSource).default(LeadSource.CSV_IMPORT),
       }),
-      useChunkedProcessing: requestField({
+      useChunkedProcessing: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.import.post.useChunkedProcessing.label" as const,
-        description:
-          "app.api.leads.import.post.useChunkedProcessing.description" as const,
-        helpText:
-          "app.api.leads.import.post.useChunkedProcessing.helpText" as const,
+        label: "post.useChunkedProcessing.label",
+        description: "post.useChunkedProcessing.description",
+        helpText: "post.useChunkedProcessing.helpText",
         columns: 6,
         schema: z.boolean().default(true),
       }),
-      batchSize: requestField({
+      batchSize: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.leads.import.post.batchSize.label" as const,
-        description: "app.api.leads.import.post.batchSize.description" as const,
-        helpText: "app.api.leads.import.post.batchSize.helpText" as const,
+        label: "post.batchSize.label",
+        description: "post.batchSize.description",
+        helpText: "post.batchSize.helpText",
         columns: 6,
         schema: z.coerce.number().min(10).max(2000).default(2000),
       }),
 
       // === RESPONSE FIELDS ===
-      batchId: responseField({
+      batchId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.import.post.response.batchId" as const,
+        content: "post.response.batchId",
         schema: z.uuid(),
       }),
-      totalRows: responseField({
+      totalRows: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.import.post.response.totalRows" as const,
+        content: "post.response.totalRows",
         schema: z.coerce.number(),
       }),
-      successfulImports: responseField({
+      successfulImports: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.import.post.response.successfulImports" as const,
+        content: "post.response.successfulImports",
         schema: z.coerce.number(),
       }),
-      failedImports: responseField({
+      failedImports: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.import.post.response.failedImports" as const,
+        content: "post.response.failedImports",
         schema: z.coerce.number(),
       }),
-      duplicateEmails: responseField({
+      duplicateEmails: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.import.post.response.duplicateEmails" as const,
+        content: "post.response.duplicateEmails",
         schema: z.coerce.number(),
       }),
-      errors: responseArrayField(
-        {
+      errors: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "post.response.errors",
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-          title: "app.api.leads.import.post.response.errors" as const,
-        },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.GRID,
-            columns: 3,
-          },
-          { response: true },
-          {
-            row: responseField({
+          layoutType: LayoutType.GRID,
+          columns: 3,
+          usage: { response: true },
+          children: {
+            row: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.leads.import.post.response.errors" as const,
+              content: "post.response.errors",
               fieldType: FieldDataType.NUMBER,
               schema: z.coerce.number(),
             }),
-            email: responseField({
+            email: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.leads.import.post.response.errors" as const,
+              content: "post.response.errors",
               fieldType: FieldDataType.TEXT,
               schema: z.string().optional(),
             }),
-            error: responseField({
+            error: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.leads.import.post.response.errors" as const,
+              content: "post.response.errors",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
           },
-        ),
-      ),
-      summary: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.leads.import.post.response.summary" as const,
-          layoutType: LayoutType.GRID,
-          columns: 3,
-        },
-        { response: true },
-        {
-          newLeads: responseField({
+        }),
+      }),
+      summary: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "post.response.summary",
+        layoutType: LayoutType.GRID,
+        columns: 3,
+        usage: { response: true },
+        children: {
+          newLeads: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.leads.import.post.response.summary" as const,
+            content: "post.response.summary",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number(),
           }),
-          updatedLeads: responseField({
+          updatedLeads: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.leads.import.post.response.summary" as const,
+            content: "post.response.summary",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number(),
           }),
-          skippedDuplicates: responseField({
+          skippedDuplicates: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.leads.import.post.response.summary" as const,
+            content: "post.response.summary",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number(),
           }),
         },
-      ),
-      isChunkedProcessing: responseField({
+      }),
+      isChunkedProcessing: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.import.post.response.isChunkedProcessing" as const,
+        content: "post.response.isChunkedProcessing",
         schema: z.boolean().default(false),
       }),
-      jobId: responseField({
+      jobId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.import.post.response.jobId" as const,
+        content: "post.response.jobId",
         schema: z.uuid().optional(),
       }),
     },
@@ -294,62 +274,53 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.leads.import.post.errors.validation.title" as const,
-      description:
-        "app.api.leads.import.post.errors.validation.description" as const,
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.leads.import.post.errors.unauthorized.title" as const,
-      description:
-        "app.api.leads.import.post.errors.unauthorized.description" as const,
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.leads.import.post.errors.forbidden.title" as const,
-      description:
-        "app.api.leads.import.post.errors.forbidden.description" as const,
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.leads.import.post.errors.notFound.title" as const,
-      description:
-        "app.api.leads.import.post.errors.notFound.description" as const,
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.leads.import.post.errors.conflict.title" as const,
-      description:
-        "app.api.leads.import.post.errors.conflict.description" as const,
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.leads.import.post.errors.server.title" as const,
-      description:
-        "app.api.leads.import.post.errors.server.description" as const,
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.leads.import.post.errors.unknown.title" as const,
-      description:
-        "app.api.leads.import.post.errors.unknown.description" as const,
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.leads.import.post.errors.network.title" as const,
-      description:
-        "app.api.leads.import.post.errors.network.description" as const,
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.leads.import.post.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.leads.import.post.errors.unsavedChanges.description" as const,
+      title: "post.errors.unsavedChanges.title",
+      description: "post.errors.unsavedChanges.description",
     },
   },
 
   successTypes: {
-    title: "app.api.leads.import.post.success.title" as const,
-    description: "app.api.leads.import.post.success.description" as const,
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   examples: {
     requests: {
       default: {
         file: "ZW1haWwsYnVzaW5lc3NfbmFtZSxjb250YWN0X25hbWUK...",
-        fileName: "app.api.leads.csv",
+        fileName: "csv",
         skipDuplicates: true,
         updateExisting: false,
         defaultCountry: "GLOBAL",
@@ -362,7 +333,7 @@ const { POST } = createEndpoint({
       },
       minimal: {
         file: "ZW1haWwsYnVzaW5lc3NfbmFtZSxjb250YWN0X25hbWUK...",
-        fileName: "app.api.leads.csv",
+        fileName: "csv",
         defaultCountry: "GLOBAL",
         defaultLanguage: "en",
       },

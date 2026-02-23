@@ -17,6 +17,9 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { TestRequestOutput, TestResponseOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Run tests Repository Interface
@@ -25,6 +28,7 @@ interface TestRepositoryInterface {
   execute(
     data: TestRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ApiResponseType<TestResponseOutput>>;
 }
 
@@ -35,6 +39,7 @@ class TestRepositoryImpl implements TestRepositoryInterface {
   async execute(
     data: TestRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ApiResponseType<TestResponseOutput>> {
     logger.info("system.check.testing.test.execute.start");
     const startTime = Date.now();
@@ -99,7 +104,7 @@ class TestRepositoryImpl implements TestRepositoryInterface {
       );
 
       return fail({
-        message: "app.api.system.check.testing.test.errors.internal.title",
+        message: t("errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,

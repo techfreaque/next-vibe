@@ -14,8 +14,8 @@ import { VibeCheckRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: vibeCheckEndpoints,
   [Methods.POST]: {
-    handler: ({ data, logger, platform }) => {
-      return VibeCheckRepository.execute(data, logger, platform);
+    handler: ({ data, logger, platform, t, locale }) => {
+      return VibeCheckRepository.execute(data, logger, platform, t, locale);
     },
   },
 });

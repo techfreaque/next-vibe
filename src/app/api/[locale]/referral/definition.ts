@@ -10,12 +10,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
+  scopedWidgetField,
+  scopedWidgetObjectField,
   submitButton,
-  widgetField,
-  widgetObjectField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -28,14 +28,16 @@ import {
 import { success } from "../shared/types/response.schema";
 import { UserRole } from "../user/user-roles/enum";
 import type { CodesListGetResponseOutput } from "./codes/list/definition";
+import { scopedTranslation } from "./i18n";
 
 export const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["referral"],
-  title: "app.api.referral.post.title",
-  description: "app.api.referral.post.description",
-  category: "app.api.payment.category",
-  tags: ["app.api.referral.tags.referral", "app.api.referral.tags.create"],
+  title: "post.title",
+  description: "post.description",
+  category: "category",
+  tags: ["tags.referral", "tags.create"],
   icon: "share",
   allowedRoles: [
     UserRole.CUSTOMER,
@@ -81,44 +83,40 @@ export const { POST } = createEndpoint({
     },
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      noCard: true,
-      layoutType: LayoutType.STACKED,
-      className: "flex flex-col gap-4",
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    noCard: true,
+    layoutType: LayoutType.STACKED,
+    className: "flex flex-col gap-4",
+    usage: { request: "data", response: true },
+    children: {
       // Fields grid
-      fieldsGrid: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          noCard: true,
-          layoutType: LayoutType.GRID,
-          innerClassName: "grid-cols-1 md:grid-cols-2",
-          gap: "4",
-        },
-        { request: "data" },
-        {
-          code: requestField({
+      fieldsGrid: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        noCard: true,
+        layoutType: LayoutType.GRID,
+        innerClassName: "grid-cols-1 md:grid-cols-2",
+        gap: "4",
+        usage: { request: "data" },
+        children: {
+          code: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
-            label: "app.api.referral.form.fields.code.label",
-            description: "app.api.referral.form.fields.code.description",
-            placeholder: "app.api.referral.form.fields.code.placeholder",
+            label: "form.fields.code.label",
+            description: "form.fields.code.description",
+            placeholder: "form.fields.code.placeholder",
             schema: z.string().min(3).max(50),
             theme: {
               style: "none",
               showAllRequired: false,
             },
           }),
-          label: requestField({
+          label: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
-            label: "app.api.referral.form.fields.label.label",
-            description: "app.api.referral.form.fields.label.description",
-            placeholder: "app.api.referral.form.fields.label.placeholder",
+            label: "form.fields.label.label",
+            description: "form.fields.label.description",
+            placeholder: "form.fields.label.placeholder",
             schema: z.string().optional(),
             theme: {
               style: "none",
@@ -126,82 +124,80 @@ export const { POST } = createEndpoint({
             },
           }),
         },
-      ),
+      }),
 
       // Form alert for validation and API errors
-      formAlert: widgetField({
+      formAlert: scopedWidgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
         usage: { request: "data" },
       }),
       // Success message
-      successMessage: responseField({
+      successMessage: scopedResponseField(scopedTranslation, {
         type: WidgetType.ALERT,
         schema: z.string(),
         usage: { response: true },
       }),
 
       // Submit button row
-      submitRow: widgetObjectField(
-        {
-          type: WidgetType.CONTAINER,
-          noCard: true,
-          layoutType: LayoutType.INLINE,
-          className: "flex justify-end",
-        },
-        { request: "data" },
-        {
+      submitRow: scopedWidgetObjectField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        noCard: true,
+        layoutType: LayoutType.INLINE,
+        className: "flex justify-end",
+        usage: { request: "data" },
+        children: {
           submit: submitButton({
             label: "app.user.referral.createCode.create",
             loadingText: "app.user.referral.createCode.creating",
             usage: { request: "data" },
           }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.referral.errors.validation.title",
-      description: "app.api.referral.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.referral.errors.notFound.title",
-      description: "app.api.referral.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.referral.errors.unauthorized.title",
-      description: "app.api.referral.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.referral.errors.forbidden.title",
-      description: "app.api.referral.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.referral.errors.serverError.title",
-      description: "app.api.referral.errors.serverError.description",
+      title: "errors.serverError.title",
+      description: "errors.serverError.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.referral.errors.network.title",
-      description: "app.api.referral.errors.network.description",
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.referral.errors.unknown.title",
-      description: "app.api.referral.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.referral.errors.unsavedChanges.title",
-      description: "app.api.referral.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.referral.errors.conflict.title",
-      description: "app.api.referral.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.referral.success.title",
-    description: "app.api.referral.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 
   examples: {
@@ -220,7 +216,7 @@ export const { POST } = createEndpoint({
     },
     responses: {
       default: {
-        successMessage: "app.api.referral.response.success",
+        successMessage: "response.success",
       },
     },
   },

@@ -19,10 +19,15 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation as dockerOperationsScopedTranslation } from "../../db/utils/docker-operations/i18n";
+import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
 import type {
   ServerStartRequestOutput,
   ServerStartResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /** Extract port number from a URL string, returns undefined if not parseable */
 function portFromUrl(url: string | undefined): number | undefined {
@@ -46,6 +51,7 @@ export interface ServerStartRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<ServerStartResponseOutput>>;
 }
 
@@ -98,8 +104,11 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           // Dynamic import: must happen AFTER DATABASE_URL is set
           const { dbUtilsRepository } =
             await import("../../db/utils/repository");
-          const dockerCheckResult =
-            await dbUtilsRepository.isDockerAvailable(logger);
+          const { t: dbUtilsT } = dbUtilsScopedTranslation.scopedT(locale);
+          const dockerCheckResult = await dbUtilsRepository.isDockerAvailable(
+            dbUtilsT,
+            logger,
+          );
 
           if (dockerCheckResult.success && dockerCheckResult.data) {
             output.push(
@@ -108,10 +117,12 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
             const { dockerOperationsRepository } =
               await import("../../db/utils/docker-operations/repository");
+            const { t: dockerOpsT } =
+              dockerOperationsScopedTranslation.scopedT(locale);
             const dbStartResult =
               await dockerOperationsRepository.dockerComposeUp(
                 logger,
-                locale,
+                dockerOpsT,
                 "docker-compose.preview.yml",
                 60000,
                 "vibe-preview",

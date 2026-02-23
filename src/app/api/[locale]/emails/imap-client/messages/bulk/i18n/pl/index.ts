@@ -1,4 +1,5 @@
 export const translations = {
+  category: "IMAP Management",
   tag: "Działania masowe",
   post: {
     title: "Masowa aktualizacja wiadomości",

@@ -1,5 +1,6 @@
 import { translations as aiStreamTranslations } from "../../ai-stream/i18n/pl";
 import { translations as chatTranslations } from "../../chat/i18n/pl";
+import { translations as openrouterTranslations } from "../../models/openrouter/i18n/pl";
 import { translations as searchTranslations } from "../../search/i18n/pl";
 import { translations as speechToTextTranslations } from "../../speech-to-text/i18n/pl";
 import { translations as textToSpeechTranslations } from "../../text-to-speech/i18n/pl";
@@ -125,9 +126,38 @@ export const translations: typeof enTranslations = {
       approve: "Zatwierdź",
       reject: "Odrzuć",
     },
+    modelUtilities: {
+      chat: "Czat",
+      coding: "Programowanie",
+      creative: "Pisanie Kreatywne",
+      analysis: "Analiza",
+      reasoning: "Rozumowanie",
+      roleplay: "Odgrywanie Ról",
+      fast: "Szybki",
+      smart: "Inteligentny",
+      vision: "Wizja",
+      imageGen: "Generowanie Obrazów",
+      politicalLeft: "Lewica Polityczna",
+      politicalRight: "Prawica Polityczna",
+      controversial: "Kontrowersyjny",
+      adultImplied: "Dorosłe (Sugerowane)",
+      adultExplicit: "Dorosłe (Jawne)",
+      violence: "Przemoc",
+      harmful: "Szkodliwe Treści",
+      illegalInfo: "Nielegalne Informacje",
+      medicalAdvice: "Porady Medyczne",
+      offensiveLanguage: "Obraźliwy Język",
+      roleplayDark: "Ciemne Odgrywanie Ról",
+      conspiracy: "Spiskowanie",
+      legacy: "Przestarzały",
+      uncensored: "Bez Cenzury",
+    },
   },
   aiStream: aiStreamTranslations,
   chat: chatTranslations,
+  models: {
+    openrouter: openrouterTranslations,
+  },
   search: searchTranslations,
   speechToText: speechToTextTranslations,
   textToSpeech: textToSpeechTranslations,

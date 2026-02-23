@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,14 +20,16 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../../user/user-roles/enum";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "check", "config", "create"],
-  title: "app.api.system.check.config.create.title",
-  description: "app.api.system.check.config.create.description",
-  category: "app.api.system.category",
-  tags: ["app.api.system.check.vibeCheck.tag"],
+  title: "title",
+  description: "description",
+  category: "category",
+  tags: ["tag"],
   icon: "wrench",
   allowedRoles: [
     UserRole.ADMIN,
@@ -38,198 +40,167 @@ const { POST } = createEndpoint({
   ],
   aliases: ["config-create", "create-config", "cc"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.check.config.create.title",
-      description: "app.api.system.check.config.create.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "title",
+    description: "description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      createMcpConfig: requestField({
+      createMcpConfig: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.check.config.create.fields.createMcpConfig.label",
-        description:
-          "app.api.system.check.config.create.fields.createMcpConfig.description",
+        label: "fields.createMcpConfig.label",
+        description: "fields.createMcpConfig.description",
         columns: 6,
         schema: z.boolean().optional(),
       }),
 
-      updateVscodeSettings: requestField({
+      updateVscodeSettings: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.check.config.create.fields.updateVscodeSettings.label",
-        description:
-          "app.api.system.check.config.create.fields.updateVscodeSettings.description",
+        label: "fields.updateVscodeSettings.label",
+        description: "fields.updateVscodeSettings.description",
         columns: 6,
         schema: z.boolean().optional(),
       }),
 
-      updatePackageJson: requestField({
+      updatePackageJson: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.check.config.create.fields.updatePackageJson.label",
-        description:
-          "app.api.system.check.config.create.fields.updatePackageJson.description",
+        label: "fields.updatePackageJson.label",
+        description: "fields.updatePackageJson.description",
         columns: 6,
         schema: z.boolean().optional().default(true),
       }),
 
-      enableEslint: requestField({
+      enableEslint: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.check.config.create.fields.enableEslint.label",
-        description:
-          "app.api.system.check.config.create.fields.enableEslint.description",
+        label: "fields.enableEslint.label",
+        description: "fields.enableEslint.description",
         columns: 6,
         schema: z.boolean().optional(),
       }),
 
-      enableReactRules: requestField({
+      enableReactRules: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.check.config.create.fields.enableReactRules.label",
-        description:
-          "app.api.system.check.config.create.fields.enableReactRules.description",
+        label: "fields.enableReactRules.label",
+        description: "fields.enableReactRules.description",
         columns: 4,
         schema: z.boolean().optional(),
       }),
 
-      enableNextjsRules: requestField({
+      enableNextjsRules: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.check.config.create.fields.enableNextjsRules.label",
-        description:
-          "app.api.system.check.config.create.fields.enableNextjsRules.description",
+        label: "fields.enableNextjsRules.label",
+        description: "fields.enableNextjsRules.description",
         columns: 4,
         schema: z.boolean().optional(),
       }),
 
-      enableI18nRules: requestField({
+      enableI18nRules: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.check.config.create.fields.enableI18nRules.label",
-        description:
-          "app.api.system.check.config.create.fields.enableI18nRules.description",
+        label: "fields.enableI18nRules.label",
+        description: "fields.enableI18nRules.description",
         columns: 4,
         schema: z.boolean().optional(),
       }),
 
-      jsxCapitalization: requestField({
+      jsxCapitalization: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.check.config.create.fields.jsxCapitalization.label",
-        description:
-          "app.api.system.check.config.create.fields.jsxCapitalization.description",
+        label: "fields.jsxCapitalization.label",
+        description: "fields.jsxCapitalization.description",
         columns: 4,
         schema: z.boolean().optional(),
       }),
 
-      enablePedanticRules: requestField({
+      enablePedanticRules: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.check.config.create.fields.enablePedanticRules.label",
-        description:
-          "app.api.system.check.config.create.fields.enablePedanticRules.description",
+        label: "fields.enablePedanticRules.label",
+        description: "fields.enablePedanticRules.description",
         columns: 4,
         schema: z.boolean().optional(),
       }),
 
-      enableRestrictedSyntax: requestField({
+      enableRestrictedSyntax: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.check.config.create.fields.enableRestrictedSyntax.label",
-        description:
-          "app.api.system.check.config.create.fields.enableRestrictedSyntax.description",
+        label: "fields.enableRestrictedSyntax.label",
+        description: "fields.enableRestrictedSyntax.description",
         columns: 4,
         schema: z.boolean().optional(),
       }),
 
-      interactive: requestField({
+      interactive: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.check.config.create.fields.interactive.label",
-        description:
-          "app.api.system.check.config.create.fields.interactive.description",
+        label: "fields.interactive.label",
+        description: "fields.interactive.description",
         columns: 6,
         schema: z.boolean().optional().default(true),
       }),
 
       // === RESPONSE FIELDS ===
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.check.config.create.response.message",
+        content: "response.message",
         schema: z.string(),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.check.config.create.errors.validation.title",
-      description:
-        "app.api.system.check.config.create.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.check.config.create.errors.internal.title",
-      description:
-        "app.api.system.check.config.create.errors.internal.description",
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.check.config.create.errors.validation.title",
-      description:
-        "app.api.system.check.config.create.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.check.config.create.errors.validation.title",
-      description:
-        "app.api.system.check.config.create.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.check.config.create.errors.validation.title",
-      description:
-        "app.api.system.check.config.create.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.check.config.create.errors.internal.title",
-      description:
-        "app.api.system.check.config.create.errors.internal.description",
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.check.config.create.errors.internal.title",
-      description:
-        "app.api.system.check.config.create.errors.internal.description",
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.check.config.create.errors.conflict.title",
-      description:
-        "app.api.system.check.config.create.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.check.config.create.errors.conflict.title",
-      description:
-        "app.api.system.check.config.create.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.system.check.config.create.success.title",
-    description: "app.api.system.check.config.create.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 
   // === EXAMPLES ===

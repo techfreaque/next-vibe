@@ -59,6 +59,11 @@ export const translations = {
         title: "Tool Executed",
         description: "The tool was executed successfully",
       },
+      widget: {
+        enterToolName: "Enter a tool name to load its form.",
+        resolving: "Resolving endpoint…",
+        unknownTool: "Unknown tool: {{toolName}}",
+      },
     },
   },
   tools: {

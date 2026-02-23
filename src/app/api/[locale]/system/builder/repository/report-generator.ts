@@ -6,7 +6,9 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
-import type { TFunction } from "@/i18n/core/static-types";
+import type { scopedTranslation } from "../i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 import type { BuildProfile, BuildReport, BuildStepResult } from "../definition";
 import { ROOT_DIR } from "./constants";
@@ -20,11 +22,7 @@ export interface IReportGenerator {
   /**
    * Generate a JSON build report
    */
-  generate(
-    report: BuildReport,
-    output: string[],
-    t: TFunction,
-  ): Promise<string>;
+  generate(report: BuildReport, output: string[], t: ModuleT): Promise<string>;
 
   /**
    * Append build summary to output
@@ -35,7 +33,7 @@ export interface IReportGenerator {
     totalDuration: number,
     filesBuilt: string[],
     filesCopied: string[],
-    t: TFunction,
+    t: ModuleT,
     profile: BuildProfile,
   ): void;
 }
@@ -48,13 +46,9 @@ export class ReportGenerator implements IReportGenerator {
   async generate(
     report: BuildReport,
     output: string[],
-    t: TFunction,
+    t: ModuleT,
   ): Promise<string> {
-    output.push(
-      outputFormatter.formatStep(
-        t("app.api.system.builder.messages.generatingReport"),
-      ),
-    );
+    output.push(outputFormatter.formatStep(t("messages.generatingReport")));
 
     const reportPath = resolve(ROOT_DIR, "dist", "build-report.json");
     const reportDir = dirname(reportPath);
@@ -68,7 +62,7 @@ export class ReportGenerator implements IReportGenerator {
     const relativePath = "dist/build-report.json";
     output.push(
       outputFormatter.formatSuccess(
-        t("app.api.system.builder.messages.reportGenerated", {
+        t("messages.reportGenerated", {
           path: relativePath,
         }),
       ),
@@ -83,26 +77,20 @@ export class ReportGenerator implements IReportGenerator {
     totalDuration: number,
     filesBuilt: string[],
     filesCopied: string[],
-    t: TFunction,
+    t: ModuleT,
     profile: BuildProfile,
   ): void {
     output.push(`\n${"─".repeat(60)}`);
+    output.push(`📊 ${t("messages.buildSummary")} [${profile.toUpperCase()}]`);
+    output.push(`  ⏱  ${t("messages.totalDuration")}: ${totalDuration}ms`);
+    output.push(`  📦 ${t("messages.filesBuilt")}: ${filesBuilt.length}`);
     output.push(
-      `📊 ${t("app.api.system.builder.messages.buildSummary")} [${profile.toUpperCase()}]`,
-    );
-    output.push(
-      `  ⏱  ${t("app.api.system.builder.messages.totalDuration")}: ${totalDuration}ms`,
-    );
-    output.push(
-      `  📦 ${t("app.api.system.builder.messages.filesBuilt")}: ${filesBuilt.length}`,
-    );
-    output.push(
-      `  📋 ${t("app.api.system.builder.messages.filesCopiedCount")}: ${filesCopied.length}`,
+      `  📋 ${t("messages.filesCopiedCount")}: ${filesCopied.length}`,
     );
 
     // Per-step breakdown
     if (stepResults.length > 0) {
-      output.push(`  ${t("app.api.system.builder.messages.stepsCompleted")}:`);
+      output.push(`  ${t("messages.stepsCompleted")}:`);
       for (const step of stepResults) {
         let stepInfo = `    ${step.success ? "✓" : "✖"} ${step.step}: ${step.duration}ms`;
         if (step.size !== undefined && step.size > 0) {

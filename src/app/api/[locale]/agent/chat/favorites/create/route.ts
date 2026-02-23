@@ -13,7 +13,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, logger }) =>
-      FavoritesCreateRepository.createFavorite(data, user, logger),
+    handler: ({ data, user, logger, t, locale }) =>
+      FavoritesCreateRepository.createFavorite(data, user, logger, t, locale),
   },
 });

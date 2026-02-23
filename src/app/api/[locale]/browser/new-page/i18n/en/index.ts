@@ -66,4 +66,9 @@ export const translations = {
     title: "New Page Created Successfully",
     description: "The new page was created successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    navigationAutomation: "Navigation Automation",
+  },
 };

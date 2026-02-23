@@ -25,6 +25,9 @@ import type {
   CronStatsGetRequestOutput,
   CronStatsGetResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Cron Stats Repository Interface
@@ -33,6 +36,7 @@ export interface ICronStatsRepository {
   getStats(
     data: CronStatsGetRequestOutput,
     user: JwtPayloadType,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronStatsGetResponseOutput>>;
 }
@@ -69,6 +73,7 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
   async getStats(
     data: CronStatsGetRequestOutput,
     user: JwtPayloadType,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronStatsGetResponseOutput>> {
     try {
@@ -390,8 +395,7 @@ class CronStatsRepositoryImpl implements ICronStatsRepository {
         error: errorDetails.message,
       });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.cronSystem.stats.get.errors.server.title",
+        message: t("errors.fetchCronTaskStats"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: errorDetails.message,

@@ -22,13 +22,16 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 
 import { newsletterSubscriptions } from "../../db";
 import { NewsletterSubscriptionStatus } from "../../enum";
+import { scopedTranslation } from "../../i18n";
 import definitions from "./definition";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger }) => {
+    handler: async (props) => {
+      const { data, logger } = props;
+      const { t } = scopedTranslation.scopedT(props.locale);
       const { batchSize, dryRun } = data;
       const startTime = Date.now();
 
@@ -143,7 +146,7 @@ export const { POST, tools } = endpointsHandler({
           error: parseError(error).message,
         });
         return fail({
-          message: "app.api.newsletter.error.default",
+          message: t("unsubscribe.sync.post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }

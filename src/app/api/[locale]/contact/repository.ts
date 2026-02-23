@@ -21,8 +21,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { contacts, type NewContact } from "./db";
 import type { ContactRequestOutput, ContactResponseOutput } from "./definition";
 import { ContactStatus } from "./enum";
-import { contactScopedT } from "./i18n";
+import type { scopedTranslation } from "./i18n";
 import { sendAdminNotificationSms, sendConfirmationSms } from "./sms";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Contact Repository Implementation
@@ -37,8 +39,8 @@ export class ContactRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<ContactResponseOutput>> {
-    const { t } = contactScopedT(locale);
     try {
       // Get leadId from user prop (JWT payload) - always present
       const leadId = user.leadId;
@@ -103,15 +105,17 @@ export class ContactRepository {
       });
 
       // Send optional SMS notifications (non-blocking)
-      sendAdminNotificationSms(data, user, locale, logger).catch((smsError) => {
-        logger.warn(t("route.sms.admin.failed"), {
-          error:
-            smsError instanceof Error ? smsError.message : String(smsError),
-          contactEmail: data.email,
-        });
-      });
+      sendAdminNotificationSms(data, user, locale, logger, t).catch(
+        (smsError) => {
+          logger.warn(t("route.sms.admin.failed"), {
+            error:
+              smsError instanceof Error ? smsError.message : String(smsError),
+            contactEmail: data.email,
+          });
+        },
+      );
 
-      sendConfirmationSms(data, user, locale, logger).catch((smsError) => {
+      sendConfirmationSms(data, user, locale, logger, t).catch((smsError) => {
         logger.warn(t("route.sms.confirmation.failed"), {
           error:
             smsError instanceof Error ? smsError.message : String(smsError),
@@ -145,10 +149,9 @@ export class ContactRepository {
    */
   static async create(
     data: NewContact,
-    locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<ContactResponseOutput>> {
-    const { t } = contactScopedT(locale);
     try {
       logger.debug(t("repository.seed.create.start"), {
         email: data.email,

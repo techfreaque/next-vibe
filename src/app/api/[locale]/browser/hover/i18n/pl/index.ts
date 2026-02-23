@@ -67,4 +67,9 @@ export const translations: typeof enTranslations = {
     title: "Operacja najechania pomyślna",
     description: "Element został pomyślnie najechany",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    inputAutomation: "Automatyzacja wprowadzania",
+  },
 };

@@ -16,13 +16,13 @@ import { getUserCreatedTasks, upsertRemoteTasks } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger }) => {
+    handler: async (props) => {
+      const { data, logger, t } = props;
       // Validate API key — return 404 to hide endpoint existence
       if (!env.THEA_REMOTE_API_KEY || data.apiKey !== env.THEA_REMOTE_API_KEY) {
         return {
           success: false as const,
-          message:
-            "app.api.system.unifiedInterface.tasks.taskSync.post.errors.notFound.title",
+          message: t("taskSync.post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         };
       }
@@ -49,7 +49,7 @@ export const { POST, tools } = endpointsHandler({
       }
 
       // Return our user-created tasks for the remote to sync
-      const localResult = await getUserCreatedTasks({ logger });
+      const localResult = await getUserCreatedTasks({ logger, t });
       const tasks = localResult.success ? localResult.data.tasks : [];
 
       return {

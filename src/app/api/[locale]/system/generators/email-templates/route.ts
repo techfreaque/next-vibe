@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definition,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger }) =>
-      emailTemplateGeneratorRepository.generateEmailTemplates(data, logger),
+    handler: ({ data, logger, t }) =>
+      emailTemplateGeneratorRepository.generateEmailTemplates(data, logger, t),
   },
 });

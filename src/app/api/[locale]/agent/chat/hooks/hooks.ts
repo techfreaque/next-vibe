@@ -22,7 +22,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 import type { TextareaKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/textarea";
 import { type TextareaRefObject } from "@/packages/next-vibe-ui/web/ui/textarea";
 
@@ -31,6 +30,7 @@ import { useCredits } from "../../../credits/hooks";
 import { useAIStreamStore } from "../../ai-stream/hooks/store";
 import { useAIStream } from "../../ai-stream/hooks/use-ai-stream";
 import { useStreamSync } from "../../ai-stream/hooks/use-stream-sync";
+import { scopedTranslation as aiStreamScopedTranslation } from "../../ai-stream/i18n";
 import type { DefaultFolderId } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 import { NEW_MESSAGE_ID, type ViewModeValue } from "../enum";
@@ -324,14 +324,14 @@ export function useChat(
   const streamAddMessage = useAIStreamStore((state) => state.addMessage);
 
   // Get translations
-  const { t } = simpleT(locale);
+  const { t: aiStreamT } = aiStreamScopedTranslation.scopedT(locale);
 
   // Get credits hook with deduct/refetch methods
   // initialCredits is required in useChat, so creditsHook is guaranteed to be non-null
   const creditsHook = useCredits(user, logger, initialCredits)!;
 
   // Get AI stream hook
-  const aiStream = useAIStream(locale, logger, t);
+  const aiStream = useAIStream(locale, logger, aiStreamT);
 
   // Local state
   const [input, setInput] = useState("");
@@ -429,54 +429,54 @@ export function useChat(
     return settingsOps.settings ?? ChatSettingsRepositoryClient.getDefaults();
   }, [settingsOps.settings]);
 
-  // Convert activeTools/visibleTools → EnabledTool[] for UI consumption
-  // A tool is "active" (in permission layer) if it's in activeTools (or activeTools is null = all)
-  // A tool is "visible" (in context window) if it's in visibleTools
+  // Convert allowedTools/pinnedTools → EnabledTool[] for UI consumption
+  // A tool is "allowed" (in permission layer) if it's in allowedTools (or allowedTools is null = all)
+  // A tool is "pinned" (in context window) if it's in pinnedTools
   const enabledTools = useMemo((): EnabledTool[] | null => {
-    const { activeTools, visibleTools } = effectiveSettings;
-    if (activeTools === null && visibleTools === null) {
+    const { allowedTools, pinnedTools } = effectiveSettings;
+    if (allowedTools === null && pinnedTools === null) {
       return null; // null = all tools default
     }
     // Build union of all tool IDs across both arrays
     const allIds = new Set([
-      ...(activeTools ?? []).map((t) => t.toolId),
-      ...(visibleTools ?? []).map((t) => t.toolId),
+      ...(allowedTools ?? []).map((t) => t.toolId),
+      ...(pinnedTools ?? []).map((t) => t.toolId),
     ]);
     return [...allIds].map((id) => {
-      const active = activeTools?.find((t) => t.toolId === id);
-      const visible = visibleTools?.find((t) => t.toolId === id);
+      const allowed = allowedTools?.find((t) => t.toolId === id);
+      const pinned = pinnedTools?.find((t) => t.toolId === id);
       return {
         id,
         requiresConfirmation:
-          active?.requiresConfirmation ??
-          visible?.requiresConfirmation ??
+          allowed?.requiresConfirmation ??
+          pinned?.requiresConfirmation ??
           false,
-        active:
-          visibleTools !== null
-            ? visibleTools.some((t) => t.toolId === id)
+        pinned:
+          pinnedTools !== null
+            ? pinnedTools.some((t) => t.toolId === id)
             : true,
       };
     });
   }, [effectiveSettings]);
 
-  // Convert EnabledTool[] → activeTools/visibleTools when saving
+  // Convert EnabledTool[] → allowedTools/pinnedTools when saving
   const setEnabledTools = useCallback(
     (tools: EnabledTool[] | null) => {
       if (tools === null) {
         settingsOps.setTools(null, null);
         return;
       }
-      const activeTools = tools.map(({ id, requiresConfirmation }) => ({
+      const allowedTools = tools.map(({ id, requiresConfirmation }) => ({
         toolId: id,
         requiresConfirmation,
       }));
-      const visibleTools = tools
-        .filter((t) => t.active)
+      const pinnedTools = tools
+        .filter((t) => t.pinned)
         .map(({ id, requiresConfirmation }) => ({
           toolId: id,
           requiresConfirmation,
         }));
-      settingsOps.setTools(activeTools, visibleTools);
+      settingsOps.setTools(allowedTools, pinnedTools);
     },
     [settingsOps],
   );
@@ -488,7 +488,7 @@ export function useChat(
     addMessage,
     updateMessage,
     addThread,
-    t,
+    t: aiStreamT,
   });
 
   const threadOps = useThreadOperations({
@@ -541,8 +541,8 @@ export function useChat(
     settings: {
       selectedModel: effectiveSettings.selectedModel,
       selectedCharacter: effectiveSettings.selectedCharacter,
-      activeTools: effectiveSettings.activeTools,
-      visibleTools: effectiveSettings.visibleTools,
+      allowedTools: effectiveSettings.allowedTools,
+      pinnedTools: effectiveSettings.pinnedTools,
       ttsAutoplay: effectiveSettings.ttsAutoplay,
       ttsVoice: effectiveSettings.ttsVoice,
     },

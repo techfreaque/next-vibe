@@ -3,6 +3,13 @@
  */
 
 export const translations = {
+  category: "Agent",
+  tags: {
+    speech: "Speech",
+    tts: "Text-to-Speech",
+    ai: "AI",
+  },
+
   post: {
     title: "Text to Speech",
     description:
@@ -74,6 +81,8 @@ export const translations = {
         description: "A conflict occurred",
       },
       apiKeyMissing: "Eden AI API key is not configured",
+      notConfigured:
+        "{{label}} API key not configured. Add {{envKey}}=<your-key> to your .env file. Get your key at {{url}}",
       conversionFailed: "Speech synthesis failed: {{error}}",
       noText: "No text provided",
       noAudioUrl: "No audio URL received from provider",

@@ -18,7 +18,7 @@ import {
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { defaultModel, modelProviders } from "../../models/models";
@@ -45,6 +45,8 @@ import {
   ModelSelectionType,
 } from "./enum";
 import { CATEGORY_CONFIG } from "./enum";
+import type { CharactersT } from "./i18n";
+import { scopedTranslation } from "./i18n";
 import { CharactersRepositoryClient } from "./repository-client";
 
 /** Default model selection used when none is provided */
@@ -70,8 +72,9 @@ export class CharactersRepository {
   static async getCharacters(
     user: JwtPayloadType,
     logger: EndpointLogger,
-    t: TFunction,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CharacterListResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const userId = user.id;
 
@@ -131,9 +134,9 @@ export class CharactersRepository {
             char.id,
             {
               icon: char.icon,
-              name: char.name,
-              tagline: char.tagline,
-              description: char.description,
+              name: t(char.name),
+              tagline: t(char.tagline),
+              description: t(char.description),
               category: char.category,
               modelSelection: char.modelSelection,
             },
@@ -148,7 +151,7 @@ export class CharactersRepository {
         ];
 
         // Group characters by category into sections
-        const sections = this.groupCharactersIntoSections(allCharacters);
+        const sections = this.groupCharactersIntoSections(allCharacters, t);
 
         // Flattened response - no container wrapper
         return success({
@@ -163,9 +166,9 @@ export class CharactersRepository {
           char.id,
           {
             icon: char.icon,
-            name: char.name,
-            tagline: char.tagline,
-            description: char.description,
+            name: t(char.name),
+            tagline: t(char.tagline),
+            description: t(char.description),
             category: char.category,
             modelSelection: char.modelSelection,
           },
@@ -174,7 +177,10 @@ export class CharactersRepository {
       });
 
       // Group characters by category into sections
-      const sections = this.groupCharactersIntoSections(defaultCharactersCards);
+      const sections = this.groupCharactersIntoSections(
+        defaultCharactersCards,
+        t,
+      );
 
       // Flattened response - no container wrapper
       return success({
@@ -183,7 +189,7 @@ export class CharactersRepository {
     } catch (error) {
       logger.error("Failed to get characters", parseError(error));
       return fail({
-        message: "app.api.agent.chat.characters.get.errors.server.title",
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -194,6 +200,7 @@ export class CharactersRepository {
    */
   private static groupCharactersIntoSections(
     characters: CharacterListItem[],
+    t: CharactersT,
   ): CharacterListResponseOutput["sections"] {
     // Group characters by category
     const groupedByCategory = new Map<
@@ -215,7 +222,7 @@ export class CharactersRepository {
         const config = CATEGORY_CONFIG[category];
         return {
           sectionIcon: config.icon,
-          sectionTitle: config.label,
+          sectionTitle: t(config.category),
           sectionCount: chars.length,
           characters: chars,
           order: config.order,
@@ -238,7 +245,9 @@ export class CharactersRepository {
     urlPathParams: { id: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CharacterGetResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const { id: characterId } = urlPathParams;
       const userId = user.id;
@@ -263,6 +272,8 @@ export class CharactersRepository {
           modelSelection: defaultCharacter.modelSelection,
           characterOwnership: CharacterOwnershipType.SYSTEM,
           compactTrigger: null,
+          allowedTools: null,
+          pinnedTools: null,
         });
       }
 
@@ -281,6 +292,8 @@ export class CharactersRepository {
           modelSelection: NO_CHARACTER.modelSelection,
           characterOwnership: CharacterOwnershipType.SYSTEM,
           compactTrigger: null,
+          allowedTools: null,
+          pinnedTools: null,
         });
       }
 
@@ -312,7 +325,7 @@ export class CharactersRepository {
 
       if (!customCharacter) {
         return fail({
-          message: "app.api.agent.chat.characters.id.get.errors.notFound.title",
+          message: t("id.get.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -332,11 +345,21 @@ export class CharactersRepository {
         modelSelection: customCharacter.modelSelection,
         characterOwnership: customCharacter.ownershipType,
         compactTrigger: customCharacter.compactTrigger ?? null,
+        allowedTools:
+          customCharacter.activeTools?.map((t) => ({
+            toolId: t.toolId,
+            requiresConfirmation: t.requiresConfirmation ?? false,
+          })) ?? null,
+        pinnedTools:
+          customCharacter.visibleTools?.map((t) => ({
+            toolId: t.toolId,
+            requiresConfirmation: t.requiresConfirmation ?? false,
+          })) ?? null,
       });
     } catch (error) {
       logger.error("Failed to get character by ID", parseError(error));
       return fail({
-        message: "app.api.agent.chat.characters.id.get.errors.server.title",
+        message: t("id.get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -349,14 +372,14 @@ export class CharactersRepository {
     data: CharacterCreateRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: CharactersT,
   ): Promise<ResponseType<CharacterCreateResponseOutput>> {
     try {
       const userId = user.id;
 
       if (!userId) {
         return fail({
-          message:
-            "app.api.agent.chat.characters.post.errors.unauthorized.title",
+          message: t("post.errors.unauthorized.title"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -386,13 +409,13 @@ export class CharactersRepository {
         .returning();
 
       return success({
-        success: "app.api.agent.chat.characters.post.success.title",
+        success: t("post.success.title"),
         id: character.id,
       });
     } catch (error) {
       logger.error("Failed to create character", parseError(error));
       return fail({
-        message: "app.api.agent.chat.characters.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -406,15 +429,16 @@ export class CharactersRepository {
     urlPathParams: { id: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CharacterUpdateResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const userId = user.id;
       const { id: characterId } = urlPathParams;
 
       if (!userId) {
         return fail({
-          message:
-            "app.api.agent.chat.characters.id.patch.errors.unauthorized.title",
+          message: t("id.patch.errors.unauthorized.title"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -452,7 +476,7 @@ export class CharactersRepository {
 
         // Flattened response
         return success({
-          success: "app.api.agent.chat.characters.id.patch.success.title",
+          success: t("id.patch.success.title"),
         });
       }
 
@@ -472,8 +496,7 @@ export class CharactersRepository {
 
       if (!existingCharacter) {
         return fail({
-          message:
-            "app.api.agent.chat.characters.id.patch.errors.notFound.title",
+          message: t("id.patch.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -517,8 +540,7 @@ export class CharactersRepository {
 
       if (!updated) {
         return fail({
-          message:
-            "app.api.agent.chat.characters.id.patch.errors.notFound.title",
+          message: t("id.patch.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -528,12 +550,12 @@ export class CharactersRepository {
       // Custom characters should never be "system", but TypeScript doesn't know this
       // Flattened response
       return success({
-        success: "app.api.agent.chat.characters.id.patch.success.title",
+        success: t("id.patch.success.title"),
       });
     } catch (error) {
       logger.error("Failed to update character", parseError(error));
       return fail({
-        message: "app.api.agent.chat.characters.id.patch.errors.server.title",
+        message: t("id.patch.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -546,15 +568,16 @@ export class CharactersRepository {
     urlPathParams: { id: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CharacterDeleteResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const userId = user.id;
       const { id: characterId } = urlPathParams;
 
       if (!userId) {
         return fail({
-          message:
-            "app.api.agent.chat.characters.id.delete.errors.unauthorized.title",
+          message: t("id.delete.errors.unauthorized.title"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -573,8 +596,7 @@ export class CharactersRepository {
 
       if (result.length === 0) {
         return fail({
-          message:
-            "app.api.agent.chat.characters.id.delete.errors.notFound.title",
+          message: t("id.delete.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -583,7 +605,7 @@ export class CharactersRepository {
     } catch (error) {
       logger.error("Failed to delete character", parseError(error));
       return fail({
-        message: "app.api.agent.chat.characters.id.delete.errors.server.title",
+        message: t("id.delete.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -597,13 +619,13 @@ export class CharactersRepository {
     id: string,
     char: {
       icon: IconKey | null;
-      name: TranslationKey | null;
-      tagline: TranslationKey | null;
-      description: TranslationKey | null;
+      name: string | null;
+      tagline: string | null;
+      description: string | null;
       category: typeof CharacterCategoryValue;
       modelSelection: ModelSelectionSimple;
     },
-    t: TFunction,
+    t: ReturnType<(typeof scopedTranslation)["scopedT"]>["t"],
   ): CharacterListItem {
     // Get best model from character's modelSelection
     const bestModel = CharactersRepositoryClient.getBestModelForCharacter(
@@ -620,28 +642,20 @@ export class CharactersRepository {
         }
       : {
           modelIcon: "sparkles" as const,
-          modelInfo: t("app.api.agent.chat.characters.fallbacks.unknownModel"),
-          modelProvider: t(
-            "app.api.agent.chat.characters.fallbacks.unknownProvider",
-          ),
+          modelInfo: t("fallbacks.unknownModel"),
+          modelProvider: t("fallbacks.unknownProvider"),
         };
 
     // Flattened structure - no nested content object
+    // name/tagline/description are pre-resolved strings (from t() for defaults, raw strings for custom chars)
     return {
       id,
       category: char.category,
       icon: char.icon ?? "sparkles",
       modelId,
-      name:
-        char.name ??
-        bestModel?.name ??
-        ("app.api.agent.chat.characters.fallbacks.unknownModel" as const),
-      description:
-        char.description ??
-        ("app.api.agent.chat.characters.fallbacks.noDescription" as const),
-      tagline:
-        char.tagline ??
-        ("app.api.agent.chat.characters.fallbacks.noTagline" as const),
+      name: char.name ?? bestModel?.name ?? t("fallbacks.unknownModel"),
+      description: char.description ?? t("fallbacks.noDescription"),
+      tagline: char.tagline ?? t("fallbacks.noTagline"),
       ...modelRow,
     };
   }

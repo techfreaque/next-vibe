@@ -19,8 +19,7 @@ import { LeadAuthRepository } from "@/app/api/[locale]/leads/auth/repository";
 import { LeadsRepository } from "@/app/api/[locale]/leads/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslationKey } from "@/i18n/core/static-types";
+import { type CountryLanguage } from "@/i18n/core/config";
 
 import { AuthRepository } from "../../auth/repository";
 import type {
@@ -43,11 +42,16 @@ import type {
 } from "./options/definition";
 import { SocialProviders } from "./options/enum";
 import type { Platform } from "../../../system/unified-interface/shared/types/platform";
-import { simpleT } from "@/i18n/core/shared";
+import type { scopedTranslation, LoginTranslationKey } from "./i18n";
+import type { scopedTranslation as leadsScopedTranslation } from "../../../leads/i18n";
+import { scopedTranslation as creditsScopedTranslation } from "../../../credits/i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+type LeadsT = ReturnType<typeof leadsScopedTranslation.scopedT>["t"];
 
 export interface SocialProvidersOptions {
   enabled: boolean;
-  name: TranslationKey;
+  name: LoginTranslationKey;
   providers: (typeof SocialProviders)[keyof typeof SocialProviders][];
 }
 
@@ -95,6 +99,8 @@ export class LoginRepository {
     request: NextRequest | undefined,
     logger: EndpointLogger,
     platform: Platform,
+    t: ModuleT,
+    leadsT: LeadsT,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     // Extract data from request
     const { email, password, rememberMe } = data;
@@ -126,7 +132,7 @@ export class LoginRepository {
         });
 
         return fail({
-          message: "app.api.user.public.login.errors.account_locked",
+          message: t("errors.account_locked"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -152,7 +158,7 @@ export class LoginRepository {
         });
 
         return fail({
-          message: "app.api.user.public.login.errors.invalid_credentials",
+          message: t("errors.invalid_credentials"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
           cause: userResponse,
         });
@@ -178,7 +184,7 @@ export class LoginRepository {
         });
 
         return fail({
-          message: "app.api.user.public.login.errors.invalid_credentials",
+          message: t("errors.invalid_credentials"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -189,7 +195,7 @@ export class LoginRepository {
         // Here you would implement 2FA flow
         // This is a placeholder for the actual implementation
         return fail({
-          message: "app.api.user.public.login.errors.two_factor_required",
+          message: t("errors.two_factor_required"),
           errorType: ErrorResponseTypes.TWO_FACTOR_REQUIRED,
         });
       }
@@ -216,6 +222,7 @@ export class LoginRepository {
         platform,
         logger,
         user, // Pass entire user object from route handler
+        t,
       );
       if (!sessionResponse.success) {
         return sessionResponse;
@@ -227,12 +234,14 @@ export class LoginRepository {
         email,
         userResponse.data.id,
         logger,
+        locale,
+        leadsT,
       );
 
       return sessionResponse;
     } catch (error) {
       return fail({
-        message: "app.api.user.public.login.errors.auth_error",
+        message: t("errors.auth_error"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           email,
@@ -260,6 +269,7 @@ export class LoginRepository {
     platform: Platform,
     logger: EndpointLogger,
     handlerUser: JWTPublicPayloadType,
+    t: ModuleT,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     return await this.createOrRenewSession(
       userId,
@@ -270,6 +280,7 @@ export class LoginRepository {
       platform,
       logger,
       handlerUser,
+      t,
     );
   }
 
@@ -291,6 +302,7 @@ export class LoginRepository {
     platform: Platform,
     logger: EndpointLogger,
     handlerUser: JWTPublicPayloadType,
+    t: ModuleT,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     return await this.createOrRenewSession(
       userId,
@@ -301,6 +313,7 @@ export class LoginRepository {
       platform,
       logger,
       handlerUser,
+      t,
     );
   }
 
@@ -324,6 +337,7 @@ export class LoginRepository {
     platform: Platform,
     logger: EndpointLogger,
     handlerUser: JWTPublicPayloadType,
+    t: ModuleT,
   ): Promise<ResponseType<LoginPostResponseOutput>> {
     try {
       // Create session and get user data
@@ -345,7 +359,7 @@ export class LoginRepository {
       );
       if (!userResponse.success) {
         return fail({
-          message: "app.api.user.public.login.errors.user_not_found",
+          message: t("errors.user_not_found"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { userId },
           cause: userResponse,
@@ -363,10 +377,12 @@ export class LoginRepository {
       // Merge lead wallet into user wallet immediately
       // This ensures user gets their pre-login credits
       const { CreditRepository } = await import("../../../credits/repository");
+      const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
       const mergeResult = await CreditRepository.mergePendingLeadWallets(
         userId,
         [leadId],
         logger,
+        creditsT,
       );
       if (!mergeResult.success) {
         logger.error("Failed to merge lead wallet during login", {
@@ -385,6 +401,7 @@ export class LoginRepository {
       const rolesResult = await UserRolesRepository.getUserRoles(
         userResponse.data.id,
         logger,
+        locale,
       );
       // Default to CUSTOMER role if roles fetch fails
       const roles = rolesResult.success
@@ -409,7 +426,11 @@ export class LoginRepository {
       };
 
       // Sign JWT token
-      const tokenResponse = await AuthRepository.signJwt(tokenPayload, logger);
+      const tokenResponse = await AuthRepository.signJwt(
+        tokenPayload,
+        logger,
+        locale,
+      );
       if (!tokenResponse.success) {
         return tokenResponse;
       }
@@ -422,11 +443,11 @@ export class LoginRepository {
         token: tokenResponse.data,
         expiresAt,
       };
-      await SessionRepository.create(sessionData);
+      await SessionRepository.create(sessionData, locale);
 
       // Create the response data - LoginPostResponseOutput
       const responseData: LoginPostResponseOutput = {
-        message: "app.api.user.public.login.success.message",
+        message: "Welcome back! You have successfully logged in.",
       };
 
       // Store auth token using platform-specific handler
@@ -437,6 +458,7 @@ export class LoginRepository {
         leadId,
         platform,
         logger,
+        locale,
         rememberMe, // Pass rememberMe to control session duration
       );
       if (storeResult.success) {
@@ -462,7 +484,7 @@ export class LoginRepository {
         error: parseError(error).message,
       });
       return fail({
-        message: "app.api.user.public.login.errors.session_creation_failed",
+        message: t("errors.session_creation_failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           userId,
@@ -483,10 +505,10 @@ export class LoginRepository {
     data: LoginOptionsGetRequestOutput,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<LoginOptionsGetResponseOutput>> {
     const email = data.email;
-    const { t } = simpleT(locale);
-    const optionsResult = await this.getLoginOptions(logger, locale, email);
+    const optionsResult = await this.getLoginOptions(logger, locale, t, email);
 
     if (!optionsResult.success) {
       return optionsResult;
@@ -497,31 +519,24 @@ export class LoginRepository {
     return success({
       response: {
         success: true,
-        message: t("app.api.user.public.login.options.messages.successMessage"),
+        message: t("options.messages.successMessage"),
         forUser: email,
         loginMethods: {
           password: {
             enabled: options.allowPasswordAuth,
-            passwordDescription: t(
-              "app.api.user.public.login.options.messages.passwordAuthDescription",
-            ),
+            passwordDescription: t("options.messages.passwordAuthDescription"),
           },
           social: {
             enabled: options.allowSocialAuth,
-            socialDescription: t(
-              "app.api.user.public.login.options.messages.socialAuthDescription",
-            ),
+            socialDescription: t("options.messages.socialAuthDescription"),
             providers:
               options.socialProviders?.map((provider) => ({
                 name: provider.name,
                 id: provider.providers[0] || "unknown",
                 enabled: provider.enabled,
-                description: t(
-                  "app.api.user.public.login.options.messages.continueWithProvider",
-                  {
-                    provider: t(provider.name),
-                  },
-                ),
+                description: t("options.messages.continueWithProvider", {
+                  provider: t(provider.name),
+                }),
               })) || [],
           },
         },
@@ -529,14 +544,14 @@ export class LoginRepository {
           maxAttempts: options.maxAttempts,
           requireTwoFactor: options.requireTwoFactor,
           securityDescription: options.requireTwoFactor
-            ? t("app.api.user.public.login.options.messages.twoFactorRequired")
-            : t("app.api.user.public.login.options.messages.standardSecurity"),
+            ? t("options.messages.twoFactorRequired")
+            : t("options.messages.standardSecurity"),
         },
         recommendations: [
           options.allowPasswordAuth
-            ? t("app.api.user.public.login.options.messages.tryPasswordFirst")
-            : t("app.api.user.public.login.options.messages.useSocialLogin"),
-          t("app.api.user.public.login.options.messages.socialLoginFaster"),
+            ? t("options.messages.tryPasswordFirst")
+            : t("options.messages.useSocialLogin"),
+          t("options.messages.socialLoginFaster"),
         ],
       },
     });
@@ -551,6 +566,7 @@ export class LoginRepository {
   static async getLoginOptions(
     logger: EndpointLogger,
     locale: CountryLanguage,
+    t: ModuleT,
     email?: string,
   ): Promise<ResponseType<LoginOptions>> {
     try {
@@ -565,17 +581,17 @@ export class LoginRepository {
         socialProviders: [
           {
             enabled: true,
-            name: "app.api.user.public.login.enums.socialProviders.google",
+            name: "enums.socialProviders.google",
             providers: [SocialProviders.GOOGLE],
           },
           {
             enabled: true,
-            name: "app.api.user.public.login.enums.socialProviders.github",
+            name: "enums.socialProviders.github",
             providers: [SocialProviders.GITHUB],
           },
           {
             enabled: true,
-            name: "app.api.user.public.login.enums.socialProviders.facebook",
+            name: "enums.socialProviders.facebook",
             providers: [SocialProviders.FACEBOOK],
           },
         ],
@@ -591,7 +607,7 @@ export class LoginRepository {
         );
         if (!user.success) {
           return fail({
-            message: "app.api.user.public.login.errors.user_not_found",
+            message: t("errors.user_not_found"),
             errorType: ErrorResponseTypes.NOT_FOUND,
             messageParams: { userId: email },
             cause: user,
@@ -611,7 +627,7 @@ export class LoginRepository {
       return success(options);
     } catch (error) {
       return fail({
-        message: "app.api.user.public.login.errors.auth_error",
+        message: t("errors.auth_error"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           email: email || "unknown",
@@ -662,6 +678,8 @@ export class LoginRepository {
     email: string,
     userId: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
+    leadsT: LeadsT,
   ): Promise<void> {
     try {
       logger.debug("Converting lead during user login", {
@@ -678,6 +696,7 @@ export class LoginRepository {
           userId,
         },
         logger,
+        leadsT,
       );
 
       if (convertResult.success) {

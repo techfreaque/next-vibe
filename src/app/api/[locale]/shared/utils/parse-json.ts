@@ -5,6 +5,10 @@ import {
   fail,
 } from "next-vibe/shared/types/response.schema";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import { scopedTranslation as sharedScopedTranslation } from "../i18n";
+
 /**
  * JSON Parser with Comment Support
  * Handles JSON files with comments (like tsconfig.json)
@@ -30,13 +34,15 @@ export interface JsonWithComments {
  */
 export function parseJsonWithComments(
   jsonString: string,
+  locale: CountryLanguage,
 ): ResponseType<JsonWithComments> {
   try {
     const result = parse(jsonString);
     if (typeof result !== "object" || result === null) {
+      const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
+
       return fail({
-        message:
-          "app.api.shared.utils.parseJsonWithComments.errors.invalid_json",
+        message: sharedT("utils.parseJsonWithComments.errors.invalid_json"),
         errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
       });
     }
@@ -46,8 +52,9 @@ export function parseJsonWithComments(
       data: result,
     };
   } catch (error) {
+    const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
     return fail({
-      message: "app.api.shared.utils.parseJsonWithComments.errors.invalid_json",
+      message: sharedT("utils.parseJsonWithComments.errors.invalid_json"),
       errorType: ErrorResponseTypes.INVALID_FORMAT_ERROR,
       messageParams: {
         error: error instanceof Error ? error.message : String(error),
@@ -64,7 +71,8 @@ export function parseJsonWithComments(
  */
 export function tryParseJsonWithComments(
   jsonString: string,
+  locale: CountryLanguage,
 ): JsonWithComments | null {
-  const result = parseJsonWithComments(jsonString);
+  const result = parseJsonWithComments(jsonString, locale);
   return result.success ? result.data : null;
 }

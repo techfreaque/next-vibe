@@ -22,12 +22,16 @@ import type {
   MessagingAccountEditGETResponseOutput,
   MessagingAccountEditPUTResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 class MessagingAccountEditRepositoryImpl {
   async getAccount(
     urlPathParams: { id: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<MessagingAccountEditGETResponseOutput>> {
     try {
       logger.debug("Getting messaging account", {
@@ -43,8 +47,7 @@ class MessagingAccountEditRepositoryImpl {
 
       if (!account) {
         return fail({
-          message:
-            "app.api.emails.messaging.accounts.edit.id.errors.notFound.title",
+          message: t("errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { accountId: urlPathParams.id },
         });
@@ -69,8 +72,7 @@ class MessagingAccountEditRepositoryImpl {
     } catch (error) {
       logger.error("Error getting messaging account", parseError(error));
       return fail({
-        message:
-          "app.api.emails.messaging.accounts.edit.id.errors.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -92,6 +94,7 @@ class MessagingAccountEditRepositoryImpl {
     },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<MessagingAccountEditPUTResponseOutput>> {
     try {
       logger.info("Updating messaging account", {
@@ -107,8 +110,7 @@ class MessagingAccountEditRepositoryImpl {
 
       if (!existing) {
         return fail({
-          message:
-            "app.api.emails.messaging.accounts.edit.id.errors.notFound.title",
+          message: t("errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { accountId: data.id },
         });
@@ -162,8 +164,7 @@ class MessagingAccountEditRepositoryImpl {
 
       if (!updated) {
         return fail({
-          message:
-            "app.api.emails.messaging.accounts.edit.id.errors.server.title",
+          message: t("errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error:
@@ -192,16 +193,14 @@ class MessagingAccountEditRepositoryImpl {
         errorMessage.includes("duplicate")
       ) {
         return fail({
-          message:
-            "app.api.emails.messaging.accounts.edit.id.errors.conflict.title",
+          message: t("errors.conflict.title"),
           errorType: ErrorResponseTypes.CONFLICT,
           messageParams: { error: errorMessage },
         });
       }
 
       return fail({
-        message:
-          "app.api.emails.messaging.accounts.edit.id.errors.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMessage },
       });

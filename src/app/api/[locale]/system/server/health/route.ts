@@ -13,10 +13,10 @@ import endpoints from "./definition";
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: async ({ data, logger }) => {
+    handler: async ({ data, locale, logger, t }) => {
       // Lazy import to avoid creating connections during route discovery
       const { healthCheckRepository } = await import("./repository");
-      return await healthCheckRepository.checkHealth(data, logger);
+      return await healthCheckRepository.checkHealth(data, logger, t, locale);
     },
   },
 });

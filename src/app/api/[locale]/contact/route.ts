@@ -23,7 +23,7 @@ export const { POST, tools } = endpointsHandler({
         ignoreErrors: false,
       },
     ],
-    handler: ({ data, user, locale, logger }) =>
-      ContactRepository.submitContactForm(data, user, locale, logger),
+    handler: ({ data, user, locale, logger, t }) =>
+      ContactRepository.submitContactForm(data, user, locale, logger, t),
   },
 });

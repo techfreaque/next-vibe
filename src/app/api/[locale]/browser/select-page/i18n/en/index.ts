@@ -61,4 +61,9 @@ export const translations = {
     title: "Page Selected Successfully",
     description: "The page was selected successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    navigationAutomation: "Navigation Automation",
+  },
 };

@@ -12,11 +12,12 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 // Import types from the endpoint definition
 import type endpoints from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 type RequestType = typeof endpoints.POST.types.RequestOutput;
 type SchemaVerifyResponseType = typeof endpoints.POST.types.ResponseOutput;
@@ -27,7 +28,7 @@ type SchemaVerifyResponseType = typeof endpoints.POST.types.ResponseOutput;
 export interface SchemaVerifyRepositoryInterface {
   execute(
     data: RequestType,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<SchemaVerifyResponseType>>;
 }
@@ -38,7 +39,7 @@ export interface SchemaVerifyRepositoryInterface {
 export class SchemaVerifyRepositoryImpl implements SchemaVerifyRepositoryInterface {
   async execute(
     data: RequestType,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<SchemaVerifyResponseType>> {
     const outputs: string[] = [];
@@ -47,28 +48,27 @@ export class SchemaVerifyRepositoryImpl implements SchemaVerifyRepositoryInterfa
 
     try {
       // Check database schema integrity
-      const validationResult = await this.performSchemaValidation(locale);
+      const validationResult = await this.performSchemaValidation(t);
       const schemaValid = validationResult.valid;
 
       if (!data.silent) {
-        const { t } = simpleT(locale);
         outputs.push(
-          t("app.api.system.db.schemaVerify.verified.tables", {
+          t("verified.tables", {
             count: validationResult.tablesChecked,
           }),
         );
         outputs.push(
-          t("app.api.system.db.schemaVerify.verified.columns", {
+          t("verified.columns", {
             count: validationResult.columnsChecked,
           }),
         );
         outputs.push(
-          t("app.api.system.db.schemaVerify.verified.indexes", {
+          t("verified.indexes", {
             count: validationResult.indexesChecked,
           }),
         );
         outputs.push(
-          t("app.api.system.db.schemaVerify.verified.constraints", {
+          t("verified.constraints", {
             count: validationResult.constraintsChecked,
           }),
         );
@@ -80,9 +80,8 @@ export class SchemaVerifyRepositoryImpl implements SchemaVerifyRepositoryInterfa
         if (data.fixIssues) {
           const fixed = await this.fixSchemaIssues();
           fixedIssues.push(...fixed);
-          const { t } = simpleT(locale);
           outputs.push(
-            t("app.api.system.db.schemaVerify.fixed", {
+            t("fixed", {
               count: fixed.length,
             }),
           );
@@ -93,12 +92,10 @@ export class SchemaVerifyRepositoryImpl implements SchemaVerifyRepositoryInterfa
         schemaValid || (data.fixIssues && fixedIssues.length === issues.length);
 
       if (!data.silent && finalValid) {
-        const { t } = simpleT(locale);
-        outputs.push(t("app.api.system.db.schemaVerify.validationPassed"));
+        outputs.push(t("validationPassed"));
       } else if (!data.silent && !finalValid) {
-        const { t } = simpleT(locale);
         outputs.push(
-          t("app.api.system.db.schemaVerify.validationFailed", {
+          t("validationFailed", {
             count: issues.length,
           }),
         );
@@ -117,13 +114,13 @@ export class SchemaVerifyRepositoryImpl implements SchemaVerifyRepositoryInterfa
       const parsedError = parseError(error);
       logger.error("Schema verification failed", parsedError);
       return fail({
-        message: "app.api.system.db.schemaVerify.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
 
-  private async performSchemaValidation(locale: CountryLanguage): Promise<{
+  private async performSchemaValidation(t: ModuleT): Promise<{
     valid: boolean;
     tablesChecked: number;
     columnsChecked: number;
@@ -148,14 +145,13 @@ export class SchemaVerifyRepositoryImpl implements SchemaVerifyRepositoryInterfa
         issues: [],
       };
     } catch {
-      const { t } = simpleT(locale);
       return {
         valid: false,
         tablesChecked: 0,
         columnsChecked: 0,
         indexesChecked: 0,
         constraintsChecked: 0,
-        issues: [t("app.api.system.db.schemaVerify.dbConnectionFailed")],
+        issues: [t("dbConnectionFailed")],
       };
     }
   }

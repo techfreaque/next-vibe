@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -19,14 +19,16 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "generators", "route-handlers"],
-  title: "app.api.system.generators.route-handlers.post.title" as const,
-  description:
-    "app.api.system.generators.route-handlers.post.description" as const,
-  category: "app.api.system.category" as const,
-  tags: ["app.api.system.generators.route-handlers.post.title" as const],
+  title: "post.title" as const,
+  description: "post.description" as const,
+  category: "category" as const,
+  tags: ["post.title" as const],
   icon: "file-code",
   allowedRoles: [
     UserRole.ADMIN,
@@ -35,67 +37,56 @@ const { POST } = createEndpoint({
     UserRole.PRODUCTION_OFF,
   ] as const,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.system.generators.route-handlers.post.container.title" as const,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.container.title" as const,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      outputFile: requestField({
+      outputFile: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.system.generators.route-handlers.post.fields.outputFile.label" as const,
-        description:
-          "app.api.system.generators.route-handlers.post.fields.outputFile.description" as const,
+        label: "post.fields.outputFile.label" as const,
+        description: "post.fields.outputFile.description" as const,
         columns: 12,
         schema: z
           .string()
           .default("src/app/api/[locale]/system/generated/route-handlers.ts"),
       }),
 
-      dryRun: requestField({
+      dryRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.generators.route-handlers.post.fields.dryRun.label" as const,
-        description:
-          "app.api.system.generators.route-handlers.post.fields.dryRun.description" as const,
+        label: "post.fields.dryRun.label" as const,
+        description: "post.fields.dryRun.description" as const,
         columns: 6,
         schema: z.boolean().optional().default(false),
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.generators.route-handlers.post.fields.success.title" as const,
+        content: "post.fields.success.title" as const,
         schema: z.boolean(),
       }),
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.generators.route-handlers.post.fields.message.title" as const,
+        content: "post.fields.message.title" as const,
         schema: z.string(),
       }),
-      routesFound: responseField({
+      routesFound: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.generators.route-handlers.post.fields.routesFound.title" as const,
+        content: "post.fields.routesFound.title" as const,
         schema: z.coerce.number(),
       }),
-      duration: responseField({
+      duration: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.generators.route-handlers.post.fields.duration.title" as const,
+        content: "post.fields.duration.title" as const,
         schema: z.coerce.number(),
       }),
     },
-  ),
+  }),
 
   // === EXAMPLES ===
   examples: {
@@ -117,66 +108,46 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.generators.route-handlers.post.errors.validation.title" as const,
-      description:
-        "app.api.system.generators.route-handlers.post.errors.validation.description" as const,
+      title: "post.errors.validation.title" as const,
+      description: "post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.generators.route-handlers.post.errors.server.title" as const,
-      description:
-        "app.api.system.generators.route-handlers.post.errors.server.description" as const,
+      title: "post.errors.server.title" as const,
+      description: "post.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.generators.route-handlers.post.errors.server.title" as const,
-      description:
-        "app.api.system.generators.route-handlers.post.errors.server.description" as const,
+      title: "post.errors.server.title" as const,
+      description: "post.errors.server.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.generators.route-handlers.post.errors.server.title" as const,
-      description:
-        "app.api.system.generators.route-handlers.post.errors.server.description" as const,
+      title: "post.errors.server.title" as const,
+      description: "post.errors.server.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.generators.route-handlers.post.errors.server.title" as const,
-      description:
-        "app.api.system.generators.route-handlers.post.errors.server.description" as const,
+      title: "post.errors.server.title" as const,
+      description: "post.errors.server.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.generators.route-handlers.post.errors.server.title" as const,
-      description:
-        "app.api.system.generators.route-handlers.post.errors.server.description" as const,
+      title: "post.errors.server.title" as const,
+      description: "post.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.generators.route-handlers.post.errors.server.title" as const,
-      description:
-        "app.api.system.generators.route-handlers.post.errors.server.description" as const,
+      title: "post.errors.server.title" as const,
+      description: "post.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.generators.route-handlers.post.errors.server.title" as const,
-      description:
-        "app.api.system.generators.route-handlers.post.errors.server.description" as const,
+      title: "post.errors.server.title" as const,
+      description: "post.errors.server.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.generators.route-handlers.post.errors.server.title" as const,
-      description:
-        "app.api.system.generators.route-handlers.post.errors.server.description" as const,
+      title: "post.errors.server.title" as const,
+      description: "post.errors.server.description" as const,
     },
   },
 
   successTypes: {
-    title:
-      "app.api.system.generators.route-handlers.post.success.title" as const,
-    description:
-      "app.api.system.generators.route-handlers.post.success.description" as const,
+    title: "post.success.title" as const,
+    description: "post.success.description" as const,
   },
 });
 

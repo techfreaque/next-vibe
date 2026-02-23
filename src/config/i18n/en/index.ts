@@ -1,5 +1,7 @@
 export const translations = {
   appName: "unbottled.ai",
+  appDescription:
+    "Free speech AI platform with 42+ models. User-controlled censorship and privacy-first design.",
   framework: "NextVibe.dev",
   websiteUrl: "https://unbottled.ai",
   group: {

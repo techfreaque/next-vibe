@@ -22,13 +22,14 @@ export const { POST, tools } = endpointsHandler({
         ignoreErrors: true,
       },
     ],
-    handler: async ({ data, logger, locale }) => {
+    handler: async ({ data, logger, locale, t }) => {
       return await PasswordRepository.confirmPasswordReset(
         data.token,
         data.email,
         data.password,
         locale,
         logger,
+        t,
       );
     },
   },

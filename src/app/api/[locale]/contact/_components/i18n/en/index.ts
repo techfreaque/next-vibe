@@ -24,6 +24,8 @@ export const translations = {
         discordDescription: "Get help from our community and team",
         twitter: "Follow us on Twitter",
         website: "Website",
+        supportEmail: "Support Email",
+        websiteUrl: "Visit our website",
       },
     },
   },

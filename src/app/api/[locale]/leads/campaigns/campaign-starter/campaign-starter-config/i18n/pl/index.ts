@@ -1,6 +1,12 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Zarządzanie Kampaniami",
+  tags: {
+    leads: "Leady",
+    campaigns: "Kampanie",
+  },
+
   get: {
     title: "Pobierz konfigurację uruchamiacza kampanii",
     description: "Załaduj konfigurację uruchamiacza kampanii",

@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Generatory",
+
   post: {
     title: "Generuj indeks endpointów",
     description: "Generuj plik indeksu endpointów",

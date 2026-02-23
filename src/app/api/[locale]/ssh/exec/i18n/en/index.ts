@@ -1,4 +1,16 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    invalidWorkingDir:
+      "Invalid working directory: must be absolute path without '..' segments",
+    commandTimedOut: "Command timed out",
+    notImplemented: {
+      local:
+        "SSH backend not yet implemented. Leave connectionId empty to run locally.",
+    },
+  },
+
   post: {
     title: "Run Command",
     description:

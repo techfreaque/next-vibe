@@ -13,10 +13,16 @@ import endpoints from "./definition";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, logger, platform }) => {
+    handler: async ({ data, logger, platform, t, locale }) => {
       const typecheckRepository = (await import("./repository"))
         .typecheckRepository;
-      return await typecheckRepository.execute(data, logger, platform);
+      return await typecheckRepository.execute(
+        data,
+        logger,
+        platform,
+        t,
+        locale,
+      );
     },
   },
 });

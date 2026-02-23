@@ -2,8 +2,8 @@
 import { join } from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { TFunction } from "@/i18n/core/static-types.js";
 
+import type { LaunchpadT } from "../../i18n";
 import type { LaunchpadConfig } from "../types/types.js";
 import {
   cloneRepo,
@@ -16,9 +16,9 @@ export async function cloneMissingRepos(
   logger: EndpointLogger,
   rootDir: string,
   config: LaunchpadConfig,
-  t: TFunction,
+  t: LaunchpadT,
 ): Promise<void> {
-  logger.info(t("app.api.system.launchpad.cloneMissing.checking"));
+  logger.info(t("cloneMissing.checking"));
   const repos = getAllRepos(config);
   let clonedCount = 0;
   let failedCount = 0;
@@ -40,7 +40,7 @@ export async function cloneMissingRepos(
         const repoPath = join(...repo.path);
         failedRepos.push(repoPath);
         logger.info(
-          t("app.api.system.launchpad.cloneMissing.failedToClone", {
+          t("cloneMissing.failedToClone", {
             repoPath,
           }),
         );
@@ -49,24 +49,24 @@ export async function cloneMissingRepos(
   }
 
   if (clonedCount === 0 && failedCount === 0) {
-    logger.info(t("app.api.system.launchpad.cloneMissing.noMissing"));
+    logger.info(t("cloneMissing.noMissing"));
   } else {
     if (clonedCount > 0) {
       logger.info(
-        t("app.api.system.launchpad.cloneMissing.success", {
+        t("cloneMissing.success", {
           count: clonedCount.toString(),
         }),
       );
     }
     if (failedCount > 0) {
       logger.info(
-        t("app.api.system.launchpad.cloneMissing.failed", {
+        t("cloneMissing.failed", {
           count: failedCount.toString(),
         }),
       );
       failedRepos.forEach((repo) =>
         logger.info(
-          t("app.api.system.launchpad.cloneMissing.failedRepo", {
+          t("cloneMissing.failedRepo", {
             repo,
           }),
         ),

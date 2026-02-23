@@ -5,25 +5,27 @@
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * Migration Status
  */
 export const { enum: MigrationStatus, options: MigrationStatusOptions } =
-  createEnumOptions({
-    PENDING: "app.api.system.db.migrate.status.pending",
-    RUNNING: "app.api.system.db.migrate.status.running",
-    SUCCESS: "app.api.system.db.migrate.status.success",
-    FAILED: "app.api.system.db.migrate.status.failed",
-    ROLLED_BACK: "app.api.system.db.migrate.status.rolledBack",
+  createEnumOptions(scopedTranslation, {
+    PENDING: "status.pending",
+    RUNNING: "status.running",
+    SUCCESS: "status.success",
+    FAILED: "status.failed",
+    ROLLED_BACK: "status.rolledBack",
   });
 
 /**
  * Migration Direction
  */
 export const { enum: MigrationDirection, options: MigrationDirectionOptions } =
-  createEnumOptions({
-    UP: "app.api.system.db.migrate.direction.up",
-    DOWN: "app.api.system.db.migrate.direction.down",
+  createEnumOptions(scopedTranslation, {
+    UP: "direction.up",
+    DOWN: "direction.down",
   });
 
 /**
@@ -32,8 +34,8 @@ export const { enum: MigrationDirection, options: MigrationDirectionOptions } =
 export const {
   enum: MigrationEnvironment,
   options: MigrationEnvironmentOptions,
-} = createEnumOptions({
-  DEVELOPMENT: "app.api.system.db.migrate.environment.development",
-  STAGING: "app.api.system.db.migrate.environment.staging",
-  PRODUCTION: "app.api.system.db.migrate.environment.production",
+} = createEnumOptions(scopedTranslation, {
+  DEVELOPMENT: "environment.development",
+  STAGING: "environment.staging",
+  PRODUCTION: "environment.production",
 });

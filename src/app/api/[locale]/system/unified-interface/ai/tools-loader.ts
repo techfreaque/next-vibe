@@ -10,12 +10,12 @@ import { jsonSchema, type JSONSchema7, tool } from "ai";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
+import { scopedTranslation as aiStreamScopedTranslation } from "@/app/api/[locale]/agent/ai-stream/i18n";
 import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import type { CliRequestData } from "../cli/runtime/parsing";
 import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
@@ -127,9 +127,9 @@ function createToolFromEndpoint(
         // Throw error for AI SDK with translated message
         const errorMessage = result.message
           ? t(result.message, result.messageParams)
-          : simpleT(context.locale).t(
-              "app.api.agent.aiStream.errors.toolExecutionFailed" as const,
-            );
+          : aiStreamScopedTranslation
+              .scopedT(context.locale)
+              .t("errors.toolExecutionFailed");
         // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Tool error must be thrown for AI SDK
         // eslint-disable-next-line @typescript-eslint/only-throw-error -- Tool error must be thrown for AI SDK
         throw new Error(errorMessage);

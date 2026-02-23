@@ -31,6 +31,7 @@ export const translations: typeof enTranslations = {
     settings: "Einstellungen",
   },
   config: {
+    appName: "unbottled.ai",
     folders: {
       private: "Privat",
       shared: "Geteilt",
@@ -76,6 +77,152 @@ export const translations: typeof enTranslations = {
         balance: "Guthaben",
         buy: "Kaufen",
         freeCreditsLeft: "Kostenlose Credits",
+      },
+    },
+    credits: {
+      credit: "{{count}} Credit",
+      credits: "{{count}} Credits",
+    },
+    navigation: {
+      subscription: "Abonnement & Credits",
+      referral: "Empfehlungsprogramm",
+      help: "Hilfe",
+      about: "Über uns",
+    },
+    confirmations: {
+      deleteMessage: "Möchten Sie diese Nachricht wirklich löschen?",
+    },
+    welcomeTour: {
+      authDialog: {
+        title: "Private & geteilte Ordner freischalten",
+        description:
+          "Melden Sie sich an oder erstellen Sie ein Konto, um auf private und geteilte Ordner zuzugreifen. Ihre Chats werden geräteübergreifend synchronisiert.",
+        continueTour: "Tour fortsetzen",
+        signUp: "Registrieren / Anmelden",
+      },
+      buttons: {
+        back: "Zurück",
+        close: "Schließen",
+        last: "Fertig",
+        next: "Weiter",
+        skip: "Überspringen",
+      },
+      welcome: {
+        title: "Willkommen bei {{appName}}!",
+        description:
+          "Ihre datenschutzorientierte KI-Plattform mit 40+ Modellen, benutzergesteuerter Inhaltsfilterung und freier Meinungsfreiheit.",
+        subtitle: "Machen Sie eine kurze Tour, um loszulegen.",
+      },
+      aiCompanion: {
+        title: "Wählen Sie Ihren KI-Begleiter",
+        description:
+          "Wählen Sie aus 40+ KI-Modellen, darunter Mainstream, Open-Source und zensurfreie Optionen.",
+        tip: "Klicken Sie, um den Modellselektor zu öffnen und Ihren Begleiter auszuwählen.",
+      },
+      rootFolders: {
+        title: "Ihre Chat-Ordner",
+        description:
+          "Organisieren Sie Ihre Chats in verschiedenen Ordnern, jeder mit einzigartigen Datenschutzeinstellungen:",
+        private: {
+          name: "Privat",
+          suffix: "— verschlüsselt, nur Sie können es sehen",
+        },
+        incognito: {
+          name: "Inkognito",
+          suffix: "— kein Verlauf gespeichert",
+        },
+        shared: {
+          name: "Geteilt",
+          suffix: "— mit anderen zusammenarbeiten",
+        },
+        public: {
+          name: "Öffentlich",
+          suffix: "— für alle sichtbar",
+        },
+      },
+      privateFolder: {
+        name: "Privat",
+        suffix: "Ordner",
+        description:
+          "Ihre privaten Chats sind verschlüsselt und nur für Sie sichtbar. Perfekt für sensible Themen.",
+      },
+      incognitoFolder: {
+        name: "Inkognito",
+        suffix: "Ordner",
+        description:
+          "Chatten Sie ohne Verlaufsspeicherung. Wenn Sie die Sitzung schließen, sind alle Nachrichten weg.",
+        note: "Während Inkognito-Sitzungen werden keine Daten auf unseren Servern gespeichert.",
+      },
+      sharedFolder: {
+        name: "Geteilt",
+        suffix: "Ordner",
+        description:
+          "Arbeiten Sie mit bestimmten Personen zusammen, indem Sie den Zugriff auf diesen Ordner teilen.",
+      },
+      publicFolder: {
+        name: "Öffentlich",
+        suffix: "Ordner",
+        description:
+          "Teilen Sie Ihre KI-Gespräche mit der Welt. Andere können Ihre Threads ansehen und forken.",
+        note: "Alles im öffentlichen Bereich ist für alle Benutzer und Suchmaschinen sichtbar.",
+      },
+      newChatButton: {
+        title: "Einen neuen Chat starten",
+        description:
+          "Klicken Sie hier, um ein neues Gespräch in einem beliebigen Ordner zu starten.",
+        tip: "Sie können auch den Tastaturkürzel Strg+K verwenden, um schnell einen neuen Chat zu starten.",
+      },
+      sidebarLogin: {
+        title: "Anmelden, um mehr freizuschalten",
+        description:
+          "Erstellen Sie ein kostenloses Konto, um auf private und geteilte Ordner zuzugreifen, geräteübergreifend zu synchronisieren und Ihren Gesprächsverlauf zu speichern.",
+        tip: "Die Registrierung ist kostenlos! Sie erhalten 100 kostenlose Credits zum Starten.",
+      },
+      subscriptionButton: {
+        title: "Credits & Abonnement",
+        description:
+          "Erhalten Sie {{credits}} Credits/Monat mit einem Pro-Abonnement für nur {{price}}.",
+        price: "9,99 €",
+        tip: "Credits werden für KI-Modellinteraktionen verwendet. Kostenlose Benutzer erhalten begrenzte monatliche Credits.",
+      },
+      chatInput: {
+        title: "Ihre Nachricht eingeben",
+        description:
+          "Geben Sie Ihre Nachricht hier ein und drücken Sie Enter oder klicken Sie Senden, um mit Ihrem KI-Begleiter zu chatten.",
+        tip: "Verwenden Sie Umschalt+Enter für eine neue Zeile. Sie können auch Dateien und Bilder anhängen.",
+      },
+      voiceInput: {
+        title: "Spracheingabe",
+        description:
+          "Verwenden Sie Ihr Mikrofon, um mit Ihrem KI-Begleiter zu sprechen:",
+        options: {
+          transcribe: "Sprache in Text transkribieren",
+          sendAudio: "Audio direkt an die KI senden",
+          pauseResume: "Aufnahme pausieren und fortsetzen",
+        },
+      },
+      callMode: {
+        title: "Anrufmodus",
+        description:
+          "Aktivieren Sie den Anrufmodus für ein freihändiges, sprachgesteuertes Gesprächserlebnis mit Echtzeit-KI-Antworten.",
+        tip: "Perfekt für unterwegs oder wenn Sie lieber sprechen als tippen.",
+      },
+      complete: {
+        title: "Alles erledigt!",
+        description:
+          "Sie haben die Tour abgeschlossen! Beginnen Sie jetzt, mit Ihrem KI-Begleiter zu chatten.",
+        help: "Brauchen Sie Hilfe? Klicken Sie jederzeit auf das Fragezeichen-Symbol in der Seitenleiste.",
+      },
+      authUnlocked: {
+        unlocked: "Freigeschaltet!",
+        privateDescription:
+          "Ihr privater Ordner ist jetzt verfügbar. Alle Chats hier sind verschlüsselt und nur für Sie sichtbar.",
+        privateNote:
+          "Private Chats werden automatisch auf allen Ihren Geräten synchronisiert.",
+        sharedDescription:
+          "Ihr geteilter Ordner ist jetzt verfügbar. Laden Sie andere ein, an KI-Gesprächen zusammenzuarbeiten.",
+        sharedNote:
+          "Sie kontrollieren, wer Zugang zu Ihren geteilten Ordnern und Threads hat.",
       },
     },
   },
@@ -367,14 +514,65 @@ export const translations: typeof enTranslations = {
         "Kimi K2 - Leistungsstarkes chinesisches KI-Modell mit ausgezeichnetem Kontextverständnis",
       kimiK2_5:
         "Kimi K2.5 - Erweitertes chinesisches KI-Modell mit verbesserten Reasoning- und kreativen Fähigkeiten",
+      claudeSonnet45:
+        "Claude Sonnet 4.5 - Anthropics Vorgänger-Sonnet-Modell mit starken Coding- und Analysefähigkeiten",
+      grok4:
+        "Grok 4 - xAIs Flaggschiff-Reasoning-Modell mit Vision- und Web-Suchfähigkeiten",
+      grok4Fast:
+        "Grok 4 Fast - xAIs Hochgeschwindigkeitsmodell mit 2M-Token-Kontext optimiert für schnelle Antworten",
+      gpt5Pro:
+        "GPT-5 Pro - OpenAIs Premium-Modell mit erstklassigem Reasoning und fortgeschrittenen Coding-Fähigkeiten",
+      gpt5Codex:
+        "GPT-5 Codex - OpenAIs spezialisiertes Coding-Modell mit außergewöhnlichen Programmier- und technischen Fähigkeiten",
+      gpt51Codex:
+        "GPT 5.1 Codex - Aktualisiertes OpenAI-Coding-Modell mit verbesserten kreativen und Programmierfähigkeiten",
+      gpt51:
+        "GPT 5.1 - OpenAIs effizientes Allzweck-Modell mit starkem Reasoning und Analyse",
+      gpt5: "GPT-5 - OpenAIs Flaggschiff-Modell mit breiter Intelligenz und vielseitigen Fähigkeiten",
+      gpt5Mini:
+        "GPT-5 Mini - OpenAIs leichtes schnelles Modell für schnelle alltägliche Aufgaben",
+      gpt5Nano:
+        "GPT-5 Nano - OpenAIs kleinstes und günstigstes Modell für einfache Konversationsaufgaben",
+      gptOss120b:
+        "GPT-OSS 120B - OpenAIs Open-Source-120B-Parameter-Modell mit starken Coding-Fähigkeiten",
+      kimiK2Thinking:
+        "Kimi K2 Thinking - Kimis Reasoning-fokussiertes Modell mit verbessertem analytischem und schrittweisem Denken",
+      glm45Air:
+        "GLM 4.5 AIR - Z.AIs ultraschnelles leichtgewichtiges Modell für schnelle Konversationsinteraktionen",
+      glm45v:
+        "GLM 4.5v - Z.AIs Vision-fähiges Modell mit Bildverständnis und Chat-Fähigkeiten",
+      geminiFlash25Lite:
+        "Gemini 2.5 Flash Lite - Googles Einstiegs-Gemini-Modell mit großem Kontext und schnellen Antworten",
+      geminiFlash25Flash:
+        "Gemini 2.5 Flash - Googles effizientes multimodales Modell mit 1M-Token-Kontext für schnelle Aufgaben",
+      geminiFlash25Pro:
+        "Gemini 2.5 Flash Pro - Googles Vorgänger-Pro-Modell mit großem Kontext und starkem Reasoning",
+      deepseekV31:
+        "DeepSeek V3.1 - DeepSeeks Vorgänger-Modell mit starken Coding- und Analysefähigkeiten",
+      deepseekR1:
+        "DeepSeek R1 - DeepSeeks Reasoning-fokussiertes Modell mit fortgeschrittenem schrittweisem Problemlösen",
+      qwen3235bFree:
+        "Qwen3 235B - Alibabas großes offenes Modell mit 235B Parametern für komplexe Coding- und Reasoning-Aufgaben",
+      deepseekR1Distill:
+        "DeepSeek R1 Distill - Kompakte destillierte Version von DeepSeek R1 mit effizienten Reasoning-Fähigkeiten",
+      qwen257b:
+        "Qwen 2.5 7B - Alibabas kompaktes 7B-Modell für schnelle und günstige Konversationsaufgaben",
     },
   },
   modelUtilities: {
     adultExplicit: "Explizite Erwachseneninhalte",
     adultImplied: "Angedeutete Erwachseneninhalte",
+    analysis: "Analyse",
+    chat: "Chat",
+    coding: "Programmierung",
     conspiracy: "Verschwörungstheorien",
+    controversial: "Kontroverse Themen",
+    creative: "Kreatives Schreiben",
+    fast: "Schnell",
     harmful: "Potenziell schädliche Inhalte",
     illegalInfo: "Illegale Informationen",
+    imageGen: "Bildgenerierung",
+    legacy: "Veraltet",
     medicalAdvice: "Medizinische Beratung",
     offensiveLanguage: "Beleidigende Sprache",
     politicalLeft: "Linke politische Ansichten",
@@ -382,7 +580,10 @@ export const translations: typeof enTranslations = {
     reasoning: "Fortgeschrittenes Denkvermögen",
     roleplay: "Rollenspiel",
     roleplayDark: "Dunkles Rollenspiel",
+    smart: "Intelligent",
+    uncensored: "Unzensiert",
     violence: "Gewalt",
+    vision: "Bildverarbeitung",
   },
   input: {
     attachments: {

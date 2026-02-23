@@ -18,6 +18,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
+import { scopedTranslation as creditsScopedTranslation } from "../../credits/i18n";
 import { CreditRepository } from "../../credits/repository";
 import { leads, userLeadLinks } from "../db";
 import { LeadSource, LeadStatus } from "../enum";
@@ -285,7 +286,8 @@ export class LeadAuthRepository {
 
     logger.debug(`Created anonymous lead ${newLead.id}`);
     // Create credit wallet for new lead (triggers via getLeadBalance)
-    await CreditRepository.getLeadBalance(newLead.id, logger);
+    const creditsT = creditsScopedTranslation.scopedT(locale).t;
+    await CreditRepository.getLeadBalance(newLead.id, logger, creditsT, locale);
 
     return newLead.id;
   }

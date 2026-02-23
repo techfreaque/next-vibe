@@ -11,11 +11,16 @@ import {
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { CountryLanguage } from "@/i18n/core/config";
 import { Countries } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import { EmailJourneyVariant } from "../../../enum";
+import {
+  type JourneysTranslationKey,
+  scopedTranslation as journeysScopedTranslation,
+} from "../journeys/i18n";
 import type { ABTestConfig } from "../types";
+import { scopedTranslation } from "./i18n";
 
 /**
  * A/B Test Constants
@@ -52,7 +57,7 @@ const JOURNEY_VARIANT_STATIC_METADATA: Partial<
     {
       color: string;
       icon: IconKey;
-      characteristicKeys: readonly string[];
+      characteristicKeys: readonly JourneysTranslationKey[];
     }
   >
 > = {
@@ -60,33 +65,33 @@ const JOURNEY_VARIANT_STATIC_METADATA: Partial<
     color: "#F59E0B", // Amber
     icon: "zap",
     characteristicKeys: [
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.uncensoredConvert.characteristics.tone",
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.uncensoredConvert.characteristics.story",
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.uncensoredConvert.characteristics.transparency",
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.uncensoredConvert.characteristics.angle",
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.uncensoredConvert.characteristics.energy",
+      "emailJourneys.components.journeyInfo.uncensoredConvert.characteristics.tone",
+      "emailJourneys.components.journeyInfo.uncensoredConvert.characteristics.story",
+      "emailJourneys.components.journeyInfo.uncensoredConvert.characteristics.transparency",
+      "emailJourneys.components.journeyInfo.uncensoredConvert.characteristics.angle",
+      "emailJourneys.components.journeyInfo.uncensoredConvert.characteristics.energy",
     ] as const,
   },
   [EmailJourneyVariant.SIDE_HUSTLE]: {
     color: "#10B981", // Emerald
     icon: "trending-up",
     characteristicKeys: [
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.sideHustle.characteristics.disclosure",
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.sideHustle.characteristics.updates",
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.sideHustle.characteristics.income",
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.sideHustle.characteristics.proof",
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.sideHustle.characteristics.energy",
+      "emailJourneys.components.journeyInfo.sideHustle.characteristics.disclosure",
+      "emailJourneys.components.journeyInfo.sideHustle.characteristics.updates",
+      "emailJourneys.components.journeyInfo.sideHustle.characteristics.income",
+      "emailJourneys.components.journeyInfo.sideHustle.characteristics.proof",
+      "emailJourneys.components.journeyInfo.sideHustle.characteristics.energy",
     ] as const,
   },
   [EmailJourneyVariant.QUIET_RECOMMENDATION]: {
     color: "#6B7280", // Gray
     icon: "user",
     characteristicKeys: [
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.quietRecommendation.characteristics.signal",
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.quietRecommendation.characteristics.specifics",
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.quietRecommendation.characteristics.testing",
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.quietRecommendation.characteristics.comparison",
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.quietRecommendation.characteristics.affiliate",
+      "emailJourneys.components.journeyInfo.quietRecommendation.characteristics.signal",
+      "emailJourneys.components.journeyInfo.quietRecommendation.characteristics.specifics",
+      "emailJourneys.components.journeyInfo.quietRecommendation.characteristics.testing",
+      "emailJourneys.components.journeyInfo.quietRecommendation.characteristics.comparison",
+      "emailJourneys.components.journeyInfo.quietRecommendation.characteristics.affiliate",
     ] as const,
   },
 };
@@ -244,11 +249,15 @@ export const abTestingService = new ABTestingService();
 /**
  * Validate A/B Test Configuration (standalone function)
  */
-export function validateABTestConfig(config: ABTestConfig): {
+export function validateABTestConfig(
+  config: ABTestConfig,
+  locale: CountryLanguage,
+): {
   isValid: boolean;
   errors: ErrorResponseType[];
 } {
   const errors: ErrorResponseType[] = [];
+  const t = scopedTranslation.scopedT(locale).t;
 
   // Check if weights sum to approximately 100
   const totalWeight = Object.values(config.variants).reduce(
@@ -259,8 +268,7 @@ export function validateABTestConfig(config: ABTestConfig): {
   if (Math.abs(totalWeight - 100) > 0.01) {
     errors.push(
       fail({
-        message:
-          "app.api.leads.campaigns.emails.services.abTesting.invalidWeights",
+        message: t("abTesting.invalidWeights"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
         messageParams: { totalWeight },
       }),
@@ -272,8 +280,7 @@ export function validateABTestConfig(config: ABTestConfig): {
     if (variantConfig.weight <= 0) {
       errors.push(
         fail({
-          message:
-            "app.api.leads.campaigns.emails.services.abTesting.negativeWeight",
+          message: t("abTesting.negativeWeight"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { variant, weight: variantConfig.weight },
         }),
@@ -291,8 +298,8 @@ export function validateABTestConfig(config: ABTestConfig): {
  * Get A/B Test Summary (standalone function)
  */
 export function getABTestSummary(
-  t: TFunction,
   config: ABTestConfig = DEFAULT_AB_TEST_CONFIG,
+  locale: CountryLanguage,
 ): {
   enabled: boolean;
   totalVariants: number;
@@ -310,7 +317,8 @@ export function getABTestSummary(
   }>;
   isValid: boolean;
 } {
-  const validation = validateABTestConfig(config);
+  const jt = journeysScopedTranslation.scopedT(locale).t;
+  const validation = validateABTestConfig(config, locale);
 
   const variants = Object.entries(config.variants) as Array<
     [
@@ -319,32 +327,40 @@ export function getABTestSummary(
     ]
   >;
 
-  const base =
-    "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo";
-
   return {
     enabled: config.isActive,
     totalVariants: Object.keys(config.variants).length,
     variants: variants.map(([key, variant]) => {
       const staticMeta = JOURNEY_VARIANT_STATIC_METADATA[key];
-      // Map enum key to camelCase journey info key
-      const journeyKey =
-        key === EmailJourneyVariant.UNCENSORED_CONVERT
-          ? "uncensoredConvert"
-          : key === EmailJourneyVariant.SIDE_HUSTLE
-            ? "sideHustle"
-            : key === EmailJourneyVariant.QUIET_RECOMMENDATION
-              ? "quietRecommendation"
-              : null;
 
-      const name = journeyKey
-        ? t(`${base}.${journeyKey}.name`)
-        : variant.description;
-      const description = journeyKey
-        ? t(`${base}.${journeyKey}.longDescription`)
-        : variant.description;
+      let name: string;
+      let description: string;
+      if (key === EmailJourneyVariant.UNCENSORED_CONVERT) {
+        name = jt(
+          "emailJourneys.components.journeyInfo.uncensoredConvert.name",
+        );
+        description = jt(
+          "emailJourneys.components.journeyInfo.uncensoredConvert.longDescription",
+        );
+      } else if (key === EmailJourneyVariant.SIDE_HUSTLE) {
+        name = jt("emailJourneys.components.journeyInfo.sideHustle.name");
+        description = jt(
+          "emailJourneys.components.journeyInfo.sideHustle.longDescription",
+        );
+      } else if (key === EmailJourneyVariant.QUIET_RECOMMENDATION) {
+        name = jt(
+          "emailJourneys.components.journeyInfo.quietRecommendation.name",
+        );
+        description = jt(
+          "emailJourneys.components.journeyInfo.quietRecommendation.longDescription",
+        );
+      } else {
+        name = variant.description;
+        description = variant.description;
+      }
+
       const characteristics = staticMeta
-        ? staticMeta.characteristicKeys.map((k) => t(k))
+        ? staticMeta.characteristicKeys.map((k) => jt(k))
         : [];
 
       return {

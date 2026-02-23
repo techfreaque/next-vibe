@@ -12,7 +12,7 @@ import { taskIndexGeneratorRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger }) =>
-      taskIndexGeneratorRepository.generateTaskIndex(data, logger),
+    handler: ({ data, logger, t }) =>
+      taskIndexGeneratorRepository.generateTaskIndex(data, logger, t),
   },
 });

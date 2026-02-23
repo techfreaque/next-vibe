@@ -1,4 +1,9 @@
 export const translations = {
+  category: "IMAP Client",
+  tags: {
+    accounts: "Accounts",
+  },
+
   // Shared translation keys
   tag: "IMAP Message",
 

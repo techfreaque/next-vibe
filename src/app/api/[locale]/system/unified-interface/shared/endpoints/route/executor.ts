@@ -18,6 +18,7 @@ import {
   success,
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { getRouteHandler } from "@/app/api/[locale]/system/generated/route-handlers";
+import { scopedTranslation as systemScopedTranslation } from "@/app/api/[locale]/system/i18n";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -61,13 +62,13 @@ export class RouteExecutionExecutor {
     logger: EndpointLogger;
     platform: CliCompatiblePlatform | Platform.AI;
   }): Promise<ResponseType<TResult>> {
+    const { t } = systemScopedTranslation.scopedT(params.locale);
     try {
       const handlerResult = await getRouteHandler(params.toolName);
 
       if (!handlerResult) {
         return fail({
-          message:
-            "app.api.system.unifiedInterface.cli.vibe.errors.routeNotFound",
+          message: t("unifiedInterface.cli.vibe.errors.routeNotFound"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -96,8 +97,7 @@ export class RouteExecutionExecutor {
       // Streaming responses are not supported in CLI/AI/MCP platforms
       if (isStreamingResponse(result)) {
         return fail({
-          message:
-            "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
+          message: t("unifiedInterface.cli.vibe.errors.executionFailed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -105,8 +105,7 @@ export class RouteExecutionExecutor {
       // File responses are not supported in CLI/AI/MCP platforms
       if (isFileResponse(result)) {
         return fail({
-          message:
-            "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
+          message: t("unifiedInterface.cli.vibe.errors.executionFailed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -131,7 +130,7 @@ export class RouteExecutionExecutor {
         },
       );
       return fail({
-        message: "app.api.system.unifiedInterface.cli.vibe.errors.unknownError",
+        message: t("unifiedInterface.cli.vibe.errors.unknownError"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

@@ -11,6 +11,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ModelId } from "../../../models/models";
+import type { AiStreamT } from "../../i18n";
 import type { StreamContext } from "../core/stream-context";
 import type { StreamingTTSHandler } from "../streaming-tts";
 import { FinishStepHandler } from "./finish-step-handler";
@@ -41,6 +42,7 @@ export class StreamPartHandler {
     emittedToolResultIds: Set<string> | undefined;
     ttsHandler: StreamingTTSHandler | null;
     logger: EndpointLogger;
+    t: AiStreamT;
   }): Promise<{ shouldAbort: boolean }> {
     const {
       part,
@@ -58,6 +60,7 @@ export class StreamPartHandler {
       emittedToolResultIds,
       ttsHandler,
       logger,
+      t,
     } = params;
 
     if (part.type === "finish-step") {
@@ -249,6 +252,7 @@ export class StreamPartHandler {
           toolsConfig,
           dbWriter: ctx.dbWriter,
           logger,
+          t,
         });
         if (result) {
           ctx.currentParentId = result.currentParentId;
@@ -289,6 +293,7 @@ export class StreamPartHandler {
         dbWriter: ctx.dbWriter,
         logger,
         emittedToolResultIds,
+        t,
       });
       if (result) {
         ctx.currentParentId = result.currentParentId;

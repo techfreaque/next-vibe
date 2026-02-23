@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Profil użytkownika",
+
   tag: "awatar",
   errors: {
     user_not_found: "Użytkownik nie znaleziony",
@@ -45,6 +47,8 @@ export const translations: typeof enTranslations = {
         validation: {
           maxSize: "Rozmiar pliku musi być mniejszy niż 5MB",
           imageOnly: "Dozwolone są tylko pliki obrazów",
+          unsupportedFormat:
+            "Nieobsługiwany format obrazu. Użyj JPEG, PNG, WebP lub GIF.",
         },
       },
     },

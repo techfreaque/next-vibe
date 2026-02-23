@@ -23,17 +23,23 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: ({ data, urlPathParams, user, logger }) =>
+    handler: ({ data, urlPathParams, user, locale, logger }) =>
       ThreadByIdRepository.updateThread(
         data,
         urlPathParams.threadId,
         user,
+        locale,
         logger,
       ),
   },
   [Methods.DELETE]: {
     email: undefined,
-    handler: ({ urlPathParams, user, logger }) =>
-      ThreadByIdRepository.deleteThread(urlPathParams.threadId, user, logger),
+    handler: ({ urlPathParams, user, locale, logger }) =>
+      ThreadByIdRepository.deleteThread(
+        urlPathParams.threadId,
+        user,
+        locale,
+        logger,
+      ),
   },
 });

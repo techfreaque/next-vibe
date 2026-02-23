@@ -1,3 +1,4 @@
+import { notFound } from "next-vibe-ui/lib/not-found";
 import { Div } from "next-vibe-ui/ui/div";
 import { PageLayout } from "next-vibe-ui/ui/page-layout";
 import type { JSX, ReactNode } from "react";
@@ -13,6 +14,7 @@ import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import type { StandardUserType } from "@/app/api/[locale]/user/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { navItems } from "../story/_components/nav/nav-constants";
@@ -26,6 +28,9 @@ export default async function SiteLayoutServer({
   children,
   params,
 }: SiteLayoutProps): Promise<JSX.Element> {
+  if (env.NEXT_PUBLIC_LOCAL_MODE) {
+    notFound();
+  }
   const { locale } = await params;
 
   // Create logger for server-side operations

@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Agent",
+
   get: {
     title: "Fetch OpenRouter Model Pricing",
     description:

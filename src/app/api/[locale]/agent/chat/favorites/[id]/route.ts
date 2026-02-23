@@ -13,22 +13,30 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ urlPathParams, user, logger }) =>
-      SingleFavoriteRepository.getFavorite(urlPathParams, user, logger),
+    handler: ({ urlPathParams, user, logger, t, locale }) =>
+      SingleFavoriteRepository.getFavorite(
+        urlPathParams,
+        user,
+        logger,
+        t,
+        locale,
+      ),
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: ({ data, urlPathParams, user, logger }) =>
+    handler: ({ data, urlPathParams, user, logger, t, locale }) =>
       SingleFavoriteRepository.updateFavorite(
         data,
         urlPathParams,
         user,
         logger,
+        t,
+        locale,
       ),
   },
   [Methods.DELETE]: {
     email: undefined,
-    handler: ({ urlPathParams, user, logger }) =>
-      SingleFavoriteRepository.deleteFavorite(urlPathParams, user, logger),
+    handler: ({ urlPathParams, user, logger, t }) =>
+      SingleFavoriteRepository.deleteFavorite(urlPathParams, user, logger, t),
   },
 });

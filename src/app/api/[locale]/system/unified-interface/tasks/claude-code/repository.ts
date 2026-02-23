@@ -1,12 +1,15 @@
 /**
  * Claude Code Repository
- * Spawns `claude -p` CLI with a prompt, blocks until done, returns output.
+ * Two modes controlled by the `headless` flag:
+ * - headless:false (default): spawns `claude` with inherited stdio so the user can chat
+ * - headless:true: spawns `claude -p` and pipes output back
+ * Both modes require a prompt.
  */
 
 import "server-only";
 
-import { exec } from "node:child_process";
-import { promisify } from "node:util";
+import { spawn } from "node:child_process";
+import { once } from "node:events";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -18,34 +21,31 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import type { scopedTranslation } from "../i18n";
 import type { RunRequestOutput, RunResponseOutput } from "./definition";
 
-const execAsync = promisify(exec);
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
-/** Max output buffer: 10 MB */
-const MAX_BUFFER = 10 * 1024 * 1024;
-
-/** Shell-escape a single argument */
-function shellEscape(arg: string): string {
-  return `'${arg.replace(/'/g, "'\\''")}'`;
-}
+// Ain't got time for that
+const YOLO_MODE = true;
 
 export async function runClaudeCode(
   data: RunRequestOutput,
   logger: EndpointLogger,
+  t: ModuleT,
 ): Promise<ResponseType<RunResponseOutput>> {
   const timeoutMs = data.timeoutMs ?? 600000;
   const start = Date.now();
+  const isInteractive = !(data.headless ?? false);
 
-  // Build claude CLI args
-  const args: string[] = [
-    "claude",
-    "-p",
-    data.prompt,
-    "--output-format",
-    "text",
-  ];
-
+  // Interactive: full claude session (user can chat back and forth)
+  // Batch: -p print mode, returns when done
+  const args: string[] = isInteractive
+    ? [data.prompt]
+    : ["-p", data.prompt, "--output-format", "text"];
+  if (YOLO_MODE) {
+    args.push("--dangerously-skip-permissions");
+  }
   if (data.model) {
     args.push("--model", data.model);
   }
@@ -59,74 +59,75 @@ export async function runClaudeCode(
     args.push("--allowedTools", data.allowedTools);
   }
 
-  const command = args.map(shellEscape).join(" ");
-
   logger.info("Running Claude Code CLI", {
+    mode: isInteractive ? "interactive" : "batch",
     prompt: data.prompt.slice(0, 200),
     model: data.model,
     timeoutMs,
   });
 
+  const stdoutChunks: Buffer[] = [];
+  const stderrChunks: Buffer[] = [];
+
+  const child = spawn("claude", args, {
+    cwd: data.workingDir ?? process.cwd(),
+    env: process.env,
+    stdio: isInteractive ? "inherit" : ["ignore", "pipe", "pipe"],
+  });
+
+  if (!isInteractive) {
+    child.stdout?.on("data", (chunk: Buffer) => {
+      stdoutChunks.push(chunk);
+      process.stdout.write(chunk);
+    });
+    child.stderr?.on("data", (chunk: Buffer) => {
+      stderrChunks.push(chunk);
+      process.stderr.write(chunk);
+    });
+  }
+
+  const timer = setTimeout(() => {
+    child.kill("SIGTERM");
+  }, timeoutMs);
+
   try {
-    const { stdout, stderr } = await execAsync(command, {
-      cwd: data.workingDir ?? process.cwd(),
-      timeout: timeoutMs,
-      maxBuffer: MAX_BUFFER,
-    });
-
-    const durationMs = Date.now() - start;
-
-    logger.info("Claude Code CLI completed", {
-      durationMs,
-      outputLength: stdout.length,
-    });
-
-    // Combine output — claude -p writes to stdout, errors to stderr
-    const output = stderr ? `${stdout}\n\n--- stderr ---\n${stderr}` : stdout;
-
-    return success({
-      output,
-      exitCode: 0,
-      durationMs,
-    });
-  } catch (error) {
-    const durationMs = Date.now() - start;
-
-    // exec errors include exit code and output
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      "stdout" in error
-    ) {
-      const execError = error as {
-        code: number;
-        stdout: string;
-        stderr: string;
-      };
-
-      logger.error("Claude Code CLI exited with error", {
-        exitCode: execError.code,
-        durationMs,
-      });
-
-      const output = execError.stderr
-        ? `${execError.stdout}\n\n--- stderr ---\n${execError.stderr}`
-        : execError.stdout;
-
-      return success({
-        output: output || "No output",
-        exitCode: execError.code,
-        durationMs,
-      });
-    }
-
-    logger.error("Claude Code CLI failed", parseError(error));
-
+    await once(child, "close");
+  } catch (err) {
+    clearTimeout(timer);
+    logger.error("Claude Code CLI failed to spawn", parseError(err));
     return fail({
-      message:
-        "app.api.system.unifiedInterface.tasks.claudeCode.run.post.errors.internal.title",
+      message: t("claudeCode.run.post.errors.internal.title"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
+
+  clearTimeout(timer);
+  const durationMs = Date.now() - start;
+  const exitCode = child.exitCode ?? 1;
+
+  if (isInteractive) {
+    logger.info("Claude Code interactive session finished", {
+      exitCode,
+      durationMs,
+    });
+    return success({ output: "", exitCode, durationMs });
+  }
+
+  const stdout = Buffer.concat(stdoutChunks).toString("utf8");
+  const stderr = Buffer.concat(stderrChunks).toString("utf8");
+
+  logger.info("Claude Code batch finished", {
+    exitCode,
+    durationMs,
+    stdoutLength: stdout.length,
+    stderrLength: stderr.length,
+  });
+
+  const output = stderr ? `${stdout}\n\n--- stderr ---\n${stderr}` : stdout;
+
+  return success({
+    output: output || "No output",
+    exitCode,
+    durationMs,
+  });
 }

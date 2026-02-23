@@ -1,6 +1,11 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Chat",
+  tags: {
+    favorites: "Favoriten",
+  },
+
   get: {
     title: "Favorit abrufen",
     description: "Spezifische Favoriten-Konfiguration abrufen",

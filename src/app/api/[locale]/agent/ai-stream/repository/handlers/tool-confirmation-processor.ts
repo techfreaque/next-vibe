@@ -14,6 +14,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { db } from "../../../../system/db";
 import type { ChatMessage, ToolCall } from "../../../chat/db";
 import { chatMessages } from "../../../chat/db";
+import type { AiStreamT } from "../../i18n";
 import { ToolConfirmationHandler } from "./tool-confirmation-handler";
 
 export class ToolConfirmationProcessor {
@@ -27,6 +28,7 @@ export class ToolConfirmationProcessor {
     locale: CountryLanguage;
     logger: EndpointLogger;
     user: JwtPayloadType;
+    t: AiStreamT;
   }): Promise<
     ResponseType<
       Array<{
@@ -43,6 +45,7 @@ export class ToolConfirmationProcessor {
       locale,
       logger,
       user,
+      t,
     } = params;
 
     logger.debug("[Setup] Processing tool confirmations", {
@@ -66,6 +69,7 @@ export class ToolConfirmationProcessor {
           locale,
           logger,
           user,
+          t,
         });
 
       if (!confirmResult.success) {

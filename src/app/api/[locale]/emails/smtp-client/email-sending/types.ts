@@ -8,7 +8,6 @@ import "server-only";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import type {
   EmailCampaignStageValues,
@@ -29,7 +28,6 @@ export interface SendEmailParams {
 
   // Localization and context
   locale: CountryLanguage;
-  t: TFunction;
 
   // Sender information
   senderName?: string; // Sender name from template, defaults to app name

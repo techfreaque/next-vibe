@@ -69,4 +69,9 @@ export const translations: typeof enTranslations = {
     title: "Konsolen-Nachricht erfolgreich abgerufen",
     description: "Die Konsolen-Nachricht wurde erfolgreich abgerufen",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    debugging: "Debugging",
+  },
 };

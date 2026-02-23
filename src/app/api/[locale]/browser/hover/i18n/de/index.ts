@@ -72,4 +72,9 @@ export const translations: typeof enTranslations = {
     title: "Hover-Vorgang erfolgreich",
     description: "Das Element wurde erfolgreich überflogen",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    inputAutomation: "Eingabe-Automatisierung",
+  },
 };

@@ -15,13 +15,13 @@ import {
 } from "@/app/api/[locale]/shared/stats-filtering";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  objectField,
-  objectOptionalField,
-  requestField,
-  responseField,
-  widgetField,
+  scopedBackButton,
+  scopedObjectFieldNew,
+  scopedObjectOptionalField,
+  scopedRequestField,
+  scopedResponseField,
+  scopedWidgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -49,111 +49,104 @@ import {
   UserStatusFilter,
   UserStatusFilterOptions,
 } from "../enum";
+import { scopedTranslation } from "./i18n";
 import { UsersStatsContainer } from "./widget";
 
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["users", "stats"],
-  title: "app.api.users.stats.title" as const,
-  description: "app.api.users.stats.description" as const,
+  title: "title" as const,
+  description: "description" as const,
   icon: "bar-chart-3",
-  category: "app.api.user.category" as const,
-  tags: ["app.api.users.stats.tag" as const],
+  category: "category" as const,
+  tags: ["tag" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
   fields: customWidgetObject({
     render: UsersStatsContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({ usage: { response: true } }),
+      backButton: scopedBackButton(scopedTranslation, {
+        usage: { response: true },
+      }),
 
       // === FORM ALERT (shows validation and API errors) ===
-      formAlert: widgetField({
+      formAlert: scopedWidgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
         order: 3.5,
         usage: { request: "data" },
       }),
 
       // === BASIC FILTERS ===
-      basicFilters: objectOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.users.stats.basicFilters.title" as const,
-          description: "app.api.users.stats.basicFilters.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 3,
-          order: 1,
-          showFormAlert: false,
-          showSubmitButton: false,
-        },
-        { request: "data" },
-        {
-          search: requestField({
+      basicFilters: scopedObjectOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "basicFilters.title" as const,
+        description: "basicFilters.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 3,
+        order: 1,
+        showFormAlert: false,
+        showSubmitButton: false,
+        usage: { request: "data" },
+        children: {
+          search: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
-            label: "app.api.users.stats.fields.search.label" as const,
-            description:
-              "app.api.users.stats.fields.search.description" as const,
-            placeholder:
-              "app.api.users.stats.fields.search.placeholder" as const,
+            label: "fields.search.label" as const,
+            description: "fields.search.description" as const,
+            placeholder: "fields.search.placeholder" as const,
             columns: 12,
             schema: z.string().optional(),
           }),
-          status: requestField({
+          status: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label: "app.api.users.stats.fields.status.label" as const,
-            description:
-              "app.api.users.stats.fields.status.description" as const,
+            label: "fields.status.label" as const,
+            description: "fields.status.description" as const,
             options: UserStatusFilterOptions,
             columns: 6,
             schema: z.enum(UserStatusFilter).default(UserStatusFilter.ALL),
           }),
-          role: requestField({
+          role: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label: "app.api.users.stats.fields.role.label" as const,
-            description: "app.api.users.stats.fields.role.description" as const,
+            label: "fields.role.label" as const,
+            description: "fields.role.description" as const,
             options: UserRoleFilterOptions,
             columns: 6,
             schema: z.enum(UserRoleFilter).default(UserRoleFilter.ALL),
           }),
         },
-      ),
+      }),
 
       // === SUBSCRIPTION FILTERS ===
-      subscriptionFilters: objectOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.users.stats.subscriptionFilters.title" as const,
-          description:
-            "app.api.users.stats.subscriptionFilters.description" as const,
-          layoutType: LayoutType.GRID_2_COLUMNS,
-          order: 1.5,
-          showFormAlert: false,
-          showSubmitButton: false,
-        },
-        { request: "data" },
-        {
-          subscriptionStatus: requestField({
+      subscriptionFilters: scopedObjectOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "subscriptionFilters.title" as const,
+        description: "subscriptionFilters.description" as const,
+        layoutType: LayoutType.GRID_2_COLUMNS,
+        order: 1.5,
+        showFormAlert: false,
+        showSubmitButton: false,
+        usage: { request: "data" },
+        children: {
+          subscriptionStatus: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label:
-              "app.api.users.stats.fields.subscriptionStatus.label" as const,
-            description:
-              "app.api.users.stats.fields.subscriptionStatus.description" as const,
+            label: "fields.subscriptionStatus.label" as const,
+            description: "fields.subscriptionStatus.description" as const,
             options: SubscriptionStatusFilterOptions,
             columns: 6,
             schema: z
               .enum(SubscriptionStatusFilter)
               .default(SubscriptionStatusFilter.ALL),
           }),
-          paymentMethod: requestField({
+          paymentMethod: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label: "app.api.users.stats.fields.paymentMethod.label" as const,
-            description:
-              "app.api.users.stats.fields.paymentMethod.description" as const,
+            label: "fields.paymentMethod.label" as const,
+            description: "fields.paymentMethod.description" as const,
             options: PaymentMethodFilterOptions,
             columns: 6,
             schema: z
@@ -161,128 +154,109 @@ const { GET } = createEndpoint({
               .default(PaymentMethodFilter.ALL),
           }),
         },
-      ),
+      }),
 
       // === LOCATION FILTERS ===
-      locationFilters: objectOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.users.stats.locationFilters.title" as const,
-          description:
-            "app.api.users.stats.locationFilters.description" as const,
-          layoutType: LayoutType.GRID_2_COLUMNS,
-          order: 2,
-          showFormAlert: false,
-          showSubmitButton: false,
-        },
-        { request: "data" },
-        {
-          country: requestField({
+      locationFilters: scopedObjectOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "locationFilters.title" as const,
+        description: "locationFilters.description" as const,
+        layoutType: LayoutType.GRID_2_COLUMNS,
+        order: 2,
+        showFormAlert: false,
+        showSubmitButton: false,
+        usage: { request: "data" },
+        children: {
+          country: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label: "app.api.users.stats.fields.country.label" as const,
-            description:
-              "app.api.users.stats.fields.country.description" as const,
-            placeholder:
-              "app.api.users.stats.fields.country.placeholder" as const,
+            label: "fields.country.label" as const,
+            description: "fields.country.description" as const,
+            placeholder: "fields.country.placeholder" as const,
             options: CountriesOptions,
             columns: 6,
             schema: z.enum(Countries).optional(),
           }),
-          language: requestField({
+          language: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label: "app.api.users.stats.fields.language.label" as const,
-            description:
-              "app.api.users.stats.fields.language.description" as const,
-            placeholder:
-              "app.api.users.stats.fields.language.placeholder" as const,
+            label: "fields.language.label" as const,
+            description: "fields.language.description" as const,
+            placeholder: "fields.language.placeholder" as const,
             options: LanguagesOptions,
             columns: 6,
             schema: z.enum(Languages).optional(),
           }),
         },
-      ),
+      }),
 
       // === TIME PERIOD OPTIONS ===
-      timePeriodOptions: objectOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.users.stats.timePeriodOptions.title" as const,
-          description:
-            "app.api.users.stats.timePeriodOptions.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 4,
-          order: 3,
-          showFormAlert: false,
-          showSubmitButton: false,
-        },
-        { request: "data" },
-        {
-          timePeriod: requestField({
+      timePeriodOptions: scopedObjectOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "timePeriodOptions.title" as const,
+        description: "timePeriodOptions.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 4,
+        order: 3,
+        showFormAlert: false,
+        showSubmitButton: false,
+        usage: { request: "data" },
+        children: {
+          timePeriod: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label: "app.api.users.stats.fields.timePeriod.label" as const,
-            description:
-              "app.api.users.stats.fields.timePeriod.description" as const,
+            label: "fields.timePeriod.label" as const,
+            description: "fields.timePeriod.description" as const,
             options: TimePeriodOptions,
             columns: 3,
             schema: z.enum(TimePeriod).default(TimePeriod.DAY),
           }),
-          dateRangePreset: requestField({
+          dateRangePreset: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label: "app.api.users.stats.fields.dateRangePreset.label" as const,
-            description:
-              "app.api.users.stats.fields.dateRangePreset.description" as const,
+            label: "fields.dateRangePreset.label" as const,
+            description: "fields.dateRangePreset.description" as const,
             options: DateRangePresetOptions,
             columns: 3,
             schema: z
               .enum(DateRangePreset)
               .default(DateRangePreset.LAST_30_DAYS),
           }),
-          chartType: requestField({
+          chartType: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label: "app.api.users.stats.fields.chartType.label" as const,
-            description:
-              "app.api.users.stats.fields.chartType.description" as const,
+            label: "fields.chartType.label" as const,
+            description: "fields.chartType.description" as const,
             options: ChartTypeOptions,
             columns: 3,
             schema: z.enum(ChartType).default(ChartType.LINE),
           }),
-          includeComparison: requestField({
+          includeComparison: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
-            label:
-              "app.api.users.stats.fields.includeComparison.label" as const,
-            description:
-              "app.api.users.stats.fields.includeComparison.description" as const,
+            label: "fields.includeComparison.label" as const,
+            description: "fields.includeComparison.description" as const,
             columns: 3,
             schema: z.coerce.boolean().default(false),
           }),
         },
-      ),
+      }),
 
       // === OVERVIEW STATISTICS ===
-      overviewStats: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.users.stats.response.overviewStats.title" as const,
-          description:
-            "app.api.users.stats.response.overviewStats.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 4,
-          order: 4,
-          showFormAlert: false,
-          showSubmitButton: false,
-        },
-        { response: true },
-        {
-          totalUsers: responseField({
+      overviewStats: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.overviewStats.title" as const,
+        description: "response.overviewStats.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 4,
+        order: 4,
+        showFormAlert: false,
+        showSubmitButton: false,
+        usage: { response: true },
+        children: {
+          totalUsers: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.users.stats.response.overviewStats.totalUsers.label" as const,
+            label: "response.overviewStats.totalUsers.label" as const,
             icon: "users",
             variant: "default",
             format: "compact",
@@ -290,73 +264,64 @@ const { GET } = createEndpoint({
               .number()
               .describe("Total number of users in system"),
           }),
-          activeUsers: responseField({
+          activeUsers: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.users.stats.response.overviewStats.activeUsers.label" as const,
+            label: "response.overviewStats.activeUsers.label" as const,
             icon: "check",
             variant: "success",
             format: "compact",
             schema: z.coerce.number().describe("Number of active users"),
           }),
-          inactiveUsers: responseField({
+          inactiveUsers: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.users.stats.response.overviewStats.inactiveUsers.label" as const,
+            label: "response.overviewStats.inactiveUsers.label" as const,
             icon: "alert-circle",
             variant: "muted",
             format: "compact",
             schema: z.coerce.number().describe("Number of inactive users"),
           }),
-          newUsers: responseField({
+          newUsers: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.users.stats.response.overviewStats.newUsers.label" as const,
+            label: "response.overviewStats.newUsers.label" as const,
             icon: "trending-up",
             variant: "info",
             format: "compact",
             schema: z.coerce.number().describe("New users this period"),
           }),
         },
-      ),
+      }),
 
       // === EMAIL VERIFICATION STATISTICS ===
-      emailStats: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.users.stats.response.emailStats.title" as const,
-          description:
-            "app.api.users.stats.response.emailStats.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 3,
-          order: 5,
-          showFormAlert: false,
-          showSubmitButton: false,
-        },
-        { response: true },
-        {
-          emailVerifiedUsers: responseField({
+      emailStats: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.emailStats.title" as const,
+        description: "response.emailStats.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 3,
+        order: 5,
+        showFormAlert: false,
+        showSubmitButton: false,
+        usage: { response: true },
+        children: {
+          emailVerifiedUsers: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.users.stats.response.emailStats.emailVerifiedUsers.label" as const,
+            label: "response.emailStats.emailVerifiedUsers.label" as const,
             icon: "check-circle",
             variant: "success",
             format: "compact",
             schema: z.coerce.number().describe("Users with verified emails"),
           }),
-          emailUnverifiedUsers: responseField({
+          emailUnverifiedUsers: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.users.stats.response.emailStats.emailUnverifiedUsers.label" as const,
+            label: "response.emailStats.emailUnverifiedUsers.label" as const,
             icon: "x-circle",
             variant: "warning",
             format: "compact",
             schema: z.coerce.number().describe("Users with unverified emails"),
           }),
-          verificationRate: responseField({
+          verificationRate: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.users.stats.response.emailStats.verificationRate.label" as const,
+            label: "response.emailStats.verificationRate.label" as const,
             icon: "activity",
             variant: "info",
             format: "percentage",
@@ -365,28 +330,24 @@ const { GET } = createEndpoint({
               .describe("Email verification percentage (0-1)"),
           }),
         },
-      ),
+      }),
 
       // === SUBSCRIPTION STATISTICS ===
-      subscriptionStats: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.users.stats.response.subscriptionStats.title" as const,
-          description:
-            "app.api.users.stats.response.subscriptionStats.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 4,
-          order: 6,
-          showFormAlert: false,
-          showSubmitButton: false,
-        },
-        { response: true },
-        {
-          activeSubscriptions: responseField({
+      subscriptionStats: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.subscriptionStats.title" as const,
+        description: "response.subscriptionStats.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 4,
+        order: 6,
+        showFormAlert: false,
+        showSubmitButton: false,
+        usage: { response: true },
+        children: {
+          activeSubscriptions: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
             label:
-              "app.api.users.stats.response.subscriptionStats.activeSubscriptions.label" as const,
+              "response.subscriptionStats.activeSubscriptions.label" as const,
             icon: "check",
             variant: "success",
             format: "compact",
@@ -394,10 +355,10 @@ const { GET } = createEndpoint({
               .number()
               .describe("Users with active subscriptions"),
           }),
-          canceledSubscriptions: responseField({
+          canceledSubscriptions: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
             label:
-              "app.api.users.stats.response.subscriptionStats.canceledSubscriptions.label" as const,
+              "response.subscriptionStats.canceledSubscriptions.label" as const,
             icon: "x",
             variant: "warning",
             format: "compact",
@@ -405,10 +366,10 @@ const { GET } = createEndpoint({
               .number()
               .describe("Users with canceled subscriptions"),
           }),
-          expiredSubscriptions: responseField({
+          expiredSubscriptions: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
             label:
-              "app.api.users.stats.response.subscriptionStats.expiredSubscriptions.label" as const,
+              "response.subscriptionStats.expiredSubscriptions.label" as const,
             icon: "clock",
             variant: "muted",
             format: "compact",
@@ -416,10 +377,9 @@ const { GET } = createEndpoint({
               .number()
               .describe("Users with expired subscriptions"),
           }),
-          noSubscription: responseField({
+          noSubscription: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.users.stats.response.subscriptionStats.noSubscription.label" as const,
+            label: "response.subscriptionStats.noSubscription.label" as const,
             icon: "users",
             variant: "muted",
             format: "compact",
@@ -427,13 +387,13 @@ const { GET } = createEndpoint({
               .number()
               .describe("Users without any subscription"),
           }),
-          subscriptionChart: responseField({
+          subscriptionChart: scopedResponseField(scopedTranslation, {
             type: WidgetType.CHART,
             chartType: "pie",
             label:
-              "app.api.users.stats.response.subscriptionStats.subscriptionChart.label" as const,
+              "response.subscriptionStats.subscriptionChart.label" as const,
             description:
-              "app.api.users.stats.response.subscriptionStats.subscriptionChart.description" as const,
+              "response.subscriptionStats.subscriptionChart.description" as const,
             height: 280,
             showLegend: true,
             columns: 12,
@@ -448,108 +408,94 @@ const { GET } = createEndpoint({
               .describe("Subscription distribution chart data"),
           }),
         },
-      ),
+      }),
 
       // === PAYMENT STATISTICS ===
-      paymentStats: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.users.stats.response.paymentStats.title" as const,
-          description:
-            "app.api.users.stats.response.paymentStats.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 4,
-          order: 6.5,
-          showFormAlert: false,
-          showSubmitButton: false,
-        },
-        { response: true },
-        {
-          totalRevenue: responseField({
+      paymentStats: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.paymentStats.title" as const,
+        description: "response.paymentStats.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 4,
+        order: 6.5,
+        showFormAlert: false,
+        showSubmitButton: false,
+        usage: { response: true },
+        children: {
+          totalRevenue: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.users.stats.response.paymentStats.totalRevenue.label" as const,
+            label: "response.paymentStats.totalRevenue.label" as const,
             icon: "dollar-sign",
             variant: "success",
             format: "currency",
             schema: z.coerce.number().describe("Total revenue in cents"),
           }),
-          transactionCount: responseField({
+          transactionCount: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.users.stats.response.paymentStats.transactionCount.label" as const,
+            label: "response.paymentStats.transactionCount.label" as const,
             icon: "receipt",
             variant: "info",
             format: "compact",
             schema: z.coerce.number().describe("Total number of transactions"),
           }),
-          averageOrderValue: responseField({
+          averageOrderValue: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.users.stats.response.paymentStats.averageOrderValue.label" as const,
+            label: "response.paymentStats.averageOrderValue.label" as const,
             icon: "trending-up",
             variant: "info",
             format: "currency",
             schema: z.coerce.number().describe("Average order value in cents"),
           }),
-          refundRate: responseField({
+          refundRate: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.users.stats.response.paymentStats.refundRate.label" as const,
+            label: "response.paymentStats.refundRate.label" as const,
             icon: "refresh-cw",
             variant: "warning",
             format: "percentage",
             schema: z.coerce.number().describe("Refund rate (0-1)"),
           }),
         },
-      ),
+      }),
 
       // === ROLE DISTRIBUTION ===
-      roleDistribution: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.users.stats.response.roleStats.title" as const,
-          description:
-            "app.api.users.stats.response.roleStats.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 3,
-          order: 7,
-          showFormAlert: false,
-          showSubmitButton: false,
-        },
-        { response: true },
-        {
-          publicUsers: responseField({
+      roleDistribution: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.roleStats.title" as const,
+        description: "response.roleStats.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 3,
+        order: 7,
+        showFormAlert: false,
+        showSubmitButton: false,
+        usage: { response: true },
+        children: {
+          publicUsers: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.users.stats.response.roleStats.publicUsers.label" as const,
+            label: "response.roleStats.publicUsers.label" as const,
             icon: "users",
             variant: "muted",
             size: "sm",
             schema: z.coerce.number().describe("Users with public role"),
           }),
-          customerUsers: responseField({
+          customerUsers: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.users.stats.response.roleStats.customerUsers.label" as const,
+            label: "response.roleStats.customerUsers.label" as const,
             icon: "users",
             variant: "success",
             size: "sm",
             schema: z.coerce.number().describe("Users with customer role"),
           }),
-          partnerAdminUsers: responseField({
+          partnerAdminUsers: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.users.stats.response.roleStats.partnerAdminUsers.label" as const,
+            label: "response.roleStats.partnerAdminUsers.label" as const,
             icon: "users",
             variant: "info",
             size: "sm",
             schema: z.coerce.number().describe("Users with partner admin role"),
           }),
-          partnerEmployeeUsers: responseField({
+          partnerEmployeeUsers: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.users.stats.response.roleStats.partnerEmployeeUsers.label" as const,
+            label: "response.roleStats.partnerEmployeeUsers.label" as const,
             icon: "users",
             variant: "info",
             size: "sm",
@@ -557,22 +503,19 @@ const { GET } = createEndpoint({
               .number()
               .describe("Users with partner employee role"),
           }),
-          adminUsers: responseField({
+          adminUsers: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
-            label:
-              "app.api.users.stats.response.roleStats.adminUsers.label" as const,
+            label: "response.roleStats.adminUsers.label" as const,
             icon: "star",
             variant: "warning",
             size: "sm",
             schema: z.coerce.number().describe("Users with admin role"),
           }),
-          roleChart: responseField({
+          roleChart: scopedResponseField(scopedTranslation, {
             type: WidgetType.CHART,
             chartType: "pie",
-            label:
-              "app.api.users.stats.response.roleStats.roleChart.label" as const,
-            description:
-              "app.api.users.stats.response.roleStats.roleChart.description" as const,
+            label: "response.roleStats.roleChart.label" as const,
+            description: "response.roleStats.roleChart.description" as const,
             height: 280,
             showLegend: true,
             columns: 12,
@@ -587,91 +530,78 @@ const { GET } = createEndpoint({
               .describe("Role distribution chart data"),
           }),
         },
-      ),
+      }),
 
       // === GROWTH METRICS ===
-      growthMetrics: objectField(
-        {
-          title: "app.api.users.stats.response.growthMetrics.title" as const,
-          description:
-            "app.api.users.stats.response.growthMetrics.description" as const,
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.GRID_2_COLUMNS,
-          order: 8,
-          showFormAlert: false,
-          showSubmitButton: false,
-        },
-        { response: true },
-        {
-          timeSeriesData: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.users.stats.response.timeStats.title" as const,
-              description:
-                "app.api.users.stats.response.timeStats.description" as const,
-              layoutType: LayoutType.GRID,
-              columns: 4,
-              showFormAlert: false,
-              showSubmitButton: false,
-            },
-            { response: true },
-            {
-              usersCreatedToday: responseField({
+      growthMetrics: scopedObjectFieldNew(scopedTranslation, {
+        title: "response.growthMetrics.title" as const,
+        description: "response.growthMetrics.description" as const,
+        type: WidgetType.CONTAINER,
+        layoutType: LayoutType.GRID_2_COLUMNS,
+        order: 8,
+        showFormAlert: false,
+        showSubmitButton: false,
+        usage: { response: true },
+        children: {
+          timeSeriesData: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "response.timeStats.title" as const,
+            description: "response.timeStats.description" as const,
+            layoutType: LayoutType.GRID,
+            columns: 4,
+            showFormAlert: false,
+            showSubmitButton: false,
+            usage: { response: true },
+            children: {
+              usersCreatedToday: scopedResponseField(scopedTranslation, {
                 type: WidgetType.STAT,
-                label:
-                  "app.api.users.stats.response.timeStats.usersCreatedToday.label" as const,
+                label: "response.timeStats.usersCreatedToday.label" as const,
                 icon: "clock",
                 variant: "info",
                 size: "sm",
                 schema: z.coerce.number().describe("Users created today"),
               }),
-              usersCreatedThisWeek: responseField({
+              usersCreatedThisWeek: scopedResponseField(scopedTranslation, {
                 type: WidgetType.STAT,
-                label:
-                  "app.api.users.stats.response.timeStats.usersCreatedThisWeek.label" as const,
+                label: "response.timeStats.usersCreatedThisWeek.label" as const,
                 icon: "clock",
                 variant: "info",
                 size: "sm",
                 schema: z.coerce.number().describe("Users created this week"),
               }),
-              usersCreatedThisMonth: responseField({
+              usersCreatedThisMonth: scopedResponseField(scopedTranslation, {
                 type: WidgetType.STAT,
                 label:
-                  "app.api.users.stats.response.timeStats.usersCreatedThisMonth.label" as const,
+                  "response.timeStats.usersCreatedThisMonth.label" as const,
                 icon: "clock",
                 variant: "success",
                 size: "sm",
                 schema: z.coerce.number().describe("Users created this month"),
               }),
-              usersCreatedLastMonth: responseField({
+              usersCreatedLastMonth: scopedResponseField(scopedTranslation, {
                 type: WidgetType.STAT,
                 label:
-                  "app.api.users.stats.response.timeStats.usersCreatedLastMonth.label" as const,
+                  "response.timeStats.usersCreatedLastMonth.label" as const,
                 icon: "clock",
                 variant: "muted",
                 size: "sm",
                 schema: z.coerce.number().describe("Users created last month"),
               }),
             },
-          ),
-          performanceRates: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.users.stats.response.performanceRates.title" as const,
-              description:
-                "app.api.users.stats.response.performanceRates.description" as const,
-              layoutType: LayoutType.GRID,
-              columns: 3,
-              showFormAlert: false,
-              showSubmitButton: false,
-            },
-            { response: true },
-            {
-              growthRate: responseField({
+          }),
+          performanceRates: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "response.performanceRates.title" as const,
+            description: "response.performanceRates.description" as const,
+            layoutType: LayoutType.GRID,
+            columns: 3,
+            showFormAlert: false,
+            showSubmitButton: false,
+            usage: { response: true },
+            children: {
+              growthRate: scopedResponseField(scopedTranslation, {
                 type: WidgetType.STAT,
-                label:
-                  "app.api.users.stats.response.performanceRates.growthRate.label" as const,
+                label: "response.performanceRates.growthRate.label" as const,
                 icon: "trending-up",
                 variant: "success",
                 format: "percentage",
@@ -679,10 +609,10 @@ const { GET } = createEndpoint({
                   .number()
                   .describe("User growth rate percentage (0-1)"),
               }),
-              leadToUserConversionRate: responseField({
+              leadToUserConversionRate: scopedResponseField(scopedTranslation, {
                 type: WidgetType.STAT,
                 label:
-                  "app.api.users.stats.response.performanceRates.leadToUserConversionRate.label" as const,
+                  "response.performanceRates.leadToUserConversionRate.label" as const,
                 icon: "target",
                 variant: "info",
                 format: "percentage",
@@ -690,24 +620,22 @@ const { GET } = createEndpoint({
                   .number()
                   .describe("Lead to user conversion rate (0-1)"),
               }),
-              retentionRate: responseField({
+              retentionRate: scopedResponseField(scopedTranslation, {
                 type: WidgetType.STAT,
-                label:
-                  "app.api.users.stats.response.performanceRates.retentionRate.label" as const,
+                label: "response.performanceRates.retentionRate.label" as const,
                 icon: "users",
                 variant: "success",
                 format: "percentage",
                 schema: z.coerce.number().describe("User retention rate (0-1)"),
               }),
             },
-          ),
-          growthChart: responseField({
+          }),
+          growthChart: scopedResponseField(scopedTranslation, {
             type: WidgetType.CHART,
             chartType: "bar",
-            label:
-              "app.api.users.stats.response.growthMetrics.growthChart.label" as const,
+            label: "response.growthMetrics.growthChart.label" as const,
             description:
-              "app.api.users.stats.response.growthMetrics.growthChart.description" as const,
+              "response.growthMetrics.growthChart.description" as const,
             height: 280,
             showLegend: false,
             xAxisLabel: "Time Period",
@@ -724,79 +652,72 @@ const { GET } = createEndpoint({
               .describe("User growth over time chart data"),
           }),
         },
-      ),
+      }),
 
       // === BUSINESS INSIGHTS ===
-      businessInsights: objectField(
-        {
-          title: "app.api.users.stats.response.businessInsights.title" as const,
-          description:
-            "app.api.users.stats.response.businessInsights.description" as const,
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.STACKED,
-          order: 9,
-          showFormAlert: false,
-          showSubmitButton: false,
-        },
-        { response: true },
-        {
-          generatedAt: responseField({
+      businessInsights: scopedObjectFieldNew(scopedTranslation, {
+        title: "response.businessInsights.title" as const,
+        description: "response.businessInsights.description" as const,
+        type: WidgetType.CONTAINER,
+        layoutType: LayoutType.STACKED,
+        order: 9,
+        showFormAlert: false,
+        showSubmitButton: false,
+        usage: { response: true },
+        children: {
+          generatedAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
             fieldType: FieldDataType.DATETIME,
-            label:
-              "app.api.users.stats.response.businessInsights.generatedAt.label" as const,
-            content:
-              "app.api.users.stats.response.businessInsights.generatedAt.label" as const,
+            label: "response.businessInsights.generatedAt.label" as const,
+            content: "response.businessInsights.generatedAt.label" as const,
             schema: dateSchema.describe("When these statistics were generated"),
           }),
         },
-      ),
+      }),
     },
   }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.users.stats.errors.validation.title" as const,
-      description: "app.api.users.stats.errors.validation.description" as const,
+      title: "errors.validation.title" as const,
+      description: "errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.users.stats.errors.unauthorized.title" as const,
-      description:
-        "app.api.users.stats.errors.unauthorized.description" as const,
+      title: "errors.unauthorized.title" as const,
+      description: "errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.users.stats.errors.server.title" as const,
-      description: "app.api.users.stats.errors.server.description" as const,
+      title: "errors.server.title" as const,
+      description: "errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.users.stats.errors.unknown.title" as const,
-      description: "app.api.users.stats.errors.unknown.description" as const,
+      title: "errors.unknown.title" as const,
+      description: "errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.users.stats.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.users.stats.errors.unsavedChanges.description" as const,
+      title: "errors.unsavedChanges.title" as const,
+      description: "errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.users.stats.errors.conflict.title" as const,
-      description: "app.api.users.stats.errors.conflict.description" as const,
+      title: "errors.conflict.title" as const,
+      description: "errors.conflict.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.users.stats.errors.forbidden.title" as const,
-      description: "app.api.users.stats.errors.forbidden.description" as const,
+      title: "errors.forbidden.title" as const,
+      description: "errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.users.stats.errors.notFound.title" as const,
-      description: "app.api.users.stats.errors.notFound.description" as const,
+      title: "errors.notFound.title" as const,
+      description: "errors.notFound.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.users.stats.errors.network.title" as const,
-      description: "app.api.users.stats.errors.network.description" as const,
+      title: "errors.network.title" as const,
+      description: "errors.network.description" as const,
     },
   },
   successTypes: {
-    title: "app.api.users.stats.success.title" as const,
-    description: "app.api.users.stats.success.description" as const,
+    title: "success.title" as const,
+    description: "success.description" as const,
   },
   examples: {
     requests: {
@@ -824,26 +745,22 @@ const { GET } = createEndpoint({
             {
               x: "Active",
               y: 850,
-              label:
-                "app.api.users.stats.response.subscriptionStats.activeSubscriptions.label",
+              label: "response.subscriptionStats.activeSubscriptions.label",
             },
             {
               x: "Canceled",
               y: 120,
-              label:
-                "app.api.users.stats.response.subscriptionStats.canceledSubscriptions.label",
+              label: "response.subscriptionStats.canceledSubscriptions.label",
             },
             {
               x: "Expired",
               y: 230,
-              label:
-                "app.api.users.stats.response.subscriptionStats.expiredSubscriptions.label",
+              label: "response.subscriptionStats.expiredSubscriptions.label",
             },
             {
               x: "None",
               y: 1250,
-              label:
-                "app.api.users.stats.response.subscriptionStats.noSubscription.label",
+              label: "response.subscriptionStats.noSubscription.label",
             },
           ],
         },

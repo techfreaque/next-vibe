@@ -74,6 +74,10 @@ export const translations: typeof enTranslations = {
     label: "Logging-Level",
     description: "Logging-Detailgrad festlegen",
     placeholder: "Logging-Level auswählen",
+    error: "Fehler",
+    warn: "Warnung",
+    info: "Info",
+    debug: "Debug",
   },
   debugMode: {
     label: "Debug-Modus",
@@ -87,6 +91,11 @@ export const translations: typeof enTranslations = {
     unauthorized: {
       title: "Nicht autorisiert",
       description: "Sie sind nicht berechtigt, auf diese Ressource zuzugreifen",
+    },
+  },
+  get: {
+    response: {
+      message: "IMAP-Konfiguration erfolgreich geladen",
     },
   },
   update: {

@@ -1,4 +1,9 @@
 export const translations = {
+  category: "Chat",
+  tags: {
+    folders: "Folders",
+  },
+
   get: {
     title: "Get Root Folder Permissions",
     description: "Compute permissions for a root folder",

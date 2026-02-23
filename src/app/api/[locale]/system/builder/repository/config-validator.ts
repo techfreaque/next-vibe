@@ -6,7 +6,9 @@
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-import type { TFunction } from "@/i18n/core/static-types";
+import type { scopedTranslation } from "../i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 import type { BuildConfig } from "../definition";
 import { ROOT_DIR } from "./constants";
@@ -26,7 +28,7 @@ export interface IConfigValidator {
   /**
    * Validate build configuration and return detailed errors/warnings
    */
-  validate(config: BuildConfig, t: TFunction): ValidationResult;
+  validate(config: BuildConfig, t: ModuleT): ValidationResult;
 }
 
 // ============================================================================
@@ -34,7 +36,7 @@ export interface IConfigValidator {
 // ============================================================================
 
 export class ConfigValidator implements IConfigValidator {
-  validate(config: BuildConfig, t: TFunction): ValidationResult {
+  validate(config: BuildConfig, t: ModuleT): ValidationResult {
     const errors: string[] = [];
     const warnings: string[] = [];
 
@@ -45,7 +47,7 @@ export class ConfigValidator implements IConfigValidator {
       !config.filesOrFoldersToCopy?.length &&
       !config.npmPackage
     ) {
-      errors.push(t("app.api.system.builder.errors.emptyConfig"));
+      errors.push(t("errors.emptyConfig"));
     }
 
     // Validate file paths for filesToCompile
@@ -54,7 +56,7 @@ export class ConfigValidator implements IConfigValidator {
         const inputPath = resolve(ROOT_DIR, file.input);
         if (!existsSync(inputPath)) {
           errors.push(
-            t("app.api.system.builder.errors.inputFileNotFound", {
+            t("errors.inputFileNotFound", {
               filePath: file.input,
             }),
           );
@@ -63,7 +65,7 @@ export class ConfigValidator implements IConfigValidator {
         // Check for common mistakes
         if (file.output.endsWith("/")) {
           warnings.push(
-            t("app.api.system.builder.warnings.outputIsDirectory", {
+            t("warnings.outputIsDirectory", {
               path: file.output,
             }),
           );
@@ -77,7 +79,7 @@ export class ConfigValidator implements IConfigValidator {
         const srcPath = resolve(ROOT_DIR, copyConfig.input);
         if (!existsSync(srcPath)) {
           warnings.push(
-            t("app.api.system.builder.warnings.sourceNotFound", {
+            t("warnings.sourceNotFound", {
               path: copyConfig.input,
             }),
           );

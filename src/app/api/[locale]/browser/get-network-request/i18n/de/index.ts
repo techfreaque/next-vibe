@@ -71,4 +71,9 @@ export const translations: typeof enTranslations = {
     title: "Netzwerk-Anfrage erfolgreich abgerufen",
     description: "Die Netzwerk-Anfrage wurde erfolgreich abgerufen",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    networkAnalysis: "Netzwerkanalyse",
+  },
 };

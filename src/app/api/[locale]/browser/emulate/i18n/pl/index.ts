@@ -75,4 +75,9 @@ export const translations: typeof enTranslations = {
     title: "Emulacja pomyślna",
     description: "Funkcje urządzenia zostały pomyślnie zemulowane",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    performanceAutomation: "Automatyzacja wydajności",
+  },
 };

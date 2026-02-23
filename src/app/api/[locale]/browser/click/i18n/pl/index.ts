@@ -75,4 +75,9 @@ export const translations: typeof enTranslations = {
     title: "Operacja kliknięcia pomyślna",
     description: "Element został pomyślnie kliknięty",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    inputAutomation: "Automatyzacja wprowadzania",
+  },
 };

@@ -13,25 +13,25 @@ export const { GET, PATCH, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async (props) => {
+    handler: async ({ user, urlPathParams, logger, t, locale }) => {
       return await getFolderPermissions(
-        props.user,
-        { id: props.urlPathParams.id },
-        props.logger,
+        user,
+        { id: urlPathParams.id },
+        logger,
+        t,
+        locale,
       );
     },
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: async (props) => {
-      const dataWithId = {
-        ...props.data,
-        id: props.urlPathParams.id,
-      };
+    handler: async ({ data, urlPathParams, user, logger, t, locale }) => {
       return await updateFolderPermissions(
-        props.user,
-        dataWithId,
-        props.logger,
+        user,
+        { ...data, id: urlPathParams.id },
+        logger,
+        t,
+        locale,
       );
     },
   },

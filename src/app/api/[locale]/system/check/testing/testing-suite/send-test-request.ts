@@ -25,6 +25,7 @@ import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
 } from "../../../unified-interface/unified-ui/widgets/_shared/types";
+import { scopedTranslation } from "../../i18n";
 
 /**
  * Call the API handler directly via the vibe runtime executor
@@ -111,10 +112,11 @@ export async function sendTestRequest<
       platform: Platform.CLI, // Use CLI platform for testing
     });
 
+    const { t } = scopedTranslation.scopedT(defaultLocale);
     // Handle streaming responses (convert to error for tests)
     if (isStreamingResponse(result)) {
       return fail({
-        message: "app.api.system.check.testing.test.errors.internal.title",
+        message: t("testing.test.errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: "Streaming responses are not supported in tests",
@@ -127,7 +129,7 @@ export async function sendTestRequest<
       const parseResult = endpoint.responseSchema.safeParse(result.data);
       if (!parseResult.success) {
         return fail({
-          message: "app.api.system.check.testing.test.errors.internal.title",
+          message: t("testing.test.errors.internal.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             endpoint: endpoint.path.join("/"),
@@ -141,8 +143,9 @@ export async function sendTestRequest<
 
     return result;
   } catch (error) {
+    const { t } = scopedTranslation.scopedT(defaultLocale);
     return fail({
-      message: "app.api.system.check.testing.test.errors.internal.title",
+      message: t("testing.test.errors.internal.title"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: { error: parseError(error).message },
     });

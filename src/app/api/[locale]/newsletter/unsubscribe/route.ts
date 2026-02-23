@@ -26,7 +26,13 @@ export const { POST, tools } = endpointsHandler({
         ignoreErrors: true,
       },
     ],
-    handler: ({ data, user, locale, logger }) =>
-      NewsletterUnsubscribeRepository.unsubscribe(data, user, locale, logger),
+    handler: ({ data, user, locale, logger, t }) =>
+      NewsletterUnsubscribeRepository.unsubscribe(
+        data,
+        user,
+        locale,
+        logger,
+        t,
+      ),
   },
 });

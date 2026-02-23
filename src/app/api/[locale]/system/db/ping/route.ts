@@ -14,8 +14,8 @@ import { DatabasePingRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: pingEndpoints,
   [Methods.POST]: {
-    handler: ({ data, logger }) => {
-      return DatabasePingRepository.pingDatabase(data, logger);
+    handler: ({ data, t, logger }) => {
+      return DatabasePingRepository.pingDatabase(data, t, logger);
     },
   },
 });

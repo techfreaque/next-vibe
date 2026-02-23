@@ -3,6 +3,7 @@
  * Comprehensive CRUD operations for import jobs
  */
 
+import { scopedTranslation as importScopedTranslation } from "@/app/api/[locale]/import/i18n";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
@@ -13,7 +14,8 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ user, data, logger }) => {
+    handler: async ({ user, data, logger, locale }) => {
+      const { t: importT } = importScopedTranslation.scopedT(locale);
       return await leadsImportRepository.listImportJobsFormatted(
         user.id,
         {
@@ -22,6 +24,7 @@ export const { GET, tools } = endpointsHandler({
           offset: data.filters.offset || 0,
         },
         logger,
+        importT,
       );
     },
   },

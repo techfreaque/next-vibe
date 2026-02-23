@@ -18,8 +18,10 @@ import { useForm, type UseFormProps } from "react-hook-form";
 import { extractSchemaDefaults } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
+import { scopedTranslation as hooksTranslation } from "./i18n";
 import { buildKey } from "./query-key-builder";
 import { useApiStore } from "./store";
 import type {
@@ -50,6 +52,7 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   endpoint: TEndpoint,
   logger: EndpointLogger,
   user: JwtPayloadType,
+  locale: CountryLanguage,
   options: ApiFormOptions<TEndpoint["types"]["RequestOutput"]> = {},
   mutationOptions: ApiMutationOptions<
     TEndpoint["types"]["RequestOutput"],
@@ -313,8 +316,9 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
         const errorResponse = isErrorResponseType(error)
           ? error
           : fail({
-              message:
-                "app.api.system.unifiedInterface.react.hooks.mutationForm.post.errors.mutation_failed.title",
+              message: hooksTranslation
+                .scopedT(locale)
+                .t("mutationForm.post.errors.mutation_failed.title"),
               errorType: ErrorResponseTypes.INTERNAL_ERROR,
             });
 
@@ -335,8 +339,9 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
 
       // Create an error response for form validation errors
       const errorResponse = fail({
-        message:
-          "app.api.system.unifiedInterface.react.hooks.mutationForm.post.errors.validation_error.title",
+        message: hooksTranslation
+          .scopedT(locale)
+          .t("mutationForm.post.errors.validation_error.title"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
         messageParams: { formErrors: JSON.stringify(errors) },
       });

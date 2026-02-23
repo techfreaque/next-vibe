@@ -15,12 +15,16 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { sshConnections } from "../../db";
 import type { ConnectionDetailResponseOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 export class ConnectionDetailRepository {
   static async get(
     logger: EndpointLogger,
     user: JwtPayloadType,
     id: string,
+    t: ModuleT,
   ): Promise<ResponseType<ConnectionDetailResponseOutput>> {
     try {
       const [row] = await db
@@ -43,7 +47,7 @@ export class ConnectionDetailRepository {
 
       if (!row) {
         return fail({
-          message: "Connection not found",
+          message: t("errors.connectionNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -63,7 +67,7 @@ export class ConnectionDetailRepository {
     } catch (error) {
       logger.error("Failed to get SSH connection", parseError(error));
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

@@ -8,7 +8,7 @@
  * @example
  * import { simpleT } from "@/app/api/[locale]/sms/i18n";
  *
- * const { t } = simpleT("en-GLOBAL");
+ * const { t } = simpleT(locale);
  * t("sms.error.invalid_phone_format");
  * t("sms.error.delivery_failed", { phoneNumber: "+1234567890", error: "Network timeout" });
  */
@@ -27,3 +27,5 @@ export const { scopedT: smsScopedT, ScopedTranslationKey: SmsTranslationKey } =
     de: deTranslations,
     pl: plTranslations,
   });
+
+export type SmsT = ReturnType<typeof smsScopedT>["t"];

@@ -7,6 +7,9 @@ export const translations: typeof enTranslations = {
   confirm: confirmTranslations,
   request: requestTranslations,
   validate: validateTranslations,
+  success: {
+    password_reset: "Twoje hasło zostało pomyślnie zresetowane.",
+  },
   errors: {
     tokenValidationFailed: "Walidacja tokenu nie powiodła się",
     userLookupFailed: "Nie udało się znaleźć użytkownika",

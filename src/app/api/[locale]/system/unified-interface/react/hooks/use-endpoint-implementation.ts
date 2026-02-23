@@ -178,13 +178,19 @@ export function useEndpoint<
     options?.create?.urlPathParams ?? readUrlPathParams;
 
   // Always call the hook unconditionally - it handles null endpoints internally
-  const createOperation = useEndpointCreate(primaryEndpoint, logger, user, {
-    formOptions: createFormOptions,
-    mutationOptions: createMutationOptions,
-    urlPathParams: createUrlPathParams,
-    autoPrefillData: createAutoPrefillData,
-    initialState: createInitialState,
-  });
+  const createOperation = useEndpointCreate(
+    primaryEndpoint,
+    logger,
+    user,
+    locale,
+    {
+      formOptions: createFormOptions,
+      mutationOptions: createMutationOptions,
+      urlPathParams: createUrlPathParams,
+      autoPrefillData: createAutoPrefillData,
+      initialState: createInitialState,
+    },
+  );
 
   // Calculate the appropriate reset data for form clearing
   const resetData = useMemo(() => {
@@ -358,13 +364,19 @@ export function useEndpoint<
     options?.update?.urlPathParams ?? readUrlPathParams;
 
   // Hook will merge endpoint options with passed options internally
-  const updateOperation = useEndpointCreate(patchEndpoint, logger, user, {
-    formOptions: updateFormOptions,
-    mutationOptions: updateMutationOptions,
-    urlPathParams: updateUrlPathParams,
-    autoPrefillData: updateAutoPrefillData,
-    initialState: updateInitialState,
-  });
+  const updateOperation = useEndpointCreate(
+    patchEndpoint,
+    logger,
+    user,
+    locale,
+    {
+      formOptions: updateFormOptions,
+      mutationOptions: updateMutationOptions,
+      urlPathParams: updateUrlPathParams,
+      autoPrefillData: updateAutoPrefillData,
+      initialState: updateInitialState,
+    },
+  );
 
   // Memoize update operation wrapper
   const updateValues = updateOperation?.form.watch();

@@ -3,6 +3,137 @@ import { translations as stopTranslations } from "../../stop/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Datenimport",
+  tags: {
+    leads: "Leads",
+    management: "Verwaltung",
+  },
+
+  get: {
+    title: "Import-Job abrufen",
+    description: "Details eines bestimmten Import-Jobs abrufen",
+    jobId: {
+      label: "Job-ID",
+      description: "Eindeutige Kennung für den Import-Job",
+    },
+    form: {
+      title: "Import-Job-Status",
+      description: "Aktueller Status und Fortschritt des Import-Jobs",
+    },
+    response: {
+      title: "Job-Informationen",
+      description: "Aktuelle Import-Job-Details",
+      info: {
+        title: "Job-Informationen",
+        description: "Grundlegende Job-Details",
+      },
+      id: {
+        content: "Job-ID",
+      },
+      fileName: {
+        content: "Dateiname",
+      },
+      status: {
+        content: "Job-Status",
+      },
+      progress: {
+        title: "Import-Fortschritt",
+        description: "Aktueller Import-Fortschritt und Statistiken",
+      },
+      totalRows: {
+        content: "Gesamtzahl der Zeilen",
+      },
+      processedRows: {
+        content: "Verarbeitete Zeilen",
+      },
+      successfulImports: {
+        content: "Erfolgreiche Importe",
+      },
+      failedImports: {
+        content: "Fehlgeschlagene Importe",
+      },
+      duplicateEmails: {
+        content: "Duplizierte E-Mails",
+      },
+      configuration: {
+        title: "Job-Konfiguration",
+        description: "Aktuelle Job-Konfigurationseinstellungen",
+      },
+      currentBatchStart: {
+        content: "Aktueller Batch-Start",
+      },
+      batchSize: {
+        content: "Batch-Größe",
+      },
+      retryCount: {
+        content: "Wiederholungszähler",
+      },
+      maxRetries: {
+        content: "Maximale Wiederholungen",
+      },
+      error: {
+        content: "Fehlermeldung",
+      },
+      timestamps: {
+        title: "Job-Zeitstempel",
+        description: "Job-Lebenszyklus-Zeitstempel",
+      },
+      createdAt: {
+        content: "Erstellt am",
+      },
+      updatedAt: {
+        content: "Aktualisiert am",
+      },
+      startedAt: {
+        content: "Gestartet am",
+      },
+      completedAt: {
+        content: "Abgeschlossen am",
+      },
+    },
+    errors: {
+      validation: {
+        title: "Validierungsfehler",
+        description: "Die angegebene Job-ID ist ungültig",
+      },
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Authentifizierung erforderlich zum Anzeigen von Jobs",
+      },
+      forbidden: {
+        title: "Zugriff verweigert",
+        description: "Sie haben keine Berechtigung, diesen Job anzuzeigen",
+      },
+      notFound: {
+        title: "Job nicht gefunden",
+        description: "Kein Import-Job mit der angegebenen ID gefunden",
+      },
+      server: {
+        title: "Serverfehler",
+        description: "Beim Abrufen des Jobs ist ein Fehler aufgetreten",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unerwarteter Fehler ist aufgetreten",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Verbindung zum Server nicht möglich",
+      },
+      unsavedChanges: {
+        title: "Nicht gespeicherte Änderungen",
+        description: "Sie haben nicht gespeicherte Änderungen",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Beim Abrufen des Jobs ist ein Konflikt aufgetreten",
+      },
+    },
+    success: {
+      title: "Erfolg",
+      description: "Import-Job erfolgreich abgerufen",
+    },
+  },
   patch: {
     title: "Import-Job aktualisieren",
     description: "Import-Job-Konfigurationseinstellungen aktualisieren",

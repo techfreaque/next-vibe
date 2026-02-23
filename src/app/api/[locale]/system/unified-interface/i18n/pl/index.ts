@@ -46,6 +46,7 @@ export const translations: typeof enTranslations = {
     chart: {
       noDataAvailable: "Brak dostępnych danych",
       noDataToDisplay: "Brak danych do wyświetlenia",
+      total: "Łącznie",
     },
     codeQualityList: {
       noIssues: "Nie znaleziono problemów",

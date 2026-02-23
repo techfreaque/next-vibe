@@ -22,6 +22,7 @@ import { endpointToToolName } from "@/app/api/[locale]/system/unified-interface/
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
+import { DEFAULT_TOOL_IDS } from "../constants";
 import { chatSettings } from "./db";
 import type {
   ChatSettingsGetResponseOutput,
@@ -29,12 +30,15 @@ import type {
   ChatSettingsUpdateResponseOutput,
   ToolConfigItem,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
 import { ChatSettingsRepositoryClient } from "./repository-client";
+
+type SettingsT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Returns the canonical set of available tool IDs for a user.
- * Used to detect when a submitted tool list equals the full available set
- * so we can store null (= default) instead of an explicit list.
+ * Used to detect when a submitted activeTools list equals the full available set
+ * so we can store null (= all tools allowed) instead of an explicit list.
  */
 function getAvailableToolIds(user: JwtPrivatePayloadType): string[] {
   const endpoints = definitionsRegistry.getEndpointsForUser(Platform.AI, user);
@@ -42,12 +46,15 @@ function getAvailableToolIds(user: JwtPrivatePayloadType): string[] {
 }
 
 /**
- * Returns null if the tool list equals the full available set (i.e. it IS the default),
+ * Returns null if the tool list equals the given defaultIds set (i.e. it IS the default),
  * otherwise returns the normalized list (sorted, only toolId + requiresConfirmation).
+ *
+ * - For allowedTools: defaultIds = full available set (null = all tools allowed)
+ * - For pinnedTools: defaultIds = DEFAULT_TOOL_IDS (null = load the standard 9 tools)
  */
 function normalizeToolsOrNull(
   tools: ToolConfigItem[] | null | undefined,
-  availableIds: string[],
+  defaultIds: readonly string[] | string[],
 ): ToolConfigItem[] | null {
   if (tools === null || tools === undefined) {
     return null;
@@ -60,13 +67,13 @@ function normalizeToolsOrNull(
     .toSorted((a, b) => a.toolId.localeCompare(b.toolId));
 
   const submittedIds = new Set(normalized.map((t) => t.toolId));
-  const availableSet = new Set(availableIds);
+  const defaultSet = new Set(defaultIds);
 
-  // If the submitted set exactly matches all available tools AND none require
+  // If the submitted set exactly matches the default set AND none require
   // confirmation, it's the default state — store null.
   const sameIds =
-    submittedIds.size === availableSet.size &&
-    [...submittedIds].every((id) => availableSet.has(id));
+    submittedIds.size === defaultSet.size &&
+    [...submittedIds].every((id) => defaultSet.has(id));
   const noConfirmations = normalized.every((t) => !t.requiresConfirmation);
 
   if (sameIds && noConfirmations) {
@@ -86,6 +93,7 @@ export class ChatSettingsRepository {
   static async getSettings(
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
+    t: SettingsT,
   ): Promise<ResponseType<ChatSettingsGetResponseOutput>> {
     const userId = user.id;
 
@@ -112,13 +120,13 @@ export class ChatSettingsRepository {
         ttsAutoplay: setting.ttsAutoplay ?? defaults.ttsAutoplay,
         ttsVoice: setting.ttsVoice ?? defaults.ttsVoice,
         viewMode: setting.viewMode ?? defaults.viewMode,
-        activeTools:
-          (setting.activeTools ?? defaults.activeTools)?.map((t) => ({
+        allowedTools:
+          (setting.activeTools ?? defaults.allowedTools)?.map((t) => ({
             toolId: t.toolId,
             requiresConfirmation: t.requiresConfirmation ?? false,
           })) ?? null,
-        visibleTools:
-          (setting.visibleTools ?? defaults.visibleTools)?.map((t) => ({
+        pinnedTools:
+          (setting.visibleTools ?? defaults.pinnedTools)?.map((t) => ({
             toolId: t.toolId,
             requiresConfirmation: t.requiresConfirmation ?? false,
           })) ?? null,
@@ -129,7 +137,7 @@ export class ChatSettingsRepository {
     } catch (error) {
       logger.error("Failed to fetch settings", parseError(error));
       return fail({
-        message: "app.api.agent.chat.settings.get.errors.server.title",
+        message: t("get.errors.server.title") ?? "get.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -142,6 +150,7 @@ export class ChatSettingsRepository {
     data: Partial<ChatSettingsUpdateRequestOutput>,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
+    t: SettingsT,
   ): Promise<ResponseType<ChatSettingsUpdateResponseOutput>> {
     const userId = user.id;
 
@@ -155,16 +164,18 @@ export class ChatSettingsRepository {
         .where(eq(chatSettings.userId, userId));
 
       const defaults = ChatSettingsRepositoryClient.getDefaults();
+      // allowedTools: null = all tools allowed → compare against full available set
       const availableIds = getAvailableToolIds(user);
+      // pinnedTools: null = load the DEFAULT_TOOL_IDS set → compare against those 9 tools
 
-      // Normalize tools against the actual available set — store null when equal to default
-      const activeToolsToStore =
-        data.activeTools !== undefined
-          ? normalizeToolsOrNull(data.activeTools, availableIds)
+      // Normalize tools — store null when submitted list equals the semantic default
+      const allowedToolsToStore =
+        data.allowedTools !== undefined
+          ? normalizeToolsOrNull(data.allowedTools, availableIds)
           : undefined;
-      const visibleToolsToStore =
-        data.visibleTools !== undefined
-          ? normalizeToolsOrNull(data.visibleTools, availableIds)
+      const pinnedToolsToStore =
+        data.pinnedTools !== undefined
+          ? normalizeToolsOrNull(data.pinnedTools, DEFAULT_TOOL_IDS)
           : undefined;
 
       let result: typeof existing;
@@ -215,8 +226,8 @@ export class ChatSettingsRepository {
                 : data.viewMode === defaults.viewMode
                   ? null
                   : undefined,
-            activeTools: activeToolsToStore,
-            visibleTools: visibleToolsToStore,
+            activeTools: allowedToolsToStore,
+            visibleTools: pinnedToolsToStore,
             compactTrigger:
               data.compactTrigger !== undefined &&
               data.compactTrigger !== null &&
@@ -263,8 +274,8 @@ export class ChatSettingsRepository {
               data.viewMode && data.viewMode !== defaults.viewMode
                 ? data.viewMode
                 : null,
-            activeTools: activeToolsToStore ?? null,
-            visibleTools: visibleToolsToStore ?? null,
+            activeTools: allowedToolsToStore ?? null,
+            visibleTools: pinnedToolsToStore ?? null,
             compactTrigger:
               data.compactTrigger !== undefined &&
               data.compactTrigger !== null &&
@@ -277,7 +288,7 @@ export class ChatSettingsRepository {
 
       if (!result || result.length === 0) {
         return fail({
-          message: "app.api.agent.chat.settings.post.errors.server.title",
+          message: t("post.errors.server.title") ?? "post.errors.server.title",
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -286,7 +297,7 @@ export class ChatSettingsRepository {
     } catch (error) {
       logger.error("Failed to upsert settings", parseError(error));
       return fail({
-        message: "app.api.agent.chat.settings.post.errors.server.title",
+        message: t("post.errors.server.title") ?? "post.errors.server.title",
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

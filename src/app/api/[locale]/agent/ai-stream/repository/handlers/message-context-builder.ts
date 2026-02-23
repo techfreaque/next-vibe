@@ -9,6 +9,8 @@ import {
   type ModelOption,
 } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import { db } from "../../../../system/db";
 import type { DefaultFolderId } from "../../../chat/config";
@@ -112,6 +114,7 @@ export class MessageContextBuilder {
     operation: "send" | "retry" | "edit" | "answer-as-ai";
     threadId: string | null | undefined;
     parentMessageId: string | null | undefined;
+    locale: CountryLanguage;
     content: string;
     role: ChatMessageRole;
     userId: string | undefined;
@@ -140,7 +143,9 @@ export class MessageContextBuilder {
     userMessageId: string | null;
     upcomingAssistantMessageId: string;
     upcomingAssistantMessageCreatedAt: Date;
-    modelConfig?: ModelOption;
+    modelConfig: ModelOption;
+    /** Pre-built trailing system message string (STT + tasks + memories + favorites), built in builder.ts via generator.ts */
+    trailingSystemMessage: string;
   }): Promise<ModelMessage[]> {
     params.logger.debug("[BuildMessageContext] === FUNCTION CALLED ===", {
       operation: params.operation,
@@ -346,6 +351,7 @@ export class MessageContextBuilder {
             params.logger,
             params.timezone,
             params.rootFolderId,
+            params.locale,
           )
         : [];
 
@@ -368,26 +374,17 @@ export class MessageContextBuilder {
           count: params.toolConfirmationResults.length,
         },
       );
-
-      const { simpleT } = await import("@/i18n/core/shared");
-      const { defaultLocale } = await import("@/i18n/core/config");
+      const { t } = simpleT(params.locale);
 
       for (const result of params.toolConfirmationResults) {
         const toolCall = result.toolCall;
 
         // Convert to AI SDK format - BOTH assistant tool-call AND tool result
-        // Translate error messages for AI (using default locale for consistency)
+        // Error messages are already translated via t() when stored
         const output = toolCall.error
           ? {
               type: "error-text" as const,
-              value:
-                toolCall.error.message ===
-                "app.api.agent.chat.aiStream.errors.userDeclinedTool"
-                  ? simpleT(defaultLocale).t(toolCall.error.message)
-                  : JSON.stringify({
-                      message: toolCall.error.message,
-                      params: toolCall.error.messageParams,
-                    }),
+              value: t(toolCall.error.message, toolCall.error.messageParams),
             }
           : { type: "json" as const, value: toolCall.result ?? null };
 
@@ -442,6 +439,8 @@ export class MessageContextBuilder {
       );
     }
 
+    // Build [Context:] line for the trailing messages
+    let contextLine: string | null = null;
     if (params.upcomingResponseContext) {
       const shortId = params.upcomingAssistantMessageId.slice(-8);
       const metadataParts: string[] = [`ID:${shortId}`];
@@ -451,17 +450,21 @@ export class MessageContextBuilder {
           `Character:${params.upcomingResponseContext.character}`,
         );
       }
-
       const timestamp = formatAbsoluteTimestamp(
         params.upcomingAssistantMessageCreatedAt,
         params.timezone,
       );
       metadataParts.push(`Posted:${timestamp}`);
+      contextLine = `[Context: ${metadataParts.join(" | ")}]`;
+    }
 
-      messages.push({
-        role: "system",
-        content: `[Context: ${metadataParts.join(" | ")}]`,
-      });
+    // Trailing system message (STT + tasks + memories + favorites), pre-built in builder.ts
+    if (params.trailingSystemMessage.trim()) {
+      messages.push({ role: "system", content: params.trailingSystemMessage });
+    }
+    // [Context:] line — always last
+    if (contextLine) {
+      messages.push({ role: "system", content: contextLine });
     }
 
     const messageHashes = messages.map((msg, idx) => {
@@ -874,6 +877,9 @@ export class MessageContextBuilder {
     character: string | null;
     timezone: string;
     rootFolderId?: DefaultFolderId;
+    /** Pre-built trailing system message string, built in builder.ts via generator.ts */
+    trailingSystemMessage: string;
+    locale: CountryLanguage;
   }): Promise<ModelMessage[] | null> {
     const {
       compactedSummary,
@@ -925,11 +931,12 @@ export class MessageContextBuilder {
         logger,
         params.timezone,
         params.rootFolderId,
+        params.locale,
       );
       messages.push(...converted);
     }
 
-    // Add context system message for upcoming AI response
+    // Build [Context:] line
     const shortId = params.upcomingAssistantMessageId.slice(-8);
     const metadataParts: string[] = [`ID:${shortId}`];
     metadataParts.push(`Model:${params.model}`);
@@ -941,13 +948,17 @@ export class MessageContextBuilder {
       params.timezone,
     );
     metadataParts.push(`Posted:${timestamp}`);
+    const contextLine = `[Context: ${metadataParts.join(" | ")}]`;
 
-    messages.push({
-      role: "system",
-      content: `[Context: ${metadataParts.join(" | ")}]`,
-    });
-
-    return messages.filter(Boolean);
+    const finalMessages = messages.filter(Boolean) as ModelMessage[];
+    if (params.trailingSystemMessage.trim()) {
+      finalMessages.push({
+        role: "system",
+        content: params.trailingSystemMessage,
+      });
+    }
+    finalMessages.push({ role: "system", content: contextLine });
+    return finalMessages;
   }
 
   /**
@@ -984,7 +995,11 @@ export class MessageContextBuilder {
    * - System messages (role === "system") are always kept.
    * - The most recent user message is always kept.
    * - Oldest non-system messages are dropped first until the estimated
-   *   token count fits inside (modelContextWindow - reservedOutputTokens).
+   *   token count fits inside (modelContextWindow - systemTokens - toolsTokens - reservedOutputTokens).
+   *
+   * systemPrompt and tools are included in the overhead calculation so the
+   * message budget is accurate — without them the truncation underestimates
+   * how many tokens will actually be sent to the API.
    *
    * This is a last-resort safety net — compacting should have prevented
    * overflow, but a single enormous conversation turn can still exceed limits.
@@ -993,10 +1008,19 @@ export class MessageContextBuilder {
     messages: ModelMessage[],
     modelContextWindow: number,
     logger: EndpointLogger,
-    /** Tokens to reserve for model output. Default 2048 is conservative but safe. */
-    reservedOutputTokens = 2048,
+    systemPrompt: string,
+    tools: Parameters<typeof streamText>[0]["tools"],
+    /** Tokens to reserve for model output. Default 4096 leaves headroom for responses. */
+    reservedOutputTokens = 4096,
   ): ModelMessage[] {
-    const limit = modelContextWindow - reservedOutputTokens;
+    // Compute overhead tokens (system prompt + tool schemas) using same divisors
+    // as calculateTotalTokens so estimates are consistent across the codebase.
+    const systemTokens = Math.ceil(systemPrompt.length / 3.5);
+    const toolsTokens = tools
+      ? Math.ceil(JSON.stringify(tools).length / 2.5)
+      : 0;
+    const overhead = systemTokens + toolsTokens + reservedOutputTokens;
+    const limit = Math.max(modelContextWindow - overhead, 0);
 
     const currentTokens =
       MessageContextBuilder.estimateModelMessageTokens(messages);
@@ -1006,6 +1030,9 @@ export class MessageContextBuilder {
 
     logger.warn("[Truncation] Messages exceed context window — truncating", {
       estimatedTokens: currentTokens,
+      systemTokens,
+      toolsTokens,
+      overhead,
       limit,
       modelContextWindow,
       reservedOutputTokens,

@@ -7,11 +7,10 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -22,50 +21,21 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../../user/user-roles/enum";
-
-/**
- * TRPC Validation Operation Types
- */
-export const {
-  enum: TRPCValidationOperationType,
-  options: TRPCValidationOperationTypeOptions,
-} = createEnumOptions({
-  VALIDATE_INTEGRATION:
-    "app.api.system.generators.generateTrpcRouter.validation.operations.validateIntegration",
-  VALIDATE_ROUTE_FILE:
-    "app.api.system.generators.generateTrpcRouter.validation.operations.validateRouteFile",
-  GENERATE_REPORT:
-    "app.api.system.generators.generateTrpcRouter.validation.operations.generateReport",
-  FIX_ROUTES:
-    "app.api.system.generators.generateTrpcRouter.validation.operations.fixRoutes",
-  CHECK_ROUTER_EXISTS:
-    "app.api.system.generators.generateTrpcRouter.validation.operations.checkRouterExists",
-});
-
-/**
- * Validation Severity Types
- */
-export const { enum: ValidationSeverity, options: ValidationSeverityOptions } =
-  createEnumOptions({
-    ERROR:
-      "app.api.system.generators.generateTrpcRouter.validation.severity.error",
-    WARNING:
-      "app.api.system.generators.generateTrpcRouter.validation.severity.warning",
-    INFO: "app.api.system.generators.generateTrpcRouter.validation.severity.info",
-  });
+import {
+  TRPCValidationOperationType,
+  TRPCValidationOperationTypeOptions,
+} from "./enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * TRPC Integration Validation Endpoint Definition
  */
 export const { POST } = createEndpoint({
-  title: "app.api.system.generators.generateTrpcRouter.validation.title",
-  description:
-    "app.api.system.generators.generateTrpcRouter.validation.description",
-  category: "app.api.system.category",
-  tags: [
-    "app.api.system.generators.generateTrpcRouter.validation.tags.trpc",
-    "app.api.system.generators.generateTrpcRouter.validation.tags.validation",
-  ],
+  scopedTranslation,
+  title: "title",
+  description: "description",
+  category: "category",
+  tags: ["tags.trpc", "tags.validation"],
   icon: "code",
   allowedRoles: [
     UserRole.ADMIN,
@@ -76,24 +46,19 @@ export const { POST } = createEndpoint({
   aliases: ["trpc-validate", "validate-trpc"],
   method: Methods.POST,
   path: ["system", "generators", "generate-trpc-router", "validation"],
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.GRID,
-      columns: 1,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.GRID,
+    columns: 1,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST ===
-      operations: requestField({
+      operations: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label:
-          "app.api.system.generators.generateTrpcRouter.validation.fields.operation.label",
-        description:
-          "app.api.system.generators.generateTrpcRouter.validation.fields.operation.description",
-        placeholder:
-          "app.api.system.generators.generateTrpcRouter.validation.fields.operation.placeholder",
+        label: "fields.operation.label",
+        description: "fields.operation.description",
+        placeholder: "fields.operation.placeholder",
         options: TRPCValidationOperationTypeOptions,
         columns: 12,
         schema: z
@@ -101,30 +66,24 @@ export const { POST } = createEndpoint({
           .min(1)
           .describe("TRPC validation operations to execute"),
       }),
-      filePath: requestField({
+      filePath: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.system.generators.generateTrpcRouter.validation.fields.filePath.label",
-        description:
-          "app.api.system.generators.generateTrpcRouter.validation.fields.filePath.description",
-        placeholder:
-          "app.api.system.generators.generateTrpcRouter.validation.fields.filePath.placeholder",
+        label: "fields.filePath.label",
+        description: "fields.filePath.description",
+        placeholder: "fields.filePath.placeholder",
         columns: 12,
         schema: z
           .string()
           .optional()
           .describe("Specific route file path to validate"),
       }),
-      options: requestField({
+      options: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
-        label:
-          "app.api.system.generators.generateTrpcRouter.validation.fields.options.label",
-        description:
-          "app.api.system.generators.generateTrpcRouter.validation.fields.options.description",
-        placeholder:
-          "app.api.system.generators.generateTrpcRouter.validation.fields.options.placeholder",
+        label: "fields.options.label",
+        description: "fields.options.description",
+        placeholder: "fields.options.placeholder",
         columns: 12,
         schema: z
           .object({
@@ -145,26 +104,23 @@ export const { POST } = createEndpoint({
           .optional(),
       }),
       // === RESPONSE ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.generators.generateTrpcRouter.validation.response.success.label",
+        content: "response.success.label",
         schema: z
           .boolean()
           .describe("Whether the TRPC validation was successful"),
       }),
-      operation: responseField({
+      operation: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.generators.generateTrpcRouter.validation.response.operation.label",
+        content: "response.operation.label",
         schema: z
           .string()
           .describe("The validation operation that was executed"),
       }),
-      result: responseField({
+      result: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.generators.generateTrpcRouter.validation.response.result.label",
+        content: "response.result.label",
         schema: z
           .object({
             success: z.boolean(),
@@ -191,7 +147,7 @@ export const { POST } = createEndpoint({
           .describe("Detailed TRPC validation result"),
       }),
     },
-  ),
+  }),
   examples: {
     requests: {
       validateAll: {
@@ -219,65 +175,45 @@ export const { POST } = createEndpoint({
     },
   },
   successTypes: {
-    title:
-      "app.api.system.generators.generateTrpcRouter.validation.success.title",
-    description:
-      "app.api.system.generators.generateTrpcRouter.validation.success.description",
+    title: "success.title",
+    description: "success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.generators.generateTrpcRouter.validation.errors.validation.title",
-      description:
-        "app.api.system.generators.generateTrpcRouter.validation.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.generators.generateTrpcRouter.validation.errors.unauthorized.title",
-      description:
-        "app.api.system.generators.generateTrpcRouter.validation.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.generators.generateTrpcRouter.validation.errors.forbidden.title",
-      description:
-        "app.api.system.generators.generateTrpcRouter.validation.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.generators.generateTrpcRouter.validation.errors.notFound.title",
-      description:
-        "app.api.system.generators.generateTrpcRouter.validation.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.generators.generateTrpcRouter.validation.errors.server.title",
-      description:
-        "app.api.system.generators.generateTrpcRouter.validation.errors.server.description",
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.generators.generateTrpcRouter.validation.errors.unknown.title",
-      description:
-        "app.api.system.generators.generateTrpcRouter.validation.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.generators.generateTrpcRouter.validation.errors.unsavedChanges.title",
-      description:
-        "app.api.system.generators.generateTrpcRouter.validation.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.generators.generateTrpcRouter.validation.errors.conflict.title",
-      description:
-        "app.api.system.generators.generateTrpcRouter.validation.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.generators.generateTrpcRouter.validation.errors.network.title",
-      description:
-        "app.api.system.generators.generateTrpcRouter.validation.errors.network.description",
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
   },
 });

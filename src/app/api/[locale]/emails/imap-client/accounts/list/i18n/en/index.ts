@@ -1,4 +1,8 @@
 export const translations = {
+  category: "IMAP Management",
+  tags: {
+    accounts: "Accounts",
+  },
   title: "Accounts",
   description: "Retrieve a paginated list of IMAP accounts with filtering",
   container: {

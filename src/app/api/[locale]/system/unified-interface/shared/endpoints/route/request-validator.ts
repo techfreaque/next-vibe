@@ -15,6 +15,7 @@ import {
 import { parseError, validateData } from "next-vibe/shared/utils";
 import { z } from "zod";
 
+import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { CountryLanguageValues } from "@/i18n/core/config";
 
@@ -33,14 +34,16 @@ export function validateLocale(
     locale,
     z.enum(CountryLanguageValues).optional(),
     logger,
+    locale,
   );
   const validatedLocale = localeValidation.success
     ? localeValidation.data
     : undefined;
   if (!validatedLocale) {
     logger.error("Invalid locale provided:", locale);
+    const { t } = sharedScopedTranslation.scopedT(locale);
     return fail({
-      message: ErrorResponseTypes.INVALID_REQUEST_ERROR.errorKey,
+      message: t("errors.invalid_request_data"),
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
         error: "Invalid locale provided",
@@ -145,6 +148,7 @@ export function validateHandlerRequestData<
       context.urlParameters,
       endpoint.requestUrlPathParamsSchema,
       logger,
+      context.locale,
     );
     if (!urlValidation.success) {
       logger.error("URL validation failed", {
@@ -166,6 +170,7 @@ export function validateHandlerRequestData<
       normalizedRequestData,
       endpoint.requestSchema,
       logger,
+      context.locale,
     );
     if (!requestValidation.success) {
       logger.error("Request validation failed", {
@@ -186,9 +191,10 @@ export function validateHandlerRequestData<
     };
   } catch (error) {
     logger.error("Request validation failed", parseError(error));
+    const { t } = sharedScopedTranslation.scopedT(context.locale);
     return {
       success: false,
-      message: ErrorResponseTypes.INVALID_REQUEST_ERROR.errorKey,
+      message: t("errors.invalid_request_data"),
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
         error: parseError(error).message,
@@ -206,8 +212,10 @@ export function validateResponseData<TResponseOutput>(
   data: unknown,
   schema: z.ZodTypeAny,
   logger: EndpointLogger,
+  locale: CountryLanguage,
 ): ResponseType<TResponseOutput> {
-  const validation = validateData(data, schema, logger);
+  const { t } = sharedScopedTranslation.scopedT(locale);
+  const validation = validateData(data, schema, logger, locale);
 
   if (!validation.success) {
     logger.error("[Request Validator] Response validation failed", {
@@ -216,7 +224,7 @@ export function validateResponseData<TResponseOutput>(
     });
     return {
       success: false,
-      message: "app.api.shared.errorTypes.invalid_response_error",
+      message: t("errorTypes.invalid_response_error"),
       errorType: ErrorResponseTypes.INVALID_RESPONSE_ERROR,
       messageParams: {
         error: validation.message,

@@ -38,8 +38,12 @@ export type ReactWidgetContext<TEndpoint extends CreateApiEndpointAny> =
     onSubmit?: () => void;
     onCancel?: () => void;
     isSubmitting?: boolean;
-    submitButton?: SubmitButtonConfig;
-    cancelButton?: CancelButtonConfig;
+    submitButton?: SubmitButtonConfig<
+      TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    >;
+    cancelButton?: CancelButtonConfig<
+      TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    >;
   };
 
 /**

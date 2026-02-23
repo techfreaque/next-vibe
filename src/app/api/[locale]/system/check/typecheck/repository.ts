@@ -14,6 +14,7 @@ import { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ResponseType as ApiResponseType } from "../../../shared/types/response.schema";
 import {
@@ -31,6 +32,7 @@ import type {
   TypecheckRequestOutput,
   TypecheckResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
 import {
   createTypecheckConfig,
   getDisplayPath,
@@ -39,6 +41,8 @@ import {
   shouldIncludeFile,
   type TypecheckConfig,
 } from "./utils";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 // ============================================================
 // Constants
@@ -90,25 +94,9 @@ interface ParsedIssue {
 const execAsync = promisify(exec);
 
 /**
- * Run TypeScript type checking Repository Interface
- */
-export interface TypecheckRepositoryInterface {
-  execute(
-    data: TypecheckRequestOutput,
-    logger: EndpointLogger,
-    platform: Platform,
-    providedConfig?: CheckConfig,
-  ): Promise<ApiResponseType<TypecheckResponseOutput>>;
-}
-
-// ============================================================
-// Repository Implementation
-// ============================================================
-
-/**
  * Run TypeScript type checking Repository Implementation
  */
-export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
+export class TypecheckRepositoryImpl {
   // --------------------------------------------------------
   // Static Private Helpers - Command Configuration
   // --------------------------------------------------------
@@ -393,6 +381,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
     filesToCheck: string[],
     tempConfigPath: string,
     cachePath: string,
+    locale: CountryLanguage,
   ): void {
     // Calculate the relative prefix based on cache directory depth
     const prefix = TypecheckRepositoryImpl.getRelativePrefix(cachePath);
@@ -401,7 +390,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
     let mainTsConfig: TsConfig;
     try {
       const tsConfigContent = readFileSync("tsconfig.json", "utf8");
-      const parsedJsonResult = parseJsonWithComments(tsConfigContent);
+      const parsedJsonResult = parseJsonWithComments(tsConfigContent, locale);
       if (!parsedJsonResult.success) {
         // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- Build infrastructure needs to throw for configuration errors
         throw new Error("Failed to parse tsconfig.json");
@@ -479,6 +468,8 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
     data: TypecheckRequestOutput,
     logger: EndpointLogger,
     platform: Platform,
+    t: ModuleT,
+    locale: CountryLanguage,
     providedConfig?: CheckConfig,
   ): Promise<ApiResponseType<TypecheckResponseOutput>> {
     const isMCP = platform === Platform.MCP;
@@ -574,14 +565,15 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         config,
         typecheckConfig.cachePath,
         logger,
+        locale,
       );
 
       if (!command) {
         return fail({
-          message: "app.api.system.check.typecheck.errors.noTsFiles.title",
+          message: t("errors.noTsFiles.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: {
-            message: "app.api.system.check.typecheck.errors.noTsFiles.message",
+            message: t("errors.noTsFiles.message"),
           },
         });
       }
@@ -597,7 +589,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
 
       if (!execResult.success && !execResult.output) {
         return fail({
-          message: "app.api.system.check.typecheck.errors.internal.title",
+          message: t("errors.internal.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error: execResult.error || "Unknown error",
@@ -643,6 +635,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         startTime,
         logger,
         isMCP,
+        t,
       );
     }
   }
@@ -790,6 +783,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
     config: TypecheckConfig,
     cachePath: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): string | null {
     if (config.pathType === PathType.NO_PATH) {
       // No specific path provided, check entire project
@@ -812,6 +806,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         [config.targetPath!],
         config.tempConfigFile,
         cachePath,
+        locale,
       );
     } else if (config.pathType === PathType.MULTIPLE_PATHS) {
       // Multiple paths - combine all into one tsconfig
@@ -820,6 +815,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         includes,
         config.tempConfigFile,
         cachePath,
+        locale,
       );
     } else {
       // Folder - create temporary tsconfig with folder glob pattern
@@ -829,6 +825,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
         [`${folderPath}/**/*`],
         config.tempConfigFile,
         cachePath,
+        locale,
       );
     }
 
@@ -903,6 +900,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
     startTime: number,
     logger: EndpointLogger,
     skipFiles = false,
+    t: ModuleT,
   ): ApiResponseType<TypecheckResponseOutput> {
     const duration = Date.now() - startTime;
     const parsedError = parseError(error);
@@ -969,7 +967,7 @@ export class TypecheckRepositoryImpl implements TypecheckRepositoryInterface {
     }
 
     return fail({
-      message: "app.api.system.check.typecheck.errors.internal.title",
+      message: t("errors.internal.title"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: {
         error: parsedError.message,

@@ -24,6 +24,7 @@ import {
   productsRepository,
 } from "../../../products/repository-client";
 import type { PaymentInterval } from "../types";
+import { scopedTranslation } from "./i18n";
 import { stripe } from "./repository";
 
 export interface StripePriceResult {
@@ -50,6 +51,7 @@ export class StripePriceManager {
     interval: PaymentInterval,
     logger: EndpointLogger,
   ): Promise<ResponseType<StripePriceResult>> {
+    const { t: tStripe } = scopedTranslation.scopedT(locale);
     try {
       // Get product definition from code with correct interval
       const product = productsRepository.getProduct(
@@ -130,8 +132,7 @@ export class StripePriceManager {
         interval,
       });
       return fail({
-        message:
-          "app.api.payment.providers.stripe.errors.priceCreationFailed.title",
+        message: tStripe("errors.priceCreationFailed.title"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: parseError(error).message, productId },
       });

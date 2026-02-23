@@ -8,7 +8,8 @@ import { z } from "zod";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
 import { smsEnv } from "./env";
 // Import and re-export enum from separate file to avoid circular dependency
@@ -113,6 +114,7 @@ export interface SmsProvider {
   sendSms(
     params: SendSmsParams,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<SmsResult>>;
   validatePhoneNumber?(
     phoneNumber: string,
@@ -130,18 +132,33 @@ export type SmsRenderReturnType = ResponseType<
   SmsTemplateReturnType | SmsTemplateReturnType[]
 >;
 
-export interface SmsRenderProps<TRequest, TResponse, TUrlVariables> {
+export interface SmsRenderProps<
+  TRequest,
+  TResponse,
+  TUrlVariables,
+  TScopedTranslationKey extends string = TranslationKey,
+> {
   requestData: TRequest;
   urlPathParams: TUrlVariables;
   responseData: TResponse;
   user: JwtPayloadType;
-  t: TFunction;
+  t: (key: TScopedTranslationKey, params?: TParams) => TranslatedKeyType;
   locale: CountryLanguage;
   logger: EndpointLogger;
 }
 
-export type SmsFunctionType<TRequest, TResponse, TUrlVariables> = (
-  props: SmsRenderProps<TRequest, TResponse, TUrlVariables>,
+export type SmsFunctionType<
+  TRequest,
+  TResponse,
+  TUrlVariables,
+  TScopedTranslationKey extends string = TranslationKey,
+> = (
+  props: SmsRenderProps<
+    TRequest,
+    TResponse,
+    TUrlVariables,
+    TScopedTranslationKey
+  >,
 ) =>
   | Promise<
       | SuccessResponseType<SmsTemplateReturnType | SmsTemplateReturnType[]>
@@ -193,17 +210,32 @@ export interface SmsHandlerOptions {
 /**
  * Explicit interface for SMS handler configuration
  */
-export interface SmsHandler<TRequest, TResponse, TUrlVariables> {
+export interface SmsHandler<
+  TRequest,
+  TResponse,
+  TUrlVariables,
+  TScopedTranslationKey extends string = TranslationKey,
+> {
   readonly ignoreErrors?: boolean;
-  readonly render: SmsFunctionType<TRequest, TResponse, TUrlVariables>;
+  readonly render: SmsFunctionType<
+    TRequest,
+    TResponse,
+    TUrlVariables,
+    TScopedTranslationKey
+  >;
 }
 
 /**
  * Explicit interface for SMS configuration
  */
-export interface SmsConfig<TRequest, TResponse, TUrlVariables> {
+export interface SmsConfig<
+  TRequest,
+  TResponse,
+  TUrlVariables,
+  TScopedTranslationKey extends string = TranslationKey,
+> {
   afterHandlerSms?: ReadonlyArray<
-    SmsHandler<TRequest, TResponse, TUrlVariables>
+    SmsHandler<TRequest, TResponse, TUrlVariables, TScopedTranslationKey>
   >;
 }
 

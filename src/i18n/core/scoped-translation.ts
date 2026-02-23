@@ -7,6 +7,7 @@ import { type CountryLanguage, defaultLocale, type Languages } from "./config";
 import { getLanguageFromLocale } from "./language-utils";
 import {
   navigateTranslationObject,
+  type NestedValue,
   processTranslationValue,
 } from "./shared-translation-utils";
 import type { TParams } from "./static-types";
@@ -21,6 +22,42 @@ export type TranslatedKeyType = "createScopedTranslation-key";
  */
 export interface ScopedTranslationSchema {
   [key: string]: string | ScopedTranslationSchema;
+}
+
+/**
+ * Non-recursive translation schema for generic constraints.
+ * Used as a constraint in createScopedTranslation to avoid TypeScript's
+ * instantiation depth limit for complex deeply nested translation objects.
+ * Structurally equivalent to ScopedTranslationSchema at runtime.
+ */
+export interface TranslationSchemaConstraint {
+  [key: string]:
+    | string
+    | {
+        [key: string]:
+          | string
+          | {
+              [key: string]:
+                | string
+                | {
+                    [key: string]:
+                      | string
+                      | {
+                          [key: string]:
+                            | string
+                            | {
+                                [key: string]:
+                                  | string
+                                  | {
+                                      [key: string]:
+                                        | string
+                                        | { [key: string]: string };
+                                    };
+                              };
+                        };
+                  };
+            };
+      };
 }
 
 /**
@@ -44,7 +81,7 @@ export interface ScopedTranslationSchema {
  * });
  *
  * // Usage:
- * const { t } = simpleT("en-GLOBAL");
+ * const { t } = simpleT(locale);
  * t("sms.error.invalid_phone_format"); // Type-safe based on EN schema
  */
 /**
@@ -57,32 +94,27 @@ export type ExtractScopedTranslationKey<T> = T extends {
   : never;
 
 export function createScopedTranslation<
-  const TTranslations extends Record<Languages, ScopedTranslationSchema>,
->(
-  translationsByLanguage: TTranslations,
-): {
-  readonly ScopedTranslationKey: DotNotation<TTranslations["en"]>;
+  const TEN,
+  const TDE,
+  const TPL,
+>(translationsByLanguage: {
+  en: TEN;
+  de: TDE;
+  pl: TPL;
+}): {
+  readonly ScopedTranslationKey: DotNotation<TEN>;
   readonly scopedT: (locale: CountryLanguage) => {
-    t: (
-      key: DotNotation<TTranslations["en"]>,
-      params?: TParams,
-    ) => TranslatedKeyType;
+    t: (key: DotNotation<TEN>, params?: TParams) => TranslatedKeyType;
   };
 } {
   return {
-    ScopedTranslationKey: undefined as DotNotation<TTranslations["en"]>,
+    ScopedTranslationKey: undefined as DotNotation<TEN>,
 
     scopedT: function simpleT(locale: CountryLanguage): {
-      t: (
-        key: DotNotation<TTranslations["en"]>,
-        params?: TParams,
-      ) => TranslatedKeyType;
+      t: (key: DotNotation<TEN>, params?: TParams) => TranslatedKeyType;
     } {
       return {
-        t: (
-          key: DotNotation<TTranslations["en"]>,
-          params?: TParams,
-        ): TranslatedKeyType => {
+        t: (key: DotNotation<TEN>, params?: TParams): TranslatedKeyType => {
           // Extract language from locale with safety check
           if (!locale || typeof locale !== "string") {
             return key as TranslatedKeyType; // Return the key as fallback
@@ -95,8 +127,12 @@ export function createScopedTranslation<
           const defaultLanguage = getLanguageFromLocale(defaultLocale);
 
           // Get translations for the requested language
-          const languageTranslations = translationsByLanguage[language];
-          const fallbackTranslations = translationsByLanguage[defaultLanguage];
+          const languageTranslations = translationsByLanguage[
+            language
+          ] as Record<string, NestedValue>;
+          const fallbackTranslations = translationsByLanguage[
+            defaultLanguage
+          ] as Record<string, NestedValue>;
 
           // Navigate through the translation object using shared logic
           const keys = (key as string).split(".");

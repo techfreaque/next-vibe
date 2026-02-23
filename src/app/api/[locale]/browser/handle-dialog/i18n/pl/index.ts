@@ -75,4 +75,9 @@ export const translations: typeof enTranslations = {
     title: "Obsługa dialogu pomyślna",
     description: "Dialog przeglądarki został pomyślnie obsłużony",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    dialogAutomation: "Automatyzacja dialogów",
+  },
 };

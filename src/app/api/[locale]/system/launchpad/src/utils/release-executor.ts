@@ -9,9 +9,10 @@ import inquirer from "inquirer";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { simpleT } from "@/i18n/core/shared";
-import type { TFunction } from "@/i18n/core/static-types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { LaunchpadT } from "../../i18n";
+import { scopedTranslation as launchpadScopedTranslation } from "../../i18n";
 import type {
   ReleaseOrchestrationOptions,
   ReleaseState,
@@ -47,11 +48,11 @@ export class ReleaseExecutor {
   executeReleaseTarget(
     target: ReleaseTarget,
     options: ReleaseOrchestrationOptions,
-    t: TFunction,
+    t: LaunchpadT,
   ): boolean {
     const fullPath = join(this.rootDir, target.directory);
     this.logger.info(
-      t("app.api.system.launchpad.releaseExecutor.processing", {
+      t("releaseExecutor.processing", {
         directory: target.directory,
       }),
     );
@@ -60,7 +61,7 @@ export class ReleaseExecutor {
       // Build the release command
       const command = this.buildReleaseCommand(target, options, t);
       this.logger.info(
-        t("app.api.system.launchpad.releaseExecutor.executing", {
+        t("releaseExecutor.executing", {
           command,
         }),
       );
@@ -73,14 +74,14 @@ export class ReleaseExecutor {
       });
 
       this.logger.info(
-        t("app.api.system.launchpad.releaseExecutor.completed", {
+        t("releaseExecutor.completed", {
           directory: target.directory,
         }),
       );
       return true;
     } catch (error) {
       this.logger.error(
-        t("app.api.system.launchpad.releaseExecutor.failed", {
+        t("releaseExecutor.failed", {
           directory: target.directory,
         }),
         parseError(error),
@@ -95,11 +96,9 @@ export class ReleaseExecutor {
   private buildReleaseCommand(
     target: ReleaseTarget,
     options: ReleaseOrchestrationOptions,
-    t: TFunction,
+    t: LaunchpadT,
   ): string {
-    const baseCommand = t(
-      "app.api.system.launchpad.releaseExecutor.baseCommand",
-    );
+    const baseCommand = t("releaseExecutor.baseCommand");
     const flags: string[] = [];
 
     if (options.ciMode) {
@@ -120,7 +119,7 @@ export class ReleaseExecutor {
   async executeReleaseOrchestration(
     targets: ReleaseTarget[],
     options: ReleaseOrchestrationOptions,
-    t: TFunction,
+    t: LaunchpadT,
   ): Promise<void> {
     let state: ReleaseState;
 
@@ -129,14 +128,10 @@ export class ReleaseExecutor {
       const existingState = this.stateManager.loadState(this.logger);
       if (existingState) {
         state = existingState;
-        this.logger.info(
-          t("app.api.system.launchpad.releaseExecutor.state.continuing"),
-        );
+        this.logger.info(t("releaseExecutor.state.continuing"));
         this.logger.info(this.stateManager.getStateSummary(state));
       } else {
-        this.logger.info(
-          t("app.api.system.launchpad.releaseExecutor.state.noState"),
-        );
+        this.logger.info(t("releaseExecutor.state.noState"));
         state = this.stateManager.initializeState(targets, this.logger);
       }
     } else {
@@ -150,9 +145,7 @@ export class ReleaseExecutor {
     const failedTargets = this.stateManager.getFailedTargets(state);
 
     if (remainingTargets.length === 0 && failedTargets.length === 0) {
-      this.logger.info(
-        t("app.api.system.launchpad.releaseExecutor.state.allCompleted"),
-      );
+      this.logger.info(t("releaseExecutor.state.allCompleted"));
       this.stateManager.clearState(this.logger);
       return;
     }
@@ -163,12 +156,9 @@ export class ReleaseExecutor {
         {
           type: "confirm",
           name: "retryFailed",
-          message: t(
-            "app.api.system.launchpad.releaseExecutor.prompts.retryFailed",
-            {
-              count: failedTargets.length,
-            },
-          ),
+          message: t("releaseExecutor.prompts.retryFailed", {
+            count: failedTargets.length,
+          }),
           default: true,
         },
       ])) as { retryFailed: boolean };
@@ -196,29 +186,20 @@ export class ReleaseExecutor {
             {
               type: "list",
               name: "action",
-              message: t(
-                "app.api.system.launchpad.releaseExecutor.prompts.targetAction",
-                {
-                  directory: target.directory,
-                },
-              ),
+              message: t("releaseExecutor.prompts.targetAction", {
+                directory: target.directory,
+              }),
               choices: [
                 {
-                  name: t(
-                    "app.api.system.launchpad.releaseExecutor.prompts.processTarget",
-                  ),
+                  name: t("releaseExecutor.prompts.processTarget"),
                   value: "process",
                 },
                 {
-                  name: t(
-                    "app.api.system.launchpad.releaseExecutor.prompts.skipTarget",
-                  ),
+                  name: t("releaseExecutor.prompts.skipTarget"),
                   value: "skip",
                 },
                 {
-                  name: t(
-                    "app.api.system.launchpad.releaseExecutor.prompts.abortOperation",
-                  ),
+                  name: t("releaseExecutor.prompts.abortOperation"),
                   value: "abort",
                 },
               ],
@@ -229,7 +210,7 @@ export class ReleaseExecutor {
         if (action === "skip") {
           this.stateManager.markSkipped(state, target.directory, this.logger);
           this.logger.info(
-            t("app.api.system.launchpad.releaseExecutor.actions.skipped", {
+            t("releaseExecutor.actions.skipped", {
               directory: target.directory,
             }),
           );
@@ -237,9 +218,7 @@ export class ReleaseExecutor {
         }
 
         if (action === "abort") {
-          this.logger.info(
-            t("app.api.system.launchpad.releaseExecutor.actions.aborted"),
-          );
+          this.logger.info(t("releaseExecutor.actions.aborted"));
           return;
         }
       }
@@ -258,25 +237,19 @@ export class ReleaseExecutor {
               {
                 type: "confirm",
                 name: "continue",
-                message: t(
-                  "app.api.system.launchpad.releaseExecutor.prompts.continueAfterFailure",
-                ),
+                message: t("releaseExecutor.prompts.continueAfterFailure"),
                 default: true,
               },
             ]);
           const continueAfterFailure = failureResponse.continue;
 
           if (!continueAfterFailure) {
-            this.logger.info(
-              t("app.api.system.launchpad.releaseExecutor.actions.stopped"),
-            );
+            this.logger.info(t("releaseExecutor.actions.stopped"));
             return;
           }
         } else {
           // In CI mode, continue processing other targets
-          this.logger.info(
-            t("app.api.system.launchpad.releaseExecutor.actions.continuing"),
-          );
+          this.logger.info(t("releaseExecutor.actions.continuing"));
         }
       }
     }
@@ -284,19 +257,15 @@ export class ReleaseExecutor {
     // Final summary
     const finalState = this.stateManager.loadState(this.logger);
     if (finalState) {
-      this.logger.info(
-        `\n📊 ${t("app.api.system.launchpad.releaseExecutor.summary.title")}`,
-      );
+      this.logger.info(`\n📊 ${t("releaseExecutor.summary.title")}`);
       this.logger.info(this.stateManager.getStateSummary(finalState));
 
       if (finalState.failed.length === 0) {
-        this.logger.info(
-          t("app.api.system.launchpad.releaseExecutor.summary.allSuccess"),
-        );
+        this.logger.info(t("releaseExecutor.summary.allSuccess"));
         this.stateManager.clearState(this.logger);
       } else {
         this.logger.info(
-          t("app.api.system.launchpad.releaseExecutor.summary.failedTargets", {
+          t("releaseExecutor.summary.failedTargets", {
             count: finalState.failed.length,
           }),
         );
@@ -307,43 +276,36 @@ export class ReleaseExecutor {
   /**
    * Execute force update for all targets
    */
-  executeForceUpdateAll(targets: ReleaseTarget[], t: TFunction): void {
-    this.logger.info(
-      `🔄 ${t("app.api.system.launchpad.releaseExecutor.forceUpdate.starting")}`,
-    );
+  executeForceUpdateAll(targets: ReleaseTarget[], t: LaunchpadT): void {
+    this.logger.info(`🔄 ${t("releaseExecutor.forceUpdate.starting")}`);
 
     for (const target of targets) {
       const fullPath = join(this.rootDir, target.directory);
       this.logger.info(
-        `\n📦 ${t("app.api.system.launchpad.releaseExecutor.forceUpdate.updating", { directory: target.directory })}`,
+        `\n📦 ${t("releaseExecutor.forceUpdate.updating", { directory: target.directory })}`,
       );
 
       try {
         // Use release tool with force update
-        execSync(
-          t("app.api.system.launchpad.releaseExecutor.forceUpdateCommand"),
-          {
-            cwd: fullPath,
-            stdio: "inherit",
-            env: { ...process.env },
-          },
-        );
+        execSync(t("releaseExecutor.forceUpdateCommand"), {
+          cwd: fullPath,
+          stdio: "inherit",
+          env: { ...process.env },
+        });
 
         this.logger.info(
-          `✅ ${t("app.api.system.launchpad.releaseExecutor.forceUpdate.updated", { directory: target.directory })}`,
+          `✅ ${t("releaseExecutor.forceUpdate.updated", { directory: target.directory })}`,
         );
       } catch (error) {
         this.logger.error(
-          `❌ ${t("app.api.system.launchpad.releaseExecutor.forceUpdate.failed", { directory: target.directory })}:`,
+          `❌ ${t("releaseExecutor.forceUpdate.failed", { directory: target.directory })}:`,
           parseError(error),
         );
         // Continue with other targets
       }
     }
 
-    this.logger.info(
-      t("app.api.system.launchpad.releaseExecutor.forceUpdate.completed"),
-    );
+    this.logger.info(t("releaseExecutor.forceUpdate.completed"));
   }
 
   /**
@@ -352,10 +314,10 @@ export class ReleaseExecutor {
   async executeForceRelease(
     targets: ReleaseTarget[],
     versionBump: VersionBumpType,
-    t: TFunction,
+    t: LaunchpadT,
   ): Promise<void> {
     this.logger.info(
-      t("app.api.system.launchpad.releaseExecutor.forceRelease.starting", {
+      t("releaseExecutor.forceRelease.starting", {
         versionBump,
       }),
     );
@@ -374,12 +336,14 @@ export class ReleaseExecutor {
   /**
    * Execute weekly update - updates all packages, creates branch, runs Snyk, creates PR
    */
-  async executeWeeklyUpdate(branchName: string, t: TFunction): Promise<void> {
+  async executeWeeklyUpdate(
+    branchName: string,
+    t: LaunchpadT,
+    locale: CountryLanguage,
+  ): Promise<void> {
+    this.logger.info(`📅 ${t("releaseExecutor.weeklyUpdate.starting")}`);
     this.logger.info(
-      `📅 ${t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.starting")}`,
-    );
-    this.logger.info(
-      t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.targetBranch", {
+      t("releaseExecutor.weeklyUpdate.targetBranch", {
         branchName,
       }),
     );
@@ -387,10 +351,10 @@ export class ReleaseExecutor {
     try {
       // 1. Create and switch to update branch
       this.logger.info(
-        `🌿 ${t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.creatingBranch")}`,
+        `🌿 ${t("releaseExecutor.weeklyUpdate.creatingBranch")}`,
       );
       execSync(
-        t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.gitCheckout", {
+        t("releaseExecutor.weeklyUpdate.gitCheckout", {
           branchName,
         }),
         {
@@ -401,39 +365,31 @@ export class ReleaseExecutor {
 
       // 2. Force update all packages
       this.logger.info(
-        `🔄 ${t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.updatingPackages")}`,
+        `🔄 ${t("releaseExecutor.weeklyUpdate.updatingPackages")}`,
       );
       const targets = this.discoverTargets();
       this.executeForceUpdateAll(targets, t);
 
       // 3. Run Snyk monitoring for all packages
-      this.logger.info(
-        `🔍 ${t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.runningSnyk")}`,
-      );
-      this.runSnykMonitoring(branchName);
+      this.logger.info(`🔍 ${t("releaseExecutor.weeklyUpdate.runningSnyk")}`);
+      this.runSnykMonitoring(branchName, locale);
 
       // 4. Check for changes
       const hasChanges = this.checkForGitChanges();
 
       if (!hasChanges) {
-        this.logger.info(
-          `📝 ${t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.noChanges")}`,
-        );
+        this.logger.info(`📝 ${t("releaseExecutor.weeklyUpdate.noChanges")}`);
         return;
       }
 
       // 5. Commit changes
-      this.logger.info(
-        `💾 ${t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.committing")}`,
-      );
+      this.logger.info(`💾 ${t("releaseExecutor.weeklyUpdate.committing")}`);
       this.commitWeeklyUpdate();
 
       // 6. Push branch
-      this.logger.info(
-        `📤 ${t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.pushing")}`,
-      );
+      this.logger.info(`📤 ${t("releaseExecutor.weeklyUpdate.pushing")}`);
       execSync(
-        t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.gitPush", {
+        t("releaseExecutor.weeklyUpdate.gitPush", {
           branchName,
         }),
         {
@@ -443,17 +399,13 @@ export class ReleaseExecutor {
       );
 
       // 7. Create or update PR
-      this.logger.info(
-        t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.creatingPR"),
-      );
-      await this.createOrUpdatePR(branchName);
+      this.logger.info(t("releaseExecutor.weeklyUpdate.creatingPR"));
+      await this.createOrUpdatePR(branchName, locale);
 
-      this.logger.info(
-        t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.completed"),
-      );
+      this.logger.info(t("releaseExecutor.weeklyUpdate.completed"));
     } catch (error) {
       this.logger.error(
-        `❌ ${t("app.api.system.launchpad.releaseExecutor.weeklyUpdate.failed")}:`,
+        `❌ ${t("releaseExecutor.weeklyUpdate.failed")}:`,
         parseError(error),
       );
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
@@ -465,26 +417,21 @@ export class ReleaseExecutor {
     return discoverReleaseTargets(this.rootDir);
   }
 
-  private runSnykMonitoring(branchName: string): void {
+  private runSnykMonitoring(branchName: string, locale: CountryLanguage): void {
     const snykToken = process.env.SNYK_TOKEN;
-    const { t } = simpleT("en-GLOBAL");
+    const { t } = launchpadScopedTranslation.scopedT(locale);
     const snykOrgKey = process.env.SNYK_ORG_KEY;
 
     if (!snykToken || !snykOrgKey) {
-      this.logger.info(
-        `⚠️  ${t("app.api.system.launchpad.releaseExecutor.snyk.noCredentials")}`,
-      );
+      this.logger.info(`⚠️  ${t("releaseExecutor.snyk.noCredentials")}`);
       return;
     }
 
     // Find all package.json files
-    const packageFiles = execSync(
-      t("app.api.system.launchpad.releaseExecutor.git.findCommand"),
-      {
-        cwd: this.rootDir,
-        encoding: "utf8",
-      },
-    )
+    const packageFiles = execSync(t("releaseExecutor.git.findCommand"), {
+      cwd: this.rootDir,
+      encoding: "utf8",
+    })
       .trim()
       .split("\n")
       .filter(Boolean);
@@ -502,7 +449,7 @@ export class ReleaseExecutor {
         const packageName = packageJson.name || "unknown";
 
         this.logger.info(
-          `🔍 ${t("app.api.system.launchpad.releaseExecutor.snyk.monitoring", { packageName })}`,
+          `🔍 ${t("releaseExecutor.snyk.monitoring", { packageName })}`,
         );
 
         // Run snyk monitor with branch prefix
@@ -516,7 +463,7 @@ export class ReleaseExecutor {
         );
       } catch {
         this.logger.info(
-          `⚠️  ${t("app.api.system.launchpad.releaseExecutor.snyk.failed", { packageFile })}`,
+          `⚠️  ${t("releaseExecutor.snyk.failed", { packageFile })}`,
         );
       }
     }
@@ -551,13 +498,14 @@ This is an automated update. Please review changes before merging.`;
     });
   }
 
-  private async createOrUpdatePR(branchName: string): Promise<void> {
-    const { t } = simpleT("en-GLOBAL");
+  private async createOrUpdatePR(
+    branchName: string,
+    locale: CountryLanguage,
+  ): Promise<void> {
+    const { t } = launchpadScopedTranslation.scopedT(locale);
     const githubToken = process.env.GITHUB_TOKEN;
     if (!githubToken) {
-      this.logger.info(
-        `⚠️  ${t("app.api.system.launchpad.releaseExecutor.github.noToken")}`,
-      );
+      this.logger.info(`⚠️  ${t("releaseExecutor.github.noToken")}`);
       return;
     }
 
@@ -596,16 +544,12 @@ Check the [Snyk dashboard](https://app.snyk.io) for security vulnerabilities bef
           title,
           body,
           githubToken,
+          locale,
         );
       }
     } catch (error) {
-      this.logger.info(
-        `⚠️  ${t("app.api.system.launchpad.releaseExecutor.github.prFailed")}`,
-      );
-      this.logger.error(
-        t("app.api.system.launchpad.releaseExecutor.github.prError"),
-        parseError(error),
-      );
+      this.logger.info(`⚠️  ${t("releaseExecutor.github.prFailed")}`);
+      this.logger.error(t("releaseExecutor.github.prError"), parseError(error));
     }
   }
 
@@ -633,8 +577,9 @@ Check the [Snyk dashboard](https://app.snyk.io) for security vulnerabilities bef
     title: string,
     body: string,
     token: string,
+    locale: CountryLanguage,
   ): Promise<void> {
-    const { t } = simpleT("en-GLOBAL");
+    const { t } = launchpadScopedTranslation.scopedT(locale);
     const curlArgs = [
       "-X",
       "POST",
@@ -657,9 +602,7 @@ Check the [Snyk dashboard](https://app.snyk.io) for security vulnerabilities bef
 
       curl.on("close", (code: number | null) => {
         if (code === 0) {
-          this.logger.info(
-            `✅ ${t("app.api.system.launchpad.releaseExecutor.github.prSuccess")}`,
-          );
+          this.logger.info(`✅ ${t("releaseExecutor.github.prSuccess")}`);
           resolve();
         } else {
           reject(new Error(`curl exited with code ${code}`));

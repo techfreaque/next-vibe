@@ -320,6 +320,7 @@ export const translations = {
   sync: {
     failed: "Failed to synchronize subscription",
     stripe_error: "Stripe synchronization error",
+    success: "Subscription synchronized successfully",
   },
 
   // Cancel operation
@@ -394,6 +395,56 @@ export const translations = {
       status: "Status",
       contact_user: "Contact User",
       footer: "This is an automated notification from {{appName}}",
+    },
+  },
+
+  // Email template metadata (for preview registry)
+  emailTemplates: {
+    success: {
+      name: "Subscription Success Email",
+      description: "Confirmation email sent when user activates a subscription",
+      category: "subscription",
+      preview: {
+        privateName: {
+          label: "User Name",
+          description: "The user's display name",
+        },
+        userId: {
+          label: "User ID",
+          description: "The user's unique identifier",
+        },
+        leadId: {
+          label: "Lead ID",
+          description: "The associated lead identifier",
+        },
+        planName: {
+          label: "Plan Name",
+          description: "The subscription plan name",
+        },
+      },
+    },
+    adminNotification: {
+      name: "Admin Subscription Notification",
+      description:
+        "Internal notification sent to admins when a user subscribes",
+      category: "admin",
+      preview: {
+        privateName: {
+          label: "User Name",
+        },
+        publicName: {
+          label: "Public Name",
+        },
+        email: {
+          label: "User Email",
+        },
+        planName: {
+          label: "Plan Name",
+        },
+        statusName: {
+          label: "Subscription Status",
+        },
+      },
     },
   },
 

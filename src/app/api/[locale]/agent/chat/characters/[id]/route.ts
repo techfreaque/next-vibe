@@ -13,17 +13,28 @@ export const { GET, PATCH, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ urlPathParams, user, logger }) =>
-      CharactersRepository.getCharacterById(urlPathParams, user, logger),
+    handler: ({ urlPathParams, user, logger, locale }) =>
+      CharactersRepository.getCharacterById(
+        urlPathParams,
+        user,
+        logger,
+        locale,
+      ),
   },
   [Methods.PATCH]: {
     email: undefined,
-    handler: ({ data, urlPathParams, user, logger }) =>
-      CharactersRepository.updateCharacter(data, urlPathParams, user, logger),
+    handler: ({ data, urlPathParams, user, logger, locale }) =>
+      CharactersRepository.updateCharacter(
+        data,
+        urlPathParams,
+        user,
+        logger,
+        locale,
+      ),
   },
   [Methods.DELETE]: {
     email: undefined,
-    handler: ({ urlPathParams, user, logger }) =>
-      CharactersRepository.deleteCharacter(urlPathParams, user, logger),
+    handler: ({ urlPathParams, user, logger, locale }) =>
+      CharactersRepository.deleteCharacter(urlPathParams, user, logger, locale),
   },
 });

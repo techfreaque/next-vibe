@@ -32,6 +32,7 @@ async function handler(
     rawLocale,
     z.string(),
     logger,
+    rawLocale,
   ) as ResponseType<CountryLanguage>;
   const locale = localeValidation.success
     ? localeValidation.data

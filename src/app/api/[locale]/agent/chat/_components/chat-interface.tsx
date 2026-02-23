@@ -20,6 +20,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { platform } from "@/config/env-client";
 import { useTranslation } from "@/i18n/core/client";
 
+import { scopedTranslation } from "../i18n";
 import { ChatArea } from "../threads/[threadId]/_components/chat-area";
 import { SidebarWrapper } from "./sidebar/sidebar-wrapper";
 import { TopBar } from "./sidebar/top-area/top-bar";
@@ -41,7 +42,8 @@ export function ChatInterface({ user }: ChatInterfaceProps): JSX.Element {
     handleCancelDelete,
   } = chat;
 
-  const { t, locale, currentCountry } = useTranslation();
+  const { locale, currentCountry } = useTranslation();
+  const { t } = scopedTranslation.scopedT(locale);
   // Create logger once - memoize to prevent recreating on every render
   const logger = useMemo(
     () => createEndpointLogger(false, Date.now(), locale),
@@ -104,22 +106,20 @@ export function ChatInterface({ user }: ChatInterfaceProps): JSX.Element {
         <AlertDialog open={deleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>
-                {t("app.admin.common.actions.delete")}
-              </AlertDialogTitle>
+              <AlertDialogTitle>{t("common.delete")}</AlertDialogTitle>
               <AlertDialogDescription>
-                {t("app.chat.confirmations.deleteMessage")}
+                {t("components.confirmations.deleteMessage")}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel onClick={handleCancelDelete}>
-                {t("app.admin.common.actions.cancel")}
+                {t("common.cancel")}
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleConfirmDelete}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
-                {t("app.admin.common.actions.delete")}
+                {t("common.delete")}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -132,15 +132,15 @@ export function ChatInterface({ user }: ChatInterfaceProps): JSX.Element {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>
-                {t("app.chat.welcomeTour.authDialog.title")}
+                {t("components.welcomeTour.authDialog.title")}
               </AlertDialogTitle>
               <AlertDialogDescription>
-                {t("app.chat.welcomeTour.authDialog.description")}
+                {t("components.welcomeTour.authDialog.description")}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel onClick={() => setAuthDialogOpen(false)}>
-                {t("app.chat.welcomeTour.authDialog.continueTour")}
+                {t("components.welcomeTour.authDialog.continueTour")}
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={() => {
@@ -148,7 +148,7 @@ export function ChatInterface({ user }: ChatInterfaceProps): JSX.Element {
                   window.location.href = `/${locale}/login?returnUrl=${encodeURIComponent(window.location.pathname)}`;
                 }}
               >
-                {t("app.chat.welcomeTour.authDialog.signUp")}
+                {t("components.welcomeTour.authDialog.signUp")}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

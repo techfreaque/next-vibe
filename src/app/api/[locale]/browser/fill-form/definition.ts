@@ -7,12 +7,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  objectOptionalField,
-  requestDataArrayField,
-  requestField,
-  responseArrayOptionalField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedObjectOptionalField,
+  scopedRequestDataArrayField,
+  scopedRequestField,
+  scopedResponseArrayOptionalField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -23,17 +23,17 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["browser", "fill-form"],
-  title: "app.api.browser.fill-form.title",
-  description: "app.api.browser.fill-form.description",
-  category: "app.api.browser.category",
+  title: "fill-form.title",
+  description: "fill-form.description",
+  category: "fill-form.category",
   icon: "pen-tool",
-  tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.inputAutomation",
-  ],
+  tags: ["fill-form.tags.browserAutomation", "fill-form.tags.inputAutomation"],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -43,131 +43,116 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.browser.fill-form.form.label",
-      description: "app.api.browser.fill-form.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      elements: requestDataArrayField(
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "fill-form.form.label",
+    description: "fill-form.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      elements: scopedRequestDataArrayField(
+        scopedTranslation,
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.browser.fill-form.form.fields.elements.label",
-          description:
-            "app.api.browser.fill-form.form.fields.elements.description",
+          title: "fill-form.form.fields.elements.label",
+          description: "fill-form.form.fields.elements.description",
           columns: 12,
         },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.GRID,
-            columns: 2,
-          },
-          { request: "data" },
-          {
-            uid: requestField({
+        scopedObjectFieldNew(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.GRID,
+          columns: 2,
+          usage: { request: "data" },
+          children: {
+            uid: scopedRequestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label: "app.api.browser.fill-form.form.fields.elements.uid.label",
-              description:
-                "app.api.browser.fill-form.form.fields.elements.uid.description",
+              label: "fill-form.form.fields.elements.uid.label",
+              description: "fill-form.form.fields.elements.uid.description",
               columns: 6,
               schema: z.string().describe("The uid of the element to fill out"),
             }),
-            value: requestField({
+            value: scopedRequestField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.browser.fill-form.form.fields.elements.value.label",
-              description:
-                "app.api.browser.fill-form.form.fields.elements.value.description",
+              label: "fill-form.form.fields.elements.value.label",
+              description: "fill-form.form.fields.elements.value.description",
               columns: 6,
               schema: z.string().describe("Value for the element"),
             }),
           },
-        ),
+        }),
       ),
 
       // Response fields
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.fill-form.response.success",
+        content: "fill-form.response.success",
         schema: z
           .boolean()
           .describe("Whether the form fill operation succeeded"),
       }),
-      result: objectOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.browser.fill-form.response.result.title",
-          description: "app.api.browser.fill-form.response.result.description",
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
-          filled: responseField({
+      result: scopedObjectOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "fill-form.response.result.title",
+        description: "fill-form.response.result.description",
+        layoutType: LayoutType.STACKED,
+        usage: { response: true },
+        children: {
+          filled: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.browser.fill-form.response.result.filled",
+            content: "fill-form.response.result.filled",
             schema: z
               .boolean()
               .describe("Whether all form elements were filled"),
           }),
-          filledCount: responseField({
+          filledCount: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.browser.fill-form.response.result.filledCount",
+            content: "fill-form.response.result.filledCount",
             schema: z.coerce.number().describe("Number of elements filled"),
           }),
-          elements: responseArrayOptionalField(
-            {
+          elements: scopedResponseArrayOptionalField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: scopedObjectFieldNew(scopedTranslation, {
               type: WidgetType.CONTAINER,
-            },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                layoutType: LayoutType.GRID,
-                columns: 2,
-              },
-              { response: true },
-              {
-                uid: responseField({
+              layoutType: LayoutType.GRID,
+              columns: 2,
+              usage: { response: true },
+              children: {
+                uid: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.browser.fill-form.response.result.elements.uid",
+                  content: "fill-form.response.result.elements.uid",
                   schema: z.string(),
                 }),
-                filled: responseField({
+                filled: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.browser.fill-form.response.result.elements.filled",
+                  content: "fill-form.response.result.elements.filled",
                   schema: z.boolean(),
                 }),
               },
-            ),
-          ),
+            }),
+          }),
         },
-      ),
-      error: responseField({
+      }),
+      error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.fill-form.response.error",
+        content: "fill-form.response.error",
         schema: z
           .string()
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: responseField({
+      executionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.fill-form.response.executionId",
+        content: "fill-form.response.executionId",
         schema: z
           .string()
           .optional()
           .describe("Unique identifier for this execution"),
       }),
     },
-  ),
+  }),
   examples: {
     requests: {
       default: { elements: [{ uid: "field-1", value: "value1" }] },
@@ -186,46 +171,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.browser.fill-form.errors.validation.title",
-      description: "app.api.browser.fill-form.errors.validation.description",
+      title: "fill-form.errors.validation.title",
+      description: "fill-form.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.browser.fill-form.errors.network.title",
-      description: "app.api.browser.fill-form.errors.network.description",
+      title: "fill-form.errors.network.title",
+      description: "fill-form.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.browser.fill-form.errors.unauthorized.title",
-      description: "app.api.browser.fill-form.errors.unauthorized.description",
+      title: "fill-form.errors.unauthorized.title",
+      description: "fill-form.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.browser.fill-form.errors.forbidden.title",
-      description: "app.api.browser.fill-form.errors.forbidden.description",
+      title: "fill-form.errors.forbidden.title",
+      description: "fill-form.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.browser.fill-form.errors.notFound.title",
-      description: "app.api.browser.fill-form.errors.notFound.description",
+      title: "fill-form.errors.notFound.title",
+      description: "fill-form.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.browser.fill-form.errors.serverError.title",
-      description: "app.api.browser.fill-form.errors.serverError.description",
+      title: "fill-form.errors.serverError.title",
+      description: "fill-form.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.browser.fill-form.errors.unknown.title",
-      description: "app.api.browser.fill-form.errors.unknown.description",
+      title: "fill-form.errors.unknown.title",
+      description: "fill-form.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.browser.fill-form.errors.unsavedChanges.title",
-      description:
-        "app.api.browser.fill-form.errors.unsavedChanges.description",
+      title: "fill-form.errors.unsavedChanges.title",
+      description: "fill-form.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.browser.fill-form.errors.conflict.title",
-      description: "app.api.browser.fill-form.errors.conflict.description",
+      title: "fill-form.errors.conflict.title",
+      description: "fill-form.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.browser.fill-form.success.title",
-    description: "app.api.browser.fill-form.success.description",
+    title: "fill-form.success.title",
+    description: "fill-form.success.description",
   },
 });
 

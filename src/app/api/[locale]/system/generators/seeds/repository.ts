@@ -29,6 +29,9 @@ import {
   getRelativeImportPath,
   writeGeneratedFile,
 } from "../shared/utils";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 // Type definitions for seeds generator
 interface SeedsRequestType {
@@ -53,6 +56,7 @@ interface SeedsGeneratorRepository {
   generateSeeds(
     data: SeedsRequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<BaseResponseType<SeedsResponseType>>;
 }
 
@@ -63,6 +67,7 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
   async generateSeeds(
     data: SeedsRequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<BaseResponseType<SeedsResponseType>> {
     const startTime = Date.now();
 
@@ -110,7 +115,7 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
       });
 
       return fail({
-        message: "app.api.system.generators.seeds.error.generation_failed",
+        message: t("error.generation_failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           duration,

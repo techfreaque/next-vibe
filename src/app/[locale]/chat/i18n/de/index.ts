@@ -1077,6 +1077,7 @@ export const translations: typeof enTranslations = {
     you: "Sie",
     user: "Benutzer",
     anonymous: "Anonym",
+    authorWithId: "{{name}} [{{id}}]",
     edited: "bearbeitet",
     error: "Fehler",
     postNumber: "Nr.{{number}}",
@@ -1215,6 +1216,18 @@ export const translations: typeof enTranslations = {
         "Dolphin Llama 3 70B - Unzensiertes großes Sprachmodell basierend auf Llama 3",
       dolphin3_0_r1_mistral_24b:
         "Dolphin 3.0 R1 Mistral 24B - Unzensiertes großes Sprachmodell basierend auf Mistral",
+      claudeOpus45:
+        "Claude Opus 4.5 - Leistungsfähigstes Claude-Modell mit außergewöhnlichem Denkvermögen und kreativen Fähigkeiten",
+      claudeOpus46:
+        "Claude Opus 4.6 - Neuestes und leistungsfähigstes Claude-Modell mit außergewöhnlichem Denkvermögen und kreativen Fähigkeiten",
+      claudeSonnet46:
+        "Claude Sonnet 4.6 - Anthropics leistungsfähigstes Sonnet-Modell mit Frontier-Leistung in Coding, Agenten und professioneller Arbeit",
+      gemini3Pro:
+        "Google Gemini 3 Pro - Fortschrittliches multimodales KI-Modell mit großem Kontextfenster und leistungsstarken Reasoning-Fähigkeiten",
+      gemini3Flash:
+        "Google Gemini 3 Flash - Schnelles, effizientes multimodales KI-Modell für schnelle Antworten",
+      deepseekV32:
+        "DeepSeek V3.2 - Hochleistungs-Reasoning-Modell mit erweiterten Coding-Fähigkeiten",
     },
   },
   tones: {
@@ -1421,6 +1434,7 @@ export const translations: typeof enTranslations = {
     today: "Heute",
     lastWeek: "Letzte 7 Tage",
     lastMonth: "Letzte 30 Tage",
+    older: "Älter",
     folderNotFound: "Ordner nicht gefunden",
     emptyFolder: "Noch keine Chats oder Ordner hier",
     createSubfolder: "Unterordner erstellen",
@@ -1557,6 +1571,7 @@ export const translations: typeof enTranslations = {
     assistantFallback: "Assistent",
     youLabel: "Sie",
     anonymous: "Anonym",
+    authorWithId: "{{name}} [{{id}}]",
   },
   flatView: {
     postNumber: "Beitrag #{{number}}",

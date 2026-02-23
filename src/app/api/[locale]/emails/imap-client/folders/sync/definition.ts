@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedBackButton,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,100 +20,97 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../../user/user-roles/enum";
+import { scopedTranslation } from "./i18n";
 import { ImapFoldersSyncContainer } from "./widget";
 
 /**
  * POST endpoint for syncing IMAP folders
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["emails", "imap-client", "folders", "sync"],
-  title: "app.api.emails.imapClient.folders.sync.title",
-  description: "app.api.emails.imapClient.folders.sync.description",
-  category: "app.api.emails.category",
+  title: "title",
+  description: "description",
+  category: "category",
   icon: "folder",
-  tags: ["app.api.emails.imapClient.folders.tag"],
+  tags: ["category" as const],
   allowedRoles: [UserRole.ADMIN],
 
   successTypes: {
-    title: "app.api.emails.imapClient.folders.sync.success.title",
-    description: "app.api.emails.imapClient.folders.sync.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 
   fields: customWidgetObject({
     render: ImapFoldersSyncContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({ usage: { request: "data", response: true } }),
+      backButton: scopedBackButton(scopedTranslation, {
+        usage: { request: "data", response: true },
+      }),
 
       // === REQUEST FIELDS ===
-      accountId: requestField({
+      accountId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.imapClient.folders.sync.accountId.label",
-        description:
-          "app.api.emails.imapClient.folders.sync.accountId.description",
-        placeholder:
-          "app.api.emails.imapClient.folders.sync.accountId.placeholder",
+        label: "accountId.label",
+        description: "accountId.description",
+        placeholder: "accountId.placeholder",
         schema: z.uuid(),
       }),
 
-      folderId: requestField({
+      folderId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.imapClient.folders.sync.folderId.label",
-        description:
-          "app.api.emails.imapClient.folders.sync.folderId.description",
-        placeholder:
-          "app.api.emails.imapClient.folders.sync.folderId.placeholder",
+        label: "folderId.label",
+        description: "folderId.description",
+        placeholder: "folderId.placeholder",
         schema: z.uuid().optional(),
       }),
 
-      force: requestField({
+      force: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.emails.imapClient.folders.sync.force.label",
-        description: "app.api.emails.imapClient.folders.sync.force.description",
+        label: "force.label",
+        description: "force.description",
         schema: z.boolean().default(false),
       }),
 
       // === RESPONSE FIELDS ===
-      foldersProcessed: responseField({
+      foldersProcessed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.folders.sync.response.foldersProcessed",
+        content: "response.foldersProcessed",
         schema: z.coerce.number(),
       }),
 
-      foldersAdded: responseField({
+      foldersAdded: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.folders.sync.response.foldersAdded",
+        content: "response.foldersAdded",
         schema: z.coerce.number(),
       }),
 
-      foldersUpdated: responseField({
+      foldersUpdated: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.folders.sync.response.foldersUpdated",
+        content: "response.foldersUpdated",
         schema: z.coerce.number(),
       }),
 
-      foldersDeleted: responseField({
+      foldersDeleted: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.folders.sync.response.foldersDeleted",
+        content: "response.foldersDeleted",
         schema: z.coerce.number(),
       }),
 
-      duration: responseField({
+      duration: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.folders.sync.response.duration",
+        content: "response.duration",
         schema: z.coerce.number(),
       }),
 
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        text: "app.api.emails.imapClient.folders.sync.response.success",
+        text: "response.success",
         schema: z.boolean(),
       }),
     },
@@ -121,50 +118,40 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.emails.imapClient.folders.sync.errors.validation.title",
-      description:
-        "app.api.emails.imapClient.folders.sync.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.emails.imapClient.folders.sync.errors.unauthorized.title",
-      description:
-        "app.api.emails.imapClient.folders.sync.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.emails.imapClient.folders.sync.errors.forbidden.title",
-      description:
-        "app.api.emails.imapClient.folders.sync.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.emails.imapClient.folders.sync.errors.server.title",
-      description:
-        "app.api.emails.imapClient.folders.sync.errors.server.description",
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.emails.imapClient.folders.sync.errors.unknown.title",
-      description:
-        "app.api.emails.imapClient.folders.sync.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.emails.imapClient.folders.sync.errors.conflict.title",
-      description:
-        "app.api.emails.imapClient.folders.sync.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.emails.imapClient.folders.sync.errors.network.title",
-      description:
-        "app.api.emails.imapClient.folders.sync.errors.network.description",
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.emails.imapClient.folders.sync.errors.notFound.title",
-      description:
-        "app.api.emails.imapClient.folders.sync.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.emails.imapClient.folders.sync.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.imapClient.folders.sync.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
   },
 

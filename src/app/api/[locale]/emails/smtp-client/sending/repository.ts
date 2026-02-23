@@ -33,6 +33,7 @@ import {
   SmtpHealthStatus,
   SmtpSecurityType,
 } from "../enum";
+import type { scopedTranslation as SmtpScopedTranslation } from "../i18n";
 import type {
   SmtpCapacityRequestOutput,
   SmtpCapacityResponseOutput,
@@ -42,6 +43,8 @@ import type {
   SmtpSendResponseOutput,
   SmtpSendResult,
 } from "./types";
+
+type ModuleT = ReturnType<typeof SmtpScopedTranslation.scopedT>["t"];
 
 const transportCache = new Map<
   string,
@@ -400,6 +403,7 @@ export class SmtpSendingRepository {
   static async sendEmail(
     data: SmtpSendRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SmtpSendResponseOutput>> {
     try {
       logger.debug("Sending email via SMTP service", {
@@ -418,8 +422,7 @@ export class SmtpSendingRepository {
 
         if (isLeadCampaign) {
           return fail({
-            message:
-              "app.api.emails.smtpClient.sending.errors.no_account.title",
+            message: t("sending.errors.no_account.title"),
             errorType: ErrorResponseTypes.NOT_FOUND,
             messageParams: {
               campaignType: data.selectionCriteria.campaignType,
@@ -433,7 +436,7 @@ export class SmtpSendingRepository {
           });
         }
         return fail({
-          message: "app.api.emails.smtpClient.sending.errors.no_account.title",
+          message: t("sending.errors.no_account.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: {
             campaignType: data.selectionCriteria.campaignType,
@@ -447,6 +450,7 @@ export class SmtpSendingRepository {
         primaryAccount,
         false,
         logger,
+        t,
       );
       if (primaryResult.success) {
         return primaryResult;
@@ -473,6 +477,7 @@ export class SmtpSendingRepository {
         fallbackAccount,
         true,
         logger,
+        t,
       );
       if (fallbackResult.success) {
         return fallbackResult;
@@ -491,7 +496,7 @@ export class SmtpSendingRepository {
     } catch (error) {
       logger.error("Critical error in email sending", parseError(error));
       return fail({
-        message: "app.api.emails.smtpClient.sending.errors.server.title",
+        message: t("sending.errors.server.title"),
         errorType: ErrorResponseTypes.EMAIL_ERROR,
         messageParams: {
           error: parseError(error).message,
@@ -508,6 +513,7 @@ export class SmtpSendingRepository {
     account: SmtpAccount,
     isFallback: boolean,
     logger: EndpointLogger,
+    t: ModuleT,
     maxRetries = 2,
   ): Promise<ResponseType<SmtpSendResult>> {
     let lastError: ResponseType<SmtpSendResult> | null = null;
@@ -524,7 +530,7 @@ export class SmtpSendingRepository {
           isFallback,
         });
 
-        const result = await this.performEmailSend(params, account, logger);
+        const result = await this.performEmailSend(params, account, logger, t);
 
         if (result.success) {
           if (attempt > 1) {
@@ -576,7 +582,7 @@ export class SmtpSendingRepository {
       } catch (error) {
         const errorMessage = parseError(error).message;
         lastError = fail({
-          message: "app.api.emails.smtpClient.sending.errors.server.title",
+          message: t("sending.errors.server.title"),
           errorType: ErrorResponseTypes.EMAIL_ERROR,
           messageParams: {
             error: errorMessage,
@@ -601,7 +607,7 @@ export class SmtpSendingRepository {
     return (
       lastError ||
       fail({
-        message: "app.api.emails.smtpClient.sending.errors.server.title",
+        message: t("sending.errors.server.title"),
         errorType: ErrorResponseTypes.EMAIL_ERROR,
         messageParams: {
           accountId: account.id,
@@ -626,11 +632,12 @@ export class SmtpSendingRepository {
     params: SmtpSendParams,
     account: SmtpAccount,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SmtpSendResult>> {
     try {
       // Check rate limits (skip if this is part of a pre-validated batch)
       if (!params.skipRateLimitCheck) {
-        const rateLimitCheck = await this.checkRateLimit(account, logger);
+        const rateLimitCheck = await this.checkRateLimit(account, logger, t);
         if (!rateLimitCheck.success) {
           // Convert rate limit error to proper SMTP send error
           return fail({
@@ -680,7 +687,7 @@ export class SmtpSendingRepository {
         const rejectedReason =
           typeof result.rejected[0] === "string"
             ? result.rejected[0]
-            : "app.api.emails.smtpClient.sending.errors.rejected.defaultReason";
+            : t("sending.errors.rejected.defaultReason");
 
         await this.updateAccountHealth(
           account.id,
@@ -690,7 +697,7 @@ export class SmtpSendingRepository {
         );
 
         return fail({
-          message: "app.api.emails.smtpClient.sending.errors.rejected.title",
+          message: t("sending.errors.rejected.title"),
           errorType: ErrorResponseTypes.EMAIL_ERROR,
           messageParams: {
             recipient: params.to,
@@ -705,12 +712,11 @@ export class SmtpSendingRepository {
           account.id,
           false,
           logger,
-          "app.api.emails.smtpClient.sending.errors.no_recipients.defaultReason",
+          t("sending.errors.no_recipients.defaultReason"),
         );
 
         return fail({
-          message:
-            "app.api.emails.smtpClient.sending.errors.no_recipients.title",
+          message: t("sending.errors.no_recipients.title"),
           errorType: ErrorResponseTypes.EMAIL_ERROR,
           messageParams: {
             recipient: params.to,
@@ -781,7 +787,7 @@ export class SmtpSendingRepository {
       }
 
       return fail({
-        message: "app.api.emails.smtpClient.sending.errors.server.title",
+        message: t("sending.errors.server.title"),
         errorType: ErrorResponseTypes.EMAIL_ERROR,
         messageParams: {
           error: parseError(error).message,
@@ -799,6 +805,7 @@ export class SmtpSendingRepository {
   private static async checkRateLimit(
     account: SmtpAccount,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<
     ResponseType<{
       canSend: boolean;
@@ -856,7 +863,7 @@ export class SmtpSendingRepository {
 
       if (!canSend) {
         return fail({
-          message: "app.api.emails.smtpClient.sending.errors.rate_limit.title",
+          message: t("sending.errors.rate_limit.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             accountName: account.name,
@@ -1030,13 +1037,13 @@ export class SmtpSendingRepository {
     data: SmtpCapacityRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SmtpCapacityResponseOutput>> {
     try {
       // Check user authorization
       if (user.isPublic) {
         return fail({
-          message:
-            "app.api.emails.smtpClient.sending.errors.unauthorized.title",
+          message: t("sending.errors.unauthorized.title"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -1072,7 +1079,7 @@ export class SmtpSendingRepository {
         const accountCapacity = account.rateLimitPerHour || 0;
         totalCapacity += accountCapacity;
 
-        const rateLimitCheck = await this.checkRateLimit(account, logger);
+        const rateLimitCheck = await this.checkRateLimit(account, logger, t);
         if (rateLimitCheck.success) {
           // Account is available, add remaining capacity
           totalRemainingCapacity += rateLimitCheck.data.remainingCapacity;
@@ -1088,7 +1095,7 @@ export class SmtpSendingRepository {
     } catch (error) {
       logger.error("Error getting total sending capacity", parseError(error));
       return fail({
-        message: "app.api.emails.smtpClient.sending.errors.capacity.title",
+        message: t("sending.errors.capacity.title"),
         errorType: ErrorResponseTypes.EMAIL_ERROR,
         messageParams: {
           error: parseError(error).message,

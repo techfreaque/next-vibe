@@ -38,6 +38,7 @@ import {
 } from "../../system/unified-interface/shared/types/platform";
 import { users } from "../db";
 import { UserDetailLevel } from "../enum";
+import { scopedTranslation as sessionScopedTranslation } from "../private/session/i18n";
 import { SessionRepository } from "../private/session/repository";
 import { UserRepository } from "../repository";
 import type { CompleteUserType } from "../types";
@@ -48,6 +49,7 @@ import {
   UserRole,
 } from "../user-roles/enum";
 import { UserRolesRepository } from "../user-roles/repository";
+import { scopedTranslation } from "./i18n";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
@@ -151,7 +153,7 @@ export class AuthRepository {
     userId: string | undefined,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    platform?: Platform,
+    platform: Platform | undefined,
   ): Promise<{ leadId: string | null; shouldUpdateCookie: boolean }> {
     if (userId) {
       const leadId = await AuthRepository.getLeadIdForUser(
@@ -242,7 +244,11 @@ export class AuthRepository {
   ): Promise<JwtPrivatePayloadType | null> {
     try {
       // Validate that the user ID from the JWT token still exists in the database
-      const userExistsResponse = await UserRepository.exists(userId, logger);
+      const userExistsResponse = await UserRepository.exists(
+        userId,
+        logger,
+        locale,
+      );
       if (!userExistsResponse.success || !userExistsResponse.data) {
         logger.debug("app.api.user.auth.debug.userIdNotExistsInDb", {
           userId,
@@ -251,7 +257,11 @@ export class AuthRepository {
       }
 
       // Validate that the session exists in the database
-      const sessionResponse = await SessionRepository.findByToken(token);
+      const { t: sessionT } = sessionScopedTranslation.scopedT(locale);
+      const sessionResponse = await SessionRepository.findByToken(
+        token,
+        sessionT,
+      );
       if (!sessionResponse.success) {
         logger.debug("app.api.user.auth.debug.sessionNotFound", {
           userId,
@@ -268,7 +278,7 @@ export class AuthRepository {
           expiresAt: session.expiresAt,
         });
         // Delete expired session from database
-        await SessionRepository.deleteByUserId(userId);
+        await SessionRepository.deleteByUserId(userId, sessionT);
         return null;
       }
 
@@ -287,6 +297,7 @@ export class AuthRepository {
       const userRolesResponse = await UserRolesRepository.findByUserId(
         userId,
         logger,
+        locale,
       );
       const roles = userRolesResponse.success
         ? userRolesResponse.data.map((r) => r.role)
@@ -313,6 +324,7 @@ export class AuthRepository {
     userId: string,
     requiredRoles: readonly UserRoleValue[],
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<UserRoleValue[]> {
     try {
       const roles: UserRoleValue[] = [];
@@ -326,6 +338,7 @@ export class AuthRepository {
       const userRolesResponse = await UserRolesRepository.findByUserId(
         userId,
         logger,
+        locale,
       );
       if (userRolesResponse.success) {
         const dbRoles = userRolesResponse.data
@@ -510,8 +523,9 @@ export class AuthRepository {
         "app.api.user.auth.debug.errorGettingPublicLeadId",
         parseError(error),
       );
+      const { t } = scopedTranslation.scopedT(locale);
       throwErrorResponse(
-        "app.api.user.auth.errors.failed_to_create_lead",
+        t("errors.failed_to_create_lead"),
         ErrorResponseTypes.INTERNAL_ERROR,
       );
     }
@@ -532,6 +546,7 @@ export class AuthRepository {
     leadId: string,
     requiredRoles: TRoles,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<InferUserType<TRoles>> {
     // Filter to get only actual permission roles (not platform markers)
     const permissionRoles = filterUserPermissionRoles(requiredRoles);
@@ -550,6 +565,7 @@ export class AuthRepository {
         userId,
         requiredRoles,
         logger,
+        locale,
       );
       return createPrivateUser(
         userId,
@@ -581,6 +597,7 @@ export class AuthRepository {
       userId,
       requiredRoles,
       logger,
+      locale,
     );
 
     // Customer role is allowed for any authenticated user
@@ -597,6 +614,7 @@ export class AuthRepository {
       const userRolesResponse = await UserRolesRepository.findByUserId(
         userId,
         logger,
+        locale,
       );
       if (!userRolesResponse.success) {
         // If we can't get user roles, but the user is authenticated,
@@ -684,6 +702,7 @@ export class AuthRepository {
           userId,
           requiredRoles,
           logger,
+          locale,
         );
         return createPrivateUser(
           userId,
@@ -705,6 +724,7 @@ export class AuthRepository {
   static async signJwt(
     payload: JwtPrivatePayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<string>> {
     try {
       const token = await new SignJWT(payload)
@@ -719,8 +739,9 @@ export class AuthRepository {
         "app.api.user.auth.debug.errorSigningJwt",
         parseError(error),
       );
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.auth.errors.jwt_signing_failed",
+        message: t("errors.jwt_signing_failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -734,6 +755,7 @@ export class AuthRepository {
   static async verifyJwt(
     token: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<JwtPrivatePayloadType>> {
     try {
       // Verify the token
@@ -745,8 +767,9 @@ export class AuthRepository {
       // Validate the payload structure
       if (!payload.id || typeof payload.id !== "string") {
         logger.debug("app.api.user.auth.debug.invalidTokenPayload");
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.user.auth.errors.invalid_token_signature",
+          message: t("errors.invalid_token_signature"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -754,8 +777,9 @@ export class AuthRepository {
       // Validate leadId is present
       if (!payload.leadId || typeof payload.leadId !== "string") {
         logger.debug("app.api.user.auth.debug.invalidTokenPayload");
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.user.auth.errors.invalid_token_signature",
+          message: t("errors.invalid_token_signature"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -763,8 +787,9 @@ export class AuthRepository {
       // Validate roles are present
       if (!payload.roles || !Array.isArray(payload.roles)) {
         logger.debug("app.api.user.auth.debug.invalidTokenPayload");
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.user.auth.errors.invalid_token_signature",
+          message: t("errors.invalid_token_signature"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -779,8 +804,9 @@ export class AuthRepository {
       logger.debug("app.api.user.auth.debug.errorVerifyingJwt", {
         error: parseError(error),
       });
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.auth.errors.invalid_token_signature",
+        message: t("errors.invalid_token_signature"),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
         messageParams: { error: parseError(error).message },
       });
@@ -842,7 +868,11 @@ export class AuthRepository {
       }
 
       // Verify token
-      const verifyResult = await AuthRepository.verifyJwt(token, logger);
+      const verifyResult = await AuthRepository.verifyJwt(
+        token,
+        logger,
+        context.locale,
+      );
       if (!verifyResult.success) {
         logger.debug(
           "Token verification failed - returning public user without clearing cookies",
@@ -875,6 +905,7 @@ export class AuthRepository {
           token,
           verifyResult.data.id,
           logger,
+          context.locale,
         );
         if (!sessionValid) {
           logger.debug(
@@ -910,6 +941,7 @@ export class AuthRepository {
       const userRolesResponse = await UserRolesRepository.findByUserId(
         verifyResult.data.id,
         logger,
+        context.locale,
       );
       const roles = userRolesResponse.success
         ? userRolesResponse.data.map((r) => r.role)
@@ -951,9 +983,14 @@ export class AuthRepository {
     token: string,
     userId: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<boolean> {
     try {
-      const sessionResult = await SessionRepository.findByToken(token);
+      const { t: sessionT } = sessionScopedTranslation.scopedT(locale);
+      const sessionResult = await SessionRepository.findByToken(
+        token,
+        sessionT,
+      );
       if (!sessionResult.success) {
         return false;
       }
@@ -988,8 +1025,9 @@ export class AuthRepository {
     const authResult = await AuthRepository.authenticate(context, logger);
 
     if (!authResult.success || authResult.data.isPublic) {
+      const { t } = scopedTranslation.scopedT(context.locale);
       return fail({
-        message: "app.api.user.auth.errors.user_not_authenticated",
+        message: t("errors.user_not_authenticated"),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
@@ -1022,8 +1060,9 @@ export class AuthRepository {
           );
         if (!leadId) {
           logger.error("Failed to get lead ID for public user");
+          const { t } = scopedTranslation.scopedT(context.locale);
           return throwErrorResponse(
-            "app.api.user.auth.errors.session_retrieval_failed",
+            t("errors.session_retrieval_failed"),
             ErrorResponseTypes.INTERNAL_ERROR,
           );
         }
@@ -1047,8 +1086,9 @@ export class AuthRepository {
         logger.debug("Public user not allowed for this endpoint", {
           roles: JSON.stringify(roles),
         });
+        const { t } = scopedTranslation.scopedT(context.locale);
         return throwErrorResponse(
-          "app.api.user.auth.errors.publicUserNotAllowed",
+          t("errors.publicUserNotAllowed"),
           ErrorResponseTypes.UNAUTHORIZED,
         );
       }
@@ -1074,8 +1114,9 @@ export class AuthRepository {
         );
       if (!leadId) {
         logger.error("Failed to get lead ID for public user");
+        const { t } = scopedTranslation.scopedT(context.locale);
         return throwErrorResponse(
-          "app.api.user.auth.errors.session_retrieval_failed",
+          t("errors.session_retrieval_failed"),
           ErrorResponseTypes.INTERNAL_ERROR,
         );
       }
@@ -1141,6 +1182,7 @@ export class AuthRepository {
         leadId,
         roles,
         logger,
+        locale,
       );
     } catch (error) {
       logger.error(
@@ -1162,8 +1204,10 @@ export class AuthRepository {
         logger.error(
           "Failed to create public lead and no payload leadId available",
         );
+        const { t } = scopedTranslation.scopedT(locale);
+
         return throwErrorResponse(
-          "app.api.user.auth.errors.session_retrieval_failed",
+          t("errors.session_retrieval_failed"),
           ErrorResponseTypes.INTERNAL_ERROR,
         );
       }
@@ -1218,6 +1262,7 @@ export class AuthRepository {
           user.id,
           requiredRoles,
           logger,
+          context.locale,
         );
       }
 
@@ -1242,6 +1287,7 @@ export class AuthRepository {
     leadId: string,
     platform: Platform,
     logger: EndpointLogger,
+    locale: CountryLanguage,
     rememberMe = true, // Default to true (30 days)
   ): Promise<ResponseType<void>> {
     try {
@@ -1260,12 +1306,14 @@ export class AuthRepository {
         userId,
         leadId,
         logger,
+        locale,
         rememberMe,
       );
     } catch (error) {
       logger.error("Error storing auth token for platform", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.auth.errors.cookie_set_failed",
+        message: t("errors.cookie_set_failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -1278,6 +1326,7 @@ export class AuthRepository {
   static async clearAuthTokenForPlatform(
     platform: Platform,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
     try {
       logger.debug("Clearing auth token for platform", { platform });
@@ -1286,11 +1335,12 @@ export class AuthRepository {
       const handler = getPlatformAuthHandler(platform);
 
       // Delegate to platform handler
-      return await handler.clearAuthToken(logger);
+      return await handler.clearAuthToken(logger, locale);
     } catch (error) {
       logger.error("Error clearing auth token for platform", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.auth.errors.cookie_clear_failed",
+        message: t("errors.cookie_clear_failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -1317,6 +1367,7 @@ export class AuthRepository {
       const rolesResult = await UserRolesRepository.getUserRoles(
         userId,
         logger,
+        locale,
       );
 
       // Default to CUSTOMER role if roles fetch fails
@@ -1340,14 +1391,15 @@ export class AuthRepository {
         roles,
       };
 
-      return await AuthRepository.signJwt(payload, logger);
+      return await AuthRepository.signJwt(payload, logger, locale);
     } catch (error) {
       logger.error(
         "app.api.user.auth.debug.errorCreatingCliToken",
         parseError(error),
       );
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.auth.errors.jwt_signing_failed",
+        message: t("errors.jwt_signing_failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -1360,12 +1412,17 @@ export class AuthRepository {
   static async validateCliToken(
     token: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<JwtPrivatePayloadType | null> {
     try {
       logger.debug("app.api.user.auth.debug.validatingCliToken");
 
       // Verify the token
-      const verifyResult = await AuthRepository.verifyJwt(token, logger);
+      const verifyResult = await AuthRepository.verifyJwt(
+        token,
+        logger,
+        locale,
+      );
       if (!verifyResult.success) {
         return null;
       }
@@ -1409,11 +1466,15 @@ export class AuthRepository {
    * @returns The user ID
    * @throws Error if user ID is not available
    */
-  static requireUserId(payload: JwtPrivatePayloadType): string {
+  static requireUserId(
+    payload: JwtPrivatePayloadType,
+    locale: CountryLanguage,
+  ): string {
     const userId = AuthRepository.extractUserId(payload);
     if (!userId) {
+      const { t } = scopedTranslation.scopedT(locale);
       throwErrorResponse(
-        "app.api.user.auth.errors.jwt_payload_missing_id",
+        t("errors.jwt_payload_missing_id"),
         ErrorResponseTypes.UNAUTHORIZED,
       );
     }
@@ -1433,7 +1494,9 @@ export class AuthRepository {
     logger: EndpointLogger,
   ): Promise<CompleteUserType> {
     // Check authentication
-    const userResponse = await UserRepository.getUserByAuth(
+    const userResponse = await UserRepository.getUserByAuth<
+      typeof UserDetailLevel.COMPLETE
+    >(
       {
         detailLevel: UserDetailLevel.COMPLETE,
       },
@@ -1454,6 +1517,7 @@ export class AuthRepository {
       user.id,
       UserRole.ADMIN,
       logger,
+      locale,
     );
 
     if (!hasAdminRole.success || !hasAdminRole.data) {
@@ -1484,8 +1548,9 @@ export class AuthRepository {
 
       if (!userResult.success || !userResult.data) {
         logger.debug("User not found in database", { email });
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.user.auth.errors.user_not_authenticated",
+          message: t("errors.user_not_authenticated"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { email },
         });
@@ -1501,8 +1566,9 @@ export class AuthRepository {
 
       if (!leadId) {
         logger.error("Failed to get lead ID for user", { userId: user.id });
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.user.auth.errors.session_retrieval_failed",
+          message: t("errors.session_retrieval_failed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -1511,6 +1577,7 @@ export class AuthRepository {
       const userRolesResponse = await UserRolesRepository.findByUserId(
         user.id,
         logger,
+        locale,
       );
       const roles = userRolesResponse.success
         ? userRolesResponse.data.map((r) => r.role)
@@ -1525,8 +1592,9 @@ export class AuthRepository {
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Error authenticating by email", parsedError);
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.auth.errors.authentication_failed",
+        message: t("errors.authentication_failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });

@@ -24,6 +24,44 @@ export const translations = {
     jobs: "Jobs",
     list: "List",
   },
+  admin: {
+    title: "Leads Management",
+    tabs: {
+      overview: "Leads Navigation",
+      stats: "Overview",
+      stats_description: "View lead statistics and analytics",
+      leads: "Leads",
+      leads_description: "Browse and manage all leads",
+      emails: "Email Campaigns",
+      emails_description: "Manage email campaigns and templates",
+      abTesting: "A/B Testing",
+      abTesting_description: "Configure A/B testing variants",
+      campaignStarter: "Campaign Starter",
+      campaignStarter_description: "Configure and start lead campaigns",
+    },
+    import: {
+      label: "Import",
+      description: "Import leads from CSV files",
+    },
+    emails: {
+      preview: {
+        error: "Failed to render email preview",
+        live: "Live Preview",
+        actions: {
+          title: "Email Preview",
+          description: "Preview how the email will look to recipients",
+        },
+      },
+      preview_title: "Email Preview",
+      testEmail: {
+        button: "Send Test Email",
+      },
+      from: "From",
+      recipient: "Recipient",
+      subject: "Subject",
+      email_preview: "Email Preview",
+    },
+  },
   auth: {
     public: {
       validCookie: "Valid cookie lead found",
@@ -283,6 +321,16 @@ export const translations = {
       pl: "Polish",
       en: "English",
     },
+    emailProvider: {
+      resend: "Resend",
+      sendgrid: "SendGrid",
+      mailgun: "Mailgun",
+      ses: "Amazon SES",
+      smtp: "SMTP",
+      mailjet: "Mailjet",
+      postmark: "Postmark",
+      other: "Other",
+    },
   },
   error: {
     general: {
@@ -342,6 +390,9 @@ export const translations = {
     },
     leadsUnsubscribe: {
       post: {
+        success: {
+          description: "Successfully unsubscribed",
+        },
         error: {
           validation: {
             title: "Invalid unsubscribe request",

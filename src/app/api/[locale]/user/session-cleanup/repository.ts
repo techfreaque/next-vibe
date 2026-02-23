@@ -20,9 +20,11 @@ import {
   AUTH_TOKEN_COOKIE_MAX_AGE_DAYS,
   RESET_TOKEN_EXPIRY,
 } from "@/config/constants";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { sessions } from "../private/session/db";
 import { passwordResets } from "../public/reset-password/db";
+import { scopedTranslation } from "./i18n";
 import type {
   SessionCleanupConfigType,
   SessionCleanupRequestOutput,
@@ -36,6 +38,7 @@ export interface SessionCleanupRepository {
   executeSessionCleanup(
     data: SessionCleanupRequestOutput,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<SessionCleanupResponseOutput>>;
 }
 
@@ -46,6 +49,7 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
   async executeSessionCleanup(
     data: SessionCleanupRequestOutput,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<SessionCleanupResponseOutput>> {
     const startTime = Date.now();
 
@@ -148,13 +152,13 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
 
       // Return error if there were any errors, otherwise success
       if (errors.length > 0) {
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.user.session-cleanup.errors.partial_failure.title",
+          message: t("errors.partial_failure.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             errors:
-              result.errors?.join(", ") ||
-              "app.api.user.session-cleanup.errors.unknown_error.title",
+              result.errors?.join(", ") || t("errors.unknown_error.title"),
           },
         });
       }
@@ -169,8 +173,9 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
         executionTimeMs,
       });
 
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.session-cleanup.errors.execution_failed.title",
+        message: t("errors.execution_failed.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMessage },
       });
@@ -195,19 +200,21 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
   async validateConfig(
     config: SessionCleanupConfigType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
     try {
       // Validate database connection
       await db.execute(sql`SELECT 1`);
 
       // Validate configuration values
+      const { t } = scopedTranslation.scopedT(locale);
+
       if (
         config.sessionRetentionDays < 1 ||
         config.sessionRetentionDays > 365
       ) {
         return fail({
-          message:
-            "app.api.user.session-cleanup.errors.invalid_session_retention.title",
+          message: t("errors.invalid_session_retention.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { sessionRetentionDays: config.sessionRetentionDays },
         });
@@ -215,8 +222,7 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
 
       if (config.tokenRetentionDays < 1 || config.tokenRetentionDays > 365) {
         return fail({
-          message:
-            "app.api.user.session-cleanup.errors.invalid_token_retention.title",
+          message: t("errors.invalid_token_retention.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { tokenRetentionDays: config.tokenRetentionDays },
         });
@@ -224,8 +230,7 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
 
       if (config.batchSize < 1 || config.batchSize > 1000) {
         return fail({
-          message:
-            "app.api.user.session-cleanup.errors.invalid_batch_size.title",
+          message: t("errors.invalid_batch_size.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { batchSize: config.batchSize },
         });
@@ -238,8 +243,9 @@ export class SessionCleanupRepositoryImpl implements SessionCleanupRepository {
         "Session cleanup configuration validation failed",
         parseError(error),
       );
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.session-cleanup.errors.validation_failed.title",
+        message: t("errors.validation_failed.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

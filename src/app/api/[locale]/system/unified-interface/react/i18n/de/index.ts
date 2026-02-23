@@ -89,6 +89,7 @@ export const translations: typeof enTranslations = {
     chart: {
       noDataAvailable: "Keine Daten verfügbar",
       noDataToDisplay: "Keine Daten anzuzeigen",
+      total: "Gesamt",
     },
     creditTransactionList: {
       invalidConfig: "Ungültige Konfiguration für Kredit-Transaktionsliste",

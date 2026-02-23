@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: listConsoleMessagesEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger }) =>
+    handler: ({ data, t, logger }) =>
       executeMCPTool(
         {
           toolName: "list-console-messages",
@@ -23,6 +23,7 @@ export const { POST, tools } = endpointsHandler({
             includePreservedMessages: data.includePreservedMessages,
           }),
         },
+        t,
         logger,
       ),
   },

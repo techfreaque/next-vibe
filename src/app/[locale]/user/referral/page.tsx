@@ -4,12 +4,14 @@
  */
 
 import type { Metadata } from "next";
+import { notFound } from "next-vibe-ui/lib/not-found";
 import type { JSX } from "react";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -38,6 +40,9 @@ export async function generateMetadata({
 export default async function ReferralPage({
   params,
 }: ReferralPageProps): Promise<JSX.Element> {
+  if (env.NEXT_PUBLIC_LOCAL_MODE) {
+    notFound();
+  }
   const { locale } = await params;
 
   // Check if user is authenticated (but don't redirect)

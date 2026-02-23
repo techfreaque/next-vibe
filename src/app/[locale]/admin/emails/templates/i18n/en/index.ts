@@ -100,6 +100,19 @@ export const translations = {
           },
         },
       },
+      unsubscribe: {
+        meta: {
+          name: "Newsletter Unsubscribe Email",
+          description:
+            "Confirmation email sent when user unsubscribes from newsletter",
+        },
+        preview: {
+          email: {
+            label: "Email Address",
+            description: "Email address that unsubscribed",
+          },
+        },
+      },
     },
     subscription: {
       success: {

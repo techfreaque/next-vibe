@@ -5,6 +5,8 @@
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * Theme enum using createEnumOptions pattern
  */
@@ -12,10 +14,10 @@ export const {
   enum: Theme,
   options: ThemeOptions,
   Value: ThemeValue,
-} = createEnumOptions({
-  LIGHT: "app.api.user.theme.light",
-  DARK: "app.api.user.theme.dark",
-  SYSTEM: "app.api.user.theme.system",
+} = createEnumOptions(scopedTranslation, {
+  LIGHT: "theme.light",
+  DARK: "theme.dark",
+  SYSTEM: "theme.system",
 });
 
 /**
@@ -25,10 +27,10 @@ export const {
   enum: ProfileVisibility,
   options: ProfileVisibilityOptions,
   Value: ProfileVisibilityValue,
-} = createEnumOptions({
-  PUBLIC: "app.api.user.profileVisibility.public",
-  PRIVATE: "app.api.user.profileVisibility.private",
-  CONTACTS_ONLY: "app.api.user.profileVisibility.contactsOnly",
+} = createEnumOptions(scopedTranslation, {
+  PUBLIC: "profileVisibility.public",
+  PRIVATE: "profileVisibility.private",
+  CONTACTS_ONLY: "profileVisibility.contactsOnly",
 });
 
 /**
@@ -38,10 +40,10 @@ export const {
   enum: UserDetailLevel,
   options: UserDetailLevelOptions,
   Value: UserDetailLevelValue,
-} = createEnumOptions({
-  MINIMAL: "app.api.user.userDetailLevel.minimal",
-  STANDARD: "app.api.user.userDetailLevel.standard",
-  COMPLETE: "app.api.user.userDetailLevel.complete",
+} = createEnumOptions(scopedTranslation, {
+  MINIMAL: "userDetailLevel.minimal",
+  STANDARD: "userDetailLevel.standard",
+  COMPLETE: "userDetailLevel.complete",
 });
 
 /**
@@ -51,10 +53,10 @@ export const {
   enum: Language,
   options: LanguageOptions,
   Value: LanguageValue,
-} = createEnumOptions({
-  EN: "app.api.user.language.en",
-  DE: "app.api.user.language.de",
-  PL: "app.api.user.language.pl",
+} = createEnumOptions(scopedTranslation, {
+  EN: "language.en",
+  DE: "language.de",
+  PL: "language.pl",
 });
 
 export const UserDetailLevelDB = [

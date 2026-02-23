@@ -10,9 +10,12 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 // Import types from the endpoint definition
 import type generateTrpcRouterEndpoints from "./definition";
+import { scopedTranslation } from "./i18n";
 
 type GenerateTrpcRouterRequestType =
   typeof generateTrpcRouterEndpoints.POST.types.RequestOutput;
@@ -20,22 +23,13 @@ type GenerateTrpcRouterResponseType =
   typeof generateTrpcRouterEndpoints.POST.types.ResponseOutput;
 
 /**
- * Generate tRPC Router Repository Interface
- */
-export interface GenerateTrpcRouterRepository {
-  generateTrpcRouter(
-    data: GenerateTrpcRouterRequestType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<GenerateTrpcRouterResponseType>>;
-}
-
-/**
  * Generate tRPC Router Repository Implementation
  */
-export class GenerateTrpcRouterRepositoryImpl implements GenerateTrpcRouterRepository {
+export class GenerateTrpcRouterRepositoryImpl {
   async generateTrpcRouter(
     data: GenerateTrpcRouterRequestType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<GenerateTrpcRouterResponseType>> {
     try {
       // Execute tRPC router generation based on the original logic
@@ -50,8 +44,9 @@ export class GenerateTrpcRouterRepositoryImpl implements GenerateTrpcRouterRepos
 
       return success(response);
     } catch (error) {
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: String(error) },
       });

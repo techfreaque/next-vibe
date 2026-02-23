@@ -31,6 +31,14 @@ export const translations: typeof enTranslations = {
       testing: "Testowanie",
     },
   },
+  send: {
+    errors: {
+      accountNotFound:
+        "Konto komunikacyjne {{accountId}} nie zostało znalezione",
+      sendFailed: "Nie udało się wysłać wiadomości",
+      unexpected: "Nieoczekiwany błąd podczas wysyłania wiadomości: {{error}}",
+    },
+  },
   accounts: {
     create: accountsCreateTranslations,
     edit: { id: accountsEditTranslations },

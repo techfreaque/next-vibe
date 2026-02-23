@@ -10,7 +10,8 @@ import type { JSX } from "react";
 
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "./i18n";
 
 interface ContactInfoProps {
   locale: CountryLanguage;
@@ -25,20 +26,22 @@ export default function ContactInfo({
   locale,
   supportEmail,
 }: ContactInfoProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   return (
     <Div className="flex flex-col gap-8">
       <Div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
         <H2 className="text-2xl font-bold mb-6">
-          {t("app.api.contact._components.pages.help.info.title")}
+          {t("pages.help.info.title")}
         </H2>
 
         <Div className="flex flex-col gap-6">
           <Div>
             <Div className="flex items-start mb-2">
               <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3" />
-              <H3 className="font-medium">{t("config.emails.support")}</H3>
+              <H3 className="font-medium">
+                {t("pages.help.info.supportEmail")}
+              </H3>
             </Div>
             <Button
               onClick={() => {
@@ -53,9 +56,7 @@ export default function ContactInfo({
           <Div>
             <Div className="flex items-start mb-2">
               <Globe className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3" />
-              <H3 className="font-medium">
-                {t("app.api.contact._components.pages.help.info.website")}
-              </H3>
+              <H3 className="font-medium">{t("pages.help.info.website")}</H3>
             </Div>
             <Link
               href={envClient.NEXT_PUBLIC_APP_URL}
@@ -63,7 +64,7 @@ export default function ContactInfo({
               rel="noopener noreferrer"
               className="text-blue-600 dark:text-blue-400 hover:underline ml-8"
             >
-              {t("config.websiteUrl")}
+              {t("pages.help.info.websiteUrl")}
             </Link>
           </Div>
         </Div>

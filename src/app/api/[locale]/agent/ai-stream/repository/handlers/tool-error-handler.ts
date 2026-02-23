@@ -26,6 +26,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { type ToolCall, type ToolCallResult } from "../../../chat/db";
+import type { AiStreamT } from "../../i18n";
 import type { MessageDbWriter } from "../core/message-db-writer";
 
 export class ToolErrorHandler {
@@ -67,6 +68,7 @@ export class ToolErrorHandler {
     toolsConfig: Map<string, { requiresConfirmation: boolean }>;
     dbWriter: MessageDbWriter;
     logger: EndpointLogger;
+    t: AiStreamT;
   }): Promise<{
     currentParentId: string | null;
     currentDepth: number;
@@ -86,6 +88,7 @@ export class ToolErrorHandler {
       toolsConfig,
       dbWriter,
       logger,
+      t,
     } = params;
 
     if (!pendingToolMessage) {
@@ -118,6 +121,7 @@ export class ToolErrorHandler {
         user,
         dbWriter,
         logger,
+        t,
       });
     }
 
@@ -135,8 +139,7 @@ export class ToolErrorHandler {
 
       // Return a clear error to the model so it knows not to retry
       const disabledError = fail({
-        message:
-          "app.api.agent.chat.aiStream.errors.toolDisabledByUser" as const,
+        message: t("errors.toolDisabledByUser"),
         errorType: ErrorResponseTypes.FORBIDDEN,
       });
 
@@ -330,6 +333,7 @@ export class ToolErrorHandler {
       user,
       dbWriter,
       logger,
+      t,
     });
   }
 
@@ -412,6 +416,7 @@ export class ToolErrorHandler {
     user: JwtPayloadType;
     dbWriter: MessageDbWriter;
     logger: EndpointLogger;
+    t: AiStreamT;
   }): Promise<{
     currentParentId: string | null;
     currentDepth: number;
@@ -429,6 +434,7 @@ export class ToolErrorHandler {
       user,
       dbWriter,
       logger,
+      t,
     } = params;
 
     const error: ErrorResponseType =
@@ -440,13 +446,11 @@ export class ToolErrorHandler {
           ? // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
             (part.error as unknown as ErrorResponseType)
           : fail({
-              message:
-                "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
+              message: t("errors.toolExecutionError"),
               errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
             })
         : fail({
-            message:
-              "app.api.agent.chat.aiStream.errors.toolExecutionFailed" as const,
+            message: t("errors.toolExecutionFailed"),
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
 

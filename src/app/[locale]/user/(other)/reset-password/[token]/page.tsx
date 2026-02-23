@@ -8,6 +8,7 @@ import type { JSX } from "react";
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import ResetPasswordConfirmForm from "@/app/api/[locale]/user/public/reset-password/confirm/_components/reset-password-confirm-form";
+import { scopedTranslation as resetPasswordScopedTranslation } from "@/app/api/[locale]/user/public/reset-password/i18n";
 import { PasswordRepository } from "@/app/api/[locale]/user/public/reset-password/repository";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { envClient } from "@/config/env-client";
@@ -67,6 +68,7 @@ export default async function ResetPasswordConfirmPage({
 }: Props): Promise<JSX.Element> {
   const { locale, token } = await params;
   const { t } = simpleT(locale);
+  const { t: resetPasswordT } = resetPasswordScopedTranslation.scopedT(locale);
 
   const logger = createEndpointLogger(false, Date.now(), locale);
   // Check if user is already logged in using repository-first pattern
@@ -93,6 +95,8 @@ export default async function ResetPasswordConfirmPage({
   const tokenValidationResponse = await PasswordRepository.verifyResetToken(
     token,
     logger,
+    resetPasswordT,
+    locale,
   );
 
   const errorFallback = (

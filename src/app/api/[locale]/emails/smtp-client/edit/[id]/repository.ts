@@ -29,6 +29,9 @@ import type {
   SmtpAccountEditGETResponseOutput,
   SmtpAccountEditPUTResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 // Explicit interface for update data (bypassing broken PUT type from definition)
 interface SmtpAccountUpdateData {
@@ -62,12 +65,14 @@ export interface SmtpAccountEditRepository {
     urlPathParams: { id: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SmtpAccountEditGETResponseOutput>>;
 
   updateSmtpAccount(
     data: SmtpAccountUpdateData,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SmtpAccountEditPUTResponseOutput>>;
 }
 
@@ -83,6 +88,7 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
     urlPathParams: { id: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SmtpAccountEditGETResponseOutput>> {
     try {
       logger.debug("Getting SMTP account", {
@@ -98,7 +104,7 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
 
       if (!account) {
         return fail({
-          message: "app.api.emails.smtpClient.edit.id.errors.notFound.title",
+          message: t("errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { accountId: urlPathParams.id },
         });
@@ -140,7 +146,7 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
     } catch (error) {
       logger.error("Error getting SMTP account", parseError(error));
       return fail({
-        message: "app.api.emails.smtpClient.edit.id.errors.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -154,6 +160,7 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
     data: SmtpAccountUpdateData,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SmtpAccountEditPUTResponseOutput>> {
     try {
       logger.info("Updating SMTP account", {
@@ -171,7 +178,7 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
 
       if (!existingAccount) {
         return fail({
-          message: "app.api.emails.smtpClient.edit.id.errors.notFound.title",
+          message: t("errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { accountId: data.id },
         });
@@ -242,11 +249,10 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
 
       if (!updatedAccount) {
         return fail({
-          message: "app.api.emails.smtpClient.edit.id.errors.server.title",
+          message: t("errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
-            error:
-              "app.api.emails.smtpClient.edit.id.errors.server.description",
+            error: t("errors.server.description"),
           },
         });
       }
@@ -286,14 +292,14 @@ class SmtpAccountEditRepositoryImpl implements SmtpAccountEditRepository {
         errorMessage.includes("duplicate")
       ) {
         return fail({
-          message: "app.api.emails.smtpClient.edit.id.errors.conflict.title",
+          message: t("errors.conflict.title"),
           errorType: ErrorResponseTypes.CONFLICT,
           messageParams: { error: errorMessage },
         });
       }
 
       return fail({
-        message: "app.api.emails.smtpClient.edit.id.errors.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMessage },
       });

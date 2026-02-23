@@ -7,8 +7,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -18,22 +18,21 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../user/user-roles/enum";
+import { scopedTranslation } from "../i18n";
 import { SubscriptionCancelContainer } from "./widget";
 
 /**
  * DELETE endpoint for canceling subscription
  */
 const { DELETE } = createEndpoint({
+  scopedTranslation,
   method: Methods.DELETE,
   path: ["subscription", "cancel"],
-  title: "app.api.subscription.delete.title" as const,
-  description: "app.api.subscription.delete.description" as const,
-  icon: "package-x" as const,
-  category: "app.api.payment.category" as const,
-  tags: [
-    "app.api.subscription.tags.subscription" as const,
-    "app.api.subscription.tags.cancel" as const,
-  ],
+  title: "delete.title" as const,
+  description: "delete.description" as const,
+  icon: "package-x",
+  category: "category" as const,
+  tags: ["tags.subscription" as const, "tags.cancel" as const],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
@@ -47,33 +46,30 @@ const { DELETE } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // REQUEST FIELDS
-      cancelAtPeriodEnd: requestField({
+      cancelAtPeriodEnd: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.subscription.form.fields.cancelAtPeriodEnd.label" as const,
-        description:
-          "app.api.subscription.form.fields.cancelAtPeriodEnd.description" as const,
+        label: "form.fields.cancelAtPeriodEnd.label" as const,
+        description: "form.fields.cancelAtPeriodEnd.description" as const,
         schema: z.boolean().default(true),
       }),
-      reason: requestField({
+      reason: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.subscription.form.fields.reason.label" as const,
-        description:
-          "app.api.subscription.form.fields.reason.description" as const,
+        label: "form.fields.reason.label" as const,
+        description: "form.fields.reason.description" as const,
         schema: z.string().optional(),
       }),
 
       // RESPONSE FIELDS
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.delete.response.success" as const,
+        content: "response.success" as const,
         schema: z.boolean(),
       }),
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.delete.response.message" as const,
+        content: "response.message" as const,
         schema: z.string(),
       }),
     },
@@ -81,55 +77,46 @@ const { DELETE } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.subscription.delete.errors.validation.title" as const,
-      description:
-        "app.api.subscription.delete.errors.validation.description" as const,
+      title: "errors.validation.title" as const,
+      description: "errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.subscription.delete.errors.unauthorized.title" as const,
-      description:
-        "app.api.subscription.delete.errors.unauthorized.description" as const,
+      title: "errors.unauthorized.title" as const,
+      description: "errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.subscription.delete.errors.notFound.title" as const,
-      description:
-        "app.api.subscription.delete.errors.notFound.description" as const,
+      title: "errors.notFound.title" as const,
+      description: "errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.subscription.delete.errors.conflict.title" as const,
-      description:
-        "app.api.subscription.delete.errors.conflict.description" as const,
+      title: "errors.conflict.title" as const,
+      description: "errors.conflict.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.subscription.delete.errors.server.title" as const,
-      description:
-        "app.api.subscription.delete.errors.server.description" as const,
+      title: "errors.server.title" as const,
+      description: "errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.subscription.delete.errors.network.title" as const,
-      description:
-        "app.api.subscription.delete.errors.network.description" as const,
+      title: "errors.network.title" as const,
+      description: "errors.network.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.subscription.delete.errors.unknown.title" as const,
-      description:
-        "app.api.subscription.delete.errors.unknown.description" as const,
+      title: "errors.unknown.title" as const,
+      description: "errors.unknown.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.subscription.delete.errors.forbidden.title" as const,
-      description:
-        "app.api.subscription.delete.errors.forbidden.description" as const,
+      title: "errors.forbidden.title" as const,
+      description: "errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.subscription.delete.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.subscription.delete.errors.unsavedChanges.description" as const,
+      title: "errors.unsavedChanges.title" as const,
+      description: "errors.unsavedChanges.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.subscription.delete.success.title" as const,
-    description: "app.api.subscription.delete.success.description" as const,
+    title: "success.title" as const,
+    description: "success.description" as const,
   },
 
   examples: {

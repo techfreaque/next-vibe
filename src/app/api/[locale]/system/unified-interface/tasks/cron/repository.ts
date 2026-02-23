@@ -15,16 +15,20 @@ import {
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { formatTasksSummary } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks-formatter";
 import { calculateNextExecutionTime } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import type { scopedTranslation } from "../i18n";
 import type {
   CronTaskExecution,
   CronTaskRow,
   NewCronTask,
   NewCronTaskExecution,
 } from "./db";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 import { cronTaskExecutions, cronTasks } from "./db";
 import type { CronTaskResponseType as CronTaskResponse } from "./tasks/definition";
 
@@ -79,6 +83,7 @@ function serializeTask(
  */
 export class CronTasksRepository {
   static async getAllTasks(
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskRow[]>> {
     try {
@@ -95,7 +100,7 @@ export class CronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: ErrorResponseTypes.DATABASE_ERROR.errorKey,
+        message: t("errors.fetchCronTasks"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { message: parsedError.message },
       });
@@ -105,6 +110,7 @@ export class CronTasksRepository {
   static async getTaskById(
     id: string,
     user: JwtPayloadType,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ task: CronTaskResponse }>> {
     try {
@@ -121,8 +127,7 @@ export class CronTasksRepository {
 
       if (!task) {
         return fail({
-          message:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.get.errors.notFound.title",
+          message: t("errors.repositoryNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { taskId: id },
         });
@@ -131,8 +136,7 @@ export class CronTasksRepository {
       // Non-admins can only access their own tasks
       if (!isAdmin && task.userId !== userId) {
         return fail({
-          message:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.get.errors.forbidden.title",
+          message: t("errors.repositoryGetTaskForbidden"),
           errorType: ErrorResponseTypes.FORBIDDEN,
           messageParams: { taskId: id },
         });
@@ -146,7 +150,7 @@ export class CronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: ErrorResponseTypes.DATABASE_ERROR.errorKey,
+        message: t("errors.fetchCronTasks"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { message: parsedError.message },
       });
@@ -156,6 +160,7 @@ export class CronTasksRepository {
   /** Find a system task (userId IS NULL) by its routeId */
   static async getSystemTaskByRouteId(
     routeId: string,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskRow | null>> {
     try {
@@ -175,7 +180,7 @@ export class CronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: ErrorResponseTypes.DATABASE_ERROR.errorKey,
+        message: t("errors.fetchCronTasks"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { message: parsedError.message },
       });
@@ -184,6 +189,7 @@ export class CronTasksRepository {
 
   /** Get all system tasks (userId IS NULL) — for startup sync */
   static async getAllSystemTasks(
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskRow[]>> {
     try {
@@ -198,7 +204,7 @@ export class CronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: ErrorResponseTypes.DATABASE_ERROR.errorKey,
+        message: t("errors.fetchCronTasks"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { message: parsedError.message },
       });
@@ -207,6 +213,7 @@ export class CronTasksRepository {
 
   static async createTask(
     task: NewCronTask,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskRow>> {
     try {
@@ -224,7 +231,7 @@ export class CronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message: ErrorResponseTypes.DATABASE_ERROR.errorKey,
+        message: t("errors.createCronTask"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { message: parsedError.message },
       });
@@ -235,6 +242,7 @@ export class CronTasksRepository {
     id: string,
     updates: Partial<CronTaskRow>,
     user: JwtPayloadType | null,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ task: CronTaskResponse; success: boolean }>> {
     try {
@@ -253,15 +261,14 @@ export class CronTasksRepository {
 
         if (!existing[0]) {
           return fail({
-            message: ErrorResponseTypes.NOT_FOUND.errorKey,
+            message: t("errors.repositoryNotFound"),
             errorType: ErrorResponseTypes.NOT_FOUND,
           });
         }
 
         if (!isAdmin && existing[0].userId !== userId) {
           return fail({
-            message:
-              "app.api.system.unifiedInterface.tasks.cronSystem.task.put.errors.forbidden.title",
+            message: t("errors.repositoryUpdateTaskForbidden"),
             errorType: ErrorResponseTypes.FORBIDDEN,
             messageParams: { taskId: id },
           });
@@ -279,7 +286,7 @@ export class CronTasksRepository {
 
       if (!task) {
         return fail({
-          message: ErrorResponseTypes.NOT_FOUND.errorKey,
+          message: t("errors.repositoryNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -295,8 +302,7 @@ export class CronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.common.cronRepositoryTaskUpdateFailed",
+        message: t("common.cronRepositoryTaskUpdateFailed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parsedError.message, taskId: id },
       });
@@ -306,6 +312,7 @@ export class CronTasksRepository {
   static async deleteTask(
     id: string,
     user: JwtPayloadType,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ success: boolean; message: string }>> {
     try {
@@ -322,15 +329,14 @@ export class CronTasksRepository {
 
       if (!existing[0]) {
         return fail({
-          message: ErrorResponseTypes.NOT_FOUND.errorKey,
+          message: t("errors.repositoryNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       if (!isAdmin && existing[0].userId !== userId) {
         return fail({
-          message:
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.delete.errors.forbidden.title",
+          message: t("errors.repositoryDeleteTaskForbidden"),
           errorType: ErrorResponseTypes.FORBIDDEN,
           messageParams: { taskId: id },
         });
@@ -347,8 +353,7 @@ export class CronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.common.cronRepositoryTaskDeleteFailed",
+        message: t("common.cronRepositoryTaskDeleteFailed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parsedError.message, taskId: id },
       });
@@ -357,6 +362,7 @@ export class CronTasksRepository {
 
   static async createExecution(
     execution: NewCronTaskExecution,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskExecution>> {
     try {
@@ -373,8 +379,7 @@ export class CronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.common.cronRepositoryExecutionCreateFailed",
+        message: t("common.cronRepositoryExecutionCreateFailed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parsedError.message, taskId: execution.taskId },
       });
@@ -384,6 +389,7 @@ export class CronTasksRepository {
   static async updateExecution(
     id: string,
     updates: Partial<CronTaskExecution>,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskExecution>> {
     try {
@@ -398,7 +404,7 @@ export class CronTasksRepository {
 
       if (!updatedExecution) {
         return fail({
-          message: ErrorResponseTypes.NOT_FOUND.errorKey,
+          message: t("errors.repositoryNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -411,8 +417,7 @@ export class CronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.common.cronRepositoryExecutionUpdateFailed",
+        message: t("common.cronRepositoryExecutionUpdateFailed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parsedError.message, executionId: id },
       });
@@ -422,6 +427,7 @@ export class CronTasksRepository {
   static async getExecutionsByTaskId(
     taskId: string,
     limit = 50,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskExecution[]>> {
     try {
@@ -442,8 +448,7 @@ export class CronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.common.cronRepositoryExecutionsFetchFailed",
+        message: t("common.cronRepositoryExecutionsFetchFailed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parsedError.message, taskId, limit },
       });
@@ -452,6 +457,7 @@ export class CronTasksRepository {
 
   static async getRecentExecutions(
     limit = 100,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskExecution[]>> {
     try {
@@ -470,15 +476,17 @@ export class CronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.common.cronRepositoryRecentExecutionsFetchFailed",
+        message: t("common.cronRepositoryRecentExecutionsFetchFailed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parsedError.message, limit },
       });
     }
   }
 
-  static async getTaskStatistics(logger: EndpointLogger): Promise<
+  static async getTaskStatistics(
+    t: ModuleT,
+    logger: EndpointLogger,
+  ): Promise<
     ResponseType<{
       totalTasks: number;
       enabledTasks: number;
@@ -509,11 +517,57 @@ export class CronTasksRepository {
         error: parsedError.message,
       });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.common.cronRepositoryStatisticsFetchFailed",
+        message: t("common.cronRepositoryStatisticsFetchFailed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parsedError.message },
       });
     }
+  }
+}
+
+/**
+ * Generate a concise tasks summary for injection into the AI system prompt.
+ * Returns an empty string if the user has no tasks.
+ */
+export async function generateTasksSummary(params: {
+  userId: string;
+  logger: EndpointLogger;
+}): Promise<string> {
+  const { userId, logger } = params;
+
+  try {
+    const tasks = await db
+      .select({
+        id: cronTasks.id,
+        displayName: cronTasks.displayName,
+        schedule: cronTasks.schedule,
+        enabled: cronTasks.enabled,
+        lastExecutionStatus: cronTasks.lastExecutionStatus,
+        lastExecutedAt: cronTasks.lastExecutedAt,
+        errorCount: cronTasks.errorCount,
+        routeId: cronTasks.routeId,
+        description: cronTasks.description,
+      })
+      .from(cronTasks)
+      .where(eq(cronTasks.userId, userId))
+      .orderBy(desc(cronTasks.updatedAt))
+      .limit(50);
+
+    const summary = formatTasksSummary(tasks);
+
+    if (summary) {
+      logger.debug("Generated tasks summary for system prompt", {
+        userId,
+        taskCount: tasks.length,
+      });
+    }
+
+    return summary;
+  } catch (error) {
+    logger.error("Failed to generate tasks summary", {
+      userId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return "";
   }
 }

@@ -9,9 +9,12 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
+import type { AiStreamTranslationKey } from "../../i18n";
+import type { scopedTranslation } from "../../i18n";
 import type { MessageDbWriter } from "../core/message-db-writer";
+
+type AiStreamModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 export class StreamErrorHandler {
   /**
@@ -26,6 +29,7 @@ export class StreamErrorHandler {
     lastSequenceId: string | null;
     dbWriter: MessageDbWriter;
     logger: EndpointLogger;
+    t: AiStreamModuleT;
   }): Promise<void> {
     const {
       error,
@@ -36,6 +40,7 @@ export class StreamErrorHandler {
       lastSequenceId,
       dbWriter,
       logger,
+      t,
     } = params;
 
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -49,35 +54,31 @@ export class StreamErrorHandler {
       errorType: errorName,
     });
 
-    let translationKey: TranslationKey;
+    let translationKey: AiStreamTranslationKey;
     let errorType = ErrorResponseTypes.UNKNOWN_ERROR;
 
     if (errorMessage.toLowerCase().includes("rate limit")) {
-      translationKey =
-        "app.api.agent.chat.aiStream.errors.rateLimitExceeded" satisfies TranslationKey;
+      translationKey = "errors.rateLimitExceeded";
       errorType = ErrorResponseTypes.EXTERNAL_SERVICE_ERROR;
     } else if (
       errorMessage.toLowerCase().includes("insufficient") &&
       errorMessage.toLowerCase().includes("credit")
     ) {
-      translationKey =
-        "app.api.agent.chat.aiStream.errors.insufficientCredits" satisfies TranslationKey;
+      translationKey = "errors.insufficientCredits";
       errorType = ErrorResponseTypes.PAYMENT_REQUIRED;
     } else if (
       errorMessage.toLowerCase().includes("no output") ||
       errorMessage.toLowerCase().includes("no response") ||
       errorName === "AI_NoOutputGeneratedError"
     ) {
-      translationKey =
-        "app.api.agent.chat.aiStream.errors.noResponse" satisfies TranslationKey;
+      translationKey = "errors.noResponse";
       errorType = ErrorResponseTypes.EXTERNAL_SERVICE_ERROR;
     } else if (
       errorMessage.toLowerCase().includes("model") &&
       (errorMessage.toLowerCase().includes("not found") ||
         errorMessage.toLowerCase().includes("unavailable"))
     ) {
-      translationKey =
-        "app.api.agent.chat.aiStream.errors.modelUnavailable" satisfies TranslationKey;
+      translationKey = "errors.modelUnavailable";
       errorType = ErrorResponseTypes.NOT_FOUND;
     } else if (
       errorMessage.toLowerCase().includes("connection") ||
@@ -85,24 +86,24 @@ export class StreamErrorHandler {
       errorMessage.toLowerCase().includes("fetch failed") ||
       errorMessage.toLowerCase().includes("econnrefused")
     ) {
-      translationKey =
-        "app.api.agent.chat.aiStream.errors.connectionFailed" satisfies TranslationKey;
+      translationKey = "errors.connectionFailed";
       errorType = ErrorResponseTypes.EXTERNAL_SERVICE_ERROR;
     } else if (
       errorMessage.toLowerCase().includes("invalid") ||
       errorMessage.toLowerCase().includes("malformed") ||
       errorMessage.toLowerCase().includes("bad request")
     ) {
-      translationKey =
-        "app.api.agent.chat.aiStream.errors.invalidRequest" satisfies TranslationKey;
+      translationKey = "errors.invalidRequest";
       errorType = ErrorResponseTypes.BAD_REQUEST;
     } else {
-      translationKey =
-        "app.api.agent.chat.aiStream.errors.streamError" satisfies TranslationKey;
+      translationKey = "errors.streamError";
       errorType = ErrorResponseTypes.UNKNOWN_ERROR;
     }
 
-    const structuredError = fail({ message: translationKey, errorType });
+    const structuredError = fail({
+      message: t(translationKey),
+      errorType,
+    });
 
     // Emit MESSAGE_CREATED SSE + save to DB + emit ERROR SSE
     await dbWriter.emitErrorMessage({

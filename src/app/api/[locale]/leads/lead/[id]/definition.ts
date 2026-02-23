@@ -9,12 +9,12 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   backButton,
   customWidgetObject,
-  objectField,
-  requestField,
-  requestUrlPathParamsField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedRequestUrlPathParamsField,
+  scopedResponseField,
+  scopedWidgetField,
   submitButton,
-  widgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -41,6 +41,7 @@ import {
   LeadStatus,
   LeadStatusOptions,
 } from "../../enum";
+import { scopedTranslation } from "./i18n";
 import { LeadDetailContainer } from "./widget";
 
 /**
@@ -48,37 +49,36 @@ import { LeadDetailContainer } from "./widget";
  * Deletes a lead by ID
  */
 const { DELETE } = createEndpoint({
+  scopedTranslation,
   method: Methods.DELETE,
   path: ["leads", "lead", "[id]"],
   allowedRoles: [UserRole.ADMIN],
 
-  title: "app.api.leads.lead.id.delete.title",
-  description: "app.api.leads.lead.id.delete.description",
+  title: "delete.title",
+  description: "delete.description",
   icon: "trash",
-  category: "app.api.leads.category",
-  tags: ["app.api.leads.tags.leads", "app.api.leads.tags.management"],
+  category: "category",
+  tags: ["tags.leads", "tags.management"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.STACKED,
-      paddingTop: "6",
-      noCard: true,
-    },
-    { request: "urlPathParams" },
-    {
-      title: widgetField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    paddingTop: "6",
+    noCard: true,
+    usage: { request: "urlPathParams" },
+    children: {
+      title: scopedWidgetField(scopedTranslation, {
         type: WidgetType.TITLE,
         level: 5,
-        content: "app.api.leads.lead.id.delete.container.description",
+        content: "delete.container.description",
         usage: { request: "urlPathParams" },
       }),
       // === URL PARAMETERS ===
-      id: requestUrlPathParamsField({
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label: "app.api.leads.lead.id.delete.id.label",
-        description: "app.api.leads.lead.id.delete.id.description",
+        label: "delete.id.label",
+        description: "delete.id.description",
         hidden: true,
 
         schema: z.uuid(),
@@ -86,65 +86,60 @@ const { DELETE } = createEndpoint({
 
       // Navigation - back to previous screen
       backButton: backButton({
-        label: "app.api.leads.lead.id.delete.backButton.label",
         icon: "arrow-left",
         variant: "outline",
         usage: { request: "urlPathParams" },
       }),
       submitButton: submitButton({
-        label: "app.api.leads.lead.id.delete.actions.delete",
-        loadingText: "app.api.leads.lead.id.delete.actions.deleting",
         icon: "trash",
         variant: "destructive",
         usage: { request: "urlPathParams" },
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.leads.lead.id.delete.errors.validation.title",
-      description: "app.api.leads.lead.id.delete.errors.validation.description",
+      title: "delete.errors.validation.title",
+      description: "delete.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.leads.lead.id.delete.errors.network.title",
-      description: "app.api.leads.lead.id.delete.errors.network.description",
+      title: "delete.errors.network.title",
+      description: "delete.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.leads.lead.id.delete.errors.unauthorized.title",
-      description:
-        "app.api.leads.lead.id.delete.errors.unauthorized.description",
+      title: "delete.errors.unauthorized.title",
+      description: "delete.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.leads.lead.id.delete.errors.forbidden.title",
-      description: "app.api.leads.lead.id.delete.errors.forbidden.description",
+      title: "delete.errors.forbidden.title",
+      description: "delete.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.leads.lead.id.delete.errors.notFound.title",
-      description: "app.api.leads.lead.id.delete.errors.notFound.description",
+      title: "delete.errors.notFound.title",
+      description: "delete.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.leads.lead.id.delete.errors.server.title",
-      description: "app.api.leads.lead.id.delete.errors.server.description",
+      title: "delete.errors.server.title",
+      description: "delete.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.leads.lead.id.delete.errors.unknown.title",
-      description: "app.api.leads.lead.id.delete.errors.unknown.description",
+      title: "delete.errors.unknown.title",
+      description: "delete.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.leads.lead.id.delete.errors.unsavedChanges.title",
-      description:
-        "app.api.leads.lead.id.delete.errors.unsavedChanges.description",
+      title: "delete.errors.unsavedChanges.title",
+      description: "delete.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.leads.lead.id.delete.errors.conflict.title",
-      description: "app.api.leads.lead.id.delete.errors.conflict.description",
+      title: "delete.errors.conflict.title",
+      description: "delete.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.leads.lead.id.delete.success.title",
-    description: "app.api.leads.lead.id.delete.success.description",
+    title: "delete.success.title",
+    description: "delete.success.description",
   },
 
   examples: {
@@ -159,29 +154,27 @@ const { DELETE } = createEndpoint({
  * Updates an existing lead
  */
 const { PATCH } = createEndpoint({
+  scopedTranslation,
   method: Methods.PATCH,
   path: ["leads", "lead", "[id]"],
-  title: "app.api.leads.lead.id.patch.title",
-  description: "app.api.leads.lead.id.patch.description",
-  category: "app.api.leads.category",
-  tags: ["app.api.leads.tags.leads", "app.api.leads.tags.management"],
+  title: "patch.title",
+  description: "patch.description",
+  category: "category",
+  tags: ["tags.leads", "tags.management"],
   allowedRoles: [UserRole.ADMIN],
   icon: "user",
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.leads.lead.id.patch.form.title",
-      description: "app.api.leads.lead.id.patch.form.description",
-      layoutType: LayoutType.STACKED,
-      paddingTop: "6",
-      noCard: true,
-    },
-    { request: "data&urlPathParams", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "patch.form.title",
+    description: "patch.form.description",
+    layoutType: LayoutType.STACKED,
+    paddingTop: "6",
+    noCard: true,
+    usage: { request: "data&urlPathParams", response: true },
+    children: {
       // Navigation - back to previous screen
       backButton: backButton({
-        label: "app.api.leads.lead.id.patch.backButton.label",
         icon: "arrow-left",
         variant: "outline",
         usage: { request: "urlPathParams" },
@@ -189,62 +182,54 @@ const { PATCH } = createEndpoint({
 
       // Submit button
       submitButton: submitButton({
-        label: "app.api.leads.lead.id.patch.submitButton.label",
-        loadingText: "app.api.leads.lead.id.patch.submitButton.loadingText",
         icon: "save",
         variant: "default",
         usage: { request: "urlPathParams" },
       }),
 
       // === URL PARAMETERS ===
-      id: requestUrlPathParamsField({
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label: "app.api.leads.lead.id.patch.id.label",
-        description: "app.api.leads.lead.id.patch.id.description",
+        label: "patch.id.label",
+        description: "patch.id.description",
         hidden: true,
         schema: z.uuid(),
       }),
 
       // === UPDATE FIELDS ===
-      updates: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.leads.lead.id.patch.updates.title",
-          description: "app.api.leads.lead.id.patch.updates.description",
-          layoutType: LayoutType.STACKED,
-        },
-        { request: "data" },
-        {
+      updates: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "patch.updates.title",
+        description: "patch.updates.description",
+        layoutType: LayoutType.STACKED,
+        usage: { request: "data" },
+        children: {
           // Basic Information
-          basicInfo: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.leads.lead.id.patch.basicInfo.title",
-              description: "app.api.leads.lead.id.patch.basicInfo.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { request: "data" },
-            {
-              email: requestField({
+          basicInfo: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "patch.basicInfo.title",
+            description: "patch.basicInfo.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { request: "data" },
+            children: {
+              email: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.EMAIL,
-                label: "app.api.leads.lead.id.patch.email.label",
-                description: "app.api.leads.lead.id.patch.email.description",
-                placeholder: "app.api.leads.lead.id.patch.email.placeholder",
+                label: "patch.email.label",
+                description: "patch.email.description",
+                placeholder: "patch.email.placeholder",
                 columns: 6,
 
                 schema: z.string().email().optional(),
               }),
-              businessName: requestField({
+              businessName: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
-                label: "app.api.leads.lead.id.patch.businessName.label",
-                description:
-                  "app.api.leads.lead.id.patch.businessName.description",
-                placeholder:
-                  "app.api.leads.lead.id.patch.businessName.placeholder",
+                label: "patch.businessName.label",
+                description: "patch.businessName.description",
+                placeholder: "patch.businessName.placeholder",
                 columns: 6,
 
                 schema: z
@@ -252,156 +237,143 @@ const { PATCH } = createEndpoint({
                   .optional()
                   .transform((v) => (v === "" ? undefined : v)),
               }),
-              contactName: requestField({
+              contactName: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
-                label: "app.api.leads.lead.id.patch.contactName.label",
-                description:
-                  "app.api.leads.lead.id.patch.contactName.description",
-                placeholder:
-                  "app.api.leads.lead.id.patch.contactName.placeholder",
+                label: "patch.contactName.label",
+                description: "patch.contactName.description",
+                placeholder: "patch.contactName.placeholder",
                 columns: 6,
 
                 schema: z.string().optional().nullable(),
               }),
-              status: requestField({
+              status: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.SELECT,
-                label: "app.api.leads.lead.id.patch.status.label",
-                description: "app.api.leads.lead.id.patch.status.description",
-                placeholder: "app.api.leads.lead.id.patch.status.placeholder",
+                label: "patch.status.label",
+                description: "patch.status.description",
+                placeholder: "patch.status.placeholder",
                 columns: 6,
                 options: LeadStatusOptions,
 
                 schema: z.enum(LeadStatus).optional(),
               }),
             },
-          ),
+          }),
 
           // Contact Details
-          contactDetails: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.leads.lead.id.patch.contactDetails.title",
-              description:
-                "app.api.leads.lead.id.patch.contactDetails.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { request: "data" },
-            {
-              phone: requestField({
+          contactDetails: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "patch.contactDetails.title",
+            description: "patch.contactDetails.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { request: "data" },
+            children: {
+              phone: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEL,
-                label: "app.api.leads.lead.id.patch.phone.label",
-                description: "app.api.leads.lead.id.patch.phone.description",
-                placeholder: "app.api.leads.lead.id.patch.phone.placeholder",
+                label: "patch.phone.label",
+                description: "patch.phone.description",
+                placeholder: "patch.phone.placeholder",
                 columns: 6,
                 schema: z
                   .string()
                   .regex(/^\+?[1-9]\d{1,14}$/)
                   .optional(),
               }),
-              website: requestField({
+              website: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.URL,
-                label: "app.api.leads.lead.id.patch.website.label",
-                description: "app.api.leads.lead.id.patch.website.description",
-                placeholder: "app.api.leads.lead.id.patch.website.placeholder",
+                label: "patch.website.label",
+                description: "patch.website.description",
+                placeholder: "patch.website.placeholder",
                 columns: 6,
 
                 schema: z.string().url().optional().or(z.literal("")),
               }),
-              country: requestField({
+              country: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.SELECT,
-                label: "app.api.leads.lead.id.patch.country.label",
-                description: "app.api.leads.lead.id.patch.country.description",
-                placeholder: "app.api.leads.lead.id.patch.country.placeholder",
+                label: "patch.country.label",
+                description: "patch.country.description",
+                placeholder: "patch.country.placeholder",
                 columns: 6,
                 options: CountriesOptions,
 
                 schema: z.enum(Countries).optional(),
               }),
-              language: requestField({
+              language: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.SELECT,
-                label: "app.api.leads.lead.id.patch.language.label",
-                description: "app.api.leads.lead.id.patch.language.description",
-                placeholder: "app.api.leads.lead.id.patch.language.placeholder",
+                label: "patch.language.label",
+                description: "patch.language.description",
+                placeholder: "patch.language.placeholder",
                 columns: 6,
                 options: LanguagesOptions,
 
                 schema: z.enum(Languages).optional(),
               }),
             },
-          ),
+          }),
 
           // Campaign Management
-          campaignManagement: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.leads.lead.id.patch.campaignManagement.title",
-              description:
-                "app.api.leads.lead.id.patch.campaignManagement.description",
-              layoutType: LayoutType.STACKED,
-            },
-            { request: "data" },
-            {
-              source: requestField({
+          campaignManagement: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "patch.campaignManagement.title",
+            description: "patch.campaignManagement.description",
+            layoutType: LayoutType.STACKED,
+            usage: { request: "data" },
+            children: {
+              source: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.SELECT,
-                label: "app.api.leads.lead.id.patch.source.label",
-                description: "app.api.leads.lead.id.patch.source.description",
-                placeholder: "app.api.leads.lead.id.patch.source.placeholder",
+                label: "patch.source.label",
+                description: "patch.source.description",
+                placeholder: "patch.source.placeholder",
                 columns: 12,
                 options: LeadSourceOptions,
 
                 schema: z.enum(LeadSource).optional(),
               }),
-              currentCampaignStage: requestField({
+              currentCampaignStage: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.SELECT,
-                label: "app.api.leads.lead.id.patch.currentCampaignStage.label",
-                description:
-                  "app.api.leads.lead.id.patch.currentCampaignStage.description",
-                placeholder:
-                  "app.api.leads.lead.id.patch.currentCampaignStage.placeholder",
+                label: "patch.currentCampaignStage.label",
+                description: "patch.currentCampaignStage.description",
+                placeholder: "patch.currentCampaignStage.placeholder",
                 columns: 12,
                 options: EmailCampaignStageOptions,
 
                 schema: z.enum(EmailCampaignStage).optional(),
               }),
             },
-          ),
+          }),
 
           // Additional Details
-          additionalDetails: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.leads.lead.id.patch.additionalDetails.title",
-              description:
-                "app.api.leads.lead.id.patch.additionalDetails.description",
-              layoutType: LayoutType.STACKED,
-            },
-            { request: "data" },
-            {
-              notes: requestField({
+          additionalDetails: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "patch.additionalDetails.title",
+            description: "patch.additionalDetails.description",
+            layoutType: LayoutType.STACKED,
+            usage: { request: "data" },
+            children: {
+              notes: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXTAREA,
-                label: "app.api.leads.lead.id.patch.notes.label",
-                description: "app.api.leads.lead.id.patch.notes.description",
-                placeholder: "app.api.leads.lead.id.patch.notes.placeholder",
+                label: "patch.notes.label",
+                description: "patch.notes.description",
+                placeholder: "patch.notes.placeholder",
                 columns: 12,
 
                 schema: z.string().optional(),
               }),
-              metadata: requestField({
+              metadata: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.JSON,
-                label: "app.api.leads.lead.id.patch.metadata.label",
-                description: "app.api.leads.lead.id.patch.metadata.description",
-                placeholder: "app.api.leads.lead.id.patch.metadata.placeholder",
+                label: "patch.metadata.label",
+                description: "patch.metadata.description",
+                placeholder: "patch.metadata.placeholder",
                 columns: 12,
                 schema: z
                   .record(
@@ -410,14 +382,12 @@ const { PATCH } = createEndpoint({
                   )
                   .optional(),
               }),
-              convertedUserId: requestField({
+              convertedUserId: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.UUID,
-                label: "app.api.leads.lead.id.patch.convertedUserId.label",
-                description:
-                  "app.api.leads.lead.id.patch.convertedUserId.description",
-                placeholder:
-                  "app.api.leads.lead.id.patch.convertedUserId.placeholder",
+                label: "patch.convertedUserId.label",
+                description: "patch.convertedUserId.description",
+                placeholder: "patch.convertedUserId.placeholder",
                 columns: 12,
 
                 schema: z
@@ -426,333 +396,293 @@ const { PATCH } = createEndpoint({
                   .optional()
                   .transform((v) => (v === "" ? undefined : v)),
               }),
-              subscriptionConfirmedAt: requestField({
+              subscriptionConfirmedAt: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.DATETIME,
-                label:
-                  "app.api.leads.lead.id.patch.subscriptionConfirmedAt.label",
-                description:
-                  "app.api.leads.lead.id.patch.subscriptionConfirmedAt.description",
-                placeholder:
-                  "app.api.leads.lead.id.patch.subscriptionConfirmedAt.placeholder",
+                label: "patch.subscriptionConfirmedAt.label",
+                description: "patch.subscriptionConfirmedAt.description",
+                placeholder: "patch.subscriptionConfirmedAt.placeholder",
                 columns: 12,
 
                 schema: z.coerce.date().nullable().optional(),
               }),
             },
-          ),
+          }),
         },
-      ),
+      }),
 
       // === RESPONSE FIELDS (same structure as GET) ===
-      lead: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.leads.lead.id.patch.response.title",
-          description: "app.api.leads.lead.id.patch.response.description",
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
+      lead: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "patch.response.title",
+        description: "patch.response.description",
+        layoutType: LayoutType.STACKED,
+        usage: { response: true },
+        children: {
           // Using same nested response structure as GET endpoint
-          basicInfo: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.leads.lead.id.patch.response.basicInfo.title",
-              description:
-                "app.api.leads.lead.id.patch.response.basicInfo.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              id: responseField({
+          basicInfo: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "patch.response.basicInfo.title",
+            description: "patch.response.basicInfo.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              id: scopedResponseField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.UUID,
-                label: "app.api.leads.lead.id.patch.id.label",
-                description: "app.api.leads.lead.id.patch.id.description",
+                label: "patch.id.label",
+                description: "patch.id.description",
                 hidden: true,
                 schema: z.uuid(),
               }),
 
-              email: responseField({
+              email: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.patch.response.email.content",
+                label: "patch.response.email.content",
 
                 schema: z.string().email().nullable(),
               }),
-              businessName: responseField({
+              businessName: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.patch.response.businessName.content",
+                label: "patch.response.businessName.content",
 
                 schema: z.string(),
               }),
-              contactName: responseField({
+              contactName: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.patch.response.contactName.content",
+                label: "patch.response.contactName.content",
 
                 schema: z.string().nullable(),
               }),
-              status: responseField({
+              status: scopedResponseField(scopedTranslation, {
                 type: WidgetType.BADGE,
-                text: "app.api.leads.lead.id.patch.response.status.content",
+                text: "patch.response.status.content",
 
                 schema: z.enum(LeadStatus),
               }),
             },
-          ),
+          }),
 
-          contactDetails: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.leads.lead.id.patch.response.contactDetails.title",
-              description:
-                "app.api.leads.lead.id.patch.response.contactDetails.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              phone: responseField({
+          contactDetails: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "patch.response.contactDetails.title",
+            description: "patch.response.contactDetails.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              phone: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.patch.response.phone.content",
+                label: "patch.response.phone.content",
 
                 schema: z.string().nullable(),
               }),
-              website: responseField({
+              website: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.patch.response.website.content",
+                label: "patch.response.website.content",
 
                 schema: z.string().nullable(),
               }),
-              country: responseField({
+              country: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.patch.response.country.content",
+                label: "patch.response.country.content",
 
                 schema: z.enum(Countries),
               }),
-              language: responseField({
+              language: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.patch.response.language.content",
+                label: "patch.response.language.content",
 
                 schema: z.enum(Languages),
               }),
             },
-          ),
+          }),
 
-          campaignTracking: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.leads.lead.id.patch.response.campaignTracking.title",
-              description:
-                "app.api.leads.lead.id.patch.response.campaignTracking.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              source: responseField({
+          campaignTracking: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "patch.response.campaignTracking.title",
+            description: "patch.response.campaignTracking.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              source: scopedResponseField(scopedTranslation, {
                 type: WidgetType.BADGE,
-                text: "app.api.leads.lead.id.patch.response.source.content",
+                text: "patch.response.source.content",
 
                 schema: z.enum(LeadSource).nullable(),
               }),
-              currentCampaignStage: responseField({
+              currentCampaignStage: scopedResponseField(scopedTranslation, {
                 type: WidgetType.BADGE,
-                text: "app.api.leads.lead.id.patch.response.currentCampaignStage.content",
+                text: "patch.response.currentCampaignStage.content",
 
                 schema: z.enum(EmailCampaignStage).nullable(),
               }),
-              emailJourneyVariant: responseField({
+              emailJourneyVariant: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.patch.response.emailJourneyVariant.content",
+                label: "patch.response.emailJourneyVariant.content",
 
                 schema: z.enum(EmailJourneyVariant).nullable(),
               }),
-              emailsSent: responseField({
+              emailsSent: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.patch.response.emailsSent.content",
+                label: "patch.response.emailsSent.content",
 
                 schema: z.coerce.number(),
               }),
-              lastEmailSentAt: responseField({
+              lastEmailSentAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.patch.response.lastEmailSentAt.content",
+                label: "patch.response.lastEmailSentAt.content",
                 schema: dateSchema.nullable(),
               }),
             },
-          ),
+          }),
 
-          engagement: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.leads.lead.id.patch.response.engagement.title",
-              description:
-                "app.api.leads.lead.id.patch.response.engagement.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              emailsOpened: responseField({
+          engagement: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "patch.response.engagement.title",
+            description: "patch.response.engagement.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              emailsOpened: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.patch.response.emailsOpened.content",
+                label: "patch.response.emailsOpened.content",
 
                 schema: z.coerce.number(),
               }),
-              emailsClicked: responseField({
+              emailsClicked: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.patch.response.emailsClicked.content",
+                label: "patch.response.emailsClicked.content",
 
                 schema: z.coerce.number(),
               }),
-              lastEngagementAt: responseField({
+              lastEngagementAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.patch.response.lastEngagementAt.content",
+                label: "patch.response.lastEngagementAt.content",
                 schema: dateSchema.nullable(),
               }),
-              unsubscribedAt: responseField({
+              unsubscribedAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.patch.response.unsubscribedAt.content",
+                label: "patch.response.unsubscribedAt.content",
                 schema: dateSchema.nullable(),
               }),
             },
-          ),
+          }),
 
-          conversion: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.leads.lead.id.patch.response.conversion.title",
-              description:
-                "app.api.leads.lead.id.patch.response.conversion.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              convertedUserId: responseField({
+          conversion: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "patch.response.conversion.title",
+            description: "patch.response.conversion.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              convertedUserId: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.patch.response.convertedUserId.content",
+                label: "patch.response.convertedUserId.content",
 
                 schema: z.string().nullable(),
               }),
-              convertedAt: responseField({
+              convertedAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.patch.response.convertedAt.content",
+                label: "patch.response.convertedAt.content",
                 schema: dateSchema.nullable(),
               }),
-              signedUpAt: responseField({
+              signedUpAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.patch.response.signedUpAt.content",
+                label: "patch.response.signedUpAt.content",
                 schema: dateSchema.nullable(),
               }),
-              subscriptionConfirmedAt: responseField({
+              subscriptionConfirmedAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.patch.response.subscriptionConfirmedAt.content",
+                label: "patch.response.subscriptionConfirmedAt.content",
                 schema: dateSchema.nullable(),
               }),
             },
-          ),
+          }),
 
-          metadata: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.leads.lead.id.patch.response.metadata.title",
-              description:
-                "app.api.leads.lead.id.patch.response.metadata.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              notes: responseField({
+          metadata: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "patch.response.metadata.title",
+            description: "patch.response.metadata.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              notes: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.patch.response.notes.content",
+                label: "patch.response.notes.content",
 
                 schema: z.string().nullable(),
               }),
-              metadata: responseField({
+              metadata: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.patch.response.metadata.content",
+                label: "patch.response.metadata.content",
 
                 schema: z.record(z.string(), z.any()),
               }),
-              createdAt: responseField({
+              createdAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.patch.response.createdAt.content",
+                label: "patch.response.createdAt.content",
                 schema: dateSchema,
               }),
-              updatedAt: responseField({
+              updatedAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.patch.response.updatedAt.content",
+                label: "patch.response.updatedAt.content",
                 schema: dateSchema,
               }),
             },
-          ),
+          }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.leads.lead.id.patch.errors.validation.title",
-      description: "app.api.leads.lead.id.patch.errors.validation.description",
+      title: "patch.errors.validation.title",
+      description: "patch.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.leads.lead.id.patch.errors.unauthorized.title",
-      description:
-        "app.api.leads.lead.id.patch.errors.unauthorized.description",
+      title: "patch.errors.unauthorized.title",
+      description: "patch.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.leads.lead.id.patch.errors.forbidden.title",
-      description: "app.api.leads.lead.id.patch.errors.forbidden.description",
+      title: "patch.errors.forbidden.title",
+      description: "patch.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.leads.lead.id.patch.errors.notFound.title",
-      description: "app.api.leads.lead.id.patch.errors.notFound.description",
+      title: "patch.errors.notFound.title",
+      description: "patch.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.leads.lead.id.patch.errors.conflict.title",
-      description: "app.api.leads.lead.id.patch.errors.conflict.description",
+      title: "patch.errors.conflict.title",
+      description: "patch.errors.conflict.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.leads.lead.id.patch.errors.server.title",
-      description: "app.api.leads.lead.id.patch.errors.server.description",
+      title: "patch.errors.server.title",
+      description: "patch.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.leads.lead.id.patch.errors.unknown.title",
-      description: "app.api.leads.lead.id.patch.errors.unknown.description",
+      title: "patch.errors.unknown.title",
+      description: "patch.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.leads.lead.id.patch.errors.network.title",
-      description: "app.api.leads.lead.id.patch.errors.network.description",
+      title: "patch.errors.network.title",
+      description: "patch.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.leads.lead.id.patch.errors.unsavedChanges.title",
-      description:
-        "app.api.leads.lead.id.patch.errors.unsavedChanges.description",
+      title: "patch.errors.unsavedChanges.title",
+      description: "patch.errors.unsavedChanges.description",
     },
   },
 
   successTypes: {
-    title: "app.api.leads.lead.id.patch.success.title",
-    description: "app.api.leads.lead.id.patch.success.description",
+    title: "patch.success.title",
+    description: "patch.success.description",
   },
 
   examples: {
@@ -839,12 +769,13 @@ const { PATCH } = createEndpoint({
  * Retrieves a specific lead by ID
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["leads", "lead", "[id]"],
-  title: "app.api.leads.lead.id.get.title",
-  description: "app.api.leads.lead.id.get.description",
-  category: "app.api.leads.category",
-  tags: ["app.api.leads.tags.leads", "app.api.leads.tags.management"],
+  title: "get.title",
+  description: "get.description",
+  category: "category",
+  tags: ["tags.leads", "tags.management"],
   allowedRoles: [UserRole.ADMIN],
   icon: "user",
 
@@ -853,11 +784,11 @@ const { GET } = createEndpoint({
     usage: { request: "urlPathParams", response: true } as const,
     children: {
       // === URL PARAMETERS ===
-      id: requestUrlPathParamsField({
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label: "app.api.leads.lead.id.get.id.label",
-        description: "app.api.leads.lead.id.get.id.description",
+        label: "get.id.label",
+        description: "get.id.description",
         disabled: true,
         hidden: true,
 
@@ -865,310 +796,279 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE FIELDS ===
-      lead: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.leads.lead.id.get.response.title",
-          description: "app.api.leads.lead.id.get.response.description",
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
+      lead: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.title",
+        description: "get.response.description",
+        layoutType: LayoutType.STACKED,
+        usage: { response: true },
+        children: {
           // Basic Information
-          basicInfo: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.leads.lead.id.get.response.basicInfo.title",
-              description:
-                "app.api.leads.lead.id.get.response.basicInfo.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              id: responseField({
+          basicInfo: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "get.response.basicInfo.title",
+            description: "get.response.basicInfo.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              id: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.get.response.id.content",
+                label: "get.response.id.content",
 
                 schema: z.uuid(),
               }),
-              email: responseField({
+              email: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.get.response.email.content",
+                label: "get.response.email.content",
 
                 schema: z.string().email().nullable(),
               }),
-              businessName: responseField({
+              businessName: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.get.response.businessName.content",
+                label: "get.response.businessName.content",
 
                 schema: z.string(),
               }),
-              contactName: responseField({
+              contactName: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.get.response.contactName.content",
+                label: "get.response.contactName.content",
 
                 schema: z.string().nullable(),
               }),
-              status: responseField({
+              status: scopedResponseField(scopedTranslation, {
                 type: WidgetType.BADGE,
-                text: "app.api.leads.lead.id.get.response.status.content",
+                text: "get.response.status.content",
 
                 schema: z.enum(LeadStatus),
               }),
             },
-          ),
+          }),
 
           // Contact Details
-          contactDetails: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.leads.lead.id.get.response.contactDetails.title",
-              description:
-                "app.api.leads.lead.id.get.response.contactDetails.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              phone: responseField({
+          contactDetails: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "get.response.contactDetails.title",
+            description: "get.response.contactDetails.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              phone: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.get.response.phone.content",
+                label: "get.response.phone.content",
 
                 schema: z.string().nullable(),
               }),
-              website: responseField({
+              website: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.get.response.website.content",
+                label: "get.response.website.content",
 
                 schema: z.string().nullable(),
               }),
-              country: responseField({
+              country: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.get.response.country.content",
+                label: "get.response.country.content",
 
                 schema: z.enum(Countries),
               }),
-              language: responseField({
+              language: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.get.response.language.content",
+                label: "get.response.language.content",
 
                 schema: z.enum(Languages),
               }),
             },
-          ),
+          }),
 
           // Campaign & Tracking
-          campaignTracking: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.leads.lead.id.get.response.campaignTracking.title",
-              description:
-                "app.api.leads.lead.id.get.response.campaignTracking.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              source: responseField({
+          campaignTracking: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "get.response.campaignTracking.title",
+            description: "get.response.campaignTracking.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              source: scopedResponseField(scopedTranslation, {
                 type: WidgetType.BADGE,
-                text: "app.api.leads.lead.id.get.response.source.content",
+                text: "get.response.source.content",
 
                 schema: z.enum(LeadSource).nullable(),
               }),
-              currentCampaignStage: responseField({
+              currentCampaignStage: scopedResponseField(scopedTranslation, {
                 type: WidgetType.BADGE,
-                text: "app.api.leads.lead.id.get.response.currentCampaignStage.content",
+                text: "get.response.currentCampaignStage.content",
 
                 schema: z.enum(EmailCampaignStage).nullable(),
               }),
-              emailJourneyVariant: responseField({
+              emailJourneyVariant: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.get.response.emailJourneyVariant.content",
+                label: "get.response.emailJourneyVariant.content",
 
                 schema: z.enum(EmailJourneyVariant).nullable(),
               }),
-              emailsSent: responseField({
+              emailsSent: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.get.response.emailsSent.content",
+                label: "get.response.emailsSent.content",
 
                 schema: z.coerce.number(),
               }),
-              lastEmailSentAt: responseField({
+              lastEmailSentAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.get.response.lastEmailSentAt.content",
+                label: "get.response.lastEmailSentAt.content",
                 schema: dateSchema.nullable(),
               }),
             },
-          ),
+          }),
 
           // Engagement
-          engagement: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.leads.lead.id.get.response.engagement.title",
-              description:
-                "app.api.leads.lead.id.get.response.engagement.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              emailsOpened: responseField({
+          engagement: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "get.response.engagement.title",
+            description: "get.response.engagement.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              emailsOpened: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.get.response.emailsOpened.content",
+                label: "get.response.emailsOpened.content",
 
                 schema: z.coerce.number(),
               }),
-              emailsClicked: responseField({
+              emailsClicked: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.get.response.emailsClicked.content",
+                label: "get.response.emailsClicked.content",
 
                 schema: z.coerce.number(),
               }),
-              lastEngagementAt: responseField({
+              lastEngagementAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.get.response.lastEngagementAt.content",
+                label: "get.response.lastEngagementAt.content",
                 schema: dateSchema.nullable(),
               }),
-              unsubscribedAt: responseField({
+              unsubscribedAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.get.response.unsubscribedAt.content",
+                label: "get.response.unsubscribedAt.content",
                 schema: dateSchema.nullable(),
               }),
             },
-          ),
+          }),
 
           // Conversion Tracking
-          conversion: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.leads.lead.id.get.response.conversion.title",
-              description:
-                "app.api.leads.lead.id.get.response.conversion.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              convertedUserId: responseField({
+          conversion: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "get.response.conversion.title",
+            description: "get.response.conversion.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              convertedUserId: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.get.response.convertedUserId.content",
+                label: "get.response.convertedUserId.content",
 
                 schema: z.string().nullable(),
               }),
-              convertedAt: responseField({
+              convertedAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.get.response.convertedAt.content",
+                label: "get.response.convertedAt.content",
                 schema: dateSchema.nullable(),
               }),
-              signedUpAt: responseField({
+              signedUpAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.get.response.signedUpAt.content",
+                label: "get.response.signedUpAt.content",
                 schema: dateSchema.nullable(),
               }),
-              subscriptionConfirmedAt: responseField({
+              subscriptionConfirmedAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label:
-                  "app.api.leads.lead.id.get.response.subscriptionConfirmedAt.content",
+                label: "get.response.subscriptionConfirmedAt.content",
                 schema: dateSchema.nullable(),
               }),
             },
-          ),
+          }),
 
           // Metadata
-          metadata: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.leads.lead.id.get.response.metadata.title",
-              description:
-                "app.api.leads.lead.id.get.response.metadata.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              notes: responseField({
+          metadata: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "get.response.metadata.title",
+            description: "get.response.metadata.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              notes: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.get.response.notes.content",
+                label: "get.response.notes.content",
 
                 schema: z.string().nullable(),
               }),
-              metadata: responseField({
+              metadata: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.get.response.metadata.content",
+                label: "get.response.metadata.content",
 
                 schema: z.record(z.string(), z.any()),
               }),
-              createdAt: responseField({
+              createdAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.get.response.createdAt.content",
+                label: "get.response.createdAt.content",
                 schema: dateSchema,
               }),
-              updatedAt: responseField({
+              updatedAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                label: "app.api.leads.lead.id.get.response.updatedAt.content",
+                label: "get.response.updatedAt.content",
                 schema: dateSchema,
               }),
             },
-          ),
+          }),
         },
-      ),
+      }),
     },
   }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.leads.lead.id.get.errors.validation.title",
-      description: "app.api.leads.lead.id.get.errors.validation.description",
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.leads.lead.id.get.errors.unauthorized.title",
-      description: "app.api.leads.lead.id.get.errors.unauthorized.description",
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.leads.lead.id.get.errors.forbidden.title",
-      description: "app.api.leads.lead.id.get.errors.forbidden.description",
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.leads.lead.id.get.errors.notFound.title",
-      description: "app.api.leads.lead.id.get.errors.notFound.description",
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.leads.lead.id.get.errors.server.title",
-      description: "app.api.leads.lead.id.get.errors.server.description",
+      title: "get.errors.server.title",
+      description: "get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.leads.lead.id.get.errors.unknown.title",
-      description: "app.api.leads.lead.id.get.errors.unknown.description",
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.leads.lead.id.get.errors.network.title",
-      description: "app.api.leads.lead.id.get.errors.network.description",
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.leads.lead.id.get.errors.unsavedChanges.title",
-      description:
-        "app.api.leads.lead.id.get.errors.unsavedChanges.description",
+      title: "get.errors.unsavedChanges.title",
+      description: "get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.leads.lead.id.get.errors.conflict.title",
-      description: "app.api.leads.lead.id.get.errors.conflict.description",
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.leads.lead.id.get.success.title",
-    description: "app.api.leads.lead.id.get.success.description",
+    title: "get.success.title",
+    description: "get.success.description",
   },
 
   examples: {

@@ -10,6 +10,7 @@ import { useTranslation } from "@/i18n/core/client";
 import resetPasswordValidateEndpoint from "./definition";
 import { useApiQuery } from "../../../../system/unified-interface/react/hooks/use-api-query";
 import type { JwtPayloadType } from "../../../auth/types";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Hook for validating a password reset token
@@ -31,7 +32,8 @@ export function useResetPasswordValidate(
   user: JwtPayloadType,
 ): ReturnType<typeof useApiQuery<typeof resetPasswordValidateEndpoint.GET>> {
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = scopedTranslation.scopedT(locale);
 
   return useApiQuery({
     endpoint: resetPasswordValidateEndpoint.GET,
@@ -43,8 +45,8 @@ export function useResetPasswordValidate(
       enabled: !!token,
       onError: ({ error }) => {
         toast({
-          title: t("app.api.user.public.resetPassword.validate.errors.title"),
-          description: t(error.message),
+          title: t("errors.title"),
+          description: error.message,
           variant: "destructive",
         });
       },

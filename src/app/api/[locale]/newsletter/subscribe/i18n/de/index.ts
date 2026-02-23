@@ -41,6 +41,7 @@ export const translations: typeof enTranslations = {
       "Diese E-Mail-Adresse ist bereits für unseren Newsletter angemeldet",
   },
   errors: {
+    email_generation_failed: "E-Mail konnte nicht generiert werden",
     badRequest: {
       title: "Ungültige Anfrage",
       description: "Ungültige Anfrageparameter bereitgestellt",
@@ -134,6 +135,31 @@ export const translations: typeof enTranslations = {
   route: {
     sms_failed_continuing:
       "SMS-Benachrichtigungen fehlgeschlagen, wird fortgesetzt",
+  },
+  emailTemplates: {
+    welcome: {
+      name: "Newsletter Welcome Email",
+      description: "Welcome email sent to new newsletter subscribers",
+      category: "newsletter",
+      preview: {
+        email: {
+          label: "E-Mail-Adresse",
+          description: "E-Mail-Adresse des Abonnenten",
+        },
+        name: {
+          label: "Name des Abonnenten",
+          description: "Name des Abonnenten (optional)",
+        },
+        leadId: {
+          label: "Lead-ID",
+          description: "Lead-Tracking-ID für Analytics",
+        },
+        userId: {
+          label: "Benutzer-ID",
+          description: "Benutzerkontoidentifikator (optional)",
+        },
+      },
+    },
   },
   emailTemplate: {
     welcome: {

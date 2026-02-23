@@ -10,11 +10,11 @@ import type { JSX } from "react";
 import { useMemo } from "react";
 import type { z } from "zod";
 
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 import { useInkWidgetLocale } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
-import { simpleT } from "@/i18n/core/shared";
 
 import type {
   CodeQualityFilesSchema,
@@ -41,7 +41,7 @@ export function CodeQualityFilesWidgetInk<
 >): JSX.Element {
   const value = field.value as z.output<CodeQualityFilesSchema> | undefined;
   const locale = useInkWidgetLocale();
-  const { t } = simpleT(locale);
+  const { t } = unifiedInterfaceScopedTranslation.scopedT(locale);
   // Build file list output as ANSI-encoded strings
   const fileLines = useMemo(() => {
     if (!value || value.length === 0) {
@@ -76,11 +76,7 @@ export function CodeQualityFilesWidgetInk<
 
   return (
     <Box flexDirection="column" marginTop={1}>
-      <Text bold>
-        {t(
-          "app.api.system.unifiedInterface.widgets.codeQualityFiles.affectedFiles",
-        )}
-      </Text>
+      <Text bold>{t("widgets.codeQualityFiles.affectedFiles")}</Text>
       <Text>{fileLines.join("\n")}</Text>
     </Box>
   );

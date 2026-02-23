@@ -14,6 +14,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
+import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
@@ -25,6 +26,9 @@ import {
 } from "../../products/repository-client";
 import type { JwtPayloadType } from "../../user/auth/types";
 import type { SpeechToTextPostResponseOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Server-side provider configuration
@@ -52,6 +56,7 @@ export class SpeechToTextRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SpeechToTextPostResponseOutput>> {
     // Server-side language configuration - ignore client input
     const language = getLanguageFromLocale(locale);
@@ -65,6 +70,8 @@ export class SpeechToTextRepository {
       mimeType: file.type,
     });
 
+    const tCredits = creditsScopedTranslation.scopedT(locale).t;
+
     // Check minimum balance upfront (cost of ~5 seconds)
     const balanceResult = await CreditRepository.getBalance(
       user.isPublic && user.leadId
@@ -73,6 +80,8 @@ export class SpeechToTextRepository {
           ? { userId: user.id, leadId: user.leadId }
           : { leadId: user.leadId! },
       logger,
+      tCredits,
+      locale,
     );
 
     if (!balanceResult.success) {
@@ -80,7 +89,7 @@ export class SpeechToTextRepository {
         error: balanceResult.message,
       });
       return fail({
-        message: "app.api.agent.speechToText.post.errors.balanceCheckFailed",
+        message: t("post.errors.balanceCheckFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -91,7 +100,7 @@ export class SpeechToTextRepository {
         minimum: STT_MINIMUM_BALANCE,
       });
       return fail({
-        message: "app.api.agent.speechToText.post.errors.insufficientCredits",
+        message: t("post.errors.insufficientCredits"),
         errorType: ErrorResponseTypes.PAYMENT_REQUIRED,
         messageParams: {
           balance: balanceResult.data.total.toString(),
@@ -142,7 +151,7 @@ export class SpeechToTextRepository {
           language,
         });
         return fail({
-          message: "app.api.agent.speechToText.post.errors.transcriptionFailed",
+          message: t("post.errors.transcriptionFailed"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           messageParams: {
             error: errorText,
@@ -166,7 +175,7 @@ export class SpeechToTextRepository {
           responseData: JSON.stringify(responseData),
         });
         return fail({
-          message: "app.api.agent.speechToText.post.errors.noPublicId",
+          message: t("post.errors.noPublicId"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
@@ -178,6 +187,7 @@ export class SpeechToTextRepository {
         publicId,
         STT_PROVIDER_KEY, // Use provider/model format to match Eden AI response
         logger,
+        t,
       );
 
       if (!pollResult.success) {
@@ -202,6 +212,7 @@ export class SpeechToTextRepository {
         user,
         creditsNeeded,
         logger,
+        tCredits,
         locale,
       );
 
@@ -211,7 +222,7 @@ export class SpeechToTextRepository {
           audioDurationSeconds,
         });
         return fail({
-          message: "app.api.agent.speechToText.post.errors.creditsFailed",
+          message: t("post.errors.creditsFailed"),
           errorType: ErrorResponseTypes.PAYMENT_ERROR,
         });
       }
@@ -244,7 +255,7 @@ export class SpeechToTextRepository {
       });
 
       return fail({
-        message: "app.api.agent.speechToText.post.errors.transcriptionFailed",
+        message: t("post.errors.transcriptionFailed"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: {
           error: errorMessage,
@@ -260,6 +271,7 @@ export class SpeechToTextRepository {
     publicId: string,
     provider: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<
     ResponseType<{
       text: string;
@@ -291,7 +303,7 @@ export class SpeechToTextRepository {
             publicId,
           });
           return fail({
-            message: "app.api.agent.speechToText.post.errors.pollFailed",
+            message: t("post.errors.pollFailed"),
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
@@ -334,8 +346,7 @@ export class SpeechToTextRepository {
               fullResponse: JSON.stringify(resultData),
             });
             return fail({
-              message:
-                "app.api.agent.speechToText.post.errors.transcriptionFailed",
+              message: t("post.errors.transcriptionFailed"),
               errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
               messageParams: {
                 error: `Provider ${provider} not found in results`,
@@ -367,7 +378,7 @@ export class SpeechToTextRepository {
 
             // Return user-friendly error message instead of exposing raw API error
             return fail({
-              message: "app.api.agent.speechToText.post.errors.providerError",
+              message: t("post.errors.providerError"),
               errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
             });
           }
@@ -400,7 +411,7 @@ export class SpeechToTextRepository {
         } else if (resultData.status === "failed") {
           logger.error("Transcription failed", { publicId, provider });
           return fail({
-            message: "app.api.agent.speechToText.post.errors.failed",
+            message: t("post.errors.failed"),
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
@@ -418,7 +429,7 @@ export class SpeechToTextRepository {
           attempts,
         });
         return fail({
-          message: "app.api.agent.speechToText.post.errors.transcriptionFailed",
+          message: t("post.errors.transcriptionFailed"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           messageParams: {
             error: errorMessage,
@@ -429,7 +440,7 @@ export class SpeechToTextRepository {
 
     logger.error("Transcription timeout", { publicId, provider });
     return fail({
-      message: "app.api.agent.speechToText.post.errors.timeout",
+      message: t("post.errors.timeout"),
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
     });
   }

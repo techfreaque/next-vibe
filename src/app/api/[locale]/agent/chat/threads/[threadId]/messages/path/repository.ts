@@ -12,15 +12,16 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { chatMessages, chatThreads } from "../../../../db";
-import { validateNotIncognito } from "../../../../validation";
 import type {
   PathGetRequestOutput,
   PathGetResponseOutput,
   PathGetUrlVariablesOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type PathT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Conversation Path Repository
@@ -35,15 +36,14 @@ export const pathRepository = {
     urlPathParams: PathGetUrlVariablesOutput,
     data: PathGetRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: PathT,
     logger: EndpointLogger,
   ): Promise<ResponseType<PathGetResponseOutput>> {
     try {
       // Type guard to ensure user has id
       if (!user.id) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.path.get.errors.unauthorized.title",
+          message: t("get.errors.unauthorized.title"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -64,20 +64,17 @@ export const pathRepository = {
 
       if (!thread) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.path.get.errors.threadNotFound.title",
+          message: t("get.errors.threadNotFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       // Reject incognito threads
-      const incognitoError = validateNotIncognito(
-        thread.rootFolderId,
-        locale,
-        "app.api.agent.chat.threads.threadId.messages.path.get",
-      );
-      if (incognitoError) {
-        return incognitoError;
+      if (thread.rootFolderId === "incognito") {
+        return fail({
+          message: t("get.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
       }
 
       // Get all messages in the thread
@@ -91,8 +88,7 @@ export const pathRepository = {
 
       if (!rootMessage) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.path.get.errors.noRootMessage.title",
+          message: t("get.errors.noRootMessage.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -161,8 +157,7 @@ export const pathRepository = {
     } catch (error) {
       logger.error("Failed to get conversation path", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.messages.path.get.errors.getFailed.title",
+        message: t("get.errors.getFailed.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

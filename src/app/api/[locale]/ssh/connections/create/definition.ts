@@ -7,8 +7,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -19,139 +19,139 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SshAuthType, SshAuthTypeDB } from "../../enum";
-import { scopedTranslation } from "../../i18n";
+import { scopedTranslation } from "./i18n";
 import { ConnectionCreateContainer } from "./widget";
 
 export const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["ssh", "connections", "create"],
-  title: "connections.create.post.title",
-  description: "connections.create.post.description",
+  title: "post.title",
+  description: "post.description",
   icon: "plus",
   category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["type"],
+  tags: ["category" as const],
 
   fields: customWidgetObject({
     render: ConnectionCreateContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      label: requestField({
+      label: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "connections.create.post.fields.label.label",
-        description: "connections.create.post.fields.label.description",
-        placeholder: "connections.create.post.fields.label.placeholder",
+        label: "post.fields.label.label",
+        description: "post.fields.label.description",
+        placeholder: "post.fields.label.placeholder",
         schema: z.string().min(1).max(100),
       }),
-      host: requestField({
+      host: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "connections.create.post.fields.host.label",
-        description: "connections.create.post.fields.host.description",
-        placeholder: "connections.create.post.fields.host.placeholder",
+        label: "post.fields.host.label",
+        description: "post.fields.host.description",
+        placeholder: "post.fields.host.placeholder",
         schema: z.string().min(1),
       }),
-      port: requestField({
+      port: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "connections.create.post.fields.port.label",
-        description: "connections.create.post.fields.port.description",
-        placeholder: "connections.create.post.fields.port.placeholder",
+        label: "post.fields.port.label",
+        description: "post.fields.port.description",
+        placeholder: "post.fields.port.placeholder",
         schema: z.coerce.number().min(1).max(65535).default(22),
       }),
-      username: requestField({
+      username: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "connections.create.post.fields.username.label",
-        description: "connections.create.post.fields.username.description",
-        placeholder: "connections.create.post.fields.username.placeholder",
+        label: "post.fields.username.label",
+        description: "post.fields.username.description",
+        placeholder: "post.fields.username.placeholder",
         schema: z.string().min(1),
       }),
-      authType: requestField({
+      authType: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "connections.create.post.fields.authType.label",
-        description: "connections.create.post.fields.authType.description",
+        label: "post.fields.authType.label",
+        description: "post.fields.authType.description",
         schema: z.enum(SshAuthTypeDB),
       }),
-      secret: requestField({
+      secret: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "connections.create.post.fields.secret.label",
-        description: "connections.create.post.fields.secret.description",
+        label: "post.fields.secret.label",
+        description: "post.fields.secret.description",
         schema: z.string().optional(),
       }),
-      passphrase: requestField({
+      passphrase: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "connections.create.post.fields.passphrase.label",
-        description: "connections.create.post.fields.passphrase.description",
+        label: "post.fields.passphrase.label",
+        description: "post.fields.passphrase.description",
         schema: z.string().optional(),
       }),
-      isDefault: requestField({
+      isDefault: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "connections.create.post.fields.isDefault.label",
-        description: "connections.create.post.fields.isDefault.description",
+        label: "post.fields.isDefault.label",
+        description: "post.fields.isDefault.description",
         schema: z.boolean().optional(),
       }),
-      notes: requestField({
+      notes: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "connections.create.post.fields.notes.label",
-        description: "connections.create.post.fields.notes.description",
+        label: "post.fields.notes.label",
+        description: "post.fields.notes.description",
         schema: z.string().optional(),
       }),
-      id: responseField({
+      id: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "connections.create.post.response.id.title",
+        content: "post.response.id.title",
         schema: z.string(),
       }),
     },
   }),
 
   successTypes: {
-    title: "connections.create.post.success.title",
-    description: "connections.create.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "connections.create.post.errors.validation.title",
-      description: "connections.create.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "connections.create.post.errors.unauthorized.title",
-      description: "connections.create.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "connections.create.post.errors.forbidden.title",
-      description: "connections.create.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "connections.create.post.errors.server.title",
-      description: "connections.create.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "connections.create.post.errors.notFound.title",
-      description: "connections.create.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "connections.create.post.errors.unknown.title",
-      description: "connections.create.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "connections.create.post.errors.unsavedChanges.title",
-      description: "connections.create.post.errors.unsavedChanges.description",
+      title: "post.errors.unsavedChanges.title",
+      description: "post.errors.unsavedChanges.title",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "connections.create.post.errors.conflict.title",
-      description: "connections.create.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "connections.create.post.errors.network.title",
-      description: "connections.create.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
   },
 

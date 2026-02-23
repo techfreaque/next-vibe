@@ -5,12 +5,12 @@
 import { Box, Text } from "ink";
 import type { JSX } from "react";
 
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import {
   useInkWidgetLocale,
   useInkWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
-import { simpleT } from "@/i18n/core/shared";
 
 import type { InkWidgetProps } from "../../_shared/cli-types";
 import type { FieldUsageConfig } from "../../_shared/types";
@@ -37,7 +37,7 @@ export function ChartWidgetInk<
   const { field } = props;
   const t = useInkWidgetTranslation();
   const locale = useInkWidgetLocale();
-  const { t: globalT } = simpleT(locale);
+  const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
   const {
     chartType = "line",
     label: labelKey,
@@ -57,11 +57,7 @@ export function ChartWidgetInk<
         {title && <Text bold>{title}</Text>}
         {description && <Text dimColor>{description}</Text>}
         <Box paddingTop={1}>
-          <Text dimColor>
-            {globalT(
-              "app.api.system.unifiedInterface.widgets.chart.noDataAvailable",
-            )}
-          </Text>
+          <Text dimColor>{widgetT("widgets.chart.noDataAvailable")}</Text>
         </Box>
       </Box>
     );
@@ -78,11 +74,7 @@ export function ChartWidgetInk<
         <Box flexDirection="column" paddingY={1}>
           {title && <Text bold>{title}</Text>}
           <Box paddingTop={1}>
-            <Text dimColor>
-              {globalT(
-                "app.api.system.unifiedInterface.widgets.chart.noDataToDisplay",
-              )}
-            </Text>
+            <Text dimColor>{widgetT("widgets.chart.noDataToDisplay")}</Text>
           </Box>
         </Box>
       );
@@ -118,8 +110,7 @@ export function ChartWidgetInk<
         </Box>
         <Box paddingTop={1}>
           <Text dimColor>
-            {globalT("app.api.system.unifiedInterface.widgets.chart.total")}:{" "}
-            <Text>{totalValue}</Text>
+            {widgetT("widgets.chart.total")}: <Text>{totalValue}</Text>
           </Text>
         </Box>
       </Box>

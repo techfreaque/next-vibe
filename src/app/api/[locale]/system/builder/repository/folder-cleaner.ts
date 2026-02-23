@@ -7,7 +7,10 @@ import { existsSync, rmSync } from "node:fs";
 import { resolve } from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { TFunction } from "@/i18n/core/static-types";
+
+import type { scopedTranslation } from "../i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 import { ROOT_DIR } from "./constants";
 import { outputFormatter } from "./output-formatter";
@@ -24,7 +27,7 @@ export interface IFolderCleaner {
     folders: string[],
     output: string[],
     logger: EndpointLogger,
-    t: TFunction,
+    t: ModuleT,
     dryRun?: boolean,
   ): Promise<void>;
 
@@ -43,14 +46,10 @@ export class FolderCleaner implements IFolderCleaner {
     folders: string[],
     output: string[],
     logger: EndpointLogger,
-    t: TFunction,
+    t: ModuleT,
     dryRun?: boolean,
   ): Promise<void> {
-    output.push(
-      outputFormatter.formatSection(
-        t("app.api.system.builder.messages.cleaningFolders"),
-      ),
-    );
+    output.push(outputFormatter.formatSection(t("messages.cleaningFolders")));
 
     for (const folder of folders) {
       const folderPath = resolve(ROOT_DIR, folder);

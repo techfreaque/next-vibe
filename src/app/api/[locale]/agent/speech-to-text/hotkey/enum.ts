@@ -5,6 +5,8 @@
 
 import { createEnumOptions } from "next-vibe/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "../i18n";
+
 /**
  * Platform enum for OS detection
  */
@@ -12,12 +14,12 @@ export const {
   enum: Platform,
   options: PlatformOptions,
   Value: PlatformValue,
-} = createEnumOptions({
-  MACOS: "app.api.agent.speechToText.hotkey.platforms.macos",
-  LINUX_WAYLAND: "app.api.agent.speechToText.hotkey.platforms.linuxWayland",
-  LINUX_X11: "app.api.agent.speechToText.hotkey.platforms.linuxX11",
-  WINDOWS: "app.api.agent.speechToText.hotkey.platforms.windows",
-} as const);
+} = createEnumOptions(scopedTranslation, {
+  MACOS: "hotkey.platforms.macos",
+  LINUX_WAYLAND: "hotkey.platforms.linuxWayland",
+  LINUX_X11: "hotkey.platforms.linuxX11",
+  WINDOWS: "hotkey.platforms.windows",
+});
 
 /**
  * Recording status enum
@@ -26,13 +28,13 @@ export const {
   enum: RecordingStatus,
   options: RecordingStatusOptions,
   Value: RecordingStatusValue,
-} = createEnumOptions({
-  IDLE: "app.api.agent.speechToText.hotkey.status.idle",
-  RECORDING: "app.api.agent.speechToText.hotkey.status.recording",
-  PROCESSING: "app.api.agent.speechToText.hotkey.status.processing",
-  COMPLETED: "app.api.agent.speechToText.hotkey.status.completed",
-  ERROR: "app.api.agent.speechToText.hotkey.status.error",
-} as const);
+} = createEnumOptions(scopedTranslation, {
+  IDLE: "hotkey.status.idle",
+  RECORDING: "hotkey.status.recording",
+  PROCESSING: "hotkey.status.processing",
+  COMPLETED: "hotkey.status.completed",
+  ERROR: "hotkey.status.error",
+});
 
 /**
  * Action type enum for CLI commands
@@ -41,12 +43,12 @@ export const {
   enum: HotkeyAction,
   options: HotkeyActionOptions,
   Value: HotkeyActionValue,
-} = createEnumOptions({
-  START: "app.api.agent.speechToText.hotkey.actions.start",
-  STOP: "app.api.agent.speechToText.hotkey.actions.stop",
-  TOGGLE: "app.api.agent.speechToText.hotkey.actions.toggle",
-  STATUS: "app.api.agent.speechToText.hotkey.actions.status",
-} as const);
+} = createEnumOptions(scopedTranslation, {
+  START: "hotkey.actions.start",
+  STOP: "hotkey.actions.stop",
+  TOGGLE: "hotkey.actions.toggle",
+  STATUS: "hotkey.actions.status",
+});
 
 /**
  * Recorder backend type enum
@@ -55,17 +57,14 @@ export const {
   enum: RecorderBackend,
   options: RecorderBackendOptions,
   Value: RecorderBackendValue,
-} = createEnumOptions({
-  FFMPEG_AVFOUNDATION:
-    "app.api.agent.speechToText.hotkey.recorderBackends.ffmpegAvfoundation",
-  FFMPEG_PULSE:
-    "app.api.agent.speechToText.hotkey.recorderBackends.ffmpegPulse",
-  FFMPEG_ALSA: "app.api.agent.speechToText.hotkey.recorderBackends.ffmpegAlsa",
-  FFMPEG_DSHOW:
-    "app.api.agent.speechToText.hotkey.recorderBackends.ffmpegDshow",
-  WF_RECORDER: "app.api.agent.speechToText.hotkey.recorderBackends.wfRecorder",
-  ARECORD: "app.api.agent.speechToText.hotkey.recorderBackends.arecord",
-} as const);
+} = createEnumOptions(scopedTranslation, {
+  FFMPEG_AVFOUNDATION: "hotkey.recorderBackends.ffmpegAvfoundation",
+  FFMPEG_PULSE: "hotkey.recorderBackends.ffmpegPulse",
+  FFMPEG_ALSA: "hotkey.recorderBackends.ffmpegAlsa",
+  FFMPEG_DSHOW: "hotkey.recorderBackends.ffmpegDshow",
+  WF_RECORDER: "hotkey.recorderBackends.wfRecorder",
+  ARECORD: "hotkey.recorderBackends.arecord",
+});
 
 /**
  * Typer backend type enum
@@ -74,14 +73,14 @@ export const {
   enum: TyperBackend,
   options: TyperBackendOptions,
   Value: TyperBackendValue,
-} = createEnumOptions({
-  APPLESCRIPT: "app.api.agent.speechToText.hotkey.typerBackends.applescript",
-  WTYPE: "app.api.agent.speechToText.hotkey.typerBackends.wtype",
-  XDOTOOL: "app.api.agent.speechToText.hotkey.typerBackends.xdotool",
-  WL_CLIPBOARD: "app.api.agent.speechToText.hotkey.typerBackends.wlClipboard",
-  XCLIP: "app.api.agent.speechToText.hotkey.typerBackends.xclip",
-  POWERSHELL: "app.api.agent.speechToText.hotkey.typerBackends.powershell",
-} as const);
+} = createEnumOptions(scopedTranslation, {
+  APPLESCRIPT: "hotkey.typerBackends.applescript",
+  WTYPE: "hotkey.typerBackends.wtype",
+  XDOTOOL: "hotkey.typerBackends.xdotool",
+  WL_CLIPBOARD: "hotkey.typerBackends.wlClipboard",
+  XCLIP: "hotkey.typerBackends.xclip",
+  POWERSHELL: "hotkey.typerBackends.powershell",
+});
 
 /**
  * Type exports for type safety

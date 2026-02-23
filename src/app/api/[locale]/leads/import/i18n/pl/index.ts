@@ -3,6 +3,12 @@ import { translations as statusTranslations } from "../../status/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  tags: {
+    import: "Importuj",
+    leads: "Leady",
+    csv: "CSV",
+  },
+
   category: "Import danych",
   post: {
     title: "Importuj leady",
@@ -159,6 +165,63 @@ export const translations: typeof enTranslations = {
       importErrorsTitle: "{{count}} błędów importu",
       errorRowLabel: "Wiersz {{row}}",
       findLeadButton: "Znajdź lead",
+    },
+  },
+  process: {
+    tag: "Przetwarzanie importu",
+    post: {
+      title: "Przetwarzaj zadania importu",
+      description: "Przetwarzaj oczekujące zadania importu CSV",
+      container: {
+        title: "Konfiguracja przetwarzania importu",
+        description: "Skonfiguruj parametry przetwarzania importu",
+      },
+      fields: {
+        maxJobsPerRun: {
+          label: "Maks. zadań na przebieg",
+          description: "Maksymalna liczba zadań do przetworzenia na przebieg",
+        },
+        maxRetriesPerJob: {
+          label: "Maks. ponowień na zadanie",
+          description: "Maksymalna liczba ponowień na zadanie",
+        },
+        dryRun: {
+          label: "Próbny przebieg",
+          description: "Uruchom bez wprowadzania zmian",
+        },
+      },
+      response: {
+        jobsProcessed: "Przetworzone zadania",
+        totalRowsProcessed: "Łącznie przetworzone wiersze",
+        successfulImports: "Udane importy",
+        failedImports: "Nieudane importy",
+      },
+      errors: {
+        unauthorized: {
+          title: "Nieautoryzowany",
+          description: "Wymagane uwierzytelnienie",
+        },
+        forbidden: {
+          title: "Zabroniony",
+          description: "Dostęp zabroniony",
+        },
+        server: {
+          title: "Błąd serwera",
+          description: "Wystąpił błąd podczas przetwarzania importów",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieznany błąd",
+        },
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe parametry żądania",
+        },
+      },
+      success: {
+        title: "Przetwarzanie importu zakończone",
+        description: "Zadania importu zostały pomyślnie przetworzone",
+      },
     },
   },
   jobs: jobsTranslations,

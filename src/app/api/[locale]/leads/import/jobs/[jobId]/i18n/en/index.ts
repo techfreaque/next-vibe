@@ -2,6 +2,137 @@ import { translations as retryTranslations } from "../../retry/i18n/en";
 import { translations as stopTranslations } from "../../stop/i18n/en";
 
 export const translations = {
+  category: "Data Import",
+  tags: {
+    leads: "Leads",
+    management: "Management",
+  },
+
+  get: {
+    title: "Get Import Job",
+    description: "Get details of a specific import job",
+    jobId: {
+      label: "Job ID",
+      description: "Unique identifier for the import job",
+    },
+    form: {
+      title: "Import Job Status",
+      description: "Current status and progress of the import job",
+    },
+    response: {
+      title: "Job Information",
+      description: "Current import job details",
+      info: {
+        title: "Job Information",
+        description: "Basic job details",
+      },
+      id: {
+        content: "Job ID",
+      },
+      fileName: {
+        content: "File Name",
+      },
+      status: {
+        content: "Job Status",
+      },
+      progress: {
+        title: "Import Progress",
+        description: "Current import progress and statistics",
+      },
+      totalRows: {
+        content: "Total Rows",
+      },
+      processedRows: {
+        content: "Processed Rows",
+      },
+      successfulImports: {
+        content: "Successful Imports",
+      },
+      failedImports: {
+        content: "Failed Imports",
+      },
+      duplicateEmails: {
+        content: "Duplicate Emails",
+      },
+      configuration: {
+        title: "Job Configuration",
+        description: "Current job configuration settings",
+      },
+      currentBatchStart: {
+        content: "Current Batch Start",
+      },
+      batchSize: {
+        content: "Batch Size",
+      },
+      retryCount: {
+        content: "Retry Count",
+      },
+      maxRetries: {
+        content: "Max Retries",
+      },
+      error: {
+        content: "Error Message",
+      },
+      timestamps: {
+        title: "Job Timestamps",
+        description: "Job lifecycle timestamps",
+      },
+      createdAt: {
+        content: "Created At",
+      },
+      updatedAt: {
+        content: "Updated At",
+      },
+      startedAt: {
+        content: "Started At",
+      },
+      completedAt: {
+        content: "Completed At",
+      },
+    },
+    errors: {
+      validation: {
+        title: "Validation Error",
+        description: "The provided job ID is invalid",
+      },
+      unauthorized: {
+        title: "Unauthorized",
+        description: "Authentication required to view jobs",
+      },
+      forbidden: {
+        title: "Access Denied",
+        description: "You don't have permission to view this job",
+      },
+      notFound: {
+        title: "Job Not Found",
+        description: "No import job found with the provided ID",
+      },
+      server: {
+        title: "Server Error",
+        description: "An error occurred while retrieving the job",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unexpected error occurred",
+      },
+      network: {
+        title: "Network Error",
+        description: "Unable to connect to the server",
+      },
+      unsavedChanges: {
+        title: "Unsaved Changes",
+        description: "You have unsaved changes",
+      },
+      conflict: {
+        title: "Conflict",
+        description: "A conflict occurred while retrieving the job",
+      },
+    },
+    success: {
+      title: "Success",
+      description: "Import job retrieved successfully",
+    },
+  },
   patch: {
     title: "Update Import Job",
     description: "Update import job configuration settings",

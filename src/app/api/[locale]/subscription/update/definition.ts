@@ -7,8 +7,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  requestResponseField,
-  responseField,
+  scopedRequestResponseField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -25,22 +25,21 @@ import {
   SubscriptionPlanOptions,
   SubscriptionStatus,
 } from "../enum";
+import { scopedTranslation } from "../i18n";
 import { SubscriptionUpdateContainer } from "./widget";
 
 /**
  * PUT endpoint for updating subscription
  */
 const { PUT } = createEndpoint({
+  scopedTranslation,
   method: Methods.PUT,
   path: ["subscription", "update"],
-  title: "app.api.subscription.put.title" as const,
-  description: "app.api.subscription.put.description" as const,
-  icon: "package-check" as const,
-  category: "app.api.payment.category" as const,
-  tags: [
-    "app.api.subscription.tags.subscription" as const,
-    "app.api.subscription.tags.update" as const,
-  ],
+  title: "put.title" as const,
+  description: "put.description" as const,
+  icon: "package-check",
+  category: "category" as const,
+  tags: ["tags.subscription" as const, "tags.update" as const],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
@@ -54,65 +53,62 @@ const { PUT } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // REQUEST & RESPONSE FIELDS
-      plan: requestResponseField({
+      plan: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.subscription.form.fields.planId.label" as const,
-        description:
-          "app.api.subscription.form.fields.planId.description" as const,
+        label: "form.fields.planId.label" as const,
+        description: "form.fields.planId.description" as const,
         options: SubscriptionPlanOptions,
         schema: z.enum(SubscriptionPlan),
       }),
-      billingInterval: requestResponseField({
+      billingInterval: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label:
-          "app.api.subscription.form.fields.billingInterval.label" as const,
-        description:
-          "app.api.subscription.form.fields.billingInterval.description" as const,
+        label: "form.fields.billingInterval.label" as const,
+        description: "form.fields.billingInterval.description" as const,
         options: BillingIntervalOptions,
         schema: z.enum(BillingInterval),
       }),
 
       // RESPONSE ONLY FIELDS
-      id: responseField({
+      id: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.id" as const,
+        content: "response.id" as const,
         schema: z.uuid(),
       }),
-      status: responseField({
+      status: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.status" as const,
+        content: "response.status" as const,
         schema: z.enum(SubscriptionStatus),
       }),
-      currentPeriodStart: responseField({
+      currentPeriodStart: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.currentPeriodStart" as const,
+        content: "response.currentPeriodStart" as const,
         schema: z.string(),
       }),
-      currentPeriodEnd: responseField({
+      currentPeriodEnd: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.currentPeriodEnd" as const,
+        content: "response.currentPeriodEnd" as const,
         schema: z.string(),
       }),
-      cancelAtPeriodEnd: responseField({
+      cancelAtPeriodEnd: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.cancelAtPeriodEnd" as const,
+        content: "response.cancelAtPeriodEnd" as const,
         schema: z.boolean(),
       }),
-      createdAt: responseField({
+      createdAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.createdAt" as const,
+        content: "response.createdAt" as const,
         schema: z.string(),
       }),
-      updatedAt: responseField({
+      updatedAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.updatedAt" as const,
+        content: "response.updatedAt" as const,
         schema: z.string(),
       }),
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.message" as const,
+        content: "response.message" as const,
         schema: z.string(),
       }),
     },
@@ -120,55 +116,46 @@ const { PUT } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.subscription.put.errors.validation.title" as const,
-      description:
-        "app.api.subscription.put.errors.validation.description" as const,
+      title: "errors.validation.title" as const,
+      description: "errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.subscription.put.errors.unauthorized.title" as const,
-      description:
-        "app.api.subscription.put.errors.unauthorized.description" as const,
+      title: "errors.unauthorized.title" as const,
+      description: "errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.subscription.put.errors.notFound.title" as const,
-      description:
-        "app.api.subscription.put.errors.notFound.description" as const,
+      title: "errors.notFound.title" as const,
+      description: "errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.subscription.put.errors.conflict.title" as const,
-      description:
-        "app.api.subscription.put.errors.conflict.description" as const,
+      title: "errors.conflict.title" as const,
+      description: "errors.conflict.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.subscription.put.errors.server.title" as const,
-      description:
-        "app.api.subscription.put.errors.server.description" as const,
+      title: "errors.server.title" as const,
+      description: "errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.subscription.put.errors.network.title" as const,
-      description:
-        "app.api.subscription.put.errors.network.description" as const,
+      title: "errors.network.title" as const,
+      description: "errors.network.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.subscription.put.errors.unknown.title" as const,
-      description:
-        "app.api.subscription.put.errors.unknown.description" as const,
+      title: "errors.unknown.title" as const,
+      description: "errors.unknown.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.subscription.put.errors.forbidden.title" as const,
-      description:
-        "app.api.subscription.put.errors.forbidden.description" as const,
+      title: "errors.forbidden.title" as const,
+      description: "errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.subscription.put.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.subscription.put.errors.unsavedChanges.description" as const,
+      title: "errors.unsavedChanges.title" as const,
+      description: "errors.unsavedChanges.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.subscription.put.success.title" as const,
-    description: "app.api.subscription.put.success.description" as const,
+    title: "success.title" as const,
+    description: "success.description" as const,
   },
 
   examples: {
@@ -191,7 +178,7 @@ const { PUT } = createEndpoint({
         cancelAtPeriodEnd: false,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        message: "app.api.subscription.update.success",
+        message: "update.success",
       },
     },
   },

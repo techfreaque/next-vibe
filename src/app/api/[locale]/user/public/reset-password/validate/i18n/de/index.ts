@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Benutzer",
+
   title: "Passwort-Reset-Token validieren",
   description: "Endpunkt zur Validierung des Passwort-Reset-Tokens",
   tag: "Passwort-Reset-Validierung",
@@ -16,6 +18,9 @@ export const translations: typeof enTranslations = {
       description: "Passwort-Reset-Token aus der E-Mail",
       placeholder: "Reset-Token eingeben",
       help: "Geben Sie das Token ein, das Sie per E-Mail erhalten haben",
+      validation: {
+        required: "Reset-Token ist erforderlich",
+      },
     },
   },
   response: {

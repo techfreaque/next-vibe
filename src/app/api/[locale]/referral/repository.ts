@@ -14,10 +14,14 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
+import {
+  CreditRepository,
+  type ModuleT as CreditsModuleT,
+} from "@/app/api/[locale]/credits/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { users } from "@/app/api/[locale]/user/db";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { leads } from "../leads/db";
 import { LeadStatus } from "../leads/enum";
@@ -41,7 +45,10 @@ import {
   type PayoutStatusValue,
   ReferralEarningStatus,
 } from "./enum";
+import { scopedTranslation } from "./i18n";
 import type { StatsGetResponseOutput } from "./stats/definition";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 // Internal types
 interface CommissionShare {
@@ -70,7 +77,10 @@ export class ReferralRepository {
     userId: string,
     data: ReferralPostRequestOutput,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ReferralPostResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
+
     try {
       // Check if code already exists
       const [existingCode] = await db
@@ -81,7 +91,7 @@ export class ReferralRepository {
 
       if (existingCode) {
         return fail({
-          message: "app.api.referral.errors.conflict.title",
+          message: t("errors.conflict.title"),
           errorType: ErrorResponseTypes.CONFLICT,
         });
       }
@@ -96,9 +106,8 @@ export class ReferralRepository {
           currentUses: 0,
         })
         .returning();
-
       return success({
-        successMessage: "app.api.referral.response.success",
+        successMessage: t("response.success"),
         formAlert: undefined,
         fieldsGrid: undefined,
         submitRow: undefined,
@@ -106,7 +115,7 @@ export class ReferralRepository {
     } catch (error) {
       logger.error("Failed to create referral code", parseError(error));
       return fail({
-        message: "app.api.referral.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -119,6 +128,7 @@ export class ReferralRepository {
   static async getUserReferralCodes(
     userId: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<CodesListGetResponseOutput>> {
     try {
       logger.debug("Getting referral codes for user", { userId });
@@ -182,7 +192,7 @@ export class ReferralRepository {
     } catch (error) {
       logger.error("Failed to get referral codes", parseError(error));
       return fail({
-        message: "app.api.referral.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -195,6 +205,7 @@ export class ReferralRepository {
   static async validateReferralCode(
     code: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<{ id: string; ownerUserId: string }>> {
     try {
       logger.debug("Validating referral code", { code });
@@ -206,16 +217,18 @@ export class ReferralRepository {
         .limit(1);
 
       if (!referralCode) {
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.referral.errors.notFound.title",
+          message: t("errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       // Check if code is active
       if (!referralCode.isActive) {
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.referral.errors.validation.title",
+          message: t("errors.validation.title"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
@@ -226,8 +239,9 @@ export class ReferralRepository {
       });
     } catch (error) {
       logger.error("Failed to validate referral code", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.referral.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -243,12 +257,17 @@ export class ReferralRepository {
     leadId: string,
     referralCode: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
     try {
       logger.debug("Linking referral to lead", { leadId, referralCode });
 
       // Validate referral code
-      const codeResult = await this.validateReferralCode(referralCode, logger);
+      const codeResult = await this.validateReferralCode(
+        referralCode,
+        logger,
+        locale,
+      );
       if (!codeResult.success) {
         return codeResult;
       }
@@ -287,8 +306,9 @@ export class ReferralRepository {
       return success();
     } catch (error) {
       logger.error("Failed to link referral to lead", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.referral.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -302,6 +322,7 @@ export class ReferralRepository {
   static async getLatestLeadReferralCode(
     leadId: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<{ referralCode: string | null }>> {
     try {
       logger.debug("Getting latest referral code for lead", { leadId });
@@ -325,8 +346,9 @@ export class ReferralRepository {
       });
     } catch (error) {
       logger.error("Failed to get latest referral code", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.referral.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -342,6 +364,7 @@ export class ReferralRepository {
     userId: string,
     leadId: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
     try {
       logger.debug("Converting lead referral to user", { userId, leadId });
@@ -384,8 +407,9 @@ export class ReferralRepository {
         logger.error("Referral code not found", {
           codeId: leadReferral.referralCodeId,
         });
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.referral.errors.notFound.title",
+          message: t("errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -423,8 +447,9 @@ export class ReferralRepository {
       return success();
     } catch (error) {
       logger.error("Failed to convert lead referral", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.referral.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -438,6 +463,7 @@ export class ReferralRepository {
   static async getReferralStats(
     userId: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<StatsGetResponseOutput>> {
     try {
       logger.debug("Getting referral stats", { userId });
@@ -514,7 +540,7 @@ export class ReferralRepository {
     } catch (error) {
       logger.error("Failed to get referral stats", parseError(error));
       return fail({
-        message: "app.api.referral.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -529,6 +555,7 @@ export class ReferralRepository {
     limit: number,
     offset: number,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<EarningsListGetResponseOutput>> {
     try {
       logger.debug("Getting referral earnings", { userId, limit, offset });
@@ -563,7 +590,7 @@ export class ReferralRepository {
     } catch (error) {
       logger.error("Failed to get referral earnings", parseError(error));
       return fail({
-        message: "app.api.referral.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -580,6 +607,8 @@ export class ReferralRepository {
     userId: string,
     creditsAmount: number,
     logger: EndpointLogger,
+    creditsT: CreditsModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
     try {
       logger.debug("Applying referral payout", {
@@ -638,6 +667,7 @@ export class ReferralRepository {
             commissionPercent,
             creditsAmount, // Original credits purchased
             logger,
+            creditsT,
             sourceUser?.email,
           );
         }
@@ -652,8 +682,9 @@ export class ReferralRepository {
       return success();
     } catch (error) {
       logger.error("Failed to apply referral payout", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.referral.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -749,6 +780,8 @@ export class ReferralRepository {
   static async getEarnedBalance(
     userId: string,
     logger: EndpointLogger,
+    creditsT: CreditsModuleT,
+    locale: CountryLanguage,
   ): Promise<
     ResponseType<{
       earnedCredits: {
@@ -773,6 +806,7 @@ export class ReferralRepository {
       const balanceResult = await CreditRepository.getEarnedCreditsBalance(
         userId,
         logger,
+        creditsT,
       );
       if (!balanceResult.success) {
         return balanceResult;
@@ -801,8 +835,9 @@ export class ReferralRepository {
       });
     } catch (error) {
       logger.error("Failed to get earned balance", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.referral.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -817,12 +852,15 @@ export class ReferralRepository {
     currency: typeof PayoutCurrencyValue,
     walletAddress: string | null,
     logger: EndpointLogger,
+    creditsT: CreditsModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<{ payoutRequestId: string }>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       // Validate minimum amount
       if (amountCents < ReferralRepository.MIN_PAYOUT_CENTS) {
         return fail({
-          message: "app.api.referral.payout.errors.minimumAmount",
+          message: t("payout.errors.minimumAmount"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
@@ -830,7 +868,7 @@ export class ReferralRepository {
       // Validate wallet address for crypto payouts
       if (currency !== PayoutCurrency.CREDITS && !walletAddress) {
         return fail({
-          message: "app.api.referral.payout.errors.walletRequired",
+          message: t("payout.errors.walletRequired"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
@@ -839,6 +877,7 @@ export class ReferralRepository {
       const balanceResult = await CreditRepository.getEarnedCreditsBalance(
         userId,
         logger,
+        creditsT,
       );
       if (!balanceResult.success) {
         return balanceResult;
@@ -847,7 +886,7 @@ export class ReferralRepository {
       // Check sufficient available balance
       if (balanceResult.data.available < amountCents) {
         return fail({
-          message: "app.api.referral.payout.errors.insufficientBalance",
+          message: t("payout.errors.insufficientBalance"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
@@ -871,6 +910,7 @@ export class ReferralRepository {
           userId,
           amountCents,
           logger,
+          creditsT,
         );
       }
 
@@ -885,7 +925,7 @@ export class ReferralRepository {
     } catch (error) {
       logger.error("Failed to create payout request", parseError(error));
       return fail({
-        message: "app.api.referral.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -899,6 +939,7 @@ export class ReferralRepository {
     userId: string,
     amountCents: number,
     logger: EndpointLogger,
+    creditsT: CreditsModuleT,
   ): Promise<void> {
     // Deduct from earned credits
     const deductResult = await CreditRepository.deductEarnedCredits(
@@ -907,6 +948,7 @@ export class ReferralRepository {
       requestId,
       "CREDITS",
       logger,
+      creditsT,
     );
 
     if (!deductResult.success) {
@@ -928,6 +970,7 @@ export class ReferralRepository {
       amountCents,
       "permanent",
       logger,
+      creditsT,
     );
 
     // Mark request as completed
@@ -955,6 +998,7 @@ export class ReferralRepository {
     limit: number,
     offset: number,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<
     ResponseType<{
       requests: Array<{
@@ -1022,8 +1066,9 @@ export class ReferralRepository {
       });
     } catch (error) {
       logger.error("Failed to list payout requests", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.referral.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -1037,7 +1082,9 @@ export class ReferralRepository {
     adminUserId: string,
     adminNotes: string | null,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const [request] = await db
         .select()
@@ -1047,14 +1094,14 @@ export class ReferralRepository {
 
       if (!request) {
         return fail({
-          message: "app.api.referral.payout.errors.notFound",
+          message: t("payout.errors.notFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       if (request.status !== PayoutStatus.PENDING) {
         return fail({
-          message: "app.api.referral.payout.errors.invalidStatus",
+          message: t("payout.errors.invalidStatus"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
@@ -1074,7 +1121,7 @@ export class ReferralRepository {
     } catch (error) {
       logger.error("Failed to approve payout request", parseError(error));
       return fail({
-        message: "app.api.referral.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -1088,7 +1135,9 @@ export class ReferralRepository {
     adminUserId: string,
     rejectionReason: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const [request] = await db
         .select()
@@ -1098,14 +1147,14 @@ export class ReferralRepository {
 
       if (!request) {
         return fail({
-          message: "app.api.referral.payout.errors.notFound",
+          message: t("payout.errors.notFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       if (request.status !== PayoutStatus.PENDING) {
         return fail({
-          message: "app.api.referral.payout.errors.invalidStatus",
+          message: t("payout.errors.invalidStatus"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
@@ -1130,7 +1179,7 @@ export class ReferralRepository {
     } catch (error) {
       logger.error("Failed to reject payout request", parseError(error));
       return fail({
-        message: "app.api.referral.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -1144,7 +1193,10 @@ export class ReferralRepository {
     adminUserId: string,
     adminNotes: string | null,
     logger: EndpointLogger,
+    creditsT: CreditsModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const [request] = await db
         .select()
@@ -1154,14 +1206,14 @@ export class ReferralRepository {
 
       if (!request) {
         return fail({
-          message: "app.api.referral.payout.errors.notFound",
+          message: t("payout.errors.notFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       if (request.status !== PayoutStatus.APPROVED) {
         return fail({
-          message: "app.api.referral.payout.errors.invalidStatus",
+          message: t("payout.errors.invalidStatus"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
@@ -1173,6 +1225,7 @@ export class ReferralRepository {
         requestId,
         request.currency as "BTC" | "USDC" | "CREDITS",
         logger,
+        creditsT,
       );
 
       if (!deductResult.success) {
@@ -1203,7 +1256,7 @@ export class ReferralRepository {
     } catch (error) {
       logger.error("Failed to complete payout request", parseError(error));
       return fail({
-        message: "app.api.referral.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

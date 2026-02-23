@@ -23,10 +23,14 @@ import type {
   StatusGetRequestOutput,
   StatusGetResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 export interface NewsletterStatusRepository {
   getStatus(
     data: StatusGetRequestOutput,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<StatusGetResponseOutput>>;
 }
@@ -34,6 +38,7 @@ export interface NewsletterStatusRepository {
 export class NewsletterStatusRepositoryImpl implements NewsletterStatusRepository {
   async getStatus(
     data: StatusGetRequestOutput,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<StatusGetResponseOutput>> {
     try {
@@ -83,7 +88,7 @@ export class NewsletterStatusRepositoryImpl implements NewsletterStatusRepositor
       });
 
       return fail({
-        message: "app.api.newsletter.status.errors.internal.title",
+        message: t("errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });

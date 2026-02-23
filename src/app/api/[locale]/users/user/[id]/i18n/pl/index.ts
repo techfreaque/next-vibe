@@ -1,3 +1,4 @@
+import { translations as rolesTranslations } from "../../roles/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -5,6 +6,7 @@ export const translations: typeof enTranslations = {
   tag: "Zarządzanie użytkownikami",
 
   id: {
+    roles: rolesTranslations.roles,
     get: {
       title: "Pobierz użytkownika",
       description: "Pobierz szczegółowe informacje o konkretnym użytkowniku",

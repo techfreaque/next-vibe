@@ -1,3 +1,6 @@
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import { scopedTranslation as sharedScopedTranslation } from "../i18n";
 import {
   ErrorResponseTypes,
   fail,
@@ -12,11 +15,14 @@ import {
  */
 export function timeToSeconds(
   timeStr: `${number}:${number}`,
+  locale: CountryLanguage,
 ): ResponseType<number> {
   const [hours, minutes] = timeStr.split(":").map(Number);
   if (hours === undefined || minutes === undefined) {
+    const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
+
     return fail({
-      message: "app.api.shared.utils.time.errors.invalid_time_format.title",
+      message: sharedT("utils.time.errors.invalid_time_format.title"),
       errorType: ErrorResponseTypes.VALIDATION_ERROR,
       messageParams: {
         inputValue: timeStr,
@@ -33,10 +39,15 @@ export type SimpleTimeFormat = `${number}:${number}`;
  * @param seconds - Seconds since midnight
  * @returns Success response with time string or error response
  */
-export function secondsToTime(seconds: number): ResponseType<string> {
+export function secondsToTime(
+  seconds: number,
+  locale: CountryLanguage,
+): ResponseType<string> {
   if (seconds < 0 || seconds >= 86_400) {
+    const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
+
     return fail({
-      message: "app.api.shared.utils.time.errors.invalid_time_range.title",
+      message: sharedT("utils.time.errors.invalid_time_range.title"),
       errorType: ErrorResponseTypes.VALIDATION_ERROR,
       messageParams: {
         inputValue: seconds,

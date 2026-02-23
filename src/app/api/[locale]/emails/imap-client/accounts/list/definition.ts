@@ -7,12 +7,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
+  scopedBackButton,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -34,6 +34,7 @@ import {
   SortOrder,
   SortOrderOptions,
 } from "../../enum";
+import { scopedTranslation } from "./i18n";
 import { ImapAccountsListContainer } from "./widget";
 
 /**
@@ -41,12 +42,13 @@ import { ImapAccountsListContainer } from "./widget";
  * Retrieves a paginated list of IMAP accounts with filtering
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["emails", "imap-client", "accounts", "list"],
-  title: "app.api.emails.imapClient.accounts.list.title",
-  description: "app.api.emails.imapClient.accounts.list.description",
-  category: "app.api.emails.category",
-  tags: ["app.api.emails.imapClient.accounts.tag"],
+  title: "title",
+  description: "description",
+  category: "category",
+  tags: ["tags.accounts"],
 
   icon: "inbox",
   allowedRoles: [UserRole.ADMIN],
@@ -55,53 +57,47 @@ const { GET } = createEndpoint({
     render: ImapAccountsListContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({ usage: { request: "data", response: true } }),
+      backButton: scopedBackButton(scopedTranslation, {
+        usage: { request: "data", response: true },
+      }),
 
       // === REQUEST FIELDS ===
-      page: requestField({
+      page: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.imapClient.accounts.list.fields.page.label",
-        description:
-          "app.api.emails.imapClient.accounts.list.fields.page.description",
-        placeholder:
-          "app.api.emails.imapClient.accounts.list.fields.page.placeholder",
+        label: "fields.page.label",
+        description: "fields.page.description",
+        placeholder: "fields.page.placeholder",
         columns: 2,
         schema: z.coerce.number().min(1).default(1),
       }),
 
-      limit: requestField({
+      limit: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.imapClient.accounts.list.fields.limit.label",
-        description:
-          "app.api.emails.imapClient.accounts.list.fields.limit.description",
-        placeholder:
-          "app.api.emails.imapClient.accounts.list.fields.limit.placeholder",
+        label: "fields.limit.label",
+        description: "fields.limit.description",
+        placeholder: "fields.limit.placeholder",
         columns: 2,
         schema: z.coerce.number().min(1).max(100).default(20),
       }),
 
-      search: requestField({
+      search: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.imapClient.accounts.list.fields.search.label",
-        description:
-          "app.api.emails.imapClient.accounts.list.fields.search.description",
-        placeholder:
-          "app.api.emails.imapClient.accounts.list.fields.search.placeholder",
+        label: "fields.search.label",
+        description: "fields.search.description",
+        placeholder: "fields.search.placeholder",
         columns: 4,
         schema: z.string().optional(),
       }),
 
-      status: requestField({
+      status: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.emails.imapClient.accounts.list.fields.status.label",
-        description:
-          "app.api.emails.imapClient.accounts.list.fields.status.description",
-        placeholder:
-          "app.api.emails.imapClient.accounts.list.fields.status.placeholder",
+        label: "fields.status.label",
+        description: "fields.status.description",
+        placeholder: "fields.status.placeholder",
         options: ImapAccountStatusFilterOptions,
         columns: 2,
         schema: z
@@ -109,24 +105,21 @@ const { GET } = createEndpoint({
           .default(ImapAccountStatusFilter.ALL),
       }),
 
-      enabled: requestField({
+      enabled: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.emails.imapClient.accounts.list.fields.enabled.label",
-        description:
-          "app.api.emails.imapClient.accounts.list.fields.enabled.description",
+        label: "fields.enabled.label",
+        description: "fields.enabled.description",
         columns: 2,
         schema: z.boolean().optional(),
       }),
 
-      sortBy: requestField({
+      sortBy: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.emails.imapClient.accounts.list.fields.sortBy.label",
-        description:
-          "app.api.emails.imapClient.accounts.list.fields.sortBy.description",
-        placeholder:
-          "app.api.emails.imapClient.accounts.list.fields.sortBy.placeholder",
+        label: "fields.sortBy.label",
+        description: "fields.sortBy.description",
+        placeholder: "fields.sortBy.placeholder",
         options: ImapAccountSortFieldOptions,
         columns: 2,
         schema: z
@@ -134,247 +127,209 @@ const { GET } = createEndpoint({
           .default(ImapAccountSortField.CREATED_AT),
       }),
 
-      sortOrder: requestField({
+      sortOrder: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.emails.imapClient.accounts.list.fields.sortOrder.label",
-        description:
-          "app.api.emails.imapClient.accounts.list.fields.sortOrder.description",
-        placeholder:
-          "app.api.emails.imapClient.accounts.list.fields.sortOrder.placeholder",
+        label: "fields.sortOrder.label",
+        description: "fields.sortOrder.description",
+        placeholder: "fields.sortOrder.placeholder",
         options: SortOrderOptions,
         columns: 2,
         schema: z.enum(SortOrder).default(SortOrder.DESC),
       }),
 
       // === RESPONSE FIELDS ===
-      accounts: responseArrayField(
-        {
+      accounts: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        sortBy: "name",
+        columns: 12,
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-          sortBy: "name",
-          columns: 12,
-        },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.GRID,
-            columns: 12,
-          },
-          { response: true },
-          {
-            id: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.list.response.accounts.item.id",
-              schema: z.uuid(),
-            }),
-            name: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.list.response.accounts.item.name",
-              schema: z.string(),
-            }),
-            email: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.list.response.accounts.item.email",
-              schema: z.email(),
-            }),
-            host: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.list.response.accounts.item.host",
-              schema: z.string(),
-            }),
-            port: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.list.response.accounts.item.port",
-              schema: z.coerce.number(),
-            }),
-            secure: responseField({
-              type: WidgetType.BADGE,
-              text: "app.api.emails.imapClient.accounts.list.response.accounts.item.secure",
-              schema: z.boolean(),
-            }),
-            username: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.list.response.accounts.item.username",
-              schema: z.string(),
-            }),
-            authMethod: responseField({
-              type: WidgetType.BADGE,
-              text: "app.api.emails.imapClient.accounts.list.response.accounts.item.authMethod",
-              schema: z.enum(ImapAuthMethod),
-            }),
-            connectionTimeout: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.list.response.accounts.item.connectionTimeout",
-              schema: z.coerce.number(),
-            }),
-            keepAlive: responseField({
-              type: WidgetType.BADGE,
-              text: "app.api.emails.imapClient.accounts.list.response.accounts.item.keepAlive",
-              schema: z.boolean(),
-            }),
-            enabled: responseField({
-              type: WidgetType.BADGE,
-              text: "app.api.emails.imapClient.accounts.list.response.accounts.item.enabled",
-              schema: z.boolean(),
-            }),
-            syncInterval: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.list.response.accounts.item.syncInterval",
-              schema: z.coerce.number(),
-            }),
-            maxMessages: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.list.response.accounts.item.maxMessages",
-              schema: z.coerce.number(),
-            }),
-            syncFolders: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.list.response.accounts.item.syncFolders",
-              schema: z.array(z.string()),
-            }),
-            lastSyncAt: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.list.response.accounts.item.lastSyncAt",
-              schema: z.string().nullable(),
-            }),
-            syncStatus: responseField({
-              type: WidgetType.BADGE,
-              text: "app.api.emails.imapClient.accounts.list.response.accounts.item.syncStatus",
-              schema: z.enum(ImapSyncStatus),
-            }),
-            syncError: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.list.response.accounts.item.syncError",
-              schema: z.string().nullable(),
-            }),
-            isConnected: responseField({
-              type: WidgetType.BADGE,
-              text: "app.api.emails.imapClient.accounts.list.response.accounts.item.isConnected",
-              schema: z.boolean(),
-            }),
-            createdAt: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.list.response.accounts.item.createdAt",
-              schema: z.string(),
-            }),
-            updatedAt: responseField({
-              type: WidgetType.TEXT,
-              content:
-                "app.api.emails.imapClient.accounts.list.response.accounts.item.updatedAt",
-              schema: z.string(),
-            }),
-          },
-        ),
-      ),
-
-      pagination: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.emails.imapClient.accounts.list.response.pagination.title",
-          description:
-            "app.api.emails.imapClient.accounts.list.response.pagination.description",
           layoutType: LayoutType.GRID,
           columns: 12,
+          usage: { response: true },
+          children: {
+            id: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "response.accounts.item.id",
+              schema: z.uuid(),
+            }),
+            name: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "response.accounts.item.name",
+              schema: z.string(),
+            }),
+            email: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "response.accounts.item.email",
+              schema: z.email(),
+            }),
+            host: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "response.accounts.item.host",
+              schema: z.string(),
+            }),
+            port: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "response.accounts.item.port",
+              schema: z.coerce.number(),
+            }),
+            secure: scopedResponseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              text: "response.accounts.item.secure",
+              schema: z.boolean(),
+            }),
+            username: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "response.accounts.item.username",
+              schema: z.string(),
+            }),
+            authMethod: scopedResponseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              text: "response.accounts.item.authMethod",
+              schema: z.enum(ImapAuthMethod),
+            }),
+            connectionTimeout: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "response.accounts.item.connectionTimeout",
+              schema: z.coerce.number(),
+            }),
+            keepAlive: scopedResponseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              text: "response.accounts.item.keepAlive",
+              schema: z.boolean(),
+            }),
+            enabled: scopedResponseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              text: "response.accounts.item.enabled",
+              schema: z.boolean(),
+            }),
+            syncInterval: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "response.accounts.item.syncInterval",
+              schema: z.coerce.number(),
+            }),
+            maxMessages: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "response.accounts.item.maxMessages",
+              schema: z.coerce.number(),
+            }),
+            syncFolders: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "response.accounts.item.syncFolders",
+              schema: z.array(z.string()),
+            }),
+            lastSyncAt: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "response.accounts.item.lastSyncAt",
+              schema: z.string().nullable(),
+            }),
+            syncStatus: scopedResponseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              text: "response.accounts.item.syncStatus",
+              schema: z.enum(ImapSyncStatus),
+            }),
+            syncError: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "response.accounts.item.syncError",
+              schema: z.string().nullable(),
+            }),
+            isConnected: scopedResponseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              text: "response.accounts.item.isConnected",
+              schema: z.boolean(),
+            }),
+            createdAt: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "response.accounts.item.createdAt",
+              schema: z.string(),
+            }),
+            updatedAt: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "response.accounts.item.updatedAt",
+              schema: z.string(),
+            }),
+          },
+        }),
+      }),
+
+      pagination: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.pagination.title",
+        description: "response.pagination.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          page: scopedResponseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "response.pagination.page",
+            schema: z.coerce.number(),
+          }),
+          limit: scopedResponseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "response.pagination.limit",
+            schema: z.coerce.number(),
+          }),
+          total: scopedResponseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "response.pagination.total",
+            schema: z.coerce.number(),
+          }),
+          totalPages: scopedResponseField(scopedTranslation, {
+            type: WidgetType.TEXT,
+            content: "response.pagination.totalPages",
+            schema: z.coerce.number(),
+          }),
         },
-        { response: true },
-        {
-          page: responseField({
-            type: WidgetType.TEXT,
-            content:
-              "app.api.emails.imapClient.accounts.list.response.pagination.page",
-            schema: z.coerce.number(),
-          }),
-          limit: responseField({
-            type: WidgetType.TEXT,
-            content:
-              "app.api.emails.imapClient.accounts.list.response.pagination.limit",
-            schema: z.coerce.number(),
-          }),
-          total: responseField({
-            type: WidgetType.TEXT,
-            content:
-              "app.api.emails.imapClient.accounts.list.response.pagination.total",
-            schema: z.coerce.number(),
-          }),
-          totalPages: responseField({
-            type: WidgetType.TEXT,
-            content:
-              "app.api.emails.imapClient.accounts.list.response.pagination.totalPages",
-            schema: z.coerce.number(),
-          }),
-        },
-      ),
+      }),
     },
   }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.emails.imapClient.accounts.list.errors.validation.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.emails.imapClient.accounts.list.errors.unauthorized.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.emails.imapClient.accounts.list.errors.forbidden.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.emails.imapClient.accounts.list.errors.notFound.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.emails.imapClient.accounts.list.errors.server.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.errors.server.description",
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.emails.imapClient.accounts.list.errors.unknown.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.emails.imapClient.accounts.list.errors.unsaved.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.errors.unsaved.description",
+      title: "errors.unsaved.title",
+      description: "errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.emails.imapClient.accounts.list.errors.conflict.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.emails.imapClient.accounts.list.errors.network.title",
-      description:
-        "app.api.emails.imapClient.accounts.list.errors.network.description",
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.emails.imapClient.accounts.list.success.title",
-    description: "app.api.emails.imapClient.accounts.list.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 
   // === EXAMPLES ===
@@ -397,7 +352,7 @@ const { GET } = createEndpoint({
             id: "123e4567-e89b-12d3-a456-426614174000",
             name: "Gmail Account",
             email: "user@gmail.com",
-            host: "app.api.emails.imapClient.imap.gmail.com",
+            host: "imap.gmail.com",
             port: 993,
             secure: true,
             username: "user@gmail.com",

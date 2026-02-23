@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,14 +20,16 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../user/user-roles/enum";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "db", "sql"],
-  title: "app.api.system.db.sql.post.title",
-  description: "app.api.system.db.sql.post.description",
-  category: "app.api.system.category",
-  tags: ["app.api.system.db.sql.tag"],
+  title: "post.title",
+  description: "post.description",
+  category: "category",
+  tags: ["tag"],
   icon: "terminal",
   allowedRoles: [
     UserRole.ADMIN,
@@ -40,140 +42,138 @@ const { POST } = createEndpoint({
     firstCliArgKey: "query",
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.db.sql.post.form.title",
-      description: "app.api.system.db.sql.post.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.form.title",
+    description: "post.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      query: requestField({
+      query: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
-        label: "app.api.system.db.sql.fields.query.title",
-        description: "app.api.system.db.sql.fields.query.description",
+        label: "fields.query.title",
+        description: "fields.query.description",
         columns: 12,
         schema: z.string().optional(),
       }),
 
-      queryFile: requestField({
+      queryFile: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.db.sql.fields.queryFile.title",
-        description: "app.api.system.db.sql.fields.queryFile.description",
-        placeholder: "app.api.system.db.sql.fields.queryFile.placeholder",
+        label: "fields.queryFile.title",
+        description: "fields.queryFile.description",
+        placeholder: "fields.queryFile.placeholder",
         columns: 12,
         schema: z.string().optional(),
       }),
 
-      dryRun: requestField({
+      dryRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.db.sql.fields.dryRun.title",
-        description: "app.api.system.db.sql.fields.dryRun.description",
+        label: "fields.dryRun.title",
+        description: "fields.dryRun.description",
         columns: 4,
         schema: z.boolean().optional().default(false),
       }),
 
-      verbose: requestField({
+      verbose: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.db.sql.fields.verbose.title",
-        description: "app.api.system.db.sql.fields.verbose.description",
+        label: "fields.verbose.title",
+        description: "fields.verbose.description",
         columns: 4,
         schema: z.boolean().optional().default(false),
       }),
 
-      limit: requestField({
+      limit: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.system.db.sql.fields.limit.title",
-        description: "app.api.system.db.sql.fields.limit.description",
+        label: "fields.limit.title",
+        description: "fields.limit.description",
         columns: 4,
         schema: z.coerce.number().optional().default(100),
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        label: "app.api.system.db.sql.fields.success.title",
+        label: "fields.success.title",
         schema: z.boolean(),
       }),
 
-      output: responseField({
+      output: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        label: "app.api.system.db.sql.fields.output.title",
+        label: "fields.output.title",
         schema: z.string(),
       }),
 
-      results: responseField({
+      results: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        label: "app.api.system.db.sql.fields.results.title",
+        label: "fields.results.title",
         schema: z.array(z.record(z.string(), z.any())).optional(),
       }),
 
-      rowCount: responseField({
+      rowCount: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        label: "app.api.system.db.sql.fields.rowCount.title",
+        label: "fields.rowCount.title",
         schema: z.coerce.number().optional(),
       }),
 
-      queryType: responseField({
+      queryType: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        label: "app.api.system.db.sql.fields.queryType.title",
+        label: "fields.queryType.title",
         schema: z.string().optional(),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.db.sql.post.errors.validation.title",
-      description: "app.api.system.db.sql.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.db.sql.post.errors.unauthorized.title",
-      description: "app.api.system.db.sql.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.db.sql.post.errors.forbidden.title",
-      description: "app.api.system.db.sql.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.db.sql.post.errors.server.title",
-      description: "app.api.system.db.sql.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.db.sql.post.errors.network.title",
-      description: "app.api.system.db.sql.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.db.sql.post.errors.notFound.title",
-      description: "app.api.system.db.sql.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.db.sql.post.errors.conflict.title",
-      description: "app.api.system.db.sql.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.db.sql.post.errors.unknown.title",
-      description: "app.api.system.db.sql.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.db.sql.post.errors.server.title",
-      description: "app.api.system.db.sql.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.system.db.sql.post.success.title",
-    description: "app.api.system.db.sql.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   // === EXAMPLES ===

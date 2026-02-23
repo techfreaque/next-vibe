@@ -25,6 +25,9 @@ import type {
   SmtpAccountsListGETRequestOutput,
   SmtpAccountsListGETResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * SMTP Accounts List Repository
@@ -38,6 +41,7 @@ export class SmtpAccountsListRepository {
     data: SmtpAccountsListGETRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SmtpAccountsListGETResponseOutput>> {
     try {
       logger.info("Getting SMTP accounts", { data, userId: user.id });
@@ -143,7 +147,7 @@ export class SmtpAccountsListRepository {
     } catch (error) {
       logger.error("Error getting SMTP accounts", parseError(error));
       return fail({
-        message: "app.api.emails.smtpClient.list.errors.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

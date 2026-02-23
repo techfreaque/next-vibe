@@ -5,6 +5,9 @@ export const translations: typeof enTranslations = {
   tags: {
     execute: "Ausführen",
   },
+  errors: {
+    executePulse: "Fehler beim Ausführen des Pulse",
+  },
   post: {
     title: "Pulse Ausführen",
     description: "Pulse Gesundheitsüberwachung und Aufgabenausführung",

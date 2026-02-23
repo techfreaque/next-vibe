@@ -14,15 +14,14 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type { GitInfo, ReleaseConfig } from "../definition";
+import { scopedTranslation } from "../i18n";
 import { MESSAGES } from "./constants";
 
-// ============================================================================
-// Interface
-// ============================================================================
-
-export interface IValidationService {
+export class ValidationService {
   /**
    * Validate branch configuration
    */
@@ -30,61 +29,7 @@ export interface IValidationService {
     config: ReleaseConfig,
     gitInfo: GitInfo,
     logger: EndpointLogger,
-  ): ResponseType<void>;
-
-  /**
-   * Validate working directory is clean
-   */
-  validateWorkingDirectory(
-    config: ReleaseConfig,
-    gitInfo: GitInfo,
-    logger: EndpointLogger,
-  ): ResponseType<void>;
-
-  /**
-   * Verify lockfile integrity
-   */
-  verifyLockfile(
-    cwd: string,
-    packageManager: string,
-    logger: EndpointLogger,
-  ): ResponseType<void>;
-
-  /**
-   * Run all validations
-   */
-  runAll(
-    config: ReleaseConfig,
-    gitInfo: GitInfo,
-    cwd: string,
-    packageManager: string,
-    logger: EndpointLogger,
-  ): ResponseType<void>;
-
-  /**
-   * Run basic validations (without branch check - for early validation)
-   * Branch check should happen later, right before git operations
-   */
-  runBasicValidations(
-    config: ReleaseConfig,
-    cwd: string,
-    packageManager: string,
-    logger: EndpointLogger,
-  ): ResponseType<void>;
-}
-
-// ============================================================================
-// Implementation
-// ============================================================================
-
-export class ValidationService implements IValidationService {
-  /**
-   * Validate branch configuration
-   */
-  validateBranch(
-    config: ReleaseConfig,
-    gitInfo: GitInfo,
-    logger: EndpointLogger,
+    locale: CountryLanguage,
   ): ResponseType<void> {
     logger.info(MESSAGES.VALIDATION_BRANCH_CHECK);
 
@@ -109,8 +54,9 @@ export class ValidationService implements IValidationService {
         currentBranch,
         mainBranch,
       });
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.git.notOnMain",
+        message: t("git.notOnMain"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
         messageParams: { currentBranch, main: mainBranch },
       });
@@ -131,6 +77,7 @@ export class ValidationService implements IValidationService {
     config: ReleaseConfig,
     gitInfo: GitInfo,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): ResponseType<void> {
     if (!config.requireCleanWorkingDir) {
       return success();
@@ -138,8 +85,9 @@ export class ValidationService implements IValidationService {
 
     if (gitInfo.hasUncommittedChanges) {
       logger.error(MESSAGES.VALIDATION_DIRTY_WORKING_DIR);
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.git.uncommittedChanges",
+        message: t("git.uncommittedChanges"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
@@ -154,6 +102,7 @@ export class ValidationService implements IValidationService {
     cwd: string,
     packageManager: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): ResponseType<void> {
     logger.info(MESSAGES.LOCKFILE_CHECKING);
 
@@ -216,8 +165,9 @@ export class ValidationService implements IValidationService {
       return success();
     } catch (error) {
       logger.error(MESSAGES.LOCKFILE_INVALID, { error: String(error) });
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.lockfile.invalid",
+        message: t("lockfile.invalid"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
         messageParams: { error: String(error) },
       });
@@ -233,9 +183,10 @@ export class ValidationService implements IValidationService {
     cwd: string,
     packageManager: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): ResponseType<void> {
     // Validate branch
-    const branchResult = this.validateBranch(config, gitInfo, logger);
+    const branchResult = this.validateBranch(config, gitInfo, logger, locale);
     if (!branchResult.success) {
       return branchResult;
     }
@@ -245,6 +196,7 @@ export class ValidationService implements IValidationService {
       config,
       gitInfo,
       logger,
+      locale,
     );
     if (!workingDirResult.success) {
       return workingDirResult;
@@ -252,7 +204,12 @@ export class ValidationService implements IValidationService {
 
     // Verify lockfile if configured
     if (config.verifyLockfile) {
-      const lockfileResult = this.verifyLockfile(cwd, packageManager, logger);
+      const lockfileResult = this.verifyLockfile(
+        cwd,
+        packageManager,
+        logger,
+        locale,
+      );
       if (!lockfileResult.success) {
         return lockfileResult;
       }
@@ -271,10 +228,16 @@ export class ValidationService implements IValidationService {
     cwd: string,
     packageManager: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): ResponseType<void> {
     // Verify lockfile if configured
     if (config.verifyLockfile) {
-      const lockfileResult = this.verifyLockfile(cwd, packageManager, logger);
+      const lockfileResult = this.verifyLockfile(
+        cwd,
+        packageManager,
+        logger,
+        locale,
+      );
       if (!lockfileResult.success) {
         return lockfileResult;
       }

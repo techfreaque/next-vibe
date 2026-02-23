@@ -1,14 +1,16 @@
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "./i18n";
+
 export const {
   enum: ImapLoggingLevel,
   options: ImapLoggingLevelOptions,
   Value: ImapLoggingLevelValue,
-} = createEnumOptions({
-  ERROR: "app.api.emails.enums.imapLoggingLevel.error",
-  WARN: "app.api.emails.enums.imapLoggingLevel.warn",
-  INFO: "app.api.emails.enums.imapLoggingLevel.info",
-  DEBUG: "app.api.emails.enums.imapLoggingLevel.debug",
+} = createEnumOptions(scopedTranslation, {
+  ERROR: "loggingLevel.error",
+  WARN: "loggingLevel.warn",
+  INFO: "loggingLevel.info",
+  DEBUG: "loggingLevel.debug",
 });
 
 // DB enum export for Drizzle

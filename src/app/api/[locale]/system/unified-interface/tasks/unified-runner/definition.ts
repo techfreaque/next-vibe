@@ -8,9 +8,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,138 +21,119 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * POST /unified-runner - Manage unified task runner
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "unified-interface", "tasks", "unified-runner"],
   aliases: ["unified-runner", "task-runner", "runner"],
-  title: "app.api.system.unifiedInterface.tasks.unifiedRunner.post.title",
-  description:
-    "app.api.system.unifiedInterface.tasks.unifiedRunner.post.description",
+  title: "post.title",
+  description: "post.description",
   icon: "check-circle",
-  category: "app.api.system.category",
+  category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["app.api.system.unifiedInterface.tasks.unifiedRunner.post.title"],
+  tags: ["post.title"],
   cli: {
     firstCliArgKey: "action",
   },
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.container.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.container.title",
+    description: "post.container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // Request fields
-      action: requestField({
+      action: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.description",
+        label: "post.fields.action.label",
+        description: "post.fields.action.description",
         options: [
           {
             value: "start",
-            label:
-              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.options.start",
+            label: "post.fields.action.options.start",
           },
           {
             value: "stop",
-            label:
-              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.options.stop",
+            label: "post.fields.action.options.stop",
           },
           {
             value: "status",
-            label:
-              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.options.status",
+            label: "post.fields.action.options.status",
           },
           {
             value: "restart",
-            label:
-              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.action.options.restart",
+            label: "post.fields.action.options.restart",
           },
         ],
         columns: 6,
         schema: z.enum(["start", "stop", "status", "restart"]),
       }),
 
-      taskFilter: requestField({
+      taskFilter: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.taskFilter.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.taskFilter.description",
+        label: "post.fields.taskFilter.label",
+        description: "post.fields.taskFilter.description",
         options: [
           {
             value: "all",
-            label:
-              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.taskFilter.options.all",
+            label: "post.fields.taskFilter.options.all",
           },
           {
             value: "cron",
-            label:
-              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.taskFilter.options.cron",
+            label: "post.fields.taskFilter.options.cron",
           },
           {
             value: "side",
-            label:
-              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.taskFilter.options.side",
+            label: "post.fields.taskFilter.options.side",
           },
         ],
         columns: 6,
         schema: z.enum(["all", "cron", "side"]).optional(),
       }),
 
-      dryRun: requestField({
+      dryRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.dryRun.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.fields.dryRun.description",
+        label: "post.fields.dryRun.label",
+        description: "post.fields.dryRun.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
       // Response fields
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.success",
+        content: "post.response.success",
         schema: z.boolean(),
       }),
 
-      actionResult: responseField({
+      actionResult: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.actionResult",
+        content: "post.response.actionResult",
         schema: z.string(),
       }),
 
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
+        content: "post.response.message",
         schema: z.string(),
       }),
 
-      timestamp: responseField({
+      timestamp: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.timestamp",
+        content: "post.response.timestamp",
         schema: z.string(),
       }),
     },
-  ),
+  }),
 
   examples: {
     requests: {
@@ -194,66 +175,46 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.validation.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.unauthorized.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.description",
+      title: "post.errors.internal.title",
+      description: "post.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.unknown.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.network.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.forbidden.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.notFound.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.conflict.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.unsaved.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.unsaved.description",
+      title: "post.errors.unsaved.title",
+      description: "post.errors.unsaved.description",
     },
   },
 
   successTypes: {
-    title:
-      "app.api.system.unifiedInterface.tasks.unifiedRunner.post.success.title",
-    description:
-      "app.api.system.unifiedInterface.tasks.unifiedRunner.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 });
 

@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Agent",
+
   get: {
     title: "OpenRouter-Modellpreise abrufen",
     description:
@@ -90,4 +92,4 @@ export const translations: typeof enTranslations = {
   tags: {
     models: "Modelle",
   },
-} as const;
+};

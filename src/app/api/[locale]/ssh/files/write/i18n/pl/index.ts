@@ -1,4 +1,17 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    invalidPath:
+      "Nieprawidłowa ścieżka: musi być bezwzględna bez segmentów '..'",
+    parentDirNotFound:
+      "Katalog nadrzędny nie znaleziony. Ustaw createDirs=true aby go utworzyć.",
+    permissionDenied: "Odmowa dostępu",
+    notImplemented: {
+      fileWrite: "Backend SSH jeszcze nie zaimplementowany dla zapisu plików",
+    },
+  },
+
   post: {
     title: "Zapisz plik",
     description: "Zapisz lub nadpisz plik na lokalnej maszynie lub przez SSH",

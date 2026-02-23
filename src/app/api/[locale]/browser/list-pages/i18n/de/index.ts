@@ -71,4 +71,9 @@ export const translations: typeof enTranslations = {
     title: "Seiten erfolgreich aufgelistet",
     description: "Die geöffneten Seiten wurden erfolgreich aufgelistet",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    navigationAutomation: "Navigations-Automatisierung",
+  },
 };

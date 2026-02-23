@@ -18,12 +18,13 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
 
+import { scopedTranslation as sttScopedTranslation } from "../../speech-to-text/i18n";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
 } from "../definition";
+import type { AiStreamT } from "../i18n";
 import { CompactingHandler } from "./handlers/compacting-handler";
 import { InitialEventsHandler } from "./handlers/initial-events-handler";
 import { MessageContextBuilder } from "./handlers/message-context-builder";
@@ -42,6 +43,8 @@ export interface HeadlessAiStreamResult {
   threadId: string;
   /** ID of the last assistant message — caller reads content from DB */
   lastAiMessageId: string;
+  /** Final text content of the last assistant message — populated even in incognito (no DB read needed) */
+  lastAiMessageContent: string | null;
 }
 
 /**
@@ -82,12 +85,12 @@ export class AiStreamRepository {
    */
   static createAiStream(params: {
     data: AiStreamPostRequestOutput;
-    t: TFunction;
     locale: CountryLanguage;
     logger: EndpointLogger;
     user: JwtPayloadType;
     request: NextRequest | undefined;
     headless: true;
+    t: AiStreamT;
     extraInstructions?: string;
   }): Promise<ResponseType<HeadlessAiStreamResult>>;
 
@@ -96,32 +99,32 @@ export class AiStreamRepository {
    */
   static createAiStream(params: {
     data: AiStreamPostRequestOutput;
-    t: TFunction;
     locale: CountryLanguage;
     logger: EndpointLogger;
     user: JwtPayloadType;
     request: NextRequest | undefined;
     headless?: false;
+    t: AiStreamT;
     extraInstructions?: string;
   }): Promise<ResponseType<AiStreamPostResponseOutput> | StreamingResponse>;
 
   static async createAiStream({
     data,
-    t,
     locale,
     logger,
     user,
     request,
     headless = false,
+    t: aiStreamT,
     extraInstructions,
   }: {
     data: AiStreamPostRequestOutput;
-    t: TFunction;
     locale: CountryLanguage;
     logger: EndpointLogger;
     user: JwtPayloadType;
     request: NextRequest | undefined;
     headless?: boolean;
+    t: AiStreamT;
     extraInstructions?: string;
   }): Promise<
     | ResponseType<AiStreamPostResponseOutput>
@@ -134,6 +137,8 @@ export class AiStreamRepository {
       headless,
     );
 
+    const sttT = sttScopedTranslation.scopedT(locale).t;
+
     const setupResult = await setupAiStream({
       data,
       locale,
@@ -142,7 +147,8 @@ export class AiStreamRepository {
       userId,
       leadId,
       ipAddress,
-      t,
+      aiStreamT,
+      sttT,
       maxDuration,
       request,
       headless,
@@ -165,6 +171,7 @@ export class AiStreamRepository {
       aiMessageId,
       messages,
       systemPrompt,
+      trailingSystemMessage,
       toolConfirmationResults,
       voiceMode,
       voiceTranscription,
@@ -180,13 +187,15 @@ export class AiStreamRepository {
       effectiveCompactTrigger,
     } = setupResult.data;
 
-    // Captured ref so headless path can read lastAiMessageId after runStream completes
+    // Captured refs so headless path can read lastAiMessageId + content after runStream completes
     let capturedLastAiMessageId: string = aiMessageId;
+    let capturedLastAiMessageContent: string | null = null;
 
     // Step 9: Start AI streaming (for all operations including answer-as-ai)
     try {
       // Shared inner function — runs compacting check + executeStream.
       // Used by both SSE and headless paths so there is zero code duplication.
+
       const runStream = async (
         controller: ReadableStreamDefaultController<Uint8Array>,
       ): Promise<void> => {
@@ -309,6 +318,7 @@ export class AiStreamRepository {
               timezone: data.timezone,
               rootFolderId: data.rootFolderId,
               compactingMessageCreatedAt,
+              t: aiStreamT,
             });
 
             // Check if compacting failed
@@ -339,6 +349,8 @@ export class AiStreamRepository {
                 character: data.character,
                 timezone: data.timezone,
                 rootFolderId: data.rootFolderId,
+                trailingSystemMessage,
+                locale,
               });
 
             // Check if rebuilding failed
@@ -354,8 +366,7 @@ export class AiStreamRepository {
               // Emit error event to frontend (noop in headless)
               ctx.dbWriter.emitError(
                 fail({
-                  message:
-                    "app.api.agent.chat.aiStream.errors.compactingRebuildFailed" as const,
+                  message: aiStreamT("errors.compactingRebuildFailed"),
                   errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
                 }),
               );
@@ -366,7 +377,7 @@ export class AiStreamRepository {
               return;
             }
 
-            // Update messages array and context for main stream
+            // Update messages array for main stream
             messages.length = 0;
             messages.push(...rebuiltHistory);
 
@@ -433,6 +444,7 @@ export class AiStreamRepository {
             user,
             locale,
             logger,
+            t: aiStreamT,
           });
 
           // After stream completes, capture the last assistant message ID from the writer.
@@ -440,6 +452,7 @@ export class AiStreamRepository {
           // on the writer is updated on every write so it always holds the final one.
           if (ctx.dbWriter.lastAssistantMessageId) {
             capturedLastAiMessageId = ctx.dbWriter.lastAssistantMessageId;
+            capturedLastAiMessageContent = ctx.dbWriter.lastAssistantContent;
           } else if (headless) {
             // No assistant message was written — stream may have errored before first emit.
             // capturedLastAiMessageId falls back to the pre-generated aiMessageId UUID,
@@ -459,6 +472,7 @@ export class AiStreamRepository {
             threadId: threadResultThreadId,
             userId,
             logger,
+            t: aiStreamT,
           });
         }
       };
@@ -491,6 +505,7 @@ export class AiStreamRepository {
           data: {
             threadId: threadResultThreadId,
             lastAiMessageId: capturedLastAiMessageId,
+            lastAiMessageContent: capturedLastAiMessageContent,
           },
         } satisfies ResponseType<HeadlessAiStreamResult>;
       }
@@ -529,8 +544,7 @@ export class AiStreamRepository {
       });
 
       return fail({
-        message:
-          "app.api.agent.chat.aiStream.route.errors.streamCreationFailed",
+        message: aiStreamT("route.errors.streamCreationFailed"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }

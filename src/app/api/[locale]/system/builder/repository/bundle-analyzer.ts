@@ -6,7 +6,9 @@
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, extname, resolve } from "node:path";
 
-import type { TFunction } from "@/i18n/core/static-types";
+import type { scopedTranslation } from "../i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 import type { BundleAnalysis } from "../definition";
 import { ROOT_DIR, SIZE_THRESHOLDS } from "./constants";
@@ -23,7 +25,7 @@ export interface IBundleAnalyzer {
   analyze(
     outputDir: string,
     output: string[],
-    t: TFunction,
+    t: ModuleT,
   ): Promise<BundleAnalysis>;
 
   /**
@@ -50,7 +52,7 @@ export class BundleAnalyzer implements IBundleAnalyzer {
   async analyze(
     outputDir: string,
     output: string[],
-    t: TFunction,
+    t: ModuleT,
   ): Promise<BundleAnalysis> {
     const dirPath = resolve(ROOT_DIR, outputDir);
     const analysis: BundleAnalysis = {
@@ -81,19 +83,15 @@ export class BundleAnalyzer implements IBundleAnalyzer {
     // Generate suggestions based on analysis
     if (analysis.totalSize > SIZE_THRESHOLDS.CRITICAL) {
       analysis.warnings.push(
-        t("app.api.system.builder.analysis.criticalSize", {
+        t("analysis.criticalSize", {
           size: outputFormatter.formatBytes(analysis.totalSize),
         }),
       );
-      analysis.suggestions.push(
-        t("app.api.system.builder.analysis.considerTreeShaking"),
-      );
-      analysis.suggestions.push(
-        t("app.api.system.builder.analysis.checkLargeDeps"),
-      );
+      analysis.suggestions.push(t("analysis.considerTreeShaking"));
+      analysis.suggestions.push(t("analysis.checkLargeDeps"));
     } else if (analysis.totalSize > SIZE_THRESHOLDS.WARNING) {
       analysis.warnings.push(
-        t("app.api.system.builder.analysis.largeBundle", {
+        t("analysis.largeBundle", {
           size: outputFormatter.formatBytes(analysis.totalSize),
         }),
       );
@@ -108,9 +106,7 @@ export class BundleAnalyzer implements IBundleAnalyzer {
     if (mapFiles.length > 0) {
       const mapSize = mapFiles.reduce((sum, f) => sum + f.size, 0);
       if (mapSize > analysis.totalSize * 0.5) {
-        analysis.suggestions.push(
-          t("app.api.system.builder.analysis.largeSourcemaps"),
-        );
+        analysis.suggestions.push(t("analysis.largeSourcemaps"));
       }
     }
 
@@ -120,29 +116,19 @@ export class BundleAnalyzer implements IBundleAnalyzer {
       (name, idx) => baseNames.indexOf(name) !== idx,
     );
     if (duplicates.length > 0) {
-      analysis.suggestions.push(
-        t("app.api.system.builder.analysis.possibleDuplicates"),
-      );
+      analysis.suggestions.push(t("analysis.possibleDuplicates"));
     }
 
     // Output analysis
     if (analysis.files.length > 0) {
-      output.push(
-        outputFormatter.formatSection(
-          t("app.api.system.builder.messages.bundleAnalysis"),
-        ),
-      );
+      output.push(outputFormatter.formatSection(t("messages.bundleAnalysis")));
       output.push(
         outputFormatter.formatItem(
-          t("app.api.system.builder.analysis.totalSize"),
+          t("analysis.totalSize"),
           outputFormatter.formatBytes(analysis.totalSize),
         ),
       );
-      output.push(
-        outputFormatter.formatStep(
-          t("app.api.system.builder.analysis.largestFiles"),
-        ),
-      );
+      output.push(outputFormatter.formatStep(t("analysis.largestFiles")));
       for (const file of analysis.files) {
         output.push(
           outputFormatter.formatItem(

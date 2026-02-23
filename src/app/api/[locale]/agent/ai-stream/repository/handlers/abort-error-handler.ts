@@ -18,8 +18,16 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import type { TParams } from "@/i18n/core/static-types";
 
+import type { AiStreamTranslationKey } from "../../i18n";
 import type { StreamContext } from "../core/stream-context";
+
+type AiStreamModuleT = (
+  key: AiStreamTranslationKey,
+  params?: TParams,
+) => TranslatedKeyType;
 
 /**
  * Flatten a ModelMessage into a plain string the way the model actually sees it.
@@ -145,6 +153,7 @@ export class AbortErrorHandler {
     messages?: ModelMessage[];
     tools?: Record<string, CoreTool>;
     user: JwtPayloadType;
+    t: AiStreamModuleT;
   }): Promise<{ wasHandled: boolean }> {
     const {
       error,
@@ -158,6 +167,7 @@ export class AbortErrorHandler {
       messages,
       tools,
       user,
+      t,
     } = params;
 
     // Check if this is a graceful abort
@@ -307,6 +317,7 @@ export class AbortErrorHandler {
                 amount: toolCall.creditsUsed,
                 feature: toolCall.toolName,
                 type: "tool",
+                model,
               });
 
               logger.info("[AI Stream] Deducted and emitted tool credits", {
@@ -336,11 +347,10 @@ export class AbortErrorHandler {
           threadId,
           errorType: "STREAM_ERROR",
           error: fail({
-            message:
-              "app.api.agent.chat.aiStream.info.streamInterrupted" as const,
+            message: t("info.streamInterrupted"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           }),
-          content: "app.api.agent.chat.aiStream.info.streamInterrupted",
+          content: t("info.streamInterrupted"),
           parentId: ctx.lastParentId,
           depth: ctx.lastDepth,
           sequenceId: ctx.sequenceId,

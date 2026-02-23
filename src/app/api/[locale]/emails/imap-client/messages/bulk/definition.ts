@@ -8,8 +8,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,15 +20,17 @@ import {
 
 import { UserRole } from "../../../../user/user-roles/enum";
 import { BulkMessageAction, BulkMessageActionOptions } from "../../enum";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["emails", "imap-client", "messages", "bulk"],
-  title: "app.api.emails.imapClient.messages.bulk.post.title",
-  description: "app.api.emails.imapClient.messages.bulk.post.description",
-  category: "app.api.emails.category",
+  title: "post.title",
+  description: "post.description",
+  category: "category",
   icon: "edit",
-  tags: ["app.api.emails.imapClient.messages.bulk.tag"],
+  tags: ["tag"],
 
   allowedRoles: [UserRole.ADMIN],
 
@@ -36,28 +38,26 @@ const { POST } = createEndpoint({
     render: undefined,
     usage: { request: "data", response: true } as const,
     children: {
-      ids: requestField({
+      ids: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.imapClient.messages.bulk.post.ids.label",
-        description:
-          "app.api.emails.imapClient.messages.bulk.post.ids.description",
+        label: "post.ids.label",
+        description: "post.ids.description",
         schema: z.array(z.uuid()).min(1),
       }),
 
-      action: requestField({
+      action: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.emails.imapClient.messages.bulk.post.action.label",
-        description:
-          "app.api.emails.imapClient.messages.bulk.post.action.description",
+        label: "post.action.label",
+        description: "post.action.description",
         options: BulkMessageActionOptions,
         schema: z.enum(BulkMessageAction),
       }),
 
-      updated: responseField({
+      updated: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.messages.bulk.post.success.title",
+        content: "post.success.title",
         schema: z.number().int(),
       }),
     },
@@ -65,64 +65,46 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.emails.imapClient.messages.bulk.post.errors.validation.title",
-      description:
-        "app.api.emails.imapClient.messages.bulk.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.emails.imapClient.messages.bulk.post.errors.unauthorized.title",
-      description:
-        "app.api.emails.imapClient.messages.bulk.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.emails.imapClient.messages.bulk.post.errors.forbidden.title",
-      description:
-        "app.api.emails.imapClient.messages.bulk.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.emails.imapClient.messages.bulk.post.errors.notFound.title",
-      description:
-        "app.api.emails.imapClient.messages.bulk.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.emails.imapClient.messages.bulk.post.errors.server.title",
-      description:
-        "app.api.emails.imapClient.messages.bulk.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.emails.imapClient.messages.bulk.post.errors.conflict.title",
-      description:
-        "app.api.emails.imapClient.messages.bulk.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.emails.imapClient.messages.bulk.post.errors.network.title",
-      description:
-        "app.api.emails.imapClient.messages.bulk.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.emails.imapClient.messages.bulk.post.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.imapClient.messages.bulk.post.errors.unsavedChanges.description",
+      title: "post.errors.unsavedChanges.title",
+      description: "post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.emails.imapClient.messages.bulk.post.errors.unknown.title",
-      description:
-        "app.api.emails.imapClient.messages.bulk.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
   },
 
   successTypes: {
-    title: "app.api.emails.imapClient.messages.bulk.post.success.title",
-    description:
-      "app.api.emails.imapClient.messages.bulk.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   examples: {

@@ -27,6 +27,7 @@ import { envClient } from "@/config/env-client";
 import { type CountryLanguage } from "@/i18n/core/config";
 
 import { type CreateApiEndpointAny } from "../shared/types/endpoint-base";
+import { scopedTranslation as reactNativeScopedTranslation } from "./i18n";
 
 /**
  * Type helpers to extract input/output types from endpoint definitions
@@ -73,7 +74,7 @@ export type EndpointParams<TEndpoint> =
 function constructUrl<TEndpoint extends CreateApiEndpointAny>(
   endpoint: TEndpoint,
   params: EndpointParams<TEndpoint>,
-  locale: string,
+  locale: CountryLanguage,
 ): ResponseType<string> {
   try {
     // Use clean config from env-client.native
@@ -96,8 +97,9 @@ function constructUrl<TEndpoint extends CreateApiEndpointAny>(
 
         if (paramValue === undefined) {
           return fail({
-            message:
-              "app.api.system.unifiedInterface.reactNative.errors.missingUrlParam",
+            message: reactNativeScopedTranslation
+              .scopedT(locale)
+              .t("errors.missingUrlParam"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: { paramName, endpoint: endpoint.title },
           });
@@ -112,8 +114,9 @@ function constructUrl<TEndpoint extends CreateApiEndpointAny>(
     return { success: true, data: urlPath };
   } catch (error) {
     return fail({
-      message:
-        "app.api.system.unifiedInterface.reactNative.errors.urlConstructionFailed",
+      message: reactNativeScopedTranslation
+        .scopedT(locale)
+        .t("errors.urlConstructionFailed"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: {
         error: String(error),
@@ -169,8 +172,9 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
       } catch (validationError) {
         logger.error("Request validation failed", parseError(validationError));
         return fail({
-          message:
-            "app.api.system.unifiedInterface.reactNative.errors.validationFailed",
+          message: reactNativeScopedTranslation
+            .scopedT(locale)
+            .t("errors.validationFailed"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             error: String(validationError),
@@ -271,8 +275,9 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
         responseText.includes("<html")
       ) {
         return fail({
-          message:
-            "app.api.system.unifiedInterface.reactNative.errors.htmlResponseReceived",
+          message: reactNativeScopedTranslation
+            .scopedT(locale)
+            .t("errors.htmlResponseReceived"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             url: fetchUrl,
@@ -303,8 +308,9 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
   } catch (error) {
     logger.error("Native endpoint call failed", parseError(error));
     return fail({
-      message:
-        "app.api.system.unifiedInterface.reactNative.errors.networkError",
+      message: reactNativeScopedTranslation
+        .scopedT(locale)
+        .t("errors.networkError"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: {
         error: String(error),

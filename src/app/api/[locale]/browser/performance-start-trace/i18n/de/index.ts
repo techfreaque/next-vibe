@@ -77,4 +77,9 @@ export const translations: typeof enTranslations = {
     title: "Leistungs-Trace erfolgreich gestartet",
     description: "Der Leistungs-Trace wurde erfolgreich gestartet",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    performanceAutomation: "Leistungs-Automatisierung",
+  },
 };

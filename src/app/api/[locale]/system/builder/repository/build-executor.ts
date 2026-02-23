@@ -12,9 +12,6 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import type {
   BuilderRequest,
@@ -27,6 +24,7 @@ import type {
 } from "../definition";
 import { isBunBuildType } from "../definition";
 import { BuildProfileEnum, StepStatusEnum } from "../enum";
+import type { scopedTranslation } from "../i18n";
 import { bunCompiler } from "./bun-compiler";
 import { bundleAnalyzer } from "./bundle-analyzer";
 import { configLoader } from "./config-loader";
@@ -40,37 +38,19 @@ import { profileService } from "./profile-service";
 import { reportGenerator } from "./report-generator";
 import { viteCompiler } from "./vite-compiler";
 
-// ============================================================================
-// Interface
-// ============================================================================
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
-export interface IBuildExecutor {
-  /**
-   * Execute a build based on the provided configuration
-   */
-  execute(
-    data: BuilderRequest,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<BuilderResponse>>;
-}
-
-// ============================================================================
-// Implementation
-// ============================================================================
-
-export class BuildExecutor implements IBuildExecutor {
+export class BuildExecutor {
   async execute(
     data: BuilderRequest,
-    locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<BuilderResponse>> {
     const startTime = Date.now();
     const output: string[] = [];
     const filesBuilt: string[] = [];
     const filesCopied: string[] = [];
     const stepResults: BuildStepResult[] = [];
-    const { t } = simpleT(locale);
 
     // Extract config from configObject (new structure)
     const configObject = data.configObject;
@@ -87,7 +67,7 @@ export class BuildExecutor implements IBuildExecutor {
       // Build header with profile info
       output.push(
         outputFormatter.formatHeader(
-          `${t("app.api.system.builder.messages.buildStart")} [${profile.toUpperCase()}]`,
+          `${t("messages.buildStart")} [${profile.toUpperCase()}]`,
         ),
       );
       logger.info("Build started", {
@@ -137,7 +117,7 @@ export class BuildExecutor implements IBuildExecutor {
           output.push(outputFormatter.formatError(error));
         }
         return fail({
-          message: "app.api.system.builder.errors.invalidBuildConfig",
+          message: t("errors.invalidBuildConfig"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -147,20 +127,12 @@ export class BuildExecutor implements IBuildExecutor {
 
       // Dry run notice
       if (dryRun) {
-        output.push(
-          outputFormatter.formatWarning(
-            t("app.api.system.builder.messages.dryRunMode"),
-          ),
-        );
+        output.push(outputFormatter.formatWarning(t("messages.dryRunMode")));
       }
 
       // Execute pre-build hook
       if (buildConfig.hooks?.preBuild) {
-        output.push(
-          outputFormatter.formatStep(
-            t("app.api.system.builder.messages.runningPreBuild"),
-          ),
-        );
+        output.push(outputFormatter.formatStep(t("messages.runningPreBuild")));
         await buildConfig.hooks.preBuild({
           config: buildConfig,
           profile,
@@ -268,9 +240,7 @@ export class BuildExecutor implements IBuildExecutor {
         );
         if (analysis.suggestions.length > 0) {
           output.push(
-            outputFormatter.formatSection(
-              t("app.api.system.builder.messages.optimizationTips"),
-            ),
+            outputFormatter.formatSection(t("messages.optimizationTips")),
           );
           for (const suggestion of analysis.suggestions) {
             output.push(outputFormatter.formatItem("💡", suggestion));
@@ -280,11 +250,7 @@ export class BuildExecutor implements IBuildExecutor {
 
       // Execute post-build hook
       if (buildConfig.hooks?.postBuild) {
-        output.push(
-          outputFormatter.formatStep(
-            t("app.api.system.builder.messages.runningPostBuild"),
-          ),
-        );
+        output.push(outputFormatter.formatStep(t("messages.runningPostBuild")));
         await buildConfig.hooks.postBuild({
           config: buildConfig,
           profile,
@@ -307,11 +273,7 @@ export class BuildExecutor implements IBuildExecutor {
         profile,
       );
 
-      output.push(
-        outputFormatter.formatSuccess(
-          t("app.api.system.builder.messages.buildComplete"),
-        ),
-      );
+      output.push(outputFormatter.formatSuccess(t("messages.buildComplete")));
       logger.info("Build complete", {
         duration,
         filesBuilt: filesBuilt.length,
@@ -376,15 +338,11 @@ export class BuildExecutor implements IBuildExecutor {
       const suggestions = errorSuggester.getSuggestions(parsedError.message, t);
       output.push(
         outputFormatter.formatError(
-          `${t("app.api.system.builder.messages.buildFailed")}: ${parsedError.message}`,
+          `${t("messages.buildFailed")}: ${parsedError.message}`,
         ),
       );
       if (suggestions.length > 0) {
-        output.push(
-          outputFormatter.formatSection(
-            t("app.api.system.builder.messages.suggestions"),
-          ),
-        );
+        output.push(outputFormatter.formatSection(t("messages.suggestions")));
         for (const suggestion of suggestions) {
           output.push(outputFormatter.formatItem("→", suggestion));
         }
@@ -393,7 +351,7 @@ export class BuildExecutor implements IBuildExecutor {
       logger.error("Build failed", { error: parsedError, duration });
 
       return fail({
-        message: "app.api.system.builder.post.errors.buildFailed.title",
+        message: t("post.errors.buildFailed.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -408,18 +366,14 @@ export class BuildExecutor implements IBuildExecutor {
     output: string[],
     filesBuilt: string[],
     logger: EndpointLogger,
-    t: TFunction,
+    t: ModuleT,
     dryRun?: boolean,
     verbose?: boolean,
     profile: BuildProfile = "development",
     onFileCompiled?: (filePath: string, size: number) => void,
     parallel = true,
   ): Promise<ResponseType<string[]>> {
-    output.push(
-      outputFormatter.formatSection(
-        t("app.api.system.builder.messages.compilingFiles"),
-      ),
-    );
+    output.push(outputFormatter.formatSection(t("messages.compilingFiles")));
     logger.info("Compiling files", {
       count: files.length,
       profile,
@@ -432,7 +386,7 @@ export class BuildExecutor implements IBuildExecutor {
       // Parallel compilation
       output.push(
         outputFormatter.formatStep(
-          t("app.api.system.builder.messages.parallelCompiling", {
+          t("messages.parallelCompiling", {
             count: files.length,
           }),
         ),
@@ -471,7 +425,7 @@ export class BuildExecutor implements IBuildExecutor {
 
       output.push(
         outputFormatter.formatStep(
-          t("app.api.system.builder.messages.parallelComplete", {
+          t("messages.parallelComplete", {
             count: files.length,
             duration,
           }),
@@ -521,7 +475,7 @@ export class BuildExecutor implements IBuildExecutor {
     output: string[],
     filesBuilt: string[],
     logger: EndpointLogger,
-    t: TFunction,
+    t: ModuleT,
     dryRun?: boolean,
     verbose?: boolean,
     profile: BuildProfile = "development",
@@ -545,6 +499,7 @@ export class BuildExecutor implements IBuildExecutor {
       output,
       filesBuilt,
       logger,
+      t,
       dryRun,
       verbose,
       profile,

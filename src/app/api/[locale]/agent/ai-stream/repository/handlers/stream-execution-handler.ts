@@ -19,6 +19,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { AiStreamT } from "../../i18n";
 import { MAX_TOOL_CALLS } from "../core/constants";
 import type { ProviderFactory } from "../core/provider-factory";
 import type { StreamContext } from "../core/stream-context";
@@ -51,6 +52,7 @@ export class StreamExecutionHandler {
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
+    t: AiStreamT;
   }): Promise<void> {
     const {
       provider,
@@ -72,6 +74,7 @@ export class StreamExecutionHandler {
       user,
       locale,
       logger,
+      t,
     } = params;
 
     const systemWithCacheControl = systemPrompt
@@ -146,6 +149,7 @@ export class StreamExecutionHandler {
           emittedToolResultIds,
           ttsHandler,
           logger,
+          t,
         });
 
         if (shouldAbort) {
@@ -169,6 +173,7 @@ export class StreamExecutionHandler {
           messages,
           tools,
           user,
+          t,
         });
 
         if (wasHandled) {

@@ -7,11 +7,12 @@ import { LinuxUserDeleteRepository } from "./repository";
 export const { DELETE, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.DELETE]: {
-    handler: ({ data, logger, urlPathParams }) =>
+    handler: ({ data, logger, urlPathParams, t }) =>
       LinuxUserDeleteRepository.delete(
         data,
         logger,
         urlPathParams?.["username"] ?? "",
+        t,
       ),
   },
 });

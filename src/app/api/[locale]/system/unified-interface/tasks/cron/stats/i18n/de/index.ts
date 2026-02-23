@@ -1,6 +1,12 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Aufgabenverwaltung",
+
+  errors: {
+    fetchCronTaskStats: "Fehler beim Abrufen der Cron-Aufgabenstatistiken",
+  },
+
   get: {
     title: "Cron-Task-Statistiken Abrufen",
     description: "Umfassende Statistiken und Metriken für Cron-Tasks abrufen",

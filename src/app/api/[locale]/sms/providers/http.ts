@@ -7,8 +7,10 @@ import { z } from "zod";
 
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { smsEnv } from "../env";
+import { smsScopedT } from "../i18n";
 import {
   phoneNumberSchema,
   type SendSmsParams,
@@ -84,7 +86,7 @@ export function getHttpProvider(): SmsProvider {
           const customSchema = z
             .string()
             .refine((value) => pattern.test(value), {
-              message: "app.api.sms.sms.error.invalid_phone_format",
+              message: "sms.error.invalid_phone_format",
             });
 
           const result = customSchema.safeParse(phoneNumber);
@@ -93,7 +95,7 @@ export function getHttpProvider(): SmsProvider {
               valid: false,
               reason:
                 result.error.issues[0]?.message ??
-                "app.api.sms.sms.error.invalid_phone_format",
+                "sms.error.invalid_phone_format",
             };
           }
           return { valid: true };
@@ -109,7 +111,7 @@ export function getHttpProvider(): SmsProvider {
       if (!result.success) {
         return {
           valid: false,
-          reason: "app.api.sms.sms.error.invalid_phone_format",
+          reason: "sms.error.invalid_phone_format",
         };
       }
       return { valid: true };
@@ -118,14 +120,16 @@ export function getHttpProvider(): SmsProvider {
     async sendSms(
       params: SendSmsParams,
       logger: EndpointLogger,
+      locale: CountryLanguage,
     ): Promise<ResponseType<SmsResult>> {
+      const { t } = smsScopedT(locale);
       try {
         logger.debug("Sending SMS via HTTP provider", { to: params.to });
 
         // Validate required configuration early
         if (!apiUrl) {
           return fail({
-            message: "app.api.sms.sms.error.missing_aws_region",
+            message: t("sms.error.missing_aws_region"),
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
@@ -133,14 +137,14 @@ export function getHttpProvider(): SmsProvider {
         // Validate required parameters
         if (!params.to) {
           return fail({
-            message: "app.api.sms.sms.error.invalid_phone_format",
+            message: t("sms.error.invalid_phone_format"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
 
         if (!params.message || params.message.trim() === "") {
           return fail({
-            message: "app.api.sms.sms.error.empty_message",
+            message: t("sms.error.empty_message"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
@@ -248,7 +252,7 @@ export function getHttpProvider(): SmsProvider {
         // Handle HTTP errors
         if (!response.ok) {
           return fail({
-            message: "app.api.sms.sms.error.delivery_failed",
+            message: t("sms.error.delivery_failed"),
             errorType: ErrorResponseTypes.SMS_ERROR,
           });
         }
@@ -339,7 +343,7 @@ export function getHttpProvider(): SmsProvider {
         const unknownMsg = "Unknown error";
         const unknownErrorMsg = unknownMsg;
         return fail({
-          message: "app.api.sms.sms.error.delivery_failed",
+          message: t("sms.error.delivery_failed"),
           errorType: ErrorResponseTypes.SMS_ERROR,
           messageParams: {
             error: error instanceof Error ? error.message : unknownErrorMsg,

@@ -56,7 +56,7 @@ const test1_3: Test1_3_MethodsPost = "PASS";
 
 // Test 1.4: Can a tuple of specific UserRoleValues extend readonly UserRoleValue[]?
 type Test1_4_TupleExtends = readonly [
-  "app.api.user.userRoles.enums.userRole.admin",
+  "enums.userRole.admin",
 ] extends readonly UserRoleValue[]
   ? "PASS"
   : "FAIL";
@@ -75,7 +75,7 @@ const test2_1_field = objectField(
 
 type Test2_1_LiteralEndpoint = ApiEndpoint<
   Methods.POST,
-  readonly ["app.api.user.userRoles.enums.userRole.admin"],
+  readonly ["enums.userRole.admin"],
   string,
   typeof test2_1_field
 >;
@@ -126,7 +126,8 @@ const test3_1_field = objectField(
     jobId: requestUrlPathParamsField({
       type: WidgetType.FORM_FIELD,
       fieldType: FieldDataType.UUID,
-      label: "Job ID",
+      // oxlint-disable-next-line no-explicit-any -- Test file: plain string label for readability
+      label: "Job ID" as any,
       schema: z.string().uuid(),
     }),
   },
@@ -134,7 +135,7 @@ const test3_1_field = objectField(
 
 type Test3_1_LiteralCreate = CreateApiEndpoint<
   Methods.POST,
-  readonly ["app.api.user.userRoles.enums.userRole.admin"],
+  readonly ["enums.userRole.admin"],
   string,
   typeof test3_1_field
 >;
@@ -161,7 +162,7 @@ const test3_3: Test3_3_ObjectFieldExtendsUnified = "PASS"; // objectField DOES e
 type Test3_4_FullCheck =
   CreateApiEndpoint<
     Methods.POST,
-    readonly ["app.api.user.userRoles.enums.userRole.admin"],
+    readonly ["enums.userRole.admin"],
     string,
     typeof test3_1_field
   > extends CreateApiEndpointAny
@@ -219,7 +220,7 @@ const test3_6: Test3_6_TypesCompat = "PASS"; // types.Fields property is compati
 type Test3_7_ApiEndpointBase =
   ApiEndpoint<
     Methods.POST,
-    readonly ["app.api.user.userRoles.enums.userRole.admin"],
+    readonly ["enums.userRole.admin"],
     string,
     TestObjectField
   > extends ApiEndpoint<
@@ -260,7 +261,7 @@ type SimpleObjectField = typeof simpleObjectFieldValue;
 type Test3_10_SimpleObject =
   ApiEndpoint<
     Methods.POST,
-    readonly ["app.api.user.userRoles.enums.userRole.admin"],
+    readonly ["enums.userRole.admin"],
     string,
     SimpleObjectField
   > extends ApiEndpoint<
@@ -553,7 +554,7 @@ const test3_21: Test3_21_OnlyMethodSpecific = "PASS"; // We WANT this to work
 type Test3_22_OnlyRolesSpecific =
   ApiEndpoint<
     Methods, // generic
-    readonly ["app.api.user.userRoles.enums.userRole.admin"], // SPECIFIC tuple
+    readonly ["enums.userRole.admin"], // SPECIFIC tuple
     string, // generic
     SimpleObjectField
   > extends ApiEndpoint<
@@ -613,7 +614,7 @@ interface MinimalApiEndpoint<
 type Test3_25_MinimalApi =
   MinimalApiEndpoint<
     Methods.POST,
-    readonly ["app.api.user.userRoles.enums.userRole.admin"],
+    readonly ["enums.userRole.admin"],
     SimpleObjectField
   > extends MinimalApiEndpoint<
     Methods,
@@ -653,7 +654,7 @@ interface ApiEndpointWithOptions<
 type Test3_26_WithOptions =
   ApiEndpointWithOptions<
     Methods.POST,
-    readonly ["app.api.user.userRoles.enums.userRole.admin"],
+    readonly ["enums.userRole.admin"],
     SimpleObjectField
   > extends ApiEndpointWithOptions<
     Methods,
@@ -696,7 +697,7 @@ interface ApiEndpointWithErrorTypes<
 type Test3_27_WithErrorTypes =
   ApiEndpointWithErrorTypes<
     Methods.POST,
-    readonly ["app.api.user.userRoles.enums.userRole.admin"],
+    readonly ["enums.userRole.admin"],
     "app.api.someScope.title",
     SimpleObjectField
   > extends ApiEndpointWithErrorTypes<
@@ -786,7 +787,7 @@ type Test3_28e_Result =
   MinimalWithIndexExamples<
     "default",
     Methods.POST,
-    readonly ["app.api.user.userRoles.enums.userRole.admin"],
+    readonly ["enums.userRole.admin"],
     SimpleObjectField
   > extends MinimalWithIndexExamples<
     string,
@@ -806,7 +807,7 @@ const test3_28e: Test3_28e_Result = "PASS"; // TypeScript infers covariance when
 // Test 3.29: Test actual CreateApiEndpoint assignability with all fixes applied
 type Test3_29_Specific = CreateApiEndpoint<
   Methods.POST,
-  readonly ["app.api.user.userRoles.enums.userRole.admin"],
+  readonly ["enums.userRole.admin"],
   "app.api.someScope.title",
   SimpleObjectField
 >;
@@ -833,7 +834,7 @@ const test3_30_check: Test3_30_Check = true; // Should pass if Test3_30_Result i
 // Test 3.31: Test if ApiEndpoint works with all fixes
 type Test3_31_SpecificApi = ApiEndpoint<
   Methods.POST,
-  readonly ["app.api.user.userRoles.enums.userRole.admin"],
+  readonly ["enums.userRole.admin"],
   "app.api.someScope.title",
   SimpleObjectField
 >;
@@ -860,7 +861,7 @@ const test3_31: Test3_31_Result = "PASS"; // We WANT ApiEndpoint to work
 // Test 4.1: Test with generic TExampleKey but specific other params
 type Test4_1_GenericExample = CreateApiEndpoint<
   Methods.POST,
-  readonly ["app.api.user.userRoles.enums.userRole.admin"],
+  readonly ["enums.userRole.admin"],
   string,
   UnifiedField<
     string,
@@ -877,7 +878,7 @@ const test4_1: Test4_1_Result = "PASS"; // Passes with variance!
 // Test 4.2: Test with generic TMethod but specific other params
 type Test4_2_GenericMethod = CreateApiEndpoint<
   Methods, // Generic
-  readonly ["app.api.user.userRoles.enums.userRole.admin"],
+  readonly ["enums.userRole.admin"],
   string,
   UnifiedField<
     string,
@@ -911,7 +912,7 @@ const test4_3: Test4_3_Result = "PASS"; // Should pass!
 // Test 4.4: Tuple of UserRoleValue extends readonly UserRoleValue[]
 type Test4_4_OnlyRoleIssue = CreateApiEndpoint<
   Methods,
-  readonly ["app.api.user.userRoles.enums.userRole.admin"], // Tuple
+  readonly ["enums.userRole.admin"], // Tuple
   string,
   UnifiedField<
     string,
@@ -931,7 +932,7 @@ const test4_4: Test4_4_Result = "PASS"; // Passes with variance!
 
 // Test 5.1: Direct tuple to array assignability
 type Test5_1_TupleToArray = readonly [
-  "app.api.user.userRoles.enums.userRole.admin",
+  "enums.userRole.admin",
 ] extends readonly UserRoleValue[]
   ? "PASS"
   : "FAIL";
@@ -941,9 +942,7 @@ const test5_1: Test5_1_TupleToArray = "PASS"; // Tuples ARE assignable to arrays
 interface Test5_2_Container<T extends readonly UserRoleValue[]> {
   roles: T;
 }
-type Test5_2_WithTuple = Test5_2_Container<
-  readonly ["app.api.user.userRoles.enums.userRole.admin"]
->;
+type Test5_2_WithTuple = Test5_2_Container<readonly ["enums.userRole.admin"]>;
 type Test5_2_Result =
   Test5_2_WithTuple extends Test5_2_Container<readonly UserRoleValue[]>
     ? "PASS"
@@ -955,7 +954,7 @@ interface Test5_3_ContainerOut<out T extends readonly UserRoleValue[]> {
   readonly roles: T;
 }
 type Test5_3_WithTuple = Test5_3_ContainerOut<
-  readonly ["app.api.user.userRoles.enums.userRole.admin"]
+  readonly ["enums.userRole.admin"]
 >;
 type Test5_3_Result =
   Test5_3_WithTuple extends Test5_3_ContainerOut<readonly UserRoleValue[]>
@@ -970,7 +969,7 @@ const test5_3: Test5_3_Result = "PASS"; // With 'out', it works!
 // Test 6.1: With the 'out' variance we added, does it work?
 type Test6_1_WithOutVariance = ApiEndpoint<
   Methods.POST,
-  readonly ["app.api.user.userRoles.enums.userRole.admin"],
+  readonly ["enums.userRole.admin"],
   string,
   UnifiedField<
     string,
@@ -1002,7 +1001,7 @@ const test6_1: Test6_1_Result = "PASS"; // Should pass now with 'out'!
 // Test 7.1: CreateApiEndpoint with specific types extends CreateApiEndpointAny
 type Test7_1_CreateWithOut = CreateApiEndpoint<
   Methods.POST,
-  readonly ["app.api.user.userRoles.enums.userRole.admin"],
+  readonly ["enums.userRole.admin"],
   string,
   UnifiedField<
     string,
@@ -1035,7 +1034,7 @@ type Test8_1_Intersection<T extends readonly UserRoleValue[]> =
   Test8_1_Base<T> & Test8_1_Extra;
 
 type Test8_1_WithTuple = Test8_1_Intersection<
-  readonly ["app.api.user.userRoles.enums.userRole.admin"]
+  readonly ["enums.userRole.admin"]
 >;
 type Test8_1_Result =
   Test8_1_WithTuple extends Test8_1_Intersection<readonly UserRoleValue[]>
@@ -1056,7 +1055,7 @@ const test8_1: Test8_1_Result = "PASS"; // Intersection preserves variance from 
 
 // Test 9.1: If CreateApiEndpointAny accepts the ACTUAL inferred types, will it work?
 // The issue: createEndpoint with 'as const' creates:
-//   readonly ["app.api.user.userRoles.enums.userRole.admin"]
+//   readonly ["enums.userRole.admin"]
 // Not:
 //   readonly UserRoleValue[]
 

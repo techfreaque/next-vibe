@@ -1,4 +1,10 @@
 export const translations = {
+  category: "Leads",
+  tags: {
+    leads: "Leads",
+    create: "Create",
+  },
+
   widget: {
     headerLeadCreated: "Lead Created",
     headerCreateLead: "Create Lead",

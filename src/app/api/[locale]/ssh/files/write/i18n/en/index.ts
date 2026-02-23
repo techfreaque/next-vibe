@@ -1,4 +1,16 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    invalidPath: "Invalid path: must be absolute without '..' segments",
+    parentDirNotFound:
+      "Parent directory not found. Set createDirs=true to create it.",
+    permissionDenied: "Permission denied",
+    notImplemented: {
+      fileWrite: "SSH backend not yet implemented for file writing",
+    },
+  },
+
   post: {
     title: "Write File",
     description: "Write or overwrite a file on the local machine or via SSH",

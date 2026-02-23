@@ -70,4 +70,9 @@ export const translations: typeof enTranslations = {
     title: "Datei-Upload erfolgreich",
     description: "Die Datei wurde erfolgreich hochgeladen",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    inputAutomation: "Eingabe-Automatisierung",
+  },
 };

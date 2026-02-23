@@ -16,6 +16,7 @@ import { useTranslation } from "@/i18n/core/client";
 
 import resetPasswordRequestEndpoint from "./definition";
 import type { JwtPayloadType } from "../../../auth/types";
+import { scopedTranslation } from "./i18n";
 
 /****************************
  * FORM HOOKS
@@ -49,13 +50,15 @@ export function useResetPasswordRequest(
   alert: FormAlertState | null;
 } {
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = scopedTranslation.scopedT(locale);
   const [isSuccess, setIsSuccess] = useState(false);
 
   const formResult = useApiForm(
     resetPasswordRequestEndpoint.POST,
     logger,
     user,
+    locale,
     {
       defaultValues: {
         email: "",
@@ -67,17 +70,15 @@ export function useResetPasswordRequest(
         setIsSuccess(true);
 
         toast({
-          title: t("app.api.user.public.resetPassword.request.success.title"),
-          description: t(
-            "app.api.user.public.resetPassword.request.response.success.message",
-          ),
+          title: t("success.title"),
+          description: t("response.success.message"),
           variant: "default",
         });
       },
       onError: ({ error }) => {
         toast({
-          title: t("app.api.user.public.resetPassword.request.errors.title"),
-          description: t(error.message),
+          title: t("errors.title"),
+          description: error.message,
           variant: "destructive",
         });
       },
@@ -90,11 +91,10 @@ export function useResetPasswordRequest(
       return {
         variant: "success",
         title: {
-          message: "app.api.user.public.resetPassword.request.success.title",
+          message: t("success.title"),
         },
         message: {
-          message:
-            "app.api.user.public.resetPassword.request.success.description",
+          message: t("success.description"),
         },
       };
     }
@@ -104,7 +104,7 @@ export function useResetPasswordRequest(
       return {
         variant: "destructive",
         title: {
-          message: "app.api.user.public.resetPassword.request.errors.title",
+          message: t("errors.title"),
         },
         message: {
           message: formResult.response.message,
@@ -114,7 +114,7 @@ export function useResetPasswordRequest(
     }
 
     return null;
-  }, [isSuccess, formResult.response]);
+  }, [isSuccess, formResult.response, t]);
 
   return {
     ...formResult,

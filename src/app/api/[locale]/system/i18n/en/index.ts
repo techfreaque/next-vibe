@@ -7,7 +7,6 @@ import { translations as helpTranslations } from "../../help/i18n/en";
 import { translations as launchpadTranslations } from "../../launchpad/i18n/en";
 import { translations as releaseToolTranslations } from "../../release-tool/i18n/en";
 import { translations as serverTranslations } from "../../server/i18n/en";
-import { translations as translationsTranslations } from "../../translations/i18n/en";
 import { translations as unifiedInterfaceTranslations } from "../../unified-interface/i18n/en";
 
 export const translations = {
@@ -69,6 +68,5 @@ export const translations = {
   launchpad: launchpadTranslations,
   releaseTool: releaseToolTranslations,
   server: serverTranslations,
-  translations: translationsTranslations,
   unifiedInterface: unifiedInterfaceTranslations,
 };

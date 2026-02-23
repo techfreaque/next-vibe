@@ -22,14 +22,22 @@ import type {
   ErrorResponseType,
   SuccessResponseType,
 } from "next-vibe/shared/types/response.schema";
+import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { env } from "@/config/env";
 import {
   FEATURED_MODELS,
   TOTAL_MODEL_COUNT,
 } from "@/app/api/[locale]/agent/models/models";
+import { translations as configTranslations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
+
+import { scopedTranslation as userScopedTranslation } from "../../i18n";
+import {
+  scopedTranslation as signupScopedTranslation,
+  type SignupT,
+  type SignupTranslationKey,
+} from "./i18n";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
@@ -45,6 +53,7 @@ import {
   type TrackingContext,
 } from "../../../emails/smtp-client/components/tracking_context.email";
 import { EmailTemplate } from "../../../emails/smtp-client/components/template.email";
+import { simpleT } from "@/i18n/core/shared";
 
 // ============================================================================
 // TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
@@ -66,28 +75,29 @@ function SignupWelcomeEmail({
   tracking,
 }: {
   props: SignupWelcomeProps;
-  t: TFunction;
+  t: SignupT;
   locale: CountryLanguage;
   recipientEmail: string;
   tracking: TrackingContext;
 }): ReactElement {
-  const appName = t("config.appName");
+  const { t: globalT } = simpleT(locale);
+  const appName = globalT("config.appName");
 
   const modelCategories = [
     {
-      label: t("app.api.user.public.signup.email.models.mainstream"),
+      label: t("email.models.mainstream"),
       models: FEATURED_MODELS.mainstream,
       color: "#1e40af",
       bg: "#dbeafe",
     },
     {
-      label: t("app.api.user.public.signup.email.models.open"),
+      label: t("email.models.open"),
       models: FEATURED_MODELS.open,
       color: "#166534",
       bg: "#dcfce7",
     },
     {
-      label: t("app.api.user.public.signup.email.models.uncensored"),
+      label: t("email.models.uncensored"),
       models: FEATURED_MODELS.uncensored,
       color: "#7c2d12",
       bg: "#fed7aa",
@@ -96,10 +106,9 @@ function SignupWelcomeEmail({
 
   return (
     <EmailTemplate
-      t={t}
       locale={locale}
-      title={t("app.api.user.public.signup.email.headline")}
-      previewText={t("app.api.user.public.signup.email.previewText", {
+      title={t("email.headline")}
+      previewText={t("email.previewText", {
         privateName: props.privateName,
         modelCount: TOTAL_MODEL_COUNT,
       })}
@@ -115,7 +124,7 @@ function SignupWelcomeEmail({
           marginBottom: "6px",
         }}
       >
-        {t("app.api.user.public.signup.email.greeting", {
+        {t("email.greeting", {
           privateName: props.privateName,
         })}
       </Text>
@@ -128,7 +137,7 @@ function SignupWelcomeEmail({
           marginBottom: "28px",
         }}
       >
-        {t("app.api.user.public.signup.email.intro", { appName })}
+        {t("email.intro", { appName })}
       </Text>
 
       {/* Model showcase */}
@@ -150,7 +159,7 @@ function SignupWelcomeEmail({
             textAlign: "center",
           }}
         >
-          {t("app.api.user.public.signup.email.models.title", {
+          {t("email.models.title", {
             modelCount: TOTAL_MODEL_COUNT,
           })}
         </Text>
@@ -211,17 +220,17 @@ function SignupWelcomeEmail({
             marginBottom: "14px",
           }}
         >
-          {t("app.api.user.public.signup.email.free.title")}
+          {t("email.free.title")}
         </Text>
 
         {[
-          t("app.api.user.public.signup.email.free.credits"),
-          t("app.api.user.public.signup.email.free.allModels", {
+          t("email.free.credits"),
+          t("email.free.allModels", {
             modelCount: TOTAL_MODEL_COUNT,
           }),
-          t("app.api.user.public.signup.email.free.uncensored"),
-          t("app.api.user.public.signup.email.free.chatModes"),
-          t("app.api.user.public.signup.email.free.noCard"),
+          t("email.free.uncensored"),
+          t("email.free.chatModes"),
+          t("email.free.noCard"),
         ].map((item, i) => (
           <Row key={i} style={{ marginBottom: "10px" }}>
             <Column
@@ -274,7 +283,7 @@ function SignupWelcomeEmail({
             boxShadow: "0 4px 12px rgba(37, 99, 235, 0.35)",
           }}
         >
-          {t("app.api.user.public.signup.email.ctaButton")}
+          {t("email.ctaButton")}
         </Button>
       </Section>
 
@@ -296,7 +305,7 @@ function SignupWelcomeEmail({
             marginBottom: "6px",
           }}
         >
-          {t("app.api.user.public.signup.email.upgrade.title")}
+          {t("email.upgrade.title")}
         </Text>
         <Text
           style={{
@@ -306,7 +315,7 @@ function SignupWelcomeEmail({
             marginBottom: "14px",
           }}
         >
-          {t("app.api.user.public.signup.email.upgrade.desc")}
+          {t("email.upgrade.desc")}
         </Text>
         <Button
           href={`${tracking.baseUrl}/${locale}/subscription`}
@@ -321,7 +330,7 @@ function SignupWelcomeEmail({
             fontWeight: "600",
           }}
         >
-          {t("app.api.user.public.signup.email.upgrade.cta")}
+          {t("email.upgrade.cta")}
         </Button>
       </Section>
 
@@ -335,7 +344,7 @@ function SignupWelcomeEmail({
           whiteSpace: "pre-line",
         }}
       >
-        {t("app.api.user.public.signup.email.signoff", { appName })}
+        {t("email.signoff", { appName })}
       </Text>
 
       {/* Privacy PS */}
@@ -349,49 +358,45 @@ function SignupWelcomeEmail({
           paddingTop: "16px",
         }}
       >
-        {t("app.api.user.public.signup.email.ps")}
+        {t("email.ps")}
       </Text>
     </EmailTemplate>
   );
 }
 
 // Template Definition Export
-const signupWelcomeTemplate: EmailTemplateDefinition<SignupWelcomeProps> = {
+const signupWelcomeTemplate: EmailTemplateDefinition<
+  SignupWelcomeProps,
+  typeof signupScopedTranslation
+> = {
+  scopedTranslation: signupScopedTranslation,
   meta: {
     id: "signup-welcome",
     version: "1.0.0",
-    name: "app.admin.emails.templates.templates.signup.welcome.meta.name",
-    description:
-      "app.admin.emails.templates.templates.signup.welcome.meta.description",
-    category: "auth",
+    name: "emailTemplates.welcome.name",
+    description: "emailTemplates.welcome.description",
+    category: "emailTemplates.welcome.category",
     path: "/user/public/signup/email.tsx",
-    defaultSubject: (t) =>
-      t("app.api.user.public.signup.email.subject", { appName: "" }),
+    defaultSubject: "email.subject",
     previewFields: {
       privateName: {
         type: "text",
-        label:
-          "app.admin.emails.templates.templates.signup.welcome.preview.privateName.label",
-        description:
-          "app.admin.emails.templates.templates.signup.welcome.preview.privateName.description",
+        label: "emailTemplates.welcome.preview.privateName.label",
+        description: "emailTemplates.welcome.preview.privateName.description",
         defaultValue: "Max",
         required: true,
       },
       userId: {
         type: "text",
-        label:
-          "app.admin.emails.templates.templates.signup.welcome.preview.userId.label",
-        description:
-          "app.admin.emails.templates.templates.signup.welcome.preview.userId.description",
+        label: "emailTemplates.welcome.preview.userId.label",
+        description: "emailTemplates.welcome.preview.userId.description",
         defaultValue: "example-user-id-123",
         required: true,
       },
       leadId: {
         type: "text",
-        label:
-          "app.admin.emails.templates.templates.signup.welcome.preview.leadId.label",
-        description:
-          "app.admin.emails.templates.templates.signup.welcome.preview.leadId.description",
+        label: "emailTemplates.welcome.preview.leadId.label",
+        description: "emailTemplates.welcome.preview.leadId.description",
         defaultValue: "example-lead-id-456",
         required: true,
       },
@@ -424,9 +429,11 @@ export default signupWelcomeTemplate;
 export async function renderWelcomeEmailByEmail(
   email: string,
   locale: CountryLanguage,
-  t: TFunction,
+  _t: unknown,
   logger: EndpointLogger,
 ): Promise<SuccessResponseType<EmailTemplateReturnType> | ErrorResponseType> {
+  const { t: tUser } = userScopedTranslation.scopedT(locale);
+  const { t: signupT } = signupScopedTranslation.scopedT(locale);
   const userResponse = await UserRepository.getUserByEmail(
     email,
     UserDetailLevel.STANDARD,
@@ -435,7 +442,7 @@ export async function renderWelcomeEmailByEmail(
   );
   if (!userResponse.success) {
     return fail({
-      message: "app.api.user.errors.not_found",
+      message: tUser("errors.not_found"),
       errorType: ErrorResponseTypes.NOT_FOUND,
       messageParams: { email },
       cause: userResponse,
@@ -448,16 +455,17 @@ export async function renderWelcomeEmailByEmail(
     userId: user.id,
     leadId: user.leadId,
   };
+  const { t: globalT } = simpleT(locale);
 
   return success({
     toEmail: user.email,
     toName: user.privateName,
-    subject: t("app.api.user.public.signup.email.subject", {
-      appName: t("config.appName"),
+    subject: signupT("email.subject", {
+      appName: globalT("config.appName"),
     }),
     jsx: signupWelcomeTemplate.component({
       props: templateProps,
-      t,
+      t: signupT,
       locale,
       recipientEmail: user.email,
       tracking: createTrackingContext(locale, user.leadId, user.id),
@@ -472,12 +480,13 @@ export async function renderWelcomeEmailByEmail(
 export const renderRegisterMail: EmailFunctionType<
   SignupPostRequestOutput,
   SignupPostResponseOutput,
-  never
+  never,
+  SignupTranslationKey
 > = ({ requestData, locale, t, logger }) =>
   renderWelcomeEmailByEmail(requestData.email, locale, t, logger);
 
 function renderAdminNotificationEmailContent(
-  t: TFunction,
+  t: SignupT,
   locale: CountryLanguage,
   recipientEmail: string,
   user: {
@@ -503,13 +512,14 @@ function renderAdminNotificationEmailContent(
     env.NEXT_PUBLIC_APP_URL,
   );
 
+  const { t: globalT } = simpleT(locale);
+
   return (
     <EmailTemplate
-      t={t}
       locale={locale}
-      title={t("app.api.user.public.signup.admin_notification.title")}
-      previewText={t("app.api.user.public.signup.admin_notification.preview", {
-        appName: t("config.appName"),
+      title={t("admin_notification.title")}
+      previewText={t("admin_notification.preview", {
+        appName: globalT("config.appName"),
       })}
       recipientEmail={recipientEmail}
       tracking={tracking}
@@ -524,7 +534,7 @@ function renderAdminNotificationEmailContent(
           fontWeight: "600",
         }}
       >
-        {t("app.api.user.public.signup.admin_notification.title")}
+        {t("admin_notification.title")}
       </Text>
 
       <Text
@@ -535,8 +545,8 @@ function renderAdminNotificationEmailContent(
           marginBottom: "24px",
         }}
       >
-        {t("app.api.user.public.signup.admin_notification.message", {
-          appName: t("config.appName"),
+        {t("admin_notification.message", {
+          appName: globalT("config.appName"),
         })}
       </Text>
 
@@ -561,7 +571,7 @@ function renderAdminNotificationEmailContent(
             paddingBottom: "8px",
           }}
         >
-          {t("app.api.user.public.signup.admin_notification.user_details")}
+          {t("admin_notification.user_details")}
         </Text>
 
         {/* Basic Info Row */}
@@ -574,9 +584,7 @@ function renderAdminNotificationEmailContent(
               fontWeight: "600",
             }}
           >
-            {t(
-              "app.api.user.public.signup.admin_notification.basic_information",
-            )}
+            {t("admin_notification.basic_information")}
           </Text>
 
           <div style={{ paddingLeft: "16px" }}>
@@ -589,8 +597,7 @@ function renderAdminNotificationEmailContent(
               }}
             >
               <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-                {t("app.api.user.public.signup.admin_notification.privateName")}
-                :
+                {t("admin_notification.privateName")}:
               </Text>{" "}
               {user.privateName}
             </Text>
@@ -604,7 +611,7 @@ function renderAdminNotificationEmailContent(
               }}
             >
               <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-                {t("app.api.user.public.signup.admin_notification.publicName")}:
+                {t("admin_notification.publicName")}:
               </Text>{" "}
               {user.publicName}
             </Text>
@@ -618,7 +625,7 @@ function renderAdminNotificationEmailContent(
               }}
             >
               <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-                {t("app.api.user.public.signup.admin_notification.email")}:
+                {t("admin_notification.email")}:
               </Text>{" "}
               <a
                 href={`mailto:${user.email}`}
@@ -637,7 +644,7 @@ function renderAdminNotificationEmailContent(
               }}
             >
               <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-                {t("app.api.user.public.signup.admin_notification.language")}:
+                {t("admin_notification.locale")}:
               </Text>{" "}
               {user.locale}
             </Text>
@@ -652,10 +659,7 @@ function renderAdminNotificationEmailContent(
                 }}
               >
                 <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-                  {t(
-                    "app.api.user.public.signup.admin_notification.creditBalance",
-                  )}
-                  :
+                  {t("admin_notification.creditBalance")}:
                 </Text>{" "}
                 {user.creditBalance}
               </Text>
@@ -671,10 +675,7 @@ function renderAdminNotificationEmailContent(
                 }}
               >
                 <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-                  {t(
-                    "app.api.user.public.signup.admin_notification.leadCreditBalance",
-                  )}
-                  :
+                  {t("admin_notification.leadCreditBalance")}:
                 </Text>{" "}
                 {user.leadCreditBalance}
               </Text>
@@ -692,9 +693,7 @@ function renderAdminNotificationEmailContent(
               fontWeight: "600",
             }}
           >
-            {t(
-              "app.api.user.public.signup.admin_notification.signup_preferences",
-            )}
+            {t("admin_notification.signup_preferences")}
           </Text>
 
           {requestData.subscribeToNewsletter !== undefined && (
@@ -707,7 +706,7 @@ function renderAdminNotificationEmailContent(
               }}
             >
               <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-                {t("app.api.user.public.signup.admin_notification.newsletter")}:
+                {t("admin_notification.newsletter")}:
               </Text>{" "}
               <span
                 style={{
@@ -724,12 +723,8 @@ function renderAdminNotificationEmailContent(
                 }}
               >
                 {requestData.subscribeToNewsletter
-                  ? t(
-                      "app.api.user.public.signup.admin_notification.subscribed",
-                    )
-                  : t(
-                      "app.api.user.public.signup.admin_notification.not_subscribed",
-                    )}
+                  ? t("admin_notification.subscribed")
+                  : t("admin_notification.not_subscribed")}
               </span>
             </Text>
           )}
@@ -745,7 +740,7 @@ function renderAdminNotificationEmailContent(
               fontWeight: "600",
             }}
           >
-            {t("app.api.user.public.signup.admin_notification.signup_details")}
+            {t("admin_notification.signup_details")}
           </Text>
 
           <div style={{ paddingLeft: "16px" }}>
@@ -758,8 +753,7 @@ function renderAdminNotificationEmailContent(
               }}
             >
               <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-                {t("app.api.user.public.signup.admin_notification.signup_date")}
-                :
+                {t("admin_notification.signup_date")}:
               </Text>{" "}
               {new Date(user.createdAt).toLocaleDateString(locale, {
                 year: "numeric",
@@ -780,7 +774,7 @@ function renderAdminNotificationEmailContent(
               }}
             >
               <Text style={{ fontWeight: "700", color: "#1f2937" }}>
-                {t("app.api.user.public.signup.admin_notification.user_id")}:
+                {t("admin_notification.user_id")}:
               </Text>{" "}
               <span
                 style={{
@@ -801,7 +795,7 @@ function renderAdminNotificationEmailContent(
       {/* Action Buttons */}
       <Section style={{ textAlign: "center", marginBottom: "32px" }}>
         <Button
-          href={`mailto:${user.email}?subject=Welcome to ${t("config.appName")} - Let's get started!`}
+          href={`mailto:${user.email}?subject=Welcome to ${globalT("config.appName")} - Let's get started!`}
           style={{
             backgroundColor: "#3b82f6",
             borderRadius: "8px",
@@ -813,7 +807,7 @@ function renderAdminNotificationEmailContent(
             display: "inline-block",
           }}
         >
-          {t("app.api.user.public.signup.admin_notification.contact_user")}
+          {t("admin_notification.contact_user")}
         </Button>
       </Section>
 
@@ -829,8 +823,8 @@ function renderAdminNotificationEmailContent(
           paddingTop: "16px",
         }}
       >
-        {t("app.api.user.public.signup.admin_notification.footer", {
-          appName: t("config.appName"),
+        {t("admin_notification.footer", {
+          appName: globalT("config.appName"),
         })}
       </Text>
     </EmailTemplate>
@@ -848,76 +842,75 @@ const adminSignupPropsSchema = z.object({
 
 type AdminSignupProps = z.infer<typeof adminSignupPropsSchema>;
 
-export const adminSignupNotificationTemplate: EmailTemplateDefinition<AdminSignupProps> =
-  {
-    meta: {
-      id: "admin-signup-notification",
-      version: "1.0.0",
-      name: "app.api.emails.templates.admin.signup.meta.name",
-      description: "app.api.emails.templates.admin.signup.meta.description",
-      category: "admin",
-      path: "/user/public/signup/email.tsx",
-      defaultSubject: (t) =>
-        t("app.api.user.public.signup.admin_notification.subject", {
-          userName: "User",
-        }),
-      previewFields: {
-        privateName: {
-          type: "text",
-          label: "app.api.emails.templates.admin.signup.preview.privateName",
-          defaultValue: "Max",
-          required: true,
-        },
-        publicName: {
-          type: "text",
-          label: "app.api.emails.templates.admin.signup.preview.publicName",
-          defaultValue: "Max Mustermann",
-          required: true,
-        },
-        email: {
-          type: "email",
-          label: "app.api.emails.templates.admin.signup.preview.email",
-          defaultValue: "max@example.com",
-          required: true,
-        },
-        userId: {
-          type: "text",
-          label: "app.api.emails.templates.admin.signup.preview.userId",
-          defaultValue: "example-user-id-123",
-          required: true,
-        },
-        subscribeToNewsletter: {
-          type: "boolean",
-          label:
-            "app.api.emails.templates.admin.signup.preview.subscribeToNewsletter",
-          defaultValue: false,
-        },
+export const adminSignupNotificationTemplate: EmailTemplateDefinition<
+  AdminSignupProps,
+  typeof signupScopedTranslation
+> = {
+  scopedTranslation: signupScopedTranslation,
+  meta: {
+    id: "admin-signup-notification",
+    version: "1.0.0",
+    name: "emailTemplates.adminSignup.name",
+    description: "emailTemplates.adminSignup.description",
+    category: "emailTemplates.adminSignup.category",
+    path: "/user/public/signup/email.tsx",
+    defaultSubject: "admin_notification.subject",
+    previewFields: {
+      privateName: {
+        type: "text",
+        label: "emailTemplates.adminSignup.preview.privateName.label",
+        defaultValue: "Max",
+        required: true,
+      },
+      publicName: {
+        type: "text",
+        label: "emailTemplates.adminSignup.preview.publicName.label",
+        defaultValue: "Max Mustermann",
+        required: true,
+      },
+      email: {
+        type: "email",
+        label: "emailTemplates.adminSignup.preview.email.label",
+        defaultValue: "max@example.com",
+        required: true,
+      },
+      userId: {
+        type: "text",
+        label: "emailTemplates.adminSignup.preview.userId.label",
+        defaultValue: "example-user-id-123",
+        required: true,
+      },
+      subscribeToNewsletter: {
+        type: "boolean",
+        label: "emailTemplates.adminSignup.preview.subscribeToNewsletter.label",
+        defaultValue: false,
       },
     },
-    schema: adminSignupPropsSchema,
-    component: ({ props, t, locale, recipientEmail }) =>
-      renderAdminNotificationEmailContent(
-        t,
+  },
+  schema: adminSignupPropsSchema,
+  component: ({ props, t, locale, recipientEmail }) =>
+    renderAdminNotificationEmailContent(
+      t,
+      locale,
+      recipientEmail,
+      {
+        privateName: props.privateName,
+        publicName: props.publicName,
+        email: props.email,
+        id: props.userId,
         locale,
-        recipientEmail,
-        {
-          privateName: props.privateName,
-          publicName: props.publicName,
-          email: props.email,
-          id: props.userId,
-          locale,
-          createdAt: new Date(),
-        },
-        { subscribeToNewsletter: props.subscribeToNewsletter },
-      ),
-    exampleProps: {
-      privateName: "Max",
-      publicName: "Max Mustermann",
-      email: "max@example.com",
-      userId: "example-user-id-123",
-      subscribeToNewsletter: false,
-    },
-  };
+        createdAt: new Date(),
+      },
+      { subscribeToNewsletter: props.subscribeToNewsletter },
+    ),
+  exampleProps: {
+    privateName: "Max",
+    publicName: "Max Mustermann",
+    email: "max@example.com",
+    userId: "example-user-id-123",
+    subscribeToNewsletter: false,
+  },
+};
 
 /**
  * Core admin notification logic — fetches full user + credit balance and renders the admin email.
@@ -927,9 +920,13 @@ export async function renderAdminNotificationByEmail(
   email: string,
   subscribeToNewsletter: boolean | null | undefined,
   locale: CountryLanguage,
-  t: TFunction,
+  _t: unknown,
   logger: EndpointLogger,
 ): Promise<SuccessResponseType<EmailTemplateReturnType> | ErrorResponseType> {
+  const { t: tUser } = userScopedTranslation.scopedT(locale);
+  const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
+  const { t: signupT } = signupScopedTranslation.scopedT(locale);
+  const { t: globalT } = simpleT(locale);
   const userResponse = await UserRepository.getUserByEmail(
     email,
     UserDetailLevel.COMPLETE,
@@ -938,7 +935,7 @@ export async function renderAdminNotificationByEmail(
   );
   if (!userResponse.success) {
     return fail({
-      message: "app.api.user.errors.not_found",
+      message: tUser("errors.not_found"),
       errorType: ErrorResponseTypes.NOT_FOUND,
       messageParams: { email },
       cause: userResponse,
@@ -948,20 +945,25 @@ export async function renderAdminNotificationByEmail(
 
   // Fetch credit balances (non-blocking — omit from email if unavailable)
   const [userBalanceResult, leadBalanceResult] = await Promise.all([
-    CreditRepository.getBalance({ userId: user.id }, logger),
+    CreditRepository.getBalance({ userId: user.id }, logger, creditsT, locale),
     user.leadId
-      ? CreditRepository.getBalance({ leadId: user.leadId }, logger)
+      ? CreditRepository.getBalance(
+          { leadId: user.leadId },
+          logger,
+          creditsT,
+          locale,
+        )
       : Promise.resolve(null),
   ]);
 
   return success({
     toEmail: contactClientRepository.getSupportEmail(locale),
-    toName: t("config.appName"),
-    subject: t("app.api.user.public.signup.admin_notification.subject", {
+    toName: globalT("config.appName"),
+    subject: signupT("admin_notification.subject", {
       userName: user.privateName,
     }),
     jsx: renderAdminNotificationEmailContent(
-      t,
+      signupT,
       locale,
       contactClientRepository.getSupportEmail(locale),
       {
@@ -985,7 +987,8 @@ export async function renderAdminNotificationByEmail(
 export const renderAdminSignupNotification: EmailFunctionType<
   SignupPostRequestOutput,
   SignupPostResponseOutput,
-  never
+  never,
+  SignupTranslationKey
 > = ({ requestData, locale, t, logger }) =>
   renderAdminNotificationByEmail(
     requestData.email,

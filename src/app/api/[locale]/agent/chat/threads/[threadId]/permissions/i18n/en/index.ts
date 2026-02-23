@@ -1,4 +1,9 @@
 export const translations = {
+  category: "Chat",
+  tags: {
+    threads: "Threads",
+    permissions: "Permissions",
+  },
   get: {
     title: "Get Thread Permissions",
     description: "Retrieve the list of moderators for a specific thread",

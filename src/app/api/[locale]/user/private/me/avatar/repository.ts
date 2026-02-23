@@ -21,6 +21,9 @@ import type {
   AvatarDeleteResponseOutput,
   AvatarPostResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Avatar Repository - Static class pattern
@@ -39,9 +42,10 @@ export class AvatarRepository {
     file: File,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<AvatarPostResponseOutput>> {
     try {
-      logger.debug("app.api.user.private.me.avatar.debug.uploadingUserAvatar", {
+      logger.debug("Uploading user avatar", {
         userId,
         fileName: file.name,
         fileSize: file.size,
@@ -57,7 +61,7 @@ export class AvatarRepository {
       );
       if (!userResponse.success) {
         return fail({
-          message: "app.api.user.private.me.avatar.errors.user_not_found",
+          message: t("errors.user_not_found"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { userId },
           cause: userResponse,
@@ -74,7 +78,7 @@ export class AvatarRepository {
       ];
       if (!allowedTypes.includes(file.type)) {
         return fail({
-          message: "app.api.user.private.me.avatar.errors.invalid_file_type",
+          message: t("errors.invalid_file_type"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             allowedTypes: allowedTypes.join(", "),
@@ -87,7 +91,7 @@ export class AvatarRepository {
       const maxSizeBytes = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSizeBytes) {
         return fail({
-          message: "app.api.user.private.me.avatar.errors.file_too_large",
+          message: t("errors.file_too_large"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             maxSize: "5MB",
@@ -125,23 +129,19 @@ export class AvatarRepository {
       return success<AvatarPostResponseOutput>({
         response: {
           success: true,
-          message: "app.api.user.private.me.avatar.success.uploaded",
+          message: t("success.uploaded"),
           avatarUrl: avatarUrl,
           uploadTime: new Date().toISOString(),
           nextSteps: [
-            "app.api.user.private.me.avatar.success.nextSteps.visible",
-            "app.api.user.private.me.avatar.success.nextSteps.update",
+            t("success.nextSteps.visible"),
+            t("success.nextSteps.update"),
           ],
         },
       });
     } catch (error) {
-      logger.error(
-        "app.api.user.private.me.avatar.debug.errorUploadingUserAvatar",
-        parseError(error),
-      );
+      logger.error("Error uploading user avatar", parseError(error));
       return fail({
-        message:
-          "app.api.user.private.me.avatar.errors.failed_to_upload_avatar",
+        message: t("errors.failed_to_upload_avatar"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { userId, error: String(error) },
       });
@@ -158,11 +158,10 @@ export class AvatarRepository {
     userId: DbId,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<AvatarDeleteResponseOutput>> {
     try {
-      logger.debug("app.api.user.private.me.avatar.debug.deletingUserAvatar", {
-        userId,
-      });
+      logger.debug("Deleting user avatar", { userId });
 
       // Check if user exists
       const userResponse = await UserRepository.getUserById(
@@ -173,7 +172,7 @@ export class AvatarRepository {
       );
       if (!userResponse.success) {
         return fail({
-          message: "app.api.user.private.me.avatar.errors.user_not_found",
+          message: t("errors.user_not_found"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { userId },
           cause: userResponse,
@@ -197,20 +196,16 @@ export class AvatarRepository {
 
       return success<AvatarDeleteResponseOutput>({
         success: true,
-        message: "app.api.user.private.me.avatar.success.deleted",
+        message: t("success.deleted"),
         nextSteps: [
-          "app.api.user.private.me.avatar.success.nextSteps.default",
-          "app.api.user.private.me.avatar.success.nextSteps.uploadNew",
+          t("success.nextSteps.default"),
+          t("success.nextSteps.uploadNew"),
         ],
       });
     } catch (error) {
-      logger.error(
-        "app.api.user.private.me.avatar.debug.errorDeletingUserAvatar",
-        parseError(error),
-      );
+      logger.error("Error deleting user avatar", parseError(error));
       return fail({
-        message:
-          "app.api.user.private.me.avatar.errors.failed_to_delete_avatar",
+        message: t("errors.failed_to_delete_avatar"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { userId, error: String(error) },
       });

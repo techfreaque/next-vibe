@@ -76,4 +76,9 @@ export const translations: typeof enTranslations = {
     title: "Snapshot erfolgreich aufgenommen",
     description: "Der Snapshot wurde erfolgreich aufgenommen",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    captureAutomation: "Erfassungs-Automatisierung",
+  },
 };

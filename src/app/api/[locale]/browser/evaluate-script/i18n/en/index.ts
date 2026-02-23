@@ -76,4 +76,9 @@ export const translations = {
     title: "Script Evaluated Successfully",
     description: "The JavaScript was executed successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    scriptExecution: "Script Execution",
+  },
 };

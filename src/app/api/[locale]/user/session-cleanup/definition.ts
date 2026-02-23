@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,144 +20,131 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["user", "session-cleanup"],
-  title: "app.api.user.sessionCleanup.post.title",
-  description: "app.api.user.sessionCleanup.post.description",
-  category: "app.api.user.category",
+  title: "post.title",
+  description: "post.description",
+  category: "category",
   icon: "trash",
-  tags: ["app.api.user.sessionCleanup.tag"],
+  tags: ["post.tag"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.user.sessionCleanup.post.container.title",
-      description: "app.api.user.sessionCleanup.post.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      sessionRetentionDays: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.container.title",
+    description: "post.container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      sessionRetentionDays: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.user.sessionCleanup.post.fields.sessionRetentionDays.label",
-        description:
-          "app.api.user.sessionCleanup.post.fields.sessionRetentionDays.description",
+        label: "post.fields.sessionRetentionDays.label",
+        description: "post.fields.sessionRetentionDays.description",
         columns: 6,
         schema: z.coerce.number().min(1).max(365).default(30),
       }),
 
-      tokenRetentionDays: requestField({
+      tokenRetentionDays: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.user.sessionCleanup.post.fields.tokenRetentionDays.label",
-        description:
-          "app.api.user.sessionCleanup.post.fields.tokenRetentionDays.description",
+        label: "post.fields.tokenRetentionDays.label",
+        description: "post.fields.tokenRetentionDays.description",
         columns: 6,
         schema: z.coerce.number().min(1).max(365).default(7),
       }),
 
-      batchSize: requestField({
+      batchSize: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.user.sessionCleanup.post.fields.batchSize.label",
-        description:
-          "app.api.user.sessionCleanup.post.fields.batchSize.description",
+        label: "post.fields.batchSize.label",
+        description: "post.fields.batchSize.description",
         columns: 6,
         schema: z.coerce.number().min(1).max(1000).default(100),
       }),
 
-      dryRun: requestField({
+      dryRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.user.sessionCleanup.post.fields.dryRun.label",
-        description:
-          "app.api.user.sessionCleanup.post.fields.dryRun.description",
+        label: "post.fields.dryRun.label",
+        description: "post.fields.dryRun.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
-      sessionsDeleted: responseField({
+      sessionsDeleted: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.user.sessionCleanup.post.response.sessionsDeleted",
+        content: "post.response.sessionsDeleted",
         schema: z.number(),
       }),
 
-      tokensDeleted: responseField({
+      tokensDeleted: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.user.sessionCleanup.post.response.tokensDeleted",
+        content: "post.response.tokensDeleted",
         schema: z.number(),
       }),
 
-      totalProcessed: responseField({
+      totalProcessed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.user.sessionCleanup.post.response.totalProcessed",
+        content: "post.response.totalProcessed",
         schema: z.number(),
       }),
 
-      executionTimeMs: responseField({
+      executionTimeMs: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.user.sessionCleanup.post.response.executionTimeMs",
+        content: "post.response.executionTimeMs",
         schema: z.number(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.user.sessionCleanup.post.errors.unauthorized.title",
-      description:
-        "app.api.user.sessionCleanup.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.user.sessionCleanup.post.errors.forbidden.title",
-      description:
-        "app.api.user.sessionCleanup.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.user.sessionCleanup.post.errors.server.title",
-      description: "app.api.user.sessionCleanup.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.user.sessionCleanup.post.errors.unknown.title",
-      description:
-        "app.api.user.sessionCleanup.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.user.sessionCleanup.post.errors.validation.title",
-      description:
-        "app.api.user.sessionCleanup.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.user.sessionCleanup.post.errors.unknown.title",
-      description:
-        "app.api.user.sessionCleanup.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.user.sessionCleanup.post.errors.unknown.title",
-      description:
-        "app.api.user.sessionCleanup.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.user.sessionCleanup.post.errors.unknown.title",
-      description:
-        "app.api.user.sessionCleanup.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.user.sessionCleanup.post.errors.unknown.title",
-      description:
-        "app.api.user.sessionCleanup.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
   },
 
   successTypes: {
-    title: "app.api.user.sessionCleanup.post.success.title",
-    description: "app.api.user.sessionCleanup.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   examples: {

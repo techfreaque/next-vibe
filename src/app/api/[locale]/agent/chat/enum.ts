@@ -5,6 +5,8 @@
 
 import { createEnumOptions } from "next-vibe/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "./i18n";
+
 export const NEW_MESSAGE_ID = "new";
 
 /**
@@ -31,23 +33,23 @@ export const ChatMessageRoleDB = [
 export const ChatMessageRoleOptions = [
   {
     value: ChatMessageRole.USER,
-    label: "app.api.agent.chat.enums.role.user" as const,
+    label: "chat.enums.role.user" as const,
   },
   {
     value: ChatMessageRole.ASSISTANT,
-    label: "app.api.agent.chat.enums.role.assistant" as const,
+    label: "chat.enums.role.assistant" as const,
   },
   {
     value: ChatMessageRole.SYSTEM,
-    label: "app.api.agent.chat.enums.role.system" as const,
+    label: "chat.enums.role.system" as const,
   },
   {
     value: ChatMessageRole.TOOL,
-    label: "app.api.agent.chat.enums.role.tool" as const,
+    label: "chat.enums.role.tool" as const,
   },
   {
     value: ChatMessageRole.ERROR,
-    label: "app.api.agent.chat.enums.role.error" as const,
+    label: "chat.enums.role.error" as const,
   },
 ];
 
@@ -58,10 +60,10 @@ export const {
   enum: ThreadStatus,
   options: ThreadStatusOptions,
   Value: ThreadStatusValue,
-} = createEnumOptions({
-  ACTIVE: "app.api.agent.chat.enums.threadStatus.active",
-  ARCHIVED: "app.api.agent.chat.enums.threadStatus.archived",
-  DELETED: "app.api.agent.chat.enums.threadStatus.deleted",
+} = createEnumOptions(scopedTranslation, {
+  ACTIVE: "enums.threadStatus.active",
+  ARCHIVED: "enums.threadStatus.archived",
+  DELETED: "enums.threadStatus.deleted",
 });
 
 export const ThreadStatusDB = [
@@ -77,11 +79,11 @@ export const {
   enum: ViewMode,
   options: ViewModeOptions,
   Value: ViewModeValue,
-} = createEnumOptions({
-  LINEAR: "app.api.agent.chat.enums.viewMode.linear",
-  THREADED: "app.api.agent.chat.enums.viewMode.threaded",
-  FLAT: "app.api.agent.chat.enums.viewMode.flat",
-  DEBUG: "app.api.agent.chat.enums.viewMode.debug",
+} = createEnumOptions(scopedTranslation, {
+  LINEAR: "enums.viewMode.linear",
+  THREADED: "enums.viewMode.threaded",
+  FLAT: "enums.viewMode.flat",
+  DEBUG: "enums.viewMode.debug",
 });
 
 export const ViewModeDB = [

@@ -76,4 +76,9 @@ export const translations = {
     title: "Fill Operation Successful",
     description: "The element was filled successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    inputAutomation: "Input Automation",
+  },
 };

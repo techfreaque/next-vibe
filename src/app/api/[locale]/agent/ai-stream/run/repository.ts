@@ -30,6 +30,7 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { AiStreamT } from "../i18n";
 import type { HeadlessPreCall } from "../repository/headless";
 import { runHeadlessAiStream } from "../repository/headless";
 import type {
@@ -104,6 +105,7 @@ export class AiStreamRunRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: AiStreamT,
   ): Promise<ResponseType<AiStreamRunPostResponseOutput>> {
     try {
       const {
@@ -113,7 +115,7 @@ export class AiStreamRunRepository {
         preCalls,
         instructions,
         maxTurns,
-        activeTools,
+        allowedTools,
         tools,
         appendThreadId,
         rootFolderId,
@@ -172,7 +174,7 @@ export class AiStreamRunRepository {
         character,
         prompt,
         availableTools: tools ?? [], // default: no tools (explicit opt-in); null = all tools
-        activeTools: activeTools ?? null, // null = all tools permitted
+        allowedTools: allowedTools ?? null, // null = all tools permitted
         headlessInstructions: instructions,
         maxTurns: maxTurns ?? 1,
         threadMode: headlessThreadMode,
@@ -183,28 +185,39 @@ export class AiStreamRunRepository {
         user,
         locale,
         logger,
+        t,
       });
 
       if (!streamResult.success) {
         return streamResult;
       }
 
-      const { lastAiMessageId, threadId } = streamResult.data;
+      const { lastAiMessageId, threadId, lastAiMessageContent } =
+        streamResult.data;
 
       // ── Step 4: Read message content + tokens from DB ───────────────────
-      const [aiMessage] = await db
-        .select({
-          content: chatMessages.content,
-          metadata: chatMessages.metadata,
-        })
-        .from(chatMessages)
-        .where(eq(chatMessages.id, lastAiMessageId))
-        .limit(1);
+      // For incognito mode, messages aren't persisted — use in-memory content directly.
+      // For persistent modes, DB read also provides token metadata.
+      let rawText: string | null = lastAiMessageContent ?? null;
+      let promptTokens: number | null = null;
+      let completionTokens: number | null = null;
 
-      const rawText = aiMessage?.content ?? null;
+      if (!isIncognito) {
+        const [aiMessage] = await db
+          .select({
+            content: chatMessages.content,
+            metadata: chatMessages.metadata,
+          })
+          .from(chatMessages)
+          .where(eq(chatMessages.id, lastAiMessageId))
+          .limit(1);
+
+        rawText = aiMessage?.content ?? rawText;
+        promptTokens = aiMessage?.metadata?.promptTokens ?? null;
+        completionTokens = aiMessage?.metadata?.completionTokens ?? null;
+      }
+
       const text = rawText ? stripThinkTags(rawText) : null;
-      const promptTokens = aiMessage?.metadata?.promptTokens ?? null;
-      const completionTokens = aiMessage?.metadata?.completionTokens ?? null;
       const resultThreadId =
         (headlessThreadMode !== "none" ? threadId : null) ?? null;
 
@@ -252,7 +265,7 @@ export class AiStreamRunRepository {
       const msg = parseError(error).message;
       logger.error("[AiStreamRun] Failed", { error: msg });
       return fail({
-        message: msg,
+        message: t("errors.unexpectedError"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: msg },
       });

@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Server Management",
+
   tag: "Health",
   get: {
     title: "Health Check",

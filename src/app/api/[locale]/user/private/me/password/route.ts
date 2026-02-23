@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: passwordEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ user, data, locale, logger }) =>
-      PasswordUpdateRepository.updatePassword(user, data, locale, logger),
+    handler: ({ user, data, locale, logger, t }) =>
+      PasswordUpdateRepository.updatePassword(user, data, locale, logger, t),
   },
 });

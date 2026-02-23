@@ -6,8 +6,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -15,18 +15,19 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { UserRole } from "../../user-roles/enum";
+import { scopedTranslation } from "../i18n";
 
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["user", "auth", "check"],
-  title: "app.api.user.auth.check.get.title" as const,
-  description: "app.api.user.auth.check.get.description" as const,
+  title: "check.get.title",
+  description: "check.get.description",
   icon: "shield",
-  category: "app.api.user.category" as const,
-  tags: ["app.api.user.search.tag" as const],
+  category: "category",
+  tags: ["search.tag"],
   allowedRoles: [
     UserRole.PUBLIC,
     UserRole.CUSTOMER,
@@ -34,47 +35,66 @@ const { GET } = createEndpoint({
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
   ] as const,
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.user.auth.check.get.response.title" as const,
-      description: "app.api.user.auth.check.get.response.description" as const,
-      layoutType: LayoutType.VERTICAL,
-    },
-    { response: true },
-    {
-      authenticated: responseField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "check.get.response.title",
+    description: "check.get.response.description",
+    layoutType: LayoutType.VERTICAL,
+    usage: { response: true },
+    children: {
+      authenticated: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        text: "app.api.user.auth.check.get.response.authenticated" as const,
+        text: "check.get.response.authenticated",
         schema: z.boolean(),
       }),
-      tokenValid: responseField({
+      tokenValid: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        text: "app.api.user.auth.check.get.response.tokenValid" as const,
+        text: "check.get.response.tokenValid",
         schema: z.boolean(),
       }),
     },
-  ),
+  }),
   errorTypes: {
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.user.auth.post.errors.server.title" as const,
-      description: "app.api.user.auth.post.errors.server.description" as const,
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.user.auth.post.errors.unauthorized.title" as const,
-      description:
-        "app.api.user.auth.post.errors.unauthorized.description" as const,
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
-  } as Record<
-    EndpointErrorTypes,
-    {
-      title: TranslationKey;
-      description: TranslationKey;
-    }
-  >,
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
+    },
+  },
   successTypes: {
-    title: "app.api.user.auth.check.get.title" as const,
-    description: "app.api.user.auth.check.get.description" as const,
+    title: "check.get.title",
+    description: "check.get.description",
   },
   examples: {
     responses: {

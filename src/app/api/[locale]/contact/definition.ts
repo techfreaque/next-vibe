@@ -19,7 +19,7 @@ import {
   scopedObjectField,
   scopedRequestField,
   scopedResponseField,
-  widgetField,
+  scopedWidgetField,
 } from "../system/unified-interface/shared/field/utils-new";
 import {
   ContactPriority,
@@ -125,7 +125,7 @@ const { POST } = createEndpoint({
         columns: 12,
       }),
 
-      submitButton: widgetField({
+      submitButton: scopedWidgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
         text: "form.submitButton.label",
         loadingText: "form.submitButton.loadingText",

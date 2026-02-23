@@ -1,4 +1,10 @@
 export const translations = {
+  category: "Leads",
+  tags: {
+    leads: "Leads",
+    batch: "Batch",
+  },
+
   patch: {
     title: "Batch Update",
     description: "Batch update leads based on filter criteria",

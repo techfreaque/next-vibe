@@ -9,12 +9,11 @@ import { parseError } from "next-vibe/shared/utils";
 import { createElement } from "react";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
-import type { InferJwtPayloadTypeFromRoles } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
-import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { InkEndpointRenderer } from "../cli/CliEndpointRenderer";
@@ -32,7 +31,7 @@ export class McpResultFormatter {
     endpoint: CreateApiEndpointAny | null,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
+    user: JwtPayloadType,
   ): string {
     if (!endpoint || !data) {
       // Fallback to JSON if no endpoint definition
@@ -65,7 +64,7 @@ export class McpResultFormatter {
     endpoint: CreateApiEndpointAny,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
+    user: JwtPayloadType,
   ): string {
     try {
       const perfStart = performance.now();

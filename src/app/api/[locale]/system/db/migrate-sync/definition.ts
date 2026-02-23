@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,149 +20,136 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../user/user-roles/enum";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "db", "migrate-sync"],
-  title: "app.api.system.db.migrateSync.post.title",
-  description: "app.api.system.db.migrateSync.post.description",
-  category: "app.api.system.category",
-  tags: ["app.api.system.db.migrateSync.tag"],
+  title: "post.title",
+  description: "post.description",
+  category: "category",
+  tags: ["tag"],
   icon: "refresh-cw",
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],
   aliases: ["migrate-sync", "db:migrate-sync"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.db.migrateSync.post.form.title",
-      description: "app.api.system.db.migrateSync.post.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.form.title",
+    description: "post.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      force: requestField({
+      force: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.db.migrateSync.fields.force.title",
-        description: "app.api.system.db.migrateSync.fields.force.description",
+        label: "fields.force.title",
+        description: "fields.force.description",
         columns: 6,
         schema: z.boolean().optional().default(false),
       }),
 
-      dryRun: requestField({
+      dryRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.db.migrateSync.fields.dryRun.title",
-        description: "app.api.system.db.migrateSync.fields.dryRun.description",
+        label: "fields.dryRun.title",
+        description: "fields.dryRun.description",
         columns: 6,
         schema: z.boolean().optional().default(false),
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.migrateSync.fields.success.title",
+        content: "fields.success.title",
         schema: z.boolean(),
       }),
 
-      output: responseField({
+      output: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.migrateSync.fields.output.title",
+        content: "fields.output.title",
         schema: z.string(),
       }),
 
-      trackingCleared: responseField({
+      trackingCleared: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.migrateSync.fields.trackingCleared.title",
+        content: "fields.trackingCleared.title",
         schema: z.boolean(),
       }),
 
-      trackingFilesCreated: responseField({
+      trackingFilesCreated: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.db.migrateSync.fields.trackingFilesCreated.title",
+        content: "fields.trackingFilesCreated.title",
         schema: z.boolean(),
       }),
 
-      drizzleMigrationRun: responseField({
+      drizzleMigrationRun: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.db.migrateSync.fields.drizzleMigrationRun.title",
+        content: "fields.drizzleMigrationRun.title",
         schema: z.boolean(),
       }),
 
-      originalFilesRestored: responseField({
+      originalFilesRestored: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.db.migrateSync.fields.originalFilesRestored.title",
+        content: "fields.originalFilesRestored.title",
         schema: z.boolean(),
       }),
 
-      migrationsProcessed: responseField({
+      migrationsProcessed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.db.migrateSync.fields.migrationsProcessed.title",
+        content: "fields.migrationsProcessed.title",
         schema: z.coerce.number(),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.db.migrateSync.post.errors.validation.title",
-      description:
-        "app.api.system.db.migrateSync.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.db.migrateSync.post.errors.network.title",
-      description:
-        "app.api.system.db.migrateSync.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.db.migrateSync.post.errors.unauthorized.title",
-      description:
-        "app.api.system.db.migrateSync.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.db.migrateSync.post.errors.forbidden.title",
-      description:
-        "app.api.system.db.migrateSync.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.db.migrateSync.post.errors.notFound.title",
-      description:
-        "app.api.system.db.migrateSync.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.db.migrateSync.post.errors.server.title",
-      description:
-        "app.api.system.db.migrateSync.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.db.migrateSync.post.errors.unknown.title",
-      description:
-        "app.api.system.db.migrateSync.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.db.migrateSync.post.errors.server.title",
-      description:
-        "app.api.system.db.migrateSync.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.db.migrateSync.post.errors.conflict.title",
-      description:
-        "app.api.system.db.migrateSync.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.system.db.migrateSync.post.success.title",
-    description: "app.api.system.db.migrateSync.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   // === EXAMPLES ===

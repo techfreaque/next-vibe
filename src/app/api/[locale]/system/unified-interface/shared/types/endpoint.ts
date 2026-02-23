@@ -112,7 +112,9 @@ type _InferSchemaFromFieldImpl<F, Usage extends FieldUsage> =
               ? never
               : K]: _InferSchemaFromFieldImpl<Normalize<TChildren[K]>, Usage>;
           } extends infer TShape extends z.ZodRawShape
-          ? z.ZodObject<TShape>
+          ? keyof TShape extends never
+            ? z.ZodNever // All children resolved to never (e.g., widget-only children like submit buttons)
+            : z.ZodObject<TShape>
           : z.ZodNever
         : z.ZodNever
       : // Handle ObjectUnionField - use string for pattern matching
@@ -158,7 +160,9 @@ type _InferSchemaFromFieldImpl<F, Usage extends FieldUsage> =
                   Usage
                 >;
               } extends infer TShape extends z.ZodRawShape
-              ? z.ZodOptional<z.ZodNullable<z.ZodObject<TShape>>>
+              ? keyof TShape extends never
+                ? z.ZodNever // All children resolved to never (widget-only children)
+                : z.ZodOptional<z.ZodNullable<z.ZodObject<TShape>>>
               : z.ZodNever
             : z.ZodNever
           : // Handle ArrayField - match on widget config structure directly

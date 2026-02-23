@@ -73,6 +73,10 @@ export const translations: typeof enTranslations = {
     label: "Poziom logowania",
     description: "Ustaw poziom szczegółowości logowania",
     placeholder: "Wybierz poziom logowania",
+    error: "Błąd",
+    warn: "Ostrzeżenie",
+    info: "Info",
+    debug: "Debug",
   },
   debugMode: {
     label: "Tryb debugowania",
@@ -86,6 +90,11 @@ export const translations: typeof enTranslations = {
     unauthorized: {
       title: "Brak autoryzacji",
       description: "Nie masz uprawnień do dostępu do tego zasobu",
+    },
+  },
+  get: {
+    response: {
+      message: "Konfiguracja IMAP załadowana pomyślnie",
     },
   },
   update: {

@@ -6,9 +6,9 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { defaultLocale } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared.js";
+import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
+import { scopedTranslation as launchpadScopedTranslation } from "../../i18n";
 import type { VersionBumpType } from "../types/types.js";
 import { getRootDirectory, loadConfig } from "../utils/config.js";
 import { cloneMissingRepos } from "./clone-missing.js";
@@ -39,8 +39,6 @@ interface ForceReleaseOptions {
 
 const program = new Command();
 
-const locale = defaultLocale;
-
 program
   .name("launchpad")
   .description(
@@ -55,7 +53,7 @@ program
   .action(async () => {
     const logger = createEndpointLogger(false, Date.now(), defaultLocale);
 
-    await runInteractiveMode(logger);
+    await runInteractiveMode(logger, defaultLocale);
   });
 
 // Release orchestration commands
@@ -71,7 +69,13 @@ program
     const logger = createEndpointLogger(false, Date.now(), defaultLocale);
     try {
       const rootDir = process.cwd();
-      await ciReleaseCommand(logger, rootDir, options.target, options.tag);
+      await ciReleaseCommand(
+        logger,
+        defaultLocale,
+        rootDir,
+        options.target,
+        options.tag,
+      );
     } catch (error) {
       handleError(logger, "CI release failed:", error);
     }
@@ -84,7 +88,7 @@ program
     const logger = createEndpointLogger(false, Date.now(), defaultLocale);
     try {
       const rootDir = process.cwd();
-      forceUpdateAllCommand(logger, rootDir);
+      forceUpdateAllCommand(logger, rootDir, defaultLocale);
     } catch (error) {
       handleError(logger, "Force update failed:", error);
     }
@@ -97,7 +101,7 @@ program
     const logger = createEndpointLogger(false, Date.now(), defaultLocale);
     try {
       const rootDir = process.cwd();
-      await releaseAllCommand(logger, rootDir);
+      await releaseAllCommand(logger, rootDir, defaultLocale);
     } catch (error) {
       handleError(logger, "Release all failed:", error);
     }
@@ -135,7 +139,7 @@ program
         }
       }
 
-      await forceReleaseCommand(logger, rootDir, versionBump);
+      await forceReleaseCommand(logger, rootDir, defaultLocale, versionBump);
     } catch (error) {
       handleError(logger, "Force release failed:", error);
     }
@@ -145,8 +149,8 @@ program
   .command("continue")
   .description("Continue release from previous state")
   .action(async () => {
-    const logger = createEndpointLogger(false, Date.now(), locale);
-    const { t } = simpleT(locale);
+    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
+    const { t } = launchpadScopedTranslation.scopedT(defaultLocale);
     try {
       const rootDir = process.cwd();
       await continueReleaseCommand(logger, rootDir, t);
@@ -159,7 +163,7 @@ program
   .command("status")
   .description("Show current release status")
   .action(() => {
-    const logger = createEndpointLogger(false, Date.now(), locale);
+    const logger = createEndpointLogger(false, Date.now(), defaultLocale);
     try {
       const rootDir = process.cwd();
       showReleaseStatusCommand(logger, rootDir);
@@ -176,7 +180,7 @@ program
     const logger = createEndpointLogger(false, Date.now(), defaultLocale);
     try {
       const rootDir = process.cwd();
-      await weeklyUpdateCommand(logger, rootDir, options.branch);
+      await weeklyUpdateCommand(logger, rootDir, defaultLocale, options.branch);
     } catch (error) {
       handleError(logger, "Weekly update failed:", error);
     }
@@ -192,8 +196,11 @@ function handleError(
   process.exit(1);
 }
 
-async function runInteractiveMode(logger: EndpointLogger): Promise<void> {
-  const { t } = simpleT(defaultLocale);
+async function runInteractiveMode(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<void> {
+  const { t } = launchpadScopedTranslation.scopedT(locale);
   logger.info("🚀 PWE Launchpad");
 
   const { action } = (await inquirer.prompt([
@@ -262,13 +269,13 @@ async function runInteractiveMode(logger: EndpointLogger): Promise<void> {
 
       // New release orchestration
       case "force-update-all":
-        forceUpdateAllCommand(logger, rootDir);
+        forceUpdateAllCommand(logger, rootDir, locale);
         break;
       case "release-all":
-        await releaseAllCommand(logger, rootDir);
+        await releaseAllCommand(logger, rootDir, locale);
         break;
       case "force-release":
-        await forceReleaseCommand(logger, rootDir);
+        await forceReleaseCommand(logger, rootDir, locale);
         break;
       case "continue-release":
         await continueReleaseCommand(logger, rootDir, t);
@@ -290,7 +297,7 @@ program.parse();
 // If no command was provided, run interactive mode
 if (process.argv.slice(2).length === 0) {
   const logger = createEndpointLogger(false, Date.now(), defaultLocale);
-  runInteractiveMode(logger).catch((error) => {
+  runInteractiveMode(logger, defaultLocale).catch((error) => {
     handleError(logger, "An unexpected error occurred:", error);
   });
 }

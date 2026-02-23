@@ -73,4 +73,9 @@ export const translations: typeof enTranslations = {
     title: "Operacja oczekiwania pomyślna",
     description: "Określony tekst pojawił się na stronie",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    waitAutomation: "Automatyzacja oczekiwania",
+  },
 };

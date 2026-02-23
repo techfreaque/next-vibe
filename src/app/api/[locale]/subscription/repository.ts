@@ -18,8 +18,8 @@ import type Stripe from "stripe";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation as checkoutScopedTranslation } from "../payment/checkout/i18n";
 import { SubscriptionCheckoutRepositoryImpl } from "../payment/checkout/repository";
 import { PaymentProvider, type PaymentProviderValue } from "../payment/enum";
 import { getPaymentProvider } from "../payment/providers";
@@ -43,6 +43,7 @@ import type {
   SubscriptionStatusValue,
 } from "./enum";
 import { SubscriptionPlan, SubscriptionStatus } from "./enum";
+import { scopedTranslation } from "./i18n";
 import type {
   SubscriptionUpdatePutRequestOutput,
   SubscriptionUpdatePutResponseOutput,
@@ -103,9 +104,9 @@ export class SubscriptionRepository {
   static async getSubscription(
     userId: string,
     logger: EndpointLogger,
-    // oxlint-disable-next-line no-unused-vars - locale is unused on server, but required on native
     locale: CountryLanguage,
   ): Promise<ResponseType<SubscriptionGetResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const results = await db
         .select()
@@ -116,7 +117,7 @@ export class SubscriptionRepository {
 
       if (results.length === 0) {
         return fail({
-          message: "app.api.subscription.errors.not_found",
+          message: t("errors.not_found"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -208,8 +209,12 @@ export class SubscriptionRepository {
                 try {
                   const { CreditRepository } =
                     await import("../credits/repository");
+                  const { scopedTranslation: creditsScopedTranslation } =
+                    await import("../credits/i18n");
                   const { productsRepository, ProductIds } =
                     await import("../products/repository-client");
+                  const { t: creditsT } =
+                    creditsScopedTranslation.scopedT(locale);
 
                   const productId =
                     subscription.planId === SubscriptionPlan.SUBSCRIPTION
@@ -242,6 +247,7 @@ export class SubscriptionRepository {
                       product.credits,
                       "subscription",
                       logger,
+                      creditsT,
                       expiresAt,
                       sessionId,
                     );
@@ -323,7 +329,7 @@ export class SubscriptionRepository {
     } catch (error) {
       logger.error("Error getting subscription:", parseError(error));
       return fail({
-        message: "app.api.subscription.errors.database_error",
+        message: t("errors.database_error"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -344,6 +350,7 @@ export class SubscriptionRepository {
     });
 
     // Create checkout session via checkout repository
+    const { t: checkoutT } = checkoutScopedTranslation.scopedT(locale);
     const checkoutRepo = new SubscriptionCheckoutRepositoryImpl();
     return await checkoutRepo.createCheckoutSession(
       {
@@ -354,6 +361,7 @@ export class SubscriptionRepository {
       user,
       locale,
       logger,
+      checkoutT,
     );
   }
 
@@ -363,7 +371,7 @@ export class SubscriptionRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<SubscriptionUpdatePutResponseOutput>> {
-    const { t } = simpleT(locale);
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const currentSubscription = await db
         .select()
@@ -373,10 +381,10 @@ export class SubscriptionRepository {
 
       if (!currentSubscription[0]) {
         return fail({
-          message: "app.api.subscription.errors.not_found",
+          message: t("errors.not_found"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: {
-            error: t("app.api.subscription.errors.not_found_description"),
+            error: t("errors.not_found_description"),
           },
         });
       }
@@ -400,10 +408,10 @@ export class SubscriptionRepository {
 
       if (results.length === 0) {
         return fail({
-          message: "app.api.subscription.errors.not_found",
+          message: t("errors.not_found"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: {
-            error: t("app.api.subscription.errors.not_found_description"),
+            error: t("errors.not_found_description"),
           },
         });
       }
@@ -423,12 +431,12 @@ export class SubscriptionRepository {
         cancelAtPeriodEnd: updatedSubscription.cancelAtPeriodEnd,
         createdAt: updatedSubscription.createdAt.toISOString(),
         updatedAt: updatedSubscription.updatedAt.toISOString(),
-        message: "app.api.subscription.update.success",
+        message: t("put.success.title"),
       });
     } catch (error) {
       logger.error("Error updating subscription:", parseError(error));
       return fail({
-        message: "app.api.subscription.errors.database_error",
+        message: t("errors.database_error"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -441,9 +449,8 @@ export class SubscriptionRepository {
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<SubscriptionCancelDeleteResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
-      const { t } = simpleT(locale);
-
       const currentSubscription = await db
         .select()
         .from(subscriptions)
@@ -452,7 +459,7 @@ export class SubscriptionRepository {
 
       if (!currentSubscription[0]) {
         return fail({
-          message: "app.api.subscription.errors.not_found",
+          message: t("errors.not_found"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -465,6 +472,7 @@ export class SubscriptionRepository {
         const cancelResult = await provider.cancelSubscription(
           subscription.providerSubscriptionId,
           logger,
+          locale,
         );
 
         if (!cancelResult.success) {
@@ -494,19 +502,19 @@ export class SubscriptionRepository {
 
       if (results.length === 0) {
         return fail({
-          message: "app.api.subscription.errors.not_found",
+          message: t("errors.not_found"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       return success({
         success: true,
-        message: t("app.api.subscription.cancel.success"),
+        message: t("cancel.success"),
       });
     } catch (error) {
       logger.error("Error canceling subscription:", parseError(error));
       return fail({
-        message: "app.api.subscription.errors.cancel_failed",
+        message: t("errors.cancel_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -520,6 +528,7 @@ export class SubscriptionRepository {
   static async handleSubscriptionCheckout(
     session: WebhookData,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<void> {
     try {
       const userId = session.metadata?.userId;
@@ -553,6 +562,7 @@ export class SubscriptionRepository {
       const subscriptionResult = await provider.retrieveSubscription(
         providerSubscriptionId,
         logger,
+        locale,
       );
 
       if (!subscriptionResult.success) {
@@ -595,10 +605,28 @@ export class SubscriptionRepository {
           },
         });
 
+      // Look up user's locale from DB for credit/product translations
+      let userLocale: CountryLanguage = locale;
+      if (userId) {
+        const { users: usersTable } = await import("../user/db");
+        const { eq: eqUser } = await import("drizzle-orm");
+        const [userRow] = await db
+          .select({ locale: usersTable.locale })
+          .from(usersTable)
+          .where(eqUser(usersTable.id, userId as string))
+          .limit(1);
+        if (userRow?.locale) {
+          userLocale = userRow.locale;
+        }
+      }
+
       // Add subscription credits with expiration date
       const { CreditRepository } = await import("../credits/repository");
+      const { scopedTranslation: creditsScopedTranslation } =
+        await import("../credits/i18n");
       const { productsRepository, ProductIds } =
         await import("../products/repository-client");
+      const { t: creditsT } = creditsScopedTranslation.scopedT(userLocale);
 
       // Map subscription plan to product ID
       const productId =
@@ -607,7 +635,7 @@ export class SubscriptionRepository {
           : null;
 
       if (productId) {
-        const product = productsRepository.getProduct(productId, "en-GLOBAL");
+        const product = productsRepository.getProduct(productId, userLocale);
         const expiresAt = subscriptionResult.data.currentPeriodEnd
           ? new Date(subscriptionResult.data.currentPeriodEnd)
           : null;
@@ -635,6 +663,7 @@ export class SubscriptionRepository {
           product.credits,
           "subscription",
           logger,
+          creditsT,
           expiresAt ?? undefined,
           session.id, // Pass sessionId for idempotency tracking
         );
@@ -666,6 +695,7 @@ export class SubscriptionRepository {
     invoice: WebhookData,
     subscriptionId: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<void> {
     try {
       const invoiceData = invoice as Stripe.Invoice & {
@@ -705,6 +735,7 @@ export class SubscriptionRepository {
       const subscriptionResult = await provider.retrieveSubscription(
         subscriptionId,
         logger,
+        locale,
       );
 
       if (!subscriptionResult.success) {
@@ -745,8 +776,27 @@ export class SubscriptionRepository {
 
         // This is a renewal - add monthly credits with expiration
         const { CreditRepository } = await import("../credits/repository");
+        const { scopedTranslation: creditsScopedTranslation } =
+          await import("../credits/i18n");
         const { productsRepository, ProductIds } =
           await import("../products/repository-client");
+
+        // Look up user's locale from DB for credit/product translations
+        let userLocaleForInvoice: CountryLanguage = locale;
+        {
+          const { users: usersTable } = await import("../user/db");
+          const { eq: eqUser } = await import("drizzle-orm");
+          const [userRow] = await db
+            .select({ locale: usersTable.locale })
+            .from(usersTable)
+            .where(eqUser(usersTable.id, subscription.userId))
+            .limit(1);
+          if (userRow?.locale) {
+            userLocaleForInvoice = userRow.locale;
+          }
+        }
+        const { t: creditsT } =
+          creditsScopedTranslation.scopedT(userLocaleForInvoice);
 
         const productId =
           subscription.planId === SubscriptionPlan.SUBSCRIPTION
@@ -754,7 +804,10 @@ export class SubscriptionRepository {
             : null;
 
         if (productId) {
-          const product = productsRepository.getProduct(productId, "en-GLOBAL");
+          const product = productsRepository.getProduct(
+            productId,
+            userLocaleForInvoice,
+          );
           const expiresAt = subscriptionResult.data.currentPeriodEnd
             ? new Date(subscriptionResult.data.currentPeriodEnd)
             : null;
@@ -792,6 +845,7 @@ export class SubscriptionRepository {
             product.credits,
             "subscription",
             logger,
+            creditsT,
             expiresAt ?? undefined,
             invoiceId, // Pass invoiceId as sessionId for idempotency tracking
           );
@@ -836,6 +890,8 @@ export class SubscriptionRepository {
     invoice: WebhookData,
     subscriptionId: string,
     logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
   ): Promise<void> {
     try {
       const invoiceId = (invoice as { id?: string }).id;
@@ -909,6 +965,8 @@ export class SubscriptionRepository {
   static async handleSubscriptionCanceled(
     subscriptionId: string,
     logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
   ): Promise<void> {
     try {
       const [subscription] = await db
@@ -952,6 +1010,7 @@ export class SubscriptionRepository {
   static async handleSubscriptionUpdated(
     stripeSubscription: Stripe.Subscription,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<void> {
     try {
       const [subscription] = await db
@@ -1027,8 +1086,27 @@ export class SubscriptionRepository {
         });
 
         const { CreditRepository } = await import("../credits/repository");
+        const { scopedTranslation: creditsScopedTranslation } =
+          await import("../credits/i18n");
         const { productsRepository, ProductIds } =
           await import("../products/repository-client");
+
+        // Look up user's locale from DB for credit/product translations
+        let userLocaleForUpdate: CountryLanguage = locale;
+        {
+          const { users: usersTable } = await import("../user/db");
+          const { eq: eqUser } = await import("drizzle-orm");
+          const [userRow] = await db
+            .select({ locale: usersTable.locale })
+            .from(usersTable)
+            .where(eqUser(usersTable.id, subscription.userId))
+            .limit(1);
+          if (userRow?.locale) {
+            userLocaleForUpdate = userRow.locale;
+          }
+        }
+        const { t: creditsT } =
+          creditsScopedTranslation.scopedT(userLocaleForUpdate);
 
         const productId =
           subscription.planId === SubscriptionPlan.SUBSCRIPTION
@@ -1036,7 +1114,10 @@ export class SubscriptionRepository {
             : null;
 
         if (productId) {
-          const product = productsRepository.getProduct(productId, "en-GLOBAL");
+          const product = productsRepository.getProduct(
+            productId,
+            userLocaleForUpdate,
+          );
 
           // Use subscription update event ID for idempotency
           const eventId = `sub_update_${fullSubscription.id}_${newPeriodEnd.getTime()}`;
@@ -1056,6 +1137,7 @@ export class SubscriptionRepository {
               product.credits,
               "subscription",
               logger,
+              creditsT,
               newPeriodEnd,
               eventId,
             );
@@ -1096,7 +1178,9 @@ export class SubscriptionRepository {
   static async syncSubscriptionWithStripe(
     userId: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<{ message: string; changes: string[] }>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const changes: string[] = [];
 
@@ -1109,14 +1193,14 @@ export class SubscriptionRepository {
 
       if (!localSubscription) {
         return fail({
-          message: "app.api.subscription.errors.not_found",
+          message: t("errors.not_found"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       if (!localSubscription.providerSubscriptionId) {
         return fail({
-          message: "app.api.subscription.errors.no_provider_id",
+          message: t("errors.no_provider_id"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
@@ -1162,7 +1246,7 @@ export class SubscriptionRepository {
             subscriptionId: localSubscription.providerSubscriptionId,
           });
           return fail({
-            message: "app.api.subscription.sync.stripe_error",
+            message: t("sync.stripe_error"),
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
             messageParams: { error: parseError(error).message },
           });
@@ -1218,7 +1302,13 @@ export class SubscriptionRepository {
 
       // Expire old credit packs
       const { CreditRepository } = await import("../credits/repository");
-      const expiryResult = await CreditRepository.expireCredits(logger);
+      const { scopedTranslation: creditsScopedTranslation } =
+        await import("../credits/i18n");
+      const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
+      const expiryResult = await CreditRepository.expireCredits(
+        logger,
+        creditsT,
+      );
 
       if (expiryResult.success && expiryResult.data > 0) {
         changes.push(`Expired ${expiryResult.data} credit pack(s)`);
@@ -1230,7 +1320,7 @@ export class SubscriptionRepository {
       });
 
       return success({
-        message: "app.api.subscription.sync.success",
+        message: t("sync.success"),
         changes,
       });
     } catch (error) {
@@ -1239,7 +1329,7 @@ export class SubscriptionRepository {
         userId,
       });
       return fail({
-        message: "app.api.subscription.sync.failed",
+        message: t("sync.failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

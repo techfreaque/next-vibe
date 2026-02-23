@@ -1,4 +1,8 @@
 export const translations = {
+  category: "Email Communication",
+  tags: {
+    messaging: "Messaging",
+  },
   title: "Create Messaging Account",
   description: "Add a new SMS, WhatsApp, or Telegram provider account",
 

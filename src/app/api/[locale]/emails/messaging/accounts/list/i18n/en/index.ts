@@ -1,4 +1,8 @@
 export const translations = {
+  category: "Email Communication",
+  tags: {
+    messaging: "Messaging",
+  },
   title: "Messaging Accounts",
   description: "Manage SMS, WhatsApp, and Telegram provider accounts",
 

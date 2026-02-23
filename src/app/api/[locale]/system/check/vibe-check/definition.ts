@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
-  widgetField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
+  scopedWidgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,14 +21,16 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../user/user-roles/enum";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "check", "vibe-check"],
-  title: "app.api.system.check.vibeCheck.title",
-  description: "app.api.system.check.vibeCheck.description",
-  category: "app.api.system.category",
-  tags: ["app.api.system.check.vibeCheck.tag"],
+  title: "title",
+  description: "description",
+  category: "category",
+  tags: ["tag"],
   icon: "wrench",
   allowedRoles: [
     UserRole.ADMIN,
@@ -44,130 +46,124 @@ const { POST } = createEndpoint({
     firstCliArgKey: "paths",
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      title: widgetField({
+      title: scopedWidgetField(scopedTranslation, {
         type: WidgetType.TITLE,
-        content: "app.api.system.check.vibeCheck.title",
+        content: "title",
         level: 1,
         columns: 12,
         usage: { request: "data" },
       }),
 
       // Default: check.config.ts vibeCheck.fix ?? false
-      fix: requestField({
+      fix: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.check.vibeCheck.fields.fix.label",
-        description: "app.api.system.check.vibeCheck.fields.fix.description",
+        label: "fields.fix.label",
+        description: "fields.fix.description",
         columns: 4,
         schema: z.boolean().optional(),
       }),
 
       // Default: check.config.ts vibeCheck.timeout ?? 3600
-      timeout: requestField({
+      timeout: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.system.check.vibeCheck.fields.timeoutSeconds.label",
-        description:
-          "app.api.system.check.vibeCheck.fields.timeoutSeconds.description",
+        label: "fields.timeoutSeconds.label",
+        description: "fields.timeoutSeconds.description",
         columns: 4,
         schema: z.coerce.number().min(1).max(36000).optional(),
       }),
 
-      paths: requestField({
+      paths: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TAGS,
-        label: "app.api.system.check.vibeCheck.fields.paths.label",
-        description: "app.api.system.check.vibeCheck.fields.paths.description",
-        placeholder: "app.api.system.check.vibeCheck.fields.paths.placeholder",
+        label: "fields.paths.label",
+        description: "fields.paths.description",
+        placeholder: "fields.paths.placeholder",
         columns: 8,
         options: [
           {
             value: "src/",
-            label: "app.api.system.check.vibeCheck.fields.paths.options.src",
+            label: "fields.paths.options.src",
           },
           {
             value: "src/components",
-            label:
-              "app.api.system.check.vibeCheck.fields.paths.options.components",
+            label: "fields.paths.options.components",
           },
           {
             value: "src/utils",
-            label: "app.api.system.check.vibeCheck.fields.paths.options.utils",
+            label: "fields.paths.options.utils",
           },
           {
             value: "src/pages",
-            label: "app.api.system.check.vibeCheck.fields.paths.options.pages",
+            label: "fields.paths.options.pages",
           },
           {
             value: "src/app",
-            label: "app.api.system.check.vibeCheck.fields.paths.options.app",
+            label: "fields.paths.options.app",
           },
         ],
         schema: z.union([z.string(), z.array(z.string())]).optional(),
       }),
 
       // Default: check.config.ts vibeCheck.limit ?? 200
-      limit: requestField({
+      limit: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.system.check.vibeCheck.fields.limit.label",
-        description: "app.api.system.check.vibeCheck.fields.limit.description",
+        label: "fields.limit.label",
+        description: "fields.limit.description",
         columns: 4,
         schema: z.coerce.number().min(1).optional(),
       }),
 
       // Default: 1 (not configurable in check.config.ts)
-      page: requestField({
+      page: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.system.check.vibeCheck.fields.page.label",
-        description: "app.api.system.check.vibeCheck.fields.page.description",
+        label: "fields.page.label",
+        description: "fields.page.description",
         columns: 4,
         schema: z.coerce.number().min(1).optional().default(1),
       }),
 
       // Filter issues by file path, message, or rule
-      filter: requestField({
+      filter: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.check.vibeCheck.fields.filter.label",
-        description: "app.api.system.check.vibeCheck.fields.filter.description",
-        placeholder: "app.api.system.check.vibeCheck.fields.filter.placeholder",
+        label: "fields.filter.label",
+        description: "fields.filter.description",
+        placeholder: "fields.filter.placeholder",
         columns: 8,
         schema: z.union([z.string(), z.array(z.string())]).optional(),
       }),
 
       // Only return summary stats, omit items and files lists
-      summaryOnly: requestField({
+      summaryOnly: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.check.vibeCheck.fields.summaryOnly.label",
-        description:
-          "app.api.system.check.vibeCheck.fields.summaryOnly.description",
+        label: "fields.summaryOnly.label",
+        description: "fields.summaryOnly.description",
         columns: 4,
         schema: z.boolean().default(false),
       }),
 
       // === RESPONSE FIELDS ===
-      editorUriSchema: responseField({
+      editorUriSchema: scopedResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.check.vibeCheck.fields.editorUriScheme.label",
-        description:
-          "app.api.system.check.vibeCheck.fields.editorUriScheme.description",
+        label: "fields.editorUriScheme.label",
+        description: "fields.editorUriScheme.description",
         columns: 8,
         schema: z.string().optional(),
         hidden: true,
       }),
-      items: responseField({
+      items: scopedResponseField(scopedTranslation, {
         type: WidgetType.CODE_QUALITY_LIST,
         editorUriSchemaFieldKey: "editorUriSchema",
         schema: z
@@ -185,7 +181,7 @@ const { POST } = createEndpoint({
       }),
 
       // === FILES LIST (optional for compact MCP responses) ===
-      files: responseField({
+      files: scopedResponseField(scopedTranslation, {
         type: WidgetType.CODE_QUALITY_FILES,
         schema: z
           .array(
@@ -200,7 +196,7 @@ const { POST } = createEndpoint({
       }),
 
       // === SUMMARY STATS ===
-      summary: responseField({
+      summary: scopedResponseField(scopedTranslation, {
         type: WidgetType.CODE_QUALITY_SUMMARY,
         schema: z.object({
           totalIssues: z.number(),
@@ -216,55 +212,52 @@ const { POST } = createEndpoint({
         }),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.check.vibeCheck.errors.validation.title",
-      description:
-        "app.api.system.check.vibeCheck.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.check.vibeCheck.errors.internal.title",
-      description: "app.api.system.check.vibeCheck.errors.internal.description",
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.check.vibeCheck.errors.unauthorized.title",
-      description:
-        "app.api.system.check.vibeCheck.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.check.vibeCheck.errors.forbidden.title",
-      description:
-        "app.api.system.check.vibeCheck.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.check.vibeCheck.errors.notFound.title",
-      description: "app.api.system.check.vibeCheck.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.check.vibeCheck.errors.server.title",
-      description: "app.api.system.check.vibeCheck.errors.server.description",
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.check.vibeCheck.errors.unknown.title",
-      description: "app.api.system.check.vibeCheck.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.check.vibeCheck.errors.unsaved.title",
-      description: "app.api.system.check.vibeCheck.errors.unsaved.description",
+      title: "errors.unsaved.title",
+      description: "errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.check.vibeCheck.errors.conflict.title",
-      description: "app.api.system.check.vibeCheck.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.system.check.vibeCheck.success.title",
-    description: "app.api.system.check.vibeCheck.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 
   // === EXAMPLES ===

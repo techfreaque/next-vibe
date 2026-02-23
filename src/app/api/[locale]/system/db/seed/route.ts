@@ -14,9 +14,9 @@ import { seedRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: seedEndpoints,
   [Methods.POST]: {
-    handler: ({ data, locale, logger }) => {
+    handler: ({ data, locale, t, logger }) => {
       logger.debug("🎯 Seed route handler called", { data, locale });
-      return seedRepository.execute(data, locale, logger);
+      return seedRepository.execute(data, locale, t, logger);
     },
   },
 });

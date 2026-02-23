@@ -89,6 +89,9 @@ export const translations: typeof enTranslations = {
     campaignType: {
       leadCampaign: "Kampania leadów",
       newsletter: "Newsletter",
+      signupNurture: "Pielęgnacja rejestracji",
+      retention: "Retencja",
+      winback: "Odzyskiwanie",
       transactional: "Transakcyjny",
       notification: "Powiadomienie",
       system: "System",

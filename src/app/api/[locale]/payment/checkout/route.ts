@@ -15,7 +15,7 @@ import { subscriptionCheckoutRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, user, locale, logger }) => {
+    handler: async ({ data, user, locale, logger, t }) => {
       logger.info("Creating subscription checkout session", {
         planId: data.planId,
         billingInterval: data.billingInterval,
@@ -35,6 +35,7 @@ export const { POST, tools } = endpointsHandler({
         user,
         locale,
         logger,
+        t,
       );
     },
   },

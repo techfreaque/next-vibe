@@ -30,6 +30,7 @@ import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 import { type TFunction } from "@/i18n/core/static-types";
@@ -105,6 +106,15 @@ export function ChatSidebar({
   // This prevents hydration mismatch - no client-side delay
   const isAuthenticated = useMemo(
     () => user !== undefined && !user.isPublic,
+    [user],
+  );
+  const isAdmin = useMemo(
+    () =>
+      !user?.isPublic &&
+      "roles" in (user ?? {}) &&
+      (user as { roles?: string[] }).roles?.includes(
+        UserPermissionRole.ADMIN,
+      ) === true,
     [user],
   );
 
@@ -205,6 +215,7 @@ export function ChatSidebar({
         activeFolderId={activeRootFolderId}
         onSelectFolder={handleSelectFolder}
         isAuthenticated={isAuthenticated}
+        isAdmin={isAdmin}
         locale={locale}
       />
       {/* New Chat Button */}

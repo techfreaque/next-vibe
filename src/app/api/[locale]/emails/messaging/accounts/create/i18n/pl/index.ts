@@ -1,6 +1,10 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Email Communication",
+  tags: {
+    messaging: "Messaging",
+  },
   title: "Utwórz konto komunikatora",
   description: "Dodaj nowe konto dostawcy SMS, WhatsApp lub Telegram",
 

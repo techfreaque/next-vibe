@@ -16,6 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { JwtPayloadType } from "../../../user/auth/types";
 import { imapAccounts } from "../db";
@@ -26,6 +27,9 @@ import type {
   ImapSyncPostRequestOutput,
   ImapSyncPostResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * IMAP Sync Repository
@@ -38,6 +42,8 @@ export class ImapSyncRepository {
     data: ImapSyncPostRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: ModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapSyncPostResponseOutput>> {
     try {
       logger.info("Starting IMAP sync operation", {
@@ -58,7 +64,7 @@ export class ImapSyncRepository {
 
         if (accountsToSync.length !== accountIdList.length) {
           return fail({
-            message: "app.api.emails.imapClient.sync.errors.validation.title",
+            message: t("post.errors.validation.title"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
@@ -115,6 +121,7 @@ export class ImapSyncRepository {
           const syncResult = await imapSyncRepository.syncAccount(
             { account },
             logger,
+            locale,
           );
 
           if (syncResult.success) {
@@ -200,7 +207,7 @@ export class ImapSyncRepository {
       const parsedError = parseError(error);
       logger.error("Error in IMAP sync operation", parsedError);
       return fail({
-        message: "app.api.emails.imapClient.sync.errors.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -214,6 +221,7 @@ export class ImapSyncRepository {
   static getSyncStatus(
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): ResponseType<ImapSyncGetResponseOutput> {
     try {
       logger.info("Getting IMAP sync status", { userId: user.id });
@@ -234,7 +242,7 @@ export class ImapSyncRepository {
       const parsedError = parseError(error);
       logger.error("Error getting IMAP sync status", parsedError);
       return fail({
-        message: "app.api.emails.imapClient.sync.errors.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });

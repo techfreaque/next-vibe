@@ -17,7 +17,9 @@ export const { GET, PATCH, tools } = endpointsHandler({
       return await getThreadPermissions(
         props.user,
         { threadId: props.urlPathParams.threadId },
+        props.t,
         props.logger,
+        props.locale,
       );
     },
   },
@@ -31,7 +33,9 @@ export const { GET, PATCH, tools } = endpointsHandler({
       return await updateThreadPermissions(
         props.user,
         dataWithId,
+        props.t,
         props.logger,
+        props.locale,
       );
     },
   },

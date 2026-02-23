@@ -6,10 +6,10 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,17 +20,20 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * GET endpoint for checking newsletter subscription status
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["newsletter", "status"],
-  title: "app.api.newsletter.status.title" as const,
-  description: "app.api.newsletter.status.description" as const,
+  title: "title",
+  description: "description",
   icon: "newspaper",
   tags: [],
-  category: "app.api.system.category" as const,
+  category: "category",
   allowedRoles: [
     UserRole.PUBLIC,
     UserRole.CUSTOMER,
@@ -40,91 +43,80 @@ const { GET } = createEndpoint({
   ],
   allowedLocalModeRoles: [] as const,
   aliases: ["newsletter-status", "newsletter:status"],
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.newsletter.status.form.title" as const,
-      description: "app.api.newsletter.status.form.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "form.title",
+    description: "form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // REQUEST FIELDS
-      email: requestField({
+      email: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
-        label: "app.api.newsletter.status.email.label" as const,
-        description: "app.api.newsletter.status.email.description" as const,
-        placeholder: "app.api.newsletter.status.email.placeholder" as const,
-        helpText: "app.api.newsletter.status.email.helpText" as const,
+        label: "email.label",
+        description: "email.description",
+        placeholder: "email.placeholder",
+        helpText: "email.helpText",
         columns: 12,
         schema: z.string().email(),
         order: 1,
       }),
       // RESPONSE FIELDS
-      subscribed: responseField({
+      subscribed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.newsletter.status.response.subscribed" as const,
+        content: "response.subscribed",
         schema: z.boolean(),
       }),
-      status: responseField({
+      status: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.newsletter.status.response.status" as const,
+        content: "response.status",
         schema: z.string(),
       }),
     },
-  ),
+  }),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.newsletter.status.errors.validation.title" as const,
-      description:
-        "app.api.newsletter.status.errors.validation.description" as const,
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.newsletter.status.errors.internal.title" as const,
-      description:
-        "app.api.newsletter.status.errors.internal.description" as const,
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.newsletter.status.errors.unauthorized.title" as const,
-      description:
-        "app.api.newsletter.status.errors.unauthorized.description" as const,
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.newsletter.status.errors.unauthorized.title" as const,
-      description:
-        "app.api.newsletter.status.errors.unauthorized.description" as const,
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.newsletter.status.errors.notFound.title" as const,
-      description:
-        "app.api.newsletter.status.errors.notFound.description" as const,
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.newsletter.status.errors.internal.title" as const,
-      description:
-        "app.api.newsletter.status.errors.internal.description" as const,
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.newsletter.status.errors.internal.title" as const,
-      description:
-        "app.api.newsletter.status.errors.internal.description" as const,
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.newsletter.status.errors.validation.title" as const,
-      description:
-        "app.api.newsletter.status.errors.validation.description" as const,
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.newsletter.status.errors.validation.title" as const,
-      description:
-        "app.api.newsletter.status.errors.validation.description" as const,
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
   },
   successTypes: {
-    title: "app.api.newsletter.status.success.title" as const,
-    description: "app.api.newsletter.status.success.description" as const,
+    title: "success.title",
+    description: "success.description",
   },
   examples: {
     requests: {

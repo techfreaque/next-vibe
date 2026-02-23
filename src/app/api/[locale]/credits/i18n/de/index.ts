@@ -3,6 +3,10 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "Guthaben",
+  tags: {
+    credits: "credits",
+    balance: "guthaben",
+  },
   purchase: purchaseTranslations,
   repository: {
     tts: "Text-zu-Sprache",
@@ -38,6 +42,45 @@ export const translations: typeof enTranslations = {
     },
   },
   expire: {
+    post: {
+      title: "Credits ablaufen lassen",
+      description:
+        "Alte Abonnement-Credits ablaufen lassen (von Cron aufgerufen)",
+      tag: "ablaufen",
+      container: {
+        title: "Credits ablaufen lassen",
+        description: "Ergebnisse des Credits-Ablaufs",
+      },
+      response: {
+        expiredCount: "Abgelaufene Anzahl",
+      },
+      success: {
+        title: "Credits abgelaufen",
+        description: "Alte Abonnement-Credits erfolgreich abgelaufen",
+      },
+      errors: {
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Authentifizierung erforderlich",
+        },
+        forbidden: {
+          title: "Verboten",
+          description: "Zugriff verweigert",
+        },
+        server: {
+          title: "Serverfehler",
+          description: "Fehler beim Ablaufen von Credits",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten",
+        },
+        validation: {
+          title: "Validierungsfehler",
+          description: "Ungültige Anfrageparameter",
+        },
+      },
+    },
     task: {
       description: "Läuft alte Abonnement-Credits täglich ab",
       error: "Fehler beim Ablaufen von Credits",

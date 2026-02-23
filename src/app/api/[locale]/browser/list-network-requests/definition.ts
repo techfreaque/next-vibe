@@ -7,11 +7,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  objectOptionalField,
-  requestField,
-  responseArrayField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedObjectOptionalField,
+  scopedRequestField,
+  scopedResponseArrayField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -22,16 +22,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["browser", "list-network-requests"],
-  title: "app.api.browser.list-network-requests.title",
-  description: "app.api.browser.list-network-requests.description",
-  category: "app.api.browser.category",
+  title: "list-network-requests.title",
+  description: "list-network-requests.description",
+  category: "list-network-requests.category",
   icon: "network",
   tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.networkAnalysis",
+    "list-network-requests.tags.browserAutomation",
+    "list-network-requests.tags.networkAnalysis",
   ],
 
   allowedRoles: [
@@ -42,25 +45,23 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.browser.list-network-requests.form.label",
-      description: "app.api.browser.list-network-requests.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      includePreservedRequests: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "list-network-requests.form.label",
+    description: "list-network-requests.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      includePreservedRequests: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label:
-          "app.api.browser.list-network-requests.form.fields.includePreservedRequests.label",
+          "list-network-requests.form.fields.includePreservedRequests.label",
         description:
-          "app.api.browser.list-network-requests.form.fields.includePreservedRequests.description",
+          "list-network-requests.form.fields.includePreservedRequests.description",
         placeholder:
-          "app.api.browser.list-network-requests.form.fields.includePreservedRequests.placeholder",
+          "list-network-requests.form.fields.includePreservedRequests.placeholder",
         columns: 4,
         schema: z
           .boolean()
@@ -70,15 +71,12 @@ const { POST } = createEndpoint({
             "Set to true to return the preserved requests over the last 3 navigations.",
           ),
       }),
-      pageIdx: requestField({
+      pageIdx: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.browser.list-network-requests.form.fields.pageIdx.label",
-        description:
-          "app.api.browser.list-network-requests.form.fields.pageIdx.description",
-        placeholder:
-          "app.api.browser.list-network-requests.form.fields.pageIdx.placeholder",
+        label: "list-network-requests.form.fields.pageIdx.label",
+        description: "list-network-requests.form.fields.pageIdx.description",
+        placeholder: "list-network-requests.form.fields.pageIdx.placeholder",
         columns: 4,
         schema: z
           .number()
@@ -88,15 +86,12 @@ const { POST } = createEndpoint({
             "Page number to return (0-based). When omitted, returns the first page.",
           ),
       }),
-      pageSize: requestField({
+      pageSize: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.browser.list-network-requests.form.fields.pageSize.label",
-        description:
-          "app.api.browser.list-network-requests.form.fields.pageSize.description",
-        placeholder:
-          "app.api.browser.list-network-requests.form.fields.pageSize.placeholder",
+        label: "list-network-requests.form.fields.pageSize.label",
+        description: "list-network-requests.form.fields.pageSize.description",
+        placeholder: "list-network-requests.form.fields.pageSize.placeholder",
         columns: 4,
         schema: z
           .number()
@@ -106,15 +101,14 @@ const { POST } = createEndpoint({
             "Maximum number of requests to return. When omitted, returns all requests.",
           ),
       }),
-      resourceTypes: requestField({
+      resourceTypes: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.browser.list-network-requests.form.fields.resourceTypes.label",
+        label: "list-network-requests.form.fields.resourceTypes.label",
         description:
-          "app.api.browser.list-network-requests.form.fields.resourceTypes.description",
+          "list-network-requests.form.fields.resourceTypes.description",
         placeholder:
-          "app.api.browser.list-network-requests.form.fields.resourceTypes.placeholder",
+          "list-network-requests.form.fields.resourceTypes.placeholder",
         columns: 12,
         schema: z
           .array(
@@ -147,94 +141,88 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.list-network-requests.response.success",
+        content: "list-network-requests.response.success",
         schema: z
           .boolean()
           .describe("Whether the network requests listing operation succeeded"),
       }),
-      result: objectOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.browser.list-network-requests.response.result.title",
-          description:
-            "app.api.browser.list-network-requests.response.result.description",
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
-          requests: responseArrayField(
+      result: scopedObjectOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "list-network-requests.response.result.title",
+        description: "list-network-requests.response.result.description",
+        layoutType: LayoutType.STACKED,
+        usage: { response: true },
+        children: {
+          requests: scopedResponseArrayField(
+            scopedTranslation,
             {
               type: WidgetType.CONTAINER,
             },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                layoutType: LayoutType.GRID,
-                columns: 12,
-              },
-              { response: true },
-              {
-                reqid: responseField({
+            scopedObjectFieldNew(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              layoutType: LayoutType.GRID,
+              columns: 12,
+              usage: { response: true },
+              children: {
+                reqid: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.browser.list-network-requests.response.result.requests.reqid",
+                    "list-network-requests.response.result.requests.reqid",
                   schema: z.coerce.number(),
                 }),
-                url: responseField({
+                url: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.browser.list-network-requests.response.result.requests.url",
+                  content: "list-network-requests.response.result.requests.url",
                   schema: z.string(),
                 }),
-                method: responseField({
+                method: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.browser.list-network-requests.response.result.requests.method",
+                    "list-network-requests.response.result.requests.method",
                   schema: z.string(),
                 }),
-                status: responseField({
+                status: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.browser.list-network-requests.response.result.requests.status",
+                    "list-network-requests.response.result.requests.status",
                   schema: z.coerce.number().optional(),
                 }),
-                type: responseField({
+                type: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.browser.list-network-requests.response.result.requests.type",
+                    "list-network-requests.response.result.requests.type",
                   schema: z.string(),
                 }),
               },
-            ),
+            }),
           ),
-          totalCount: responseField({
+          totalCount: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.browser.list-network-requests.response.result.totalCount",
+            content: "list-network-requests.response.result.totalCount",
             schema: z.coerce.number().describe("Total number of requests"),
           }),
         },
-      ),
-      error: responseField({
+      }),
+      error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.list-network-requests.response.error",
+        content: "list-network-requests.response.error",
         schema: z
           .string()
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: responseField({
+      executionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.list-network-requests.response.executionId",
+        content: "list-network-requests.response.executionId",
         schema: z
           .string()
           .optional()
           .describe("Unique identifier for this execution"),
       }),
     },
-  ),
+  }),
   examples: {
     requests: {
       default: { pageIdx: 0 },
@@ -260,55 +248,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.browser.list-network-requests.errors.validation.title",
-      description:
-        "app.api.browser.list-network-requests.errors.validation.description",
+      title: "list-network-requests.errors.validation.title",
+      description: "list-network-requests.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.browser.list-network-requests.errors.network.title",
-      description:
-        "app.api.browser.list-network-requests.errors.network.description",
+      title: "list-network-requests.errors.network.title",
+      description: "list-network-requests.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.browser.list-network-requests.errors.unauthorized.title",
-      description:
-        "app.api.browser.list-network-requests.errors.unauthorized.description",
+      title: "list-network-requests.errors.unauthorized.title",
+      description: "list-network-requests.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.browser.list-network-requests.errors.forbidden.title",
-      description:
-        "app.api.browser.list-network-requests.errors.forbidden.description",
+      title: "list-network-requests.errors.forbidden.title",
+      description: "list-network-requests.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.browser.list-network-requests.errors.notFound.title",
-      description:
-        "app.api.browser.list-network-requests.errors.notFound.description",
+      title: "list-network-requests.errors.notFound.title",
+      description: "list-network-requests.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.browser.list-network-requests.errors.serverError.title",
-      description:
-        "app.api.browser.list-network-requests.errors.serverError.description",
+      title: "list-network-requests.errors.serverError.title",
+      description: "list-network-requests.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.browser.list-network-requests.errors.unknown.title",
-      description:
-        "app.api.browser.list-network-requests.errors.unknown.description",
+      title: "list-network-requests.errors.unknown.title",
+      description: "list-network-requests.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.browser.list-network-requests.errors.unsavedChanges.title",
-      description:
-        "app.api.browser.list-network-requests.errors.unsavedChanges.description",
+      title: "list-network-requests.errors.unsavedChanges.title",
+      description: "list-network-requests.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.browser.list-network-requests.errors.conflict.title",
-      description:
-        "app.api.browser.list-network-requests.errors.conflict.description",
+      title: "list-network-requests.errors.conflict.title",
+      description: "list-network-requests.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.browser.list-network-requests.success.title",
-    description: "app.api.browser.list-network-requests.success.description",
+    title: "list-network-requests.success.title",
+    description: "list-network-requests.success.description",
   },
 });
 

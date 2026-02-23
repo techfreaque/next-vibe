@@ -6,4 +6,11 @@ export const translations: typeof enTranslations = {
   tag: "Ordner",
   list: listTranslations,
   sync: syncTranslations,
+  errors: {
+    server: { title: "Serverfehler" },
+    notFound: { title: "Ordner nicht gefunden" },
+    accountNotFound: { title: "Konto nicht gefunden" },
+    syncFailed: { title: "Synchronisierung fehlgeschlagen" },
+    missingAccount: { title: "Konto-ID ist erforderlich" },
+  },
 };

@@ -4,6 +4,7 @@
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import type Stripe from "stripe";
 
 import type { WebhookData } from "@/app/api/[locale]/payment/providers/types";
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
@@ -99,24 +100,54 @@ export class SubscriptionRepository {
     throw new Error("cancelSubscription is not implemented on native");
   }
 
-  static async handleSubscriptionCheckout(): Promise<void> {
+  static async handleSubscriptionCheckout(
+    // oxlint-disable-next-line no-unused-vars
+    _session: WebhookData,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+  ): Promise<void> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("handleSubscriptionCheckout is not implemented on native");
   }
 
-  static async handleInvoicePaymentSucceeded(): Promise<void> {
+  static async handleInvoicePaymentSucceeded(
+    // oxlint-disable-next-line no-unused-vars
+    _invoice: WebhookData,
+    // oxlint-disable-next-line no-unused-vars
+    _subscriptionId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+  ): Promise<void> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error(
       "handleInvoicePaymentSucceeded is not implemented on native",
     );
   }
 
-  static async handleSubscriptionCanceled(): Promise<void> {
+  static async handleSubscriptionCanceled(
+    // oxlint-disable-next-line no-unused-vars
+    _subscriptionId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+  ): Promise<void> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("handleSubscriptionCanceled is not implemented on native");
   }
 
-  static async handleSubscriptionUpdated(): Promise<void> {
+  static async handleSubscriptionUpdated(
+    // oxlint-disable-next-line no-unused-vars
+    _stripeSubscription: Stripe.Subscription,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+  ): Promise<void> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("handleSubscriptionUpdated is not implemented on native");
   }
@@ -126,6 +157,8 @@ export class SubscriptionRepository {
     _userId: string,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
   ): Promise<ResponseType<{ message: string; changes: string[] }>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("syncSubscriptionWithStripe is not implemented on native");
@@ -138,6 +171,8 @@ export class SubscriptionRepository {
     _subscriptionId: string,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
   ): Promise<void> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("handleInvoicePaymentFailed is not implemented on native");

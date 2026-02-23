@@ -17,8 +17,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -28,11 +28,13 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
 import { ExecuteToolWidget } from "./widget";
 
 export const EXECUTE_TOOL_ALIAS = "execute-tool" as const;
 
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "unified-interface", "ai", "execute-tool"],
   aliases: [
@@ -42,12 +44,11 @@ const { POST } = createEndpoint({
     "route-execute",
     "tool-execute",
   ],
-  title: "app.api.system.unifiedInterface.ai.executeTool.post.title" as const,
-  description:
-    "app.api.system.unifiedInterface.ai.executeTool.post.description" as const,
+  title: "executeTool.post.title" as const,
+  description: "executeTool.post.description" as const,
   icon: "zap",
-  category: "app.api.system.category" as const,
-  tags: ["app.api.system.unifiedInterface.mcp.serve.tags.mcp" as const],
+  category: "tools.get.category" as const,
+  tags: ["tools.get.tags.tools" as const],
 
   // Public — the target route enforces its own auth
   allowedRoles: [
@@ -65,36 +66,30 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // ── Request fields ────────────────────────────────────────────────────
-      toolName: requestField({
+      toolName: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.system.unifiedInterface.ai.executeTool.post.fields.toolName.label",
-        description:
-          "app.api.system.unifiedInterface.ai.executeTool.post.fields.toolName.description",
-        placeholder:
-          "app.api.system.unifiedInterface.ai.executeTool.post.fields.toolName.placeholder",
+        label: "executeTool.post.fields.toolName.label",
+        description: "executeTool.post.fields.toolName.description",
+        placeholder: "executeTool.post.fields.toolName.placeholder",
         columns: 12,
         schema: z.string().min(1),
       }),
 
-      input: requestField({
+      input: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
-        label:
-          "app.api.system.unifiedInterface.ai.executeTool.post.fields.input.label",
-        description:
-          "app.api.system.unifiedInterface.ai.executeTool.post.fields.input.description",
+        label: "executeTool.post.fields.input.label",
+        description: "executeTool.post.fields.input.description",
         columns: 12,
         schema: z.record(z.string(), z.unknown()).default({}),
       }),
 
       // ── Response fields ───────────────────────────────────────────────────
-      result: responseField({
+      result: scopedResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
-        label:
-          "app.api.system.unifiedInterface.ai.executeTool.post.response.result" as const,
+        label: "executeTool.post.response.result" as const,
         columns: 12,
         schema: z.unknown().optional(),
       }),
@@ -104,66 +99,47 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.unifiedInterface.ai.executeTool.post.errors.validation.title",
-      description:
-        "app.api.system.unifiedInterface.ai.executeTool.post.errors.validation.description",
+      title: "executeTool.post.errors.validation.title",
+      description: "executeTool.post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.unifiedInterface.ai.executeTool.post.errors.unauthorized.title",
-      description:
-        "app.api.system.unifiedInterface.ai.executeTool.post.errors.unauthorized.description",
+      title: "executeTool.post.errors.unauthorized.title",
+      description: "executeTool.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.unifiedInterface.ai.executeTool.post.errors.forbidden.title",
-      description:
-        "app.api.system.unifiedInterface.ai.executeTool.post.errors.forbidden.description",
+      title: "executeTool.post.errors.forbidden.title",
+      description: "executeTool.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.unifiedInterface.ai.executeTool.post.errors.notFound.title",
-      description:
-        "app.api.system.unifiedInterface.ai.executeTool.post.errors.notFound.description",
+      title: "executeTool.post.errors.notFound.title",
+      description: "executeTool.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.ai.executeTool.post.errors.server.title",
-      description:
-        "app.api.system.unifiedInterface.ai.executeTool.post.errors.server.description",
+      title: "executeTool.post.errors.server.title",
+      description: "executeTool.post.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.ai.executeTool.post.errors.network.title",
-      description:
-        "app.api.system.unifiedInterface.ai.executeTool.post.errors.network.description",
+      title: "executeTool.post.errors.network.title",
+      description: "executeTool.post.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.ai.executeTool.post.errors.unknown.title",
-      description:
-        "app.api.system.unifiedInterface.ai.executeTool.post.errors.unknown.description",
+      title: "executeTool.post.errors.unknown.title",
+      description: "executeTool.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.unifiedInterface.ai.executeTool.post.errors.server.title",
-      description:
-        "app.api.system.unifiedInterface.ai.executeTool.post.errors.server.description",
+      title: "executeTool.post.errors.server.title",
+      description: "executeTool.post.errors.server.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.unifiedInterface.ai.executeTool.post.errors.server.title",
-      description:
-        "app.api.system.unifiedInterface.ai.executeTool.post.errors.server.description",
+      title: "executeTool.post.errors.server.title",
+      description: "executeTool.post.errors.server.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.system.unifiedInterface.ai.executeTool.post.success.title",
-    description:
-      "app.api.system.unifiedInterface.ai.executeTool.post.success.description",
+    title: "executeTool.post.success.title",
+    description: "executeTool.post.success.description",
   },
 
   // === EXAMPLES ===

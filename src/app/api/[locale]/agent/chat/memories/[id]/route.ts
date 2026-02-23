@@ -13,7 +13,7 @@ export const { PATCH, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.PATCH]: {
     email: undefined,
-    handler: ({ user, data, urlPathParams, logger }) =>
+    handler: ({ user, data, urlPathParams, logger, t }) =>
       repository.updateMemory({
         userId: user.id,
         memoryNumber: urlPathParams.id,
@@ -21,15 +21,17 @@ export const { PATCH, DELETE, tools } = endpointsHandler({
         tags: data.tags,
         priority: data.priority,
         logger,
+        t,
       }),
   },
   [Methods.DELETE]: {
     email: undefined,
-    handler: ({ user, urlPathParams, logger }) =>
+    handler: ({ user, urlPathParams, logger, t }) =>
       repository.deleteMemory({
         userId: user.id,
         memoryNumber: urlPathParams.id,
         logger,
+        t,
       }),
   },
 });

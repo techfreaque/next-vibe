@@ -8,7 +8,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  responseField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -18,122 +18,122 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SshAuthType, SshAuthTypeDB } from "../../enum";
-import { scopedTranslation } from "../../i18n";
+import { scopedTranslation } from "./i18n";
 import { ConnectionDetailContainer } from "./widget";
 
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["ssh", "connections", "[id]"],
-  title: "connections.id.get.title",
-  description: "connections.id.get.description",
+  title: "get.title",
+  description: "get.description",
   icon: "server",
   category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["type"],
+  tags: ["category" as const],
 
   fields: customWidgetObject({
     render: ConnectionDetailContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      id: responseField({
+      id: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "connections.id.get.response.id.title",
+        content: "get.response.id.title",
         schema: z.string(),
       }),
-      label: responseField({
+      label: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "connections.id.get.response.label.title",
+        content: "get.response.label.title",
         schema: z.string(),
       }),
-      host: responseField({
+      host: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "connections.id.get.response.host.title",
+        content: "get.response.host.title",
         schema: z.string(),
       }),
-      port: responseField({
+      port: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "connections.id.get.response.port.title",
+        content: "get.response.port.title",
         schema: z.number(),
       }),
-      username: responseField({
+      username: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "connections.id.get.response.username.title",
+        content: "get.response.username.title",
         schema: z.string(),
       }),
-      authType: responseField({
+      authType: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "connections.id.get.response.authType.title",
+        content: "get.response.authType.title",
         schema: z.enum(SshAuthTypeDB),
       }),
-      isDefault: responseField({
+      isDefault: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "connections.id.get.response.isDefault.title",
+        content: "get.response.isDefault.title",
         schema: z.boolean(),
       }),
-      fingerprint: responseField({
+      fingerprint: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "connections.id.get.response.fingerprint.title",
+        content: "get.response.fingerprint.title",
         schema: z.string().nullable(),
       }),
-      notes: responseField({
+      notes: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "connections.id.get.response.notes.title",
+        content: "get.response.notes.title",
         schema: z.string().nullable(),
       }),
-      createdAt: responseField({
+      createdAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "connections.id.get.response.createdAt.title",
+        content: "get.response.createdAt.title",
         schema: z.string(),
       }),
     },
   }),
 
   successTypes: {
-    title: "connections.id.get.success.title",
-    description: "connections.id.get.success.description",
+    title: "get.success.title",
+    description: "get.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "connections.id.get.errors.validation.title",
-      description: "connections.id.get.errors.validation.description",
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "connections.id.get.errors.unauthorized.title",
-      description: "connections.id.get.errors.unauthorized.description",
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "connections.id.get.errors.forbidden.title",
-      description: "connections.id.get.errors.forbidden.description",
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "connections.id.get.errors.server.title",
-      description: "connections.id.get.errors.server.description",
+      title: "get.errors.server.title",
+      description: "get.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "connections.id.get.errors.notFound.title",
-      description: "connections.id.get.errors.notFound.description",
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "connections.id.get.errors.unknown.title",
-      description: "connections.id.get.errors.unknown.description",
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "connections.id.get.errors.unsavedChanges.title",
-      description: "connections.id.get.errors.unsavedChanges.description",
+      title: "get.errors.unsavedChanges.title",
+      description: "get.errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "connections.id.get.errors.conflict.title",
-      description: "connections.id.get.errors.conflict.description",
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "connections.id.get.errors.network.title",
-      description: "connections.id.get.errors.network.description",
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
     },
   },
 
   examples: {
-    requests: { default: {} },
+    requests: undefined,
     responses: {
       default: {
         id: "uuid",

@@ -1,6 +1,11 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "IMAP-Client",
+  tags: {
+    accounts: "Konten",
+  },
+
   // Shared translation keys
   tag: "IMAP-Nachricht",
 

@@ -16,7 +16,10 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { TFunction } from "@/i18n/core/static-types";
+
+import type { scopedTranslation } from "../i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 import type { BuildProfile, FileToCompile } from "../definition";
 import { PROFILE_DEFAULTS, ROOT_DIR, SIZE_THRESHOLDS } from "./constants";
@@ -61,7 +64,7 @@ export interface IBunCompiler {
     output: string[],
     filesBuilt: string[],
     logger: EndpointLogger,
-    t: TFunction,
+    t: ModuleT,
     dryRun?: boolean,
     verbose?: boolean,
     profile?: BuildProfile,
@@ -84,7 +87,7 @@ export class BunCompiler implements IBunCompiler {
     output: string[],
     filesBuilt: string[],
     logger: EndpointLogger,
-    t: TFunction,
+    t: ModuleT,
     dryRun?: boolean,
     verbose?: boolean,
     profile: BuildProfile = "development",
@@ -101,7 +104,7 @@ export class BunCompiler implements IBunCompiler {
 
     if (!existsSync(entrypointPath)) {
       return fail({
-        message: "app.api.system.builder.errors.inputFileNotFound",
+        message: t("errors.inputFileNotFound"),
         messageParams: {
           filePath: fileConfig.input,
         },
@@ -203,7 +206,7 @@ export class BunCompiler implements IBunCompiler {
         .map((log) => log.message)
         .join("\n");
       return fail({
-        message: "app.api.system.builder.messages.bundleFailed",
+        message: t("messages.bundleFailed"),
         messageParams: {
           error: errorMessages || "Unknown error",
         },
@@ -216,13 +219,13 @@ export class BunCompiler implements IBunCompiler {
 
     if (size > SIZE_THRESHOLDS.CRITICAL) {
       warnings.push(
-        t("app.api.system.builder.analysis.criticalSize", {
+        t("analysis.criticalSize", {
           size: outputFormatter.formatBytes(size),
         }),
       );
     } else if (size > SIZE_THRESHOLDS.WARNING) {
       warnings.push(
-        t("app.api.system.builder.analysis.largeBundle", {
+        t("analysis.largeBundle", {
           size: outputFormatter.formatBytes(size),
         }),
       );
@@ -235,7 +238,7 @@ export class BunCompiler implements IBunCompiler {
     const sizeIndicator = outputFormatter.getSizeIndicator(size);
     output.push(
       outputFormatter.formatSuccess(
-        `${sizeIndicator} ${t("app.api.system.builder.messages.bundleSuccess")} (${outputFormatter.formatBytes(size)})`,
+        `${sizeIndicator} ${t("messages.bundleSuccess")} (${outputFormatter.formatBytes(size)})`,
       ),
     );
     logger.info("Executable compiled successfully", {

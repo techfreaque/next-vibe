@@ -14,7 +14,10 @@ import {
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { scopedTranslation } from "../i18n";
 import type { CompleteUserType } from "../types";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Require an authenticated admin user - Native stub
@@ -22,12 +25,13 @@ import type { CompleteUserType } from "../types";
  */
 export async function requireAdminUser(
   locale: CountryLanguage,
+  t: ModuleT,
   redirectPath?: string,
 ): Promise<ResponseType<CompleteUserType>> {
   // Stub implementation for React Native
   // In a real implementation, this would check native auth state
   return fail({
-    message: "app.api.user.auth.errors.not_implemented_native",
+    message: t("errors.not_implemented_on_native"),
     errorType: ErrorResponseTypes.INTERNAL_ERROR,
     messageParams: {
       context: "requireAdminUser",
@@ -44,12 +48,13 @@ export async function requireAdminUser(
  */
 export async function requireUser(
   locale: CountryLanguage,
+  t: ModuleT,
   redirectPath?: string,
 ): Promise<ResponseType<CompleteUserType>> {
   // Stub implementation for React Native
   // In a real implementation, this would check native auth state
   return fail({
-    message: "app.api.user.auth.errors.not_implemented_native",
+    message: t("errors.not_implemented_on_native"),
     errorType: ErrorResponseTypes.INTERNAL_ERROR,
     messageParams: {
       context: "requireUser",

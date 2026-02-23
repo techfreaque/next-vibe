@@ -9,6 +9,7 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { UserRepository } from "../repository";
 import type {
@@ -28,6 +29,7 @@ export class UserSearchRepository {
   static async searchUsers(
     data: UserSearchGetRequestOutput,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<UserSearchGetResponseOutput>> {
     const result = await UserRepository.searchUsersWithPagination(
       data.searchCriteria?.search || "",
@@ -37,6 +39,7 @@ export class UserSearchRepository {
         roles: data.filters?.roles,
       },
       logger,
+      locale,
     );
 
     if (!result.success) {

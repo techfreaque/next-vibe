@@ -14,7 +14,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ data, user, logger }) =>
-      MessagingAccountsListRepository.listAccounts(data, user, logger),
+    handler: ({ data, user, logger, t }) =>
+      MessagingAccountsListRepository.listAccounts(data, user, logger, t),
   },
 });

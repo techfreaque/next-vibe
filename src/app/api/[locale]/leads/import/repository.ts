@@ -20,8 +20,9 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
-import type { Countries, Languages } from "@/i18n/core/config";
+import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
 
+import type { scopedTranslation as importScopedTranslation } from "../../import/i18n";
 import { importRepository } from "../../import/repository";
 import type { DomainRecord } from "../../import/types";
 import type { JwtPrivatePayloadType } from "../../user/auth/types";
@@ -37,7 +38,10 @@ import type {
   LeadsImportResponseOutput,
 } from "./definition";
 import type { CsvImportJobStatus, CsvImportJobStatusValue } from "./enum";
+import { scopedTranslation } from "./i18n";
 import type { ImportJobsStatusGetResponseOutput } from "./status/definition";
+
+type ImportModuleT = ReturnType<typeof importScopedTranslation.scopedT>["t"];
 
 /**
  * Domain Repository Interface
@@ -84,6 +88,7 @@ export interface DomainImportRepository<T extends DomainRecord> {
       offset?: number;
     },
     logger: EndpointLogger,
+    t: ImportModuleT,
   ): Promise<ResponseType<ImportJobsStatusGetResponseOutput>>;
 
   /**
@@ -97,6 +102,7 @@ export interface DomainImportRepository<T extends DomainRecord> {
       maxRetries?: number;
     },
     logger: EndpointLogger,
+    t: ImportModuleT,
   ): Promise<
     ResponseType<{
       job: {
@@ -136,6 +142,7 @@ export interface DomainImportRepository<T extends DomainRecord> {
     userId: string,
     jobId: string,
     logger: EndpointLogger,
+    t: ImportModuleT,
   ): Promise<
     ResponseType<{
       result: {
@@ -248,7 +255,7 @@ export interface CsvImportJobStatusType {
 /**
  * Leads Domain Import Repository
  */
-export class LeadsImportRepository {
+export class LeadsImportRepository implements DomainImportRepository<LeadRecord> {
   /**
    * Get domain name for tracking
    */
@@ -262,9 +269,11 @@ export class LeadsImportRepository {
   validateCsvRow(
     row: Record<string, string>,
     config: CsvImportConfig,
+    locale: CountryLanguage,
   ): CsvRowValidationResult {
     const errors: ErrorResponseType[] = [];
     const data: Record<string, string | number | boolean | null> = {};
+    const t = scopedTranslation.scopedT(locale).t;
 
     // Email is required
     if (row.email?.trim()) {
@@ -274,8 +283,7 @@ export class LeadsImportRepository {
       } else {
         errors.push(
           fail({
-            message:
-              "app.admin.leads.leadsErrors.leadsImport.post.error.validation.invalid_email_format",
+            message: t("post.errors.validation.title"),
             errorType: ErrorResponseTypes.BAD_REQUEST,
           }),
         );
@@ -283,8 +291,7 @@ export class LeadsImportRepository {
     } else {
       errors.push(
         fail({
-          message:
-            "app.admin.leads.leadsErrors.leadsImport.post.error.validation.email_required",
+          message: t("post.errors.validation.title"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         }),
       );
@@ -326,6 +333,7 @@ export class LeadsImportRepository {
     data: LeadRecord,
     config: CsvImportConfig,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<
     ResponseType<{ created: boolean; updated: boolean; duplicate: boolean }>
   > {
@@ -426,9 +434,9 @@ export class LeadsImportRepository {
       });
     } catch (error) {
       logger.error("Error creating/updating lead", parseError(error));
+      const t = scopedTranslation.scopedT(locale).t;
       return fail({
-        message:
-          "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -463,6 +471,8 @@ export class LeadsImportRepository {
     data: LeadsImportRequestOutput,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
+    t: ImportModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<LeadsImportResponseOutput>> {
     try {
       // Convert the request data to the generic config format
@@ -494,6 +504,7 @@ export class LeadsImportRepository {
         user.id,
         this,
         logger,
+        t,
       );
 
       // Map the generic result to the leads-specific response format
@@ -527,9 +538,9 @@ export class LeadsImportRepository {
       return result;
     } catch (error) {
       logger.error("Error importing leads from CSV", parseError(error));
+      const t = scopedTranslation.scopedT(locale).t;
       return fail({
-        message:
-          "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -541,20 +552,22 @@ export class LeadsImportRepository {
   async listImportJobsFormatted(
     userId: string,
     filters: {
-      status?: typeof CsvImportJobStatusValue | "all";
+      status?: typeof CsvImportJobStatusValue | undefined;
       limit?: number;
       offset?: number;
     },
     logger: EndpointLogger,
+    t: ImportModuleT,
   ): Promise<ResponseType<ImportJobsStatusGetResponseOutput>> {
     const response = await importRepository.listImportJobs(
       userId,
       {
-        status: filters.status as typeof CsvImportJobStatusValue | undefined,
+        status: filters.status,
         limit: filters.limit || 50,
         offset: filters.offset || 0,
       },
       logger,
+      t,
     );
 
     if (!response.success) {
@@ -598,6 +611,7 @@ export class LeadsImportRepository {
       maxRetries?: number;
     },
     logger: EndpointLogger,
+    t: ImportModuleT,
   ): Promise<
     ResponseType<{
       job: {
@@ -633,6 +647,7 @@ export class LeadsImportRepository {
       userId,
       updates,
       logger,
+      t,
     );
 
     if (!response.success) {
@@ -677,6 +692,7 @@ export class LeadsImportRepository {
     userId: string,
     jobId: string,
     logger: EndpointLogger,
+    t: ImportModuleT,
   ): Promise<
     ResponseType<{
       result: {
@@ -689,6 +705,7 @@ export class LeadsImportRepository {
       userId,
       jobId,
       logger,
+      t,
     );
 
     if (!response.success) {

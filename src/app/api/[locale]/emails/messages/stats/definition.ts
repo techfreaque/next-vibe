@@ -9,12 +9,12 @@ import { z } from "zod";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
+  scopedBackButton,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -41,6 +41,7 @@ import {
   TimePeriod,
   TimePeriodOptions,
 } from "./enum";
+import { scopedTranslation } from "./i18n";
 import { EmailStatsContainer } from "./widget";
 
 /**
@@ -48,30 +49,33 @@ import { EmailStatsContainer } from "./widget";
  * Retrieves comprehensive email statistics as historical charts only
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["emails", "messages", "stats"],
   allowedRoles: [UserRole.ADMIN],
 
-  title: "app.api.emails.messages.stats.get.title",
-  description: "app.api.emails.messages.stats.get.description",
-  category: "app.api.emails.category",
+  title: "get.title",
+  description: "get.description",
+  category: "category",
   icon: "bar-chart-3",
-  tags: ["app.api.emails.tags.stats", "app.api.emails.tags.analytics"],
+  tags: ["tags.stats", "tags.analytics"],
 
   fields: customWidgetObject({
     render: EmailStatsContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({ usage: { request: "data", response: true } }),
+      backButton: scopedBackButton(scopedTranslation, {
+        usage: { request: "data", response: true },
+      }),
 
       // === REQUEST FIELDS (Filters) ===
 
       // Time-based filtering
-      timePeriod: requestField({
+      timePeriod: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.emails.messages.stats.get.timePeriod.label",
-        description: "app.api.emails.messages.stats.get.timePeriod.description",
+        label: "get.timePeriod.label",
+        description: "get.timePeriod.description",
         options: TimePeriodOptions,
         columns: 4,
         schema: z
@@ -79,12 +83,11 @@ const { GET } = createEndpoint({
           .default(TimePeriod.day),
       }),
 
-      dateRangePreset: requestField({
+      dateRangePreset: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.emails.messages.stats.get.dateRangePreset.label",
-        description:
-          "app.api.emails.messages.stats.get.dateRangePreset.description",
+        label: "get.dateRangePreset.label",
+        description: "get.dateRangePreset.description",
         options: DateRangePresetOptions,
         columns: 4,
         schema: z
@@ -92,29 +95,29 @@ const { GET } = createEndpoint({
           .default(DateRangePreset.last_30_days),
       }),
 
-      dateFrom: requestField({
+      dateFrom: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
-        label: "app.api.emails.messages.stats.get.dateFrom.label",
-        description: "app.api.emails.messages.stats.get.dateFrom.description",
+        label: "get.dateFrom.label",
+        description: "get.dateFrom.description",
         columns: 6,
         schema: dateSchema.optional(),
       }),
 
-      dateTo: requestField({
+      dateTo: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
-        label: "app.api.emails.messages.stats.get.dateTo.label",
-        description: "app.api.emails.messages.stats.get.dateTo.description",
+        label: "get.dateTo.label",
+        description: "get.dateTo.description",
         columns: 6,
         schema: dateSchema.optional(),
       }),
 
-      chartType: requestField({
+      chartType: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.emails.messages.stats.get.chartType.label",
-        description: "app.api.emails.messages.stats.get.chartType.description",
+        label: "get.chartType.label",
+        description: "get.chartType.description",
         options: ChartTypeOptions,
         columns: 4,
         schema: z
@@ -122,22 +125,21 @@ const { GET } = createEndpoint({
           .default(ChartType.line),
       }),
 
-      includeComparison: requestField({
+      includeComparison: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.emails.messages.stats.get.includeComparison.label",
-        description:
-          "app.api.emails.messages.stats.get.includeComparison.description",
+        label: "get.includeComparison.label",
+        description: "get.includeComparison.description",
         columns: 6,
         schema: z.coerce.boolean().default(false),
       }),
 
       // Email-specific filters
-      status: requestField({
+      status: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.emails.messages.stats.get.status.label",
-        description: "app.api.emails.messages.stats.get.status.description",
+        label: "get.status.label",
+        description: "get.status.description",
         columns: 3,
         options: EmailStatusFilterOptions,
         schema: z
@@ -145,11 +147,11 @@ const { GET } = createEndpoint({
           .default(EmailStatusFilter.ANY),
       }),
 
-      type: requestField({
+      type: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.emails.messages.stats.get.type.label",
-        description: "app.api.emails.messages.stats.get.type.description",
+        label: "get.type.label",
+        description: "get.type.description",
         columns: 3,
         options: EmailTypeFilterOptions,
         schema: z
@@ -157,21 +159,21 @@ const { GET } = createEndpoint({
           .default(EmailTypeFilter.ANY),
       }),
 
-      search: requestField({
+      search: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.messages.stats.get.search.label",
-        description: "app.api.emails.messages.stats.get.search.description",
+        label: "get.search.label",
+        description: "get.search.description",
         columns: 6,
         schema: z.string().optional(),
       }),
 
       // Sorting
-      sortBy: requestField({
+      sortBy: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.emails.messages.stats.get.sortBy.label",
-        description: "app.api.emails.messages.stats.get.sortBy.description",
+        label: "get.sortBy.label",
+        description: "get.sortBy.description",
         options: EmailSortFieldOptions,
         columns: 6,
         schema: z
@@ -179,11 +181,11 @@ const { GET } = createEndpoint({
           .default(EmailSortField.CREATED_AT),
       }),
 
-      sortOrder: requestField({
+      sortOrder: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.emails.messages.stats.get.sortOrder.label",
-        description: "app.api.emails.messages.stats.get.sortOrder.description",
+        label: "get.sortOrder.label",
+        description: "get.sortOrder.description",
         options: SortOrderOptions,
         columns: 6,
         schema: z
@@ -194,575 +196,502 @@ const { GET } = createEndpoint({
       // === RESPONSE FIELDS ===
 
       // Current period email metrics
-      totalEmails: responseField({
+      totalEmails: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.totalEmails",
+        content: "get.response.totalEmails",
         schema: z.coerce.number(),
       }),
-      sentEmails: responseField({
+      sentEmails: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.sentEmails",
+        content: "get.response.sentEmails",
         schema: z.coerce.number(),
       }),
-      deliveredEmails: responseField({
+      deliveredEmails: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.deliveredEmails",
+        content: "get.response.deliveredEmails",
         schema: z.coerce.number(),
       }),
-      openedEmails: responseField({
+      openedEmails: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.openedEmails",
+        content: "get.response.openedEmails",
         schema: z.coerce.number(),
       }),
-      clickedEmails: responseField({
+      clickedEmails: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.clickedEmails",
+        content: "get.response.clickedEmails",
         schema: z.coerce.number(),
       }),
-      bouncedEmails: responseField({
+      bouncedEmails: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.bouncedEmails",
+        content: "get.response.bouncedEmails",
         schema: z.coerce.number(),
       }),
-      failedEmails: responseField({
+      failedEmails: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.failedEmails",
+        content: "get.response.failedEmails",
         schema: z.coerce.number(),
       }),
-      draftEmails: responseField({
+      draftEmails: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.draftEmails",
+        content: "get.response.draftEmails",
         schema: z.coerce.number(),
       }),
 
       // Engagement rates
-      deliveryRate: responseField({
+      deliveryRate: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.deliveryRate",
+        content: "get.response.deliveryRate",
         schema: z.coerce.number(),
       }),
-      openRate: responseField({
+      openRate: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.openRate",
+        content: "get.response.openRate",
         schema: z.coerce.number(),
       }),
-      clickRate: responseField({
+      clickRate: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.clickRate",
+        content: "get.response.clickRate",
         schema: z.coerce.number(),
       }),
-      bounceRate: responseField({
+      bounceRate: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.bounceRate",
+        content: "get.response.bounceRate",
         schema: z.coerce.number(),
       }),
-      failureRate: responseField({
+      failureRate: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.failureRate",
+        content: "get.response.failureRate",
         schema: z.coerce.number(),
       }),
 
       // Provider/template/status/type metrics
-      emailsByProvider: responseField({
+      emailsByProvider: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.emailsByProvider",
+        content: "get.response.emailsByProvider",
         schema: z.record(z.string(), z.coerce.number()),
       }),
-      emailsByTemplate: responseField({
+      emailsByTemplate: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.emailsByTemplate",
+        content: "get.response.emailsByTemplate",
         schema: z.record(z.string(), z.coerce.number()),
       }),
-      emailsByStatus: responseField({
+      emailsByStatus: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.emailsByStatus",
+        content: "get.response.emailsByStatus",
         schema: z.record(z.string(), z.coerce.number()),
       }),
-      emailsByType: responseField({
+      emailsByType: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.emailsByType",
+        content: "get.response.emailsByType",
         schema: z.record(z.string(), z.coerce.number()),
       }),
 
       // User association metrics
-      emailsWithUserId: responseField({
+      emailsWithUserId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.emailsWithUserId",
+        content: "get.response.emailsWithUserId",
         schema: z.coerce.number(),
       }),
-      emailsWithoutUserId: responseField({
+      emailsWithoutUserId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.messages.stats.get.response.emailsWithoutUserId",
+        content: "get.response.emailsWithoutUserId",
         schema: z.coerce.number(),
       }),
-      emailsWithLeadId: responseField({
+      emailsWithLeadId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.emailsWithLeadId",
+        content: "get.response.emailsWithLeadId",
         schema: z.coerce.number(),
       }),
-      emailsWithoutLeadId: responseField({
+      emailsWithoutLeadId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.messages.stats.get.response.emailsWithoutLeadId",
+        content: "get.response.emailsWithoutLeadId",
         schema: z.coerce.number(),
       }),
 
       // Error metrics
-      emailsWithErrors: responseField({
+      emailsWithErrors: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.emailsWithErrors",
+        content: "get.response.emailsWithErrors",
         schema: z.coerce.number(),
       }),
-      emailsWithoutErrors: responseField({
+      emailsWithoutErrors: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.messages.stats.get.response.emailsWithoutErrors",
+        content: "get.response.emailsWithoutErrors",
         schema: z.coerce.number(),
       }),
-      averageRetryCount: responseField({
+      averageRetryCount: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.averageRetryCount",
+        content: "get.response.averageRetryCount",
         schema: z.coerce.number(),
       }),
-      maxRetryCount: responseField({
+      maxRetryCount: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.maxRetryCount",
+        content: "get.response.maxRetryCount",
         schema: z.coerce.number(),
       }),
 
       // Performance metrics
-      averageProcessingTime: responseField({
+      averageProcessingTime: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.messages.stats.get.response.averageProcessingTime",
+        content: "get.response.averageProcessingTime",
         schema: z.coerce.number(),
       }),
-      averageDeliveryTime: responseField({
+      averageDeliveryTime: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.messages.stats.get.response.averageDeliveryTime",
+        content: "get.response.averageDeliveryTime",
         schema: z.coerce.number(),
       }),
 
       // Historical data - complex nested structure
-      historicalData: responseField({
+      historicalData: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.historicalData",
+        content: "get.response.historicalData",
         schema: chartDataSchema,
       }),
 
       // Grouped stats - complex nested structure
-      groupedStats: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.emails.messages.stats.get.response.groupedStats",
+      groupedStats: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.groupedStats",
+        usage: { response: true },
+        children: {
+          byStatus: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: scopedObjectFieldNew(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              usage: { response: true },
+              children: {
+                status: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  content: "get.response.groupedStats.status",
+                  schema: z.string(),
+                }),
+                count: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  content: "get.response.groupedStats.count",
+                  schema: z.number(),
+                }),
+              },
+            }),
+          }),
+          byType: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: scopedObjectFieldNew(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              usage: { response: true },
+              children: {
+                type: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  content: "get.response.groupedStats.type",
+                  schema: z.string(),
+                }),
+                count: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  content: "get.response.groupedStats.count",
+                  schema: z.number(),
+                }),
+              },
+            }),
+          }),
+          byProvider: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: scopedObjectFieldNew(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              usage: { response: true },
+              children: {
+                provider: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  content: "get.response.groupedStats.provider",
+                  schema: z.string(),
+                }),
+                count: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  content: "get.response.groupedStats.count",
+                  schema: z.number(),
+                }),
+              },
+            }),
+          }),
+          byTemplate: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: scopedObjectFieldNew(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              usage: { response: true },
+              children: {
+                template: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  content: "get.response.groupedStats.template",
+                  schema: z.string(),
+                }),
+                count: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  content: "get.response.groupedStats.count",
+                  schema: z.number(),
+                }),
+              },
+            }),
+          }),
+          byEngagement: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: scopedObjectFieldNew(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              usage: { response: true },
+              children: {
+                engagement: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  content: "get.response.groupedStats.engagement",
+                  schema: z.string(),
+                }),
+                count: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  content: "get.response.groupedStats.count",
+                  schema: z.number(),
+                }),
+              },
+            }),
+          }),
+          byRetryCount: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: scopedObjectFieldNew(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              usage: { response: true },
+              children: {
+                retryCount: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  content: "get.response.groupedStats.retryCount",
+                  schema: z.number(),
+                }),
+                count: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  content: "get.response.groupedStats.count",
+                  schema: z.number(),
+                }),
+              },
+            }),
+          }),
+          byUserAssociation: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: scopedObjectFieldNew(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              usage: { response: true },
+              children: {
+                association: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  content: "get.response.groupedStats.association",
+                  schema: z.string(),
+                }),
+                count: scopedResponseField(scopedTranslation, {
+                  type: WidgetType.TEXT,
+                  content: "get.response.groupedStats.count",
+                  schema: z.number(),
+                }),
+              },
+            }),
+          }),
         },
-        { response: true },
-        {
-          byStatus: responseArrayField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            objectField(
-              { type: WidgetType.CONTAINER },
-              { response: true },
-              {
-                status: responseField({
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.messages.stats.get.response.groupedStats.status",
-                  schema: z.string(),
-                }),
-                count: responseField({
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.messages.stats.get.response.groupedStats.count",
-                  schema: z.number(),
-                }),
-              },
-            ),
-          ),
-          byType: responseArrayField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            objectField(
-              { type: WidgetType.CONTAINER },
-              { response: true },
-              {
-                type: responseField({
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.messages.stats.get.response.groupedStats.type",
-                  schema: z.string(),
-                }),
-                count: responseField({
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.messages.stats.get.response.groupedStats.count",
-                  schema: z.number(),
-                }),
-              },
-            ),
-          ),
-          byProvider: responseArrayField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            objectField(
-              { type: WidgetType.CONTAINER },
-              { response: true },
-              {
-                provider: responseField({
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.messages.stats.get.response.groupedStats.provider",
-                  schema: z.string(),
-                }),
-                count: responseField({
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.messages.stats.get.response.groupedStats.count",
-                  schema: z.number(),
-                }),
-              },
-            ),
-          ),
-          byTemplate: responseArrayField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            objectField(
-              { type: WidgetType.CONTAINER },
-              { response: true },
-              {
-                template: responseField({
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.messages.stats.get.response.groupedStats.template",
-                  schema: z.string(),
-                }),
-                count: responseField({
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.messages.stats.get.response.groupedStats.count",
-                  schema: z.number(),
-                }),
-              },
-            ),
-          ),
-          byEngagement: responseArrayField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            objectField(
-              { type: WidgetType.CONTAINER },
-              { response: true },
-              {
-                engagement: responseField({
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.messages.stats.get.response.groupedStats.engagement",
-                  schema: z.string(),
-                }),
-                count: responseField({
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.messages.stats.get.response.groupedStats.count",
-                  schema: z.number(),
-                }),
-              },
-            ),
-          ),
-          byRetryCount: responseArrayField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            objectField(
-              { type: WidgetType.CONTAINER },
-              { response: true },
-              {
-                retryCount: responseField({
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.messages.stats.get.response.groupedStats.retryCount",
-                  schema: z.number(),
-                }),
-                count: responseField({
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.messages.stats.get.response.groupedStats.count",
-                  schema: z.number(),
-                }),
-              },
-            ),
-          ),
-          byUserAssociation: responseArrayField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            objectField(
-              { type: WidgetType.CONTAINER },
-              { response: true },
-              {
-                association: responseField({
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.messages.stats.get.response.groupedStats.association",
-                  schema: z.string(),
-                }),
-                count: responseField({
-                  type: WidgetType.TEXT,
-                  content:
-                    "app.api.emails.messages.stats.get.response.groupedStats.count",
-                  schema: z.number(),
-                }),
-              },
-            ),
-          ),
-        },
-      ),
+      }),
 
       // Metadata
-      generatedAt: responseField({
+      generatedAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.messages.stats.get.response.generatedAt",
+        content: "get.response.generatedAt",
         schema: z.string(),
       }),
 
-      dataRange: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.emails.messages.stats.get.response.dataRange",
-        },
-        { response: true },
-        {
-          from: responseField({
+      dataRange: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.dataRange",
+        usage: { response: true },
+        children: {
+          from: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.emails.messages.stats.get.response.dataRange.from",
+            content: "get.response.dataRange.from",
             schema: z.string(),
           }),
-          to: responseField({
+          to: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.stats.get.response.dataRange.to",
+            content: "get.response.dataRange.to",
             schema: z.string(),
           }),
         },
-      ),
+      }),
 
       // Recent activity
-      recentActivity: responseArrayField(
-        {
+      recentActivity: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-        },
-        objectField(
-          { type: WidgetType.CONTAINER },
-          { response: true },
-          {
-            id: responseField({
+          usage: { response: true },
+          children: {
+            id: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.recentActivity.id",
+              content: "get.response.recentActivity.id",
               schema: z.string(),
             }),
-            action: responseField({
+            action: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.recentActivity.action",
+              content: "get.response.recentActivity.action",
               schema: z.string(),
             }),
-            timestamp: responseField({
+            timestamp: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.recentActivity.timestamp",
+              content: "get.response.recentActivity.timestamp",
               schema: z.string(),
             }),
-            details: responseField({
+            details: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.recentActivity.details",
+              content: "get.response.recentActivity.details",
               schema: z.string().optional(),
             }),
           },
-        ),
-      ),
+        }),
+      }),
 
       // Top performers
-      topPerformingTemplates: responseArrayField(
-        {
+      topPerformingTemplates: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-        },
-        objectField(
-          { type: WidgetType.CONTAINER },
-          { response: true },
-          {
-            template: responseField({
+          usage: { response: true },
+          children: {
+            template: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.topPerformingTemplates.template",
+              content: "get.response.topPerformingTemplates.template",
               schema: z.string(),
             }),
-            sent: responseField({
+            sent: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.topPerformingTemplates.sent",
+              content: "get.response.topPerformingTemplates.sent",
               schema: z.number(),
             }),
-            delivered: responseField({
+            delivered: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.topPerformingTemplates.delivered",
+              content: "get.response.topPerformingTemplates.delivered",
               schema: z.number(),
             }),
-            opened: responseField({
+            opened: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.topPerformingTemplates.opened",
+              content: "get.response.topPerformingTemplates.opened",
               schema: z.number(),
             }),
-            clicked: responseField({
+            clicked: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.topPerformingTemplates.clicked",
+              content: "get.response.topPerformingTemplates.clicked",
               schema: z.number(),
             }),
-            deliveryRate: responseField({
+            deliveryRate: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.topPerformingTemplates.deliveryRate",
+              content: "get.response.topPerformingTemplates.deliveryRate",
               schema: z.number(),
             }),
-            openRate: responseField({
+            openRate: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.topPerformingTemplates.openRate",
+              content: "get.response.topPerformingTemplates.openRate",
               schema: z.number(),
             }),
-            clickRate: responseField({
+            clickRate: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.topPerformingTemplates.clickRate",
+              content: "get.response.topPerformingTemplates.clickRate",
               schema: z.number(),
             }),
           },
-        ),
-      ),
+        }),
+      }),
 
-      topPerformingProviders: responseArrayField(
-        {
+      topPerformingProviders: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-        },
-        objectField(
-          { type: WidgetType.CONTAINER },
-          { response: true },
-          {
-            provider: responseField({
+          usage: { response: true },
+          children: {
+            provider: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.topPerformingProviders.provider",
+              content: "get.response.topPerformingProviders.provider",
               schema: z.string(),
             }),
-            sent: responseField({
+            sent: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.topPerformingProviders.sent",
+              content: "get.response.topPerformingProviders.sent",
               schema: z.number(),
             }),
-            delivered: responseField({
+            delivered: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.topPerformingProviders.delivered",
+              content: "get.response.topPerformingProviders.delivered",
               schema: z.number(),
             }),
-            opened: responseField({
+            opened: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.topPerformingProviders.opened",
+              content: "get.response.topPerformingProviders.opened",
               schema: z.number(),
             }),
-            clicked: responseField({
+            clicked: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.topPerformingProviders.clicked",
+              content: "get.response.topPerformingProviders.clicked",
               schema: z.number(),
             }),
-            deliveryRate: responseField({
+            deliveryRate: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.topPerformingProviders.deliveryRate",
+              content: "get.response.topPerformingProviders.deliveryRate",
               schema: z.number(),
             }),
-            openRate: responseField({
+            openRate: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.topPerformingProviders.openRate",
+              content: "get.response.topPerformingProviders.openRate",
               schema: z.number(),
             }),
-            clickRate: responseField({
+            clickRate: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messages.stats.get.response.topPerformingProviders.clickRate",
+              content: "get.response.topPerformingProviders.clickRate",
               schema: z.number(),
             }),
           },
-        ),
-      ),
+        }),
+      }),
     },
   }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.emails.messages.stats.get.errors.validation.title",
-      description:
-        "app.api.emails.messages.stats.get.errors.validation.description",
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.emails.messages.stats.get.errors.unauthorized.title",
-      description:
-        "app.api.emails.messages.stats.get.errors.unauthorized.description",
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.emails.messages.stats.get.errors.server.title",
-      description:
-        "app.api.emails.messages.stats.get.errors.server.description",
+      title: "get.errors.server.title",
+      description: "get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.emails.messages.stats.get.errors.unknown.title",
-      description:
-        "app.api.emails.messages.stats.get.errors.unknown.description",
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.emails.messages.stats.get.errors.network.title",
-      description:
-        "app.api.emails.messages.stats.get.errors.network.description",
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.emails.messages.stats.get.errors.forbidden.title",
-      description:
-        "app.api.emails.messages.stats.get.errors.forbidden.description",
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.emails.messages.stats.get.errors.notFound.title",
-      description:
-        "app.api.emails.messages.stats.get.errors.notFound.description",
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.emails.messages.stats.get.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.messages.stats.get.errors.unsavedChanges.description",
+      title: "get.errors.unsavedChanges.title",
+      description: "get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.emails.messages.stats.get.errors.conflict.title",
-      description:
-        "app.api.emails.messages.stats.get.errors.conflict.description",
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.emails.messages.stats.get.success.title",
-    description: "app.api.emails.messages.stats.get.success.description",
+    title: "get.success.title",
+    description: "get.success.description",
   },
 
   examples: {

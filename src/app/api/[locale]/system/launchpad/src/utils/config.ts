@@ -3,8 +3,7 @@
 import { existsSync } from "node:fs";
 import { dirname, join, parse, resolve } from "node:path";
 
-import type { TFunction } from "@/i18n/core/static-types";
-
+import type { LaunchpadT } from "../../i18n";
 import type { LaunchpadConfig } from "../types/types";
 
 export const DEFAULT_CONFIG_PATH = "launchpad.config.ts";
@@ -13,10 +12,10 @@ export const DEFAULT_CONFIG_PATH = "launchpad.config.ts";
 let configRootDir: string | null = null;
 
 // Get the root directory from the config file location
-export function getRootDirectory(t: TFunction): string {
+export function getRootDirectory(t: LaunchpadT): string {
   if (!configRootDir) {
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
-    throw new Error(t("app.api.system.launchpad.errors.configNotLoaded"));
+    throw new Error(t("errors.configNotLoaded"));
   }
   return configRootDir;
 }
@@ -86,7 +85,7 @@ function isLaunchpadConfigModule(
 }
 
 export async function loadConfig(
-  t: TFunction,
+  t: LaunchpadT,
   explicitConfigPath?: string,
 ): Promise<LaunchpadConfig> {
   const configPath = explicitConfigPath || DEFAULT_CONFIG_PATH;
@@ -98,7 +97,7 @@ export async function loadConfig(
     if (!existsSync(resolvedConfigPath)) {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
       throw new Error(
-        t("app.api.system.launchpad.errors.configFileNotFound" as const, {
+        t("errors.configFileNotFound" as const, {
           path: resolvedConfigPath,
         }),
       );
@@ -109,12 +108,9 @@ export async function loadConfig(
     if (!foundConfigPath) {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
       throw new Error(
-        t(
-          "app.api.system.launchpad.errors.configFileNotFoundInParents" as const,
-          {
-            filename: configPath,
-          },
-        ),
+        t("errors.configFileNotFoundInParents" as const, {
+          filename: configPath,
+        }),
       );
     }
     resolvedConfigPath = foundConfigPath;
@@ -132,9 +128,7 @@ export async function loadConfig(
 
     if (!isLaunchpadConfigModule(importedModule)) {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
-      throw new Error(
-        t("app.api.system.launchpad.errors.invalidConfigFormat" as const),
-      );
+      throw new Error(t("errors.invalidConfigFormat" as const));
     }
 
     const config = importedModule.default;
@@ -144,9 +138,7 @@ export async function loadConfig(
   } catch (error) {
     // Re-throw the error with additional context
     const errorMessage = error instanceof Error ? error.message : String(error);
-    const contextMessage = t(
-      "app.api.system.launchpad.errors.errorLoadingConfig" as const,
-    );
+    const contextMessage = t("errors.errorLoadingConfig" as const);
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Build/CLI tool error handling requires throwing to exit with error status
     throw new Error(`${contextMessage} ${errorMessage}`, { cause: error });
   }

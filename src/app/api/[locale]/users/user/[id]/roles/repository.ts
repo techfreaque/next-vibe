@@ -18,6 +18,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { users } from "@/app/api/[locale]/user/db";
 import { UserRolesRepository } from "@/app/api/[locale]/user/user-roles/repository";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
   UserRoleDeleteRequestOutput,
@@ -27,6 +28,7 @@ import type {
   UserRolePostResponseOutput,
   UserRolePostUrlParamsOutput,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 export class UserRoleManagementRepository {
   static async addUserRole(
@@ -34,6 +36,7 @@ export class UserRoleManagementRepository {
     urlPathParams: UserRolePostUrlParamsOutput,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<UserRolePostResponseOutput>> {
     logger.debug("Adding role to user", {
       targetUserId: urlPathParams.id,
@@ -49,8 +52,9 @@ export class UserRoleManagementRepository {
       .limit(1);
 
     if (!targetUser) {
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.users.user.errors.not_found.title",
+        message: t("roles.post.errors.notFound.title"),
         errorType: ErrorResponseTypes.NOT_FOUND,
         messageParams: { userId: urlPathParams.id },
       });
@@ -59,11 +63,13 @@ export class UserRoleManagementRepository {
     const result = await UserRolesRepository.addRole(
       { userId: urlPathParams.id, role: data.role },
       logger,
+      locale,
     );
 
     if (!result.success || !result.data) {
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.users.user.id.roles.errors.add_failed",
+        message: t("roles.post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { userId: urlPathParams.id, role: data.role },
       });
@@ -87,6 +93,7 @@ export class UserRoleManagementRepository {
     urlPathParams: UserRoleDeleteUrlParamsOutput,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<UserRoleDeleteResponseOutput>> {
     logger.debug("Removing role from user", {
       targetUserId: urlPathParams.id,
@@ -102,8 +109,9 @@ export class UserRoleManagementRepository {
       .limit(1);
 
     if (!targetUser) {
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.users.user.errors.not_found.title",
+        message: t("roles.delete.errors.notFound.title"),
         errorType: ErrorResponseTypes.NOT_FOUND,
         messageParams: { userId: urlPathParams.id },
       });
@@ -113,11 +121,13 @@ export class UserRoleManagementRepository {
       urlPathParams.id,
       data.role,
       logger,
+      locale,
     );
 
     if (!result.success) {
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.users.user.id.roles.errors.remove_failed",
+        message: t("roles.delete.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { userId: urlPathParams.id, role: data.role },
       });

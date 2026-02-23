@@ -5,17 +5,18 @@
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "./i18n";
+
 export const {
   enum: EngagementTypes,
   options: EngagementTypesOptions,
   Value: EngagementTypesValues,
-} = createEnumOptions({
-  EMAIL_OPEN: "app.api.leads.enums.engagementTypes.emailOpen" as const,
-  EMAIL_CLICK: "app.api.leads.enums.engagementTypes.emailClick" as const,
-  WEBSITE_VISIT: "app.api.leads.enums.engagementTypes.websiteVisit" as const,
-  FORM_SUBMIT: "app.api.leads.enums.engagementTypes.formSubmit" as const,
-  LEAD_ATTRIBUTION:
-    "app.api.leads.enums.engagementTypes.leadAttribution" as const,
+} = createEnumOptions(scopedTranslation, {
+  EMAIL_OPEN: "enums.engagementTypes.emailOpen",
+  EMAIL_CLICK: "enums.engagementTypes.emailClick",
+  WEBSITE_VISIT: "enums.engagementTypes.websiteVisit",
+  FORM_SUBMIT: "enums.engagementTypes.formSubmit",
+  LEAD_ATTRIBUTION: "enums.engagementTypes.leadAttribution",
 });
 
 /**
@@ -26,20 +27,18 @@ export const {
   enum: LeadStatus,
   options: LeadStatusOptions,
   Value: LeadStatusValues,
-} = createEnumOptions({
-  NEW: "app.api.leads.enums.leadStatus.new",
-  PENDING: "app.api.leads.enums.leadStatus.pending",
-  CAMPAIGN_RUNNING: "app.api.leads.enums.leadStatus.campaignRunning", // Changed from CONTACTED
-  WEBSITE_USER: "app.api.leads.enums.leadStatus.websiteUser", // For leads created through website engagement tracking
-  NEWSLETTER_SUBSCRIBER:
-    "app.api.leads.enums.leadStatus.newsletterSubscriber" as const, // For website users who subscribed to newsletter
-  IN_CONTACT: "app.api.leads.enums.leadStatus.inContact", // For leads who have contacted us and are in the process of being contacted but not yet converted
-  SIGNED_UP: "app.api.leads.enums.leadStatus.signedUp", // User created account (what CONVERTED currently means)
-  SUBSCRIPTION_CONFIRMED:
-    "app.api.leads.enums.leadStatus.subscriptionConfirmed", // True conversion - subscription confirmed
-  UNSUBSCRIBED: "app.api.leads.enums.leadStatus.unsubscribed",
-  BOUNCED: "app.api.leads.enums.leadStatus.bounced",
-  INVALID: "app.api.leads.enums.leadStatus.invalid",
+} = createEnumOptions(scopedTranslation, {
+  NEW: "enums.leadStatus.new",
+  PENDING: "enums.leadStatus.pending",
+  CAMPAIGN_RUNNING: "enums.leadStatus.campaignRunning", // Changed from CONTACTED
+  WEBSITE_USER: "enums.leadStatus.websiteUser", // For leads created through website engagement tracking
+  NEWSLETTER_SUBSCRIBER: "enums.leadStatus.newsletterSubscriber", // For website users who subscribed to newsletter
+  IN_CONTACT: "enums.leadStatus.inContact", // For leads who have contacted us and are in the process of being contacted but not yet converted
+  SIGNED_UP: "enums.leadStatus.signedUp", // User created account (what CONVERTED currently means)
+  SUBSCRIPTION_CONFIRMED: "enums.leadStatus.subscriptionConfirmed", // True conversion - subscription confirmed
+  UNSUBSCRIBED: "enums.leadStatus.unsubscribed",
+  BOUNCED: "enums.leadStatus.bounced",
+  INVALID: "enums.leadStatus.invalid",
 });
 
 /**
@@ -50,14 +49,14 @@ export const {
   enum: EmailCampaignStage,
   options: EmailCampaignStageOptions,
   Value: EmailCampaignStageValues,
-} = createEnumOptions({
-  NOT_STARTED: "app.api.leads.enums.emailCampaignStage.notStarted" as const,
-  INITIAL: "app.api.leads.enums.emailCampaignStage.initial" as const,
-  FOLLOWUP_1: "app.api.leads.enums.emailCampaignStage.followup1" as const,
-  FOLLOWUP_2: "app.api.leads.enums.emailCampaignStage.followup2" as const,
-  FOLLOWUP_3: "app.api.leads.enums.emailCampaignStage.followup3" as const,
-  NURTURE: "app.api.leads.enums.emailCampaignStage.nurture" as const,
-  REACTIVATION: "app.api.leads.enums.emailCampaignStage.reactivation" as const,
+} = createEnumOptions(scopedTranslation, {
+  NOT_STARTED: "enums.emailCampaignStage.notStarted",
+  INITIAL: "enums.emailCampaignStage.initial",
+  FOLLOWUP_1: "enums.emailCampaignStage.followup1",
+  FOLLOWUP_2: "enums.emailCampaignStage.followup2",
+  FOLLOWUP_3: "enums.emailCampaignStage.followup3",
+  NURTURE: "enums.emailCampaignStage.nurture",
+  REACTIVATION: "enums.emailCampaignStage.reactivation",
 } as const);
 
 /**
@@ -68,25 +67,21 @@ export const {
   enum: EmailJourneyVariant,
   options: EmailJourneyVariantOptions,
   Value: EmailJourneyVariantValues,
-} = createEnumOptions({
-  UNCENSORED_CONVERT:
-    "app.api.leads.enums.emailJourneyVariant.uncensoredConvert",
-  SIDE_HUSTLE: "app.api.leads.enums.emailJourneyVariant.sideHustle",
-  QUIET_RECOMMENDATION:
-    "app.api.leads.enums.emailJourneyVariant.quietRecommendation",
+} = createEnumOptions(scopedTranslation, {
+  UNCENSORED_CONVERT: "enums.emailJourneyVariant.uncensoredConvert",
+  SIDE_HUSTLE: "enums.emailJourneyVariant.sideHustle",
+  QUIET_RECOMMENDATION: "enums.emailJourneyVariant.quietRecommendation",
 });
 
 export const {
   enum: EmailJourneyVariantFilter,
   options: EmailJourneyVariantFilterOptions,
   Value: EmailJourneyVariantFilterValues,
-} = createEnumOptions({
-  ALL: "app.api.leads.enums.emailJourneyVariantFilter.all",
-  UNCENSORED_CONVERT:
-    "app.api.leads.enums.emailJourneyVariantFilter.uncensoredConvert",
-  SIDE_HUSTLE: "app.api.leads.enums.emailJourneyVariantFilter.sideHustle",
-  QUIET_RECOMMENDATION:
-    "app.api.leads.enums.emailJourneyVariantFilter.quietRecommendation",
+} = createEnumOptions(scopedTranslation, {
+  ALL: "enums.emailJourneyVariantFilter.all",
+  UNCENSORED_CONVERT: "enums.emailJourneyVariantFilter.uncensoredConvert",
+  SIDE_HUSTLE: "enums.emailJourneyVariantFilter.sideHustle",
+  QUIET_RECOMMENDATION: "enums.emailJourneyVariantFilter.quietRecommendation",
 });
 
 /**
@@ -97,15 +92,15 @@ export const {
   enum: EmailProvider,
   options: EmailProviderOptions,
   Value: EmailProviderValues,
-} = createEnumOptions({
-  RESEND: "app.api.emails.enums.emailProvider.resend",
-  SENDGRID: "app.api.emails.enums.emailProvider.sendgrid",
-  MAILGUN: "app.api.emails.enums.emailProvider.mailgun",
-  SES: "app.api.emails.enums.emailProvider.ses",
-  SMTP: "app.api.emails.enums.emailProvider.smtp",
-  MAILJET: "app.api.emails.enums.emailProvider.mailjet",
-  POSTMARK: "app.api.emails.enums.emailProvider.postmark",
-  OTHER: "app.api.emails.enums.emailProvider.other",
+} = createEnumOptions(scopedTranslation, {
+  RESEND: "enums.emailProvider.resend",
+  SENDGRID: "enums.emailProvider.sendgrid",
+  MAILGUN: "enums.emailProvider.mailgun",
+  SES: "enums.emailProvider.ses",
+  SMTP: "enums.emailProvider.smtp",
+  MAILJET: "enums.emailProvider.mailjet",
+  POSTMARK: "enums.emailProvider.postmark",
+  OTHER: "enums.emailProvider.other",
 });
 
 /**
@@ -116,9 +111,9 @@ export const {
   enum: SortOrder,
   options: SortOrderOptions,
   Value: SortOrderValues,
-} = createEnumOptions({
-  ASC: "app.api.leads.enums.sortOrder.asc",
-  DESC: "app.api.leads.enums.sortOrder.desc",
+} = createEnumOptions(scopedTranslation, {
+  ASC: "enums.sortOrder.asc",
+  DESC: "enums.sortOrder.desc",
 });
 
 /**
@@ -129,12 +124,12 @@ export const {
   enum: LeadSortField,
   options: LeadSortFieldOptions,
   Value: LeadSortFieldValues,
-} = createEnumOptions({
-  EMAIL: "app.api.leads.enums.leadSortField.email",
-  BUSINESS_NAME: "app.api.leads.enums.leadSortField.businessName",
-  CREATED_AT: "app.api.leads.enums.leadSortField.createdAt",
-  UPDATED_AT: "app.api.leads.enums.leadSortField.updatedAt",
-  LAST_ENGAGEMENT_AT: "app.api.leads.enums.leadSortField.lastEngagementAt",
+} = createEnumOptions(scopedTranslation, {
+  EMAIL: "enums.leadSortField.email",
+  BUSINESS_NAME: "enums.leadSortField.businessName",
+  CREATED_AT: "enums.leadSortField.createdAt",
+  UPDATED_AT: "enums.leadSortField.updatedAt",
+  LAST_ENGAGEMENT_AT: "enums.leadSortField.lastEngagementAt",
 });
 
 /**
@@ -145,9 +140,9 @@ export const {
   enum: ExportFormat,
   options: ExportFormatOptions,
   Value: ExportFormatValues,
-} = createEnumOptions({
-  CSV: "app.api.leads.enums.exportFormat.csv",
-  XLSX: "app.api.leads.enums.exportFormat.xlsx",
+} = createEnumOptions(scopedTranslation, {
+  CSV: "enums.exportFormat.csv",
+  XLSX: "enums.exportFormat.xlsx",
 });
 
 /**
@@ -158,9 +153,9 @@ export const {
   enum: MimeType,
   options: MimeTypeOptions,
   Value: MimeTypeValues,
-} = createEnumOptions({
-  CSV: "app.api.leads.enums.mimeType.csv",
-  XLSX: "app.api.leads.enums.mimeType.xlsx",
+} = createEnumOptions(scopedTranslation, {
+  CSV: "enums.mimeType.csv",
+  XLSX: "enums.mimeType.xlsx",
 });
 
 /**
@@ -171,14 +166,14 @@ export const {
   enum: ActivityType,
   options: ActivityTypeOptions,
   Value: ActivityTypeValues,
-} = createEnumOptions({
-  LEAD_CREATED: "app.api.leads.enums.activityType.leadCreated",
-  LEAD_UPDATED: "app.api.leads.enums.activityType.leadUpdated",
-  EMAIL_SENT: "app.api.leads.enums.activityType.emailSent",
-  EMAIL_OPENED: "app.api.leads.enums.activityType.emailOpened",
-  EMAIL_CLICKED: "app.api.leads.enums.activityType.emailClicked",
-  LEAD_CONVERTED: "app.api.leads.enums.activityType.leadConverted",
-  LEAD_UNSUBSCRIBED: "app.api.leads.enums.activityType.leadUnsubscribed",
+} = createEnumOptions(scopedTranslation, {
+  LEAD_CREATED: "enums.activityType.leadCreated",
+  LEAD_UPDATED: "enums.activityType.leadUpdated",
+  EMAIL_SENT: "enums.activityType.emailSent",
+  EMAIL_OPENED: "enums.activityType.emailOpened",
+  EMAIL_CLICKED: "enums.activityType.emailClicked",
+  LEAD_CONVERTED: "enums.activityType.leadConverted",
+  LEAD_UNSUBSCRIBED: "enums.activityType.leadUnsubscribed",
 });
 
 /**
@@ -189,11 +184,11 @@ export const {
   enum: UserAssociation,
   options: UserAssociationOptions,
   Value: UserAssociationValues,
-} = createEnumOptions({
-  WITH_USER: "app.api.leads.enums.userAssociation.withUser",
-  WITH_LEAD: "app.api.leads.enums.userAssociation.withLead",
-  STANDALONE: "app.api.leads.enums.userAssociation.standalone",
-  WITH_BOTH: "app.api.leads.enums.userAssociation.withBoth",
+} = createEnumOptions(scopedTranslation, {
+  WITH_USER: "enums.userAssociation.withUser",
+  WITH_LEAD: "enums.userAssociation.withLead",
+  STANDALONE: "enums.userAssociation.standalone",
+  WITH_BOTH: "enums.userAssociation.withBoth",
 });
 
 /**
@@ -204,12 +199,12 @@ export const {
   enum: LeadSource,
   options: LeadSourceOptions,
   Value: LeadSourceValues,
-} = createEnumOptions({
-  WEBSITE: "app.api.leads.enums.leadSource.website",
-  SOCIAL_MEDIA: "app.api.leads.enums.leadSource.socialMedia",
-  EMAIL_CAMPAIGN: "app.api.leads.enums.leadSource.emailCampaign",
-  REFERRAL: "app.api.leads.enums.leadSource.referral",
-  CSV_IMPORT: "app.api.leads.enums.leadSource.csvImport",
+} = createEnumOptions(scopedTranslation, {
+  WEBSITE: "enums.leadSource.website",
+  SOCIAL_MEDIA: "enums.leadSource.socialMedia",
+  EMAIL_CAMPAIGN: "enums.leadSource.emailCampaign",
+  REFERRAL: "enums.leadSource.referral",
+  CSV_IMPORT: "enums.leadSource.csvImport",
 });
 
 /**
@@ -225,21 +220,19 @@ export const {
   enum: LeadStatusFilter,
   options: LeadStatusFilterOptions,
   Value: LeadStatusFilterValues,
-} = createEnumOptions({
-  ALL: "app.api.leads.enums.leadStatusFilter.all",
-  NEW: "app.api.leads.enums.leadStatusFilter.new",
-  PENDING: "app.api.leads.enums.leadStatusFilter.pending",
-  CAMPAIGN_RUNNING: "app.api.leads.enums.leadStatusFilter.campaignRunning",
-  WEBSITE_USER: "app.api.leads.enums.leadStatusFilter.websiteUser",
-  NEWSLETTER_SUBSCRIBER:
-    "app.api.leads.enums.leadStatusFilter.newsletterSubscriber" as const,
-  IN_CONTACT: "app.api.leads.enums.leadStatusFilter.inContact",
-  SIGNED_UP: "app.api.leads.enums.leadStatusFilter.signedUp",
-  SUBSCRIPTION_CONFIRMED:
-    "app.api.leads.enums.leadStatusFilter.subscriptionConfirmed",
-  UNSUBSCRIBED: "app.api.leads.enums.leadStatusFilter.unsubscribed",
-  BOUNCED: "app.api.leads.enums.leadStatusFilter.bounced",
-  INVALID: "app.api.leads.enums.leadStatusFilter.invalid",
+} = createEnumOptions(scopedTranslation, {
+  ALL: "enums.leadStatusFilter.all",
+  NEW: "enums.leadStatusFilter.new",
+  PENDING: "enums.leadStatusFilter.pending",
+  CAMPAIGN_RUNNING: "enums.leadStatusFilter.campaignRunning",
+  WEBSITE_USER: "enums.leadStatusFilter.websiteUser",
+  NEWSLETTER_SUBSCRIBER: "enums.leadStatusFilter.newsletterSubscriber",
+  IN_CONTACT: "enums.leadStatusFilter.inContact",
+  SIGNED_UP: "enums.leadStatusFilter.signedUp",
+  SUBSCRIPTION_CONFIRMED: "enums.leadStatusFilter.subscriptionConfirmed",
+  UNSUBSCRIBED: "enums.leadStatusFilter.unsubscribed",
+  BOUNCED: "enums.leadStatusFilter.bounced",
+  INVALID: "enums.leadStatusFilter.invalid",
 });
 
 /**
@@ -250,15 +243,15 @@ export const {
   enum: EmailCampaignStageFilter,
   options: EmailCampaignStageFilterOptions,
   Value: EmailCampaignStageFilterValues,
-} = createEnumOptions({
-  ALL: "app.api.leads.enums.emailCampaignStageFilter.all",
-  NOT_STARTED: "app.api.leads.enums.emailCampaignStage.notStarted",
-  INITIAL: "app.api.leads.enums.emailCampaignStage.initial",
-  FOLLOWUP_1: "app.api.leads.enums.emailCampaignStage.followup1",
-  FOLLOWUP_2: "app.api.leads.enums.emailCampaignStage.followup2",
-  FOLLOWUP_3: "app.api.leads.enums.emailCampaignStage.followup3",
-  NURTURE: "app.api.leads.enums.emailCampaignStage.nurture",
-  REACTIVATION: "app.api.leads.enums.emailCampaignStage.reactivation",
+} = createEnumOptions(scopedTranslation, {
+  ALL: "enums.emailCampaignStageFilter.all",
+  NOT_STARTED: "enums.emailCampaignStage.notStarted",
+  INITIAL: "enums.emailCampaignStage.initial",
+  FOLLOWUP_1: "enums.emailCampaignStage.followup1",
+  FOLLOWUP_2: "enums.emailCampaignStage.followup2",
+  FOLLOWUP_3: "enums.emailCampaignStage.followup3",
+  NURTURE: "enums.emailCampaignStage.nurture",
+  REACTIVATION: "enums.emailCampaignStage.reactivation",
 });
 
 /**
@@ -269,13 +262,13 @@ export const {
   enum: LeadSourceFilter,
   options: LeadSourceFilterOptions,
   Value: LeadSourceFilterValues,
-} = createEnumOptions({
-  ALL: "app.api.leads.enums.leadSourceFilter.all",
-  WEBSITE: "app.api.leads.enums.leadSource.website",
-  SOCIAL_MEDIA: "app.api.leads.enums.leadSource.socialMedia",
-  EMAIL_CAMPAIGN: "app.api.leads.enums.leadSource.emailCampaign",
-  REFERRAL: "app.api.leads.enums.leadSource.referral",
-  CSV_IMPORT: "app.api.leads.enums.leadSource.csvImport",
+} = createEnumOptions(scopedTranslation, {
+  ALL: "enums.leadSourceFilter.all",
+  WEBSITE: "enums.leadSource.website",
+  SOCIAL_MEDIA: "enums.leadSource.socialMedia",
+  EMAIL_CAMPAIGN: "enums.leadSource.emailCampaign",
+  REFERRAL: "enums.leadSource.referral",
+  CSV_IMPORT: "enums.leadSource.csvImport",
 });
 
 /**
@@ -286,9 +279,9 @@ export const {
   enum: BatchOperationScope,
   options: BatchOperationScopeOptions,
   Value: BatchOperationScopeValues,
-} = createEnumOptions({
-  CURRENT_PAGE: "app.api.leads.enums.batchOperationScope.currentPage",
-  ALL_PAGES: "app.api.leads.enums.batchOperationScope.allPages",
+} = createEnumOptions(scopedTranslation, {
+  CURRENT_PAGE: "enums.batchOperationScope.currentPage",
+  ALL_PAGES: "enums.batchOperationScope.allPages",
 });
 
 /**

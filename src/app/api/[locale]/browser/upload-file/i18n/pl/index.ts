@@ -70,4 +70,9 @@ export const translations: typeof enTranslations = {
     title: "Operacja przesyłania pliku pomyślna",
     description: "Plik został pomyślnie przesłany",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    inputAutomation: "Automatyzacja wprowadzania",
+  },
 };

@@ -3,6 +3,10 @@ import { translations as permissionsTranslations } from "../../permissions/i18n/
 import { translations as shareLinksTranslations } from "../../share-links/i18n/en";
 
 export const translations = {
+  category: "Chat",
+  tags: {
+    threads: "Threads",
+  },
   messages: messagesTranslations,
   permissions: permissionsTranslations,
   shareLinks: shareLinksTranslations,

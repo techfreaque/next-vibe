@@ -18,7 +18,6 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
-import { simpleT } from "@/i18n/core/shared";
 
 import { leads } from "../../../leads/db";
 import type { JwtPayloadType, JwtPrivatePayloadType } from "../../auth/types";
@@ -31,6 +30,9 @@ import type {
   MePostRequestOutput,
   MePostResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * User Profile Repository - Static class pattern
@@ -48,6 +50,7 @@ export class UserProfileRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<MeGetResponseOutput>> {
     try {
       // Handle public users - return JWT payload only
@@ -64,7 +67,7 @@ export class UserProfileRepository {
       // Handle private users - return full profile
       if (!user.id) {
         return fail({
-          message: "app.api.user.private.me.get.errors.unauthorized.title",
+          message: t("get.errors.unauthorized.title"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -80,7 +83,7 @@ export class UserProfileRepository {
       );
       if (!userResponse.success) {
         return fail({
-          message: "app.api.user.private.me.get.errors.internal.title",
+          message: t("get.errors.internal.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { userId },
           cause: userResponse,
@@ -96,7 +99,7 @@ export class UserProfileRepository {
       logger.error("Error getting user profile", parseError(error));
       const parsedError = parseError(error);
       return fail({
-        message: "app.api.user.private.me.get.errors.internal.title",
+        message: t("get.errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           userId: user.isPublic ? "public" : (user.id ?? "unknown"),
@@ -119,9 +122,8 @@ export class UserProfileRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<MePostResponseOutput>> {
-    const { t } = simpleT(locale);
-
     try {
       // Public users: sync lead locale only
       if (user.isPublic) {
@@ -135,7 +137,7 @@ export class UserProfileRepository {
         return success<MePostResponseOutput>({
           response: {
             success: true,
-            message: t("app.api.user.private.me.update.success.message"),
+            message: t("update.response.message"),
             id: user.leadId,
             leadId: user.leadId,
             isPublic: false as const,
@@ -157,14 +159,14 @@ export class UserProfileRepository {
               verificationRequired: false,
               lastUpdated: now,
             },
-            nextSteps: [t("app.api.user.private.me.update.success.nextSteps")],
+            nextSteps: [t("update.success.nextSteps") as string],
           },
         });
       }
 
       if (!user.id) {
         return fail({
-          message: "app.api.user.private.me.update.errors.unauthorized.title",
+          message: t("update.errors.unauthorized.title"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -172,15 +174,12 @@ export class UserProfileRepository {
       logger.debug("Updating user profile", { userId, data });
 
       // Check if user exists
-      const userResponse = await UserRepository.getUserById(
-        userId,
-        UserDetailLevel.COMPLETE,
-        locale,
-        logger,
-      );
+      const userResponse = await UserRepository.getUserById<
+        typeof UserDetailLevel.COMPLETE
+      >(userId, UserDetailLevel.COMPLETE, locale, logger);
       if (!userResponse.success) {
         return fail({
-          message: "app.api.user.private.me.update.errors.unauthorized.title",
+          message: t("update.errors.unauthorized.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { userId },
           cause: userResponse,
@@ -195,15 +194,16 @@ export class UserProfileRepository {
           data.basicInfo.email,
           userId,
           logger,
+          locale,
         );
 
         if (emailExistsResponse.success && emailExistsResponse.data) {
           return fail({
-            message: "app.api.user.auth.errors.validation_failed",
+            message: t("update.errors.validation.title"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
             messageParams: {
               field: "email",
-              message: t("app.api.user.errors.emailAlreadyInUse"),
+              message: t("update.errors.conflict.title"),
             },
           });
         }
@@ -243,15 +243,12 @@ export class UserProfileRepository {
       logger.debug("Successfully updated user profile", { userId });
 
       // Get the updated user data
-      const updatedUserResponse = await UserRepository.getUserById(
-        userId,
-        UserDetailLevel.COMPLETE,
-        locale,
-        logger,
-      );
+      const updatedUserResponse = await UserRepository.getUserById<
+        typeof UserDetailLevel.COMPLETE
+      >(userId, UserDetailLevel.COMPLETE, locale, logger);
       if (!updatedUserResponse.success) {
         return fail({
-          message: "app.api.user.private.me.update.errors.internal.title",
+          message: t("update.errors.internal.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           cause: updatedUserResponse,
         });
@@ -266,22 +263,23 @@ export class UserProfileRepository {
       return success({
         response: {
           success: true,
-          message: "app.api.user.private.me.update.success.message",
+          message: t("update.response.message"),
           ...updatedUserResponse.data,
+          leadId: updatedUserResponse.data.leadId ?? null,
           changesSummary: {
             totalChanges: changedFields.length,
             changedFields: changedFields,
             verificationRequired: false,
             lastUpdated: new Date().toISOString(),
           },
-          nextSteps: [t("app.api.user.private.me.update.success.nextSteps")],
+          nextSteps: [t("update.success.nextSteps") as string],
         },
       });
     } catch (error) {
       logger.error("Error updating user profile", parseError(error));
       const parsedError = parseError(error);
       return fail({
-        message: "app.api.user.private.me.update.errors.internal.title",
+        message: t("update.errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           userId: user.id ?? "unknown",
@@ -303,11 +301,12 @@ export class UserProfileRepository {
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<MeDeleteResponseOutput>> {
     try {
       if (!user.id) {
         return fail({
-          message: "app.api.user.private.me.delete.errors.unauthorized.title",
+          message: t("delete.errors.unauthorized.title"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -323,7 +322,7 @@ export class UserProfileRepository {
       );
       if (!userResponse.success) {
         return fail({
-          message: "app.api.user.private.me.delete.errors.unauthorized.title",
+          message: t("delete.errors.unauthorized.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { userId },
           cause: userResponse,
@@ -342,7 +341,7 @@ export class UserProfileRepository {
       logger.error("Error deleting user account", parseError(error));
       const parsedError = parseError(error);
       return fail({
-        message: "app.api.user.private.me.delete.errors.internal.title",
+        message: t("delete.errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           userId: user.id ?? "unknown",

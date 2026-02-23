@@ -7,12 +7,12 @@ import { z } from "zod";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  requestField,
-  requestResponseField,
-  requestUrlPathParamsResponseField,
-  responseField,
+  scopedBackButton,
+  scopedRequestField,
+  scopedRequestResponseField,
+  scopedRequestUrlPathParamsResponseField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -32,96 +32,89 @@ import {
   MessagingProviderDB,
   MessagingProviderOptions,
 } from "../../../enum";
+import { scopedTranslation } from "./i18n";
 import { MessagingAccountEditContainer } from "./widget";
 
 /**
  * GET endpoint — retrieve account by ID
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["emails", "messaging", "accounts", "edit", "[id]"],
-  title: "app.api.emails.messaging.accounts.edit.id.get.title",
-  description: "app.api.emails.messaging.accounts.edit.id.get.description",
-  category: "app.api.emails.category",
+  title: "get.title",
+  description: "get.description",
+  category: "category",
   icon: "message-circle",
-  tags: ["app.api.emails.messaging.tag"],
+  tags: ["tags.messaging"],
   allowedRoles: [UserRole.ADMIN],
 
   fields: customWidgetObject({
     render: MessagingAccountEditContainer,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
-      id: requestUrlPathParamsResponseField({
+      id: scopedRequestUrlPathParamsResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.messaging.accounts.edit.id.fields.id.label",
-        description:
-          "app.api.emails.messaging.accounts.edit.id.fields.id.description",
+        label: "fields.id.label",
+        description: "fields.id.description",
         columns: 12,
         schema: z.uuid(),
       }),
 
-      name: responseField({
+      name: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.messaging.accounts.edit.id.response.account.name",
+        content: "response.account.name",
         schema: z.string(),
       }),
-      description: responseField({
+      description: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.messaging.accounts.edit.id.response.account.description",
+        content: "response.account.description",
         schema: z.string().optional(),
       }),
-      channel: responseField({
+      channel: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        text: "app.api.emails.messaging.accounts.edit.id.response.account.channel",
+        text: "response.account.channel",
         schema: z.enum(MessageChannelDB),
       }),
-      provider: responseField({
+      provider: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        text: "app.api.emails.messaging.accounts.edit.id.response.account.provider",
+        text: "response.account.provider",
         schema: z.enum(MessagingProviderDB),
       }),
-      fromId: responseField({
+      fromId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.messaging.accounts.edit.id.response.account.fromId",
+        content: "response.account.fromId",
         schema: z.string().nullable(),
       }),
-      status: responseField({
+      status: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        text: "app.api.emails.messaging.accounts.edit.id.response.account.status",
+        text: "response.account.status",
         schema: z.enum(MessagingAccountStatusDB),
       }),
-      priority: responseField({
+      priority: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.messaging.accounts.edit.id.response.account.priority",
+        content: "response.account.priority",
         schema: z.coerce.number().int().optional(),
       }),
-      messagesSentTotal: responseField({
+      messagesSentTotal: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.messaging.accounts.edit.id.response.account.messagesSentTotal",
+        content: "response.account.messagesSentTotal",
         schema: z.coerce.number().int(),
       }),
-      lastUsedAt: responseField({
+      lastUsedAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.messaging.accounts.edit.id.response.account.lastUsedAt",
+        content: "response.account.lastUsedAt",
         schema: dateSchema.nullable(),
       }),
-      createdAt: responseField({
+      createdAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.messaging.accounts.edit.id.response.account.createdAt",
+        content: "response.account.createdAt",
         schema: dateSchema,
       }),
-      updatedAt: responseField({
+      updatedAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.messaging.accounts.edit.id.response.account.updatedAt",
+        content: "response.account.updatedAt",
         schema: dateSchema,
       }),
     },
@@ -129,60 +122,46 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.emails.messaging.accounts.edit.id.errors.validation.title",
-      description:
-        "app.api.emails.messaging.accounts.edit.id.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.emails.messaging.accounts.edit.id.errors.unauthorized.title",
-      description:
-        "app.api.emails.messaging.accounts.edit.id.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.emails.messaging.accounts.edit.id.errors.forbidden.title",
-      description:
-        "app.api.emails.messaging.accounts.edit.id.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.emails.messaging.accounts.edit.id.errors.notFound.title",
-      description:
-        "app.api.emails.messaging.accounts.edit.id.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.emails.messaging.accounts.edit.id.errors.conflict.title",
-      description:
-        "app.api.emails.messaging.accounts.edit.id.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.emails.messaging.accounts.edit.id.errors.server.title",
-      description:
-        "app.api.emails.messaging.accounts.edit.id.errors.server.description",
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.emails.messaging.accounts.edit.id.errors.networkError.title",
-      description:
-        "app.api.emails.messaging.accounts.edit.id.errors.networkError.description",
+      title: "errors.networkError.title",
+      description: "errors.networkError.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.emails.messaging.accounts.edit.id.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.messaging.accounts.edit.id.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.emails.messaging.accounts.edit.id.errors.unknown.title",
-      description:
-        "app.api.emails.messaging.accounts.edit.id.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
   },
 
   successTypes: {
-    title: "app.api.emails.messaging.accounts.edit.id.success.title",
-    description:
-      "app.api.emails.messaging.accounts.edit.id.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 
   examples: {
@@ -209,134 +188,117 @@ const { GET } = createEndpoint({
  * PUT endpoint — update account
  */
 const { PUT } = createEndpoint({
+  scopedTranslation,
   method: Methods.PUT,
   path: ["emails", "messaging", "accounts", "edit", "[id]"],
-  title: "app.api.emails.messaging.accounts.edit.id.put.title",
-  description: "app.api.emails.messaging.accounts.edit.id.put.description",
-  category: "app.api.emails.category",
+  title: "put.title",
+  description: "put.description",
+  category: "category",
   icon: "message-circle",
-  tags: ["app.api.emails.messaging.tag"],
+  tags: ["tags.messaging"],
   allowedRoles: [UserRole.ADMIN],
 
   fields: customWidgetObject({
     render: MessagingAccountEditContainer,
     usage: { request: "data&urlPathParams", response: true } as const,
     children: {
-      backButton: backButton({ usage: { request: "data", response: true } }),
+      backButton: scopedBackButton(scopedTranslation, {
+        usage: { request: "data", response: true },
+      }),
 
-      id: requestUrlPathParamsResponseField({
+      id: scopedRequestUrlPathParamsResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.messaging.accounts.edit.id.fields.id.label",
-        description:
-          "app.api.emails.messaging.accounts.edit.id.fields.id.description",
+        label: "fields.id.label",
+        description: "fields.id.description",
         columns: 12,
         schema: z.uuid(),
       }),
 
-      name: requestResponseField({
+      name: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.messaging.accounts.edit.id.fields.name.label",
-        description:
-          "app.api.emails.messaging.accounts.edit.id.fields.name.description",
-        placeholder:
-          "app.api.emails.messaging.accounts.edit.id.fields.name.placeholder",
+        label: "fields.name.label",
+        description: "fields.name.description",
+        placeholder: "fields.name.placeholder",
         columns: 6,
         schema: z.string().min(1).optional(),
       }),
 
-      description: requestField({
+      description: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
-        label:
-          "app.api.emails.messaging.accounts.edit.id.fields.description.label",
-        description:
-          "app.api.emails.messaging.accounts.edit.id.fields.description.description",
-        placeholder:
-          "app.api.emails.messaging.accounts.edit.id.fields.description.placeholder",
+        label: "fields.description.label",
+        description: "fields.description.description",
+        placeholder: "fields.description.placeholder",
         columns: 12,
         schema: z.string().optional(),
       }),
 
-      channel: requestResponseField({
+      channel: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.emails.messaging.accounts.edit.id.fields.channel.label",
-        description:
-          "app.api.emails.messaging.accounts.edit.id.fields.channel.description",
+        label: "fields.channel.label",
+        description: "fields.channel.description",
         columns: 6,
         options: MessageChannelOptions,
         schema: z.enum(MessageChannelDB).optional(),
       }),
 
-      provider: requestResponseField({
+      provider: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label:
-          "app.api.emails.messaging.accounts.edit.id.fields.provider.label",
-        description:
-          "app.api.emails.messaging.accounts.edit.id.fields.provider.description",
+        label: "fields.provider.label",
+        description: "fields.provider.description",
         columns: 6,
         options: MessagingProviderOptions,
         schema: z.enum(MessagingProviderDB).optional(),
       }),
 
-      fromId: requestResponseField({
+      fromId: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.messaging.accounts.edit.id.fields.fromId.label",
-        description:
-          "app.api.emails.messaging.accounts.edit.id.fields.fromId.description",
-        placeholder:
-          "app.api.emails.messaging.accounts.edit.id.fields.fromId.placeholder",
+        label: "fields.fromId.label",
+        description: "fields.fromId.description",
+        placeholder: "fields.fromId.placeholder",
         columns: 6,
         schema: z.string().optional(),
       }),
 
-      apiToken: requestField({
+      apiToken: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
-        label:
-          "app.api.emails.messaging.accounts.edit.id.fields.apiToken.label",
-        description:
-          "app.api.emails.messaging.accounts.edit.id.fields.apiToken.description",
-        placeholder:
-          "app.api.emails.messaging.accounts.edit.id.fields.apiToken.placeholder",
+        label: "fields.apiToken.label",
+        description: "fields.apiToken.description",
+        placeholder: "fields.apiToken.placeholder",
         columns: 6,
         schema: z.string().optional(),
       }),
 
-      apiSecret: requestField({
+      apiSecret: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
-        label:
-          "app.api.emails.messaging.accounts.edit.id.fields.apiSecret.label",
-        description:
-          "app.api.emails.messaging.accounts.edit.id.fields.apiSecret.description",
-        placeholder:
-          "app.api.emails.messaging.accounts.edit.id.fields.apiSecret.placeholder",
+        label: "fields.apiSecret.label",
+        description: "fields.apiSecret.description",
+        placeholder: "fields.apiSecret.placeholder",
         columns: 6,
         schema: z.string().optional(),
       }),
 
-      priority: requestField({
+      priority: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.emails.messaging.accounts.edit.id.fields.priority.label",
-        description:
-          "app.api.emails.messaging.accounts.edit.id.fields.priority.description",
+        label: "fields.priority.label",
+        description: "fields.priority.description",
         columns: 6,
         schema: z.coerce.number().int().min(0).max(100).optional(),
       }),
 
-      status: requestResponseField({
+      status: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.emails.messaging.accounts.edit.id.fields.status.label",
-        description:
-          "app.api.emails.messaging.accounts.edit.id.fields.status.description",
+        label: "fields.status.label",
+        description: "fields.status.description",
         columns: 6,
         schema: z.enum(MessagingAccountStatusDB).optional(),
       }),
@@ -345,60 +307,46 @@ const { PUT } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.emails.messaging.accounts.edit.id.errors.validation.title",
-      description:
-        "app.api.emails.messaging.accounts.edit.id.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.emails.messaging.accounts.edit.id.errors.unauthorized.title",
-      description:
-        "app.api.emails.messaging.accounts.edit.id.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.emails.messaging.accounts.edit.id.errors.forbidden.title",
-      description:
-        "app.api.emails.messaging.accounts.edit.id.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.emails.messaging.accounts.edit.id.errors.notFound.title",
-      description:
-        "app.api.emails.messaging.accounts.edit.id.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.emails.messaging.accounts.edit.id.errors.conflict.title",
-      description:
-        "app.api.emails.messaging.accounts.edit.id.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.emails.messaging.accounts.edit.id.errors.server.title",
-      description:
-        "app.api.emails.messaging.accounts.edit.id.errors.server.description",
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.emails.messaging.accounts.edit.id.errors.networkError.title",
-      description:
-        "app.api.emails.messaging.accounts.edit.id.errors.networkError.description",
+      title: "errors.networkError.title",
+      description: "errors.networkError.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.emails.messaging.accounts.edit.id.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.messaging.accounts.edit.id.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.emails.messaging.accounts.edit.id.errors.unknown.title",
-      description:
-        "app.api.emails.messaging.accounts.edit.id.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
   },
 
   successTypes: {
-    title: "app.api.emails.messaging.accounts.edit.id.put.success.title",
-    description:
-      "app.api.emails.messaging.accounts.edit.id.put.success.description",
+    title: "put.success.title",
+    description: "put.success.description",
   },
 
   examples: {

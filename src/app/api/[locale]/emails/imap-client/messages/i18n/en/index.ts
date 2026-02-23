@@ -11,4 +11,11 @@ export const translations = {
   sync: syncTranslations,
   compose: composeTranslations,
   bulk: bulkTranslations,
+  errors: {
+    server: { title: "Server Error" },
+    notFound: { title: "Message Not Found" },
+    accountNotFound: { title: "Account Not Found" },
+    syncFailed: { title: "Sync Failed" },
+    syncSuccess: { message: "Messages synced successfully" },
+  },
 };

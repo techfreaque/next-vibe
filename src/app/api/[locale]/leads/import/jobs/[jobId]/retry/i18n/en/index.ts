@@ -1,4 +1,10 @@
 export const translations = {
+  category: "Data Import",
+  tags: {
+    leads: "Leads",
+    management: "Management",
+  },
+
   post: {
     title: "Retry Import Job",
     description: "Retry a failed import job",

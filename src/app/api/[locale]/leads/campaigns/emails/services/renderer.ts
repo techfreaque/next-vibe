@@ -10,7 +10,6 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
 import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import { createTrackingContext } from "../../../../emails/smtp-client/components/tracking_context.email";
 import {
@@ -20,6 +19,7 @@ import {
   LeadStatus,
 } from "../../../enum";
 import type { LeadWithEmailType } from "../../../types";
+import { scopedTranslation } from "../journeys/i18n";
 import { quietRecommendationJourneyTemplates } from "../journeys/quiet-recommendation.email";
 import { sideHustleJourneyTemplates } from "../journeys/side-hustle.email";
 import { uncensoredConvertJourneyTemplates } from "../journeys/uncensored-convert.email";
@@ -165,7 +165,6 @@ export class EmailRendererService {
     journeyVariant: (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
     stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage],
     context: {
-      t: TFunction;
       locale: CountryLanguage;
       companyName: string;
       companyEmail: string;
@@ -243,7 +242,6 @@ export class EmailRendererService {
       // Render the email
       const result = await templateFunction({
         data: templateData,
-        t: context.t,
         locale: context.locale,
         tracking,
       });
@@ -323,7 +321,7 @@ export class EmailRendererService {
    */
   getJourneyInfo(
     journeyVariant: (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
-    t: TFunction,
+    locale: CountryLanguage,
   ): {
     name: string;
     description: string;
@@ -331,6 +329,7 @@ export class EmailRendererService {
       (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage]
     >;
   } {
+    const { t } = scopedTranslation.scopedT(locale);
     const journeyInfo: Partial<
       Record<
         (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
@@ -338,27 +337,23 @@ export class EmailRendererService {
       >
     > = {
       [EmailJourneyVariant.UNCENSORED_CONVERT]: {
-        name: t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.uncensoredConvert.name",
-        ),
+        name: t("emailJourneys.components.journeyInfo.uncensoredConvert.name"),
         description: t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.uncensoredConvert.description",
+          "emailJourneys.components.journeyInfo.uncensoredConvert.description",
         ),
       },
       [EmailJourneyVariant.SIDE_HUSTLE]: {
-        name: t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.sideHustle.name",
-        ),
+        name: t("emailJourneys.components.journeyInfo.sideHustle.name"),
         description: t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.sideHustle.description",
+          "emailJourneys.components.journeyInfo.sideHustle.description",
         ),
       },
       [EmailJourneyVariant.QUIET_RECOMMENDATION]: {
         name: t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.quietRecommendation.name",
+          "emailJourneys.components.journeyInfo.quietRecommendation.name",
         ),
         description: t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.components.journeyInfo.quietRecommendation.description",
+          "emailJourneys.components.journeyInfo.quietRecommendation.description",
         ),
       },
     };
@@ -381,7 +376,6 @@ export class EmailRendererService {
     journeyVariant: (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant],
     stage: (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage],
     context: {
-      t: TFunction;
       locale: CountryLanguage;
       companyName: string;
       companyEmail: string;
@@ -391,23 +385,15 @@ export class EmailRendererService {
       Countries,
       Languages,
     ];
+    const { t } = scopedTranslation.scopedT(context.locale);
+
     // Create mock lead data for preview
     const mockLead: LeadWithEmailType = {
-      id: context.t(
-        "app.api.leads.campaigns.emails.journeys.emailJourneys.components.defaults.previewLeadId",
-      ),
-      email: context.t(
-        "app.api.leads.campaigns.emails.journeys.emailJourneys.components.defaults.previewEmail",
-      ),
-      businessName: context.t(
-        "app.api.leads.campaigns.emails.journeys.emailJourneys.components.defaults.previewBusinessName",
-      ),
-      contactName: context.t(
-        "app.api.leads.campaigns.emails.journeys.emailJourneys.components.defaults.previewContactName",
-      ),
-      phone: context.t(
-        "app.api.leads.campaigns.emails.journeys.emailJourneys.components.defaults.previewPhone",
-      ),
+      id: t("emailJourneys.components.defaults.previewLeadId"),
+      email: t("emailJourneys.components.defaults.previewEmail"),
+      businessName: t("emailJourneys.components.defaults.previewBusinessName"),
+      contactName: t("emailJourneys.components.defaults.previewContactName"),
+      phone: t("emailJourneys.components.defaults.previewPhone"),
       website: env.NEXT_PUBLIC_APP_URL,
       country: country,
       language: language,
@@ -446,9 +432,7 @@ export class EmailRendererService {
       stage,
       {
         ...context,
-        campaignId: context.t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.components.defaults.previewCampaignId",
-        ),
+        campaignId: t("emailJourneys.components.defaults.previewCampaignId"),
         unsubscribeUrl: `${env.NEXT_PUBLIC_APP_URL}/unsubscribe?preview=true`,
         trackingUrl: `${env.NEXT_PUBLIC_APP_URL}/track?preview=true`,
       },

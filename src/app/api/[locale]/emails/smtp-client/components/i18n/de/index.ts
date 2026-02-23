@@ -2,12 +2,16 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   email: {
+    tagline: "KI-Plattform für freie Meinungsäußerung",
     footer: {
       needHelp: "Brauchen Sie Hilfe?",
       helpText: "Brauchen Sie Hilfe? Kontaktieren Sie uns unter",
       unsubscribeText: "Möchten Sie diese E-Mails nicht mehr erhalten?",
       unsubscribeLink: "Abmelden",
       copyright: "© {{currentYear}} {{appName}}. Alle Rechte vorbehalten.",
+      visitWebsite: "Website besuchen",
+      allRightsReserved:
+        "© {{currentYear}} {{appName}}. Alle Rechte vorbehalten.",
     },
   },
   post: {

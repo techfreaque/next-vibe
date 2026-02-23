@@ -10,4 +10,16 @@ export const translations: typeof enTranslations = {
   id: idTranslations,
   list: listTranslations,
   test: testTranslations,
+  connection: {
+    test: {
+      success: "Test połączenia IMAP powiódł się",
+      failed: "Test połączenia IMAP nie powiódł się",
+      timeout: "Test połączenia IMAP przekroczył limit czasu",
+    },
+    validation: {
+      usernameRequired: "Nazwa użytkownika jest wymagana",
+      portInvalid: "Nieprawidłowy numer portu",
+      hostInvalid: "Nieprawidłowy format hosta",
+    },
+  },
 };

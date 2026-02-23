@@ -321,6 +321,7 @@ export const translations: typeof enTranslations = {
   sync: {
     failed: "Nie udało się zsynchronizować subskrypcji",
     stripe_error: "Błąd synchronizacji Stripe",
+    success: "Subskrypcja zsynchronizowana pomyślnie",
   },
 
   // Cancel operation
@@ -396,6 +397,55 @@ export const translations: typeof enTranslations = {
       status: "Status",
       contact_user: "Skontaktuj się z użytkownikiem",
       footer: "To jest automatyczne powiadomienie z {{appName}}",
+    },
+  },
+
+  // Email template metadata (for preview registry)
+  emailTemplates: {
+    success: {
+      name: "E-mail potwierdzający subskrypcję",
+      description: "E-mail potwierdzający wysyłany po aktywacji subskrypcji",
+      category: "subskrypcja",
+      preview: {
+        privateName: {
+          label: "Nazwa użytkownika",
+          description: "Wyświetlana nazwa użytkownika",
+        },
+        userId: {
+          label: "ID użytkownika",
+          description: "Unikalny identyfikator użytkownika",
+        },
+        leadId: {
+          label: "ID leada",
+          description: "Powiązany identyfikator leada",
+        },
+        planName: {
+          label: "Nazwa planu",
+          description: "Nazwa planu subskrypcji",
+        },
+      },
+    },
+    adminNotification: {
+      name: "Powiadomienie admina o subskrypcji",
+      description: "Wewnętrzne powiadomienie do adminów o nowych subskrypcjach",
+      category: "admin",
+      preview: {
+        privateName: {
+          label: "Nazwa użytkownika",
+        },
+        publicName: {
+          label: "Nazwa publiczna",
+        },
+        email: {
+          label: "E-mail użytkownika",
+        },
+        planName: {
+          label: "Nazwa planu",
+        },
+        statusName: {
+          label: "Status subskrypcji",
+        },
+      },
     },
   },
 

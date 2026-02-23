@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,135 +20,122 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["leads", "import", "process"],
-  title: "app.api.leads.import.process.post.title",
-  description: "app.api.leads.import.process.post.description",
-  category: "app.api.leads.category",
+  title: "import.process.post.title",
+  description: "import.process.post.description",
+  category: "category",
   icon: "upload",
-  tags: ["app.api.leads.import.process.tag"],
+  tags: ["import.process.tag"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.leads.import.process.post.container.title",
-      description: "app.api.leads.import.process.post.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      maxJobsPerRun: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "import.process.post.container.title",
+    description: "import.process.post.container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      maxJobsPerRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.leads.import.process.post.fields.maxJobsPerRun.label",
-        description:
-          "app.api.leads.import.process.post.fields.maxJobsPerRun.description",
+        label: "import.process.post.fields.maxJobsPerRun.label",
+        description: "import.process.post.fields.maxJobsPerRun.description",
         columns: 6,
         schema: z.coerce.number().min(1).max(10).default(5),
       }),
 
-      maxRetriesPerJob: requestField({
+      maxRetriesPerJob: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.leads.import.process.post.fields.maxRetriesPerJob.label",
-        description:
-          "app.api.leads.import.process.post.fields.maxRetriesPerJob.description",
+        label: "import.process.post.fields.maxRetriesPerJob.label",
+        description: "import.process.post.fields.maxRetriesPerJob.description",
         columns: 6,
         schema: z.coerce.number().min(1).max(5).default(3),
       }),
 
-      dryRun: requestField({
+      dryRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.import.process.post.fields.dryRun.label",
-        description:
-          "app.api.leads.import.process.post.fields.dryRun.description",
+        label: "import.process.post.fields.dryRun.label",
+        description: "import.process.post.fields.dryRun.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
-      jobsProcessed: responseField({
+      jobsProcessed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.import.process.post.response.jobsProcessed",
+        content: "import.process.post.response.jobsProcessed",
         schema: z.number(),
       }),
 
-      totalRowsProcessed: responseField({
+      totalRowsProcessed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.import.process.post.response.totalRowsProcessed",
+        content: "import.process.post.response.totalRowsProcessed",
         schema: z.number(),
       }),
 
-      successfulImports: responseField({
+      successfulImports: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.import.process.post.response.successfulImports",
+        content: "import.process.post.response.successfulImports",
         schema: z.number(),
       }),
 
-      failedImports: responseField({
+      failedImports: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.import.process.post.response.failedImports",
+        content: "import.process.post.response.failedImports",
         schema: z.number(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.leads.import.process.post.errors.unauthorized.title",
-      description:
-        "app.api.leads.import.process.post.errors.unauthorized.description",
+      title: "import.process.post.errors.unauthorized.title",
+      description: "import.process.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.leads.import.process.post.errors.forbidden.title",
-      description:
-        "app.api.leads.import.process.post.errors.forbidden.description",
+      title: "import.process.post.errors.forbidden.title",
+      description: "import.process.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.leads.import.process.post.errors.server.title",
-      description:
-        "app.api.leads.import.process.post.errors.server.description",
+      title: "import.process.post.errors.server.title",
+      description: "import.process.post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.leads.import.process.post.errors.unknown.title",
-      description:
-        "app.api.leads.import.process.post.errors.unknown.description",
+      title: "import.process.post.errors.unknown.title",
+      description: "import.process.post.errors.unknown.description",
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.leads.import.process.post.errors.validation.title",
-      description:
-        "app.api.leads.import.process.post.errors.validation.description",
+      title: "import.process.post.errors.validation.title",
+      description: "import.process.post.errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.leads.import.process.post.errors.unknown.title",
-      description:
-        "app.api.leads.import.process.post.errors.unknown.description",
+      title: "import.process.post.errors.unknown.title",
+      description: "import.process.post.errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.leads.import.process.post.errors.unknown.title",
-      description:
-        "app.api.leads.import.process.post.errors.unknown.description",
+      title: "import.process.post.errors.unknown.title",
+      description: "import.process.post.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.leads.import.process.post.errors.unknown.title",
-      description:
-        "app.api.leads.import.process.post.errors.unknown.description",
+      title: "import.process.post.errors.unknown.title",
+      description: "import.process.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.leads.import.process.post.errors.unknown.title",
-      description:
-        "app.api.leads.import.process.post.errors.unknown.description",
+      title: "import.process.post.errors.unknown.title",
+      description: "import.process.post.errors.unknown.description",
     },
   },
 
   successTypes: {
-    title: "app.api.leads.import.process.post.success.title",
-    description: "app.api.leads.import.process.post.success.description",
+    title: "import.process.post.success.title",
+    description: "import.process.post.success.description",
   },
 
   examples: {

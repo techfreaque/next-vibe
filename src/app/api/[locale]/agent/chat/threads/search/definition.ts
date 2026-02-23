@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -22,253 +22,218 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ThreadStatus, ThreadStatusOptions } from "../../enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Search Threads Endpoint (GET)
  * Full-text search across thread titles, previews, and system prompts
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["agent", "chat", "threads", "search"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  title: "app.api.agent.chat.threads.search.get.title" as const,
-  description: "app.api.agent.chat.threads.search.get.description" as const,
+  title: "search.get.title" as const,
+  description: "search.get.description" as const,
   icon: "search",
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.threads" as const],
+  category: "category" as const,
+  tags: ["tags.threads" as const],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.agent.chat.threads.search.get.container.title" as const,
-      description:
-        "app.api.agent.chat.threads.search.get.container.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "search.get.container.title" as const,
+    description: "search.get.container.description" as const,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data", response: true },
+    children: {
       // === SEARCH QUERY ===
-      query: requestField({
+      query: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.agent.chat.threads.search.get.query.label" as const,
-        description:
-          "app.api.agent.chat.threads.search.get.query.description" as const,
-        placeholder:
-          "app.api.agent.chat.threads.search.get.query.placeholder" as const,
+        label: "search.get.query.label" as const,
+        description: "search.get.query.description" as const,
+        placeholder: "search.get.query.placeholder" as const,
         schema: z.string().min(1).max(500),
       }),
 
       // === PAGINATION ===
-      pagination: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.agent.chat.threads.search.get.sections.pagination.title" as const,
-          description:
-            "app.api.agent.chat.threads.search.get.sections.pagination.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 2,
-        },
-        { request: "data" },
-        {
-          page: requestField({
+      pagination: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "search.get.sections.pagination.title" as const,
+        description: "search.get.sections.pagination.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 2,
+        usage: { request: "data" },
+        children: {
+          page: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
-            label: "app.api.agent.chat.threads.search.get.page.label" as const,
-            description:
-              "app.api.agent.chat.threads.search.get.page.description" as const,
+            label: "search.get.page.label" as const,
+            description: "search.get.page.description" as const,
             columns: 6,
             schema: z.coerce.number().min(1).optional().default(1),
           }),
-          limit: requestField({
+          limit: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
-            label: "app.api.agent.chat.threads.search.get.limit.label" as const,
-            description:
-              "app.api.agent.chat.threads.search.get.limit.description" as const,
+            label: "search.get.limit.label" as const,
+            description: "search.get.limit.description" as const,
             columns: 6,
             schema: z.coerce.number().min(1).max(100).optional().default(20),
           }),
         },
-      ),
+      }),
 
       // === SORT OPTIONS ===
-      sortBy: requestField({
+      sortBy: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.agent.chat.threads.search.get.sortBy.label" as const,
-        description:
-          "app.api.agent.chat.threads.search.get.sortBy.description" as const,
+        label: "search.get.sortBy.label" as const,
+        description: "search.get.sortBy.description" as const,
         options: [
           {
             value: "relevance",
-            label:
-              "app.api.agent.chat.threads.search.get.sortBy.options.relevance" as const,
+            label: "search.get.sortBy.options.relevance" as const,
           },
           {
             value: "date",
-            label:
-              "app.api.agent.chat.threads.search.get.sortBy.options.date" as const,
+            label: "search.get.sortBy.options.date" as const,
           },
         ],
         schema: z.enum(["relevance", "date"]).optional().default("relevance"),
       }),
 
       // === FILTERS ===
-      includeArchived: requestField({
+      includeArchived: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.agent.chat.threads.search.get.includeArchived.label" as const,
-        description:
-          "app.api.agent.chat.threads.search.get.includeArchived.description" as const,
+        label: "search.get.includeArchived.label" as const,
+        description: "search.get.includeArchived.description" as const,
         schema: z.boolean().optional().default(false),
       }),
 
       // === RESPONSE ===
-      results: responseArrayField(
-        {
+      results: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-        },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.STACKED,
-          },
-          { response: true },
-          {
-            id: responseField({
+          layoutType: LayoutType.STACKED,
+          usage: { response: true },
+          children: {
+            id: scopedResponseField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.UUID,
-              label:
-                "app.api.agent.chat.threads.search.get.response.results.thread.id.label" as const,
+              label: "search.get.response.results.thread.id.label" as const,
               schema: z.uuid(),
             }),
-            threadTitle: responseField({
+            threadTitle: scopedResponseField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
-              label:
-                "app.api.agent.chat.threads.search.get.response.results.thread.title.label" as const,
+              label: "search.get.response.results.thread.title.label" as const,
               schema: z.string(),
             }),
-            preview: responseField({
+            preview: scopedResponseField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXTAREA,
               label:
-                "app.api.agent.chat.threads.search.get.response.results.thread.preview.label" as const,
+                "search.get.response.results.thread.preview.label" as const,
               schema: z.string().nullable(),
             }),
-            rank: responseField({
+            rank: scopedResponseField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.NUMBER,
-              label:
-                "app.api.agent.chat.threads.search.get.response.results.thread.rank.label" as const,
+              label: "search.get.response.results.thread.rank.label" as const,
               description:
-                "app.api.agent.chat.threads.search.get.response.results.thread.rank.description" as const,
+                "search.get.response.results.thread.rank.description" as const,
               schema: z.coerce.number(),
             }),
-            headline: responseField({
+            headline: scopedResponseField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXTAREA,
               label:
-                "app.api.agent.chat.threads.search.get.response.results.thread.headline.label" as const,
+                "search.get.response.results.thread.headline.label" as const,
               description:
-                "app.api.agent.chat.threads.search.get.response.results.thread.headline.description" as const,
+                "search.get.response.results.thread.headline.description" as const,
               schema: z.string(),
             }),
-            status: responseField({
+            status: scopedResponseField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.SELECT,
-              label:
-                "app.api.agent.chat.threads.search.get.response.results.thread.status.label" as const,
+              label: "search.get.response.results.thread.status.label" as const,
               options: ThreadStatusOptions,
               schema: z.enum(ThreadStatus),
             }),
-            createdAt: responseField({
+            createdAt: scopedResponseField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label:
-                "app.api.agent.chat.threads.search.get.response.results.thread.createdAt.label" as const,
+                "search.get.response.results.thread.createdAt.label" as const,
               schema: z.string(),
             }),
-            updatedAt: responseField({
+            updatedAt: scopedResponseField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.TEXT,
               label:
-                "app.api.agent.chat.threads.search.get.response.results.thread.updatedAt.label" as const,
+                "search.get.response.results.thread.updatedAt.label" as const,
               schema: z.string(),
             }),
           },
-        ),
-      ),
+        }),
+      }),
 
-      totalResults: responseField({
+      totalResults: scopedResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.agent.chat.threads.search.get.response.totalResults.label" as const,
-        description:
-          "app.api.agent.chat.threads.search.get.response.totalResults.description" as const,
+        label: "search.get.response.totalResults.label" as const,
+        description: "search.get.response.totalResults.description" as const,
         schema: z.coerce.number(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.threads.search.get.errors.validationFailed.title",
-      description:
-        "app.api.agent.chat.threads.search.get.errors.validationFailed.description",
+      title: "search.get.errors.validationFailed.title",
+      description: "search.get.errors.validationFailed.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.chat.threads.search.get.errors.network.title",
-      description:
-        "app.api.agent.chat.threads.search.get.errors.network.description",
+      title: "search.get.errors.network.title",
+      description: "search.get.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.agent.chat.threads.search.get.errors.unauthorized.title",
-      description:
-        "app.api.agent.chat.threads.search.get.errors.unauthorized.description",
+      title: "search.get.errors.unauthorized.title",
+      description: "search.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.agent.chat.threads.search.get.errors.forbidden.title",
-      description:
-        "app.api.agent.chat.threads.search.get.errors.forbidden.description",
+      title: "search.get.errors.forbidden.title",
+      description: "search.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.agent.chat.threads.search.get.errors.notFound.title",
-      description:
-        "app.api.agent.chat.threads.search.get.errors.notFound.description",
+      title: "search.get.errors.notFound.title",
+      description: "search.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.chat.threads.search.get.errors.serverError.title",
-      description:
-        "app.api.agent.chat.threads.search.get.errors.serverError.description",
+      title: "search.get.errors.serverError.title",
+      description: "search.get.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.chat.threads.search.get.errors.unknown.title",
-      description:
-        "app.api.agent.chat.threads.search.get.errors.unknown.description",
+      title: "search.get.errors.unknown.title",
+      description: "search.get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.threads.search.get.errors.unsavedChanges.title",
-      description:
-        "app.api.agent.chat.threads.search.get.errors.unsavedChanges.description",
+      title: "search.get.errors.unsavedChanges.title",
+      description: "search.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.agent.chat.threads.search.get.errors.conflict.title",
-      description:
-        "app.api.agent.chat.threads.search.get.errors.conflict.description",
+      title: "search.get.errors.conflict.title",
+      description: "search.get.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.agent.chat.threads.search.get.success.title",
-    description: "app.api.agent.chat.threads.search.get.success.description",
+    title: "search.get.success.title",
+    description: "search.get.success.description",
   },
 
   examples: {

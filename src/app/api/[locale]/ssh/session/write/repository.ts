@@ -9,21 +9,25 @@ import {
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import type { scopedTranslation } from "../../i18n";
 import { sessionPool } from "../pool";
 import type {
   SessionWriteRequestOutput,
   SessionWriteResponseOutput,
 } from "./definition";
 
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+
 export class SessionWriteRepository {
   static async write(
     data: SessionWriteRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SessionWriteResponseOutput>> {
     const entry = sessionPool.get(data.sessionId);
     if (!entry) {
       return fail({
-        message: "Session not found",
+        message: t("errors.sessionNotFound"),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -34,7 +38,7 @@ export class SessionWriteRepository {
       return success({ ok: true });
     } catch (error) {
       return fail({
-        message: String(error),
+        message: t("errors.notImplemented.session"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

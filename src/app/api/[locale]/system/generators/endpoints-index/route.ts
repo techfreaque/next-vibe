@@ -12,7 +12,7 @@ import { endpointsIndexGeneratorRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger }) =>
-      endpointsIndexGeneratorRepository.generateEndpointsIndex(data, logger),
+    handler: ({ data, logger, t }) =>
+      endpointsIndexGeneratorRepository.generateEndpointsIndex(data, logger, t),
   },
 });

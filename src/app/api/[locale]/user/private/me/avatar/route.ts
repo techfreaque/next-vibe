@@ -10,17 +10,18 @@ export const { POST, DELETE, tools } = endpointsHandler({
   endpoint: avatarEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ user, data, locale, logger }) =>
+    handler: ({ user, data, locale, logger, t }) =>
       AvatarRepository.uploadAvatar(
         user.id,
         data.fileUpload.file,
         locale,
         logger,
+        t,
       ),
   },
   [Methods.DELETE]: {
     email: undefined,
-    handler: ({ user, locale, logger }) =>
-      AvatarRepository.deleteAvatar(user.id, locale, logger),
+    handler: ({ user, locale, logger, t }) =>
+      AvatarRepository.deleteAvatar(user.id, locale, logger, t),
   },
 });

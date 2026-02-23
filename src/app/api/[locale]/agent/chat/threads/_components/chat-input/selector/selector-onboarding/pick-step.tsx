@@ -7,6 +7,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import { type JSX, useCallback, useState } from "react";
 
+import { scopedTranslation as charactersScopedTranslation } from "@/app/api/[locale]/agent/chat/characters/i18n";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -65,9 +66,6 @@ export function PickStep({
       const createdId = await addFavorite({
         characterId: selectedId,
         icon: character.icon,
-        name: character.name,
-        tagline: character.tagline,
-        description: character.description,
         voice: character.voice,
         modelSelection: null,
       });
@@ -155,7 +153,7 @@ function CompanionCard({
   isSelected,
   locale,
 }: CompanionCardProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = charactersScopedTranslation.scopedT(locale);
 
   return (
     <Div

@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,11 +20,14 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * Speech-to-Text Endpoint (POST)
  * Transcribes audio to text using Eden AI
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["agent", "speech-to-text"],
   allowedRoles: [
@@ -33,48 +36,39 @@ const { POST } = createEndpoint({
     UserRole.PUBLIC,
     UserRole.AI_TOOL_OFF,
   ],
-  title: "app.api.agent.speechToText.post.title",
-  description: "app.api.agent.speechToText.post.description",
+  title: "post.title",
+  description: "post.description",
   icon: "mic",
-  category: "app.api.agent.chat.category",
-  tags: [
-    "app.api.agent.tags.speech",
-    "app.api.agent.tags.transcription",
-    "app.api.agent.tags.ai",
-  ],
+  category: "category",
+  tags: ["hotkey.tags.speech", "hotkey.tags.transcription", "hotkey.tags.ai"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.agent.speechToText.post.form.title",
-      description: "app.api.agent.speechToText.post.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.form.title",
+    description: "post.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === FILE UPLOAD SECTION ===
-      fileUpload: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.agent.speechToText.post.fileUpload.title",
-          description: "app.api.agent.speechToText.post.fileUpload.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { request: "data" },
-        {
-          file: requestField({
+      fileUpload: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "post.fileUpload.title",
+        description: "post.fileUpload.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { request: "data" },
+        children: {
+          file: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.FILE,
-            label: "app.api.agent.speechToText.post.audio.label",
-            description: "app.api.agent.speechToText.post.audio.description",
+            label: "post.audio.label",
+            description: "post.audio.description",
             columns: 12,
             schema: z
               .instanceof(File)
               .refine((file) => file.size <= 25 * 1024 * 1024, {
-                message:
-                  "app.api.agent.speechToText.post.audio.validation.maxSize",
+                message: "post.audio.validation.maxSize",
               })
               .refine(
                 (file) => {
@@ -84,113 +78,105 @@ const { POST } = createEndpoint({
                   );
                 },
                 {
-                  message:
-                    "app.api.agent.speechToText.post.audio.validation.audioOnly",
+                  message: "post.audio.validation.audioOnly",
                 },
               ),
           }),
         },
-      ),
+      }),
 
       // // === CONFIG FIELDS ===
-      // provider: requestField(
-      //   {
-      //     type: WidgetType.FORM_FIELD,
-      //     fieldType: FieldDataType.SELECT,
-      //     label: "app.api.agent.speechToText.post.provider.label",
-      //     description: "app.api.agent.speechToText.post.provider.description",
-      //     columns: 6,
-      //     options: SttProviderOptions,
-      //   },
-      //   z.string().default("openai"),
-      // ),
+      // provider: scopedRequestField(scopedTranslation, {
+      //   type: WidgetType.FORM_FIELD,
+      //   fieldType: FieldDataType.SELECT,
+      //   label: "post.provider.label",
+      //   description: "post.provider.description",
+      //   columns: 6,
+      //   options: SttProviderOptions,
+      //   schema: z.string().default("openai"),
+      // }),
 
       // === RESPONSE FIELDS ===
-      creditCost: responseField({
+      creditCost: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.agent.speechToText.post.response.creditCost",
+        content: "post.response.creditCost",
         schema: z.number().optional(),
       }),
-      response: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.agent.speechToText.post.response.title",
-          description: "app.api.agent.speechToText.post.response.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          success: responseField({
+      response: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "post.response.title",
+        description: "post.response.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          success: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.agent.speechToText.post.response.success",
+            content: "post.response.success",
             schema: z.boolean(),
           }),
-          text: responseField({
+          text: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.agent.speechToText.post.response.text",
+            content: "post.response.text",
             schema: z.string(),
           }),
-          provider: responseField({
+          provider: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.agent.speechToText.post.response.provider",
+            content: "post.response.provider",
             schema: z.string(),
           }),
-          confidence: responseField({
+          confidence: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.agent.speechToText.post.response.confidence",
+            content: "post.response.confidence",
             schema: z.coerce.number().optional(),
           }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.agent.speechToText.post.errors.unauthorized.title",
-      description:
-        "app.api.agent.speechToText.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.agent.speechToText.post.errors.validation.title",
-      description:
-        "app.api.agent.speechToText.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.speechToText.post.errors.server.title",
-      description: "app.api.agent.speechToText.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.agent.speechToText.post.errors.server.title",
-      description: "app.api.agent.speechToText.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.agent.speechToText.post.errors.unauthorized.title",
-      description:
-        "app.api.agent.speechToText.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.speechToText.post.errors.server.title",
-      description: "app.api.agent.speechToText.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.agent.speechToText.post.errors.server.title",
-      description: "app.api.agent.speechToText.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.agent.speechToText.post.errors.server.title",
-      description: "app.api.agent.speechToText.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.speechToText.post.errors.server.title",
-      description: "app.api.agent.speechToText.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
   },
 
   successTypes: {
-    title: "app.api.agent.speechToText.post.success.title",
-    description: "app.api.agent.speechToText.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   examples: {

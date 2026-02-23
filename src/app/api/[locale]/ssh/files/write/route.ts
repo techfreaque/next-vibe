@@ -11,6 +11,7 @@ import { FilesWriteRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger }) => FilesWriteRepository.write(data, logger),
+    handler: ({ data, logger, t }) =>
+      FilesWriteRepository.write(data, logger, t),
   },
 });

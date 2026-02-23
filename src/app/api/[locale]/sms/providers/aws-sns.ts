@@ -8,7 +8,11 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import { smsEnv } from "../env";
+import { smsScopedT } from "../i18n";
 import type {
   SendSmsParams,
   SmsProvider,
@@ -53,26 +57,32 @@ export function getAwsSnsProvider(): SmsProvider {
   return {
     name: SmsProviders.AWS_SNS,
 
-    async sendSms(params: SendSmsParams): Promise<ResponseType<SmsResult>> {
+    async sendSms(
+      params: SendSmsParams,
+      // oxlint-disable-next-line no-unused-vars
+      _logger: EndpointLogger,
+      locale: CountryLanguage,
+    ): Promise<ResponseType<SmsResult>> {
+      const { t } = smsScopedT(locale);
       try {
         // Validate credentials
         if (!accessKeyId) {
           return fail({
-            message: "app.api.sms.sms.error.missing_aws_access_key",
+            message: t("sms.error.missing_aws_access_key"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
 
         if (!region) {
           return fail({
-            message: "app.api.sms.sms.error.missing_aws_region",
+            message: t("sms.error.missing_aws_region"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
 
         if (!secretAccessKey) {
           return fail({
-            message: "app.api.sms.sms.error.missing_aws_secret_key",
+            message: t("sms.error.missing_aws_secret_key"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
@@ -80,14 +90,14 @@ export function getAwsSnsProvider(): SmsProvider {
         // Validate required parameters
         if (!params.to) {
           return fail({
-            message: "app.api.sms.sms.error.missing_recipient",
+            message: t("sms.error.missing_recipient"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
 
         if (!params.message || params.message.trim() === "") {
           return fail({
-            message: "app.api.sms.sms.error.empty_message",
+            message: t("sms.error.empty_message"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
@@ -273,7 +283,7 @@ export function getAwsSnsProvider(): SmsProvider {
           const errorMessage = errorMatch?.[1] ?? "Unknown AWS SNS error";
 
           return fail({
-            message: "app.api.sms.sms.error.aws_sns_api_error",
+            message: t("sms.error.aws_sns_api_error"),
             errorType: ErrorResponseTypes.SMS_ERROR,
             messageParams: {
               error: errorMessage,
@@ -317,7 +327,7 @@ export function getAwsSnsProvider(): SmsProvider {
       } catch (error) {
         const parsedError = parseError(error);
         return fail({
-          message: "app.api.sms.sms.error.aws_sns_error",
+          message: t("sms.error.aws_sns_error"),
           errorType: ErrorResponseTypes.SMS_ERROR,
           messageParams: { error: parsedError.message },
         });

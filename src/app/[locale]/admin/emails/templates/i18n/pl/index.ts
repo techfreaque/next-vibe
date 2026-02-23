@@ -106,6 +106,18 @@ export const translations: typeof enTranslations = {
           },
         },
       },
+      unsubscribe: {
+        meta: {
+          name: "E-mail potwierdzenia wypisania z biuletynu",
+          description: "E-mail potwierdzający wypisanie z biuletynu",
+        },
+        preview: {
+          email: {
+            label: "Adres e-mail",
+            description: "Adres e-mail, który się wypisał",
+          },
+        },
+      },
     },
     subscription: {
       success: {

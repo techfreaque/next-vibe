@@ -19,6 +19,7 @@ import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
 import type { InputChangeEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
+import { scopedTranslation } from "./i18n";
 import statusEndpoints from "./status/definition";
 import subscribeEndpoints from "./subscribe/definition";
 import unsubscribeEndpoints from "./unsubscribe/definition";
@@ -166,6 +167,7 @@ export function useNewsletterManager(
     () => createEndpointLogger(false, Date.now(), locale),
     [locale],
   );
+  const { t } = useMemo(() => scopedTranslation.scopedT(locale), [locale]);
 
   // Use typed custom state for newsletter-related state
   const [manualEmail, setManualEmail] = useCustomState(manualEmailKey, "");
@@ -249,43 +251,43 @@ export function useNewsletterManager(
       if (subscriptionEndpoint.create?.error) {
         return {
           type: "error",
-          message: "app.api.newsletter.subscription.error.description",
+          message: t("subscription.error.description"),
         };
       }
       if (unsubscribeEndpoint.create?.error) {
         return {
           type: "error",
-          message: "app.api.newsletter.subscription.unsubscribe.error",
+          message: t("subscription.unsubscribe.error"),
         };
       }
       if (subscriptionEndpoint.create?.isSuccess ?? false) {
         return {
           type: "success",
-          message: "app.api.newsletter.subscribe.post.success.description",
+          message: t("subscribe.post.success.description"),
         };
       }
       if (unsubscribeEndpoint.create?.isSuccess ?? false) {
         return {
           type: "success",
-          message: "app.api.newsletter.unsubscribe.post.success.description",
+          message: t("unsubscribe.post.success.description"),
         };
       }
       if (showConfirmUnsubscribe) {
         return {
           type: "confirm",
-          message:
-            "app.api.newsletter.subscription.unsubscribe.confirmQuestion",
+          message: t("subscription.unsubscribe.confirmQuestion"),
         };
       }
       // Show unsubscribe text when email is already subscribed
       if (isSubscribed && isCurrentEmailValid) {
         return {
           type: "info",
-          message: "app.api.newsletter.enum.status.subscribed",
+          message: t("enum.status.subscribed"),
         };
       }
       return null;
     }, [
+      t,
       subscriptionEndpoint.create?.error,
       subscriptionEndpoint.create?.isSuccess,
       unsubscribeEndpoint.create?.error,

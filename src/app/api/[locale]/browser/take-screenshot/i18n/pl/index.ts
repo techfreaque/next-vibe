@@ -93,4 +93,9 @@ export const translations: typeof enTranslations = {
     title: "Zrzut ekranu przechwycony pomyślnie",
     description: "Zrzut ekranu został pomyślnie przechwycony",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    captureAutomation: "Automatyzacja przechwytywania",
+  },
 };

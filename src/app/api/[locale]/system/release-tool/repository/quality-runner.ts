@@ -15,6 +15,8 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import {
   formatError,
@@ -22,6 +24,7 @@ import {
   formatSkip,
   formatSuccess,
 } from "../../unified-interface/shared/logger/formatters";
+import { scopedTranslation } from "../i18n";
 import { MESSAGES } from "./constants";
 import {
   hasStdout,
@@ -43,6 +46,7 @@ export interface IQualityRunner {
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
     customCommand?: string,
   ): ResponseType<void>;
 
@@ -54,6 +58,7 @@ export interface IQualityRunner {
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
     customCommand?: string,
   ): ResponseType<void>;
 
@@ -65,6 +70,7 @@ export interface IQualityRunner {
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
     customCommand?: string,
   ): ResponseType<void>;
 
@@ -76,6 +82,7 @@ export interface IQualityRunner {
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
     customCommand?: string,
   ): ResponseType<void>;
 
@@ -87,6 +94,7 @@ export interface IQualityRunner {
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
     customCommand?: string,
   ): ResponseType<void>;
 
@@ -98,6 +106,7 @@ export interface IQualityRunner {
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
     customCommand?: string,
   ): ResponseType<void>;
 }
@@ -112,6 +121,7 @@ export class QualityRunner implements IQualityRunner {
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
     customCommand?: string,
   ): ResponseType<void> {
     if (dryRun) {
@@ -169,8 +179,9 @@ export class QualityRunner implements IQualityRunner {
         : parseError(err).message;
       logger.vibe(formatError("Lint failed"));
       logger.debug(MESSAGES.LINT_FAILED, { output });
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.scripts.lintFailed",
+        message: t("scripts.lintFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { path: cwd, output },
       });
@@ -182,6 +193,7 @@ export class QualityRunner implements IQualityRunner {
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
     customCommand?: string,
   ): ResponseType<void> {
     // Skip tsconfig check if custom command provided
@@ -222,8 +234,9 @@ export class QualityRunner implements IQualityRunner {
     } catch (error) {
       logger.vibe(formatError("Typecheck failed"));
       logger.debug(MESSAGES.TYPECHECK_FAILED, parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.scripts.typecheckFailed",
+        message: t("scripts.typecheckFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { path: cwd, error: String(error) },
       });
@@ -235,6 +248,7 @@ export class QualityRunner implements IQualityRunner {
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
     customCommand?: string,
   ): ResponseType<void> {
     if (dryRun) {
@@ -255,8 +269,9 @@ export class QualityRunner implements IQualityRunner {
     } catch (error) {
       logger.vibe(formatError("Build failed"));
       logger.debug(MESSAGES.BUILD_FAILED, parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.scripts.buildFailed",
+        message: t("scripts.buildFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { path: cwd, error: String(error) },
       });
@@ -268,6 +283,7 @@ export class QualityRunner implements IQualityRunner {
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
     customCommand?: string,
   ): ResponseType<void> {
     // Skip package.json check if custom command provided
@@ -304,8 +320,9 @@ export class QualityRunner implements IQualityRunner {
     } catch (error) {
       logger.vibe(formatError("Tests failed"));
       logger.debug(MESSAGES.TESTS_FAILED, parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.scripts.testsFailed",
+        message: t("scripts.testsFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { path: cwd, error: String(error) },
       });
@@ -317,6 +334,7 @@ export class QualityRunner implements IQualityRunner {
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
     customCommand?: string,
   ): ResponseType<void> {
     if (dryRun) {
@@ -338,8 +356,9 @@ export class QualityRunner implements IQualityRunner {
     } catch (error) {
       logger.vibe(formatError("Install failed"));
       logger.debug(MESSAGES.INSTALL_FAILED, parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.dependencies.failed",
+        message: t("dependencies.failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { directory: cwd, error: String(error) },
       });
@@ -351,6 +370,7 @@ export class QualityRunner implements IQualityRunner {
     packageManager: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
     customCommand?: string,
   ): ResponseType<void> {
     if (dryRun) {
@@ -372,8 +392,9 @@ export class QualityRunner implements IQualityRunner {
         return success();
       } catch (error) {
         logger.error(MESSAGES.CLEAN_FAILED, parseError(error));
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.system.releaseTool.scripts.buildFailed",
+          message: t("scripts.buildFailed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { path: cwd, error: String(error) },
         });
@@ -397,8 +418,9 @@ export class QualityRunner implements IQualityRunner {
           return success();
         } catch (error) {
           logger.error(MESSAGES.CLEAN_FAILED, parseError(error));
+          const { t } = scopedTranslation.scopedT(locale);
           return fail({
-            message: "app.api.system.releaseTool.scripts.buildFailed",
+            message: t("scripts.buildFailed"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: { path: cwd, error: String(error) },
           });

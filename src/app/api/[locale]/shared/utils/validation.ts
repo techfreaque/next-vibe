@@ -2,7 +2,9 @@ import type { ZodError, ZodIssue } from "zod";
 import { z } from "zod";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { type CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation as sharedScopedTranslation } from "../i18n";
 import type { ResponseType } from "../types/response.schema";
 import { ErrorResponseTypes, fail } from "../types/response.schema";
 import { parseError } from "./parse-error";
@@ -12,13 +14,17 @@ import { parseError } from "./parse-error";
  * Accepts any data (from HTTP, user input, etc.) and validates it
  * @param data - The data to validate (can be any type from HTTP)
  * @param schema - The schema to validate against
+ * @param logger - Logger instance
+ * @param locale - Locale for error messages
  * @returns A response with the validated data or error
  */
 export function validateData<TSchema extends z.ZodType>(
   data: Parameters<TSchema["parse"]>[0],
   schema: TSchema,
   logger: EndpointLogger,
+  locale: CountryLanguage,
 ): ResponseType<z.infer<TSchema>> {
+  const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
   if (isEmptyObjectSchema(schema)) {
     return { success: true, data: {} as z.infer<TSchema> };
   }
@@ -50,7 +56,7 @@ export function validateData<TSchema extends z.ZodType>(
         fullError: JSON.stringify(result.error, null, 2),
       });
       return fail({
-        message: "app.api.shared.errorTypes.validation_error",
+        message: sharedT("errorTypes.validation_error"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
         messageParams: {
           error: formattedErrors.join(", "),
@@ -65,7 +71,7 @@ export function validateData<TSchema extends z.ZodType>(
     const parsedError = parseError(error);
     logger.error("Unexpected validation error", parsedError);
     return fail({
-      message: "app.api.shared.errorTypes.validation_error",
+      message: sharedT("errorTypes.validation_error"),
       errorType: ErrorResponseTypes.VALIDATION_ERROR,
       messageParams: { error: parsedError.message },
     });

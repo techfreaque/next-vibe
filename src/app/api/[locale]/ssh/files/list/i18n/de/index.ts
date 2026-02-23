@@ -1,4 +1,14 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    invalidPath: "Ungültiger Pfad: Muss absolut sein ohne '..' Segmente",
+    directoryNotFound: "Verzeichnis nicht gefunden",
+    notImplemented: {
+      fileList: "SSH-Backend noch nicht für Dateiauflistung implementiert",
+    },
+  },
+
   get: {
     title: "Dateien auflisten",
     description:

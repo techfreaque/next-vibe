@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,17 +20,17 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["browser", "fill"],
-  title: "app.api.browser.fill.title",
-  description: "app.api.browser.fill.description",
-  category: "app.api.browser.category",
+  title: "fill.title",
+  description: "fill.description",
+  category: "fill.category",
   icon: "edit",
-  tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.inputAutomation",
-  ],
+  tags: ["fill.tags.browserAutomation", "fill.tags.inputAutomation"],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -40,22 +40,20 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.browser.fill.form.label",
-      description: "app.api.browser.fill.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      uid: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "fill.form.label",
+    description: "fill.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      uid: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.browser.fill.form.fields.uid.label",
-        description: "app.api.browser.fill.form.fields.uid.description",
-        placeholder: "app.api.browser.fill.form.fields.uid.placeholder",
+        label: "fill.form.fields.uid.label",
+        description: "fill.form.fields.uid.description",
+        placeholder: "fill.form.fields.uid.placeholder",
         columns: 6,
         schema: z
           .string()
@@ -63,25 +61,25 @@ const { POST } = createEndpoint({
             "The uid of an element on the page from the page content snapshot",
           ),
       }),
-      value: requestField({
+      value: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.browser.fill.form.fields.value.label",
-        description: "app.api.browser.fill.form.fields.value.description",
-        placeholder: "app.api.browser.fill.form.fields.value.placeholder",
+        label: "fill.form.fields.value.label",
+        description: "fill.form.fields.value.description",
+        placeholder: "fill.form.fields.value.placeholder",
         columns: 6,
         schema: z.string().describe("The value to fill in"),
       }),
 
       // Response fields
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.fill.response.success",
+        content: "fill.response.success",
         schema: z.boolean().describe("Whether the fill operation succeeded"),
       }),
-      result: responseField({
+      result: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.fill.response.result",
+        content: "fill.response.result",
         schema: z
           .object({
             filled: z.boolean().describe("Whether the element was filled"),
@@ -91,24 +89,24 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Result of the fill operation"),
       }),
-      error: responseField({
+      error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.fill.response.error",
+        content: "fill.response.error",
         schema: z
           .string()
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: responseField({
+      executionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.fill.response.executionId",
+        content: "fill.response.executionId",
         schema: z
           .string()
           .optional()
           .describe("Unique identifier for this execution"),
       }),
     },
-  ),
+  }),
   examples: {
     requests: {
       default: { uid: "element-123", value: "test value" },
@@ -127,45 +125,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.browser.fill.errors.validation.title",
-      description: "app.api.browser.fill.errors.validation.description",
+      title: "fill.errors.validation.title",
+      description: "fill.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.browser.fill.errors.network.title",
-      description: "app.api.browser.fill.errors.network.description",
+      title: "fill.errors.network.title",
+      description: "fill.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.browser.fill.errors.unauthorized.title",
-      description: "app.api.browser.fill.errors.unauthorized.description",
+      title: "fill.errors.unauthorized.title",
+      description: "fill.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.browser.fill.errors.forbidden.title",
-      description: "app.api.browser.fill.errors.forbidden.description",
+      title: "fill.errors.forbidden.title",
+      description: "fill.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.browser.fill.errors.notFound.title",
-      description: "app.api.browser.fill.errors.notFound.description",
+      title: "fill.errors.notFound.title",
+      description: "fill.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.browser.fill.errors.serverError.title",
-      description: "app.api.browser.fill.errors.serverError.description",
+      title: "fill.errors.serverError.title",
+      description: "fill.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.browser.fill.errors.unknown.title",
-      description: "app.api.browser.fill.errors.unknown.description",
+      title: "fill.errors.unknown.title",
+      description: "fill.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.browser.fill.errors.unsavedChanges.title",
-      description: "app.api.browser.fill.errors.unsavedChanges.description",
+      title: "fill.errors.unsavedChanges.title",
+      description: "fill.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.browser.fill.errors.conflict.title",
-      description: "app.api.browser.fill.errors.conflict.description",
+      title: "fill.errors.conflict.title",
+      description: "fill.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.browser.fill.success.title",
-    description: "app.api.browser.fill.success.description",
+    title: "fill.success.title",
+    description: "fill.success.description",
   },
 });
 

@@ -8,8 +8,11 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
 import {
   ErrorResponseError,
+  ErrorResponseTypes,
+  fail,
   isFileResponse,
   isStreamingResponse,
   type ResponseType,
@@ -62,7 +65,9 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
     T["types"]["ResponseOutput"],
     T["types"]["UrlVariablesOutput"],
     T["allowedRoles"],
-    T
+    T,
+    Platform,
+    T["types"]["ScopedTranslationKey"]
   >,
 ): NextHandlerReturnType<
   T["types"]["ResponseOutput"],
@@ -148,18 +153,15 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
 
       // Handle unexpected errors
       logger.error("Unexpected error in Next.js handler", parseError(error));
+      const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
       return wrapErrorResponse(
-        {
-          success: false,
-          message: "app.api.shared.errorTypes.internal_error",
-          errorType: {
-            errorKey: "app.api.shared.errorTypes.internal_error",
-            errorCode: 500,
-          },
+        fail({
+          message: sharedT("errorTypes.internal_error"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error: parseError(error).message,
           },
-        },
+        }),
         locale,
         logger,
       );

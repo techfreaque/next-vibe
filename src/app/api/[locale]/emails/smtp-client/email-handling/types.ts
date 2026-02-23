@@ -18,7 +18,8 @@ import type {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
 import type { EmailType } from "../../messages/enum";
 import type { CampaignType } from "../enum";
@@ -52,12 +53,17 @@ export interface EmailTemplateReturnType {
 /**
  * Email Render Props
  */
-export interface EmailRenderProps<TRequest, TResponse, TUrlVariables> {
+export interface EmailRenderProps<
+  TRequest,
+  TResponse,
+  TUrlVariables,
+  TScopedTranslationKey extends string = TranslationKey,
+> {
   requestData: TRequest;
   urlPathParams: TUrlVariables;
   responseData: TResponse;
   user: JwtPayloadType;
-  t: TFunction;
+  t: (key: TScopedTranslationKey, params?: TParams) => TranslatedKeyType;
   locale: CountryLanguage;
   logger: EndpointLogger;
 }
@@ -65,9 +71,19 @@ export interface EmailRenderProps<TRequest, TResponse, TUrlVariables> {
 /**
  * Email Function Type
  */
-export type EmailFunctionType<TRequest, TResponse, TUrlVariables> = ({
+export type EmailFunctionType<
+  TRequest,
+  TResponse,
+  TUrlVariables,
+  TScopedTranslationKey extends string = TranslationKey,
+> = ({
   requestData,
-}: EmailRenderProps<TRequest, TResponse, TUrlVariables>) =>
+}: EmailRenderProps<
+  TRequest,
+  TResponse,
+  TUrlVariables,
+  TScopedTranslationKey
+>) =>
   | Promise<SuccessResponseType<EmailTemplateReturnType> | ErrorResponseType>
   | SuccessResponseType<EmailTemplateReturnType>
   | ErrorResponseType;
@@ -75,12 +91,22 @@ export type EmailFunctionType<TRequest, TResponse, TUrlVariables> = ({
 /**
  * Email Handle Request Type
  */
-export interface EmailHandleRequestOutput<TRequest, TResponse, TUrlVariables> {
+export interface EmailHandleRequestOutput<
+  TRequest,
+  TResponse,
+  TUrlVariables,
+  TScopedTranslationKey extends string = TranslationKey,
+> {
   email:
     | {
         afterHandlerEmails?: {
           ignoreErrors?: boolean;
-          render: EmailFunctionType<TRequest, TResponse, TUrlVariables>;
+          render: EmailFunctionType<
+            TRequest,
+            TResponse,
+            TUrlVariables,
+            TScopedTranslationKey
+          >;
         }[];
       }
     | undefined;
@@ -88,7 +114,7 @@ export interface EmailHandleRequestOutput<TRequest, TResponse, TUrlVariables> {
   responseData: TResponse;
   urlPathParams: TUrlVariables;
   requestData: TRequest;
-  t: TFunction;
+  t: (key: TScopedTranslationKey, params?: TParams) => TranslatedKeyType;
   locale: CountryLanguage;
 }
 

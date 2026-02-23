@@ -17,9 +17,12 @@ import { eq, sql } from "drizzle-orm";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import type { ModuleT } from "@/app/api/[locale]/credits/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import {
   chatMessages,
@@ -54,9 +57,13 @@ export class MessageDbWriter {
   private readonly controller: ReadableStreamDefaultController<Uint8Array>;
   private readonly encoder: TextEncoder;
   private readonly pending = new Map<string, PendingWrite>();
+  private readonly creditsT: ModuleT;
+  private readonly locale: CountryLanguage;
 
   /** Tracks the last assistant message ID written — used by headless callers */
   lastAssistantMessageId: string | null = null;
+  /** Tracks the final text content of the last assistant message — populated even in incognito */
+  lastAssistantContent: string | null = null;
 
   constructor(
     isIncognito: boolean,
@@ -64,12 +71,16 @@ export class MessageDbWriter {
     controller: ReadableStreamDefaultController<Uint8Array>,
     encoder: TextEncoder,
     isHeadless = false,
+    creditsT: ModuleT,
+    locale: CountryLanguage,
   ) {
     this.isIncognito = isIncognito;
     this.isHeadless = isHeadless;
     this.logger = logger;
     this.controller = controller;
     this.encoder = encoder;
+    this.creditsT = creditsT;
+    this.locale = locale;
   }
 
   // ─── High-level methods (SSE + DB in one call) ────────────────────────────
@@ -134,6 +145,7 @@ export class MessageDbWriter {
         character,
         sequenceId,
         logger: this.logger,
+        locale: this.locale,
       });
       if (!result.success) {
         this.logger.warn(
@@ -190,6 +202,9 @@ export class MessageDbWriter {
     });
     this.enqueue(doneEvent);
 
+    // Always track final content in memory (incognito mode needs this since DB is skipped)
+    this.lastAssistantContent = content;
+
     // DB: flush pending throttled write, then write definitive final content + token metadata
     if (!this.isIncognito) {
       await this.flush(messageId);
@@ -220,13 +235,23 @@ export class MessageDbWriter {
    * Deduct credits in DB then emit CREDITS_DEDUCTED SSE.
    * Returns whether deduction succeeded.
    */
-  async deductAndEmitCredits(params: {
-    user: JwtPayloadType;
-    amount: number;
-    feature: string;
-    type: "model" | "tool";
-    model?: ModelId;
-  }): Promise<void> {
+  async deductAndEmitCredits(
+    params:
+      | {
+          user: JwtPayloadType;
+          amount: number;
+          feature: string;
+          type: "model";
+          model: ModelId;
+        }
+      | {
+          user: JwtPayloadType;
+          amount: number;
+          feature: string;
+          type: "tool";
+          model: ModelId | undefined;
+        },
+  ): Promise<void> {
     if (params.amount <= 0) {
       return;
     }
@@ -238,14 +263,18 @@ export class MessageDbWriter {
         ? await CreditRepository.deductCreditsForModelUsage(
             params.user,
             params.amount,
-            params.model ?? (params.feature as ModelId),
+            params.model,
             this.logger,
+            this.creditsT,
+            this.locale,
           )
         : await CreditRepository.deductCreditsForFeature(
             params.user,
             params.amount,
             params.feature,
             this.logger,
+            this.creditsT,
+            this.locale,
           );
 
     if (deductResult.success) {
@@ -329,6 +358,7 @@ export class MessageDbWriter {
         character,
         sequenceId,
         logger: this.logger,
+        locale: this.locale,
       });
       if (!result.success) {
         this.logger.warn(
@@ -534,6 +564,7 @@ export class MessageDbWriter {
         amount: toolCall.creditsUsed,
         feature: toolName,
         type: "tool",
+        model,
       });
     }
   }
@@ -865,7 +896,7 @@ export class MessageDbWriter {
     depth: number;
     sequenceId: string | null;
     userId: string | undefined;
-    content?: string;
+    content?: TranslationKey;
   }): Promise<void> {
     const { threadId, errorType, error, parentId, depth, sequenceId, userId } =
       params;

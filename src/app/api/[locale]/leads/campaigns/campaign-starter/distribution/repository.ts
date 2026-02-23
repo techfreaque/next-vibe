@@ -21,12 +21,15 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import { leads } from "../../../db";
+import type { scopedTranslation } from "../../../i18n";
 import type {
   DistributionCalculationInputType,
   DistributionCalculationOutputType,
   LocaleProcessingInfoOutputType,
   LocaleQuotaCalculationInputType,
 } from "./types";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Distribution Repository Implementation
@@ -35,6 +38,7 @@ export class DistributionRepository {
   static calculateDistribution(
     data: DistributionCalculationInputType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): ResponseType<DistributionCalculationOutputType> {
     try {
       const { config, cronSchedule } = data;
@@ -71,8 +75,7 @@ export class DistributionRepository {
     } catch (error) {
       logger.error("Distribution calculation failed", parseError(error));
       return fail({
-        message:
-          "app.api.leads.leadsErrors.campaigns.common.error.server.title" as const,
+        message: t("leadsErrors.campaigns.common.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -81,6 +84,7 @@ export class DistributionRepository {
   static async calculateLocaleQuota(
     data: LocaleQuotaCalculationInputType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<LocaleProcessingInfoOutputType>> {
     try {
       const {
@@ -156,8 +160,7 @@ export class DistributionRepository {
     } catch (error) {
       logger.error("Locale quota calculation failed", parseError(error));
       return fail({
-        message:
-          "app.api.leads.leadsErrors.campaigns.common.error.server.title" as const,
+        message: t("leadsErrors.campaigns.common.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

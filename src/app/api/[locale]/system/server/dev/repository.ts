@@ -31,8 +31,11 @@ import type { Task } from "@/app/api/[locale]/system/unified-interface/tasks/uni
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation as migrateScopedTranslation } from "../../db/migrate/i18n";
 import { databaseMigrationRepository } from "../../db/migrate/repository";
+import { scopedTranslation as dockerScopedTranslation } from "../../db/utils/docker-operations/i18n";
 import { dockerOperationsRepository } from "../../db/utils/docker-operations/repository";
+import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
 import { dbUtilsRepository } from "../../db/utils/repository";
 import { DEV_WATCHER_TASK_NAME } from "../../unified-interface/tasks/dev-watcher/task-runner";
 import type endpoints from "./definition";
@@ -167,9 +170,10 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
 
     // 1. Stop Docker containers
     logger.debug("Stopping Docker containers...");
+    const { t: dockerT } = dockerScopedTranslation.scopedT(locale);
     const downResult = await dockerOperationsRepository.dockerComposeDown(
       logger,
-      locale,
+      dockerT,
       "docker-compose-dev.yml",
       30000,
       DEV_PROJECT_NAME,
@@ -195,7 +199,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     logger.debug("Starting Docker containers...");
     const upResult = await dockerOperationsRepository.dockerComposeUp(
       logger,
-      locale,
+      dockerT,
       "docker-compose-dev.yml",
       60000,
       DEV_PROJECT_NAME,
@@ -399,13 +403,16 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     }
 
     try {
-      const dockerCheckResult =
-        await dbUtilsRepository.isDockerAvailable(logger);
+      const { t: dbUtilsT } = dbUtilsScopedTranslation.scopedT(locale);
+      const dockerCheckResult = await dbUtilsRepository.isDockerAvailable(
+        dbUtilsT,
+        logger,
+      );
 
       if (!dockerCheckResult.success || !dockerCheckResult.data) {
         logger.vibe(formatWarning("Docker unavailable (continuing anyway)"));
         logger.vibe(
-          `� ${formatCommand("Install Docker")} to enable database functionality`,
+          `🐳 ${formatCommand("Install Docker")} to enable database functionality`,
         );
         return true;
       }
@@ -452,6 +459,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         if (data.skipMigrations) {
           logger.vibe(formatSkip("Migrations skipped"));
         } else {
+          const { t: migrateT } = migrateScopedTranslation.scopedT(locale);
           await databaseMigrationRepository.runMigrations(
             {
               generate: !data.skipMigrationGeneration,
@@ -459,7 +467,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
               schema: "public",
               dryRun: false,
             },
-            locale,
+            migrateT,
             logger,
           );
         }
@@ -499,6 +507,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     if (data.skipMigrations) {
       logger.vibe(formatSkip("Migrations skipped"));
     } else {
+      const { t: migrateT } = migrateScopedTranslation.scopedT(locale);
       await databaseMigrationRepository.runMigrations(
         {
           generate: !data.skipMigrationGeneration,
@@ -506,7 +515,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
           schema: "public",
           dryRun: false,
         },
-        locale,
+        migrateT,
         logger,
       );
     }
@@ -523,10 +532,10 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     logger.debug(
       `🐘 ${formatActionCommand("Starting PostgreSQL using:", "docker compose -f docker-compose-dev.yml up -d")}`,
     );
-
+    const { t: dockerT } = dockerScopedTranslation.scopedT(locale);
     const dbStartResult = await dockerOperationsRepository.dockerComposeUp(
       logger,
-      locale,
+      dockerT,
       "docker-compose-dev.yml",
       60000,
       "vibe-dev",

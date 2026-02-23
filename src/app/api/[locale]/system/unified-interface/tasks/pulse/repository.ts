@@ -5,13 +5,13 @@
  */
 
 import { and, count, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
-
-import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "@/app/api/[locale]/shared/types/response.schema";
+} from "next-vibe/shared/types/response.schema";
+
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -23,6 +23,7 @@ import { users as usersTable } from "@/app/api/[locale]/user/db";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { cronTasks as cronTasksTable } from "../cron/db";
+import { scopedTranslation as tasksScopedTranslation } from "../i18n";
 import type {
   NewPulseExecution,
   NewPulseHealth,
@@ -35,54 +36,12 @@ import { pulseExecutions, pulseHealth, pulseNotifications } from "./db";
 import type { PulseStatusResponseOutput } from "./status/definition";
 
 /**
- * Public Interface for Pulse Health Repository
- */
-export interface IPulseHealthRepository {
-  // Health management
-  getCurrentHealth(): Promise<ResponseType<PulseHealth | null>>;
-  updateHealth(
-    updates: Partial<PulseHealth>,
-  ): Promise<ResponseType<PulseHealth>>;
-  createHealthRecord(
-    health: NewPulseHealth,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<PulseHealth>>;
-
-  // Pulse execution management
-  createExecution(
-    execution: NewPulseExecution,
-  ): Promise<ResponseType<PulseExecution>>;
-  updateExecution(
-    id: string,
-    updates: Partial<PulseExecution>,
-  ): Promise<ResponseType<PulseExecution>>;
-  getRecentExecutions(limit?: number): Promise<ResponseType<PulseExecution[]>>;
-  getExecutionById(id: string): Promise<ResponseType<PulseExecution | null>>;
-
-  // Notification management
-  createNotification(
-    notification: NewPulseNotification,
-  ): Promise<ResponseType<PulseNotification>>;
-  getUnsentNotifications(): Promise<ResponseType<PulseNotification[]>>;
-  markNotificationSent(id: string): Promise<ResponseType<PulseNotification>>;
-
-  // Health statistics
-  getHealthStatistics(): Promise<
-    ResponseType<{
-      currentStatus: string;
-      totalExecutions: number;
-      successRate: number;
-      averageExecutionTime: number;
-      consecutiveFailures: number;
-    }>
-  >;
-}
-
-/**
  * Implementation of Pulse Health Repository
  */
-export class PulseHealthRepository implements IPulseHealthRepository {
-  async getCurrentHealth(): Promise<ResponseType<PulseHealth | null>> {
+export class PulseHealthRepository {
+  static async getCurrentHealth(
+    locale: CountryLanguage,
+  ): Promise<ResponseType<PulseHealth | null>> {
     try {
       const health = await db
         .select()
@@ -92,23 +51,27 @@ export class PulseHealthRepository implements IPulseHealthRepository {
 
       return success<PulseHealth | null>((health[0] as PulseHealth) || null);
     } catch {
+      const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("errors.repositoryInternalError"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
 
-  async updateHealth(
+  static async updateHealth(
     updates: Partial<PulseHealth>,
+    locale: CountryLanguage,
   ): Promise<ResponseType<PulseHealth>> {
     try {
       // Get the current health record
-      const currentHealthResponse = await this.getCurrentHealth();
+      const currentHealthResponse =
+        await PulseHealthRepository.getCurrentHealth(locale);
       if (!currentHealthResponse.success || !currentHealthResponse.data) {
         // If no health record exists, cannot update - require a full create
+        const { t } = tasksScopedTranslation.scopedT(locale);
         return fail({
-          message: ErrorResponseTypes.NOT_FOUND.errorKey,
+          message: t("errors.repositoryNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -121,16 +84,18 @@ export class PulseHealthRepository implements IPulseHealthRepository {
 
       return success<PulseHealth>(updatedHealth as PulseHealth);
     } catch {
+      const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("errors.repositoryInternalError"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
 
-  async createHealthRecord(
+  static async createHealthRecord(
     health: NewPulseHealth,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<PulseHealth>> {
     try {
       const [newHealth] = await db
@@ -140,15 +105,17 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       return success<PulseHealth>(newHealth as PulseHealth);
     } catch (error) {
       logger.error("Failed to create health record", parseError(error));
+      const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("errors.repositoryInternalError"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
 
-  async createExecution(
+  static async createExecution(
     execution: NewPulseExecution,
+    locale: CountryLanguage,
   ): Promise<ResponseType<PulseExecution>> {
     try {
       const [newExecution] = await db
@@ -157,16 +124,18 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         .returning();
       return success(newExecution as PulseExecution);
     } catch {
+      const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("errors.repositoryInternalError"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
 
-  async updateExecution(
+  static async updateExecution(
     id: string,
     updates: Partial<PulseExecution>,
+    locale: CountryLanguage,
   ): Promise<ResponseType<PulseExecution>> {
     try {
       const [updatedExecution] = await db
@@ -176,23 +145,26 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         .returning();
 
       if (!updatedExecution) {
+        const { t } = tasksScopedTranslation.scopedT(locale);
         return fail({
-          message: ErrorResponseTypes.NOT_FOUND.errorKey,
+          message: t("errors.repositoryNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       return success(updatedExecution as PulseExecution);
     } catch {
+      const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("errors.repositoryInternalError"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
 
-  async getRecentExecutions(
+  static async getRecentExecutions(
     limit = 50,
+    locale: CountryLanguage,
   ): Promise<ResponseType<PulseExecution[]>> {
     try {
       const executions = await db
@@ -203,15 +175,17 @@ export class PulseHealthRepository implements IPulseHealthRepository {
 
       return success(executions as PulseExecution[]);
     } catch {
+      const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("errors.repositoryInternalError"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
 
-  async getExecutionById(
+  static async getExecutionById(
     id: string,
+    locale: CountryLanguage,
   ): Promise<ResponseType<PulseExecution | null>> {
     try {
       const execution = await db
@@ -222,15 +196,17 @@ export class PulseHealthRepository implements IPulseHealthRepository {
 
       return success((execution[0] as PulseExecution) || null);
     } catch {
+      const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("errors.repositoryInternalError"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
 
-  async createNotification(
+  static async createNotification(
     notification: NewPulseNotification,
+    locale: CountryLanguage,
   ): Promise<ResponseType<PulseNotification>> {
     try {
       const [newNotification] = await db
@@ -239,14 +215,18 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         .returning();
       return success(newNotification as PulseNotification);
     } catch {
+      const { t } = tasksScopedTranslation.scopedT(locale);
+
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("errors.repositoryInternalError"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
 
-  async getUnsentNotifications(): Promise<ResponseType<PulseNotification[]>> {
+  static async getUnsentNotifications(
+    locale: CountryLanguage,
+  ): Promise<ResponseType<PulseNotification[]>> {
     try {
       const notifications = await db
         .select()
@@ -256,15 +236,17 @@ export class PulseHealthRepository implements IPulseHealthRepository {
 
       return success(notifications as PulseNotification[]);
     } catch {
+      const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("errors.repositoryInternalError"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
 
-  async markNotificationSent(
+  static async markNotificationSent(
     id: string,
+    locale: CountryLanguage,
   ): Promise<ResponseType<PulseNotification>> {
     try {
       const [updatedNotification] = await db
@@ -274,22 +256,24 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         .returning();
 
       if (!updatedNotification) {
+        const { t } = tasksScopedTranslation.scopedT(locale);
         return fail({
-          message: ErrorResponseTypes.NOT_FOUND.errorKey,
+          message: t("errors.repositoryNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
-      return success(updatedNotification as PulseNotification);
+      return success(updatedNotification);
     } catch {
+      const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("errors.repositoryInternalError"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   }
 
-  async getHealthStatistics(): Promise<
+  static async getHealthStatistics(locale: CountryLanguage): Promise<
     ResponseType<{
       currentStatus: string;
       totalExecutions: number;
@@ -300,10 +284,12 @@ export class PulseHealthRepository implements IPulseHealthRepository {
   > {
     try {
       // Get current health
-      const currentHealthResponse = await this.getCurrentHealth();
+      const currentHealthResponse =
+        await PulseHealthRepository.getCurrentHealth(locale);
       if (!currentHealthResponse.success) {
+        const { t } = tasksScopedTranslation.scopedT(locale);
         return fail({
-          message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+          message: t("errors.repositoryInternalError"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           cause: currentHealthResponse,
         });
@@ -326,8 +312,9 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         consecutiveFailures: currentHealth?.consecutiveFailures || 0,
       });
     } catch {
+      const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("errors.repositoryInternalError"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -336,7 +323,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
    * Execute a pulse cycle with the given options
    * Merged functionality from old system
    */
-  async executePulse(
+  static async executePulse(
     options: {
       dryRun?: boolean;
       taskNames?: string[];
@@ -344,6 +331,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       systemLocale: CountryLanguage;
     },
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<
     ResponseType<{
       success: boolean;
@@ -367,6 +355,8 @@ export class PulseHealthRepository implements IPulseHealthRepository {
     }>
   > {
     try {
+      // Use the provided systemLocale for all translations in this pulse cycle
+      locale = options.systemLocale;
       const startTime = Date.now();
       const pulseId = crypto.randomUUID();
 
@@ -489,6 +479,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
             const { Platform } =
               await import("@/app/api/[locale]/system/unified-interface/shared/types/platform");
             const { CronTasksRepository } = await import("../cron/repository");
+            const { scopedTranslation } = await import("../i18n");
 
             for (const dbTask of userCreatedTasks) {
               const isDue =
@@ -580,10 +571,12 @@ export class PulseHealthRepository implements IPulseHealthRepository {
 
               // Run-once: disable after first execution regardless of outcome
               if (dbTask.runOnce) {
+                const { t: tPulse } = scopedTranslation.scopedT(userLocale);
                 await CronTasksRepository.updateTask(
                   dbTask.id,
                   { enabled: false },
                   null,
+                  tPulse,
                   logger,
                 );
                 logger.info(
@@ -612,10 +605,11 @@ export class PulseHealthRepository implements IPulseHealthRepository {
       };
 
       // Record pulse execution for health tracking
-      await this.recordPulseExecution(
+      await PulseHealthRepository.recordPulseExecution(
         tasksFailed.length === 0,
         summary.totalExecutionTimeMs,
         logger,
+        options.systemLocale,
         summary,
       );
 
@@ -625,8 +619,9 @@ export class PulseHealthRepository implements IPulseHealthRepository {
         isDryRun: options.dryRun || false,
       });
     } catch (error) {
+      const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("errors.repositoryInternalError"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -636,10 +631,11 @@ export class PulseHealthRepository implements IPulseHealthRepository {
   /**
    * Record a pulse execution for health tracking and persist to pulseExecutions
    */
-  async recordPulseExecution(
+  static async recordPulseExecution(
     isSuccessful: boolean,
     executionTimeMs: number,
     logger: EndpointLogger,
+    locale: CountryLanguage,
     summary?: {
       pulseId: string;
       executedAt: string;
@@ -655,34 +651,38 @@ export class PulseHealthRepository implements IPulseHealthRepository {
     try {
       // Persist to pulseExecutions table if summary is available
       if (summary) {
-        await this.createExecution({
-          pulseId: summary.pulseId,
-          executionId: crypto.randomUUID(),
-          status: isSuccessful
-            ? PulseExecutionStatus.SUCCESS
-            : PulseExecutionStatus.FAILURE,
-          healthStatus: isSuccessful
-            ? PulseHealthStatus.HEALTHY
-            : PulseHealthStatus.WARNING,
-          startedAt: new Date(summary.executedAt),
-          completedAt: new Date(),
-          durationMs: summary.totalExecutionTimeMs,
-          totalTasksDiscovered: summary.totalTasksDiscovered,
-          tasksDue: summary.tasksDue,
-          tasksExecuted: summary.tasksExecuted,
-          tasksSucceeded: summary.tasksSucceeded,
-          tasksFailed: summary.tasksFailed,
-          tasksSkipped: summary.tasksSkipped,
-          totalExecutionTimeMs: summary.totalExecutionTimeMs,
-          triggeredBy: "schedule",
-        });
+        await PulseHealthRepository.createExecution(
+          {
+            pulseId: summary.pulseId,
+            executionId: crypto.randomUUID(),
+            status: isSuccessful
+              ? PulseExecutionStatus.SUCCESS
+              : PulseExecutionStatus.FAILURE,
+            healthStatus: isSuccessful
+              ? PulseHealthStatus.HEALTHY
+              : PulseHealthStatus.WARNING,
+            startedAt: new Date(summary.executedAt),
+            completedAt: new Date(),
+            durationMs: summary.totalExecutionTimeMs,
+            totalTasksDiscovered: summary.totalTasksDiscovered,
+            tasksDue: summary.tasksDue,
+            tasksExecuted: summary.tasksExecuted,
+            tasksSucceeded: summary.tasksSucceeded,
+            tasksFailed: summary.tasksFailed,
+            tasksSkipped: summary.tasksSkipped,
+            totalExecutionTimeMs: summary.totalExecutionTimeMs,
+            triggeredBy: "schedule",
+          },
+          locale,
+        );
       }
 
-      const currentHealthResponse = await this.getCurrentHealth();
+      const currentHealthResponse =
+        await PulseHealthRepository.getCurrentHealth(locale);
 
       if (!currentHealthResponse.success || !currentHealthResponse.data) {
         // Create initial health record
-        await this.createHealthRecord(
+        await PulseHealthRepository.createHealthRecord(
           {
             status: isSuccessful
               ? PulseHealthStatus.HEALTHY
@@ -700,6 +700,7 @@ export class PulseHealthRepository implements IPulseHealthRepository {
             isMaintenanceMode: false,
           },
           logger,
+          locale,
         );
       } else {
         // Update existing health record
@@ -712,28 +713,32 @@ export class PulseHealthRepository implements IPulseHealthRepository {
           (newTotalSuccesses / newTotalExecutions) * 10000,
         );
 
-        await this.updateHealth({
-          lastPulseAt: new Date(),
-          consecutiveFailures: isSuccessful
-            ? 0
-            : health.consecutiveFailures + 1,
-          avgExecutionTimeMs: Math.round(
-            ((health.avgExecutionTimeMs || 0) + executionTimeMs) / 2,
-          ),
-          successRate: newSuccessRate,
-          totalExecutions: newTotalExecutions,
-          totalSuccesses: newTotalSuccesses,
-          totalFailures: newTotalFailures,
-          status: isSuccessful
-            ? PulseHealthStatus.HEALTHY
-            : PulseHealthStatus.WARNING,
-        });
+        await PulseHealthRepository.updateHealth(
+          {
+            lastPulseAt: new Date(),
+            consecutiveFailures: isSuccessful
+              ? 0
+              : health.consecutiveFailures + 1,
+            avgExecutionTimeMs: Math.round(
+              ((health.avgExecutionTimeMs || 0) + executionTimeMs) / 2,
+            ),
+            successRate: newSuccessRate,
+            totalExecutions: newTotalExecutions,
+            totalSuccesses: newTotalSuccesses,
+            totalFailures: newTotalFailures,
+            status: isSuccessful
+              ? PulseHealthStatus.HEALTHY
+              : PulseHealthStatus.WARNING,
+          },
+          locale,
+        );
       }
 
       return success();
     } catch {
+      const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("errors.repositoryInternalError"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -742,8 +747,10 @@ export class PulseHealthRepository implements IPulseHealthRepository {
   /**
    * Get the current pulse health status for the status endpoint
    */
-  async getHealthStatus(): Promise<ResponseType<PulseStatusResponseOutput>> {
-    const healthResponse = await this.getCurrentHealth();
+  static async getHealthStatus(
+    locale: CountryLanguage,
+  ): Promise<ResponseType<PulseStatusResponseOutput>> {
+    const healthResponse = await PulseHealthRepository.getCurrentHealth(locale);
 
     if (!healthResponse.success || !healthResponse.data) {
       return success<PulseStatusResponseOutput>({
@@ -763,5 +770,3 @@ export class PulseHealthRepository implements IPulseHealthRepository {
     });
   }
 }
-
-export const pulseHealthRepository = new PulseHealthRepository();

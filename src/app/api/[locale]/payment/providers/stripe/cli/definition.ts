@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,21 +20,20 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 /**
  * CLI Stripe Endpoint Definition
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["payment", "providers", "stripe", "cli"],
-  title: "app.api.stripe.title" as const,
-  description: "app.api.stripe.description" as const,
-  category: "app.api.payment.category" as const,
+  title: "title" as const,
+  description: "description" as const,
+  category: "category" as const,
   icon: "credit-card" as const,
-  tags: [
-    "app.api.stripe.tags.stripe" as const,
-    "app.api.stripe.tags.cli" as const,
-    "app.api.stripe.tags.webhook" as const,
-  ],
+  tags: ["tags.stripe" as const, "tags.cli" as const, "tags.webhook" as const],
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.WEB_OFF,
@@ -47,169 +46,156 @@ const { POST } = createEndpoint({
     firstCliArgKey: "operation",
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.stripe.form.title" as const,
-      description: "app.api.stripe.form.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "title" as const,
+    description: "description" as const,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // REQUEST FIELDS
-      operation: requestField({
+      operation: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.stripe.form.fields.operation.label" as const,
-        description:
-          "app.api.stripe.form.fields.operation.description" as const,
-        placeholder:
-          "app.api.stripe.form.fields.operation.placeholder" as const,
+        label: "fields.operation.label" as const,
+        description: "fields.operation.description" as const,
+        placeholder: "fields.operation.placeholder" as const,
         columns: 6,
         options: [
           {
             value: "check",
-            label: "app.api.stripe.operations.check" as const,
+            label: "operations.check" as const,
           },
           {
             value: "install",
-            label: "app.api.stripe.operations.install" as const,
+            label: "operations.install" as const,
           },
           {
             value: "listen",
-            label: "app.api.stripe.operations.listen" as const,
+            label: "operations.listen" as const,
           },
           {
             value: "login",
-            label: "app.api.stripe.operations.login" as const,
+            label: "operations.login" as const,
           },
           {
             value: "status",
-            label: "app.api.stripe.operations.status" as const,
+            label: "operations.status" as const,
           },
         ],
         schema: z.enum(["check", "install", "listen", "login", "status"]),
       }),
 
-      port: requestField({
+      port: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.stripe.form.fields.port.label" as const,
-        description: "app.api.stripe.form.fields.port.description" as const,
-        placeholder: "app.api.stripe.form.fields.port.placeholder" as const,
+        label: "fields.port.label" as const,
+        description: "fields.port.description" as const,
+        placeholder: "fields.port.placeholder" as const,
         columns: 6,
         schema: z.coerce.number().optional(),
       }),
 
-      events: requestField({
+      events: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label: "app.api.stripe.form.fields.events.label" as const,
-        description: "app.api.stripe.form.fields.events.description" as const,
-        placeholder: "app.api.stripe.form.fields.events.placeholder" as const,
+        label: "fields.events.label" as const,
+        description: "fields.events.description" as const,
+        placeholder: "fields.events.placeholder" as const,
         columns: 12,
         options: [
           {
             value: "payment_intent.succeeded",
-            label:
-              "app.api.stripe.form.fields.events.paymentIntentSucceeded" as const,
+            label: "fields.events.paymentIntentSucceeded" as const,
           },
           {
             value: "payment_intent.payment_failed",
-            label:
-              "app.api.stripe.form.fields.events.paymentIntentFailed" as const,
+            label: "fields.events.paymentIntentFailed" as const,
           },
           {
             value: "customer.subscription.created",
-            label:
-              "app.api.stripe.form.fields.events.subscriptionCreated" as const,
+            label: "fields.events.subscriptionCreated" as const,
           },
           {
             value: "customer.subscription.updated",
-            label:
-              "app.api.stripe.form.fields.events.subscriptionUpdated" as const,
+            label: "fields.events.subscriptionUpdated" as const,
           },
           {
             value: "invoice.payment_succeeded",
-            label:
-              "app.api.stripe.form.fields.events.invoicePaymentSucceeded" as const,
+            label: "fields.events.invoicePaymentSucceeded" as const,
           },
           {
             value: "invoice.payment_failed",
-            label:
-              "app.api.stripe.form.fields.events.invoicePaymentFailed" as const,
+            label: "fields.events.invoicePaymentFailed" as const,
           },
         ],
         schema: z.array(z.string()).optional(),
       }),
 
-      forwardTo: requestField({
+      forwardTo: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.stripe.form.fields.forwardTo.label" as const,
-        description:
-          "app.api.stripe.form.fields.forwardTo.description" as const,
-        placeholder:
-          "app.api.stripe.form.fields.forwardTo.placeholder" as const,
+        label: "fields.forwardTo.label" as const,
+        description: "fields.forwardTo.description" as const,
+        placeholder: "fields.forwardTo.placeholder" as const,
         columns: 6,
         schema: z.string().optional(),
       }),
 
-      skipSslVerify: requestField({
+      skipSslVerify: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.stripe.form.fields.skipSslVerify.label" as const,
-        description:
-          "app.api.stripe.form.fields.skipSslVerify.description" as const,
+        label: "fields.skipSslVerify.label" as const,
+        description: "fields.skipSslVerify.description" as const,
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
       // RESPONSE FIELDS
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.stripe.response.success" as const,
+        content: "response.success" as const,
         schema: z.boolean(),
       }),
 
-      installed: responseField({
+      installed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.stripe.response.installed" as const,
+        content: "response.installed" as const,
         schema: z.boolean().optional(),
       }),
 
-      version: responseField({
+      version: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.stripe.response.version" as const,
+        content: "response.version" as const,
         schema: z.string().optional(),
       }),
 
-      status: responseField({
+      status: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.stripe.response.status" as const,
+        content: "response.status" as const,
         schema: z.string().optional(),
       }),
 
-      output: responseField({
+      output: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.stripe.response.output" as const,
+        content: "response.output" as const,
         schema: z.string().optional(),
       }),
 
-      instructions: responseField({
+      instructions: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.stripe.response.instructions" as const,
+        content: "response.instructions" as const,
         schema: z.string().optional(),
       }),
 
-      webhookEndpoint: responseField({
+      webhookEndpoint: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.stripe.response.webhookEndpoint" as const,
+        content: "response.webhookEndpoint" as const,
         schema: z.string().optional(),
       }),
     },
-  ),
+  }),
 
   examples: {
     requests: {
@@ -254,46 +240,46 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.stripe.errors.validation.title" as const,
-      description: "app.api.stripe.errors.validation.description" as const,
+      title: "errors.validation.title" as const,
+      description: "errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.stripe.errors.network.title" as const,
-      description: "app.api.stripe.errors.network.description" as const,
+      title: "errors.network.title" as const,
+      description: "errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.stripe.errors.unauthorized.title" as const,
-      description: "app.api.stripe.errors.unauthorized.description" as const,
+      title: "errors.unauthorized.title" as const,
+      description: "errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.stripe.errors.forbidden.title" as const,
-      description: "app.api.stripe.errors.forbidden.description" as const,
+      title: "errors.forbidden.title" as const,
+      description: "errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.stripe.errors.notFound.title" as const,
-      description: "app.api.stripe.errors.notFound.description" as const,
+      title: "errors.notFound.title" as const,
+      description: "errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.stripe.errors.serverError.title" as const,
-      description: "app.api.stripe.errors.serverError.description" as const,
+      title: "errors.serverError.title" as const,
+      description: "errors.serverError.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.stripe.errors.unknown.title" as const,
-      description: "app.api.stripe.errors.unknown.description" as const,
+      title: "errors.unknown.title" as const,
+      description: "errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.stripe.errors.unsavedChanges.title" as const,
-      description: "app.api.stripe.errors.unsavedChanges.description" as const,
+      title: "errors.unsavedChanges.title" as const,
+      description: "errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.stripe.errors.conflict.title" as const,
-      description: "app.api.stripe.errors.conflict.description" as const,
+      title: "errors.conflict.title" as const,
+      description: "errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.stripe.success.title" as const,
-    description: "app.api.stripe.success.description" as const,
+    title: "success.title" as const,
+    description: "success.description" as const,
   },
 });
 

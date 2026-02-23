@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Generators",
+
   post: {
     title: "Generate Endpoints Index",
     description: "Generate endpoints index file",

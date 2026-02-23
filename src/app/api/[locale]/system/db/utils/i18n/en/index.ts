@@ -1,6 +1,8 @@
 import { translations as dockerOperationsTranslations } from "../../docker-operations/i18n/en";
 
 export const translations = {
+  category: "Database Operations",
+
   dockerOperations: dockerOperationsTranslations,
   title: "Database Utils",
   description: "Utility functions for database operations",

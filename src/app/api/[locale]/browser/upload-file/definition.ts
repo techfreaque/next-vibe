@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,16 +20,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["browser", "upload-file"],
-  title: "app.api.browser.upload-file.title",
-  description: "app.api.browser.upload-file.description",
-  category: "app.api.browser.category",
+  title: "upload-file.title",
+  description: "upload-file.description",
+  category: "upload-file.category",
   icon: "upload",
   tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.inputAutomation",
+    "upload-file.tags.browserAutomation",
+    "upload-file.tags.inputAutomation",
   ],
 
   allowedRoles: [
@@ -40,22 +43,20 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.browser.upload-file.form.label",
-      description: "app.api.browser.upload-file.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      uid: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "upload-file.form.label",
+    description: "upload-file.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      uid: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.browser.upload-file.form.fields.uid.label",
-        description: "app.api.browser.upload-file.form.fields.uid.description",
-        placeholder: "app.api.browser.upload-file.form.fields.uid.placeholder",
+        label: "upload-file.form.fields.uid.label",
+        description: "upload-file.form.fields.uid.description",
+        placeholder: "upload-file.form.fields.uid.placeholder",
         columns: 6,
         schema: z
           .string()
@@ -63,29 +64,27 @@ const { POST } = createEndpoint({
             "The uid of the file input element or an element that will open file chooser on the page from the page content snapshot",
           ),
       }),
-      filePath: requestField({
+      filePath: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.browser.upload-file.form.fields.filePath.label",
-        description:
-          "app.api.browser.upload-file.form.fields.filePath.description",
-        placeholder:
-          "app.api.browser.upload-file.form.fields.filePath.placeholder",
+        label: "upload-file.form.fields.filePath.label",
+        description: "upload-file.form.fields.filePath.description",
+        placeholder: "upload-file.form.fields.filePath.placeholder",
         columns: 6,
         schema: z.string().describe("The local path of the file to upload"),
       }),
 
       // Response fields
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.upload-file.response.success",
+        content: "upload-file.response.success",
         schema: z
           .boolean()
           .describe("Whether the file upload operation succeeded"),
       }),
-      result: responseField({
+      result: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.upload-file.response.result",
+        content: "upload-file.response.result",
         schema: z
           .object({
             uploaded: z.boolean().describe("Whether the file was uploaded"),
@@ -97,24 +96,24 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Result of file upload operation"),
       }),
-      error: responseField({
+      error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.upload-file.response.error",
+        content: "upload-file.response.error",
         schema: z
           .string()
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: responseField({
+      executionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.upload-file.response.executionId",
+        content: "upload-file.response.executionId",
         schema: z
           .string()
           .optional()
           .describe("Unique identifier for this execution"),
       }),
     },
-  ),
+  }),
   examples: {
     requests: {
       default: {
@@ -135,47 +134,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.browser.upload-file.errors.validation.title",
-      description: "app.api.browser.upload-file.errors.validation.description",
+      title: "upload-file.errors.validation.title",
+      description: "upload-file.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.browser.upload-file.errors.network.title",
-      description: "app.api.browser.upload-file.errors.network.description",
+      title: "upload-file.errors.network.title",
+      description: "upload-file.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.browser.upload-file.errors.unauthorized.title",
-      description:
-        "app.api.browser.upload-file.errors.unauthorized.description",
+      title: "upload-file.errors.unauthorized.title",
+      description: "upload-file.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.browser.upload-file.errors.forbidden.title",
-      description: "app.api.browser.upload-file.errors.forbidden.description",
+      title: "upload-file.errors.forbidden.title",
+      description: "upload-file.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.browser.upload-file.errors.notFound.title",
-      description: "app.api.browser.upload-file.errors.notFound.description",
+      title: "upload-file.errors.notFound.title",
+      description: "upload-file.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.browser.upload-file.errors.serverError.title",
-      description: "app.api.browser.upload-file.errors.serverError.description",
+      title: "upload-file.errors.serverError.title",
+      description: "upload-file.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.browser.upload-file.errors.unknown.title",
-      description: "app.api.browser.upload-file.errors.unknown.description",
+      title: "upload-file.errors.unknown.title",
+      description: "upload-file.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.browser.upload-file.errors.unsavedChanges.title",
-      description:
-        "app.api.browser.upload-file.errors.unsavedChanges.description",
+      title: "upload-file.errors.unsavedChanges.title",
+      description: "upload-file.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.browser.upload-file.errors.conflict.title",
-      description: "app.api.browser.upload-file.errors.conflict.description",
+      title: "upload-file.errors.conflict.title",
+      description: "upload-file.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.browser.upload-file.success.title",
-    description: "app.api.browser.upload-file.success.description",
+    title: "upload-file.success.title",
+    description: "upload-file.success.description",
   },
 });
 

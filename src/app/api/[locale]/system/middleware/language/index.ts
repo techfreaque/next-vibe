@@ -94,26 +94,31 @@ export function detectLocale(
   const isApiRoute = pathFirstPart === "api";
   const localeSegment = isApiRoute ? pathParts[1] : pathFirstPart;
 
-  // Check if the path starts with a valid locale
-  const isValidLocalePrefix =
+  // Check if the path starts with a valid locale (case-insensitive)
+  const matchedLocale =
     localeSegment &&
-    supportedLocales.some((locale) => {
-      const normalizedLocale = locale.toLowerCase();
-      const normalizedPathPart = localeSegment.toLowerCase();
-      return normalizedPathPart === normalizedLocale;
+    supportedLocales.find((locale) => {
+      return localeSegment.toLowerCase() === locale.toLowerCase();
     });
 
-  // If the path already has a valid locale prefix, no redirect needed
-  if (isValidLocalePrefix) {
-    return null;
+  if (matchedLocale) {
+    // If casing is already correct, no redirect needed
+    if (localeSegment === matchedLocale) {
+      return null;
+    }
+    // Casing is wrong (e.g. "en-us" instead of "en-US") — redirect to fix it
+    return matchedLocale;
   }
 
   // Check for user's preferred locale from cookie
-  const cookieLocale = request.cookies.get(cookieName)?.value as
-    | CountryLanguage
-    | undefined;
+  const rawCookieLocale = request.cookies.get(cookieName)?.value;
+  const cookieLocale =
+    rawCookieLocale &&
+    supportedLocales.find(
+      (locale) => rawCookieLocale.toLowerCase() === locale.toLowerCase(),
+    );
 
-  if (cookieLocale && supportedLocales.includes(cookieLocale)) {
+  if (cookieLocale) {
     return cookieLocale;
   }
 

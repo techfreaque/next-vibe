@@ -20,17 +20,21 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { LinuxUsersListResponseOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 const execAsync = promisify(exec);
 
 export class LinuxUsersListRepository {
   static async list(
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<LinuxUsersListResponseOutput>> {
     const isLocalMode = process.env["NEXT_PUBLIC_LOCAL_MODE"] !== "false";
     if (!isLocalMode) {
       return fail({
-        message: "Linux user management is only available in LOCAL_MODE",
+        message: t("errors.localModeOnly.title"),
         errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
@@ -85,7 +89,7 @@ export class LinuxUsersListRepository {
     } catch (error) {
       logger.error("Failed to list Linux users", parseError(error));
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

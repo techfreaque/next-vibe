@@ -21,6 +21,7 @@ import { db } from "../../../../system/db";
 import type { ChatMessage, ToolCall, ToolCallResult } from "../../../chat/db";
 import { chatMessages } from "../../../chat/db";
 import type { ChatMessageRole } from "../../../chat/enum";
+import type { AiStreamT } from "../../i18n";
 
 export class ToolConfirmationHandler {
   /**
@@ -37,6 +38,7 @@ export class ToolConfirmationHandler {
     locale: CountryLanguage;
     logger: EndpointLogger;
     user: JwtPayloadType;
+    t: AiStreamT;
   }): Promise<ResponseType<{ threadId: string; toolMessageId: string }>> {
     const {
       toolConfirmation,
@@ -45,6 +47,7 @@ export class ToolConfirmationHandler {
       locale,
       logger,
       user,
+      t,
     } = params;
 
     logger.debug("[Tool Confirmation] handleToolConfirmationInSetup called", {
@@ -75,8 +78,7 @@ export class ToolConfirmationHandler {
         isIncognito,
       });
       return fail({
-        message:
-          "app.api.agent.chat.aiStream.post.toolConfirmation.errors.messageNotFound",
+        message: t("post.toolConfirmation.errors.messageNotFound"),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -85,8 +87,7 @@ export class ToolConfirmationHandler {
     if (!toolCall) {
       logger.error("[Tool Confirmation] ToolCall metadata missing");
       return fail({
-        message:
-          "app.api.agent.chat.aiStream.post.toolConfirmation.errors.toolCallMissing",
+        message: t("post.toolConfirmation.errors.toolCallMissing"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
@@ -129,8 +130,7 @@ export class ToolConfirmationHandler {
           toolName: toolCall.toolName,
         });
         return fail({
-          message:
-            "app.api.agent.chat.aiStream.post.toolConfirmation.errors.toolNotFound",
+          message: t("post.toolConfirmation.errors.toolNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -174,8 +174,7 @@ export class ToolConfirmationHandler {
             toolName: toolCall.toolName,
           });
           toolError = fail({
-            message:
-              "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
+            message: t("errors.toolExecutionError"),
             errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           });
         }
@@ -185,8 +184,7 @@ export class ToolConfirmationHandler {
           error: error instanceof Error ? error.message : String(error),
         });
         toolError = fail({
-          message:
-            "app.api.agent.chat.aiStream.errors.toolExecutionError" as const,
+          message: t("errors.toolExecutionError"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
@@ -233,8 +231,7 @@ export class ToolConfirmationHandler {
         isConfirmed: false,
         waitingForConfirmation: false,
         error: fail({
-          message:
-            "app.api.agent.chat.aiStream.errors.userDeclinedTool" as const,
+          message: t("errors.userDeclinedTool"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         }),
       };

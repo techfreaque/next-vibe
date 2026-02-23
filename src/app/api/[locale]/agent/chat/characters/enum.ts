@@ -23,6 +23,7 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 import type { IconComponent } from "@/packages/next-vibe-ui/web/lib/helper";
 
 import { ModelUtility, type ModelUtilityValue } from "../../models/enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Model Selection Mode Enum
@@ -31,9 +32,9 @@ export const {
   enum: ModelSelectionMode,
   options: ModelSelectionModeOptions,
   Value: ModelSelectionModeValue,
-} = createEnumOptions({
-  AUTO: "app.api.agent.chat.favorites.enums.mode.auto",
-  MANUAL: "app.api.agent.chat.favorites.enums.mode.manual",
+} = createEnumOptions(scopedTranslation, {
+  AUTO: "enums.mode.auto",
+  MANUAL: "enums.mode.manual",
 });
 
 export const ModelSelectionModeDB = [
@@ -49,12 +50,11 @@ export const {
   enum: ModelSelectionType,
   options: ModelSelectionTypeOptions,
   Value: ModelSelectionTypeValue,
-} = createEnumOptions({
-  CHARACTER_BASED:
-    "app.api.agent.chat.favorites.enums.selectionType.characterBased",
-  MANUAL: "app.api.agent.chat.favorites.enums.selectionType.manual",
-  FILTERS: "app.api.agent.chat.favorites.enums.selectionType.filters",
-});
+} = createEnumOptions(scopedTranslation, {
+  CHARACTER_BASED: "enums.selectionType.characterBased",
+  MANUAL: "enums.selectionType.manual",
+  FILTERS: "enums.selectionType.filters",
+} as const);
 
 export const ModelSelectionTypeDB = [
   ModelSelectionType.MANUAL,
@@ -69,10 +69,10 @@ export const {
   enum: IntelligenceLevel,
   options: IntelligenceLevelOptions,
   Value: IntelligenceLevelValue,
-} = createEnumOptions({
-  QUICK: "app.api.agent.chat.favorites.enums.intelligence.quick",
-  SMART: "app.api.agent.chat.favorites.enums.intelligence.smart",
-  BRILLIANT: "app.api.agent.chat.favorites.enums.intelligence.brilliant",
+} = createEnumOptions(scopedTranslation, {
+  QUICK: "enums.intelligence.quick",
+  SMART: "enums.intelligence.smart",
+  BRILLIANT: "enums.intelligence.brilliant",
 });
 
 /**
@@ -92,10 +92,10 @@ export const {
   enum: PriceLevel,
   options: PriceLevelOptions,
   Value: PriceLevelValue,
-} = createEnumOptions({
-  CHEAP: "app.api.agent.chat.favorites.enums.price.cheap",
-  STANDARD: "app.api.agent.chat.favorites.enums.price.standard",
-  PREMIUM: "app.api.agent.chat.favorites.enums.price.premium",
+} = createEnumOptions(scopedTranslation, {
+  CHEAP: "enums.price.cheap",
+  STANDARD: "enums.price.standard",
+  PREMIUM: "enums.price.premium",
 });
 
 /**
@@ -115,10 +115,10 @@ export const {
   enum: ContentLevel,
   options: ContentLevelOptions,
   Value: ContentLevelValue,
-} = createEnumOptions({
-  MAINSTREAM: "app.api.agent.chat.favorites.enums.content.mainstream",
-  OPEN: "app.api.agent.chat.favorites.enums.content.open",
-  UNCENSORED: "app.api.agent.chat.favorites.enums.content.uncensored",
+} = createEnumOptions(scopedTranslation, {
+  MAINSTREAM: "enums.content.mainstream",
+  OPEN: "enums.content.open",
+  UNCENSORED: "enums.content.uncensored",
 });
 
 /**
@@ -138,10 +138,10 @@ export const {
   enum: SpeedLevel,
   options: SpeedLevelOptions,
   Value: SpeedLevelValue,
-} = createEnumOptions({
-  FAST: "app.api.agent.chat.favorites.enums.speed.fast",
-  BALANCED: "app.api.agent.chat.favorites.enums.speed.balanced",
-  THOROUGH: "app.api.agent.chat.favorites.enums.speed.thorough",
+} = createEnumOptions(scopedTranslation, {
+  FAST: "enums.speed.fast",
+  BALANCED: "enums.speed.balanced",
+  THOROUGH: "enums.speed.thorough",
 });
 
 /**
@@ -160,11 +160,11 @@ export const {
   enum: ModelSortField,
   options: ModelSortFieldOptions,
   Value: ModelSortFieldValue,
-} = createEnumOptions({
-  INTELLIGENCE: "app.api.agent.chat.favorites.modelSelection.sort.intelligence",
-  PRICE: "app.api.agent.chat.favorites.modelSelection.sort.price",
-  SPEED: "app.api.agent.chat.favorites.modelSelection.sort.speed",
-  CONTENT: "app.api.agent.chat.favorites.modelSelection.sort.content",
+} = createEnumOptions(scopedTranslation, {
+  INTELLIGENCE: "modelSelection.sort.intelligence",
+  PRICE: "modelSelection.sort.price",
+  SPEED: "modelSelection.sort.speed",
+  CONTENT: "modelSelection.sort.content",
 });
 
 export const ModelSortFieldDB = [
@@ -181,9 +181,9 @@ export const {
   enum: ModelSortDirection,
   options: ModelSortDirectionOptions,
   Value: ModelSortDirectionValue,
-} = createEnumOptions({
-  ASC: "app.api.agent.chat.favorites.modelSelection.sortDirection.asc",
-  DESC: "app.api.agent.chat.favorites.modelSelection.sortDirection.desc",
+} = createEnumOptions(scopedTranslation, {
+  ASC: "modelSelection.sortDirection.asc",
+  DESC: "modelSelection.sortDirection.desc",
 });
 
 export const ModelSortDirectionDB = [
@@ -292,16 +292,16 @@ export const {
   enum: CharacterCategory,
   options: CharacterCategoryOptions,
   Value: CharacterCategoryValue,
-} = createEnumOptions({
-  COMPANION: "app.api.agent.chat.characters.enums.category.companion",
-  ASSISTANT: "app.api.agent.chat.characters.enums.category.assistant",
-  CODING: "app.api.agent.chat.characters.enums.category.coding",
-  CREATIVE: "app.api.agent.chat.characters.enums.category.creative",
-  WRITING: "app.api.agent.chat.characters.enums.category.writing",
-  ANALYSIS: "app.api.agent.chat.characters.enums.category.analysis",
-  ROLEPLAY: "app.api.agent.chat.characters.enums.category.roleplay",
-  EDUCATION: "app.api.agent.chat.characters.enums.category.education",
-  CONTROVERSIAL: "app.api.agent.chat.characters.enums.category.controversial",
+} = createEnumOptions(scopedTranslation, {
+  COMPANION: "enums.category.companion",
+  ASSISTANT: "enums.category.assistant",
+  CODING: "enums.category.coding",
+  CREATIVE: "enums.category.creative",
+  WRITING: "enums.category.writing",
+  ANALYSIS: "enums.category.analysis",
+  ROLEPLAY: "enums.category.roleplay",
+  EDUCATION: "enums.category.education",
+  CONTROVERSIAL: "enums.category.controversial",
 });
 
 /**
@@ -327,10 +327,10 @@ export const {
   enum: CharacterOwnershipType,
   options: CharacterOwnershipTypeOptions,
   Value: CharacterOwnershipTypeValue,
-} = createEnumOptions({
-  SYSTEM: "app.api.agent.chat.characters.enums.ownershipType.system",
-  USER: "app.api.agent.chat.characters.enums.ownershipType.user",
-  PUBLIC: "app.api.agent.chat.characters.enums.ownershipType.public",
+} = createEnumOptions(scopedTranslation, {
+  SYSTEM: "enums.ownershipType.system",
+  USER: "enums.ownershipType.user",
+  PUBLIC: "enums.ownershipType.public",
 });
 
 /**
@@ -357,74 +357,62 @@ export interface CategoryConfig {
  * Centralized category configuration
  * Maps each category to its icon and primary task utility
  */
-export const CATEGORY_CONFIG: Record<
-  typeof CharacterCategoryValue,
-  CategoryConfig
-> = {
+export const CATEGORY_CONFIG = {
   [CharacterCategory.COMPANION]: {
     category: CharacterCategory.COMPANION,
-    label: CharacterCategory.COMPANION,
-    icon: "heart",
+    icon: "heart" as const,
     task: ModelUtility.CHAT,
     order: 0,
   },
   [CharacterCategory.ASSISTANT]: {
     category: CharacterCategory.ASSISTANT,
-    label: CharacterCategory.ASSISTANT,
-    icon: "robot-face",
+    icon: "robot-face" as const,
     task: ModelUtility.CHAT,
     order: 1,
   },
   [CharacterCategory.CODING]: {
     category: CharacterCategory.CODING,
-    label: CharacterCategory.CODING,
-    icon: "code",
+    icon: "code" as const,
     task: ModelUtility.CODING,
     order: 2,
   },
   [CharacterCategory.CREATIVE]: {
     category: CharacterCategory.CREATIVE,
-    label: CharacterCategory.CREATIVE,
-    icon: "artist-palette",
+    icon: "artist-palette" as const,
     task: ModelUtility.CREATIVE,
     order: 4,
   },
   [CharacterCategory.WRITING]: {
     category: CharacterCategory.WRITING,
-    label: CharacterCategory.WRITING,
-    icon: "pen-tool",
+    icon: "pen-tool" as const,
     task: ModelUtility.CREATIVE,
     order: 3,
   },
   [CharacterCategory.ANALYSIS]: {
     category: CharacterCategory.ANALYSIS,
-    label: CharacterCategory.ANALYSIS,
-    icon: "magnifying-glass-icon",
+    icon: "magnifying-glass-icon" as const,
     task: ModelUtility.ANALYSIS,
     order: 5,
   },
   [CharacterCategory.ROLEPLAY]: {
     category: CharacterCategory.ROLEPLAY,
-    label: CharacterCategory.ROLEPLAY,
-    icon: "game-controller",
+    icon: "game-controller" as const,
     task: ModelUtility.ROLEPLAY,
     order: 7,
   },
   [CharacterCategory.EDUCATION]: {
     category: CharacterCategory.EDUCATION,
-    label: CharacterCategory.EDUCATION,
-    icon: "books",
+    icon: "books" as const,
     task: ModelUtility.REASONING,
     order: 6,
   },
   [CharacterCategory.CONTROVERSIAL]: {
     category: CharacterCategory.CONTROVERSIAL,
-    label: CharacterCategory.CONTROVERSIAL,
-    icon: "fire",
+    icon: "fire" as const,
     task: ModelUtility.CHAT,
     order: 8,
   },
-};
+} as const;
 
 /**
  * Category options with icons for UI
@@ -460,10 +448,7 @@ export interface ModelUtilityConfig {
  * Configuration for model utility categories
  * Used for grouping models by their primary use cases
  */
-export const MODEL_UTILITIES: Record<
-  typeof ModelUtilityValue,
-  ModelUtilityConfig
-> = {
+export const MODEL_UTILITIES = {
   // Core capabilities
   [ModelUtility.CHAT]: {
     id: ModelUtility.CHAT,

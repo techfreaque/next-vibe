@@ -16,11 +16,12 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation as sendScopedTranslation } from "../../emails/send/i18n";
 import { smsServiceRepository } from "../../emails/sms-service/repository";
 import { CampaignType } from "../../emails/smtp-client/enum";
 import { smsEnv } from "../../sms/env";
+import { scopedTranslation } from "../i18n";
 import type { UnsubscribePostRequestOutput } from "./definition";
 
 // Use proper imported types
@@ -81,13 +82,12 @@ export class NewsletterUnsubscribeSmsServiceImpl implements NewsletterUnsubscrib
         unsubscribeEmail: unsubscribeData.email,
         userPhone,
       });
-      const { t } = simpleT(locale);
-      const message = t(
-        "app.api.newsletter.unsubscribe.sms.confirmation.message",
-        {
-          email: unsubscribeData.email,
-        },
-      );
+      const { t } = scopedTranslation.scopedT(locale);
+      const message = t("unsubscribe.sms.confirmation.message", {
+        email: unsubscribeData.email,
+      });
+
+      const { t: sendT } = sendScopedTranslation.scopedT(locale);
 
       const smsResult = await smsServiceRepository.sendSms(
         {
@@ -97,16 +97,14 @@ export class NewsletterUnsubscribeSmsServiceImpl implements NewsletterUnsubscrib
         },
         user || { isPublic: true as const },
         logger,
+        sendT,
       );
 
       if (!smsResult.success) {
+        const { t: t2 } = scopedTranslation.scopedT(locale);
         return fail({
-          message:
-            "app.api.newsletter.unsubscribe.sms.errors.confirmation_failed.title",
+          message: t2("unsubscribe.sms.errors.confirmation_failed.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
-            error: smsResult.message || t("app.common.error.sending_sms"),
-          },
         });
       }
 
@@ -115,15 +113,14 @@ export class NewsletterUnsubscribeSmsServiceImpl implements NewsletterUnsubscrib
         sent: true,
       });
     } catch (error) {
+      const { t: t2 } = scopedTranslation.scopedT(locale);
       logger.error(
         "Error sending unsubscribe confirmation SMS",
         parseError(error),
       );
       return fail({
-        message:
-          "app.api.newsletter.unsubscribe.sms.errors.confirmation_failed.title",
+        message: t2("unsubscribe.sms.errors.confirmation_failed.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }
@@ -162,14 +159,13 @@ export class NewsletterUnsubscribeSmsServiceImpl implements NewsletterUnsubscrib
         },
       );
 
-      const { t } = simpleT(locale);
+      const { t } = scopedTranslation.scopedT(locale);
 
-      const message = t(
-        "app.api.newsletter.unsubscribe.sms.admin_notification.message",
-        {
-          email: unsubscribeData.email,
-        },
-      );
+      const message = t("unsubscribe.sms.admin_notification.message", {
+        email: unsubscribeData.email,
+      });
+
+      const { t: sendT2 } = sendScopedTranslation.scopedT(locale);
 
       const smsResult = await smsServiceRepository.sendSms(
         {
@@ -179,16 +175,13 @@ export class NewsletterUnsubscribeSmsServiceImpl implements NewsletterUnsubscrib
         },
         user || { id: "system", isPublic: false as const },
         logger,
+        sendT2,
       );
 
       if (!smsResult.success) {
         return fail({
-          message:
-            "app.api.newsletter.unsubscribe.sms.errors.admin_notification_failed.title",
+          message: t("unsubscribe.sms.errors.admin_notification_failed.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
-            error: t(smsResult.message) || t("app.common.error.sending_sms"),
-          },
         });
       }
 
@@ -197,12 +190,11 @@ export class NewsletterUnsubscribeSmsServiceImpl implements NewsletterUnsubscrib
         sent: true,
       });
     } catch (error) {
+      const { t } = scopedTranslation.scopedT(locale);
       logger.error("Error sending admin notification SMS", parseError(error));
       return fail({
-        message:
-          "app.api.newsletter.unsubscribe.sms.errors.admin_notification_failed.title",
+        message: t("unsubscribe.sms.errors.admin_notification_failed.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

@@ -1,6 +1,10 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Chat",
+  tags: {
+    settings: "Ustawienia",
+  },
   get: {
     title: "Pobierz ustawienia czatu",
     description: "Pobierz ustawienia i preferencje użytkownika",
@@ -71,8 +75,11 @@ export const translations: typeof enTranslations = {
     viewMode: {
       label: "Tryb widoku",
     },
-    enabledTools: {
-      label: "Włączone narzędzia",
+    allowedTools: {
+      label: "Dozwolone narzędzia",
+    },
+    pinnedTools: {
+      label: "Przypięte narzędzia",
     },
     errors: {
       validation: {

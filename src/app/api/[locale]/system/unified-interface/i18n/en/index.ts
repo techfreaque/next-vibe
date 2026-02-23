@@ -43,6 +43,7 @@ export const translations = {
     chart: {
       noDataAvailable: "No data available",
       noDataToDisplay: "No data to display",
+      total: "Total",
     },
     codeQualityList: {
       noIssues: "No issues found",

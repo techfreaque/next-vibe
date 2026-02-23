@@ -2,6 +2,12 @@ import { translations as jobsTranslations } from "../../jobs/i18n/en";
 import { translations as statusTranslations } from "../../status/i18n/en";
 
 export const translations = {
+  tags: {
+    import: "Import",
+    leads: "Leads",
+    csv: "CSV",
+  },
+
   category: "Data Import",
   post: {
     title: "Import Leads",
@@ -158,6 +164,63 @@ export const translations = {
       importErrorsTitle: "{{count}} Import Errors",
       errorRowLabel: "Row {{row}}",
       findLeadButton: "Find Lead",
+    },
+  },
+  process: {
+    tag: "Import Process",
+    post: {
+      title: "Process Import Jobs",
+      description: "Process pending CSV import jobs",
+      container: {
+        title: "Import Process Configuration",
+        description: "Configure import process parameters",
+      },
+      fields: {
+        maxJobsPerRun: {
+          label: "Max Jobs Per Run",
+          description: "Maximum number of jobs to process per run",
+        },
+        maxRetriesPerJob: {
+          label: "Max Retries Per Job",
+          description: "Maximum number of retries per job",
+        },
+        dryRun: {
+          label: "Dry Run",
+          description: "Run without making changes",
+        },
+      },
+      response: {
+        jobsProcessed: "Jobs Processed",
+        totalRowsProcessed: "Total Rows Processed",
+        successfulImports: "Successful Imports",
+        failedImports: "Failed Imports",
+      },
+      errors: {
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+        forbidden: {
+          title: "Forbidden",
+          description: "Access forbidden",
+        },
+        server: {
+          title: "Server Error",
+          description: "An error occurred while processing imports",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unknown error occurred",
+        },
+        validation: {
+          title: "Validation Error",
+          description: "Invalid request parameters",
+        },
+      },
+      success: {
+        title: "Import Processing Complete",
+        description: "Import jobs processed successfully",
+      },
     },
   },
   jobs: jobsTranslations,

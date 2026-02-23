@@ -10,8 +10,9 @@ import type { JSX, ReactNode } from "react";
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
+import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation } from "../i18n";
 import { EmailImage } from "./email-image.email";
 import { TrackedLink } from "./tracked_link.email";
 import { TrackedPixel } from "./tracked_pixel.email";
@@ -21,7 +22,6 @@ interface EmailTemplateProps {
   title: string;
   previewText: string;
   children: ReactNode;
-  t: TFunction;
   locale: CountryLanguage;
   tracking: TrackingContext;
   recipientEmail: string;
@@ -31,12 +31,13 @@ export function EmailTemplate({
   title,
   previewText,
   children,
-  t,
   locale,
   tracking,
   recipientEmail,
 }: EmailTemplateProps): JSX.Element {
   const currentYear = new Date().getFullYear();
+  const { t: globalT } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   return (
     <Html lang={locale.split("-")[0]}>
@@ -82,7 +83,7 @@ export function EmailTemplate({
             >
               <EmailImage
                 src="/images/unbottled-icon.png"
-                alt={t("config.appName")}
+                alt={globalT("config.appName")}
                 width="28"
                 height="28"
                 recipientEmail={recipientEmail}
@@ -101,7 +102,7 @@ export function EmailTemplate({
                   whiteSpace: "nowrap",
                 }}
               >
-                {t("config.appName")}
+                {globalT("config.appName")}
               </div>
             </div>
             <div
@@ -122,7 +123,7 @@ export function EmailTemplate({
                   margin: "0",
                 }}
               >
-                {t("app.api.emails.template.tagline")}
+                {t("components.email.tagline")}
               </div>
             </div>
           </Section>
@@ -198,7 +199,7 @@ export function EmailTemplate({
                   display: "inline-block",
                 }}
               >
-                {t("app.api.emails.footer.visitWebsite")}
+                {t("components.email.footer.visitWebsite")}
               </TrackedLink>
             </div>
 
@@ -210,9 +211,9 @@ export function EmailTemplate({
                 margin: "0 0 8px 0",
               }}
             >
-              {t("app.api.emails.footer.allRightsReserved", {
+              {t("components.email.footer.allRightsReserved", {
                 currentYear,
-                appName: t("config.appName"),
+                appName: globalT("config.appName"),
               })}
             </div>
 
@@ -224,7 +225,7 @@ export function EmailTemplate({
                 margin: "8px 0 0 0",
               }}
             >
-              {t("app.api.emails.smtpClient.components.email.footer.needHelp")}{" "}
+              {t("components.email.footer.needHelp")}{" "}
               <TrackedLink
                 href={`mailto:${contactClientRepository.getSupportEmail(locale)}`}
                 tracking={tracking}
@@ -242,13 +243,10 @@ export function EmailTemplate({
                 margin: "16px 0 0 0",
               }}
             >
-              {t(
-                "app.api.emails.smtpClient.components.email.footer.copyright",
-                {
-                  currentYear,
-                  appName: t("config.appName"),
-                },
-              )}
+              {t("components.email.footer.copyright", {
+                currentYear,
+                appName: globalT("config.appName"),
+              })}
             </div>
           </Section>
         </Container>

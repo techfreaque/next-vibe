@@ -17,7 +17,6 @@ import type {
   LoggerMetadata,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import { serializeError } from "../../ai-stream/error-utils";
 import { ChatMessageRole } from "../../chat/enum";
@@ -42,6 +41,7 @@ import {
   type ToolWaitingEventData,
   type VoiceTranscribedEventData,
 } from "../events";
+import type { AiStreamT } from "../i18n";
 import { getAudioQueue } from "./audio-queue";
 import type { StreamingMessage, StreamingThread } from "./store";
 import { useAIStreamStore } from "./store";
@@ -332,7 +332,7 @@ function handleMessageCreatedEvent(params: {
 export function useAIStream(
   locale: CountryLanguage,
   logger: EndpointLogger,
-  t: TFunction,
+  t: AiStreamT,
 ): UseAIStreamReturn {
   const store = useAIStreamStore();
 
@@ -570,7 +570,7 @@ export function useAIStream(
           // Show persistent toast notification for stream errors
           // The errorMessage from the server is already a translation key, just use t()
           toast({
-            title: t("app.api.agent.chat.aiStream.error.title"),
+            title: t("error.title"),
             description: t(errorMessage as Parameters<typeof t>[0]),
             variant: "destructive",
             duration: Infinity, // Never auto-dismiss
@@ -588,8 +588,7 @@ export function useAIStream(
 
           if (activeThreadId) {
             const errorResponse = fail({
-              message:
-                "app.api.agent.chat.aiStream.route.errors.noResponseBody",
+              message: t("route.errors.noResponseBody"),
               errorType: ErrorResponseTypes.INTERNAL_ERROR,
             });
 
@@ -1535,8 +1534,7 @@ export function useAIStream(
 
             if (activeThreadId) {
               const errorResponse = fail({
-                message:
-                  "app.api.agent.chat.aiStream.errors.unexpectedError" as const,
+                message: t("errors.unexpectedError"),
                 errorType: ErrorResponseTypes.UNKNOWN_ERROR,
                 messageParams: { error: error.message },
               });
@@ -1642,7 +1640,7 @@ export function useAIStream(
           id: crypto.randomUUID(),
           threadId: tid,
           role: ChatMessageRole.ERROR,
-          content: "app.api.agent.chat.aiStream.info.streamInterrupted",
+          content: t("info.streamInterrupted"),
           parentId,
           depth,
           sequenceId: activeSequenceId,
@@ -1651,7 +1649,7 @@ export function useAIStream(
           model: null,
           character: null,
           errorType: "STREAM_ERROR",
-          errorMessage: t("app.api.agent.chat.aiStream.info.streamInterrupted"),
+          errorMessage: t("info.streamInterrupted"),
           errorCode: null,
           metadata: {},
           upvotes: 0,

@@ -189,6 +189,7 @@ export const translations: typeof enTranslations = {
         },
       },
       errors: {
+        default: "IMAP-Synchronisation fehlgeschlagen",
         account_failed: "Kontosynchronisation fehlgeschlagen",
         folder_sync_failed: "Ordnersynchronisation fehlgeschlagen",
         message_sync_error: "Nachrichtensynchronisationsfehler",
@@ -197,6 +198,12 @@ export const translations: typeof enTranslations = {
     },
   },
   enums: {
+    loggingLevel: {
+      error: "Fehler",
+      warn: "Warnung",
+      info: "Info",
+      debug: "Debug",
+    },
     syncStatus: {
       pending: "Ausstehend",
       syncing: "Synchronisierung",

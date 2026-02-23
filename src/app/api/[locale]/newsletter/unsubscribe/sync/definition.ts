@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,123 +20,107 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["newsletter", "unsubscribe", "sync"],
-  title: "app.api.newsletter.unsubscribe.sync.post.title",
-  description: "app.api.newsletter.unsubscribe.sync.post.description",
-  category: "app.api.system.category",
+  title: "unsubscribe.sync.post.title",
+  description: "unsubscribe.sync.post.description",
+  category: "category",
   icon: "refresh-cw",
-  tags: ["app.api.newsletter.unsubscribe.sync.tag"],
+  tags: ["unsubscribe.sync.tag"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.newsletter.unsubscribe.sync.post.container.title",
-      description:
-        "app.api.newsletter.unsubscribe.sync.post.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      batchSize: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "unsubscribe.sync.post.container.title",
+    description: "unsubscribe.sync.post.container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      batchSize: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.newsletter.unsubscribe.sync.post.fields.batchSize.label",
-        description:
-          "app.api.newsletter.unsubscribe.sync.post.fields.batchSize.description",
+        label: "unsubscribe.sync.post.fields.batchSize.label",
+        description: "unsubscribe.sync.post.fields.batchSize.description",
         columns: 6,
         schema: z.coerce.number().min(1).max(1000).default(500),
       }),
 
-      dryRun: requestField({
+      dryRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.newsletter.unsubscribe.sync.post.fields.dryRun.label",
-        description:
-          "app.api.newsletter.unsubscribe.sync.post.fields.dryRun.description",
+        label: "unsubscribe.sync.post.fields.dryRun.label",
+        description: "unsubscribe.sync.post.fields.dryRun.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
-      leadsProcessed: responseField({
+      leadsProcessed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.newsletter.unsubscribe.sync.post.response.leadsProcessed",
+        content: "unsubscribe.sync.post.response.leadsProcessed",
         schema: z.number(),
       }),
 
-      leadsUpdated: responseField({
+      leadsUpdated: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.newsletter.unsubscribe.sync.post.response.leadsUpdated",
+        content: "unsubscribe.sync.post.response.leadsUpdated",
         schema: z.number(),
       }),
 
-      executionTimeMs: responseField({
+      executionTimeMs: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.newsletter.unsubscribe.sync.post.response.executionTimeMs",
+        content: "unsubscribe.sync.post.response.executionTimeMs",
         schema: z.number(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.newsletter.unsubscribe.sync.post.errors.unauthorized.title",
-      description:
-        "app.api.newsletter.unsubscribe.sync.post.errors.unauthorized.description",
+      title: "unsubscribe.sync.post.errors.unauthorized.title",
+      description: "unsubscribe.sync.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.newsletter.unsubscribe.sync.post.errors.forbidden.title",
-      description:
-        "app.api.newsletter.unsubscribe.sync.post.errors.forbidden.description",
+      title: "unsubscribe.sync.post.errors.forbidden.title",
+      description: "unsubscribe.sync.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.newsletter.unsubscribe.sync.post.errors.server.title",
-      description:
-        "app.api.newsletter.unsubscribe.sync.post.errors.server.description",
+      title: "unsubscribe.sync.post.errors.server.title",
+      description: "unsubscribe.sync.post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.newsletter.unsubscribe.sync.post.errors.unknown.title",
-      description:
-        "app.api.newsletter.unsubscribe.sync.post.errors.unknown.description",
+      title: "unsubscribe.sync.post.errors.unknown.title",
+      description: "unsubscribe.sync.post.errors.unknown.description",
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.newsletter.unsubscribe.sync.post.errors.validation.title",
-      description:
-        "app.api.newsletter.unsubscribe.sync.post.errors.validation.description",
+      title: "unsubscribe.sync.post.errors.validation.title",
+      description: "unsubscribe.sync.post.errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.newsletter.unsubscribe.sync.post.errors.unknown.title",
-      description:
-        "app.api.newsletter.unsubscribe.sync.post.errors.unknown.description",
+      title: "unsubscribe.sync.post.errors.unknown.title",
+      description: "unsubscribe.sync.post.errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.newsletter.unsubscribe.sync.post.errors.unknown.title",
-      description:
-        "app.api.newsletter.unsubscribe.sync.post.errors.unknown.description",
+      title: "unsubscribe.sync.post.errors.unknown.title",
+      description: "unsubscribe.sync.post.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.newsletter.unsubscribe.sync.post.errors.unknown.title",
-      description:
-        "app.api.newsletter.unsubscribe.sync.post.errors.unknown.description",
+      title: "unsubscribe.sync.post.errors.unknown.title",
+      description: "unsubscribe.sync.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.newsletter.unsubscribe.sync.post.errors.unknown.title",
-      description:
-        "app.api.newsletter.unsubscribe.sync.post.errors.unknown.description",
+      title: "unsubscribe.sync.post.errors.unknown.title",
+      description: "unsubscribe.sync.post.errors.unknown.description",
     },
   },
 
   successTypes: {
-    title: "app.api.newsletter.unsubscribe.sync.post.success.title",
-    description: "app.api.newsletter.unsubscribe.sync.post.success.description",
+    title: "unsubscribe.sync.post.success.title",
+    description: "unsubscribe.sync.post.success.description",
   },
 
   examples: {

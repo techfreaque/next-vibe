@@ -15,13 +15,13 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 import type Stripe from "stripe";
 
+import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { users } from "@/app/api/[locale]/user/db";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { subscriptions } from "../subscription/db";
 import { paymentMethods, paymentTransactions, paymentWebhooks } from "./db";
@@ -32,6 +32,7 @@ import type {
   PaymentPostResponseOutput,
 } from "./definition";
 import { CheckoutMode, PaymentProvider, PaymentStatus } from "./enum";
+import { scopedTranslation } from "./i18n";
 import type {
   PaymentInvoiceRequestOutput,
   PaymentInvoiceResponseOutput,
@@ -48,22 +49,23 @@ import type {
   PaymentRefundResponseOutput,
 } from "./refund/definition";
 
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+
 export class PaymentRepository {
   static async createPaymentSession(
     data: PaymentPostRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<PaymentPostResponseOutput>> {
-    const { t } = simpleT(locale);
-
     if (env.NEXT_PUBLIC_LOCAL_MODE) {
       logger.info("Payment disabled in local mode");
       return fail({
-        message: "app.api.payment.errors.localMode",
+        message: t("errors.localMode"),
         errorType: ErrorResponseTypes.FORBIDDEN,
         messageParams: {
-          error: t("app.api.payment.errors.unauthorized.description"),
+          error: t("errors.unauthorized.description"),
         },
       });
     }
@@ -73,10 +75,10 @@ export class PaymentRepository {
       if (user.isPublic) {
         logger.error("payment.create.error.publicUserNotAllowed");
         return fail({
-          message: "app.api.payment.errors.unauthorized.title",
+          message: t("errors.unauthorized.title"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
           messageParams: {
-            error: t("app.api.payment.errors.unauthorized.description"),
+            error: t("errors.unauthorized.description"),
           },
         });
       }
@@ -97,7 +99,7 @@ export class PaymentRepository {
       if (!userRecord) {
         logger.error("payment.create.error.userNotFound", { userId: user.id });
         return fail({
-          message: "app.api.payment.create.errors.notFound.title",
+          message: t("create.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { userId: user.id },
         });
@@ -112,6 +114,7 @@ export class PaymentRepository {
         userRecord.email,
         userRecord.publicName,
         logger,
+        locale,
       );
 
       if (!customerResult.success) {
@@ -210,7 +213,7 @@ export class PaymentRepository {
         mode: data.mode,
         sessionUrl: session.url || "",
         sessionId: session.id,
-        message: t("app.api.payment.success.sessionCreated"),
+        message: t("success.sessionCreated"),
       });
     } catch (error) {
       const parsedError = parseError(error);
@@ -221,7 +224,7 @@ export class PaymentRepository {
       });
 
       return fail({
-        message: "app.api.payment.create.errors.server.title",
+        message: t("create.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -231,20 +234,18 @@ export class PaymentRepository {
   static async getPaymentInfo(
     data: PaymentGetRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<PaymentGetResponseOutput>> {
-    const { t } = simpleT(locale);
-
     try {
       // Payment endpoints require authenticated users with ID
       if (user.isPublic) {
         logger.error("payment.get.error.publicUserNotAllowed");
         return fail({
-          message: "app.api.payment.errors.unauthorized.title",
+          message: t("errors.unauthorized.title"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
           messageParams: {
-            error: t("app.api.payment.errors.unauthorized.description"),
+            error: t("errors.unauthorized.description"),
           },
         });
       }
@@ -281,7 +282,7 @@ export class PaymentRepository {
         mode: userTransactions[0]?.mode || CheckoutMode.PAYMENT,
         sessionUrl: "",
         sessionId: userTransactions[0]?.providerSessionId || "",
-        message: t("app.api.payment.success.infoRetrieved"),
+        message: t("success.infoRetrieved"),
       });
     } catch (error) {
       const parsedError = parseError(error);
@@ -291,7 +292,7 @@ export class PaymentRepository {
       });
 
       return fail({
-        message: "app.api.payment.get.errors.server.title",
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -311,6 +312,7 @@ export class PaymentRepository {
     userId: string,
     data: PaymentPortalRequestOutput,
     locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<PaymentPortalResponseOutput>> {
     // Get user's subscription to determine provider
@@ -324,7 +326,7 @@ export class PaymentRepository {
     if (!subscription[0]) {
       logger.error("No subscription found for user", { userId });
       return fail({
-        message: "app.api.payment.errors.notFound.title",
+        message: t("errors.notFound.title"),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -356,9 +358,11 @@ export class PaymentRepository {
   static async handleWebhook(
     body: string,
     signature: string,
+    locale: CountryLanguage,
     logger: EndpointLogger,
     provider: "stripe" | "nowpayments" = "stripe",
   ): Promise<ResponseType<{ received: boolean }>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Processing webhook", {
         signature: `${signature.slice(0, 20)}...`,
@@ -374,6 +378,7 @@ export class PaymentRepository {
         body,
         signature,
         logger,
+        locale,
       );
 
       if (!verificationResult.success) {
@@ -382,7 +387,7 @@ export class PaymentRepository {
           error: verificationResult.message,
         });
         return fail({
-          message: "app.api.stripe.errors.webhookVerificationFailed.title",
+          message: t("errors.webhookVerificationFailed"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
           messageParams: { error: verificationResult.message },
         });
@@ -437,16 +442,16 @@ export class PaymentRepository {
           break;
         case "invoice.payment_succeeded":
         case "invoice.paid":
-          await this.handleInvoicePaymentSucceeded(eventData, logger);
+          await this.handleInvoicePaymentSucceeded(eventData, logger, locale);
           break;
         case "invoice.payment_failed":
-          await this.handleInvoicePaymentFailed(eventData, logger);
+          await this.handleInvoicePaymentFailed(eventData, logger, locale);
           break;
         case "customer.subscription.deleted":
-          await this.handleSubscriptionDeleted(eventData, logger);
+          await this.handleSubscriptionDeleted(eventData, logger, locale);
           break;
         case "customer.subscription.updated":
-          await this.handleSubscriptionUpdated(eventData, logger);
+          await this.handleSubscriptionUpdated(eventData, logger, locale);
           break;
         default:
           logger.debug("Unhandled webhook event type", {
@@ -468,7 +473,7 @@ export class PaymentRepository {
       });
 
       return fail({
-        message: "app.api.payment.errors.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
         messageParams: { error: parsedError.message },
       });
@@ -534,6 +539,7 @@ export class PaymentRepository {
   private static async handleInvoicePaymentSucceeded(
     data: WebhookData,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<void> {
     try {
       const invoiceId = data.id;
@@ -619,6 +625,7 @@ export class PaymentRepository {
         data,
         subscriptionId,
         logger,
+        locale,
       );
     } catch (error) {
       if (typeof error === "object" && error && "id" in error) {
@@ -637,6 +644,7 @@ export class PaymentRepository {
   private static async handleInvoicePaymentFailed(
     data: WebhookData,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<void> {
     try {
       const invoiceId = (data as { id?: string }).id;
@@ -708,6 +716,7 @@ export class PaymentRepository {
         data,
         subscriptionId,
         logger,
+        locale,
       );
     } catch (error) {
       if (typeof error === "object" && error && "id" in error) {
@@ -746,6 +755,41 @@ export class PaymentRepository {
         },
       );
 
+      // Find transaction by session ID first — it holds the authoritative userId
+      const [transaction] = await db
+        .select()
+        .from(paymentTransactions)
+        .where(eq(paymentTransactions.providerSessionId, sessionId))
+        .limit(1);
+
+      if (!transaction) {
+        logger.warn("No transaction found for checkout session", {
+          sessionId,
+        });
+        return;
+      }
+
+      // Look up user's locale from DB — the transaction userId is the source of truth
+      const [userRecord] = await db
+        .select({ locale: users.locale })
+        .from(users)
+        .where(eq(users.id, transaction.userId))
+        .limit(1);
+
+      if (!userRecord) {
+        logger.warn(
+          "User not found for transaction — cannot process checkout",
+          {
+            sessionId,
+            userId: transaction.userId,
+          },
+        );
+        return;
+      }
+
+      const userLocale = userRecord.locale;
+      const { t: creditsT } = creditsScopedTranslation.scopedT(userLocale);
+
       // Route to appropriate module based on purchase type
       if (type === "credit_pack") {
         const { CreditRepository } = await import("../credits/repository");
@@ -762,11 +806,16 @@ export class PaymentRepository {
         await CreditRepository.handleCreditPackPurchase(
           creditPackSession,
           logger,
+          creditsT,
         );
       } else if (type === "subscription") {
         const { SubscriptionRepository } =
           await import("../subscription/repository");
-        await SubscriptionRepository.handleSubscriptionCheckout(data, logger);
+        await SubscriptionRepository.handleSubscriptionCheckout(
+          data,
+          logger,
+          userLocale,
+        );
       } else {
         logger.debug("Unhandled checkout session type", {
           sessionId,
@@ -774,69 +823,55 @@ export class PaymentRepository {
         });
       }
 
-      // Find transaction by session ID and process referral payout
-      // This is provider-agnostic - uses transaction data, not raw webhook data
-      const [transaction] = await db
-        .select()
-        .from(paymentTransactions)
-        .where(eq(paymentTransactions.providerSessionId, sessionId))
-        .limit(1);
+      // Update transaction status to SUCCEEDED
+      await db
+        .update(paymentTransactions)
+        .set({
+          status: PaymentStatus.SUCCEEDED,
+          updatedAt: new Date(),
+        })
+        .where(eq(paymentTransactions.id, transaction.id));
 
-      if (transaction) {
-        // Update transaction status to SUCCEEDED
-        await db
-          .update(paymentTransactions)
-          .set({
-            status: PaymentStatus.SUCCEEDED,
-            updatedAt: new Date(),
-          })
-          .where(eq(paymentTransactions.id, transaction.id));
+      logger.debug("Transaction status updated to succeeded", {
+        transactionId: transaction.id,
+        sessionId,
+      });
 
-        logger.debug("Transaction status updated to succeeded", {
-          transactionId: transaction.id,
-          sessionId,
-        });
+      // Apply referral payout using credits (currency-independent)
+      // Credits are determined from product type, not payment amount
+      const { productsRepository, ProductIds } =
+        await import("../products/repository-client");
 
-        // Apply referral payout using credits (currency-independent)
-        // Credits are determined from product type, not payment amount
-        const { productsRepository, ProductIds } =
-          await import("../products/repository-client");
+      let creditsAmount = 0;
+      if (type === "subscription") {
+        const subscriptionProduct = productsRepository.getProduct(
+          ProductIds.SUBSCRIPTION,
+          userLocale,
+        );
+        creditsAmount = subscriptionProduct.credits; // 800
+      } else if (type === "credit_pack") {
+        // Credit pack: quantity * credits per pack
+        const quantity =
+          metadata && typeof metadata === "object" && "quantity" in metadata
+            ? Number(metadata.quantity) || 1
+            : 1;
+        const creditPackProduct = productsRepository.getProduct(
+          ProductIds.CREDIT_PACK,
+          userLocale,
+        );
+        creditsAmount = quantity * creditPackProduct.credits; // quantity * 500
+      }
 
-        let creditsAmount = 0;
-        if (type === "subscription") {
-          // Subscription: fixed credits from product definition
-          // Use "en-US" as default locale since we only need the credits value
-          const subscriptionProduct = productsRepository.getProduct(
-            ProductIds.SUBSCRIPTION,
-            "en-US",
-          );
-          creditsAmount = subscriptionProduct.credits; // 800
-        } else if (type === "credit_pack") {
-          // Credit pack: quantity * credits per pack
-          const quantity =
-            metadata && typeof metadata === "object" && "quantity" in metadata
-              ? Number(metadata.quantity) || 1
-              : 1;
-          const creditPackProduct = productsRepository.getProduct(
-            ProductIds.CREDIT_PACK,
-            "en-US",
-          );
-          creditsAmount = quantity * creditPackProduct.credits; // quantity * 500
-        }
-
-        if (creditsAmount > 0) {
-          const { ReferralRepository } = await import("../referral/repository");
-          await ReferralRepository.applyReferralPayoutOnPayment(
-            transaction.id,
-            transaction.userId,
-            creditsAmount,
-            logger,
-          );
-        }
-      } else {
-        logger.warn("No transaction found for checkout session", {
-          sessionId,
-        });
+      if (creditsAmount > 0) {
+        const { ReferralRepository } = await import("../referral/repository");
+        await ReferralRepository.applyReferralPayoutOnPayment(
+          transaction.id,
+          transaction.userId,
+          creditsAmount,
+          logger,
+          creditsT,
+          userLocale,
+        );
       }
     } catch (error) {
       if (typeof error === "object" && error && "id" in error) {
@@ -855,6 +890,7 @@ export class PaymentRepository {
   private static async handleSubscriptionDeleted(
     data: WebhookData,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<void> {
     try {
       const subscriptionId = data.id;
@@ -868,6 +904,7 @@ export class PaymentRepository {
       await SubscriptionRepository.handleSubscriptionCanceled(
         subscriptionId,
         logger,
+        locale,
       );
     } catch (error) {
       if (typeof error === "object" && error && "id" in error) {
@@ -886,6 +923,7 @@ export class PaymentRepository {
   private static async handleSubscriptionUpdated(
     data: WebhookData,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<void> {
     try {
       logger.debug("Subscription updated - delegating to subscription module", {
@@ -898,6 +936,7 @@ export class PaymentRepository {
       await SubscriptionRepository.handleSubscriptionUpdated(
         data as Stripe.Subscription,
         logger,
+        locale,
       );
     } catch (error) {
       if (typeof error === "object" && error && "id" in error) {

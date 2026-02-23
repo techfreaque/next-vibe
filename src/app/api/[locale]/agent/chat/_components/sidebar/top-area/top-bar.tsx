@@ -26,8 +26,8 @@ import { Logo } from "@/app/[locale]/_components/logo";
 import { ThemeToggleDropdown } from "@/app/[locale]/_components/theme-toggle";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { scopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { LocaleSelectorContent } from "./locale-selector-content";
 
@@ -45,7 +45,7 @@ export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
     handleCreateThread,
   } = useChatContext();
 
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const [mounted, setMounted] = useState(false);
   const [localeDialogOpen, setLocaleDialogOpen] = useState(false);
 
@@ -69,7 +69,7 @@ export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
           size="icon"
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           className="bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9"
-          title={t("app.chat.common.toggleSidebar")}
+          title={t("common.toggleSidebar")}
           data-tour="sidebar-toggle"
         >
           <PanelLeft className="h-5 w-5" />
@@ -82,7 +82,7 @@ export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
               variant="ghost"
               size="icon"
               className="bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9"
-              title={t("app.chat.common.settings")}
+              title={t("common.settings")}
               suppressHydrationWarning
             >
               <Settings className="h-5 w-5" />
@@ -128,7 +128,7 @@ export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
               size="icon"
               onClick={() => handleCreateThread(null)}
               className="bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9"
-              title={t("app.chat.common.newChat")}
+              title={t("common.newChat")}
             >
               <MessageSquarePlus className="h-5 w-5" />
             </Button>

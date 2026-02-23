@@ -19,6 +19,7 @@ mock.module("@/i18n/core/shared", () => ({
 }));
 
 import { BuildProfileEnum, ViteBuildTypeEnum } from "../enum";
+import type { BuilderT } from "../i18n";
 import { buildExecutor } from "./build-executor";
 
 const TEST_PROJECT_PATH = resolve(__dirname, "../test-files/test-project");
@@ -29,6 +30,8 @@ describe("BuildExecutor", () => {
     Date.now(),
     defaultLocale,
   );
+
+  const mockT: BuilderT = (key) => key as ReturnType<BuilderT>;
 
   afterEach(() => {
     // Bun test automatically cleans up mocks
@@ -54,8 +57,8 @@ describe("BuildExecutor", () => {
             filesOrFoldersToCopy: [],
           },
         },
-        "en-US",
         mockLogger,
+        mockT,
       );
 
       expect(result.success).toBe(true);
@@ -83,8 +86,8 @@ describe("BuildExecutor", () => {
             filesOrFoldersToCopy: [],
           },
         },
-        "en-US",
         mockLogger,
+        mockT,
       );
 
       expect(result.success).toBe(false);
@@ -103,8 +106,8 @@ describe("BuildExecutor", () => {
             filesOrFoldersToCopy: [],
           },
         },
-        "en-US",
         mockLogger,
+        mockT,
       );
 
       expect(result.success).toBe(true);
@@ -125,8 +128,8 @@ describe("BuildExecutor", () => {
             filesOrFoldersToCopy: [],
           },
         },
-        "en-US",
         mockLogger,
+        mockT,
       );
 
       expect(result.success).toBe(true);
@@ -148,8 +151,8 @@ describe("BuildExecutor", () => {
             filesOrFoldersToCopy: [],
           },
         },
-        "en-US",
         mockLogger,
+        mockT,
       );
 
       // Empty config fails validation (nothing to build)
@@ -171,8 +174,8 @@ describe("BuildExecutor", () => {
             ],
           },
         },
-        "en-US",
         mockLogger,
+        mockT,
       );
 
       // Dry run succeeds even with invalid paths

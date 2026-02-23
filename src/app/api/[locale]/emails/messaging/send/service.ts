@@ -21,11 +21,13 @@ import { getSmsProvider } from "@/app/api/[locale]/sms/send-sms";
 import { SmsProviders } from "@/app/api/[locale]/sms/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { emails } from "../../messages/db";
 import { EmailStatus, EmailType } from "../../messages/enum";
 import { messagingAccounts } from "../db";
 import { MessagingProvider } from "../enum";
+import { scopedTranslation } from "../i18n";
 
 type EmailInsert = typeof emails.$inferInsert;
 
@@ -72,7 +74,9 @@ function resolveProviderEnum(provider: string): SmsProviders {
 export async function sendViaMessagingAccount(
   params: SendMessagingParams,
   logger: EndpointLogger,
+  locale: CountryLanguage,
 ): Promise<ResponseType<SendMessagingResult>> {
+  const { t } = scopedTranslation.scopedT(locale);
   try {
     // 1. Look up the messaging account
     const [account] = await db
@@ -83,9 +87,10 @@ export async function sendViaMessagingAccount(
 
     if (!account) {
       return fail({
-        message: "app.api.emails.messaging.send.errors.accountNotFound",
+        message: t("send.errors.accountNotFound", {
+          accountId: params.messagingAccountId,
+        }),
         errorType: ErrorResponseTypes.NOT_FOUND,
-        messageParams: { accountId: params.messagingAccountId },
       });
     }
 
@@ -125,6 +130,7 @@ export async function sendViaMessagingAccount(
         from: account.fromId ?? undefined,
       },
       logger,
+      locale,
     );
 
     if (!sendResult.success) {
@@ -146,7 +152,7 @@ export async function sendViaMessagingAccount(
       });
 
       return fail({
-        message: sendResult.message as string,
+        message: t("send.errors.sendFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -205,9 +211,10 @@ export async function sendViaMessagingAccount(
       parseError(error),
     );
     return fail({
-      message: "app.api.emails.messaging.send.errors.unexpected",
+      message: t("send.errors.unexpected", {
+        error: parseError(error).message,
+      }),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: { error: parseError(error).message },
     });
   }
 }

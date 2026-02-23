@@ -9,6 +9,10 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+
 import type { RequestSchema, ResponseSchema } from "./definition";
 
 interface NgrokTunnel {
@@ -24,6 +28,7 @@ export interface CliNowpaymentsRepository {
   execute(
     params: RequestSchema,
     locale: string,
+    t: ModuleT,
   ): Promise<ResponseType<ResponseSchema>>;
 }
 
@@ -31,6 +36,7 @@ export class CliNowpaymentsRepositoryImpl implements CliNowpaymentsRepository {
   async execute(
     params: RequestSchema,
     locale: string,
+    t: ModuleT,
   ): Promise<ResponseType<ResponseSchema>> {
     const { operation, port = 3000 } = params;
 
@@ -40,13 +46,12 @@ export class CliNowpaymentsRepositoryImpl implements CliNowpaymentsRepository {
       case "install":
         return this.getInstallInstructions();
       case "tunnel":
-        return this.executeNgrokTunnelBlocking(port, locale);
+        return this.executeNgrokTunnelBlocking(port, locale, t);
       case "status":
         return this.checkTunnelStatus();
       default:
         return fail({
-          message:
-            "app.api.payment.providers.nowpayments.cli.post.errors.validationFailed.title" as const,
+          message: t("post.errors.validationFailed.title"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
           messageParams: { operation },
         });
@@ -116,6 +121,7 @@ Or use package managers:
   private async executeNgrokTunnelBlocking(
     port: number,
     locale: string,
+    t: ModuleT,
   ): Promise<ResponseType<ResponseSchema>> {
     process.stdout.write(`\n🚀 Starting ngrok tunnel on port ${port}...\n\n`);
 
@@ -133,8 +139,7 @@ Or use package managers:
 
     if (!tunnelUrl) {
       return fail({
-        message:
-          "app.api.payment.providers.nowpayments.cli.post.errors.serverError.title" as const,
+        message: t("post.errors.serverError.title"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: "Failed to get ngrok tunnel URL" },
       });

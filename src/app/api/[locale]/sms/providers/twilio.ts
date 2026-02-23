@@ -6,8 +6,10 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { smsEnv } from "../env";
+import { smsScopedT } from "../i18n";
 import type { SendSmsParams, SmsProvider, SmsResult } from "../utils";
 import { SmsProviders } from "../utils";
 
@@ -44,19 +46,21 @@ export function getTwilioProvider(): SmsProvider {
     async sendSms(
       params: SendSmsParams,
       logger: EndpointLogger,
+      locale: CountryLanguage,
     ): Promise<ResponseType<SmsResult>> {
+      const { t } = smsScopedT(locale);
       try {
         // Validate credentials
         if (!accountSid) {
           return fail({
-            message: "app.api.sms.sms.error.missing_recipient",
+            message: t("sms.error.missing_recipient"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
 
         if (!authToken) {
           return fail({
-            message: "app.api.sms.sms.error.missing_recipient",
+            message: t("sms.error.missing_recipient"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
@@ -73,7 +77,7 @@ export function getTwilioProvider(): SmsProvider {
         // Type guard for params
         if (!params || typeof params !== "object") {
           return fail({
-            message: "app.api.sms.sms.error.invalid_phone_format",
+            message: t("sms.error.invalid_phone_format"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
@@ -83,7 +87,7 @@ export function getTwilioProvider(): SmsProvider {
         // Validate required parameters
         if (!params.to) {
           return fail({
-            message: "app.api.sms.sms.error.invalid_phone_format",
+            message: t("sms.error.invalid_phone_format"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
@@ -92,7 +96,7 @@ export function getTwilioProvider(): SmsProvider {
         const fromNumber = params.from ?? smsEnv.SMS_FROM_NUMBER;
         if (!fromNumber) {
           return fail({
-            message: "app.api.sms.sms.error.invalid_phone_format",
+            message: t("sms.error.invalid_phone_format"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
@@ -103,7 +107,7 @@ export function getTwilioProvider(): SmsProvider {
           params.message.trim() === ""
         ) {
           return fail({
-            message: "app.api.sms.sms.error.empty_message",
+            message: t("sms.error.empty_message"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
@@ -182,7 +186,7 @@ export function getTwilioProvider(): SmsProvider {
             errorData.code ?? errorData.error_code ?? response.status;
 
           return fail({
-            message: "app.api.sms.sms.error.delivery_failed",
+            message: t("sms.error.delivery_failed"),
             errorType: ErrorResponseTypes.SMS_ERROR,
             messageParams: {
               error: errorMessage,
@@ -226,7 +230,7 @@ export function getTwilioProvider(): SmsProvider {
           // eslint-disable-next-line i18next/no-literal-string -- Technical error message from exception
           error instanceof Error ? error.message : "Unknown error";
         return fail({
-          message: "app.api.sms.sms.error.delivery_failed",
+          message: t("sms.error.delivery_failed"),
           errorType: ErrorResponseTypes.SMS_ERROR,
           messageParams: {
             error: errorMessage,

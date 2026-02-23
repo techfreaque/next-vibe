@@ -8,10 +8,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -33,364 +33,328 @@ import {
   CsvImportJobStatusOptions,
 } from "../leads/import/enum";
 import { ImportDomain, ImportDomainOptions } from "./enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Import from CSV Endpoint (POST)
  * User-friendly interface for importing data from CSV files
  */
 const { POST: ImportCsvPost } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["import", "csv"],
   allowedRoles: [UserRole.ADMIN] as const,
   aliases: ["import:csv", "csv-import"],
 
-  title: "app.api.import.csv.post.title",
-  description: "app.api.import.csv.post.description",
+  title: "csv.post.title",
+  description: "csv.post.description",
   icon: "upload" as const,
-  category: "app.api.system.category",
-  tags: [
-    "app.api.import.tags.csv",
-    "app.api.import.tags.upload",
-    "app.api.import.tags.batch",
-  ],
+  category: "category",
+  tags: ["tags.csv", "tags.upload", "tags.batch"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.import.csv.post.form.title",
-      description: "app.api.import.csv.post.form.description",
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "csv.post.form.title",
+    description: "csv.post.form.description",
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data", response: true },
+    children: {
       // === FILE UPLOAD SECTION ===
-      fileUploadSection: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.import.csv.post.fileSection.title",
-          description: "app.api.import.csv.post.fileSection.description",
-          layoutType: LayoutType.STACKED,
-        },
-        { request: "data" },
-        {
-          file: requestField({
+      fileUploadSection: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "csv.post.fileSection.title",
+        description: "csv.post.fileSection.description",
+        layoutType: LayoutType.STACKED,
+        usage: { request: "data" },
+        children: {
+          file: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.FILE,
-            label: "app.api.import.csv.post.file.label",
-            description: "app.api.import.csv.post.file.description",
-            placeholder: "app.api.import.csv.post.file.placeholder",
+            label: "csv.post.file.label",
+            description: "csv.post.file.description",
+            placeholder: "csv.post.file.placeholder",
             schema: z.string().min(1),
           }),
 
-          fileName: requestField({
+          fileName: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
-            label: "app.api.import.csv.post.fileName.label",
-            description: "app.api.import.csv.post.fileName.description",
-            placeholder: "app.api.import.csv.post.fileName.placeholder",
+            label: "csv.post.fileName.label",
+            description: "csv.post.fileName.description",
+            placeholder: "csv.post.fileName.placeholder",
             schema: z.string().min(1),
           }),
 
-          domain: requestField({
+          domain: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label: "app.api.import.csv.post.domain.label",
-            description: "app.api.import.csv.post.domain.description",
-            placeholder: "app.api.import.csv.post.domain.placeholder",
+            label: "csv.post.domain.label",
+            description: "csv.post.domain.description",
+            placeholder: "csv.post.domain.placeholder",
             options: ImportDomainOptions,
             schema: z.enum(ImportDomain),
           }),
         },
-      ),
+      }),
 
       // === PROCESSING OPTIONS SECTION ===
-      processingSection: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.import.csv.post.processingSection.title",
-          description: "app.api.import.csv.post.processingSection.description",
-          layoutType: LayoutType.GRID,
-          columns: 2,
-        },
-        { request: "data" },
-        {
-          skipDuplicates: requestField({
+      processingSection: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "csv.post.processingSection.title",
+        description: "csv.post.processingSection.description",
+        layoutType: LayoutType.GRID,
+        columns: 2,
+        usage: { request: "data" },
+        children: {
+          skipDuplicates: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
-            label: "app.api.import.csv.post.skipDuplicates.label",
-            description: "app.api.import.csv.post.skipDuplicates.description",
+            label: "csv.post.skipDuplicates.label",
+            description: "csv.post.skipDuplicates.description",
             schema: z.boolean().default(true),
           }),
 
-          updateExisting: requestField({
+          updateExisting: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
-            label: "app.api.import.csv.post.updateExisting.label",
-            description: "app.api.import.csv.post.updateExisting.description",
+            label: "csv.post.updateExisting.label",
+            description: "csv.post.updateExisting.description",
             schema: z.boolean().default(false),
           }),
 
-          useChunkedProcessing: requestField({
+          useChunkedProcessing: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
-            label: "app.api.import.csv.post.useChunkedProcessing.label",
-            description:
-              "app.api.import.csv.post.useChunkedProcessing.description",
+            label: "csv.post.useChunkedProcessing.label",
+            description: "csv.post.useChunkedProcessing.description",
             schema: z.boolean().default(false),
           }),
 
-          batchSize: requestField({
+          batchSize: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
-            label: "app.api.import.csv.post.batchSize.label",
-            description: "app.api.import.csv.post.batchSize.description",
-            placeholder: "app.api.import.csv.post.batchSize.placeholder",
+            label: "csv.post.batchSize.label",
+            description: "csv.post.batchSize.description",
+            placeholder: "csv.post.batchSize.placeholder",
             schema: z.coerce.number().min(10).max(1000).default(100),
           }),
         },
-      ),
+      }),
 
       // === DEFAULT VALUES SECTION ===
-      defaultsSection: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.import.csv.post.defaultsSection.title",
-          description: "app.api.import.csv.post.defaultsSection.description",
-          layoutType: LayoutType.GRID,
-          columns: 2,
-        },
-        { request: "data" },
-        {
-          defaultCountry: requestField({
+      defaultsSection: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "csv.post.defaultsSection.title",
+        description: "csv.post.defaultsSection.description",
+        layoutType: LayoutType.GRID,
+        columns: 2,
+        usage: { request: "data" },
+        children: {
+          defaultCountry: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label: "app.api.import.csv.post.defaultCountry.label",
-            description: "app.api.import.csv.post.defaultCountry.description",
-            placeholder: "app.api.import.csv.post.defaultCountry.placeholder",
+            label: "csv.post.defaultCountry.label",
+            description: "csv.post.defaultCountry.description",
+            placeholder: "csv.post.defaultCountry.placeholder",
             options: CountriesOptions,
             schema: z.enum(Countries).default(Countries.GLOBAL),
           }),
 
-          defaultLanguage: requestField({
+          defaultLanguage: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label: "app.api.import.csv.post.defaultLanguage.label",
-            description: "app.api.import.csv.post.defaultLanguage.description",
-            placeholder: "app.api.import.csv.post.defaultLanguage.placeholder",
+            label: "csv.post.defaultLanguage.label",
+            description: "csv.post.defaultLanguage.description",
+            placeholder: "csv.post.defaultLanguage.placeholder",
             options: LanguagesOptions,
             schema: z.enum(Languages).default(Languages.EN),
           }),
         },
-      ),
+      }),
 
       // === RESPONSE DATA ===
-      importResult: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.import.csv.post.response.title",
-          description: "app.api.import.csv.post.response.description",
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
+      importResult: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "csv.post.response.title",
+        description: "csv.post.response.description",
+        layoutType: LayoutType.STACKED,
+        usage: { response: true },
+        children: {
           // === BASIC RESULTS ===
-          basicResults: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.import.csv.post.response.basicResults.title",
-              description:
-                "app.api.import.csv.post.response.basicResults.description",
-              layoutType: LayoutType.STACKED,
-            },
-            { response: true },
-            {
-              batchId: responseField({
+          basicResults: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "csv.post.response.basicResults.title",
+            description: "csv.post.response.basicResults.description",
+            layoutType: LayoutType.STACKED,
+            usage: { response: true },
+            children: {
+              batchId: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.import.csv.post.response.batchId.label",
+                content: "csv.post.response.batchId.label",
                 schema: z.uuid(),
               }),
-              totalRows: responseField({
+              totalRows: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.import.csv.post.response.totalRows.label",
+                content: "csv.post.response.totalRows.label",
                 schema: z.coerce.number(),
               }),
-              isChunkedProcessing: responseField({
+              isChunkedProcessing: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.import.csv.post.response.isChunkedProcessing.label",
+                content: "csv.post.response.isChunkedProcessing.label",
                 schema: z.boolean(),
               }),
-              jobId: responseField({
+              jobId: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.import.csv.post.response.jobId.label",
+                content: "csv.post.response.jobId.label",
                 schema: z.uuid().optional(),
               }),
             },
-          ),
+          }),
 
           // === STATISTICS ===
-          statistics: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.import.csv.post.response.statistics.title",
-              description:
-                "app.api.import.csv.post.response.statistics.description",
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              successfulImports: responseField({
+          statistics: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "csv.post.response.statistics.title",
+            description: "csv.post.response.statistics.description",
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              successfulImports: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.import.csv.post.response.successfulImports.label",
+                content: "csv.post.response.successfulImports.label",
                 schema: z.coerce.number(),
               }),
-              failedImports: responseField({
+              failedImports: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.import.csv.post.response.failedImports.label",
+                content: "csv.post.response.failedImports.label",
                 schema: z.coerce.number(),
               }),
-              duplicateEmails: responseField({
+              duplicateEmails: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.import.csv.post.response.duplicateEmails.label",
+                content: "csv.post.response.duplicateEmails.label",
                 schema: z.coerce.number(),
               }),
-              processingTimeMs: responseField({
+              processingTimeMs: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.import.csv.post.response.processingTimeMs.label",
+                content: "csv.post.response.processingTimeMs.label",
                 schema: z.coerce.number().optional(),
               }),
             },
-          ),
+          }),
 
           // === DETAILED SUMMARY ===
-          summary: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.import.csv.post.response.summary.title",
-              description:
-                "app.api.import.csv.post.response.summary.description",
-              layoutType: LayoutType.GRID,
-              columns: 3,
-            },
-            { response: true },
-            {
-              newRecords: responseField({
+          summary: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "csv.post.response.summary.title",
+            description: "csv.post.response.summary.description",
+            layoutType: LayoutType.GRID,
+            columns: 3,
+            usage: { response: true },
+            children: {
+              newRecords: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.import.csv.post.response.newRecords.label",
+                content: "csv.post.response.newRecords.label",
                 schema: z.coerce.number(),
               }),
-              updatedRecords: responseField({
+              updatedRecords: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.import.csv.post.response.updatedRecords.label",
+                content: "csv.post.response.updatedRecords.label",
                 schema: z.coerce.number(),
               }),
-              skippedDuplicates: responseField({
+              skippedDuplicates: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.import.csv.post.response.skippedDuplicates.label",
+                content: "csv.post.response.skippedDuplicates.label",
                 schema: z.coerce.number(),
               }),
             },
-          ),
+          }),
 
           // === ERROR DETAILS ===
-          errors: responseArrayField(
-            {
+          errors: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: scopedObjectFieldNew(scopedTranslation, {
               type: WidgetType.CONTAINER,
-            },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                title: "app.api.import.csv.post.response.errors.title",
-                layoutType: LayoutType.STACKED,
-              },
-              { response: true },
-              {
-                row: responseField({
+              title: "csv.post.response.errors.title",
+              layoutType: LayoutType.STACKED,
+              usage: { response: true },
+              children: {
+                row: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "app.api.import.csv.post.response.errors.row.label",
+                  content: "csv.post.response.errors.row.label",
                   schema: z.coerce.number(),
                 }),
-                email: responseField({
+                email: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.csv.post.response.errors.email.label",
+                  content: "csv.post.response.errors.email.label",
                   schema: z.string().optional(),
                 }),
-                error: responseField({
+                error: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.csv.post.response.errors.error.label",
+                  content: "csv.post.response.errors.error.label",
                   schema: z.string(),
                 }),
               },
-            ),
-          ),
+            }),
+          }),
 
           // === NEXT STEPS ===
-          nextSteps: responseArrayField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.import.csv.post.response.nextSteps.title",
-            },
-            responseField({
+          nextSteps: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "csv.post.response.nextSteps.title",
+            child: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.import.csv.post.response.nextSteps.item.label",
+              content: "csv.post.response.nextSteps.item.label",
               schema: z.string(),
             }),
-          ),
+          }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.import.csv.post.errors.validation.title",
-      description: "app.api.import.csv.post.errors.validation.description",
+      title: "csv.post.errors.validation.title",
+      description: "csv.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.import.csv.post.errors.network.title",
-      description: "app.api.import.csv.post.errors.network.description",
+      title: "csv.post.errors.network.title",
+      description: "csv.post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.import.csv.post.errors.unauthorized.title",
-      description: "app.api.import.csv.post.errors.unauthorized.description",
+      title: "csv.post.errors.unauthorized.title",
+      description: "csv.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.import.csv.post.errors.forbidden.title",
-      description: "app.api.import.csv.post.errors.forbidden.description",
+      title: "csv.post.errors.forbidden.title",
+      description: "csv.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.import.csv.post.errors.notFound.title",
-      description: "app.api.import.csv.post.errors.notFound.description",
+      title: "csv.post.errors.notFound.title",
+      description: "csv.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.import.csv.post.errors.server.title",
-      description: "app.api.import.csv.post.errors.server.description",
+      title: "csv.post.errors.server.title",
+      description: "csv.post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.import.csv.post.errors.unknown.title",
-      description: "app.api.import.csv.post.errors.unknown.description",
+      title: "csv.post.errors.unknown.title",
+      description: "csv.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.import.csv.post.errors.unsavedChanges.title",
-      description: "app.api.import.csv.post.errors.unsavedChanges.description",
+      title: "csv.post.errors.unsavedChanges.title",
+      description: "csv.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.import.csv.post.errors.conflict.title",
-      description: "app.api.import.csv.post.errors.conflict.description",
+      title: "csv.post.errors.conflict.title",
+      description: "csv.post.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.import.csv.post.success.title",
-    description: "app.api.import.csv.post.success.description",
+    title: "csv.post.success.title",
+    description: "csv.post.success.description",
   },
 
   examples: {
@@ -455,283 +419,255 @@ const { POST: ImportCsvPost } = createEndpoint({
  * User-friendly interface for viewing import job status
  */
 const { GET: ListImportJobsGet } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["import", "jobs"],
   allowedRoles: [UserRole.ADMIN] as const,
   aliases: ["import:jobs", "import-jobs-list"],
 
-  title: "app.api.import.jobs.get.title",
-  description: "app.api.import.jobs.get.description",
+  title: "jobs.get.title",
+  description: "jobs.get.description",
   icon: "file-text" as const,
-  category: "app.api.system.category",
-  tags: [
-    "app.api.import.tags.jobs",
-    "app.api.import.tags.status",
-    "app.api.import.tags.history",
-  ],
+  category: "category",
+  tags: ["tags.jobs", "tags.status", "tags.history"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.import.jobs.get.form.title",
-      description: "app.api.import.jobs.get.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 2,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "jobs.get.form.title",
+    description: "jobs.get.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 2,
+    usage: { request: "data", response: true },
+    children: {
       // === FILTER OPTIONS ===
-      status: requestField({
+      status: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.import.jobs.get.status.label",
-        description: "app.api.import.jobs.get.status.description",
-        placeholder: "app.api.import.jobs.get.status.placeholder",
+        label: "jobs.get.status.label",
+        description: "jobs.get.status.description",
+        placeholder: "jobs.get.status.placeholder",
         options: CsvImportJobStatusOptions,
         schema: z.enum(CsvImportJobStatus).optional(),
       }),
 
-      limit: requestField({
+      limit: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.import.jobs.get.limit.label",
-        description: "app.api.import.jobs.get.limit.description",
-        placeholder: "app.api.import.jobs.get.limit.placeholder",
+        label: "jobs.get.limit.label",
+        description: "jobs.get.limit.description",
+        placeholder: "jobs.get.limit.placeholder",
         schema: z.coerce.number().min(1).max(100).default(20),
       }),
 
-      offset: requestField({
+      offset: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.import.jobs.get.offset.label",
-        description: "app.api.import.jobs.get.offset.description",
-        placeholder: "app.api.import.jobs.get.offset.placeholder",
+        label: "jobs.get.offset.label",
+        description: "jobs.get.offset.description",
+        placeholder: "jobs.get.offset.placeholder",
         schema: z.coerce.number().min(0).default(0),
       }),
 
       // === RESPONSE DATA ===
-      jobs: responseArrayField(
-        {
+      jobs: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "jobs.get.response.jobs.title",
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-          title: "app.api.import.jobs.get.response.jobs.title",
-        },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            title: "app.api.import.jobs.get.response.job.title",
-            layoutType: LayoutType.STACKED,
-          },
-          { response: true },
-          {
-            id: responseField({
+          title: "jobs.get.response.job.title",
+          layoutType: LayoutType.STACKED,
+          usage: { response: true },
+          children: {
+            id: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.import.jobs.get.response.job.id.label",
+              content: "jobs.get.response.job.id.label",
               schema: z.uuid(),
             }),
-            fileName: responseField({
+            fileName: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.import.jobs.get.response.job.fileName.label",
+              content: "jobs.get.response.job.fileName.label",
               schema: z.string(),
             }),
-            domain: responseField({
+            domain: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              text: "app.api.import.jobs.get.response.job.domain.label",
+              text: "jobs.get.response.job.domain.label",
               schema: z.string(),
             }),
-            status: responseField({
+            status: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              text: "app.api.import.jobs.get.response.job.status.label",
+              text: "jobs.get.response.job.status.label",
               schema: z.enum(CsvImportJobStatus),
             }),
 
             // === PROGRESS INFORMATION ===
-            progress: objectField(
-              {
-                type: WidgetType.CONTAINER,
-                title: "app.api.import.jobs.get.response.job.progress.title",
-                layoutType: LayoutType.GRID,
-                columns: 2,
-              },
-              { response: true },
-              {
-                totalRows: responseField({
+            progress: scopedObjectFieldNew(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              title: "jobs.get.response.job.progress.title",
+              layoutType: LayoutType.GRID,
+              columns: 2,
+              usage: { response: true },
+              children: {
+                totalRows: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.jobs.get.response.job.progress.totalRows.label",
+                  content: "jobs.get.response.job.progress.totalRows.label",
                   schema: z.coerce.number(),
                 }),
-                processedRows: responseField({
+                processedRows: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.jobs.get.response.job.progress.processedRows.label",
+                  content: "jobs.get.response.job.progress.processedRows.label",
                   schema: z.coerce.number(),
                 }),
-                currentBatchStart: responseField({
+                currentBatchStart: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.import.jobs.get.response.job.progress.currentBatchStart.label",
+                    "jobs.get.response.job.progress.currentBatchStart.label",
                   schema: z.coerce.number(),
                 }),
-                batchSize: responseField({
+                batchSize: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.jobs.get.response.job.progress.batchSize.label",
+                  content: "jobs.get.response.job.progress.batchSize.label",
                   schema: z.coerce.number(),
                 }),
-                percentComplete: responseField({
+                percentComplete: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.import.jobs.get.response.job.progress.percentComplete.label",
+                    "jobs.get.response.job.progress.percentComplete.label",
                   schema: z.coerce.number(),
                 }),
               },
-            ),
+            }),
 
             // === RESULTS ===
-            results: objectField(
-              {
-                type: WidgetType.CONTAINER,
-                title: "app.api.import.jobs.get.response.job.results.title",
-                layoutType: LayoutType.GRID,
-                columns: 3,
-              },
-              { response: true },
-              {
-                successfulImports: responseField({
+            results: scopedObjectFieldNew(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              title: "jobs.get.response.job.results.title",
+              layoutType: LayoutType.GRID,
+              columns: 3,
+              usage: { response: true },
+              children: {
+                successfulImports: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.import.jobs.get.response.job.results.successfulImports.label",
+                    "jobs.get.response.job.results.successfulImports.label",
                   schema: z.coerce.number(),
                 }),
-                failedImports: responseField({
+                failedImports: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.jobs.get.response.job.results.failedImports.label",
+                  content: "jobs.get.response.job.results.failedImports.label",
                   schema: z.coerce.number(),
                 }),
-                duplicateEmails: responseField({
+                duplicateEmails: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.import.jobs.get.response.job.results.duplicateEmails.label",
+                    "jobs.get.response.job.results.duplicateEmails.label",
                   schema: z.coerce.number(),
                 }),
               },
-            ),
+            }),
 
             // === TIMING INFORMATION ===
-            timing: objectField(
-              {
-                type: WidgetType.CONTAINER,
-                title: "app.api.import.jobs.get.response.job.timing.title",
-                layoutType: LayoutType.GRID,
-                columns: 2,
-              },
-              { response: true },
-              {
-                createdAt: responseField({
+            timing: scopedObjectFieldNew(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              title: "jobs.get.response.job.timing.title",
+              layoutType: LayoutType.GRID,
+              columns: 2,
+              usage: { response: true },
+              children: {
+                createdAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.jobs.get.response.job.timing.createdAt.label",
+                  content: "jobs.get.response.job.timing.createdAt.label",
                   schema: z.string(),
                 }),
-                updatedAt: responseField({
+                updatedAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.jobs.get.response.job.timing.updatedAt.label",
+                  content: "jobs.get.response.job.timing.updatedAt.label",
                   schema: z.string(),
                 }),
-                startedAt: responseField({
+                startedAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.jobs.get.response.job.timing.startedAt.label",
+                  content: "jobs.get.response.job.timing.startedAt.label",
                   schema: z.string().nullable(),
                 }),
-                completedAt: responseField({
+                completedAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.jobs.get.response.job.timing.completedAt.label",
+                  content: "jobs.get.response.job.timing.completedAt.label",
                   schema: z.string().nullable(),
                 }),
               },
-            ),
+            }),
 
             // === ERROR HANDLING ===
-            errorInfo: objectField(
-              {
-                type: WidgetType.CONTAINER,
-                title: "app.api.import.jobs.get.response.job.errorInfo.title",
-                layoutType: LayoutType.STACKED,
-              },
-              { response: true },
-              {
-                error: responseField({
+            errorInfo: scopedObjectFieldNew(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              title: "jobs.get.response.job.errorInfo.title",
+              layoutType: LayoutType.STACKED,
+              usage: { response: true },
+              children: {
+                error: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.jobs.get.response.job.errorInfo.error.label",
+                  content: "jobs.get.response.job.errorInfo.error.label",
                   schema: z.string().nullable(),
                 }),
-                retryCount: responseField({
+                retryCount: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.jobs.get.response.job.errorInfo.retryCount.label",
+                  content: "jobs.get.response.job.errorInfo.retryCount.label",
                   schema: z.coerce.number(),
                 }),
-                maxRetries: responseField({
+                maxRetries: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.import.jobs.get.response.job.errorInfo.maxRetries.label",
+                  content: "jobs.get.response.job.errorInfo.maxRetries.label",
                   schema: z.coerce.number(),
                 }),
               },
-            ),
+            }),
           },
-        ),
-      ),
+        }),
+      }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.import.csv.post.errors.validation.title",
-      description: "app.api.import.csv.post.errors.validation.description",
+      title: "csv.post.errors.validation.title",
+      description: "csv.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.import.csv.post.errors.network.title",
-      description: "app.api.import.csv.post.errors.network.description",
+      title: "csv.post.errors.network.title",
+      description: "csv.post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.import.csv.post.errors.unauthorized.title",
-      description: "app.api.import.csv.post.errors.unauthorized.description",
+      title: "csv.post.errors.unauthorized.title",
+      description: "csv.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.import.csv.post.errors.forbidden.title",
-      description: "app.api.import.csv.post.errors.forbidden.description",
+      title: "csv.post.errors.forbidden.title",
+      description: "csv.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.import.csv.post.errors.notFound.title",
-      description: "app.api.import.csv.post.errors.notFound.description",
+      title: "csv.post.errors.notFound.title",
+      description: "csv.post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.import.jobs.get.errors.server.title",
-      description: "app.api.import.jobs.get.errors.server.description",
+      title: "jobs.get.errors.server.title",
+      description: "jobs.get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.import.csv.post.errors.unknown.title",
-      description: "app.api.import.csv.post.errors.unknown.description",
+      title: "csv.post.errors.unknown.title",
+      description: "csv.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.import.csv.post.errors.unsavedChanges.title",
-      description: "app.api.import.csv.post.errors.unsavedChanges.description",
+      title: "csv.post.errors.unsavedChanges.title",
+      description: "csv.post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.import.csv.post.errors.conflict.title",
-      description: "app.api.import.csv.post.errors.conflict.description",
+      title: "csv.post.errors.conflict.title",
+      description: "csv.post.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.import.jobs.get.success.title",
-    description: "app.api.import.jobs.get.success.description",
+    title: "jobs.get.success.title",
+    description: "jobs.get.success.description",
   },
 
   examples: {

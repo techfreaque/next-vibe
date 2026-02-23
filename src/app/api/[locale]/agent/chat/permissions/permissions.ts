@@ -34,6 +34,7 @@ import {
   UserRole,
 } from "@/app/api/[locale]/user/user-roles/enum";
 import { UserRolesRepository } from "@/app/api/[locale]/user/user-roles/repository";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { type DefaultFolderConfig, getDefaultFolderConfig } from "../config";
 import type { ChatFolder, ChatMessage, ChatThread } from "../db";
@@ -48,11 +49,13 @@ import type { ChatFolder, ChatMessage, ChatThread } from "../db";
 export async function isAdmin(
   userId: string,
   logger: EndpointLogger,
+  locale: CountryLanguage,
 ): Promise<boolean> {
   const hasAdminRole = await UserRolesRepository.hasRole(
     userId,
     UserRole.ADMIN,
     logger,
+    locale,
   );
   return hasAdminRole.success && hasAdminRole.data;
 }
@@ -201,6 +204,7 @@ export async function hasRolePermission(
   user: JwtPayloadType,
   effectiveRoles: (typeof UserPermissionRoleValue)[],
   logger: EndpointLogger,
+  locale: CountryLanguage,
 ): Promise<boolean> {
   // Empty roles = owner only (already checked before this function)
   if (effectiveRoles.length === 0) {
@@ -214,7 +218,11 @@ export async function hasRolePermission(
 
   // Authenticated users - check their roles
   if (user.id) {
-    const userRoles = await UserRolesRepository.getUserRoles(user.id, logger);
+    const userRoles = await UserRolesRepository.getUserRoles(
+      user.id,
+      logger,
+      locale,
+    );
     if (userRoles.success && userRoles.data) {
       return effectiveRoles.some((role) => userRoles.data!.includes(role));
     }
@@ -238,6 +246,7 @@ export async function canViewFolder(
   user: JwtPayloadType,
   folder: ChatFolder,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
   const userId = user.id;
@@ -248,7 +257,7 @@ export async function canViewFolder(
   }
 
   // Admin can always view
-  if (userId && (await isAdmin(userId, logger))) {
+  if (userId && (await isAdmin(userId, logger, locale))) {
     return true;
   }
 
@@ -256,7 +265,7 @@ export async function canViewFolder(
   const effectiveRoles = getEffectiveRoles(folder, "rolesView", allFolders);
 
   // Check if user has required role
-  return await hasRolePermission(user, effectiveRoles, logger);
+  return await hasRolePermission(user, effectiveRoles, logger, locale);
 }
 
 /**
@@ -277,6 +286,7 @@ export async function canCreateFolder(
   user: JwtPayloadType,
   rootFolderId: DefaultFolderId,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   parentId?: string | null,
 ): Promise<boolean> {
   // Public users cannot create folders on server
@@ -296,7 +306,7 @@ export async function canCreateFolder(
 
   // PUBLIC root folder: Only ADMIN can create top-level folders (parentId is null)
   if (rootFolderId === "public" && !parentId) {
-    return await isAdmin(userId, logger);
+    return await isAdmin(userId, logger, locale);
   }
 
   // For PUBLIC subfolders (parentId is not null), only moderators can create subfolders
@@ -329,6 +339,7 @@ export async function canCreateFolder(
       user,
       effectiveHideRoles,
       logger,
+      locale,
     );
     logger.debug("PUBLIC subfolder creation permission check", {
       userId,
@@ -354,6 +365,7 @@ export async function canManageFolder(
   user: JwtPayloadType,
   folder: ChatFolder | null,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
   // If no folder specified, cannot manage
@@ -369,7 +381,7 @@ export async function canManageFolder(
   }
 
   // Admin can always manage
-  if (userId && (await isAdmin(userId, logger))) {
+  if (userId && (await isAdmin(userId, logger, locale))) {
     return true;
   }
 
@@ -377,7 +389,7 @@ export async function canManageFolder(
   const effectiveRoles = getEffectiveRoles(folder, "rolesManage", allFolders);
 
   // Check if user has required role
-  return await hasRolePermission(user, effectiveRoles, logger);
+  return await hasRolePermission(user, effectiveRoles, logger, locale);
 }
 
 /**
@@ -391,6 +403,7 @@ export async function canCreateThreadInFolder(
   user: JwtPayloadType,
   folder: ChatFolder | null,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
   // If no folder specified, cannot create thread
@@ -406,7 +419,7 @@ export async function canCreateThreadInFolder(
   }
 
   // Admin can always create threads
-  if (userId && (await isAdmin(userId, logger))) {
+  if (userId && (await isAdmin(userId, logger, locale))) {
     return true;
   }
 
@@ -418,7 +431,7 @@ export async function canCreateThreadInFolder(
   );
 
   // Check if user has required role
-  return await hasRolePermission(user, effectiveRoles, logger);
+  return await hasRolePermission(user, effectiveRoles, logger, locale);
 }
 
 /**
@@ -432,6 +445,7 @@ export async function canDeleteFolder(
   user: JwtPayloadType,
   folder: ChatFolder,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
   const userId = user.id;
@@ -442,7 +456,7 @@ export async function canDeleteFolder(
   }
 
   // Admin can always delete
-  if (userId && (await isAdmin(userId, logger))) {
+  if (userId && (await isAdmin(userId, logger, locale))) {
     return true;
   }
 
@@ -450,7 +464,7 @@ export async function canDeleteFolder(
   const effectiveRoles = getEffectiveRoles(folder, "rolesAdmin", allFolders);
 
   // Check if user has required role
-  return await hasRolePermission(user, effectiveRoles, logger);
+  return await hasRolePermission(user, effectiveRoles, logger, locale);
 }
 
 /**
@@ -464,6 +478,7 @@ export async function canHideFolder(
   user: JwtPayloadType,
   folder: ChatFolder,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
   const userId = user.id;
@@ -474,7 +489,7 @@ export async function canHideFolder(
   }
 
   // Admin can always hide
-  if (userId && (await isAdmin(userId, logger))) {
+  if (userId && (await isAdmin(userId, logger, locale))) {
     return true;
   }
 
@@ -482,7 +497,7 @@ export async function canHideFolder(
   const effectiveRoles = getEffectiveRoles(folder, "rolesModerate", allFolders);
 
   // Check if user has required role
-  return await hasRolePermission(user, effectiveRoles, logger);
+  return await hasRolePermission(user, effectiveRoles, logger, locale);
 }
 
 /**
@@ -493,9 +508,10 @@ export async function canUpdateFolder(
   user: JwtPayloadType,
   folder: ChatFolder,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
-  return await canManageFolder(user, folder, logger, allFolders);
+  return await canManageFolder(user, folder, logger, locale, allFolders);
 }
 
 /**
@@ -508,6 +524,7 @@ export async function canManageFolderPermissions(
   user: JwtPayloadType,
   folder: ChatFolder,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
   // Permission management is only available for PUBLIC root folder
@@ -524,13 +541,13 @@ export async function canManageFolderPermissions(
   }
 
   // Admin can manage permissions
-  if (userId && (await isAdmin(userId, logger))) {
+  if (userId && (await isAdmin(userId, logger, locale))) {
     return true;
   }
 
   // Check rolesAdmin permission
   const effectiveRoles = getEffectiveRoles(folder, "rolesAdmin", allFolders);
-  return await hasRolePermission(user, effectiveRoles, logger);
+  return await hasRolePermission(user, effectiveRoles, logger, locale);
 }
 
 // ============================================================================
@@ -549,6 +566,7 @@ export async function canViewThread(
   thread: ChatThread,
   folder: ChatFolder | null,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
   const userId = user.id;
@@ -573,7 +591,7 @@ export async function canViewThread(
 
   // Admin can always view
   if (userId) {
-    const isAdminUser = await isAdmin(userId, logger);
+    const isAdminUser = await isAdmin(userId, logger, locale);
     logger.debug("canViewThread: Admin check", { userId, isAdminUser });
     if (isAdminUser) {
       return true;
@@ -596,7 +614,12 @@ export async function canViewThread(
   });
 
   // Check if user has required role
-  const hasPermission = await hasRolePermission(user, effectiveRoles, logger);
+  const hasPermission = await hasRolePermission(
+    user,
+    effectiveRoles,
+    logger,
+    locale,
+  );
 
   logger.debug("canViewThread: Final result", {
     hasPermission,
@@ -618,6 +641,7 @@ export async function canEditThread(
   thread: ChatThread,
   folder: ChatFolder | null,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
   const userId = user.id;
@@ -628,7 +652,7 @@ export async function canEditThread(
   }
 
   // Admin can always edit
-  if (userId && (await isAdmin(userId, logger))) {
+  if (userId && (await isAdmin(userId, logger, locale))) {
     return true;
   }
 
@@ -642,7 +666,7 @@ export async function canEditThread(
   const effectiveRoles = getEffectiveRoles(thread, "rolesEdit", folderMap);
 
   // Check if user has required role
-  return await hasRolePermission(user, effectiveRoles, logger);
+  return await hasRolePermission(user, effectiveRoles, logger, locale);
 }
 
 /**
@@ -657,6 +681,7 @@ export async function canPostInThread(
   thread: ChatThread,
   folder: ChatFolder | null,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
   const userId = user.id;
@@ -667,7 +692,7 @@ export async function canPostInThread(
   }
 
   // Admin can always post
-  if (userId && (await isAdmin(userId, logger))) {
+  if (userId && (await isAdmin(userId, logger, locale))) {
     return true;
   }
 
@@ -681,7 +706,7 @@ export async function canPostInThread(
   const effectiveRoles = getEffectiveRoles(thread, "rolesPost", folderMap);
 
   // Check if user has required role
-  return await hasRolePermission(user, effectiveRoles, logger);
+  return await hasRolePermission(user, effectiveRoles, logger, locale);
 }
 
 /**
@@ -695,6 +720,7 @@ export async function canDeleteThread(
   user: JwtPayloadType,
   thread: ChatThread,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   folder: ChatFolder | null = null,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
@@ -706,7 +732,7 @@ export async function canDeleteThread(
   }
 
   // Admin can always delete
-  if (userId && (await isAdmin(userId, logger))) {
+  if (userId && (await isAdmin(userId, logger, locale))) {
     return true;
   }
 
@@ -720,7 +746,7 @@ export async function canDeleteThread(
   const effectiveRoles = getEffectiveRoles(thread, "rolesAdmin", folderMap);
 
   // Check if user has required role
-  return await hasRolePermission(user, effectiveRoles, logger);
+  return await hasRolePermission(user, effectiveRoles, logger, locale);
 }
 
 /**
@@ -734,6 +760,7 @@ export async function canHideThread(
   user: JwtPayloadType,
   thread: ChatThread,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   folder: ChatFolder | null = null,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
@@ -745,7 +772,7 @@ export async function canHideThread(
   }
 
   // Admin can always hide
-  if (userId && (await isAdmin(userId, logger))) {
+  if (userId && (await isAdmin(userId, logger, locale))) {
     return true;
   }
 
@@ -759,7 +786,7 @@ export async function canHideThread(
   const effectiveRoles = getEffectiveRoles(thread, "rolesModerate", folderMap);
 
   // Check if user has required role
-  return await hasRolePermission(user, effectiveRoles, logger);
+  return await hasRolePermission(user, effectiveRoles, logger, locale);
 }
 
 /**
@@ -771,9 +798,10 @@ export async function canUpdateThread(
   thread: ChatThread,
   folder: ChatFolder | null,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
-  return await canEditThread(user, thread, folder, logger, allFolders);
+  return await canEditThread(user, thread, folder, logger, locale, allFolders);
 }
 
 /**
@@ -787,6 +815,7 @@ export async function canManageThreadPermissions(
   thread: ChatThread,
   folder: ChatFolder | null,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
   // Permission management is only available for PUBLIC root folder
@@ -803,7 +832,7 @@ export async function canManageThreadPermissions(
   }
 
   // Admin can manage permissions
-  if (userId && (await isAdmin(userId, logger))) {
+  if (userId && (await isAdmin(userId, logger, locale))) {
     return true;
   }
 
@@ -815,7 +844,7 @@ export async function canManageThreadPermissions(
 
   // Check rolesAdmin permission
   const effectiveRoles = getEffectiveRoles(thread, "rolesAdmin", folderMap);
-  return await hasRolePermission(user, effectiveRoles, logger);
+  return await hasRolePermission(user, effectiveRoles, logger, locale);
 }
 
 // ============================================================================
@@ -831,10 +860,11 @@ export async function canReadMessage(
   thread: ChatThread,
   folder: ChatFolder | null,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
   // Messages inherit thread permissions
-  return await canViewThread(user, thread, folder, logger, allFolders);
+  return await canViewThread(user, thread, folder, logger, locale, allFolders);
 }
 
 /**
@@ -849,9 +879,17 @@ export async function canWriteMessage(
   thread: ChatThread,
   folder: ChatFolder | null,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
-  return await canPostInThread(user, thread, folder, logger, allFolders);
+  return await canPostInThread(
+    user,
+    thread,
+    folder,
+    logger,
+    locale,
+    allFolders,
+  );
 }
 
 /**
@@ -867,6 +905,7 @@ export async function canDeleteMessage(
   thread: ChatThread,
   folder: ChatFolder | null,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
   const userId = user.id;
@@ -877,7 +916,7 @@ export async function canDeleteMessage(
   }
 
   // Admin can delete any message
-  if (userId && (await isAdmin(userId, logger))) {
+  if (userId && (await isAdmin(userId, logger, locale))) {
     return true;
   }
 
@@ -891,7 +930,7 @@ export async function canDeleteMessage(
   const effectiveRoles = getEffectiveRoles(thread, "rolesAdmin", folderMap);
 
   // Check if user has required role
-  return await hasRolePermission(user, effectiveRoles, logger);
+  return await hasRolePermission(user, effectiveRoles, logger, locale);
 }
 
 /**
@@ -907,6 +946,7 @@ export async function canHideMessage(
   thread: ChatThread,
   folder: ChatFolder | null,
   logger: EndpointLogger,
+  locale: CountryLanguage,
   allFolders: Record<string, ChatFolder> = {},
 ): Promise<boolean> {
   const userId = user.id;
@@ -917,7 +957,7 @@ export async function canHideMessage(
   }
 
   // Admin can hide any message
-  if (userId && (await isAdmin(userId, logger))) {
+  if (userId && (await isAdmin(userId, logger, locale))) {
     return true;
   }
 
@@ -931,5 +971,5 @@ export async function canHideMessage(
   const effectiveRoles = getEffectiveRoles(thread, "rolesModerate", folderMap);
 
   // Check if user has required role
-  return await hasRolePermission(user, effectiveRoles, logger);
+  return await hasRolePermission(user, effectiveRoles, logger, locale);
 }

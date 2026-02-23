@@ -16,7 +16,10 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import type { scopedTranslation as sendScopedTranslation } from "../send/i18n";
 import type { CampaignType } from "../smtp-client/enum";
+
+type SendModuleT = ReturnType<typeof sendScopedTranslation.scopedT>["t"];
 
 /**
  * SMS Send Request Type
@@ -50,6 +53,7 @@ export interface SmsServiceRepository {
     data: SmsSendProps,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: SendModuleT,
   ): Promise<ResponseType<SmsSendResponse>>;
 }
 
@@ -62,6 +66,7 @@ export class SmsServiceRepositoryImpl implements SmsServiceRepository {
     data: SmsSendProps,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: SendModuleT,
   ): Promise<ResponseType<SmsSendResponse>> {
     try {
       logger.debug("SMS service: Sending SMS notification", {
@@ -74,9 +79,8 @@ export class SmsServiceRepositoryImpl implements SmsServiceRepository {
       // Validate phone number format
       if (!this.isValidPhoneNumber(data.to)) {
         return fail({
-          message: "app.api.emails.smsService.errors.invalid_phone.title",
+          message: t("errors.sms.invalidPhone", { phoneNumber: data.to }),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: { phoneNumber: data.to },
         });
       }
 
@@ -113,9 +117,10 @@ export class SmsServiceRepositoryImpl implements SmsServiceRepository {
         parseError(error),
       );
       return fail({
-        message: "app.api.emails.smsService.errors.send.title",
+        message: t("errors.sms.sendFailed", {
+          error: parseError(error).message,
+        }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

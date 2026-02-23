@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Profil użytkownika",
+
   title: "Zmień Hasło",
   description: "Bezpiecznie zaktualizuj hasło do swojego konta",
   tag: "zmiana-hasła",

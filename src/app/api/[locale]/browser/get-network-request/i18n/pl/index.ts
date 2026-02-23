@@ -66,4 +66,9 @@ export const translations: typeof enTranslations = {
     title: "Żądanie sieciowe pobrane pomyślnie",
     description: "Żądanie sieciowe zostało pomyślnie pobrane",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    networkAnalysis: "Analiza sieci",
+  },
 };

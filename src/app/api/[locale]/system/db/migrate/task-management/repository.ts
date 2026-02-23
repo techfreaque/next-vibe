@@ -19,6 +19,9 @@ import type {
   MigrationTaskManagementRequestOutput,
   MigrationTaskManagementResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Migration Task interface for internal operations
@@ -95,6 +98,7 @@ interface MigrationTaskResult {
 export interface MigrationTaskManagementRepository {
   executeMigrationTaskOperation(
     data: MigrationTaskManagementRequestOutput,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<MigrationTaskManagementResponseOutput>>;
 
@@ -150,6 +154,7 @@ export class MigrationTaskManagementRepositoryImpl implements MigrationTaskManag
    */
   async executeMigrationTaskOperation(
     data: MigrationTaskManagementRequestOutput,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<MigrationTaskManagementResponseOutput>> {
     try {
@@ -191,8 +196,7 @@ export class MigrationTaskManagementRepositoryImpl implements MigrationTaskManag
           break;
         default:
           return fail({
-            message:
-              "app.api.system.db.migrate.taskManagement.errors.validation.title",
+            message: t("errors.validation.title"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: { operation },
           });
@@ -224,8 +228,7 @@ export class MigrationTaskManagementRepositoryImpl implements MigrationTaskManag
       logger.error("Migration task operation execution failed", parsedError);
 
       return fail({
-        message:
-          "app.api.system.db.migrate.taskManagement.errors.internal.title",
+        message: t("errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });

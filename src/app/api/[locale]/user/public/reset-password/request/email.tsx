@@ -19,12 +19,19 @@ import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import { env } from "@/config/env";
 import { RESET_TOKEN_EXPIRY } from "@/config/constants";
+import { translations as configTranslations } from "@/config/i18n/en";
 import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
-
 import { UserDetailLevel } from "../../../enum";
 import { UserRepository } from "../../../repository";
+import {
+  scopedTranslation as requestScopedTranslation,
+  type ResetPasswordRequestT,
+} from "./i18n";
+import {
+  scopedTranslation as resetPasswordScopedTranslation,
+  type ResetPasswordTranslationKey,
+} from "../i18n";
 import { PasswordRepository } from "../repository";
 import type {
   ResetPasswordRequestPostRequestOutput,
@@ -35,6 +42,7 @@ import {
   type TrackingContext,
 } from "@/app/api/[locale]/emails/smtp-client/components/tracking_context.email";
 import { EmailTemplate } from "@/app/api/[locale]/emails/smtp-client/components/template.email";
+import { simpleT } from "@/i18n/core/shared";
 
 // ============================================================================
 // TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
@@ -58,27 +66,24 @@ function PasswordResetRequestEmail({
   tracking,
 }: {
   props: PasswordResetRequestProps;
-  t: TFunction;
+  t: ResetPasswordRequestT;
   locale: CountryLanguage;
   recipientEmail: string;
   tracking: TrackingContext;
 }): ReactElement {
-  const translatedAppName = t("config.appName");
+  const { t: globalT } = simpleT(locale);
+  const translatedAppName = globalT("config.appName");
 
   return (
     <EmailTemplate
-      t={t}
       locale={locale}
-      title={t("app.api.user.public.resetPassword.request.email.title", {
+      title={t("email.title", {
         appName: translatedAppName,
       })}
-      previewText={t(
-        "app.api.user.public.resetPassword.request.email.previewText",
-        {
-          appName: translatedAppName,
-          modelCount: TOTAL_MODEL_COUNT,
-        },
-      )}
+      previewText={t("email.previewText", {
+        appName: translatedAppName,
+        modelCount: TOTAL_MODEL_COUNT,
+      })}
       recipientEmail={recipientEmail}
       tracking={tracking}
     >
@@ -90,7 +95,7 @@ function PasswordResetRequestEmail({
           marginBottom: "16px",
         }}
       >
-        {t("app.api.user.public.resetPassword.request.email.greeting", {
+        {t("email.greeting", {
           name: props.publicName,
         })}
       </Text>
@@ -103,7 +108,7 @@ function PasswordResetRequestEmail({
           marginBottom: "16px",
         }}
       >
-        {t("app.api.user.public.resetPassword.request.email.requestInfo", {
+        {t("email.requestInfo", {
           appName: translatedAppName,
         })}
       </Text>
@@ -116,7 +121,7 @@ function PasswordResetRequestEmail({
           marginBottom: "16px",
         }}
       >
-        {t("app.api.user.public.resetPassword.request.email.instructions", {
+        {t("email.instructions", {
           hours: RESET_TOKEN_EXPIRY,
         })}
       </Text>
@@ -133,7 +138,7 @@ function PasswordResetRequestEmail({
             textDecoration: "none",
           }}
         >
-          {t("app.api.user.public.resetPassword.request.email.buttonText")}
+          {t("email.buttonText")}
         </Button>
       </Section>
 
@@ -145,7 +150,7 @@ function PasswordResetRequestEmail({
           marginTop: "24px",
         }}
       >
-        {t("app.api.user.public.resetPassword.request.email.expirationInfo", {
+        {t("email.expirationInfo", {
           hours: RESET_TOKEN_EXPIRY,
         })}
       </Text>
@@ -154,58 +159,52 @@ function PasswordResetRequestEmail({
 }
 
 // Template Definition Export
-const passwordResetRequestTemplate: EmailTemplateDefinition<PasswordResetRequestProps> =
-  {
-    meta: {
-      id: "password-reset-request",
-      version: "1.0.0",
-      name: "app.api.emails.templates.password.reset.request.meta.name",
-      description:
-        "app.api.emails.templates.password.reset.request.meta.description",
-      category: "auth",
-      path: "/user/public/reset-password/request/email.tsx",
-      defaultSubject: (t) =>
-        t("app.api.user.public.resetPassword.request.email.subject", {
-          appName: "",
-        }),
-      previewFields: {
-        publicName: {
-          type: "text",
-          label:
-            "app.admin.emails.templates.templates.password.reset.request.preview.privateName.label",
-          description:
-            "app.admin.emails.templates.templates.password.reset.request.preview.privateName.description",
-          defaultValue: "Max Mustermann",
-          required: true,
-        },
-        userId: {
-          type: "text",
-          label:
-            "app.admin.emails.templates.templates.password.reset.request.preview.userId.label",
-          description:
-            "app.admin.emails.templates.templates.password.reset.request.preview.userId.description",
-          defaultValue: "example-user-id-123",
-          required: true,
-        },
-        passwordResetUrl: {
-          type: "url",
-          label:
-            "app.admin.emails.templates.templates.password.reset.request.preview.resetToken.label",
-          description:
-            "app.admin.emails.templates.templates.password.reset.request.preview.resetToken.description",
-          defaultValue: "https://example.com/user/reset-password/token123",
-          required: true,
-        },
+const passwordResetRequestTemplate: EmailTemplateDefinition<
+  PasswordResetRequestProps,
+  typeof requestScopedTranslation
+> = {
+  scopedTranslation: requestScopedTranslation,
+  meta: {
+    id: "password-reset-request",
+    version: "1.0.0",
+    name: "emailTemplates.request.name",
+    description: "emailTemplates.request.description",
+    category: "emailTemplates.request.category",
+    path: "/user/public/reset-password/request/email.tsx",
+    defaultSubject: "email.subject",
+    previewFields: {
+      publicName: {
+        type: "text",
+        label: "emailTemplates.request.preview.publicName.label",
+        description: "emailTemplates.request.preview.publicName.description",
+        defaultValue: "Max Mustermann",
+        required: true,
+      },
+      userId: {
+        type: "text",
+        label: "emailTemplates.request.preview.userId.label",
+        description: "emailTemplates.request.preview.userId.description",
+        defaultValue: "example-user-id-123",
+        required: true,
+      },
+      passwordResetUrl: {
+        type: "url",
+        label: "emailTemplates.request.preview.passwordResetUrl.label",
+        description:
+          "emailTemplates.request.preview.passwordResetUrl.description",
+        defaultValue: "https://example.com/user/reset-password/token123",
+        required: true,
       },
     },
-    schema: passwordResetRequestPropsSchema,
-    component: PasswordResetRequestEmail,
-    exampleProps: {
-      publicName: "Max Mustermann",
-      userId: "example-user-id-123",
-      passwordResetUrl: "https://example.com/user/reset-password/token123",
-    },
-  };
+  },
+  schema: passwordResetRequestPropsSchema,
+  component: PasswordResetRequestEmail,
+  exampleProps: {
+    publicName: "Max Mustermann",
+    userId: "example-user-id-123",
+    passwordResetUrl: "https://example.com/user/reset-password/token123",
+  },
+};
 
 export default passwordResetRequestTemplate;
 
@@ -226,11 +225,15 @@ export default passwordResetRequestTemplate;
 export const renderResetPasswordMail: EmailFunctionType<
   ResetPasswordRequestPostRequestOutput,
   ResetPasswordRequestPostResponseOutput,
-  UndefinedType
-> = async ({ requestData, t, locale, logger }) => {
+  UndefinedType,
+  ResetPasswordTranslationKey
+> = async ({ requestData, locale, logger }) => {
   logger.debug("Rendering password reset email", {
     email: requestData.email,
   });
+
+  const { t } = requestScopedTranslation.scopedT(locale);
+  const { t: resetT } = resetPasswordScopedTranslation.scopedT(locale);
 
   try {
     const userResponse = await UserRepository.getUserByEmail(
@@ -242,7 +245,7 @@ export const renderResetPasswordMail: EmailFunctionType<
     if (!userResponse.success) {
       // will not get sent to the user as ignoreError is true
       return fail({
-        message: "app.api.emails.errors.no_email",
+        message: t("errors.no_email"),
         errorType: ErrorResponseTypes.NOT_FOUND,
         messageParams: { email: requestData.email },
         cause: userResponse,
@@ -256,10 +259,11 @@ export const renderResetPasswordMail: EmailFunctionType<
       requestData.email,
       locale,
       logger,
+      resetT,
     );
     if (!tokenResponse.success) {
       return fail({
-        message: "app.api.emails.errors.email_generation_failed",
+        message: t("errors.email_generation_failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { email: requestData.email },
         cause: tokenResponse,
@@ -275,13 +279,13 @@ export const renderResetPasswordMail: EmailFunctionType<
       passwordResetUrl,
     };
 
-    const translatedAppName = t("config.appName");
+    const { t: globalT } = simpleT(locale);
 
     return success({
       toEmail: requestData.email,
       toName: user.publicName,
-      subject: t("app.api.user.public.resetPassword.request.email.subject", {
-        appName: translatedAppName,
+      subject: t("email.subject", {
+        appName: globalT("config.appName"),
       }),
       jsx: passwordResetRequestTemplate.component({
         props: templateProps,
@@ -295,7 +299,7 @@ export const renderResetPasswordMail: EmailFunctionType<
     logger.error("Error generating password reset email", parseError(error));
     const parsedError = parseError(error);
     return fail({
-      message: "app.api.emails.errors.email_generation_failed",
+      message: t("errors.email_generation_failed"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: {
         email: requestData.email,

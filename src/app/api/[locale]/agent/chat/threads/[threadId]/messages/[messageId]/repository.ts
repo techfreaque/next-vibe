@@ -25,7 +25,6 @@ import {
   canReadMessage,
   canWriteMessage,
 } from "../../../../permissions/permissions";
-import { validateNotIncognito } from "../../../../validation";
 import type {
   MessageDeleteResponseOutput,
   MessageDeleteUrlVariablesOutput,
@@ -35,33 +34,9 @@ import type {
   MessagePatchResponseOutput,
   MessagePatchUrlVariablesOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
 
-/**
- * Repository interface
- */
-export interface MessageRepositoryInterface {
-  getMessage(
-    urlPathParams: MessageGetUrlVariablesOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<MessageGetResponseOutput>>;
-
-  updateMessage(
-    data: MessagePatchRequestOutput,
-    urlPathParams: MessagePatchUrlVariablesOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<MessagePatchResponseOutput>>;
-
-  deleteMessage(
-    urlPathParams: MessageDeleteUrlVariablesOutput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<MessageDeleteResponseOutput>>;
-}
+type MessageByIdT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Message Repository Implementation
@@ -73,8 +48,9 @@ export class MessageRepository {
   static async getMessage(
     urlPathParams: MessageGetUrlVariablesOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: MessageByIdT,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<MessageGetResponseOutput>> {
     try {
       // Get thread
@@ -86,20 +62,17 @@ export class MessageRepository {
 
       if (!thread) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.threadNotFound.title" as const,
+          message: t("get.errors.threadNotFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       // Reject incognito threads
-      const incognitoError = validateNotIncognito(
-        thread.rootFolderId,
-        locale,
-        "app.api.agent.chat.threads.threadId.messages.messageId.get",
-      );
-      if (incognitoError) {
-        return incognitoError;
+      if (thread.rootFolderId === "incognito") {
+        return fail({
+          message: t("get.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
       }
 
       // Get message
@@ -116,8 +89,7 @@ export class MessageRepository {
 
       if (!message) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.messageNotFound.title" as const,
+          message: t("get.errors.messageNotFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -133,10 +105,9 @@ export class MessageRepository {
       }
 
       // Check if user can read this message
-      if (!(await canReadMessage(user, thread, folder, logger))) {
+      if (!(await canReadMessage(user, thread, folder, logger, locale))) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.forbidden.title" as const,
+          message: t("get.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -159,8 +130,7 @@ export class MessageRepository {
     } catch (error) {
       logger.error("Error getting message:", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.messages.messageId.get.errors.server.description" as const,
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -173,8 +143,9 @@ export class MessageRepository {
     data: MessagePatchRequestOutput,
     urlPathParams: MessagePatchUrlVariablesOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: MessageByIdT,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<MessagePatchResponseOutput>> {
     try {
       // Get thread
@@ -186,20 +157,17 @@ export class MessageRepository {
 
       if (!thread) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.threadNotFound.title" as const,
+          message: t("patch.errors.threadNotFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       // Reject incognito threads
-      const incognitoError = validateNotIncognito(
-        thread.rootFolderId,
-        locale,
-        "app.api.agent.chat.threads.threadId.messages.messageId.patch",
-      );
-      if (incognitoError) {
-        return incognitoError;
+      if (thread.rootFolderId === "incognito") {
+        return fail({
+          message: t("patch.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
       }
 
       // Verify message exists and belongs to thread
@@ -216,8 +184,7 @@ export class MessageRepository {
 
       if (!existingMessage) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.messageNotFound.title" as const,
+          message: t("patch.errors.messageNotFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -242,12 +209,12 @@ export class MessageRepository {
         thread,
         folder,
         logger,
+        locale,
       );
 
       if (!isAuthor && !hasWritePermission) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.forbidden.title" as const,
+          message: t("patch.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -281,8 +248,7 @@ export class MessageRepository {
     } catch (error) {
       logger.error("Error updating message:", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.messages.messageId.patch.errors.server.description" as const,
+        message: t("patch.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -294,8 +260,9 @@ export class MessageRepository {
   static async deleteMessage(
     urlPathParams: MessageDeleteUrlVariablesOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: MessageByIdT,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<MessageDeleteResponseOutput>> {
     try {
       // Get thread
@@ -307,20 +274,17 @@ export class MessageRepository {
 
       if (!thread) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.threadNotFound.title" as const,
+          message: t("delete.errors.threadNotFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       // Reject incognito threads
-      const incognitoError = validateNotIncognito(
-        thread.rootFolderId,
-        locale,
-        "app.api.agent.chat.threads.threadId.messages.messageId.delete",
-      );
-      if (incognitoError) {
-        return incognitoError;
+      if (thread.rootFolderId === "incognito") {
+        return fail({
+          message: t("delete.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
       }
 
       // Verify message exists
@@ -337,8 +301,7 @@ export class MessageRepository {
 
       if (!existingMessage) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.messageNotFound.title" as const,
+          message: t("delete.errors.messageNotFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -355,11 +318,17 @@ export class MessageRepository {
 
       // Check if user can delete this message
       if (
-        !(await canDeleteMessage(user, existingMessage, thread, folder, logger))
+        !(await canDeleteMessage(
+          user,
+          existingMessage,
+          thread,
+          folder,
+          logger,
+          locale,
+        ))
       ) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.forbidden.title" as const,
+          message: t("delete.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -387,8 +356,7 @@ export class MessageRepository {
     } catch (error) {
       logger.error("Error deleting message:", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.messages.messageId.delete.errors.server.description" as const,
+        message: t("delete.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

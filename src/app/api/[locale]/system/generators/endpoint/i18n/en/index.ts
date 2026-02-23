@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Generators",
+
   post: {
     title: "Endpoint Generator",
     description: "Generate endpoint.ts with dynamic imports",

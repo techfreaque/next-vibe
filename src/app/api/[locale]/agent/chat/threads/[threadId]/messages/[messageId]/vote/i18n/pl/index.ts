@@ -1,6 +1,10 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Chat",
+  tags: {
+    messages: "Wiadomości",
+  },
   post: {
     title: "Głosuj na wiadomość",
     description: "Zagłosuj za lub przeciw wiadomości",

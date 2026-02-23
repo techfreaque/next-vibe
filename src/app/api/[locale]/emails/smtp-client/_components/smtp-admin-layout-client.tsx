@@ -18,7 +18,8 @@ import { H2 } from "next-vibe-ui/ui/typography";
 import type { ComponentType, JSX, ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "./i18n";
 
 interface SmtpAdminLayoutClientProps {
   children: ReactNode;
@@ -39,23 +40,23 @@ export function SmtpAdminLayoutClient({
   locale,
 }: SmtpAdminLayoutClientProps): JSX.Element {
   const pathname = usePathname();
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   const subNavigationItems: SubNavigationItem[] = [
     {
       key: "accounts",
       href: `/${locale}/admin/emails/smtp/accounts`,
       icon: Users,
-      label: t("app.admin.emails.smtp.list.title"),
-      description: t("app.admin.emails.smtp.list.description"),
+      label: t("list.title"),
+      description: t("list.description"),
       pattern: new RegExp(`^/${locale}/admin/emails/smtp/accounts`),
     },
     {
       key: "create",
       href: `/${locale}/admin/emails/smtp/create`,
       icon: Plus,
-      label: t("app.admin.emails.smtp.admin.create.title"),
-      description: t("app.admin.emails.smtp.admin.create.description"),
+      label: t("admin.create.title"),
+      description: t("admin.create.description"),
       pattern: new RegExp(`^/${locale}/admin/emails/smtp/create`),
     },
   ];
@@ -72,19 +73,16 @@ export function SmtpAdminLayoutClient({
           <Div className="flex flex-col gap-4">
             <Div>
               <H2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {t("app.admin.emails.smtp.list.title")}
+                {t("list.title")}
               </H2>
               <P className="text-sm text-gray-600 dark:text-gray-400">
-                {t("app.admin.emails.smtp.list.description")}
+                {t("list.description")}
               </P>
             </Div>
 
             {/* Sub Navigation Tabs */}
             <Div className="border-b border-gray-200 dark:border-gray-700">
-              <Nav
-                className="flex flex-row gap-8"
-                aria-label={t("app.admin.emails.smtp.list.title")}
-              >
+              <Nav className="flex flex-row gap-8" aria-label={t("list.title")}>
                 {subNavigationItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = currentSubSection?.key === item.key;

@@ -1,6 +1,11 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Przeglądarka",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    inputAutomation: "Automatyzacja wejścia",
+  },
   title: "Wypełnij formularz",
   description: "Wypełnij wiele elementów formularza jednocześnie",
 

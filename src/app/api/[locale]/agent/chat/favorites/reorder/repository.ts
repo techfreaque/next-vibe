@@ -20,6 +20,9 @@ import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { chatFavorites } from "../db";
 import type { FavoritesReorderRequestOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ReorderT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Favorites Reorder Repository
@@ -32,13 +35,13 @@ export class FavoritesReorderRepository {
     requestData: FavoritesReorderRequestOutput,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
+    t: ReorderT,
   ): Promise<ResponseType<{ success: boolean }>> {
     const userId = user.id;
 
     if (!userId) {
       return fail({
-        message:
-          "app.api.agent.chat.favorites.reorder.post.errors.unauthorized.description",
+        message: t("post.errors.unauthorized.title"),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
@@ -65,8 +68,7 @@ export class FavoritesReorderRepository {
     } catch (error) {
       logger.error("Failed to reorder favorites", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.favorites.reorder.post.errors.server.description",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

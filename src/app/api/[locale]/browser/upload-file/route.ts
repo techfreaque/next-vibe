@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: uploadFileEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger }) =>
+    handler: ({ data, t, logger }) =>
       executeUploadFile(
         {
           toolName: "upload-file",
@@ -21,6 +21,7 @@ export const { POST, tools } = endpointsHandler({
             filePath: data.filePath,
           }),
         },
+        t,
         logger,
       ),
   },

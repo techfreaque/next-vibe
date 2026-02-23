@@ -1,4 +1,13 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    connectionNotFound: "Połączenie nie znalezione",
+    notImplemented: {
+      test: "Backend SSH jeszcze nie zaimplementowany. Nie można testować połączeń zdalnych.",
+    },
+  },
+
   post: {
     title: "Testuj połączenie SSH",
     description: "Testuj połączenie z serwerem SSH",

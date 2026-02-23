@@ -181,6 +181,8 @@ export const translations: typeof enTranslations = {
     },
     sms: {
       temporarilyUnavailable: "Usługa SMS jest tymczasowo niedostępna",
+      invalidPhone: "Nieprawidłowy numer telefonu: {{phoneNumber}}",
+      sendFailed: "Nie udało się wysłać SMS: {{error}}",
     },
     unauthorized: {
       title: "Brak autoryzacji",

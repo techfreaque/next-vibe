@@ -77,4 +77,9 @@ export const translations: typeof enTranslations = {
     title: "Seite erfolgreich geschlossen",
     description: "Die Seite wurde erfolgreich geschlossen",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    chromeDevTools: "Chrome DevTools",
+  },
 };

@@ -1,20 +1,45 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Kampagnen-Verwaltung",
+
+  tag: "E-Mail-Kampagnen",
   task: {
     description:
       "Automatisierte E-Mail-Kampagnen an Leads basierend auf deren Phase und Timing senden",
   },
   post: {
-    title: "Titel",
-    description: "Endpunkt-Beschreibung",
+    title: "E-Mail-Kampagnen",
+    description: "E-Mail-Kampagnen verarbeiten",
     form: {
-      title: "Konfiguration",
-      description: "Parameter konfigurieren",
+      title: "E-Mail-Kampagnen-Konfiguration",
+      description: "E-Mail-Kampagnen-Parameter konfigurieren",
+    },
+    container: {
+      title: "E-Mail-Kampagnen-Konfiguration",
+      description: "E-Mail-Kampagnen-Parameter konfigurieren",
+    },
+    fields: {
+      batchSize: {
+        label: "Batch-Größe",
+        description: "Anzahl der Leads pro Batch",
+      },
+      maxEmailsPerRun: {
+        label: "Max. E-Mails pro Durchlauf",
+        description: "Maximale Anzahl zu sendender E-Mails pro Durchlauf",
+      },
+      dryRun: {
+        label: "Testlauf",
+        description: "Ohne E-Mail-Versand ausführen",
+      },
     },
     response: {
       title: "Antwort",
       description: "Antwortdaten",
+      emailsScheduled: "Geplante E-Mails",
+      emailsSent: "Gesendete E-Mails",
+      emailsFailed: "Fehlgeschlagene E-Mails",
+      leadsProcessed: "Verarbeitete Leads",
     },
     errors: {
       unauthorized: {

@@ -7,12 +7,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  objectFieldNew,
-  requestField,
-  responseArrayField,
-  responseField,
+  scopedBackButton,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -26,6 +26,7 @@ import { ModelId } from "../../agent/models/models";
 import { dateSchema } from "../../shared/types/common.schema";
 import { paginationField } from "../../system/unified-interface/unified-ui/widgets/containers/pagination/types";
 import { CreditTransactionType } from "../enum";
+import { scopedTranslation } from "../i18n";
 import { CreditHistoryContainer } from "./widget";
 
 /**
@@ -33,12 +34,13 @@ import { CreditHistoryContainer } from "./widget";
  * Retrieves paginated credit transaction history
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["credits", "history"],
-  title: "app.api.agent.chat.credits.history.get.title",
-  description: "app.api.agent.chat.credits.history.get.description",
-  category: "app.api.payment.category",
-  tags: ["app.api.agent.chat.tags.credits", "app.api.agent.chat.tags.balance"],
+  title: "history.get.title",
+  description: "history.get.description",
+  category: "category",
+  tags: ["tags.credits", "tags.balance"],
   icon: "wallet",
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
@@ -46,74 +48,68 @@ const { GET } = createEndpoint({
     render: CreditHistoryContainer,
     usage: { response: true, request: "data" },
     children: {
-      backButton: backButton({
+      backButton: scopedBackButton(scopedTranslation, {
         usage: { response: true, request: "data" },
       }),
       // === ADMIN: optional target user override ===
-      targetUserId: requestField({
+      targetUserId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.agent.chat.credits.history.get.targetUserId.label" as const,
+        label: "history.get.targetUserId.label" as const,
         hidden: true,
         schema: z.string().optional(),
       }),
 
       // === ADMIN: optional target lead override ===
-      targetLeadId: requestField({
+      targetLeadId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.agent.chat.credits.history.get.targetLeadId.label" as const,
+        label: "history.get.targetLeadId.label" as const,
         hidden: true,
         schema: z.string().optional(),
       }),
 
       // === TRANSACTION LIST ===
-      transactions: responseArrayField(
-        {
-          type: WidgetType.CONTAINER,
-        },
-        objectFieldNew({
+      transactions: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
           usage: { response: true },
           children: {
-            id: responseField({
+            id: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.agent.chat.credits.history.get.id" as const,
+              content: "history.get.id" as const,
               schema: z.string(),
             }),
-            amount: responseField({
+            amount: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.agent.chat.credits.history.get.amount" as const,
+              content: "history.get.amount" as const,
               schema: z.coerce.number(),
             }),
-            balanceAfter: responseField({
+            balanceAfter: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.subscription.subscription.history.balance" as const,
+              content: "history.get.transaction.balanceAfter.content" as const,
               schema: z.coerce.number(),
             }),
-            type: responseField({
+            type: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.agent.chat.credits.history.get.type" as const,
+              content: "history.get.type" as const,
               schema: z.string().optional(),
             }),
-            messageId: responseField({
+            messageId: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.agent.chat.credits.history.get.messageId" as const,
+              content: "history.get.messageId" as const,
               schema: z.string().nullable(),
             }),
-            createdAt: responseField({
+            createdAt: scopedResponseField(scopedTranslation, {
               type: WidgetType.FORM_FIELD,
               fieldType: FieldDataType.DATE,
-              content:
-                "app.api.agent.chat.credits.history.get.createdAt" as const,
+              content: "history.get.createdAt" as const,
               schema: dateSchema,
             }),
           },
         }),
-      ),
+      }),
 
       paginationInfo: paginationField({
         order: 2,
@@ -123,57 +119,47 @@ const { GET } = createEndpoint({
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.agent.chat.credits.history.get.success.title",
-    description: "app.api.agent.chat.credits.history.get.success.description",
+    title: "history.get.success.title",
+    description: "history.get.success.description",
   },
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.agent.chat.credits.history.get.errors.validation.title",
-      description:
-        "app.api.agent.chat.credits.history.get.errors.validation.description",
+      title: "history.get.errors.validation.title",
+      description: "history.get.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.chat.credits.history.get.errors.network.title",
-      description:
-        "app.api.agent.chat.credits.history.get.errors.network.description",
+      title: "history.get.errors.network.title",
+      description: "history.get.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.agent.chat.credits.history.get.errors.unauthorized.title",
-      description:
-        "app.api.agent.chat.credits.history.get.errors.unauthorized.description",
+      title: "history.get.errors.unauthorized.title",
+      description: "history.get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.agent.chat.credits.history.get.errors.forbidden.title",
-      description:
-        "app.api.agent.chat.credits.history.get.errors.forbidden.description",
+      title: "history.get.errors.forbidden.title",
+      description: "history.get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.agent.chat.credits.history.get.errors.notFound.title",
-      description:
-        "app.api.agent.chat.credits.history.get.errors.notFound.description",
+      title: "history.get.errors.notFound.title",
+      description: "history.get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.chat.credits.history.get.errors.server.title",
-      description:
-        "app.api.agent.chat.credits.history.get.errors.server.description",
+      title: "history.get.errors.server.title",
+      description: "history.get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.chat.credits.history.get.errors.unknown.title",
-      description:
-        "app.api.agent.chat.credits.history.get.errors.unknown.description",
+      title: "history.get.errors.unknown.title",
+      description: "history.get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.credits.history.get.errors.unsavedChanges.title",
-      description:
-        "app.api.agent.chat.credits.history.get.errors.unsavedChanges.description",
+      title: "history.get.errors.unsavedChanges.title",
+      description: "history.get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.agent.chat.credits.history.get.errors.conflict.title",
-      description:
-        "app.api.agent.chat.credits.history.get.errors.conflict.description",
+      title: "history.get.errors.conflict.title",
+      description: "history.get.errors.conflict.description",
     },
   },
 

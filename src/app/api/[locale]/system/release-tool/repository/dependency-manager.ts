@@ -13,8 +13,11 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type { PackageJson, SecurityScanResult } from "../definition";
+import { scopedTranslation } from "../i18n";
 import { MESSAGES, TIMEOUTS } from "./constants";
 import { toCatchError } from "./utils";
 
@@ -58,71 +61,7 @@ export interface UpdateOptions {
   target?: "latest" | "newest" | "greatest" | "minor" | "patch";
 }
 
-// ============================================================================
-// Interface
-// ============================================================================
-
-export interface IDependencyManager {
-  /**
-   * Update dependencies using npm-check-updates
-   */
-  updateDependencies(
-    cwd: string,
-    packageManager: string,
-    packageJson: PackageJson,
-    logger: EndpointLogger,
-    dryRun: boolean,
-    options?: UpdateOptions,
-  ): ResponseType<void>;
-
-  /**
-   * Check for outdated dependencies
-   */
-  checkOutdated(
-    cwd: string,
-    packageManager: string,
-    logger: EndpointLogger,
-  ): ResponseType<OutdatedResult>;
-
-  /**
-   * Run security audit
-   */
-  runAudit(
-    cwd: string,
-    packageManager: string,
-    logger: EndpointLogger,
-    fix?: boolean,
-  ): ResponseType<SecurityScanResult>;
-
-  /**
-   * Deduplicate dependencies
-   */
-  deduplicate(
-    cwd: string,
-    packageManager: string,
-    logger: EndpointLogger,
-  ): ResponseType<void>;
-
-  /**
-   * Prune unused dependencies
-   */
-  prune(
-    cwd: string,
-    packageManager: string,
-    logger: EndpointLogger,
-  ): ResponseType<void>;
-
-  /**
-   * Check if npm-check-updates is available
-   */
-  isNcuAvailable(): boolean;
-}
-
-// ============================================================================
-// Implementation
-// ============================================================================
-
-export class DependencyManager implements IDependencyManager {
+export class DependencyManager {
   private ncuAvailable: boolean | null = null;
 
   isNcuAvailable(): boolean {
@@ -146,6 +85,7 @@ export class DependencyManager implements IDependencyManager {
     packageJson: PackageJson,
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
     options?: UpdateOptions,
   ): ResponseType<void> {
     if (dryRun) {
@@ -167,7 +107,12 @@ export class DependencyManager implements IDependencyManager {
         logger.warn(
           "npm-check-updates (ncu) not found, attempting to use package manager directly",
         );
-        return this.updateWithPackageManager(cwd, packageManager, logger);
+        return this.updateWithPackageManager(
+          cwd,
+          packageManager,
+          logger,
+          locale,
+        );
       }
 
       // Build ncu command
@@ -207,8 +152,9 @@ export class DependencyManager implements IDependencyManager {
       return success();
     } catch (error) {
       logger.error(MESSAGES.DEPS_FAILED, parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.packageJson.errorUpdatingDeps",
+        message: t("packageJson.errorUpdatingDeps"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { directory: cwd, error: String(error) },
       });
@@ -219,6 +165,7 @@ export class DependencyManager implements IDependencyManager {
     cwd: string,
     packageManager: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): ResponseType<void> {
     try {
       // Use the package manager's built-in update command
@@ -247,8 +194,9 @@ export class DependencyManager implements IDependencyManager {
       return success();
     } catch (error) {
       logger.error(MESSAGES.DEPS_FAILED, parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.packageJson.errorUpdatingDeps",
+        message: t("packageJson.errorUpdatingDeps"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { directory: cwd, error: String(error) },
       });
@@ -340,6 +288,7 @@ export class DependencyManager implements IDependencyManager {
     cwd: string,
     packageManager: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
     fix = false,
   ): ResponseType<SecurityScanResult> {
     logger.info(MESSAGES.AUDIT_RUNNING);
@@ -432,8 +381,9 @@ export class DependencyManager implements IDependencyManager {
       });
     } catch (error) {
       logger.error(MESSAGES.AUDIT_FAILED, parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.security.auditFailed",
+        message: t("security.auditFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { directory: cwd, error: String(error) },
       });
@@ -444,6 +394,7 @@ export class DependencyManager implements IDependencyManager {
     cwd: string,
     packageManager: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): ResponseType<void> {
     logger.info("Deduplicating dependencies...");
 
@@ -474,8 +425,9 @@ export class DependencyManager implements IDependencyManager {
       return success();
     } catch (error) {
       logger.error("Deduplication failed", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.dependencies.dedupeFailed",
+        message: t("dependencies.dedupeFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { directory: cwd, error: String(error) },
       });

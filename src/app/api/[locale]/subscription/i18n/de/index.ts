@@ -343,6 +343,7 @@ export const translations: typeof enTranslations = {
   sync: {
     failed: "Synchronisierung des Abonnements fehlgeschlagen",
     stripe_error: "Stripe-Synchronisierungsfehler",
+    success: "Abonnement erfolgreich synchronisiert",
   },
 
   // Cancel operation
@@ -418,6 +419,55 @@ export const translations: typeof enTranslations = {
       status: "Status",
       contact_user: "Benutzer kontaktieren",
       footer: "Dies ist eine automatische Benachrichtigung von {{appName}}",
+    },
+  },
+
+  // Email template metadata (for preview registry)
+  emailTemplates: {
+    success: {
+      name: "Abonnement-Bestätigungs-E-Mail",
+      description: "Bestätigungs-E-Mail bei Aktivierung eines Abonnements",
+      category: "abonnement",
+      preview: {
+        privateName: {
+          label: "Benutzername",
+          description: "Der Anzeigename des Benutzers",
+        },
+        userId: {
+          label: "Benutzer-ID",
+          description: "Die eindeutige Kennung des Benutzers",
+        },
+        leadId: {
+          label: "Lead-ID",
+          description: "Die zugehörige Lead-Kennung",
+        },
+        planName: {
+          label: "Plan-Name",
+          description: "Der Name des Abonnementplans",
+        },
+      },
+    },
+    adminNotification: {
+      name: "Admin-Abonnement-Benachrichtigung",
+      description: "Interne Benachrichtigung an Admins bei neuen Abonnements",
+      category: "admin",
+      preview: {
+        privateName: {
+          label: "Benutzername",
+        },
+        publicName: {
+          label: "Öffentlicher Name",
+        },
+        email: {
+          label: "Benutzer-E-Mail",
+        },
+        planName: {
+          label: "Plan-Name",
+        },
+        statusName: {
+          label: "Abonnementstatus",
+        },
+      },
     },
   },
 

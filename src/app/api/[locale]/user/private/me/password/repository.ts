@@ -28,6 +28,9 @@ import type {
   PasswordPostRequestOutput,
   PasswordPostResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Password Update Repository - Static class pattern
@@ -41,12 +44,13 @@ export class PasswordUpdateRepository {
     passwords: PasswordPostRequestOutput,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<PasswordPostResponseOutput>> {
     const userId = user.id;
 
     if (!userId) {
       return fail({
-        message: "app.api.user.private.me.password.errors.unauthorized.title",
+        message: t("errors.unauthorized.title"),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
@@ -56,8 +60,7 @@ export class PasswordUpdateRepository {
 
       if (!passwords.currentCredentials || !passwords.newCredentials) {
         return fail({
-          message:
-            "app.api.user.private.me.password.errors.invalid_request.title",
+          message: t("errors.invalid_request.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -75,8 +78,7 @@ export class PasswordUpdateRepository {
 
       if (newPassword !== confirmPassword) {
         return fail({
-          message:
-            "app.api.user.private.me.password.errors.passwords_do_not_match",
+          message: t("errors.passwords_do_not_match"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -89,7 +91,7 @@ export class PasswordUpdateRepository {
       );
       if (!userResponse.success) {
         return fail({
-          message: "app.api.user.private.me.password.errors.user_not_found",
+          message: t("errors.user_not_found"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { userId },
           cause: userResponse,
@@ -108,7 +110,7 @@ export class PasswordUpdateRepository {
 
       if (!user) {
         return fail({
-          message: "app.api.user.private.me.password.errors.user_not_found",
+          message: t("errors.user_not_found"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { userId },
         });
@@ -120,7 +122,7 @@ export class PasswordUpdateRepository {
       );
       if (!isPasswordValid) {
         return fail({
-          message: "app.api.user.private.me.password.errors.incorrect_password",
+          message: t("errors.incorrect_password"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -131,8 +133,7 @@ export class PasswordUpdateRepository {
 
         if (!twoFactorCode) {
           return fail({
-            message:
-              "app.api.user.private.me.password.errors.two_factor_code_required",
+            message: t("errors.two_factor_code_required"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
@@ -143,8 +144,7 @@ export class PasswordUpdateRepository {
         );
         if (!is2FAValid) {
           return fail({
-            message:
-              "app.api.user.private.me.password.errors.invalid_two_factor_code",
+            message: t("errors.invalid_two_factor_code"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
@@ -158,6 +158,7 @@ export class PasswordUpdateRepository {
         userId,
         newPassword,
         logger,
+        t,
       );
       if (!setPasswordResponse.success) {
         return setPasswordResponse as ResponseType<PasswordPostResponseOutput>;
@@ -166,18 +167,18 @@ export class PasswordUpdateRepository {
       return success<PasswordPostResponseOutput>({
         response: {
           success: true,
-          message: "app.api.user.private.me.password.success.updated",
-          securityTip: "app.api.user.private.me.password.success.securityTip",
+          message: t("success.updated"),
+          securityTip: t("success.securityTip"),
           nextSteps: [
-            "app.api.user.private.me.password.success.nextSteps.logoutOther",
-            "app.api.user.private.me.password.success.nextSteps.enable2fa",
+            t("success.nextSteps.logoutOther"),
+            t("success.nextSteps.enable2fa"),
           ],
         },
       });
     } catch (error) {
       logger.error("Error updating password", parseError(error));
       return fail({
-        message: "app.api.user.private.me.password.errors.update_failed",
+        message: t("errors.update_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
       });
     }
@@ -202,6 +203,7 @@ export class PasswordUpdateRepository {
     userId: DbId,
     newPassword: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<null>> {
     try {
       logger.debug("Setting password", { userId });
@@ -220,8 +222,7 @@ export class PasswordUpdateRepository {
     } catch (error) {
       logger.error("Error setting password", parseError(error));
       return fail({
-        message:
-          "app.api.user.private.me.password.errors.token_creation_failed",
+        message: t("errors.token_creation_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
       });
     }

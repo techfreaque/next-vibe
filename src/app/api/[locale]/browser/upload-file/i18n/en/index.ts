@@ -67,4 +67,9 @@ export const translations = {
     title: "File Upload Operation Successful",
     description: "The file was uploaded successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    inputAutomation: "Input Automation",
+  },
 };

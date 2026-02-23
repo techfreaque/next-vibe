@@ -17,7 +17,7 @@ import { SttHotkeyRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }) =>
-      SttHotkeyRepository.handleHotkeyAction(data, user, locale, logger),
+    handler: ({ data, user, locale, logger, t }) =>
+      SttHotkeyRepository.handleHotkeyAction(data, user, locale, logger, t),
   },
 });

@@ -14,11 +14,11 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
 import { LeadsRepository } from "@/app/api/[locale]/leads/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { db } from "../../system/db";
 import { newsletterSubscriptions } from "../db";
@@ -27,6 +27,9 @@ import type {
   UnsubscribePostRequestOutput,
   UnsubscribePostResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 export class NewsletterUnsubscribeRepository {
   static async unsubscribe(
@@ -34,19 +37,20 @@ export class NewsletterUnsubscribeRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<UnsubscribePostResponseOutput>> {
-    const { t } = simpleT(locale);
-
     try {
       logger.debug("Starting newsletter unsubscription", {
         email: data.email,
       });
 
       // Update lead status to unsubscribed if lead exists
+      const leadsT = leadsScopedTranslation.scopedT(locale).t;
       const leadUpdateResult =
         await LeadsRepository.updateLeadStatusOnNewsletterUnsubscribe(
           data.email,
           logger,
+          leadsT,
         );
       if (leadUpdateResult.success) {
         logger.debug("Lead status update result", {
@@ -94,7 +98,7 @@ export class NewsletterUnsubscribeRepository {
 
         return success({
           success: true,
-          message: t("app.api.newsletter.unsubscribe.response.success"),
+          message: t("response.success"),
         });
       }
 
@@ -104,7 +108,7 @@ export class NewsletterUnsubscribeRepository {
         });
         return success({
           success: true,
-          message: t("app.api.newsletter.unsubscribe.response.success"),
+          message: t("response.success"),
         });
       }
 
@@ -139,7 +143,7 @@ export class NewsletterUnsubscribeRepository {
 
       return success({
         success: true,
-        message: t("app.api.newsletter.unsubscribe.response.success"),
+        message: t("response.success"),
       });
     } catch (error) {
       const parsedError = parseError(error);
@@ -149,7 +153,7 @@ export class NewsletterUnsubscribeRepository {
       });
 
       return fail({
-        message: "app.api.newsletter.unsubscribe.errors.internal.title",
+        message: t("errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });

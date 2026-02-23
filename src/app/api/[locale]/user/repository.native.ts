@@ -97,6 +97,8 @@ export class UserRepository {
     _userId: DbId,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("exists is not implemented on native");
@@ -107,6 +109,8 @@ export class UserRepository {
     _email: string,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("emailExists is not implemented on native");
@@ -119,6 +123,8 @@ export class UserRepository {
     _excludeUserId: DbId,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("emailExistsByOtherUser is not implemented on native");
@@ -129,6 +135,8 @@ export class UserRepository {
     _data: NewUser,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
   ): Promise<ResponseType<StandardUserType>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("createWithHashedPassword is not implemented on native");
@@ -141,6 +149,8 @@ export class UserRepository {
     _options: UserSearchOptions,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
   ): Promise<ResponseType<StandardUserType[]>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("searchUsers is not implemented on native");
@@ -151,6 +161,8 @@ export class UserRepository {
     _options: UserSearchOptions,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
   ): Promise<ResponseType<StandardUserType[]>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("getAllUsers is not implemented on native");
@@ -161,6 +173,8 @@ export class UserRepository {
     _query: string,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
   ): Promise<ResponseType<number>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("getUserSearchCount is not implemented on native");
@@ -177,6 +191,8 @@ export class UserRepository {
     },
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
   ): Promise<
     ResponseType<{
       users: Array<StandardUserType & { createdAt: string; updatedAt: string }>;
@@ -203,6 +219,8 @@ export class UserRepository {
   static async getActiveUserCount(
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
   ): Promise<ResponseType<number>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("getActiveUserCount is not implemented on native");

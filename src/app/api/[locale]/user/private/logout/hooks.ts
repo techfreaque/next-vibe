@@ -14,9 +14,11 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { useTranslation } from "@/i18n/core/client";
 
 import { useApiMutation } from "../../../system/unified-interface/react/hooks/use-api-mutation";
+import { scopedTranslation as authScopedTranslation } from "../../auth/i18n";
 import { authClientRepository } from "../../auth/repository-client";
 import type { JwtPayloadType } from "../../auth/types";
 import logoutEndpoints from "./definition";
+import { scopedTranslation } from "./i18n";
 
 /****************************
  * MUTATION HOOKS
@@ -38,18 +40,20 @@ export function useLogout(
   user: JwtPayloadType,
 ): () => void {
   const { toast } = useToast();
-  const { t, locale } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = scopedTranslation.scopedT(locale);
+  const { t: authT } = authScopedTranslation.scopedT(locale);
 
   const logout = useApiMutation(logoutEndpoints.POST, logger, user, {
     onSuccess: async () => {
       toast({
-        title: t("app.api.user.private.logout.success.title"),
-        description: t("app.api.user.private.logout.success.description"),
+        title: t("success.title"),
+        description: t("success.description"),
         variant: "default",
       });
 
       // remove react native token - web token is already cleared by server
-      await authClientRepository.removeAuthToken(logger);
+      await authClientRepository.removeAuthToken(logger, authT);
       // Invalidate credits queries to trigger refetch with new auth state
       await apiClient.refetchEndpoint(definitions.GET, logger);
 
@@ -60,12 +64,12 @@ export function useLogout(
     onError: async () => {
       // Even if the API call fails, we still want to log the user out locally
       toast({
-        title: t("app.api.user.private.logout.success.title"),
-        description: t("app.api.user.private.logout.success.description"),
+        title: t("success.title"),
+        description: t("success.description"),
         variant: "default",
       });
       // remove react native token - web token is already cleared by server
-      await authClientRepository.removeAuthToken(logger);
+      await authClientRepository.removeAuthToken(logger, authT);
 
       // Invalidate credits queries to trigger refetch with new auth state
       await apiClient.refetchEndpoint(definitions.GET, logger);

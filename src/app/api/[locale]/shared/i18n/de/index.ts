@@ -82,4 +82,21 @@ export const translations: typeof enTranslations = {
       description: "Ein interner Serverfehler ist aufgetreten",
     },
   },
+  utils: {
+    parseJsonWithComments: {
+      errors: {
+        invalid_json: "Ungültiges JSON-Format",
+      },
+    },
+    time: {
+      errors: {
+        invalid_time_format: {
+          title: "Ungültiges Zeitformat",
+        },
+        invalid_time_range: {
+          title: "Zeitwert außerhalb des gültigen Bereichs",
+        },
+      },
+    },
+  },
 };

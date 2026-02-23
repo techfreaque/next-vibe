@@ -2,6 +2,8 @@ import { translations as taskManagementTranslations } from "../../task-managemen
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Operacje bazodanowe",
+
   tag: "reset",
   post: {
     title: "Reset bazy danych",

@@ -14,8 +14,8 @@ import { testRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: testEndpoints,
   [Methods.POST]: {
-    handler: ({ data, logger }) => {
-      return testRepository.execute(data, logger);
+    handler: ({ data, logger, t }) => {
+      return testRepository.execute(data, logger, t);
     },
   },
 });

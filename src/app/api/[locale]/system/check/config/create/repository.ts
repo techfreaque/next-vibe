@@ -21,22 +21,24 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { isCliPlatform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { configRepository } from "../repository";
 import type {
   ConfigCreateRequestOutput,
   ConfigCreateResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 export class ConfigCreateRepository {
   static async execute(
     data: ConfigCreateRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
+    platform: Platform,
     locale: CountryLanguage,
-    platform?: Platform,
   ): Promise<ResponseType<ConfigCreateResponseOutput>> {
-    const { t } = simpleT(locale);
     const isCLI = platform ? isCliPlatform(platform) : false;
 
     logger.debug("[Config Create] Repository received data", {
@@ -52,7 +54,7 @@ export class ConfigCreateRepository {
       const configPath = resolve(process.cwd(), "check.config.ts");
       if (existsSync(configPath)) {
         return fail({
-          message: "app.api.system.check.config.create.errors.conflict.title",
+          message: t("errors.conflict.title"),
           messageParams: {
             path: configPath,
           },
@@ -65,79 +67,57 @@ export class ConfigCreateRepository {
         // oxlint-disable-next-line no-console
         console.log(`\n${"═".repeat(60)}`);
         // oxlint-disable-next-line no-console
-        console.log(
-          `  🔧 ${t("app.api.system.check.config.create.interactive.welcome")}`,
-        );
+        console.log(`  🔧 ${t("interactive.welcome")}`);
         // oxlint-disable-next-line no-console
         console.log("═".repeat(60));
         // oxlint-disable-next-line no-console
-        console.log(
-          `  ${t("app.api.system.check.config.create.interactive.description")}`,
-        );
+        console.log(`  ${t("interactive.description")}`);
         // oxlint-disable-next-line no-console
         console.log(`${"═".repeat(60)}\n`);
 
         // Ask each question step by step
         data.createMcpConfig = await confirm({
-          message: t(
-            "app.api.system.check.config.create.interactive.createMcpConfig",
-          ),
+          message: t("interactive.createMcpConfig"),
           default: data.createMcpConfig,
         });
 
         data.updateVscodeSettings = await confirm({
-          message: t(
-            "app.api.system.check.config.create.interactive.updateVscodeSettings",
-          ),
+          message: t("interactive.updateVscodeSettings"),
           default: data.updateVscodeSettings,
         });
 
         data.enableReactRules = await confirm({
-          message: t(
-            "app.api.system.check.config.create.interactive.enableReactRules",
-          ),
+          message: t("interactive.enableReactRules"),
           default: data.enableReactRules,
         });
 
         data.enableNextjsRules = await confirm({
-          message: t(
-            "app.api.system.check.config.create.interactive.enableNextjsRules",
-          ),
+          message: t("interactive.enableNextjsRules"),
           default: data.enableNextjsRules,
         });
 
         data.enableI18nRules = await confirm({
-          message: t(
-            "app.api.system.check.config.create.interactive.enableI18nRules",
-          ),
+          message: t("interactive.enableI18nRules"),
           default: data.enableI18nRules,
         });
 
         data.jsxCapitalization = await confirm({
-          message: t(
-            "app.api.system.check.config.create.interactive.jsxCapitalization",
-          ),
+          message: t("interactive.jsxCapitalization"),
           default: data.jsxCapitalization,
         });
 
         data.enablePedanticRules = await confirm({
-          message: t(
-            "app.api.system.check.config.create.interactive.enablePedanticRules",
-          ),
+          message: t("interactive.enablePedanticRules"),
           default: data.enablePedanticRules,
         });
 
         data.enableRestrictedSyntax = await confirm({
-          message: t(
-            "app.api.system.check.config.create.interactive.enableRestrictedSyntax",
-          ),
+          message: t("interactive.enableRestrictedSyntax"),
           default: data.enableRestrictedSyntax,
         });
 
         data.updatePackageJson = await confirm({
-          message: t(
-            "app.api.system.check.config.create.interactive.updatePackageJson",
-          ),
+          message: t("interactive.updatePackageJson"),
           default: data.updatePackageJson,
         });
       }
@@ -148,7 +128,7 @@ export class ConfigCreateRepository {
 
       if (!configResult.success) {
         return fail({
-          message: "app.api.system.check.config.create.errors.configCreation",
+          message: t("errors.configCreation"),
           messageParams: { error: configResult.error || "Unknown error" },
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
@@ -225,12 +205,9 @@ export class ConfigCreateRepository {
         if (mcpResult.success) {
           mcpConfigPath = mcpResult.mcpConfigPath;
         } else {
-          logger.warn(
-            t("app.api.system.check.config.create.warnings.mcpConfigFailed"),
-            {
-              error: mcpResult.error,
-            },
-          );
+          logger.warn(t("warnings.mcpConfigFailed"), {
+            error: mcpResult.error,
+          });
         }
 
         const mcpCursorResult = await configRepository.createDefaultMcpConfig(
@@ -240,12 +217,9 @@ export class ConfigCreateRepository {
         if (mcpCursorResult.success) {
           mcpConfigPath = mcpCursorResult.mcpConfigPath;
         } else {
-          logger.warn(
-            t("app.api.system.check.config.create.warnings.mcpConfigFailed"),
-            {
-              error: mcpCursorResult.error,
-            },
-          );
+          logger.warn(t("warnings.mcpConfigFailed"), {
+            error: mcpCursorResult.error,
+          });
         }
 
         const mcpVscodeResult = await configRepository.createDefaultMcpConfig(
@@ -255,12 +229,9 @@ export class ConfigCreateRepository {
         if (mcpVscodeResult.success) {
           mcpConfigPath = mcpVscodeResult.mcpConfigPath;
         } else {
-          logger.warn(
-            t("app.api.system.check.config.create.warnings.mcpConfigFailed"),
-            {
-              error: mcpVscodeResult.error,
-            },
-          );
+          logger.warn(t("warnings.mcpConfigFailed"), {
+            error: mcpVscodeResult.error,
+          });
         }
       }
 
@@ -273,17 +244,15 @@ export class ConfigCreateRepository {
           const vscodeResult = await configRepository.generateVSCodeSettings(
             logger,
             configReadResult.config,
+            locale,
           );
 
           if (vscodeResult.success) {
             vscodeSettingsPath = vscodeResult.settingsPath;
           } else {
-            logger.warn(
-              t("app.api.system.check.config.create.warnings.vscodeFailed"),
-              {
-                error: vscodeResult.error,
-              },
-            );
+            logger.warn(t("warnings.vscodeFailed"), {
+              error: vscodeResult.error,
+            });
           }
         }
       }
@@ -305,21 +274,12 @@ export class ConfigCreateRepository {
             writeFileSync(pkgPath, `${JSON.stringify(packageJson, null, 2)}\n`);
             packageJsonPath = pkgPath;
           } catch (error) {
-            logger.warn(
-              t(
-                "app.api.system.check.config.create.warnings.packageJsonFailed",
-              ),
-              {
-                error: parseError(error).message,
-              },
-            );
+            logger.warn(t("warnings.packageJsonFailed"), {
+              error: parseError(error).message,
+            });
           }
         } else {
-          logger.warn(
-            t(
-              "app.api.system.check.config.create.warnings.packageJsonNotFound",
-            ),
-          );
+          logger.warn(t("warnings.packageJsonNotFound"));
         }
       }
 
@@ -342,12 +302,9 @@ export class ConfigCreateRepository {
         message: messages.join("\n"),
       });
     } catch (error) {
-      logger.error(
-        t("app.api.system.check.config.create.errors.unexpected"),
-        parseError(error),
-      );
+      logger.error(t("errors.unexpected"), parseError(error));
       return fail({
-        message: "app.api.system.check.config.create.errors.unexpected",
+        message: t("errors.unexpected"),
         messageParams: { error: parseError(error).message },
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });

@@ -17,6 +17,9 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type guardDestroyEndpoints from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 type GuardDestroyRequestType =
   typeof guardDestroyEndpoints.POST.types.RequestOutput;
@@ -30,6 +33,7 @@ export interface GuardDestroyRepository {
   destroyGuard(
     data: GuardDestroyRequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): ResponseType<GuardDestroyResponseType>;
 }
 
@@ -40,6 +44,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
   destroyGuard(
     data: GuardDestroyRequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): ResponseType<GuardDestroyResponseType> {
     try {
       logger.info("Destroying guard environment");
@@ -55,7 +60,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
       }
 
       if (data.projectPath) {
-        return this.destroyByProject(data.projectPath, logger);
+        return this.destroyByProject(data.projectPath, logger, t);
       }
 
       // Default to current project if no parameters specified
@@ -63,14 +68,14 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
       logger.info(
         `No parameters specified, defaulting to current project: ${currentProjectPath}`,
       );
-      return this.destroyByProject(currentProjectPath, logger);
+      return this.destroyByProject(currentProjectPath, logger, t);
     } catch (error) {
       logger.error("Guard destruction failed", parseError(error));
       const parsedError =
         error instanceof Error ? error : new Error(String(error));
 
       return fail({
-        message: "app.api.system.guard.destroy.errors.destruction_failed.title",
+        message: t("errors.destruction_failed.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -121,6 +126,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
   private destroyByProject(
     projectPath: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): ResponseType<GuardDestroyResponseType> {
     logger.debug(`Destroying guard for project: ${projectPath}`);
 
@@ -129,7 +135,7 @@ export class GuardDestroyRepositoryImpl implements GuardDestroyRepository {
 
     if (!fs.existsSync(guardScriptPath)) {
       return fail({
-        message: "app.api.system.guard.destroy.errors.guard_not_found.title",
+        message: t("errors.guard_not_found.title"),
         errorType: ErrorResponseTypes.NOT_FOUND,
         messageParams: { error: `No guard found for project '${projectName}'` }, // eslint-disable-line i18next/no-literal-string
       });

@@ -8,7 +8,7 @@ import { Environment } from "next-vibe/shared/utils/env-util";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
-import type { CountryLanguage } from "@/i18n/core/config";
+import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
 import { PixelTrackingRepository } from "./repository";
 
@@ -27,7 +27,7 @@ export const GET = (request: NextRequest): Response => {
   const localeSegment: CountryLanguage =
     (pathSegments.find((segment) =>
       /^[a-z]{2}-[A-Z]{2}$/.test(segment),
-    ) as CountryLanguage) || "en-GLOBAL";
+    ) as CountryLanguage) || defaultLocale;
 
   const logger = createEndpointLogger(
     env.NODE_ENV === Environment.DEVELOPMENT,
@@ -35,5 +35,9 @@ export const GET = (request: NextRequest): Response => {
     localeSegment,
   );
 
-  return PixelTrackingRepository.handlePixelRequest(request, logger);
+  return PixelTrackingRepository.handlePixelRequest(
+    request,
+    logger,
+    localeSegment,
+  );
 };

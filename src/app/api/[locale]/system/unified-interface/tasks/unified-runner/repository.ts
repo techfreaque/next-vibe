@@ -35,6 +35,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { CronTaskExecution } from "../cron/db";
 import { CronTasksRepository } from "../cron/repository";
 import { CronTaskStatus } from "../enum";
+import { scopedTranslation as tasksScopedTranslation } from "../i18n";
 import type {
   UnifiedRunnerRequestOutput,
   UnifiedRunnerResponseOutput,
@@ -76,58 +77,10 @@ const CRON_SYSTEM_USER: JwtPrivatePayloadType = {
 };
 
 /**
- * Task Runner Manager Interface
- * Enhanced to match spec.md unified task runner requirements
- */
-export interface TaskRunnerManager {
-  name: "unified-task-runner";
-  description: string;
-
-  // Environment-specific behavior
-  environment: "development" | "production" | "serverless";
-
-  // Task execution with overlap prevention
-  executeCronTask: (
-    task: CronTaskAny,
-  ) => Promise<ResponseType<{ status: string; message: string }>>;
-  startTaskRunner: (
-    task: TaskRunner,
-    signal: AbortSignal,
-  ) => Promise<ResponseType<void>>;
-  stopTaskRunner: (taskName: string) => void;
-
-  // Task state management
-  getTaskStatus: (taskName: string) => TaskStatus;
-  isTaskRunning: (taskName: string) => boolean;
-  getRunningTasks: () => string[];
-
-  // Core lifecycle methods
-  start(
-    tasks: Task[],
-    signal: AbortSignal,
-    systemLocale: CountryLanguage,
-    logger: EndpointLogger,
-  ): ResponseType<void>;
-  stop(systemLocale: CountryLanguage): Promise<ResponseType<void>>;
-  getStatus(): {
-    running: boolean;
-    activeTasks: string[];
-    errors: Array<{ taskName: string; error: string; timestamp: Date }>;
-  };
-
-  manageRunner(
-    data: UnifiedRunnerRequestOutput,
-    user: JwtPayloadType,
-    systemLocale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<UnifiedRunnerResponseOutput>>;
-}
-
-/**
  * Unified Task Runner Repository Implementation
  * Implements the complete unified task runner as per spec.md
  */
-export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
+export class UnifiedTaskRunnerRepositoryImpl {
   name = "unified-task-runner" as const;
   description =
     "app.api.system.unifiedInterface.tasks.unifiedRunner.description" as const;
@@ -153,6 +106,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
     systemLocale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<UnifiedRunnerResponseOutput>> {
+    const { t } = tasksScopedTranslation.scopedT(systemLocale);
     try {
       logger.debug("Managing unified task runner", {
         action: data.action,
@@ -168,8 +122,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
           return success({
             success: true,
             actionResult: data.action,
-            message:
-              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
+            message: "unifiedRunner.post.response.message",
             timestamp,
           });
 
@@ -180,8 +133,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
           return success({
             success: true,
             actionResult: data.action,
-            message:
-              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
+            message: "unifiedRunner.post.response.message",
             timestamp,
           });
 
@@ -190,8 +142,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
           return success({
             success: true,
             actionResult: data.action,
-            message:
-              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
+            message: "unifiedRunner.post.response.message",
             timestamp,
           });
 
@@ -201,15 +152,13 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
           return success({
             success: true,
             actionResult: data.action,
-            message:
-              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.response.message",
+            message: "unifiedRunner.post.response.message",
             timestamp,
           });
 
         default:
           return fail({
-            message:
-              "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.validation.title",
+            message: t("errors.getTaskRunnerStatus"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
             messageParams: { action: data.action },
           });
@@ -221,8 +170,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
       });
 
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
+        message: t("errors.startTaskRunner"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -233,16 +181,15 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
   async executeCronTask(
     task: CronTaskAny,
   ): Promise<ResponseType<{ status: string; message: string }>> {
+    const { t } = tasksScopedTranslation.scopedT(this.systemLocale);
     const taskName = task.name;
 
     // Check if task is already running (overlap prevention)
     if (this.isTaskRunning(taskName)) {
       return success({
         status: CronTaskStatus.SKIPPED,
-        reason:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.reasons.previousInstanceRunning",
-        message:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.messages.taskSkipped",
+        reason: "Previous instance still running",
+        message: "Task skipped",
       });
     }
 
@@ -254,8 +201,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
       const errorMsg = "Task runner not properly initialized with logger";
       this.markTaskAsFailed(taskName, errorMsg);
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
+        message: t("errors.startTaskRunner"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMsg, taskName },
       });
@@ -264,6 +210,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
     // Look up system task DB record by routeId to get its ID, priority, and config
     const dbTaskResponse = await CronTasksRepository.getSystemTaskByRouteId(
       taskName,
+      t,
       this.logger,
     );
     const dbTask = dbTaskResponse.success ? dbTaskResponse.data : null;
@@ -290,6 +237,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
           config: resolvedInput,
           triggeredBy: "schedule",
         },
+        t,
         this.logger,
       );
       if (execResponse.success) {
@@ -340,11 +288,15 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
       }
 
       if (!result.success) {
-        const errorMsg =
+        const errorMsgStr =
           "message" in result && typeof result.message === "string"
             ? result.message
             : "Task failed";
-        this.markTaskAsFailed(taskName, errorMsg);
+        const errorMsg =
+          "message" in result && result.message
+            ? result.message
+            : t("errors.executeCronTask");
+        this.markTaskAsFailed(taskName, errorMsgStr);
 
         // Persist failure
         if (dbTask && executionDbId) {
@@ -359,6 +311,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
                 errorType: ErrorResponseTypes.INTERNAL_ERROR,
               }),
             },
+            t,
             this.logger,
           );
           await CronTasksRepository.updateTask(
@@ -372,6 +325,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
               errorCount: dbTask.errorCount + 1,
             },
             null,
+            t,
             this.logger,
           );
 
@@ -381,6 +335,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
               dbTask.id,
               { enabled: false },
               null,
+              t,
               this.logger,
             );
             this.logger.info(
@@ -390,8 +345,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
         }
 
         return fail({
-          message:
-            "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
+          message: t("errors.executeCronTask"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: errorMsg, taskName },
         });
@@ -413,6 +367,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
             durationMs,
             result: resultPayload,
           },
+          t,
           this.logger,
         );
         await CronTasksRepository.updateTask(
@@ -426,6 +381,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
             successCount: dbTask.successCount + 1,
           },
           null,
+          t,
           this.logger,
         );
 
@@ -435,6 +391,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
             dbTask.id,
             { enabled: false },
             null,
+            t,
             this.logger,
           );
           this.logger.info(
@@ -445,8 +402,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
 
       return success({
         status: CronTaskStatus.COMPLETED,
-        message:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.messages.taskCompleted",
+        message: t("errors.executeCronTask"),
       });
     } catch (error) {
       const errorMsg = parseError(error).message;
@@ -462,10 +418,12 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
             completedAt: new Date(),
             durationMs,
             error: fail({
-              message: errorMsg,
+              message: t("errors.executeCronTask"),
               errorType: ErrorResponseTypes.INTERNAL_ERROR,
+              messageParams: { error: errorMsg },
             }),
           },
+          t,
           this.logger,
         );
         await CronTasksRepository.updateTask(
@@ -479,6 +437,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
             errorCount: dbTask.errorCount + 1,
           },
           null,
+          t,
           this.logger,
         );
 
@@ -488,6 +447,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
             dbTask.id,
             { enabled: false },
             null,
+            t,
             this.logger,
           );
           this.logger.info(
@@ -497,8 +457,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
       }
 
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
+        message: t("errors.executeCronTask"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMsg, taskName },
       });
@@ -509,12 +468,12 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
     task: TaskRunner,
     signal: AbortSignal,
   ): Promise<ResponseType<void>> {
+    const { t } = tasksScopedTranslation.scopedT(this.systemLocale);
     const taskName = task.name;
 
     if (this.isTaskRunning(taskName)) {
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.validation.title",
+        message: t("errors.startTaskRunner"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
         messageParams: { taskName },
       });
@@ -545,8 +504,7 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
         });
       }
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
+        message: t("errors.startTaskRunner"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorObj.message, taskName },
       });
@@ -620,9 +578,9 @@ export class UnifiedTaskRunnerRepositoryImpl implements TaskRunnerManager {
         });
       }
 
+      const { t: tasksT } = tasksScopedTranslation.scopedT(systemLocale);
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.unifiedRunner.post.errors.internal.title",
+        message: tasksT("errors.startTaskRunner"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMsg },
       });

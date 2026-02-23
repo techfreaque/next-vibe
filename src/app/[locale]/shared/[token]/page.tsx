@@ -9,6 +9,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { scopedTranslation as shareLinksScopedTranslation } from "@/app/api/[locale]/agent/chat/threads/[threadId]/share-links/i18n";
 import { ShareLinksRepository } from "@/app/api/[locale]/agent/chat/threads/[threadId]/share-links/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
@@ -30,6 +31,7 @@ export default async function SharedTokenPage({
   const { locale, token } = await params;
   const logger = createEndpointLogger(false, Date.now(), locale);
   const { t } = simpleT(locale);
+  const { t: shareLinksT } = shareLinksScopedTranslation.scopedT(locale);
 
   // Get current user (could be public or authenticated)
   const userResponse = await UserRepository.getUserByAuth(
@@ -47,10 +49,10 @@ export default async function SharedTokenPage({
       <Div className="flex items-center justify-center min-h-screen p-4">
         <Div className="max-w-md text-center">
           <P className="text-lg font-semibold mb-2">
-            {t("app.shared.error.title")}
+            {t("app.common.error.title")}
           </P>
           <P className="text-sm text-muted-foreground">
-            {t("app.shared.error.userError")}
+            {t("app.common.error.message")}
           </P>
         </Div>
       </Div>
@@ -60,6 +62,7 @@ export default async function SharedTokenPage({
   // Get share link by token
   const shareLinkResponse = await ShareLinksRepository.getByToken(
     token,
+    shareLinksT,
     logger,
   );
 
@@ -68,10 +71,10 @@ export default async function SharedTokenPage({
       <Div className="flex items-center justify-center min-h-screen p-4">
         <Div className="max-w-md text-center">
           <P className="text-lg font-semibold mb-2">
-            {t("app.shared.error.title")}
+            {t("app.common.error.title")}
           </P>
           <P className="text-sm text-muted-foreground">
-            {shareLinkResponse.message || t("app.shared.error.invalidToken")}
+            {shareLinkResponse.message || t("app.common.error.message")}
           </P>
         </Div>
       </Div>

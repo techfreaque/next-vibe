@@ -10,6 +10,37 @@ export const translations = {
       title: "Admin Only",
       description: "Only admins can access machine features",
     },
+    connectionNotFound: "Connection not found",
+    sessionNotFound: "Session not found",
+    fileNotFound: "File not found",
+    directoryNotFound: "Directory not found",
+    permissionDenied: "Permission denied",
+    sshSecretKeyNotSet:
+      "SSH_SECRET_KEY env var not set. Add a 32-byte hex value to enable SSH mode.",
+    encryptionFailed: "Encryption failed — SSH_SECRET_KEY may be invalid",
+    noRowReturned: "No row returned from insert",
+    notImplemented: {
+      test: "SSH backend not yet implemented. Cannot test remote connections yet.",
+      local:
+        "SSH backend not yet implemented. Leave connectionId empty to run locally.",
+      fileList: "SSH backend not yet implemented for file listing",
+      fileRead: "SSH backend not yet implemented for file reading",
+      fileWrite: "SSH backend not yet implemented for file writing",
+      session:
+        "SSH PTY sessions not yet implemented. Use ssh_exec_POST for remote commands.",
+    },
+    invalidWorkingDir:
+      "Invalid working directory: must be absolute path without '..' segments",
+    invalidPath: "Invalid path: must be absolute without '..' segments",
+    parentDirNotFound:
+      "Parent directory not found. Set createDirs=true to create it.",
+    commandTimedOut: "Command timed out",
+    cannotDeleteCurrentUser: "Cannot delete the current process user",
+    cannotDeleteSystemUser: "Cannot delete system users (uid < 1000)",
+    userNotFound: "User not found",
+    userAlreadyExists: "User already exists",
+    invalidUsername:
+      "Invalid username: must be lowercase alphanumeric + hyphen, starting with a letter",
   },
 
   session: {

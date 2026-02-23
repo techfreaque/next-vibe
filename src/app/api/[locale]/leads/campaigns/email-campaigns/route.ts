@@ -16,10 +16,7 @@ import definitions from "./definition";
 import { emailCampaignsRepository } from "./repository";
 import { createEmptyEmailCampaignResult } from "./types";
 
-const STAGE_PRIORITIES: Record<
-  (typeof EmailCampaignStage)[keyof typeof EmailCampaignStage],
-  number
-> = {
+const STAGE_PRIORITIES: Record<string, number> = {
   [EmailCampaignStage.NOT_STARTED]: 0,
   [EmailCampaignStage.INITIAL]: 1,
   [EmailCampaignStage.FOLLOWUP_1]: 2,
@@ -33,7 +30,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger }) => {
+    handler: async ({ data, logger, t }) => {
       const config = getDefaultConfig();
       // Override from request data
       const batchSize = data.batchSize ?? config.batchSize;
@@ -59,7 +56,11 @@ export const { POST, tools } = endpointsHandler({
       }
 
       // Bootstrap pending leads
-      await emailCampaignsRepository.bootstrapPendingLeads(batchSize, logger);
+      await emailCampaignsRepository.bootstrapPendingLeads(
+        batchSize,
+        t,
+        logger,
+      );
 
       // Process stages by priority
       const stagesToProcess = config.enabledStages.toSorted((a, b) => {
@@ -77,6 +78,7 @@ export const { POST, tools } = endpointsHandler({
         const stageResult = await emailCampaignsRepository.processStage(
           stage,
           { batchSize: Math.min(batchSize, remainingQuota), dryRun },
+          t,
           logger,
         );
 

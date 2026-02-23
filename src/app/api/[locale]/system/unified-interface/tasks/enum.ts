@@ -6,6 +6,8 @@
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * Task Types
  * Unified task type definitions
@@ -14,10 +16,9 @@ export const {
   enum: TaskType,
   options: TaskTypeOptions,
   Value: TaskTypeValue,
-} = createEnumOptions({
-  CRON: "app.api.system.unifiedInterface.tasks.type.cron" as const,
-  TASK_RUNNER:
-    "app.api.system.unifiedInterface.tasks.type.task_runner" as const,
+} = createEnumOptions(scopedTranslation, {
+  CRON: "type.cron" as const,
+  TASK_RUNNER: "type.task_runner" as const,
 });
 export const TaskTypeDB = [TaskType.CRON, TaskType.TASK_RUNNER] as const;
 
@@ -29,13 +30,12 @@ export const {
   enum: CronTaskPriority,
   options: CronTaskPriorityOptions,
   Value: CronTaskPriorityValue,
-} = createEnumOptions({
-  CRITICAL: "app.api.system.unifiedInterface.tasks.priority.critical" as const,
-  HIGH: "app.api.system.unifiedInterface.tasks.priority.high" as const,
-  MEDIUM: "app.api.system.unifiedInterface.tasks.priority.medium" as const,
-  LOW: "app.api.system.unifiedInterface.tasks.priority.low" as const,
-  BACKGROUND:
-    "app.api.system.unifiedInterface.tasks.priority.background" as const,
+} = createEnumOptions(scopedTranslation, {
+  CRITICAL: "priority.critical" as const,
+  HIGH: "priority.high" as const,
+  MEDIUM: "priority.medium" as const,
+  LOW: "priority.low" as const,
+  BACKGROUND: "priority.background" as const,
 } as const);
 export const CronTaskPriorityDB = [
   CronTaskPriority.CRITICAL,
@@ -52,18 +52,15 @@ export const {
   enum: CronTaskPriorityFilter,
   options: CronTaskPriorityFilterOptions,
   Value: CronTaskPriorityFilterValue,
-} = createEnumOptions({
-  ALL: "app.api.system.unifiedInterface.tasks.priority.filter.all" as const,
-  CRITICAL: "app.api.system.unifiedInterface.tasks.priority.critical" as const,
-  HIGH: "app.api.system.unifiedInterface.tasks.priority.high" as const,
-  MEDIUM: "app.api.system.unifiedInterface.tasks.priority.medium" as const,
-  LOW: "app.api.system.unifiedInterface.tasks.priority.low" as const,
-  BACKGROUND:
-    "app.api.system.unifiedInterface.tasks.priority.background" as const,
-  HIGH_AND_ABOVE:
-    "app.api.system.unifiedInterface.tasks.priority.filter.highAndAbove" as const,
-  MEDIUM_AND_ABOVE:
-    "app.api.system.unifiedInterface.tasks.priority.filter.mediumAndAbove" as const,
+} = createEnumOptions(scopedTranslation, {
+  ALL: "priority.filter.all" as const,
+  CRITICAL: "priority.critical" as const,
+  HIGH: "priority.high" as const,
+  MEDIUM: "priority.medium" as const,
+  LOW: "priority.low" as const,
+  BACKGROUND: "priority.background" as const,
+  HIGH_AND_ABOVE: "priority.filter.highAndAbove" as const,
+  MEDIUM_AND_ABOVE: "priority.filter.mediumAndAbove" as const,
 });
 
 /**
@@ -74,18 +71,18 @@ export const {
   enum: CronTaskStatus,
   options: CronTaskStatusOptions,
   Value: CronTaskStatusValue,
-} = createEnumOptions({
-  PENDING: "app.api.system.unifiedInterface.tasks.status.pending" as const,
-  RUNNING: "app.api.system.unifiedInterface.tasks.status.running" as const,
-  COMPLETED: "app.api.system.unifiedInterface.tasks.status.completed" as const,
-  FAILED: "app.api.system.unifiedInterface.tasks.status.failed" as const,
-  TIMEOUT: "app.api.system.unifiedInterface.tasks.status.timeout" as const,
-  CANCELLED: "app.api.system.unifiedInterface.tasks.status.cancelled" as const,
-  SKIPPED: "app.api.system.unifiedInterface.tasks.status.skipped" as const,
-  BLOCKED: "app.api.system.unifiedInterface.tasks.status.blocked" as const,
-  SCHEDULED: "app.api.system.unifiedInterface.tasks.status.scheduled" as const,
-  STOPPED: "app.api.system.unifiedInterface.tasks.status.stopped" as const,
-  ERROR: "app.api.system.unifiedInterface.tasks.status.error" as const,
+} = createEnumOptions(scopedTranslation, {
+  PENDING: "status.pending" as const,
+  RUNNING: "status.running" as const,
+  COMPLETED: "status.completed" as const,
+  FAILED: "status.failed" as const,
+  TIMEOUT: "status.timeout" as const,
+  CANCELLED: "status.cancelled" as const,
+  SKIPPED: "status.skipped" as const,
+  BLOCKED: "status.blocked" as const,
+  SCHEDULED: "status.scheduled" as const,
+  STOPPED: "status.stopped" as const,
+  ERROR: "status.error" as const,
 });
 export const CronTaskStatusDB = [
   CronTaskStatus.PENDING,
@@ -108,15 +105,15 @@ export const {
   enum: CronTaskStatusFilter,
   options: CronTaskStatusFilterOptions,
   Value: CronTaskStatusFilterValue,
-} = createEnumOptions({
-  ALL: "app.api.system.unifiedInterface.tasks.status.filter.all" as const,
-  ACTIVE: "app.api.system.unifiedInterface.tasks.status.filter.active" as const,
-  COMPLETED: "app.api.system.unifiedInterface.tasks.status.completed" as const,
-  FAILED: "app.api.system.unifiedInterface.tasks.status.failed" as const,
-  RUNNING: "app.api.system.unifiedInterface.tasks.status.running" as const,
-  PENDING: "app.api.system.unifiedInterface.tasks.status.pending" as const,
-  ERROR: "app.api.system.unifiedInterface.tasks.status.filter.error" as const,
-  STOPPED: "app.api.system.unifiedInterface.tasks.status.stopped" as const,
+} = createEnumOptions(scopedTranslation, {
+  ALL: "status.filter.all" as const,
+  ACTIVE: "status.filter.active" as const,
+  COMPLETED: "status.completed" as const,
+  FAILED: "status.failed" as const,
+  RUNNING: "status.running" as const,
+  PENDING: "status.pending" as const,
+  ERROR: "status.filter.error" as const,
+  STOPPED: "status.stopped" as const,
 });
 
 /**
@@ -127,21 +124,16 @@ export const {
   enum: TaskCategory,
   options: TaskCategoryOptions,
   Value: TaskCategoryValue,
-} = createEnumOptions({
-  DEVELOPMENT:
-    "app.api.system.unifiedInterface.tasks.taskCategory.development" as const,
-  BUILD: "app.api.system.unifiedInterface.tasks.taskCategory.build" as const,
-  WATCH: "app.api.system.unifiedInterface.tasks.taskCategory.watch" as const,
-  GENERATOR:
-    "app.api.system.unifiedInterface.tasks.taskCategory.generator" as const,
-  TEST: "app.api.system.unifiedInterface.tasks.taskCategory.test" as const,
-  MAINTENANCE:
-    "app.api.system.unifiedInterface.tasks.taskCategory.maintenance" as const,
-  DATABASE:
-    "app.api.system.unifiedInterface.tasks.taskCategory.database" as const,
-  SYSTEM: "app.api.system.unifiedInterface.tasks.taskCategory.system" as const,
-  MONITORING:
-    "app.api.system.unifiedInterface.tasks.taskCategory.monitoring" as const,
+} = createEnumOptions(scopedTranslation, {
+  DEVELOPMENT: "taskCategory.development" as const,
+  BUILD: "taskCategory.build" as const,
+  WATCH: "taskCategory.watch" as const,
+  GENERATOR: "taskCategory.generator" as const,
+  TEST: "taskCategory.test" as const,
+  MAINTENANCE: "taskCategory.maintenance" as const,
+  DATABASE: "taskCategory.database" as const,
+  SYSTEM: "taskCategory.system" as const,
+  MONITORING: "taskCategory.monitoring" as const,
 });
 export const TaskCategoryDB = [
   TaskCategory.DEVELOPMENT,
@@ -163,12 +155,10 @@ export const {
   enum: CronTaskEnabledFilter,
   options: CronTaskEnabledFilterOptions,
   Value: CronTaskEnabledFilterValue,
-} = createEnumOptions({
-  ALL: "app.api.system.unifiedInterface.tasks.enabledFilter.all" as const,
-  ENABLED:
-    "app.api.system.unifiedInterface.tasks.enabledFilter.enabled" as const,
-  DISABLED:
-    "app.api.system.unifiedInterface.tasks.enabledFilter.disabled" as const,
+} = createEnumOptions(scopedTranslation, {
+  ALL: "enabledFilter.all" as const,
+  ENABLED: "enabledFilter.enabled" as const,
+  DISABLED: "enabledFilter.disabled" as const,
 });
 export const CronTaskEnabledFilterDB = [
   CronTaskEnabledFilter.ALL,
@@ -183,9 +173,9 @@ export const {
   enum: SortOrder,
   options: SortOrderOptions,
   Value: SortOrderValue,
-} = createEnumOptions({
-  ASC: "app.api.system.unifiedInterface.tasks.sort.asc" as const,
-  DESC: "app.api.system.unifiedInterface.tasks.sort.desc" as const,
+} = createEnumOptions(scopedTranslation, {
+  ASC: "sort.asc" as const,
+  DESC: "sort.desc" as const,
 });
 
 /**
@@ -196,15 +186,11 @@ export const {
   enum: PulseHealthStatus,
   options: PulseHealthStatusOptions,
   Value: PulseHealthStatusValue,
-} = createEnumOptions({
-  HEALTHY:
-    "app.api.system.unifiedInterface.tasks.pulse.health.healthy" as const,
-  WARNING:
-    "app.api.system.unifiedInterface.tasks.pulse.health.warning" as const,
-  CRITICAL:
-    "app.api.system.unifiedInterface.tasks.pulse.health.critical" as const,
-  UNKNOWN:
-    "app.api.system.unifiedInterface.tasks.pulse.health.unknown" as const,
+} = createEnumOptions(scopedTranslation, {
+  HEALTHY: "pulse.health.healthy" as const,
+  WARNING: "pulse.health.warning" as const,
+  CRITICAL: "pulse.health.critical" as const,
+  UNKNOWN: "pulse.health.unknown" as const,
 });
 export const PulseHealthStatusDB = [
   PulseHealthStatus.HEALTHY,
@@ -221,13 +207,10 @@ export const {
   enum: TaskOutputMode,
   options: TaskOutputModeOptions,
   Value: TaskOutputModeValue,
-} = createEnumOptions({
-  STORE_ONLY:
-    "app.api.system.unifiedInterface.tasks.outputMode.storeOnly" as const,
-  NOTIFY_ON_FAILURE:
-    "app.api.system.unifiedInterface.tasks.outputMode.notifyOnFailure" as const,
-  NOTIFY_ALWAYS:
-    "app.api.system.unifiedInterface.tasks.outputMode.notifyAlways" as const,
+} = createEnumOptions(scopedTranslation, {
+  STORE_ONLY: "outputMode.storeOnly" as const,
+  NOTIFY_ON_FAILURE: "outputMode.notifyOnFailure" as const,
+  NOTIFY_ALWAYS: "outputMode.notifyAlways" as const,
 });
 export const TaskOutputModeDB = [
   TaskOutputMode.STORE_ONLY,
@@ -243,17 +226,12 @@ export const {
   enum: PulseExecutionStatus,
   options: PulseExecutionStatusOptions,
   Value: PulseExecutionStatusValue,
-} = createEnumOptions({
-  SUCCESS:
-    "app.api.system.unifiedInterface.tasks.pulse.execution.success" as const,
-  FAILURE:
-    "app.api.system.unifiedInterface.tasks.pulse.execution.failure" as const,
-  TIMEOUT:
-    "app.api.system.unifiedInterface.tasks.pulse.execution.timeout" as const,
-  CANCELLED:
-    "app.api.system.unifiedInterface.tasks.pulse.execution.cancelled" as const,
-  PENDING:
-    "app.api.system.unifiedInterface.tasks.pulse.execution.pending" as const,
+} = createEnumOptions(scopedTranslation, {
+  SUCCESS: "pulse.execution.success" as const,
+  FAILURE: "pulse.execution.failure" as const,
+  TIMEOUT: "pulse.execution.timeout" as const,
+  CANCELLED: "pulse.execution.cancelled" as const,
+  PENDING: "pulse.execution.pending" as const,
 });
 export const PulseExecutionStatusDB = [
   PulseExecutionStatus.SUCCESS,

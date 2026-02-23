@@ -18,7 +18,7 @@ import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
+import { simpleT } from "@/i18n/core/shared";
 
 import { EmailTemplate } from "../../emails/smtp-client/components/template.email";
 import {
@@ -29,6 +29,10 @@ import type {
   SubscribePostRequestOutput as NewsletterSubscriptionType,
   SubscribePostResponseOutput as NewsletterSubscriptionResponseType,
 } from "./definition";
+import {
+  type NewsletterSubscribeTranslationKey,
+  scopedTranslation,
+} from "./i18n";
 
 // ============================================================================
 // TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
@@ -43,6 +47,8 @@ const newsletterWelcomePropsSchema = z.object({
 
 type NewsletterWelcomeProps = z.infer<typeof newsletterWelcomePropsSchema>;
 
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+
 function NewsletterWelcomeEmail({
   props,
   t,
@@ -51,19 +57,19 @@ function NewsletterWelcomeEmail({
   tracking,
 }: {
   props: NewsletterWelcomeProps;
-  t: TFunction;
+  t: ModuleT;
   locale: CountryLanguage;
   recipientEmail: string;
   tracking: TrackingContext;
 }): ReactElement {
-  const appName = t("config.appName");
+  const { t: globalT } = simpleT(locale);
+  const appName = globalT("config.appName");
 
   return (
     <EmailTemplate
-      t={t}
       locale={locale}
-      title={t("app.api.newsletter.email.welcome.title")}
-      previewText={t("app.api.newsletter.email.welcome.preview")}
+      title={t("emailTemplate.welcome.title")}
+      previewText={t("emailTemplate.welcome.preview")}
       recipientEmail={recipientEmail}
       tracking={tracking}
     >
@@ -77,10 +83,10 @@ function NewsletterWelcomeEmail({
         }}
       >
         {props.name
-          ? t("app.api.newsletter.email.welcome.greeting_with_name", {
+          ? t("emailTemplate.welcome.greeting_with_name", {
               name: props.name,
             })
-          : t("app.api.newsletter.email.welcome.greeting")}
+          : t("emailTemplate.welcome.greeting")}
       </div>
 
       {/* Welcome message */}
@@ -92,7 +98,7 @@ function NewsletterWelcomeEmail({
           marginBottom: "16px",
         }}
       >
-        {t("app.api.newsletter.email.welcome.message", { appName })}
+        {t("emailTemplate.welcome.message", { appName })}
       </div>
 
       {/* What to expect */}
@@ -104,7 +110,7 @@ function NewsletterWelcomeEmail({
           marginBottom: "8px",
         }}
       >
-        {t("app.api.newsletter.email.welcome.what_to_expect")}
+        {t("emailTemplate.welcome.what_to_expect")}
       </div>
 
       <ul
@@ -115,16 +121,16 @@ function NewsletterWelcomeEmail({
         }}
       >
         <li style={{ margin: "8px 0" }}>
-          {t("app.api.newsletter.email.welcome.benefit_1")}
+          {t("emailTemplate.welcome.benefit_1")}
         </li>
         <li style={{ margin: "8px 0" }}>
-          {t("app.api.newsletter.email.welcome.benefit_2")}
+          {t("emailTemplate.welcome.benefit_2")}
         </li>
         <li style={{ margin: "8px 0" }}>
-          {t("app.api.newsletter.email.welcome.benefit_3")}
+          {t("emailTemplate.welcome.benefit_3")}
         </li>
         <li style={{ margin: "8px 0" }}>
-          {t("app.api.newsletter.email.welcome.benefit_4")}
+          {t("emailTemplate.welcome.benefit_4")}
         </li>
       </ul>
 
@@ -137,7 +143,7 @@ function NewsletterWelcomeEmail({
           marginBottom: "24px",
         }}
       >
-        {t("app.api.newsletter.email.welcome.frequency")}
+        {t("emailTemplate.welcome.frequency")}
       </div>
 
       {/* Unsubscribe link */}
@@ -149,14 +155,14 @@ function NewsletterWelcomeEmail({
           marginTop: "32px",
         }}
       >
-        {t("app.api.newsletter.email.welcome.unsubscribe_text")}{" "}
+        {t("emailTemplate.welcome.unsubscribe_text")}{" "}
         <Link
           href={`${env.NEXT_PUBLIC_APP_URL}/${locale}/newsletter/unsubscribe/${encodeURIComponent(
             props.email,
           )}`}
           style={{ color: "#4f46e5" }}
         >
-          {t("app.api.newsletter.email.welcome.unsubscribe_link")}
+          {t("emailTemplate.welcome.unsubscribe_link")}
         </Link>
       </div>
     </EmailTemplate>
@@ -164,62 +170,56 @@ function NewsletterWelcomeEmail({
 }
 
 // Template Definition Export
-const newsletterWelcomeTemplate: EmailTemplateDefinition<NewsletterWelcomeProps> =
-  {
-    meta: {
-      id: "newsletter-welcome",
-      version: "1.0.0",
-      name: "app.api.emails.templates.newsletter.welcome.meta.name",
-      description:
-        "app.api.emails.templates.newsletter.welcome.meta.description",
-      category: "newsletter",
-      path: "/newsletter/subscribe/email.tsx",
-      defaultSubject: (t) => t("app.api.newsletter.email.welcome.subject"),
-      previewFields: {
-        email: {
-          type: "email",
-          label:
-            "app.admin.emails.templates.templates.newsletter.welcome.preview.email.label",
-          description:
-            "app.admin.emails.templates.templates.newsletter.welcome.preview.email.description",
-          defaultValue: "max@example.com",
-          required: true,
-        },
-        name: {
-          type: "text",
-          label:
-            "app.admin.emails.templates.templates.newsletter.welcome.preview.name.label",
-          description:
-            "app.admin.emails.templates.templates.newsletter.welcome.preview.name.description",
-          defaultValue: "Max Mustermann",
-        },
-        leadId: {
-          type: "text",
-          label:
-            "app.admin.emails.templates.templates.newsletter.welcome.preview.leadId.label",
-          description:
-            "app.admin.emails.templates.templates.newsletter.welcome.preview.leadId.description",
-          defaultValue: "example-lead-id-456",
-        },
-        userId: {
-          type: "text",
-          label:
-            "app.admin.emails.templates.templates.newsletter.welcome.preview.userId.label",
-          description:
-            "app.admin.emails.templates.templates.newsletter.welcome.preview.userId.description",
-          defaultValue: "example-user-id-123",
-        },
+const newsletterWelcomeTemplate: EmailTemplateDefinition<
+  NewsletterWelcomeProps,
+  typeof scopedTranslation
+> = {
+  meta: {
+    id: "newsletter-welcome",
+    version: "1.0.0",
+    name: "emailTemplates.welcome.name",
+    description: "emailTemplates.welcome.description",
+    category: "emailTemplates.welcome.category",
+    path: "/newsletter/subscribe/email.tsx",
+    defaultSubject: "emailTemplate.welcome.subject",
+    previewFields: {
+      email: {
+        type: "email",
+        label: "emailTemplates.welcome.preview.email.label",
+        description: "emailTemplates.welcome.preview.email.description",
+        defaultValue: "max@example.com",
+        required: true,
+      },
+      name: {
+        type: "text",
+        label: "emailTemplates.welcome.preview.name.label",
+        description: "emailTemplates.welcome.preview.name.description",
+        defaultValue: "Max Mustermann",
+      },
+      leadId: {
+        type: "text",
+        label: "emailTemplates.welcome.preview.leadId.label",
+        description: "emailTemplates.welcome.preview.leadId.description",
+        defaultValue: "example-lead-id-456",
+      },
+      userId: {
+        type: "text",
+        label: "emailTemplates.welcome.preview.userId.label",
+        description: "emailTemplates.welcome.preview.userId.description",
+        defaultValue: "example-user-id-123",
       },
     },
-    schema: newsletterWelcomePropsSchema,
-    component: NewsletterWelcomeEmail,
-    exampleProps: {
-      email: "max@example.com",
-      name: "Max Mustermann",
-      leadId: "example-lead-id-456",
-      userId: "example-user-id-123",
-    },
-  };
+  },
+  scopedTranslation,
+  schema: newsletterWelcomePropsSchema,
+  component: NewsletterWelcomeEmail,
+  exampleProps: {
+    email: "max@example.com",
+    name: "Max Mustermann",
+    leadId: "example-lead-id-456",
+    userId: "example-user-id-123",
+  },
+};
 
 export default newsletterWelcomeTemplate;
 
@@ -234,7 +234,7 @@ function AdminNotificationEmailContent({
   recipientEmail,
 }: {
   requestData: NewsletterSubscriptionType;
-  t: TFunction;
+  t: ModuleT;
   locale: CountryLanguage;
   recipientEmail: string;
 }): ReactElement {
@@ -242,10 +242,9 @@ function AdminNotificationEmailContent({
 
   return (
     <EmailTemplate
-      t={t}
       locale={locale}
-      title={t("app.api.newsletter.email.admin_notification.title")}
-      previewText={t("app.api.newsletter.email.admin_notification.preview")}
+      title={t("emailTemplate.admin_notification.title")}
+      previewText={t("emailTemplate.admin_notification.preview")}
       recipientEmail={recipientEmail}
       tracking={tracking}
     >
@@ -257,7 +256,7 @@ function AdminNotificationEmailContent({
           marginBottom: "16px",
         }}
       >
-        {t("app.api.newsletter.email.admin_notification.message")}
+        {t("emailTemplate.admin_notification.message")}
       </div>
 
       <Hr style={{ borderColor: "#e5e7eb", margin: "16px 0" }} />
@@ -271,7 +270,7 @@ function AdminNotificationEmailContent({
           marginBottom: "12px",
         }}
       >
-        {t("app.api.newsletter.email.admin_notification.subscriber_details")}:
+        {t("emailTemplate.admin_notification.subscriber_details")}:
       </div>
 
       <div
@@ -282,9 +281,7 @@ function AdminNotificationEmailContent({
           marginBottom: "8px",
         }}
       >
-        <strong>
-          {t("app.api.newsletter.email.admin_notification.email")}:
-        </strong>{" "}
+        <strong>{t("emailTemplate.admin_notification.email")}:</strong>{" "}
         {requestData.email}
       </div>
 
@@ -297,9 +294,7 @@ function AdminNotificationEmailContent({
             marginBottom: "8px",
           }}
         >
-          <strong>
-            {t("app.api.newsletter.email.admin_notification.name")}:
-          </strong>{" "}
+          <strong>{t("emailTemplate.admin_notification.name")}:</strong>{" "}
           {requestData.name}
         </div>
       )}
@@ -315,7 +310,7 @@ function AdminNotificationEmailContent({
             }}
           >
             <strong>
-              {t("app.api.newsletter.email.admin_notification.preferences")}:
+              {t("emailTemplate.admin_notification.preferences")}:
             </strong>
           </div>
           <ul style={{ color: "#4b5563", paddingLeft: "20px" }}>
@@ -343,7 +338,7 @@ function AdminNotificationEmailContent({
             textDecoration: "none",
           }}
         >
-          {t("app.api.newsletter.email.admin_notification.view_in_admin")}
+          {t("emailTemplate.admin_notification.view_in_admin")}
         </Button>
       </Section>
     </EmailTemplate>
@@ -361,7 +356,8 @@ function AdminNotificationEmailContent({
 export const renderWelcomeMail: EmailFunctionType<
   NewsletterSubscriptionType,
   NewsletterSubscriptionResponseType,
-  never
+  never,
+  NewsletterSubscribeTranslationKey
 > = ({ requestData, responseData, locale, t }) => {
   try {
     const templateProps: NewsletterWelcomeProps = {
@@ -374,7 +370,7 @@ export const renderWelcomeMail: EmailFunctionType<
     return success({
       toEmail: requestData.email,
       toName: requestData.name || requestData.email,
-      subject: t("app.api.newsletter.email.welcome.subject"),
+      subject: t("emailTemplate.welcome.subject"),
       jsx: newsletterWelcomeTemplate.component({
         props: templateProps,
         t,
@@ -389,7 +385,7 @@ export const renderWelcomeMail: EmailFunctionType<
     });
   } catch {
     return fail({
-      message: "app.api.newsletter.errors.email_generation_failed",
+      message: t("errors.email_generation_failed"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
@@ -402,13 +398,15 @@ export const renderWelcomeMail: EmailFunctionType<
 export const renderAdminNotificationMail: EmailFunctionType<
   NewsletterSubscriptionType,
   NewsletterSubscriptionResponseType,
-  never
+  never,
+  NewsletterSubscribeTranslationKey
 > = ({ requestData, locale, t }) => {
+  const { t: globalT } = simpleT(locale);
   try {
     return success({
       toEmail: contactClientRepository.getSupportEmail(locale),
-      toName: t("config.appName"),
-      subject: t("app.api.newsletter.email.admin_notification.subject"),
+      toName: globalT("config.appName"),
+      subject: t("emailTemplate.admin_notification.subject"),
       jsx: AdminNotificationEmailContent({
         requestData,
         t,
@@ -418,7 +416,7 @@ export const renderAdminNotificationMail: EmailFunctionType<
     });
   } catch {
     return fail({
-      message: "app.api.newsletter.errors.email_generation_failed",
+      message: t("errors.email_generation_failed"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }

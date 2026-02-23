@@ -7,14 +7,14 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  objectField,
-  requestField,
-  requestResponseField,
-  responseArrayField,
-  responseField,
-  widgetField,
+  scopedBackButton,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedRequestResponseField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
+  scopedWidgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -35,6 +35,7 @@ import {
   UserStatusFilter,
   UserStatusFilterOptions,
 } from "../enum";
+import { scopedTranslation } from "./i18n";
 import { UsersListContainer } from "./widget";
 
 /**
@@ -42,84 +43,81 @@ import { UsersListContainer } from "./widget";
  * Retrieves a paginated list of users with filtering
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["users", "list"],
   allowedRoles: [UserRole.ADMIN] as const,
 
-  title: "app.api.users.list.get.title" as const,
-  description: "app.api.users.list.get.description" as const,
+  title: "get.title" as const,
+  description: "get.description" as const,
   icon: "users",
-  category: "app.api.user.category" as const,
-  tags: ["app.api.users.list.tag" as const],
+  category: "category" as const,
+  tags: ["tag" as const],
 
   fields: customWidgetObject({
     render: UsersListContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({ usage: { request: "data", response: true } }),
+      backButton: scopedBackButton(scopedTranslation, {
+        usage: { request: "data", response: true },
+      }),
       // === SEARCH & FILTERS ===
-      searchFilters: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.users.list.get.searchFilters.title" as const,
-          description:
-            "app.api.users.list.get.searchFilters.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 3,
-          order: 1,
-        },
-        { request: "data" },
-        {
-          search: requestField({
+      searchFilters: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.searchFilters.title" as const,
+        description: "get.searchFilters.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 3,
+        order: 1,
+        usage: { request: "data" },
+        children: {
+          search: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
-            label: "app.api.users.list.get.search.label" as const,
-            description: "app.api.users.list.get.search.description" as const,
-            placeholder: "app.api.users.list.get.search.placeholder" as const,
+            label: "get.search.label" as const,
+            description: "get.search.description" as const,
+            placeholder: "get.search.placeholder" as const,
             columns: 12,
             schema: z.string().optional(),
           }),
-          status: requestField({
+          status: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.MULTISELECT,
-            label: "app.api.users.list.get.status.label" as const,
-            description: "app.api.users.list.get.status.description" as const,
-            placeholder: "app.api.users.list.get.status.placeholder" as const,
+            label: "get.status.label" as const,
+            description: "get.status.description" as const,
+            placeholder: "get.status.placeholder" as const,
             options: UserStatusFilterOptions,
             columns: 6,
             schema: z.array(z.enum(UserStatusFilter)).optional(),
           }),
-          role: requestField({
+          role: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.MULTISELECT,
-            label: "app.api.users.list.get.role.label" as const,
-            description: "app.api.users.list.get.role.description" as const,
-            placeholder: "app.api.users.list.get.role.placeholder" as const,
+            label: "get.role.label" as const,
+            description: "get.role.description" as const,
+            placeholder: "get.role.placeholder" as const,
             options: UserRoleFilterOptions,
             columns: 6,
             schema: z.array(z.enum(UserRoleFilter)).optional(),
           }),
         },
-      ),
+      }),
 
       // === SORTING OPTIONS ===
-      sortingOptions: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.users.list.get.sortingOptions.title" as const,
-          description:
-            "app.api.users.list.get.sortingOptions.description" as const,
-          layoutType: LayoutType.GRID_2_COLUMNS,
-          order: 2,
-        },
-        { request: "data" },
-        {
-          sortBy: requestField({
+      sortingOptions: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.sortingOptions.title" as const,
+        description: "get.sortingOptions.description" as const,
+        layoutType: LayoutType.GRID_2_COLUMNS,
+        order: 2,
+        usage: { request: "data" },
+        children: {
+          sortBy: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label: "app.api.users.list.get.sortBy.label" as const,
-            description: "app.api.users.list.get.sortBy.description" as const,
-            placeholder: "app.api.users.list.get.sortBy.placeholder" as const,
+            label: "get.sortBy.label" as const,
+            description: "get.sortBy.description" as const,
+            placeholder: "get.sortBy.placeholder" as const,
             options: UserSortFieldOptions,
             columns: 6,
             schema: z
@@ -127,198 +125,177 @@ const { GET } = createEndpoint({
               .optional()
               .default(UserSortField.CREATED_AT),
           }),
-          sortOrder: requestField({
+          sortOrder: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label: "app.api.users.list.get.sortOrder.label" as const,
-            description:
-              "app.api.users.list.get.sortOrder.description" as const,
-            placeholder:
-              "app.api.users.list.get.sortOrder.placeholder" as const,
+            label: "get.sortOrder.label" as const,
+            description: "get.sortOrder.description" as const,
+            placeholder: "get.sortOrder.placeholder" as const,
             options: SortOrderOptions,
             columns: 6,
             schema: z.enum(SortOrder).optional().default(SortOrder.DESC),
           }),
         },
-      ),
+      }),
 
       // === FORM ALERT (shows validation and API errors) ===
-      formAlert: widgetField({
+      formAlert: scopedWidgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
         order: 2.5,
         usage: { request: "data" },
       }),
 
       // === RESPONSE FIELDS ===
-      response: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.users.list.get.response.title" as const,
-          description: "app.api.users.list.get.response.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-          order: 3,
-        },
-        { response: true },
-        {
-          users: responseArrayField(
-            {
+      response: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.title" as const,
+        description: "get.response.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        order: 3,
+        usage: { response: true },
+        children: {
+          users: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            columns: 12,
+            child: scopedObjectFieldNew(scopedTranslation, {
               type: WidgetType.CONTAINER,
+              layoutType: LayoutType.GRID,
               columns: 12,
-            },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                layoutType: LayoutType.GRID,
-                columns: 12,
-              },
-              { response: true },
-              {
-                email: responseField({
+              usage: { response: true },
+              children: {
+                email: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.users.list.get.response.users.email" as const,
+                  content: "get.response.users.email" as const,
                   schema: z.string(),
                 }),
-                privateName: responseField({
+                privateName: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.users.list.get.response.users.privateName" as const,
+                  content: "get.response.users.privateName" as const,
                   schema: z.string(),
                 }),
-                publicName: responseField({
+                publicName: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.users.list.get.response.users.publicName" as const,
+                  content: "get.response.users.publicName" as const,
                   schema: z.string(),
                 }),
-                isActive: responseField({
+                isActive: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  text: "app.api.users.list.get.response.users.isActive" as const,
+                  text: "get.response.users.isActive" as const,
                   schema: z.boolean(),
                 }),
-                emailVerified: responseField({
+                emailVerified: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  text: "app.api.users.list.get.response.users.emailVerified" as const,
+                  text: "get.response.users.emailVerified" as const,
                   schema: z.boolean(),
                 }),
-                createdAt: responseField({
+                createdAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
-                  content:
-                    "app.api.users.list.get.response.users.createdAt" as const,
+                  content: "get.response.users.createdAt" as const,
                   schema: z.coerce.date(),
                 }),
-                updatedAt: responseField({
+                updatedAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   fieldType: FieldDataType.DATETIME,
-                  content:
-                    "app.api.users.list.get.response.users.updatedAt" as const,
+                  content: "get.response.users.updatedAt" as const,
                   schema: z.coerce.date(),
                 }),
-                id: responseField({
+                id: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "app.api.users.list.get.response.users.id" as const,
+                  content: "get.response.users.id" as const,
                   schema: z.string(),
                 }),
               },
-            ),
-          ),
+            }),
+          }),
         },
-      ),
+      }),
 
       // === PAGINATION INFO (Editable controls + display in one row) ===
-      paginationInfo: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.HORIZONTAL,
-          noCard: true,
-          gap: "4",
-          order: 4,
-        },
-        { request: "data", response: true },
-        {
-          page: requestResponseField({
+      paginationInfo: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        layoutType: LayoutType.HORIZONTAL,
+        noCard: true,
+        gap: "4",
+        order: 4,
+        usage: { request: "data", response: true },
+        children: {
+          page: scopedRequestResponseField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
-            label: "app.api.users.list.get.page.label" as const,
+            label: "get.page.label" as const,
             columns: 3,
             schema: z.coerce.number().optional().default(1),
           }),
-          limit: requestResponseField({
+          limit: scopedRequestResponseField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
-            label: "app.api.users.list.get.limit.label" as const,
+            label: "get.limit.label" as const,
             columns: 3,
             schema: z.coerce.number().optional().default(20),
           }),
-          totalCount: responseField({
+          totalCount: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            label: "app.api.users.list.get.response.totalCount" as const,
-            content: "app.api.users.list.get.response.totalCount" as const,
+            label: "get.response.totalCount" as const,
+            content: "get.response.totalCount" as const,
             columns: 3,
             schema: z.coerce.number(),
           }),
-          pageCount: responseField({
+          pageCount: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            label: "app.api.users.list.get.response.pageCount" as const,
-            content: "app.api.users.list.get.response.pageCount" as const,
+            label: "get.response.pageCount" as const,
+            content: "get.response.pageCount" as const,
             columns: 3,
             schema: z.coerce.number(),
           }),
         },
-      ),
+      }),
     },
   }),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.users.list.get.errors.unauthorized.title" as const,
-      description:
-        "app.api.users.list.get.errors.unauthorized.description" as const,
+      title: "get.errors.unauthorized.title" as const,
+      description: "get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.users.list.get.errors.validation.title" as const,
-      description:
-        "app.api.users.list.get.errors.validation.description" as const,
+      title: "get.errors.validation.title" as const,
+      description: "get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.users.list.get.errors.forbidden.title" as const,
-      description:
-        "app.api.users.list.get.errors.forbidden.description" as const,
+      title: "get.errors.forbidden.title" as const,
+      description: "get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.users.list.get.errors.server.title" as const,
-      description: "app.api.users.list.get.errors.server.description" as const,
+      title: "get.errors.server.title" as const,
+      description: "get.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.users.list.get.errors.unknown.title" as const,
-      description: "app.api.users.list.get.errors.unknown.description" as const,
+      title: "get.errors.unknown.title" as const,
+      description: "get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.users.list.get.errors.conflict.title" as const,
-      description:
-        "app.api.users.list.get.errors.conflict.description" as const,
+      title: "get.errors.conflict.title" as const,
+      description: "get.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.users.list.get.errors.network.title" as const,
-      description: "app.api.users.list.get.errors.network.description" as const,
+      title: "get.errors.network.title" as const,
+      description: "get.errors.network.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.users.list.get.errors.notFound.title" as const,
-      description:
-        "app.api.users.list.get.errors.notFound.description" as const,
+      title: "get.errors.notFound.title" as const,
+      description: "get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.users.list.get.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.users.list.get.errors.unsavedChanges.description" as const,
+      title: "get.errors.unsavedChanges.title" as const,
+      description: "get.errors.unsavedChanges.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.users.list.get.success.title" as const,
-    description: "app.api.users.list.get.success.description" as const,
+    title: "get.success.title" as const,
+    description: "get.success.description" as const,
   },
 
   examples: {

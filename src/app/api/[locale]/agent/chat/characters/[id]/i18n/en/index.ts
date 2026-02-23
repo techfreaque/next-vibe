@@ -1,4 +1,9 @@
 export const translations = {
+  category: "AI Tools",
+  tags: {
+    characters: "Characters",
+  },
+
   get: {
     title: "Get Character",
     description: "Retrieve a specific character by ID",

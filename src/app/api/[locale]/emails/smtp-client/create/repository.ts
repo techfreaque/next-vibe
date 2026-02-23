@@ -23,6 +23,9 @@ import type {
   SmtpAccountCreateRequestOutput,
   SmtpAccountCreateResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * SMTP Account Create Repository Interface
@@ -32,6 +35,7 @@ interface SmtpAccountCreateRepository {
     data: SmtpAccountCreateRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SmtpAccountCreateResponseOutput>>;
 }
 
@@ -47,6 +51,7 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
     data: SmtpAccountCreateRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SmtpAccountCreateResponseOutput>> {
     try {
       logger.debug("Creating SMTP account", {
@@ -78,10 +83,10 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
 
       if (!newAccount) {
         return fail({
-          message: "app.api.emails.smtpClient.create.errors.server.title",
+          message: t("errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
-            error: "app.api.emails.smtpClient.create.errors.server.description",
+            error: t("errors.server.description"),
           },
         });
       }
@@ -143,17 +148,16 @@ class SmtpAccountCreateRepositoryImpl implements SmtpAccountCreateRepository {
 
       if (isUniqueViolation) {
         return fail({
-          message: "app.api.emails.smtpClient.create.errors.conflict.title",
+          message: t("errors.conflict.title"),
           errorType: ErrorResponseTypes.CONFLICT,
           messageParams: {
-            error:
-              "app.api.emails.smtpClient.create.errors.conflict.description",
+            error: t("errors.conflict.description"),
           },
         });
       }
 
       return fail({
-        message: "app.api.emails.smtpClient.create.errors.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

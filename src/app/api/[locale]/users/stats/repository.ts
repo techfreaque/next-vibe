@@ -29,6 +29,7 @@ import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { userRoles, users } from "@/app/api/[locale]/user/db";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import {
   PaymentMethodFilter,
@@ -40,15 +41,9 @@ import type {
   UserStatsRequestOutput,
   UserStatsResponseOutput,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 
-export interface UsersStatsRepository {
-  getUserStats(
-    data: UserStatsRequestOutput | undefined,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<UserStatsResponseOutput>>;
-}
-
-class UsersStatsRepositoryImpl implements UsersStatsRepository {
+class UsersStatsRepositoryImpl {
   private getDateTruncFormat(
     timePeriod: (typeof TimePeriod)[keyof typeof TimePeriod],
   ): string {
@@ -107,6 +102,7 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
   async getUserStats(
     rawQuery: UserStatsRequestOutput | undefined,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<UserStatsResponseOutput>> {
     try {
       // Extract nested filters with type safety
@@ -236,8 +232,9 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
       return success(response);
     } catch (error) {
       logger.error("Error fetching user statistics", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.users.stats.errors.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -455,28 +452,24 @@ class UsersStatsRepositoryImpl implements UsersStatsRepository {
         noSubscription,
         subscriptionChart: [
           {
-            x: "app.api.users.stats.response.subscriptionStats.activeSubscriptions.label",
+            x: "Active Subscriptions",
             y: activeSubscriptions,
-            label:
-              "app.api.users.stats.response.subscriptionStats.activeSubscriptions.label",
+            label: "Active Subscriptions",
           },
           {
-            x: "app.api.users.stats.response.subscriptionStats.canceledSubscriptions.label",
+            x: "Canceled Subscriptions",
             y: canceledSubscriptions,
-            label:
-              "app.api.users.stats.response.subscriptionStats.canceledSubscriptions.label",
+            label: "Canceled Subscriptions",
           },
           {
-            x: "app.api.users.stats.response.subscriptionStats.expiredSubscriptions.label",
+            x: "Expired Subscriptions",
             y: expiredSubscriptions,
-            label:
-              "app.api.users.stats.response.subscriptionStats.expiredSubscriptions.label",
+            label: "Expired Subscriptions",
           },
           {
-            x: "app.api.users.stats.response.subscriptionStats.noSubscription.label",
+            x: "No Subscription",
             y: noSubscription,
-            label:
-              "app.api.users.stats.response.subscriptionStats.noSubscription.label",
+            label: "No Subscription",
           },
         ],
       },

@@ -14,8 +14,8 @@ import { guardStartRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: guardStartEndpoints,
   [Methods.POST]: {
-    handler: ({ data, logger }) => {
-      return guardStartRepository.startGuard(data, logger);
+    handler: ({ data, logger, t }) => {
+      return guardStartRepository.startGuard(data, logger, t);
     },
   },
 });

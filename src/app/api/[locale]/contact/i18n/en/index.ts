@@ -168,6 +168,7 @@ export const translations = {
       title: "Conflict",
       description: "A conflict occurred while processing your request",
     },
+    email_generation_failed: "Failed to generate email",
   },
 
   sms: {
@@ -326,6 +327,83 @@ export const translations = {
   error: {
     general: {
       internal_server_error: "Internal server error occurred",
+    },
+  },
+
+  emailTemplates: {
+    contactForm: {
+      meta: {
+        name: "Contact Form Notification",
+        description:
+          "Email sent to the contact and the company team when a contact form is submitted",
+        category: "contact",
+      },
+      preview: {
+        name: {
+          label: "Sender Name",
+          description: "Full name of the person submitting the contact form",
+        },
+        email: {
+          label: "Sender Email",
+          description: "Email address of the person submitting the form",
+        },
+        company: {
+          label: "Company Name",
+          description: "Optional company name of the sender",
+        },
+        subject: {
+          label: "Message Subject",
+          description: "Subject line of the contact message",
+        },
+        message: {
+          label: "Message Body",
+          description: "The main message content from the contact form",
+        },
+        isForCompany: {
+          label: "Company Email Flag",
+          description:
+            "Whether this email is addressed to the company (admin) or the sender (confirmation)",
+        },
+        userId: {
+          label: "User ID",
+          description: "Optional user ID for tracking",
+        },
+        leadId: {
+          label: "Lead ID",
+          description: "Optional lead ID for CRM tracking",
+        },
+      },
+    },
+    adminContact: {
+      meta: {
+        name: "Admin Contact Notification",
+        description:
+          "Internal notification email sent to admins when a new contact form is submitted",
+        category: "admin",
+      },
+      preview: {
+        name: {
+          label: "Sender Name",
+        },
+        email: {
+          label: "Sender Email",
+        },
+        subject: {
+          label: "Message Subject",
+        },
+        message: {
+          label: "Message Body",
+        },
+        company: {
+          label: "Company Name",
+        },
+        userId: {
+          label: "User ID",
+        },
+        leadId: {
+          label: "Lead ID",
+        },
+      },
     },
   },
 };

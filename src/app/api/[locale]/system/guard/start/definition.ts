@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,14 +20,16 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../user/user-roles/enum";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "guard", "start"],
-  title: "app.api.system.guard.start.title",
-  description: "app.api.system.guard.start.description",
-  category: "app.api.system.category",
-  tags: ["app.api.system.guard.start.tag"],
+  title: "title",
+  description: "description",
+  category: "category",
+  tags: ["tag"],
   icon: "lock",
   allowedRoles: [
     UserRole.ADMIN,
@@ -37,157 +39,149 @@ const { POST } = createEndpoint({
   ],
   aliases: ["guard", "guard:start", "guard-start"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.guard.start.container.title",
-      description: "app.api.system.guard.start.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "container.title",
+    description: "container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      projectPath: requestField({
+      projectPath: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.guard.start.fields.projectPath.title",
-        description:
-          "app.api.system.guard.start.fields.projectPath.description",
-        placeholder:
-          "app.api.system.guard.start.fields.projectPath.placeholder",
+        label: "fields.projectPath.title",
+        description: "fields.projectPath.description",
+        placeholder: "fields.projectPath.placeholder",
         columns: 6,
         schema: z.string().optional(),
       }),
 
-      startAll: requestField({
+      startAll: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.guard.start.fields.startAll.title",
-        description: "app.api.system.guard.start.fields.startAll.description",
+        label: "fields.startAll.title",
+        description: "fields.startAll.description",
         columns: 12,
         schema: z.boolean().optional().default(false),
       }),
 
-      guardIdInput: requestField({
+      guardIdInput: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.guard.start.fields.guardId.title",
-        description: "app.api.system.guard.start.fields.guardId.description",
-        placeholder: "app.api.system.guard.start.fields.guardId.placeholder",
+        label: "fields.guardId.title",
+        description: "fields.guardId.description",
+        placeholder: "fields.guardId.placeholder",
         columns: 6,
         schema: z.string().optional(),
       }),
 
       // === RESPONSE FIELDS ===
-      summary: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.system.guard.start.fields.summary.title",
-          layoutType: LayoutType.GRID,
-          columns: 3,
-        },
-        { response: true },
-        {
-          totalStarted: responseField({
+      summary: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "fields.summary.title",
+        layoutType: LayoutType.GRID,
+        columns: 3,
+        usage: { response: true },
+        children: {
+          totalStarted: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.system.guard.start.fields.totalStarted.title",
+            content: "fields.totalStarted.title",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number(),
           }),
-          status: responseField({
+          status: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.system.guard.start.fields.status.title",
+            content: "fields.status.title",
             fieldType: FieldDataType.TEXT,
             schema: z.string(),
           }),
-          hasIssues: responseField({
+          hasIssues: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.system.guard.start.fields.hasIssues.title",
+            content: "fields.hasIssues.title",
             fieldType: FieldDataType.BOOLEAN,
             schema: z.boolean(),
           }),
         },
-      ),
+      }),
 
-      output: responseField({
+      output: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.guard.start.fields.output.title",
+        content: "fields.output.title",
         schema: z.string(),
       }),
 
-      guardId: responseField({
+      guardId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.guard.start.fields.guardId.title",
+        content: "fields.guardId.title",
         schema: z.string(),
       }),
 
-      username: responseField({
+      username: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.guard.start.fields.startedGuards.columns.username",
+        content: "fields.startedGuards.columns.username",
         schema: z.string(),
       }),
 
-      guardProjectPath: responseField({
+      guardProjectPath: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.guard.start.fields.startedGuards.columns.projectPath",
+        content: "fields.startedGuards.columns.projectPath",
         schema: z.string(),
       }),
 
-      scriptPath: responseField({
+      scriptPath: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.guard.start.fields.output.title",
+        content: "fields.output.title",
         schema: z.string(),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.guard.start.errors.validation.title",
-      description: "app.api.system.guard.start.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.guard.start.errors.internal.title",
-      description: "app.api.system.guard.start.errors.internal.description",
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.guard.start.errors.unauthorized.title",
-      description: "app.api.system.guard.start.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.guard.start.errors.unauthorized.title",
-      description: "app.api.system.guard.start.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.guard.start.errors.notFound.title",
-      description: "app.api.system.guard.start.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.guard.start.errors.internal.title",
-      description: "app.api.system.guard.start.errors.internal.description",
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.guard.start.errors.internal.title",
-      description: "app.api.system.guard.start.errors.internal.description",
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.guard.start.errors.internal.title",
-      description: "app.api.system.guard.start.errors.internal.description",
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.guard.start.errors.conflict.title",
-      description: "app.api.system.guard.start.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.system.guard.start.success.title",
-    description: "app.api.system.guard.start.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 
   // === EXAMPLES ===

@@ -15,7 +15,9 @@ import {
   LEAD_ID_COOKIE_NAME,
 } from "@/config/constants";
 import { env } from "@/config/env";
+import { type CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation as cliScopedTranslation } from "../cli/i18n";
 import type { EndpointLogger } from "../shared/logger/endpoint";
 import {
   type AuthContext,
@@ -61,6 +63,7 @@ export class WebAuthHandler extends BaseAuthHandler {
     userId: string,
     leadId: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
     rememberMe = true, // Default to true (30 days)
   ): Promise<ResponseType<void>> {
     try {
@@ -68,6 +71,7 @@ export class WebAuthHandler extends BaseAuthHandler {
         userId,
         leadId,
         rememberMe,
+        locale,
       });
 
       const cookieStore = await cookies();
@@ -118,8 +122,9 @@ export class WebAuthHandler extends BaseAuthHandler {
       return success();
     } catch (error) {
       logger.error("Error storing auth token", parseError(error));
+      const { t } = cliScopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.unifiedInterface.cli.vibe.errors.storeFailed",
+        message: t("vibe.errors.storeFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -131,7 +136,10 @@ export class WebAuthHandler extends BaseAuthHandler {
    * IMPORTANT: This should ONLY be called on explicit logout, NOT on session validation failures
    * Lead ID cookie is NEVER deleted - it persists across all sessions
    */
-  async clearAuthToken(logger: EndpointLogger): Promise<ResponseType<void>> {
+  async clearAuthToken(
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<void>> {
     try {
       logger.debug("Clearing auth token from cookies (logout)");
       try {
@@ -150,8 +158,9 @@ export class WebAuthHandler extends BaseAuthHandler {
       return success();
     } catch (error) {
       logger.error("Error clearing auth token", parseError(error));
+      const { t } = cliScopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.unifiedInterface.cli.vibe.errors.clearFailed",
+        message: t("vibe.errors.clearFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

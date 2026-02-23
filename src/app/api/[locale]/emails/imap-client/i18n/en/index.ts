@@ -188,6 +188,7 @@ export const translations = {
         },
       },
       errors: {
+        default: "IMAP sync failed",
         account_failed: "Account sync failed",
         folder_sync_failed: "Folder sync failed",
         message_sync_error: "Message sync error",
@@ -196,6 +197,12 @@ export const translations = {
     },
   },
   enums: {
+    loggingLevel: {
+      error: "Error",
+      warn: "Warning",
+      info: "Info",
+      debug: "Debug",
+    },
     syncStatus: {
       pending: "Pending",
       syncing: "Syncing",

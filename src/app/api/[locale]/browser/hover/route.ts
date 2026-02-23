@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: hoverEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger }) =>
+    handler: ({ data, t, logger }) =>
       executeMCPTool(
         {
           toolName: "hover",
@@ -20,6 +20,7 @@ export const { POST, tools } = endpointsHandler({
             uid: data.uid,
           }),
         },
+        t,
         logger,
       ),
   },

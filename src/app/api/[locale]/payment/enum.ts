@@ -5,6 +5,8 @@
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * Payment provider enum
  * Supports Stripe and NOWPayments (crypto)
@@ -13,9 +15,9 @@ export const {
   enum: PaymentProvider,
   options: PaymentProviderOptions,
   Value: PaymentProviderValue,
-} = createEnumOptions({
-  STRIPE: "app.api.payment.enums.paymentProvider.stripe",
-  NOWPAYMENTS: "app.api.payment.enums.paymentProvider.nowpayments",
+} = createEnumOptions(scopedTranslation, {
+  STRIPE: "enums.paymentProvider.stripe",
+  NOWPAYMENTS: "enums.paymentProvider.nowpayments",
 });
 
 /**
@@ -26,13 +28,13 @@ export const {
   enum: PaymentStatus,
   options: PaymentStatusOptions,
   Value: PaymentStatusValue,
-} = createEnumOptions({
-  PENDING: "app.api.payment.enums.paymentStatus.pending",
-  PROCESSING: "app.api.payment.enums.paymentStatus.processing",
-  SUCCEEDED: "app.api.payment.enums.paymentStatus.succeeded",
-  FAILED: "app.api.payment.enums.paymentStatus.failed",
-  CANCELED: "app.api.payment.enums.paymentStatus.canceled",
-  REFUNDED: "app.api.payment.enums.paymentStatus.refunded",
+} = createEnumOptions(scopedTranslation, {
+  PENDING: "enums.paymentStatus.pending",
+  PROCESSING: "enums.paymentStatus.processing",
+  SUCCEEDED: "enums.paymentStatus.succeeded",
+  FAILED: "enums.paymentStatus.failed",
+  CANCELED: "enums.paymentStatus.canceled",
+  REFUNDED: "enums.paymentStatus.refunded",
 });
 
 /**
@@ -43,13 +45,13 @@ export const {
   enum: PaymentMethodType,
   options: PaymentMethodTypeOptions,
   Value: PaymentMethodTypeValue,
-} = createEnumOptions({
-  CARD: "app.api.payment.enums.paymentMethodType.card",
-  BANK_TRANSFER: "app.api.payment.enums.paymentMethodType.bankTransfer",
-  PAYPAL: "app.api.payment.enums.paymentMethodType.paypal",
-  APPLE_PAY: "app.api.payment.enums.paymentMethodType.applePay",
-  GOOGLE_PAY: "app.api.payment.enums.paymentMethodType.googlePay",
-  SEPA_DEBIT: "app.api.payment.enums.paymentMethodType.sepaDebit",
+} = createEnumOptions(scopedTranslation, {
+  CARD: "enums.paymentMethodType.card",
+  BANK_TRANSFER: "enums.paymentMethodType.bankTransfer",
+  PAYPAL: "enums.paymentMethodType.paypal",
+  APPLE_PAY: "enums.paymentMethodType.applePay",
+  GOOGLE_PAY: "enums.paymentMethodType.googlePay",
+  SEPA_DEBIT: "enums.paymentMethodType.sepaDebit",
 });
 
 /**
@@ -60,16 +62,14 @@ export const {
   enum: PaymentIntentStatus,
   options: PaymentIntentStatusOptions,
   Value: PaymentIntentStatusValue,
-} = createEnumOptions({
-  REQUIRES_PAYMENT_METHOD:
-    "app.api.payment.enums.paymentIntentStatus.requiresPaymentMethod",
-  REQUIRES_CONFIRMATION:
-    "app.api.payment.enums.paymentIntentStatus.requiresConfirmation",
-  REQUIRES_ACTION: "app.api.payment.enums.paymentIntentStatus.requiresAction",
-  PROCESSING: "app.api.payment.enums.paymentIntentStatus.processing",
-  REQUIRES_CAPTURE: "app.api.payment.enums.paymentIntentStatus.requiresCapture",
-  CANCELED: "app.api.payment.enums.paymentIntentStatus.canceled",
-  SUCCEEDED: "app.api.payment.enums.paymentIntentStatus.succeeded",
+} = createEnumOptions(scopedTranslation, {
+  REQUIRES_PAYMENT_METHOD: "enums.paymentIntentStatus.requiresPaymentMethod",
+  REQUIRES_CONFIRMATION: "enums.paymentIntentStatus.requiresConfirmation",
+  REQUIRES_ACTION: "enums.paymentIntentStatus.requiresAction",
+  PROCESSING: "enums.paymentIntentStatus.processing",
+  REQUIRES_CAPTURE: "enums.paymentIntentStatus.requiresCapture",
+  CANCELED: "enums.paymentIntentStatus.canceled",
+  SUCCEEDED: "enums.paymentIntentStatus.succeeded",
 });
 
 /**
@@ -80,10 +80,10 @@ export const {
   enum: CheckoutMode,
   options: CheckoutModeOptions,
   Value: CheckoutModeValue,
-} = createEnumOptions({
-  PAYMENT: "app.api.payment.enums.checkoutMode.payment",
-  SUBSCRIPTION: "app.api.payment.enums.checkoutMode.subscription",
-  SETUP: "app.api.payment.enums.checkoutMode.setup",
+} = createEnumOptions(scopedTranslation, {
+  PAYMENT: "enums.checkoutMode.payment",
+  SUBSCRIPTION: "enums.checkoutMode.subscription",
+  SETUP: "enums.checkoutMode.setup",
 });
 
 /**
@@ -94,11 +94,11 @@ export const {
   enum: RefundStatus,
   options: RefundStatusOptions,
   Value: RefundStatusValue,
-} = createEnumOptions({
-  PENDING: "app.api.payment.enums.refundStatus.pending",
-  SUCCEEDED: "app.api.payment.enums.refundStatus.succeeded",
-  FAILED: "app.api.payment.enums.refundStatus.failed",
-  CANCELED: "app.api.payment.enums.refundStatus.canceled",
+} = createEnumOptions(scopedTranslation, {
+  PENDING: "enums.refundStatus.pending",
+  SUCCEEDED: "enums.refundStatus.succeeded",
+  FAILED: "enums.refundStatus.failed",
+  CANCELED: "enums.refundStatus.canceled",
 });
 
 /**
@@ -109,17 +109,15 @@ export const {
   enum: DisputeStatus,
   options: DisputeStatusOptions,
   Value: DisputeStatusValue,
-} = createEnumOptions({
-  WARNING_NEEDS_RESPONSE:
-    "app.api.payment.enums.disputeStatus.warningNeedsResponse",
-  WARNING_UNDER_REVIEW:
-    "app.api.payment.enums.disputeStatus.warningUnderReview",
-  WARNING_CLOSED: "app.api.payment.enums.disputeStatus.warningClosed",
-  NEEDS_RESPONSE: "app.api.payment.enums.disputeStatus.needsResponse",
-  UNDER_REVIEW: "app.api.payment.enums.disputeStatus.underReview",
-  CHARGE_REFUNDED: "app.api.payment.enums.disputeStatus.chargeRefunded",
-  WON: "app.api.payment.enums.disputeStatus.won",
-  LOST: "app.api.payment.enums.disputeStatus.lost",
+} = createEnumOptions(scopedTranslation, {
+  WARNING_NEEDS_RESPONSE: "enums.disputeStatus.warningNeedsResponse",
+  WARNING_UNDER_REVIEW: "enums.disputeStatus.warningUnderReview",
+  WARNING_CLOSED: "enums.disputeStatus.warningClosed",
+  NEEDS_RESPONSE: "enums.disputeStatus.needsResponse",
+  UNDER_REVIEW: "enums.disputeStatus.underReview",
+  CHARGE_REFUNDED: "enums.disputeStatus.chargeRefunded",
+  WON: "enums.disputeStatus.won",
+  LOST: "enums.disputeStatus.lost",
 });
 
 /**
@@ -130,12 +128,12 @@ export const {
   enum: InvoiceStatus,
   options: InvoiceStatusOptions,
   Value: InvoiceStatusValue,
-} = createEnumOptions({
-  DRAFT: "app.api.payment.enums.invoiceStatus.draft",
-  OPEN: "app.api.payment.enums.invoiceStatus.open",
-  PAID: "app.api.payment.enums.invoiceStatus.paid",
-  VOID: "app.api.payment.enums.invoiceStatus.void",
-  UNCOLLECTIBLE: "app.api.payment.enums.invoiceStatus.uncollectible",
+} = createEnumOptions(scopedTranslation, {
+  DRAFT: "enums.invoiceStatus.draft",
+  OPEN: "enums.invoiceStatus.open",
+  PAID: "enums.invoiceStatus.paid",
+  VOID: "enums.invoiceStatus.void",
+  UNCOLLECTIBLE: "enums.invoiceStatus.uncollectible",
 });
 
 /**
@@ -145,10 +143,10 @@ export const {
   enum: TaxStatus,
   options: TaxStatusOptions,
   Value: TaxStatusValue,
-} = createEnumOptions({
-  COMPLETE: "app.api.payment.enums.taxStatus.complete",
-  FAILED: "app.api.payment.enums.taxStatus.failed",
-  REQUIRES_LOCATION: "app.api.payment.enums.taxStatus.requiresLocation",
+} = createEnumOptions(scopedTranslation, {
+  COMPLETE: "enums.taxStatus.complete",
+  FAILED: "enums.taxStatus.failed",
+  REQUIRES_LOCATION: "enums.taxStatus.requiresLocation",
 });
 
 // Create DB enum arrays for Drizzle

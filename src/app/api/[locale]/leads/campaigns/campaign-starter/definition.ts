@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,128 +20,104 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["leads", "campaigns", "campaign-starter"],
-  title: "app.api.leads.campaigns.campaignStarter.post.title",
-  description: "app.api.leads.campaigns.campaignStarter.post.description",
-  category: "app.api.leads.category",
+  title: "post.title",
+  description: "post.description",
+  category: "category",
   icon: "play",
-  tags: ["app.api.leads.campaigns.campaignStarter.tag"],
+  tags: ["tag"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.leads.campaigns.campaignStarter.post.container.title",
-      description:
-        "app.api.leads.campaigns.campaignStarter.post.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      dryRun: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.container.title",
+    description: "post.container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      dryRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.leads.campaigns.campaignStarter.post.fields.dryRun.label",
-        description:
-          "app.api.leads.campaigns.campaignStarter.post.fields.dryRun.description",
+        label: "post.fields.dryRun.label",
+        description: "post.fields.dryRun.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
-      leadsProcessed: responseField({
+      leadsProcessed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.campaigns.campaignStarter.post.response.leadsProcessed",
+        content: "post.response.leadsProcessed",
         schema: z.number(),
       }),
 
-      leadsStarted: responseField({
+      leadsStarted: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.campaigns.campaignStarter.post.response.leadsStarted",
+        content: "post.response.leadsStarted",
         schema: z.number(),
       }),
 
-      leadsSkipped: responseField({
+      leadsSkipped: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.campaigns.campaignStarter.post.response.leadsSkipped",
+        content: "post.response.leadsSkipped",
         schema: z.number(),
       }),
 
-      executionTimeMs: responseField({
+      executionTimeMs: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.campaigns.campaignStarter.post.response.executionTimeMs",
+        content: "post.response.executionTimeMs",
         schema: z.number(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.post.errors.unauthorized.title",
-      description:
-        "app.api.leads.campaigns.campaignStarter.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.post.errors.forbidden.title",
-      description:
-        "app.api.leads.campaigns.campaignStarter.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.leads.campaigns.campaignStarter.post.errors.server.title",
-      description:
-        "app.api.leads.campaigns.campaignStarter.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.post.errors.unknown.title",
-      description:
-        "app.api.leads.campaigns.campaignStarter.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.post.errors.validation.title",
-      description:
-        "app.api.leads.campaigns.campaignStarter.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.post.errors.unknown.title",
-      description:
-        "app.api.leads.campaigns.campaignStarter.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.post.errors.unknown.title",
-      description:
-        "app.api.leads.campaigns.campaignStarter.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.post.errors.unknown.title",
-      description:
-        "app.api.leads.campaigns.campaignStarter.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.leads.campaigns.campaignStarter.post.errors.unknown.title",
-      description:
-        "app.api.leads.campaigns.campaignStarter.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
   },
 
   successTypes: {
-    title: "app.api.leads.campaigns.campaignStarter.post.success.title",
-    description:
-      "app.api.leads.campaigns.campaignStarter.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   examples: {

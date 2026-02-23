@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Generatory",
+
   post: {
     title: "Generuj indeks tras klienta",
     description: "Automatycznie generuj plik indeksu tras klienta",

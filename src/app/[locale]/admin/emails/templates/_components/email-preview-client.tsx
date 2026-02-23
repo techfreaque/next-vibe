@@ -38,7 +38,7 @@ interface EmailPreviewClientProps {
   locale: CountryLanguage;
   templateId: string;
   templateName: string;
-  previewFields?: Record<string, PreviewFieldConfig>;
+  previewFields?: Record<string, PreviewFieldConfig<string>>;
   exampleProps: Record<string, string | number | boolean>;
   user: JwtPayloadType;
 }

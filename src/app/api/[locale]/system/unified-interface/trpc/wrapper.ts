@@ -9,6 +9,7 @@ import {
   isStreamingResponse,
 } from "next-vibe/shared/types/response.schema";
 
+import { scopedTranslation as cliScopedTranslation } from "../cli/i18n";
 import type {
   EndpointDefinitionsConstraint,
   ToolsObject,
@@ -54,12 +55,12 @@ export function wrapToolsForTRPC<T extends EndpointDefinitionsConstraint>(
 
         // Streaming not supported in tRPC
         if (isStreamingResponse(result)) {
+          const { t: cliT } = cliScopedTranslation.scopedT(ctx.locale);
           // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- tRPC pattern: Throwing TRPCError is the standard way to send errors to tRPC clients. This is documented tRPC behavior for error handling.
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
-            message: ctx.t(
-              "app.api.system.unifiedInterface.cli.vibe.endpoints.endpointHandler.error.general.internal_server_error",
-              {},
+            message: cliT(
+              "vibe.endpoints.endpointHandler.error.general.internal_server_error",
             ),
           });
         }

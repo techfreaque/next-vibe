@@ -21,6 +21,9 @@ import type {
   TRPCValidationRequestOutput,
   TRPCValidationResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * TRPC Validation Options interface
@@ -66,6 +69,7 @@ export interface TRPCValidationRepository {
   executeValidationOperation(
     data: TRPCValidationRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<TRPCValidationResponseOutput>>;
 
   validateTRPCIntegration(
@@ -92,6 +96,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
   async executeValidationOperation(
     data: TRPCValidationRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<TRPCValidationResponseOutput>> {
     try {
       logger.info("Starting TRPC validation operation execution", {
@@ -217,8 +222,7 @@ export class TRPCValidationRepositoryImpl implements TRPCValidationRepository {
       logger.error("TRPC validation operation execution failed", parsedError);
 
       return fail({
-        message:
-          "app.api.system.generators.generateTrpcRouter.validation.errors.executionFailed.title",
+        message: t("errors.executionFailed.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });

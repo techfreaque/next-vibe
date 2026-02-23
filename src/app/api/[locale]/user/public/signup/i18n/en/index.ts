@@ -1,6 +1,8 @@
 import { translations as _componentsTranslations } from "../../_components/i18n/en";
 
 export const translations = {
+  category: "Users",
+
   _components: _componentsTranslations,
   title: "User Signup",
   description: "User registration endpoint",
@@ -291,6 +293,9 @@ export const translations = {
     privateName: "Private Name",
     publicName: "Public Name",
     email: "Email",
+    locale: "Language",
+    creditBalance: "Credit Balance",
+    leadCreditBalance: "Lead Credit Balance",
     signup_preferences: "Signup Preferences",
     user_details: "User Details",
     basic_information: "Basic Information",
@@ -337,5 +342,48 @@ export const translations = {
     },
     signoff: "Happy chatting,\nThe {{appName}} Team",
     ps: "P.S. Use Incognito mode to keep conversations on your device only - we never store them on our servers.",
+  },
+  emailTemplates: {
+    welcome: {
+      name: "Signup Welcome Email",
+      description: "Welcome email sent to users after successful registration",
+      category: "Authentication",
+      preview: {
+        privateName: {
+          label: "Private Name",
+          description: "The user's private name",
+        },
+        userId: {
+          label: "User ID",
+          description: "The user's unique identifier",
+        },
+        leadId: {
+          label: "Lead ID",
+          description: "The user's lead identifier",
+        },
+      },
+    },
+    adminSignup: {
+      name: "Admin Signup Notification Email",
+      description: "Email sent to admins when a new user registers",
+      category: "Administration",
+      preview: {
+        privateName: {
+          label: "Private Name",
+        },
+        publicName: {
+          label: "Public Name",
+        },
+        email: {
+          label: "Email Address",
+        },
+        userId: {
+          label: "User ID",
+        },
+        subscribeToNewsletter: {
+          label: "Newsletter Subscription",
+        },
+      },
+    },
   },
 };

@@ -14,16 +14,17 @@ export const { GET, PUT, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ urlPathParams, user, logger }) =>
-      messagingAccountEditRepository.getAccount(urlPathParams, user, logger),
+    handler: ({ urlPathParams, user, logger, t }) =>
+      messagingAccountEditRepository.getAccount(urlPathParams, user, logger, t),
   },
   [Methods.PUT]: {
     email: undefined,
-    handler: ({ data, urlPathParams, user, logger }) =>
+    handler: ({ data, urlPathParams, user, logger, t }) =>
       messagingAccountEditRepository.updateAccount(
         { ...data, id: urlPathParams.id },
         user,
         logger,
+        t,
       ),
   },
 });

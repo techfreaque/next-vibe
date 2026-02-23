@@ -9,8 +9,8 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   backButton,
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -30,6 +30,7 @@ import {
   LeadSource,
   LeadSourceOptions,
 } from "../../enum";
+import { scopedTranslation } from "./i18n";
 import {
   LeadClickTrackingContainer,
   LeadEngagementTrackingContainer,
@@ -74,16 +75,14 @@ const engagementMetadataSchema = z
  * Records a new engagement event for a lead
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["leads", "tracking", "engagement"],
-  title: "app.api.leads.tracking.engagement.post.title" as const,
-  description: "app.api.leads.tracking.engagement.post.description" as const,
-  category: "app.api.leads.category" as const,
-  icon: "activity" as const,
-  tags: [
-    "app.api.leads.tracking.engagement.tags.tracking" as const,
-    "app.api.leads.tracking.engagement.tags.engagement" as const,
-  ],
+  title: "post.title",
+  description: "post.description",
+  category: "category",
+  icon: "activity",
+  tags: ["tags.tracking", "tags.engagement"],
   allowedRoles: [
     UserRole.PUBLIC,
     UserRole.CUSTOMER,
@@ -104,141 +103,114 @@ const { POST } = createEndpoint({
       backButton: backButton({ usage: { response: true } }),
 
       // === REQUEST FIELDS ===
-      leadId: requestField({
+      leadId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label: "app.api.leads.tracking.engagement.post.leadId.label" as const,
-        description:
-          "app.api.leads.tracking.engagement.post.leadId.description" as const,
-        placeholder:
-          "app.api.leads.tracking.engagement.post.leadId.placeholder" as const,
-        helpText:
-          "app.api.leads.tracking.engagement.post.leadId.helpText" as const,
+        label: "post.leadId.label",
+        description: "post.leadId.description",
+        placeholder: "post.leadId.placeholder",
+        helpText: "post.leadId.helpText",
         columns: 12,
         schema: z.uuid().nullable().optional(),
       }),
-      engagementType: requestField({
+      engagementType: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label:
-          "app.api.leads.tracking.engagement.post.engagementType.label" as const,
-        description:
-          "app.api.leads.tracking.engagement.post.engagementType.description" as const,
-        placeholder:
-          "app.api.leads.tracking.engagement.post.engagementType.placeholder" as const,
-        helpText:
-          "app.api.leads.tracking.engagement.post.engagementType.helpText" as const,
+        label: "post.engagementType.label",
+        description: "post.engagementType.description",
+        placeholder: "post.engagementType.placeholder",
+        helpText: "post.engagementType.helpText",
         options: EngagementTypesOptions,
         columns: 6,
         schema: z.enum(EngagementTypesDB),
       }),
-      campaignId: requestField({
+      campaignId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label:
-          "app.api.leads.tracking.engagement.post.campaignId.label" as const,
-        description:
-          "app.api.leads.tracking.engagement.post.campaignId.description" as const,
-        placeholder:
-          "app.api.leads.tracking.engagement.post.campaignId.placeholder" as const,
-        helpText:
-          "app.api.leads.tracking.engagement.post.campaignId.helpText" as const,
+        label: "post.campaignId.label",
+        description: "post.campaignId.description",
+        placeholder: "post.campaignId.placeholder",
+        helpText: "post.campaignId.helpText",
         columns: 6,
         schema: z.uuid().optional(),
       }),
-      metadata: requestField({
+      metadata: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
-        label: "app.api.leads.tracking.engagement.post.metadata.label" as const,
-        description:
-          "app.api.leads.tracking.engagement.post.metadata.description" as const,
-        placeholder:
-          "app.api.leads.tracking.engagement.post.metadata.placeholder" as const,
-        helpText:
-          "app.api.leads.tracking.engagement.post.metadata.helpText" as const,
+        label: "post.metadata.label",
+        description: "post.metadata.description",
+        placeholder: "post.metadata.placeholder",
+        helpText: "post.metadata.helpText",
         columns: 12,
         schema: engagementMetadataSchema,
       }),
-      userId: requestField({
+      userId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label: "app.api.leads.tracking.engagement.post.userId.label" as const,
-        description:
-          "app.api.leads.tracking.engagement.post.userId.description" as const,
-        placeholder:
-          "app.api.leads.tracking.engagement.post.userId.placeholder" as const,
-        helpText:
-          "app.api.leads.tracking.engagement.post.userId.helpText" as const,
+        label: "post.userId.label",
+        description: "post.userId.description",
+        placeholder: "post.userId.placeholder",
+        helpText: "post.userId.helpText",
         columns: 12,
         schema: z.uuid().optional(),
       }),
 
       // === RESPONSE FIELDS ===
-      id: responseField({
+      id: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.tracking.engagement.post.response.id" as const,
+        content: "post.response.id",
         schema: z.uuid(),
       }),
-      responseLeadId: responseField({
+      responseLeadId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.tracking.engagement.post.response.leadId" as const,
+        content: "post.response.leadId",
         schema: z.uuid(),
       }),
-      responseEngagementType: responseField({
+      responseEngagementType: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.tracking.engagement.post.response.engagementType" as const,
+        content: "post.response.engagementType",
         schema: z.enum(EngagementTypesDB),
       }),
-      responseCampaignId: responseField({
+      responseCampaignId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.tracking.engagement.post.response.campaignId" as const,
+        content: "post.response.campaignId",
         schema: z.uuid().optional(),
       }),
-      responseMetadata: responseField({
+      responseMetadata: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.tracking.engagement.post.response.metadata" as const,
+        content: "post.response.metadata",
         schema: z
           .record(z.string(), z.string().or(z.coerce.number()).or(z.boolean()))
           .optional(),
       }),
-      timestamp: responseField({
+      timestamp: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.tracking.engagement.post.response.timestamp" as const,
+        content: "post.response.timestamp",
         schema: dateSchema,
       }),
-      ipAddress: responseField({
+      ipAddress: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.tracking.engagement.post.response.ipAddress" as const,
+        content: "post.response.ipAddress",
         schema: z.string().optional(),
       }),
-      userAgent: responseField({
+      userAgent: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.tracking.engagement.post.response.userAgent" as const,
+        content: "post.response.userAgent",
         schema: z.string().optional(),
       }),
-      createdAt: responseField({
+      createdAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.tracking.engagement.post.response.createdAt" as const,
+        content: "post.response.createdAt",
         schema: dateSchema,
       }),
-      leadCreated: responseField({
+      leadCreated: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.tracking.engagement.post.response.leadCreated" as const,
+        content: "post.response.leadCreated",
         schema: z.boolean().optional(),
       }),
-      relationshipEstablished: responseField({
+      relationshipEstablished: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.tracking.engagement.post.response.relationshipEstablished" as const,
+        content: "post.response.relationshipEstablished",
         schema: z.boolean().optional(),
       }),
     },
@@ -246,65 +218,46 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.leads.tracking.engagement.post.errors.validation.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.post.errors.validation.description" as const,
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.leads.tracking.engagement.post.errors.unauthorized.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.post.errors.unauthorized.description" as const,
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.leads.tracking.engagement.post.errors.forbidden.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.post.errors.forbidden.description" as const,
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.leads.tracking.engagement.post.errors.notFound.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.post.errors.notFound.description" as const,
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.leads.tracking.engagement.post.errors.conflict.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.post.errors.conflict.description" as const,
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.leads.tracking.engagement.post.errors.server.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.post.errors.server.description" as const,
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.leads.tracking.engagement.post.errors.unknown.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.post.errors.unknown.description" as const,
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.leads.tracking.engagement.post.errors.network.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.post.errors.network.description" as const,
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.leads.tracking.engagement.post.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.post.errors.unsavedChanges.description" as const,
+      title: "post.errors.unsavedChanges.title",
+      description: "post.errors.unsavedChanges.description",
     },
   },
 
   successTypes: {
-    title: "app.api.leads.tracking.engagement.post.success.title" as const,
-    description:
-      "app.api.leads.tracking.engagement.post.success.description" as const,
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   examples: {
@@ -369,16 +322,14 @@ const { POST } = createEndpoint({
  * Handles click tracking and redirects for leads
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["leads", "tracking", "engagement"],
-  title: "app.api.leads.tracking.engagement.get.title" as const,
-  description: "app.api.leads.tracking.engagement.get.description" as const,
-  category: "app.api.leads.category" as const,
-  icon: "bar-chart" as const,
-  tags: [
-    "app.api.leads.tracking.engagement.tags.tracking" as const,
-    "app.api.leads.tracking.engagement.tags.engagement" as const,
-  ],
+  title: "get.title",
+  description: "get.description",
+  category: "category",
+  icon: "bar-chart",
+  tags: ["tags.tracking", "tags.engagement"],
   allowedRoles: [
     UserRole.PUBLIC,
     UserRole.CUSTOMER,
@@ -399,126 +350,103 @@ const { GET } = createEndpoint({
       backButton: backButton({ usage: { response: true } }),
 
       // === REQUEST FIELDS (Query Parameters) ===
-      id: requestField({
+      id: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label: "app.api.leads.tracking.engagement.get.id.label" as const,
-        description:
-          "app.api.leads.tracking.engagement.get.id.description" as const,
-        placeholder:
-          "app.api.leads.tracking.engagement.get.id.placeholder" as const,
-        helpText: "app.api.leads.tracking.engagement.get.id.helpText" as const,
+        label: "get.id.label",
+        description: "get.id.description",
+        placeholder: "get.id.placeholder",
+        helpText: "get.id.helpText",
         columns: 12,
         schema: z.uuid().optional(),
       }),
-      campaignId: requestField({
+      campaignId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label:
-          "app.api.leads.tracking.engagement.post.campaignId.label" as const,
-        description:
-          "app.api.leads.tracking.engagement.post.campaignId.description" as const,
-        placeholder:
-          "app.api.leads.tracking.engagement.post.campaignId.placeholder" as const,
-        helpText:
-          "app.api.leads.tracking.engagement.post.campaignId.helpText" as const,
+        label: "post.campaignId.label",
+        description: "post.campaignId.description",
+        placeholder: "post.campaignId.placeholder",
+        helpText: "post.campaignId.helpText",
         columns: 6,
         schema: z.uuid().optional(),
       }),
-      stage: requestField({
+      stage: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.tracking.engagement.get.stage.label" as const,
-        description:
-          "app.api.leads.tracking.engagement.get.stage.description" as const,
-        placeholder:
-          "app.api.leads.tracking.engagement.get.stage.placeholder" as const,
-        helpText:
-          "app.api.leads.tracking.engagement.get.stage.helpText" as const,
+        label: "get.stage.label",
+        description: "get.stage.description",
+        placeholder: "get.stage.placeholder",
+        helpText: "get.stage.helpText",
         options: EmailCampaignStageOptions,
         columns: 6,
         schema: z.enum(EmailCampaignStage).optional(),
       }),
-      source: requestField({
+      source: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.tracking.engagement.get.source.label" as const,
-        description:
-          "app.api.leads.tracking.engagement.get.source.description" as const,
-        placeholder:
-          "app.api.leads.tracking.engagement.get.source.placeholder" as const,
-        helpText:
-          "app.api.leads.tracking.engagement.get.source.helpText" as const,
+        label: "get.source.label",
+        description: "get.source.description",
+        placeholder: "get.source.placeholder",
+        helpText: "get.source.helpText",
         options: LeadSourceOptions,
         columns: 6,
         schema: z.enum(LeadSource).default(LeadSource.EMAIL_CAMPAIGN),
       }),
-      url: requestField({
+      url: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.leads.tracking.engagement.get.url.label" as const,
-        description:
-          "app.api.leads.tracking.engagement.get.url.description" as const,
-        placeholder:
-          "app.api.leads.tracking.engagement.get.url.placeholder" as const,
-        helpText: "app.api.leads.tracking.engagement.get.url.helpText" as const,
+        label: "get.url.label",
+        description: "get.url.description",
+        placeholder: "get.url.placeholder",
+        helpText: "get.url.helpText",
         columns: 12,
         schema: z.string(),
       }),
-      ref: requestField({
+      ref: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.leads.tracking.engagement.get.ref.label" as const,
-        description:
-          "app.api.leads.tracking.engagement.get.ref.description" as const,
-        placeholder:
-          "app.api.leads.tracking.engagement.get.ref.placeholder" as const,
-        helpText: "app.api.leads.tracking.engagement.get.ref.helpText" as const,
+        label: "get.ref.label",
+        description: "get.ref.description",
+        placeholder: "get.ref.placeholder",
+        helpText: "get.ref.helpText",
         columns: 12,
         schema: z.string().optional(),
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.tracking.engagement.get.response.success" as const,
+        content: "get.response.success",
         schema: z.boolean(),
       }),
-      redirectUrl: responseField({
+      redirectUrl: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.tracking.engagement.get.response.redirectUrl" as const,
+        content: "get.response.redirectUrl",
         schema: z.string(),
       }),
-      responseLeadId: responseField({
+      responseLeadId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.tracking.engagement.get.response.leadId" as const,
+        content: "get.response.leadId",
         schema: z.string().optional(),
       }),
-      responseCampaignId: responseField({
+      responseCampaignId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.tracking.engagement.get.response.campaignId" as const,
+        content: "get.response.campaignId",
         schema: z.uuid().optional(),
       }),
-      engagementRecorded: responseField({
+      engagementRecorded: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.tracking.engagement.get.response.engagementRecorded" as const,
+        content: "get.response.engagementRecorded",
         schema: z.boolean(),
       }),
-      leadStatusUpdated: responseField({
+      leadStatusUpdated: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.tracking.engagement.get.response.leadStatusUpdated" as const,
+        content: "get.response.leadStatusUpdated",
         schema: z.boolean(),
       }),
-      isLoggedIn: responseField({
+      isLoggedIn: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.leads.tracking.engagement.get.response.isLoggedIn" as const,
+        content: "get.response.isLoggedIn",
         schema: z.boolean(),
       }),
     },
@@ -526,65 +454,46 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.leads.tracking.engagement.get.errors.validation.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.get.errors.validation.description" as const,
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.leads.tracking.engagement.get.errors.unauthorized.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.get.errors.unauthorized.description" as const,
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.leads.tracking.engagement.get.errors.forbidden.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.get.errors.forbidden.description" as const,
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.leads.tracking.engagement.get.errors.notFound.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.get.errors.notFound.description" as const,
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.leads.tracking.engagement.get.errors.conflict.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.get.errors.conflict.description" as const,
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.leads.tracking.engagement.get.errors.server.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.get.errors.server.description" as const,
+      title: "get.errors.server.title",
+      description: "get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.leads.tracking.engagement.get.errors.unknown.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.get.errors.unknown.description" as const,
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.leads.tracking.engagement.get.errors.network.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.get.errors.network.description" as const,
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.leads.tracking.engagement.get.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.leads.tracking.engagement.get.errors.unsavedChanges.description" as const,
+      title: "get.errors.unsavedChanges.title",
+      description: "get.errors.unsavedChanges.description",
     },
   },
 
   successTypes: {
-    title: "app.api.leads.tracking.engagement.get.success.title" as const,
-    description:
-      "app.api.leads.tracking.engagement.get.success.description" as const,
+    title: "get.success.title",
+    description: "get.success.description",
   },
 
   examples: {

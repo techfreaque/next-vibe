@@ -7,11 +7,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  objectField,
-  requestUrlPathParamsField,
-  responseField,
+  scopedBackButton,
+  scopedObjectFieldNew,
+  scopedRequestUrlPathParamsField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -24,201 +24,200 @@ import {
 import { dateSchema } from "../../../shared/types/common.schema";
 import { UserRole } from "../../../user/user-roles/enum";
 import { EmailStatus, EmailType } from "../enum";
+import { scopedTranslation } from "./i18n";
 import { EmailDetailContainer } from "./widget";
 
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["emails", "messages", "[id]"],
-  title: "app.api.emails.messages.id.title",
-  description: "app.api.emails.messages.id.description",
-  category: "app.api.emails.category",
+  title: "title",
+  description: "description",
+  category: "category",
   icon: "message-square",
-  tags: ["app.api.emails.messages.tag"],
+  tags: ["tags.emails"],
   allowedRoles: [UserRole.ADMIN],
 
   fields: customWidgetObject({
     render: EmailDetailContainer,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
-      backButton: backButton({
+      backButton: scopedBackButton(scopedTranslation, {
         usage: { request: "urlPathParams", response: true },
       }),
       // === URL PARAMETER ===
-      id: requestUrlPathParamsField({
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.messages.id.fields.id.label",
-        description: "app.api.emails.messages.id.fields.id.description",
+        label: "fields.id.label",
+        description: "fields.id.description",
         columns: 12,
         schema: z.uuid(),
       }),
 
       // === RESPONSE FIELDS ===
-      email: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.emails.messages.id.response.email.title",
-          description: "app.api.emails.messages.id.response.email.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          id: responseField({
+      email: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.email.title",
+        description: "response.email.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          id: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.id.response.email.id",
+            content: "response.email.id",
             schema: z.uuid(),
           }),
-          subject: responseField({
+          subject: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.id.response.email.subject",
+            content: "response.email.subject",
             schema: z.string(),
           }),
-          recipientEmail: responseField({
+          recipientEmail: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.id.response.email.recipientEmail",
+            content: "response.email.recipientEmail",
             schema: z.email(),
           }),
-          recipientName: responseField({
+          recipientName: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.id.response.email.recipientName",
+            content: "response.email.recipientName",
             schema: z.string().nullable(),
           }),
-          senderEmail: responseField({
+          senderEmail: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.id.response.email.senderEmail",
+            content: "response.email.senderEmail",
             schema: z.email(),
           }),
-          senderName: responseField({
+          senderName: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.id.response.email.senderName",
+            content: "response.email.senderName",
             schema: z.string().nullable(),
           }),
-          type: responseField({
+          type: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.messages.id.response.email.type",
+            text: "response.email.type",
             schema: z.enum(EmailType),
           }),
-          status: responseField({
+          status: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.messages.id.response.email.status",
+            text: "response.email.status",
             schema: z.enum(EmailStatus),
           }),
-          templateName: responseField({
+          templateName: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.id.response.email.templateName",
+            content: "response.email.templateName",
             schema: z.string().nullable(),
           }),
-          emailProvider: responseField({
+          emailProvider: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.id.response.email.emailProvider",
+            content: "response.email.emailProvider",
             schema: z.string().nullable(),
           }),
-          externalId: responseField({
+          externalId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.id.response.email.externalId",
+            content: "response.email.externalId",
             schema: z.string().nullable(),
           }),
-          sentAt: responseField({
+          sentAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.id.response.email.sentAt",
+            content: "response.email.sentAt",
             schema: dateSchema.nullable(),
           }),
-          deliveredAt: responseField({
+          deliveredAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.id.response.email.deliveredAt",
+            content: "response.email.deliveredAt",
             schema: dateSchema.nullable(),
           }),
-          openedAt: responseField({
+          openedAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.id.response.email.openedAt",
+            content: "response.email.openedAt",
             schema: dateSchema.nullable(),
           }),
-          clickedAt: responseField({
+          clickedAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.id.response.email.clickedAt",
+            content: "response.email.clickedAt",
             schema: dateSchema.nullable(),
           }),
-          retryCount: responseField({
+          retryCount: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.id.response.email.retryCount",
+            content: "response.email.retryCount",
             schema: z.coerce.number().int(),
           }),
-          error: responseField({
+          error: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.id.response.email.error",
+            content: "response.email.error",
             schema: z.string().nullable(),
           }),
-          userId: responseField({
+          userId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.id.response.email.userId",
+            content: "response.email.userId",
             schema: z.uuid().nullable(),
           }),
-          leadId: responseField({
+          leadId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.id.response.email.leadId",
+            content: "response.email.leadId",
             schema: z.uuid().nullable(),
           }),
-          createdAt: responseField({
+          createdAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.id.response.email.createdAt",
+            content: "response.email.createdAt",
             schema: dateSchema,
           }),
-          updatedAt: responseField({
+          updatedAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.emails.messages.id.response.email.updatedAt",
+            content: "response.email.updatedAt",
             schema: dateSchema,
           }),
         },
-      ),
+      }),
     },
   }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.emails.messages.id.errors.validation.title",
-      description: "app.api.emails.messages.id.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.emails.messages.id.errors.unauthorized.title",
-      description: "app.api.emails.messages.id.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.emails.messages.id.errors.notFound.title",
-      description: "app.api.emails.messages.id.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.emails.messages.id.errors.forbidden.title",
-      description: "app.api.emails.messages.id.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.emails.messages.id.errors.server.title",
-      description: "app.api.emails.messages.id.errors.server.description",
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.emails.messages.id.errors.conflict.title",
-      description: "app.api.emails.messages.id.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.emails.messages.id.errors.network.title",
-      description: "app.api.emails.messages.id.errors.network.description",
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.emails.messages.id.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.messages.id.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.emails.messages.id.errors.unknown.title",
-      description: "app.api.emails.messages.id.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.emails.messages.id.success.title",
-    description: "app.api.emails.messages.id.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 
   // === EXAMPLES ===

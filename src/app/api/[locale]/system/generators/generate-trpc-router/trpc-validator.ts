@@ -14,7 +14,8 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "../i18n";
 
 /**
  * Constants for code pattern matching
@@ -60,7 +61,7 @@ export function validateTRPCIntegration(
   options: TRPCValidationOptions,
 ): ValidationResult {
   const { apiDir, fix = false, verbose = false, logger, locale } = options;
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   const result: ValidationResult = {
     success: true,
@@ -75,12 +76,9 @@ export function validateTRPCIntegration(
 
     if (!fs.existsSync(resolvedApiDir)) {
       result.errors.push(
-        t(
-          "app.api.system.generators.generateTrpcRouter.trpcValidator.apiDirectoryNotFound",
-          {
-            resolvedApiDir,
-          },
-        ),
+        t("generateTrpcRouter.trpcValidator.apiDirectoryNotFound", {
+          resolvedApiDir,
+        }),
       );
       result.success = false;
       return result;
@@ -91,12 +89,9 @@ export function validateTRPCIntegration(
 
     if (verbose) {
       logger.info(
-        t(
-          "app.api.system.generators.generateTrpcRouter.trpcValidator.foundRouteFiles",
-          {
-            count: routeFiles.length.toString(),
-          },
-        ),
+        t("generateTrpcRouter.trpcValidator.foundRouteFiles", {
+          count: routeFiles.length.toString(),
+        }),
       );
     }
 
@@ -128,45 +123,32 @@ export function validateTRPCIntegration(
     );
     if (!fs.existsSync(routerFile)) {
       result.warnings.push(
-        t(
-          "app.api.system.generators.generateTrpcRouter.trpcValidator.routerNotFound",
-        ),
+        t("generateTrpcRouter.trpcValidator.routerNotFound"),
       );
     }
 
     // Summary
     if (verbose) {
       const status = result.success
-        ? t("app.api.system.generators.generateTrpcRouter.trpcValidator.passed")
-        : t(
-            "app.api.system.generators.generateTrpcRouter.trpcValidator.failed",
-          );
+        ? t("generateTrpcRouter.trpcValidator.passed")
+        : t("generateTrpcRouter.trpcValidator.failed");
       logger.info(
-        t(
-          "app.api.system.generators.generateTrpcRouter.trpcValidator.validationComplete",
-          {
-            status,
-          },
-        ),
+        t("generateTrpcRouter.trpcValidator.validationComplete", {
+          status,
+        }),
       );
       logger.info(
-        t(
-          "app.api.system.generators.generateTrpcRouter.trpcValidator.errorsSummary",
-          {
-            errorCount: result.errors.length.toString(),
-            warningCount: result.warnings.length.toString(),
-          },
-        ),
+        t("generateTrpcRouter.trpcValidator.errorsSummary", {
+          errorCount: result.errors.length.toString(),
+          warningCount: result.warnings.length.toString(),
+        }),
       );
     }
   } catch (error) {
     result.errors.push(
-      t(
-        "app.api.system.generators.generateTrpcRouter.trpcValidator.validationFailed",
-        {
-          message: parseError(error).message,
-        },
-      ),
+      t("generateTrpcRouter.trpcValidator.validationFailed", {
+        message: parseError(error).message,
+      }),
     );
     result.success = false;
   }
@@ -182,7 +164,7 @@ function validateRouteFile(
   fix: boolean,
   locale: CountryLanguage,
 ): RouteFileValidation {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   const validation: RouteFileValidation = {
     filePath,
@@ -199,10 +181,10 @@ function validateRouteFile(
 
     // Check for definition import
     const definitionImportFrom = t(
-      "app.api.system.generators.generateTrpcRouter.trpcValidator.definitionImportFrom",
+      "generateTrpcRouter.trpcValidator.definitionImportFrom",
     );
     const definitionImportFromTs = t(
-      "app.api.system.generators.generateTrpcRouter.trpcValidator.definitionImportFromTs",
+      "generateTrpcRouter.trpcValidator.definitionImportFromTs",
     );
     const fromKeyword = "from";
     const quote = CODE_PATTERNS.QUOTE;
@@ -216,13 +198,13 @@ function validateRouteFile(
 
     // Check for enhanced handler usage
     const enhancedApiHandlerCall = t(
-      "app.api.system.generators.generateTrpcRouter.trpcValidator.enhancedApiHandlerCall",
+      "generateTrpcRouter.trpcValidator.enhancedApiHandlerCall",
     );
     validation.hasEnhancedHandler = content.includes(enhancedApiHandlerCall);
 
     // Check for tRPC export
     const exportConstTrpc = t(
-      "app.api.system.generators.generateTrpcRouter.trpcValidator.exportConstTrpc",
+      "generateTrpcRouter.trpcValidator.exportConstTrpc",
     );
     validation.hasTRPCExport = content.includes(exportConstTrpc);
 
@@ -247,40 +229,30 @@ function validateRouteFile(
       // If has definition, should have enhanced handler
       if (!validation.hasEnhancedHandler) {
         validation.warnings.push(
-          t(
-            "app.api.system.generators.generateTrpcRouter.trpcValidator.routeHasDefinitionNoHandler",
-          ),
+          t("generateTrpcRouter.trpcValidator.routeHasDefinitionNoHandler"),
         );
       }
 
       // If has enhanced handler, should have tRPC export
       if (validation.hasEnhancedHandler && !validation.hasTRPCExport) {
         validation.warnings.push(
-          t(
-            "app.api.system.generators.generateTrpcRouter.trpcValidator.routeHasHandlerNoTrpc",
-          ),
+          t("generateTrpcRouter.trpcValidator.routeHasHandlerNoTrpc"),
         );
       }
 
       // Should maintain Next.js exports for backward compatibility
       if (validation.hasEnhancedHandler && !validation.hasNextExport) {
         validation.errors.push(
-          t(
-            "app.api.system.generators.generateTrpcRouter.trpcValidator.routeMissingNextExports",
-          ),
+          t("generateTrpcRouter.trpcValidator.routeMissingNextExports"),
         );
       }
     }
 
     // Check for old apiHandler usage
-    const apiHandlerOld = t(
-      "app.api.system.generators.generateTrpcRouter.trpcValidator.apiHandlerOld",
-    );
+    const apiHandlerOld = t("generateTrpcRouter.trpcValidator.apiHandlerOld");
     if (content.includes(apiHandlerOld) && !validation.hasEnhancedHandler) {
       validation.warnings.push(
-        t(
-          "app.api.system.generators.generateTrpcRouter.trpcValidator.routeUsesOldHandler",
-        ),
+        t("generateTrpcRouter.trpcValidator.routeUsesOldHandler"),
       );
     }
 
@@ -288,19 +260,14 @@ function validateRouteFile(
     if (fix && validation.warnings.length > 0) {
       // This would trigger the migration script
       validation.warnings.push(
-        t(
-          "app.api.system.generators.generateTrpcRouter.trpcValidator.autoFixNotImplemented",
-        ),
+        t("generateTrpcRouter.trpcValidator.autoFixNotImplemented"),
       );
     }
   } catch (error) {
     validation.errors.push(
-      t(
-        "app.api.system.generators.generateTrpcRouter.trpcValidator.failedToReadRoute",
-        {
-          message: parseError(error).message,
-        },
-      ),
+      t("generateTrpcRouter.trpcValidator.failedToReadRoute", {
+        message: parseError(error).message,
+      }),
     );
   }
 
@@ -311,22 +278,18 @@ function validateRouteFile(
  * Find all route.ts files in the API directory
  */
 function findRouteFiles(apiDir: string, locale: CountryLanguage): string[] {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const routeFiles: string[] = [];
 
   // Get directory names to skip from translations
-  const trpcDir = t(
-    "app.api.system.generators.generateTrpcRouter.trpcValidator.directoriesSkip.trpc",
-  );
+  const trpcDir = t("generateTrpcRouter.trpcValidator.directoriesSkip.trpc");
   const generatedDir = t(
-    "app.api.system.generators.generateTrpcRouter.trpcValidator.directoriesSkip.generated",
+    "generateTrpcRouter.trpcValidator.directoriesSkip.generated",
   );
   const nodeModulesDir = t(
-    "app.api.system.generators.generateTrpcRouter.trpcValidator.directoriesSkip.nodeModules",
+    "generateTrpcRouter.trpcValidator.directoriesSkip.nodeModules",
   );
-  const routeFileName = t(
-    "app.api.system.generators.generateTrpcRouter.trpcValidator.routeFileName",
-  );
+  const routeFileName = t("generateTrpcRouter.trpcValidator.routeFileName");
 
   function scanDirectory(dir: string): void {
     try {
@@ -366,81 +329,49 @@ export function generateValidationReport(
   result: ValidationResult,
   locale: CountryLanguage,
 ): string {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const lines: string[] = [];
 
-  const checkmark = t(
-    "app.api.system.generators.generateTrpcRouter.trpcValidator.checkmark",
-  );
-  const crossmark = t(
-    "app.api.system.generators.generateTrpcRouter.trpcValidator.crossmark",
-  );
-  const warningIcon = t(
-    "app.api.system.generators.generateTrpcRouter.trpcValidator.warningIcon",
-  );
+  const checkmark = t("generateTrpcRouter.trpcValidator.checkmark");
+  const crossmark = t("generateTrpcRouter.trpcValidator.crossmark");
+  const warningIcon = t("generateTrpcRouter.trpcValidator.warningIcon");
 
-  lines.push(
-    t("app.api.system.generators.generateTrpcRouter.trpcValidator.reportTitle"),
-  );
+  lines.push(t("generateTrpcRouter.trpcValidator.reportTitle"));
   lines.push("");
 
   const statusText = result.success
-    ? t(
-        "app.api.system.generators.generateTrpcRouter.trpcValidator.reportStatusPassed",
-      )
-    : t(
-        "app.api.system.generators.generateTrpcRouter.trpcValidator.reportStatusFailed",
-      );
+    ? t("generateTrpcRouter.trpcValidator.reportStatusPassed")
+    : t("generateTrpcRouter.trpcValidator.reportStatusFailed");
   lines.push(
-    t(
-      "app.api.system.generators.generateTrpcRouter.trpcValidator.reportStatus",
-      {
-        status: statusText,
-      },
-    ),
+    t("generateTrpcRouter.trpcValidator.reportStatus", {
+      status: statusText,
+    }),
   );
   lines.push(
-    t(
-      "app.api.system.generators.generateTrpcRouter.trpcValidator.reportRouteFiles",
-      {
-        count: result.routeFiles.length.toString(),
-      },
-    ),
+    t("generateTrpcRouter.trpcValidator.reportRouteFiles", {
+      count: result.routeFiles.length.toString(),
+    }),
   );
   lines.push(
-    t(
-      "app.api.system.generators.generateTrpcRouter.trpcValidator.reportErrors",
-      {
-        count: result.errors.length.toString(),
-      },
-    ),
+    t("generateTrpcRouter.trpcValidator.reportErrors", {
+      count: result.errors.length.toString(),
+    }),
   );
   lines.push(
-    t(
-      "app.api.system.generators.generateTrpcRouter.trpcValidator.reportWarnings",
-      {
-        count: result.warnings.length.toString(),
-      },
-    ),
+    t("generateTrpcRouter.trpcValidator.reportWarnings", {
+      count: result.warnings.length.toString(),
+    }),
   );
   lines.push("");
 
   if (result.errors.length > 0) {
-    lines.push(
-      t(
-        "app.api.system.generators.generateTrpcRouter.trpcValidator.errorsSection",
-      ),
-    );
+    lines.push(t("generateTrpcRouter.trpcValidator.errorsSection"));
     result.errors.forEach((error) => lines.push(`- ${crossmark} ${error}`));
     lines.push("");
   }
 
   if (result.warnings.length > 0) {
-    lines.push(
-      t(
-        "app.api.system.generators.generateTrpcRouter.trpcValidator.warningsSection",
-      ),
-    );
+    lines.push(t("generateTrpcRouter.trpcValidator.warningsSection"));
     result.warnings.forEach((warning) =>
       lines.push(`- ${warningIcon} ${warning}`),
     );
@@ -448,11 +379,7 @@ export function generateValidationReport(
   }
 
   // Route file details
-  lines.push(
-    t(
-      "app.api.system.generators.generateTrpcRouter.trpcValidator.routeFileDetails",
-    ),
-  );
+  lines.push(t("generateTrpcRouter.trpcValidator.routeFileDetails"));
   for (const routeFile of result.routeFiles) {
     const relativePath = path.relative(process.cwd(), routeFile.filePath);
     const markdownHeading = CODE_PATTERNS.MARKDOWN_H3;
@@ -461,63 +388,43 @@ export function generateValidationReport(
 
     const definitionStatus = routeFile.hasDefinition ? checkmark : crossmark;
     lines.push(
-      t(
-        "app.api.system.generators.generateTrpcRouter.trpcValidator.definitionField",
-        {
-          status: definitionStatus,
-        },
-      ),
+      t("generateTrpcRouter.trpcValidator.definitionField", {
+        status: definitionStatus,
+      }),
     );
 
     const enhancedHandlerStatus = routeFile.hasEnhancedHandler
       ? checkmark
       : crossmark;
     lines.push(
-      t(
-        "app.api.system.generators.generateTrpcRouter.trpcValidator.enhancedHandlerField",
-        {
-          status: enhancedHandlerStatus,
-        },
-      ),
+      t("generateTrpcRouter.trpcValidator.enhancedHandlerField", {
+        status: enhancedHandlerStatus,
+      }),
     );
 
     const trpcExportStatus = routeFile.hasTRPCExport ? checkmark : crossmark;
     lines.push(
-      t(
-        "app.api.system.generators.generateTrpcRouter.trpcValidator.trpcExportField",
-        {
-          status: trpcExportStatus,
-        },
-      ),
+      t("generateTrpcRouter.trpcValidator.trpcExportField", {
+        status: trpcExportStatus,
+      }),
     );
 
     const nextExportStatus = routeFile.hasNextExport ? checkmark : crossmark;
     lines.push(
-      t(
-        "app.api.system.generators.generateTrpcRouter.trpcValidator.nextExportField",
-        {
-          status: nextExportStatus,
-        },
-      ),
+      t("generateTrpcRouter.trpcValidator.nextExportField", {
+        status: nextExportStatus,
+      }),
     );
 
     if (routeFile.errors.length > 0) {
-      lines.push(
-        t(
-          "app.api.system.generators.generateTrpcRouter.trpcValidator.errorsList",
-        ),
-      );
+      lines.push(t("generateTrpcRouter.trpcValidator.errorsList"));
       routeFile.errors.forEach((error) =>
         lines.push(`  - ${crossmark} ${error}`),
       );
     }
 
     if (routeFile.warnings.length > 0) {
-      lines.push(
-        t(
-          "app.api.system.generators.generateTrpcRouter.trpcValidator.warningsList",
-        ),
-      );
+      lines.push(t("generateTrpcRouter.trpcValidator.warningsList"));
       routeFile.warnings.forEach((warning) =>
         lines.push(`  - ${warningIcon} ${warning}`),
       );

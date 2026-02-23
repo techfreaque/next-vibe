@@ -9,6 +9,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
+import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   EndpointErrorTypes,
@@ -17,7 +18,6 @@ import {
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { callApi, containsFile, objectToFormData } from "./api-utils";
@@ -157,11 +157,12 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
       const validationErrorConfig =
         endpoint.errorTypes?.[EndpointErrorTypes.VALIDATION_FAILED];
 
+      const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
       const message = validationErrorConfig?.description
         ? endpoint.scopedTranslation
             .scopedT(locale)
             .t(validationErrorConfig.description)
-        : ("app.api.shared.errors.validationFailed.description" satisfies TranslationKey);
+        : sharedT("errors.validationFailed.description");
 
       const errorResponse = fail({
         message,
@@ -214,11 +215,12 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
           const validationErrorConfig =
             endpoint.errorTypes?.[EndpointErrorTypes.VALIDATION_FAILED];
 
+          const { t: sharedT2 } = sharedScopedTranslation.scopedT(locale);
           const message = validationErrorConfig?.description
             ? endpoint.scopedTranslation
                 .scopedT(locale)
                 .t(validationErrorConfig.description)
-            : ("app.api.shared.errors.validationFailed.description" satisfies TranslationKey);
+            : sharedT2("errors.validationFailed.description");
 
           const errorResponse = fail({
             message,
@@ -389,9 +391,10 @@ export async function executeQuery<TEndpoint extends CreateApiEndpointAny>({
       parsedError.message.toLowerCase().includes("fetch");
     const errorConfig = isNetworkError ? networkErrorConfig : serverErrorConfig;
 
+    const { t: sharedT3 } = sharedScopedTranslation.scopedT(locale);
     const message = errorConfig?.description
       ? endpoint.scopedTranslation.scopedT(locale).t(errorConfig.description)
-      : ("app.api.shared.errors.serverError.description" satisfies TranslationKey);
+      : sharedT3("errors.serverError.description");
 
     const errorResponse = fail({
       message,

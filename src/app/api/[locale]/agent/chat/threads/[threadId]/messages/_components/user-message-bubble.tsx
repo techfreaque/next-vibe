@@ -54,7 +54,7 @@ export function UserMessageBubble({
         {showAuthor && (
           <Div className="mb-2 flex justify-end">
             <MessageAuthorInfo
-              authorName={message.authorName}
+              authorName={message.authorName ?? null}
               authorId={message.authorId}
               currentUserId={currentUserId}
               isAI={message.isAI}

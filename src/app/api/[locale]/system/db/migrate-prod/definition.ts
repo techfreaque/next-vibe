@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,156 +20,145 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../user/user-roles/enum";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "db", "migrate-prod"],
-  title: "app.api.system.db.migrateProd.post.title",
-  description: "app.api.system.db.migrateProd.post.description",
-  category: "app.api.system.category",
-  tags: ["app.api.system.db.migrateProd.tag"],
+  title: "post.title",
+  description: "post.description",
+  category: "category",
+  tags: ["tag"],
   icon: "git-branch",
   allowedRoles: [UserRole.ADMIN, UserRole.CLI_OFF],
   aliases: ["migrate-prod", "db:migrate-prod"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.db.migrateProd.post.form.title",
-      description: "app.api.system.db.migrateProd.post.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.form.title",
+    description: "post.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      skipSeeding: requestField({
+      skipSeeding: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.db.migrateProd.fields.skipSeeding.title",
-        description:
-          "app.api.system.db.migrateProd.fields.skipSeeding.description",
+        label: "fields.skipSeeding.title",
+        description: "fields.skipSeeding.description",
         columns: 4,
         schema: z.boolean().optional().default(false),
       }),
 
-      force: requestField({
+      force: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.db.migrateProd.fields.force.title",
-        description: "app.api.system.db.migrateProd.fields.force.description",
+        label: "fields.force.title",
+        description: "fields.force.description",
         columns: 4,
         schema: z.boolean().optional().default(false),
       }),
 
-      dryRun: requestField({
+      dryRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.db.migrateProd.fields.dryRun.title",
-        description: "app.api.system.db.migrateProd.fields.dryRun.description",
+        label: "fields.dryRun.title",
+        description: "fields.dryRun.description",
         columns: 4,
         schema: z.boolean().optional().default(false),
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.migrateProd.fields.success.title",
+        content: "fields.success.title",
         schema: z.boolean(),
       }),
 
-      output: responseField({
+      output: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.migrateProd.fields.output.title",
+        content: "fields.output.title",
         schema: z.string(),
       }),
 
-      environment: responseField({
+      environment: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.migrateProd.fields.environment.title",
+        content: "fields.environment.title",
         schema: z.string(),
       }),
 
-      databaseUrl: responseField({
+      databaseUrl: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.migrateProd.fields.databaseUrl.title",
+        content: "fields.databaseUrl.title",
         schema: z.string(),
       }),
 
-      migrationsGenerated: responseField({
+      migrationsGenerated: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.db.migrateProd.fields.migrationsGenerated.title",
+        content: "fields.migrationsGenerated.title",
         schema: z.boolean(),
       }),
 
-      migrationsApplied: responseField({
+      migrationsApplied: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.migrateProd.fields.migrationsApplied.title",
+        content: "fields.migrationsApplied.title",
         schema: z.boolean(),
       }),
 
-      seedingCompleted: responseField({
+      seedingCompleted: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.migrateProd.fields.seedingCompleted.title",
+        content: "fields.seedingCompleted.title",
         schema: z.boolean(),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.db.migrateProd.post.errors.validation.title",
-      description:
-        "app.api.system.db.migrateProd.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.db.migrateProd.post.errors.network.title",
-      description:
-        "app.api.system.db.migrateProd.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.db.migrateProd.post.errors.unauthorized.title",
-      description:
-        "app.api.system.db.migrateProd.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.db.migrateProd.post.errors.forbidden.title",
-      description:
-        "app.api.system.db.migrateProd.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.db.migrateProd.post.errors.notFound.title",
-      description:
-        "app.api.system.db.migrateProd.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.db.migrateProd.post.errors.server.title",
-      description:
-        "app.api.system.db.migrateProd.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.db.migrateProd.post.errors.unknown.title",
-      description:
-        "app.api.system.db.migrateProd.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.db.migrateProd.post.errors.server.title",
-      description:
-        "app.api.system.db.migrateProd.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.db.migrateProd.post.errors.conflict.title",
-      description:
-        "app.api.system.db.migrateProd.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.system.db.migrateProd.post.success.title",
-    description: "app.api.system.db.migrateProd.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   // === EXAMPLES ===

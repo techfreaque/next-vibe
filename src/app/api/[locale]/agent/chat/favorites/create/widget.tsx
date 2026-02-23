@@ -6,6 +6,7 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { Span } from "next-vibe-ui/ui/span";
 import { useState } from "react";
 
 import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/config";
@@ -23,7 +24,6 @@ import {
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { AlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/react";
-import TextWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/react";
 import { IconFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/react";
 import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
@@ -164,19 +164,18 @@ export function FavoriteCreateContainer({
               <IconFieldWidget fieldName="icon" field={children.icon} />
               <Div className="flex-1 flex flex-col gap-2">
                 <Div className="flex flex-col gap-1">
-                  <TextWidget
-                    fieldName="name"
-                    field={withValue(children.name, undefined, null)}
-                  />
-                  <TextWidget
-                    fieldName="tagline"
-                    field={withValue(children.tagline, undefined, null)}
-                  />
+                  {characterData?.name && (
+                    <Span className="font-medium">{characterData.name}</Span>
+                  )}
+                  {characterData?.tagline && (
+                    <Span className="text-sm text-muted-foreground">
+                      {characterData.tagline}
+                    </Span>
+                  )}
                 </Div>
-                <TextWidget
-                  fieldName="description"
-                  field={withValue(children.description, undefined, null)}
-                />
+                {characterData?.description && (
+                  <Span className="text-sm">{characterData.description}</Span>
+                )}
               </Div>
             </Div>
           )}

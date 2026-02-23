@@ -38,8 +38,8 @@ interface UseChatSettingsReturn {
   setTTSAutoplay: (autoplay: boolean) => void;
   setViewMode: (mode: typeof ViewModeValue) => void;
   setTools: (
-    activeTools: ChatSettingsUpdateRequestOutput["activeTools"],
-    visibleTools: ChatSettingsUpdateRequestOutput["visibleTools"],
+    allowedTools: ChatSettingsUpdateRequestOutput["allowedTools"],
+    pinnedTools: ChatSettingsUpdateRequestOutput["pinnedTools"],
   ) => void;
   setCompactTrigger: (value: number | null) => void;
 }
@@ -126,11 +126,11 @@ export function useChatSettings(
       if (updates.viewMode !== undefined) {
         endpoint.create?.setValue("viewMode", updates.viewMode);
       }
-      if (updates.activeTools !== undefined) {
-        endpoint.create?.setValue("activeTools", updates.activeTools);
+      if (updates.allowedTools !== undefined) {
+        endpoint.create?.setValue("allowedTools", updates.allowedTools);
       }
-      if (updates.visibleTools !== undefined) {
-        endpoint.create?.setValue("visibleTools", updates.visibleTools);
+      if (updates.pinnedTools !== undefined) {
+        endpoint.create?.setValue("pinnedTools", updates.pinnedTools);
       }
       if (updates.compactTrigger !== undefined) {
         endpoint.create?.setValue("compactTrigger", updates.compactTrigger);
@@ -157,10 +157,10 @@ export function useChatSettings(
 
   const setTools = useCallback(
     (
-      activeTools: ChatSettingsUpdateRequestOutput["activeTools"],
-      visibleTools: ChatSettingsUpdateRequestOutput["visibleTools"],
+      allowedTools: ChatSettingsUpdateRequestOutput["allowedTools"],
+      pinnedTools: ChatSettingsUpdateRequestOutput["pinnedTools"],
     ) => {
-      void updateSettings({ activeTools, visibleTools });
+      void updateSettings({ allowedTools, pinnedTools });
     },
     [updateSettings],
   );

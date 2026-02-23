@@ -2,6 +2,64 @@ import { translations as validationTranslations } from "../../validation/i18n/de
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Generatoren",
+
+  title: "tRPC-Router generieren",
+  description: "tRPC-Router aus API-Endpunkten generieren",
+  tag: "tRPC",
+  container: {
+    title: "tRPC-Router-Generierung",
+    description: "tRPC-Router-Konfiguration generieren",
+  },
+  fields: {
+    apiDir: {
+      title: "API-Verzeichnis",
+      description: "Verzeichnis mit API-Route-Dateien",
+    },
+    outputFile: {
+      title: "Ausgabedatei",
+      description: "Pfad zur generierten tRPC-Router-Datei",
+    },
+    includeWarnings: {
+      title: "Warnungen einbeziehen",
+      description: "Warnmeldungen in der Ausgabe einbeziehen",
+    },
+    excludePatterns: {
+      title: "Ausschlussmuster",
+      description:
+        "Muster, die von der tRPC-Router-Generierung ausgeschlossen werden sollen",
+    },
+    success: {
+      title: "Erfolg",
+    },
+    generationCompleted: {
+      title: "Generierung abgeschlossen",
+    },
+    output: {
+      title: "Ausgabe",
+    },
+    generationStats: {
+      title: "Generierungsstatistik",
+    },
+  },
+  errors: {
+    validation: {
+      title: "Validierungsfehler",
+      description: "Ungültige Parameter für die tRPC-Router-Generierung",
+    },
+    internal: {
+      title: "Interner Fehler",
+      description: "Fehler bei der tRPC-Router-Generierung",
+    },
+    unauthorized: {
+      title: "Nicht autorisiert",
+      description: "Keine Berechtigung zum Generieren des tRPC-Routers",
+    },
+  },
+  success: {
+    title: "tRPC-Router generiert",
+    description: "tRPC-Router wurde erfolgreich generiert",
+  },
   validation: validationTranslations,
   trpcValidator: {
     apiDirectoryNotFound: "API-Verzeichnis nicht gefunden: {{resolvedApiDir}}",

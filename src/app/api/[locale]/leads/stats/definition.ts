@@ -15,10 +15,10 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   backButton,
   customWidgetObject,
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -46,6 +46,7 @@ import {
   SortOrder,
   SortOrderOptions,
 } from "../enum";
+import { scopedTranslation } from "./i18n";
 import { LeadsStatsContainer } from "./widget";
 
 // ========== Zod Schemas for Complex Response Types ==========
@@ -97,147 +98,147 @@ const dataRangeSchema = z.object({
 const TimePeriodOptions = [
   {
     value: TimePeriod.HOUR,
-    label: "app.api.leads.stats.timePeriod.hour" as const,
+    label: "timePeriod.hour",
   },
   {
     value: TimePeriod.DAY,
-    label: "app.api.leads.stats.timePeriod.day" as const,
+    label: "timePeriod.day",
   },
   {
     value: TimePeriod.WEEK,
-    label: "app.api.leads.stats.timePeriod.week" as const,
+    label: "timePeriod.week",
   },
   {
     value: TimePeriod.MONTH,
-    label: "app.api.leads.stats.timePeriod.month" as const,
+    label: "timePeriod.month",
   },
   {
     value: TimePeriod.QUARTER,
-    label: "app.api.leads.stats.timePeriod.quarter" as const,
+    label: "timePeriod.quarter",
   },
   {
     value: TimePeriod.YEAR,
-    label: "app.api.leads.stats.timePeriod.year" as const,
+    label: "timePeriod.year",
   },
 ];
 
 const DateRangePresetOptions = [
   {
     value: DateRangePreset.TODAY,
-    label: "app.api.leads.stats.dateRange.today" as const,
+    label: "dateRange.today",
   },
   {
     value: DateRangePreset.YESTERDAY,
-    label: "app.api.leads.stats.dateRange.yesterday" as const,
+    label: "dateRange.yesterday",
   },
   {
     value: DateRangePreset.LAST_7_DAYS,
-    label: "app.api.leads.stats.dateRange.last7Days" as const,
+    label: "dateRange.last7Days",
   },
   {
     value: DateRangePreset.LAST_30_DAYS,
-    label: "app.api.leads.stats.dateRange.last30Days" as const,
+    label: "dateRange.last30Days",
   },
   {
     value: DateRangePreset.LAST_90_DAYS,
-    label: "app.api.leads.stats.dateRange.last90Days" as const,
+    label: "dateRange.last90Days",
   },
   {
     value: DateRangePreset.THIS_WEEK,
-    label: "app.api.leads.stats.dateRange.thisWeek" as const,
+    label: "dateRange.thisWeek",
   },
   {
     value: DateRangePreset.LAST_WEEK,
-    label: "app.api.leads.stats.dateRange.lastWeek" as const,
+    label: "dateRange.lastWeek",
   },
   {
     value: DateRangePreset.THIS_MONTH,
-    label: "app.api.leads.stats.dateRange.thisMonth" as const,
+    label: "dateRange.thisMonth",
   },
   {
     value: DateRangePreset.LAST_MONTH,
-    label: "app.api.leads.stats.dateRange.lastMonth" as const,
+    label: "dateRange.lastMonth",
   },
   {
     value: DateRangePreset.THIS_QUARTER,
-    label: "app.api.leads.stats.dateRange.thisQuarter" as const,
+    label: "dateRange.thisQuarter",
   },
   {
     value: DateRangePreset.LAST_QUARTER,
-    label: "app.api.leads.stats.dateRange.lastQuarter" as const,
+    label: "dateRange.lastQuarter",
   },
   {
     value: DateRangePreset.THIS_YEAR,
-    label: "app.api.leads.stats.dateRange.thisYear" as const,
+    label: "dateRange.thisYear",
   },
   {
     value: DateRangePreset.LAST_YEAR,
-    label: "app.api.leads.stats.dateRange.lastYear" as const,
+    label: "dateRange.lastYear",
   },
   {
     value: DateRangePreset.CUSTOM,
-    label: "app.api.leads.stats.dateRange.custom" as const,
+    label: "dateRange.custom",
   },
 ];
 
 const ChartTypeOptions = [
   {
     value: ChartType.LINE,
-    label: "app.api.leads.stats.chartType.line" as const,
+    label: "chartType.line",
   },
   {
     value: ChartType.BAR,
-    label: "app.api.leads.stats.chartType.bar" as const,
+    label: "chartType.bar",
   },
   {
     value: ChartType.AREA,
-    label: "app.api.leads.stats.chartType.area" as const,
+    label: "chartType.area",
   },
   {
     value: ChartType.PIE,
-    label: "app.api.leads.stats.chartType.pie" as const,
+    label: "chartType.pie",
   },
   {
     value: ChartType.DONUT,
-    label: "app.api.leads.stats.chartType.donut" as const,
+    label: "chartType.donut",
   },
 ];
 
 const CountryFilterOptions = [
   {
     value: CountryFilter.ALL,
-    label: "app.api.leads.stats.country.all" as const,
+    label: "country.all",
   },
   {
     value: CountryFilter.DE,
-    label: "app.api.leads.stats.country.de" as const,
+    label: "country.de",
   },
   {
     value: CountryFilter.PL,
-    label: "app.api.leads.stats.country.pl" as const,
+    label: "country.pl",
   },
   {
     value: CountryFilter.GLOBAL,
-    label: "app.api.leads.stats.country.global" as const,
+    label: "country.global",
   },
 ];
 
 const LanguageFilterOptions = [
   {
     value: LanguageFilter.ALL,
-    label: "app.api.leads.stats.language.all" as const,
+    label: "language.all",
   },
   {
     value: LanguageFilter.EN,
-    label: "app.api.leads.stats.language.en" as const,
+    label: "language.en",
   },
   {
     value: LanguageFilter.DE,
-    label: "app.api.leads.stats.language.de" as const,
+    label: "language.de",
   },
   {
     value: LanguageFilter.PL,
-    label: "app.api.leads.stats.language.pl" as const,
+    label: "language.pl",
   },
 ];
 
@@ -246,16 +247,13 @@ const LanguageFilterOptions = [
  * Using new field-based API
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["leads", "stats"],
-  title: "app.api.leads.stats.title",
-  description: "app.api.leads.stats.description",
-  category: "app.api.leads.category",
-  tags: [
-    "app.api.leads.stats.tags.leads",
-    "app.api.leads.stats.tags.statistics",
-    "app.api.leads.stats.tags.analytics",
-  ],
+  title: "title",
+  description: "description",
+  category: "category",
+  tags: ["tags.leads", "tags.statistics", "tags.analytics"],
   allowedRoles: [UserRole.ADMIN],
   icon: "bar-chart-3",
 
@@ -267,119 +265,119 @@ const { GET } = createEndpoint({
       // === REQUEST FIELDS (Filters) ===
 
       // Time-based filtering
-      timePeriod: requestField({
+      timePeriod: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.stats.timePeriod.label",
-        description: "app.api.leads.stats.timePeriod.description",
+        label: "timePeriod.label",
+        description: "timePeriod.description",
         options: TimePeriodOptions,
         columns: 4,
         schema: z.enum(TimePeriod).default(TimePeriod.DAY),
       }),
 
-      dateRangePreset: requestField({
+      dateRangePreset: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.stats.dateRangePreset.label",
-        description: "app.api.leads.stats.dateRangePreset.description",
+        label: "dateRangePreset.label",
+        description: "dateRangePreset.description",
         options: DateRangePresetOptions,
         columns: 4,
         schema: z.enum(DateRangePreset).default(DateRangePreset.LAST_30_DAYS),
       }),
 
-      dateFrom: requestField({
+      dateFrom: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
-        label: "app.api.leads.stats.dateFrom.label",
-        description: "app.api.leads.stats.dateFrom.description",
+        label: "dateFrom.label",
+        description: "dateFrom.description",
         columns: 6,
         schema: dateSchema.optional(),
       }),
 
-      dateTo: requestField({
+      dateTo: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
-        label: "app.api.leads.stats.dateTo.label",
-        description: "app.api.leads.stats.dateTo.description",
+        label: "dateTo.label",
+        description: "dateTo.description",
         columns: 6,
         schema: dateSchema.optional(),
       }),
 
-      chartType: requestField({
+      chartType: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.stats.chartType.label",
-        description: "app.api.leads.stats.chartType.description",
+        label: "chartType.label",
+        description: "chartType.description",
         options: ChartTypeOptions,
         columns: 4,
         schema: z.enum(ChartType).default(ChartType.LINE),
       }),
 
-      includeComparison: requestField({
+      includeComparison: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.stats.includeComparison.label",
-        description: "app.api.leads.stats.includeComparison.description",
+        label: "includeComparison.label",
+        description: "includeComparison.description",
         columns: 6,
         schema: z.coerce.boolean().default(false),
       }),
 
-      comparisonPeriod: requestField({
+      comparisonPeriod: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.stats.comparisonPeriod.label",
-        description: "app.api.leads.stats.comparisonPeriod.description",
+        label: "comparisonPeriod.label",
+        description: "comparisonPeriod.description",
         options: DateRangePresetOptions,
         columns: 6,
         schema: z.enum(DateRangePreset).optional(),
       }),
 
       // Lead-specific filters
-      status: requestField({
+      status: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.stats.status.label",
-        description: "app.api.leads.stats.status.description",
+        label: "status.label",
+        description: "status.description",
         options: LeadStatusFilterOptions,
         columns: 4,
         schema: z.enum(LeadStatusFilter).default(LeadStatusFilter.ALL),
       }),
 
-      source: requestField({
+      source: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.stats.source.label",
-        description: "app.api.leads.stats.source.description",
+        label: "source.label",
+        description: "source.description",
         options: LeadSourceFilterOptions,
         columns: 4,
         schema: z.enum(LeadSourceFilter).default(LeadSourceFilter.ALL),
       }),
 
-      country: requestField({
+      country: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.stats.country.label",
-        description: "app.api.leads.stats.country.description",
+        label: "country.label",
+        description: "country.description",
         options: CountryFilterOptions,
         columns: 4,
         schema: z.enum(CountryFilter).default(CountryFilter.ALL),
       }),
 
-      language: requestField({
+      language: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.stats.language.label",
-        description: "app.api.leads.stats.language.description",
+        label: "language.label",
+        description: "language.description",
         options: LanguageFilterOptions,
         columns: 4,
         schema: z.enum(LanguageFilter).default(LanguageFilter.ALL),
       }),
 
-      campaignStage: requestField({
+      campaignStage: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.stats.campaignStage.label",
-        description: "app.api.leads.stats.campaignStage.description",
+        label: "campaignStage.label",
+        description: "campaignStage.description",
         options: EmailCampaignStageFilterOptions,
         columns: 4,
         schema: z
@@ -388,741 +386,723 @@ const { GET } = createEndpoint({
       }),
 
       // Engagement filters
-      hasEngagement: requestField({
+      hasEngagement: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.stats.hasEngagement.label",
-        description: "app.api.leads.stats.hasEngagement.description",
+        label: "hasEngagement.label",
+        description: "hasEngagement.description",
         columns: 4,
         schema: z.coerce.boolean().optional(),
       }),
 
-      minEmailsOpened: requestField({
+      minEmailsOpened: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.leads.stats.minEmailsOpened.label",
-        description: "app.api.leads.stats.minEmailsOpened.description",
+        label: "minEmailsOpened.label",
+        description: "minEmailsOpened.description",
         columns: 4,
         schema: z.coerce.number().optional(),
       }),
 
-      minEmailsClicked: requestField({
+      minEmailsClicked: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.leads.stats.minEmailsClicked.label",
-        description: "app.api.leads.stats.minEmailsClicked.description",
+        label: "minEmailsClicked.label",
+        description: "minEmailsClicked.description",
         columns: 4,
         schema: z.coerce.number().optional(),
       }),
 
       // Conversion filters
-      isConverted: requestField({
+      isConverted: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.stats.isConverted.label",
-        description: "app.api.leads.stats.isConverted.description",
+        label: "isConverted.label",
+        description: "isConverted.description",
         columns: 3,
         schema: z.coerce.boolean().optional(),
       }),
 
-      hasSignedUp: requestField({
+      hasSignedUp: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.stats.hasSignedUp.label",
-        description: "app.api.leads.stats.hasSignedUp.description",
+        label: "hasSignedUp.label",
+        description: "hasSignedUp.description",
         columns: 3,
         schema: z.coerce.boolean().optional(),
       }),
 
-      hasConfirmedSubscription: requestField({
+      hasConfirmedSubscription: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.stats.hasConfirmedSubscription.label",
-        description: "app.api.leads.stats.hasConfirmedSubscription.description",
+        label: "hasConfirmedSubscription.label",
+        description: "hasConfirmedSubscription.description",
         columns: 3,
         schema: z.coerce.boolean().optional(),
       }),
 
       // Business filters
-      hasBusinessName: requestField({
+      hasBusinessName: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.stats.hasBusinessName.label",
-        description: "app.api.leads.stats.hasBusinessName.description",
+        label: "hasBusinessName.label",
+        description: "hasBusinessName.description",
         columns: 3,
         schema: z.coerce.boolean().optional(),
       }),
 
-      hasContactName: requestField({
+      hasContactName: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.stats.hasContactName.label",
-        description: "app.api.leads.stats.hasContactName.description",
+        label: "hasContactName.label",
+        description: "hasContactName.description",
         columns: 3,
         schema: z.coerce.boolean().optional(),
       }),
 
-      hasPhone: requestField({
+      hasPhone: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.stats.hasPhone.label",
-        description: "app.api.leads.stats.hasPhone.description",
+        label: "hasPhone.label",
+        description: "hasPhone.description",
         columns: 3,
         schema: z.coerce.boolean().optional(),
       }),
 
-      hasWebsite: requestField({
+      hasWebsite: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.stats.hasWebsite.label",
-        description: "app.api.leads.stats.hasWebsite.description",
+        label: "hasWebsite.label",
+        description: "hasWebsite.description",
         columns: 3,
         schema: z.coerce.boolean().optional(),
       }),
 
-      hasNotes: requestField({
+      hasNotes: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.stats.hasNotes.label",
-        description: "app.api.leads.stats.hasNotes.description",
+        label: "hasNotes.label",
+        description: "hasNotes.description",
         columns: 3,
         schema: z.coerce.boolean().optional(),
       }),
 
       // Association filters
-      hasUserId: requestField({
+      hasUserId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.stats.hasUserId.label",
-        description: "app.api.leads.stats.hasUserId.description",
+        label: "hasUserId.label",
+        description: "hasUserId.description",
         columns: 6,
         schema: z.coerce.boolean().optional(),
       }),
 
-      emailVerified: requestField({
+      emailVerified: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.stats.emailVerified.label",
-        description: "app.api.leads.stats.emailVerified.description",
+        label: "emailVerified.label",
+        description: "emailVerified.description",
         columns: 6,
         schema: z.coerce.boolean().optional(),
       }),
 
       // Journey and campaign filters
-      journeyVariant: requestField({
+      journeyVariant: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.leads.stats.journeyVariant.label",
-        description: "app.api.leads.stats.journeyVariant.description",
+        label: "journeyVariant.label",
+        description: "journeyVariant.description",
         columns: 6,
         schema: z.enum(EmailJourneyVariant).optional(),
       }),
 
-      minEmailsSent: requestField({
+      minEmailsSent: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.leads.stats.minEmailsSent.label",
-        description: "app.api.leads.stats.minEmailsSent.description",
+        label: "minEmailsSent.label",
+        description: "minEmailsSent.description",
         columns: 6,
         schema: z.coerce.number().optional(),
       }),
 
       // Date range filters
-      createdAfter: requestField({
+      createdAfter: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
-        label: "app.api.leads.stats.createdAfter.label",
-        description: "app.api.leads.stats.createdAfter.description",
+        label: "createdAfter.label",
+        description: "createdAfter.description",
         columns: 6,
         schema: dateSchema.optional(),
       }),
 
-      createdBefore: requestField({
+      createdBefore: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
-        label: "app.api.leads.stats.createdBefore.label",
-        description: "app.api.leads.stats.createdBefore.description",
+        label: "createdBefore.label",
+        description: "createdBefore.description",
         columns: 6,
         schema: dateSchema.optional(),
       }),
 
-      updatedAfter: requestField({
+      updatedAfter: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
-        label: "app.api.leads.stats.updatedAfter.label",
-        description: "app.api.leads.stats.updatedAfter.description",
+        label: "updatedAfter.label",
+        description: "updatedAfter.description",
         columns: 6,
         schema: dateSchema.optional(),
       }),
 
-      updatedBefore: requestField({
+      updatedBefore: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
-        label: "app.api.leads.stats.updatedBefore.label",
-        description: "app.api.leads.stats.updatedBefore.description",
+        label: "updatedBefore.label",
+        description: "updatedBefore.description",
         columns: 6,
         schema: dateSchema.optional(),
       }),
 
       // Search
-      search: requestField({
+      search: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.leads.stats.search.label",
-        description: "app.api.leads.stats.search.description",
-        placeholder: "app.api.leads.stats.search.placeholder",
+        label: "search.label",
+        description: "search.description",
+        placeholder: "search.placeholder",
         columns: 12,
         schema: z.string().optional(),
       }),
 
       // Sorting
-      sortBy: requestField({
+      sortBy: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.stats.sortBy.label",
-        description: "app.api.leads.stats.sortBy.description",
+        label: "sortBy.label",
+        description: "sortBy.description",
         options: LeadSortFieldOptions,
         columns: 6,
         schema: z.enum(LeadSortField).default(LeadSortField.CREATED_AT),
       }),
 
-      sortOrder: requestField({
+      sortOrder: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.stats.sortOrder.label",
-        description: "app.api.leads.stats.sortOrder.description",
+        label: "sortOrder.label",
+        description: "sortOrder.description",
         options: SortOrderOptions,
         columns: 6,
         schema: z.enum(SortOrder).default(SortOrder.DESC),
       }),
 
       // === RESPONSE FIELDS ===
-      // Note: For stats endpoints, we typically return a complex nested structure
-      // For simplicity and to get this working, I'll add the key response fields
-      // The repository will return the full structure as defined in the old schema
-
-      totalLeads: responseField({
+      totalLeads: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.totalLeads",
+        content: "response.totalLeads",
         schema: z.coerce.number(),
       }),
 
-      newLeads: responseField({
+      newLeads: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.newLeads",
+        content: "response.newLeads",
         schema: z.coerce.number(),
       }),
 
-      activeLeads: responseField({
+      activeLeads: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.activeLeads",
+        content: "response.activeLeads",
         schema: z.coerce.number(),
       }),
 
-      conversionRate: responseField({
+      conversionRate: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.conversionRate",
+        content: "response.conversionRate",
         schema: z.coerce.number(),
       }),
 
-      averageOpenRate: responseField({
+      averageOpenRate: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.averageOpenRate",
+        content: "response.averageOpenRate",
         schema: z.coerce.number(),
       }),
 
-      averageClickRate: responseField({
+      averageClickRate: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.averageClickRate",
+        content: "response.averageClickRate",
         schema: z.coerce.number(),
       }),
 
       // Additional lead metrics
-      campaignRunningLeads: responseField({
+      campaignRunningLeads: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.campaignRunningLeads",
+        content: "response.campaignRunningLeads",
         schema: z.coerce.number(),
       }),
 
-      websiteUserLeads: responseField({
+      websiteUserLeads: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.websiteUserLeads",
+        content: "response.websiteUserLeads",
         schema: z.coerce.number(),
       }),
 
-      newsletterSubscriberLeads: responseField({
+      newsletterSubscriberLeads: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.newsletterSubscriberLeads",
+        content: "response.newsletterSubscriberLeads",
         schema: z.coerce.number(),
       }),
 
-      convertedLeads: responseField({
+      convertedLeads: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.convertedLeads",
+        content: "response.convertedLeads",
         schema: z.coerce.number(),
       }),
 
-      signedUpLeads: responseField({
+      signedUpLeads: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.signedUpLeads",
+        content: "response.signedUpLeads",
         schema: z.coerce.number(),
       }),
 
-      consultationBookedLeads: responseField({
+      consultationBookedLeads: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.consultationBookedLeads",
+        content: "response.consultationBookedLeads",
         schema: z.coerce.number(),
       }),
 
-      subscriptionConfirmedLeads: responseField({
+      subscriptionConfirmedLeads: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.subscriptionConfirmedLeads",
+        content: "response.subscriptionConfirmedLeads",
         schema: z.coerce.number(),
       }),
 
-      unsubscribedLeads: responseField({
+      unsubscribedLeads: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.unsubscribedLeads",
+        content: "response.unsubscribedLeads",
         schema: z.coerce.number(),
       }),
 
-      bouncedLeads: responseField({
+      bouncedLeads: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.bouncedLeads",
+        content: "response.bouncedLeads",
         schema: z.coerce.number(),
       }),
 
-      invalidLeads: responseField({
+      invalidLeads: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.invalidLeads",
+        content: "response.invalidLeads",
         schema: z.coerce.number(),
       }),
 
       // Email campaign metrics
-      totalEmailsSent: responseField({
+      totalEmailsSent: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.totalEmailsSent",
+        content: "response.totalEmailsSent",
         schema: z.coerce.number(),
       }),
 
-      totalEmailsOpened: responseField({
+      totalEmailsOpened: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.totalEmailsOpened",
+        content: "response.totalEmailsOpened",
         schema: z.coerce.number(),
       }),
 
-      totalEmailsClicked: responseField({
+      totalEmailsClicked: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.totalEmailsClicked",
+        content: "response.totalEmailsClicked",
         schema: z.coerce.number(),
       }),
 
-      averageEmailsPerLead: responseField({
+      averageEmailsPerLead: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.averageEmailsPerLead",
+        content: "response.averageEmailsPerLead",
         schema: z.coerce.number(),
       }),
 
       // Engagement metrics
-      leadsWithEmailEngagement: responseField({
+      leadsWithEmailEngagement: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsWithEmailEngagement",
+        content: "response.leadsWithEmailEngagement",
         schema: z.coerce.number(),
       }),
 
-      leadsWithoutEmailEngagement: responseField({
+      leadsWithoutEmailEngagement: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsWithoutEmailEngagement",
+        content: "response.leadsWithoutEmailEngagement",
         schema: z.coerce.number(),
       }),
 
-      averageEmailEngagementScore: responseField({
+      averageEmailEngagementScore: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.averageEmailEngagementScore",
+        content: "response.averageEmailEngagementScore",
         schema: z.coerce.number(),
       }),
 
-      totalEmailEngagements: responseField({
+      totalEmailEngagements: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.totalEmailEngagements",
+        content: "response.totalEmailEngagements",
         schema: z.coerce.number(),
       }),
 
       // Conversion metrics
-      signupRate: responseField({
+      signupRate: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.signupRate",
+        content: "response.signupRate",
         schema: z.coerce.number(),
       }),
 
-      consultationBookingRate: responseField({
+      consultationBookingRate: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.consultationBookingRate",
+        content: "response.consultationBookingRate",
         schema: z.coerce.number(),
       }),
 
-      subscriptionConfirmationRate: responseField({
+      subscriptionConfirmationRate: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.subscriptionConfirmationRate",
+        content: "response.subscriptionConfirmationRate",
         schema: z.coerce.number(),
       }),
 
       // Data completeness
-      dataCompletenessRate: responseField({
+      dataCompletenessRate: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.dataCompletenessRate",
+        content: "response.dataCompletenessRate",
         schema: z.coerce.number(),
       }),
 
       // Performance metrics
-      leadVelocity: responseField({
+      leadVelocity: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadVelocity",
+        content: "response.leadVelocity",
         schema: z.coerce.number(),
       }),
 
       // Time-based metrics
-      leadsCreatedToday: responseField({
+      leadsCreatedToday: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsCreatedToday",
+        content: "response.leadsCreatedToday",
         schema: z.coerce.number(),
       }),
 
-      leadsCreatedThisWeek: responseField({
+      leadsCreatedThisWeek: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsCreatedThisWeek",
+        content: "response.leadsCreatedThisWeek",
         schema: z.coerce.number(),
       }),
 
-      leadsCreatedThisMonth: responseField({
+      leadsCreatedThisMonth: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsCreatedThisMonth",
+        content: "response.leadsCreatedThisMonth",
         schema: z.coerce.number(),
       }),
 
-      leadsUpdatedToday: responseField({
+      leadsUpdatedToday: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsUpdatedToday",
+        content: "response.leadsUpdatedToday",
         schema: z.coerce.number(),
       }),
 
-      leadsUpdatedThisWeek: responseField({
+      leadsUpdatedThisWeek: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsUpdatedThisWeek",
+        content: "response.leadsUpdatedThisWeek",
         schema: z.coerce.number(),
       }),
 
-      leadsUpdatedThisMonth: responseField({
+      leadsUpdatedThisMonth: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsUpdatedThisMonth",
+        content: "response.leadsUpdatedThisMonth",
         schema: z.coerce.number(),
       }),
 
       // Distribution metrics
-      leadsByCampaignStage: responseField({
+      leadsByCampaignStage: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsByCampaignStage",
+        content: "response.leadsByCampaignStage",
         schema: z.record(z.string(), z.coerce.number()),
       }),
 
-      leadsInActiveCampaigns: responseField({
+      leadsInActiveCampaigns: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsInActiveCampaigns",
+        content: "response.leadsInActiveCampaigns",
         schema: z.coerce.number(),
       }),
 
-      leadsNotInCampaigns: responseField({
+      leadsNotInCampaigns: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsNotInCampaigns",
+        content: "response.leadsNotInCampaigns",
         schema: z.coerce.number(),
       }),
 
-      leadsByJourneyVariant: responseField({
+      leadsByJourneyVariant: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsByJourneyVariant",
+        content: "response.leadsByJourneyVariant",
         schema: z.record(z.string(), z.coerce.number()),
       }),
 
-      leadsByCountry: responseField({
+      leadsByCountry: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsByCountry",
+        content: "response.leadsByCountry",
         schema: z.record(z.string(), z.coerce.number()),
       }),
 
-      leadsByLanguage: responseField({
+      leadsByLanguage: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsByLanguage",
+        content: "response.leadsByLanguage",
         schema: z.record(z.string(), z.coerce.number()),
       }),
 
-      leadsBySource: responseField({
+      leadsBySource: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsBySource",
+        content: "response.leadsBySource",
         schema: z.record(z.string(), z.coerce.number()),
       }),
 
-      leadsByStatus: responseField({
+      leadsByStatus: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsByStatus",
+        content: "response.leadsByStatus",
         schema: z.record(z.string(), z.coerce.number()),
       }),
 
       // Business information completeness
-      leadsWithBusinessName: responseField({
+      leadsWithBusinessName: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsWithBusinessName",
+        content: "response.leadsWithBusinessName",
         schema: z.coerce.number(),
       }),
 
-      leadsWithContactName: responseField({
+      leadsWithContactName: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsWithContactName",
+        content: "response.leadsWithContactName",
         schema: z.coerce.number(),
       }),
 
-      leadsWithPhone: responseField({
+      leadsWithPhone: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsWithPhone",
+        content: "response.leadsWithPhone",
         schema: z.coerce.number(),
       }),
 
-      leadsWithWebsite: responseField({
+      leadsWithWebsite: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsWithWebsite",
+        content: "response.leadsWithWebsite",
         schema: z.coerce.number(),
       }),
 
-      leadsWithNotes: responseField({
+      leadsWithNotes: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.leadsWithNotes",
+        content: "response.leadsWithNotes",
         schema: z.coerce.number(),
       }),
 
       // Historical data with proper Zod schema
-      historicalData: responseField({
+      historicalData: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.historicalData",
+        content: "response.historicalData",
         schema: historicalDataSchema,
       }),
 
       // Grouped stats with proper Zod schema
-      groupedStats: responseField({
+      groupedStats: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.groupedStats",
+        content: "response.groupedStats",
         schema: groupedStatsSchema,
       }),
 
       // Performance metrics - time-based
-      averageTimeToConversion: responseField({
+      averageTimeToConversion: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.averageTimeToConversion",
+        content: "response.averageTimeToConversion",
         schema: z.coerce.number(),
       }),
 
-      averageTimeToSignup: responseField({
+      averageTimeToSignup: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.averageTimeToSignup",
+        content: "response.averageTimeToSignup",
         schema: z.coerce.number(),
       }),
 
-      averageTimeToConsultation: responseField({
+      averageTimeToConsultation: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.averageTimeToConsultation",
+        content: "response.averageTimeToConsultation",
         schema: z.coerce.number(),
       }),
 
       // Top performers with proper Zod schemas
-      topPerformingCampaigns: responseArrayField(
-        {
+      topPerformingCampaigns: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.topPerformingCampaigns",
+        description: "response.topPerformingCampaigns",
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-          title: "app.api.leads.stats.response.topPerformingCampaigns",
-          description: "app.api.leads.stats.response.topPerformingCampaigns",
-        },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.GRID,
-            columns: 12,
-          },
-          { response: true },
-          {
-            campaignId: responseField({
+          layoutType: LayoutType.GRID,
+          columns: 12,
+          usage: { response: true },
+          children: {
+            campaignId: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.leads.stats.response.topPerformingCampaigns",
+              content: "response.topPerformingCampaigns",
               schema: z.string(),
             }),
-            campaignName: responseField({
+            campaignName: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.leads.stats.response.topPerformingCampaigns",
+              content: "response.topPerformingCampaigns",
               schema: z.string(),
             }),
-            leadsGenerated: responseField({
+            leadsGenerated: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.leads.stats.response.topPerformingCampaigns",
+              content: "response.topPerformingCampaigns",
               schema: z.coerce.number(),
             }),
-            conversionRate: responseField({
+            conversionRate: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.leads.stats.response.conversionRate",
+              content: "response.conversionRate",
               schema: z.coerce.number(),
             }),
-            openRate: responseField({
+            openRate: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.leads.stats.response.averageOpenRate",
+              content: "response.averageOpenRate",
               schema: z.coerce.number(),
             }),
-            clickRate: responseField({
+            clickRate: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.leads.stats.response.averageClickRate",
+              content: "response.averageClickRate",
               schema: z.coerce.number(),
             }),
           },
-        ),
-      ),
+        }),
+      }),
 
-      topPerformingSources: responseArrayField(
-        {
+      topPerformingSources: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.topPerformingSources",
+        description: "response.topPerformingSources",
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-          title: "app.api.leads.stats.response.topPerformingSources",
-          description: "app.api.leads.stats.response.topPerformingSources",
-        },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.GRID,
-            columns: 12,
-          },
-          { response: true },
-          {
-            source: responseField({
+          layoutType: LayoutType.GRID,
+          columns: 12,
+          usage: { response: true },
+          children: {
+            source: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              text: "app.api.leads.stats.response.leadsBySource",
+              text: "response.leadsBySource",
               schema: z.enum(LeadSource),
             }),
-            leadsGenerated: responseField({
+            leadsGenerated: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.leads.stats.response.topPerformingSources",
+              content: "response.topPerformingSources",
               schema: z.coerce.number(),
             }),
-            conversionRate: responseField({
+            conversionRate: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.leads.stats.response.conversionRate",
+              content: "response.conversionRate",
               schema: z.coerce.number(),
             }),
-            qualityScore: responseField({
+            qualityScore: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.leads.stats.response.topPerformingSources",
+              content: "response.topPerformingSources",
               schema: z.coerce.number(),
             }),
           },
-        ),
-      ),
+        }),
+      }),
 
       // Recent activity with proper Zod schema
-      recentActivity: responseArrayField(
-        {
+      recentActivity: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.recentActivity",
+        description: "response.recentActivity",
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-          title: "app.api.leads.stats.response.recentActivity",
-          description: "app.api.leads.stats.response.recentActivity",
-        },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.GRID,
-            columns: 12,
-          },
-          { response: true },
-          {
-            id: responseField({
+          layoutType: LayoutType.GRID,
+          columns: 12,
+          usage: { response: true },
+          children: {
+            id: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.leads.stats.response.recentActivity",
+              content: "response.recentActivity",
               schema: z.string(),
             }),
-            leadEmail: responseField({
+            leadEmail: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.leads.stats.response.recentActivity",
+              content: "response.recentActivity",
               schema: z.string(),
             }),
-            leadBusinessName: responseField({
+            leadBusinessName: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.leads.stats.response.recentActivity",
+              content: "response.recentActivity",
               schema: z.string(),
             }),
-            timestamp: responseField({
+            timestamp: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.leads.stats.response.generatedAt",
+              content: "response.generatedAt",
               schema: z.string(),
             }),
-            type: responseField({
+            type: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              text: "app.api.leads.stats.response.recentActivity",
+              text: "response.recentActivity",
               schema: z.enum(ActivityType),
             }),
-            details: objectField(
-              {
-                type: WidgetType.CONTAINER,
-                title: "app.api.leads.stats.response.recentActivity",
-                layoutType: LayoutType.GRID,
-                columns: 12,
-              },
-              { response: true },
-              {
-                status: responseField({
+            details: scopedObjectFieldNew(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              title: "response.recentActivity",
+              layoutType: LayoutType.GRID,
+              columns: 12,
+              usage: { response: true },
+              children: {
+                status: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  text: "app.api.leads.stats.response.leadsByStatus",
+                  text: "response.leadsByStatus",
                   schema: z.enum(LeadStatus),
                 }),
-                source: responseField({
+                source: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.stats.response.leadsBySource",
+                  content: "response.leadsBySource",
                   schema: z.string(),
                 }),
-                country: responseField({
+                country: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.stats.response.leadsByCountry",
+                  content: "response.leadsByCountry",
                   schema: z.string(),
                 }),
-                emailsSent: responseField({
+                emailsSent: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.stats.response.totalEmailsSent",
+                  content: "response.totalEmailsSent",
                   schema: z.coerce.number(),
                 }),
-                emailsOpened: responseField({
+                emailsOpened: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.stats.response.totalEmailsOpened",
+                  content: "response.totalEmailsOpened",
                   schema: z.coerce.number(),
                 }),
-                emailsClicked: responseField({
+                emailsClicked: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.stats.response.totalEmailsClicked",
+                  content: "response.totalEmailsClicked",
                   schema: z.coerce.number(),
                 }),
-                daysSinceCreated: responseField({
+                daysSinceCreated: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.stats.response.recentActivity",
+                  content: "response.recentActivity",
                   schema: z.coerce.number(),
                 }),
-                isConverted: responseField({
+                isConverted: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.stats.response.convertedLeads",
+                  content: "response.convertedLeads",
                   schema: z.boolean(),
                 }),
               },
-            ),
+            }),
           },
-        ),
-      ),
+        }),
+      }),
 
       // Metadata
-      generatedAt: responseField({
+      generatedAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.generatedAt",
+        content: "response.generatedAt",
         schema: z.string(),
       }),
 
-      dataRange: responseField({
+      dataRange: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.stats.response.dataRange",
+        content: "response.dataRange",
         schema: dataRangeSchema,
       }),
     },
@@ -1370,46 +1350,46 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.leads.stats.errors.unauthorized.title",
-      description: "app.api.leads.stats.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.leads.stats.errors.validation.title",
-      description: "app.api.leads.stats.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.leads.stats.errors.notFound.title",
-      description: "app.api.leads.stats.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.leads.stats.errors.forbidden.title",
-      description: "app.api.leads.stats.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.leads.stats.errors.conflict.title",
-      description: "app.api.leads.stats.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.leads.stats.errors.unsavedChanges.title",
-      description: "app.api.leads.stats.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.leads.stats.errors.network.title",
-      description: "app.api.leads.stats.errors.network.description",
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.leads.stats.errors.server.title",
-      description: "app.api.leads.stats.errors.server.description",
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.leads.stats.errors.unknown.title",
-      description: "app.api.leads.stats.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
   },
 
   successTypes: {
-    title: "app.api.leads.stats.success.title",
-    description: "app.api.leads.stats.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 });
 

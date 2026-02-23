@@ -35,8 +35,8 @@ export function Notifications({
     href: string;
   }[] = [
     {
-      title: "app.common.api.notifications.welcome.title",
-      description: "app.common.api.notifications.welcome.description",
+      title: "app.story._components.nav.welcomeNotification.title",
+      description: "app.story._components.nav.welcomeNotification.description",
       level: "info",
       href: "/",
     },

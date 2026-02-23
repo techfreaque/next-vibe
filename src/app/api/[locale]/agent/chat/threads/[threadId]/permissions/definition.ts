@@ -2,10 +2,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  requestUrlPathParamsField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedRequestUrlPathParamsField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -16,163 +16,126 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * Get Thread Permissions Endpoint (GET)
  * Retrieves the list of moderator IDs for a thread
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["agent", "chat", "threads", "[threadId]", "permissions"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  title: "app.api.agent.chat.threads.threadId.permissions.get.title" as const,
-  description:
-    "app.api.agent.chat.threads.threadId.permissions.get.description" as const,
+  title: "get.title" as const,
+  description: "get.description" as const,
   icon: "shield",
-  category: "app.api.agent.chat.category" as const,
-  tags: [
-    "app.api.agent.chat.tags.threads" as const,
-    "app.api.agent.chat.tags.permissions" as const,
-  ],
+  category: "category" as const,
+  tags: ["tags.threads" as const, "tags.permissions" as const],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.get.container.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.get.container.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "urlPathParams", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "get.container.title" as const,
+    description: "get.container.description" as const,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "urlPathParams", response: true },
+    children: {
       // === REQUEST URL PARAMS ===
-      threadId: requestUrlPathParamsField({
+      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label:
-          "app.api.agent.chat.threads.threadId.permissions.get.threadId.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.permissions.get.threadId.description" as const,
+        label: "get.threadId.label" as const,
+        description: "get.threadId.description" as const,
         schema: z.uuid(),
       }),
 
       // === RESPONSE FIELDS ===
-      rolesView: responseField({
+      rolesView: scopedResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label:
-          "app.api.agent.chat.threads.threadId.permissions.get.response.rolesView.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.permissions.get.response.rolesView.description" as const,
+        label: "get.response.rolesView.label" as const,
+        description: "get.response.rolesView.description" as const,
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable(),
       }),
-      rolesEdit: responseField({
+      rolesEdit: scopedResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label:
-          "app.api.agent.chat.threads.threadId.permissions.get.response.rolesEdit.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.permissions.get.response.rolesEdit.description" as const,
+        label: "get.response.rolesEdit.label" as const,
+        description: "get.response.rolesEdit.description" as const,
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable(),
       }),
-      rolesPost: responseField({
+      rolesPost: scopedResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label:
-          "app.api.agent.chat.threads.threadId.permissions.get.response.rolesPost.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.permissions.get.response.rolesPost.description" as const,
+        label: "get.response.rolesPost.label" as const,
+        description: "get.response.rolesPost.description" as const,
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable(),
       }),
-      rolesModerate: responseField({
+      rolesModerate: scopedResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label:
-          "app.api.agent.chat.threads.threadId.permissions.get.response.rolesModerate.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.permissions.get.response.rolesModerate.description" as const,
+        label: "get.response.rolesModerate.label" as const,
+        description: "get.response.rolesModerate.description" as const,
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable(),
       }),
-      rolesAdmin: responseField({
+      rolesAdmin: scopedResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label:
-          "app.api.agent.chat.threads.threadId.permissions.get.response.rolesAdmin.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.permissions.get.response.rolesAdmin.description" as const,
+        label: "get.response.rolesAdmin.label" as const,
+        description: "get.response.rolesAdmin.description" as const,
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.validation.description" as const,
+      title: "get.errors.validation.title" as const,
+      description: "get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.network.description" as const,
+      title: "get.errors.network.title" as const,
+      description: "get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.unauthorized.description" as const,
+      title: "get.errors.unauthorized.title" as const,
+      description: "get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.forbidden.description" as const,
+      title: "get.errors.forbidden.title" as const,
+      description: "get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.notFound.description" as const,
+      title: "get.errors.notFound.title" as const,
+      description: "get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.server.description" as const,
+      title: "get.errors.server.title" as const,
+      description: "get.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.unknown.description" as const,
+      title: "get.errors.unknown.title" as const,
+      description: "get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.unsaved.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.unsaved.description" as const,
+      title: "get.errors.unsaved.title" as const,
+      description: "get.errors.unsaved.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.conflict.description" as const,
+      title: "get.errors.conflict.title" as const,
+      description: "get.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title:
-      "app.api.agent.chat.threads.threadId.permissions.get.success.title" as const,
-    description:
-      "app.api.agent.chat.threads.threadId.permissions.get.success.description" as const,
+    title: "get.success.title" as const,
+    description: "get.success.description" as const,
   },
 
   examples: {
@@ -196,226 +159,174 @@ const { GET } = createEndpoint({
  * Updates the list of moderator IDs for a thread
  */
 const { PATCH } = createEndpoint({
+  scopedTranslation,
   method: Methods.PATCH,
   path: ["agent", "chat", "threads", "[threadId]", "permissions"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  title: "app.api.agent.chat.threads.threadId.permissions.patch.title" as const,
-  description:
-    "app.api.agent.chat.threads.threadId.permissions.patch.description" as const,
+  title: "patch.title" as const,
+  description: "patch.description" as const,
   icon: "shield",
-  category: "app.api.agent.chat.category" as const,
-  tags: [
-    "app.api.agent.chat.tags.threads" as const,
-    "app.api.agent.chat.tags.permissions" as const,
-  ],
+  category: "category" as const,
+  tags: ["tags.threads" as const, "tags.permissions" as const],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.patch.container.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.patch.container.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data&urlPathParams", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "patch.container.title" as const,
+    description: "patch.container.description" as const,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data&urlPathParams", response: true },
+    children: {
       // === REQUEST URL PARAMS ===
-      threadId: requestUrlPathParamsField({
+      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label:
-          "app.api.agent.chat.threads.threadId.permissions.patch.threadId.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.permissions.patch.threadId.description" as const,
+        label: "patch.threadId.label" as const,
+        description: "patch.threadId.description" as const,
         schema: z.uuid(),
       }),
 
       // === REQUEST DATA ===
-      rolesView: requestField({
+      rolesView: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label:
-          "app.api.agent.chat.threads.threadId.permissions.patch.rolesView.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.permissions.patch.rolesView.description" as const,
+        label: "patch.rolesView.label" as const,
+        description: "patch.rolesView.description" as const,
         columns: 6,
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
       }),
-      rolesEdit: requestField({
+      rolesEdit: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label:
-          "app.api.agent.chat.threads.threadId.permissions.patch.rolesEdit.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.permissions.patch.rolesEdit.description" as const,
+        label: "patch.rolesEdit.label" as const,
+        description: "patch.rolesEdit.description" as const,
         columns: 6,
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
       }),
-      rolesPost: requestField({
+      rolesPost: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label:
-          "app.api.agent.chat.threads.threadId.permissions.patch.rolesPost.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.permissions.patch.rolesPost.description" as const,
+        label: "patch.rolesPost.label" as const,
+        description: "patch.rolesPost.description" as const,
         columns: 6,
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
       }),
-      rolesModerate: requestField({
+      rolesModerate: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label:
-          "app.api.agent.chat.threads.threadId.permissions.patch.rolesModerate.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.permissions.patch.rolesModerate.description" as const,
+        label: "patch.rolesModerate.label" as const,
+        description: "patch.rolesModerate.description" as const,
         columns: 6,
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
       }),
-      rolesAdmin: requestField({
+      rolesAdmin: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label:
-          "app.api.agent.chat.threads.threadId.permissions.patch.rolesAdmin.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.permissions.patch.rolesAdmin.description" as const,
+        label: "patch.rolesAdmin.label" as const,
+        description: "patch.rolesAdmin.description" as const,
         columns: 6,
         options: UserRoleDB.map((role) => ({ value: role, label: role })),
         schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
       }),
 
       // === RESPONSE ===
-      response: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.agent.chat.threads.threadId.permissions.patch.response.title" as const,
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
-          rolesView: responseField({
+      response: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "patch.response.title" as const,
+        layoutType: LayoutType.STACKED,
+        usage: { response: true },
+        children: {
+          rolesView: scopedResponseField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.MULTISELECT,
-            label:
-              "app.api.agent.chat.threads.threadId.permissions.patch.response.rolesView.label" as const,
-            description:
-              "app.api.agent.chat.threads.threadId.permissions.patch.response.rolesView.description" as const,
+            label: "patch.response.rolesView.label" as const,
+            description: "patch.response.rolesView.description" as const,
             options: UserRoleDB.map((role) => ({ value: role, label: role })),
             schema: z.array(z.enum(UserRoleDB)).nullable(),
           }),
-          rolesEdit: responseField({
+          rolesEdit: scopedResponseField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.MULTISELECT,
-            label:
-              "app.api.agent.chat.threads.threadId.permissions.patch.response.rolesEdit.label" as const,
-            description:
-              "app.api.agent.chat.threads.threadId.permissions.patch.response.rolesEdit.description" as const,
+            label: "patch.response.rolesEdit.label" as const,
+            description: "patch.response.rolesEdit.description" as const,
             options: UserRoleDB.map((role) => ({ value: role, label: role })),
             schema: z.array(z.enum(UserRoleDB)).nullable(),
           }),
-          rolesPost: responseField({
+          rolesPost: scopedResponseField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.MULTISELECT,
-            label:
-              "app.api.agent.chat.threads.threadId.permissions.patch.response.rolesPost.label" as const,
-            description:
-              "app.api.agent.chat.threads.threadId.permissions.patch.response.rolesPost.description" as const,
+            label: "patch.response.rolesPost.label" as const,
+            description: "patch.response.rolesPost.description" as const,
             options: UserRoleDB.map((role) => ({ value: role, label: role })),
             schema: z.array(z.enum(UserRoleDB)).nullable(),
           }),
-          rolesModerate: responseField({
+          rolesModerate: scopedResponseField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.MULTISELECT,
-            label:
-              "app.api.agent.chat.threads.threadId.permissions.patch.response.rolesModerate.label" as const,
-            description:
-              "app.api.agent.chat.threads.threadId.permissions.patch.response.rolesModerate.description" as const,
+            label: "patch.response.rolesModerate.label" as const,
+            description: "patch.response.rolesModerate.description" as const,
             options: UserRoleDB.map((role) => ({ value: role, label: role })),
             schema: z.array(z.enum(UserRoleDB)).nullable(),
           }),
-          rolesAdmin: responseField({
+          rolesAdmin: scopedResponseField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.MULTISELECT,
-            label:
-              "app.api.agent.chat.threads.threadId.permissions.patch.response.rolesAdmin.label" as const,
-            description:
-              "app.api.agent.chat.threads.threadId.permissions.patch.response.rolesAdmin.description" as const,
+            label: "patch.response.rolesAdmin.label" as const,
+            description: "patch.response.rolesAdmin.description" as const,
             options: UserRoleDB.map((role) => ({ value: role, label: role })),
             schema: z.array(z.enum(UserRoleDB)).nullable(),
           }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.validation.description" as const,
+      title: "patch.errors.validation.title" as const,
+      description: "patch.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.network.description" as const,
+      title: "patch.errors.network.title" as const,
+      description: "patch.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.unauthorized.description" as const,
+      title: "patch.errors.unauthorized.title" as const,
+      description: "patch.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.forbidden.description" as const,
+      title: "patch.errors.forbidden.title" as const,
+      description: "patch.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.notFound.description" as const,
+      title: "patch.errors.notFound.title" as const,
+      description: "patch.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.server.description" as const,
+      title: "patch.errors.server.title" as const,
+      description: "patch.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.unknown.description" as const,
+      title: "patch.errors.unknown.title" as const,
+      description: "patch.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.unsaved.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.unsaved.description" as const,
+      title: "patch.errors.unsaved.title" as const,
+      description: "patch.errors.unsaved.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.conflict.description" as const,
+      title: "patch.errors.conflict.title" as const,
+      description: "patch.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title:
-      "app.api.agent.chat.threads.threadId.permissions.patch.success.title" as const,
-    description:
-      "app.api.agent.chat.threads.threadId.permissions.patch.success.description" as const,
+    title: "patch.success.title" as const,
+    description: "patch.success.description" as const,
   },
 
   examples: {

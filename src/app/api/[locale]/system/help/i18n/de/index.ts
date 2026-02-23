@@ -265,6 +265,33 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  aiTools: {
+    modal: {
+      pinnedLabel: "angeheftet",
+      pinnedTooltip:
+        "Angeheftete Tools sind immer im Kontext — die KI sieht sie bei jedem Schritt",
+      enabledLabel: "erlaubt",
+      enabledTooltip:
+        "Erlaubte Tools können auf Anfrage aufgerufen werden, wenn Hilfe aktiviert ist",
+      totalLabel: "gesamt",
+      searchPlaceholder: "Tools suchen...",
+      expandAll: "Alle erweitern",
+      collapseAll: "Alle zusammenklappen",
+      deselectAll: "Alle abwählen",
+      selectAll: "Alle auswählen",
+      resetToDefault: "Auf Standard zurücksetzen",
+      noToolsFound: "Keine Tools gefunden",
+      noToolsAvailable: "Keine KI-Tools verfügbar",
+      legendActive: "Immer im Kontext (angeheftet)",
+      legendConfirm: "Fragt vor dem Ausführen",
+      stats: "{{pinned}} von {{total}} Tools angeheftet",
+      activeOn: "Angeheftet — immer im Kontext. Klicken zum Ablösen",
+      activeOff:
+        "Nicht angeheftet — KI kann trotzdem auf Anfrage aufrufen. Klicken zum Anheften",
+      confirmOn: "Fragt nach Bestätigung — klicken zum Deaktivieren",
+      confirmOff: "Läuft automatisch — klicken um Bestätigung zu erfordern",
+    },
+  },
   list: {
     post: {
       title: "Verfügbare Befehle auflisten",

@@ -8,6 +8,7 @@
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 
+import { scopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import {
   filterPlatformMarkers,
@@ -19,9 +20,9 @@ import {
   UserRole,
   type UserRoleValue,
 } from "@/app/api/[locale]/user/user-roles/enum";
+import { scopedTranslation as userRolesScopedTranslation } from "@/app/api/[locale]/user/user-roles/i18n";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import { Platform } from "../../types/platform";
@@ -325,10 +326,10 @@ class PermissionsRegistry implements IPermissionsRegistry {
   ): ResponseType<true> {
     // Safety check: if allowedRoles is undefined or not an array, deny access
     if (!endpoint.allowedRoles || !Array.isArray(endpoint.allowedRoles)) {
+      const { t } = scopedTranslation.scopedT(locale);
       return {
         success: false,
-        message:
-          "app.api.system.unifiedInterface.shared.permissions.errors.definitionError",
+        message: t("shared.permissions.errors.definitionError"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: "Endpoint allowedRoles is not properly configured",
@@ -347,8 +348,9 @@ class PermissionsRegistry implements IPermissionsRegistry {
       if (!platformAccess.allowed) {
         return {
           success: false,
-          message:
-            "app.api.system.unifiedInterface.shared.permissions.errors.platformAccessDenied",
+          message: scopedTranslation
+            .scopedT(locale)
+            .t("shared.permissions.errors.platformAccessDenied"),
           errorType: ErrorResponseTypes.FORBIDDEN,
           messageParams: {
             platform: String(platform),
@@ -363,17 +365,20 @@ class PermissionsRegistry implements IPermissionsRegistry {
         user,
       );
       if (!hasPermission) {
-        const { t } = simpleT(locale);
+        const { t: tRoles } = userRolesScopedTranslation.scopedT(locale);
         return {
           success: false,
-          message:
-            "app.api.system.unifiedInterface.shared.permissions.errors.insufficientRoles",
+          message: scopedTranslation
+            .scopedT(locale)
+            .t("shared.permissions.errors.insufficientRoles"),
           errorType: ErrorResponseTypes.FORBIDDEN,
           messageParams: {
             userId: user.isPublic ? "public" : user.id,
-            requiredRoles: localModeRoles.map((role) => t(role)).join(", "),
+            requiredRoles: localModeRoles
+              .map((role) => tRoles(role))
+              .join(", "),
             userRoles: user.roles?.length
-              ? user.roles.map((role) => t(role)).join(", ")
+              ? user.roles.map((role) => tRoles(role)).join(", ")
               : "none",
           },
         };
@@ -390,8 +395,9 @@ class PermissionsRegistry implements IPermissionsRegistry {
     if (!platformAccess.allowed) {
       return {
         success: false,
-        message:
-          "app.api.system.unifiedInterface.shared.permissions.errors.platformAccessDenied",
+        message: scopedTranslation
+          .scopedT(locale)
+          .t("shared.permissions.errors.platformAccessDenied"),
         errorType: ErrorResponseTypes.FORBIDDEN,
         messageParams: {
           platform: String(platform),
@@ -403,19 +409,20 @@ class PermissionsRegistry implements IPermissionsRegistry {
     // 2. Check user permissions
     const hasPermission = this.hasEndpointPermission(endpoint, user, platform);
     if (!hasPermission) {
-      const { t } = simpleT(locale);
+      const { t: tRoles } = userRolesScopedTranslation.scopedT(locale);
       return {
         success: false,
-        message:
-          "app.api.system.unifiedInterface.shared.permissions.errors.insufficientRoles",
+        message: scopedTranslation
+          .scopedT(locale)
+          .t("shared.permissions.errors.insufficientRoles"),
         errorType: ErrorResponseTypes.FORBIDDEN,
         messageParams: {
           userId: user.isPublic ? "public" : user.id,
           requiredRoles: endpoint.allowedRoles
-            .map((role) => t(role))
+            .map((role) => tRoles(role))
             .join(", "),
           userRoles: user.roles?.length
-            ? user.roles.map((role) => t(role)).join(", ")
+            ? user.roles.map((role) => tRoles(role)).join(", ")
             : "none",
         },
       };

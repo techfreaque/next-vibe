@@ -26,6 +26,8 @@ import { getModelById } from "@/app/api/[locale]/agent/models/models";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation } from "../../../i18n";
+
 interface RedditStyleViewProps {
   locale: CountryLanguage;
 }
@@ -52,6 +54,7 @@ interface ThreadItem {
 export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
   const chat = useChatContext();
   const { t } = simpleT(locale);
+  const { t: scopedT } = scopedTranslation.scopedT(locale);
   const [sortMode, setSortMode] = useState<SortMode>("hot");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -216,16 +219,16 @@ export function RedditStyleView({ locale }: RedditStyleViewProps): JSX.Element {
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
     if (hours < 1) {
-      return t("app.api.agent.chat.threads.publicFeed.timestamp.justNow");
+      return t("app.chat.timestamp.justNow");
     }
     if (hours < 24) {
-      return t("app.api.agent.chat.threads.publicFeed.timestamp.hoursAgo", {
-        count: hours.toString(),
+      return scopedT("publicFeed.timestamp.hoursAgo", {
+        hours: hours.toString(),
       });
     }
     if (days < 30) {
-      return t("app.api.agent.chat.threads.publicFeed.timestamp.daysAgo", {
-        count: days.toString(),
+      return scopedT("publicFeed.timestamp.daysAgo", {
+        days: days.toString(),
       });
     }
     return date.toLocaleDateString(locale, { month: "short", day: "numeric" });

@@ -14,7 +14,10 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { TFunction } from "@/i18n/core/static-types";
+
+import type { scopedTranslation } from "../i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 import type {
   BuildConfig,
@@ -55,7 +58,7 @@ export interface IConfigLoader {
     inlineConfig: InlineConfigInput | undefined,
     output: string[],
     logger: EndpointLogger,
-    t: TFunction,
+    t: ModuleT,
   ): Promise<ResponseType<BuildConfig>>;
 
   /**
@@ -81,7 +84,7 @@ export class ConfigLoader implements IConfigLoader {
     inlineConfig: InlineConfigInput | undefined,
     output: string[],
     logger: EndpointLogger,
-    t: TFunction,
+    t: ModuleT,
   ): Promise<ResponseType<BuildConfig>> {
     // Use config file if path provided
     if (configPath) {
@@ -89,7 +92,7 @@ export class ConfigLoader implements IConfigLoader {
 
       if (!existsSync(fullPath)) {
         return fail({
-          message: "app.api.system.builder.errors.configNotFound",
+          message: t("errors.configNotFound"),
           messageParams: {
             path: configPath,
           },
@@ -99,7 +102,7 @@ export class ConfigLoader implements IConfigLoader {
 
       output.push(
         outputFormatter.formatStep(
-          t("app.api.system.builder.messages.loadingConfig", {
+          t("messages.loadingConfig", {
             path: configPath,
           }),
         ),
@@ -112,7 +115,7 @@ export class ConfigLoader implements IConfigLoader {
 
       if (!this.isValidBuildConfigModule(importedModule)) {
         return fail({
-          message: "app.api.system.builder.errors.invalidBuildConfig",
+          message: t("errors.invalidBuildConfig"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -121,11 +124,7 @@ export class ConfigLoader implements IConfigLoader {
     }
 
     // Use inline configuration
-    output.push(
-      outputFormatter.formatStep(
-        t("app.api.system.builder.messages.usingInlineConfig"),
-      ),
-    );
+    output.push(outputFormatter.formatStep(t("messages.usingInlineConfig")));
     logger.info("Using inline config");
 
     return success({

@@ -6,6 +6,9 @@ export const translations = {
   confirm: confirmTranslations,
   request: requestTranslations,
   validate: validateTranslations,
+  success: {
+    password_reset: "Your password has been successfully reset.",
+  },
   errors: {
     tokenValidationFailed: "Token validation failed",
     userLookupFailed: "Failed to lookup user",

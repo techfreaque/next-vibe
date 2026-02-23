@@ -68,11 +68,8 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
-import { simpleT } from "@/i18n/core/shared";
 
 import { getModelById, type ModelId } from "../agent/models/models";
-import sttDefinition from "../agent/speech-to-text/definition";
-import ttsDefinition from "../agent/text-to-speech/definition";
 import { ProductIds, productsRepository } from "../products/repository-client";
 import { payoutRequests } from "../referral/db";
 import { PayoutStatus } from "../referral/enum";
@@ -95,6 +92,9 @@ import type {
   CreditsHistoryGetRequestOutput,
   CreditsHistoryGetResponseOutput,
 } from "./history/definition";
+import type { scopedTranslation } from "./i18n";
+
+export type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Pool of wallets that share free credits
@@ -139,9 +139,8 @@ export class CreditRepository {
    * Initial free credits for new wallets
    * Uses the FREE_TIER product definition as single source of truth
    */
-  private static getInitialFreeCredits(): number {
-    return productsRepository.getProduct(ProductIds.FREE_TIER, "en-GLOBAL")
-      .credits;
+  private static getInitialFreeCredits(locale: CountryLanguage): number {
+    return productsRepository.getProduct(ProductIds.FREE_TIER, locale).credits;
   }
 
   /**
@@ -150,12 +149,14 @@ export class CreditRepository {
   static async getUserPool(
     userId: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<CreditPool>> {
     try {
       // Get user wallet
       const userWalletResult = await CreditRepository.getOrCreateUserWallet(
         userId,
         logger,
+        t,
       );
       if (!userWalletResult.success) {
         return userWalletResult;
@@ -187,7 +188,7 @@ export class CreditRepository {
       logger.error("Failed to get user pool", parseError(error));
       return fail({
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        message: "app.api.credits.errors.getBalanceFailed",
+        message: t("errors.getBalanceFailed"),
       });
     }
   }
@@ -198,6 +199,8 @@ export class CreditRepository {
   static async getLeadPoolOnly(
     leadId: string,
     logger: EndpointLogger,
+    t: ModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CreditPool>> {
     try {
       const connectedLeadIds =
@@ -212,6 +215,8 @@ export class CreditRepository {
         const walletResult = await CreditRepository.getOrCreateLeadWallet(
           leadId,
           logger,
+          t,
+          locale,
         );
         if (!walletResult.success) {
           return walletResult;
@@ -229,7 +234,7 @@ export class CreditRepository {
       logger.error("Failed to get lead pool", parseError(error));
       return fail({
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        message: "app.api.credits.errors.getBalanceFailed",
+        message: t("errors.getBalanceFailed"),
       });
     }
   }
@@ -243,6 +248,8 @@ export class CreditRepository {
   static async getLeadPool(
     leadId: string,
     logger: EndpointLogger,
+    t: ModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CreditPool>> {
     try {
       // Check if lead is linked to a user
@@ -254,7 +261,7 @@ export class CreditRepository {
 
       if (userLink) {
         // Lead is linked to user -> return user's pool
-        return CreditRepository.getUserPool(userLink.userId, logger);
+        return CreditRepository.getUserPool(userLink.userId, logger, t);
       }
 
       // Lead is not linked to user -> find lead-to-lead pool
@@ -272,6 +279,8 @@ export class CreditRepository {
         const walletResult = await CreditRepository.getOrCreateLeadWallet(
           leadId,
           logger,
+          t,
+          locale,
         );
         if (!walletResult.success) {
           return walletResult;
@@ -297,7 +306,7 @@ export class CreditRepository {
       logger.error("Failed to get lead pool", parseError(error));
       return fail({
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        message: "app.api.credits.errors.getBalanceFailed",
+        message: t("errors.getBalanceFailed"),
       });
     }
   }
@@ -711,6 +720,7 @@ export class CreditRepository {
   private static async getOrCreateUserWallet(
     userId: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<CreditWallet>> {
     const [existingWallet] = await db
       .select()
@@ -820,7 +830,7 @@ export class CreditRepository {
       });
       return fail({
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        message: "app.api.credits.errors.walletCreationFailed",
+        message: t("errors.walletCreationFailed"),
       });
     }
 
@@ -838,6 +848,8 @@ export class CreditRepository {
   private static async getOrCreateLeadWallet(
     leadId: string,
     logger: EndpointLogger,
+    t: ModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CreditWallet>> {
     const [existingWallet] = await db
       .select()
@@ -868,7 +880,7 @@ export class CreditRepository {
 
     // Create new wallet for lead - ATOMIC operation
     // Always grant 20 free credits for new lead wallets
-    const initialCredits = CreditRepository.getInitialFreeCredits();
+    const initialCredits = CreditRepository.getInitialFreeCredits(locale);
     const now = new Date();
     const periodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
@@ -937,7 +949,7 @@ export class CreditRepository {
       });
       return fail({
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        message: "app.api.credits.errors.walletCreationFailed",
+        message: t("errors.walletCreationFailed"),
       });
     }
 
@@ -954,6 +966,7 @@ export class CreditRepository {
   private static async ensureMonthlyFreeCreditsForPool(
     pool: CreditPool,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<void> {
     const now = new Date();
 
@@ -1024,7 +1037,7 @@ export class CreditRepository {
 
     const maxFreeCreditsPerPool = productsRepository.getProduct(
       ProductIds.FREE_TIER,
-      "en-GLOBAL",
+      locale,
     ).credits;
 
     await withTransaction(logger, async (tx) => {
@@ -1105,6 +1118,9 @@ export class CreditRepository {
   static async getBalance(
     identifier: CreditIdentifier,
     logger: EndpointLogger,
+    t: ModuleT,
+    // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
+    locale: CountryLanguage,
   ): Promise<ResponseType<CreditsGetResponseOutput>> {
     try {
       let poolResult: ResponseType<CreditPool>;
@@ -1113,15 +1129,18 @@ export class CreditRepository {
         poolResult = await CreditRepository.getUserPool(
           identifier.userId,
           logger,
+          t,
         );
       } else if (identifier.leadId) {
         poolResult = await CreditRepository.getLeadPool(
           identifier.leadId,
           logger,
+          t,
+          locale,
         );
       } else {
         return fail({
-          message: "app.api.credits.errors.invalidIdentifier",
+          message: t("errors.invalidIdentifier"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
@@ -1140,7 +1159,7 @@ export class CreditRepository {
         ...identifier,
       });
       return fail({
-        message: "app.api.credits.errors.getBalanceFailed",
+        message: t("errors.getBalanceFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -1153,10 +1172,17 @@ export class CreditRepository {
   static async getLeadBalance(
     leadId: string,
     logger: EndpointLogger,
+    t: ModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<number>> {
     try {
       // Get pool for this lead
-      const poolResult = await CreditRepository.getLeadPool(leadId, logger);
+      const poolResult = await CreditRepository.getLeadPool(
+        leadId,
+        logger,
+        t,
+        locale,
+      );
       if (!poolResult.success) {
         return poolResult;
       }
@@ -1164,7 +1190,11 @@ export class CreditRepository {
       const pool = poolResult.data;
 
       // Check and reset monthly free credits for entire pool if needed
-      await CreditRepository.ensureMonthlyFreeCreditsForPool(pool, logger);
+      await CreditRepository.ensureMonthlyFreeCreditsForPool(
+        pool,
+        logger,
+        locale,
+      );
 
       // Calculate balance across all wallets in pool
       const balance = await CreditRepository.calculatePoolBalance(pool, logger);
@@ -1172,7 +1202,7 @@ export class CreditRepository {
     } catch (error) {
       logger.error("Failed to get lead balance", parseError(error), { leadId });
       return fail({
-        message: "app.api.credits.errors.getLeadBalanceFailed",
+        message: t("errors.getLeadBalanceFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -1186,6 +1216,7 @@ export class CreditRepository {
     // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<CreditsGetResponseOutput>> {
     try {
       let poolResult: ResponseType<CreditPool>;
@@ -1193,9 +1224,11 @@ export class CreditRepository {
         poolResult = await CreditRepository.getLeadPoolOnly(
           user.leadId,
           logger,
+          t,
+          locale,
         );
       } else {
-        poolResult = await CreditRepository.getUserPool(user.id, logger);
+        poolResult = await CreditRepository.getUserPool(user.id, logger, t);
       }
 
       if (!poolResult.success) {
@@ -1205,7 +1238,11 @@ export class CreditRepository {
       const pool = poolResult.data;
 
       // Check and reset monthly free credits for entire pool if needed
-      await CreditRepository.ensureMonthlyFreeCreditsForPool(pool, logger);
+      await CreditRepository.ensureMonthlyFreeCreditsForPool(
+        pool,
+        logger,
+        locale,
+      );
 
       // Calculate balance across all wallets in pool
       const balance = await CreditRepository.calculatePoolBalance(pool, logger);
@@ -1217,7 +1254,7 @@ export class CreditRepository {
         leadId: user.leadId,
       });
       return fail({
-        message: "app.api.credits.errors.getBalanceFailed",
+        message: t("errors.getBalanceFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -1231,6 +1268,7 @@ export class CreditRepository {
     ipAddress: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<{ leadId: string; credits: number }>> {
     try {
       // Check if lead exists for this IP
@@ -1245,6 +1283,8 @@ export class CreditRepository {
         const poolResult = await CreditRepository.getLeadPool(
           existingLead.id,
           logger,
+          t,
+          locale,
         );
         if (!poolResult.success) {
           return poolResult;
@@ -1254,6 +1294,7 @@ export class CreditRepository {
         await CreditRepository.ensureMonthlyFreeCreditsForPool(
           poolResult.data,
           logger,
+          locale,
         );
 
         // Calculate total credits across pool
@@ -1287,6 +1328,8 @@ export class CreditRepository {
       const walletResult = await CreditRepository.getOrCreateLeadWallet(
         newLead.id,
         logger,
+        t,
+        locale,
       );
       if (!walletResult.success) {
         return walletResult;
@@ -1311,7 +1354,7 @@ export class CreditRepository {
         ipAddress,
       });
       return fail({
-        message: "app.api.credits.errors.getOrCreateLeadFailed",
+        message: t("errors.getOrCreateLeadFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -1326,18 +1369,20 @@ export class CreditRepository {
     amount: number,
     type: "subscription" | "permanent" | "bonus",
     logger: EndpointLogger,
+    t: ModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
     // Input validation
     if (amount <= 0) {
       return fail({
-        message: "app.api.credits.errors.invalidAmount",
+        message: t("errors.invalidAmount"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
 
     if (!identifier.userId && !identifier.leadId) {
       return fail({
-        message: "app.api.credits.errors.invalidIdentifier",
+        message: t("errors.invalidIdentifier"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
@@ -1350,6 +1395,7 @@ export class CreditRepository {
         walletResult = await CreditRepository.getOrCreateUserWallet(
           identifier.userId,
           logger,
+          t,
         );
       } else {
         // Check if this lead is linked to a user
@@ -1368,12 +1414,15 @@ export class CreditRepository {
           walletResult = await CreditRepository.getOrCreateUserWallet(
             leadLink.userId,
             logger,
+            t,
           );
         } else {
           // Lead is not linked - use lead wallet
           walletResult = await CreditRepository.getOrCreateLeadWallet(
             identifier.leadId!,
             logger,
+            t,
+            locale,
           );
         }
       }
@@ -1458,7 +1507,7 @@ export class CreditRepository {
         type,
       });
       return fail({
-        message: "app.api.credits.errors.addCreditsFailed",
+        message: t("errors.addCreditsFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -1473,6 +1522,7 @@ export class CreditRepository {
     amount: number,
     type: "subscription" | "permanent" | "free",
     logger: EndpointLogger,
+    t: ModuleT,
     expiresAt?: Date,
     sessionId?: string,
   ): Promise<ResponseType<void>> {
@@ -1481,6 +1531,7 @@ export class CreditRepository {
       const walletResult = await CreditRepository.getOrCreateUserWallet(
         userId,
         logger,
+        t,
       );
       if (!walletResult.success) {
         return walletResult;
@@ -1550,7 +1601,7 @@ export class CreditRepository {
         type,
       });
       return fail({
-        message: "app.api.credits.errors.addCreditsFailed",
+        message: t("errors.addCreditsFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -1568,19 +1619,21 @@ export class CreditRepository {
     feature: string | undefined,
     messageId: string,
     logger: EndpointLogger,
+    t: ModuleT,
+    locale: CountryLanguage,
     allowPartial = false, //  allow deducting less than requested
   ): Promise<ResponseType<void>> {
     // Input validation
     if (amount <= 0) {
       return fail({
-        message: "app.api.credits.errors.invalidAmount",
+        message: t("errors.invalidAmount"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
 
     if (!identifier.userId && !identifier.leadId) {
       return fail({
-        message: "app.api.credits.errors.invalidIdentifier",
+        message: t("errors.invalidIdentifier"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
@@ -1594,6 +1647,7 @@ export class CreditRepository {
         poolResult = await CreditRepository.getUserPool(
           identifier.userId,
           logger,
+          t,
         );
         // For authenticated users, we need to know which lead is current
         // Get the leadId from identifier or fetch primary lead
@@ -1610,6 +1664,8 @@ export class CreditRepository {
         poolResult = await CreditRepository.getLeadPool(
           identifier.leadId!,
           logger,
+          t,
+          locale,
         );
         currentLeadId = identifier.leadId;
       }
@@ -1628,7 +1684,11 @@ export class CreditRepository {
       await CreditRepository.expireExpiredCreditsForWallets(walletIds, logger);
 
       // Ensure monthly credits are current for ENTIRE pool (pool-aware reset)
-      await CreditRepository.ensureMonthlyFreeCreditsForPool(pool, logger);
+      await CreditRepository.ensureMonthlyFreeCreditsForPool(
+        pool,
+        logger,
+        locale,
+      );
 
       // Determine which wallets to deduct from based on user type
       let walletsForDeduction: CreditWallet[];
@@ -2015,7 +2075,6 @@ export class CreditRepository {
             });
             return {
               success: false as const,
-              error: "app.api.credits.errors.insufficientCredits" as const,
             };
           }
         }
@@ -2025,7 +2084,7 @@ export class CreditRepository {
 
       if (!result.success) {
         return fail({
-          message: result.error,
+          message: t("errors.insufficientCredits"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
@@ -2044,7 +2103,7 @@ export class CreditRepository {
         amount,
       });
       return fail({
-        message: "app.api.credits.errors.deductCreditsFailed",
+        message: t("errors.deductCreditsFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -2064,6 +2123,7 @@ export class CreditRepository {
     limit: number,
     offset: number,
     logger: EndpointLogger,
+    t: ModuleT,
     locale: CountryLanguage,
   ): Promise<
     ResponseType<{
@@ -2073,7 +2133,7 @@ export class CreditRepository {
   > {
     try {
       // Get user pool
-      const poolResult = await CreditRepository.getUserPool(userId, logger);
+      const poolResult = await CreditRepository.getUserPool(userId, logger, t);
       if (!poolResult.success) {
         return poolResult;
       }
@@ -2087,12 +2147,17 @@ export class CreditRepository {
       }
 
       // Ensure monthly free credits are reset if needed (new period)
-      await CreditRepository.ensureMonthlyFreeCreditsForPool(pool, logger);
+      await CreditRepository.ensureMonthlyFreeCreditsForPool(
+        pool,
+        logger,
+        locale,
+      );
 
       // Refetch pool to get updated period IDs after potential reset
       const updatedPoolResult = await CreditRepository.getUserPool(
         userId,
         logger,
+        t,
       );
       if (!updatedPoolResult.success) {
         return updatedPoolResult;
@@ -2185,7 +2250,6 @@ export class CreditRepository {
 
       // Convert count to number (PostgreSQL count returns bigint as string)
       const totalCount = Number(count);
-      const { t } = simpleT(locale);
       const result: CreditTransactionOutput[] = transactions.map(
         (transaction) => {
           const featureLabel = CreditRepository.getFetaureLabel(
@@ -2225,7 +2289,7 @@ export class CreditRepository {
     } catch (error) {
       logger.error("Failed to get transactions", parseError(error), { userId });
       return fail({
-        message: "app.api.credits.errors.getTransactionsFailed",
+        message: t("errors.getTransactionsFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -2246,6 +2310,7 @@ export class CreditRepository {
     data: CreditsHistoryGetRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: ModuleT,
     locale: CountryLanguage,
   ): Promise<ResponseType<CreditsHistoryGetResponseOutput>> {
     const { page, limit } = data.paginationInfo;
@@ -2266,6 +2331,7 @@ export class CreditRepository {
           limit,
           offset,
           logger,
+          t,
           locale,
         )
       : await CreditRepository.getTransactionsByLeadId(
@@ -2273,6 +2339,7 @@ export class CreditRepository {
           limit,
           offset,
           logger,
+          t,
           locale,
         );
 
@@ -2304,6 +2371,7 @@ export class CreditRepository {
     limit: number,
     offset: number,
     logger: EndpointLogger,
+    t: ModuleT,
     locale: CountryLanguage,
   ): Promise<
     ResponseType<{
@@ -2313,7 +2381,12 @@ export class CreditRepository {
   > {
     try {
       // Get lead pool (lead wallets only, no user wallet)
-      const poolResult = await CreditRepository.getLeadPoolOnly(leadId, logger);
+      const poolResult = await CreditRepository.getLeadPoolOnly(
+        leadId,
+        logger,
+        t,
+        locale,
+      );
       if (!poolResult.success) {
         return poolResult;
       }
@@ -2321,12 +2394,18 @@ export class CreditRepository {
       const pool = poolResult.data;
 
       // Ensure monthly free credits are reset if needed (new period)
-      await CreditRepository.ensureMonthlyFreeCreditsForPool(pool, logger);
+      await CreditRepository.ensureMonthlyFreeCreditsForPool(
+        pool,
+        logger,
+        locale,
+      );
 
       // Refetch pool to get updated period IDs after potential reset
       const updatedPoolResult = await CreditRepository.getLeadPoolOnly(
         leadId,
         logger,
+        t,
+        locale,
       );
       if (!updatedPoolResult.success) {
         return updatedPoolResult;
@@ -2418,7 +2497,6 @@ export class CreditRepository {
 
       // Convert count to number (PostgreSQL count returns bigint as string)
       const totalCount = Number(count);
-      const { t } = simpleT(locale);
       const result: CreditTransactionOutput[] = transactions.map(
         (transaction) => {
           const featureLabel = CreditRepository.getFetaureLabel(
@@ -2440,12 +2518,11 @@ export class CreditRepository {
 
       // Add summary entry for other devices' spending if > 0
       if (otherDevicesSpending > 0 && offset === 0) {
-        const { t } = simpleT(locale);
         result.unshift({
           id: "other-devices-summary",
           amount: -otherDevicesSpending,
           balanceAfter: currentWallet.balance,
-          type: t("app.api.credits.enums.transactionType.otherDevices"),
+          type: t("enums.transactionType.otherDevices"),
           messageId: null,
           createdAt: new Date(),
         });
@@ -2458,7 +2535,7 @@ export class CreditRepository {
     } catch (error) {
       logger.error("Failed to get transactions", parseError(error), { leadId });
       return fail({
-        message: "app.api.credits.errors.getTransactionsFailed",
+        message: t("errors.getTransactionsFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -2471,6 +2548,7 @@ export class CreditRepository {
    */
   static async expireCredits(
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<number>> {
     try {
       const expiredPacks = await db
@@ -2551,7 +2629,7 @@ export class CreditRepository {
     } catch (error) {
       logger.error("Failed to expire credits", parseError(error));
       return fail({
-        message: "app.api.credits.errors.expireCreditsFailed",
+        message: t("errors.expireCreditsFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -2564,6 +2642,7 @@ export class CreditRepository {
     userId: string,
     leadId: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<
     ResponseType<{
       userId?: string;
@@ -2605,7 +2684,7 @@ export class CreditRepository {
         leadId,
       });
       return fail({
-        message: "app.api.credits.errors.getCreditIdentifierFailed",
+        message: t("errors.getCreditIdentifierFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -2619,6 +2698,9 @@ export class CreditRepository {
     cost: number,
     feature: string,
     logger: EndpointLogger,
+    t: ModuleT,
+    // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
+    locale: CountryLanguage,
   ): Promise<{
     success: boolean;
     messageId?: string;
@@ -2657,6 +2739,8 @@ export class CreditRepository {
         feature,
         creditMessageId,
         logger,
+        t,
+        locale,
       );
 
       if (!result.success) {
@@ -2690,7 +2774,9 @@ export class CreditRepository {
     user: JwtPayloadType,
     cost: number,
     logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
+    t: ModuleT,
   ): Promise<{
     success: boolean;
     messageId?: string;
@@ -2715,15 +2801,15 @@ export class CreditRepository {
         logger.error("No identifier for TTS credit deduction", { cost });
         return { success: false };
       }
-      const { t } = simpleT(locale);
-
       const result = await CreditRepository.deductCredits(
         identifier,
         cost,
         undefined,
-        t(ttsDefinition.POST.title),
+        t("repository.tts"),
         creditMessageId,
         logger,
+        t,
+        locale,
         true, // allowPartial = true for TTS
       );
 
@@ -2761,6 +2847,8 @@ export class CreditRepository {
     user: JwtPayloadType,
     cost: number,
     logger: EndpointLogger,
+    t: ModuleT,
+    // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
     locale: CountryLanguage,
   ): Promise<{
     success: boolean;
@@ -2786,14 +2874,15 @@ export class CreditRepository {
         logger.error("No identifier for STT credit deduction", { cost });
         return { success: false };
       }
-      const { t } = simpleT(locale);
       const result = await CreditRepository.deductCredits(
         identifier,
         cost,
         undefined,
-        t(sttDefinition.POST.title),
+        t("repository.stt"),
         creditMessageId,
         logger,
+        t,
+        locale,
         true, // allowPartial = true for STT
       );
 
@@ -2834,6 +2923,9 @@ export class CreditRepository {
     cost: number,
     model: ModelId,
     logger: EndpointLogger,
+    t: ModuleT,
+    // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
+    locale: CountryLanguage,
   ): Promise<{
     success: boolean;
     messageId?: string;
@@ -2870,6 +2962,8 @@ export class CreditRepository {
         undefined,
         creditMessageId,
         logger,
+        t,
+        locale,
         true, // Allow partial deduction for model usage
       );
 
@@ -2917,6 +3011,7 @@ export class CreditRepository {
   static async handleCreditPackPurchase(
     session: CreditPackCheckoutSession,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<void> {
     try {
       const userId = session.metadata?.userId;
@@ -2951,6 +3046,7 @@ export class CreditRepository {
         totalCredits,
         "permanent",
         logger,
+        t,
         undefined, // no expiration for permanent packs
         session.id, // sessionId for idempotency tracking
       );
@@ -2985,6 +3081,7 @@ export class CreditRepository {
     userId: string,
     leadIds: string[],
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<void>> {
     try {
       logger.debug("Linking lead wallets to user during signup/login", {
@@ -2993,7 +3090,7 @@ export class CreditRepository {
       });
 
       // Get user pool (this will create user wallet if it doesn't exist)
-      const poolResult = await CreditRepository.getUserPool(userId, logger);
+      const poolResult = await CreditRepository.getUserPool(userId, logger, t);
       if (!poolResult.success) {
         logger.error("Failed to get user pool during signup", {
           userId,
@@ -3022,7 +3119,7 @@ export class CreditRepository {
         },
       );
       return fail({
-        message: "app.api.credits.errors.mergeLeadWalletsFailed",
+        message: t("errors.mergeLeadWalletsFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -3036,12 +3133,20 @@ export class CreditRepository {
     identifier: CreditIdentifier,
     required: number,
     logger: EndpointLogger,
+    t: ModuleT,
+    // oxlint-disable-next-line no-unused-vars -- locale is unused on server, but required on native
+    locale: CountryLanguage,
   ): Promise<boolean> {
     if (!identifier.leadId && !identifier.userId) {
       logger.error("Credit check requires leadId or userId");
       return false;
     }
-    const balanceResult = await CreditRepository.getBalance(identifier, logger);
+    const balanceResult = await CreditRepository.getBalance(
+      identifier,
+      logger,
+      t,
+      locale,
+    );
     if (!balanceResult.success) {
       return false;
     }
@@ -3068,6 +3173,7 @@ export class CreditRepository {
     commissionPercent: number,
     originalAmountCents: number,
     logger: EndpointLogger,
+    t: ModuleT,
     sourceUserEmail?: string,
   ): Promise<ResponseType<{ packId: string; transactionId: string }>> {
     try {
@@ -3075,6 +3181,7 @@ export class CreditRepository {
       const walletResult = await CreditRepository.getOrCreateUserWallet(
         userId,
         logger,
+        t,
       );
       if (!walletResult.success) {
         return walletResult;
@@ -3145,7 +3252,7 @@ export class CreditRepository {
         sourceUserId,
       });
       return fail({
-        message: "app.api.credits.errors.addEarnedCreditsFailed",
+        message: t("errors.addEarnedCreditsFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -3158,6 +3265,7 @@ export class CreditRepository {
   static async getEarnedCreditsBalance(
     userId: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<
     ResponseType<{
       total: number;
@@ -3169,6 +3277,7 @@ export class CreditRepository {
       const walletResult = await CreditRepository.getOrCreateUserWallet(
         userId,
         logger,
+        t,
       );
       if (!walletResult.success) {
         return walletResult;
@@ -3217,7 +3326,7 @@ export class CreditRepository {
         userId,
       });
       return fail({
-        message: "app.api.credits.errors.getEarnedBalanceFailed",
+        message: t("errors.getEarnedBalanceFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -3233,11 +3342,13 @@ export class CreditRepository {
     payoutRequestId: string,
     currency: "BTC" | "USDC" | "CREDITS",
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<void>> {
     try {
       const walletResult = await CreditRepository.getOrCreateUserWallet(
         userId,
         logger,
+        t,
       );
       if (!walletResult.success) {
         return walletResult;
@@ -3283,7 +3394,7 @@ export class CreditRepository {
 
       if (remaining > 0) {
         return fail({
-          message: "app.api.credits.errors.insufficientEarnedCredits",
+          message: t("errors.insufficientEarnedCredits"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
@@ -3324,7 +3435,7 @@ export class CreditRepository {
         payoutRequestId,
       });
       return fail({
-        message: "app.api.credits.errors.deductEarnedCreditsFailed",
+        message: t("errors.deductEarnedCreditsFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -3338,6 +3449,7 @@ export class CreditRepository {
     limit: number,
     offset: number,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<
     ResponseType<{
       transactions: CreditTransactionOutput[];
@@ -3348,6 +3460,7 @@ export class CreditRepository {
       const walletResult = await CreditRepository.getOrCreateUserWallet(
         userId,
         logger,
+        t,
       );
       if (!walletResult.success) {
         return walletResult;
@@ -3403,7 +3516,7 @@ export class CreditRepository {
         userId,
       });
       return fail({
-        message: "app.api.credits.errors.getReferralTransactionsFailed",
+        message: t("errors.getReferralTransactionsFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

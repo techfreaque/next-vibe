@@ -1,6 +1,12 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Leads",
+  tags: {
+    leads: "Leady",
+    create: "Utwórz",
+  },
+
   widget: {
     headerLeadCreated: "Lead stworzony",
     headerCreateLead: "Stwórz lead",

@@ -61,6 +61,11 @@ export const translations: typeof enTranslations = {
         title: "Narzędzie wykonane",
         description: "Narzędzie zostało wykonane pomyślnie",
       },
+      widget: {
+        enterToolName: "Wprowadź nazwę narzędzia, aby załadować formularz.",
+        resolving: "Rozwiązywanie punktu końcowego…",
+        unknownTool: "Nieznane narzędzie: {{toolName}}",
+      },
     },
   },
   tools: {

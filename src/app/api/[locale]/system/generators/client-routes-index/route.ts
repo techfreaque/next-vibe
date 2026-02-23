@@ -10,10 +10,11 @@ import { ClientRoutesIndexGeneratorRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
-    handler: async ({ data, logger }) => {
+    handler: async ({ data, logger, t }) => {
       return await ClientRoutesIndexGeneratorRepository.generateClientRoutesIndex(
         data,
         logger,
+        t,
       );
     },
   },

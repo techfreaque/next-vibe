@@ -78,4 +78,9 @@ export const translations: typeof enTranslations = {
     title: "Wartevorgang erfolgreich",
     description: "Der angegebene Text ist auf der Seite erschienen",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    waitAutomation: "Warte-Automatisierung",
+  },
 };

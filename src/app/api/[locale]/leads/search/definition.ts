@@ -9,10 +9,10 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   backButton,
   customWidgetObject,
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -26,6 +26,7 @@ import { Countries, Languages } from "@/i18n/core/config";
 
 import { dateSchema } from "../../shared/types/common.schema";
 import { EmailCampaignStage, LeadSource, LeadStatus } from "../enum";
+import { scopedTranslation } from "./i18n";
 import { LeadsSearchContainer } from "./widget";
 
 // Inline schema to avoid deprecated schema.ts imports
@@ -64,18 +65,16 @@ const leadResponseSchema = z.object({
  * Searches leads with pagination and filtering
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["leads", "search"],
   allowedRoles: [UserRole.ADMIN],
   icon: "search",
 
-  title: "app.api.leads.search.get.title" as const,
-  description: "app.api.leads.search.get.description" as const,
-  category: "app.api.leads.category" as const,
-  tags: [
-    "app.api.leads.tags.leads" as const,
-    "app.api.leads.tags.search" as const,
-  ],
+  title: "get.title",
+  description: "get.description",
+  category: "category",
+  tags: ["tags.leads", "tags.search"],
 
   fields: customWidgetObject({
     render: LeadsSearchContainer,
@@ -83,123 +82,110 @@ const { GET } = createEndpoint({
     children: {
       backButton: backButton({ usage: { response: true } }),
       // === QUERY PARAMETERS ===
-      search: requestField({
+      search: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.leads.search.get.search.label" as const,
-        description: "app.api.leads.search.get.search.description" as const,
+        label: "get.search.label",
+        description: "get.search.description",
         columns: 6,
-        placeholder: "app.api.leads.search.get.search.placeholder" as const,
+        placeholder: "get.search.placeholder",
         schema: z.string().optional(),
       }),
-      limit: requestField({
+      limit: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.leads.search.get.limit.label" as const,
-        description: "app.api.leads.search.get.limit.description" as const,
+        label: "get.limit.label",
+        description: "get.limit.description",
         columns: 3,
         schema: z.coerce.number().min(1).max(50).default(10),
       }),
-      offset: requestField({
+      offset: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.leads.search.get.offset.label" as const,
-        description: "app.api.leads.search.get.offset.description" as const,
+        label: "get.offset.label",
+        description: "get.offset.description",
         columns: 3,
         schema: z.coerce.number().min(0).default(0),
       }),
 
       // === RESPONSE FIELDS ===
-      response: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.leads.search.get.response.title" as const,
-          description: "app.api.leads.search.get.response.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          leads: responseArrayField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.leads.search.get.response.leads.title" as const,
-            },
-            responseField({
+      response: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.title",
+        description: "get.response.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          leads: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "get.response.leads.title",
+            child: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.leads.search.get.response.leads.item" as const,
+              content: "get.response.leads.item",
               fieldType: FieldDataType.TEXT,
               schema: leadResponseSchema,
             }),
-          ),
-          total: responseField({
+          }),
+          total: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.leads.search.get.response.total" as const,
+            content: "get.response.total",
             fieldType: FieldDataType.NUMBER,
             schema: z.coerce.number(),
           }),
-          hasMore: responseField({
+          hasMore: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.leads.search.get.response.hasMore" as const,
+            content: "get.response.hasMore",
             fieldType: FieldDataType.BOOLEAN,
             schema: z.boolean(),
           }),
         },
-      ),
+      }),
     },
   }),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.leads.search.get.errors.unauthorized.title" as const,
-      description:
-        "app.api.leads.search.get.errors.unauthorized.description" as const,
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.leads.search.get.errors.validation.title" as const,
-      description:
-        "app.api.leads.search.get.errors.validation.description" as const,
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.leads.search.get.errors.server.title" as const,
-      description:
-        "app.api.leads.search.get.errors.server.description" as const,
+      title: "get.errors.server.title",
+      description: "get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.leads.search.get.errors.unknown.title" as const,
-      description:
-        "app.api.leads.search.get.errors.unknown.description" as const,
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.leads.search.get.errors.network.title" as const,
-      description:
-        "app.api.leads.search.get.errors.network.description" as const,
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.leads.search.get.errors.forbidden.title" as const,
-      description:
-        "app.api.leads.search.get.errors.forbidden.description" as const,
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.leads.search.get.errors.notFound.title" as const,
-      description:
-        "app.api.leads.search.get.errors.notFound.description" as const,
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.leads.search.get.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.leads.search.get.errors.unsavedChanges.description" as const,
+      title: "get.errors.unsavedChanges.title",
+      description: "get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.leads.search.get.errors.conflict.title" as const,
-      description:
-        "app.api.leads.search.get.errors.conflict.description" as const,
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.leads.search.get.success.title" as const,
-    description: "app.api.leads.search.get.success.description" as const,
+    title: "get.success.title",
+    description: "get.success.description",
   },
 
   examples: {

@@ -65,4 +65,9 @@ export const translations = {
     title: "Page Resized Successfully",
     description: "The page was resized successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    viewportAutomation: "Viewport Automation",
+  },
 };

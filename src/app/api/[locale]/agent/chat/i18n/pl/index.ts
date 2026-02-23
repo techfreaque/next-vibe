@@ -31,6 +31,7 @@ export const translations: typeof enTranslations = {
     settings: "Ustawienia",
   },
   config: {
+    appName: "unbottled.ai",
     folders: {
       private: "Prywatny",
       shared: "Udostępniony",
@@ -76,6 +77,151 @@ export const translations: typeof enTranslations = {
         balance: "Saldo",
         buy: "Kup",
         freeCreditsLeft: "Darmowe kredyty",
+      },
+    },
+    credits: {
+      credit: "{{count}} kredyt",
+      credits: "{{count}} kredytów",
+    },
+    navigation: {
+      subscription: "Subskrypcja i Kredyty",
+      referral: "Program Poleceń",
+      help: "Pomoc",
+      about: "O nas",
+    },
+    confirmations: {
+      deleteMessage: "Czy na pewno chcesz usunąć tę wiadomość?",
+    },
+    welcomeTour: {
+      authDialog: {
+        title: "Odblokuj prywatne i udostępnione foldery",
+        description:
+          "Zarejestruj się lub zaloguj, aby uzyskać dostęp do prywatnych i udostępnionych folderów. Twoje czaty będą synchronizowane między urządzeniami.",
+        continueTour: "Kontynuuj wycieczkę",
+        signUp: "Zarejestruj się / Zaloguj",
+      },
+      buttons: {
+        back: "Wstecz",
+        close: "Zamknij",
+        last: "Zakończ",
+        next: "Dalej",
+        skip: "Pomiń",
+      },
+      welcome: {
+        title: "Witaj w {{appName}}!",
+        description:
+          "Twoja platforma AI zorientowana na prywatność z ponad 40 modelami, kontrolą treści przez użytkownika i zasadami wolności słowa.",
+        subtitle: "Zrób szybką wycieczkę, aby zacząć.",
+      },
+      aiCompanion: {
+        title: "Wybierz swojego towarzysza AI",
+        description:
+          "Wybieraj spośród ponad 40 modeli AI, w tym głównonurtowych, open-source i bez cenzury.",
+        tip: "Kliknij, aby otworzyć selektor modeli i wybrać towarzysza.",
+      },
+      rootFolders: {
+        title: "Twoje foldery czatów",
+        description:
+          "Organizuj swoje czaty w różnych folderach, każdy z unikalnymi ustawieniami prywatności:",
+        private: {
+          name: "Prywatny",
+          suffix: "— zaszyfrowany, tylko Ty możesz zobaczyć",
+        },
+        incognito: {
+          name: "Incognito",
+          suffix: "— historia nie jest zapisywana",
+        },
+        shared: {
+          name: "Udostępniony",
+          suffix: "— współpracuj z innymi",
+        },
+        public: {
+          name: "Publiczny",
+          suffix: "— widoczny dla wszystkich",
+        },
+      },
+      privateFolder: {
+        name: "Prywatny",
+        suffix: "Folder",
+        description:
+          "Twoje prywatne czaty są zaszyfrowane i widoczne tylko dla Ciebie. Idealne do wrażliwych tematów.",
+      },
+      incognitoFolder: {
+        name: "Incognito",
+        suffix: "Folder",
+        description:
+          "Rozmawiaj bez zapisywania historii. Po zamknięciu sesji wszystkie wiadomości znikają.",
+        note: "Żadne dane nie są przechowywane na naszych serwerach podczas sesji incognito.",
+      },
+      sharedFolder: {
+        name: "Udostępniony",
+        suffix: "Folder",
+        description:
+          "Współpracuj z konkretnymi osobami, udostępniając im dostęp do tego folderu.",
+      },
+      publicFolder: {
+        name: "Publiczny",
+        suffix: "Folder",
+        description:
+          "Udostępniaj swoje rozmowy AI światu. Inni mogą przeglądać i forkować Twoje wątki.",
+        note: "Wszystko w folderze publicznym jest widoczne dla wszystkich użytkowników i wyszukiwarek.",
+      },
+      newChatButton: {
+        title: "Rozpocznij nowy czat",
+        description:
+          "Kliknij tutaj, aby rozpocząć nową rozmowę w dowolnym folderze.",
+        tip: "Możesz też użyć skrótu klawiszowego Ctrl+K, aby szybko rozpocząć nowy czat.",
+      },
+      sidebarLogin: {
+        title: "Zaloguj się, aby odblokować więcej",
+        description:
+          "Utwórz darmowe konto, aby uzyskać dostęp do folderów prywatnych i udostępnionych, synchronizować między urządzeniami i zapisywać historię rozmów.",
+        tip: "Rejestracja jest bezpłatna! Otrzymujesz 100 darmowych kredytów na start.",
+      },
+      subscriptionButton: {
+        title: "Kredyty i subskrypcja",
+        description:
+          "Otrzymuj {{credits}} kredytów/miesiąc z subskrypcją Pro za jedyne {{price}}.",
+        price: "9,99 zł",
+        tip: "Kredyty są używane do interakcji z modelami AI. Bezpłatni użytkownicy otrzymują ograniczone miesięczne kredyty.",
+      },
+      chatInput: {
+        title: "Wpisz swoją wiadomość",
+        description:
+          "Wpisz swoją wiadomość tutaj i naciśnij Enter lub kliknij Wyślij, aby rozmawiać z towarzyszem AI.",
+        tip: "Użyj Shift+Enter dla nowej linii. Możesz też załączać pliki i zdjęcia.",
+      },
+      voiceInput: {
+        title: "Wprowadzanie głosowe",
+        description: "Użyj mikrofonu, aby rozmawiać z towarzyszem AI:",
+        options: {
+          transcribe: "Transkrybuj mowę na tekst",
+          sendAudio: "Wyślij audio bezpośrednio do AI",
+          pauseResume: "Wstrzymaj i wznów nagrywanie",
+        },
+      },
+      callMode: {
+        title: "Tryb połączenia",
+        description:
+          "Włącz tryb połączenia dla bezobsługowej, głosowej rozmowy z odpowiedziami AI w czasie rzeczywistym.",
+        tip: "Idealne, gdy jesteś w ruchu lub wolisz mówić niż pisać.",
+      },
+      complete: {
+        title: "Gotowe!",
+        description:
+          "Ukończyłeś wycieczkę! Zacznij teraz rozmawiać z towarzyszem AI.",
+        help: "Potrzebujesz pomocy? Kliknij ikonę znaku zapytania na pasku bocznym w dowolnym momencie.",
+      },
+      authUnlocked: {
+        unlocked: "Odblokowany!",
+        privateDescription:
+          "Twój prywatny folder jest teraz dostępny. Wszystkie czaty są zaszyfrowane i widoczne tylko dla Ciebie.",
+        privateNote:
+          "Prywatne czaty automatycznie synchronizują się na wszystkich Twoich urządzeniach.",
+        sharedDescription:
+          "Twój udostępniony folder jest teraz dostępny. Zaproś innych do współpracy przy rozmowach AI.",
+        sharedNote:
+          "Kontrolujesz, kto ma dostęp do Twoich udostępnionych folderów i wątków.",
       },
     },
   },
@@ -366,14 +512,64 @@ export const translations: typeof enTranslations = {
         "Kimi K2 - Potężny chiński model AI z doskonałym zrozumieniem kontekstu",
       kimiK2_5:
         "Kimi K2.5 - Rozszerzony chiński model AI z ulepszonymi możliwościami rozumowania i kreatywnymi",
+      claudeSonnet45:
+        "Claude Sonnet 4.5 - Poprzednia generacja modelu Sonnet od Anthropic z silnymi możliwościami kodowania i analizy",
+      grok4:
+        "Grok 4 - Flagowy model rozumowania xAI z możliwościami wizji i wyszukiwania w sieci",
+      grok4Fast:
+        "Grok 4 Fast - Szybki model xAI z kontekstem 2M tokenów zoptymalizowany dla szybkich odpowiedzi",
+      gpt5Pro:
+        "GPT-5 Pro - Premium model OpenAI z najwyższym poziomem rozumowania i zaawansowanymi możliwościami kodowania",
+      gpt5Codex:
+        "GPT-5 Codex - Wyspecjalizowany model kodowania OpenAI z wyjątkowymi możliwościami programistycznymi i technicznymi",
+      gpt51Codex:
+        "GPT 5.1 Codex - Zaktualizowany model kodowania OpenAI z ulepszonymi możliwościami kreatywnymi i programistycznymi",
+      gpt51:
+        "GPT 5.1 - Wydajny model ogólnego przeznaczenia OpenAI z silnym rozumowaniem i analizą",
+      gpt5: "GPT-5 - Flagowy model OpenAI z szeroką inteligencją i wszechstronnymi możliwościami",
+      gpt5Mini: "GPT-5 Mini - Lekki szybki model OpenAI do codziennych zadań",
+      gpt5Nano:
+        "GPT-5 Nano - Najmniejszy i najbardziej przystępny cenowo model OpenAI do prostych rozmów",
+      gptOss120b:
+        "GPT-OSS 120B - Model open-source OpenAI z 120B parametrami z silnymi możliwościami kodowania",
+      kimiK2Thinking:
+        "Kimi K2 Thinking - Model Kimi skoncentrowany na rozumowaniu z ulepszoną analizą krok po kroku",
+      glm45Air:
+        "GLM 4.5 AIR - Ultraszybki lekki model Z.AI do szybkich interakcji konwersacyjnych",
+      glm45v:
+        "GLM 4.5v - Model wizyjny Z.AI z rozumieniem obrazów i możliwościami czatu",
+      geminiFlash25Lite:
+        "Gemini 2.5 Flash Lite - Podstawowy model Gemini Google z dużym kontekstem i szybkimi odpowiedziami",
+      geminiFlash25Flash:
+        "Gemini 2.5 Flash - Wydajny multimodalny model Google z kontekstem 1M tokenów dla szybkich zadań",
+      geminiFlash25Pro:
+        "Gemini 2.5 Flash Pro - Poprzedni model Pro Google z dużym kontekstem i silnym rozumowaniem",
+      deepseekV31:
+        "DeepSeek V3.1 - Poprzednia generacja modelu DeepSeek z silnymi możliwościami kodowania i analizy",
+      deepseekR1:
+        "DeepSeek R1 - Model DeepSeek skoncentrowany na rozumowaniu z zaawansowanym rozwiązywaniem problemów krok po kroku",
+      qwen3235bFree:
+        "Qwen3 235B - Duży otwarty model Alibaby z 235B parametrami do złożonych zadań kodowania i rozumowania",
+      deepseekR1Distill:
+        "DeepSeek R1 Distill - Kompaktowa zdestylowana wersja DeepSeek R1 z wydajnymi możliwościami rozumowania",
+      qwen257b:
+        "Qwen 2.5 7B - Kompaktowy model 7B Alibaby do szybkich i niedrogich zadań konwersacyjnych",
     },
   },
   modelUtilities: {
     adultExplicit: "Treści dla dorosłych/Jednoznaczne",
     adultImplied: "Treści dla dorosłych/Sugerowane",
+    analysis: "Analiza",
+    chat: "Czat",
+    coding: "Programowanie",
     conspiracy: "Teorie spiskowe",
+    controversial: "Kontrowersyjne tematy",
+    creative: "Twórcze pisanie",
+    fast: "Szybki",
     harmful: "Potencjalnie szkodliwe treści",
     illegalInfo: "Nielegalne informacje",
+    imageGen: "Generowanie obrazów",
+    legacy: "Przestarzały",
     medicalAdvice: "Porady medyczne",
     offensiveLanguage: "Obraźliwy język",
     politicalLeft: "Lewicowe poglądy polityczne",
@@ -381,7 +577,10 @@ export const translations: typeof enTranslations = {
     reasoning: "Zaawansowane rozumowanie",
     roleplay: "Odgrywanie ról",
     roleplayDark: "Mroczne odgrywanie ról",
+    smart: "Inteligentny",
+    uncensored: "Niecenzurowany",
     violence: "Przemoc",
+    vision: "Przetwarzanie obrazu",
   },
   input: {
     attachments: {

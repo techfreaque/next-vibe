@@ -16,6 +16,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { db } from "../../system/db";
 import { SortOrder } from "../imap-client/enum";
@@ -36,33 +37,12 @@ import type {
   EmailsListRequestOutput,
   EmailsListResponseOutput,
 } from "./list/definition";
-
-/**
- * Emails Repository Interface
- */
-export interface EmailsRepository {
-  getEmails(
-    data: EmailsListRequestOutput,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<EmailsListResponseOutput>>;
-
-  getEmailById(
-    urlPathParams: EmailGetGETUrlVariablesOutput,
-    user: JwtPayloadType,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<EmailGetGETResponseOutput>>;
-
-  create(
-    data: NewEmail,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<{ id: string }>>;
-}
+import { scopedTranslation } from "./list/i18n";
 
 /**
  * Emails Repository Implementation
  */
-class EmailsRepositoryImpl implements EmailsRepository {
+class EmailsRepositoryImpl {
   /**
    * Get paginated list of emails with filtering and sorting
    */
@@ -70,6 +50,7 @@ class EmailsRepositoryImpl implements EmailsRepository {
     data: EmailsListRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<EmailsListResponseOutput>> {
     try {
       logger.debug("Fetching emails with query", {
@@ -272,8 +253,9 @@ class EmailsRepositoryImpl implements EmailsRepository {
       return success(response);
     } catch (error) {
       logger.error("Error fetching emails", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.emails.messages.list.errors.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -287,7 +269,9 @@ class EmailsRepositoryImpl implements EmailsRepository {
     urlPathParams: EmailGetGETUrlVariablesOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<EmailGetGETResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const emailId = urlPathParams.id;
       logger.debug("Fetching email by ID", {
@@ -302,7 +286,7 @@ class EmailsRepositoryImpl implements EmailsRepository {
 
       if (!emailResult) {
         return fail({
-          message: "app.api.emails.messages.id.get.errors.not_found.title",
+          message: t("errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -338,7 +322,7 @@ class EmailsRepositoryImpl implements EmailsRepository {
     } catch (error) {
       logger.error("Error fetching email by ID", parseError(error));
       return fail({
-        message: "app.api.emails.messages.id.get.errors.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -351,7 +335,9 @@ class EmailsRepositoryImpl implements EmailsRepository {
   async create(
     data: NewEmail,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<{ id: string }>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const [result] = await db
         .insert(emails)
@@ -360,7 +346,7 @@ class EmailsRepositoryImpl implements EmailsRepository {
 
       if (!result) {
         return fail({
-          message: "app.api.emails.messages.list.errors.server.title",
+          message: t("errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -369,7 +355,7 @@ class EmailsRepositoryImpl implements EmailsRepository {
     } catch (error) {
       logger.error("Error creating email record", parseError(error));
       return fail({
-        message: "app.api.emails.messages.list.errors.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

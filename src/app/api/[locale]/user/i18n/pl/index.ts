@@ -13,6 +13,7 @@ export const translations: typeof enTranslations = {
   public: publicTranslations,
   search: searchTranslations,
   "session-cleanup": sessionCleanupTranslations,
+  sessionCleanup: sessionCleanupTranslations,
   userRoles: userRolesTranslations,
   profileVisibility: {
     public: "Publiczny",

@@ -14,7 +14,7 @@ import { imapHealthRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: ({ user, logger }) =>
-      imapHealthRepository.getHealthStatus(user, logger),
+    handler: ({ user, logger, locale }) =>
+      imapHealthRepository.getHealthStatus(user, logger, locale),
   },
 });

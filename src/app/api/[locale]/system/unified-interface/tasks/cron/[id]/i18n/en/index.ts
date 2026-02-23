@@ -1,4 +1,5 @@
 export const translations = {
+  category: "System",
   get: {
     title: "Get Cron Task",
     description: "Retrieve a single cron task by ID",

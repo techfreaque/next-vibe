@@ -22,6 +22,9 @@ import type {
   FilesWriteRequestOutput,
   FilesWriteResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 function resolvePath(inputPath: string): string {
   if (inputPath === "~" || inputPath.startsWith("~/")) {
@@ -38,10 +41,11 @@ export class FilesWriteRepository {
   static async write(
     data: FilesWriteRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<FilesWriteResponseOutput>> {
     if (data.connectionId) {
       return fail({
-        message: "SSH backend not yet implemented for file writing",
+        message: t("errors.notImplemented.fileWrite"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
@@ -50,7 +54,7 @@ export class FilesWriteRepository {
 
     if (!isValidPath(filePath)) {
       return fail({
-        message: "Invalid path: must be absolute without '..' segments",
+        message: t("errors.invalidPath"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
@@ -69,20 +73,19 @@ export class FilesWriteRepository {
       const err = error as NodeJS.ErrnoException;
       if (err.code === "ENOENT") {
         return fail({
-          message:
-            "Parent directory not found. Set createDirs=true to create it.",
+          message: t("errors.parentDirNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
       if (err.code === "EACCES") {
         return fail({
-          message: "Permission denied",
+          message: t("errors.permissionDenied"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
       logger.error("Failed to write file", parseError(error));
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

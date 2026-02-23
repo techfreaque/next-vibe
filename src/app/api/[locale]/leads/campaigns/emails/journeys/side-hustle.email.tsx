@@ -9,6 +9,7 @@ import React from "react";
 import { CampaignEmailLayout } from "@/app/api/[locale]/emails/smtp-client/components/campaign_email_layout.email";
 import { HumanCTAButton } from "@/app/api/[locale]/emails/smtp-client/components/human_cta_button.email";
 import { HumanText } from "@/app/api/[locale]/emails/smtp-client/components/human_text.email";
+import { simpleT } from "@/i18n/core/shared";
 
 import { EmailCampaignStage } from "../../../enum";
 import type {
@@ -16,86 +17,68 @@ import type {
   EmailTemplateFunction,
   JourneyTemplateMap,
 } from "../types";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Side Hustle - Initial Contact
  */
 export const sideHustleInitialEmail: EmailTemplateFunction = ({
   data,
-  t,
   locale,
   tracking,
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
-
+  const t = scopedTranslation.scopedT(locale).t;
+  const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
       previewText={t(
-        "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.initial.previewText",
+        "emailJourneys.leads.journeys.sideHustle.initial.previewText",
       )}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
-      t={t}
       tracking={tracking}
     >
       <HumanText variant="greeting">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.initial.greeting",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.initial.greeting")}
       </HumanText>
 
       <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.initial.opening",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.initial.opening")}
       </HumanText>
 
       <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.initial.myStory",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.initial.myStory")}
       </HumanText>
 
       <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.initial.affiliateHonesty",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.initial.affiliateHonesty")}
       </HumanText>
 
       <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.initial.proof",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.initial.proof")}
       </HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
-        text={t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.initial.ctaText",
-        )}
+        text={globalT("config.appName")}
         variant="primary"
         tracking={tracking}
       />
 
       <HumanText variant="signature">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.initial.signature",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.initial.signature")}
       </HumanText>
 
       <HumanText variant="ps">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.initial.postScript",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.initial.postScript")}
       </HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t(
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.initial.subject",
-    ),
+    subject: t("emailJourneys.leads.journeys.sideHustle.initial.subject"),
     jsx: emailContent,
   };
 };
@@ -105,68 +88,53 @@ export const sideHustleInitialEmail: EmailTemplateFunction = ({
  */
 export const sideHustleFollowup1Email: EmailTemplateFunction = ({
   data,
-  t,
   locale,
   tracking,
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
-
+  const t = scopedTranslation.scopedT(locale).t;
+  const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
       previewText={t(
-        "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup1.previewText",
+        "emailJourneys.leads.journeys.sideHustle.followup1.previewText",
       )}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
-      t={t}
       tracking={tracking}
     >
       <HumanText variant="greeting">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup1.greeting",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.followup1.greeting")}
       </HumanText>
 
       <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup1.thisWeek",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.followup1.thisWeek")}
       </HumanText>
 
       <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup1.clientWork",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.followup1.clientWork")}
       </HumanText>
 
       <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup1.howYouCanToo",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.followup1.howYouCanToo")}
       </HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
-        text={t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup1.ctaText",
-        )}
+        text={globalT("config.appName")}
         variant="primary"
         tracking={tracking}
       />
 
       <HumanText variant="signature">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup1.signature",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.followup1.signature")}
       </HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t(
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup1.subject",
-    ),
+    subject: t("emailJourneys.leads.journeys.sideHustle.followup1.subject"),
     jsx: emailContent,
   };
 };
@@ -176,74 +144,57 @@ export const sideHustleFollowup1Email: EmailTemplateFunction = ({
  */
 export const sideHustleFollowup2Email: EmailTemplateFunction = ({
   data,
-  t,
   locale,
   tracking,
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
-
+  const t = scopedTranslation.scopedT(locale).t;
+  const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
       previewText={t(
-        "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup2.previewText",
+        "emailJourneys.leads.journeys.sideHustle.followup2.previewText",
       )}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
-      t={t}
       tracking={tracking}
     >
       <HumanText variant="greeting">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup2.greeting",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.followup2.greeting")}
       </HumanText>
 
       <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup2.anotherUseCase",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.followup2.anotherUseCase")}
       </HumanText>
 
       <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup2.passiveIncome",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.followup2.passiveIncome")}
       </HumanText>
 
       <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup2.callToAction",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.followup2.callToAction")}
       </HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
-        text={t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup2.ctaText",
-        )}
+        text={globalT("config.appName")}
         variant="primary"
         tracking={tracking}
       />
 
       <HumanText variant="signature">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup2.signature",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.followup2.signature")}
       </HumanText>
 
       <HumanText variant="ps">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup2.postScript",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.followup2.postScript")}
       </HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t(
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup2.subject",
-    ),
+    subject: t("emailJourneys.leads.journeys.sideHustle.followup2.subject"),
     jsx: emailContent,
   };
 };
@@ -253,62 +204,49 @@ export const sideHustleFollowup2Email: EmailTemplateFunction = ({
  */
 export const sideHustleFollowup3Email: EmailTemplateFunction = ({
   data,
-  t,
   locale,
   tracking,
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
-
+  const t = scopedTranslation.scopedT(locale).t;
+  const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
       previewText={t(
-        "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup3.previewText",
+        "emailJourneys.leads.journeys.sideHustle.followup3.previewText",
       )}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
-      t={t}
       tracking={tracking}
     >
       <HumanText variant="greeting">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup3.greeting",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.followup3.greeting")}
       </HumanText>
 
       <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup3.monthlyEarnings",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.followup3.monthlyEarnings")}
       </HumanText>
 
       <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup3.noHardSell",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.followup3.noHardSell")}
       </HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
-        text={t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup3.ctaText",
-        )}
+        text={globalT("config.appName")}
         variant="secondary"
         tracking={tracking}
       />
 
       <HumanText variant="signature">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup3.signature",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.followup3.signature")}
       </HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t(
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.followup3.subject",
-    ),
+    subject: t("emailJourneys.leads.journeys.sideHustle.followup3.subject"),
     jsx: emailContent,
   };
 };
@@ -318,62 +256,49 @@ export const sideHustleFollowup3Email: EmailTemplateFunction = ({
  */
 export const sideHustleNurtureEmail: EmailTemplateFunction = ({
   data,
-  t,
   locale,
   tracking,
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
-
+  const t = scopedTranslation.scopedT(locale).t;
+  const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
       previewText={t(
-        "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.nurture.previewText",
+        "emailJourneys.leads.journeys.sideHustle.nurture.previewText",
       )}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
-      t={t}
       tracking={tracking}
     >
       <HumanText variant="greeting">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.nurture.greeting",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.nurture.greeting")}
       </HumanText>
 
       <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.nurture.tip",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.nurture.tip")}
       </HumanText>
 
       <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.nurture.freeValue",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.nurture.freeValue")}
       </HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
-        text={t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.nurture.ctaText",
-        )}
+        text={globalT("config.appName")}
         variant="secondary"
         tracking={tracking}
       />
 
       <HumanText variant="signature">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.nurture.signature",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.nurture.signature")}
       </HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t(
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.nurture.subject",
-    ),
+    subject: t("emailJourneys.leads.journeys.sideHustle.nurture.subject"),
     jsx: emailContent,
   };
 };
@@ -383,62 +308,51 @@ export const sideHustleNurtureEmail: EmailTemplateFunction = ({
  */
 export const sideHustleReactivationEmail: EmailTemplateFunction = ({
   data,
-  t,
   locale,
   tracking,
 }: EmailRenderContext) => {
   const { lead, unsubscribeUrl, trackingUrl } = data;
-
+  const t = scopedTranslation.scopedT(locale).t;
+  const { t: globalT } = simpleT(locale);
   const emailContent = (
     <CampaignEmailLayout
       previewText={t(
-        "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.reactivation.previewText",
+        "emailJourneys.leads.journeys.sideHustle.reactivation.previewText",
       )}
       locale={locale}
       unsubscribeUrl={unsubscribeUrl}
-      t={t}
       tracking={tracking}
     >
       <HumanText variant="greeting">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.reactivation.greeting",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.reactivation.greeting")}
+      </HumanText>
+
+      <HumanText variant="body">
+        {t("emailJourneys.leads.journeys.sideHustle.reactivation.update")}
       </HumanText>
 
       <HumanText variant="body">
         {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.reactivation.update",
-        )}
-      </HumanText>
-
-      <HumanText variant="body">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.reactivation.newOpportunity",
+          "emailJourneys.leads.journeys.sideHustle.reactivation.newOpportunity",
         )}
       </HumanText>
 
       <HumanCTAButton
         href={trackingUrl}
-        text={t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.reactivation.ctaText",
-        )}
+        text={globalT("config.appName")}
         variant="primary"
         tracking={tracking}
       />
 
       <HumanText variant="signature">
-        {t(
-          "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.reactivation.signature",
-        )}
+        {t("emailJourneys.leads.journeys.sideHustle.reactivation.signature")}
       </HumanText>
     </CampaignEmailLayout>
   );
 
   return {
     to: lead.email,
-    subject: t(
-      "app.api.leads.campaigns.emails.journeys.emailJourneys.leads.journeys.sideHustle.reactivation.subject",
-    ),
+    subject: t("emailJourneys.leads.journeys.sideHustle.reactivation.subject"),
     jsx: emailContent,
   };
 };

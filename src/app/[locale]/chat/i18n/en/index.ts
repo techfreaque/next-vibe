@@ -1071,6 +1071,7 @@ export const translations = {
     you: "You",
     user: "User",
     anonymous: "Anonymous",
+    authorWithId: "{{name}} [{{id}}]",
     edited: "edited",
     error: "Error",
     postNumber: "No.{{number}}",
@@ -1231,6 +1232,18 @@ export const translations = {
         "Dolphin Llama 3 70B - Uncensored large language model based on Llama 3",
       dolphin3_0_r1_mistral_24b:
         "Dolphin 3.0 R1 Mistral 24B - Uncensored large language model based on Mistral",
+      claudeOpus45:
+        "Claude Opus 4.5 - Most powerful Claude model with exceptional reasoning and creative capabilities",
+      claudeOpus46:
+        "Claude Opus 4.6 - Latest and most powerful Claude model with exceptional reasoning and creative capabilities",
+      claudeSonnet46:
+        "Claude Sonnet 4.6 - Anthropic's most capable Sonnet-class model with frontier performance across coding, agents, and professional work",
+      gemini3Pro:
+        "Google Gemini 3 Pro - Advanced multimodal AI model with large context window and powerful reasoning capabilities",
+      gemini3Flash:
+        "Google Gemini 3 Flash - Fast, efficient multimodal AI model optimized for quick responses",
+      deepseekV32:
+        "DeepSeek V3.2 - High-performance reasoning model with advanced coding capabilities",
     },
   },
   tones: {
@@ -1420,6 +1433,7 @@ export const translations = {
     today: "Today",
     lastWeek: "Last 7 Days",
     lastMonth: "Last 30 Days",
+    older: "Older",
     folderNotFound: "Folder not found",
     emptyFolder: "No chats or folders here yet",
     createSubfolder: "Create Subfolder",
@@ -1614,6 +1628,7 @@ export const translations = {
     assistantFallback: "Assistant",
     youLabel: "You",
     anonymous: "Anonymous",
+    authorWithId: "{{name}} [{{id}}]",
   },
   flatView: {
     postNumber: "Post #{{number}}",

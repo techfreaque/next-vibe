@@ -31,6 +31,7 @@ import type {
   ThreadPatchRequestOutput,
   ThreadPatchResponseOutput,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Thread by ID Repository - Static class pattern
@@ -42,10 +43,10 @@ export class ThreadByIdRepository {
   static async getThreadById(
     threadId: string,
     user: JwtPayloadType,
-    // oxlint-disable-next-line no-unused-vars - locale is unused on server, but required on native
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadGetResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Getting thread by ID", {
         threadId,
@@ -63,8 +64,7 @@ export class ThreadByIdRepository {
       // Check if thread exists
       if (!thread) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.get.errors.notFound.title",
+          message: t("get.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -80,10 +80,9 @@ export class ThreadByIdRepository {
       }
 
       // Use permission system to check read access
-      if (!(await canViewThread(user, thread, folder, logger))) {
+      if (!(await canViewThread(user, thread, folder, logger, locale))) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.get.errors.forbidden.title",
+          message: t("get.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -121,7 +120,7 @@ export class ThreadByIdRepository {
     } catch (error) {
       logger.error("Error getting thread by ID", parseError(error));
       return fail({
-        message: "app.api.agent.chat.threads.threadId.get.errors.server.title",
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -135,8 +134,10 @@ export class ThreadByIdRepository {
     data: ThreadPatchRequestOutput,
     threadId: string,
     user: JwtPayloadType,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadPatchResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Updating thread", {
         threadId,
@@ -154,8 +155,7 @@ export class ThreadByIdRepository {
 
       if (!existingThread) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.patch.errors.notFound.title",
+          message: t("patch.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { threadId },
         });
@@ -173,10 +173,11 @@ export class ThreadByIdRepository {
       }
 
       // Check if user can update this thread (moderators can rename)
-      if (!(await canUpdateThread(user, existingThread, folder, logger))) {
+      if (
+        !(await canUpdateThread(user, existingThread, folder, logger, locale))
+      ) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.patch.errors.forbidden.title",
+          message: t("patch.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -223,8 +224,7 @@ export class ThreadByIdRepository {
     } catch (error) {
       logger.error("Error updating thread", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.patch.errors.server.title",
+        message: t("patch.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -237,8 +237,10 @@ export class ThreadByIdRepository {
   static async deleteThread(
     threadId: string,
     user: JwtPayloadType,
+    locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ThreadDeleteResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Deleting thread", {
         threadId,
@@ -249,8 +251,7 @@ export class ThreadByIdRepository {
       // Public users cannot delete threads
       if (user.isPublic) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.delete.errors.forbidden.title",
+          message: t("delete.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -264,8 +265,7 @@ export class ThreadByIdRepository {
 
       if (!existingThread) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.delete.errors.notFound.title",
+          message: t("delete.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { threadId },
         });
@@ -292,14 +292,14 @@ export class ThreadByIdRepository {
         user,
         existingThread,
         logger,
+        locale,
         folder,
         allFolders,
       );
 
       if (!canDelete) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.delete.errors.forbidden.title",
+          message: t("delete.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -316,8 +316,7 @@ export class ThreadByIdRepository {
     } catch (error) {
       logger.error("Error deleting thread", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.delete.errors.server.title",
+        message: t("delete.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

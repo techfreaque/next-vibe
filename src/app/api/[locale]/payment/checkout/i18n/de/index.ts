@@ -161,4 +161,17 @@ export const translations: typeof enTranslations = {
 
   // General error message
   error: "Ein Fehler ist beim Checkout aufgetreten",
+
+  // Subscription plan labels
+  plans: {
+    starter: {
+      title: "Starter",
+    },
+  },
+
+  // Billing interval labels
+  billing: {
+    monthly: "Monatlich",
+    yearly: "Jährlich",
+  },
 };

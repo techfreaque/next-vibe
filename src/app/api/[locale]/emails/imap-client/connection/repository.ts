@@ -16,7 +16,6 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { TranslationKey } from "@/i18n/core/static-types";
 
 import type { ImapAccount } from "../db";
 import {
@@ -24,6 +23,7 @@ import {
   ImapConnectionStatus,
   ImapSpecialUseType,
 } from "../enum";
+import type { scopedTranslation } from "../i18n";
 import type {
   ImapConnectionCloseRequestOutput,
   ImapConnectionCloseResponseOutput,
@@ -37,6 +37,8 @@ import type {
   ImapMessageListRequestOutput,
   ImapMessageListResponseOutput,
 } from "./types";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * IMAP Box Information from node-imap library
@@ -95,31 +97,37 @@ export interface ImapConnectionRepository {
   testConnection(
     data: ImapConnectionTestRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<ImapConnectionTestResponseOutput>>;
 
   connect(
     account: ImapAccount,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<ImapConnectionImpl>>;
 
   disconnect(
     data: ImapConnectionCloseRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<ImapConnectionCloseResponseOutput>>;
 
   listFolders(
     data: ImapFolderListRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<ImapFolderListResponseOutput>>;
 
   listMessages(
     data: ImapMessageListRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<ImapMessageListResponseOutput>>;
 
   closeAllConnections(
     logger: EndpointLogger,
-  ): ResponseType<{ success: boolean; message: TranslationKey }>;
+    t: ModuleT,
+  ): ResponseType<{ success: boolean; message: string }>;
 }
 
 /**
@@ -181,6 +189,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
   async testConnection(
     data: ImapConnectionTestRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<ImapConnectionTestResponseOutput>> {
     const startTime = Date.now();
     const config = this.createConnectionConfig(data.account);
@@ -208,8 +217,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
             username: config.username,
           });
           return fail({
-            message:
-              "app.api.emails.imapClient.imapErrors.validation.account.username.required",
+            message: t("imapErrors.validation.account.username.required"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
@@ -221,8 +229,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
             port: config.port,
           });
           return fail({
-            message:
-              "app.api.emails.imapClient.imapErrors.validation.account.port.invalid",
+            message: t("imapErrors.validation.account.port.invalid"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
@@ -234,8 +241,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
             host: config.host,
           });
           return fail({
-            message:
-              "app.api.emails.imapClient.imapErrors.validation.account.host.invalid",
+            message: t("imapErrors.validation.account.host.invalid"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
         }
@@ -277,8 +283,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
             resolveOnce(
               success({
                 success: true,
-                message:
-                  "app.api.emails.imapClient.imap.connection.test.success" as const,
+                message: t("imap.connection.test.success"),
                 connectionStatus: ImapConnectionStatus.CONNECTED,
                 details: {
                   host: config.host,
@@ -306,8 +311,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
 
             resolveOnce(
               fail({
-                message:
-                  "app.api.emails.imapClient.imapErrors.connection.test.failed",
+                message: t("imapErrors.connection.test.failed"),
                 errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
               }),
             );
@@ -317,8 +321,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
           setTimeout(() => {
             resolveOnce(
               fail({
-                message:
-                  "app.api.emails.imapClient.imap.connection.test.timeout",
+                message: t("imap.connection.test.timeout"),
                 errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
               }),
             );
@@ -330,7 +333,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
         logger.error("IMAP connection test failed", parseError(error));
 
         return fail({
-          message: "app.api.emails.imapClient.imap.connection.test.failed",
+          message: t("imap.connection.test.failed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -338,7 +341,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
       logger.error("IMAP connection test failed", parseError(error));
 
       return fail({
-        message: "app.api.emails.imapClient.imap.connection.test.failed",
+        message: t("imap.connection.test.failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -350,6 +353,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
   async connect(
     account: ImapAccount,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<ImapConnectionImpl>> {
     const config = this.createConnectionConfig(account);
     const connectionKey = `${config.host}:${config.port}:${config.username}`;
@@ -429,7 +433,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
     } catch (error) {
       logger.error("Failed to connect to IMAP server", parseError(error));
       return fail({
-        message: "app.api.emails.imapClient.imapErrors.connection.failed",
+        message: t("imapErrors.connection.failed"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -441,6 +445,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
   async disconnect(
     data: ImapConnectionCloseRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<ImapConnectionCloseResponseOutput>> {
     const config = this.createConnectionConfig(data.account);
     const connectionKey = `${config.host}:${config.port}:${config.username}`;
@@ -460,12 +465,12 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
 
       return success({
         success: true,
-        message: "app.api.emails.imapClient.imap.connection.test.success",
+        message: t("imap.connection.test.success"),
       });
     } catch (error) {
       logger.error("Error closing IMAP connection", parseError(error));
       return fail({
-        message: "app.api.emails.imapClient.imapErrors.connection.close.failed",
+        message: t("imapErrors.connection.close.failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -477,6 +482,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
   async listFolders(
     data: ImapFolderListRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<ImapFolderListResponseOutput>> {
     try {
       logger.debug("Listing IMAP folders", { accountId: data.account.id });
@@ -556,8 +562,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
     } catch (error) {
       logger.error("Error listing IMAP folders", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.connection.folders.list.failed",
+        message: t("imapErrors.connection.folders.list.failed"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -569,6 +574,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
   async listMessages(
     data: ImapMessageListRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<ImapMessageListResponseOutput>> {
     try {
       logger.debug("Listing IMAP messages", {
@@ -732,8 +738,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
     } catch (error) {
       logger.error("Error listing IMAP messages", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.connection.messages.list.failed",
+        message: t("imapErrors.connection.messages.list.failed"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
       });
     }
@@ -806,7 +811,8 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
    */
   closeAllConnections(
     logger: EndpointLogger,
-  ): ResponseType<{ success: boolean; message: TranslationKey }> {
+    t: ModuleT,
+  ): ResponseType<{ success: boolean; message: string }> {
     try {
       logger.debug("Closing all IMAP connections");
 
@@ -821,12 +827,12 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
 
       return success({
         success: true,
-        message: "app.api.emails.imapClient.imap.connection.test.success",
+        message: t("imap.connection.test.success"),
       });
     } catch (error) {
       logger.error("Error closing IMAP connections", parseError(error));
       return fail({
-        message: "app.api.emails.imapClient.imapErrors.connection.close.failed",
+        message: t("imapErrors.connection.close.failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

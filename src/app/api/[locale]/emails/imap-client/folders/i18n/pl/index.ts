@@ -6,4 +6,11 @@ export const translations: typeof enTranslations = {
   tag: "Foldery",
   list: listTranslations,
   sync: syncTranslations,
+  errors: {
+    server: { title: "Błąd serwera" },
+    notFound: { title: "Folder nie znaleziony" },
+    accountNotFound: { title: "Konto nie znalezione" },
+    syncFailed: { title: "Synchronizacja nie powiodła się" },
+    missingAccount: { title: "Wymagane ID konta" },
+  },
 };

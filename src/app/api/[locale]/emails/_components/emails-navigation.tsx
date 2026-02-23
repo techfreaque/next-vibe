@@ -13,7 +13,8 @@ import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "./i18n";
 
 interface EmailsNavigationProps {
   locale: CountryLanguage;
@@ -24,36 +25,36 @@ export function EmailsNavigation({
   locale,
   currentPage,
 }: EmailsNavigationProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   const navigationItems = [
     {
       key: "stats",
       href: `/${locale}/admin/emails/stats` as const,
       icon: BarChart3,
-      label: t("app.admin.emails.components.nav.overview"),
-      description: t("app.admin.emails.components.admin.stats.title"),
+      label: t("nav.overview"),
+      description: t("admin.stats.title"),
     },
     {
       key: "list",
       href: `/${locale}/admin/emails/list` as const,
       icon: List,
-      label: t("app.admin.emails.components.nav.campaigns"),
-      description: t("app.admin.emails.components.admin.title"),
+      label: t("nav.campaigns"),
+      description: t("admin.title"),
     },
     {
       key: "imap",
       href: `/${locale}/admin/emails/imap` as const,
       icon: Database,
-      label: t("app.admin.emails.components.nav.imap"),
-      description: t("app.admin.emails.imap.admin.overview.title"),
+      label: t("nav.imap"),
+      description: t("imap.admin.overview.title"),
     },
     {
       key: "smtp",
       href: `/${locale}/admin/emails/smtp` as const,
       icon: Settings,
-      label: t("app.admin.emails.components.nav.smtp"),
-      description: t("app.admin.emails.components.nav.smtpDescription"),
+      label: t("nav.smtp"),
+      description: t("nav.smtpDescription"),
     },
   ] as const;
 

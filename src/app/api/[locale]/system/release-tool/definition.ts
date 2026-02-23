@@ -16,12 +16,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  objectOptionalField,
-  requestDataArrayOptionalField,
-  requestField,
-  responseArrayOptionalField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedObjectOptionalField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -31,6 +29,12 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+
+import {
+  scopedRequestDataArrayOptionalField,
+  scopedResponseArrayOptionalField,
+} from "../unified-interface/shared/field/utils";
+import { scopedTranslation } from "./i18n";
 
 // ============================================================================
 // Shared Enums/Schemas (minimal - used only for select options)
@@ -98,12 +102,13 @@ const PackageStatusSchema = z.enum(["success", "skipped", "failed"]);
 // ============================================================================
 
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "release-tool"],
-  title: "app.api.system.releaseTool.title",
-  description: "app.api.system.releaseTool.description",
-  category: "app.api.system.category",
-  tags: ["app.api.system.releaseTool.tags.release"],
+  title: "title",
+  description: "description",
+  category: "category",
+  tags: ["tags.release"],
   icon: "rocket",
   allowedRoles: [
     UserRole.ADMIN,
@@ -113,217 +118,205 @@ const { POST } = createEndpoint({
   ],
   aliases: ["release", "pub", "publish"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.releaseTool.form.title",
-      description: "app.api.system.releaseTool.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "form.title",
+    description: "form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // ========================================================================
       // REQUEST FIELDS - Runtime options at root level for CLI access
       // ========================================================================
 
-      configPath: requestField({
+      configPath: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.releaseTool.fields.configPath.title",
-        description: "app.api.system.releaseTool.fields.configPath.description",
+        label: "fields.configPath.title",
+        description: "fields.configPath.description",
         schema: z.string().optional().default("release.config.ts"),
       }),
 
       // ========================================================================
       // Runtime options (CLI flags) - at root level for direct CLI access
       // ========================================================================
-      ci: requestField({
+      ci: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.releaseTool.fields.ci.title",
-        description: "app.api.system.releaseTool.fields.ci.description",
+        label: "fields.ci.title",
+        description: "fields.ci.description",
         schema: z.boolean().optional().default(false),
       }),
 
-      dryRun: requestField({
+      dryRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.releaseTool.fields.dryRun.title",
-        description: "app.api.system.releaseTool.fields.dryRun.description",
+        label: "fields.dryRun.title",
+        description: "fields.dryRun.description",
         schema: z.boolean().optional().default(false),
       }),
 
-      verbose: requestField({
+      verbose: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.releaseTool.fields.verbose.title",
-        description: "app.api.system.releaseTool.fields.verbose.description",
+        label: "fields.verbose.title",
+        description: "fields.verbose.description",
         schema: z.boolean().optional().default(false),
       }),
 
-      forceUpdate: requestField({
+      forceUpdate: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.releaseTool.fields.forceUpdate.title",
-        description:
-          "app.api.system.releaseTool.fields.forceUpdate.description",
+        label: "fields.forceUpdate.title",
+        description: "fields.forceUpdate.description",
         schema: z.boolean().optional(), // No default - undefined means "ask user",
       }),
 
       // Skip options
-      skipLint: requestField({
+      skipLint: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.releaseTool.fields.skipLint.title",
-        description: "app.api.system.releaseTool.fields.skipLint.description",
+        label: "fields.skipLint.title",
+        description: "fields.skipLint.description",
         schema: z.boolean().optional().default(false),
       }),
 
-      skipTypecheck: requestField({
+      skipTypecheck: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.releaseTool.fields.skipTypecheck.title",
-        description:
-          "app.api.system.releaseTool.fields.skipTypecheck.description",
+        label: "fields.skipTypecheck.title",
+        description: "fields.skipTypecheck.description",
         schema: z.boolean().optional().default(false),
       }),
 
-      skipBuild: requestField({
+      skipBuild: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.releaseTool.fields.skipBuild.title",
-        description: "app.api.system.releaseTool.fields.skipBuild.description",
+        label: "fields.skipBuild.title",
+        description: "fields.skipBuild.description",
         schema: z.boolean().optional().default(false),
       }),
 
-      skipTests: requestField({
+      skipTests: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.releaseTool.fields.skipTests.title",
-        description: "app.api.system.releaseTool.fields.skipTests.description",
+        label: "fields.skipTests.title",
+        description: "fields.skipTests.description",
         schema: z.boolean().optional().default(false),
       }),
 
-      skipSnyk: requestField({
+      skipSnyk: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.releaseTool.fields.skipSnyk.title",
-        description: "app.api.system.releaseTool.fields.skipSnyk.description",
+        label: "fields.skipSnyk.title",
+        description: "fields.skipSnyk.description",
         schema: z.boolean().optional().default(false),
       }),
 
-      skipChangelog: requestField({
+      skipChangelog: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.releaseTool.fields.skipChangelog.title",
-        description:
-          "app.api.system.releaseTool.fields.skipChangelog.description",
+        label: "fields.skipChangelog.title",
+        description: "fields.skipChangelog.description",
         schema: z.boolean().optional().default(false),
       }),
 
-      skipGitTag: requestField({
+      skipGitTag: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.releaseTool.fields.skipGitTag.title",
-        description: "app.api.system.releaseTool.fields.skipGitTag.description",
+        label: "fields.skipGitTag.title",
+        description: "fields.skipGitTag.description",
         schema: z.boolean().optional().default(false),
       }),
 
-      skipGitPush: requestField({
+      skipGitPush: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.releaseTool.fields.skipGitPush.title",
-        description:
-          "app.api.system.releaseTool.fields.skipGitPush.description",
+        label: "fields.skipGitPush.title",
+        description: "fields.skipGitPush.description",
         schema: z.boolean().optional().default(false),
       }),
 
-      skipInstall: requestField({
+      skipInstall: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.releaseTool.fields.skipInstall.title",
-        description:
-          "app.api.system.releaseTool.fields.skipInstall.description",
+        label: "fields.skipInstall.title",
+        description: "fields.skipInstall.description",
         schema: z.boolean().optional().default(false),
       }),
 
-      skipClean: requestField({
+      skipClean: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.releaseTool.fields.skipClean.title",
-        description: "app.api.system.releaseTool.fields.skipClean.description",
+        label: "fields.skipClean.title",
+        description: "fields.skipClean.description",
         schema: z.boolean().optional().default(false),
       }),
 
       // Version options
-      versionIncrement: requestField({
+      versionIncrement: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.system.releaseTool.fields.versionIncrement.title",
-        description:
-          "app.api.system.releaseTool.fields.versionIncrement.description",
+        label: "fields.versionIncrement.title",
+        description: "fields.versionIncrement.description",
         options: [
           {
             value: "patch",
-            label: "app.api.system.releaseTool.enums.versionIncrement.patch",
+            label: "enums.versionIncrement.patch",
           },
           {
             value: "minor",
-            label: "app.api.system.releaseTool.enums.versionIncrement.minor",
+            label: "enums.versionIncrement.minor",
           },
           {
             value: "major",
-            label: "app.api.system.releaseTool.enums.versionIncrement.major",
+            label: "enums.versionIncrement.major",
           },
           {
             value: "prepatch",
-            label: "app.api.system.releaseTool.enums.versionIncrement.prepatch",
+            label: "enums.versionIncrement.prepatch",
           },
           {
             value: "preminor",
-            label: "app.api.system.releaseTool.enums.versionIncrement.preminor",
+            label: "enums.versionIncrement.preminor",
           },
           {
             value: "premajor",
-            label: "app.api.system.releaseTool.enums.versionIncrement.premajor",
+            label: "enums.versionIncrement.premajor",
           },
           {
             value: "prerelease",
-            label:
-              "app.api.system.releaseTool.enums.versionIncrement.prerelease",
+            label: "enums.versionIncrement.prerelease",
           },
         ],
         optional: true,
         schema: VersionIncrementSchema.optional(),
       }),
 
-      prereleaseId: requestField({
+      prereleaseId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.releaseTool.fields.prereleaseId.title",
-        description:
-          "app.api.system.releaseTool.fields.prereleaseId.description",
+        label: "fields.prereleaseId.title",
+        description: "fields.prereleaseId.description",
         optional: true,
         schema: z.string().optional(),
       }),
 
-      targetPackage: requestField({
+      targetPackage: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.releaseTool.fields.targetPackage.title",
-        description:
-          "app.api.system.releaseTool.fields.targetPackage.description",
+        label: "fields.targetPackage.title",
+        description: "fields.targetPackage.description",
         optional: true,
         schema: z.string().optional(),
       }),
 
-      commitMessage: requestField({
+      commitMessage: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.releaseTool.fields.commitMessage.title",
-        description:
-          "app.api.system.releaseTool.fields.commitMessage.description",
+        label: "fields.commitMessage.title",
+        description: "fields.commitMessage.description",
         optional: true,
         schema: z.string().optional(),
       }),
@@ -331,894 +324,794 @@ const { POST } = createEndpoint({
       // ========================================================================
       // CONFIG OBJECT - Contains release configuration (not runtime flags)
       // ========================================================================
-      configObject: objectOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.system.releaseTool.fields.configObject.title",
-          description:
-            "app.api.system.releaseTool.fields.configObject.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
-          optional: true,
-        },
-        { request: "data" },
-        {
-          packageManager: requestField({
+      configObject: scopedObjectOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "fields.configObject.title",
+        description: "fields.configObject.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        optional: true,
+        usage: { request: "data" },
+        children: {
+          packageManager: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label: "app.api.system.releaseTool.fields.packageManager.title",
-            description:
-              "app.api.system.releaseTool.fields.packageManager.description",
+            label: "fields.packageManager.title",
+            description: "fields.packageManager.description",
             options: [
               {
                 value: "bun",
-                label: "app.api.system.releaseTool.enums.packageManager.bun",
+                label: "enums.packageManager.bun",
               },
               {
                 value: "npm",
-                label: "app.api.system.releaseTool.enums.packageManager.npm",
+                label: "enums.packageManager.npm",
               },
               {
                 value: "yarn",
-                label: "app.api.system.releaseTool.enums.packageManager.yarn",
+                label: "enums.packageManager.yarn",
               },
               {
                 value: "pnpm",
-                label: "app.api.system.releaseTool.enums.packageManager.pnpm",
+                label: "enums.packageManager.pnpm",
               },
               {
                 value: "deno",
-                label: "app.api.system.releaseTool.enums.packageManager.deno",
+                label: "enums.packageManager.deno",
               },
             ],
             schema: PackageManagerSchema.optional().default("bun"),
           }),
 
-          globalVersion: requestField({
+          globalVersion: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
-            label: "app.api.system.releaseTool.fields.globalVersion.title",
-            description:
-              "app.api.system.releaseTool.fields.globalVersion.description",
+            label: "fields.globalVersion.title",
+            description: "fields.globalVersion.description",
             optional: true,
             schema: z.string().optional(),
           }),
 
-          parallel: requestField({
+          parallel: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
-            label: "app.api.system.releaseTool.fields.parallel.title",
-            description:
-              "app.api.system.releaseTool.fields.parallel.description",
+            label: "fields.parallel.title",
+            description: "fields.parallel.description",
             optional: true,
             schema: z.boolean().optional(),
           }),
 
-          maxParallelJobs: requestField({
+          maxParallelJobs: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
-            label: "app.api.system.releaseTool.fields.maxParallelJobs.title",
-            description:
-              "app.api.system.releaseTool.fields.maxParallelJobs.description",
+            label: "fields.maxParallelJobs.title",
+            description: "fields.maxParallelJobs.description",
             optional: true,
             schema: z.coerce.number().optional(),
           }),
 
-          continueOnError: requestField({
+          continueOnError: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
-            label: "app.api.system.releaseTool.fields.continueOnError.title",
-            description:
-              "app.api.system.releaseTool.fields.continueOnError.description",
+            label: "fields.continueOnError.title",
+            description: "fields.continueOnError.description",
             optional: true,
             schema: z.boolean().optional(),
           }),
 
-          verifyGitStatus: requestField({
+          verifyGitStatus: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
-            label: "app.api.system.releaseTool.fields.verifyGitStatus.title",
-            description:
-              "app.api.system.releaseTool.fields.verifyGitStatus.description",
+            label: "fields.verifyGitStatus.title",
+            description: "fields.verifyGitStatus.description",
             optional: true,
             schema: z.boolean().optional(),
           }),
 
-          requireCleanWorkingDir: requestField({
+          requireCleanWorkingDir: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
-            label:
-              "app.api.system.releaseTool.fields.requireCleanWorkingDir.title",
-            description:
-              "app.api.system.releaseTool.fields.requireCleanWorkingDir.description",
+            label: "fields.requireCleanWorkingDir.title",
+            description: "fields.requireCleanWorkingDir.description",
             optional: true,
             schema: z.boolean().optional(),
           }),
 
-          verifyLockfile: requestField({
+          verifyLockfile: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.BOOLEAN,
-            label: "app.api.system.releaseTool.fields.verifyLockfile.title",
-            description:
-              "app.api.system.releaseTool.fields.verifyLockfile.description",
+            label: "fields.verifyLockfile.title",
+            description: "fields.verifyLockfile.description",
             optional: true,
             schema: z.boolean().optional(),
           }),
 
           // Branch configuration
-          branch: objectOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.system.releaseTool.fields.branch.title",
-              description:
-                "app.api.system.releaseTool.fields.branch.description",
-              layoutType: LayoutType.GRID,
-              columns: 12,
-              optional: true,
-            },
-            { request: "data" },
-            {
-              main: requestField({
+          branch: scopedObjectOptionalField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "fields.branch.title",
+            description: "fields.branch.description",
+            layoutType: LayoutType.GRID,
+            columns: 12,
+            optional: true,
+            usage: { request: "data" },
+            children: {
+              main: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
-                label: "app.api.system.releaseTool.fields.branchMain.title",
+                label: "fields.branchMain.title",
                 schema: z.string().optional().default("main"),
               }),
-              develop: requestField({
+              develop: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
-                label: "app.api.system.releaseTool.fields.branchDevelop.title",
+                label: "fields.branchDevelop.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              allowNonMain: requestField({
+              allowNonMain: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.BOOLEAN,
-                label: "app.api.system.releaseTool.fields.allowNonMain.title",
+                label: "fields.allowNonMain.title",
                 schema: z.boolean().optional().default(false),
               }),
-              protected: requestField({
+              protected: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
-                label:
-                  "app.api.system.releaseTool.fields.protectedBranches.title",
+                label: "fields.protectedBranches.title",
                 optional: true,
                 schema: z.array(z.string()).optional(),
               }),
             },
-          ),
+          }),
 
           // Notifications configuration
-          notifications: objectOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.system.releaseTool.fields.notifications.title",
-              description:
-                "app.api.system.releaseTool.fields.notifications.description",
-              layoutType: LayoutType.GRID,
-              columns: 12,
-              optional: true,
-            },
-            { request: "data" },
-            {
-              enabled: requestField({
+          notifications: scopedObjectOptionalField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "fields.notifications.title",
+            description: "fields.notifications.description",
+            layoutType: LayoutType.GRID,
+            columns: 12,
+            optional: true,
+            usage: { request: "data" },
+            children: {
+              enabled: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.BOOLEAN,
-                label:
-                  "app.api.system.releaseTool.fields.notificationsEnabled.title",
+                label: "fields.notificationsEnabled.title",
                 schema: z.boolean().optional().default(false),
               }),
-              webhookUrl: requestField({
+              webhookUrl: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
-                label: "app.api.system.releaseTool.fields.webhookUrl.title",
+                label: "fields.webhookUrl.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              type: requestField({
+              type: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.SELECT,
-                label: "app.api.system.releaseTool.fields.webhookType.title",
+                label: "fields.webhookType.title",
                 options: [
                   {
                     value: "slack",
-                    label: "app.api.system.releaseTool.enums.webhookType.slack",
+                    label: "enums.webhookType.slack",
                   },
                   {
                     value: "discord",
-                    label:
-                      "app.api.system.releaseTool.enums.webhookType.discord",
+                    label: "enums.webhookType.discord",
                   },
                   {
                     value: "teams",
-                    label: "app.api.system.releaseTool.enums.webhookType.teams",
+                    label: "enums.webhookType.teams",
                   },
                   {
                     value: "custom",
-                    label:
-                      "app.api.system.releaseTool.enums.webhookType.custom",
+                    label: "enums.webhookType.custom",
                   },
                 ],
                 optional: true,
                 schema: WebhookTypeSchema.optional(),
               }),
-              onSuccess: requestField({
+              onSuccess: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.BOOLEAN,
-                label: "app.api.system.releaseTool.fields.onSuccess.title",
+                label: "fields.onSuccess.title",
                 schema: z.boolean().optional().default(true),
               }),
-              onFailure: requestField({
+              onFailure: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.BOOLEAN,
-                label: "app.api.system.releaseTool.fields.onFailure.title",
+                label: "fields.onFailure.title",
                 schema: z.boolean().optional().default(true),
               }),
-              messageTemplate: requestField({
+              messageTemplate: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
-                label:
-                  "app.api.system.releaseTool.fields.messageTemplate.title",
+                label: "fields.messageTemplate.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              includeTimings: requestField({
+              includeTimings: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.BOOLEAN,
-                label: "app.api.system.releaseTool.fields.includeTimings.title",
+                label: "fields.includeTimings.title",
                 optional: true,
                 schema: z.boolean().optional(),
               }),
             },
-          ),
+          }),
 
           // Retry configuration
-          retry: objectOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.system.releaseTool.fields.retry.title",
-              description:
-                "app.api.system.releaseTool.fields.retry.description",
-              layoutType: LayoutType.GRID,
-              columns: 12,
-              optional: true,
-            },
-            { request: "data" },
-            {
-              maxAttempts: requestField({
+          retry: scopedObjectOptionalField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "fields.retry.title",
+            description: "fields.retry.description",
+            layoutType: LayoutType.GRID,
+            columns: 12,
+            optional: true,
+            usage: { request: "data" },
+            children: {
+              maxAttempts: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.NUMBER,
-                label: "app.api.system.releaseTool.fields.maxAttempts.title",
+                label: "fields.maxAttempts.title",
                 schema: z.coerce.number().optional().default(3),
               }),
-              delayMs: requestField({
+              delayMs: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.NUMBER,
-                label: "app.api.system.releaseTool.fields.delayMs.title",
+                label: "fields.delayMs.title",
                 schema: z.coerce.number().optional().default(1000),
               }),
-              backoffMultiplier: requestField({
+              backoffMultiplier: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.NUMBER,
-                label:
-                  "app.api.system.releaseTool.fields.backoffMultiplier.title",
+                label: "fields.backoffMultiplier.title",
                 schema: z.coerce.number().optional().default(2),
               }),
-              maxDelayMs: requestField({
+              maxDelayMs: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.NUMBER,
-                label: "app.api.system.releaseTool.fields.maxDelayMs.title",
+                label: "fields.maxDelayMs.title",
                 schema: z.coerce.number().optional().default(30000),
               }),
             },
-          ),
+          }),
 
           // Rollback configuration
-          rollback: objectOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.system.releaseTool.fields.rollback.title",
-              description:
-                "app.api.system.releaseTool.fields.rollback.description",
-              layoutType: LayoutType.GRID,
-              columns: 12,
-              optional: true,
-            },
-            { request: "data" },
-            {
-              enabled: requestField({
+          rollback: scopedObjectOptionalField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "fields.rollback.title",
+            description: "fields.rollback.description",
+            layoutType: LayoutType.GRID,
+            columns: 12,
+            optional: true,
+            usage: { request: "data" },
+            children: {
+              enabled: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.BOOLEAN,
-                label:
-                  "app.api.system.releaseTool.fields.rollbackEnabled.title",
+                label: "fields.rollbackEnabled.title",
                 schema: z.boolean().optional().default(false),
               }),
-              git: requestField({
+              git: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.BOOLEAN,
-                label: "app.api.system.releaseTool.fields.rollbackGit.title",
+                label: "fields.rollbackGit.title",
                 schema: z.boolean().optional().default(true),
               }),
-              version: requestField({
+              version: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.BOOLEAN,
-                label:
-                  "app.api.system.releaseTool.fields.rollbackVersion.title",
+                label: "fields.rollbackVersion.title",
                 schema: z.boolean().optional().default(true),
               }),
             },
-          ),
+          }),
 
           // Packages array
-          packages: requestDataArrayOptionalField(
+          packages: scopedRequestDataArrayOptionalField(
+            scopedTranslation,
             {
               type: WidgetType.CONTAINER,
-              title: "app.api.system.releaseTool.fields.packages.title",
-              description:
-                "app.api.system.releaseTool.fields.packages.description",
+              title: "fields.packages.title",
+              description: "fields.packages.description",
               layoutType: LayoutType.GRID,
               optional: true,
             },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                title: "app.api.system.releaseTool.fields.package.title",
-                layoutType: LayoutType.GRID,
-                columns: 12,
-              },
-              { request: "data" },
-              {
-                directory: requestField({
+            scopedObjectFieldNew(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              title: "fields.package.title",
+              layoutType: LayoutType.GRID,
+              columns: 12,
+              usage: { request: "data" },
+              children: {
+                directory: scopedRequestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
-                  label: "app.api.system.releaseTool.fields.directory.title",
+                  label: "fields.directory.title",
                   schema: z.string(),
                 }),
-                name: requestField({
+                name: scopedRequestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
-                  label: "app.api.system.releaseTool.fields.name.title",
+                  label: "fields.name.title",
                   optional: true,
                   schema: z.string().optional(),
                 }),
-                updateDeps: requestField({
+                updateDeps: scopedRequestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
-                  label: "app.api.system.releaseTool.fields.updateDeps.title",
-                  description:
-                    "app.api.system.releaseTool.fields.updateDeps.description",
+                  label: "fields.updateDeps.title",
+                  description: "fields.updateDeps.description",
                   schema: z
                     .union([z.boolean(), z.literal("force")])
                     .optional()
                     .default(false),
                 }),
-                clean: requestField({
+                clean: scopedRequestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
-                  label: "app.api.system.releaseTool.fields.clean.title",
-                  description:
-                    "app.api.system.releaseTool.fields.clean.description",
+                  label: "fields.clean.title",
+                  description: "fields.clean.description",
                   optional: true,
                   schema: z.union([z.boolean(), z.string()]).optional(),
                 }),
-                lint: requestField({
+                lint: scopedRequestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
-                  label: "app.api.system.releaseTool.fields.lint.title",
-                  description:
-                    "app.api.system.releaseTool.fields.lint.description",
+                  label: "fields.lint.title",
+                  description: "fields.lint.description",
                   schema: z
                     .union([z.boolean(), z.string()])
                     .optional()
                     .default(true),
                 }),
-                typecheck: requestField({
+                typecheck: scopedRequestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
-                  label: "app.api.system.releaseTool.fields.typecheck.title",
-                  description:
-                    "app.api.system.releaseTool.fields.typecheck.description",
+                  label: "fields.typecheck.title",
+                  description: "fields.typecheck.description",
                   optional: true,
                   schema: z.union([z.boolean(), z.string()]).optional(),
                 }),
-                build: requestField({
+                build: scopedRequestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
-                  label: "app.api.system.releaseTool.fields.build.title",
-                  description:
-                    "app.api.system.releaseTool.fields.build.description",
+                  label: "fields.build.title",
+                  description: "fields.build.description",
                   schema: z
                     .union([z.boolean(), z.string()])
                     .optional()
                     .default(true),
                 }),
-                test: requestField({
+                test: scopedRequestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
-                  label: "app.api.system.releaseTool.fields.test.title",
-                  description:
-                    "app.api.system.releaseTool.fields.test.description",
+                  label: "fields.test.title",
+                  description: "fields.test.description",
                   schema: z
                     .union([z.boolean(), z.string()])
                     .optional()
                     .default(true),
                 }),
-                snyk: requestField({
+                snyk: scopedRequestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.BOOLEAN,
-                  label: "app.api.system.releaseTool.fields.snyk.title",
+                  label: "fields.snyk.title",
                   optional: true,
                   schema: z.boolean().optional(),
                 }),
-                install: requestField({
+                install: scopedRequestField(scopedTranslation, {
                   type: WidgetType.FORM_FIELD,
                   fieldType: FieldDataType.TEXT,
-                  label: "app.api.system.releaseTool.fields.install.title",
-                  description:
-                    "app.api.system.releaseTool.fields.install.description",
+                  label: "fields.install.title",
+                  description: "fields.install.description",
                   optional: true,
                   schema: z.union([z.boolean(), z.string()]).optional(),
                 }),
 
                 // Release options (nested)
-                release: objectOptionalField(
-                  {
-                    type: WidgetType.CONTAINER,
-                    title: "app.api.system.releaseTool.fields.release.title",
-                    layoutType: LayoutType.GRID,
-                    columns: 12,
-                    optional: true,
-                  },
-                  { request: "data" },
-                  {
-                    version: requestField({
+                release: scopedObjectOptionalField(scopedTranslation, {
+                  type: WidgetType.CONTAINER,
+                  title: "fields.release.title",
+                  layoutType: LayoutType.GRID,
+                  columns: 12,
+                  optional: true,
+                  usage: { request: "data" },
+                  children: {
+                    version: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label:
-                        "app.api.system.releaseTool.fields.releaseVersion.title",
+                      label: "fields.releaseVersion.title",
                       optional: true,
                       schema: z.string().optional(),
                     }),
-                    tagPrefix: requestField({
+                    tagPrefix: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label:
-                        "app.api.system.releaseTool.fields.tagPrefix.title",
+                      label: "fields.tagPrefix.title",
                       schema: z.string().optional().default("v"),
                     }),
-                    tagSuffix: requestField({
+                    tagSuffix: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label:
-                        "app.api.system.releaseTool.fields.tagSuffix.title",
+                      label: "fields.tagSuffix.title",
                       optional: true,
                       schema: z.string().optional(),
                     }),
-                    prereleaseId: requestField({
+                    prereleaseId: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label:
-                        "app.api.system.releaseTool.fields.prereleaseId.title",
+                      label: "fields.prereleaseId.title",
                       optional: true,
                       schema: z.string().optional(),
                     }),
-                    ciReleaseCommand: objectOptionalField(
+                    ciReleaseCommand: scopedObjectOptionalField(
+                      scopedTranslation,
                       {
                         type: WidgetType.CONTAINER,
-                        title:
-                          "app.api.system.releaseTool.fields.ciReleaseCommand.title",
-                        description:
-                          "app.api.system.releaseTool.fields.ciReleaseCommand.description",
+                        title: "fields.ciReleaseCommand.title",
+                        description: "fields.ciReleaseCommand.description",
                         layoutType: LayoutType.GRID,
                         columns: 12,
                         optional: true,
-                      },
-                      { request: "data" },
-                      {
-                        command: requestField({
-                          type: WidgetType.FORM_FIELD,
-                          fieldType: FieldDataType.TEXT,
-                          label:
-                            "app.api.system.releaseTool.fields.ciCommand.title",
-                          description:
-                            "app.api.system.releaseTool.fields.ciCommand.description",
-                          schema: z.array(z.string()),
-                        }),
-                        env: requestField({
-                          type: WidgetType.FORM_FIELD,
-                          fieldType: FieldDataType.TEXT,
-                          label:
-                            "app.api.system.releaseTool.fields.ciEnvMapping.title",
-                          description:
-                            "app.api.system.releaseTool.fields.ciEnvMapping.description",
-                          optional: true,
-                          schema: z.record(z.string(), z.string()).optional(),
-                        }),
+                        usage: { request: "data" },
+                        children: {
+                          command: scopedRequestField(scopedTranslation, {
+                            type: WidgetType.FORM_FIELD,
+                            fieldType: FieldDataType.TEXT,
+                            label: "fields.ciCommand.title",
+                            description: "fields.ciCommand.description",
+                            schema: z.array(z.string()),
+                          }),
+                          env: scopedRequestField(scopedTranslation, {
+                            type: WidgetType.FORM_FIELD,
+                            fieldType: FieldDataType.TEXT,
+                            label: "fields.ciEnvMapping.title",
+                            description: "fields.ciEnvMapping.description",
+                            optional: true,
+                            schema: z.record(z.string(), z.string()).optional(),
+                          }),
+                        },
                       },
                     ),
 
                     // Git operations
-                    git: objectOptionalField(
-                      {
-                        type: WidgetType.CONTAINER,
-                        title: "app.api.system.releaseTool.fields.gitOps.title",
-                        layoutType: LayoutType.GRID,
-                        columns: 12,
-                        optional: true,
-                      },
-                      { request: "data" },
-                      {
-                        skipTag: requestField({
+                    git: scopedObjectOptionalField(scopedTranslation, {
+                      type: WidgetType.CONTAINER,
+                      title: "fields.gitOps.title",
+                      layoutType: LayoutType.GRID,
+                      columns: 12,
+                      optional: true,
+                      usage: { request: "data" },
+                      children: {
+                        skipTag: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.releaseTool.fields.skipTag.title",
+                          label: "fields.skipTag.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        skipPush: requestField({
+                        skipPush: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.releaseTool.fields.skipPush.title",
+                          label: "fields.skipPush.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        skipCommit: requestField({
+                        skipCommit: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.releaseTool.fields.skipCommit.title",
+                          label: "fields.skipCommit.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        commitMessage: requestField({
+                        commitMessage: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
-                          label:
-                            "app.api.system.releaseTool.fields.commitMessage.title",
+                          label: "fields.commitMessage.title",
                           optional: true,
                           schema: z.string().optional(),
                         }),
-                        signCommit: requestField({
+                        signCommit: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.releaseTool.fields.signCommit.title",
+                          label: "fields.signCommit.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        signTag: requestField({
+                        signTag: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.releaseTool.fields.signTag.title",
+                          label: "fields.signTag.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        remote: requestField({
+                        remote: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
-                          label:
-                            "app.api.system.releaseTool.fields.remote.title",
+                          label: "fields.remote.title",
                           optional: true,
                           schema: z.string().optional(),
                         }),
                       },
-                    ),
+                    }),
 
                     // NPM publishing
-                    npm: objectOptionalField(
-                      {
-                        type: WidgetType.CONTAINER,
-                        title: "app.api.system.releaseTool.fields.npm.title",
-                        layoutType: LayoutType.GRID,
-                        columns: 12,
-                        optional: true,
-                      },
-                      { request: "data" },
-                      {
-                        enabled: requestField({
+                    npm: scopedObjectOptionalField(scopedTranslation, {
+                      type: WidgetType.CONTAINER,
+                      title: "fields.npm.title",
+                      layoutType: LayoutType.GRID,
+                      columns: 12,
+                      optional: true,
+                      usage: { request: "data" },
+                      children: {
+                        enabled: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.releaseTool.fields.npmEnabled.title",
+                          label: "fields.npmEnabled.title",
                           schema: z.boolean().optional().default(true),
                         }),
-                        registry: requestField({
+                        registry: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
-                          label:
-                            "app.api.system.releaseTool.fields.npmRegistry.title",
+                          label: "fields.npmRegistry.title",
                           optional: true,
                           schema: z.string().optional(),
                         }),
-                        tag: requestField({
+                        tag: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
-                          label:
-                            "app.api.system.releaseTool.fields.npmTag.title",
+                          label: "fields.npmTag.title",
                           optional: true,
                           schema: z.string().optional(),
                         }),
-                        access: requestField({
+                        access: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.SELECT,
-                          label:
-                            "app.api.system.releaseTool.fields.npmAccess.title",
+                          label: "fields.npmAccess.title",
                           options: [
                             {
                               value: "public",
-                              label:
-                                "app.api.system.releaseTool.enums.npmAccess.public",
+                              label: "enums.npmAccess.public",
                             },
                             {
                               value: "restricted",
-                              label:
-                                "app.api.system.releaseTool.enums.npmAccess.restricted",
+                              label: "enums.npmAccess.restricted",
                             },
                           ],
                           optional: true,
                           schema: NpmAccessSchema.optional(),
                         }),
-                        otpEnvVar: requestField({
+                        otpEnvVar: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
-                          label:
-                            "app.api.system.releaseTool.fields.otpEnvVar.title",
+                          label: "fields.otpEnvVar.title",
                           optional: true,
                           schema: z.string().optional(),
                         }),
-                        provenance: requestField({
+                        provenance: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.releaseTool.fields.provenance.title",
+                          label: "fields.provenance.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        ignoreScripts: requestField({
+                        ignoreScripts: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.releaseTool.fields.ignoreScripts.title",
+                          label: "fields.ignoreScripts.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        dryRun: requestField({
+                        dryRun: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.releaseTool.fields.npmDryRun.title",
+                          label: "fields.npmDryRun.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
                       },
-                    ),
+                    }),
 
                     // JSR publishing
-                    jsr: objectOptionalField(
-                      {
-                        type: WidgetType.CONTAINER,
-                        title: "app.api.system.releaseTool.fields.jsr.title",
-                        layoutType: LayoutType.GRID,
-                        columns: 12,
-                        optional: true,
-                      },
-                      { request: "data" },
-                      {
-                        enabled: requestField({
+                    jsr: scopedObjectOptionalField(scopedTranslation, {
+                      type: WidgetType.CONTAINER,
+                      title: "fields.jsr.title",
+                      layoutType: LayoutType.GRID,
+                      columns: 12,
+                      optional: true,
+                      usage: { request: "data" },
+                      children: {
+                        enabled: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.releaseTool.fields.jsrEnabled.title",
+                          label: "fields.jsrEnabled.title",
                           schema: z.boolean().optional().default(false),
                         }),
-                        allowSlowTypes: requestField({
+                        allowSlowTypes: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.releaseTool.fields.allowSlowTypes.title",
+                          label: "fields.allowSlowTypes.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        allowDirty: requestField({
+                        allowDirty: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.releaseTool.fields.allowDirty.title",
+                          label: "fields.allowDirty.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        dryRun: requestField({
+                        dryRun: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.releaseTool.fields.jsrDryRun.title",
+                          label: "fields.jsrDryRun.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
                       },
-                    ),
+                    }),
 
                     // Changelog
-                    changelog: objectOptionalField(
-                      {
-                        type: WidgetType.CONTAINER,
-                        title:
-                          "app.api.system.releaseTool.fields.changelog.title",
-                        layoutType: LayoutType.GRID,
-                        columns: 12,
-                        optional: true,
-                      },
-                      { request: "data" },
-                      {
-                        enabled: requestField({
+                    changelog: scopedObjectOptionalField(scopedTranslation, {
+                      type: WidgetType.CONTAINER,
+                      title: "fields.changelog.title",
+                      layoutType: LayoutType.GRID,
+                      columns: 12,
+                      optional: true,
+                      usage: { request: "data" },
+                      children: {
+                        enabled: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.releaseTool.fields.changelogEnabled.title",
+                          label: "fields.changelogEnabled.title",
                           schema: z.boolean().optional().default(false),
                         }),
-                        file: requestField({
+                        file: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
-                          label:
-                            "app.api.system.releaseTool.fields.changelogFile.title",
+                          label: "fields.changelogFile.title",
                           schema: z.string().optional().default("CHANGELOG.md"),
                         }),
-                        header: requestField({
+                        header: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
-                          label:
-                            "app.api.system.releaseTool.fields.changelogHeader.title",
+                          label: "fields.changelogHeader.title",
                           optional: true,
                           schema: z.string().optional(),
                         }),
-                        compareUrlFormat: requestField({
+                        compareUrlFormat: scopedRequestField(
+                          scopedTranslation,
+                          {
+                            type: WidgetType.FORM_FIELD,
+                            fieldType: FieldDataType.TEXT,
+                            label: "fields.compareUrlFormat.title",
+                            optional: true,
+                            schema: z.string().optional(),
+                          },
+                        ),
+                        commitUrlFormat: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
-                          label:
-                            "app.api.system.releaseTool.fields.compareUrlFormat.title",
+                          label: "fields.commitUrlFormat.title",
                           optional: true,
                           schema: z.string().optional(),
                         }),
-                        commitUrlFormat: requestField({
-                          type: WidgetType.FORM_FIELD,
-                          fieldType: FieldDataType.TEXT,
-                          label:
-                            "app.api.system.releaseTool.fields.commitUrlFormat.title",
-                          optional: true,
-                          schema: z.string().optional(),
-                        }),
-                        includeBody: requestField({
+                        includeBody: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.releaseTool.fields.includeBody.title",
+                          label: "fields.includeBody.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        preset: requestField({
+                        preset: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.SELECT,
-                          label:
-                            "app.api.system.releaseTool.fields.changelogPreset.title",
+                          label: "fields.changelogPreset.title",
                           options: [
                             {
                               value: "conventional-commits",
                               label:
-                                "app.api.system.releaseTool.enums.changelogPreset.conventional-commits",
+                                "enums.changelogPreset.conventional-commits",
                             },
                             {
                               value: "angular",
-                              label:
-                                "app.api.system.releaseTool.enums.changelogPreset.angular",
+                              label: "enums.changelogPreset.angular",
                             },
                             {
                               value: "atom",
-                              label:
-                                "app.api.system.releaseTool.enums.changelogPreset.atom",
+                              label: "enums.changelogPreset.atom",
                             },
                             {
                               value: "eslint",
-                              label:
-                                "app.api.system.releaseTool.enums.changelogPreset.eslint",
+                              label: "enums.changelogPreset.eslint",
                             },
                             {
                               value: "ember",
-                              label:
-                                "app.api.system.releaseTool.enums.changelogPreset.ember",
+                              label: "enums.changelogPreset.ember",
                             },
                           ],
                           optional: true,
                           schema: ChangelogPresetSchema.optional(),
                         }),
                       },
-                    ),
+                    }),
 
                     // Git release (GitHub/GitLab)
-                    gitRelease: objectOptionalField(
-                      {
-                        type: WidgetType.CONTAINER,
-                        title:
-                          "app.api.system.releaseTool.fields.gitRelease.title",
-                        layoutType: LayoutType.GRID,
-                        columns: 12,
-                        optional: true,
-                      },
-                      { request: "data" },
-                      {
-                        enabled: requestField({
+                    gitRelease: scopedObjectOptionalField(scopedTranslation, {
+                      type: WidgetType.CONTAINER,
+                      title: "fields.gitRelease.title",
+                      layoutType: LayoutType.GRID,
+                      columns: 12,
+                      optional: true,
+                      usage: { request: "data" },
+                      children: {
+                        enabled: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.releaseTool.fields.gitReleaseEnabled.title",
+                          label: "fields.gitReleaseEnabled.title",
                           schema: z.boolean().optional().default(false),
                         }),
-                        title: requestField({
+                        title: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
-                          label:
-                            "app.api.system.releaseTool.fields.releaseTitle.title",
+                          label: "fields.releaseTitle.title",
                           optional: true,
                           schema: z.string().optional(),
                         }),
-                        generateNotes: requestField({
+                        generateNotes: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.releaseTool.fields.generateNotes.title",
+                          label: "fields.generateNotes.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        body: requestField({
+                        body: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
-                          label:
-                            "app.api.system.releaseTool.fields.releaseBody.title",
+                          label: "fields.releaseBody.title",
                           optional: true,
                           schema: z.string().optional(),
                         }),
-                        draft: requestField({
+                        draft: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.releaseTool.fields.draft.title",
+                          label: "fields.draft.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        prerelease: requestField({
+                        prerelease: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.BOOLEAN,
-                          label:
-                            "app.api.system.releaseTool.fields.prerelease.title",
+                          label: "fields.prerelease.title",
                           optional: true,
                           schema: z.boolean().optional(),
                         }),
-                        discussionCategory: requestField({
+                        discussionCategory: scopedRequestField(
+                          scopedTranslation,
+                          {
+                            type: WidgetType.FORM_FIELD,
+                            fieldType: FieldDataType.TEXT,
+                            label: "fields.discussionCategory.title",
+                            optional: true,
+                            schema: z.string().optional(),
+                          },
+                        ),
+                        target: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
-                          label:
-                            "app.api.system.releaseTool.fields.discussionCategory.title",
+                          label: "fields.target.title",
                           optional: true,
                           schema: z.string().optional(),
                         }),
-                        target: requestField({
+                        assets: scopedRequestField(scopedTranslation, {
                           type: WidgetType.FORM_FIELD,
                           fieldType: FieldDataType.TEXT,
-                          label:
-                            "app.api.system.releaseTool.fields.target.title",
-                          optional: true,
-                          schema: z.string().optional(),
-                        }),
-                        assets: requestField({
-                          type: WidgetType.FORM_FIELD,
-                          fieldType: FieldDataType.TEXT,
-                          label:
-                            "app.api.system.releaseTool.fields.assets.title",
-                          description:
-                            "app.api.system.releaseTool.fields.assets.description",
+                          label: "fields.assets.title",
+                          description: "fields.assets.description",
                           optional: true,
                           schema: z
                             .array(
@@ -1232,16 +1125,14 @@ const { POST } = createEndpoint({
                             .optional(),
                         }),
                       },
-                    ),
+                    }),
 
                     // Folders to zip for release
-                    foldersToZip: requestField({
+                    foldersToZip: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label:
-                        "app.api.system.releaseTool.fields.foldersToZip.title",
-                      description:
-                        "app.api.system.releaseTool.fields.foldersToZip.description",
+                      label: "fields.foldersToZip.title",
+                      description: "fields.foldersToZip.description",
                       optional: true,
                       schema: z
                         .array(
@@ -1254,13 +1145,11 @@ const { POST } = createEndpoint({
                     }),
 
                     // Version bumper for non-package.json files
-                    versionBumper: requestField({
+                    versionBumper: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label:
-                        "app.api.system.releaseTool.fields.versionBumper.title",
-                      description:
-                        "app.api.system.releaseTool.fields.versionBumper.description",
+                      label: "fields.versionBumper.title",
+                      description: "fields.versionBumper.description",
                       optional: true,
                       schema: z
                         .array(
@@ -1274,26 +1163,22 @@ const { POST } = createEndpoint({
                         .optional(),
                     }),
                   },
-                ),
+                }),
 
                 // Package-level hooks
-                hooks: objectOptionalField(
-                  {
-                    type: WidgetType.CONTAINER,
-                    title: "app.api.system.releaseTool.fields.hooks.title",
-                    description:
-                      "app.api.system.releaseTool.fields.hooks.description",
-                    layoutType: LayoutType.GRID,
-                    columns: 12,
-                    optional: true,
-                  },
-                  { request: "data" },
-                  {
-                    preInstall: requestField({
+                hooks: scopedObjectOptionalField(scopedTranslation, {
+                  type: WidgetType.CONTAINER,
+                  title: "fields.hooks.title",
+                  description: "fields.hooks.description",
+                  layoutType: LayoutType.GRID,
+                  columns: 12,
+                  optional: true,
+                  usage: { request: "data" },
+                  children: {
+                    preInstall: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label:
-                        "app.api.system.releaseTool.fields.preInstall.title",
+                      label: "fields.preInstall.title",
                       optional: true,
                       schema: z
                         .object({
@@ -1306,11 +1191,10 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    postInstall: requestField({
+                    postInstall: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label:
-                        "app.api.system.releaseTool.fields.postInstall.title",
+                      label: "fields.postInstall.title",
                       optional: true,
                       schema: z
                         .object({
@@ -1323,10 +1207,10 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    preClean: requestField({
+                    preClean: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label: "app.api.system.releaseTool.fields.preClean.title",
+                      label: "fields.preClean.title",
                       optional: true,
                       schema: z
                         .object({
@@ -1339,11 +1223,10 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    postClean: requestField({
+                    postClean: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label:
-                        "app.api.system.releaseTool.fields.postClean.title",
+                      label: "fields.postClean.title",
                       optional: true,
                       schema: z
                         .object({
@@ -1356,10 +1239,10 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    preLint: requestField({
+                    preLint: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label: "app.api.system.releaseTool.fields.preLint.title",
+                      label: "fields.preLint.title",
                       optional: true,
                       schema: z
                         .object({
@@ -1372,10 +1255,10 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    postLint: requestField({
+                    postLint: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label: "app.api.system.releaseTool.fields.postLint.title",
+                      label: "fields.postLint.title",
                       optional: true,
                       schema: z
                         .object({
@@ -1388,10 +1271,10 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    preBuild: requestField({
+                    preBuild: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label: "app.api.system.releaseTool.fields.preBuild.title",
+                      label: "fields.preBuild.title",
                       optional: true,
                       schema: z
                         .object({
@@ -1404,11 +1287,10 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    postBuild: requestField({
+                    postBuild: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label:
-                        "app.api.system.releaseTool.fields.postBuild.title",
+                      label: "fields.postBuild.title",
                       optional: true,
                       schema: z
                         .object({
@@ -1421,10 +1303,10 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    preTest: requestField({
+                    preTest: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label: "app.api.system.releaseTool.fields.preTest.title",
+                      label: "fields.preTest.title",
                       optional: true,
                       schema: z
                         .object({
@@ -1437,10 +1319,10 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    postTest: requestField({
+                    postTest: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label: "app.api.system.releaseTool.fields.postTest.title",
+                      label: "fields.postTest.title",
                       optional: true,
                       schema: z
                         .object({
@@ -1453,11 +1335,10 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    prePublish: requestField({
+                    prePublish: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label:
-                        "app.api.system.releaseTool.fields.prePublish.title",
+                      label: "fields.prePublish.title",
                       optional: true,
                       schema: z
                         .object({
@@ -1470,11 +1351,10 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    postPublish: requestField({
+                    postPublish: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label:
-                        "app.api.system.releaseTool.fields.postPublish.title",
+                      label: "fields.postPublish.title",
                       optional: true,
                       schema: z
                         .object({
@@ -1487,11 +1367,10 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    preRelease: requestField({
+                    preRelease: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label:
-                        "app.api.system.releaseTool.fields.preRelease.title",
+                      label: "fields.preRelease.title",
                       optional: true,
                       schema: z
                         .object({
@@ -1504,11 +1383,10 @@ const { POST } = createEndpoint({
                         })
                         .optional(),
                     }),
-                    postRelease: requestField({
+                    postRelease: scopedRequestField(scopedTranslation, {
                       type: WidgetType.FORM_FIELD,
                       fieldType: FieldDataType.TEXT,
-                      label:
-                        "app.api.system.releaseTool.fields.postRelease.title",
+                      label: "fields.postRelease.title",
                       optional: true,
                       schema: z
                         .object({
@@ -1522,28 +1400,25 @@ const { POST } = createEndpoint({
                         .optional(),
                     }),
                   },
-                ),
+                }),
               },
-            ),
+            }),
           ),
 
           // Global hooks
-          hooks: objectOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.system.releaseTool.fields.globalHooks.title",
-              description:
-                "app.api.system.releaseTool.fields.globalHooks.description",
-              layoutType: LayoutType.GRID,
-              columns: 12,
-              optional: true,
-            },
-            { request: "data" },
-            {
-              preRelease: requestField({
+          hooks: scopedObjectOptionalField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "fields.globalHooks.title",
+            description: "fields.globalHooks.description",
+            layoutType: LayoutType.GRID,
+            columns: 12,
+            optional: true,
+            usage: { request: "data" },
+            children: {
+              preRelease: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
-                label: "app.api.system.releaseTool.fields.preRelease.title",
+                label: "fields.preRelease.title",
                 optional: true,
                 schema: z
                   .object({
@@ -1556,10 +1431,10 @@ const { POST } = createEndpoint({
                   })
                   .optional(),
               }),
-              postRelease: requestField({
+              postRelease: scopedRequestField(scopedTranslation, {
                 type: WidgetType.FORM_FIELD,
                 fieldType: FieldDataType.TEXT,
-                label: "app.api.system.releaseTool.fields.postRelease.title",
+                label: "fields.postRelease.title",
                 optional: true,
                 schema: z
                   .object({
@@ -1573,493 +1448,489 @@ const { POST } = createEndpoint({
                   .optional(),
               }),
             },
-          ),
+          }),
         },
-      ),
+      }),
 
       // ========================================================================
       // RESPONSE FIELDS - Ordered for optimal display
       // ========================================================================
 
       // Summary stats at the top
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.releaseTool.response.status",
+        content: "response.status",
         schema: z.boolean(),
       }),
 
-      duration: responseField({
+      duration: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.releaseTool.response.duration",
+        content: "response.duration",
         schema: z.coerce.number(),
       }),
 
       // Output log
-      output: responseField({
+      output: scopedResponseField(scopedTranslation, {
         type: WidgetType.CODE_OUTPUT,
         schema: z.string(),
       }),
 
       // Errors displayed prominently if present
-      errors: responseArrayOptionalField(
+      errors: scopedResponseArrayOptionalField(
+        scopedTranslation,
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.system.releaseTool.response.errors",
+          title: "response.errors",
           optional: true,
         },
-        responseField({
+        scopedResponseField(scopedTranslation, {
           type: WidgetType.TEXT,
           schema: z.string(),
         }),
       ),
 
       // Warnings displayed if present
-      warnings: responseArrayOptionalField(
+      warnings: scopedResponseArrayOptionalField(
+        scopedTranslation,
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.system.releaseTool.response.warnings",
+          title: "response.warnings",
           optional: true,
         },
-        responseField({
+        scopedResponseField(scopedTranslation, {
           type: WidgetType.TEXT,
           schema: z.string(),
         }),
       ),
 
       // Packages table with status highlighting
-      packagesProcessed: responseArrayOptionalField(
+      packagesProcessed: scopedResponseArrayOptionalField(
+        scopedTranslation,
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.system.releaseTool.response.packages",
+          title: "response.packages",
         },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.GRID,
-            columns: 12,
-          },
-          { response: true },
-          {
-            name: responseField({
+        scopedObjectFieldNew(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.GRID,
+          columns: 12,
+          usage: { response: true },
+          children: {
+            name: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.system.releaseTool.table.name",
+              content: "table.name",
               schema: z.string(),
             }),
-            directory: responseField({
+            directory: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.system.releaseTool.table.directory",
+              content: "table.directory",
               schema: z.string(),
             }),
-            version: responseField({
+            version: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.system.releaseTool.table.version",
+              content: "table.version",
               schema: z.string().optional(),
             }),
-            tag: responseField({
+            tag: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.system.releaseTool.table.tag",
+              content: "table.tag",
               schema: z.string().optional(),
             }),
-            status: responseField({
+            status: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
               schema: PackageStatusSchema,
             }),
-            message: responseField({
+            message: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.system.releaseTool.table.message",
+              content: "table.message",
               schema: z.string().optional(),
             }),
           },
-        ),
+        }),
       ),
 
       // Git info displayed as metadata card
-      gitInfo: objectOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.system.releaseTool.response.gitInfo",
-        },
-        { response: true },
-        {
-          currentBranch: responseField({
+      gitInfo: scopedObjectOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.gitInfo",
+        usage: { response: true },
+        children: {
+          currentBranch: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
             schema: z.string().nullable(),
           }),
-          lastTag: responseField({
+          lastTag: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
             schema: z.string().nullable(),
           }),
-          newTag: responseField({
+          newTag: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
             schema: z.string().nullable(),
           }),
-          commitsSinceLastTag: responseField({
+          commitsSinceLastTag: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().nullable(),
           }),
-          hasUncommittedChanges: responseField({
+          hasUncommittedChanges: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
             schema: z.boolean(),
           }),
         },
-      ),
+      }),
 
       // CI environment as metadata card
-      ciEnvironment: objectOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.system.releaseTool.response.ciEnvironment",
-        },
-        { response: true },
-        {
-          isCI: responseField({
+      ciEnvironment: scopedObjectOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.ciEnvironment",
+        usage: { response: true },
+        children: {
+          isCI: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
             schema: z.boolean(),
           }),
-          provider: responseField({
+          provider: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
             schema: CIProviderSchema.nullable(),
           }),
-          branch: responseField({
+          branch: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
             schema: z.string().nullable(),
           }),
-          commit: responseField({
+          commit: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
             schema: z.string().nullable(),
           }),
-          pr: responseField({
+          pr: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
             schema: z.string().nullable(),
           }),
-          tag: responseField({
+          tag: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
             schema: z.string().nullable(),
           }),
         },
-      ),
+      }),
 
       // Published packages
-      publishedPackages: responseArrayOptionalField(
+      publishedPackages: scopedResponseArrayOptionalField(
+        scopedTranslation,
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.system.releaseTool.response.published",
+          title: "response.published",
         },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.GRID,
-            columns: 12,
-          },
-          { response: true },
-          {
-            name: responseField({
+        scopedObjectFieldNew(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.GRID,
+          columns: 12,
+          usage: { response: true },
+          children: {
+            name: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.system.releaseTool.table.name",
+              content: "table.name",
               schema: z.string(),
             }),
-            version: responseField({
+            version: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
               variant: "success",
               schema: z.string(),
             }),
-            registry: responseField({
+            registry: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
               variant: "info",
               schema: z.string(),
             }),
-            url: responseField({
+            url: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.system.releaseTool.table.url",
+              content: "table.url",
               schema: z.string().optional(),
             }),
           },
-        ),
+        }),
       ),
 
       // Timings
-      timings: objectOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.system.releaseTool.response.timings",
-        },
-        { response: true },
-        {
-          total: responseField({
+      timings: scopedObjectOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.timings",
+        usage: { response: true },
+        children: {
+          total: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number(),
           }),
-          validation: responseField({
+          validation: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
-          install: responseField({
+          install: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
-          clean: responseField({
+          clean: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
-          lint: responseField({
+          lint: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
-          typecheck: responseField({
+          typecheck: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
-          build: responseField({
+          build: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
-          test: responseField({
+          test: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
-          publish: responseField({
+          publish: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
-          changelog: responseField({
+          changelog: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
-          gitOperations: responseField({
+          gitOperations: scopedResponseField(scopedTranslation, {
             type: WidgetType.STAT,
             schema: z.coerce.number().optional(),
           }),
         },
-      ),
+      }),
 
-      rollbackPerformed: responseField({
+      rollbackPerformed: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
         variant: "warning",
         schema: z.boolean().optional(),
       }),
 
-      notificationsSent: responseArrayOptionalField(
+      notificationsSent: scopedResponseArrayOptionalField(
+        scopedTranslation,
         {
           type: WidgetType.CONTAINER,
-          title: "app.api.system.releaseTool.response.notificationsSent",
+          title: "response.notificationsSent",
           optional: true,
         },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.GRID,
-            columns: 12,
-          },
-          { response: true },
-          {
-            type: responseField({
+        scopedObjectFieldNew(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.GRID,
+          columns: 12,
+          usage: { response: true },
+          children: {
+            type: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
               variant: "info",
               schema: z.string(),
             }),
-            success: responseField({
+            success: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
               schema: z.boolean(),
             }),
-            message: responseField({
+            message: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.system.releaseTool.table.message",
+              content: "table.message",
               schema: z.string().optional(),
             }),
           },
-        ),
+        }),
       ),
 
       // ========================================================================
       // INTERNAL TYPES (for repository services - not shown in UI)
       // ========================================================================
 
-      _internal: objectOptionalField(
-        { type: WidgetType.CONTAINER, optional: true },
-        { response: true },
-        {
+      _internal: scopedObjectOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        optional: true,
+        usage: { response: true },
+        children: {
           // Package.json structure
-          packageJson: objectOptionalField(
-            { type: WidgetType.CONTAINER, optional: true },
-            { response: true },
-            {
-              name: responseField({
+          packageJson: scopedObjectOptionalField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            optional: true,
+            usage: { response: true },
+            children: {
+              name: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 schema: z.string(),
               }),
-              version: responseField({
+              version: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.table.version",
+                content: "table.version",
                 schema: z.string(),
               }),
-              scripts: responseField({
+              scripts: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 optional: true,
                 schema: z.record(z.string(), z.string()).optional(),
               }),
-              dependencies: responseField({
+              dependencies: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 optional: true,
                 schema: z.record(z.string(), z.string()).optional(),
               }),
-              devDependencies: responseField({
+              devDependencies: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 optional: true,
                 schema: z.record(z.string(), z.string()).optional(),
               }),
-              peerDependencies: responseField({
+              peerDependencies: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 optional: true,
                 schema: z.record(z.string(), z.string()).optional(),
               }),
-              optionalDependencies: responseField({
+              optionalDependencies: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 optional: true,
                 schema: z.record(z.string(), z.string()).optional(),
               }),
-              updateIgnoreDependencies: responseArrayOptionalField(
+              updateIgnoreDependencies: scopedResponseArrayOptionalField(
+                scopedTranslation,
                 {
                   type: WidgetType.CONTAINER,
-                  title: "app.api.system.releaseTool.fields.name.title",
+                  title: "fields.name.title",
                   optional: true,
                 },
-                responseField({
+                scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   schema: z.string(),
                 }),
               ),
-              private: responseField({
+              private: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 optional: true,
                 schema: z.boolean().optional(),
               }),
-              publishConfig: objectOptionalField(
-                { type: WidgetType.CONTAINER, optional: true },
-                { response: true },
-                {
-                  access: responseField({
+              publishConfig: scopedObjectOptionalField(scopedTranslation, {
+                type: WidgetType.CONTAINER,
+                optional: true,
+                usage: { response: true },
+                children: {
+                  access: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.releaseTool.fields.npmAccess.title",
+                    content: "fields.npmAccess.title",
                     optional: true,
                     schema: z.enum(["public", "restricted"]).optional(),
                   }),
-                  registry: responseField({
+                  registry: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "app.api.system.releaseTool.table.registry",
+                    content: "table.registry",
                     optional: true,
                     schema: z.string().optional(),
                   }),
-                  tag: responseField({
+                  tag: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "app.api.system.releaseTool.table.tag",
+                    content: "table.tag",
                     optional: true,
                     schema: z.string().optional(),
                   }),
                 },
-              ),
-              repository: objectOptionalField(
-                { type: WidgetType.CONTAINER, optional: true },
-                { response: true },
-                {
-                  type: responseField({
+              }),
+              repository: scopedObjectOptionalField(scopedTranslation, {
+                type: WidgetType.CONTAINER,
+                optional: true,
+                usage: { response: true },
+                children: {
+                  type: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "app.api.system.releaseTool.fields.name.title",
+                    content: "fields.name.title",
                     schema: z.string(),
                   }),
-                  url: responseField({
+                  url: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "app.api.system.releaseTool.table.url",
+                    content: "table.url",
                     schema: z.string(),
                   }),
                 },
-              ),
+              }),
             },
-          ),
+          }),
 
           // Version info
-          versionInfo: objectOptionalField(
-            { type: WidgetType.CONTAINER, optional: true },
-            { response: true },
-            {
-              newVersion: responseField({
+          versionInfo: scopedObjectOptionalField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            optional: true,
+            usage: { response: true },
+            children: {
+              newVersion: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.table.version",
+                content: "table.version",
                 schema: z.string(),
               }),
-              lastTag: responseField({
+              lastTag: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.table.tag",
+                content: "table.tag",
                 schema: z.string(),
               }),
-              newTag: responseField({
+              newTag: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.table.tag",
+                content: "table.tag",
                 schema: z.string(),
               }),
             },
-          ),
+          }),
 
           // Parsed version
-          parsedVersion: objectOptionalField(
-            { type: WidgetType.CONTAINER, optional: true },
-            { response: true },
-            {
-              major: responseField({
+          parsedVersion: scopedObjectOptionalField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            optional: true,
+            usage: { response: true },
+            children: {
+              major: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.releaseTool.enums.versionIncrement.major",
+                content: "enums.versionIncrement.major",
                 schema: z.number(),
               }),
-              minor: responseField({
+              minor: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.releaseTool.enums.versionIncrement.minor",
+                content: "enums.versionIncrement.minor",
                 schema: z.number(),
               }),
-              patch: responseField({
+              patch: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.releaseTool.enums.versionIncrement.patch",
+                content: "enums.versionIncrement.patch",
                 schema: z.number(),
               }),
-              prerelease: responseField({
+              prerelease: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.releaseTool.enums.versionIncrement.prerelease",
+                content: "enums.versionIncrement.prerelease",
                 optional: true,
                 schema: z.string().nullable(),
               }),
-              prereleaseNumber: responseField({
+              prereleaseNumber: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.prereleaseId.title",
+                content: "fields.prereleaseId.title",
                 optional: true,
                 schema: z.number().nullable(),
               }),
-              buildMetadata: responseField({
+              buildMetadata: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 optional: true,
                 schema: z.string().nullable(),
               }),
             },
-          ),
+          }),
 
           // Repo info
-          repoInfo: objectOptionalField(
-            { type: WidgetType.CONTAINER, optional: true },
-            { response: true },
-            {
-              type: responseField({
+          repoInfo: scopedObjectOptionalField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            optional: true,
+            usage: { response: true },
+            children: {
+              type: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 schema: z.enum([
                   "github",
                   "gitlab",
@@ -2068,402 +1939,405 @@ const { POST } = createEndpoint({
                   "other",
                 ]),
               }),
-              url: responseField({
+              url: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.table.url",
+                content: "table.url",
                 schema: z.string(),
               }),
-              owner: responseField({
+              owner: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              repo: responseField({
+              repo: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              defaultBranch: responseField({
+              defaultBranch: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.branchMain.title",
+                content: "fields.branchMain.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
             },
-          ),
+          }),
 
           // Commit info
-          commitInfo: objectOptionalField(
-            { type: WidgetType.CONTAINER, optional: true },
-            { response: true },
-            {
-              sha: responseField({
+          commitInfo: scopedObjectOptionalField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            optional: true,
+            usage: { response: true },
+            children: {
+              sha: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 schema: z.string(),
               }),
-              shortSha: responseField({
+              shortSha: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 schema: z.string(),
               }),
-              subject: responseField({
+              subject: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 schema: z.string(),
               }),
-              body: responseField({
+              body: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.releaseBody.title",
+                content: "fields.releaseBody.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              authorName: responseField({
+              authorName: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 schema: z.string(),
               }),
-              authorEmail: responseField({
+              authorEmail: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 schema: z.string(),
               }),
-              timestamp: responseField({
+              timestamp: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 schema: z.coerce.date(),
               }),
-              conventionalType: responseField({
+              conventionalType: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              conventionalScope: responseField({
+              conventionalScope: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              isBreaking: responseField({
+              isBreaking: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 optional: true,
                 schema: z.boolean().optional(),
               }),
             },
-          ),
+          }),
 
           // Hook context
-          hookContext: objectOptionalField(
-            { type: WidgetType.CONTAINER, optional: true },
-            { response: true },
-            {
-              packageManager: responseField({
+          hookContext: scopedObjectOptionalField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            optional: true,
+            usage: { response: true },
+            children: {
+              packageManager: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.releaseTool.fields.packageManager.title",
+                content: "fields.packageManager.title",
                 schema: z.string(),
               }),
-              packageName: responseField({
+              packageName: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              version: responseField({
+              version: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.table.version",
+                content: "table.version",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              directory: responseField({
+              directory: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.directory.title",
+                content: "fields.directory.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              previousVersion: responseField({
+              previousVersion: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.table.version",
+                content: "table.version",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              tag: responseField({
+              tag: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.table.tag",
+                content: "table.tag",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              isCI: responseField({
+              isCI: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.ci.title",
+                content: "fields.ci.title",
                 optional: true,
                 schema: z.boolean().optional(),
               }),
-              ciProvider: responseField({
+              ciProvider: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              dryRun: responseField({
+              dryRun: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.dryRun.title",
+                content: "fields.dryRun.title",
                 optional: true,
                 schema: z.boolean().optional(),
               }),
             },
-          ),
+          }),
 
           // Hook result
-          hookResult: objectOptionalField(
-            { type: WidgetType.CONTAINER, optional: true },
-            { response: true },
-            {
-              success: responseField({
+          hookResult: scopedObjectOptionalField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            optional: true,
+            usage: { response: true },
+            children: {
+              success: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.response.status",
+                content: "response.status",
                 schema: z.boolean(),
               }),
-              command: responseField({
+              command: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.ciCommand.title",
+                content: "fields.ciCommand.title",
                 schema: z.string(),
               }),
-              exitCode: responseField({
+              exitCode: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 optional: true,
                 schema: z.number().optional(),
               }),
-              stdout: responseField({
+              stdout: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              stderr: responseField({
+              stderr: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              duration: responseField({
+              duration: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.response.duration",
+                content: "response.duration",
                 optional: true,
                 schema: z.number().optional(),
               }),
-              message: responseField({
+              message: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.table.message",
+                content: "table.message",
                 optional: true,
                 schema: z.string().optional(),
               }),
             },
-          ),
+          }),
 
           // Security scan result
-          securityScanResult: objectOptionalField(
-            { type: WidgetType.CONTAINER, optional: true },
-            { response: true },
-            {
-              passed: responseField({
+          securityScanResult: scopedObjectOptionalField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            optional: true,
+            usage: { response: true },
+            children: {
+              passed: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 schema: z.boolean(),
               }),
-              vulnerabilities: objectField(
-                { type: WidgetType.CONTAINER },
-                { response: true },
-                {
-                  critical: responseField({
+              vulnerabilities: scopedObjectFieldNew(scopedTranslation, {
+                type: WidgetType.CONTAINER,
+                usage: { response: true },
+                children: {
+                  critical: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "app.api.system.releaseTool.fields.name.title",
+                    content: "fields.name.title",
                     schema: z.number(),
                   }),
-                  high: responseField({
+                  high: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "app.api.system.releaseTool.fields.name.title",
+                    content: "fields.name.title",
                     schema: z.number(),
                   }),
-                  medium: responseField({
+                  medium: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "app.api.system.releaseTool.fields.name.title",
+                    content: "fields.name.title",
                     schema: z.number(),
                   }),
-                  low: responseField({
+                  low: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "app.api.system.releaseTool.fields.name.title",
+                    content: "fields.name.title",
                     schema: z.number(),
                   }),
                 },
-              ),
+              }),
             },
-          ),
+          }),
 
           // Notification data
-          notificationData: objectOptionalField(
-            { type: WidgetType.CONTAINER, optional: true },
-            { response: true },
-            {
-              success: responseField({
+          notificationData: scopedObjectOptionalField(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            optional: true,
+            usage: { response: true },
+            children: {
+              success: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.response.status",
+                content: "response.status",
                 schema: z.boolean(),
               }),
-              packageName: responseField({
+              packageName: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              version: responseField({
+              version: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.table.version",
+                content: "table.version",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              duration: responseField({
+              duration: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.response.duration",
+                content: "response.duration",
                 optional: true,
                 schema: z.number().optional(),
               }),
-              error: responseField({
+              error: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.response.errors",
+                content: "response.errors",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              releaseUrl: responseField({
+              releaseUrl: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.table.url",
+                content: "table.url",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              commitSha: responseField({
+              commitSha: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.name.title",
+                content: "fields.name.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              branch: responseField({
+              branch: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.fields.branch.title",
+                content: "fields.branch.title",
                 optional: true,
                 schema: z.string().optional(),
               }),
-              registryUrls: responseField({
+              registryUrls: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content: "app.api.system.releaseTool.table.url",
+                content: "table.url",
                 optional: true,
                 schema: z.array(z.string()).optional(),
               }),
-              timings: objectOptionalField(
-                { type: WidgetType.CONTAINER, optional: true },
-                { response: true },
-                {
-                  total: responseField({
+              timings: scopedObjectOptionalField(scopedTranslation, {
+                type: WidgetType.CONTAINER,
+                optional: true,
+                usage: { response: true },
+                children: {
+                  total: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "app.api.system.releaseTool.response.duration",
+                    content: "response.duration",
                     optional: true,
                     schema: z.number().optional(),
                   }),
-                  version: responseField({
+                  version: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "app.api.system.releaseTool.table.version",
+                    content: "table.version",
                     optional: true,
                     schema: z.number().optional(),
                   }),
-                  quality: responseField({
+                  quality: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "app.api.system.releaseTool.fields.name.title",
+                    content: "fields.name.title",
                     optional: true,
                     schema: z.number().optional(),
                   }),
-                  publish: responseField({
+                  publish: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "app.api.system.releaseTool.fields.name.title",
+                    content: "fields.name.title",
                     optional: true,
                     schema: z.number().optional(),
                   }),
-                  git: responseField({
+                  git: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "app.api.system.releaseTool.fields.name.title",
+                    content: "fields.name.title",
                     optional: true,
                     schema: z.number().optional(),
                   }),
-                  changelog: responseField({
+                  changelog: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content:
-                      "app.api.system.releaseTool.fields.changelog.title",
+                    content: "fields.changelog.title",
                     optional: true,
                     schema: z.number().optional(),
                   }),
-                  notification: responseField({
+                  notification: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
-                    content: "app.api.system.releaseTool.fields.name.title",
+                    content: "fields.name.title",
                     optional: true,
                     schema: z.number().optional(),
                   }),
                 },
-              ),
+              }),
             },
-          ),
+          }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.releaseTool.errors.validation.title",
-      description: "app.api.system.releaseTool.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.releaseTool.errors.notFound.title",
-      description: "app.api.system.releaseTool.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.releaseTool.errors.server.title",
-      description: "app.api.system.releaseTool.errors.server.description",
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.releaseTool.errors.unknown.title",
-      description: "app.api.system.releaseTool.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.releaseTool.errors.network.title",
-      description: "app.api.system.releaseTool.errors.network.description",
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.releaseTool.errors.unauthorized.title",
-      description: "app.api.system.releaseTool.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.releaseTool.errors.forbidden.title",
-      description: "app.api.system.releaseTool.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.releaseTool.errors.conflict.title",
-      description: "app.api.system.releaseTool.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.releaseTool.errors.unsavedChanges.title",
-      description:
-        "app.api.system.releaseTool.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.system.releaseTool.success.title",
-    description: "app.api.system.releaseTool.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 
   // === EXAMPLES ===

@@ -28,6 +28,9 @@ import {
   generateFileHeader,
   writeGeneratedFile,
 } from "../shared/utils";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 // Type definitions
 interface EmailTemplateRequestType {
@@ -49,7 +52,7 @@ import type { TemplateCachedMetadata } from "@/app/api/[locale]/emails/registry/
 interface TemplateInfo {
   id: string;
   importPath: string;
-  metadata: TemplateCachedMetadata;
+  metadata: TemplateCachedMetadata<string>;
 }
 
 /**
@@ -59,6 +62,7 @@ interface EmailTemplateGeneratorRepository {
   generateEmailTemplates(
     data: EmailTemplateRequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<BaseResponseType<EmailTemplateResponseType>>;
 }
 
@@ -69,6 +73,7 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
   async generateEmailTemplates(
     data: EmailTemplateRequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<BaseResponseType<EmailTemplateResponseType>> {
     const startTime = Date.now();
 
@@ -149,8 +154,7 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
       });
 
       return fail({
-        message:
-          "app.api.system.generators.emailTemplates.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           duration,
@@ -355,7 +359,10 @@ ${loaderEntries}
  * Contains only metadata (id, version, name, description, category)
  * Actual components are lazy-loaded
  */
-export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
+export const templateMetadataMap: Record<
+  string,
+  TemplateCachedMetadata<string>
+> = {
 ${metadataEntries}
 };
 
@@ -379,7 +386,7 @@ export async function getTemplate(
  */
 export function getTemplateMetadata(
   id: string,
-): TemplateCachedMetadata | undefined {
+): TemplateCachedMetadata<string> | undefined {
   return templateMetadataMap[id];
 }
 
@@ -393,7 +400,7 @@ export function getAllTemplateIds(): string[] {
 /**
  * Get all template metadata (fast, no component loading)
  */
-export function getAllTemplateMetadata(): TemplateCachedMetadata[] {
+export function getAllTemplateMetadata(): TemplateCachedMetadata<string>[] {
   return Object.values(templateMetadataMap);
 }
 
@@ -402,7 +409,7 @@ export function getAllTemplateMetadata(): TemplateCachedMetadata[] {
  */
 export function getTemplatesByCategory(
   category: string,
-): TemplateCachedMetadata[] {
+): TemplateCachedMetadata<string>[] {
   return getAllTemplateMetadata().filter((t) => t.category === category);
 }
 
@@ -505,7 +512,10 @@ import type { TemplateCachedMetadata } from "./types";
  * Template metadata cache for fast lookups
  * Contains only metadata (id, version, name, description, category)
  */
-export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
+export const templateMetadataMap: Record<
+  string,
+  TemplateCachedMetadata<string>
+> = {
 ${metadataEntries}
 };
 
@@ -514,14 +524,14 @@ ${metadataEntries}
  */
 export function getTemplateMetadata(
   id: string,
-): TemplateCachedMetadata | undefined {
+): TemplateCachedMetadata<string> | undefined {
   return templateMetadataMap[id];
 }
 
 /**
  * Get all template metadata (fast, no component loading)
  */
-export function getAllTemplateMetadata(): TemplateCachedMetadata[] {
+export function getAllTemplateMetadata(): TemplateCachedMetadata<string>[] {
   return Object.values(templateMetadataMap);
 }
 
@@ -530,7 +540,7 @@ export function getAllTemplateMetadata(): TemplateCachedMetadata[] {
  */
 export function getTemplatesByCategory(
   category: string,
-): TemplateCachedMetadata[] {
+): TemplateCachedMetadata<string>[] {
   return getAllTemplateMetadata().filter((t) => t.category === category);
 }
 `;

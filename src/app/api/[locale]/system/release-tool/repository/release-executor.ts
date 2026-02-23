@@ -40,10 +40,11 @@ import type {
   RequestType,
   Timings,
 } from "../definition";
+import { scopedTranslation } from "../i18n";
 import { assetZipper } from "./asset-zipper";
 import { changelogGenerator } from "./changelog-generator";
 import { ciDetector } from "./ci-detector";
-import type { IConfigLoader } from "./config";
+import type { ConfigLoader } from "./config";
 import { MESSAGES } from "./constants";
 import { dependencyManager } from "./dependency-manager";
 import { gitService } from "./git-service";
@@ -82,7 +83,6 @@ export class ReleaseExecutor implements IReleaseExecutor {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<ReleaseResponseType>> {
-    void locale;
     const startTime = Date.now();
     const output: string[] = [];
     const errors: string[] = [];
@@ -118,9 +118,13 @@ export class ReleaseExecutor implements IReleaseExecutor {
         // Lazy-load configLoader to avoid Turbopack warning about dynamic imports
         // The config module uses dynamic imports that can't be statically analyzed
         const { configLoader } = (await import("./config")) as {
-          configLoader: IConfigLoader;
+          configLoader: ConfigLoader;
         };
-        const configResult = await configLoader.load(logger, data.configPath);
+        const configResult = await configLoader.load(
+          logger,
+          locale,
+          data.configPath,
+        );
         if (!configResult.success) {
           return fail({
             message: configResult.message,
@@ -130,6 +134,11 @@ export class ReleaseExecutor implements IReleaseExecutor {
         }
         config = configResult.data;
       }
+
+      // config is always defined here - either from configObject or loaded from file
+      // (early return on failure above ensures we never reach here with undefined)
+      const loadedConfig: ReleaseConfig = config!;
+      config = loadedConfig;
 
       // Extract runtime options - request (data) params override config file
       const isCI = data.ci ?? ciEnv.isCI;
@@ -201,6 +210,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
         originalCwd,
         packageManager,
         logger,
+        locale,
       );
       if (!validationResult.success) {
         return fail({
@@ -223,6 +233,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
           const pkgJsonResult = packageService.getPackageJson(
             originalCwd,
             logger,
+            locale,
           );
           if (pkgJsonResult.success) {
             const updateResult = dependencyManager.updateDependencies(
@@ -231,6 +242,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               pkgJsonResult.data,
               logger,
               dryRun,
+              locale,
             );
             if (updateResult.success) {
               logger.vibe(formatSuccess("Dependencies updated"));
@@ -258,7 +270,11 @@ export class ReleaseExecutor implements IReleaseExecutor {
             !isCI
           ) {
             const cwd = join(originalCwd, pkg.directory);
-            const pkgJsonResult = packageService.getPackageJson(cwd, logger);
+            const pkgJsonResult = packageService.getPackageJson(
+              cwd,
+              logger,
+              locale,
+            );
             if (pkgJsonResult.success) {
               const updateResult = dependencyManager.updateDependencies(
                 cwd,
@@ -266,6 +282,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
                 pkgJsonResult.data,
                 logger,
                 dryRun,
+                locale,
               );
               if (!updateResult.success) {
                 errors.push(
@@ -295,6 +312,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
           logger,
           dryRun,
           { packageManager },
+          locale,
         );
         if (!hookResult.success) {
           const errorMsg = `Pre-release hook failed: ${hookResult.message}`;
@@ -330,8 +348,9 @@ export class ReleaseExecutor implements IReleaseExecutor {
             pkg.directory.includes(targetPackage),
         );
         if (packages.length === 0) {
+          const { t } = scopedTranslation.scopedT(locale);
           return fail({
-            message: "app.api.system.releaseTool.errors.packageNotFound",
+            message: t("errors.packageNotFound"),
             errorType: ErrorResponseTypes.NOT_FOUND,
             messageParams: { targetPackage },
           });
@@ -341,7 +360,11 @@ export class ReleaseExecutor implements IReleaseExecutor {
       // Process each package
       for (const pkg of packages) {
         const cwd = join(originalCwd, pkg.directory);
-        const packageJsonResult = packageService.getPackageJson(cwd, logger);
+        const packageJsonResult = packageService.getPackageJson(
+          cwd,
+          logger,
+          locale,
+        );
 
         if (!packageJsonResult.success) {
           packagesProcessed.push({
@@ -407,6 +430,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               logger,
               dryRun,
               hookContext,
+              locale,
             );
             if (!hookResult.success && handleHookFailure("preInstall")) {
               continue;
@@ -419,6 +443,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
             packageManager,
             logger,
             dryRun,
+            locale,
             installCommand,
           );
           if (handleFailure(installResult, "Install")) {
@@ -431,6 +456,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               logger,
               dryRun,
               hookContext,
+              locale,
             );
             if (!hookResult.success && handleHookFailure("postInstall")) {
               continue;
@@ -447,6 +473,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               logger,
               dryRun,
               hookContext,
+              locale,
             );
             if (!hookResult.success && handleHookFailure("preClean")) {
               continue;
@@ -459,6 +486,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
             packageManager,
             logger,
             dryRun,
+            locale,
             cleanCommand,
           );
           if (handleFailure(cleanResult, "Clean")) {
@@ -471,6 +499,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               logger,
               dryRun,
               hookContext,
+              locale,
             );
             if (!hookResult.success && handleHookFailure("postClean")) {
               continue;
@@ -490,6 +519,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               logger,
               dryRun,
               hookContext,
+              locale,
             );
             if (!hookResult.success && handleHookFailure("preLint")) {
               continue;
@@ -502,6 +532,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
             packageManager,
             logger,
             dryRun,
+            locale,
             lintCommand,
           );
           if (handleFailure(lintResult, "Lint")) {
@@ -514,6 +545,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               logger,
               dryRun,
               hookContext,
+              locale,
             );
             if (!hookResult.success && handleHookFailure("postLint")) {
               continue;
@@ -530,6 +562,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
             packageManager,
             logger,
             dryRun,
+            locale,
             typecheckCommand,
           );
           if (handleFailure(typecheckResult, "Typecheck")) {
@@ -546,6 +579,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               logger,
               dryRun,
               hookContext,
+              locale,
             );
             if (!hookResult.success && handleHookFailure("preBuild")) {
               continue;
@@ -558,6 +592,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
             packageManager,
             logger,
             dryRun,
+            locale,
             buildCommand,
           );
           if (handleFailure(buildResult, "Build")) {
@@ -570,6 +605,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               logger,
               dryRun,
               hookContext,
+              locale,
             );
             if (!hookResult.success && handleHookFailure("postBuild")) {
               continue;
@@ -586,6 +622,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               logger,
               dryRun,
               hookContext,
+              locale,
             );
             if (!hookResult.success && handleHookFailure("preTest")) {
               continue;
@@ -598,6 +635,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
             packageManager,
             logger,
             dryRun,
+            locale,
             testCommand,
           );
           if (handleFailure(testResult, "Tests")) {
@@ -610,6 +648,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               logger,
               dryRun,
               hookContext,
+              locale,
             );
             if (!hookResult.success && handleHookFailure("postTest")) {
               continue;
@@ -620,8 +659,20 @@ export class ReleaseExecutor implements IReleaseExecutor {
         // Snyk
         if (pkg.snyk && !skipSnyk && !packageFailed) {
           const snykResult = isCI
-            ? snykService.runSnykMonitor(cwd, packageJson.name, logger, dryRun)
-            : snykService.runSnykTest(cwd, packageJson.name, logger, dryRun);
+            ? snykService.runSnykMonitor(
+                cwd,
+                packageJson.name,
+                logger,
+                dryRun,
+                locale,
+              )
+            : snykService.runSnykTest(
+                cwd,
+                packageJson.name,
+                logger,
+                dryRun,
+                locale,
+              );
           if (handleFailure(snykResult, "Security scan")) {
             continue;
           }
@@ -708,6 +759,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               logger,
               dryRun,
               hookContext,
+              locale,
             );
             if (!hookResult.success && handleHookFailure("preRelease")) {
               continue;
@@ -722,6 +774,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               cwd,
               originalCwd,
               logger,
+              locale,
             );
             if (handleFailure(updateResult, "Version update")) {
               continue;
@@ -760,6 +813,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               logger,
               dryRun,
               hookContext,
+              locale,
             );
             if (!hookResult.success && handleHookFailure("prePublish")) {
               continue;
@@ -774,6 +828,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               versionInfo,
               logger,
               dryRun,
+              locale,
             );
             if (handleFailure(changelogResult, "Changelog generation")) {
               continue;
@@ -871,6 +926,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
                 cwd,
                 logger,
                 dryRun,
+                locale,
                 effectiveGitConfig,
               );
               if (handleFailure(tagResult, "Git tag creation")) {
@@ -892,6 +948,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
                   packageJson.name,
                   logger,
                   dryRun,
+                  locale,
                 );
                 if (handleFailure(ciResult, "CI release command")) {
                   continue;
@@ -904,6 +961,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
                   logger,
                   dryRun,
                   ciEnv,
+                  locale,
                 );
                 if (handleFailure(npmResult, "NPM publish")) {
                   continue;
@@ -926,6 +984,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
                   releaseConfig,
                   logger,
                   dryRun,
+                  locale,
                 );
                 if (handleFailure(jsrResult, "JSR publish")) {
                   continue;
@@ -961,6 +1020,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               versionInfo,
               logger,
               dryRun,
+              locale,
             );
             if (handleFailure(gitReleaseResult, "Git release creation")) {
               continue;
@@ -975,6 +1035,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               logger,
               dryRun,
               hookContext,
+              locale,
             );
             if (!hookResult.success) {
               warnings.push(
@@ -991,6 +1052,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
               logger,
               dryRun,
               hookContext,
+              locale,
             );
             if (!hookResult.success) {
               warnings.push(
@@ -1037,6 +1099,7 @@ export class ReleaseExecutor implements IReleaseExecutor {
           logger,
           dryRun,
           { packageManager },
+          locale,
         );
         if (!hookResult.success) {
           warnings.push(

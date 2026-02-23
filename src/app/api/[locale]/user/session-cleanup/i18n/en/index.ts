@@ -1,4 +1,65 @@
 export const translations = {
+  category: "Users",
+
+  post: {
+    title: "Session Cleanup",
+    description: "Clean up expired user sessions and tokens",
+    tag: "Session Cleanup",
+    container: {
+      title: "Session Cleanup",
+      description: "Configure and run session cleanup",
+    },
+    fields: {
+      sessionRetentionDays: {
+        label: "Session Retention Days",
+        description: "Number of days to retain sessions",
+      },
+      tokenRetentionDays: {
+        label: "Token Retention Days",
+        description: "Number of days to retain tokens",
+      },
+      batchSize: {
+        label: "Batch Size",
+        description: "Number of records to process per batch",
+      },
+      dryRun: {
+        label: "Dry Run",
+        description: "Run without actually deleting records",
+      },
+    },
+    response: {
+      sessionsDeleted: "Sessions Deleted",
+      tokensDeleted: "Tokens Deleted",
+      totalProcessed: "Total Processed",
+      executionTimeMs: "Execution Time (ms)",
+    },
+    errors: {
+      unauthorized: {
+        title: "Unauthorized",
+        description: "You must be an admin to run session cleanup",
+      },
+      forbidden: {
+        title: "Forbidden",
+        description: "Access forbidden",
+      },
+      server: {
+        title: "Server Error",
+        description: "Internal server error during cleanup",
+      },
+      unknown: {
+        title: "Unknown Error",
+        description: "An unknown error occurred",
+      },
+      validation: {
+        title: "Validation Error",
+        description: "Invalid cleanup configuration",
+      },
+    },
+    success: {
+      title: "Session Cleanup Completed",
+      description: "Sessions and tokens cleaned up successfully",
+    },
+  },
   task: {
     description: "Clean up expired user sessions to maintain system security",
     purpose: "Removes expired sessions to maintain security and performance",

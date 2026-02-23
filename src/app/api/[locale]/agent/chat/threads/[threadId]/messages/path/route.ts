@@ -13,7 +13,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ urlPathParams, data, user, locale, logger }) =>
-      pathRepository.getPath(urlPathParams, data, user, locale, logger),
+    handler: ({ urlPathParams, data, user, t, logger }) =>
+      pathRepository.getPath(urlPathParams, data, user, t, logger),
   },
 });

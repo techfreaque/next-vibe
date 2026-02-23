@@ -14,6 +14,9 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type guardStopEndpoints from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 type GuardStopRequestType = typeof guardStopEndpoints.POST.types.RequestOutput;
 type GuardStopResponseType =
@@ -26,6 +29,7 @@ export interface GuardStopRepository {
   stopGuard(
     data: GuardStopRequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): ResponseType<GuardStopResponseType>;
 }
 
@@ -36,6 +40,7 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
   stopGuard(
     data: GuardStopRequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): ResponseType<GuardStopResponseType> {
     try {
       logger.info("Stopping guard environment");
@@ -58,7 +63,7 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
       }
 
       return fail({
-        message: "app.api.system.guard.stop.errors.validation.title",
+        message: t("errors.validation.title"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
         messageParams: {
           error: "Either projectPath, guardId, or stopAll must be specified",
@@ -70,7 +75,7 @@ export class GuardStopRepositoryImpl implements GuardStopRepository {
         error instanceof Error ? error : new Error(String(error));
 
       return fail({
-        message: "app.api.system.guard.stop.errors.internal.title",
+        message: t("errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });

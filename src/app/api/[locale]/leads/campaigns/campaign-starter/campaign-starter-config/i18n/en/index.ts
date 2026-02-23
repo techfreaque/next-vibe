@@ -1,4 +1,10 @@
 export const translations = {
+  category: "Campaign Management",
+  tags: {
+    leads: "Leads",
+    campaigns: "Campaigns",
+  },
+
   get: {
     title: "Get Campaign Starter Config",
     description: "Retrieve campaign starter configuration",

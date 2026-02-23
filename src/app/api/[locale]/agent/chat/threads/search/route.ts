@@ -3,16 +3,9 @@
  * Handles GET requests for searching threads
  */
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-
-import type { ApiHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import type {
-  ThreadSearchGetRequestOutput,
-  ThreadSearchGetResponseOutput,
-} from "./definition";
 import { definitions } from "./definition";
 import { searchThreads } from "./repository";
 
@@ -20,16 +13,10 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async (
-      props: ApiHandlerProps<
-        ThreadSearchGetRequestOutput,
-        Record<string, never>,
-        typeof definitions.GET.allowedRoles
-      >,
-    ): Promise<ResponseType<ThreadSearchGetResponseOutput>> => {
+    handler: async ({ user, data }) => {
       return {
         success: true,
-        data: await searchThreads(props.user.id, props.data),
+        data: await searchThreads(user.id, data),
       };
     },
   },

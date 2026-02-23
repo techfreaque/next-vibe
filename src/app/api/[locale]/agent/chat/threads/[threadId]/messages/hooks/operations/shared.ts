@@ -41,8 +41,8 @@ export interface MessageOperationDeps {
   settings: {
     selectedModel: ModelId;
     selectedCharacter: string;
-    activeTools: ToolConfigItem[] | null;
-    visibleTools: ToolConfigItem[] | null;
+    allowedTools: ToolConfigItem[] | null;
+    pinnedTools: ToolConfigItem[] | null;
     ttsAutoplay: boolean;
     ttsVoice: typeof TtsVoiceValue;
   };
@@ -189,16 +189,16 @@ export async function createAndSendUserMessage(
     // Get user's timezone from browser
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    // activeTools = permission layer (null = all tools allowed)
-    // visibleTools = visibility layer (tools loaded into AI SDK context window)
+    // allowedTools = permission layer (null = all tools allowed)
+    // pinnedTools = context window layer (tools loaded into AI SDK context window)
     // Both stored in settings in the same format as ai-stream expects
-    const activeToolsPayload =
-      settings.activeTools?.map((t) => ({
+    const allowedToolsPayload =
+      settings.allowedTools?.map((t) => ({
         toolId: t.toolId,
         requiresConfirmation: t.requiresConfirmation ?? false,
       })) ?? null;
-    const toolsPayload = (
-      settings.visibleTools ??
+    const pinnedToolsPayload = (
+      settings.pinnedTools ??
       DEFAULT_TOOL_IDS.map((id) => ({
         toolId: id,
         requiresConfirmation: false,
@@ -221,8 +221,8 @@ export async function createAndSendUserMessage(
         role: ChatMessageRole.USER,
         model: settings.selectedModel,
         character: settings.selectedCharacter ?? null,
-        activeTools: activeToolsPayload,
-        tools: toolsPayload,
+        allowedTools: allowedToolsPayload,
+        tools: pinnedToolsPayload,
         toolConfirmations: params.toolConfirmations ?? null,
         messageHistory: messageHistory ?? [],
         attachments: attachments && attachments.length > 0 ? attachments : null,

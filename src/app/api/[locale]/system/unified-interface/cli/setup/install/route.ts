@@ -14,12 +14,12 @@ import { setupInstallRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: installEndpoints,
   [Methods.POST]: {
-    handler: ({ data, user, logger, locale }) => {
+    handler: ({ data, user, logger, t }) => {
       logger.debug("Setup install operation started", {
         force: data.force,
         verbose: data.verbose,
       });
-      return setupInstallRepository.installCli(data, user, locale);
+      return setupInstallRepository.installCli(data, user, t);
     },
   },
 });

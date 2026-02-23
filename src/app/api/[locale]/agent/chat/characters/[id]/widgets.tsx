@@ -58,8 +58,8 @@ import {
   CharacterOwnershipType,
   type CharacterOwnershipTypeValue,
 } from "../../characters/enum";
+import { useAddToFavorites } from "../../favorites/create/hooks";
 import { useChatFavorites } from "../../favorites/hooks";
-import { useAddToFavorites } from "../../favorites/use-add-to-favorites";
 import type definitionGet from "./definition";
 import type definitionPatch from "./definition";
 import type {
@@ -608,9 +608,6 @@ function CustomizeAndAddButton({
         data: {
           characterId: characterId,
           icon: fullChar.icon ?? undefined,
-          name: fullChar.name,
-          tagline: fullChar.tagline,
-          description: fullChar.description,
           voice: fullChar.voice ?? DEFAULT_TTS_VOICE,
           modelSelection: null,
         },

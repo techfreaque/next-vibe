@@ -72,4 +72,9 @@ export const translations: typeof enTranslations = {
     title: "Seite erfolgreich skaliert",
     description: "Die Seite wurde erfolgreich skaliert",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    viewportAutomation: "Viewport-Automatisierung",
+  },
 };

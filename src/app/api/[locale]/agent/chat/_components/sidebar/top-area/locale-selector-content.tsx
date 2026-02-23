@@ -62,7 +62,7 @@ export const LocaleSelectorContent: FC = () => {
             onMouseLeave={() => setTabHover(null)}
           >
             <Span className="text-sm">{currentCountry.flag}</Span>
-            {t("app.chat.common.selector.country")}
+            {t("app.common.selector.country")}
           </TabsTrigger>
           <TabsTrigger
             value="language"
@@ -71,7 +71,7 @@ export const LocaleSelectorContent: FC = () => {
             onMouseLeave={() => setTabHover(null)}
           >
             <Span className="text-sm">{currentLanguageFlag}</Span>
-            {t("app.chat.common.selector.language")}
+            {t("app.common.selector.language")}
           </TabsTrigger>
         </TabsList>
 

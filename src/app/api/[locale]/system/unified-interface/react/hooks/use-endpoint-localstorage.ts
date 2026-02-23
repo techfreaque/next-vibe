@@ -15,6 +15,7 @@ import { useForm, type UseFormReturn } from "react-hook-form";
 import type { z } from "zod";
 
 import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
+import { useTranslation } from "@/i18n/core/client";
 
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
@@ -32,6 +33,7 @@ import type {
   PrimaryMutationResponse,
   PrimaryMutationUrlVariables,
 } from "../../shared/types/endpoint-helpers";
+import { scopedTranslation as hooksScopedTranslation } from "./i18n";
 import { buildKey } from "./query-key-builder";
 
 /**
@@ -81,6 +83,9 @@ export function useLocalStorageRead<T>(
     defaultValues: (options.initialState ?? {}) as RequestType,
   });
 
+  const { locale } = useTranslation();
+  const { t: hooksT } = hooksScopedTranslation.scopedT(locale);
+
   // Build query key for React Query
   const queryKey = endpoint
     ? [buildKey("query", endpoint, options.urlPathParams, logger)]
@@ -92,8 +97,7 @@ export function useLocalStorageRead<T>(
     queryFn: async (): Promise<ResponseType<GetResponse<T>>> => {
       if (!callback) {
         return fail({
-          message:
-            "app.api.system.unifiedInterface.react.hooks.localstorage.noCallback",
+          message: hooksT("localstorage.noCallback"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }

@@ -1,4 +1,12 @@
 export const translations = {
+  category: "Task Management",
+
+  errors: {
+    cronTaskNotFound: "Cron task not found",
+    repositoryInternalError: "An internal error occurred",
+    fetchCronTaskHistory: "Failed to fetch cron task history",
+  },
+
   get: {
     tags: {
       tasks: "Tasks",

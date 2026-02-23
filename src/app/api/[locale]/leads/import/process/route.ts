@@ -13,6 +13,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { scopedTranslation as importScopedTranslation } from "@/app/api/[locale]/import/i18n";
 import { db } from "@/app/api/[locale]/system/db";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -26,8 +27,9 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ data, logger }) => {
+    handler: async ({ data, logger, t, locale }) => {
       const { maxJobsPerRun, maxRetriesPerJob, dryRun } = data;
+      const { t: importT } = importScopedTranslation.scopedT(locale);
 
       let jobsProcessed = 0;
       let totalRowsProcessed = 0;
@@ -57,6 +59,7 @@ export const { POST, tools } = endpointsHandler({
               job.id,
               leadsImportRepository,
               logger,
+              importT,
             );
 
             if (batchResult.success) {
@@ -143,7 +146,7 @@ export const { POST, tools } = endpointsHandler({
           error: parseError(error).message,
         });
         return fail({
-          message: "app.api.leads.import.post.errors.server.title",
+          message: t("import.process.post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }

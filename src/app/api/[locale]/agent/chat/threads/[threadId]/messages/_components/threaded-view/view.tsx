@@ -76,6 +76,7 @@ export function ThreadedMessage({
     answerAsAI: onAnswerAsModel,
     voteMessage: onVoteMessage,
     ttsVoice,
+    currentRootFolderId: rootFolderId,
   } = useChatContext();
 
   const { t } = simpleT(locale);
@@ -282,6 +283,7 @@ export function ThreadedMessage({
                 }}
                 logger={logger}
                 characterName={characterName}
+                rootFolderId={rootFolderId}
               />
             )}
 
@@ -390,9 +392,12 @@ export function ThreadedMessage({
         <UserProfileCard
           userId={hoveredUserId}
           userName={
-            message.authorId
-              ? message.authorId.slice(-8)
-              : t("app.chat.threadedView.userFallback")
+            rootFolderId === "public" || rootFolderId === "shared"
+              ? (message.authorName ??
+                (message.authorId
+                  ? message.authorId.slice(0, 8)
+                  : t("app.chat.threadedView.userFallback")))
+              : t("app.chat.threadedView.youLabel")
           }
           messages={allMessages}
           position={userCardPosition}

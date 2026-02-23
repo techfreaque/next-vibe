@@ -19,49 +19,19 @@ import { build as viteBuild } from "vite";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { BuildProfile, FileToCompile } from "../definition";
+import type { scopedTranslation } from "../i18n";
 import { PROFILE_DEFAULTS, ROOT_DIR } from "./constants";
 import { outputFormatter } from "./output-formatter";
 
-// ============================================================================
-// Interface
-// ============================================================================
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
-export interface IViteCompiler {
-  /**
-   * Compile a single file with Vite
-   */
-  compileFile(
-    fileConfig: FileToCompile,
-    output: string[],
-    filesBuilt: string[],
-    logger: EndpointLogger,
-    dryRun?: boolean,
-    verbose?: boolean,
-    profile?: BuildProfile,
-  ): Promise<ResponseType<string[]>>;
-
-  /**
-   * Build Vite configuration for a file
-   */
-  buildViteConfig(
-    fileConfig: FileToCompile,
-    inputFilePath: string,
-    outputDir: string,
-    verbose?: boolean,
-    profile?: BuildProfile,
-  ): Promise<InlineConfig>;
-}
-
-// ============================================================================
-// Implementation
-// ============================================================================
-
-export class ViteCompiler implements IViteCompiler {
+export class ViteCompiler {
   async compileFile(
     fileConfig: FileToCompile,
     output: string[],
     filesBuilt: string[],
     logger: EndpointLogger,
+    t: ModuleT,
     dryRun?: boolean,
     verbose?: boolean,
     profile: BuildProfile = "development",
@@ -72,7 +42,7 @@ export class ViteCompiler implements IViteCompiler {
 
     if (!existsSync(inputFilePath)) {
       return fail({
-        message: "app.api.system.builder.errors.inputFileNotFound",
+        message: t("errors.inputFileNotFound"),
         messageParams: {
           filePath: fileConfig.input,
         },

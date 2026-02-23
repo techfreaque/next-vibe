@@ -90,4 +90,9 @@ export const translations = {
     title: "Screenshot Captured Successfully",
     description: "The screenshot was captured successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    captureAutomation: "Capture Automation",
+  },
 };

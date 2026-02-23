@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Guard Systemu",
+
   title: "Zniszcz Guard",
   description: "Zniszcz środowiska guard i wyczyść zasoby",
   tag: "zarządzanie-guard",

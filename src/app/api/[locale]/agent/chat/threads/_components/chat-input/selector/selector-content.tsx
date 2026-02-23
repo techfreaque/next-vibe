@@ -12,6 +12,7 @@ import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unifi
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+import type { TFunction } from "@/i18n/core/static-types";
 
 const SelectorOnboarding = lazy(() =>
   import("./selector-onboarding").then((mod) => ({
@@ -27,7 +28,7 @@ interface SelectorContentProps {
   logger: EndpointLogger;
 }
 
-function LoadingSpinner({ t }: { t: (key: string) => string }): JSX.Element {
+function LoadingSpinner({ t }: { t: TFunction }): JSX.Element {
   return (
     <Div className="flex items-center justify-center p-8">
       <Div className="flex flex-col items-center gap-3">

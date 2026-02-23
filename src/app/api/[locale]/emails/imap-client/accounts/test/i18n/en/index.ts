@@ -1,4 +1,8 @@
 export const translations = {
+  category: "IMAP Management",
+  tags: {
+    accounts: "Accounts",
+  },
   title: "Test IMAP Account",
   description: "Test IMAP account connection",
   container: {

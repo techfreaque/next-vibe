@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,21 +21,23 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { InvoiceStatus } from "../enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * POST endpoint for creating invoices
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["payment", "invoice"],
-  title: "app.api.payment.invoice.post.title" as const,
-  description: "app.api.payment.invoice.post.description" as const,
-  category: "app.api.payment.category" as const,
+  title: "post.title" as const,
+  description: "post.description" as const,
+  category: "post.title" as const,
   icon: "receipt" as const,
   tags: [
-    "app.api.payment.tags.payment" as const,
-    "app.api.payment.tags.info" as const,
-    "app.api.payment.tags.transactions" as const,
+    "tags.payment" as const,
+    "tags.invoice" as const,
+    "tags.transactions" as const,
   ],
   allowedRoles: [
     UserRole.CUSTOMER,
@@ -44,244 +46,216 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.payment.invoice.post.form.title" as const,
-      description: "app.api.payment.invoice.post.form.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.form.title" as const,
+    description: "post.form.description" as const,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // REQUEST FIELDS
-      customerId: requestField({
+      customerId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.payment.invoice.customerId.label" as const,
-        description: "app.api.payment.invoice.customerId.description" as const,
-        placeholder: "app.api.payment.invoice.customerId.placeholder" as const,
+        label: "customerId.label" as const,
+        description: "customerId.description" as const,
+        placeholder: "customerId.placeholder" as const,
         columns: 12,
         schema: z.string().optional(),
       }),
 
-      amount: requestField({
+      amount: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.payment.invoice.amount.label" as const,
-        description: "app.api.payment.invoice.amount.description" as const,
-        placeholder: "app.api.payment.invoice.amount.placeholder" as const,
+        label: "amount.label" as const,
+        description: "amount.description" as const,
+        placeholder: "amount.placeholder" as const,
         columns: 12,
         schema: z.coerce.number().min(0.01),
       }),
 
-      currency: requestField({
+      currency: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.payment.invoice.currency.label" as const,
-        description: "app.api.payment.invoice.currency.description" as const,
-        placeholder: "app.api.payment.invoice.currency.placeholder" as const,
+        label: "currency.label" as const,
+        description: "currency.description" as const,
+        placeholder: "currency.placeholder" as const,
         options: [
           {
             value: "USD",
-            label: "app.api.payment.currency.usd" as const,
+            label: "currency.usd" as const,
           },
           {
             value: "EUR",
-            label: "app.api.payment.currency.eur" as const,
+            label: "currency.eur" as const,
           },
           {
             value: "PLN",
-            label: "app.api.payment.currency.pln" as const,
+            label: "currency.pln" as const,
           },
         ],
         columns: 12,
         schema: z.enum(["USD", "EUR", "PLN"]),
       }),
 
-      description: requestField({
+      description: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
-        label: "app.api.payment.invoice.description.label" as const,
-        description: "app.api.payment.invoice.description.description" as const,
-        placeholder: "app.api.payment.invoice.description.placeholder" as const,
+        label: "description.label" as const,
+        description: "description.description" as const,
+        placeholder: "description.placeholder" as const,
         columns: 12,
         schema: z.string().optional(),
       }),
 
-      dueDate: requestField({
+      dueDate: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
-        label: "app.api.payment.invoice.dueDate.label" as const,
-        description: "app.api.payment.invoice.dueDate.description" as const,
-        placeholder: "app.api.payment.invoice.dueDate.placeholder" as const,
+        label: "dueDate.label" as const,
+        description: "dueDate.description" as const,
+        placeholder: "dueDate.placeholder" as const,
         columns: 12,
         schema: z.string().optional(),
       }),
 
-      metadata: requestField({
+      metadata: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
-        label: "app.api.payment.invoice.metadata.label" as const,
-        description: "app.api.payment.invoice.metadata.description" as const,
-        placeholder: "app.api.payment.invoice.metadata.placeholder" as const,
+        label: "metadata.label" as const,
+        description: "metadata.description" as const,
+        placeholder: "metadata.placeholder" as const,
         columns: 12,
         schema: z.record(z.string(), z.string()).optional(),
       }),
 
       // RESPONSE FIELDS
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.payment.invoice.post.response.success" as const,
+        content: "post.response.success" as const,
         schema: z.boolean(),
       }),
 
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.payment.invoice.post.response.message" as const,
+        content: "post.response.message" as const,
         schema: z.string().nullable(),
       }),
 
-      invoice: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.payment.invoice.post.response.invoice.title" as const,
-          description:
-            "app.api.payment.invoice.post.response.invoice.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          id: responseField({
+      invoice: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "post.response.invoice.title" as const,
+        description: "post.response.invoice.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          id: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.invoice.post.response.invoice.id" as const,
+            content: "post.response.invoice.id" as const,
             schema: z.uuid(),
           }),
-          userId: responseField({
+          userId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.invoice.post.response.invoice.userId" as const,
+            content: "post.response.invoice.userId" as const,
             schema: z.uuid(),
           }),
-          stripeInvoiceId: responseField({
+          stripeInvoiceId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.invoice.post.response.invoice.stripeInvoiceId" as const,
+            content: "post.response.invoice.stripeInvoiceId" as const,
             schema: z.string(),
           }),
-          invoiceNumber: responseField({
+          invoiceNumber: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.invoice.post.response.invoice.invoiceNumber" as const,
+            content: "post.response.invoice.invoiceNumber" as const,
             schema: z.string(),
           }),
-          amount: responseField({
+          amount: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.invoice.post.response.invoice.amount" as const,
+            content: "post.response.invoice.amount" as const,
             schema: z.coerce.number(),
           }),
-          currency: responseField({
+          currency: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.invoice.post.response.invoice.currency" as const,
+            content: "post.response.invoice.currency" as const,
             schema: z.string(),
           }),
-          status: responseField({
+          status: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.invoice.post.response.invoice.status" as const,
+            content: "post.response.invoice.status" as const,
             schema: z.enum(InvoiceStatus),
           }),
-          invoiceUrl: responseField({
+          invoiceUrl: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.invoice.post.response.invoice.invoiceUrl" as const,
+            content: "post.response.invoice.invoiceUrl" as const,
             schema: z.string().url(),
           }),
-          invoicePdf: responseField({
+          invoicePdf: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.invoice.post.response.invoice.invoicePdf" as const,
+            content: "post.response.invoice.invoicePdf" as const,
             schema: z.string().url(),
           }),
-          dueDate: responseField({
+          dueDate: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.invoice.post.response.invoice.dueDate" as const,
+            content: "post.response.invoice.dueDate" as const,
             schema: z.string(),
           }),
-          paidAt: responseField({
+          paidAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.invoice.post.response.invoice.paidAt" as const,
+            content: "post.response.invoice.paidAt" as const,
             schema: z.string().nullable().optional(),
           }),
-          createdAt: responseField({
+          createdAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.invoice.post.response.invoice.createdAt" as const,
+            content: "post.response.invoice.createdAt" as const,
             schema: z.string(),
           }),
-          updatedAt: responseField({
+          updatedAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.invoice.post.response.invoice.updatedAt" as const,
+            content: "post.response.invoice.updatedAt" as const,
             schema: z.string(),
           }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.payment.invoice.post.errors.validation.title" as const,
-      description:
-        "app.api.payment.invoice.post.errors.validation.description" as const,
+      title: "post.errors.validation.title" as const,
+      description: "post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.payment.invoice.post.errors.network.title" as const,
-      description:
-        "app.api.payment.invoice.post.errors.network.description" as const,
+      title: "post.errors.network.title" as const,
+      description: "post.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.payment.invoice.post.errors.unauthorized.title" as const,
-      description:
-        "app.api.payment.invoice.post.errors.unauthorized.description" as const,
+      title: "post.errors.unauthorized.title" as const,
+      description: "post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.payment.invoice.post.errors.forbidden.title" as const,
-      description:
-        "app.api.payment.invoice.post.errors.forbidden.description" as const,
+      title: "post.errors.forbidden.title" as const,
+      description: "post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.payment.invoice.post.errors.notFound.title" as const,
-      description:
-        "app.api.payment.invoice.post.errors.notFound.description" as const,
+      title: "post.errors.notFound.title" as const,
+      description: "post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.payment.invoice.post.errors.server.title" as const,
-      description:
-        "app.api.payment.invoice.post.errors.server.description" as const,
+      title: "post.errors.server.title" as const,
+      description: "post.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.payment.invoice.post.errors.unknown.title" as const,
-      description:
-        "app.api.payment.invoice.post.errors.unknown.description" as const,
+      title: "post.errors.unknown.title" as const,
+      description: "post.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.payment.invoice.post.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.payment.invoice.post.errors.unsavedChanges.description" as const,
+      title: "post.errors.unsavedChanges.title" as const,
+      description: "post.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.payment.invoice.post.errors.conflict.title" as const,
-      description:
-        "app.api.payment.invoice.post.errors.conflict.description" as const,
+      title: "post.errors.conflict.title" as const,
+      description: "post.errors.conflict.description" as const,
     },
   },
 
@@ -321,8 +295,8 @@ const { POST } = createEndpoint({
   },
 
   successTypes: {
-    title: "app.api.payment.invoice.post.success.title" as const,
-    description: "app.api.payment.invoice.post.success.description" as const,
+    title: "post.success.title" as const,
+    description: "post.success.description" as const,
   },
 });
 

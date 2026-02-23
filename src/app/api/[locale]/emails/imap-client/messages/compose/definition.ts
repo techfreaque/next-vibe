@@ -7,8 +7,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -18,16 +18,18 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../../user/user-roles/enum";
+import { scopedTranslation } from "./i18n";
 import { ComposeEmailContainer } from "./widget";
 
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["emails", "imap-client", "messages", "compose"],
-  title: "app.api.emails.imapClient.messages.compose.post.title",
-  description: "app.api.emails.imapClient.messages.compose.post.description",
-  category: "app.api.emails.category",
+  title: "post.title",
+  description: "post.description",
+  category: "category",
   icon: "edit",
-  tags: ["app.api.emails.imapClient.messages.list.tag"],
+  tags: ["category" as const],
 
   allowedRoles: [UserRole.ADMIN],
 
@@ -35,65 +37,56 @@ const { POST } = createEndpoint({
     render: ComposeEmailContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      to: requestField({
+      to: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.imapClient.messages.compose.post.to.label",
-        description:
-          "app.api.emails.imapClient.messages.compose.post.to.description",
-        placeholder:
-          "app.api.emails.imapClient.messages.compose.post.to.placeholder",
+        label: "post.to.label",
+        description: "post.to.description",
+        placeholder: "post.to.placeholder",
         columns: 12,
         schema: z.email(),
       }),
 
-      toName: requestField({
+      toName: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.imapClient.messages.compose.post.toName.label",
-        description:
-          "app.api.emails.imapClient.messages.compose.post.toName.description",
-        placeholder:
-          "app.api.emails.imapClient.messages.compose.post.toName.placeholder",
+        label: "post.toName.label",
+        description: "post.toName.description",
+        placeholder: "post.toName.placeholder",
         columns: 12,
         schema: z.string().optional(),
       }),
 
-      subject: requestField({
+      subject: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.imapClient.messages.compose.post.subject.label",
-        description:
-          "app.api.emails.imapClient.messages.compose.post.subject.description",
-        placeholder:
-          "app.api.emails.imapClient.messages.compose.post.subject.placeholder",
+        label: "post.subject.label",
+        description: "post.subject.description",
+        placeholder: "post.subject.placeholder",
         columns: 12,
         schema: z.string().min(1),
       }),
 
-      body: requestField({
+      body: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
-        label: "app.api.emails.imapClient.messages.compose.post.body.label",
-        description:
-          "app.api.emails.imapClient.messages.compose.post.body.description",
-        placeholder:
-          "app.api.emails.imapClient.messages.compose.post.body.placeholder",
+        label: "post.body.label",
+        description: "post.body.description",
+        placeholder: "post.body.placeholder",
         columns: 12,
         schema: z.string().min(1),
       }),
 
       // Response
-      sent: responseField({
+      sent: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        text: "app.api.emails.imapClient.messages.compose.post.success.title",
+        text: "post.success.title",
         schema: z.boolean(),
       }),
 
-      messageId: responseField({
+      messageId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.messages.compose.post.success.title",
+        content: "post.success.title",
         schema: z.string().optional(),
       }),
     },
@@ -101,65 +94,46 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.emails.imapClient.messages.compose.post.errors.validation.title",
-      description:
-        "app.api.emails.imapClient.messages.compose.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.emails.imapClient.messages.compose.post.errors.unauthorized.title",
-      description:
-        "app.api.emails.imapClient.messages.compose.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.emails.imapClient.messages.compose.post.errors.forbidden.title",
-      description:
-        "app.api.emails.imapClient.messages.compose.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.emails.imapClient.messages.compose.post.errors.notFound.title",
-      description:
-        "app.api.emails.imapClient.messages.compose.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.emails.imapClient.messages.compose.post.errors.server.title",
-      description:
-        "app.api.emails.imapClient.messages.compose.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.emails.imapClient.messages.compose.post.errors.conflict.title",
-      description:
-        "app.api.emails.imapClient.messages.compose.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.emails.imapClient.messages.compose.post.errors.network.title",
-      description:
-        "app.api.emails.imapClient.messages.compose.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.emails.imapClient.messages.compose.post.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.imapClient.messages.compose.post.errors.unsavedChanges.description",
+      title: "post.errors.unsavedChanges.title",
+      description: "post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.emails.imapClient.messages.compose.post.errors.unknown.title",
-      description:
-        "app.api.emails.imapClient.messages.compose.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
   },
 
   successTypes: {
-    title: "app.api.emails.imapClient.messages.compose.post.success.title",
-    description:
-      "app.api.emails.imapClient.messages.compose.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   examples: {

@@ -1,4 +1,8 @@
 export const translations = {
+  category: "Chat",
+  tags: {
+    settings: "Settings",
+  },
   get: {
     title: "Get Chat Settings",
     description: "Retrieve user's chat settings and preferences",
@@ -69,8 +73,11 @@ export const translations = {
     viewMode: {
       label: "View Mode",
     },
-    enabledTools: {
-      label: "Enabled Tools",
+    allowedTools: {
+      label: "Allowed Tools",
+    },
+    pinnedTools: {
+      label: "Pinned Tools",
     },
     errors: {
       validation: {

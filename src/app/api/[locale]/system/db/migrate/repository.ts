@@ -21,11 +21,12 @@ import {
   formatDatabase,
   formatDuration,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 // Import types from the endpoint definition
 import type migrateEndpoints from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 type MigrateRequestType = typeof migrateEndpoints.POST.types.RequestOutput;
 type MigrateResponseType = typeof migrateEndpoints.POST.types.ResponseOutput;
@@ -37,7 +38,7 @@ type MigrateResponseType = typeof migrateEndpoints.POST.types.ResponseOutput;
 export interface DatabaseMigrationRepository {
   runMigrations(
     data: MigrateRequestType,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<MigrateResponseType>>;
 
@@ -46,7 +47,7 @@ export interface DatabaseMigrationRepository {
    */
   repairMigrations(
     options: { force?: boolean; dryRun?: boolean; reset?: boolean },
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ repaired: boolean; message: string }>>;
 
@@ -55,7 +56,7 @@ export interface DatabaseMigrationRepository {
    */
   runProductionMigrations(
     options: { force?: boolean; backup?: boolean },
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): ResponseType<{ migrated: boolean; message: string }>;
 
@@ -64,7 +65,7 @@ export interface DatabaseMigrationRepository {
    */
   syncMigrations(
     options: { force?: boolean; direction?: "up" | "down" },
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): ResponseType<{ synced: boolean; message: string }>;
 }
@@ -76,10 +77,9 @@ export interface DatabaseMigrationRepository {
 export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationRepository {
   async runMigrations(
     data: MigrateRequestType,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<MigrateResponseType>> {
-    const { t } = simpleT(locale);
     const startTime = Date.now();
 
     try {
@@ -103,10 +103,10 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
 
         if (generateResult.error) {
           return fail({
-            message: "app.api.system.db.migrate.post.errors.network.title",
+            message: t("post.errors.network.title"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
-              error: t("app.api.system.db.migrate.errors.generationFailed", {
+              error: t("errors.generationFailed", {
                 message: generateResult.error.message,
               }),
             },
@@ -117,16 +117,13 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
           const errorOutput =
             generateResult.stderr || generateResult.stdout || "Unknown error";
           return fail({
-            message: "app.api.system.db.migrate.post.errors.network.title",
+            message: t("post.errors.network.title"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
-              error: t(
-                "app.api.system.db.migrate.errors.generationFailedWithCode",
-                {
-                  code: String(generateResult.status ?? "unknown"),
-                  output: errorOutput,
-                },
-              ),
+              error: t("errors.generationFailedWithCode", {
+                code: String(generateResult.status ?? "unknown"),
+                output: errorOutput,
+              }),
             },
           });
         }
@@ -156,10 +153,10 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
 
       if (pushResult.error) {
         return fail({
-          message: "app.api.system.db.migrate.post.errors.network.title",
+          message: t("post.errors.network.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
-            error: t("app.api.system.db.migrate.errors.migrationFailed", {
+            error: t("errors.migrationFailed", {
               message: pushResult.error.message,
             }),
           },
@@ -173,7 +170,7 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
       if (pushResult.status !== 0) {
         logger.error("Migration failed", { output });
         return fail({
-          message: "app.api.system.db.migrate.post.errors.network.title",
+          message: t("post.errors.network.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error: `Migration failed with exit code ${pushResult.status}`,
@@ -204,7 +201,7 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
       logger.error("Migration error", { error: parsedError.message });
 
       return fail({
-        message: "app.api.system.db.migrate.post.errors.network.title",
+        message: t("post.errors.network.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,
@@ -219,15 +216,14 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
    */
   async repairMigrations(
     options: { force?: boolean; dryRun?: boolean; reset?: boolean },
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ repaired: boolean; message: string }>> {
-    const { t } = simpleT(locale);
     try {
-      let message = t("app.api.system.db.migrate.messages.repairCompleted");
+      let message = t("messages.repairCompleted");
 
       if (options.dryRun) {
-        message = t("app.api.system.db.migrate.messages.repairDryRun");
+        message = t("messages.repairDryRun");
         return success({ repaired: false, message });
       }
 
@@ -235,14 +231,14 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
         // Reset migration tracking
         logger.info("Resetting migration tracking");
         await db.execute(sql`DROP TABLE IF EXISTS __drizzle_migrations`);
-        message = t("app.api.system.db.migrate.messages.trackingReset");
+        message = t("messages.trackingReset");
       }
 
       // Repair logic would be implemented here
       return success({ repaired: true, message });
     } catch (error) {
       return fail({
-        message: "app.api.system.db.migrate.post.errors.network.title",
+        message: t("post.errors.network.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -254,24 +250,23 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
    */
   runProductionMigrations(
     options: { force?: boolean; backup?: boolean },
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): ResponseType<{ migrated: boolean; message: string }> {
-    const { t } = simpleT(locale);
     try {
-      let message = t("app.api.system.db.migrate.messages.productionCompleted");
+      let message = t("messages.productionCompleted");
 
       if (options.backup) {
         // Backup logic would be implemented here
         logger.info("Creating backup before production migration");
-        message += t("app.api.system.db.migrate.messages.productionWithBackup");
+        message += t("messages.productionWithBackup");
       }
 
       // Production migration logic would be implemented here
       return success({ migrated: true, message });
     } catch (error) {
       return fail({
-        message: "app.api.system.db.migrate.post.errors.network.title",
+        message: t("post.errors.network.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -283,14 +278,13 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
    */
   syncMigrations(
     options: { force?: boolean; direction?: "up" | "down" },
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): ResponseType<{ synced: boolean; message: string }> {
-    const { t } = simpleT(locale);
     try {
       const direction = options.direction || "up";
       logger.info("Syncing migrations", { direction });
-      const message = t("app.api.system.db.migrate.messages.syncCompleted", {
+      const message = t("messages.syncCompleted", {
         direction,
       });
 
@@ -298,7 +292,7 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
       return success({ synced: true, message });
     } catch (error) {
       return fail({
-        message: "app.api.system.db.migrate.post.errors.network.title",
+        message: t("post.errors.network.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

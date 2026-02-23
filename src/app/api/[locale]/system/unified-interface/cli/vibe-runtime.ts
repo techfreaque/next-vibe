@@ -10,10 +10,10 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { enableDebug, enableMcpSilentMode } from "@/config/debug";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { createEndpointLogger } from "../shared/logger/endpoint";
 import { Platform } from "../shared/types/platform";
+import { scopedTranslation as cliScopedTranslation } from "./i18n";
 import { type EnvironmentResult, loadEnvironment } from "./runtime/environment";
 import {
   ErrorHandler,
@@ -69,61 +69,38 @@ import {
 
 const program = new Command();
 
-const { t: earlyT } = simpleT(env.VIBE_CLI_LOCALE);
+const { t: earlyT } = cliScopedTranslation.scopedT(env.VIBE_CLI_LOCALE);
 
 program
   .name(CLI_NAME)
-  .description(
-    earlyT("app.api.system.unifiedInterface.cli.vibe.help.description"),
-  )
+  .description(earlyT("vibe.help.description"))
   .version(CLI_VERSION);
 
 // Main command - execute any route with schema-driven UI
 
 program
-  .argument(
-    "[command]",
-    earlyT("app.api.system.unifiedInterface.cli.vibe.help.usage"),
-  )
-  .argument(
-    "[args...]",
-    earlyT("app.api.system.unifiedInterface.cli.vibe.help.commands"),
-  )
-  .option(
-    "-d, --data <json>",
-    earlyT("app.api.system.unifiedInterface.cli.vibe.executeCommand"),
-  )
+  .argument("[command]", earlyT("vibe.help.usage"))
+  .argument("[args...]", earlyT("vibe.help.commands"))
+  .option("-d, --data <json>", earlyT("vibe.executeCommand"))
   .option(
     "-l, --locale <locale>",
-    earlyT("app.api.system.unifiedInterface.cli.vibe.help.locale"),
+    earlyT("vibe.help.locale"),
     env.VIBE_CLI_LOCALE,
   )
-  .option(
-    "-o, --output <format>",
-    earlyT("app.api.system.unifiedInterface.cli.vibe.output"),
-    DEFAULT_OUTPUT,
-  )
+  .option("-o, --output <format>", earlyT("vibe.output"), DEFAULT_OUTPUT)
 
   .option(
     "-v, --verbose", // eslint-disable-line i18next/no-literal-string
-    earlyT("app.api.system.unifiedInterface.cli.vibe.help.verbose"),
+    earlyT("vibe.help.verbose"),
     false,
   )
   .option(
     "-x, --debug", // eslint-disable-line i18next/no-literal-string
-    earlyT("app.api.system.unifiedInterface.cli.vibe.help.verbose"),
+    earlyT("vibe.help.verbose"),
     false,
   )
-  .option(
-    "-i, --interactive",
-    earlyT("app.api.system.unifiedInterface.cli.vibe.help.interactive"),
-    false,
-  )
-  .option(
-    "--dry-run",
-    earlyT("app.api.system.unifiedInterface.cli.vibe.help.dryRun"),
-    false,
-  )
+  .option("-i, --interactive", earlyT("vibe.help.interactive"), false)
+  .option("--dry-run", earlyT("vibe.help.dryRun"), false)
   .option(
     "--platform <platform>", // eslint-disable-line i18next/no-literal-string
     `Override detected platform. Valid values: ${Object.values(Platform).join(", ")}`, // eslint-disable-line i18next/no-literal-string
@@ -165,7 +142,7 @@ program
         Date.now(),
         options.locale,
       );
-      const { t } = simpleT(options.locale);
+      const { t } = cliScopedTranslation.scopedT(options.locale);
       // Setup global error handlers
       setupGlobalErrorHandlers(logger);
 
@@ -309,19 +286,13 @@ program
         logger.error(handled.message);
 
         if (debug) {
-          logger.error(
-            t(
-              "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
-            ),
-            error as Error,
-          );
+          logger.error(t("vibe.errors.executionFailed"), parseError(error));
         }
 
         // Cleanup and exit with error code
         await cliResourceManager.cleanupAndExit(logger, debug ?? false, {
           success: false,
-          error:
-            "app.api.system.unifiedInterface.cli.vibe.errors.executionFailed",
+          error: t("vibe.errors.executionFailed"),
           errorParams: {
             error: handled.message,
           },

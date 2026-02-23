@@ -77,4 +77,9 @@ export const translations: typeof enTranslations = {
     title: "Skrypt pomyślnie oceniony",
     description: "JavaScript został pomyślnie wykonany",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    scriptExecution: "Wykonywanie skryptów",
+  },
 };

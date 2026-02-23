@@ -23,10 +23,12 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { LeadAuthRepository } from "../leads/auth/repository";
 import { userLeadLinks } from "../leads/db";
+import { scopedTranslation as authScopedTranslation } from "./auth/i18n";
 import { AuthRepository } from "./auth/repository";
 import type { NewUser, User } from "./db";
 import { users } from "./db";
 import { UserDetailLevel } from "./enum";
+import { scopedTranslation as userScopedTranslation } from "./i18n";
 import type {
   CompleteUserType,
   ExtendedUserDetailLevel,
@@ -70,6 +72,8 @@ export class UserRepository {
         `Getting user by auth (roles: ${roles.map(String).join(", ")}, detailLevel: ${String(detailLevel)})`,
       );
 
+      const { t: authT } = authScopedTranslation.scopedT(locale);
+      const { t } = userScopedTranslation.scopedT(locale);
       const verifiedUser = await AuthRepository.getAuthMinimalUser(
         roles,
         { platform: Platform.NEXT_PAGE, locale },
@@ -78,7 +82,7 @@ export class UserRepository {
 
       if (!verifiedUser) {
         return fail({
-          message: "app.api.user.errors.auth_required",
+          message: t("errors.auth_required"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
           messageParams: { roles: roles.join(",") },
         });
@@ -97,7 +101,7 @@ export class UserRepository {
           isPublic: verifiedUser.isPublic,
         });
         return fail({
-          message: "app.api.user.auth.errors.jwt_payload_missing_id",
+          message: authT("errors.jwt_payload_missing_id"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -110,8 +114,9 @@ export class UserRepository {
       )) as ResponseType<UserType<T>>;
     } catch (error) {
       logger.error("Error getting authenticated user", parseError(error));
+      const { t } = userScopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.errors.auth_retrieval_failed",
+        message: t("errors.auth_retrieval_failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -130,11 +135,12 @@ export class UserRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ExtendedUserType<T>>> {
     try {
+      const { t } = userScopedTranslation.scopedT(locale);
       const results = await db.select().from(users).where(eq(users.id, userId));
 
       if (results.length === 0) {
         return fail({
-          message: "app.api.user.errors.not_found",
+          message: t("errors.not_found"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { userId },
         });
@@ -145,10 +151,11 @@ export class UserRepository {
       const userRolesResponse = await UserRolesRepository.findByUserId(
         userId,
         logger,
+        locale,
       );
       if (!userRolesResponse.success) {
         return fail({
-          message: "app.api.user.errors.roles_lookup_failed",
+          message: t("errors.roles_lookup_failed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { userId },
           cause: userRolesResponse,
@@ -191,8 +198,9 @@ export class UserRepository {
       return success(completeUser) as ResponseType<ExtendedUserType<T>>;
     } catch (error) {
       logger.error("Error getting user by ID", parseError(error));
+      const { t } = userScopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.errors.id_lookup_failed",
+        message: t("errors.id_lookup_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { userId, error: parseError(error).message },
       });
@@ -211,6 +219,7 @@ export class UserRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<ExtendedUserType<T>>> {
     try {
+      const { t } = userScopedTranslation.scopedT(locale);
       const results = await db
         .select({ id: users.id })
         .from(users)
@@ -218,7 +227,7 @@ export class UserRepository {
 
       if (results.length === 0) {
         return fail({
-          message: "app.api.user.errors.not_found",
+          message: t("errors.not_found"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { email },
         });
@@ -234,8 +243,9 @@ export class UserRepository {
       const errorMessage = parseError(error).message;
       logger.error("Error getting user by email", "");
       logger.debug("Error getting user by email", parseError(error));
+      const { t } = userScopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.errors.email_lookup_failed",
+        message: t("errors.email_lookup_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { email, error: errorMessage },
       });
@@ -248,6 +258,7 @@ export class UserRepository {
   static async exists(
     userId: DbId,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
     try {
       const results = await db
@@ -258,8 +269,9 @@ export class UserRepository {
       return success(results.length > 0);
     } catch (error) {
       logger.error("Error checking if user exists", parseError(error));
+      const { t } = userScopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.errors.id_lookup_failed",
+        message: t("errors.id_lookup_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { userId, error: parseError(error).message },
       });
@@ -272,6 +284,7 @@ export class UserRepository {
   static async emailExists(
     email: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
     try {
       const results = await db
@@ -282,8 +295,9 @@ export class UserRepository {
       return success(results.length > 0);
     } catch (error) {
       logger.error("Error checking if email exists", parseError(error));
+      const { t } = userScopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.errors.email_check_failed",
+        message: t("errors.email_check_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { email, error: parseError(error).message },
       });
@@ -297,6 +311,7 @@ export class UserRepository {
     email: string,
     excludeUserId: DbId,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
     try {
       const results = await db
@@ -311,8 +326,9 @@ export class UserRepository {
         "Error checking if email exists by other user",
         parseError(error),
       );
+      const { t } = userScopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.errors.email_duplicate_check_failed",
+        message: t("errors.email_duplicate_check_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: {
           email,
@@ -330,6 +346,7 @@ export class UserRepository {
     query: string,
     options: UserSearchOptions,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<StandardUserType[]>> {
     try {
       const { limit = 10, offset = 0 } = options;
@@ -369,11 +386,13 @@ export class UserRepository {
       const rolesMapResponse = await UserRolesRepository.findByUserIds(
         userIds,
         logger,
+        locale,
       );
 
       if (!rolesMapResponse.success) {
+        const { t } = userScopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.user.errors.roles_batch_fetch_failed",
+          message: t("errors.roles_batch_fetch_failed"),
           errorType: ErrorResponseTypes.DATABASE_ERROR,
           messageParams: { count: userIds.length },
           cause: rolesMapResponse,
@@ -408,8 +427,9 @@ export class UserRepository {
       return success(mappedResults);
     } catch (error) {
       logger.error("Error searching users", parseError(error));
+      const { t } = userScopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.errors.search_failed",
+        message: t("errors.search_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { query, error: parseError(error).message },
       });
@@ -422,6 +442,7 @@ export class UserRepository {
   static async getAllUsers(
     options: UserSearchOptions,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<StandardUserType[]>> {
     try {
       const { limit = 10, offset = 0 } = options;
@@ -439,11 +460,13 @@ export class UserRepository {
       const rolesMapResponse = await UserRolesRepository.findByUserIds(
         userIds,
         logger,
+        locale,
       );
 
       if (!rolesMapResponse.success) {
+        const { t } = userScopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.user.errors.roles_batch_fetch_failed",
+          message: t("errors.roles_batch_fetch_failed"),
           errorType: ErrorResponseTypes.DATABASE_ERROR,
           messageParams: { count: userIds.length },
           cause: rolesMapResponse,
@@ -478,8 +501,9 @@ export class UserRepository {
       return success(mappedResults);
     } catch (error) {
       logger.error("Error getting all users", parseError(error));
+      const { t } = userScopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.errors.search_failed",
+        message: t("errors.search_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -492,6 +516,7 @@ export class UserRepository {
   static async getUserSearchCount(
     query: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<number>> {
     try {
       logger.debug("Getting user search count", { query });
@@ -523,8 +548,9 @@ export class UserRepository {
       return success(totalCount);
     } catch (error) {
       logger.error("Error getting user search count", parseError(error));
+      const { t } = userScopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.errors.search_failed",
+        message: t("errors.search_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { query, error: parseError(error).message },
       });
@@ -537,6 +563,7 @@ export class UserRepository {
   static async createWithHashedPassword(
     data: NewUser,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<StandardUserType>> {
     try {
       const hashedPassword = await hashPassword(data.password);
@@ -547,10 +574,11 @@ export class UserRepository {
       };
       const results = await db.insert(users).values(hashedData).returning();
       if (results.length === 0) {
+        const { t } = userScopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.user.errors.creation_failed",
+          message: t("errors.creation_failed"),
           errorType: ErrorResponseTypes.DATABASE_ERROR,
-          messageParams: { error: "app.api.user.errors.no_data_returned" },
+          messageParams: { error: "no data returned" },
         });
       }
       const createdUser = results[0] as User;
@@ -578,8 +606,9 @@ export class UserRepository {
         "Error creating user with hashed password",
         parseError(error),
       );
+      const { t } = userScopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.errors.password_hashing_failed",
+        message: t("errors.password_hashing_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { email: data.email, error: parseError(error).message },
       });
@@ -597,6 +626,7 @@ export class UserRepository {
       roles?: UserRoleValue[];
     },
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<
     ResponseType<{
       users: Array<StandardUserType & { createdAt: Date; updatedAt: Date }>;
@@ -623,6 +653,7 @@ export class UserRepository {
       searchTerm,
       { limit: currentLimit, offset: currentOffset, roles: options.roles },
       logger,
+      locale,
     );
 
     if (!searchResult.success) {
@@ -632,6 +663,7 @@ export class UserRepository {
     const totalCountResult = await UserRepository.getUserSearchCount(
       searchTerm,
       logger,
+      locale,
     );
 
     if (!totalCountResult.success) {
@@ -679,6 +711,7 @@ export class UserRepository {
    */
   static async getActiveUserCount(
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<number>> {
     try {
       const now = Date.now();
@@ -711,8 +744,9 @@ export class UserRepository {
       return success(total);
     } catch (error) {
       logger.error("Error getting active user count", parseError(error));
+      const { t } = userScopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.errors.count_failed",
+        message: t("errors.count_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parseError(error).message },
       });

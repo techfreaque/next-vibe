@@ -17,6 +17,9 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type guardStatusEndpoints from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 type GuardStatusRequestType =
   typeof guardStatusEndpoints.POST.types.RequestOutput;
@@ -30,6 +33,7 @@ export interface GuardStatusRepository {
   getStatus(
     data: GuardStatusRequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): ResponseType<GuardStatusResponseType>;
 }
 
@@ -40,6 +44,7 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
   getStatus(
     data: GuardStatusRequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): ResponseType<GuardStatusResponseType> {
     try {
       logger.info("Checking guard status");
@@ -65,7 +70,7 @@ export class GuardStatusRepositoryImpl implements GuardStatusRepository {
         error instanceof Error ? error : new Error(String(error));
 
       return fail({
-        message: "app.api.system.guard.status.post.errors.internal.title",
+        message: t("post.errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });

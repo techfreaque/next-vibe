@@ -7,8 +7,8 @@ import { Ul } from "next-vibe-ui/ui/ul";
 import type { Step } from "react-joyride";
 
 import { DEFAULT_FOLDER_CONFIGS } from "@/app/api/[locale]/agent/chat/config";
+import type { ChatT } from "@/app/api/[locale]/agent/chat/i18n";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import type { TFunction } from "@/i18n/core/static-types";
 
 export interface TourStepConfig extends Step {
   requiresAuth?: boolean;
@@ -102,7 +102,7 @@ export type TourPlacement =
 
 // Helper to get localized Joyride button labels
 export const getJoyrideLabels = (
-  t: TFunction,
+  t: ChatT,
 ): {
   back: string;
   close: string;
@@ -110,11 +110,11 @@ export const getJoyrideLabels = (
   next: string;
   skip: string;
 } => ({
-  back: t("app.chat.welcomeTour.buttons.back"),
-  close: t("app.chat.welcomeTour.buttons.close"),
-  last: t("app.chat.welcomeTour.buttons.last"),
-  next: t("app.chat.welcomeTour.buttons.next"),
-  skip: t("app.chat.welcomeTour.buttons.skip"),
+  back: t("components.welcomeTour.buttons.back"),
+  close: t("components.welcomeTour.buttons.close"),
+  last: t("components.welcomeTour.buttons.last"),
+  next: t("components.welcomeTour.buttons.next"),
+  skip: t("components.welcomeTour.buttons.skip"),
 });
 
 // Tour style constants
@@ -143,7 +143,7 @@ export const TOUR_TEXT_ALIGN = {
 } as const;
 
 export const getTourSteps = (
-  t: TFunction,
+  t: ChatT,
   isAuthenticated = false,
 ): TourStepConfig[] => {
   const appName = t("config.appName");
@@ -155,13 +155,13 @@ export const getTourSteps = (
       content: (
         <Div className="space-y-3">
           <H2 className="text-2xl font-bold">
-            {t("app.chat.welcomeTour.welcome.title", { appName })}
+            {t("components.welcomeTour.welcome.title", { appName })}
           </H2>
           <P className="text-base">
-            {t("app.chat.welcomeTour.welcome.description")}
+            {t("components.welcomeTour.welcome.description")}
           </P>
           <P className="text-sm text-muted-foreground">
-            {t("app.chat.welcomeTour.welcome.subtitle")}
+            {t("components.welcomeTour.welcome.subtitle")}
           </P>
         </Div>
       ),
@@ -174,13 +174,13 @@ export const getTourSteps = (
       content: (
         <Div className="space-y-2">
           <H3 className="text-lg font-semibold">
-            {t("app.chat.welcomeTour.aiCompanion.title")}
+            {t("components.welcomeTour.aiCompanion.title")}
           </H3>
           <P className="text-sm">
-            {t("app.chat.welcomeTour.aiCompanion.description")}
+            {t("components.welcomeTour.aiCompanion.description")}
           </P>
           <P className="text-xs text-muted-foreground">
-            {t("app.chat.welcomeTour.aiCompanion.tip")}
+            {t("components.welcomeTour.aiCompanion.tip")}
           </P>
         </Div>
       ),
@@ -196,35 +196,35 @@ export const getTourSteps = (
       content: (
         <Div className="space-y-2">
           <H3 className="text-lg font-semibold">
-            {t("app.chat.welcomeTour.rootFolders.title")}
+            {t("components.welcomeTour.rootFolders.title")}
           </H3>
           <P className="text-sm">
-            {t("app.chat.welcomeTour.rootFolders.description")}
+            {t("components.welcomeTour.rootFolders.description")}
           </P>
           <Ul className="text-xs space-y-1 ml-4 list-disc">
             <Li>
               <Strong className="text-sky-400">
-                {t("app.chat.welcomeTour.rootFolders.private.name")}
+                {t("components.welcomeTour.rootFolders.private.name")}
               </Strong>{" "}
-              - {t("app.chat.welcomeTour.rootFolders.private.suffix")}
+              - {t("components.welcomeTour.rootFolders.private.suffix")}
             </Li>
             <Li>
               <Strong className="text-purple-400">
-                {t("app.chat.welcomeTour.rootFolders.incognito.name")}
+                {t("components.welcomeTour.rootFolders.incognito.name")}
               </Strong>{" "}
-              - {t("app.chat.welcomeTour.rootFolders.incognito.suffix")}
+              - {t("components.welcomeTour.rootFolders.incognito.suffix")}
             </Li>
             <Li>
               <Strong className="text-teal-400">
-                {t("app.chat.welcomeTour.rootFolders.shared.name")}
+                {t("components.welcomeTour.rootFolders.shared.name")}
               </Strong>{" "}
-              - {t("app.chat.welcomeTour.rootFolders.shared.suffix")}
+              - {t("components.welcomeTour.rootFolders.shared.suffix")}
             </Li>
             <Li>
               <Strong className="text-amber-400">
-                {t("app.chat.welcomeTour.rootFolders.public.name")}
+                {t("components.welcomeTour.rootFolders.public.name")}
               </Strong>{" "}
-              - {t("app.chat.welcomeTour.rootFolders.public.suffix")}
+              - {t("components.welcomeTour.rootFolders.public.suffix")}
             </Li>
           </Ul>
         </Div>
@@ -244,12 +244,12 @@ export const getTourSteps = (
                     className="h-5 w-5"
                   />
                   <Span className="text-sky-400">
-                    {t("app.chat.welcomeTour.privateFolder.name")}
+                    {t("components.welcomeTour.privateFolder.name")}
                   </Span>
-                  {t("app.chat.welcomeTour.privateFolder.suffix")}
+                  {t("components.welcomeTour.privateFolder.suffix")}
                 </H3>
                 <P className="text-sm">
-                  {t("app.chat.welcomeTour.privateFolder.description")}
+                  {t("components.welcomeTour.privateFolder.description")}
                 </P>
               </Div>
             ),
@@ -267,15 +267,15 @@ export const getTourSteps = (
               className="h-5 w-5"
             />
             <Span className="text-purple-400">
-              {t("app.chat.welcomeTour.incognitoFolder.name")}
+              {t("components.welcomeTour.incognitoFolder.name")}
             </Span>
-            {t("app.chat.welcomeTour.incognitoFolder.suffix")}
+            {t("components.welcomeTour.incognitoFolder.suffix")}
           </H3>
           <P className="text-sm">
-            {t("app.chat.welcomeTour.incognitoFolder.description")}
+            {t("components.welcomeTour.incognitoFolder.description")}
           </P>
           <P className="text-xs text-muted-foreground">
-            {t("app.chat.welcomeTour.incognitoFolder.note")}
+            {t("components.welcomeTour.incognitoFolder.note")}
           </P>
         </Div>
       ),
@@ -294,12 +294,12 @@ export const getTourSteps = (
                     className="h-5 w-5"
                   />
                   <Span className="text-teal-400">
-                    {t("app.chat.welcomeTour.sharedFolder.name")}
+                    {t("components.welcomeTour.sharedFolder.name")}
                   </Span>
-                  {t("app.chat.welcomeTour.sharedFolder.suffix")}
+                  {t("components.welcomeTour.sharedFolder.suffix")}
                 </H3>
                 <P className="text-sm">
-                  {t("app.chat.welcomeTour.sharedFolder.description")}
+                  {t("components.welcomeTour.sharedFolder.description")}
                 </P>
               </Div>
             ),
@@ -317,15 +317,15 @@ export const getTourSteps = (
               className="h-5 w-5"
             />
             <Span className="text-amber-400">
-              {t("app.chat.welcomeTour.publicFolder.name")}
+              {t("components.welcomeTour.publicFolder.name")}
             </Span>
-            {t("app.chat.welcomeTour.publicFolder.suffix")}
+            {t("components.welcomeTour.publicFolder.suffix")}
           </H3>
           <P className="text-sm">
-            {t("app.chat.welcomeTour.publicFolder.description")}
+            {t("components.welcomeTour.publicFolder.description")}
           </P>
           <P className="text-xs text-muted-foreground">
-            {t("app.chat.welcomeTour.publicFolder.note")}
+            {t("components.welcomeTour.publicFolder.note")}
           </P>
         </Div>
       ),
@@ -336,13 +336,13 @@ export const getTourSteps = (
       content: (
         <Div className="space-y-2">
           <H3 className="text-lg font-semibold">
-            {t("app.chat.welcomeTour.newChatButton.title")}
+            {t("components.welcomeTour.newChatButton.title")}
           </H3>
           <P className="text-sm">
-            {t("app.chat.welcomeTour.newChatButton.description")}
+            {t("components.welcomeTour.newChatButton.description")}
           </P>
           <P className="text-xs text-muted-foreground">
-            {t("app.chat.welcomeTour.newChatButton.tip")}
+            {t("components.welcomeTour.newChatButton.tip")}
           </P>
         </Div>
       ),
@@ -356,13 +356,13 @@ export const getTourSteps = (
             content: (
               <Div className="space-y-2">
                 <H3 className="text-lg font-semibold">
-                  {t("app.chat.welcomeTour.sidebarLogin.title")}
+                  {t("components.welcomeTour.sidebarLogin.title")}
                 </H3>
                 <P className="text-sm">
-                  {t("app.chat.welcomeTour.sidebarLogin.description")}
+                  {t("components.welcomeTour.sidebarLogin.description")}
                 </P>
                 <P className="text-xs text-muted-foreground">
-                  {t("app.chat.welcomeTour.sidebarLogin.tip")}
+                  {t("components.welcomeTour.sidebarLogin.tip")}
                 </P>
               </Div>
             ),
@@ -375,16 +375,16 @@ export const getTourSteps = (
       content: (
         <Div className="space-y-2">
           <H3 className="text-lg font-semibold">
-            {t("app.chat.welcomeTour.subscriptionButton.title")}
+            {t("components.welcomeTour.subscriptionButton.title")}
           </H3>
           <P className="text-sm">
-            {t("app.chat.welcomeTour.subscriptionButton.description", {
+            {t("components.welcomeTour.subscriptionButton.description", {
               credits: "800",
-              price: t("app.chat.welcomeTour.subscriptionButton.price"),
+              price: t("components.welcomeTour.subscriptionButton.price"),
             })}
           </P>
           <P className="text-xs text-muted-foreground">
-            {t("app.chat.welcomeTour.subscriptionButton.tip")}
+            {t("components.welcomeTour.subscriptionButton.tip")}
           </P>
         </Div>
       ),
@@ -397,13 +397,13 @@ export const getTourSteps = (
         <Div className="space-y-2">
           <H3 className="text-lg font-semibold flex items-center gap-2">
             <Icon icon="keyboard" className="h-5 w-5" />
-            {t("app.chat.welcomeTour.chatInput.title")}
+            {t("components.welcomeTour.chatInput.title")}
           </H3>
           <P className="text-sm">
-            {t("app.chat.welcomeTour.chatInput.description")}
+            {t("components.welcomeTour.chatInput.description")}
           </P>
           <P className="text-xs text-muted-foreground">
-            {t("app.chat.welcomeTour.chatInput.tip")}
+            {t("components.welcomeTour.chatInput.tip")}
           </P>
         </Div>
       ),
@@ -416,15 +416,17 @@ export const getTourSteps = (
         <Div className="space-y-2">
           <H3 className="text-lg font-semibold flex items-center gap-2">
             <Icon icon="mic" className="h-5 w-5" />
-            {t("app.chat.welcomeTour.voiceInput.title")}
+            {t("components.welcomeTour.voiceInput.title")}
           </H3>
           <P className="text-sm">
-            {t("app.chat.welcomeTour.voiceInput.description")}
+            {t("components.welcomeTour.voiceInput.description")}
           </P>
           <Ul className="text-xs space-y-1 ml-4 list-disc text-muted-foreground">
-            <Li>{t("app.chat.welcomeTour.voiceInput.options.transcribe")}</Li>
-            <Li>{t("app.chat.welcomeTour.voiceInput.options.sendAudio")}</Li>
-            <Li>{t("app.chat.welcomeTour.voiceInput.options.pauseResume")}</Li>
+            <Li>{t("components.welcomeTour.voiceInput.options.transcribe")}</Li>
+            <Li>{t("components.welcomeTour.voiceInput.options.sendAudio")}</Li>
+            <Li>
+              {t("components.welcomeTour.voiceInput.options.pauseResume")}
+            </Li>
           </Ul>
         </Div>
       ),
@@ -437,13 +439,13 @@ export const getTourSteps = (
         <Div className="space-y-2">
           <H3 className="text-lg font-semibold flex items-center gap-2">
             <Icon icon="phone" className="h-5 w-5 text-green-500" />
-            {t("app.chat.welcomeTour.callMode.title")}
+            {t("components.welcomeTour.callMode.title")}
           </H3>
           <P className="text-sm">
-            {t("app.chat.welcomeTour.callMode.description")}
+            {t("components.welcomeTour.callMode.description")}
           </P>
           <P className="text-xs text-muted-foreground">
-            {t("app.chat.welcomeTour.callMode.tip")}
+            {t("components.welcomeTour.callMode.tip")}
           </P>
         </Div>
       ),
@@ -454,13 +456,13 @@ export const getTourSteps = (
       content: (
         <Div className="space-y-3">
           <H2 className="text-2xl font-bold">
-            {t("app.chat.welcomeTour.complete.title")}
+            {t("components.welcomeTour.complete.title")}
           </H2>
           <P className="text-base">
-            {t("app.chat.welcomeTour.complete.description")}
+            {t("components.welcomeTour.complete.description")}
           </P>
           <P className="text-sm text-muted-foreground">
-            {t("app.chat.welcomeTour.complete.help")}
+            {t("components.welcomeTour.complete.help")}
           </P>
         </Div>
       ),
@@ -470,7 +472,7 @@ export const getTourSteps = (
 };
 
 // Steps specifically for authenticated users (shown after login during tour)
-export const getAuthContinuationSteps = (t: TFunction): TourStepConfig[] => [
+export const getAuthContinuationSteps = (t: ChatT): TourStepConfig[] => [
   {
     target: getTourSelector(TOUR_DATA_ATTRS.PRIVATE_FOLDER),
     content: (
@@ -478,15 +480,15 @@ export const getAuthContinuationSteps = (t: TFunction): TourStepConfig[] => [
         <H3 className="text-lg font-semibold">
           ✅{" "}
           <Span className="text-sky-400">
-            {t("app.chat.welcomeTour.privateFolder.name")}
+            {t("components.welcomeTour.privateFolder.name")}
           </Span>{" "}
-          {t("app.chat.welcomeTour.authUnlocked.unlocked")}
+          {t("components.welcomeTour.authUnlocked.unlocked")}
         </H3>
         <P className="text-sm">
-          {t("app.chat.welcomeTour.authUnlocked.privateDescription")}
+          {t("components.welcomeTour.authUnlocked.privateDescription")}
         </P>
         <P className="text-xs text-muted-foreground">
-          {t("app.chat.welcomeTour.authUnlocked.privateNote")}
+          {t("components.welcomeTour.authUnlocked.privateNote")}
         </P>
       </Div>
     ),
@@ -500,15 +502,15 @@ export const getAuthContinuationSteps = (t: TFunction): TourStepConfig[] => [
         <H3 className="text-lg font-semibold">
           ✅{" "}
           <Span className="text-teal-400">
-            {t("app.chat.welcomeTour.sharedFolder.name")}
+            {t("components.welcomeTour.sharedFolder.name")}
           </Span>{" "}
-          {t("app.chat.welcomeTour.authUnlocked.unlocked")}
+          {t("components.welcomeTour.authUnlocked.unlocked")}
         </H3>
         <P className="text-sm">
-          {t("app.chat.welcomeTour.authUnlocked.sharedDescription")}
+          {t("components.welcomeTour.authUnlocked.sharedDescription")}
         </P>
         <P className="text-xs text-muted-foreground">
-          {t("app.chat.welcomeTour.authUnlocked.sharedNote")}
+          {t("components.welcomeTour.authUnlocked.sharedNote")}
         </P>
       </Div>
     ),

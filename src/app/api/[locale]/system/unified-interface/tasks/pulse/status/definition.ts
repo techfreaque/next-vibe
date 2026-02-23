@@ -8,8 +8,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -19,66 +19,58 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * GET endpoint definition - Get pulse status
  * Retrieves current pulse health status
  */
 const pulseStatusEndpoint = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["system", "unified-interface", "tasks", "pulse", "status"],
-  title: "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.title",
-  description:
-    "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.description",
+  title: "get.title",
+  description: "get.description",
   icon: "activity",
-  category: "app.api.system.category",
+  category: "category",
   allowedRoles: [UserRole.ADMIN],
   aliases: ["pulse:status"],
-  tags: [
-    "app.api.system.unifiedInterface.tasks.pulseSystem.status.tags.status",
-  ],
+  tags: ["tags.status"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.container.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "get.container.title",
+    description: "get.container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { response: true },
+    children: {
       // === RESPONSE FIELDS ===
-      status: responseField({
+      status: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.fields.status.title",
+        content: "get.fields.status.title",
         schema: z.string(),
       }),
 
-      lastPulseAt: responseField({
+      lastPulseAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.fields.lastPulseAt.title",
+        content: "get.fields.lastPulseAt.title",
         schema: z.string().nullable(),
       }),
 
-      successRate: responseField({
+      successRate: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.fields.successRate.title",
+        content: "get.fields.successRate.title",
         schema: z.coerce.number().nullable(),
       }),
 
-      totalExecutions: responseField({
+      totalExecutions: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.fields.totalExecutions.title",
+        content: "get.fields.totalExecutions.title",
         schema: z.coerce.number(),
       }),
     },
-  ),
+  }),
 
   examples: {
     responses: {
@@ -99,66 +91,46 @@ const pulseStatusEndpoint = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.validation.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.validation.description",
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.network.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.network.description",
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.unauthorized.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.unauthorized.description",
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.forbidden.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.forbidden.description",
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.notFound.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.notFound.description",
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.internal.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.internal.description",
+      title: "get.errors.internal.title",
+      description: "get.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.unknown.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.unknown.description",
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.unsaved.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.unsaved.description",
+      title: "get.errors.unsaved.title",
+      description: "get.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.conflict.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.errors.conflict.description",
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title:
-      "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.success.title",
-    description:
-      "app.api.system.unifiedInterface.tasks.pulseSystem.status.get.success.description",
+    title: "get.success.title",
+    description: "get.success.description",
   },
 });
 

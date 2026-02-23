@@ -16,11 +16,14 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { pulseHealthRepository } from "../repository";
+import { PulseHealthRepository } from "../repository";
 import type {
   PulseExecuteRequestOutput,
   PulseExecuteResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Pulse Execute Repository Implementation
@@ -33,6 +36,7 @@ export class PulseExecuteRepository {
     data: PulseExecuteRequestOutput,
     systemLocale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<PulseExecuteResponseOutput>> {
     try {
       logger.debug("Executing pulse health check cycle", {
@@ -41,7 +45,7 @@ export class PulseExecuteRepository {
         taskNames: data.taskNames,
       });
 
-      const result = await pulseHealthRepository.executePulse(
+      const result = await PulseHealthRepository.executePulse(
         {
           dryRun: data.dryRun ?? false,
           taskNames: data.taskNames,
@@ -49,12 +53,12 @@ export class PulseExecuteRepository {
           systemLocale,
         },
         logger,
+        systemLocale,
       );
 
       if (!result.success) {
         return fail({
-          message:
-            "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.internal.title",
+          message: t("errors.executePulse"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -77,9 +81,7 @@ export class PulseExecuteRepository {
 
       const response: PulseExecuteResponseOutput = {
         success: summary.tasksFailed.length === 0,
-        message: isDryRun
-          ? "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.response.dryRunSuccess"
-          : "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.response.executionSuccess",
+        message: isDryRun ? "Dry run completed" : "Pulse execution completed",
         executedAt: summary.executedAt,
         tasksExecuted: summary.tasksExecuted.length,
         results,
@@ -100,8 +102,7 @@ export class PulseExecuteRepository {
       });
 
       return fail({
-        message:
-          "app.api.system.unifiedInterface.tasks.pulseSystem.execute.post.errors.internal.title",
+        message: t("errors.executePulse"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

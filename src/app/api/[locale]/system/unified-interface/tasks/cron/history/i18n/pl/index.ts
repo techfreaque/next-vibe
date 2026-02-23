@@ -1,6 +1,14 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Zarządzanie zadaniami",
+
+  errors: {
+    cronTaskNotFound: "Zadanie cron nie znalezione",
+    repositoryInternalError: "Wystąpił błąd wewnętrzny",
+    fetchCronTaskHistory: "Nie udało się pobrać historii zadań cron",
+  },
+
   get: {
     tags: {
       tasks: "Zadania",

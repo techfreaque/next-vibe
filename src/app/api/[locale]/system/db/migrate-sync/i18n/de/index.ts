@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Datenbankoperationen",
+
   post: {
     title: "Datenbank-Migration Synchronisation",
     description:

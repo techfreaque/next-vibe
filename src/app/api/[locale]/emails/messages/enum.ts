@@ -2,8 +2,9 @@
  * Emails Enums
  * Enums for email management and filtering
  */
-
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
+
+import { scopedTranslation } from "./i18n";
 
 export { SortOrder, SortOrderOptions } from "../imap-client/enum";
 
@@ -14,15 +15,15 @@ export const {
   enum: EmailStatus,
   options: EmailStatusOptions,
   Value: EmailStatusValue,
-} = createEnumOptions({
-  PENDING: "app.api.emails.enums.emailStatus.pending",
-  SENT: "app.api.emails.enums.emailStatus.sent",
-  DELIVERED: "app.api.emails.enums.emailStatus.delivered",
-  OPENED: "app.api.emails.enums.emailStatus.opened",
-  CLICKED: "app.api.emails.enums.emailStatus.clicked",
-  BOUNCED: "app.api.emails.enums.emailStatus.bounced",
-  FAILED: "app.api.emails.enums.emailStatus.failed",
-  UNSUBSCRIBED: "app.api.emails.enums.emailStatus.unsubscribed",
+} = createEnumOptions(scopedTranslation, {
+  PENDING: "enums.status.pending",
+  SENT: "enums.status.sent",
+  DELIVERED: "enums.status.delivered",
+  OPENED: "enums.status.opened",
+  CLICKED: "enums.status.clicked",
+  BOUNCED: "enums.status.bounced",
+  FAILED: "enums.status.failed",
+  UNSUBSCRIBED: "enums.status.unsubscribed",
 });
 
 /**
@@ -32,13 +33,13 @@ export const {
   enum: EmailType,
   options: EmailTypeOptions,
   Value: EmailTypeValue,
-} = createEnumOptions({
-  TRANSACTIONAL: "app.api.emails.enums.emailType.transactional",
-  MARKETING: "app.api.emails.enums.emailType.marketing",
-  NOTIFICATION: "app.api.emails.enums.emailType.notification",
-  SYSTEM: "app.api.emails.enums.emailType.system",
-  LEAD_CAMPAIGN: "app.api.emails.enums.emailType.leadCampaign",
-  USER_COMMUNICATION: "app.api.emails.enums.emailType.userCommunication",
+} = createEnumOptions(scopedTranslation, {
+  TRANSACTIONAL: "enums.type.transactional",
+  MARKETING: "enums.type.marketing",
+  NOTIFICATION: "enums.type.notification",
+  SYSTEM: "enums.type.system",
+  LEAD_CAMPAIGN: "enums.type.leadCampaign",
+  USER_COMMUNICATION: "enums.type.userCommunication",
 });
 
 /**
@@ -48,15 +49,15 @@ export const {
   enum: EmailProvider,
   options: EmailProviderOptions,
   Value: EmailProviderValue,
-} = createEnumOptions({
-  RESEND: "app.api.emails.enums.emailProvider.resend",
-  SENDGRID: "app.api.emails.enums.emailProvider.sendgrid",
-  MAILGUN: "app.api.emails.enums.emailProvider.mailgun",
-  SES: "app.api.emails.enums.emailProvider.ses",
-  SMTP: "app.api.emails.enums.emailProvider.smtp",
-  MAILJET: "app.api.emails.enums.emailProvider.mailjet",
-  POSTMARK: "app.api.emails.enums.emailProvider.postmark",
-  OTHER: "app.api.emails.enums.emailProvider.other",
+} = createEnumOptions(scopedTranslation, {
+  RESEND: "enums.provider.resend",
+  SENDGRID: "enums.provider.sendgrid",
+  MAILGUN: "enums.provider.mailgun",
+  SES: "enums.provider.ses",
+  SMTP: "enums.provider.smtp",
+  MAILJET: "enums.provider.mailjet",
+  POSTMARK: "enums.provider.postmark",
+  OTHER: "enums.provider.other",
 });
 
 /**
@@ -66,14 +67,14 @@ export const {
   enum: EmailSortField,
   options: EmailSortFieldOptions,
   Value: EmailSortFieldValue,
-} = createEnumOptions({
-  SUBJECT: "app.api.emails.enums.emailSortField.subject",
-  RECIPIENT_EMAIL: "app.api.emails.enums.emailSortField.recipientEmail",
-  RECIPIENT_NAME: "app.api.emails.enums.emailSortField.recipientName",
-  TYPE: "app.api.emails.enums.emailSortField.type",
-  STATUS: "app.api.emails.enums.emailSortField.status",
-  SENT_AT: "app.api.emails.enums.emailSortField.sentAt",
-  CREATED_AT: "app.api.emails.enums.emailSortField.createdAt",
+} = createEnumOptions(scopedTranslation, {
+  SUBJECT: "enums.sortField.subject",
+  RECIPIENT_EMAIL: "enums.sortField.recipientEmail",
+  RECIPIENT_NAME: "enums.sortField.recipientName",
+  TYPE: "enums.sortField.type",
+  STATUS: "enums.sortField.status",
+  SENT_AT: "enums.sortField.sentAt",
+  CREATED_AT: "enums.sortField.createdAt",
 });
 
 /**
@@ -83,16 +84,16 @@ export const {
   enum: EmailStatusFilter,
   options: EmailStatusFilterOptions,
   Value: EmailStatusFilterValue,
-} = createEnumOptions({
-  ANY: "app.api.emails.enums.emailStatusFilter.any",
-  PENDING: "app.api.emails.enums.emailStatus.pending",
-  SENT: "app.api.emails.enums.emailStatus.sent",
-  DELIVERED: "app.api.emails.enums.emailStatus.delivered",
-  OPENED: "app.api.emails.enums.emailStatus.opened",
-  CLICKED: "app.api.emails.enums.emailStatus.clicked",
-  BOUNCED: "app.api.emails.enums.emailStatus.bounced",
-  FAILED: "app.api.emails.enums.emailStatus.failed",
-  UNSUBSCRIBED: "app.api.emails.enums.emailStatus.unsubscribed",
+} = createEnumOptions(scopedTranslation, {
+  ANY: "enums.statusFilter.any",
+  PENDING: "enums.status.pending",
+  SENT: "enums.status.sent",
+  DELIVERED: "enums.status.delivered",
+  OPENED: "enums.status.opened",
+  CLICKED: "enums.status.clicked",
+  BOUNCED: "enums.status.bounced",
+  FAILED: "enums.status.failed",
+  UNSUBSCRIBED: "enums.status.unsubscribed",
 });
 
 /**
@@ -102,14 +103,14 @@ export const {
   enum: EmailTypeFilter,
   options: EmailTypeFilterOptions,
   Value: EmailTypeFilterValue,
-} = createEnumOptions({
-  ANY: "app.api.emails.enums.emailTypeFilter.any",
-  TRANSACTIONAL: "app.api.emails.enums.emailType.transactional",
-  MARKETING: "app.api.emails.enums.emailType.marketing",
-  NOTIFICATION: "app.api.emails.enums.emailType.notification",
-  SYSTEM: "app.api.emails.enums.emailType.system",
-  LEAD_CAMPAIGN: "app.api.emails.enums.emailType.leadCampaign",
-  USER_COMMUNICATION: "app.api.emails.enums.emailType.userCommunication",
+} = createEnumOptions(scopedTranslation, {
+  ANY: "enums.typeFilter.any",
+  TRANSACTIONAL: "enums.type.transactional",
+  MARKETING: "enums.type.marketing",
+  NOTIFICATION: "enums.type.notification",
+  SYSTEM: "enums.type.system",
+  LEAD_CAMPAIGN: "enums.type.leadCampaign",
+  USER_COMMUNICATION: "enums.type.userCommunication",
 });
 
 /**
@@ -119,11 +120,11 @@ export const {
   enum: RetryRange,
   options: RetryRangeOptions,
   Value: RetryRangeValue,
-} = createEnumOptions({
-  NO_RETRIES: "app.api.emails.enums.emailRetryRange.noRetries",
-  ONE_TO_TWO: "app.api.emails.enums.emailRetryRange.oneToTwo",
-  THREE_TO_FIVE: "app.api.emails.enums.emailRetryRange.threeToFive",
-  SIX_PLUS: "app.api.emails.enums.emailRetryRange.sixPlus",
+} = createEnumOptions(scopedTranslation, {
+  NO_RETRIES: "enums.retryRange.noRetries",
+  ONE_TO_TWO: "enums.retryRange.oneToTwo",
+  THREE_TO_FIVE: "enums.retryRange.threeToFive",
+  SIX_PLUS: "enums.retryRange.sixPlus",
 });
 
 /**

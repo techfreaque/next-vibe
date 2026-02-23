@@ -8,10 +8,13 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
-import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
+import { PROVIDER_SETUP_INSTRUCTIONS } from "@/app/api/[locale]/agent/env-availability";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { BraveSearchGetResponseOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Map readable freshness values to Brave API codes
@@ -98,15 +101,16 @@ export class BraveSearchRepository {
       freshness?: "past_day" | "past_week" | "past_month" | "past_year";
     },
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<BraveSearchGetResponseOutput>> {
     const { fail, success, ErrorResponseTypes } =
       await import("next-vibe/shared/types/response.schema");
 
     // Guard: key not configured
     if (!agentEnv.BRAVE_SEARCH_API_KEY) {
-      logger.warn("Brave Search API key not configured");
+      const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.braveSearch;
       return fail({
-        message: buildMissingKeyMessage("braveSearch"),
+        message: t("get.errors.notConfigured.title", { label, envKey, url }),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
@@ -115,16 +119,14 @@ export class BraveSearchRepository {
       // Validate query
       if (!query || typeof query !== "string" || query.trim() === "") {
         return fail({
-          message:
-            "app.api.agent.search.brave.get.errors.queryEmpty.title" as const,
+          message: t("get.errors.queryEmpty.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
 
       if (query.length > this.MAX_QUERY_LENGTH) {
         return fail({
-          message:
-            "app.api.agent.search.brave.get.errors.queryTooLong.title" as const,
+          message: t("get.errors.queryTooLong.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { maxLength: this.MAX_QUERY_LENGTH },
         });
@@ -152,15 +154,13 @@ export class BraveSearchRepository {
 
       if (error instanceof Error && error.name === "AbortError") {
         return fail({
-          message:
-            "app.api.agent.search.brave.get.errors.timeout.title" as const,
+          message: t("get.errors.timeout.title"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
 
       return fail({
-        message:
-          "app.api.agent.search.brave.get.errors.searchFailed.title" as const,
+        message: t("get.errors.searchFailed.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

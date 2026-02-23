@@ -9,6 +9,7 @@
  */
 
 import type { FavoriteGetModelSelection } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
+import type { ChatT } from "@/app/api/[locale]/agent/chat/i18n";
 import type {
   FiltersModelSelection,
   ManualModelSelection,
@@ -22,7 +23,6 @@ import {
   getCreditCostFromModel,
   modelOptions,
 } from "@/app/api/[locale]/agent/models/models";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import {
   ContentLevelDB,
@@ -41,17 +41,17 @@ export class CharactersRepositoryClient {
    */
   static formatCreditCost(
     cost: number,
-    t: TFunction,
+    t: ChatT,
     isTokenBased = false,
   ): string {
     const prefix = isTokenBased ? "~" : "";
     if (cost === 0) {
-      return t("app.chat.selector.free");
+      return t("selector.free");
     }
     if (cost === 1) {
-      return `${prefix}${t("app.chat.credits.credit", { count: cost })}`;
+      return `${prefix}${t("components.credits.credit", { count: cost })}`;
     }
-    return `${prefix}${t("app.chat.credits.credits", { count: cost })}`;
+    return `${prefix}${t("components.credits.credits", { count: cost })}`;
   }
   /**
    * Convert model credit cost to price level
@@ -179,7 +179,8 @@ export class CharactersRepositoryClient {
     modelSelection: FiltersModelSelection | ManualModelSelection,
   ): ModelOption[] {
     if (modelSelection.selectionType === ModelSelectionType.MANUAL) {
-      const model = modelOptions[modelSelection.manualModelId];
+      const manualSelection = modelSelection;
+      const model = modelOptions[manualSelection.manualModelId];
       return model ? [model] : [];
     }
 

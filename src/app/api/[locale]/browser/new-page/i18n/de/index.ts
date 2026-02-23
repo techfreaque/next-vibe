@@ -73,4 +73,9 @@ export const translations: typeof enTranslations = {
     title: "Neue Seite erfolgreich erstellt",
     description: "Die neue Seite wurde erfolgreich erstellt",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    navigationAutomation: "Navigations-Automatisierung",
+  },
 };

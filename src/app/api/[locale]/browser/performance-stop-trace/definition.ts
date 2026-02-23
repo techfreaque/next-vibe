@@ -7,8 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -18,16 +18,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["browser", "performance-stop-trace"],
-  title: "app.api.browser.performance-stop-trace.title",
-  description: "app.api.browser.performance-stop-trace.description",
-  category: "app.api.browser.category",
+  title: "performance-stop-trace.title",
+  description: "performance-stop-trace.description",
+  category: "performance-stop-trace.category",
   icon: "pause-circle",
   tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.performanceAutomation",
+    "performance-stop-trace.tags.browserAutomation",
+    "performance-stop-trace.tags.performanceAutomation",
   ],
 
   allowedRoles: [
@@ -38,27 +41,25 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.browser.performance-stop-trace.form.label",
-      description: "app.api.browser.performance-stop-trace.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "performance-stop-trace.form.label",
+    description: "performance-stop-trace.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // Response fields
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.performance-stop-trace.response.success",
+        content: "performance-stop-trace.response.success",
         schema: z
           .boolean()
           .describe("Whether the trace stop operation succeeded"),
       }),
-      result: responseField({
+      result: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.performance-stop-trace.response.result",
+        content: "performance-stop-trace.response.result",
         schema: z
           .object({
             stopped: z.boolean().describe("Whether the trace was stopped"),
@@ -75,28 +76,25 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Result of trace stop operation"),
       }),
-      error: responseField({
+      error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.performance-stop-trace.response.error",
+        content: "performance-stop-trace.response.error",
         schema: z
           .string()
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: responseField({
+      executionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.performance-stop-trace.response.executionId",
+        content: "performance-stop-trace.response.executionId",
         schema: z
           .string()
           .optional()
           .describe("Unique identifier for this execution"),
       }),
     },
-  ),
+  }),
   examples: {
-    requests: {
-      default: {},
-    },
     responses: {
       default: {
         success: true,
@@ -115,55 +113,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.browser.performance-stop-trace.errors.validation.title",
-      description:
-        "app.api.browser.performance-stop-trace.errors.validation.description",
+      title: "performance-stop-trace.errors.validation.title",
+      description: "performance-stop-trace.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.browser.performance-stop-trace.errors.network.title",
-      description:
-        "app.api.browser.performance-stop-trace.errors.network.description",
+      title: "performance-stop-trace.errors.network.title",
+      description: "performance-stop-trace.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.browser.performance-stop-trace.errors.unauthorized.title",
-      description:
-        "app.api.browser.performance-stop-trace.errors.unauthorized.description",
+      title: "performance-stop-trace.errors.unauthorized.title",
+      description: "performance-stop-trace.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.browser.performance-stop-trace.errors.forbidden.title",
-      description:
-        "app.api.browser.performance-stop-trace.errors.forbidden.description",
+      title: "performance-stop-trace.errors.forbidden.title",
+      description: "performance-stop-trace.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.browser.performance-stop-trace.errors.notFound.title",
-      description:
-        "app.api.browser.performance-stop-trace.errors.notFound.description",
+      title: "performance-stop-trace.errors.notFound.title",
+      description: "performance-stop-trace.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.browser.performance-stop-trace.errors.serverError.title",
-      description:
-        "app.api.browser.performance-stop-trace.errors.serverError.description",
+      title: "performance-stop-trace.errors.serverError.title",
+      description: "performance-stop-trace.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.browser.performance-stop-trace.errors.unknown.title",
-      description:
-        "app.api.browser.performance-stop-trace.errors.unknown.description",
+      title: "performance-stop-trace.errors.unknown.title",
+      description: "performance-stop-trace.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.browser.performance-stop-trace.errors.unsavedChanges.title",
-      description:
-        "app.api.browser.performance-stop-trace.errors.unsavedChanges.description",
+      title: "performance-stop-trace.errors.unsavedChanges.title",
+      description: "performance-stop-trace.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.browser.performance-stop-trace.errors.conflict.title",
-      description:
-        "app.api.browser.performance-stop-trace.errors.conflict.description",
+      title: "performance-stop-trace.errors.conflict.title",
+      description: "performance-stop-trace.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.browser.performance-stop-trace.success.title",
-    description: "app.api.browser.performance-stop-trace.success.description",
+    title: "performance-stop-trace.success.title",
+    description: "performance-stop-trace.success.description",
   },
 });
 

@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,168 +21,146 @@ import {
 
 import { UserRole } from "../../../../user/user-roles/enum";
 import { ImapAuthMethod, ImapConnectionStatus } from "../../enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Test IMAP Account Connection Endpoint (POST)
  * Tests connection to an IMAP account
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["emails", "imap-client", "accounts", "test"],
-  title: "app.api.emails.imapClient.accounts.test.title",
-  description: "app.api.emails.imapClient.accounts.test.description",
-  category: "app.api.emails.category",
-  tags: ["app.api.emails.imapClient.accounts.tag"],
+  title: "title",
+  description: "description",
+  category: "category",
+  tags: ["tags.accounts"],
   icon: "inbox",
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.emails.imapClient.accounts.test.container.title",
-      description:
-        "app.api.emails.imapClient.accounts.test.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "container.title",
+    description: "container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      accountId: requestField({
+      accountId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.imapClient.accounts.test.accountId.label",
-        description:
-          "app.api.emails.imapClient.accounts.test.accountId.description",
-        placeholder:
-          "app.api.emails.imapClient.accounts.test.accountId.placeholder",
+        label: "accountId.label",
+        description: "accountId.description",
+        placeholder: "accountId.placeholder",
         columns: 12,
         schema: z.uuid(),
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        text: "app.api.emails.imapClient.accounts.test.response.success",
+        text: "response.success",
         schema: z.boolean(),
       }),
 
-      connectionStatus: responseField({
+      connectionStatus: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        text: "app.api.emails.imapClient.accounts.test.response.connectionStatus",
+        text: "response.connectionStatus",
         schema: z.enum(ImapConnectionStatus),
       }),
 
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.accounts.test.response.message",
+        content: "response.message",
         schema: z.string(),
       }),
 
-      details: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.emails.imapClient.accounts.test.response.details.title",
-          description:
-            "app.api.emails.imapClient.accounts.test.response.details.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          host: responseField({
+      details: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.details.title",
+        description: "response.details.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          host: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.emails.imapClient.accounts.test.response.details.host",
+            content: "response.details.host",
             schema: z.string().optional(),
           }),
-          port: responseField({
+          port: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.emails.imapClient.accounts.test.response.details.port",
+            content: "response.details.port",
             schema: z.coerce.number().optional(),
           }),
-          secure: responseField({
+          secure: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.imapClient.accounts.test.response.details.secure",
+            text: "response.details.secure",
             schema: z.boolean().optional(),
           }),
-          authMethod: responseField({
+          authMethod: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.emails.imapClient.accounts.test.response.details.authMethod",
+            text: "response.details.authMethod",
             schema: z.enum(ImapAuthMethod).optional(),
           }),
-          responseTime: responseField({
+          responseTime: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.emails.imapClient.accounts.test.response.details.responseTime",
+            content: "response.details.responseTime",
             schema: z.coerce.number().optional(),
           }),
-          serverCapabilities: responseField({
+          serverCapabilities: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.emails.imapClient.accounts.test.response.details.serverCapabilities",
+            content: "response.details.serverCapabilities",
             schema: z.array(z.string()).optional(),
           }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.emails.imapClient.accounts.test.errors.validation.title",
-      description:
-        "app.api.emails.imapClient.accounts.test.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.emails.imapClient.accounts.test.errors.unauthorized.title",
-      description:
-        "app.api.emails.imapClient.accounts.test.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.emails.imapClient.accounts.test.errors.server.title",
-      description:
-        "app.api.emails.imapClient.accounts.test.errors.server.description",
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.emails.imapClient.accounts.test.errors.unknown.title",
-      description:
-        "app.api.emails.imapClient.accounts.test.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.emails.imapClient.accounts.test.errors.forbidden.title",
-      description:
-        "app.api.emails.imapClient.accounts.test.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.emails.imapClient.accounts.test.errors.network.title",
-      description:
-        "app.api.emails.imapClient.accounts.test.errors.network.description",
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.emails.imapClient.accounts.test.errors.notFound.title",
-      description:
-        "app.api.emails.imapClient.accounts.test.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.emails.imapClient.accounts.test.errors.conflict.title",
-      description:
-        "app.api.emails.imapClient.accounts.test.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.emails.imapClient.accounts.test.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.imapClient.accounts.test.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
   },
 
   successTypes: {
-    title: "app.api.emails.imapClient.accounts.test.success.title",
-    description: "app.api.emails.imapClient.accounts.test.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 
   examples: {
@@ -197,7 +175,7 @@ const { POST } = createEndpoint({
         connectionStatus: ImapConnectionStatus.CONNECTED,
         message: "Connection test successful",
         details: {
-          host: "app.api.emails.imapClient.imap.gmail.com",
+          host: "imap.gmail.com",
           port: 993,
           secure: true,
           authMethod: ImapAuthMethod.PLAIN,

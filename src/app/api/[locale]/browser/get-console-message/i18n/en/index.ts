@@ -64,4 +64,9 @@ export const translations = {
     title: "Console Message Retrieved Successfully",
     description: "The console message was retrieved successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    debugging: "Debugging",
+  },
 };

@@ -12,7 +12,7 @@ import { AiStreamRunRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ data, user, locale, logger }) =>
-      AiStreamRunRepository.run(data, user, locale, logger),
+    handler: async ({ data, user, locale, logger, t }) =>
+      AiStreamRunRepository.run(data, user, locale, logger, t),
   },
 });

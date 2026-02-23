@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Benutzer",
+
   roles: {
     post: {
       title: "Benutzerrolle hinzufügen",

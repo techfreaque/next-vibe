@@ -78,4 +78,9 @@ export const translations: typeof enTranslations = {
     title: "Ausfüllvorgang erfolgreich",
     description: "Das Element wurde erfolgreich ausgefüllt",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    inputAutomation: "Eingabe-Automatisierung",
+  },
 };

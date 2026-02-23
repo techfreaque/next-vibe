@@ -72,4 +72,9 @@ export const translations: typeof enTranslations = {
     title: "Strona pomyślnie zamknięta",
     description: "Strona została pomyślnie zamknięta",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    chromeDevTools: "Chrome DevTools",
+  },
 };

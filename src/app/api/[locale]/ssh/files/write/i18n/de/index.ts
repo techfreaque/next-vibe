@@ -1,4 +1,16 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    invalidPath: "Ungültiger Pfad: Muss absolut sein ohne '..' Segmente",
+    parentDirNotFound:
+      "Übergeordnetes Verzeichnis nicht gefunden. Setzen Sie createDirs=true um es zu erstellen.",
+    permissionDenied: "Zugriff verweigert",
+    notImplemented: {
+      fileWrite: "SSH-Backend noch nicht für Dateischreiben implementiert",
+    },
+  },
+
   post: {
     title: "Datei schreiben",
     description:

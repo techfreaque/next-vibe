@@ -14,12 +14,16 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
   FolderPermissionsGetResponseOutput,
   FolderPermissionsUpdateRequestOutput,
   FolderPermissionsUpdateResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type FolderPermissionsT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Get folder permissions
@@ -30,11 +34,12 @@ export async function getFolderPermissions(
   user: JwtPayloadType,
   data: { id: string },
   logger: EndpointLogger,
+  t: FolderPermissionsT,
+  locale: CountryLanguage,
 ): Promise<ResponseType<FolderPermissionsGetResponseOutput>> {
   if (user.isPublic) {
     return fail({
-      message:
-        "app.api.agent.chat.folders.id.permissions.get.errors.unauthorized.title",
+      message: t("get.errors.unauthorized.title"),
       errorType: ErrorResponseTypes.UNAUTHORIZED,
     });
   }
@@ -48,18 +53,21 @@ export async function getFolderPermissions(
 
     if (!folder) {
       return fail({
-        message:
-          "app.api.agent.chat.folders.id.permissions.get.errors.notFound.title",
+        message: t("get.errors.notFound.title"),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
 
     // Check if user can manage this folder's permissions
-    const canManage = await canManageFolderPermissions(user, folder, logger);
+    const canManage = await canManageFolderPermissions(
+      user,
+      folder,
+      logger,
+      locale,
+    );
     if (!canManage) {
       return fail({
-        message:
-          "app.api.agent.chat.folders.id.permissions.get.errors.forbidden.title",
+        message: t("get.errors.forbidden.title"),
         errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
@@ -79,8 +87,7 @@ export async function getFolderPermissions(
     return success(responseData);
   } catch {
     return fail({
-      message:
-        "app.api.agent.chat.folders.id.permissions.get.errors.server.title",
+      message: t("get.errors.server.title"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
@@ -95,11 +102,12 @@ export async function updateFolderPermissions(
   user: JwtPayloadType,
   data: FolderPermissionsUpdateRequestOutput & { id: string },
   logger: EndpointLogger,
+  t: FolderPermissionsT,
+  locale: CountryLanguage,
 ): Promise<ResponseType<FolderPermissionsUpdateResponseOutput>> {
   if (user.isPublic) {
     return fail({
-      message:
-        "app.api.agent.chat.folders.id.permissions.patch.errors.unauthorized.title",
+      message: t("patch.errors.unauthorized.title"),
       errorType: ErrorResponseTypes.UNAUTHORIZED,
     });
   }
@@ -124,8 +132,7 @@ export async function updateFolderPermissions(
 
     if (!existingFolder) {
       return fail({
-        message:
-          "app.api.agent.chat.folders.id.permissions.patch.errors.notFound.title",
+        message: t("patch.errors.notFound.title"),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -135,11 +142,11 @@ export async function updateFolderPermissions(
       user,
       existingFolder,
       logger,
+      locale,
     );
     if (!canManage) {
       return fail({
-        message:
-          "app.api.agent.chat.folders.id.permissions.patch.errors.forbidden.title",
+        message: t("patch.errors.forbidden.title"),
         errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
@@ -208,8 +215,7 @@ export async function updateFolderPermissions(
     });
   } catch {
     return fail({
-      message:
-        "app.api.agent.chat.folders.id.permissions.patch.errors.server.title",
+      message: t("patch.errors.server.title"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }

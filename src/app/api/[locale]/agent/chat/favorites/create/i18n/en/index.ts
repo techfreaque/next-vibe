@@ -1,4 +1,9 @@
 export const translations = {
+  category: "Chat",
+  tags: {
+    favorites: "Favorites",
+  },
+
   post: {
     title: "Create Favorite",
     description: "Create a new favorite character configuration",
@@ -174,6 +179,11 @@ export const translations = {
     },
     modifyCharacter: {
       label: "Modify Character",
+    },
+    character: {
+      name: "Name",
+      tagline: "Tagline",
+      description: "Description",
     },
   },
 };

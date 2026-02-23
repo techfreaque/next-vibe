@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: performanceStartTraceEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger }) =>
+    handler: ({ data, t, logger }) =>
       executeMCPTool(
         {
           toolName: "performance-start-trace",
@@ -21,6 +21,7 @@ export const { POST, tools } = endpointsHandler({
             autoStop: data.autoStop,
           }),
         },
+        t,
         logger,
       ),
   },

@@ -1,11 +1,14 @@
 export const translations = {
   email: {
+    tagline: "Free speech AI platform",
     footer: {
       needHelp: "Need help?",
       helpText: "Need help? Contact us at",
       unsubscribeText: "Don't want to receive these emails?",
       unsubscribeLink: "Unsubscribe",
       copyright: "© {{currentYear}} {{appName}}. All rights reserved.",
+      visitWebsite: "Visit Website",
+      allRightsReserved: "© {{currentYear}} {{appName}}. All rights reserved.",
     },
   },
   post: {

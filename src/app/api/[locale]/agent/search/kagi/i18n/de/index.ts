@@ -94,6 +94,12 @@ export const translations: typeof enTranslations = {
         description:
           "Wir konnten Ihre Suche nicht abschließen. Bitte versuchen Sie es erneut",
       },
+      notConfigured: {
+        title:
+          "{{label}} API-Schlüssel nicht konfiguriert. Fügen Sie {{envKey}}=<ihr-schlüssel> zu Ihrer .env-Datei hinzu. Holen Sie sich Ihren Schlüssel auf {{url}}",
+        description:
+          "Richten Sie {{label}} ein, um die Kagi-Suche zu aktivieren",
+      },
     },
     success: {
       title: "Suche erfolgreich",

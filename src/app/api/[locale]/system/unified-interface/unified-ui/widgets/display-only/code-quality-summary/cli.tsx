@@ -8,6 +8,7 @@ import { Box, Text } from "ink";
 import type { JSX } from "react";
 import type { z } from "zod";
 
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
@@ -17,7 +18,6 @@ import {
   useInkWidgetPlatform,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 import { CliIcon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/cli-icons";
-import { simpleT } from "@/i18n/core/shared";
 
 import type {
   CodeQualitySummarySchema,
@@ -44,7 +44,7 @@ export function CodeQualitySummaryWidgetInk<
   const value = field.value as z.output<CodeQualitySummarySchema> | undefined;
   const platform = useInkWidgetPlatform();
   const locale = useInkWidgetLocale();
-  const { t: globalT } = simpleT(locale);
+  const { t: globalT } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
   if (!value) {
     return <Box />;
@@ -60,44 +60,31 @@ export function CodeQualitySummaryWidgetInk<
 
   const filesDisplay =
     displayedFiles < totalFiles
-      ? `${displayedFiles} ${globalT("app.api.system.unifiedInterface.widgets.codeQualitySummary.of")} ${totalFiles}`
+      ? `${displayedFiles} ${globalT("widgets.codeQualitySummary.of")} ${totalFiles}`
       : totalFiles;
 
   const issuesDisplay =
     displayedIssues < totalIssues
-      ? `${displayedIssues} ${globalT("app.api.system.unifiedInterface.widgets.codeQualitySummary.of")} ${totalIssues}`
+      ? `${displayedIssues} ${globalT("widgets.codeQualitySummary.of")} ${totalIssues}`
       : totalIssues;
 
   // MCP uses plain text without icons/colors
   if (platform === Platform.MCP) {
     return (
       <Box flexDirection="column" marginTop={1} paddingX={1}>
-        <Text>
-          {globalT(
-            "app.api.system.unifiedInterface.widgets.codeQualitySummary.summary",
-          )}
-        </Text>
+        <Text>{globalT("widgets.codeQualitySummary.summary")}</Text>
         {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Separator decoration */}
         <Text>──────────────────────────────────────────────────</Text>
         <Box flexDirection="column">
           <Text>
-            {globalT(
-              "app.api.system.unifiedInterface.widgets.codeQualitySummary.files",
-            )}
-            : {filesDisplay}
+            {globalT("widgets.codeQualitySummary.files")}: {filesDisplay}
           </Text>
           <Text>
-            {globalT(
-              "app.api.system.unifiedInterface.widgets.codeQualitySummary.issues",
-            )}
-            : {issuesDisplay}
+            {globalT("widgets.codeQualitySummary.issues")}: {issuesDisplay}
           </Text>
           {totalErrors > 0 && (
             <Text>
-              {globalT(
-                "app.api.system.unifiedInterface.widgets.codeQualitySummary.errors",
-              )}
-              : {totalErrors}
+              {globalT("widgets.codeQualitySummary.errors")}: {totalErrors}
             </Text>
           )}
         </Box>
@@ -109,12 +96,7 @@ export function CodeQualitySummaryWidgetInk<
     <Box flexDirection="column" marginTop={1} paddingX={1}>
       <Box>
         <CliIcon icon="bar-chart" />
-        <Text bold>
-          {" "}
-          {globalT(
-            "app.api.system.unifiedInterface.widgets.codeQualitySummary.summary",
-          )}
-        </Text>
+        <Text bold> {globalT("widgets.codeQualitySummary.summary")}</Text>
       </Box>
       {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- Separator decoration */}
       <Text>──────────────────────────────────────────────────</Text>
@@ -123,20 +105,14 @@ export function CodeQualitySummaryWidgetInk<
           <CliIcon icon="folder" />
           <Text>
             {" "}
-            {globalT(
-              "app.api.system.unifiedInterface.widgets.codeQualitySummary.files",
-            )}
-            : {filesDisplay}
+            {globalT("widgets.codeQualitySummary.files")}: {filesDisplay}
           </Text>
         </Box>
         <Box>
           <CliIcon icon="alert" />
           <Text>
             {"  "}
-            {globalT(
-              "app.api.system.unifiedInterface.widgets.codeQualitySummary.issues",
-            )}
-            : {issuesDisplay}
+            {globalT("widgets.codeQualitySummary.issues")}: {issuesDisplay}
           </Text>
         </Box>
         {totalErrors > 0 && (
@@ -144,10 +120,7 @@ export function CodeQualitySummaryWidgetInk<
             <CliIcon icon="x-circle" color="red" />
             <Text color="red">
               {" "}
-              {globalT(
-                "app.api.system.unifiedInterface.widgets.codeQualitySummary.errors",
-              )}
-              : {totalErrors}
+              {globalT("widgets.codeQualitySummary.errors")}: {totalErrors}
             </Text>
           </Box>
         )}

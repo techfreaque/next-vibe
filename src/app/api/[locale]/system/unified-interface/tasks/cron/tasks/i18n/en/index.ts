@@ -3,6 +3,10 @@ export const translations = {
   tags: {
     tasks: "Tasks",
   },
+  errors: {
+    fetchCronTasks: "Failed to fetch cron tasks",
+    createCronTask: "Failed to create cron task",
+  },
   list: {
     columns: {
       createdAt: "Created At",

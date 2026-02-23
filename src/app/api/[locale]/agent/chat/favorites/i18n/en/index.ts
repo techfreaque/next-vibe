@@ -2,6 +2,10 @@ import { translations as idTranslations } from "../../[id]/i18n/en";
 
 export const translations = {
   id: idTranslations,
+  category: "Chat",
+  tags: {
+    favorites: "Favorites",
+  },
   fallbacks: {
     unknownCharacter: "Unknown Character",
     unknownModel: "Unknown Model",

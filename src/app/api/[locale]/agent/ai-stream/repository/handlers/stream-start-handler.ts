@@ -108,6 +108,7 @@ export class StreamStartHandler {
       logger,
       controller,
       encoder,
+      locale,
     });
 
     // Create streaming TTS handler if voice mode enabled

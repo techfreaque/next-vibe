@@ -2,10 +2,15 @@ import type { translations as enTranslations } from "../en";
 import { translations as componentsTranslations } from "../../_components/i18n/de";
 
 export const translations: typeof enTranslations = {
+  category: "Benutzer",
+
   _components: componentsTranslations,
   title: "Passwort-Reset Anfrage",
   description: "Passwort-Reset anfordern",
   tag: "Passwort-Reset",
+  actions: {
+    submitting: "Senden...",
+  },
   email: {
     title: "Setzen Sie Ihr {{appName}}-Passwort zurück",
     subject: "Anfrage zur Passwortzurücksetzung - {{appName}}",
@@ -104,6 +109,8 @@ export const translations: typeof enTranslations = {
       title: "Konflikt",
       description: "Datenkonflikt aufgetreten",
     },
+    no_email: "Kein Konto mit dieser E-Mail-Adresse gefunden",
+    email_generation_failed: "E-Mail konnte nicht generiert werden",
   },
   success: {
     title: "Anfrage gesendet",
@@ -157,6 +164,28 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Erfolg",
       description: "Vorgang erfolgreich abgeschlossen",
+    },
+  },
+  emailTemplates: {
+    request: {
+      name: "E-Mail zur Passwort-Reset-Anfrage",
+      description:
+        "E-Mail, die an Benutzer mit einem Link zum Zurücksetzen ihres Passworts gesendet wird",
+      category: "Authentifizierung",
+      preview: {
+        publicName: {
+          label: "Öffentlicher Name",
+          description: "Der öffentliche Anzeigename des Benutzers",
+        },
+        userId: {
+          label: "Benutzer-ID",
+          description: "Die eindeutige Kennung des Benutzers",
+        },
+        passwordResetUrl: {
+          label: "Passwort-Reset-URL",
+          description: "Die URL zum Zurücksetzen des Passworts",
+        },
+      },
     },
   },
 };

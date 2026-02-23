@@ -1,4 +1,8 @@
 export const translations = {
+  category: "Chat",
+  tags: {
+    messages: "Messages",
+  },
   post: {
     title: "Branch Message",
     description: "Create a new branch from this message",

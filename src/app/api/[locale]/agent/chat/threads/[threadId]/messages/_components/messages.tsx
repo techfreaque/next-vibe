@@ -134,6 +134,7 @@ export function ChatMessages({
         sequenceId: streamMsg.sequenceId ?? null,
         // Required fields with defaults
         authorId: null,
+        authorName: null,
         isAI: streamMsg.role === "assistant",
         errorType: null,
         errorMessage: null,

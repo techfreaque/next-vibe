@@ -7,7 +7,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  responseField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -16,23 +16,21 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../user/user-roles/enum";
+import { scopedTranslation } from "../../i18n";
 import { ReferralCodesListContainer } from "./widget";
 
 /**
  * GET endpoint for listing user's referral codes
  */
 export const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["referral", "codes", "list"],
-  title: "app.api.referral.codes.list.get.title",
-  description: "app.api.referral.codes.list.get.description",
-  category: "app.api.payment.category",
-  icon: "gift" as const,
-  tags: [
-    "app.api.referral.tags.referral",
-    "app.api.referral.tags.codes",
-    "app.api.referral.tags.list",
-  ],
+  title: "get.title",
+  description: "get.description",
+  category: "category",
+  icon: "gift",
+  tags: ["tags.referral", "tags.codes", "tags.list"],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
@@ -44,7 +42,7 @@ export const { GET } = createEndpoint({
     render: ReferralCodesListContainer,
     usage: { response: true } as const,
     children: {
-      codes: responseField({
+      codes: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.array(
           z.object({
@@ -80,45 +78,45 @@ export const { GET } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.referral.errors.validation.title",
-      description: "app.api.referral.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.referral.errors.notFound.title",
-      description: "app.api.referral.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.referral.errors.serverError.title",
-      description: "app.api.referral.errors.serverError.description",
+      title: "errors.serverError.title",
+      description: "errors.serverError.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.referral.errors.network.title",
-      description: "app.api.referral.errors.network.description",
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.referral.errors.unauthorized.title",
-      description: "app.api.referral.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.referral.errors.forbidden.title",
-      description: "app.api.referral.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.referral.errors.conflict.title",
-      description: "app.api.referral.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.referral.errors.unknown.title",
-      description: "app.api.referral.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.referral.errors.unsavedChanges.title",
-      description: "app.api.referral.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
   },
   successTypes: {
-    title: "app.api.referral.codes.list.success.title",
-    description: "app.api.referral.codes.list.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 });
 

@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Server Management",
+
   post: {
     title: "Dev",
     description: "Dev endpoint",

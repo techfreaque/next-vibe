@@ -12,7 +12,7 @@ export const { GET, POST, tools } = endpointsHandler({
 
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ user, logger, request }) => {
+    handler: async ({ user, logger, request, t }) => {
       // Resolve the current session token from cookie or Authorization header
       let currentToken: string | undefined;
       if (request) {
@@ -25,13 +25,13 @@ export const { GET, POST, tools } = endpointsHandler({
         const cookieStore = await cookies();
         currentToken = cookieStore.get(AUTH_TOKEN_COOKIE_NAME)?.value;
       }
-      return SessionManagementRepository.list(user, currentToken, logger);
+      return SessionManagementRepository.list(user, currentToken, logger, t);
     },
   },
 
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, logger }) =>
-      SessionManagementRepository.create(user, data.name, logger),
+    handler: ({ data, user, logger, locale, t }) =>
+      SessionManagementRepository.create(user, data.name, logger, locale, t),
   },
 });

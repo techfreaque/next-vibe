@@ -1,6 +1,11 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Chat",
+  tags: {
+    folders: "Ordner",
+  },
+
   get: {
     title: "Root-Ordner-Berechtigungen abrufen",
     description: "Berechtigungen für einen Root-Ordner berechnen",

@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,18 +20,20 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../user-roles/enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * POST /avatar - Upload avatar
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["user", "private", "me", "avatar"],
-  title: "app.api.user.private.me.avatar.upload.title" as const,
-  description: "app.api.user.private.me.avatar.upload.description" as const,
+  title: "upload.title",
+  description: "upload.description",
   icon: "user",
-  category: "app.api.user.category" as const,
-  tags: ["app.api.user.private.me.avatar.tag" as const],
+  category: "category",
+  tags: ["tag"],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
@@ -39,50 +41,38 @@ const { POST } = createEndpoint({
     UserRole.ADMIN,
     UserRole.AI_TOOL_OFF,
   ] as const,
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.user.private.me.avatar.upload.title" as const,
-      description: "app.api.user.private.me.avatar.upload.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "upload.title",
+    description: "upload.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === FILE UPLOAD SECTION ===
-      fileUpload: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.user.private.me.avatar.upload.groups.fileUpload.title" as const,
-          description:
-            "app.api.user.private.me.avatar.upload.groups.fileUpload.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { request: "data" },
-        {
-          file: requestField({
+      fileUpload: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "upload.groups.fileUpload.title",
+        description: "upload.groups.fileUpload.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { request: "data" },
+        children: {
+          file: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.FILE,
-            label:
-              "app.api.user.private.me.avatar.upload.fields.file.label" as const,
-            description:
-              "app.api.user.private.me.avatar.upload.fields.file.description" as const,
-            placeholder:
-              "app.api.user.private.me.avatar.upload.fields.file.placeholder" as const,
+            label: "upload.fields.file.label",
+            description: "upload.fields.file.description",
+            placeholder: "upload.fields.file.placeholder",
             columns: 12,
-            helpText:
-              "app.api.user.private.me.avatar.upload.fields.file.help" as const,
+            helpText: "upload.fields.file.help",
             schema: z
               .instanceof(File)
               .refine((file) => file.size <= 5 * 1024 * 1024, {
-                message:
-                  "app.api.user.private.me.avatar.upload.fields.file.validation.maxSize",
+                message: "upload.fields.file.validation.maxSize",
               })
               .refine((file) => file.type.startsWith("image/"), {
-                message:
-                  "app.api.user.private.me.avatar.upload.fields.file.validation.imageOnly",
+                message: "upload.fields.file.validation.imageOnly",
               })
               .refine(
                 (file) => {
@@ -95,125 +85,96 @@ const { POST } = createEndpoint({
                   return allowedTypes.includes(file.type);
                 },
                 {
-                  message:
-                    "app.api.user.private.me.avatar.upload.fields.file.validation.unsupportedFormat",
+                  message: "upload.fields.file.validation.unsupportedFormat",
                 },
               ),
           }),
         },
-      ),
+      }),
 
       // === RESPONSE FIELDS ===
-      response: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.user.private.me.avatar.upload.response.title" as const,
-          description:
-            "app.api.user.private.me.avatar.upload.response.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          success: responseField({
+      response: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "upload.response.title",
+        description: "upload.response.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          success: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.private.me.avatar.upload.response.success" as const,
+            content: "upload.response.success",
             schema: z.boolean(),
           }),
-          message: responseField({
+          message: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.private.me.avatar.upload.response.message" as const,
+            content: "upload.response.message",
             schema: z.string(),
           }),
-          avatarUrl: responseField({
+          avatarUrl: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.private.me.avatar.upload.response.avatarUrl" as const,
+            content: "upload.response.avatarUrl",
             schema: z.string().url().optional(),
           }),
-          uploadTime: responseField({
+          uploadTime: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.private.me.avatar.upload.response.uploadTime" as const,
+            content: "upload.response.uploadTime",
             schema: z.string().optional(),
           }),
-          nextSteps: responseField({
+          nextSteps: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.private.me.avatar.upload.response.nextSteps.item" as const,
+            content: "upload.response.nextSteps.item",
             schema: z.array(z.string()),
           }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.user.private.me.avatar.upload.errors.validation.title" as const,
-      description:
-        "app.api.user.private.me.avatar.upload.errors.validation.description" as const,
+      title: "upload.errors.validation.title",
+      description: "upload.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.user.private.me.avatar.upload.errors.unauthorized.title" as const,
-      description:
-        "app.api.user.private.me.avatar.upload.errors.unauthorized.description" as const,
+      title: "upload.errors.unauthorized.title",
+      description: "upload.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.user.private.me.avatar.upload.errors.internal.title" as const,
-      description:
-        "app.api.user.private.me.avatar.upload.errors.internal.description" as const,
+      title: "upload.errors.internal.title",
+      description: "upload.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.user.private.me.avatar.upload.errors.unknown.title" as const,
-      description:
-        "app.api.user.private.me.avatar.upload.errors.unknown.description" as const,
+      title: "upload.errors.unknown.title",
+      description: "upload.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.user.private.me.avatar.upload.errors.network.title" as const,
-      description:
-        "app.api.user.private.me.avatar.upload.errors.network.description" as const,
+      title: "upload.errors.network.title",
+      description: "upload.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.user.private.me.avatar.upload.errors.forbidden.title" as const,
-      description:
-        "app.api.user.private.me.avatar.upload.errors.forbidden.description" as const,
+      title: "upload.errors.forbidden.title",
+      description: "upload.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.user.private.me.avatar.upload.errors.notFound.title" as const,
-      description:
-        "app.api.user.private.me.avatar.upload.errors.notFound.description" as const,
+      title: "upload.errors.notFound.title",
+      description: "upload.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.user.private.me.avatar.upload.errors.unsaved.title" as const,
-      description:
-        "app.api.user.private.me.avatar.upload.errors.unsaved.description" as const,
+      title: "upload.errors.unsaved.title",
+      description: "upload.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.user.private.me.avatar.upload.errors.conflict.title" as const,
-      description:
-        "app.api.user.private.me.avatar.upload.errors.conflict.description" as const,
+      title: "upload.errors.conflict.title",
+      description: "upload.errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.user.private.me.avatar.upload.success.title" as const,
-    description:
-      "app.api.user.private.me.avatar.upload.success.description" as const,
+    title: "upload.success.title",
+    description: "upload.success.description",
   },
 
   // === EXAMPLES ===
@@ -281,13 +242,14 @@ const { POST } = createEndpoint({
  * DELETE /avatar - Delete avatar
  */
 const { DELETE } = createEndpoint({
+  scopedTranslation,
   method: Methods.DELETE,
   path: ["user", "private", "me", "avatar"],
-  title: "app.api.user.private.me.avatar.delete.title" as const,
-  description: "app.api.user.private.me.avatar.delete.description" as const,
+  title: "delete.title",
+  description: "delete.description",
   icon: "user-x" as const,
-  category: "app.api.user.category" as const,
-  tags: ["app.api.user.private.me.avatar.tag" as const],
+  category: "category",
+  tags: ["tag"],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
@@ -295,101 +257,76 @@ const { DELETE } = createEndpoint({
     UserRole.ADMIN,
     UserRole.AI_TOOL_OFF,
   ] as const,
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.user.private.me.avatar.delete.response.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.response.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { response: true },
-    {
-      success: responseField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "delete.response.title",
+    description: "delete.response.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { response: true },
+    children: {
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.user.private.me.avatar.delete.response.success" as const,
+        content: "delete.response.success",
         schema: z.boolean(),
       }),
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.user.private.me.avatar.delete.response.message" as const,
+        content: "delete.response.message",
         schema: z.string(),
       }),
-      nextSteps: responseField({
+      nextSteps: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.user.private.me.avatar.delete.response.nextSteps.item" as const,
+        content: "delete.response.nextSteps.item",
         schema: z.array(z.string()),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.user.private.me.avatar.delete.errors.validation.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.errors.validation.description" as const,
+      title: "delete.errors.validation.title",
+      description: "delete.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.user.private.me.avatar.delete.errors.unauthorized.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.errors.unauthorized.description" as const,
+      title: "delete.errors.unauthorized.title",
+      description: "delete.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.user.private.me.avatar.delete.errors.internal.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.errors.internal.description" as const,
+      title: "delete.errors.internal.title",
+      description: "delete.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.user.private.me.avatar.delete.errors.unknown.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.errors.unknown.description" as const,
+      title: "delete.errors.unknown.title",
+      description: "delete.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.user.private.me.avatar.delete.errors.network.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.errors.network.description" as const,
+      title: "delete.errors.network.title",
+      description: "delete.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.user.private.me.avatar.delete.errors.forbidden.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.errors.forbidden.description" as const,
+      title: "delete.errors.forbidden.title",
+      description: "delete.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.user.private.me.avatar.delete.errors.notFound.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.errors.notFound.description" as const,
+      title: "delete.errors.notFound.title",
+      description: "delete.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.user.private.me.avatar.delete.errors.unsaved.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.errors.unsaved.description" as const,
+      title: "delete.errors.unsaved.title",
+      description: "delete.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.user.private.me.avatar.delete.errors.conflict.title" as const,
-      description:
-        "app.api.user.private.me.avatar.delete.errors.conflict.description" as const,
+      title: "delete.errors.conflict.title",
+      description: "delete.errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.user.private.me.avatar.delete.success.title" as const,
-    description:
-      "app.api.user.private.me.avatar.delete.success.description" as const,
+    title: "delete.success.title",
+    description: "delete.success.description",
   },
 
   // === EXAMPLES ===

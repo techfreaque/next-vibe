@@ -13,6 +13,7 @@ import { Environment } from "next-vibe/shared/utils/env-util";
 
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { PaymentRepository } from "../../../repository";
 
@@ -26,11 +27,15 @@ const ERROR_METHOD_NOT_ALLOWED = "Method not allowed";
  * POST handler for NOWPayments webhooks
  * Processes incoming IPN webhook events from NOWPayments
  */
-export async function POST(request: NextRequest): Promise<NextResponse> {
+export async function POST(
+  request: NextRequest,
+  context: { params: Promise<{ locale: CountryLanguage }> },
+): Promise<NextResponse> {
+  const { locale } = await context.params;
   const logger = createEndpointLogger(
     env.NODE_ENV === Environment.DEVELOPMENT,
     Date.now(),
-    "en-GLOBAL", // Webhooks don't have locale context - use default global locale
+    locale,
   );
 
   try {
@@ -55,8 +60,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const result = await PaymentRepository.handleWebhook(
       body,
       signature,
+      locale,
       logger,
-      "nowpayments", // Specify provider
+      "nowpayments",
     );
 
     if (!result.success) {

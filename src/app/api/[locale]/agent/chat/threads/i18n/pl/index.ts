@@ -309,4 +309,13 @@ export const translations: typeof enTranslations = {
       daysAgo: "{{days}}d temu",
     },
   },
+  config: {
+    folders: {
+      private: "Prywatne czaty",
+      shared: "Udostępnione czaty",
+      public: "Publiczne czaty",
+      incognito: "Czaty incognito",
+      cron: "Wątki cron",
+    },
+  },
 };

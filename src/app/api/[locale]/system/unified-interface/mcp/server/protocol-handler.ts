@@ -13,6 +13,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { definitionsRegistry } from "../../shared/endpoints/definitions/registry";
+import { permissionsRegistry } from "../../shared/endpoints/permissions/registry";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import { Platform } from "../../shared/types/platform";
 import type { WidgetData } from "../../shared/widgets/widget-data";
@@ -211,7 +212,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     });
 
     // Initialize registry
-    await mcpRegistry.initialize(this.logger, this.locale);
+    await mcpRegistry.initialize(this.logger);
 
     const capabilities = {
       tools: true,
@@ -246,8 +247,16 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
       this.user,
     );
 
+    // MCP tool discovery is opt-in: only expose endpoints marked MCP_VISIBLE.
+    // Execution uses opt-out semantics (MCP_OFF/CLI_OFF), but listing is separate.
+    const discoverableEndpoints = endpoints.filter(
+      (endpoint) =>
+        permissionsRegistry.checkMcpDiscoveryAccess(endpoint.allowedRoles)
+          .allowed,
+    );
+
     // Convert to MCP tool format with proper JSON Schema and translated descriptions
-    const tools = endpoints.map((endpoint) =>
+    const tools = discoverableEndpoints.map((endpoint) =>
       endpointToMCPTool(endpoint, this.locale),
     );
 

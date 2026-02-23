@@ -30,6 +30,9 @@ import {
   generateFileHeader,
   writeGeneratedFile,
 } from "../shared/utils";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 // Type definitions
 interface EndpointRequestType {
@@ -46,22 +49,13 @@ interface EndpointResponseType {
 }
 
 /**
- * Endpoint Generator Repository Interface
- */
-interface EndpointGeneratorRepository {
-  generateEndpoint(
-    data: EndpointRequestType,
-    logger: EndpointLogger,
-  ): Promise<BaseResponseType<EndpointResponseType>>;
-}
-
-/**
  * Endpoint Generator Repository Implementation
  */
-class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
+class EndpointGeneratorRepositoryImpl {
   async generateEndpoint(
     data: EndpointRequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<BaseResponseType<EndpointResponseType>> {
     const startTime = Date.now();
 
@@ -125,7 +119,7 @@ class EndpointGeneratorRepositoryImpl implements EndpointGeneratorRepository {
       });
 
       return fail({
-        message: "app.api.system.generators.endpoints.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           duration,

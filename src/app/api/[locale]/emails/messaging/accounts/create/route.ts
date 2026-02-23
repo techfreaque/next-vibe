@@ -14,7 +14,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, user, logger }) =>
-      messagingAccountCreateRepository.createAccount(data, user, logger),
+    handler: ({ data, user, logger, t }) =>
+      messagingAccountCreateRepository.createAccount(data, user, logger, t),
   },
 });

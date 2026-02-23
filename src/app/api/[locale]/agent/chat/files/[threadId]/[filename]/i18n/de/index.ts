@@ -1,4 +1,8 @@
 export const translations = {
+  category: "Chat",
+  tags: {
+    files: "Dateien",
+  },
   get: {
     title: "Datei abrufen",
     description: "Hochgeladene Datei abrufen",

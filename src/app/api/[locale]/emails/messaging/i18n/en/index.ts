@@ -30,6 +30,13 @@ export const translations = {
       testing: "Testing",
     },
   },
+  send: {
+    errors: {
+      accountNotFound: "Messaging account {{accountId}} not found",
+      sendFailed: "Failed to send message",
+      unexpected: "Unexpected error sending message: {{error}}",
+    },
+  },
   accounts: {
     create: accountsCreateTranslations,
     edit: { id: accountsEditTranslations },

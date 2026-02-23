@@ -11,6 +11,6 @@ import { FilesReadRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: ({ data, logger }) => FilesReadRepository.read(data, logger),
+    handler: ({ data, logger, t }) => FilesReadRepository.read(data, logger, t),
   },
 });

@@ -1,4 +1,8 @@
 export const translations = {
+  category: "Emails",
+  tags: {
+    emails: "Emails",
+  },
   title: "Email Detail",
   description: "Retrieve a single email by its unique identifier",
   container: {

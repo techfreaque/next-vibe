@@ -16,7 +16,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
-import { simpleT } from "@/i18n/core/shared";
 
 import { ProductIds } from "../../products/repository-client";
 import { BillingInterval } from "../../subscription/enum";
@@ -29,6 +28,9 @@ import type {
   CheckoutRequestOutput,
   CheckoutResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Subscription Checkout Repository Interface
@@ -39,6 +41,7 @@ export interface SubscriptionCheckoutRepository {
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<CheckoutResponseOutput>>;
 }
 
@@ -54,15 +57,13 @@ export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutR
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<CheckoutResponseOutput>> {
     logger.debug("Function called - before try block", {
       userId: user?.id,
       locale,
     });
     try {
-      logger.debug("Step 1: Getting translation function");
-      const { t } = simpleT(locale);
-
       logger.debug("Step 2: Creating subscription checkout session", {
         userId: user.id,
         planId: data.planId,
@@ -102,8 +103,7 @@ export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutR
             subscriptionId: existingSubscription.data.id,
           });
           return fail({
-            message:
-              "app.api.payment.checkout.post.errors.alreadySubscribed.title",
+            message: t("post.errors.alreadySubscribed.title"),
             errorType: ErrorResponseTypes.BAD_REQUEST,
             messageParams: { userId: user.id },
           });
@@ -126,7 +126,7 @@ export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutR
 
       if (!userResult.success || !userResult.data) {
         return fail({
-          message: "app.api.payment.checkout.post.errors.notFound.title",
+          message: t("post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { userId: user.id },
         });
@@ -138,6 +138,7 @@ export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutR
         userResult.data.email || "",
         userResult.data.publicName || "",
         logger,
+        locale,
       );
 
       if (!customerResult.success) {
@@ -176,6 +177,7 @@ export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutR
         customerResult.data.customerId,
         logger,
         callbackToken,
+        locale,
       );
 
       if (!session.success) {
@@ -191,7 +193,7 @@ export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutR
         success: true,
         sessionId: session.data.sessionId,
         checkoutUrl: session.data.checkoutUrl,
-        message: t("app.api.payment.checkout.post.success.description"),
+        message: t("post.success.description"),
       });
     } catch (error) {
       const errorMessage =
@@ -204,7 +206,7 @@ export class SubscriptionCheckoutRepositoryImpl implements SubscriptionCheckoutR
         errorConstructor: error?.constructor?.name,
       });
       return fail({
-        message: "app.api.payment.checkout.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMessage },
       });

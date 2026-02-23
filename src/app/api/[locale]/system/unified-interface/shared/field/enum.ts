@@ -5,6 +5,7 @@
  * and Zod schema generation for the data-driven UI system.
  */
 
+import type { ExtractScopedTranslationKey } from "@/i18n/core/scoped-translation";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
 export interface EnumOptions<T extends Record<string, TranslationKey>> {
@@ -28,30 +29,29 @@ function createEnumObjectWithKeyValues<T extends Record<string, string>>(
   return result;
 }
 
-export function createEnumOptions<
-  const TTranslationKey extends string = TranslationKey,
-  const T extends Record<string, TTranslationKey> = Record<
-    string,
-    TTranslationKey
-  >,
->(
-  enumMap: T,
-): {
+interface EnumResult<T extends Record<string, string>> {
   enum: { readonly [K in keyof T]: T[K] };
-  options: Array<{ [K in keyof T]: { value: T[K]; label: T[K] } }[keyof T]>;
+  options: Array<{ value: T[keyof T]; label: T[keyof T] }>;
   Value: T[keyof T];
-} {
+}
+
+export function createEnumOptions<
+  const TScopeObj extends { ScopedTranslationKey: string },
+  const T extends Record<string, ExtractScopedTranslationKey<TScopeObj>>,
+  // oxlint-disable-next-line no-unused-vars
+>(scope: TScopeObj, enumMap: T): EnumResult<T> {
   const enumObj = createEnumObjectWithKeyValues(enumMap);
 
-  const optionsArray = Object.entries(enumMap).map(([, translationValue]) => ({
-    value: translationValue,
-    label: translationValue,
-  })) as Array<{ [K in keyof T]: { value: T[K]; label: T[K] } }[keyof T]>;
+  const optionsArray: Array<{ value: T[keyof T]; label: T[keyof T] }> =
+    Object.entries(enumMap).map(([, translationValue]) => ({
+      value: translationValue as T[keyof T],
+      label: translationValue as T[keyof T],
+    }));
 
   return {
     enum: enumObj,
     options: optionsArray,
-    // intentianally unsafe cast to get a enum value type
+    // intentionally unsafe cast to get a enum value type
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: Type placeholder for enum value extraction requires 'unknown' cast for type system compatibility. This is a compile-time only type, never used at runtime.
     Value: undefined as unknown as T[keyof T],
   };

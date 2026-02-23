@@ -7,11 +7,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  requestField,
-  responseField,
-  widgetField,
+  scopedBackButton,
+  scopedRequestField,
+  scopedResponseField,
+  scopedWidgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,23 +21,21 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../user/user-roles/enum";
+import { scopedTranslation } from "./i18n";
 import { UserViewContainer } from "./widget";
 
 /**
  * GET endpoint for viewing detailed user information
  */
 export const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["users", "view"],
-  title: "app.api.users.view.get.title",
-  description: "app.api.users.view.get.description",
-  category: "app.api.user.category",
+  title: "get.title",
+  description: "get.description",
+  category: "category",
   icon: "user" as const,
-  tags: [
-    "app.api.users.tags.user",
-    "app.api.users.tags.view",
-    "app.api.users.tags.stats",
-  ],
+  tags: ["tags.user" as const, "tags.view" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
   fields: customWidgetObject({
@@ -45,25 +43,27 @@ export const { GET } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // Request fields
-      userId: requestField({
+      userId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         schema: z.uuid(),
-        label: "app.api.users.view.get.userId.label" as const,
+        label: "get.userId.label" as const,
         hidden: true,
       }),
 
       // Top action buttons
-      backButton: backButton({ usage: { response: true } }),
+      backButton: scopedBackButton(scopedTranslation, {
+        usage: { response: true },
+      }),
 
-      title: widgetField({
+      title: scopedWidgetField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.users.view.get.title" as const,
+        content: "get.title" as const,
         usage: { response: true },
       }),
 
       // Basic User Information
-      basicInfo: responseField({
+      basicInfo: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.object({
           id: z.string(),
@@ -84,7 +84,7 @@ export const { GET } = createEndpoint({
       }),
 
       // Chat Activity Statistics
-      chatStats: responseField({
+      chatStats: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.object({
           totalThreads: z.coerce.number(),
@@ -98,7 +98,7 @@ export const { GET } = createEndpoint({
       }),
 
       // Credit Information
-      creditInfo: responseField({
+      creditInfo: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.object({
           currentBalance: z.coerce.number(),
@@ -112,7 +112,7 @@ export const { GET } = createEndpoint({
       }),
 
       // Payment & Revenue Statistics
-      paymentStats: responseField({
+      paymentStats: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.object({
           totalRevenueCents: z.coerce.number(),
@@ -127,7 +127,7 @@ export const { GET } = createEndpoint({
       }),
 
       // Newsletter Status
-      newsletterInfo: responseField({
+      newsletterInfo: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.object({
           isSubscribed: z.boolean(),
@@ -138,7 +138,7 @@ export const { GET } = createEndpoint({
       }),
 
       // Referral Statistics
-      referralStats: responseField({
+      referralStats: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.object({
           totalReferrals: z.coerce.number(),
@@ -149,7 +149,7 @@ export const { GET } = createEndpoint({
       }),
 
       // User Roles
-      roles: responseField({
+      roles: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.array(
           z.object({
@@ -160,7 +160,7 @@ export const { GET } = createEndpoint({
       }),
 
       // Recent Activity Summary
-      recentActivity: responseField({
+      recentActivity: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.object({
           lastLogin: z.coerce.date().nullable(),
@@ -254,46 +254,46 @@ export const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.users.view.errors.validation.title",
-      description: "app.api.users.view.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.users.view.errors.notFound.title",
-      description: "app.api.users.view.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.users.view.errors.serverError.title",
-      description: "app.api.users.view.errors.serverError.description",
+      title: "errors.serverError.title",
+      description: "errors.serverError.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.users.view.errors.network.title",
-      description: "app.api.users.view.errors.network.description",
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.users.view.errors.unauthorized.title",
-      description: "app.api.users.view.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.users.view.errors.forbidden.title",
-      description: "app.api.users.view.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.users.view.errors.conflict.title",
-      description: "app.api.users.view.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.users.view.errors.unknown.title",
-      description: "app.api.users.view.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.users.view.errors.unsavedChanges.title",
-      description: "app.api.users.view.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
   },
 
   successTypes: {
-    title: "app.api.users.view.success.title",
-    description: "app.api.users.view.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 });
 

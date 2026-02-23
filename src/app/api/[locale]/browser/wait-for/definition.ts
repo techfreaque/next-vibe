@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,17 +20,17 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["browser", "wait-for"],
-  title: "app.api.browser.wait-for.title",
-  description: "app.api.browser.wait-for.description",
-  category: "app.api.browser.category",
+  title: "wait-for.title",
+  description: "wait-for.description",
+  category: "wait-for.category",
   icon: "clock",
-  tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.waitAutomation",
-  ],
+  tags: ["wait-for.tags.browserAutomation", "wait-for.tags.waitAutomation"],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -40,31 +40,29 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.browser.wait-for.form.label",
-      description: "app.api.browser.wait-for.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      text: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "wait-for.form.label",
+    description: "wait-for.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      text: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.browser.wait-for.form.fields.text.label",
-        description: "app.api.browser.wait-for.form.fields.text.description",
-        placeholder: "app.api.browser.wait-for.form.fields.text.placeholder",
+        label: "wait-for.form.fields.text.label",
+        description: "wait-for.form.fields.text.description",
+        placeholder: "wait-for.form.fields.text.placeholder",
         columns: 8,
         schema: z.string().describe("Text to appear on the page"),
       }),
-      timeout: requestField({
+      timeout: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.browser.wait-for.form.fields.timeout.label",
-        description: "app.api.browser.wait-for.form.fields.timeout.description",
-        placeholder: "app.api.browser.wait-for.form.fields.timeout.placeholder",
+        label: "wait-for.form.fields.timeout.label",
+        description: "wait-for.form.fields.timeout.description",
+        placeholder: "wait-for.form.fields.timeout.placeholder",
         columns: 4,
         schema: z
           .number()
@@ -75,14 +73,14 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.wait-for.response.success",
+        content: "wait-for.response.success",
         schema: z.boolean().describe("Whether the wait operation succeeded"),
       }),
-      result: responseField({
+      result: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.wait-for.response.result",
+        content: "wait-for.response.result",
         schema: z
           .object({
             found: z.boolean().describe("Whether the text was found"),
@@ -94,27 +92,27 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Result of wait operation"),
       }),
-      error: responseField({
+      error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.wait-for.response.error",
+        content: "wait-for.response.error",
         schema: z
           .string()
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: responseField({
+      executionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.wait-for.response.executionId",
+        content: "wait-for.response.executionId",
         schema: z
           .string()
           .optional()
           .describe("Unique identifier for this execution"),
       }),
     },
-  ),
+  }),
   examples: {
     requests: {
-      default: { text: "Loading..." },
+      default: { text: "wait-for.Loading..." },
     },
     responses: {
       default: {
@@ -129,45 +127,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.browser.wait-for.errors.validation.title",
-      description: "app.api.browser.wait-for.errors.validation.description",
+      title: "wait-for.errors.validation.title",
+      description: "wait-for.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.browser.wait-for.errors.network.title",
-      description: "app.api.browser.wait-for.errors.network.description",
+      title: "wait-for.errors.network.title",
+      description: "wait-for.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.browser.wait-for.errors.unauthorized.title",
-      description: "app.api.browser.wait-for.errors.unauthorized.description",
+      title: "wait-for.errors.unauthorized.title",
+      description: "wait-for.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.browser.wait-for.errors.forbidden.title",
-      description: "app.api.browser.wait-for.errors.forbidden.description",
+      title: "wait-for.errors.forbidden.title",
+      description: "wait-for.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.browser.wait-for.errors.notFound.title",
-      description: "app.api.browser.wait-for.errors.notFound.description",
+      title: "wait-for.errors.notFound.title",
+      description: "wait-for.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.browser.wait-for.errors.serverError.title",
-      description: "app.api.browser.wait-for.errors.serverError.description",
+      title: "wait-for.errors.serverError.title",
+      description: "wait-for.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.browser.wait-for.errors.unknown.title",
-      description: "app.api.browser.wait-for.errors.unknown.description",
+      title: "wait-for.errors.unknown.title",
+      description: "wait-for.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.browser.wait-for.errors.unsavedChanges.title",
-      description: "app.api.browser.wait-for.errors.unsavedChanges.description",
+      title: "wait-for.errors.unsavedChanges.title",
+      description: "wait-for.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.browser.wait-for.errors.conflict.title",
-      description: "app.api.browser.wait-for.errors.conflict.description",
+      title: "wait-for.errors.conflict.title",
+      description: "wait-for.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.browser.wait-for.success.title",
-    description: "app.api.browser.wait-for.success.description",
+    title: "wait-for.success.title",
+    description: "wait-for.success.description",
   },
 });
 

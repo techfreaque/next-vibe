@@ -32,12 +32,14 @@ import {
   canPostInThread,
   canViewThread,
 } from "../../../permissions/permissions";
-import { validateNotIncognito } from "../../../validation";
 import type {
   MessageCreateRequestOutput,
   MessageCreateResponseOutput,
   MessageListResponseOutput,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
+
+type MessagesT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Calculate message depth from parent
@@ -232,6 +234,7 @@ export async function createUserMessage(params: {
     parentId: resolvedParentId,
     depth: resolvedDepth,
     authorId: params.userId ?? null,
+    authorName: params.authorName ?? null,
     isAI: false,
     metadata,
   });
@@ -359,6 +362,7 @@ export async function createTextMessage(params: {
   character: string;
   sequenceId: string | null;
   logger: EndpointLogger;
+  locale: CountryLanguage;
 }): Promise<ResponseType<void>> {
   try {
     await db.insert(chatMessages).values({
@@ -389,9 +393,9 @@ export async function createTextMessage(params: {
       character: params.character,
       model: params.model,
     });
+    const { t } = scopedTranslation.scopedT(params.locale);
     return fail({
-      message:
-        "app.api.agent.chat.threads.messages.post.errors.createFailed.title",
+      message: t("post.errors.createFailed.title"),
       errorType: ErrorResponseTypes.DATABASE_ERROR,
     });
   }
@@ -504,25 +508,6 @@ export function handleAnswerAsAiOperation<
 }
 
 /**
- * Messages Repository Interface
- */
-export interface MessagesRepositoryInterface {
-  listMessages(
-    data: { threadId: string },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<MessageListResponseOutput>>;
-
-  createMessage(
-    data: MessageCreateRequestOutput & { threadId: string },
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<MessageCreateResponseOutput>>;
-}
-
-/**
  * Messages Repository Implementation
  */
 export class MessagesRepository {
@@ -532,8 +517,9 @@ export class MessagesRepository {
   static async listMessages(
     data: { threadId: string },
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: MessagesT,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<MessageListResponseOutput>> {
     try {
       logger.debug("Listing messages", {
@@ -551,20 +537,17 @@ export class MessagesRepository {
 
       if (!thread) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.get.errors.notFound.title" as const,
+          message: t("get.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       // Reject incognito threads - they should never be accessed on server
-      const incognitoError = validateNotIncognito(
-        thread.rootFolderId,
-        locale,
-        "app.api.agent.chat.threads.threadId.messages.get",
-      );
-      if (incognitoError) {
-        return incognitoError;
+      if (thread.rootFolderId === "incognito") {
+        return fail({
+          message: t("get.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
       }
 
       // Get folder for permission check
@@ -578,10 +561,9 @@ export class MessagesRepository {
       }
 
       // Check read permission using permission system
-      if (!(await canViewThread(user, thread, folder, logger))) {
+      if (!(await canViewThread(user, thread, folder, logger, locale))) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.get.errors.forbidden.title" as const,
+          message: t("get.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -603,8 +585,7 @@ export class MessagesRepository {
     } catch (error) {
       logger.error("Error listing messages", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.messages.get.errors.server.title" as const,
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -618,8 +599,9 @@ export class MessagesRepository {
   static async createMessage(
     data: MessageCreateRequestOutput & { threadId: string },
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: MessagesT,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<MessageCreateResponseOutput>> {
     try {
       // Extract user identifier - use leadId for PUBLIC users, userId for authenticated
@@ -635,8 +617,7 @@ export class MessagesRepository {
         });
 
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.post.errors.forbidden.title" as const,
+          message: t("post.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -652,8 +633,7 @@ export class MessagesRepository {
         });
 
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.post.errors.forbidden.title" as const,
+          message: t("post.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -674,20 +654,17 @@ export class MessagesRepository {
 
       if (!thread) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.post.errors.notFound.title",
+          message: t("post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       // Reject incognito threads - they should never be accessed on server
-      const incognitoError = validateNotIncognito(
-        thread.rootFolderId,
-        locale,
-        "app.api.agent.chat.threads.threadId.messages.post",
-      );
-      if (incognitoError) {
-        return incognitoError;
+      if (thread.rootFolderId === "incognito") {
+        return fail({
+          message: t("post.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
       }
 
       // Get folder for permission check
@@ -701,10 +678,9 @@ export class MessagesRepository {
       }
 
       // Check write permission using permission system
-      if (!(await canPostInThread(user, thread, folder, logger))) {
+      if (!(await canPostInThread(user, thread, folder, logger, locale))) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.post.errors.forbidden.title" as const,
+          message: t("post.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -725,12 +701,10 @@ export class MessagesRepository {
 
         if (!parentMessage) {
           return fail({
-            message:
-              "app.api.agent.chat.threads.threadId.messages.post.errors.validation.title",
+            message: t("post.errors.validation.title"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
             messageParams: {
-              error:
-                "app.api.agent.chat.threads.threadId.messages.post.errors.validation.parentNotFound",
+              error: "Parent message not found",
             },
           });
         }
@@ -740,8 +714,7 @@ export class MessagesRepository {
 
       if (!data.message?.id) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.post.errors.validation.title",
+          message: t("post.errors.validation.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             message: "Message ID must be provided by client",
@@ -770,8 +743,7 @@ export class MessagesRepository {
 
       if (!message) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.post.errors.server.title",
+          message: t("post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -794,8 +766,7 @@ export class MessagesRepository {
     } catch (error) {
       logger.error("Error creating message", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.messages.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

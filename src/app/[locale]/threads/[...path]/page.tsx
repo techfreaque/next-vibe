@@ -29,13 +29,15 @@ import { ChatProvider } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ThreadByIdRepository } from "@/app/api/[locale]/agent/chat/threads/[threadId]/repository";
 import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { EnvAvailabilityProvider } from "@/app/api/[locale]/agent/env-availability-context";
+import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
+import { scopedTranslation as userScopedTranslation } from "@/app/api/[locale]/user/i18n";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 interface ThreadsPathPageProps {
   params: Promise<{
@@ -49,7 +51,8 @@ export default async function ThreadsPathPage({
 }: ThreadsPathPageProps): Promise<JSX.Element> {
   const { locale, path } = await params;
   const logger = createEndpointLogger(false, Date.now(), locale);
-  const { t } = simpleT(locale);
+  const { t } = userScopedTranslation.scopedT(locale);
+  const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
 
   // Get authenticated user
   const userResponse = await UserRepository.getUserByAuth(
@@ -63,7 +66,11 @@ export default async function ThreadsPathPage({
 
   const user = userResponse.success ? userResponse.data : undefined;
   if (!user) {
-    return <Div>{t("app.api.user.auth.errors.unknownError")}</Div>;
+    return <Div>{t("auth.errors.unknownError")}</Div>;
+  }
+
+  if (env.NEXT_PUBLIC_LOCAL_MODE && user.isPublic) {
+    redirect(`/${locale}/user/login`);
   }
 
   // Fetch credit balance for all users (both authenticated and public)
@@ -72,6 +79,7 @@ export default async function ThreadsPathPage({
     user,
     locale,
     logger,
+    creditsT,
   );
   const initialCredits = creditsResponse.success ? creditsResponse.data : null;
 

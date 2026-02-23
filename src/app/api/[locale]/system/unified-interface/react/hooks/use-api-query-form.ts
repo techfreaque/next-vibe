@@ -16,7 +16,9 @@ import { extractSchemaDefaults } from "@/app/api/[locale]/system/unified-interfa
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { useTranslation } from "@/i18n/core/client";
 
+import { scopedTranslation as hooksScopedTranslation } from "./i18n";
 import { buildKey } from "./query-key-builder";
 import type { ApiStore, FormQueryParams } from "./store";
 import { useApiStore } from "./store";
@@ -142,6 +144,8 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax, i18next/no-literal-string -- React hook requires throwing for missing required endpoint parameter
     throw new Error("Endpoint is required");
   }
+  const { locale } = useTranslation();
+  const { t: hooksT } = hooksScopedTranslation.scopedT(locale);
   const {
     autoSubmit = true,
     debounceMs = 500,
@@ -424,8 +428,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
       if (error) {
         // Convert Error to ErrorResponseType
         const errorResponse = fail({
-          message:
-            "app.api.system.unifiedInterface.react.hooks.queryForm.errors.validation_failed",
+          message: hooksT("queryForm.errors.validation_failed"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { formId, message: error.message },
         });
@@ -434,7 +437,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         setFormErrorStore(formId, null);
       }
     },
-    [setFormErrorStore, formId],
+    [setFormErrorStore, formId, hooksT],
   );
 
   // Use API query with form values as parameters from the store
@@ -730,8 +733,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         });
 
         const errorResponse = fail({
-          message:
-            "app.api.system.unifiedInterface.react.hooks.queryForm.errors.network_failure",
+          message: hooksT("queryForm.errors.network_failure"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { formId, error: errorMessage },
         });
@@ -766,8 +768,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         if (options.onError) {
           // Create a proper error response for validation errors with translation key
           const errorResponse = fail({
-            message:
-              "app.api.system.unifiedInterface.react.hooks.queryForm.errors.validation_failed",
+            message: hooksT("queryForm.errors.validation_failed"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
             messageParams: { formId, errors: JSON.stringify(errors) },
           });

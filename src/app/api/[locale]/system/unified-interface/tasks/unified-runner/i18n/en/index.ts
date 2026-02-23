@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Task Management",
+
   description: "Executes cron tasks and manages side tasks",
   common: {
     taskName: "Task Name",

@@ -3,8 +3,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,72 +21,74 @@ export const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["ssh", "session", "close"],
-  title: "session.close.post.title",
-  description: "session.close.post.description",
+  title: "session.close.post.title" as const,
+  description: "session.close.post.description" as const,
   icon: "terminal",
-  category: "category",
+  category: "category" as const,
   allowedRoles: [UserRole.ADMIN],
-  tags: ["type"],
+  tags: ["category" as const],
 
   fields: customWidgetObject({
     render: SessionCloseContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      sessionId: requestField({
+      sessionId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "session.close.post.fields.sessionId.label",
-        description: "session.close.post.fields.sessionId.description",
+        label: "session.close.post.fields.sessionId.label" as const,
+        description: "session.close.post.fields.sessionId.description" as const,
         schema: z.string(),
       }),
-      ok: responseField({
+      ok: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "session.close.post.response.ok.title",
+        content: "session.close.post.response.ok.title" as const,
         schema: z.boolean(),
       }),
     },
   }),
 
   successTypes: {
-    title: "session.close.post.success.title",
-    description: "session.close.post.success.description",
+    title: "session.close.post.success.title" as const,
+    description: "session.close.post.success.description" as const,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "session.close.post.errors.validation.title",
-      description: "session.close.post.errors.validation.description",
+      title: "session.close.post.errors.validation.title" as const,
+      description: "session.close.post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "session.close.post.errors.unauthorized.title",
-      description: "session.close.post.errors.unauthorized.description",
+      title: "session.close.post.errors.unauthorized.title" as const,
+      description:
+        "session.close.post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "session.close.post.errors.forbidden.title",
-      description: "session.close.post.errors.forbidden.description",
+      title: "session.close.post.errors.forbidden.title" as const,
+      description: "session.close.post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "session.close.post.errors.server.title",
-      description: "session.close.post.errors.server.description",
+      title: "session.close.post.errors.server.title" as const,
+      description: "session.close.post.errors.server.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "session.close.post.errors.notFound.title",
-      description: "session.close.post.errors.notFound.description",
+      title: "session.close.post.errors.notFound.title" as const,
+      description: "session.close.post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "session.close.post.errors.unknown.title",
-      description: "session.close.post.errors.unknown.description",
+      title: "session.close.post.errors.unknown.title" as const,
+      description: "session.close.post.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "session.close.post.errors.unsavedChanges.title",
-      description: "session.close.post.errors.unsavedChanges.description",
+      title: "session.close.post.errors.unsavedChanges.title" as const,
+      description:
+        "session.close.post.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "session.close.post.errors.conflict.title",
-      description: "session.close.post.errors.conflict.description",
+      title: "session.close.post.errors.conflict.title" as const,
+      description: "session.close.post.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "session.close.post.errors.network.title",
-      description: "session.close.post.errors.network.description",
+      title: "session.close.post.errors.network.title" as const,
+      description: "session.close.post.errors.network.description" as const,
     },
   },
   examples: {

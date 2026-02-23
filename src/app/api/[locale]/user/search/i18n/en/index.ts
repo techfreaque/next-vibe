@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Users",
+
   title: "User Search",
   description: "Search for users",
   tag: "User Search",

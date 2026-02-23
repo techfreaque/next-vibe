@@ -78,4 +78,9 @@ export const translations: typeof enTranslations = {
     title: "Leistungs-Insight erfolgreich analysiert",
     description: "Der Leistungs-Insight wurde erfolgreich analysiert",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    performanceAutomation: "Leistungs-Automatisierung",
+  },
 };

@@ -12,8 +12,8 @@ import type React from "react";
 import type { ReactNode } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation as leadsScopedTranslation } from "../i18n";
 import { LeadsNavigation } from "./leads-navigation";
 
 interface AdminLeadsLayoutClientProps {
@@ -35,7 +35,7 @@ export function AdminLeadsLayoutClient({
   locale,
 }: AdminLeadsLayoutClientProps): React.JSX.Element {
   const pathname = usePathname();
-  const { t } = simpleT(locale);
+  const { t } = leadsScopedTranslation.scopedT(locale);
 
   // Determine current page from pathname
   const getCurrentPage = (): CurrentPageType => {
@@ -65,7 +65,7 @@ export function AdminLeadsLayoutClient({
       <Div className="flex flex-col gap-4">
         <Div>
           <H1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            {t("app.admin.leads.leads.admin.title")}
+            {t("admin.title")}
           </H1>
         </Div>
 

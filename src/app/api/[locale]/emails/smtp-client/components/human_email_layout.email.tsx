@@ -18,6 +18,7 @@ import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
 
+import { scopedTranslation } from "../i18n";
 import { TrackedLink } from "./tracked_link.email";
 import { TrackedPixel } from "./tracked_pixel.email";
 import type { TrackingContext } from "./tracking_context.email";
@@ -46,6 +47,7 @@ export function HumanEmailLayout({
   t,
   tracking,
 }: HumanEmailLayoutProps): JSX.Element {
+  const { t: st } = scopedTranslation.scopedT(locale);
   return (
     <Html lang={locale.split("-")[0]}>
       <Head />
@@ -135,7 +137,7 @@ export function HumanEmailLayout({
                   fontStyle: "italic",
                 }}
               >
-                {t("app.api.emails.template.tagline")}
+                {st("components.email.tagline")}
               </div>
             </div>
 
@@ -147,7 +149,7 @@ export function HumanEmailLayout({
                 margin: "0 0 8px 0",
               }}
             >
-              {t("app.api.emails.smtpClient.components.email.footer.helpText")}{" "}
+              {st("components.email.footer.helpText")}{" "}
               <TrackedLink
                 href={`mailto:${companyEmail}`}
                 tracking={tracking}
@@ -168,9 +170,7 @@ export function HumanEmailLayout({
                 margin: "0",
               }}
             >
-              {t(
-                "app.api.emails.smtpClient.components.email.footer.unsubscribeText",
-              )}{" "}
+              {st("components.email.footer.unsubscribeText")}{" "}
               <TrackedLink
                 href={unsubscribeUrl}
                 tracking={tracking}
@@ -179,9 +179,7 @@ export function HumanEmailLayout({
                   textDecoration: "underline",
                 }}
               >
-                {t(
-                  "app.api.emails.smtpClient.components.email.footer.unsubscribeLink",
-                )}
+                {st("components.email.footer.unsubscribeLink")}
               </TrackedLink>
             </div>
 
@@ -193,13 +191,10 @@ export function HumanEmailLayout({
                 margin: "8px 0 0 0",
               }}
             >
-              {t(
-                "app.api.emails.smtpClient.components.email.footer.copyright",
-                {
-                  currentYear: new Date().getFullYear(),
-                  companyName,
-                },
-              )}
+              {st("components.email.footer.copyright", {
+                currentYear: new Date().getFullYear(),
+                companyName,
+              })}
             </div>
           </Section>
         </Container>

@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,16 +20,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["browser", "get-network-request"],
-  title: "app.api.browser.get-network-request.title",
-  description: "app.api.browser.get-network-request.description",
-  category: "app.api.browser.category",
+  title: "get-network-request.title",
+  description: "get-network-request.description",
+  category: "get-network-request.category",
   icon: "network",
   tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.networkAnalysis",
+    "get-network-request.tags.browserAutomation",
+    "get-network-request.tags.networkAnalysis",
   ],
 
   allowedRoles: [
@@ -40,24 +43,20 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.browser.get-network-request.form.label",
-      description: "app.api.browser.get-network-request.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      reqid: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "get-network-request.form.label",
+    description: "get-network-request.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      reqid: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.browser.get-network-request.form.fields.reqid.label",
-        description:
-          "app.api.browser.get-network-request.form.fields.reqid.description",
-        placeholder:
-          "app.api.browser.get-network-request.form.fields.reqid.placeholder",
+        label: "get-network-request.form.fields.reqid.label",
+        description: "get-network-request.form.fields.reqid.description",
+        placeholder: "get-network-request.form.fields.reqid.placeholder",
         columns: 6,
         schema: z
           .number()
@@ -68,18 +67,18 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.get-network-request.response.success",
+        content: "get-network-request.response.success",
         schema: z
           .boolean()
           .describe(
             "Whether the network request retrieval operation succeeded",
           ),
       }),
-      result: responseField({
+      result: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.get-network-request.response.result",
+        content: "get-network-request.response.result",
         schema: z
           .object({
             found: z.boolean().describe("Whether the request was found"),
@@ -99,24 +98,24 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Result of the network request retrieval"),
       }),
-      error: responseField({
+      error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.get-network-request.response.error",
+        content: "get-network-request.response.error",
         schema: z
           .string()
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: responseField({
+      executionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.get-network-request.response.executionId",
+        content: "get-network-request.response.executionId",
         schema: z
           .string()
           .optional()
           .describe("Unique identifier for this execution"),
       }),
     },
-  ),
+  }),
   examples: {
     requests: {
       default: { reqid: 456 },
@@ -139,54 +138,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.browser.get-network-request.errors.validation.title",
-      description:
-        "app.api.browser.get-network-request.errors.validation.description",
+      title: "get-network-request.errors.validation.title",
+      description: "get-network-request.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.browser.get-network-request.errors.network.title",
-      description:
-        "app.api.browser.get-network-request.errors.network.description",
+      title: "get-network-request.errors.network.title",
+      description: "get-network-request.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.browser.get-network-request.errors.unauthorized.title",
-      description:
-        "app.api.browser.get-network-request.errors.unauthorized.description",
+      title: "get-network-request.errors.unauthorized.title",
+      description: "get-network-request.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.browser.get-network-request.errors.forbidden.title",
-      description:
-        "app.api.browser.get-network-request.errors.forbidden.description",
+      title: "get-network-request.errors.forbidden.title",
+      description: "get-network-request.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.browser.get-network-request.errors.notFound.title",
-      description:
-        "app.api.browser.get-network-request.errors.notFound.description",
+      title: "get-network-request.errors.notFound.title",
+      description: "get-network-request.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.browser.get-network-request.errors.serverError.title",
-      description:
-        "app.api.browser.get-network-request.errors.serverError.description",
+      title: "get-network-request.errors.serverError.title",
+      description: "get-network-request.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.browser.get-network-request.errors.unknown.title",
-      description:
-        "app.api.browser.get-network-request.errors.unknown.description",
+      title: "get-network-request.errors.unknown.title",
+      description: "get-network-request.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.browser.get-network-request.errors.unsavedChanges.title",
-      description:
-        "app.api.browser.get-network-request.errors.unsavedChanges.description",
+      title: "get-network-request.errors.unsavedChanges.title",
+      description: "get-network-request.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.browser.get-network-request.errors.conflict.title",
-      description:
-        "app.api.browser.get-network-request.errors.conflict.description",
+      title: "get-network-request.errors.conflict.title",
+      description: "get-network-request.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.browser.get-network-request.success.title",
-    description: "app.api.browser.get-network-request.success.description",
+    title: "get-network-request.success.title",
+    description: "get-network-request.success.description",
   },
 });
 

@@ -1,6 +1,11 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Chat",
+  tags: {
+    threads: "Wątki",
+    permissions: "Uprawnienia",
+  },
   get: {
     title: "Pobierz uprawnienia wątku",
     description: "Pobierz listę moderatorów dla konkretnego wątku",

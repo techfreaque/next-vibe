@@ -1,5 +1,6 @@
 import { translations as aiStreamTranslations } from "../../ai-stream/i18n/en";
 import { translations as chatTranslations } from "../../chat/i18n/en";
+import { translations as openrouterTranslations } from "../../models/openrouter/i18n/en";
 import { translations as searchTranslations } from "../../search/i18n/en";
 import { translations as speechToTextTranslations } from "../../speech-to-text/i18n/en";
 import { translations as textToSpeechTranslations } from "../../text-to-speech/i18n/en";
@@ -124,9 +125,38 @@ export const translations = {
       approve: "Approve",
       reject: "Reject",
     },
+    modelUtilities: {
+      chat: "Chat",
+      coding: "Coding",
+      creative: "Creative Writing",
+      analysis: "Analysis",
+      reasoning: "Reasoning",
+      roleplay: "Roleplay",
+      fast: "Fast",
+      smart: "Smart",
+      vision: "Vision",
+      imageGen: "Image Generation",
+      politicalLeft: "Political Left",
+      politicalRight: "Political Right",
+      controversial: "Controversial",
+      adultImplied: "Adult (Implied)",
+      adultExplicit: "Adult (Explicit)",
+      violence: "Violence",
+      harmful: "Harmful Content",
+      illegalInfo: "Illegal Information",
+      medicalAdvice: "Medical Advice",
+      offensiveLanguage: "Offensive Language",
+      roleplayDark: "Dark Roleplay",
+      conspiracy: "Conspiracy",
+      legacy: "Legacy",
+      uncensored: "Uncensored",
+    },
   },
   aiStream: aiStreamTranslations,
   chat: chatTranslations,
+  models: {
+    openrouter: openrouterTranslations,
+  },
   search: searchTranslations,
   speechToText: speechToTextTranslations,
   textToSpeech: textToSpeechTranslations,

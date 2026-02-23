@@ -22,12 +22,16 @@ import type {
   ConnectionTestRequestOutput,
   ConnectionTestResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 export class ConnectionTestRepository {
   static async test(
     data: ConnectionTestRequestOutput,
     logger: EndpointLogger,
     user: JwtPayloadType,
+    t: ModuleT,
   ): Promise<ResponseType<ConnectionTestResponseOutput>> {
     try {
       const [row] = await db
@@ -46,7 +50,7 @@ export class ConnectionTestRepository {
 
       if (!row) {
         return fail({
-          message: "Connection not found",
+          message: t("errors.connectionNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -55,14 +59,13 @@ export class ConnectionTestRepository {
       logger.info(`SSH test stub for connection ${row.id} to ${row.host}`);
 
       return fail({
-        message:
-          "SSH backend not yet implemented. Cannot test remote connections yet.",
+        message: t("errors.notImplemented.test"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     } catch (error) {
       logger.error("Failed to test SSH connection", parseError(error));
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

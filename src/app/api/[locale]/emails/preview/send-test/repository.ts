@@ -18,10 +18,12 @@ import { CampaignType } from "@/app/api/[locale]/emails/smtp-client/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Countries, Languages } from "@/i18n/core/config";
 import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
-import { simpleT } from "@/i18n/core/shared";
 
+import type { scopedTranslation } from "../../i18n";
 import { getTemplate } from "../../registry/generated";
 import { createTrackingContext } from "../../smtp-client/components/tracking_context.email";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 // Type definitions
 export interface SendTestRequestType {
@@ -44,6 +46,7 @@ interface EmailPreviewSendTestRepository {
   sendTest(
     data: SendTestRequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<BaseResponseType<SendTestResponseType>>;
 }
 
@@ -54,6 +57,7 @@ class EmailPreviewSendTestRepositoryImpl implements EmailPreviewSendTestReposito
   async sendTest(
     data: SendTestRequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<BaseResponseType<SendTestResponseType>> {
     try {
       logger.debug("Sending test email", {
@@ -69,7 +73,7 @@ class EmailPreviewSendTestRepositoryImpl implements EmailPreviewSendTestReposito
       if (!template) {
         logger.warn("Template not found", { templateId: data.templateId });
         return fail({
-          message: "app.api.emails.preview.sendTest.error.templateNotFound",
+          message: t("preview.sendTest.error.templateNotFound"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             templateId: data.templateId,
@@ -83,8 +87,8 @@ class EmailPreviewSendTestRepositoryImpl implements EmailPreviewSendTestReposito
         data.country,
       );
 
-      // Get translation function
-      const { t } = simpleT(locale);
+      // Get scoped t for this template's own module scope
+      const { t: templateT } = template.scopedTranslation.scopedT(locale);
 
       // Validate and render the email component
       // TypeScript can't verify the props match because EmailTemplateDefinition uses generics
@@ -94,7 +98,7 @@ class EmailPreviewSendTestRepositoryImpl implements EmailPreviewSendTestReposito
         const validatedProps = template.schema.parse(data.props);
         jsx = template.component({
           props: validatedProps as never,
-          t,
+          t: templateT as never,
           locale,
           recipientEmail: data.recipientEmail,
           tracking: createTrackingContext(locale),
@@ -106,7 +110,7 @@ class EmailPreviewSendTestRepositoryImpl implements EmailPreviewSendTestReposito
           error: errorParsed,
         });
         return fail({
-          message: "app.api.emails.preview.sendTest.error.invalidProps",
+          message: t("preview.sendTest.error.invalidProps"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             error: errorParsed.message,
@@ -115,9 +119,7 @@ class EmailPreviewSendTestRepositoryImpl implements EmailPreviewSendTestReposito
       }
 
       // Get subject
-      const subjectRaw = template.meta.defaultSubject;
-      const subject =
-        typeof subjectRaw === "function" ? subjectRaw(t) : subjectRaw;
+      const subject = templateT(template.meta.defaultSubject as never);
 
       // Send email using existing email sending infrastructure
       const sendResult = await EmailSendingRepository.sendEmail(
@@ -128,12 +130,12 @@ class EmailPreviewSendTestRepositoryImpl implements EmailPreviewSendTestReposito
             toEmail: data.recipientEmail,
             toName: data.recipientEmail,
             locale,
-            t,
             campaignType: CampaignType.SYSTEM, // Test emails are system emails
             skipRateLimitCheck: true, // Skip rate limiting for test emails
           },
         },
         logger,
+        locale,
       );
 
       if (!sendResult.success) {
@@ -142,7 +144,7 @@ class EmailPreviewSendTestRepositoryImpl implements EmailPreviewSendTestReposito
           error: sendResult.message,
         });
         return fail({
-          message: "app.api.emails.preview.sendTest.error.sendFailed",
+          message: t("preview.sendTest.error.sendFailed"),
           errorType: ErrorResponseTypes.EMAIL_ERROR,
           messageParams: {
             error: sendResult.message,
@@ -159,7 +161,7 @@ class EmailPreviewSendTestRepositoryImpl implements EmailPreviewSendTestReposito
 
       return success({
         success: true,
-        message: t("app.api.emails.preview.sendTest.success", {
+        message: t("preview.sendTest.success", {
           email: data.recipientEmail,
         }),
       });
@@ -170,7 +172,7 @@ class EmailPreviewSendTestRepositoryImpl implements EmailPreviewSendTestReposito
         templateId: data.templateId,
       });
       return fail({
-        message: "app.api.emails.preview.sendTest.error.sendFailed",
+        message: t("preview.sendTest.error.sendFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: errorParsed.message,

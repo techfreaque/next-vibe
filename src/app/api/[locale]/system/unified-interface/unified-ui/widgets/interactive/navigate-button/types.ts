@@ -72,4 +72,5 @@ export interface NavigateButtonWidgetConfig<
   popNavigationOnSuccess?: number;
   iconSize?: "xs" | "sm" | "base" | "lg";
   iconSpacing?: SpacingSize;
+  loadingText?: NoInfer<TKey>;
 }

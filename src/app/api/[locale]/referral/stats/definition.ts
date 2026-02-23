@@ -8,7 +8,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  responseField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -17,19 +17,21 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../user/user-roles/enum";
+import { scopedTranslation } from "../i18n";
 import { ReferralStatsContainer } from "./widget";
 
 /**
  * GET endpoint for referral stats
  */
 export const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["referral", "stats"],
-  title: "app.api.referral.stats.get.title",
-  description: "app.api.referral.stats.get.description",
-  category: "app.api.payment.category",
-  icon: "trending-up" as const,
-  tags: ["app.api.referral.tags.referral", "app.api.referral.tags.get"],
+  title: "get.title",
+  description: "get.description",
+  category: "category",
+  icon: "trending-up",
+  tags: ["tags.referral", "tags.get"],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
@@ -41,54 +43,54 @@ export const { GET } = createEndpoint({
     render: ReferralStatsContainer,
     usage: { response: true } as const,
     children: {
-      totalSignupsTitle: responseField({
+      totalSignupsTitle: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
       }),
-      totalSignupsValue: responseField({
+      totalSignupsValue: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.coerce.number(),
       }),
-      totalSignupsDescription: responseField({
+      totalSignupsDescription: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
       }),
 
-      totalRevenueTitle: responseField({
+      totalRevenueTitle: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
       }),
-      totalRevenueValue: responseField({
+      totalRevenueValue: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.coerce.number(),
       }),
-      totalRevenueDescription: responseField({
+      totalRevenueDescription: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
       }),
 
-      totalEarnedTitle: responseField({
+      totalEarnedTitle: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
       }),
-      totalEarnedValue: responseField({
+      totalEarnedValue: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.coerce.number(),
       }),
-      totalEarnedDescription: responseField({
+      totalEarnedDescription: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
       }),
 
-      availableCreditsTitle: responseField({
+      availableCreditsTitle: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
       }),
-      availableCreditsValue: responseField({
+      availableCreditsValue: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.coerce.number(),
       }),
-      availableCreditsDescription: responseField({
+      availableCreditsDescription: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
       }),
@@ -98,71 +100,67 @@ export const { GET } = createEndpoint({
   examples: {
     responses: {
       default: {
-        totalSignupsTitle: "app.api.referral.stats.fields.totalSignups",
+        totalSignupsTitle: "fields.totalSignups",
         totalSignupsValue: 10,
-        totalSignupsDescription:
-          "app.api.referral.stats.fields.totalSignupsDescription",
+        totalSignupsDescription: "fields.totalSignupsDescription",
 
-        totalRevenueTitle: "app.api.referral.stats.fields.totalRevenue",
+        totalRevenueTitle: "fields.totalRevenue",
         totalRevenueValue: 8000,
-        totalRevenueDescription:
-          "app.api.referral.stats.fields.totalRevenueDescription",
+        totalRevenueDescription: "fields.totalRevenueDescription",
 
-        totalEarnedTitle: "app.api.referral.stats.fields.totalEarned",
+        totalEarnedTitle: "fields.totalEarned",
         totalEarnedValue: 1600,
-        totalEarnedDescription:
-          "app.api.referral.stats.fields.totalEarnedDescription",
+        totalEarnedDescription: "fields.totalEarnedDescription",
 
-        availableCreditsTitle: "app.api.referral.stats.fields.availableBalance",
+        availableCreditsTitle: "fields.availableBalance",
         availableCreditsValue: 1600,
-        availableCreditsDescription:
-          "app.api.referral.stats.fields.availableBalanceDescription",
+        availableCreditsDescription: "fields.availableBalanceDescription",
       },
     },
   },
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.referral.errors.validation.title",
-      description: "app.api.referral.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.referral.errors.network.title",
-      description: "app.api.referral.errors.network.description",
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.referral.errors.unauthorized.title",
-      description: "app.api.referral.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.referral.errors.forbidden.title",
-      description: "app.api.referral.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.referral.errors.notFound.title",
-      description: "app.api.referral.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.referral.errors.serverError.title",
-      description: "app.api.referral.errors.serverError.description",
+      title: "errors.serverError.title",
+      description: "errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.referral.errors.unknown.title",
-      description: "app.api.referral.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.referral.errors.unsavedChanges.title",
-      description: "app.api.referral.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.referral.errors.conflict.title",
-      description: "app.api.referral.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.referral.stats.success.title",
-    description: "app.api.referral.stats.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 });
 

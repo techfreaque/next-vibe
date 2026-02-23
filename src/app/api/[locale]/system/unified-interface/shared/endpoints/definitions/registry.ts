@@ -28,6 +28,8 @@ export interface SerializableToolMetadata {
   allowedRoles: UserRoleValue[];
   aliases?: string[];
   requiresConfirmation?: boolean;
+  /** Credit cost for this endpoint (only present when > 0) */
+  credits?: number;
   /** Raw examples from the endpoint definition (requests + urlPathParams merged, responses keyed by example name) */
   examples?: {
     /** Merged request data + url path params — what the caller passes as flat args */
@@ -235,6 +237,9 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
           : [],
         aliases: definition.aliases ? [...definition.aliases] : undefined,
         requiresConfirmation: definition.requiresConfirmation,
+        ...(definition.credits && definition.credits > 0
+          ? { credits: definition.credits }
+          : {}),
         examples: definition.examples
           ? {
               inputs: DefinitionsRegistry.mergeExampleInputs(

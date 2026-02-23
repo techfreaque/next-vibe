@@ -63,4 +63,9 @@ export const translations: typeof enTranslations = {
     title: "Leistungs-Trace erfolgreich gestoppt",
     description: "Der Leistungs-Trace wurde erfolgreich gestoppt",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    performanceAutomation: "Leistungs-Automatisierung",
+  },
 };

@@ -19,6 +19,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { sessions } from "../session/db";
 import type { SessionDeleteResponseOutput } from "./[id]/definition";
@@ -26,6 +27,9 @@ import type {
   SessionsGetResponseOutput,
   SessionsPostResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 export class SessionManagementRepository {
   /**
@@ -36,6 +40,7 @@ export class SessionManagementRepository {
     user: JwtPrivatePayloadType,
     currentToken: string | undefined,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SessionsGetResponseOutput>> {
     try {
       const rows = await db
@@ -61,7 +66,7 @@ export class SessionManagementRepository {
     } catch (error) {
       logger.error("Failed to list sessions", parseError(error));
       return fail({
-        message: "app.api.user.private.sessions.create.errors.server.title",
+        message: t("create.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -76,6 +81,8 @@ export class SessionManagementRepository {
     user: JwtPrivatePayloadType,
     name: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
+    t: ModuleT,
   ): Promise<ResponseType<SessionsPostResponseOutput>> {
     try {
       const payload: JwtPrivatePayloadType = {
@@ -85,7 +92,7 @@ export class SessionManagementRepository {
         roles: [UserPermissionRole.CUSTOMER],
       };
 
-      const tokenResult = await AuthRepository.signJwt(payload, logger);
+      const tokenResult = await AuthRepository.signJwt(payload, logger, locale);
       if (!tokenResult.success) {
         return tokenResult;
       }
@@ -109,12 +116,12 @@ export class SessionManagementRepository {
         token,
         id: row.id,
         sessionName: name,
-        message: "app.api.user.private.sessions.create.response.message",
+        message: t("create.response.message"),
       });
     } catch (error) {
       logger.error("Failed to create named session", parseError(error));
       return fail({
-        message: "app.api.user.private.sessions.create.errors.server.title",
+        message: t("create.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -128,6 +135,7 @@ export class SessionManagementRepository {
     user: JwtPrivatePayloadType,
     sessionId: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SessionDeleteResponseOutput>> {
     try {
       const deleted = await db
@@ -137,7 +145,7 @@ export class SessionManagementRepository {
 
       if (deleted.length === 0) {
         return fail({
-          message: "app.api.user.private.sessions.revoke.errors.notFound.title",
+          message: t("revoke.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { sessionId },
         });
@@ -146,12 +154,12 @@ export class SessionManagementRepository {
       logger.info("Session revoked", { userId: user.id, sessionId });
 
       return success({
-        message: "app.api.user.private.sessions.revoke.response.message",
+        message: t("revoke.response.message"),
       });
     } catch (error) {
       logger.error("Failed to revoke session", parseError(error));
       return fail({
-        message: "app.api.user.private.sessions.create.errors.server.title",
+        message: t("create.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

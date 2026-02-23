@@ -12,6 +12,7 @@ import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { chatFolders, chatThreads } from "../../../db";
 import { canViewThread } from "../../../permissions/permissions";
@@ -31,6 +32,7 @@ export class ChatFileRepository {
     data: FileRequestParams,
     user: JwtPayloadType | undefined,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<FileResult> {
     if (agentEnv.CHAT_STORAGE_TYPE !== "filesystem") {
       logger.error("File serving only available for filesystem storage");
@@ -80,7 +82,13 @@ export class ChatFileRepository {
       }
 
       // Check thread access permissions - same logic as thread endpoint
-      const hasAccess = await canViewThread(user, thread, folder, logger);
+      const hasAccess = await canViewThread(
+        user,
+        thread,
+        folder,
+        logger,
+        locale,
+      );
 
       if (!hasAccess) {
         logger.error("User does not have permission to access file", {

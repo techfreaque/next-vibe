@@ -20,6 +20,9 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import { ModelId, type ModelOption, modelOptions } from "../models";
 import type { OpenRouterModelsGetResponseOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 interface OpenRouterModel {
   id: string;
@@ -40,6 +43,7 @@ const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/models";
 export class OpenRouterModelsRepository {
   static async fetchModels(
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<OpenRouterModelsGetResponseOutput>> {
     try {
       logger.info("Fetching models from OpenRouter API", {
@@ -59,8 +63,7 @@ export class OpenRouterModelsRepository {
         });
 
         return fail({
-          message:
-            "app.api.agent.models.openrouter.get.errors.server.title" as const,
+          message: t("get.errors.server.title"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
           messageParams: {
             status: response.status,
@@ -266,8 +269,7 @@ export class OpenRouterModelsRepository {
       logger.error("Failed to fetch OpenRouter models", parsedError);
 
       return fail({
-        message:
-          "app.api.agent.models.openrouter.get.errors.unknown.title" as const,
+        message: t("get.errors.unknown.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,

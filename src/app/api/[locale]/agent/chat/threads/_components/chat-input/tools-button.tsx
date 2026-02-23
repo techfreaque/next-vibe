@@ -8,6 +8,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React from "react";
 
+import { DEFAULT_TOOL_IDS } from "@/app/api/[locale]/agent/chat/constants";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useToolsModalStore } from "@/app/api/[locale]/agent/tools/store";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -26,13 +27,13 @@ export function ToolsButton({
   disabled = false,
   locale,
 }: ToolsButtonProps): JSX.Element {
-  const { enabledTools, totalToolCount } = useChatContext();
+  const { enabledTools } = useChatContext();
   const openToolsModal = useToolsModalStore((state) => state.open);
-  // null = default (all tools enabled), show total count
-  // customized = show count of enabled tools
+  // null = default: DEFAULT_TOOL_IDS are pinned (active)
+  // customized: count tools with active=true
   const activeToolCount = enabledTools
-    ? enabledTools.filter((t) => t.active).length
-    : totalToolCount;
+    ? enabledTools.filter((t) => t.pinned).length
+    : DEFAULT_TOOL_IDS.length;
   const { t } = simpleT(locale);
 
   return (

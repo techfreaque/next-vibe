@@ -7,9 +7,12 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
+import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
 import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
+
+import { scopedTranslation } from "../i18n";
 
 interface ErrorMessageBubbleProps {
   message: ChatMessage;
@@ -18,7 +21,9 @@ interface ErrorMessageBubbleProps {
 export function ErrorMessageBubble({
   message,
 }: ErrorMessageBubbleProps): JSX.Element {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const { t: ts } = scopedTranslation.scopedT(locale);
+  const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
 
   let errorData: ErrorResponseType | null = null;
   let displayContent: string;
@@ -33,7 +38,7 @@ export function ErrorMessageBubble({
 
       // Also translate the error type if available
       if (parsed.errorType?.errorKey) {
-        errorTypeDisplay = t(parsed.errorType.errorKey);
+        errorTypeDisplay = sharedT(parsed.errorType.errorKey);
       }
 
       // Handle nested causes
@@ -72,8 +77,7 @@ export function ErrorMessageBubble({
               </Div>
               {errorData?.errorType?.errorCode && (
                 <Span className="text-xs text-red-600 dark:text-red-400">
-                  {t("app.api.agent.chat.threads.messages.errorCode")}:{" "}
-                  {errorData.errorType.errorCode}
+                  {ts("errorCode")}: {errorData.errorType.errorCode}
                 </Span>
               )}
             </Div>
@@ -94,7 +98,7 @@ function translateErrorRecursive(
   error: ErrorResponseType,
   t: (key: TranslationKey, params?: Record<string, string | number>) => string,
 ): string {
-  const mainMessage = t(error.message as TranslationKey, error.messageParams);
+  const mainMessage = t(error.message, error.messageParams);
 
   if (error.cause) {
     const causeMessage = translateErrorRecursive(error.cause, t);

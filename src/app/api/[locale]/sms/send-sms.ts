@@ -9,8 +9,10 @@ import {
 
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { smsEnv } from "./env";
+import { smsScopedT } from "./i18n";
 import { getAwsSnsProvider } from "./providers/aws-sns";
 import { getHttpProvider } from "./providers/http";
 import { getMessageBirdProvider } from "./providers/messagebird";
@@ -99,7 +101,9 @@ export function validatePhoneNumber(
 export async function sendSms(
   params: SendSmsParams,
   logger: EndpointLogger,
+  locale: CountryLanguage,
 ): Promise<ResponseType<SmsResult>> {
+  const { t } = smsScopedT(locale);
   const maxAttempts =
     params.retry?.attempts ||
     parseInt(smsEnv.SMS_MAX_RETRY_ATTEMPTS || "3", 10);
@@ -109,12 +113,12 @@ export async function sendSms(
   // Validate phone number
   const validation = validatePhoneNumber(params.to, logger);
   if (!validation.valid) {
-    logger.error("app.api.sms.sms.error.invalid_phone_format", {
+    logger.error("sms.error.invalid_phone_format", {
       to: params.to,
       reason: validation.reason,
     });
     return fail({
-      message: "app.api.sms.sms.error.invalid_phone_format",
+      message: t("sms.error.invalid_phone_format"),
       errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
       messageParams: {
         reason: validation.reason || "",
@@ -141,7 +145,7 @@ export async function sendSms(
     // Implement retry logic
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        const result = await provider.sendSms(smsParams, logger);
+        const result = await provider.sendSms(smsParams, logger, locale);
 
         if (result.success) {
           logger.info("SMS sent successfully", {
@@ -181,21 +185,21 @@ export async function sendSms(
     }
 
     // If we get here, all attempts failed
-    logger.error("app.api.sms.sms.error.delivery_failed", {
+    logger.error("sms.error.delivery_failed", {
       to: params.to,
       attempts: maxAttempts,
     });
     return fail({
-      message: "app.api.sms.sms.error.delivery_failed",
+      message: t("sms.error.delivery_failed"),
       errorType: ErrorResponseTypes.SMS_ERROR,
       messageParams: {
         errorMessage: lastError?.message ?? "",
       },
     });
   } catch (error) {
-    logger.error("app.api.sms.sms.error.unexpected_error", parseError(error));
+    logger.error("sms.error.unexpected_error", parseError(error));
     return fail({
-      message: "app.api.sms.sms.error.unexpected_error",
+      message: t("sms.error.unexpected_error"),
       errorType: ErrorResponseTypes.SMS_ERROR,
       messageParams: {
         errorMessage: error instanceof Error ? error.message : "",
@@ -210,6 +214,7 @@ export async function sendSms(
 export async function batchSendSms(
   messages: SendSmsParams[],
   logger: EndpointLogger,
+  locale: CountryLanguage,
 ): Promise<
   ResponseType<{
     results: Array<{
@@ -220,11 +225,12 @@ export async function batchSendSms(
     }>;
   }>
 > {
+  const { t } = smsScopedT(locale);
   logger.info("Sending batch SMS", { count: messages.length });
 
   const results = await Promise.all(
     messages.map(async (params) => {
-      const result = await sendSms(params, logger);
+      const result = await sendSms(params, logger, locale);
       const to = params.to;
       const success = result.success;
       const messageId = result.success ? result.data.messageId : undefined;
@@ -244,11 +250,11 @@ export async function batchSendSms(
   const failureCount = results.filter((r) => !r.success).length;
 
   if (failureCount === results.length) {
-    logger.error("app.api.sms.sms.error.all_failed", {
+    logger.error("sms.error.all_failed", {
       totalResults: results.length,
     });
     return fail({
-      message: "app.api.sms.sms.error.all_failed",
+      message: t("sms.error.all_failed"),
       errorType: ErrorResponseTypes.SMS_ERROR,
       messageParams: {
         totalResults: results.length.toString(),
@@ -257,12 +263,12 @@ export async function batchSendSms(
   }
 
   if (failureCount > 0) {
-    logger.warn("app.api.sms.sms.error.partial_failure", {
+    logger.warn("sms.error.partial_failure", {
       failureCount,
       totalCount: results.length,
     });
     return fail({
-      message: "app.api.sms.sms.error.partial_failure",
+      message: t("sms.error.partial_failure"),
       errorType: ErrorResponseTypes.SMS_ERROR,
       messageParams: {
         failureCount: failureCount.toString(),

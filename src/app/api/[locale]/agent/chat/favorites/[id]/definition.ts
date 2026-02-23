@@ -7,24 +7,23 @@ import { z } from "zod";
 
 import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/components/types";
 import {
+  TtsVoice,
   TtsVoiceDB,
   TtsVoiceOptions,
 } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  deleteButton,
-  navigateButtonField,
-  objectField,
-  objectFieldNew,
-  requestField,
-  requestUrlPathParamsField,
-  responseField,
-  submitButton,
-  widgetField,
-  widgetObjectField,
+  scopedBackButton,
+  scopedDeleteButton,
+  scopedNavigateButtonField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedRequestUrlPathParamsField,
+  scopedResponseField,
+  scopedWidgetField,
+  scopedWidgetObjectField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -47,22 +46,24 @@ import {
   PriceLevel,
   SpeedLevel,
 } from "../../characters/enum";
+import { scopedTranslation } from "./i18n";
 import { FavoriteEditContainer } from "./widgets";
 
 /**
  * Delete Favorite Endpoint (DELETE)
  */
 const { DELETE } = createEndpoint({
+  scopedTranslation,
   method: Methods.DELETE,
   path: ["agent", "chat", "favorites", "[id]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 
-  title: "app.api.agent.chat.favorites.id.delete.title" as const,
-  description: "app.api.agent.chat.favorites.id.delete.description" as const,
+  title: "delete.title" as const,
+  description: "delete.description" as const,
   icon: "trash" as const,
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.favorites" as const],
+  category: "category" as const,
+  tags: ["tags.favorites" as const],
 
   options: {
     mutationOptions: {
@@ -147,127 +148,99 @@ const { DELETE } = createEndpoint({
     },
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.STACKED,
-      gap: "4",
-      noCard: true,
-    },
-    { request: "urlPathParams" },
-    {
-      title: widgetField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    gap: "4",
+    noCard: true,
+    usage: { request: "urlPathParams" },
+    children: {
+      title: scopedWidgetField(scopedTranslation, {
         type: WidgetType.TITLE,
         level: 5,
-        content:
-          "app.api.agent.chat.favorites.id.delete.container.description" as const,
+        content: "delete.container.description" as const,
         usage: { request: "urlPathParams" },
       }),
 
       // === REQUEST (URL Path Params) ===
-      id: requestUrlPathParamsField({
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.agent.chat.favorites.id.delete.id.label" as const,
-        description:
-          "app.api.agent.chat.favorites.id.delete.id.description" as const,
+        label: "delete.id.label" as const,
+        description: "delete.id.description" as const,
         hidden: true,
         schema: z.string().uuid(),
       }),
 
       // Button container for horizontal layout
-      actions: widgetObjectField(
-        {
-          type: WidgetType.CONTAINER,
-          layoutType: LayoutType.INLINE,
-          gap: "2",
-          noCard: true,
-        },
-        { request: "urlPathParams" },
-        {
-          backButton: backButton({
-            label:
-              "app.api.agent.chat.favorites.id.delete.backButton.label" as const,
+      actions: scopedWidgetObjectField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        layoutType: LayoutType.INLINE,
+        gap: "2",
+        noCard: true,
+        usage: { request: "urlPathParams" },
+        children: {
+          backButton: scopedBackButton(scopedTranslation, {
+            label: "delete.backButton.label" as const,
             icon: "arrow-left",
             variant: "outline",
             usage: { request: "urlPathParams" },
           }),
-          deleteButton: submitButton({
-            label:
-              "app.api.agent.chat.favorites.id.delete.actions.delete" as const,
-            loadingText:
-              "app.api.agent.chat.favorites.id.delete.actions.deleting" as const,
+          deleteButton: scopedDeleteButton(scopedTranslation, {
+            label: "delete.actions.delete" as const,
+            loadingText: "delete.actions.deleting" as const,
             icon: "trash",
             variant: "destructive",
             className: "ml-auto",
             usage: { request: "urlPathParams" },
           }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.favorites.id.delete.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.delete.errors.validation.description" as const,
+      title: "delete.errors.validation.title" as const,
+      description: "delete.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.favorites.id.delete.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.delete.errors.network.description" as const,
+      title: "delete.errors.network.title" as const,
+      description: "delete.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.favorites.id.delete.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.delete.errors.unauthorized.description" as const,
+      title: "delete.errors.unauthorized.title" as const,
+      description: "delete.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.favorites.id.delete.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.delete.errors.forbidden.description" as const,
+      title: "delete.errors.forbidden.title" as const,
+      description: "delete.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.favorites.id.delete.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.delete.errors.notFound.description" as const,
+      title: "delete.errors.notFound.title" as const,
+      description: "delete.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.favorites.id.delete.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.delete.errors.server.description" as const,
+      title: "delete.errors.server.title" as const,
+      description: "delete.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.favorites.id.delete.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.delete.errors.unknown.description" as const,
+      title: "delete.errors.unknown.title" as const,
+      description: "delete.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.favorites.id.delete.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.delete.errors.unsavedChanges.description" as const,
+      title: "delete.errors.unsavedChanges.title" as const,
+      description: "delete.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.favorites.id.delete.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.delete.errors.conflict.description" as const,
+      title: "delete.errors.conflict.title" as const,
+      description: "delete.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.agent.chat.favorites.id.delete.success.title" as const,
-    description:
-      "app.api.agent.chat.favorites.id.delete.success.description" as const,
+    title: "delete.success.title" as const,
+    description: "delete.success.description" as const,
   },
 
   examples: {
@@ -281,16 +254,17 @@ const { DELETE } = createEndpoint({
  * Update Favorite Endpoint (PATCH)
  */
 const { PATCH } = createEndpoint({
+  scopedTranslation,
   method: Methods.PATCH,
   path: ["agent", "chat", "favorites", "[id]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 
-  title: "app.api.agent.chat.favorites.id.patch.title" as const,
-  description: "app.api.agent.chat.favorites.id.patch.description" as const,
+  title: "patch.title" as const,
+  description: "patch.description" as const,
   icon: "edit" as const,
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.favorites" as const],
+  category: "category" as const,
+  tags: ["tags.favorites" as const],
 
   options: {
     mutationOptions: {
@@ -397,10 +371,10 @@ const { PATCH } = createEndpoint({
                   // Only update icon (from request) and modelSelection (from updatedConfig).
                   const characterIcon = requestData.icon ?? null;
 
-                  // Extract character info from existing favorite
-                  const characterName = requestData.name ?? null;
-                  const characterTagline = requestData.tagline ?? null;
-                  const characterDescription = requestData.description ?? null;
+                  // Keep name/tagline/description from the existing favorite card
+                  const characterName = fav.name ?? null;
+                  const characterTagline = fav.tagline ?? null;
+                  const characterDescription = fav.description ?? null;
 
                   // Get characterModelSelection from GET endpoint cache
                   const getEndpointData = apiClient.getEndpointData(
@@ -455,10 +429,9 @@ const { PATCH } = createEndpoint({
               data: {
                 ...prevData.data,
                 characterIcon: requestData.icon ?? prevData.data.icon,
-                characterName: requestData.name ?? prevData.data.name,
-                characterTagline: requestData.tagline ?? prevData.data.tagline,
-                characterDescription:
-                  requestData.description ?? prevData.data.description,
+                characterName: prevData.data.name,
+                characterTagline: prevData.data.tagline,
+                characterDescription: prevData.data.description,
                 voice: requestData.voice ?? null,
                 modelSelection: requestData.modelSelection,
               },
@@ -475,18 +448,17 @@ const { PATCH } = createEndpoint({
     usage: { request: "data&urlPathParams", response: true } as const,
     children: {
       // === URL PARAMETERS ===
-      id: requestUrlPathParamsField({
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.agent.chat.favorites.id.patch.id.label" as const,
+        label: "patch.id.label" as const,
         hidden: true,
         schema: z.string().uuid(),
       }),
 
       // Delete button configuration
-      deleteButton: deleteButton({
-        label:
-          "app.api.agent.chat.favorites.id.patch.deleteButton.label" as const,
+      deleteButton: scopedDeleteButton(scopedTranslation, {
+        label: "patch.deleteButton.label" as const,
         targetEndpoint: DELETE,
         extractParams: (source) => ({
           urlPathParams: {
@@ -501,23 +473,22 @@ const { PATCH } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.ALERT,
         schema: z.string(),
       }),
 
       // === REQUEST ===
-      characterId: requestField({
+      characterId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.agent.chat.favorites.id.patch.characterId.label" as const,
+        label: "patch.characterId.label" as const,
         columns: 6,
         hidden: true,
         schema: z.string().optional(),
       }),
 
-      icon: requestField({
+      icon: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ICON,
         schema: iconSchema,
@@ -526,33 +497,11 @@ const { PATCH } = createEndpoint({
         } as const,
       }),
 
-      name: requestField({
-        type: WidgetType.TEXT,
-        schema: z.string().nullable(),
-        size: "base",
-        emphasis: "bold",
-      }),
-
-      tagline: requestField({
-        type: WidgetType.TEXT,
-        schema: z.string().nullable(),
-        size: "sm",
-        variant: "muted",
-      }),
-
-      description: requestField({
-        type: WidgetType.TEXT,
-        schema: z.string().nullable(),
-        size: "xs",
-        variant: "muted",
-      }),
-
-      voice: requestField({
+      voice: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.agent.chat.favorites.id.patch.voice.label" as const,
-        description:
-          "app.api.agent.chat.favorites.id.patch.voice.description" as const,
+        label: "patch.voice.label" as const,
+        description: "patch.voice.description" as const,
         options: TtsVoiceOptions,
         columns: 6,
         theme: {
@@ -562,87 +511,94 @@ const { PATCH } = createEndpoint({
         schema: z.enum(TtsVoiceDB).nullable().optional(),
       }),
 
-      modelSelection: requestField({
+      modelSelection: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.OBJECT,
+        fieldType: FieldDataType.TEXT,
         schema: modelSelectionSchemaSimple.nullable(),
       }),
 
       // Auto-compacting token threshold (null = fall through to character/settings default)
-      compactTrigger: requestField({
+      compactTrigger: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.agent.chat.favorites.id.patch.compactTrigger.label" as const,
-        description:
-          "app.api.agent.chat.favorites.id.patch.compactTrigger.description" as const,
+        label: "patch.compactTrigger.label" as const,
+        description: "patch.compactTrigger.description" as const,
         columns: 6,
         schema: z.number().int().min(1000).max(200000).nullable().optional(),
+      }),
+
+      // Tool configuration — null = fall through to character/settings default
+      allowedTools: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        schema: z
+          .array(
+            z.object({
+              toolId: z.string(),
+              requiresConfirmation: z.boolean().default(false),
+            }),
+          )
+          .nullable()
+          .optional(),
+      }),
+      pinnedTools: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        schema: z
+          .array(
+            z.object({
+              toolId: z.string(),
+              requiresConfirmation: z.boolean().default(false),
+            }),
+          )
+          .nullable()
+          .optional(),
       }),
     },
   }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.favorites.id.patch.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.patch.errors.validation.description" as const,
+      title: "patch.errors.validation.title" as const,
+      description: "patch.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.favorites.id.patch.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.patch.errors.network.description" as const,
+      title: "patch.errors.network.title" as const,
+      description: "patch.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.favorites.id.patch.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.patch.errors.unauthorized.description" as const,
+      title: "patch.errors.unauthorized.title" as const,
+      description: "patch.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.favorites.id.patch.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.patch.errors.forbidden.description" as const,
+      title: "patch.errors.forbidden.title" as const,
+      description: "patch.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.favorites.id.patch.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.patch.errors.notFound.description" as const,
+      title: "patch.errors.notFound.title" as const,
+      description: "patch.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.favorites.id.patch.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.patch.errors.server.description" as const,
+      title: "patch.errors.server.title" as const,
+      description: "patch.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.favorites.id.patch.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.patch.errors.unknown.description" as const,
+      title: "patch.errors.unknown.title" as const,
+      description: "patch.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.favorites.id.patch.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.patch.errors.unsavedChanges.description" as const,
+      title: "patch.errors.unsavedChanges.title" as const,
+      description: "patch.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.favorites.id.patch.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.patch.errors.conflict.description" as const,
+      title: "patch.errors.conflict.title" as const,
+      description: "patch.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.agent.chat.favorites.id.patch.success.title" as const,
-    description:
-      "app.api.agent.chat.favorites.id.patch.success.description" as const,
+    title: "patch.success.title" as const,
+    description: "patch.success.description" as const,
   },
 
   examples: {
@@ -650,10 +606,7 @@ const { PATCH } = createEndpoint({
       update: {
         characterId: "thea",
         icon: "sun" as const,
-        name: "Thea",
-        tagline: "AI Assistant",
-        description: "A helpful AI assistant",
-        voice: "app.api.agent.textToSpeech.voices.FEMALE" as const,
+        voice: TtsVoice.FEMALE,
         modelSelection: {
           selectionType: ModelSelectionType.FILTERS,
           intelligenceRange: {
@@ -677,7 +630,7 @@ const { PATCH } = createEndpoint({
     },
     responses: {
       update: {
-        success: "app.api.agent.chat.favorites.id.patch.success.title",
+        success: "patch.success.title",
       },
     },
     urlPathParams: {
@@ -690,33 +643,33 @@ const { PATCH } = createEndpoint({
  * Get Single Favorite Endpoint (GET)
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["agent", "chat", "favorites", "[id]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 
-  title: "app.api.agent.chat.favorites.id.get.title" as const,
-  description: "app.api.agent.chat.favorites.id.get.description" as const,
+  title: "get.title" as const,
+  description: "get.description" as const,
   icon: "star" as const,
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.favorites" as const],
+  category: "category" as const,
+  tags: ["tags.favorites" as const],
 
-  fields: objectFieldNew({
+  fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
       // === URL PARAMETERS ===
-      id: requestUrlPathParamsField({
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label:
-          "app.api.agent.chat.favorites.get.response.favorite.id.content" as const,
+        label: "get.response.favorite.id.content" as const,
         schema: z.string().uuid(),
         hidden: true,
       }),
 
       // Edit button configuration
-      editButton: navigateButtonField({
+      editButton: scopedNavigateButtonField(scopedTranslation, {
         targetEndpoint: PATCH,
         extractParams: (source) => ({
           urlPathParams: {
@@ -724,7 +677,7 @@ const { GET } = createEndpoint({
           },
         }),
         prefillFromGet: true,
-        label: "app.api.agent.chat.favorites.id.get.editButton.label" as const,
+        label: "get.editButton.label" as const,
         icon: "pencil",
         variant: "default",
         className: "ml-auto",
@@ -732,15 +685,14 @@ const { GET } = createEndpoint({
       }),
 
       // Delete button configuration
-      deleteButton: deleteButton({
+      deleteButton: scopedDeleteButton(scopedTranslation, {
         targetEndpoint: DELETE,
         extractParams: (source) => ({
           urlPathParams: {
             id: (source.urlPathParams as { id: string }).id,
           },
         }),
-        label:
-          "app.api.agent.chat.favorites.id.get.deleteButton.label" as const,
+        label: "get.deleteButton.label" as const,
         icon: "trash",
         variant: "destructive",
         popNavigationOnSuccess: 1,
@@ -748,7 +700,7 @@ const { GET } = createEndpoint({
       }),
 
       // Separator
-      separator: widgetField({
+      separator: scopedWidgetField(scopedTranslation, {
         type: WidgetType.SEPARATOR,
         spacingTop: SpacingSize.RELAXED,
         spacingBottom: SpacingSize.RELAXED,
@@ -756,13 +708,13 @@ const { GET } = createEndpoint({
       }),
 
       // === FLAT RESPONSE FIELDS ===
-      characterId: responseField({
+      characterId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
         hidden: true,
       }),
 
-      icon: responseField({
+      icon: scopedResponseField(scopedTranslation, {
         type: WidgetType.ICON,
         containerSize: "lg",
         iconSize: "lg",
@@ -770,47 +722,47 @@ const { GET } = createEndpoint({
         schema: iconSchema,
       }),
 
-      name: responseField({
+      name: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         size: "base",
         emphasis: "bold",
         schema: z.string(),
       }),
 
-      tagline: responseField({
+      tagline: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         size: "sm",
         variant: "muted",
         schema: z.string(),
       }),
 
-      description: responseField({
+      description: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         size: "xs",
         variant: "muted",
         schema: z.string(),
       }),
 
-      voice: responseField({
+      voice: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
         variant: "default",
         schema: z.enum(TtsVoiceDB).nullable(),
       }),
 
-      modelSelection: responseField({
+      modelSelection: scopedResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.OBJECT,
         schema: modelSelectionSchemaSimple.nullable(),
       }),
 
-      characterModelSelection: responseField({
+      characterModelSelection: scopedResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.OBJECT,
         schema: modelSelectionSchemaSimple.nullable().optional(),
       }),
 
       // Auto-compacting token threshold (null = fall through to character/settings default)
-      compactTrigger: responseField({
+      compactTrigger: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.number().int().nullable(),
@@ -820,64 +772,46 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.favorites.id.get.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.get.errors.validation.description" as const,
+      title: "get.errors.validation.title" as const,
+      description: "get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.favorites.id.get.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.get.errors.network.description" as const,
+      title: "get.errors.network.title" as const,
+      description: "get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.favorites.id.get.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.get.errors.unauthorized.description" as const,
+      title: "get.errors.unauthorized.title" as const,
+      description: "get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.favorites.id.get.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.get.errors.forbidden.description" as const,
+      title: "get.errors.forbidden.title" as const,
+      description: "get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.favorites.id.get.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.get.errors.notFound.description" as const,
+      title: "get.errors.notFound.title" as const,
+      description: "get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.chat.favorites.id.get.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.get.errors.server.description" as const,
+      title: "get.errors.server.title" as const,
+      description: "get.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.favorites.id.get.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.get.errors.unknown.description" as const,
+      title: "get.errors.unknown.title" as const,
+      description: "get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.favorites.id.get.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.get.errors.unsavedChanges.description" as const,
+      title: "get.errors.unsavedChanges.title" as const,
+      description: "get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.favorites.id.get.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.favorites.id.get.errors.conflict.description" as const,
+      title: "get.errors.conflict.title" as const,
+      description: "get.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.agent.chat.favorites.id.get.success.title" as const,
-    description:
-      "app.api.agent.chat.favorites.id.get.success.description" as const,
+    title: "get.success.title" as const,
+    description: "get.success.description" as const,
   },
 
   examples: {
@@ -885,11 +819,9 @@ const { GET } = createEndpoint({
       default: {
         characterId: "thea",
         icon: "sun" as const,
-        name: "app.api.agent.chat.characters.characters.thea.name" as const,
-        tagline:
-          "app.api.agent.chat.characters.characters.thea.tagline" as const,
-        description:
-          "app.api.agent.chat.characters.characters.thea.description" as const,
+        name: "fallbacks.unknownCharacter" as const,
+        tagline: "fallbacks.noTagline" as const,
+        description: "fallbacks.noDescription" as const,
         voice: null,
         modelSelection: {
           selectionType: ModelSelectionType.FILTERS,

@@ -1,4 +1,8 @@
 export const translations = {
+  category: "Authentication",
+  search: {
+    tag: "Auth",
+  },
   authClient: {
     errors: {
       status_save_failed: "Failed to save authentication status",

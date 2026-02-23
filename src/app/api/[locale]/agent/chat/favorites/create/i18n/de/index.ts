@@ -1,6 +1,11 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Chat",
+  tags: {
+    favorites: "Favoriten",
+  },
+
   post: {
     title: "Favorit erstellen",
     description: "Neue Favoriten-Konfiguration erstellen",
@@ -181,6 +186,11 @@ export const translations: typeof enTranslations = {
     },
     modifyCharacter: {
       label: "Charakter bearbeiten",
+    },
+    character: {
+      name: "Name",
+      tagline: "Slogan",
+      description: "Beschreibung",
     },
   },
 };

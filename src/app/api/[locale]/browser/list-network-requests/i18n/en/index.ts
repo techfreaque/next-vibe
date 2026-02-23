@@ -112,4 +112,9 @@ export const translations = {
     title: "Network Requests Retrieved Successfully",
     description: "The network requests were retrieved successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    networkAnalysis: "Network Analysis",
+  },
 };

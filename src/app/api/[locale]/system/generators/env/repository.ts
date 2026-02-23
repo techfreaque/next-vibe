@@ -17,7 +17,10 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import type { scopedTranslation } from "./i18n";
 import type { EnvValidationErrorType } from "./validator";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Entry for .env.example generation
@@ -100,22 +103,13 @@ interface EnvGeneratorResponseType {
 }
 
 /**
- * Env Generator Repository Interface
- */
-interface EnvGeneratorRepository {
-  generateEnv(
-    data: EnvGeneratorRequestType,
-    logger: EndpointLogger,
-  ): Promise<BaseResponseType<EnvGeneratorResponseType>>;
-}
-
-/**
  * Env Generator Repository Implementation
  */
-class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
+class EnvGeneratorRepositoryImpl {
   async generateEnv(
     data: EnvGeneratorRequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<BaseResponseType<EnvGeneratorResponseType>> {
     const startTime = Date.now();
 
@@ -256,7 +250,7 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
       if (validServerModules.length === 0 && validClientModules.length === 0) {
         logger.error("No valid env files found");
         return fail({
-          message: "app.api.system.generators.env.error.noValidFiles",
+          message: t("error.noValidFiles"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -364,7 +358,7 @@ class EnvGeneratorRepositoryImpl implements EnvGeneratorRepository {
       });
 
       return fail({
-        message: "app.api.system.generators.env.error.generation_failed",
+        message: t("error.generation_failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           duration,
@@ -468,6 +462,7 @@ import { validateEnv } from "next-vibe/shared/utils/env-util";
 import type { z } from "zod";
 
 import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface/shared/env/validation-logger";
+import { defaultLocale } from "@/i18n/core/config";
 
 // Import env modules
 ${imports.join("\n")}
@@ -498,6 +493,7 @@ export function validateAllEnv(): Env {
     { ...process.env, platform },
     envSchema,
     envValidationLogger,
+    defaultLocale,
   );
 }
 
@@ -618,6 +614,7 @@ import { validateEnv } from "next-vibe/shared/utils/env-util";
 import type { z } from "zod";
 
 import { envValidationLogger } from "@/app/api/[locale]/system/unified-interface/shared/env/validation-logger";
+import { defaultLocale } from "@/i18n/core/config";
 
 // Import client env modules
 ${imports.join("\n")}
@@ -655,6 +652,7 @@ export function validateAllClientEnv(): EnvClient {
     { ...process.env, platform },
     envClientSchema,
     envValidationLogger,
+    defaultLocale,
   );
 }
 

@@ -1,6 +1,35 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  passwordStrength: {
+    label: "Passwortstärke",
+    weak: "Schwach",
+    fair: "Ausreichend",
+    good: "Gut",
+    strong: "Stark",
+    requirement: {
+      minLength: {
+        icon: "✗",
+        text: "Mindestens 8 Zeichen",
+      },
+      uppercase: {
+        icon: "✗",
+        text: "Mindestens ein Großbuchstabe",
+      },
+      lowercase: {
+        icon: "✗",
+        text: "Mindestens ein Kleinbuchstabe",
+      },
+      number: {
+        icon: "✗",
+        text: "Mindestens eine Zahl",
+      },
+      special: {
+        icon: "!",
+        text: "Sonderzeichen (optional, verbessert Stärke)",
+      },
+    },
+  },
   post: {
     title: "Titel",
     description: "Endpunkt-Beschreibung",

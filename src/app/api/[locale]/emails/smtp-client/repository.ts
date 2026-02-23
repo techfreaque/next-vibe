@@ -22,7 +22,7 @@ import type SMTPTransport from "nodemailer/lib/smtp-transport";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { emails } from "../messages/db";
 import { EmailStatus, EmailType } from "../messages/enum";
@@ -35,6 +35,10 @@ import {
   SmtpHealthStatus,
   SmtpSecurityType,
 } from "./enum";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+
 // Import types from definition.ts following standard pattern
 import type {
   SmtpCapacityRequestOutput,
@@ -60,7 +64,7 @@ export class SmtpRepository {
   static async sendEmail(
     data: SmtpSendRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpSendResponseOutput>> {
     try {
@@ -68,7 +72,6 @@ export class SmtpRepository {
         to: data.to,
         subject: data.subject,
         userId: user.id,
-        locale,
       });
 
       // Get the primary account first
@@ -82,8 +85,7 @@ export class SmtpRepository {
 
         if (isLeadCampaign) {
           return fail({
-            message:
-              "app.api.emails.smtpClient.sending.errors.no_account.title",
+            message: t("sending.errors.no_account.title"),
             errorType: ErrorResponseTypes.NOT_FOUND,
             messageParams: {
               campaignType: data.selectionCriteria.campaignType,
@@ -97,7 +99,7 @@ export class SmtpRepository {
           });
         }
         return fail({
-          message: "app.api.emails.smtpClient.sending.errors.no_account.title",
+          message: t("sending.errors.no_account.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: {
             campaignType: data.selectionCriteria.campaignType,
@@ -111,6 +113,7 @@ export class SmtpRepository {
         primaryAccount,
         false,
         logger,
+        t,
       );
       if (primaryResult.success) {
         return primaryResult;
@@ -137,6 +140,7 @@ export class SmtpRepository {
         fallbackAccount,
         true,
         logger,
+        t,
       );
       if (fallbackResult.success) {
         return fallbackResult;
@@ -155,7 +159,7 @@ export class SmtpRepository {
     } catch (error) {
       logger.error("Critical error in email sending", parseError(error));
       return fail({
-        message: "app.api.emails.smtpClient.sending.errors.server.title",
+        message: t("sending.errors.server.title"),
         errorType: ErrorResponseTypes.EMAIL_ERROR,
         messageParams: {
           error: parseError(error).message,
@@ -170,6 +174,7 @@ export class SmtpRepository {
   static async getTotalSendingCapacity(
     data: SmtpCapacityRequestOutput,
     user: JwtPayloadType,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<SmtpCapacityResponseOutput>> {
     try {
@@ -199,6 +204,7 @@ export class SmtpRepository {
         const rateLimitCheck = await SmtpRepository.checkRateLimit(
           account,
           logger,
+          t,
         );
         if (rateLimitCheck.success) {
           // Account is available, add remaining capacity
@@ -215,7 +221,7 @@ export class SmtpRepository {
     } catch (error) {
       logger.error("Error getting total sending capacity", parseError(error));
       return fail({
-        message: "app.api.emails.smtpClient.sending.errors.capacity.title",
+        message: t("sending.errors.capacity.title"),
         errorType: ErrorResponseTypes.EMAIL_ERROR,
         messageParams: {
           error: parseError(error).message,
@@ -230,8 +236,9 @@ export class SmtpRepository {
   static async testConnection(
     data: { accountId: string },
     user: JwtPayloadType,
+    t: ModuleT,
     logger: EndpointLogger,
-  ): Promise<ResponseType<{ success: boolean; message: string }>> {
+  ): Promise<ResponseType<{ success: boolean; message: TranslationKey }>> {
     try {
       logger.info("Testing SMTP connection", {
         accountId: data.accountId,
@@ -246,7 +253,7 @@ export class SmtpRepository {
 
       if (!account) {
         return fail({
-          message: "app.api.emails.smtpClient.list.errors.notFound.title",
+          message: t("list.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: {
             accountId: data.accountId,
@@ -257,6 +264,7 @@ export class SmtpRepository {
       const transportResult = await SmtpRepository.getTransport(
         account,
         logger,
+        t,
       );
       if (!transportResult.success) {
         return fail({
@@ -274,7 +282,7 @@ export class SmtpRepository {
 
       return success({
         success: true,
-        message: "app.api.emails.smtpClient.sending.success.connectionTest",
+        message: t("enums.testResult.success"),
       });
     } catch (error) {
       await SmtpRepository.updateAccountHealth(
@@ -285,7 +293,7 @@ export class SmtpRepository {
       );
 
       return fail({
-        message: "app.api.emails.smtpClient.sending.errors.server.title",
+        message: t("sending.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parseError(error).message,
@@ -459,6 +467,7 @@ export class SmtpRepository {
   private static async getTransport(
     account: SmtpAccount,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<Transporter<SMTPTransport.SentMessageInfo>>> {
     const cacheKey = account.id;
 
@@ -509,7 +518,7 @@ export class SmtpRepository {
       );
 
       return fail({
-        message: "app.api.emails.smtpClient.sending.errors.server.title",
+        message: t("sending.errors.server.title"),
         errorType: ErrorResponseTypes.EMAIL_ERROR,
         messageParams: {
           accountId: account.id,
@@ -528,6 +537,7 @@ export class SmtpRepository {
     account: SmtpAccount,
     isFallback: boolean,
     logger: EndpointLogger,
+    t: ModuleT,
     maxRetries = 2,
   ): Promise<ResponseType<SmtpSendResponseOutput>> {
     let lastError: ResponseType<SmtpSendResponseOutput> | null = null;
@@ -543,7 +553,7 @@ export class SmtpRepository {
           isFallback,
         });
 
-        const result = await this.performEmailSend(params, account, logger);
+        const result = await this.performEmailSend(params, account, logger, t);
 
         if (result.success) {
           if (attempt > 1) {
@@ -592,7 +602,7 @@ export class SmtpRepository {
       } catch (error) {
         const errorMessage = parseError(error).message;
         lastError = fail({
-          message: "app.api.emails.smtpClient.sending.errors.server.title",
+          message: t("sending.errors.server.title"),
           errorType: ErrorResponseTypes.EMAIL_ERROR,
           messageParams: {
             error: errorMessage,
@@ -617,7 +627,7 @@ export class SmtpRepository {
     return (
       lastError ||
       fail({
-        message: "app.api.emails.smtpClient.sending.errors.server.title",
+        message: t("sending.errors.server.title"),
         errorType: ErrorResponseTypes.EMAIL_ERROR,
         messageParams: {
           accountId: account.id,
@@ -642,6 +652,7 @@ export class SmtpRepository {
     params: SmtpSendRequestOutput,
     account: SmtpAccount,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<SmtpSendResponseOutput>> {
     try {
       // Check rate limits (skip if this is part of a pre-validated batch)
@@ -649,6 +660,7 @@ export class SmtpRepository {
         const rateLimitCheck = await SmtpRepository.checkRateLimit(
           account,
           logger,
+          t,
         );
         if (!rateLimitCheck.success) {
           // Convert rate limit error to proper SMTP send error
@@ -676,6 +688,7 @@ export class SmtpRepository {
       const transportResult = await SmtpRepository.getTransport(
         account,
         logger,
+        t,
       );
       if (!transportResult.success) {
         return fail({
@@ -722,7 +735,7 @@ export class SmtpRepository {
         );
 
         return fail({
-          message: "app.api.emails.smtpClient.sending.errors.rejected.title",
+          message: t("sending.errors.rejected.title"),
           errorType: ErrorResponseTypes.EMAIL_ERROR,
           messageParams: {
             recipient: params.to,
@@ -741,8 +754,7 @@ export class SmtpRepository {
         );
 
         return fail({
-          message:
-            "app.api.emails.smtpClient.sending.errors.no_recipients.title",
+          message: t("sending.errors.no_recipients.title"),
           errorType: ErrorResponseTypes.EMAIL_ERROR,
           messageParams: {
             recipient: params.to,
@@ -816,7 +828,7 @@ export class SmtpRepository {
       }
 
       return fail({
-        message: "app.api.emails.smtpClient.sending.errors.server.title",
+        message: t("sending.errors.server.title"),
         errorType: ErrorResponseTypes.EMAIL_ERROR,
         messageParams: {
           error: parseError(error).message,
@@ -833,6 +845,7 @@ export class SmtpRepository {
   private static async checkRateLimit(
     account: SmtpAccount,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<
     ResponseType<{
       canSend: boolean;
@@ -876,7 +889,7 @@ export class SmtpRepository {
 
       if (!canSend) {
         return fail({
-          message: "app.api.emails.smtpClient.sending.errors.rate_limit.title",
+          message: t("sending.errors.rate_limit.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             accountName: account.name,

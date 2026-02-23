@@ -3,6 +3,8 @@ export const translations = {
   description: "Logs out the current user and invalidates their session",
   category: "User Management",
   tag: "logout",
+  logoutButton: "Logout",
+  loggingOut: "Logging out...",
   response: {
     title: "Logout Response",
     description: "Response indicating successful logout",

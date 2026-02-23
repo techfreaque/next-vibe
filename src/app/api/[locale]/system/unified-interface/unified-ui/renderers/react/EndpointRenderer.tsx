@@ -47,11 +47,11 @@ import { WidgetRenderer } from "./WidgetRenderer";
 /**
  * Submit button configuration
  */
-export interface SubmitButtonConfig {
+export interface SubmitButtonConfig<TKey extends string> {
   /** Submit button text translation key */
-  text?: TranslationKey;
+  text?: TKey;
   /** Submit button loading text translation key */
-  loadingText?: TranslationKey;
+  loadingText?: TKey;
   /** Submit button position - 'bottom' (default) or 'header' */
   position?: "bottom" | "header";
   /** Icon component to display in the button */
@@ -62,9 +62,9 @@ export interface SubmitButtonConfig {
   size?: "default" | "sm" | "lg" | "icon";
 }
 
-export interface CancelButtonConfig {
+export interface CancelButtonConfig<TKey extends string> {
   /** Cancel button text translation key */
-  text?: TranslationKey;
+  text?: TKey;
   /** Button variant */
   variant?:
     | "default"
@@ -100,9 +100,13 @@ export interface EndpointRendererProps<TEndpoint extends CreateApiEndpointAny> {
   /** Submit button loading text translation key (deprecated - use submitButton.loadingText) */
   submitButtonLoadingText?: TranslationKey;
   /** Submit button configuration */
-  submitButton?: SubmitButtonConfig;
+  submitButton?: SubmitButtonConfig<
+    TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+  >;
   /** Cancel button configuration */
-  cancelButton?: CancelButtonConfig;
+  cancelButton?: CancelButtonConfig<
+    TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+  >;
   /** Additional content to render below fields */
   children?: React.ReactNode;
   /** Custom className for the container */

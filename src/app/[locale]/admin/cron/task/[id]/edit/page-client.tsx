@@ -1,6 +1,6 @@
 "use client";
 
-import type { JSX } from "react";
+import { type JSX, useMemo } from "react";
 
 import cronTaskDefinition from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
@@ -16,24 +16,28 @@ export function CronTaskEditPageClient({
   user: JwtPayloadType;
   id: string;
 }): JSX.Element {
+  const endpointOptions = useMemo(() => {
+    return {
+      create: {
+        urlPathParams: { id },
+      },
+      read: {
+        urlPathParams: { id },
+        queryOptions: {
+          enabled: true,
+          staleTime: 30 * 1000,
+        },
+      },
+    };
+  }, [id]);
+
   return (
     <EndpointsPage
       endpoint={cronTaskDefinition}
       locale={locale}
       user={user}
       forceMethod="PUT"
-      endpointOptions={{
-        create: {
-          urlPathParams: { id },
-        },
-        read: {
-          urlPathParams: { id },
-          queryOptions: {
-            enabled: true,
-            staleTime: 30 * 1000,
-          },
-        },
-      }}
+      endpointOptions={endpointOptions}
     />
   );
 }

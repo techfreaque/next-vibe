@@ -59,4 +59,9 @@ export const translations: typeof enTranslations = {
     title: "Trace wydajności zatrzymany pomyślnie",
     description: "Trace wydajności został pomyślnie zatrzymany",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    performanceAutomation: "Automatyzacja wydajności",
+  },
 };

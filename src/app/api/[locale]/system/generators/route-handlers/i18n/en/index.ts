@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Generators",
+
   post: {
     title: "Route Handlers Generator",
     description: "Generate route-handlers.ts with dynamic imports",

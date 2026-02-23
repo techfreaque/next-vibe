@@ -80,4 +80,9 @@ export const translations: typeof enTranslations = {
     title: "Ziehvorgang erfolgreich",
     description: "Das Element wurde erfolgreich gezogen",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    inputAutomation: "Eingabe-Automatisierung",
+  },
 };

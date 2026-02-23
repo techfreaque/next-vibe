@@ -12,66 +12,14 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type { GitInfo, GitOpsConfig, RepoInfo } from "../definition";
+import { scopedTranslation } from "../i18n";
 import { MESSAGES } from "./constants";
 
-// ============================================================================
-// Interface
-// ============================================================================
-
-export interface IGitService {
-  /**
-   * Get comprehensive git information for a directory
-   */
-  getInfo(cwd: string, logger: EndpointLogger): GitInfo;
-
-  /**
-   * Check if a tag exists
-   */
-  checkTagExists(tag: string, logger: EndpointLogger): Promise<boolean>;
-
-  /**
-   * Check if there are new commits since a tag
-   */
-  hasNewCommitsSinceTag(
-    tag: string,
-    cwd: string,
-    logger: EndpointLogger,
-  ): boolean;
-
-  /**
-   * Get the current branch name
-   */
-  getCurrentBranch(): string;
-
-  /**
-   * Get repository URL information
-   */
-  getRepoUrl(): RepoInfo | null;
-
-  /**
-   * Get PR URL for a branch
-   */
-  getPRUrl(currentBranch: string): string | null;
-
-  /**
-   * Create a git tag with configuration
-   */
-  createTag(
-    tag: string,
-    cwd: string,
-    logger: EndpointLogger,
-    dryRun: boolean,
-    config?: GitOpsConfig,
-  ): ResponseType<void>;
-}
-
-// ============================================================================
-// Implementation
-// ============================================================================
-
-export class GitService implements IGitService {
+export class GitService {
   getInfo(cwd: string, logger: EndpointLogger): GitInfo {
     logger.debug("Getting git info", { cwd });
     let currentBranch: string | null = null;
@@ -253,6 +201,7 @@ export class GitService implements IGitService {
     cwd: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
     config?: GitOpsConfig,
   ): ResponseType<void> {
     const skipTag = config?.skipTag ?? false;
@@ -276,8 +225,9 @@ export class GitService implements IGitService {
           ? error.stderr.toString()
           : error.message || String(err);
         logger.error("git add failed", { stderr, cwd });
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.system.releaseTool.errors.gitOperationFailed",
+          message: t("errors.gitOperationFailed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: stderr },
         });
@@ -336,8 +286,9 @@ export class GitService implements IGitService {
             ? error.stderr.toString()
             : error.message || String(err);
           logger.error("git tag failed", { stderr, tag, cwd });
+          const { t } = scopedTranslation.scopedT(locale);
           return fail({
-            message: "app.api.system.releaseTool.git.tagFailed",
+            message: t("git.tagFailed"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: { tag, error: stderr },
           });
@@ -362,8 +313,9 @@ export class GitService implements IGitService {
             ? error.stderr.toString()
             : error.message || String(err);
           logger.error("git push failed", { stderr, remote, cwd });
+          const { t: tGit } = scopedTranslation.scopedT(locale);
           return fail({
-            message: "app.api.system.releaseTool.git.pushFailed",
+            message: tGit("git.pushFailed"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: { remote, error: stderr },
           });
@@ -383,8 +335,9 @@ export class GitService implements IGitService {
               ? error.stderr.toString()
               : error.message || String(err);
             logger.error("git push tag failed", { stderr, remote, tag, cwd });
+            const { t: tPushTag } = scopedTranslation.scopedT(locale);
             return fail({
-              message: "app.api.system.releaseTool.git.pushFailed",
+              message: tPushTag("git.pushFailed"),
               errorType: ErrorResponseTypes.INTERNAL_ERROR,
               messageParams: { tag, remote, error: stderr },
             });

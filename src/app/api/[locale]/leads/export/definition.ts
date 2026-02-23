@@ -10,8 +10,8 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   backButton,
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -36,18 +36,20 @@ import {
   LeadStatusOptions,
   MimeType,
 } from "../enum";
+import { scopedTranslation } from "./i18n";
 import { LeadsExportContainer } from "./widget";
 
 /**
  * Export Leads Endpoint (GET)
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["leads", "export"],
-  title: "app.api.leads.export.get.title",
-  description: "app.api.leads.export.get.description",
-  category: "app.api.leads.category",
-  tags: ["app.api.leads.tags.leads", "app.api.leads.tags.export"],
+  title: "get.title",
+  description: "get.description",
+  category: "category",
+  tags: ["tags.leads", "tags.export"],
   allowedRoles: [UserRole.ADMIN],
   icon: "download",
 
@@ -57,131 +59,130 @@ const { GET } = createEndpoint({
     children: {
       backButton: backButton({ usage: { response: true } }),
       // === REQUEST FIELDS ===
-      format: requestField({
+      format: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.export.get.format.label",
-        description: "app.api.leads.export.get.format.description",
+        label: "get.format.label",
+        description: "get.format.description",
         options: ExportFormatOptions,
         columns: 6,
         schema: z.enum(ExportFormat).default(ExportFormat.CSV),
       }),
 
-      status: requestField({
+      status: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.export.get.status.label",
-        description: "app.api.leads.export.get.status.description",
+        label: "get.status.label",
+        description: "get.status.description",
         options: LeadStatusOptions,
         columns: 6,
         schema: z.enum(LeadStatus).optional(),
       }),
 
-      country: requestField({
+      country: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.export.get.country.label",
-        description: "app.api.leads.export.get.country.description",
+        label: "get.country.label",
+        description: "get.country.description",
         options: CountriesOptions,
         columns: 6,
         schema: z.enum(Countries).optional(),
       }),
 
-      language: requestField({
+      language: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.export.get.language.label",
-        description: "app.api.leads.export.get.language.description",
+        label: "get.language.label",
+        description: "get.language.description",
         options: LanguagesOptions,
         columns: 6,
         schema: z.enum(Languages).optional(),
       }),
 
-      source: requestField({
+      source: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.export.get.source.label",
-        description: "app.api.leads.export.get.source.description",
+        label: "get.source.label",
+        description: "get.source.description",
         options: LeadSourceOptions,
         columns: 12,
         schema: z.enum(LeadSource).optional(),
       }),
 
-      search: requestField({
+      search: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.leads.export.get.search.label",
-        description: "app.api.leads.export.get.search.description",
-        placeholder: "app.api.leads.export.get.search.placeholder",
+        label: "get.search.label",
+        description: "get.search.description",
+        placeholder: "get.search.placeholder",
         columns: 12,
         schema: z.string().optional(),
       }),
 
-      dateFrom: requestField({
+      dateFrom: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
-        label: "app.api.leads.export.get.dateFrom.label",
-        description: "app.api.leads.export.get.dateFrom.description",
+        label: "get.dateFrom.label",
+        description: "get.dateFrom.description",
         columns: 6,
         schema: dateSchema.optional(),
       }),
 
-      dateTo: requestField({
+      dateTo: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.DATE,
-        label: "app.api.leads.export.get.dateTo.label",
-        description: "app.api.leads.export.get.dateTo.description",
+        label: "get.dateTo.label",
+        description: "get.dateTo.description",
         columns: 6,
         schema: dateSchema.optional(),
       }),
 
-      includeMetadata: requestField({
+      includeMetadata: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.export.get.includeMetadata.label",
-        description: "app.api.leads.export.get.includeMetadata.description",
+        label: "get.includeMetadata.label",
+        description: "get.includeMetadata.description",
         columns: 6,
         schema: z.coerce.boolean().default(false),
       }),
 
-      includeEngagementData: requestField({
+      includeEngagementData: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.export.get.includeEngagementData.label",
-        description:
-          "app.api.leads.export.get.includeEngagementData.description",
+        label: "get.includeEngagementData.label",
+        description: "get.includeEngagementData.description",
         columns: 6,
         schema: z.coerce.boolean().default(false),
       }),
 
       // === RESPONSE FIELDS ===
-      fileName: responseField({
+      fileName: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.export.get.response.fileName",
+        content: "get.response.fileName",
         schema: z.string(),
       }),
 
-      fileContent: responseField({
+      fileContent: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.export.get.response.fileContent",
+        content: "get.response.fileContent",
         schema: z.string(),
       }),
 
-      mimeType: responseField({
+      mimeType: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.export.get.response.mimeType",
+        content: "get.response.mimeType",
         schema: z.enum(MimeType),
       }),
 
-      totalRecords: responseField({
+      totalRecords: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.export.get.response.totalRecords",
+        content: "get.response.totalRecords",
         schema: z.coerce.number(),
       }),
 
-      exportedAt: responseField({
+      exportedAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.leads.export.get.response.exportedAt",
+        content: "get.response.exportedAt",
         schema: z.coerce.date(),
       }),
     },
@@ -189,46 +190,46 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.leads.export.get.errors.validation.title",
-      description: "app.api.leads.export.get.errors.validation.description",
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.leads.export.get.errors.unauthorized.title",
-      description: "app.api.leads.export.get.errors.unauthorized.description",
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.leads.export.get.errors.server.title",
-      description: "app.api.leads.export.get.errors.server.description",
+      title: "get.errors.server.title",
+      description: "get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.leads.export.get.errors.unknown.title",
-      description: "app.api.leads.export.get.errors.unknown.description",
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.leads.export.get.errors.network.title",
-      description: "app.api.leads.export.get.errors.network.description",
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.leads.export.get.errors.forbidden.title",
-      description: "app.api.leads.export.get.errors.forbidden.description",
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.leads.export.get.errors.notFound.title",
-      description: "app.api.leads.export.get.errors.notFound.description",
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.leads.export.get.errors.unsavedChanges.title",
-      description: "app.api.leads.export.get.errors.unsavedChanges.description",
+      title: "get.errors.unsavedChanges.title",
+      description: "get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.leads.export.get.errors.conflict.title",
-      description: "app.api.leads.export.get.errors.conflict.description",
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.leads.export.get.success.title",
-    description: "app.api.leads.export.get.success.description",
+    title: "get.success.title",
+    description: "get.success.description",
   },
 
   examples: {

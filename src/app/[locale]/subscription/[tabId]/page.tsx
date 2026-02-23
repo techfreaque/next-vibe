@@ -4,12 +4,15 @@
  */
 
 import { notFound } from "next/navigation";
+import { redirect } from "next-vibe-ui/lib/redirect";
 import type { JSX } from "react";
 
+import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { SubscriptionPageClient } from "./page-client";
@@ -34,6 +37,7 @@ export default async function SubscriptionPage({
   }
 
   const logger = createEndpointLogger(false, Date.now(), locale);
+  const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
 
   // Get user
   const userResponse = await UserRepository.getUserByAuth({}, locale, logger);
@@ -41,7 +45,11 @@ export default async function SubscriptionPage({
     notFound();
   }
   const user = userResponse.data;
-  const isAuthenticated = user && !user.isPublic && "id" in user && user.id;
+  const isAuthenticated = user && !user.isPublic && user.id;
+
+  if (env.NEXT_PUBLIC_LOCAL_MODE && !isAuthenticated) {
+    redirect(`/${locale}/user/login`);
+  }
 
   // Fetch subscription data
   let initialSubscription = null;
@@ -62,6 +70,8 @@ export default async function SubscriptionPage({
     const creditsResponse = await CreditRepository.getBalance(
       { userId: user.id },
       logger,
+      creditsT,
+      locale,
     );
     initialCredits = creditsResponse.success ? creditsResponse.data : null;
   }
@@ -73,6 +83,7 @@ export default async function SubscriptionPage({
       { paginationInfo: { page: 1, limit: 50 } },
       user,
       logger,
+      creditsT,
       locale,
     );
     initialHistory = historyResponse.success ? historyResponse.data : null;

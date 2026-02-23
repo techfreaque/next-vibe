@@ -14,8 +14,8 @@ import { KagiSearchRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: kagiSearchDefinition,
   [Methods.GET]: {
-    handler: ({ data, logger }) => {
-      return KagiSearchRepository.search(data, logger);
+    handler: ({ data, logger, t }) => {
+      return KagiSearchRepository.search(data, logger, t);
     },
   },
 });

@@ -9,11 +9,11 @@ import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  objectField,
-  requestField,
-  responseArrayField,
   responseArrayOptionalField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -27,6 +27,7 @@ import { UserRole, UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
 import { dateSchema } from "../../../shared/types/common.schema";
 import { DefaultFolderId } from "../config";
 import { ThreadStatus, ThreadStatusDB, ThreadStatusOptions } from "../enum";
+import { scopedTranslation } from "./i18n";
 import { ThreadsListContainer } from "./widget";
 
 /**
@@ -37,6 +38,7 @@ import { ThreadsListContainer } from "./widget";
  * The repository layer filters results based on authentication status
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["agent", "chat", "threads"],
   allowedRoles: [
@@ -46,59 +48,57 @@ const { GET } = createEndpoint({
     UserRole.REMOTE_SKILL,
   ] as const,
 
-  title: "app.api.agent.chat.threads.get.title" as const,
-  description: "app.api.agent.chat.threads.get.description" as const,
+  title: "get.title" as const,
+  description: "get.description" as const,
   icon: "message-square",
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.threads" as const],
+  category: "category" as const,
+  tags: ["tags.threads" as const],
 
   fields: customWidgetObject({
     render: ThreadsListContainer,
     usage: { request: "data", response: true } as const,
     children: {
       // === PAGINATION ===
-      page: requestField({
+      page: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.agent.chat.threads.get.page.label" as const,
-        description: "app.api.agent.chat.threads.get.page.description" as const,
+        label: "get.page.label" as const,
+        description: "get.page.description" as const,
         columns: 6,
         schema: z.coerce.number().min(1).optional().default(1),
       }),
-      limit: requestField({
+      limit: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.agent.chat.threads.get.limit.label" as const,
-        description:
-          "app.api.agent.chat.threads.get.limit.description" as const,
+        label: "get.limit.label" as const,
+        description: "get.limit.description" as const,
         columns: 6,
         schema: z.coerce.number().min(1).max(100).optional().default(20),
       }),
 
       // === FILTERS ===
-      rootFolderId: requestField({
+      rootFolderId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.agent.chat.threads.get.rootFolderId.label" as const,
-        description:
-          "app.api.agent.chat.threads.get.rootFolderId.description" as const,
+        label: "get.rootFolderId.label" as const,
+        description: "get.rootFolderId.description" as const,
         columns: 6,
         options: [
           {
             value: DefaultFolderId.PRIVATE,
-            label: "app.api.agent.chat.config.folders.private" as const,
+            label: "config.folders.private" as const,
           },
           {
             value: DefaultFolderId.SHARED,
-            label: "app.api.agent.chat.config.folders.shared" as const,
+            label: "config.folders.shared" as const,
           },
           {
             value: DefaultFolderId.PUBLIC,
-            label: "app.api.agent.chat.config.folders.public" as const,
+            label: "config.folders.public" as const,
           },
           {
             value: DefaultFolderId.CRON,
-            label: "app.chat.common.cronChats" as const,
+            label: "config.folders.cron" as const,
           },
         ],
         schema: z
@@ -112,126 +112,111 @@ const { GET } = createEndpoint({
             "Root folder to filter threads (incognito not allowed - local-only)",
           ),
       }),
-      subFolderId: requestField({
+      subFolderId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label: "app.api.agent.chat.threads.get.subFolderId.label" as const,
-        description:
-          "app.api.agent.chat.threads.get.subFolderId.description" as const,
+        label: "get.subFolderId.label" as const,
+        description: "get.subFolderId.description" as const,
         columns: 6,
         schema: z.string().uuid().or(z.literal("")).nullish(),
       }),
-      status: requestField({
+      status: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.agent.chat.threads.get.status.label" as const,
-        description:
-          "app.api.agent.chat.threads.get.status.description" as const,
+        label: "get.status.label" as const,
+        description: "get.status.description" as const,
         columns: 6,
         options: ThreadStatusOptions,
         schema: z.enum(ThreadStatusDB).optional(),
       }),
-      search: requestField({
+      search: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.agent.chat.threads.get.search.label" as const,
-        description:
-          "app.api.agent.chat.threads.get.search.description" as const,
+        label: "get.search.label" as const,
+        description: "get.search.description" as const,
         columns: 12,
         schema: z.string().optional(),
       }),
-      isPinned: requestField({
+      isPinned: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.agent.chat.threads.get.isPinned.label" as const,
-        description:
-          "app.api.agent.chat.threads.get.isPinned.description" as const,
+        label: "get.isPinned.label" as const,
+        description: "get.isPinned.description" as const,
         columns: 6,
         schema: z.boolean().optional(),
       }),
-      dateFrom: requestField({
+      dateFrom: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.agent.chat.threads.get.dateFrom.label" as const,
-        description:
-          "app.api.agent.chat.threads.get.dateFrom.description" as const,
+        label: "get.dateFrom.label" as const,
+        description: "get.dateFrom.description" as const,
         columns: 6,
         schema: dateSchema.optional(),
       }),
-      dateTo: requestField({
+      dateTo: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.agent.chat.threads.get.dateTo.label" as const,
-        description:
-          "app.api.agent.chat.threads.get.dateTo.description" as const,
+        label: "get.dateTo.label" as const,
+        description: "get.dateTo.description" as const,
         columns: 6,
         schema: dateSchema.optional(),
       }),
 
       // === RESPONSE ===
-      response: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.agent.chat.threads.get.response.title" as const,
-          description:
-            "app.api.agent.chat.threads.get.response.description" as const,
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
-          threads: responseArrayField(
-            {
+      response: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.title" as const,
+        description: "get.response.description" as const,
+        layoutType: LayoutType.STACKED,
+        usage: { response: true },
+        children: {
+          threads: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: scopedObjectFieldNew(scopedTranslation, {
               type: WidgetType.CONTAINER,
-            },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                title:
-                  "app.api.agent.chat.threads.get.response.threads.thread.title" as const,
-                layoutType: LayoutType.GRID,
-                columns: 2,
-              },
-              { response: true },
-              {
-                id: responseField({
+              title: "get.response.threads.thread.title" as const,
+              layoutType: LayoutType.GRID,
+              columns: 2,
+              usage: { response: true },
+              children: {
+                id: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.agent.chat.threads.get.response.threads.thread.id.content" as const,
+                  content: "get.response.threads.thread.id.content" as const,
                   schema: z.uuid(),
                 }),
-                title: responseField({
+                title: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.agent.chat.threads.get.response.threads.thread.threadTitle.content" as const,
+                    "get.response.threads.thread.threadTitle.content" as const,
                   schema: z.string(),
                 }),
-                rootFolderId: responseField({
+                rootFolderId: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.agent.chat.threads.get.response.threads.thread.rootFolderId.content" as const,
+                    "get.response.threads.thread.rootFolderId.content" as const,
                   schema: z.enum(DefaultFolderId),
                 }),
-                folderId: responseField({
+                folderId: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.agent.chat.threads.get.response.threads.thread.folderId.content" as const,
+                    "get.response.threads.thread.folderId.content" as const,
                   schema: z.uuid().nullable(),
                 }),
-                status: responseField({
+                status: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  text: "app.api.agent.chat.threads.get.response.threads.thread.status.content" as const,
+                  text: "get.response.threads.thread.status.content" as const,
                   schema: z.enum(ThreadStatusDB),
                 }),
-                preview: responseField({
+                preview: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.agent.chat.threads.get.response.threads.thread.preview.content" as const,
+                    "get.response.threads.thread.preview.content" as const,
                   schema: z.string().nullable(),
                 }),
-                pinned: responseField({
+                pinned: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.agent.chat.threads.get.response.threads.thread.pinned.content" as const,
+                    "get.response.threads.thread.pinned.content" as const,
                   schema: z.boolean(),
                 }),
                 // Permission roles - nullable arrays (null = inherit, [] = deny, [roles...] = allow)
@@ -239,7 +224,7 @@ const { GET } = createEndpoint({
                   {
                     type: WidgetType.CONTAINER,
                   },
-                  responseField({
+                  scopedResponseField(scopedTranslation, {
                     type: WidgetType.BADGE,
                     schema: z.enum(UserRoleDB),
                   }),
@@ -248,7 +233,7 @@ const { GET } = createEndpoint({
                   {
                     type: WidgetType.CONTAINER,
                   },
-                  responseField({
+                  scopedResponseField(scopedTranslation, {
                     type: WidgetType.BADGE,
                     schema: z.enum(UserRoleDB),
                   }),
@@ -257,7 +242,7 @@ const { GET } = createEndpoint({
                   {
                     type: WidgetType.CONTAINER,
                   },
-                  responseField({
+                  scopedResponseField(scopedTranslation, {
                     type: WidgetType.BADGE,
                     schema: z.enum(UserRoleDB),
                   }),
@@ -266,7 +251,7 @@ const { GET } = createEndpoint({
                   {
                     type: WidgetType.CONTAINER,
                   },
-                  responseField({
+                  scopedResponseField(scopedTranslation, {
                     type: WidgetType.BADGE,
                     schema: z.enum(UserRoleDB),
                   }),
@@ -275,152 +260,144 @@ const { GET } = createEndpoint({
                   {
                     type: WidgetType.CONTAINER,
                   },
-                  responseField({
+                  scopedResponseField(scopedTranslation, {
                     type: WidgetType.BADGE,
                     schema: z.enum(UserRoleDB),
                   }),
                 ),
                 // Permission flags - computed server-side based on user's roles
-                canEdit: responseField({
+                canEdit: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.agent.chat.threads.get.response.threads.thread.canEdit.content" as const,
+                    "get.response.threads.thread.canEdit.content" as const,
                   schema: z
                     .boolean()
                     .describe(
                       "Whether the current user can edit this thread (title, settings)",
                     ),
                 }),
-                canPost: responseField({
+                canPost: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.agent.chat.threads.get.response.threads.thread.canPost.content" as const,
+                    "get.response.threads.thread.canPost.content" as const,
                   schema: z
                     .boolean()
                     .describe(
                       "Whether the current user can post messages in this thread",
                     ),
                 }),
-                canModerate: responseField({
+                canModerate: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.agent.chat.threads.get.response.threads.thread.canModerate.content" as const,
+                    "get.response.threads.thread.canModerate.content" as const,
                   schema: z
                     .boolean()
                     .describe(
                       "Whether the current user can moderate/hide messages in this thread",
                     ),
                 }),
-                canDelete: responseField({
+                canDelete: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.agent.chat.threads.get.response.threads.thread.canDelete.content" as const,
+                    "get.response.threads.thread.canDelete.content" as const,
                   schema: z
                     .boolean()
                     .describe(
                       "Whether the current user can delete this thread",
                     ),
                 }),
-                canManagePermissions: responseField({
+                canManagePermissions: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.agent.chat.threads.get.response.threads.thread.canManagePermissions.content" as const,
+                    "get.response.threads.thread.canManagePermissions.content" as const,
                   schema: z
                     .boolean()
                     .describe(
                       "Whether the current user can manage permissions for this thread",
                     ),
                 }),
-                createdAt: responseField({
+                createdAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.agent.chat.threads.get.response.threads.thread.createdAt.content" as const,
+                    "get.response.threads.thread.createdAt.content" as const,
                   schema: dateSchema,
                 }),
-                updatedAt: responseField({
+                updatedAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.agent.chat.threads.get.response.threads.thread.updatedAt.content" as const,
+                    "get.response.threads.thread.updatedAt.content" as const,
                   schema: dateSchema,
                 }),
               },
-            ),
-          ),
-          totalCount: responseField({
+            }),
+          }),
+          totalCount: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.agent.chat.threads.get.response.totalCount.content" as const,
+            content: "get.response.totalCount.content" as const,
             schema: z.coerce.number(),
           }),
-          pageCount: responseField({
+          pageCount: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.agent.chat.threads.get.response.pageCount.content" as const,
+            content: "get.response.pageCount.content" as const,
             schema: z.coerce.number(),
           }),
-          page: responseField({
+          page: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.agent.chat.threads.get.response.page.content" as const,
+            content: "get.response.page.content" as const,
             schema: z.coerce.number(),
           }),
-          limit: responseField({
+          limit: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.agent.chat.threads.get.response.limit.content" as const,
+            content: "get.response.limit.content" as const,
             schema: z.coerce.number(),
           }),
         },
-      ),
+      }),
     },
   }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.agent.chat.threads.get.errors.validation.title",
-      description:
-        "app.api.agent.chat.threads.get.errors.validation.description",
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.agent.chat.threads.get.errors.unauthorized.title",
-      description:
-        "app.api.agent.chat.threads.get.errors.unauthorized.description",
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.agent.chat.threads.get.errors.forbidden.title",
-      description:
-        "app.api.agent.chat.threads.get.errors.forbidden.description",
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.agent.chat.threads.get.errors.notFound.title",
-      description: "app.api.agent.chat.threads.get.errors.notFound.description",
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.chat.threads.get.errors.server.title",
-      description: "app.api.agent.chat.threads.get.errors.server.description",
+      title: "get.errors.server.title",
+      description: "get.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.chat.threads.get.errors.network.title",
-      description: "app.api.agent.chat.threads.get.errors.network.description",
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.chat.threads.get.errors.unknown.title",
-      description: "app.api.agent.chat.threads.get.errors.unknown.description",
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.agent.chat.threads.get.errors.unsavedChanges.title",
-      description:
-        "app.api.agent.chat.threads.get.errors.unsavedChanges.description",
+      title: "get.errors.unsavedChanges.title",
+      description: "get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.agent.chat.threads.get.errors.conflict.title",
-      description: "app.api.agent.chat.threads.get.errors.conflict.description",
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.agent.chat.threads.get.success.title",
-    description: "app.api.agent.chat.threads.get.success.description",
+    title: "get.success.title",
+    description: "get.success.description",
   },
 
   examples: {
@@ -450,6 +427,7 @@ const { GET } = createEndpoint({
  * Creates a new chat thread
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["agent", "chat", "threads"],
   allowedRoles: [
@@ -458,243 +436,208 @@ const { POST } = createEndpoint({
     UserRole.REMOTE_SKILL,
   ] as const,
 
-  title: "app.api.agent.chat.threads.post.title" as const,
-  description: "app.api.agent.chat.threads.post.description" as const,
+  title: "post.title" as const,
+  description: "post.description" as const,
   icon: "message-square-plus" as const,
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.threads" as const],
+  category: "category" as const,
+  tags: ["tags.threads" as const],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.agent.chat.threads.post.form.title" as const,
-      description: "app.api.agent.chat.threads.post.form.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.form.title" as const,
+    description: "post.form.description" as const,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      thread: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.agent.chat.threads.post.sections.thread.title" as const,
-          description:
-            "app.api.agent.chat.threads.post.sections.thread.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 2,
-        },
-        { request: "data" },
-        {
-          id: requestField({
+      thread: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "post.sections.thread.title" as const,
+        description: "post.sections.thread.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 2,
+        usage: { request: "data" },
+        children: {
+          id: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.UUID,
-            label: "app.api.agent.chat.threads.post.id.label" as const,
-            description:
-              "app.api.agent.chat.threads.post.id.description" as const,
+            label: "post.id.label" as const,
+            description: "post.id.description" as const,
             columns: 12,
             schema: z.uuid(),
           }),
-          title: requestField({
+          title: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
-            label: "app.api.agent.chat.threads.post.threadTitle.label" as const,
-            description:
-              "app.api.agent.chat.threads.post.threadTitle.description" as const,
+            label: "post.threadTitle.label" as const,
+            description: "post.threadTitle.description" as const,
             columns: 12,
             schema: z.string().min(1).max(255).optional().default("New Chat"),
           }),
-          rootFolderId: requestField({
+          rootFolderId: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label:
-              "app.api.agent.chat.threads.post.rootFolderId.label" as const,
-            description:
-              "app.api.agent.chat.threads.post.rootFolderId.description" as const,
+            label: "post.rootFolderId.label" as const,
+            description: "post.rootFolderId.description" as const,
             columns: 6,
             options: [
               {
                 value: DefaultFolderId.PRIVATE,
-                label: "app.api.agent.chat.config.folders.private" as const,
+                label: "config.folders.private" as const,
               },
               {
                 value: DefaultFolderId.SHARED,
-                label: "app.api.agent.chat.config.folders.shared" as const,
+                label: "config.folders.shared" as const,
               },
               {
                 value: DefaultFolderId.PUBLIC,
-                label: "app.api.agent.chat.config.folders.public" as const,
+                label: "config.folders.public" as const,
               },
               {
                 value: DefaultFolderId.INCOGNITO,
-                label: "app.api.agent.chat.config.folders.incognito" as const,
+                label: "config.folders.incognito" as const,
               },
             ],
             schema: z
               .enum(DefaultFolderId)
               .refine((val) => val !== DefaultFolderId.INCOGNITO, {
-                message:
-                  "app.api.agent.chat.threads.post.errors.forbidden.incognitoNotAllowed",
+                message: "post.errors.forbidden.incognitoNotAllowed",
               }),
           }),
-          subFolderId: requestField({
+          subFolderId: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.UUID,
-            label: "app.api.agent.chat.threads.post.subFolderId.label" as const,
-            description:
-              "app.api.agent.chat.threads.post.subFolderId.description" as const,
+            label: "post.subFolderId.label" as const,
+            description: "post.subFolderId.description" as const,
             columns: 6,
             schema: z.uuid().optional().nullable(),
           }),
-          model: requestField({
+          model: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
-            label:
-              "app.api.agent.chat.threads.post.defaultModel.label" as const,
-            description:
-              "app.api.agent.chat.threads.post.defaultModel.description" as const,
+            label: "post.defaultModel.label" as const,
+            description: "post.defaultModel.description" as const,
             columns: 6,
             schema: z.enum(ModelId),
           }),
-          character: requestField({
+          character: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
-            label: "app.api.agent.chat.threads.post.defaultTone.label" as const,
-            description:
-              "app.api.agent.chat.threads.post.defaultTone.description" as const,
+            label: "post.defaultTone.label" as const,
+            description: "post.defaultTone.description" as const,
             columns: 6,
             schema: z.string().nullable(),
           }),
-          systemPrompt: requestField({
+          systemPrompt: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXTAREA,
-            label:
-              "app.api.agent.chat.threads.post.systemPrompt.label" as const,
-            description:
-              "app.api.agent.chat.threads.post.systemPrompt.description" as const,
+            label: "post.systemPrompt.label" as const,
+            description: "post.systemPrompt.description" as const,
             columns: 12,
             schema: z.string().optional(),
           }),
         },
-      ),
+      }),
 
       // === RESPONSE ===
-      response: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.agent.chat.threads.post.response.title" as const,
-          description:
-            "app.api.agent.chat.threads.post.response.description" as const,
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
-          thread: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.agent.chat.threads.post.response.thread.title" as const,
-              layoutType: LayoutType.GRID,
-              columns: 2,
-            },
-            { response: true },
-            {
-              id: responseField({
+      response: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "post.response.title" as const,
+        description: "post.response.description" as const,
+        layoutType: LayoutType.STACKED,
+        usage: { response: true },
+        children: {
+          thread: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "post.response.thread.title" as const,
+            layoutType: LayoutType.GRID,
+            columns: 2,
+            usage: { response: true },
+            children: {
+              id: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.threads.post.response.thread.id.content" as const,
+                content: "post.response.thread.id.content" as const,
                 schema: z.uuid(),
               }),
-              title: responseField({
+              title: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.threads.post.response.thread.threadTitle.content" as const,
+                content: "post.response.thread.threadTitle.content" as const,
                 schema: z.string(),
               }),
-              rootFolderId: responseField({
+              rootFolderId: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.threads.post.response.thread.rootFolderId.content" as const,
+                content: "post.response.thread.rootFolderId.content" as const,
                 schema: z.enum(DefaultFolderId),
               }),
-              subFolderId: responseField({
+              subFolderId: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.threads.post.response.thread.subFolderId.content" as const,
+                content: "post.response.thread.subFolderId.content" as const,
                 schema: z.uuid().nullable(),
               }),
-              status: responseField({
+              status: scopedResponseField(scopedTranslation, {
                 type: WidgetType.BADGE,
-                text: "app.api.agent.chat.threads.post.response.thread.status.content" as const,
+                text: "post.response.thread.status.content" as const,
                 schema: z.enum(ThreadStatusDB),
               }),
-              createdAt: responseField({
+              createdAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.threads.post.response.thread.createdAt.content" as const,
+                content: "post.response.thread.createdAt.content" as const,
                 schema: dateSchema,
               }),
-              updatedAt: responseField({
+              updatedAt: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.agent.chat.threads.post.response.thread.updatedAt.content" as const,
+                content: "post.response.thread.updatedAt.content" as const,
                 schema: dateSchema,
               }),
             },
-          ),
+          }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.agent.chat.threads.post.errors.validation.title",
-      description:
-        "app.api.agent.chat.threads.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.agent.chat.threads.post.errors.unauthorized.title",
-      description:
-        "app.api.agent.chat.threads.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.agent.chat.threads.post.errors.forbidden.title",
-      description:
-        "app.api.agent.chat.threads.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.agent.chat.threads.post.errors.notFound.title",
-      description:
-        "app.api.agent.chat.threads.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.chat.threads.post.errors.server.title",
-      description: "app.api.agent.chat.threads.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.chat.threads.post.errors.network.title",
-      description: "app.api.agent.chat.threads.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.chat.threads.post.errors.unknown.title",
-      description: "app.api.agent.chat.threads.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.agent.chat.threads.post.errors.unsavedChanges.title",
-      description:
-        "app.api.agent.chat.threads.post.errors.unsavedChanges.description",
+      title: "post.errors.unsavedChanges.title",
+      description: "post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.agent.chat.threads.post.errors.conflict.title",
-      description:
-        "app.api.agent.chat.threads.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.agent.chat.threads.post.success.title",
-    description: "app.api.agent.chat.threads.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   examples: {

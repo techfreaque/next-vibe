@@ -8,9 +8,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,6 +21,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../user-roles/enum";
+import { scopedTranslation } from "./i18n";
 
 const ALLOWED_ROLES = [
   UserRole.CUSTOMER,
@@ -33,81 +34,64 @@ const ALLOWED_ROLES = [
 // ── Shared error types ──────────────────────────────────────────────────────
 const SESSION_ERROR_TYPES = {
   [EndpointErrorTypes.VALIDATION_FAILED]: {
-    title:
-      "app.api.user.private.sessions.create.errors.validation.title" as const,
-    description:
-      "app.api.user.private.sessions.create.errors.validation.description" as const,
+    title: "create.errors.validation.title",
+    description: "create.errors.validation.description",
   },
   [EndpointErrorTypes.UNAUTHORIZED]: {
-    title:
-      "app.api.user.private.sessions.create.errors.unauthorized.title" as const,
-    description:
-      "app.api.user.private.sessions.create.errors.unauthorized.description" as const,
+    title: "create.errors.unauthorized.title",
+    description: "create.errors.unauthorized.description",
   },
   [EndpointErrorTypes.SERVER_ERROR]: {
-    title: "app.api.user.private.sessions.create.errors.server.title" as const,
-    description:
-      "app.api.user.private.sessions.create.errors.server.description" as const,
+    title: "create.errors.server.title",
+    description: "create.errors.server.description",
   },
   [EndpointErrorTypes.UNKNOWN_ERROR]: {
-    title: "app.api.user.private.sessions.create.errors.unknown.title" as const,
-    description:
-      "app.api.user.private.sessions.create.errors.unknown.description" as const,
+    title: "create.errors.unknown.title",
+    description: "create.errors.unknown.description",
   },
   [EndpointErrorTypes.NETWORK_ERROR]: {
-    title: "app.api.user.private.sessions.create.errors.network.title" as const,
-    description:
-      "app.api.user.private.sessions.create.errors.network.description" as const,
+    title: "create.errors.network.title",
+    description: "create.errors.network.description",
   },
   [EndpointErrorTypes.FORBIDDEN]: {
-    title:
-      "app.api.user.private.sessions.create.errors.forbidden.title" as const,
-    description:
-      "app.api.user.private.sessions.create.errors.forbidden.description" as const,
+    title: "create.errors.forbidden.title",
+    description: "create.errors.forbidden.description",
   },
   [EndpointErrorTypes.NOT_FOUND]: {
-    title:
-      "app.api.user.private.sessions.create.errors.notFound.title" as const,
-    description:
-      "app.api.user.private.sessions.create.errors.notFound.description" as const,
+    title: "create.errors.notFound.title",
+    description: "create.errors.notFound.description",
   },
   [EndpointErrorTypes.CONFLICT]: {
-    title:
-      "app.api.user.private.sessions.create.errors.conflict.title" as const,
-    description:
-      "app.api.user.private.sessions.create.errors.conflict.description" as const,
+    title: "create.errors.conflict.title",
+    description: "create.errors.conflict.description",
   },
   [EndpointErrorTypes.UNSAVED_CHANGES]: {
-    title:
-      "app.api.user.private.sessions.create.errors.conflict.title" as const,
-    description:
-      "app.api.user.private.sessions.create.errors.conflict.description" as const,
+    title: "create.errors.conflict.title",
+    description: "create.errors.conflict.description",
   },
 } as const;
 
 // ── GET /user/private/sessions — list sessions ──────────────────────────────
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["user", "private", "sessions"],
-  title: "app.api.user.private.sessions.list.title" as const,
-  description: "app.api.user.private.sessions.list.description" as const,
+  title: "list.title",
+  description: "list.description",
   icon: "key",
-  category: "app.api.user.category" as const,
-  tags: ["app.api.user.private.sessions.list.tag" as const],
+  category: "category",
+  tags: ["list.tag"],
   allowedRoles: ALLOWED_ROLES,
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.user.private.sessions.list.title" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { response: true },
-    {
-      sessions: responseField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "list.title",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { response: true },
+    children: {
+      sessions: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.user.private.sessions.list.response.sessions" as const,
+        content: "list.response.sessions",
         schema: z.array(
           z.object({
             id: z.string().uuid(),
@@ -119,12 +103,11 @@ const { GET } = createEndpoint({
         ),
       }),
     },
-  ),
+  }),
   errorTypes: SESSION_ERROR_TYPES,
   successTypes: {
-    title: "app.api.user.private.sessions.list.success.title" as const,
-    description:
-      "app.api.user.private.sessions.list.success.description" as const,
+    title: "list.success.title",
+    description: "list.success.description",
   },
   examples: {
     responses: {
@@ -137,59 +120,55 @@ const { GET } = createEndpoint({
 
 // ── POST /user/private/sessions — create named session ──────────────────────
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["user", "private", "sessions"],
-  title: "app.api.user.private.sessions.create.title" as const,
-  description: "app.api.user.private.sessions.create.description" as const,
+  title: "create.title",
+  description: "create.description",
   icon: "key",
-  category: "app.api.user.category" as const,
-  tags: ["app.api.user.private.sessions.create.tag" as const],
+  category: "category",
+  tags: ["create.tag"],
   allowedRoles: ALLOWED_ROLES,
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.user.private.sessions.create.title" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true } as const,
-    {
-      name: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "create.title",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true } as const,
+    children: {
+      name: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.user.private.sessions.create.form.name" as const,
-        description:
-          "app.api.user.private.sessions.create.form.namePlaceholder" as const,
+        label: "create.form.name",
+        description: "create.form.namePlaceholder",
         schema: z.string().min(1).max(100),
       }),
-      token: responseField({
+      token: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.user.private.sessions.create.response.token" as const,
+        content: "create.response.token",
         schema: z.string(),
       }),
-      id: responseField({
+      id: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.user.private.sessions.create.response.id" as const,
+        content: "create.response.id",
         schema: z.string().uuid(),
       }),
-      sessionName: responseField({
+      sessionName: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.user.private.sessions.create.response.name" as const,
+        content: "create.response.name",
         schema: z.string(),
       }),
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.ALERT,
-        content:
-          "app.api.user.private.sessions.create.response.message" as const,
+        content: "create.response.message",
         schema: z.string(),
       }),
     },
-  ),
+  }),
   errorTypes: SESSION_ERROR_TYPES,
   successTypes: {
-    title: "app.api.user.private.sessions.create.success.title" as const,
-    description:
-      "app.api.user.private.sessions.create.success.description" as const,
+    title: "create.success.title",
+    description: "create.success.description",
   },
   examples: {
     requests: {
@@ -200,7 +179,7 @@ const { POST } = createEndpoint({
         token: "eyJ...",
         id: "00000000-0000-0000-0000-000000000000",
         sessionName: "My agent bot",
-        message: "app.api.user.private.sessions.create.response.message",
+        message: "create.response.message",
       },
     },
   },

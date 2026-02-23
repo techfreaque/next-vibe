@@ -16,7 +16,8 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "../i18n";
 
 // CLI Options types
 export interface CliOptionsRequestOutput {
@@ -78,8 +79,12 @@ export interface CliOptionsRepository {
   validateOption(
     name: string,
     value: string | number | boolean | null | string[],
+    locale: CountryLanguage,
   ): Promise<ResponseType<boolean>>;
-  generateHelp(category?: string): Promise<ResponseType<string>>;
+  generateHelp(
+    locale: CountryLanguage,
+    category?: string,
+  ): Promise<ResponseType<string>>;
 }
 
 /**
@@ -100,18 +105,15 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
   ): Promise<ResponseType<CliOptionsResponseOutput>> {
-    const { t } = simpleT(locale);
+    const { t } = scopedTranslation.scopedT(locale);
 
     // Validate user permissions
     if (!user?.id) {
       return fail({
-        message:
-          "app.api.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.title",
+        message: t("endpoints.post.errors.unauthorized.title"),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
         messageParams: {
-          error: t(
-            "app.api.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.description",
-          ),
+          error: t("endpoints.post.errors.unauthorized.description"),
         },
       });
     }
@@ -143,39 +145,24 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
           } else {
             response.validation = {
               isValid: false,
-              errors: [
-                t(
-                  "app.api.system.unifiedInterface.cli.setup.install.post.errors.validation.title",
-                ),
-              ],
+              errors: [t("endpoints.post.errors.validation.title")],
             };
           }
           break;
         case "define":
           // Define new option (implementation would go here)
-          response.options = [
-            t(
-              "app.api.system.unifiedInterface.cli.setup.install.post.success.title",
-            ),
-          ];
+          response.options = [t("endpoints.post.success.title")];
           break;
         case "parse":
           // Parse option values (implementation would go here)
-          response.options = [
-            t(
-              "app.api.system.unifiedInterface.cli.setup.install.post.success.title",
-            ),
-          ];
+          response.options = [t("endpoints.post.success.title")];
           break;
         default:
           return fail({
-            message:
-              "app.api.system.generators.endpoints.post.errors.server.title",
+            message: t("endpoints.post.errors.server.title"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
-              error: t(
-                "app.api.system.generators.endpoints.post.errors.server.description",
-              ),
+              error: t("endpoints.post.errors.server.description"),
             },
           });
       }
@@ -183,7 +170,7 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
       return success(response);
     } catch (error) {
       return fail({
-        message: "app.api.shared.errorTypes.internal_error",
+        message: t("endpoints.post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -196,14 +183,16 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
   validateOption(
     name: string,
     value: string | number | boolean | null | string[],
+    locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const validation = this.validateOptionValue(name, value);
       return Promise.resolve(success(validation.valid));
     } catch (error) {
       return Promise.resolve(
         fail({
-          message: "app.api.shared.errorTypes.validation_error",
+          message: t("endpoints.post.errors.validation.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: parseError(error).message },
         }),
@@ -214,14 +203,18 @@ export class CliOptionsRepositoryImpl implements CliOptionsRepository {
   /**
    * Generate help text
    */
-  generateHelp(category?: string): Promise<ResponseType<string>> {
+  generateHelp(
+    locale: CountryLanguage,
+    category?: string,
+  ): Promise<ResponseType<string>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       const help = this.generateOptionsHelp(category);
       return Promise.resolve(success(help));
     } catch (error) {
       return Promise.resolve(
         fail({
-          message: "app.api.shared.errorTypes.internal_error",
+          message: t("endpoints.post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: parseError(error).message },
         }),

@@ -15,6 +15,7 @@ import {
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation as leadsScopedTranslation } from "../i18n";
 import { LeadsRepository } from "../repository";
 import type {
   BatchDeleteRequestOutput,
@@ -22,6 +23,10 @@ import type {
   BatchUpdateRequestOutput,
   BatchUpdateResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+type LeadsModuleT = ReturnType<typeof leadsScopedTranslation.scopedT>["t"];
 
 /**
  * Batch Operations Repository - Static class pattern
@@ -35,13 +40,15 @@ export class BatchRepository {
   static async batchUpdateLeads(
     data: BatchUpdateRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
     locale: CountryLanguage,
   ): Promise<ResponseType<BatchUpdateResponseOutput>> {
     logger.debug("Batch update leads operation", {
       dataKeys: Object.keys(data),
     });
 
-    const result = await LeadsRepository.batchUpdateLeads(data, logger, locale);
+    const leadsT: LeadsModuleT = leadsScopedTranslation.scopedT(locale).t;
+    const result = await LeadsRepository.batchUpdateLeads(data, logger, leadsT);
 
     if (result.success && result.data) {
       return success({
@@ -50,7 +57,7 @@ export class BatchRepository {
     }
 
     return fail({
-      message: "app.api.leads.error.general.internal_server_error",
+      message: t("patch.errors.server.title"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
@@ -62,12 +69,15 @@ export class BatchRepository {
   static async batchDeleteLeads(
     data: BatchDeleteRequestOutput,
     logger: EndpointLogger,
+    locale: CountryLanguage,
+    t: ModuleT,
   ): Promise<ResponseType<BatchDeleteResponseOutput>> {
     logger.debug("Batch delete leads operation", {
       dataKeys: Object.keys(data),
     });
 
-    const result = await LeadsRepository.batchDeleteLeads(data, logger);
+    const leadsT: LeadsModuleT = leadsScopedTranslation.scopedT(locale).t;
+    const result = await LeadsRepository.batchDeleteLeads(data, logger, leadsT);
 
     if (result.success && result.data) {
       return success({
@@ -76,7 +86,7 @@ export class BatchRepository {
     }
 
     return fail({
-      message: "app.api.leads.error.general.internal_server_error",
+      message: t("delete.errors.server.title"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }

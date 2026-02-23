@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  responseField,
-  widgetField,
+  scopedObjectFieldNew,
+  scopedResponseField,
+  scopedWidgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -19,15 +19,17 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../user-roles/enum";
+import { scopedTranslation } from "./i18n";
 
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["user", "private", "logout"],
-  title: "app.api.user.private.logout.title" as const,
-  description: "app.api.user.private.logout.description" as const,
+  title: "title",
+  description: "description",
   icon: "log-out",
-  category: "app.api.user.category" as const,
-  tags: ["app.api.user.private.logout.tag" as const],
+  category: "category",
+  tags: ["tag"],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
@@ -36,85 +38,73 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
     UserRole.REMOTE_SKILL,
   ] as const,
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.user.private.logout.title" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { response: true },
-    {
-      message: responseField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "title",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { response: true },
+    children: {
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.ALERT,
-        content: "app.api.user.private.logout.response.message" as const,
+        content: "response.message",
         schema: z.string(),
       }),
-      submitButton: widgetField({
+      submitButton: scopedWidgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
-        text: "app.api.user.private.logout.logoutButton" as const,
-        loadingText: "app.api.user.private.logout.loggingOut" as const,
+        text: "logoutButton",
+        loadingText: "loggingOut",
         icon: "log-out",
         columns: 12,
         usage: { response: true },
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.user.private.logout.errors.validation.title" as const,
-      description:
-        "app.api.user.private.logout.errors.validation.description" as const,
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.user.private.logout.errors.unauthorized.title" as const,
-      description:
-        "app.api.user.private.logout.errors.unauthorized.description" as const,
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.user.private.logout.errors.internal.title" as const,
-      description:
-        "app.api.user.private.logout.errors.internal.description" as const,
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.user.private.logout.errors.unknown.title" as const,
-      description:
-        "app.api.user.private.logout.errors.unknown.description" as const,
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.user.private.logout.errors.conflict.title" as const,
-      description:
-        "app.api.user.private.logout.errors.conflict.description" as const,
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.user.private.logout.errors.forbidden.title" as const,
-      description:
-        "app.api.user.private.logout.errors.forbidden.description" as const,
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.user.private.logout.errors.network_error.title" as const,
-      description:
-        "app.api.user.private.logout.errors.network_error.description" as const,
+      title: "errors.network_error.title",
+      description: "errors.network_error.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.user.private.logout.errors.not_found.title" as const,
-      description:
-        "app.api.user.private.logout.errors.not_found.description" as const,
+      title: "errors.not_found.title",
+      description: "errors.not_found.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.user.private.logout.errors.unsaved_changes.title" as const,
-      description:
-        "app.api.user.private.logout.errors.unsaved_changes.description" as const,
+      title: "errors.unsaved_changes.title",
+      description: "errors.unsaved_changes.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.user.private.logout.success.title" as const,
-    description: "app.api.user.private.logout.success.description" as const,
+    title: "success.title",
+    description: "success.description",
   },
 
   // === EXAMPLES ===

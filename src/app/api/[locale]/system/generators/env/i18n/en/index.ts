@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Generators",
+
   post: {
     title: "Environment Generator",
     description: "Generate consolidated environment configuration files",

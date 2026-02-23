@@ -9,8 +9,11 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { SessionData } from "../../shared/server-only/auth/base-auth-handler";
+import { scopedTranslation as cliScopedTranslation } from "../i18n";
 
 /**
  * Session file path
@@ -56,6 +59,7 @@ function getSessionFilePath(): string {
  */
 export async function readSessionFile(
   logger: EndpointLogger,
+  locale: CountryLanguage,
 ): Promise<ResponseType<SessionData>> {
   try {
     const sessionPath = getSessionFilePath();
@@ -79,9 +83,9 @@ export async function readSessionFile(
       !sessionData.leadId ||
       !sessionData.expiresAt
     ) {
+      const { t } = cliScopedTranslation.scopedT(locale);
       return fail({
-        message:
-          "app.api.system.unifiedInterface.cli.vibe.errors.invalidFormat",
+        message: t("vibe.errors.invalidFormat"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
         messageParams: { path: sessionPath },
       });
@@ -90,9 +94,9 @@ export async function readSessionFile(
     // Check if session is expired
     const expiresAt = new Date(sessionData.expiresAt);
     if (expiresAt < new Date()) {
+      const { t } = cliScopedTranslation.scopedT(locale);
       return fail({
-        message:
-          "app.api.system.unifiedInterface.cli.vibe.errors.sessionExpired",
+        message: t("vibe.errors.sessionExpired"),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
         messageParams: { expiresAt: sessionData.expiresAt },
       });
@@ -107,8 +111,9 @@ export async function readSessionFile(
       parsedError.message.includes(FILE_NOT_FOUND_ERROR_PATTERNS.ENOENT) ||
       parsedError.message.includes(FILE_NOT_FOUND_ERROR_PATTERNS.NO_SUCH_FILE);
     if (isFileNotFoundError) {
+      const { t } = cliScopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.unifiedInterface.cli.vibe.errors.notFound",
+        message: t("vibe.errors.notFound"),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -116,8 +121,9 @@ export async function readSessionFile(
     logger.error(
       `[SESSION FILE] Error reading session file: ${parsedError.message} (path: ${getSessionFilePath()}, projectRoot: ${getProjectRoot()}, cwd: ${process.cwd()})`,
     );
+    const { t } = cliScopedTranslation.scopedT(locale);
     return fail({
-      message: "app.api.system.unifiedInterface.cli.vibe.errors.readFailed",
+      message: t("vibe.errors.readFailed"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: { error: parsedError.message },
     });
@@ -130,6 +136,7 @@ export async function readSessionFile(
 export async function writeSessionFile(
   sessionData: SessionData,
   logger: EndpointLogger,
+  locale: CountryLanguage,
 ): Promise<ResponseType<void>> {
   try {
     const sessionPath = getSessionFilePath();
@@ -145,8 +152,9 @@ export async function writeSessionFile(
       !sessionData.leadId ||
       !sessionData.expiresAt
     ) {
+      const { t } = cliScopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.unifiedInterface.cli.vibe.errors.invalidData",
+        message: t("vibe.errors.invalidData"),
         errorType: ErrorResponseTypes.VALIDATION_ERROR,
       });
     }
@@ -165,8 +173,9 @@ export async function writeSessionFile(
     logger.error(
       `[SESSION FILE] Error writing session file: ${parsedError.message}`,
     );
+    const { t } = cliScopedTranslation.scopedT(locale);
     return fail({
-      message: "app.api.system.unifiedInterface.cli.vibe.errors.writeFailed",
+      message: t("vibe.errors.writeFailed"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: { error: parsedError.message },
     });
@@ -178,6 +187,7 @@ export async function writeSessionFile(
  */
 export async function deleteSessionFile(
   logger: EndpointLogger,
+  locale: CountryLanguage,
 ): Promise<ResponseType<void>> {
   try {
     const sessionPath = getSessionFilePath();
@@ -203,8 +213,9 @@ export async function deleteSessionFile(
     logger.error(
       `[SESSION FILE] Error deleting session file: ${parsedError.message}`,
     );
+    const { t } = cliScopedTranslation.scopedT(locale);
     return fail({
-      message: "app.api.system.unifiedInterface.cli.vibe.errors.deleteFailed",
+      message: t("vibe.errors.deleteFailed"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: { error: parsedError.message },
     });

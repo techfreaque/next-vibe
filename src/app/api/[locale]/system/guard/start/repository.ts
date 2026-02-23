@@ -20,6 +20,9 @@ import type {
   GuardStartRequestOutput,
   GuardStartResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 interface GuardJailConfig {
   project: {
@@ -480,6 +483,7 @@ export interface GuardStartRepository {
   startGuard(
     data: GuardStartRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<GuardStartResponseOutput>>;
 }
 
@@ -490,17 +494,18 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
   async startGuard(
     data: GuardStartRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<GuardStartResponseOutput>> {
     try {
       logger.info("Starting guard environment");
       logger.debug("Guard start request data", { data });
 
       if (data.guardIdInput) {
-        return await this.startByGuardId(data.guardIdInput, logger);
+        return await this.startByGuardId(data.guardIdInput, logger, t);
       }
 
       if (data.projectPath) {
-        return await this.startByProject(data.projectPath, logger);
+        return await this.startByProject(data.projectPath, logger, t);
       }
 
       if (data.startAll) {
@@ -512,14 +517,14 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
       logger.info(
         `No parameters specified, defaulting to current project: ${currentProjectPath}`,
       );
-      return await this.startByProject(currentProjectPath, logger);
+      return await this.startByProject(currentProjectPath, logger, t);
     } catch (error) {
       logger.error("Guard start failed", parseError(error));
       const parsedError =
         error instanceof Error ? error : new Error(String(error));
 
       return fail({
-        message: "app.api.system.guard.start.errors.internal.title",
+        message: t("errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -529,12 +534,13 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
   private async startByGuardId(
     guardId: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<GuardStartResponseOutput>> {
     logger.debug(`Starting guard: ${guardId}`);
 
     // For now, return error - guard ID lookup not implemented yet
     return fail({
-      message: "app.api.system.guard.start.errors.notFound.title",
+      message: t("errors.notFound.title"),
       errorType: ErrorResponseTypes.NOT_FOUND,
       messageParams: {
         error: `Guard ID lookup not implemented yet. Use project path instead.`,
@@ -545,6 +551,7 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
   private async startByProject(
     projectPath: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<GuardStartResponseOutput>> {
     logger.debug(`Starting guard for project: ${projectPath}`);
 
@@ -554,7 +561,7 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
     const vscodePath = path.join(projectPath, ".vscode");
     if (!fs.existsSync(vscodePath)) {
       return fail({
-        message: "app.api.system.guard.start.errors.notFound.title",
+        message: t("errors.notFound.title"),
         errorType: ErrorResponseTypes.NOT_FOUND,
         messageParams: {
           error: `Guard requires a VSCode project. .vscode directory not found in ${projectPath}`,
@@ -573,7 +580,7 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
     const setupResult = setupGuardJailEnvironment(config, projectPath, logger);
     if (!setupResult.success) {
       return fail({
-        message: "app.api.system.guard.start.errors.internal.title",
+        message: t("errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: setupResult.message },
       });
@@ -583,7 +590,7 @@ export class GuardStartRepositoryImpl implements GuardStartRepository {
     const vscodeResult = setupVSCodeIntegration(projectPath, logger);
     if (!vscodeResult.success) {
       return fail({
-        message: "app.api.system.guard.start.errors.internal.title",
+        message: t("errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: vscodeResult.message },
       });

@@ -307,4 +307,13 @@ export const translations = {
       daysAgo: "{{days}}d ago",
     },
   },
+  config: {
+    folders: {
+      private: "Private Chats",
+      shared: "Shared Chats",
+      public: "Public Chats",
+      incognito: "Incognito Chats",
+      cron: "Cron Threads",
+    },
+  },
 };

@@ -12,9 +12,9 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async ({ data, user, logger }) => {
+    handler: async ({ data, user, logger, locale }) => {
       const { userId } = data;
-      return await UserViewRepository.getUserView(userId, user, logger);
+      return await UserViewRepository.getUserView(userId, user, logger, locale);
     },
   },
 });

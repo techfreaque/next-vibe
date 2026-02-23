@@ -7,14 +7,14 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  objectField,
-  requestResponseField,
-  requestUrlPathParamsField,
-  requestUrlPathParamsResponseField,
-  responseArrayField,
-  responseField,
+  scopedBackButton,
+  scopedObjectFieldNew,
+  scopedRequestResponseField,
+  scopedRequestUrlPathParamsField,
+  scopedRequestUrlPathParamsResponseField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 // // leadId schema not needed - using z.uuid() directly // TODO: Remove if not needed
 import {
@@ -27,6 +27,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema } from "../../../shared/types/common.schema";
+import { scopedTranslation } from "./i18n";
 import {
   UserDeleteContainer,
   UserDetailContainer,
@@ -37,243 +38,214 @@ import {
  * Get User Endpoint Definition
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["users", "user", "[id]"],
-  title: "app.api.users.user.id.id.get.title" as const,
-  description: "app.api.users.user.id.id.get.description" as const,
+  title: "id.get.title" as const,
+  description: "id.get.description" as const,
   icon: "user",
-  category: "app.api.user.category" as const,
-  tags: ["app.api.users.user.tag" as const],
+  category: "category" as const,
+  tags: ["tag" as const],
   allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
 
   fields: customWidgetObject({
     render: UserDetailContainer,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
-      backButton: backButton({ usage: { response: true } }),
+      backButton: scopedBackButton(scopedTranslation, {
+        usage: { response: true },
+      }),
       // === URL PARAMS ===
-      id: requestUrlPathParamsField({
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label: "app.api.users.user.id.id.get.id.label" as const,
-        description: "app.api.users.user.id.id.get.id.description" as const,
-        placeholder: "app.api.users.user.id.id.get.id.placeholder" as const,
+        label: "id.get.id.label" as const,
+        description: "id.get.id.description" as const,
+        placeholder: "id.get.id.placeholder" as const,
         columns: 12,
         schema: z.uuid("usersErrors.validation.id.invalid"),
       }),
 
       // === USER PROFILE INFORMATION ===
-      userProfile: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.users.user.id.id.get.response.userProfile.title" as const,
-          description:
-            "app.api.users.user.id.id.get.response.userProfile.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 2,
-        },
-        { response: true },
-        {
-          basicInfo: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.users.user.id.id.get.response.userProfile.basicInfo.title" as const,
-              description:
-                "app.api.users.user.id.id.get.response.userProfile.basicInfo.description" as const,
-              layoutType: LayoutType.VERTICAL,
-            },
-            { response: true },
-            {
-              id: responseField({
+      userProfile: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "id.get.response.userProfile.title" as const,
+        description: "id.get.response.userProfile.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 2,
+        usage: { response: true },
+        children: {
+          basicInfo: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "id.get.response.userProfile.basicInfo.title" as const,
+            description:
+              "id.get.response.userProfile.basicInfo.description" as const,
+            layoutType: LayoutType.VERTICAL,
+            usage: { response: true },
+            children: {
+              id: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.users.user.id.id.get.response.userProfile.basicInfo.id.content" as const,
+                  "id.get.response.userProfile.basicInfo.id.content" as const,
                 schema: z.string().uuid().describe("User unique identifier"),
               }),
-              email: responseField({
+              email: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.users.user.id.id.get.response.userProfile.basicInfo.email.content" as const,
+                  "id.get.response.userProfile.basicInfo.email.content" as const,
                 schema: z.string().email().describe("User's email address"),
               }),
-              privateName: responseField({
+              privateName: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.users.user.id.id.get.response.userProfile.basicInfo.privateName.content" as const,
+                  "id.get.response.userProfile.basicInfo.privateName.content" as const,
                 schema: z.string().describe("User's private name"),
               }),
-              publicName: responseField({
+              publicName: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
                 content:
-                  "app.api.users.user.id.id.get.response.userProfile.basicInfo.publicName.content" as const,
+                  "id.get.response.userProfile.basicInfo.publicName.content" as const,
                 schema: z.string().describe("User's public name"),
               }),
             },
-          ),
+          }),
         },
-      ),
+      }),
 
       // === ACCOUNT STATUS ===
-      accountStatus: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.users.user.id.id.get.response.accountStatus.title" as const,
-          description:
-            "app.api.users.user.id.id.get.response.accountStatus.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 2,
-        },
-        { response: true },
-        {
-          isActive: responseField({
+      accountStatus: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "id.get.response.accountStatus.title" as const,
+        description: "id.get.response.accountStatus.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 2,
+        usage: { response: true },
+        children: {
+          isActive: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.users.user.id.id.get.response.accountStatus.isActive.content" as const,
+            text: "id.get.response.accountStatus.isActive.content" as const,
             schema: z.boolean().describe("Account active status"),
           }),
-          emailVerified: responseField({
+          emailVerified: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.users.user.id.id.get.response.accountStatus.emailVerified.content" as const,
+            text: "id.get.response.accountStatus.emailVerified.content" as const,
             schema: z.boolean().describe("Email verification status"),
           }),
-          stripeCustomerId: responseField({
+          stripeCustomerId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content:
-              "app.api.users.user.id.id.get.response.accountStatus.stripeCustomerId.content" as const,
+              "id.get.response.accountStatus.stripeCustomerId.content" as const,
             schema: z.string().nullable().describe("Stripe customer ID"),
           }),
-          userRoles: responseArrayField(
-            {
+          userRoles: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: scopedObjectFieldNew(scopedTranslation, {
               type: WidgetType.CONTAINER,
-            },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                layoutType: LayoutType.HORIZONTAL,
-              },
-              { response: true },
-              {
-                id: responseField({
+              layoutType: LayoutType.HORIZONTAL,
+              usage: { response: true },
+              children: {
+                id: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.users.user.id.id.get.response.accountStatus.userRoles.content" as const,
+                    "id.get.response.accountStatus.userRoles.content" as const,
                   schema: z.uuid().describe("Role ID"),
                 }),
-                role: responseField({
+                role: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  text: "app.api.users.user.id.id.get.response.accountStatus.userRoles.content" as const,
+                  text: "id.get.response.accountStatus.userRoles.content" as const,
                   schema: z.string().describe("Role name"),
                 }),
               },
-            ),
-          ),
+            }),
+          }),
         },
-      ),
+      }),
 
       // === TIMESTAMPS ===
-      timestamps: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.users.user.id.id.get.response.timestamps.title" as const,
-          description:
-            "app.api.users.user.id.id.get.response.timestamps.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 2,
-        },
-        { response: true },
-        {
-          createdAt: responseField({
+      timestamps: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "id.get.response.timestamps.title" as const,
+        description: "id.get.response.timestamps.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 2,
+        usage: { response: true },
+        children: {
+          createdAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.users.user.id.id.get.response.timestamps.createdAt.content" as const,
+            content: "id.get.response.timestamps.createdAt.content" as const,
             schema: dateSchema.describe("Account creation date"),
           }),
-          updatedAt: responseField({
+          updatedAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.users.user.id.id.get.response.timestamps.updatedAt.content" as const,
+            content: "id.get.response.timestamps.updatedAt.content" as const,
             schema: dateSchema.describe("Last update date"),
           }),
         },
-      ),
+      }),
 
-      leadId: responseField({
+      leadId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.users.user.id.id.get.response.leadId.content" as const,
+        content: "id.get.response.leadId.content" as const,
         schema: z.uuid().nullable(),
       }),
-      email: responseField({
+      email: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.users.user.id.id.get.response.email.content" as const,
+        content: "id.get.response.email.content" as const,
         schema: z.email(),
       }),
-      privateName: responseField({
+      privateName: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.users.user.id.id.get.response.privateName.content" as const,
+        content: "id.get.response.privateName.content" as const,
         schema: z.string(),
       }),
-      publicName: responseField({
+      publicName: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.users.user.id.id.get.response.publicName.content" as const,
+        content: "id.get.response.publicName.content" as const,
         schema: z.string(),
       }),
-      emailVerified: responseField({
+      emailVerified: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        text: "app.api.users.user.id.id.get.response.emailVerified.content" as const,
+        text: "id.get.response.emailVerified.content" as const,
         schema: z.boolean(),
       }),
-      isActive: responseField({
+      isActive: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        text: "app.api.users.user.id.id.get.response.isActive.content" as const,
+        text: "id.get.response.isActive.content" as const,
         schema: z.boolean(),
       }),
-      stripeCustomerId: responseField({
+      stripeCustomerId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.users.user.id.id.get.response.stripeCustomerId.content" as const,
+        content: "id.get.response.stripeCustomerId.content" as const,
         schema: z.string().nullable(),
       }),
-      userRoles: responseArrayField(
-        {
+      userRoles: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-        },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.HORIZONTAL,
-          },
-          { response: true },
-          {
-            id: responseField({
+          layoutType: LayoutType.HORIZONTAL,
+          usage: { response: true },
+          children: {
+            id: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.users.user.id.id.get.response.userRoles.content" as const,
+              content: "id.get.response.userRoles.content" as const,
               schema: z.uuid(),
             }),
-            role: responseField({
+            role: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              text: "app.api.users.user.id.id.get.response.userRoles.content" as const,
+              text: "id.get.response.userRoles.content" as const,
               schema: z.string(),
             }),
           },
-        ),
-      ),
-      createdAt: responseField({
+        }),
+      }),
+      createdAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.users.user.id.id.get.response.createdAt.content" as const,
+        content: "id.get.response.createdAt.content" as const,
         schema: dateSchema,
       }),
-      updatedAt: responseField({
+      updatedAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.users.user.id.id.get.response.updatedAt.content" as const,
+        content: "id.get.response.updatedAt.content" as const,
         schema: dateSchema,
       }),
     },
@@ -281,55 +253,45 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.users.user.id.id.get.errors.unauthorized.title" as const,
-      description:
-        "app.api.users.user.id.id.get.errors.unauthorized.description" as const,
+      title: "id.get.errors.unauthorized.title" as const,
+      description: "id.get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.users.user.id.id.get.errors.validation.title" as const,
-      description:
-        "app.api.users.user.id.id.get.errors.validation.description" as const,
+      title: "id.get.errors.validation.title" as const,
+      description: "id.get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.users.user.id.id.get.errors.forbidden.title" as const,
-      description:
-        "app.api.users.user.id.id.get.errors.forbidden.description" as const,
+      title: "id.get.errors.forbidden.title" as const,
+      description: "id.get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.users.user.id.id.get.errors.notFound.title" as const,
-      description:
-        "app.api.users.user.id.id.get.errors.notFound.description" as const,
+      title: "id.get.errors.notFound.title" as const,
+      description: "id.get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.users.user.id.id.get.errors.conflict.title" as const,
-      description:
-        "app.api.users.user.id.id.get.errors.conflict.description" as const,
+      title: "id.get.errors.conflict.title" as const,
+      description: "id.get.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.users.user.id.id.get.errors.network.title" as const,
-      description:
-        "app.api.users.user.id.id.get.errors.network.description" as const,
+      title: "id.get.errors.network.title" as const,
+      description: "id.get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.users.user.id.id.get.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.users.user.id.id.get.errors.unsavedChanges.description" as const,
+      title: "id.get.errors.unsavedChanges.title" as const,
+      description: "id.get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.users.user.id.id.get.errors.server.title" as const,
-      description:
-        "app.api.users.user.id.id.get.errors.server.description" as const,
+      title: "id.get.errors.server.title" as const,
+      description: "id.get.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.users.user.id.id.get.errors.unknown.title" as const,
-      description:
-        "app.api.users.user.id.id.get.errors.unknown.description" as const,
+      title: "id.get.errors.unknown.title" as const,
+      description: "id.get.errors.unknown.description" as const,
     },
   },
   successTypes: {
-    title: "app.api.users.user.id.id.get.success.title" as const,
-    description: "app.api.users.user.id.id.get.success.description" as const,
+    title: "id.get.success.title" as const,
+    description: "id.get.success.description" as const,
   },
 
   examples: {
@@ -388,39 +350,42 @@ const { GET } = createEndpoint({
  * Update User Endpoint Definition
  */
 const { PUT } = createEndpoint({
+  scopedTranslation,
   method: Methods.PUT,
   path: ["users", "user", "[id]"],
-  title: "app.api.users.user.id.id.put.title" as const,
-  description: "app.api.users.user.id.id.put.description" as const,
+  title: "id.put.title" as const,
+  description: "id.put.description" as const,
   icon: "user-check" as const,
-  category: "app.api.user.category" as const,
-  tags: ["app.api.users.user.tag" as const],
+  category: "category" as const,
+  tags: ["tag" as const],
   allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
 
   fields: customWidgetObject({
     render: UserEditContainer,
     usage: { request: "data&urlPathParams", response: true } as const,
     children: {
-      backButton: backButton({ usage: { request: "data", response: true } }),
+      backButton: scopedBackButton(scopedTranslation, {
+        usage: { request: "data", response: true },
+      }),
 
       // === URL PARAMS ===
-      id: requestUrlPathParamsResponseField({
+      id: scopedRequestUrlPathParamsResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label: "app.api.users.user.id.id.put.id.label" as const,
-        description: "app.api.users.user.id.id.put.id.description" as const,
-        placeholder: "app.api.users.user.id.id.put.id.placeholder" as const,
+        label: "id.put.id.label" as const,
+        description: "id.put.id.description" as const,
+        placeholder: "id.put.id.placeholder" as const,
         columns: 12,
         schema: z.string().uuid("usersErrors.validation.id.invalid"),
       }),
 
       // === BASIC INFORMATION ===
-      email: requestResponseField({
+      email: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
-        label: "app.api.users.user.id.id.put.email.label" as const,
-        description: "app.api.users.user.id.id.put.email.description" as const,
-        placeholder: "app.api.users.user.id.id.put.email.placeholder" as const,
+        label: "id.put.email.label" as const,
+        description: "id.put.email.description" as const,
+        placeholder: "id.put.email.placeholder" as const,
         columns: 6,
         schema: z
           .string()
@@ -428,12 +393,11 @@ const { PUT } = createEndpoint({
           .transform((val) => val.toLowerCase().trim())
           .optional(),
       }),
-      privateName: requestResponseField({
+      privateName: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.users.user.id.id.put.privateName.label" as const,
-        description:
-          "app.api.users.user.id.id.put.privateName.description" as const,
+        label: "id.put.privateName.label" as const,
+        description: "id.put.privateName.description" as const,
         columns: 6,
         schema: z
           .string()
@@ -442,12 +406,11 @@ const { PUT } = createEndpoint({
           .transform((val) => val.trim())
           .optional(),
       }),
-      publicName: requestResponseField({
+      publicName: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.users.user.id.id.put.publicName.label" as const,
-        description:
-          "app.api.users.user.id.id.put.publicName.description" as const,
+        label: "id.put.publicName.label" as const,
+        description: "id.put.publicName.description" as const,
         columns: 6,
         schema: z
           .string()
@@ -458,75 +421,65 @@ const { PUT } = createEndpoint({
       }),
 
       // === ADMINISTRATIVE SETTINGS ===
-      emailVerified: requestResponseField({
+      emailVerified: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.users.user.id.id.put.emailVerified.label" as const,
-        description:
-          "app.api.users.user.id.id.put.emailVerified.description" as const,
+        label: "id.put.emailVerified.label" as const,
+        description: "id.put.emailVerified.description" as const,
         columns: 6,
         schema: z.boolean().optional(),
       }),
-      isActive: requestResponseField({
+      isActive: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.users.user.id.id.put.isActive.label" as const,
-        description:
-          "app.api.users.user.id.id.put.isActive.description" as const,
+        label: "id.put.isActive.label" as const,
+        description: "id.put.isActive.description" as const,
         columns: 6,
         schema: z.boolean().optional(),
       }),
-      leadId: requestResponseField({
+      leadId: scopedRequestResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label: "app.api.users.user.id.id.put.leadId.label" as const,
-        description: "app.api.users.user.id.id.put.leadId.description" as const,
+        label: "id.put.leadId.label" as const,
+        description: "id.put.leadId.description" as const,
         columns: 6,
         schema: z.uuid().nullable().optional(),
       }),
 
       // === RESPONSE-ONLY FIELDS ===
-      stripeCustomerId: responseField({
+      stripeCustomerId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.users.user.id.id.put.response.stripeCustomerId.content" as const,
+        content: "id.put.response.stripeCustomerId.content" as const,
         schema: z.string().nullable(),
       }),
-      userRoles: responseArrayField(
-        {
+      userRoles: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-        },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.HORIZONTAL,
-          },
-          { response: true },
-          {
-            id: responseField({
+          layoutType: LayoutType.HORIZONTAL,
+          usage: { response: true },
+          children: {
+            id: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.users.user.id.id.put.response.userRoles.content" as const,
+              content: "id.put.response.userRoles.content" as const,
               schema: z.uuid(),
             }),
-            role: responseField({
+            role: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              text: "app.api.users.user.id.id.put.response.userRoles.content" as const,
+              text: "id.put.response.userRoles.content" as const,
               schema: z.string(),
             }),
           },
-        ),
-      ),
-      createdAt: responseField({
+        }),
+      }),
+      createdAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.users.user.id.id.put.response.createdAt.content" as const,
+        content: "id.put.response.createdAt.content" as const,
         schema: dateSchema,
       }),
-      updatedAt: responseField({
+      updatedAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.users.user.id.id.put.response.updatedAt.content" as const,
+        content: "id.put.response.updatedAt.content" as const,
         schema: dateSchema,
       }),
     },
@@ -534,50 +487,40 @@ const { PUT } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.users.user.id.id.put.errors.unauthorized.title" as const,
-      description:
-        "app.api.users.user.id.id.put.errors.unauthorized.description" as const,
+      title: "id.put.errors.unauthorized.title" as const,
+      description: "id.put.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.users.user.id.id.put.errors.validation.title" as const,
-      description:
-        "app.api.users.user.id.id.put.errors.validation.description" as const,
+      title: "id.put.errors.validation.title" as const,
+      description: "id.put.errors.validation.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.users.user.id.id.put.errors.forbidden.title" as const,
-      description:
-        "app.api.users.user.id.id.put.errors.forbidden.description" as const,
+      title: "id.put.errors.forbidden.title" as const,
+      description: "id.put.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.users.user.id.id.put.errors.notFound.title" as const,
-      description:
-        "app.api.users.user.id.id.put.errors.notFound.description" as const,
+      title: "id.put.errors.notFound.title" as const,
+      description: "id.put.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.users.user.id.id.put.errors.conflict.title" as const,
-      description:
-        "app.api.users.user.id.id.put.errors.conflict.description" as const,
+      title: "id.put.errors.conflict.title" as const,
+      description: "id.put.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.users.user.id.id.put.errors.server.title" as const,
-      description:
-        "app.api.users.user.id.id.put.errors.server.description" as const,
+      title: "id.put.errors.server.title" as const,
+      description: "id.put.errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.users.user.id.id.put.errors.network.title" as const,
-      description:
-        "app.api.users.user.id.id.put.errors.network.description" as const,
+      title: "id.put.errors.network.title" as const,
+      description: "id.put.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.users.user.id.id.put.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.users.user.id.id.put.errors.unsavedChanges.description" as const,
+      title: "id.put.errors.unsavedChanges.title" as const,
+      description: "id.put.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.users.user.id.id.put.errors.unknown.title" as const,
-      description:
-        "app.api.users.user.id.id.put.errors.unknown.description" as const,
+      title: "id.put.errors.unknown.title" as const,
+      description: "id.put.errors.unknown.description" as const,
     },
   },
 
@@ -616,8 +559,8 @@ const { PUT } = createEndpoint({
     },
   },
   successTypes: {
-    title: "app.api.users.user.id.id.put.success.title",
-    description: "app.api.users.user.id.id.put.success.description",
+    title: "id.put.success.title" as const,
+    description: "id.put.success.description" as const,
   },
 });
 
@@ -625,48 +568,49 @@ const { PUT } = createEndpoint({
  * Delete User Endpoint Definition
  */
 const { DELETE } = createEndpoint({
+  scopedTranslation,
   method: Methods.DELETE,
   path: ["users", "user", "[id]"],
-  title: "app.api.users.user.id.id.delete.title" as const,
-  description: "app.api.users.user.id.id.delete.description" as const,
+  title: "id.delete.title" as const,
+  description: "id.delete.description" as const,
   icon: "user-x" as const,
-  category: "app.api.user.category" as const,
-  tags: ["app.api.users.user.tag" as const],
+  category: "category" as const,
+  tags: ["tag" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
   fields: customWidgetObject({
     render: UserDeleteContainer,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
-      backButton: backButton({ usage: { response: true } }),
+      backButton: scopedBackButton(scopedTranslation, {
+        usage: { response: true },
+      }),
       // === URL PARAMS ===
-      id: requestUrlPathParamsField({
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label: "app.api.users.user.id.id.delete.id.label" as const,
-        description: "app.api.users.user.id.id.delete.id.description" as const,
-        placeholder: "app.api.users.user.id.id.delete.id.placeholder" as const,
-        helpText: "app.api.users.user.id.id.delete.id.helpText" as const,
+        label: "id.delete.id.label" as const,
+        description: "id.delete.id.description" as const,
+        placeholder: "id.delete.id.placeholder" as const,
+        helpText: "id.delete.id.helpText" as const,
         columns: 12,
         schema: z.string().uuid("usersErrors.validation.id.invalid"),
       }),
 
       // === RESPONSE ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
-        text: "app.api.users.user.id.id.delete.response.deletionResult.success.content" as const,
+        text: "id.delete.response.deletionResult.success.content" as const,
         schema: z.boolean().describe("Whether the deletion was successful"),
       }),
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.users.user.id.id.delete.response.deletionResult.message.content" as const,
+        content: "id.delete.response.deletionResult.message.content" as const,
         schema: z.string().describe("Human-readable result message"),
       }),
-      deletedAt: responseField({
+      deletedAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.users.user.id.id.delete.response.deletionResult.deletedAt.content" as const,
+        content: "id.delete.response.deletionResult.deletedAt.content" as const,
         schema: dateSchema.describe("When the user was deleted"),
       }),
     },
@@ -674,51 +618,40 @@ const { DELETE } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.users.user.id.id.delete.errors.unauthorized.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.errors.unauthorized.description" as const,
+      title: "id.delete.errors.unauthorized.title" as const,
+      description: "id.delete.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.users.user.id.id.delete.errors.validation.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.errors.validation.description" as const,
+      title: "id.delete.errors.validation.title" as const,
+      description: "id.delete.errors.validation.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.users.user.id.id.delete.errors.forbidden.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.errors.forbidden.description" as const,
+      title: "id.delete.errors.forbidden.title" as const,
+      description: "id.delete.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.users.user.id.id.delete.errors.notFound.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.errors.notFound.description" as const,
+      title: "id.delete.errors.notFound.title" as const,
+      description: "id.delete.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.users.user.id.id.delete.errors.conflict.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.errors.conflict.description" as const,
+      title: "id.delete.errors.conflict.title" as const,
+      description: "id.delete.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.users.user.id.id.delete.errors.server.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.errors.server.description" as const,
+      title: "id.delete.errors.server.title" as const,
+      description: "id.delete.errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.users.user.id.id.delete.errors.network.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.errors.network.description" as const,
+      title: "id.delete.errors.network.title" as const,
+      description: "id.delete.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.users.user.id.id.delete.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.errors.unsavedChanges.description" as const,
+      title: "id.delete.errors.unsavedChanges.title" as const,
+      description: "id.delete.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.users.user.id.id.delete.errors.unknown.title" as const,
-      description:
-        "app.api.users.user.id.id.delete.errors.unknown.description" as const,
+      title: "id.delete.errors.unknown.title" as const,
+      description: "id.delete.errors.unknown.description" as const,
     },
   },
 
@@ -737,8 +670,8 @@ const { DELETE } = createEndpoint({
     },
   },
   successTypes: {
-    title: "app.api.users.user.id.id.delete.success.title",
-    description: "app.api.users.user.id.id.delete.success.description",
+    title: "id.delete.success.title" as const,
+    description: "id.delete.success.description" as const,
   },
 });
 

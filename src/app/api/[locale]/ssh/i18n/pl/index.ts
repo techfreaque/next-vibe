@@ -11,6 +11,33 @@ export const translations = {
       description:
         "Tylko administratorzy mogą uzyskać dostęp do funkcji maszynowych",
     },
+    connectionNotFound: "Połączenie nie znalezione",
+    sessionNotFound: "Sesja nie znaleziona",
+    fileNotFound: "Plik nie znaleziony",
+    directoryNotFound: "Katalog nie znaleziony",
+    permissionDenied: "Odmowa dostępu",
+    sshSecretKeyNotSet: "Zmienna SSH_SECRET_KEY nie jest ustawiona.",
+    encryptionFailed: "Szyfrowanie nieudane",
+    noRowReturned: "Brak wiersza zwróconego z wstawiania",
+    notImplemented: {
+      test: "Backend SSH nie jest jeszcze zaimplementowany.",
+      local: "Backend SSH nie jest jeszcze zaimplementowany.",
+      fileList: "Backend SSH dla listowania plików nie jest zaimplementowany",
+      fileRead: "Backend SSH dla odczytu plików nie jest zaimplementowany",
+      fileWrite: "Backend SSH dla zapisu plików nie jest zaimplementowany",
+      session: "Sesje SSH PTY nie są jeszcze zaimplementowane.",
+    },
+    invalidWorkingDir:
+      "Nieprawidłowy katalog roboczy: musi być ścieżką bezwzględną bez '..'",
+    invalidPath: "Nieprawidłowa ścieżka: musi być bezwzględna bez '..'",
+    parentDirNotFound: "Katalog nadrzędny nie znaleziony.",
+    commandTimedOut: "Polecenie przekroczyło limit czasu",
+    cannotDeleteCurrentUser: "Nie można usunąć bieżącego użytkownika procesu",
+    cannotDeleteSystemUser:
+      "Nie można usunąć użytkowników systemowych (uid < 1000)",
+    userNotFound: "Użytkownik nie znaleziony",
+    userAlreadyExists: "Użytkownik już istnieje",
+    invalidUsername: "Nieprawidłowa nazwa użytkownika",
   },
 
   session: {

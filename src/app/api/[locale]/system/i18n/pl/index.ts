@@ -7,7 +7,6 @@ import { translations as helpTranslations } from "../../help/i18n/pl";
 import { translations as launchpadTranslations } from "../../launchpad/i18n/pl";
 import { translations as releaseToolTranslations } from "../../release-tool/i18n/pl";
 import { translations as serverTranslations } from "../../server/i18n/pl";
-import { translations as translationsTranslations } from "../../translations/i18n/pl";
 import { translations as unifiedInterfaceTranslations } from "../../unified-interface/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
@@ -70,6 +69,5 @@ export const translations: typeof enTranslations = {
   launchpad: launchpadTranslations,
   releaseTool: releaseToolTranslations,
   server: serverTranslations,
-  translations: translationsTranslations,
   unifiedInterface: unifiedInterfaceTranslations,
 };

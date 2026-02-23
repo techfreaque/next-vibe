@@ -40,6 +40,7 @@ import {
   PaymentProvider,
   type PaymentProviderValue,
 } from "@/app/api/[locale]/payment/enum";
+import { scopedTranslation as paymentScopedTranslation } from "@/app/api/[locale]/payment/i18n";
 import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 import {
   BillingInterval,
@@ -52,6 +53,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { TOTAL_MODEL_COUNT } from "../../agent/models/models";
 import type { JwtPayloadType } from "../../user/auth/types";
+import { scopedTranslation as subscriptionScopedTranslation } from "../i18n";
 
 interface BuyCreditsTabProps {
   locale: CountryLanguage;
@@ -77,6 +79,8 @@ export function BuyCreditsTab({
   user,
 }: BuyCreditsTabProps): JSX.Element {
   const { t } = useTranslation();
+  const { t: st } = subscriptionScopedTranslation.scopedT(locale);
+  const { t: pt } = paymentScopedTranslation.scopedT(locale);
 
   // Modal and provider state
   const [isProviderModalOpen, setIsProviderModalOpen] = useState(false);
@@ -167,12 +171,10 @@ export function BuyCreditsTab({
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {t("app.api.subscription.checkout.form.fields.provider.label")}
+              {st("checkout.form.fields.provider.label")}
             </DialogTitle>
             <DialogDescription>
-              {t(
-                "app.api.subscription.checkout.form.fields.provider.description",
-              )}
+              {st("checkout.form.fields.provider.description")}
             </DialogDescription>
           </DialogHeader>
           <Div className="grid gap-4 py-4">
@@ -184,7 +186,7 @@ export function BuyCreditsTab({
               <CreditCard className="h-6 w-6 text-blue-600 mr-3" />
               <Div className="text-left">
                 <Div className="font-semibold">
-                  {t("app.api.payment.enums.paymentProvider.stripe")}
+                  {pt("enums.paymentProvider.stripe")}
                 </Div>
                 <Div className="text-sm text-muted-foreground">
                   {t(
@@ -202,7 +204,7 @@ export function BuyCreditsTab({
               <Bitcoin className="h-6 w-6 text-orange-500 mr-3" />
               <Div className="text-left">
                 <Div className="font-semibold">
-                  {t("app.api.payment.enums.paymentProvider.nowpayments")}
+                  {pt("enums.paymentProvider.nowpayments")}
                 </Div>
                 <Div className="text-sm text-muted-foreground">
                   {t(
@@ -276,7 +278,7 @@ export function BuyCreditsTab({
                 onClick={() => setBillingInterval(BillingInterval.MONTHLY)}
                 className="flex-1"
               >
-                {t("app.api.subscription.billing.monthly")}
+                {st("billing.monthly")}
               </Button>
               <Button
                 variant={
@@ -288,7 +290,7 @@ export function BuyCreditsTab({
                 onClick={() => setBillingInterval(BillingInterval.YEARLY)}
                 className="flex-1"
               >
-                {t("app.api.subscription.billing.yearly")}
+                {st("billing.yearly")}
               </Button>
             </Div>
 

@@ -17,6 +17,7 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CharactersRepository } from "../../characters/repository";
 import { chatFavorites } from "../db";
@@ -24,6 +25,9 @@ import type {
   FavoriteCreateRequestOutput,
   FavoriteCreateResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type FavoritesCreateT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Favorites Create Repository
@@ -36,12 +40,14 @@ export class FavoritesCreateRepository {
     data: FavoriteCreateRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: FavoritesCreateT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<FavoriteCreateResponseOutput>> {
     const userId = user.id;
 
     if (!userId) {
       return fail({
-        message: "app.api.agent.chat.favorites.post.errors.unauthorized.title",
+        message: t("post.errors.unauthorized.title"),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
@@ -55,7 +61,7 @@ export class FavoritesCreateRepository {
       // Validate characterId is not empty
       if (!data.characterId || data.characterId.trim() === "") {
         return fail({
-          message: "app.api.agent.chat.favorites.post.errors.validation.title",
+          message: t("post.errors.validation.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -67,10 +73,11 @@ export class FavoritesCreateRepository {
           { id: data.characterId },
           user,
           logger,
+          locale,
         );
         if (!characterResult.success) {
           return fail({
-            message: "app.api.agent.chat.favorites.post.errors.notFound.title",
+            message: t("post.errors.notFound.title"),
             errorType: ErrorResponseTypes.NOT_FOUND,
           });
         }
@@ -109,19 +116,19 @@ export class FavoritesCreateRepository {
 
       if (!favorite) {
         return fail({
-          message: "app.api.agent.chat.favorites.post.errors.server.title",
+          message: t("post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
 
       return success({
-        success: "app.api.agent.chat.favorites.post.success.title",
+        success: t("post.success.title"),
         id: favorite.id,
       });
     } catch (error) {
       logger.error("Failed to create favorite", parseError(error));
       return fail({
-        message: "app.api.agent.chat.favorites.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

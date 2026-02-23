@@ -25,6 +25,44 @@ export const translations: typeof enTranslations = {
     jobs: "Zadania",
     list: "Lista",
   },
+  admin: {
+    title: "Zarządzanie Leadami",
+    tabs: {
+      overview: "Nawigacja Leadów",
+      stats: "Przegląd",
+      stats_description: "Przeglądaj statystyki i analizy leadów",
+      leads: "Leady",
+      leads_description: "Przeglądaj i zarządzaj wszystkimi leadami",
+      emails: "Kampanie E-mail",
+      emails_description: "Zarządzaj kampaniami e-mail i szablonami",
+      abTesting: "Testy A/B",
+      abTesting_description: "Konfiguruj warianty testów A/B",
+      campaignStarter: "Starter Kampanii",
+      campaignStarter_description: "Konfiguruj i uruchamiaj kampanie leadów",
+    },
+    import: {
+      label: "Importuj",
+      description: "Importuj leady z plików CSV",
+    },
+    emails: {
+      preview: {
+        error: "Błąd renderowania podglądu e-maila",
+        live: "Podgląd na żywo",
+        actions: {
+          title: "Podgląd E-maila",
+          description: "Podgląd jak e-mail będzie wyglądał dla odbiorców",
+        },
+      },
+      preview_title: "Podgląd E-maila",
+      testEmail: {
+        button: "Wyślij testowy e-mail",
+      },
+      from: "Od",
+      recipient: "Odbiorca",
+      subject: "Temat",
+      email_preview: "Podgląd E-maila",
+    },
+  },
   auth: {
     public: {
       validCookie: "Znaleziono ważny lead z cookie",
@@ -284,6 +322,16 @@ export const translations: typeof enTranslations = {
       pl: "Polski",
       en: "Angielski",
     },
+    emailProvider: {
+      resend: "Resend",
+      sendgrid: "SendGrid",
+      mailgun: "Mailgun",
+      ses: "Amazon SES",
+      smtp: "SMTP",
+      mailjet: "Mailjet",
+      postmark: "Postmark",
+      other: "Inne",
+    },
   },
   error: {
     general: {
@@ -343,6 +391,9 @@ export const translations: typeof enTranslations = {
     },
     leadsUnsubscribe: {
       post: {
+        success: {
+          description: "Pomyślnie wypisano",
+        },
         error: {
           validation: {
             title: "Nieprawidłowe żądanie rezygnacji",

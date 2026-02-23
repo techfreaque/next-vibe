@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next-vibe-ui/lib/not-found";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronLeft } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
@@ -17,6 +18,7 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interfac
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
@@ -57,6 +59,9 @@ export default async function ContactPage({
   params,
 }: Props): Promise<JSX.Element> {
   const { locale } = await params;
+  if (env.NEXT_PUBLIC_LOCAL_MODE) {
+    notFound();
+  }
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
 

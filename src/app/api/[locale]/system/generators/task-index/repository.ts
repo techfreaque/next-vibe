@@ -33,6 +33,9 @@ import {
   writeGeneratedFile,
 } from "../shared/utils";
 import type endpoints from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 type RequestType = typeof endpoints.POST.types.RequestOutput;
 type TaskIndexResponseType = typeof endpoints.POST.types.ResponseOutput;
@@ -44,6 +47,7 @@ interface TaskIndexGeneratorRepository {
   generateTaskIndex(
     data: RequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<BaseResponseType<TaskIndexResponseType>>;
 }
 
@@ -54,6 +58,7 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
   async generateTaskIndex(
     data: RequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<BaseResponseType<TaskIndexResponseType>> {
     const startTime = Date.now();
 
@@ -82,8 +87,7 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
       );
       if (!validationResult.success) {
         return fail({
-          message:
-            "app.api.system.generators.taskIndex.post.errors.validation.title",
+          message: t("post.errors.validation.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             error: validationResult.error || "Validation failed",
@@ -124,8 +128,7 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
         error: parseError(error),
       });
       return fail({
-        message:
-          "app.api.system.generators.taskIndex.post.errors.internal.title",
+        message: t("post.errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: `Task index generation failed: ${parseError(error).message}`,
@@ -259,7 +262,7 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
 import type {
   Task,
   TaskRegistry,
- } from "../unified-interface/tasks/unified-runner/types";
+} from "../unified-interface/tasks/unified-runner/types";
 
 ${imports.join("\n")}
 
@@ -300,15 +303,9 @@ export const taskRegistry: TaskRegistry = {
   allTasks,
   tasksByCategory,
   tasksByName,
- };
+};
 
-export {
-  allTasks,
-  cronTasks,
-  taskRunners,
-  tasksByCategory,
-  tasksByName,
- };
+export { allTasks, cronTasks, taskRunners, tasksByCategory, tasksByName };
 export default allTasks;
 `;
   }

@@ -12,16 +12,17 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { chatMessages, chatThreads } from "../../../../../db";
 import { PermissionsRepositoryClient } from "../../../../../permissions/repository-client";
-import { validateNotIncognito } from "../../../../../validation";
 import type {
   VotePostRequestOutput,
   VotePostResponseOutput,
   VotePostUrlVariablesOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type VoteT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Vote Message Repository
@@ -35,15 +36,14 @@ export const voteRepository = {
     urlPathParams: VotePostUrlVariablesOutput,
     data: VotePostRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: VoteT,
     logger: EndpointLogger,
   ): Promise<ResponseType<VotePostResponseOutput>> {
     try {
       // Type guard to ensure user has id
       if (!user.id) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.unauthorized.title",
+          message: t("post.errors.unauthorized.title"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -68,8 +68,7 @@ export const voteRepository = {
 
       if (!messageWithThread) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.notFound.title",
+          message: t("post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -77,20 +76,17 @@ export const voteRepository = {
       const { message, thread } = messageWithThread;
 
       // Reject incognito threads
-      const incognitoError = validateNotIncognito(
-        thread.rootFolderId,
-        locale,
-        "app.api.agent.chat.threads.threadId.messages.messageId.vote.post",
-      );
-      if (incognitoError) {
-        return incognitoError;
+      if (thread.rootFolderId === "incognito") {
+        return fail({
+          message: t("post.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
       }
 
       // Check voting permissions - simplified
       if (!PermissionsRepositoryClient.canVoteMessage(userId, message)) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.forbidden.title",
+          message: t("post.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -191,8 +187,7 @@ export const voteRepository = {
     } catch (error) {
       logger.error("Failed to record vote", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.messages.messageId.vote.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

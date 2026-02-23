@@ -9,4 +9,16 @@ export const translations = {
   id: idTranslations,
   list: listTranslations,
   test: testTranslations,
+  connection: {
+    test: {
+      success: "IMAP-Verbindungstest erfolgreich",
+      failed: "IMAP-Verbindungstest fehlgeschlagen",
+      timeout: "IMAP-Verbindungstest ist abgelaufen",
+    },
+    validation: {
+      usernameRequired: "Benutzername ist erforderlich",
+      portInvalid: "Ungültige Portnummer",
+      hostInvalid: "Ungültiges Host-Format",
+    },
+  },
 };

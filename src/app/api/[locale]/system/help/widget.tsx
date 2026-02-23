@@ -37,17 +37,21 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useMemo, useState } from "react";
 
+import { DEFAULT_TOOL_IDS } from "@/app/api/[locale]/agent/chat/constants";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import { useWidgetNavigation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { simpleT } from "@/i18n/core/shared";
+import {
+  useWidgetLocale,
+  useWidgetNavigation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type definition from "./definition";
 import type {
   HelpGetResponseOutput,
   HelpToolMetadataSerialized,
 } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Props for custom widget — follows the CustomWidgetProps pattern
@@ -178,8 +182,8 @@ async function navigateToTool(
 export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   const { push: navigate } = useWidgetNavigation();
   const { enabledTools, setEnabledTools } = useChatContext();
-  const locale = "en-US";
-  const { t } = simpleT(locale as Parameters<typeof simpleT>[0]);
+  const locale = useWidgetLocale();
+  const { t } = scopedTranslation.scopedT(locale);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
@@ -200,10 +204,12 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     if (enabledTools !== null) {
       return enabledTools;
     }
+    // null = default: all tools are allowed (enabled), only DEFAULT_TOOL_IDS are pinned
+    const defaultPinnedSet = new Set<string>(DEFAULT_TOOL_IDS);
     return availableTools.map((tool) => ({
       id: tool.toolName,
       requiresConfirmation: tool.requiresConfirmation ?? false,
-      active: false,
+      pinned: defaultPinnedSet.has(tool.toolName),
     }));
   }, [enabledTools, availableTools]);
 
@@ -246,9 +252,9 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   }, [filteredTools]);
 
   const stats = useMemo(() => {
-    const active = effectiveEnabledTools.filter((t) => t.active).length;
+    const pinned = effectiveEnabledTools.filter((t) => t.pinned).length;
     const enabled = effectiveEnabledTools.length;
-    return { active, enabled, total: totalCount };
+    return { pinned, enabled, total: totalCount };
   }, [effectiveEnabledTools, totalCount]);
 
   const allVisibleEnabled = useMemo(
@@ -273,7 +279,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
         {
           id: toolName,
           requiresConfirmation: tool?.requiresConfirmation ?? false,
-          active: true,
+          pinned: true,
         },
       ]);
     }
@@ -282,7 +288,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   const handleToggleActive = (toolName: string): void => {
     setEnabledTools(
       effectiveEnabledTools.map((t) =>
-        t.id === toolName ? { ...t, active: !t.active } : t,
+        t.id === toolName ? { ...t, pinned: !t.pinned } : t,
       ),
     );
   };
@@ -314,7 +320,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
         .map((tool) => ({
           id: tool.toolName,
           requiresConfirmation: tool.requiresConfirmation ?? false,
-          active: true,
+          pinned: true,
         }));
       setEnabledTools([...effectiveEnabledTools, ...toAdd]);
     }
@@ -349,7 +355,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
         .map((tool) => ({
           id: tool.toolName,
           requiresConfirmation: tool.requiresConfirmation ?? false,
-          active: true,
+          pinned: true,
         }));
       setEnabledTools([...effectiveEnabledTools, ...toAdd]);
     }
@@ -388,7 +394,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
           ))}
         </Div>
         <P className="text-xs text-muted-foreground text-center">
-          {t("app.api.system.help.get.fields.totalCount.title")}: {totalCount}
+          {t("get.fields.totalCount.title")}: {totalCount}
         </P>
       </Div>
     );
@@ -412,8 +418,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
             </P>
             {tool.aliases && tool.aliases.length > 0 && (
               <P className="text-xs text-muted-foreground/70 mt-1">
-                {t("app.api.system.help.get.fields.aliases.title")}:{" "}
-                {tool.aliases.join(", ")}
+                {t("get.fields.aliases.title")}: {tool.aliases.join(", ")}
               </P>
             )}
           </Div>
@@ -422,7 +427,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
         {tool.parameters && (
           <Div>
             <Span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              {t("app.api.system.help.get.fields.parameters.title")}
+              {t("get.fields.parameters.title")}
             </Span>
             <Div className="mt-1 rounded-md bg-muted/50 p-3 text-xs font-mono overflow-x-auto">
               <Pre>{JSON.stringify(tool.parameters, null, 2)}</Pre>
@@ -437,7 +442,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
             void navigateToTool(tool.toolName, navigate);
           }}
         >
-          {t("app.api.system.help.get.fields.openTool.label")}
+          {t("get.fields.openTool.label")}
         </Button>
       </Div>
     );
@@ -454,14 +459,12 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
               <Div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-primary/10 text-primary font-medium">
                 <Eye className="h-3.5 w-3.5" />
                 <Span>
-                  {stats.active} {t("app.chat.aiTools.modal.activeLabel")}
+                  {stats.pinned} {t("aiTools.modal.pinnedLabel")}
                 </Span>
               </Div>
             </TooltipTrigger>
             <TooltipContent>
-              <P className="text-xs">
-                {t("app.chat.aiTools.modal.activeTooltip")}
-              </P>
+              <P className="text-xs">{t("aiTools.modal.pinnedTooltip")}</P>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -472,21 +475,19 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
               <Div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-muted text-muted-foreground font-medium">
                 <Shield className="h-3.5 w-3.5" />
                 <Span>
-                  {stats.enabled} {t("app.chat.aiTools.modal.enabledLabel")}
+                  {stats.enabled} {t("aiTools.modal.enabledLabel")}
                 </Span>
               </Div>
             </TooltipTrigger>
             <TooltipContent>
-              <P className="text-xs">
-                {t("app.chat.aiTools.modal.enabledTooltip")}
-              </P>
+              <P className="text-xs">{t("aiTools.modal.enabledTooltip")}</P>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
 
         <Div className="flex items-center gap-1.5 px-2.5 py-1.5 text-muted-foreground/60">
           <Span>
-            {stats.total} {t("app.chat.aiTools.modal.totalLabel")}
+            {stats.total} {t("aiTools.modal.totalLabel")}
           </Span>
         </Div>
 
@@ -504,7 +505,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
-              placeholder={t("app.chat.aiTools.modal.searchPlaceholder")}
+              placeholder={t("aiTools.modal.searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
@@ -528,8 +529,8 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
               >
                 <Span className="truncate">
                   {expandedCategories.size === 0
-                    ? t("app.chat.aiTools.modal.expandAll")
-                    : t("app.chat.aiTools.modal.collapseAll")}
+                    ? t("aiTools.modal.expandAll")
+                    : t("aiTools.modal.collapseAll")}
                 </Span>
               </Button>
 
@@ -543,14 +544,14 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
                   <>
                     <X className="h-4 w-4 mr-1 shrink-0" />
                     <Span className="truncate">
-                      {t("app.chat.aiTools.modal.deselectAll")}
+                      {t("aiTools.modal.deselectAll")}
                     </Span>
                   </>
                 ) : (
                   <>
                     <Check className="h-4 w-4 mr-1 shrink-0" />
                     <Span className="truncate">
-                      {t("app.chat.aiTools.modal.selectAll")}
+                      {t("aiTools.modal.selectAll")}
                     </Span>
                   </>
                 )}
@@ -564,7 +565,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
               >
                 <RotateCcw className="h-3.5 w-3.5 mr-1 shrink-0" />
                 <Span className="truncate">
-                  {t("app.chat.aiTools.modal.resetToDefault")}
+                  {t("aiTools.modal.resetToDefault")}
                 </Span>
               </Button>
             </Div>
@@ -578,8 +579,8 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
           {filteredTools.length === 0 ? (
             <Div className="text-center py-8 text-muted-foreground text-sm">
               {searchQuery.length > 0
-                ? t("app.chat.aiTools.modal.noToolsFound")
-                : t("app.chat.aiTools.modal.noToolsAvailable")}
+                ? t("aiTools.modal.noToolsFound")
+                : t("aiTools.modal.noToolsAvailable")}
             </Div>
           ) : (
             <Div className="flex flex-col gap-3">
@@ -591,7 +592,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
                     effectiveEnabledTools.some((t) => t.id === id),
                   ).length;
                   const activeCount = categoryIds.filter((id) =>
-                    effectiveEnabledTools.some((t) => t.id === id && t.active),
+                    effectiveEnabledTools.some((t) => t.id === id && t.pinned),
                   ).length;
                   const allCategoryEnabled = enabledCount === tools.length;
                   const hasSubcategories =
@@ -713,16 +714,16 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
           <Div className="flex items-center gap-4">
             <Div className="flex items-center gap-1">
               <Eye className="h-3 w-3" />
-              <Span>{t("app.chat.aiTools.modal.legendActive")}</Span>
+              <Span>{t("aiTools.modal.legendActive")}</Span>
             </Div>
             <Div className="flex items-center gap-1">
               <Shield className="h-3 w-3" />
-              <Span>{t("app.chat.aiTools.modal.legendConfirm")}</Span>
+              <Span>{t("aiTools.modal.legendConfirm")}</Span>
             </Div>
           </Div>
           <P>
-            {t("app.chat.aiTools.modal.stats", {
-              enabled: stats.enabled,
+            {t("aiTools.modal.stats", {
+              pinned: stats.pinned,
               total: stats.total,
             })}
           </P>
@@ -749,13 +750,13 @@ function ToolRow({
   onToggleActive: (toolName: string) => void;
   onToggleConfirmation: (toolName: string) => void;
   onOpenTool: (toolName: string) => Promise<void>;
-  t: (key: string, params?: Record<string, string | number>) => string;
+  t: ReturnType<typeof scopedTranslation.scopedT>["t"];
 }): JSX.Element {
   const enabledTool = effectiveEnabledTools.find(
     (et) => et.id === tool.toolName,
   );
   const isEnabled = !!enabledTool;
-  const isActive = enabledTool?.active ?? false;
+  const isActive = enabledTool?.pinned ?? false;
   const requiresConfirmation = enabledTool?.requiresConfirmation ?? false;
 
   return (
@@ -814,8 +815,8 @@ function ToolRow({
               <TooltipContent side="left">
                 <P className="text-xs">
                   {isActive
-                    ? t("app.chat.aiTools.modal.activeOn")
-                    : t("app.chat.aiTools.modal.activeOff")}
+                    ? t("aiTools.modal.activeOn")
+                    : t("aiTools.modal.activeOff")}
                 </P>
               </TooltipContent>
             </Tooltip>
@@ -845,8 +846,8 @@ function ToolRow({
               <TooltipContent side="left">
                 <P className="text-xs">
                   {requiresConfirmation
-                    ? t("app.chat.aiTools.modal.confirmOn")
-                    : t("app.chat.aiTools.modal.confirmOff")}
+                    ? t("aiTools.modal.confirmOn")
+                    : t("aiTools.modal.confirmOff")}
                 </P>
               </TooltipContent>
             </Tooltip>
@@ -868,9 +869,7 @@ function ToolRow({
               </Button>
             </TooltipTrigger>
             <TooltipContent side="left">
-              <P className="text-xs">
-                {t("app.api.system.help.get.fields.openTool.label")}
-              </P>
+              <P className="text-xs">{t("get.fields.openTool.label")}</P>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

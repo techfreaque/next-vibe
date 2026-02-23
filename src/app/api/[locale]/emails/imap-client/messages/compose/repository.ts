@@ -22,6 +22,9 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { smtpAccounts } from "../../../smtp-client/db";
 import { SmtpAccountStatus, SmtpSecurityType } from "../../../smtp-client/enum";
 import type { ComposeEmailResponseOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 interface ComposeEmailData {
   to: string;
@@ -33,6 +36,7 @@ interface ComposeEmailData {
 export async function sendComposedEmail(
   data: ComposeEmailData,
   logger: EndpointLogger,
+  t: ModuleT,
 ): Promise<ResponseType<ComposeEmailResponseOutput>> {
   try {
     logger.debug("Composing email", { to: data.to, subject: data.subject });
@@ -47,8 +51,7 @@ export async function sendComposedEmail(
 
     if (accounts.length === 0) {
       return fail({
-        message:
-          "app.api.emails.imapClient.messages.compose.post.errors.notFound.title",
+        message: t("post.errors.notFound.title"),
         errorType: ErrorResponseTypes.NOT_FOUND,
         messageParams: {},
       });
@@ -98,8 +101,7 @@ export async function sendComposedEmail(
   } catch (err) {
     logger.error("Failed to send composed email", parseError(err));
     return fail({
-      message:
-        "app.api.emails.imapClient.messages.compose.post.errors.server.title",
+      message: t("post.errors.server.title"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
       messageParams: { error: parseError(err).message },
     });

@@ -18,6 +18,9 @@ import type {
   LinuxUserDeleteRequestOutput,
   LinuxUserDeleteResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 const execAsync = promisify(exec);
 
@@ -26,11 +29,12 @@ export class LinuxUserDeleteRepository {
     data: LinuxUserDeleteRequestOutput,
     logger: EndpointLogger,
     username: string,
+    t: ModuleT,
   ): Promise<ResponseType<LinuxUserDeleteResponseOutput>> {
     const isLocalMode = process.env["NEXT_PUBLIC_LOCAL_MODE"] !== "false";
     if (!isLocalMode) {
       return fail({
-        message: "Linux user management is only available in LOCAL_MODE",
+        message: t("errors.localModeOnly.title"),
         errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
@@ -39,7 +43,7 @@ export class LinuxUserDeleteRepository {
     const currentUser = userInfo().username;
     if (username === currentUser) {
       return fail({
-        message: "Cannot delete the current process user",
+        message: t("errors.cannotDeleteCurrentUser"),
         errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
@@ -49,13 +53,13 @@ export class LinuxUserDeleteRepository {
       const uid = parseInt(uidStr.trim(), 10);
       if (uid < 1000) {
         return fail({
-          message: "Cannot delete system users (uid < 1000)",
+          message: t("errors.cannotDeleteSystemUser"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
     } catch {
       return fail({
-        message: `User '${username}' not found`,
+        message: t("errors.userNotFound"),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -68,7 +72,7 @@ export class LinuxUserDeleteRepository {
     } catch (error) {
       logger.error("Failed to delete Linux user", parseError(error));
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("delete.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

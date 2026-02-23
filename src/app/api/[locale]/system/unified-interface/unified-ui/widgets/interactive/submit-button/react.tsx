@@ -4,11 +4,11 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { type JSX } from "react";
 
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import {
   Icon,
   type IconKey,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { simpleT } from "@/i18n/core/shared";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import {
@@ -48,7 +48,7 @@ export function SubmitButtonWidget<
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
   const isSubmitting = useWidgetIsSubmitting();
-  const { t: globalT } = simpleT(locale);
+  const { t: globalT } = unifiedInterfaceScopedTranslation.scopedT(locale);
   const {
     text: textKey,
     loadingText: loadingTextKey,
@@ -68,15 +68,11 @@ export function SubmitButtonWidget<
 
   const buttonText = textKey
     ? t(textKey)
-    : globalT(
-        "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submit",
-      );
+    : globalT("react.widgets.endpointRenderer.submit");
 
   const loadingText = loadingTextKey
     ? t(loadingTextKey)
-    : globalT(
-        "app.api.system.unifiedInterface.react.widgets.endpointRenderer.submitting",
-      );
+    : globalT("react.widgets.endpointRenderer.submitting");
 
   // Hide submit button when form is undefined (e.g., when data is already loaded)
   if (!form || !onSubmit || isDisabled) {

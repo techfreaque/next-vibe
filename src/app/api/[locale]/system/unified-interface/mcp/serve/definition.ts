@@ -7,8 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -18,16 +18,18 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "unified-interface", "mcp", "serve"],
   aliases: ["mcp", "mcp:serve", "mcp:start", "start-mcp"],
-  title: "app.api.system.unifiedInterface.mcp.serve.post.title" as const,
-  description:
-    "app.api.system.unifiedInterface.mcp.serve.post.description" as const,
+  title: "serve.post.title" as const,
+  description: "serve.post.description" as const,
   icon: "plug",
-  category: "app.api.system.category" as const,
-  tags: ["app.api.system.unifiedInterface.mcp.serve.tags.mcp" as const],
+  category: "serve.category" as const,
+  tags: ["serve.tags.mcp" as const],
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.WEB_OFF,
@@ -35,90 +37,66 @@ const { POST } = createEndpoint({
     UserRole.CLI_AUTH_BYPASS,
   ] as const,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.system.unifiedInterface.mcp.serve.post.response.title" as const,
-      description:
-        "app.api.system.unifiedInterface.mcp.serve.post.response.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { response: true },
-    {
-      status: responseField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "serve.post.response.title" as const,
+    description: "serve.post.response.description" as const,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { response: true },
+    children: {
+      status: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.mcp.serve.post.response.title",
+        content: "serve.post.response.title",
         schema: z.string(),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.unifiedInterface.mcp.serve.post.errors.validation.title",
-      description:
-        "app.api.system.unifiedInterface.mcp.serve.post.errors.validation.description",
+      title: "serve.post.errors.validation.title",
+      description: "serve.post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.mcp.serve.post.errors.server.title",
-      description:
-        "app.api.system.unifiedInterface.mcp.serve.post.errors.server.description",
+      title: "serve.post.errors.server.title",
+      description: "serve.post.errors.server.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.unifiedInterface.mcp.serve.post.errors.unauthorized.title",
-      description:
-        "app.api.system.unifiedInterface.mcp.serve.post.errors.unauthorized.description",
+      title: "serve.post.errors.unauthorized.title",
+      description: "serve.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.unifiedInterface.mcp.serve.post.errors.unauthorized.title",
-      description:
-        "app.api.system.unifiedInterface.mcp.serve.post.errors.unauthorized.description",
+      title: "serve.post.errors.unauthorized.title",
+      description: "serve.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.unifiedInterface.mcp.serve.post.errors.server.title",
-      description:
-        "app.api.system.unifiedInterface.mcp.serve.post.errors.server.description",
+      title: "serve.post.errors.server.title",
+      description: "serve.post.errors.server.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.mcp.serve.post.errors.server.title",
-      description:
-        "app.api.system.unifiedInterface.mcp.serve.post.errors.server.description",
+      title: "serve.post.errors.server.title",
+      description: "serve.post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.mcp.serve.post.errors.server.title",
-      description:
-        "app.api.system.unifiedInterface.mcp.serve.post.errors.server.description",
+      title: "serve.post.errors.server.title",
+      description: "serve.post.errors.server.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.unifiedInterface.mcp.serve.post.errors.server.title",
-      description:
-        "app.api.system.unifiedInterface.mcp.serve.post.errors.server.description",
+      title: "serve.post.errors.server.title",
+      description: "serve.post.errors.server.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.unifiedInterface.mcp.serve.post.errors.server.title",
-      description:
-        "app.api.system.unifiedInterface.mcp.serve.post.errors.server.description",
+      title: "serve.post.errors.server.title",
+      description: "serve.post.errors.server.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.system.unifiedInterface.mcp.serve.post.success.title",
-    description:
-      "app.api.system.unifiedInterface.mcp.serve.post.success.description",
+    title: "serve.post.success.title",
+    description: "serve.post.success.description",
   },
 
   // === EXAMPLES ===

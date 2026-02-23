@@ -71,6 +71,10 @@ export const translations = {
     label: "Logging Level",
     description: "Set the logging verbosity level",
     placeholder: "Select logging level",
+    error: "Error",
+    warn: "Warning",
+    info: "Info",
+    debug: "Debug",
   },
   debugMode: {
     label: "Debug Mode",
@@ -84,6 +88,11 @@ export const translations = {
     unauthorized: {
       title: "Unauthorized",
       description: "You are not authorized to access this resource",
+    },
+  },
+  get: {
+    response: {
+      message: "IMAP configuration loaded successfully",
     },
   },
   update: {

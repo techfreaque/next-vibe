@@ -9,7 +9,7 @@ export const { DELETE, tools } = endpointsHandler({
 
   [Methods.DELETE]: {
     email: undefined,
-    handler: ({ user, urlPathParams, logger }) =>
-      SessionManagementRepository.revoke(user, urlPathParams.id, logger),
+    handler: ({ user, urlPathParams, logger, t }) =>
+      SessionManagementRepository.revoke(user, urlPathParams.id, logger, t),
   },
 });

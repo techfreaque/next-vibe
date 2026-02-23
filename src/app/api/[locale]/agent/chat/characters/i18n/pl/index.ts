@@ -3,6 +3,10 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   id: idTranslations,
+  category: "Chat",
+  tags: {
+    characters: "Postacie",
+  },
   separator: {
     or: "lub",
   },
@@ -40,8 +44,49 @@ export const translations: typeof enTranslations = {
       male: "Męski głos",
       female: "Damski głos",
     },
+    mode: {
+      auto: "Automatyczny",
+      manual: "Ręczny",
+    },
+    selectionType: {
+      characterBased: "Na podstawie postaci",
+      manual: "Konkretny model",
+      filters: "Kryteria filtrów",
+    },
+    intelligence: {
+      quick: "Szybki",
+      smart: "Inteligentny",
+      brilliant: "Błyskotliwy",
+    },
+    price: {
+      cheap: "Tani",
+      standard: "Standardowy",
+      premium: "Premium",
+    },
+    content: {
+      mainstream: "Główny nurt",
+      open: "Otwarty",
+      uncensored: "Bez cenzury",
+    },
+    speed: {
+      fast: "Szybki",
+      balanced: "Zrównoważony",
+      thorough: "Dokładny",
+    },
   },
-  tags: {
+  modelSelection: {
+    sort: {
+      intelligence: "Inteligencja",
+      price: "Cena",
+      speed: "Prędkość",
+      content: "Treść",
+    },
+    sortDirection: {
+      asc: "Rosnąco",
+      desc: "Malejąco",
+    },
+  },
+  characterTags: {
     general: "Ogólne",
     helpful: "Pomocne",
     companion: "Towarzysz",

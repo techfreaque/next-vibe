@@ -3,6 +3,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
+import { scopedTranslation as threadsScopedTranslation } from "@/app/api/[locale]/agent/chat/threads/i18n";
 import { ThreadsRepository } from "@/app/api/[locale]/agent/chat/threads/repository";
 import {
   ProductIds,
@@ -95,10 +96,10 @@ export default async function HomePage({
         <Div className="flex items-center justify-center min-h-screen p-4">
           <Div className="max-w-md text-center">
             <P className="text-lg font-semibold mb-2">
-              {t("app.shared.error.title")}
+              {t("app.common.error.title")}
             </P>
             <P className="text-sm text-muted-foreground">
-              {t("app.shared.error.userError")}
+              {t("app.common.error.message")}
             </P>
           </Div>
         </Div>
@@ -107,10 +108,13 @@ export default async function HomePage({
   }
 
   // Fetch stats for hero section (cached for 24h)
-  const activeUserCountResponse =
-    await UserRepository.getActiveUserCount(logger);
+  const activeUserCountResponse = await UserRepository.getActiveUserCount(
+    logger,
+    locale,
+  );
+  const { t: threadsT } = threadsScopedTranslation.scopedT(locale);
   const totalConversationsResponse =
-    await ThreadsRepository.getTotalConversationsCount(logger);
+    await ThreadsRepository.getTotalConversationsCount(logger, threadsT);
 
   const activeUserCount = activeUserCountResponse.success
     ? activeUserCountResponse.data

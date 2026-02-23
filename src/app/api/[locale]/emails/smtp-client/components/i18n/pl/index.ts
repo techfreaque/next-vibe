@@ -2,12 +2,16 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   email: {
+    tagline: "Platforma AI wolnego słowa",
     footer: {
       needHelp: "Potrzebujesz pomocy?",
       helpText: "Potrzebujesz pomocy? Skontaktuj się z nami pod adresem",
       unsubscribeText: "Nie chcesz otrzymywać tych wiadomości?",
       unsubscribeLink: "Wypisz się",
       copyright: "© {{currentYear}} {{appName}}. Wszelkie prawa zastrzeżone.",
+      visitWebsite: "Odwiedź stronę",
+      allRightsReserved:
+        "© {{currentYear}} {{appName}}. Wszelkie prawa zastrzeżone.",
     },
   },
   post: {

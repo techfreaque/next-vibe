@@ -34,7 +34,6 @@ import {
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import type definition from "./definition";
 import type { ImportJobsStatusGetResponseOutput } from "./definition";
@@ -50,7 +49,7 @@ interface CustomWidgetProps {
   fieldName: string;
 }
 
-type TFunc = TFunction;
+type TFunc = ReturnType<typeof useWidgetTranslation>;
 
 // ---------------------------------------------------------------------------
 // Status badge config
@@ -86,21 +85,21 @@ function getStatusIcon(
 }
 
 const STATUS_FILTER_VALUES = [
-  { key: "app.api.leads.import.status.widget.filter.all", value: null },
+  { key: "widget.filter.all", value: null },
   {
-    key: "app.api.leads.import.status.widget.filter.pending",
+    key: "widget.filter.pending",
     value: CsvImportJobStatus.PENDING,
   },
   {
-    key: "app.api.leads.import.status.widget.filter.running",
+    key: "widget.filter.running",
     value: CsvImportJobStatus.PROCESSING,
   },
   {
-    key: "app.api.leads.import.status.widget.filter.completed",
+    key: "widget.filter.completed",
     value: CsvImportJobStatus.COMPLETED,
   },
   {
-    key: "app.api.leads.import.status.widget.filter.failed",
+    key: "widget.filter.failed",
     value: CsvImportJobStatus.FAILED,
   },
 ] as const;
@@ -165,8 +164,7 @@ function ProgressBar({
     <Div className="mt-1.5">
       <Div className="flex justify-between text-xs text-muted-foreground mb-0.5">
         <Span>
-          {processed} / {total}{" "}
-          {t("app.api.leads.import.status.widget.progress.rows")}
+          {processed} / {total} {t("widget.progress.rows")}
         </Span>
         <Span>{pct}%</Span>
       </Div>
@@ -220,7 +218,7 @@ function JobRow({
           {/* Row counts */}
           <Div className="flex items-center gap-3 text-xs text-muted-foreground">
             <Span title="Total rows">
-              {t("app.api.leads.import.status.widget.job.total")}{" "}
+              {t("widget.job.total")}{" "}
               <Strong className="text-foreground">
                 {job.totalRows ?? "?"}
               </Strong>
@@ -229,35 +227,30 @@ function JobRow({
               title="Processed rows"
               className="text-blue-600 dark:text-blue-400"
             >
-              {t("app.api.leads.import.status.widget.job.processed")}{" "}
-              <Strong>{job.processedRows}</Strong>
+              {t("widget.job.processed")} <Strong>{job.processedRows}</Strong>
             </Span>
             <Span
               title="Successful imports"
               className="text-green-600 dark:text-green-400"
             >
-              {t("app.api.leads.import.status.widget.job.ok")}{" "}
-              <Strong>{job.successfulImports}</Strong>
+              {t("widget.job.ok")} <Strong>{job.successfulImports}</Strong>
             </Span>
             <Span
               title="Failed imports"
               className="text-red-600 dark:text-red-400"
             >
-              {t("app.api.leads.import.status.widget.job.fail")}{" "}
-              <Strong>{job.failedImports}</Strong>
+              {t("widget.job.fail")} <Strong>{job.failedImports}</Strong>
             </Span>
           </Div>
 
           {/* Timestamps */}
           <Div className="hidden sm:flex flex-col text-xs text-muted-foreground text-right">
             <Span>
-              {t("app.api.leads.import.status.widget.job.created")}{" "}
-              {formatDate(job.createdAt)}
+              {t("widget.job.created")} {formatDate(job.createdAt)}
             </Span>
             {job.completedAt && (
               <Span>
-                {t("app.api.leads.import.status.widget.job.done")}{" "}
-                {formatDate(job.completedAt)}
+                {t("widget.job.done")} {formatDate(job.completedAt)}
               </Span>
             )}
           </Div>
@@ -326,7 +319,7 @@ export function ImportStatusContainer({
         <Div className="flex items-center gap-2 mr-auto">
           <Activity className="h-5 w-5 text-muted-foreground" />
           <Span className="font-semibold text-base">
-            {t("app.api.leads.import.status.widget.header.title")}
+            {t("widget.header.title")}
           </Span>
           {allJobs.length > 0 && (
             <Span className="text-xs text-muted-foreground">
@@ -346,7 +339,7 @@ export function ImportStatusContainer({
           onClick={handleNewImport}
         >
           <Plus className="h-4 w-4" />
-          {t("app.api.leads.import.status.widget.header.newImport")}
+          {t("widget.header.newImport")}
         </Button>
       </Div>
 
@@ -385,7 +378,7 @@ export function ImportStatusContainer({
         <Div className="h-32 flex flex-col items-center justify-center gap-3">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           <Span className="text-sm text-muted-foreground">
-            {t("app.api.leads.import.status.widget.loading")}
+            {t("widget.loading")}
           </Span>
         </Div>
       )}
@@ -398,14 +391,12 @@ export function ImportStatusContainer({
               <RefreshCw className="h-8 w-8 text-muted-foreground" />
               <Div>
                 <Span className="block text-sm font-medium">
-                  {t("app.api.leads.import.status.widget.empty.title")}
+                  {t("widget.empty.title")}
                 </Span>
                 <Span className="block text-xs text-muted-foreground mt-1">
                   {activeFilter !== null
-                    ? t("app.api.leads.import.status.widget.empty.withFilter")
-                    : t(
-                        "app.api.leads.import.status.widget.empty.withoutFilter",
-                      )}
+                    ? t("widget.empty.withFilter")
+                    : t("widget.empty.withoutFilter")}
                 </Span>
               </Div>
               <Button
@@ -415,7 +406,7 @@ export function ImportStatusContainer({
                 onClick={handleNewImport}
               >
                 <Plus className="h-4 w-4" />
-                {t("app.api.leads.import.status.widget.empty.newImport")}
+                {t("widget.empty.newImport")}
               </Button>
             </Div>
           ) : (

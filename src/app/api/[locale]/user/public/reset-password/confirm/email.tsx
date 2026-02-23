@@ -16,11 +16,13 @@ import { z } from "zod";
 import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
+import { translations as configTranslations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import { UserDetailLevel } from "../../../enum";
 import { UserRepository } from "../../../repository";
+import { scopedTranslation as confirmScopedTranslation } from "./i18n";
+import { type ResetPasswordTranslationKey } from "../i18n";
 import type {
   ResetPasswordConfirmPostRequestOutput,
   ResetPasswordConfirmPostResponseOutput,
@@ -30,6 +32,7 @@ import {
   type TrackingContext,
 } from "@/app/api/[locale]/emails/smtp-client/components/tracking_context.email";
 import { EmailTemplate } from "@/app/api/[locale]/emails/smtp-client/components/template.email";
+import { simpleT } from "@/i18n/core/shared";
 
 // ============================================================================
 // TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
@@ -44,6 +47,8 @@ type PasswordResetConfirmProps = z.infer<
   typeof passwordResetConfirmPropsSchema
 >;
 
+type ScopedT = ReturnType<typeof confirmScopedTranslation.scopedT>["t"];
+
 function PasswordResetConfirmEmail({
   props,
   t,
@@ -52,27 +57,24 @@ function PasswordResetConfirmEmail({
   tracking,
 }: {
   props: PasswordResetConfirmProps;
-  t: TFunction;
+  t: ScopedT;
   locale: CountryLanguage;
   recipientEmail: string;
   tracking: TrackingContext;
 }): ReactElement {
-  const appName = t("config.appName");
+  const { t: globalT } = simpleT(locale);
+  const appName = globalT("config.appName");
 
   return (
     <EmailTemplate
-      t={t}
       locale={locale}
-      title={t("app.api.user.public.resetPassword.confirm.email.title", {
+      title={t("email.title", {
         appName,
       })}
-      previewText={t(
-        "app.api.user.public.resetPassword.confirm.email.previewText",
-        {
-          appName,
-          modelCount: TOTAL_MODEL_COUNT,
-        },
-      )}
+      previewText={t("email.previewText", {
+        appName,
+        modelCount: TOTAL_MODEL_COUNT,
+      })}
       recipientEmail={recipientEmail}
       tracking={tracking}
     >
@@ -84,7 +86,7 @@ function PasswordResetConfirmEmail({
           marginBottom: "16px",
         }}
       >
-        {t("app.api.user.public.resetPassword.confirm.email.greeting", {
+        {t("email.greeting", {
           name: props.publicName,
         })}
       </Text>
@@ -97,7 +99,7 @@ function PasswordResetConfirmEmail({
           marginBottom: "16px",
         }}
       >
-        {t("app.api.user.public.resetPassword.confirm.email.successMessage", {
+        {t("email.successMessage", {
           appName,
         })}
       </Text>
@@ -110,12 +112,9 @@ function PasswordResetConfirmEmail({
           marginBottom: "16px",
         }}
       >
-        {t(
-          "app.api.user.public.resetPassword.confirm.email.loginInstructions",
-          {
-            modelCount: TOTAL_MODEL_COUNT,
-          },
-        )}
+        {t("email.loginInstructions", {
+          modelCount: TOTAL_MODEL_COUNT,
+        })}
       </Text>
 
       <Section style={{ marginTop: "32px" }}>
@@ -127,7 +126,7 @@ function PasswordResetConfirmEmail({
             marginBottom: "16px",
           }}
         >
-          {t("app.api.user.public.resetPassword.confirm.email.securityWarning")}
+          {t("email.securityWarning")}
         </Text>
       </Section>
 
@@ -139,55 +138,50 @@ function PasswordResetConfirmEmail({
           marginTop: "24px",
         }}
       >
-        {t("app.api.user.public.resetPassword.confirm.email.securityTip")}
+        {t("email.securityTip")}
       </Text>
     </EmailTemplate>
   );
 }
 
 // Template Definition Export
-const passwordResetConfirmTemplate: EmailTemplateDefinition<PasswordResetConfirmProps> =
-  {
-    meta: {
-      id: "password-reset-confirm",
-      version: "1.0.0",
-      name: "app.api.emails.templates.password.reset.confirm.meta.name",
-      description:
-        "app.api.emails.templates.password.reset.confirm.meta.description",
-      category: "auth",
-      path: "/user/public/reset-password/confirm/email.tsx",
-      defaultSubject: (t) =>
-        t("app.api.user.public.resetPassword.confirm.email.subject", {
-          appName: "",
-        }),
-      previewFields: {
-        publicName: {
-          type: "text",
-          label:
-            "app.admin.emails.templates.templates.password.reset.confirm.preview.privateName.label",
-          description:
-            "app.admin.emails.templates.templates.password.reset.confirm.preview.privateName.description",
-          defaultValue: "Max Mustermann",
-          required: true,
-        },
-        userId: {
-          type: "text",
-          label:
-            "app.admin.emails.templates.templates.password.reset.confirm.preview.userId.label",
-          description:
-            "app.admin.emails.templates.templates.password.reset.confirm.preview.userId.description",
-          defaultValue: "example-user-id-123",
-          required: true,
-        },
+const passwordResetConfirmTemplate: EmailTemplateDefinition<
+  PasswordResetConfirmProps,
+  typeof confirmScopedTranslation
+> = {
+  scopedTranslation: confirmScopedTranslation,
+  meta: {
+    id: "password-reset-confirm",
+    version: "1.0.0",
+    name: "emailTemplates.confirm.name",
+    description: "emailTemplates.confirm.description",
+    category: "emailTemplates.confirm.category",
+    path: "/user/public/reset-password/confirm/email.tsx",
+    defaultSubject: "email.subject",
+    previewFields: {
+      publicName: {
+        type: "text",
+        label: "emailTemplates.confirm.preview.publicName.label",
+        description: "emailTemplates.confirm.preview.publicName.description",
+        defaultValue: "Max Mustermann",
+        required: true,
+      },
+      userId: {
+        type: "text",
+        label: "emailTemplates.confirm.preview.userId.label",
+        description: "emailTemplates.confirm.preview.userId.description",
+        defaultValue: "example-user-id-123",
+        required: true,
       },
     },
-    schema: passwordResetConfirmPropsSchema,
-    component: PasswordResetConfirmEmail,
-    exampleProps: {
-      publicName: "Max Mustermann",
-      userId: "example-user-id-123",
-    },
-  };
+  },
+  schema: passwordResetConfirmPropsSchema,
+  component: PasswordResetConfirmEmail,
+  exampleProps: {
+    publicName: "Max Mustermann",
+    userId: "example-user-id-123",
+  },
+};
 
 export default passwordResetConfirmTemplate;
 
@@ -207,11 +201,14 @@ export default passwordResetConfirmTemplate;
 export const renderResetPasswordConfirmMail: EmailFunctionType<
   ResetPasswordConfirmPostRequestOutput,
   ResetPasswordConfirmPostResponseOutput,
-  UndefinedType
-> = async ({ requestData, locale, t, logger }) => {
+  UndefinedType,
+  ResetPasswordTranslationKey
+> = async ({ requestData, locale, logger }) => {
   logger.debug("Rendering password reset confirmation email", {
     email: requestData.email,
   });
+
+  const { t } = confirmScopedTranslation.scopedT(locale);
 
   const userResponse = await UserRepository.getUserByEmail(
     requestData.email,
@@ -221,14 +218,13 @@ export const renderResetPasswordConfirmMail: EmailFunctionType<
   );
   if (!userResponse.success) {
     return fail({
-      message: "app.api.emails.errors.no_email",
+      message: t("errors.no_email"),
       errorType: ErrorResponseTypes.NOT_FOUND,
       cause: userResponse,
     });
   }
 
   const user = userResponse.data;
-  const appName = t("config.appName");
 
   const templateProps: PasswordResetConfirmProps = {
     publicName: user.publicName,
@@ -238,9 +234,7 @@ export const renderResetPasswordConfirmMail: EmailFunctionType<
   return success({
     toEmail: requestData.email,
     toName: user.publicName,
-    subject: t("app.api.user.public.resetPassword.confirm.email.subject", {
-      appName,
-    }),
+    subject: t("email.subject"),
     jsx: passwordResetConfirmTemplate.component({
       props: templateProps,
       t,

@@ -14,9 +14,8 @@ import definitions from "./definition";
 export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    email: undefined, // No emails for GET requests
-    handler: ({ data, user, logger }) => {
-      return imapAccountsRepository.listAccounts(data, user, logger);
-    },
+    email: undefined,
+    handler: ({ data, user, locale, logger }) =>
+      imapAccountsRepository.listAccounts(data, user, logger, locale),
   },
 });

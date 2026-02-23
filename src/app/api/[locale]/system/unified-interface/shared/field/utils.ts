@@ -319,13 +319,12 @@ export function extractSchemaDefaults<T>(
  * )
  */
 export function requestDataRangeField<
-  TKey extends string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TEnum extends z.ZodEnum<any>,
 >(
   config: Omit<
     RangeSliderFieldWidgetConfig<
-      TKey,
+      TranslationKey,
       z.ZodOptional<
         z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
       >,
@@ -336,7 +335,7 @@ export function requestDataRangeField<
     schema: TEnum;
   },
 ): RangeSliderFieldWidgetConfig<
-  TKey,
+  TranslationKey,
   z.ZodOptional<
     z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
   >,
@@ -360,13 +359,12 @@ export function requestDataRangeField<
 }
 
 export function requestResponseRangeField<
-  TKey extends string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TEnum extends z.ZodEnum<any>,
 >(
   config: Omit<
     RangeSliderFieldWidgetConfig<
-      TKey,
+      TranslationKey,
       z.ZodOptional<
         z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
       >,
@@ -377,7 +375,7 @@ export function requestResponseRangeField<
     schema: TEnum;
   },
 ): RangeSliderFieldWidgetConfig<
-  TKey,
+  TranslationKey,
   z.ZodOptional<
     z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
   >,
@@ -401,13 +399,12 @@ export function requestResponseRangeField<
 }
 
 export function responseRangeField<
-  TKey extends string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TEnum extends z.ZodEnum<any>,
 >(
   config: Omit<
     RangeSliderFieldWidgetConfig<
-      TKey,
+      TranslationKey,
       z.ZodOptional<
         z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
       >,
@@ -418,7 +415,7 @@ export function responseRangeField<
     schema: TEnum;
   },
 ): RangeSliderFieldWidgetConfig<
-  TKey,
+  TranslationKey,
   z.ZodOptional<
     z.ZodObject<{ min: z.ZodOptional<TEnum>; max: z.ZodOptional<TEnum> }>
   >,
@@ -445,13 +442,38 @@ export function responseRangeField<
  * Create a widget-only field (buttons, alerts, static content)
  */
 export function widgetField<
-  TKey extends string,
   TUsage extends FieldUsageConfig,
   const TUIConfig extends Omit<
-    DisplayOnlyWidgetConfig<TKey, TUsage, "widget">,
+    DisplayOnlyWidgetConfig<TranslationKey, TUsage, "widget">,
     "schemaType" | "schema"
   >,
 >(ui: TUIConfig): TUIConfig & { schemaType: "widget"; schema: never } {
+  return {
+    schemaType: "widget" as const,
+    schema: undefined as never,
+    ...ui,
+  };
+}
+
+/**
+ * Create a widget-only field for scoped translations
+ */
+export function scopedWidgetField<
+  TScopedTranslation extends ScopedTranslationType,
+  TUsage extends FieldUsageConfig,
+  const TUIConfig extends Omit<
+    DisplayOnlyWidgetConfig<
+      TScopedTranslation["ScopedTranslationKey"],
+      TUsage,
+      "widget"
+    >,
+    "schemaType" | "schema"
+  >,
+>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
+  _scopedTranslation: TScopedTranslation,
+  ui: TUIConfig,
+): TUIConfig & { schemaType: "widget"; schema: never } {
   return {
     schemaType: "widget" as const,
     schema: undefined as never,
@@ -464,14 +486,13 @@ export function widgetField<
  * This is like widgetField but for grouped widgets - renders based on usage pattern, not response data
  */
 export function widgetObjectField<
-  TKey extends string,
   TUsage extends FieldUsageConfig,
   TChildren extends ObjectChildrenConstraint<
-    TKey,
+    TranslationKey,
     ConstrainedChildUsage<TUsage>
   >,
   const TUIConfig extends Omit<
-    ObjectWidgetConfig<TKey, TUsage, "widget-object", TChildren>,
+    ObjectWidgetConfig<TranslationKey, TUsage, "widget-object", TChildren>,
     "usage" | "children" | "schemaType"
   >,
 >(
@@ -498,14 +519,13 @@ export function widgetObjectField<
  * For scoped translations, use scopedObjectField<ScopedKeyType> instead.
  */
 export function objectField<
-  TKey extends string,
   TUsage extends FieldUsageConfig,
   TChildren extends ObjectChildrenConstraint<
-    TKey,
+    TranslationKey,
     ConstrainedChildUsage<TUsage>
   >,
   const TUIConfig extends Omit<
-    ObjectWidgetConfig<TKey, TUsage, "object", TChildren>,
+    ObjectWidgetConfig<TranslationKey, TUsage, "object", TChildren>,
     "children" | "usage" | "schemaType"
   >,
 >(
@@ -616,11 +636,53 @@ export function scopedResponseArrayOptionalField<
  * Create an array field containing repeated items
  */
 export function arrayField<
-  TKey extends string,
-  TChild extends AnyChildrenConstrain<TKey, ConstrainedChildUsage<TUsage>>,
+  TChild extends AnyChildrenConstrain<
+    TranslationKey,
+    ConstrainedChildUsage<TUsage>
+  >,
   TUsage extends FieldUsageConfig,
-  const TUIConfig extends ArrayWidgetConfig<TKey, TUsage, "array", TChild>,
+  const TUIConfig extends ArrayWidgetConfig<
+    TranslationKey,
+    TUsage,
+    "array",
+    TChild
+  >,
 >(
+  usage: TUsage,
+  ui: TUIConfig,
+  child: TChild,
+): TUIConfig & {
+  schemaType: "array";
+  child: TChild;
+  usage: TUsage;
+} {
+  return {
+    ...ui,
+    schemaType: "array" as const,
+    child,
+    usage,
+  };
+}
+
+/**
+ * Create an array field for scoped translations
+ */
+export function scopedArrayField<
+  TScopedTranslation extends ScopedTranslationType,
+  TChild extends AnyChildrenConstrain<
+    TScopedTranslation["ScopedTranslationKey"],
+    ConstrainedChildUsage<TUsage>
+  >,
+  TUsage extends FieldUsageConfig,
+  const TUIConfig extends ArrayWidgetConfig<
+    TScopedTranslation["ScopedTranslationKey"],
+    TUsage,
+    "array",
+    TChild
+  >,
+>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
+  _scopedTranslation: TScopedTranslation,
   usage: TUsage,
   ui: TUIConfig,
   child: TChild,
@@ -641,14 +703,13 @@ export function arrayField<
  * Create a request array field
  */
 export function requestDataArrayField<
-  TKey extends string,
   TChild extends ArrayChildConstraint<
-    TKey,
+    TranslationKey,
     ConstrainedChildUsage<{ request: "data"; response?: never }>
   >, // oxlint-disable-line typescript/no-explicit-any
   const TUIConfig extends Omit<
     ArrayWidgetConfig<
-      TKey,
+      TranslationKey,
       { request: "data"; response?: never },
       "array",
       TChild
@@ -672,17 +733,52 @@ export function requestDataArrayField<
 }
 
 /**
+ * Create a request array field for scoped translations
+ */
+export function scopedRequestDataArrayField<
+  TScopedTranslation extends ScopedTranslationType,
+  TChild extends ArrayChildConstraint<
+    TScopedTranslation["ScopedTranslationKey"],
+    ConstrainedChildUsage<{ request: "data"; response?: never }>
+  >,
+  const TUIConfig extends Omit<
+    ArrayWidgetConfig<
+      TScopedTranslation["ScopedTranslationKey"],
+      { request: "data"; response?: never },
+      "array",
+      TChild
+    >,
+    "child" | "schemaType" | "usage"
+  >,
+>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
+  _scopedTranslation: TScopedTranslation,
+  ui: TUIConfig,
+  child: TChild,
+): TUIConfig & {
+  schemaType: "array";
+  child: TChild;
+  usage: { request: "data"; response?: never };
+} {
+  return {
+    ...ui,
+    schemaType: "array" as const,
+    child,
+    usage: { request: "data" },
+  };
+}
+
+/**
  * Create a response array field
  */
 export function responseArrayField<
-  TKey extends string,
   TChild extends ArrayChildConstraint<
-    TKey,
+    TranslationKey,
     ConstrainedChildUsage<{ response: true }>
   >,
   const TUIConfig extends Omit<
     ArrayWidgetConfig<
-      TKey,
+      TranslationKey,
       { request?: never; response: true },
       "array",
       TChild
@@ -706,17 +802,57 @@ export function responseArrayField<
 }
 
 /**
+ * Create a response array field for scoped translations
+ */
+export function scopedResponseArrayField<
+  TScopedTranslation extends ScopedTranslationType,
+  TChild extends ArrayChildConstraint<
+    TScopedTranslation["ScopedTranslationKey"],
+    ConstrainedChildUsage<{ response: true }>
+  >,
+  const TUIConfig extends Omit<
+    ArrayWidgetConfig<
+      TScopedTranslation["ScopedTranslationKey"],
+      { request?: never; response: true },
+      "array",
+      TChild
+    >,
+    "child" | "schemaType" | "usage"
+  >,
+>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
+  _scopedTranslation: TScopedTranslation,
+  ui: TUIConfig,
+  child: TChild,
+): TUIConfig & {
+  schemaType: "array";
+  child: TChild;
+  usage: { request?: never; response: true };
+} {
+  return {
+    ...ui,
+    schemaType: "array" as const,
+    child,
+    usage: { response: true },
+  };
+}
+
+/**
  * Create an optional object field
  */
 export function objectOptionalField<
-  TKey extends string,
   TFieldUsageConfig extends FieldUsageConfig,
   TChildren extends ObjectChildrenConstraint<
-    TKey,
+    TranslationKey,
     ConstrainedChildUsage<TFieldUsageConfig>
   >,
   const TUIConfig extends Omit<
-    ObjectWidgetConfig<TKey, TFieldUsageConfig, "object-optional", TChildren>,
+    ObjectWidgetConfig<
+      TranslationKey,
+      TFieldUsageConfig,
+      "object-optional",
+      TChildren
+    >,
     "usage" | "children" | "schemaType"
   >,
 >(
@@ -737,18 +873,49 @@ export function objectOptionalField<
 }
 
 /**
+ * Create an optional object field for scoped translations
+ */
+export function scopedObjectOptionalField<
+  TScopedTranslation extends ScopedTranslationType,
+  TFieldUsageConfig extends FieldUsageConfig,
+  TChildren extends ObjectChildrenConstraint<
+    TScopedTranslation["ScopedTranslationKey"],
+    ConstrainedChildUsage<TFieldUsageConfig>
+  >,
+  const TUIConfig extends Omit<
+    ObjectWidgetConfig<
+      TScopedTranslation["ScopedTranslationKey"],
+      TFieldUsageConfig,
+      "object-optional",
+      TChildren
+    >,
+    "schemaType"
+  >,
+>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
+  _scopedTranslation: TScopedTranslation,
+  config: TUIConfig,
+): TUIConfig & {
+  schemaType: "object-optional";
+} {
+  return {
+    schemaType: "object-optional" as const,
+    ...config,
+  };
+}
+
+/**
  * Create a discriminated union object field
  */
 export function objectUnionField<
-  TKey extends string,
   TUsage extends FieldUsageConfig,
   TDiscriminator extends string,
   const TVariants extends UnionObjectWidgetConfigConstrain<
-    TKey,
+    TranslationKey,
     ConstrainedChildUsage<TUsage>
   >,
   const TUIConfig extends Omit<
-    ObjectUnionWidgetConfig<TKey, TUsage, TVariants>,
+    ObjectUnionWidgetConfig<TranslationKey, TUsage, TVariants>,
     "usage" | "discriminator" | "variants" | "schemaType"
   >,
 >(
@@ -772,14 +939,57 @@ export function objectUnionField<
 }
 
 /**
+ * Create a discriminated union object field for scoped translations
+ */
+export function scopedObjectUnionField<
+  TScopedTranslation extends ScopedTranslationType,
+  TUsage extends FieldUsageConfig,
+  TDiscriminator extends string,
+  const TVariants extends UnionObjectWidgetConfigConstrain<
+    TScopedTranslation["ScopedTranslationKey"],
+    ConstrainedChildUsage<TUsage>
+  >,
+  const TUIConfig extends Omit<
+    ObjectUnionWidgetConfig<
+      TScopedTranslation["ScopedTranslationKey"],
+      TUsage,
+      TVariants
+    >,
+    "usage" | "discriminator" | "variants" | "schemaType"
+  >,
+>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
+  _scopedTranslation: TScopedTranslation,
+  ui: TUIConfig,
+  usage: TUsage,
+  discriminator: TDiscriminator,
+  variants: TVariants,
+): TUIConfig & {
+  schemaType: "object-union";
+  discriminator: TDiscriminator;
+  variants: TVariants;
+  usage: TUsage;
+} {
+  return {
+    schemaType: "object-union" as const,
+    discriminator,
+    variants,
+    usage,
+    ...ui,
+  };
+}
+
+/**
  * Create an optional array field
  */
 export function arrayOptionalField<
-  TKey extends string,
   TUsage extends FieldUsageConfig,
-  TChild extends ArrayChildConstraint<TKey, ConstrainedChildUsage<TUsage>>,
+  TChild extends ArrayChildConstraint<
+    TranslationKey,
+    ConstrainedChildUsage<TUsage>
+  >,
   const TUIConfig extends ArrayWidgetConfig<
-    TKey,
+    TranslationKey,
     TUsage,
     "array-optional",
     TChild
@@ -805,14 +1015,13 @@ export function arrayOptionalField<
  * Create an optional request array field
  */
 export function requestDataArrayOptionalField<
-  TKey extends string,
   TChild extends ArrayChildConstraint<
-    TKey,
+    TranslationKey,
     ConstrainedChildUsage<{ request: "data"; response?: never }>
   >,
-  TUIConfig extends Omit<
+  const TUIConfig extends Omit<
     ArrayWidgetConfig<
-      TKey,
+      TranslationKey,
       { request: "data"; response?: never },
       "array-optional",
       TChild
@@ -836,17 +1045,52 @@ export function requestDataArrayOptionalField<
 }
 
 /**
+ * Create an optional request array field for scoped translations
+ */
+export function scopedRequestDataArrayOptionalField<
+  TScopedTranslation extends ScopedTranslationType,
+  TChild extends ArrayChildConstraint<
+    TScopedTranslation["ScopedTranslationKey"],
+    ConstrainedChildUsage<{ request: "data"; response?: never }>
+  >,
+  const TUIConfig extends Omit<
+    ArrayWidgetConfig<
+      TScopedTranslation["ScopedTranslationKey"],
+      { request: "data"; response?: never },
+      "array-optional",
+      TChild
+    >,
+    "child" | "schemaType" | "usage"
+  >,
+>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
+  _scopedTranslation: TScopedTranslation,
+  ui: TUIConfig,
+  child: TChild,
+): TUIConfig & {
+  schemaType: "array-optional";
+  child: TChild;
+  usage: { request: "data"; response?: never };
+} {
+  return {
+    ...ui,
+    schemaType: "array-optional" as const,
+    child,
+    usage: { request: "data" },
+  };
+}
+
+/**
  * Create an optional response array field
  */
 export function responseArrayOptionalField<
-  TKey extends string,
   TChild extends ArrayChildConstraint<
-    TKey,
+    TranslationKey,
     ConstrainedChildUsage<{ request?: never; response: true }>
   >,
   const TUIConfig extends Omit<
     ArrayWidgetConfig<
-      TKey,
+      TranslationKey,
       { request?: never; response: true },
       "array-optional",
       TChild
@@ -975,18 +1219,18 @@ export type InferUnionType<
         ObjectChildrenConstraint<string, FieldUsageConfig>
       >[]
       ?
-          | InferFieldType<Head, Usage, TTranslatedKey>
+          | InferFieldType<Head, Usage>
           | InferUnionType<TTranslatedKey, Tail, Usage>
-      : InferFieldType<Head, Usage, TTranslatedKey>
+      : InferFieldType<Head, Usage>
     : never
   : never;
 
 /**
  * Infer field type based on usage
  */
-export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
+export type InferFieldType<F, Usage extends FieldUsage> =
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Type parameters used for narrowing
-  F extends UnifiedField<TKey, infer TSchema, infer _TUsage, infer _TChildren>
+  F extends UnifiedField<string, infer TSchema, infer _TUsage, infer _TChildren>
     ? F extends {
         type: "primitive";
         usage: infer U;
@@ -1012,21 +1256,21 @@ export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
         ? Usage extends FieldUsage.ResponseData
           ? HasResponseUsage<U> extends true
             ? MakeOptional<
-                Array<InferFieldType<Child, Usage, TKey>>,
+                Array<InferFieldType<Child, Usage>>,
                 IsOptionalField<F>
               >
             : never
           : Usage extends FieldUsage.RequestData
             ? HasRequestDataUsage<U> extends true
               ? MakeOptional<
-                  Array<InferFieldType<Child, Usage, TKey>>,
+                  Array<InferFieldType<Child, Usage>>,
                   IsOptionalField<F>
                 >
               : never
             : Usage extends FieldUsage.RequestUrlParams
               ? HasRequestUrlParamsUsage<U> extends true
                 ? MakeOptional<
-                    Array<InferFieldType<Child, Usage, TKey>>,
+                    Array<InferFieldType<Child, Usage>>,
                     IsOptionalField<F>
                   >
                 : never
@@ -1038,20 +1282,20 @@ export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
             }
           ? U extends FieldUsageConfig
             ? TVariants extends UnionObjectWidgetConfigConstrain<
-                TKey,
+                string,
                 ConstrainedChildUsage<U>
               >
               ? Usage extends FieldUsage.ResponseData
                 ? HasResponseUsage<U> extends true
-                  ? InferUnionType<TKey, TVariants, Usage>
+                  ? InferUnionType<string, TVariants, Usage>
                   : never
                 : Usage extends FieldUsage.RequestData
                   ? HasRequestDataUsage<U> extends true
-                    ? InferUnionType<TKey, TVariants, Usage>
+                    ? InferUnionType<string, TVariants, Usage>
                     : never
                   : Usage extends FieldUsage.RequestUrlParams
                     ? HasRequestUrlParamsUsage<U> extends true
-                      ? InferUnionType<TKey, TVariants, Usage>
+                      ? InferUnionType<string, TVariants, Usage>
                       : never
                     : never
               : never
@@ -1063,22 +1307,16 @@ export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
               }
             ? Usage extends FieldUsage.ResponseData
               ? HasResponseUsage<U> extends true
-                ? MakeOptional<
-                    InferObjectType<C, Usage, TKey>,
-                    IsOptionalField<F>
-                  >
+                ? MakeOptional<InferObjectType<C, Usage>, IsOptionalField<F>>
                 : never
               : Usage extends FieldUsage.RequestData
                 ? HasRequestDataUsage<U> extends true
-                  ? MakeOptional<
-                      InferObjectType<C, Usage, TKey>,
-                      IsOptionalField<F>
-                    >
+                  ? MakeOptional<InferObjectType<C, Usage>, IsOptionalField<F>>
                   : never
                 : Usage extends FieldUsage.RequestUrlParams
                   ? HasRequestUrlParamsUsage<U> extends true
                     ? MakeOptional<
-                        InferObjectType<C, Usage, TKey>,
+                        InferObjectType<C, Usage>,
                         IsOptionalField<F>
                       >
                     : never
@@ -1087,10 +1325,7 @@ export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
                   type: "object" | "object-optional";
                   children: infer C;
                 }
-              ? MakeOptional<
-                  InferObjectType<C, Usage, TKey>,
-                  IsOptionalField<F>
-                >
+              ? MakeOptional<InferObjectType<C, Usage>, IsOptionalField<F>>
               : never
     : never;
 
@@ -1099,31 +1334,23 @@ export type InferFieldType<F, Usage extends FieldUsage, TKey extends string> =
  * Uses flexible constraint that accepts both readonly and mutable properties
  * Checks each field's optional flag to make properties optional in the resulting type
  */
-export type InferObjectType<C, Usage extends FieldUsage, TKey extends string> =
+export type InferObjectType<C, Usage extends FieldUsage> =
   C extends Record<
     string,
     UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any> // oxlint-disable-line typescript/no-explicit-any
   >
     ? {
-        -readonly [K in keyof C as InferFieldType<
-          C[K],
-          Usage,
-          TKey
-        > extends never
+        -readonly [K in keyof C as InferFieldType<C[K], Usage> extends never
           ? never
           : IsOptionalField<C[K]> extends true
             ? never
-            : K]: InferFieldType<C[K], Usage, TKey>;
+            : K]: InferFieldType<C[K], Usage>;
       } & {
-        -readonly [K in keyof C as InferFieldType<
-          C[K],
-          Usage,
-          TKey
-        > extends never
+        -readonly [K in keyof C as InferFieldType<C[K], Usage> extends never
           ? never
           : IsOptionalField<C[K]> extends true
             ? K
-            : never]?: InferFieldType<C[K], Usage, TKey>;
+            : never]?: InferFieldType<C[K], Usage>;
       }
     : never;
 
@@ -1552,7 +1779,6 @@ export function generateResponseSchema<F>(
  *
  * @template TSourceData - The data available in the source context (e.g., list item data)
  * @template TTargetEndpoint - The target endpoint to navigate to
- * @template TKey - Translation key type
  *
  * @param config - Navigation button configuration with type-safe parameter extraction
  * @returns WidgetField configured for navigation
@@ -1618,12 +1844,61 @@ export function navigateButtonField<
 }
 
 /**
+ * Scoped navigate button field for cross-definition navigation with scoped translations
+ */
+export function scopedNavigateButtonField<
+  TScopedTranslation extends ScopedTranslationType,
+  TUsage extends FieldUsageConfig,
+  TTargetEndpoint extends CreateApiEndpointAny,
+  TGetEndpoint extends CreateApiEndpointAny | undefined = undefined,
+>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
+  _scopedTranslation: TScopedTranslation,
+  config: Omit<
+    NavigateButtonWidgetConfig<
+      TScopedTranslation["ScopedTranslationKey"],
+      TUsage,
+      "widget",
+      TTargetEndpoint,
+      TGetEndpoint
+    >,
+    "schemaType" | "type"
+  >,
+): NavigateButtonWidgetConfig<
+  TScopedTranslation["ScopedTranslationKey"],
+  TUsage,
+  "widget",
+  TTargetEndpoint,
+  TGetEndpoint
+> {
+  return {
+    schemaType: "widget" as const,
+    usage: config.usage,
+    type: WidgetType.NAVIGATE_BUTTON,
+    label: config.label,
+    icon: config.icon,
+    variant: config.variant ?? "outline",
+    size: config.size,
+    className: config.className,
+    inline: config.inline,
+    hidden: config.hidden,
+    order: config.order,
+    columns: config.columns,
+    targetEndpoint: config.targetEndpoint,
+    extractParams: config.extractParams,
+    prefillFromGet: config.prefillFromGet,
+    getEndpoint: config.getEndpoint,
+    renderInModal: config.renderInModal,
+    popNavigationOnSuccess: config.popNavigationOnSuccess,
+  };
+}
+
+/**
  * Convenience helper for creating an edit button that navigates to an edit endpoint
  * Automatically sets prefillFromGet: true to fetch current data before showing form
  *
  * @template TSourceData - The data available in the source context
  * @template TTargetEndpoint - The edit endpoint to navigate to
- * @template TKey - Translation key type
  *
  * @example
  * ```typescript
@@ -1659,12 +1934,46 @@ export function editButton<
 }
 
 /**
+ * Scoped edit button for scoped translations
+ */
+export function scopedEditButton<
+  TScopedTranslation extends ScopedTranslationType,
+  TTargetEndpoint extends CreateApiEndpointAny,
+  TUsage extends FieldUsageConfig,
+  TGetEndpoint extends CreateApiEndpointAny | undefined = undefined,
+>(
+  _scopedTranslation: TScopedTranslation,
+  config: NavigateButtonWidgetConfig<
+    TScopedTranslation["ScopedTranslationKey"],
+    TUsage,
+    "widget",
+    TTargetEndpoint,
+    TGetEndpoint
+  >,
+): NavigateButtonWidgetConfig<
+  TScopedTranslation["ScopedTranslationKey"],
+  TUsage,
+  "widget",
+  TTargetEndpoint,
+  TGetEndpoint
+> {
+  return scopedNavigateButtonField<
+    TScopedTranslation,
+    TUsage,
+    TTargetEndpoint,
+    TGetEndpoint
+  >(_scopedTranslation, {
+    ...config,
+    prefillFromGet: true,
+  });
+}
+
+/**
  * Convenience helper for creating a delete button that opens DELETE endpoint in a modal popover
  * The back button closes the modal instead of navigating back
  * On successful deletion, optionally pops the navigation stack N times
  *
  * @template TTargetEndpoint - The delete endpoint to use
- * @template TKey - Translation key type
  *
  * @example Delete from list (stays on list)
  * ```typescript
@@ -1714,10 +2023,48 @@ export function deleteButton<
 }
 
 /**
+ * Scoped delete button for scoped translations
+ */
+export function scopedDeleteButton<
+  TScopedTranslation extends ScopedTranslationType,
+  TTargetEndpoint extends CreateApiEndpointAny,
+  TUsage extends FieldUsageConfig,
+>(
+  _scopedTranslation: TScopedTranslation,
+  config: Omit<
+    NavigateButtonWidgetConfig<
+      TScopedTranslation["ScopedTranslationKey"],
+      TUsage,
+      "widget",
+      TTargetEndpoint,
+      undefined
+    >,
+    "schemaType" | "type" | "getEndpoint" | "prefillFromGet"
+  >,
+): NavigateButtonWidgetConfig<
+  TScopedTranslation["ScopedTranslationKey"],
+  TUsage,
+  "widget",
+  TTargetEndpoint,
+  undefined
+> {
+  return scopedNavigateButtonField<
+    TScopedTranslation,
+    TUsage,
+    TTargetEndpoint,
+    undefined
+  >(_scopedTranslation, {
+    ...config,
+    renderInModal: true,
+    icon: config.icon ?? "trash",
+    variant: config.variant ?? "destructive",
+    popNavigationOnSuccess: config.popNavigationOnSuccess,
+  });
+}
+
+/**
  * Convenience helper for creating a back button that pops the navigation stack
  * Sets targetEndpoint to null to trigger navigation.pop()
- *
- * @template TKey - Translation key type
  *
  * @example
  * ```typescript
@@ -1774,10 +2121,63 @@ export function backButton<
 }
 
 /**
+ * Scoped back button for scoped translations
+ */
+export function scopedBackButton<
+  TScopedTranslation extends ScopedTranslationType,
+  TUsage extends FieldUsageConfig,
+  const TConfig extends Omit<
+    NavigateButtonWidgetConfig<
+      TScopedTranslation["ScopedTranslationKey"],
+      TUsage,
+      "widget",
+      undefined,
+      undefined
+    >,
+    "schemaType" | "type" | "targetEndpoint" | "getEndpoint" | "prefillFromGet"
+  >,
+>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
+  _scopedTranslation: TScopedTranslation,
+  config: TConfig,
+): TConfig & {
+  schemaType: "widget";
+  type: WidgetType.NAVIGATE_BUTTON;
+  targetEndpoint: undefined;
+  getEndpoint: undefined;
+  prefillFromGet: false;
+} {
+  return {
+    schemaType: "widget" as const,
+    usage: config.usage,
+    type: WidgetType.NAVIGATE_BUTTON,
+    label: config?.label,
+    icon: config?.icon ?? ("arrow-left" as const),
+    variant: config?.variant ?? ("outline" as const),
+    size: config?.size,
+    className: config?.className,
+    inline: config?.inline,
+    hidden: config?.hidden,
+    order: config?.order,
+    columns: config?.columns,
+    targetEndpoint: undefined,
+    extractParams: undefined,
+    prefillFromGet: false,
+    getEndpoint: undefined,
+    renderInModal: false,
+    popNavigationOnSuccess: undefined,
+  } as TConfig & {
+    schemaType: "widget";
+    type: WidgetType.NAVIGATE_BUTTON;
+    targetEndpoint: undefined;
+    getEndpoint: undefined;
+    prefillFromGet: false;
+  };
+}
+
+/**
  * Convenience helper for creating a submit button
  * Renders a button that triggers form submission
- *
- * @template TKey - Translation key type
  *
  * @example
  * ```typescript
@@ -1809,6 +2209,55 @@ export function submitButton<TUsage extends FieldUsageConfig>(config: {
   className?: string;
   inline?: boolean;
 }): SubmitButtonWidgetConfig<TranslationKey, TUsage, "widget"> {
+  return {
+    schemaType: "widget" as const,
+    usage: config.usage,
+    type: WidgetType.SUBMIT_BUTTON,
+    text: config.label,
+    loadingText: config.loadingText,
+    icon: config.icon,
+    variant: config.variant ?? "default",
+    size: config.size ?? "default",
+    iconSize: config.iconSize,
+    iconSpacing: config.iconSpacing,
+    className: config.className,
+    inline: config.inline,
+  };
+}
+
+/**
+ * Scoped submit button for scoped translations
+ */
+export function scopedSubmitButton<
+  TScopedTranslation extends ScopedTranslationType,
+  TUsage extends FieldUsageConfig,
+>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for type inference only
+  _scopedTranslation: TScopedTranslation,
+  config: {
+    label?: TScopedTranslation["ScopedTranslationKey"];
+    loadingText?: TScopedTranslation["ScopedTranslationKey"];
+    icon?: IconKey;
+    variant?:
+      | "default"
+      | "primary"
+      | "secondary"
+      | "destructive"
+      | "ghost"
+      | "outline"
+      | "link";
+    size?: "default" | "sm" | "lg" | "icon";
+    iconSize?: "xs" | "sm" | "base" | "lg";
+    iconSpacing?: SpacingSize;
+    usage: TUsage;
+    className?: string;
+    inline?: boolean;
+  },
+): SubmitButtonWidgetConfig<
+  TScopedTranslation["ScopedTranslationKey"],
+  TUsage,
+  "widget"
+> {
   return {
     schemaType: "widget" as const,
     usage: config.usage,

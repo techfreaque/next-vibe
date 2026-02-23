@@ -23,7 +23,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined, // No emails for POST requests
-    handler: ({ data, user, locale, logger }) =>
-      emailSendRepository.sendEmail(data, user, locale, logger),
+    handler: ({ data, user, logger, t, locale }) =>
+      emailSendRepository.sendEmail(data, user, logger, t, locale),
   },
 });

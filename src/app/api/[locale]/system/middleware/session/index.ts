@@ -9,7 +9,9 @@ import type { NextRequest, NextResponse } from "next/server";
 import { NextResponse as NextResponseClass } from "next/server";
 
 import { AUTH_TOKEN_COOKIE_NAME } from "@/config/constants";
+import type { CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation as sessionScopedTranslation } from "../../../user/private/session/i18n";
 import { SessionRepository } from "../../../user/private/session/repository";
 
 enum SessionCheckResult {
@@ -35,9 +37,13 @@ export function getSessionTokenFromRequest(
  * @param token The session token to check
  * @returns true if session exists and hasn't expired
  */
-export async function isSessionTokenValid(token: string): Promise<boolean> {
+export async function isSessionTokenValid(
+  token: string,
+  locale: CountryLanguage,
+): Promise<boolean> {
   try {
-    const result = await SessionRepository.findByToken(token);
+    const { t } = sessionScopedTranslation.scopedT(locale);
+    const result = await SessionRepository.findByToken(token, t);
     if (!result.success) {
       return false;
     }
@@ -61,6 +67,7 @@ export async function isSessionTokenValid(token: string): Promise<boolean> {
  */
 export async function checkSession(
   request: NextRequest,
+  locale: CountryLanguage,
 ): Promise<SessionCheckResult> {
   const path = request.nextUrl.pathname;
 
@@ -82,7 +89,7 @@ export async function checkSession(
   }
 
   // Check if token is valid in database
-  const isValid = await isSessionTokenValid(existingToken);
+  const isValid = await isSessionTokenValid(existingToken, locale);
   if (!isValid) {
     return SessionCheckResult.INVALID;
   }

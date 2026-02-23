@@ -14,7 +14,7 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ data, user, locale, logger }) =>
-      ChatFoldersRepository.getFolders(data, user, locale, logger),
+    handler: ({ data, user, logger, t, locale }) =>
+      ChatFoldersRepository.getFolders(data, user, t, logger, locale),
   },
 });

@@ -11,10 +11,11 @@ import {
 
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import type migrateProdEndpoints from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 // Constants to avoid lint issues
 const UNKNOWN_ERROR = "Unknown error";
@@ -32,7 +33,7 @@ type MigrateProdResponseType =
 export interface DatabaseMigrateProdRepository {
   runProductionMigrations(
     data: MigrateProdRequestType,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<MigrateProdResponseType>>;
 }
@@ -43,11 +44,9 @@ export interface DatabaseMigrateProdRepository {
 export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRepository {
   async runProductionMigrations(
     data: MigrateProdRequestType,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<MigrateProdResponseType>> {
-    const { t } = simpleT(locale);
-
     try {
       logger.info("Starting production migration process", { options: data });
 
@@ -58,9 +57,7 @@ export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRep
 
       if (data.dryRun) {
         logger.info("DRY RUN MODE - No changes will be made");
-        const output = t(
-          "app.api.system.db.migrateProd.messages.dryRunComplete",
-        );
+        const output = t("messages.dryRunComplete");
 
         return success({
           success: true,
@@ -83,7 +80,7 @@ export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRep
       const generateResult = await this.generateMigrations(logger);
       if (!generateResult.success) {
         return fail({
-          message: "app.api.system.db.migrateProd.post.errors.server.title",
+          message: t("post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: generateResult.error || UNKNOWN_ERROR },
         });
@@ -95,7 +92,7 @@ export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRep
       const applyResult = await this.applyMigrations(logger);
       if (!applyResult.success) {
         return fail({
-          message: "app.api.system.db.migrateProd.post.errors.server.title",
+          message: t("post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: applyResult.error || UNKNOWN_ERROR },
         });
@@ -110,7 +107,7 @@ export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRep
         const seedResult = await this.runProductionSeeding(logger);
         if (!seedResult.success) {
           return fail({
-            message: "app.api.system.db.migrateProd.post.errors.server.title",
+            message: t("post.errors.server.title"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: { error: seedResult.error || UNKNOWN_ERROR },
           });
@@ -119,8 +116,8 @@ export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRep
       }
 
       const output = seedingCompleted
-        ? t("app.api.system.db.migrateProd.messages.successWithSeeding")
-        : t("app.api.system.db.migrateProd.messages.successWithoutSeeding");
+        ? t("messages.successWithSeeding")
+        : t("messages.successWithoutSeeding");
 
       logger.info("Production migration completed successfully");
 
@@ -136,7 +133,7 @@ export class DatabaseMigrateProdRepositoryImpl implements DatabaseMigrateProdRep
     } catch (error) {
       logger.error("Production migration failed", { error: String(error) });
       return fail({
-        message: "app.api.system.db.migrateProd.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: String(error) },
       });

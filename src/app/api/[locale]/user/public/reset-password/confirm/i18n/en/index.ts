@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Users",
+
   title: "Confirm Password Reset",
   description: "Confirm your password reset with a new password",
   tag: "Password Reset",
@@ -100,6 +102,7 @@ export const translations = {
   },
   errors: {
     title: "Password Reset Error",
+    no_email: "No account found with that email address",
     validation: {
       title: "Validation Error",
       description: "Please check your input and try again",
@@ -143,5 +146,26 @@ export const translations = {
     description: "Your password has been successfully reset",
     message: "Password has been reset successfully",
     password_reset: "Your password has been successfully reset",
+  },
+  actions: {
+    requestNewLink: "Request a New Reset Link",
+  },
+  emailTemplates: {
+    confirm: {
+      name: "Password Reset Confirmation Email",
+      description:
+        "Email sent to users after their password has been successfully reset",
+      category: "Authentication",
+      preview: {
+        publicName: {
+          label: "Public Name",
+          description: "The user's public display name",
+        },
+        userId: {
+          label: "User ID",
+          description: "The user's unique identifier",
+        },
+      },
+    },
   },
 };

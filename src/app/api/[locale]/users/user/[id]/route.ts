@@ -13,17 +13,17 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ urlPathParams, user, logger }) =>
-      UserByIdRepository.getUserById(urlPathParams, user, logger),
+    handler: ({ urlPathParams, user, logger, locale }) =>
+      UserByIdRepository.getUserById(urlPathParams, user, logger, locale),
   },
   [Methods.PUT]: {
     email: undefined,
-    handler: ({ data, urlPathParams, user, logger }) =>
-      UserByIdRepository.updateUser(data, urlPathParams, user, logger),
+    handler: ({ data, urlPathParams, user, logger, locale }) =>
+      UserByIdRepository.updateUser(data, urlPathParams, user, logger, locale),
   },
   [Methods.DELETE]: {
     email: undefined,
-    handler: ({ urlPathParams, user, logger }) =>
-      UserByIdRepository.deleteUser(urlPathParams, user, logger),
+    handler: ({ urlPathParams, user, logger, locale }) =>
+      UserByIdRepository.deleteUser(urlPathParams, user, logger, locale),
   },
 });

@@ -1,4 +1,6 @@
 export const translations = {
+  category: "IMAP Client",
+
   title: "Sync IMAP Folders",
   description: "Synchronize folders from IMAP account",
 

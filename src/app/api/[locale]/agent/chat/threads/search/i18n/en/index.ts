@@ -3,6 +3,10 @@
  */
 
 export const translations = {
+  category: "Chat",
+  tags: {
+    threads: "Threads",
+  },
   search: {
     get: {
       title: "Search Threads",

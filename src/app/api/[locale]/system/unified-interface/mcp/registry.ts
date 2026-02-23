@@ -21,6 +21,7 @@ import { permissionsRegistry } from "../shared/endpoints/permissions/registry";
 import { RouteExecutionExecutor } from "../shared/endpoints/route/executor";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Platform } from "../shared/types/platform";
+import { scopedTranslation as mcpScopedTranslation } from "./i18n";
 import type {
   MCPExecutionContext,
   MCPToolCallResult,
@@ -29,35 +30,16 @@ import type {
 import { MCPErrorCode } from "./types";
 
 /**
- * MCP Registry Interface
- */
-export interface IMCPRegistry {
-  initialize(logger: EndpointLogger, locale: CountryLanguage): Promise<void>;
-  getTools(user: JwtPayloadType, logger: EndpointLogger): MCPToolMetadata[];
-  getToolByName(name: string, logger: EndpointLogger): MCPToolMetadata | null;
-  executeTool(
-    context: MCPExecutionContext,
-    logger: EndpointLogger,
-  ): Promise<MCPToolCallResult>;
-  isInitialized(): boolean;
-  refresh(logger: EndpointLogger, locale: CountryLanguage): Promise<void>;
-}
-
-/**
  * MCP Registry Implementation
  */
-export class MCPRegistry implements IMCPRegistry {
+export class MCPRegistry {
   private initialized = false;
   private lastRefresh = 0;
-  private locale: CountryLanguage = "en-GLOBAL" as CountryLanguage;
 
   /**
    * Initialize the registry
    */
-  async initialize(
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<void> {
+  async initialize(logger: EndpointLogger): Promise<void> {
     if (this.initialized) {
       return;
     }
@@ -65,7 +47,6 @@ export class MCPRegistry implements IMCPRegistry {
     try {
       logger.info("[MCP Registry] Starting initialization...");
 
-      this.locale = locale;
       this.lastRefresh = Date.now();
       this.initialized = true;
 
@@ -92,14 +73,18 @@ export class MCPRegistry implements IMCPRegistry {
   /**
    * Get all tools for a specific user (filtered by permissions)
    */
-  getTools(user: JwtPayloadType, logger: EndpointLogger): MCPToolMetadata[] {
+  getTools(
+    user: JwtPayloadType,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): MCPToolMetadata[] {
     this.ensureInitialized(logger);
 
     // Get full execution-set tools for this user on MCP platform
     const allMcpTools = definitionsRegistry.getSerializedToolsForUser(
       Platform.MCP,
       user,
-      this.locale,
+      locale,
     );
 
     // MCP native tool listing is opt-in: only expose tools marked MCP_VISIBLE
@@ -129,7 +114,11 @@ export class MCPRegistry implements IMCPRegistry {
   /**
    * Get tool metadata by name
    */
-  getToolByName(name: string, logger: EndpointLogger): MCPToolMetadata | null {
+  getToolByName(
+    name: string,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): MCPToolMetadata | null {
     this.ensureInitialized(logger);
 
     // Get all tools (this will be filtered by user in getTools, but here we need unfiltered)
@@ -140,7 +129,7 @@ export class MCPRegistry implements IMCPRegistry {
       roles: [UserPermissionRole.PUBLIC],
     };
 
-    const tools = this.getTools(publicUser, logger);
+    const tools = this.getTools(publicUser, logger, locale);
 
     // Try direct name match first
     const tool = tools.find((t) => t.name === name);
@@ -161,10 +150,10 @@ export class MCPRegistry implements IMCPRegistry {
   ): Promise<MCPToolCallResult> {
     this.ensureInitialized(logger);
 
-    const { t } = simpleT(context.locale);
+    const { t } = mcpScopedTranslation.scopedT(context.locale);
 
     // Get tool metadata (this checks if tool exists and user has permission)
-    const userTools = this.getTools(context.user, logger);
+    const userTools = this.getTools(context.user, logger, context.locale);
     const toolMeta = userTools.find(
       (t) =>
         t.name === context.toolName || t.aliases?.includes(context.toolName),
@@ -172,7 +161,7 @@ export class MCPRegistry implements IMCPRegistry {
 
     if (!toolMeta) {
       return this.fail({
-        error: t("app.api.system.unifiedInterface.mcp.registry.toolNotFound"),
+        error: t("registry.toolNotFound"),
         code: MCPErrorCode.TOOL_NOT_FOUND,
         details: { toolName: context.toolName },
       });
@@ -237,9 +226,7 @@ export class MCPRegistry implements IMCPRegistry {
       });
 
       return this.fail({
-        error: t(
-          "app.api.system.unifiedInterface.mcp.registry.toolExecutionFailed",
-        ),
+        error: t("registry.toolExecutionFailed"),
         code: MCPErrorCode.TOOL_EXECUTION_FAILED,
         details: {
           toolName: context.toolName,
@@ -290,7 +277,7 @@ export class MCPRegistry implements IMCPRegistry {
     endpoint: CreateApiEndpointAny | null,
     user: JwtPayloadType,
   ): MCPToolCallResult {
-    const { t } = simpleT(locale);
+    const { t } = mcpScopedTranslation.scopedT(locale);
 
     if (result.success && result.data) {
       // Format successful response using endpoint renderer if available
@@ -334,9 +321,10 @@ export class MCPRegistry implements IMCPRegistry {
     }
 
     // Error response
+    const { t: globalT } = simpleT(locale);
     const errorMessage = result.message
-      ? t(result.message, result.messageParams)
-      : t("app.api.system.unifiedInterface.mcp.registry.toolExecutionFailed");
+      ? globalT(result.message, result.messageParams)
+      : t("registry.toolExecutionFailed");
 
     return this.fail({
       error: errorMessage,
@@ -358,13 +346,10 @@ export class MCPRegistry implements IMCPRegistry {
   /**
    * Refresh the registry
    */
-  async refresh(
-    logger: EndpointLogger,
-    locale: CountryLanguage,
-  ): Promise<void> {
+  async refresh(logger: EndpointLogger): Promise<void> {
     logger.info("[MCP Registry] Refreshing...");
     this.initialized = false;
-    await this.initialize(logger, locale);
+    await this.initialize(logger);
   }
 }
 

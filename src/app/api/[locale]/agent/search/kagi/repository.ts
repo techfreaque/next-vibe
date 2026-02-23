@@ -8,13 +8,16 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
-import { buildMissingKeyMessage } from "@/app/api/[locale]/agent/env-availability";
+import { PROVIDER_SETUP_INSTRUCTIONS } from "@/app/api/[locale]/agent/env-availability";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type {
   KagiSearchGetRequestOutput,
   KagiSearchGetResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Kagi FastGPT API Response Types
@@ -65,15 +68,16 @@ export class KagiSearchRepository {
   static async search(
     data: KagiSearchGetRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<KagiSearchGetResponseOutput>> {
     const { fail, success, ErrorResponseTypes } =
       await import("next-vibe/shared/types/response.schema");
 
     // Guard: key not configured
     if (!agentEnv.KAGI_API_KEY) {
-      logger.warn("Kagi API key not configured");
+      const { envKey, url, label } = PROVIDER_SETUP_INSTRUCTIONS.kagiSearch;
       return fail({
-        message: buildMissingKeyMessage("kagiSearch"),
+        message: t("get.errors.notConfigured.title", { label, envKey, url }),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
@@ -86,16 +90,14 @@ export class KagiSearchRepository {
         data.query.trim() === ""
       ) {
         return fail({
-          message:
-            "app.api.agent.search.kagi.get.errors.queryEmpty.title" as const,
+          message: t("get.errors.queryEmpty.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
 
       if (data.query.length > this.MAX_QUERY_LENGTH) {
         return fail({
-          message:
-            "app.api.agent.search.kagi.get.errors.queryTooLong.title" as const,
+          message: t("get.errors.queryTooLong.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { maxLength: this.MAX_QUERY_LENGTH },
         });
@@ -120,15 +122,13 @@ export class KagiSearchRepository {
 
       if (error instanceof Error && error.name === "AbortError") {
         return fail({
-          message:
-            "app.api.agent.search.kagi.get.errors.timeout.title" as const,
+          message: t("get.errors.timeout.title"),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         });
       }
 
       return fail({
-        message:
-          "app.api.agent.search.kagi.get.errors.searchFailed.title" as const,
+        message: t("get.errors.searchFailed.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

@@ -14,38 +14,21 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type { HookContext, ReleaseHook } from "../definition";
+import { scopedTranslation } from "../i18n";
 import { MESSAGES } from "./constants";
 
-// ============================================================================
-// Interface
-// ============================================================================
-
-export interface IHookRunner {
-  /**
-   * Run a release hook
-   */
+export class HookRunner {
   runHook(
     hook: ReleaseHook,
     cwd: string,
     logger: EndpointLogger,
     dryRun: boolean,
     context: HookContext,
-  ): ResponseType<void>;
-}
-
-// ============================================================================
-// Implementation
-// ============================================================================
-
-export class HookRunner implements IHookRunner {
-  runHook(
-    hook: ReleaseHook,
-    cwd: string,
-    logger: EndpointLogger,
-    dryRun: boolean,
-    context: HookContext,
+    locale: CountryLanguage,
   ): ResponseType<void> {
     // Skip if no command is defined (hook config exists but is empty)
     if (!hook.command) {
@@ -87,8 +70,9 @@ export class HookRunner implements IHookRunner {
         logger.warn("Hook failed but continuing due to continueOnError");
         return success();
       }
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.hooks.failed",
+        message: t("hooks.failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { command, error: String(error) },
       });

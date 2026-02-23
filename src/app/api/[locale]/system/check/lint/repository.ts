@@ -29,7 +29,7 @@ export interface LintRepositoryInterface {
   execute(
     data: LintRequestOutput,
     logger: EndpointLogger,
-    platform?: Platform,
+    platform: Platform,
     providedConfig?: CheckConfig,
   ): Promise<ApiResponseType<LintResponseOutput>>;
 }

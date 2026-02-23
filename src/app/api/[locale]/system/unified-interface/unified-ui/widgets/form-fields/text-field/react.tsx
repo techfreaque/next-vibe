@@ -21,6 +21,7 @@ import {
 } from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
 
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import type { ReactFormFieldProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import { simpleT } from "@/i18n/core/shared";
@@ -89,16 +90,11 @@ export function TextFieldWidget<
   const form = useWidgetForm();
   const isDisabled = useWidgetDisabled();
 
+  const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
   const { t: globalT } = simpleT(locale);
 
   if (!form || !fieldName) {
-    return (
-      <Div>
-        {globalT(
-          "app.api.system.unifiedInterface.react.widgets.formField.requiresContext",
-        )}
-      </Div>
-    );
+    return <Div>{widgetT("react.widgets.formField.requiresContext")}</Div>;
   }
 
   // Get theme from config or use default

@@ -8,8 +8,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -19,82 +19,79 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { scopedTranslation } from "../../../i18n";
+import { scopedTranslation } from "./i18n";
 import { LinuxUserDeleteContainer } from "./widget";
 
 export const { DELETE } = createEndpoint({
   scopedTranslation,
   method: Methods.DELETE,
   path: ["ssh", "linux", "users", "[username]"],
-  title: "linux.users.username.delete.title",
-  description: "linux.users.username.delete.description",
+  title: "delete.title",
+  description: "delete.description",
   icon: "user",
   category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["type"],
+  tags: ["category" as const],
 
   fields: customWidgetObject({
     render: LinuxUserDeleteContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      removeHome: requestField({
+      removeHome: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "linux.users.username.delete.fields.removeHome.label",
-        description:
-          "linux.users.username.delete.fields.removeHome.description",
+        label: "delete.fields.removeHome.label",
+        description: "delete.fields.removeHome.description",
         schema: z.boolean().optional(),
       }),
-      ok: responseField({
+      ok: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "linux.users.username.delete.response.ok.title",
+        content: "delete.response.ok.title",
         schema: z.boolean(),
       }),
     },
   }),
 
   successTypes: {
-    title: "linux.users.username.delete.success.title",
-    description: "linux.users.username.delete.success.description",
+    title: "delete.success.title",
+    description: "delete.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "linux.users.username.delete.errors.validation.title",
-      description: "linux.users.username.delete.errors.validation.description",
+      title: "delete.errors.validation.title",
+      description: "delete.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "linux.users.username.delete.errors.unauthorized.title",
-      description:
-        "linux.users.username.delete.errors.unauthorized.description",
+      title: "delete.errors.unauthorized.title",
+      description: "delete.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "linux.users.username.delete.errors.forbidden.title",
-      description: "linux.users.username.delete.errors.forbidden.description",
+      title: "delete.errors.forbidden.title",
+      description: "delete.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "linux.users.username.delete.errors.server.title",
-      description: "linux.users.username.delete.errors.server.description",
+      title: "delete.errors.server.title",
+      description: "delete.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "linux.users.username.delete.errors.notFound.title",
-      description: "linux.users.username.delete.errors.notFound.description",
+      title: "delete.errors.notFound.title",
+      description: "delete.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "linux.users.username.delete.errors.unknown.title",
-      description: "linux.users.username.delete.errors.unknown.description",
+      title: "delete.errors.unknown.title",
+      description: "delete.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "linux.users.username.delete.errors.unsavedChanges.title",
-      description:
-        "linux.users.username.delete.errors.unsavedChanges.description",
+      title: "delete.errors.unsavedChanges.title",
+      description: "delete.errors.unsavedChanges.title",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "linux.users.username.delete.errors.conflict.title",
-      description: "linux.users.username.delete.errors.conflict.description",
+      title: "delete.errors.conflict.title",
+      description: "delete.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "linux.users.username.delete.errors.network.title",
-      description: "linux.users.username.delete.errors.network.description",
+      title: "delete.errors.network.title",
+      description: "delete.errors.network.description",
     },
   },
 

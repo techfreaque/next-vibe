@@ -116,4 +116,9 @@ export const translations: typeof enTranslations = {
     title: "Wiadomości konsoli pobrane pomyślnie",
     description: "Wiadomości konsoli zostały pomyślnie pobrane",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    debugging: "Debugowanie",
+  },
 };

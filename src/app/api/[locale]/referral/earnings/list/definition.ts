@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,22 +21,20 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../user/user-roles/enum";
+import { scopedTranslation } from "../../i18n";
 
 /**
  * GET endpoint for earnings list
  */
 export const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["referral", "earnings", "list"],
-  title: "app.api.referral.earnings.list.get.title",
-  description: "app.api.referral.earnings.list.get.description",
-  category: "app.api.payment.category",
-  icon: "dollar-sign" as const,
-  tags: [
-    "app.api.referral.tags.referral",
-    "app.api.referral.tags.earnings",
-    "app.api.referral.tags.list",
-  ],
+  title: "get.title",
+  description: "get.description",
+  category: "category",
+  icon: "dollar-sign",
+  tags: ["tags.referral", "tags.earnings", "tags.list"],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
@@ -44,107 +42,94 @@ export const { GET } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
   ] as const,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.referral.earnings.list.get.form.title",
-      description: "app.api.referral.earnings.list.get.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "get.form.title",
+    description: "get.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // Request fields
-      limit: requestField({
+      limit: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.browser.tags.browserAutomation",
-        description: "app.api.browser.tags.browserAutomation",
+        label: "get.form.limit",
+        description: "get.form.limit",
         schema: z.coerce.number().positive().optional(),
       }),
-      offset: requestField({
+      offset: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.browser.tags.browserAutomation",
-        description: "app.api.browser.tags.browserAutomation",
+        label: "get.form.offset",
+        description: "get.form.offset",
         schema: z.coerce.number().min(0).optional(),
       }),
 
       // Response fields
-      earnings: responseArrayField(
-        { type: WidgetType.CONTAINER },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.GRID,
-            columns: 12,
-          },
-          { response: true },
-          {
-            id: responseField({
+      earnings: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: scopedObjectFieldNew(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.GRID,
+          columns: 12,
+          usage: { response: true },
+          children: {
+            id: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.referral.earnings.list.get.response.earnings.id",
+              content: "get.response.earnings.id",
               schema: z.string(),
             }),
-            earnerUserId: responseField({
+            earnerUserId: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.referral.earnings.list.get.response.earnings.earnerUserId",
+              content: "get.response.earnings.earnerUserId",
               schema: z.string(),
             }),
-            sourceUserId: responseField({
+            sourceUserId: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.referral.earnings.list.get.response.earnings.sourceUserId",
+              content: "get.response.earnings.sourceUserId",
               schema: z.string(),
             }),
-            transactionId: responseField({
+            transactionId: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.referral.earnings.list.get.response.earnings.transactionId",
+              content: "get.response.earnings.transactionId",
               schema: z.string(),
             }),
-            level: responseField({
+            level: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.referral.earnings.list.get.response.earnings.level",
+              content: "get.response.earnings.level",
               schema: z.coerce.number(),
             }),
-            amountCents: responseField({
+            amountCents: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.referral.earnings.list.get.response.earnings.amountCents",
+              content: "get.response.earnings.amountCents",
               schema: z.coerce.number(),
             }),
-            currency: responseField({
+            currency: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.referral.earnings.list.get.response.earnings.currency",
+              content: "get.response.earnings.currency",
               schema: z.string(),
             }),
-            status: responseField({
+            status: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.referral.earnings.list.get.response.earnings.status",
+              content: "get.response.earnings.status",
               schema: z.string(),
             }),
-            createdAt: responseField({
+            createdAt: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.referral.earnings.list.get.response.earnings.createdAt",
+              content: "get.response.earnings.createdAt",
               schema: z.string(),
             }),
           },
-        ),
-      ),
-      totalCount: responseField({
+        }),
+      }),
+      totalCount: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.tags.browserAutomation",
+        content: "get.response.totalCount",
         schema: z.coerce.number(),
       }),
     },
-  ),
+  }),
 
   examples: {
     requests: {
@@ -160,46 +145,46 @@ export const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.referral.errors.validation.title",
-      description: "app.api.referral.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.referral.errors.network.title",
-      description: "app.api.referral.errors.network.description",
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.referral.errors.unauthorized.title",
-      description: "app.api.referral.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.referral.errors.forbidden.title",
-      description: "app.api.referral.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.referral.errors.notFound.title",
-      description: "app.api.referral.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.referral.errors.serverError.title",
-      description: "app.api.referral.errors.serverError.description",
+      title: "errors.serverError.title",
+      description: "errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.referral.errors.unknown.title",
-      description: "app.api.referral.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.referral.errors.unsavedChanges.title",
-      description: "app.api.referral.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.referral.errors.conflict.title",
-      description: "app.api.referral.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.referral.earnings.list.success.title",
-    description: "app.api.referral.earnings.list.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 });
 

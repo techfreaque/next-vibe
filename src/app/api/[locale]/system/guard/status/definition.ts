@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,13 +21,16 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "guard", "status"],
-  title: "app.api.system.guard.status.post.title",
-  description: "app.api.system.guard.status.post.description",
-  category: "app.api.system.category",
-  tags: ["app.api.system.guard.status.post.tag"],
+  title: "post.title",
+  description: "post.description",
+  category: "category",
+  tags: ["post.tag"],
   icon: "eye",
   allowedRoles: [
     UserRole.ADMIN,
@@ -37,207 +40,182 @@ const { POST } = createEndpoint({
   ],
   aliases: ["guard:status", "guard-status"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.guard.status.post.container.title",
-      description: "app.api.system.guard.status.post.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.container.title",
+    description: "post.container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      projectPath: requestField({
+      projectPath: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.guard.status.post.fields.projectPath.title",
-        description:
-          "app.api.system.guard.status.post.fields.projectPath.description",
-        placeholder:
-          "app.api.system.guard.status.post.fields.projectPath.placeholder",
+        label: "post.fields.projectPath.title",
+        description: "post.fields.projectPath.description",
+        placeholder: "post.fields.projectPath.placeholder",
         columns: 6,
         schema: z.string().optional(),
       }),
 
-      guardId: requestField({
+      guardId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.guard.status.post.fields.guardId.title",
-        description:
-          "app.api.system.guard.status.post.fields.guardId.description",
-        placeholder:
-          "app.api.system.guard.status.post.fields.guardId.placeholder",
+        label: "post.fields.guardId.title",
+        description: "post.fields.guardId.description",
+        placeholder: "post.fields.guardId.placeholder",
         columns: 6,
         schema: z.string().optional(),
       }),
 
-      listAll: requestField({
+      listAll: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.guard.status.post.fields.listAll.title",
-        description:
-          "app.api.system.guard.status.post.fields.listAll.description",
+        label: "post.fields.listAll.title",
+        description: "post.fields.listAll.description",
         columns: 12,
         schema: z.boolean().optional().default(false),
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.guard.status.post.fields.success.title",
+        content: "post.fields.success.title",
         schema: z.boolean(),
       }),
 
-      output: responseField({
+      output: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.guard.status.post.fields.output.title",
+        content: "post.fields.output.title",
         schema: z.string(),
       }),
 
-      guards: responseArrayField(
-        {
+      guards: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "post.fields.guards.title",
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-          title: "app.api.system.guard.status.post.fields.guards.title",
-        },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.GRID,
-            columns: 4,
-          },
-          { response: true },
-          {
-            guardId: responseField({
+          layoutType: LayoutType.GRID,
+          columns: 4,
+          usage: { response: true },
+          children: {
+            guardId: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.system.guard.status.post.fields.guardId.title",
+              content: "post.fields.guardId.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
-            username: responseField({
+            username: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.system.guard.status.post.fields.username.title",
+              content: "post.fields.username.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
-            projectPath: responseField({
+            projectPath: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.guard.status.post.fields.projectPath.title",
+              content: "post.fields.projectPath.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
-            status: responseField({
+            status: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.system.guard.status.post.fields.status.title",
+              content: "post.fields.status.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
-            createdAt: responseField({
+            createdAt: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.guard.status.post.fields.createdAt.title",
+              content: "post.fields.createdAt.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
-            securityLevel: responseField({
+            securityLevel: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.guard.status.post.fields.securityLevel.title",
+              content: "post.fields.securityLevel.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
-            isolationMethod: responseField({
+            isolationMethod: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.guard.status.post.fields.isolationMethod.title",
+              content: "post.fields.isolationMethod.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
-            isRunning: responseField({
+            isRunning: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.guard.status.post.fields.isRunning.title",
+              content: "post.fields.isRunning.title",
               fieldType: FieldDataType.BOOLEAN,
               schema: z.boolean(),
             }),
-            userHome: responseField({
+            userHome: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.system.guard.status.post.fields.userHome.title",
+              content: "post.fields.userHome.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string().optional(),
             }),
           },
-        ),
-      ),
+        }),
+      }),
 
-      totalGuards: responseField({
+      totalGuards: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.guard.status.post.fields.totalGuards.title",
+        content: "post.fields.totalGuards.title",
         schema: z.coerce.number().optional(),
       }),
 
-      activeGuards: responseField({
+      activeGuards: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.guard.status.post.fields.activeGuards.title",
+        content: "post.fields.activeGuards.title",
         schema: z.coerce.number().optional(),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.guard.status.post.errors.validation.title",
-      description:
-        "app.api.system.guard.status.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.guard.status.post.errors.internal.title",
-      description:
-        "app.api.system.guard.status.post.errors.internal.description",
+      title: "post.errors.internal.title",
+      description: "post.errors.internal.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.guard.status.post.errors.unauthorized.title",
-      description:
-        "app.api.system.guard.status.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.guard.status.post.errors.unauthorized.title",
-      description:
-        "app.api.system.guard.status.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.guard.status.post.errors.notFound.title",
-      description:
-        "app.api.system.guard.status.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.guard.status.post.errors.internal.title",
-      description:
-        "app.api.system.guard.status.post.errors.internal.description",
+      title: "post.errors.internal.title",
+      description: "post.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.guard.status.post.errors.internal.title",
-      description:
-        "app.api.system.guard.status.post.errors.internal.description",
+      title: "post.errors.internal.title",
+      description: "post.errors.internal.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.guard.status.post.errors.internal.title",
-      description:
-        "app.api.system.guard.status.post.errors.internal.description",
+      title: "post.errors.internal.title",
+      description: "post.errors.internal.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.guard.status.post.errors.internal.title",
-      description:
-        "app.api.system.guard.status.post.errors.internal.description",
+      title: "post.errors.internal.title",
+      description: "post.errors.internal.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.system.guard.status.post.success.title",
-    description: "app.api.system.guard.status.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   // === EXAMPLES ===

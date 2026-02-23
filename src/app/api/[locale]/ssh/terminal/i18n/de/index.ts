@@ -1,4 +1,6 @@
 export const translations = {
+  category: "SSH",
+
   get: {
     title: "Terminal",
     description: "Vollständiges PTY-Terminal im Browser",

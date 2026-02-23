@@ -5,6 +5,8 @@ export const translations: typeof enTranslations = {
   description: "Wylogowuje bieżącego użytkownika i unieważnia jego sesję",
   category: "Zarządzanie Użytkownikami",
   tag: "wylogowanie",
+  logoutButton: "Wyloguj",
+  loggingOut: "Wylogowywanie...",
   response: {
     title: "Odpowiedź Wylogowania",
     description: "Odpowiedź wskazująca pomyślne wylogowanie",

@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -19,17 +19,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../user/user-roles/enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Functional Generators Endpoint Definition
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "generators", "endpoints"],
-  title: "app.api.system.dev.category",
-  description: "app.api.system.dev.typecheck.description",
-  category: "app.api.system.category",
-  tags: ["app.api.system.dev.category"],
+  title: "post.title",
+  description: "post.description",
+  category: "category",
+  tags: ["post.title"],
   icon: "sparkles",
 
   // === ROLES ===
@@ -41,93 +43,91 @@ const { POST } = createEndpoint({
   ],
 
   // === FIELDS ===
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.dev.lint.container.title",
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.form.title",
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      skipEndpoints: requestField({
+      skipEndpoints: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.dev.typecheck.title",
-        description: "app.api.system.dev.typecheck.description",
+        label: "post.title",
+        description: "post.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
-      skipSeeds: requestField({
+      skipSeeds: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.dev.typecheck.title",
-        description: "app.api.system.dev.typecheck.description",
+        label: "post.title",
+        description: "post.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
-      skipCronTasks: requestField({
+      skipCronTasks: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.dev.typecheck.title",
-        description: "app.api.system.dev.typecheck.description",
+        label: "post.title",
+        description: "post.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
-      skipTRPCRouter: requestField({
+      skipTRPCRouter: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.dev.typecheck.title",
-        description: "app.api.system.dev.typecheck.description",
+        label: "post.title",
+        description: "post.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
-      rootDir: requestField({
+      rootDir: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.dev.typecheck.title",
-        description: "app.api.system.dev.typecheck.description",
+        label: "post.title",
+        description: "post.description",
         columns: 6,
         schema: z.string().optional(),
       }),
 
-      verbose: requestField({
+      verbose: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.dev.typecheck.title",
-        description: "app.api.system.dev.typecheck.description",
+        label: "post.title",
+        description: "post.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.dev.typecheck.success.title",
+        content: "post.response.title",
         schema: z.boolean(),
       }),
-      generatorsRun: responseField({
+      generatorsRun: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.dev.typecheck.success.title",
+        content: "post.response.title",
         schema: z.coerce.number(),
       }),
-      generatorsSkipped: responseField({
+      generatorsSkipped: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.dev.typecheck.success.title",
+        content: "post.response.title",
         schema: z.coerce.number(),
       }),
-      output: responseField({
+      output: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.dev.typecheck.success.title",
+        content: "post.response.title",
         schema: z.array(z.string()),
       }),
-      results: responseField({
+      results: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.dev.typecheck.success.title",
+        content: "post.response.title",
         schema: z.object({
           endpoints: z.boolean(),
           seeds: z.boolean(),
@@ -136,52 +136,52 @@ const { POST } = createEndpoint({
         }),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.dev.typecheck.title",
-      description: "app.api.system.dev.typecheck.description",
+      title: "post.title",
+      description: "post.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.dev.typecheck.title",
-      description: "app.api.system.dev.typecheck.description",
+      title: "post.title",
+      description: "post.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.dev.typecheck.title",
-      description: "app.api.system.dev.typecheck.description",
+      title: "post.title",
+      description: "post.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.dev.typecheck.title",
-      description: "app.api.system.dev.typecheck.description",
+      title: "post.title",
+      description: "post.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.dev.typecheck.title",
-      description: "app.api.system.dev.typecheck.description",
+      title: "post.title",
+      description: "post.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.dev.typecheck.title",
-      description: "app.api.system.dev.typecheck.description",
+      title: "post.title",
+      description: "post.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.dev.typecheck.title",
-      description: "app.api.system.dev.typecheck.description",
+      title: "post.title",
+      description: "post.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.dev.typecheck.title",
-      description: "app.api.system.dev.typecheck.description",
+      title: "post.title",
+      description: "post.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.dev.typecheck.title",
-      description: "app.api.system.dev.typecheck.description",
+      title: "post.title",
+      description: "post.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.system.dev.typecheck.success.title",
-    description: "app.api.system.dev.typecheck.success.description",
+    title: "post.response.title",
+    description: "post.response.description",
   },
 
   // === EXAMPLES ===

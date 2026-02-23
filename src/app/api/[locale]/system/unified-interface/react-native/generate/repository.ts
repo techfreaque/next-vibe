@@ -19,10 +19,11 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { findFilesByName } from "@/app/api/[locale]/system/unified-interface/shared/utils/scanner";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import type { scopedTranslation } from "../i18n";
 import type { GenerateResponseOutput } from "./definition";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 interface GenerationResult {
   created: string[];
@@ -36,7 +37,7 @@ interface GenerationResult {
 export interface GenerateExpoIndexesRepository {
   generate(
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: ModuleT,
   ): Promise<ResponseType<GenerateResponseOutput>>;
 }
 
@@ -57,20 +58,15 @@ class GenerateExpoIndexesRepositoryImpl implements GenerateExpoIndexesRepository
 
   async generate(
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: ModuleT,
   ): Promise<ResponseType<GenerateResponseOutput>> {
-    const { t } = simpleT(locale);
-
     // Validate user permissions
     if (!user?.id) {
       return fail({
-        message:
-          "app.api.system.unifiedInterface.reactNative.generate.post.errors.unauthorized.title",
+        message: t("generate.post.errors.unauthorized.title"),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
         messageParams: {
-          error: t(
-            "app.api.system.unifiedInterface.reactNative.generate.post.errors.unauthorized.description",
-          ),
+          error: t("generate.post.errors.unauthorized.description"),
         },
       });
     }
@@ -79,13 +75,10 @@ class GenerateExpoIndexesRepositoryImpl implements GenerateExpoIndexesRepository
       // Check if source directory exists
       if (!existsSync(this.SOURCE_DIR)) {
         return fail({
-          message:
-            "app.api.system.unifiedInterface.reactNative.generate.post.errors.notFound.title",
+          message: t("generate.post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: {
-            error: t(
-              "app.api.system.unifiedInterface.reactNative.generate.post.errors.notFound.description",
-            ),
+            error: t("generate.post.errors.notFound.description"),
           },
         });
       }
@@ -97,14 +90,11 @@ class GenerateExpoIndexesRepositoryImpl implements GenerateExpoIndexesRepository
       const result = this.generateIndexes();
 
       // Prepare success message
-      const message = t(
-        "app.api.system.unifiedInterface.reactNative.generate.post.success.description",
-        {
-          created: result.created.length,
-          skipped: result.skipped.length,
-          errors: result.errors.length,
-        },
-      );
+      const message = t("generate.post.success.description", {
+        created: result.created.length,
+        skipped: result.skipped.length,
+        errors: result.errors.length,
+      });
 
       return success({
         success: result.errors.length === 0,
@@ -116,8 +106,7 @@ class GenerateExpoIndexesRepositoryImpl implements GenerateExpoIndexesRepository
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message:
-          "app.api.system.unifiedInterface.reactNative.generate.post.errors.server.title",
+        message: t("generate.post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           error: parsedError.message,

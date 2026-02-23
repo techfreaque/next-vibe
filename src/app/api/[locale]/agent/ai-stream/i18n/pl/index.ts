@@ -1,11 +1,18 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Agent",
+  tags: {
+    streaming: "Strumieniowanie",
+    chat: "Czat",
+    ai: "AI",
+  },
+
   run: {
     post: {
       title: "Uruchom agenta AI",
       description:
-        "Wykonaj wywołania wstępne, a następnie uruchom headless prompt AI i zwróć odpowiedź.",
+        "Wykonaj wywołania wstępne, a następnie uruchom headless prompt AI i zwróć odpowiedź. Kredyty są pobierane w zależności od użytego modelu.",
       container: {
         title: "Uruchomienie agenta AI",
         description: "Konfiguracja wywołań wstępnych i promptu",
@@ -40,28 +47,32 @@ export const translations: typeof enTranslations = {
           },
           args: { label: "Argumenty", description: "Płaskie argumenty" },
         },
-        activeTools: {
-          label: "Aktywne narzędzia",
-          description: "Narzędzia, które AI może wykonać",
+        allowedTools: {
+          label: "Może wykonywać (warstwa uprawnień)",
+          description:
+            "Kontroluje, które narzędzia AI może faktycznie uruchomić. null = wszystkie dozwolone. Tablica = tylko wymienione narzędzia (pozostałe są blokowane). Standardowe ustawienie agenta: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool uruchamia dowolny endpoint, system_help_GET pozwala odkrywać dostępne narzędzia.",
           toolId: {
             label: "ID narzędzia",
-            description: "Identyfikator narzędzia",
+            description:
+              "Alias lub pełna nazwa narzędzia, które AI może wykonać (np. 'execute-tool', 'system_help_GET')",
           },
           requiresConfirmation: {
             label: "Wymaga potwierdzenia",
-            description: "Czy wymagane jest potwierdzenie",
+            description:
+              "Jeśli true, wykonanie czeka na potwierdzenie użytkownika. Używaj dla destrukcyjnych akcji.",
           },
         },
         tools: {
-          label: "Widoczne narzędzia",
-          description: "Narzędzia w kontekście AI",
+          label: "W kontekście (AI to widzi)",
+          description:
+            "Narzędzia załadowane do kontekstu modelu — co AI zna i może rozważać. null = domyślny zestaw narzędzi użytkownika (zalecane). Tablica tylko dla skupionego kontekstu. Uwaga: allowedTools kontroluje rzeczywiste wykonanie.",
           toolId: {
             label: "ID narzędzia",
-            description: "Identyfikator narzędzia",
+            description: "Alias lub pełna nazwa narzędzia w kontekście",
           },
           requiresConfirmation: {
             label: "Wymaga potwierdzenia",
-            description: "Czy wymagane jest potwierdzenie",
+            description: "Czy wymagane jest potwierdzenie przed wykonaniem",
           },
         },
         maxTurns: {
@@ -92,7 +103,12 @@ export const translations: typeof enTranslations = {
         lastAiMessageId: "ID ostatniej wiadomości AI",
         threadTitle: "Tytuł wątku",
         threadCreatedAt: "Czas utworzenia wątku",
-        preCallResults: "Wyniki wywołań wstępnych",
+        preCallResults: {
+          title: "Wyniki wywołań wstępnych",
+          routeId: "ID trasy",
+          succeeded: "Sukces",
+          errorMessage: "Błąd",
+        },
       },
       errors: {
         validation: {
@@ -234,21 +250,21 @@ export const translations: typeof enTranslations = {
         "Zezwól AI na przeszukiwanie sieci w poszukiwaniu aktualnych informacji",
     },
     activeTool: {
-      label: "Aktywne narzędzia",
+      label: "Może wykonywać",
       description:
-        "Narzędzia, które model może wykonywać. Null oznacza, że wszystkie narzędzia są dozwolone.",
+        "Warstwa uprawnień wykonania — które narzędzia AI może faktycznie uruchomić. null = wszystkie dozwolone. Tablica = tylko wymienione.",
       toolId: {
         label: "ID narzędzia",
-        description: "Unikalny identyfikator narzędzia AI",
+        description: "Alias lub pełna nazwa narzędzia, które AI może wykonać",
       },
     },
     tools: {
-      label: "Widoczne narzędzia",
+      label: "W kontekście (AI to widzi)",
       description:
-        "Narzędzia załadowane do okna kontekstu AI. Model może je bezpośrednio wywoływać.",
+        "Narzędzia w oknie kontekstu modelu — co AI zna. null = domyślny zestaw użytkownika. allowedTools kontroluje rzeczywiste wykonanie.",
       toolId: {
         label: "ID narzędzia",
-        description: "Unikalny identyfikator narzędzia AI",
+        description: "Alias lub pełna nazwa narzędzia w kontekście",
       },
       requiresConfirmation: {
         label: "Wymaga potwierdzenia",
@@ -406,6 +422,10 @@ export const translations: typeof enTranslations = {
         "Niewystarczająca liczba kredytów do wykonania żądania",
       noResponseBody: "Nie otrzymano treści odpowiedzi ze strumienia",
     },
+  },
+  debugView: {
+    systemPromptTitle: "Systemowy monit",
+    copied: "Skopiowano!",
   },
   errorTypes: {
     streamError: "Błąd strumienia",

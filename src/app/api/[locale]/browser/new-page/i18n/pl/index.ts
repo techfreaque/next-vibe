@@ -69,4 +69,9 @@ export const translations: typeof enTranslations = {
     title: "Nowa strona pomyślnie utworzona",
     description: "Nowa strona została pomyślnie utworzona",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    navigationAutomation: "Automatyzacja nawigacji",
+  },
 };

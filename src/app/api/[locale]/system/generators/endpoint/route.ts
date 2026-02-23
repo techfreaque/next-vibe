@@ -15,6 +15,7 @@ export const { POST, tools } = endpointsHandler({
       return await endpointGeneratorRepository.generateEndpoint(
         props.data,
         props.logger,
+        props.t,
       );
     },
   },

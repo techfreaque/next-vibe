@@ -74,4 +74,9 @@ export const translations = {
     title: "Drag Operation Successful",
     description: "The element was dragged successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    inputAutomation: "Input Automation",
+  },
 };

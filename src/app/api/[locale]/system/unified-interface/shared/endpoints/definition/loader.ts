@@ -7,6 +7,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
+import { scopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -46,14 +47,16 @@ export class DefinitionLoader implements IDefinitionLoader {
     options: LoadEndpointOptions,
   ): Promise<ResponseType<TEndpoint>> {
     const { identifier, platform, user, logger, locale } = options;
+    const { t } = scopedTranslation.scopedT(locale);
 
     try {
       const endpoint = await getEndpoint(identifier);
 
       if (!endpoint) {
         return fail({
-          message:
-            "app.api.system.unifiedInterface.shared.endpoints.definition.loader.errors.endpointNotFound",
+          message: t(
+            "shared.endpoints.definition.loader.errors.endpointNotFound",
+          ),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { identifier },
         });
@@ -77,8 +80,7 @@ export class DefinitionLoader implements IDefinitionLoader {
         `[Definition Loader] Failed to load definition (identifier: ${identifier}, error: ${parseError(error).message})`,
       );
       return fail({
-        message:
-          "app.api.system.unifiedInterface.shared.endpoints.definition.loader.errors.loadFailed",
+        message: t("shared.endpoints.definition.loader.errors.loadFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { identifier, error: parseError(error).message },
       });
@@ -89,6 +91,7 @@ export class DefinitionLoader implements IDefinitionLoader {
     options: LoadEndpointsOptions,
   ): Promise<ResponseType<TEndpoint[]>> {
     const { identifiers, platform, user, logger, locale } = options;
+    const { t } = scopedTranslation.scopedT(locale);
 
     try {
       const results = await Promise.all(
@@ -107,8 +110,9 @@ export class DefinitionLoader implements IDefinitionLoader {
       if (failures.length > 0) {
         const firstFailure = failures[0];
         return fail({
-          message:
-            "app.api.system.unifiedInterface.shared.endpoints.definition.loader.errors.batchLoadFailed",
+          message: t(
+            "shared.endpoints.definition.loader.errors.batchLoadFailed",
+          ),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             failedCount: failures.length,
@@ -128,8 +132,7 @@ export class DefinitionLoader implements IDefinitionLoader {
         error: parseError(error).message,
       });
       return fail({
-        message:
-          "app.api.system.unifiedInterface.shared.endpoints.definition.loader.errors.batchLoadFailed",
+        message: t("shared.endpoints.definition.loader.errors.batchLoadFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           failedCount: identifiers.length,

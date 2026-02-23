@@ -6,7 +6,8 @@ import { Mic } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "../i18n";
 
 /**
  * TranscribingIndicator - Loading animation for speech-to-text transcription
@@ -17,7 +18,7 @@ export function TranscribingIndicator({
 }: {
   locale: CountryLanguage;
 }): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   return (
     <Div className="flex items-center gap-3 py-1">
       {/* Microphone icon */}
@@ -66,7 +67,7 @@ export function TranscribingIndicator({
 
       {/* Transcribing text */}
       <Div className="text-sm text-muted-foreground animate-pulse">
-        {t("app.api.agent.chat.threads.messages.transcribing")}
+        {t("transcribing")}
       </Div>
     </Div>
   );

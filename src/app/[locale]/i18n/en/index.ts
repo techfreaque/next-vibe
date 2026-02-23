@@ -1,3 +1,5 @@
+import { translations as leadsTranslations } from "../../../api/[locale]/leads/i18n/en";
+import { translations as productsTranslations } from "../../../api/[locale]/products/i18n/en";
 import { translations as componentsTranslations } from "../../_components/i18n/en";
 import { translations as notFoundTranslations } from "../../[...notFound]/i18n/en";
 import { translations as adminTranslations } from "../../admin/i18n/en";
@@ -13,6 +15,10 @@ export const translations = {
   story: siteTranslations,
   notFound: notFoundTranslations,
   admin: adminTranslations,
+  api: {
+    leads: leadsTranslations,
+    products: productsTranslations,
+  },
   chat: chatTranslations,
   help: helpTranslations,
   subscription: subscriptionTranslations,
@@ -95,7 +101,7 @@ export const translations = {
     title: "Stay Updated",
     description:
       "Subscribe to our newsletter for the latest updates and insights.",
-    emailPlaceholder: "Enter your email",
+    emailPlaceholder: "Enter email",
     subscribe: "Subscribe",
     subscription: {
       unsubscribe: {
@@ -110,8 +116,8 @@ export const translations = {
       message: "We're sorry, but something unexpected happened.",
       errorId: "Error ID: {{id}}",
       error_message: "Error: {{message}}",
-      stackTrace: "Stack trace: {{stack}}",
-      tryAgain: "Try again",
+      stackTrace: "Stack Trace: {{stack}}",
+      tryAgain: "Try Again",
       backToHome: "Back to Home",
     },
     notFound: {
@@ -119,7 +125,7 @@ export const translations = {
       description:
         "The page you're looking for doesn't exist or has been moved.",
       goBack: "Go Back",
-      goHome: "Go to Homepage",
+      goHome: "Go Home",
     },
   },
   meta: {
@@ -239,11 +245,12 @@ export const translations = {
       },
     },
   },
+
   constants: {
     languages: {
       en: "English",
-      de: "Deutsch",
-      pl: "Polski",
+      de: "German",
+      pl: "Polish",
     },
   },
   native: {
@@ -311,17 +318,7 @@ export const translations = {
       country: "Country",
       language: "Language",
     },
-    countries: {
-      global: "Global",
-      de: "Germany",
-      pl: "Poland",
-      us: "United States",
-    },
-    languages: {
-      en: "English",
-      de: "German",
-      pl: "Polish",
-    },
+
     accessibility: {
       srOnly: {
         enableLightMode: "Enable light mode",
@@ -368,22 +365,8 @@ export const translations = {
         cause: "Cause:",
       },
     },
-    api: {
-      notifications: {
-        welcome: {
-          title: "Welcome!",
-          description: "Thanks for joining us. Let's get started!",
-        },
-      },
-    },
   },
-  shared: {
-    error: {
-      title: "Error",
-      userError: "User error occurred",
-      invalidToken: "Invalid or expired token",
-    },
-  },
+
   ui: {
     iconPicker: {
       title: "Select Icon",
@@ -410,53 +393,13 @@ export const translations = {
         ui: "UI & Controls",
       },
     },
-    countries: {
-      global: "Global",
-      de: "Germany",
-      pl: "Poland",
-      us: "United States",
-    },
-    languages: {
-      en: "English",
-      de: "German",
-      pl: "Polish",
-    },
-    error: {
-      title: "Error",
-      message: "Something went wrong",
-      description: "An error occurred. Please try again.",
-      tryAgain: "Try Again",
-      sending_sms: "Failed to send SMS",
-      boundary: {
-        stackTrace: "Stack Trace",
-        componentStack: "Component Stack",
-        errorDetails: "Error Details",
-        name: "Name:",
-        errorMessage: "Message:",
-        cause: "Cause:",
-      },
-    },
-    errors: {
-      unknown: "An unknown error occurred",
-    },
-    success: {
-      title: "Success",
-      message: "Operation completed successfully",
-      description: "Your action was completed successfully.",
-    },
+
     info: {
       title: "Information",
       message: "Please note",
       description: "Here's some information for you.",
     },
-    api: {
-      notifications: {
-        welcome: {
-          title: "Welcome!",
-          description: "Thanks for joining us. Let's get started!",
-        },
-      },
-    },
+
     footer: {
       description:
         "Transform your social media presence with professional content creation and strategic management.",

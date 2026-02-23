@@ -85,4 +85,9 @@ export const translations: typeof enTranslations = {
     title: "Nawigacja pomyślna",
     description: "Strona została pomyślnie znawigowana",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    navigationAutomation: "Automatyzacja nawigacji",
+  },
 };

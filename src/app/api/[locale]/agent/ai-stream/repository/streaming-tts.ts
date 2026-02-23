@@ -10,6 +10,7 @@ import "server-only";
 import { parseError } from "next-vibe/shared/utils";
 
 import { agentEnv } from "@/app/api/[locale]/agent/env";
+import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { TTS_COST_PER_CHARACTER } from "@/app/api/[locale]/products/repository-client";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -243,11 +244,13 @@ export class StreamingTTSHandler {
         // Deduct credits for TTS (with partial deduction allowed - graceful to 0)
         const creditsNeeded = cleanText.length * TTS_COST_PER_CHARACTER;
         if (creditsNeeded > 0) {
+          const { t: creditsT } = creditsScopedTranslation.scopedT(this.locale);
           const deductResult = await CreditRepository.deductCreditsForTTS(
             this.user,
             creditsNeeded,
             this.logger,
             this.locale,
+            creditsT,
           );
 
           if (deductResult.success) {

@@ -6,6 +6,8 @@ export const translations: typeof enTranslations = {
     "Meldet den aktuellen Benutzer ab und macht seine Sitzung ungültig",
   category: "Benutzerverwaltung",
   tag: "abmelden",
+  logoutButton: "Abmelden",
+  loggingOut: "Abmelden...",
   response: {
     title: "Abmelde-Antwort",
     description: "Antwort, die eine erfolgreiche Abmeldung anzeigt",

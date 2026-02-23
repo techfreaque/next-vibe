@@ -6,6 +6,7 @@ import { useTranslation } from "@/i18n/core/client";
 import { useApiForm } from "../../../../system/unified-interface/react/hooks/use-api-mutation-form";
 import type { JwtPayloadType } from "../../../auth/types";
 import passwordEndpoints from "./definition";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Hook for updating user password
@@ -21,26 +22,30 @@ export function useUpdatePassword(
   (typeof passwordEndpoints.POST)["types"]["UrlVariablesOutput"]
 > {
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { locale } = useTranslation();
+  const { t } = scopedTranslation.scopedT(locale);
 
-  return useApiForm(passwordEndpoints.POST, logger, user, undefined, {
-    onSuccess: () => {
-      toast({
-        title: t("app.api.user.private.me.password.update.success.title"),
-        description: t(
-          "app.api.user.private.me.password.update.success.description",
-        ),
-        variant: "default",
-      });
+  return useApiForm(
+    passwordEndpoints.POST,
+    logger,
+    user,
+    locale,
+    {},
+    {
+      onSuccess: () => {
+        toast({
+          title: t("update.success.title"),
+          description: t("update.success.description"),
+          variant: "default",
+        });
+      },
+      onError: ({ error }) => {
+        toast({
+          title: t("update.errors.unknown.title"),
+          description: error.message,
+          variant: "destructive",
+        });
+      },
     },
-    onError: ({ error }) => {
-      toast({
-        title: t(
-          "app.api.user.private.me.password.update.errors.unknown.title",
-        ),
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
+  );
 }

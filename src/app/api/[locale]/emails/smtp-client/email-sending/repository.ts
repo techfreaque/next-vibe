@@ -16,8 +16,10 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import { CampaignType } from "../enum";
+import { scopedTranslation } from "../i18n";
 import { SmtpSendingRepository } from "../sending/repository";
 import type { SmtpSelectionCriteria } from "../sending/types";
 import type {
@@ -79,7 +81,9 @@ export class EmailSendingRepository {
   static async sendEmail(
     data: SendEmailRequestTypeOutput,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<SendEmailResponseTypeOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Enhanced email sending initiated", {
         toEmail: data.params.toEmail,
@@ -100,8 +104,7 @@ export class EmailSendingRepository {
       if (!localeMapping) {
         logger.error("Invalid locale format", { locale: data.params.locale });
         return fail({
-          message:
-            "app.api.emails.smtpClient.emailSending.email.errors.sending_failed",
+          message: t("emailSending.email.errors.sending_failed"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             recipient: data.params.toEmail,
@@ -121,6 +124,7 @@ export class EmailSendingRepository {
         country,
         language,
       };
+      const { t: globalT } = simpleT(data.params.locale);
 
       // 4) Send email using enhanced SMTP client service with selection criteria
       const emailResponse = await SmtpSendingRepository.sendEmail(
@@ -134,13 +138,14 @@ export class EmailSendingRepository {
               ? `${data.params.replyToName} <${data.params.replyToEmail}>`
               : undefined,
           unsubscribeUrl: data.params.unsubscribeUrl,
-          senderName: data.params.senderName || data.params.t("config.appName"), // Default to app name if not provided
+          senderName: data.params.senderName || globalT("config.appName"),
           selectionCriteria,
           skipRateLimitCheck: data.params.skipRateLimitCheck,
           leadId: data.params.leadId,
           campaignId: data.params.campaignId,
         },
         logger,
+        t,
       );
 
       if (!emailResponse.success) {
@@ -183,8 +188,7 @@ export class EmailSendingRepository {
         campaignType: data.params.campaignType,
       });
       return fail({
-        message:
-          "app.api.emails.smtpClient.emailSending.email.errors.sending_failed",
+        message: t("emailSending.email.errors.sending_failed"),
         errorType: ErrorResponseTypes.EMAIL_ERROR,
         messageParams: {
           recipient: data.params.toEmail,

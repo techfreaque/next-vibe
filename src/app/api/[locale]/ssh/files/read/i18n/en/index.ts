@@ -1,4 +1,15 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    invalidPath: "Invalid path: must be absolute without '..' segments",
+    fileNotFound: "File not found",
+    permissionDenied: "Permission denied",
+    notImplemented: {
+      fileRead: "SSH backend not yet implemented for file reading",
+    },
+  },
+
   get: {
     title: "Read File",
     description: "Read a text file from the local machine or via SSH",

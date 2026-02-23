@@ -3,6 +3,9 @@ export const translations = {
   tags: {
     execute: "Execute",
   },
+  errors: {
+    executePulse: "Failed to execute pulse",
+  },
   post: {
     title: "Execute Pulse",
     description: "Execute pulse health monitoring and task execution",

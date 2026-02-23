@@ -14,6 +14,6 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger }) => bulkUpdateMessages(data, logger),
+    handler: ({ data, logger, t }) => bulkUpdateMessages(data, logger, t),
   },
 });

@@ -32,6 +32,9 @@ import {
   generateFileHeader,
   writeGeneratedFile,
 } from "../shared/utils";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 // Type definitions
 interface RouteHandlersRequestType {
@@ -54,6 +57,7 @@ interface RouteHandlersGeneratorRepository {
   generateRouteHandlers(
     data: RouteHandlersRequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<BaseResponseType<RouteHandlersResponseType>>;
 }
 
@@ -64,6 +68,7 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
   async generateRouteHandlers(
     data: RouteHandlersRequestType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<BaseResponseType<RouteHandlersResponseType>> {
     const startTime = Date.now();
 
@@ -138,7 +143,7 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
       });
 
       return fail({
-        message: "app.api.system.generators.endpoints.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           duration,

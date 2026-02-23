@@ -14,8 +14,8 @@ import { StudioRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: studioEndpoints,
   [Methods.POST]: {
-    handler: ({ data, logger }) => {
-      return StudioRepository.execute(data, logger);
+    handler: ({ data, t, logger }) => {
+      return StudioRepository.execute(data, t, logger);
     },
   },
 });

@@ -19,11 +19,15 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { sshConnections } from "../../db";
 import type { ConnectionsListResponseOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 export class ConnectionsListRepository {
   static async list(
     logger: EndpointLogger,
     user: JwtPayloadType,
+    t: ModuleT,
   ): Promise<ResponseType<ConnectionsListResponseOutput>> {
     try {
       const rows = await db
@@ -63,7 +67,7 @@ export class ConnectionsListRepository {
     } catch (error) {
       logger.error("Failed to list SSH connections", parseError(error));
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

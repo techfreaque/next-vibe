@@ -10,6 +10,7 @@ import type { JSX } from "react";
 import { useMemo } from "react";
 import terminalLink from "terminal-link";
 
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
@@ -20,7 +21,6 @@ import {
   useInkWidgetResponse,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 import { CliIcon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/cli-icons";
-import { simpleT } from "@/i18n/core/shared";
 
 import type {
   CodeQualityListSchema,
@@ -62,7 +62,7 @@ export function CodeQualityListWidgetInk<
   const locale = useInkWidgetLocale();
   const platform = useInkWidgetPlatform();
   const response = useInkWidgetResponse();
-  const { t } = simpleT(locale);
+  const { t } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
   // Get editor URI scheme from response data if field key is provided
   const editorUriScheme = useMemo(() => {
@@ -158,13 +158,7 @@ export function CodeQualityListWidgetInk<
   // MCP uses plain text without chalk/terminal-links
   if (platform === Platform.MCP) {
     if (!value || value.length === 0) {
-      return (
-        <Text>
-          {t(
-            "app.api.system.unifiedInterface.widgets.codeQualityList.noIssues",
-          )}
-        </Text>
-      );
+      return <Text>{t("widgets.codeQualityList.noIssues")}</Text>;
     }
 
     const mcpGrouped = new Map<string, CodeQualityItem[]>();
@@ -205,12 +199,7 @@ export function CodeQualityListWidgetInk<
     return (
       <Box>
         <CliIcon icon="check-circle" color="green" />
-        <Text color="green">
-          {" "}
-          {t(
-            "app.api.system.unifiedInterface.widgets.codeQualityList.noIssues",
-          )}
-        </Text>
+        <Text color="green"> {t("widgets.codeQualityList.noIssues")}</Text>
       </Box>
     );
   }

@@ -7,14 +7,14 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
-  deleteButton,
-  objectField,
-  requestField,
-  requestUrlPathParamsField,
-  responseField,
-  submitButton,
-  widgetField,
+  scopedBackButton,
+  scopedDeleteButton,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedRequestUrlPathParamsField,
+  scopedResponseField,
+  scopedSubmitButton,
+  scopedWidgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -24,6 +24,8 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+
+import { scopedTranslation } from "./i18n";
 
 /**
  * Memory tool aliases for AI tool calling
@@ -36,17 +38,18 @@ export const MEMORY_DELETE_ALIAS = "memories-delete" as const;
  * Removes a memory by ID
  */
 const { DELETE } = createEndpoint({
+  scopedTranslation,
   method: Methods.DELETE,
   path: ["agent", "chat", "memories", "[id]"],
   aliases: [MEMORY_DELETE_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   requiresConfirmation: true,
 
-  title: "app.api.agent.chat.memories.id.delete.title" as const,
-  description: "app.api.agent.chat.memories.id.delete.description" as const,
+  title: "delete.title" as const,
+  description: "delete.description" as const,
   icon: "brain" as const,
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.memories" as const],
+  category: "category" as const,
+  tags: ["tags.memories" as const],
 
   options: {
     mutationOptions: {
@@ -80,40 +83,34 @@ const { DELETE } = createEndpoint({
     },
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.agent.chat.memories.id.delete.container.title" as const,
-      description:
-        "app.api.agent.chat.memories.id.delete.container.description" as const,
-      layoutType: LayoutType.STACKED,
-      noCard: true,
-    },
-    { request: "urlPathParams", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "delete.container.title" as const,
+    description: "delete.container.description" as const,
+    layoutType: LayoutType.STACKED,
+    noCard: true,
+    usage: { request: "urlPathParams", response: true },
+    children: {
       // === REQUEST URL PARAMS ===
-      id: requestUrlPathParamsField({
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.agent.chat.memories.id.delete.id.label" as const,
-        description:
-          "app.api.agent.chat.memories.id.delete.id.description" as const,
+        label: "delete.id.label" as const,
+        description: "delete.id.description" as const,
         schema: z.coerce.number().int().min(0),
         hidden: true,
       }),
 
       // Back button
-      backButton: backButton({
-        label:
-          "app.api.agent.chat.memories.id.delete.backButton.label" as const,
+      backButton: scopedBackButton(scopedTranslation, {
+        label: "delete.backButton.label" as const,
         usage: { request: "urlPathParams", response: true } as const,
         inline: true,
       }),
 
       // Delete button (submit)
-      deleteButton: submitButton({
-        label:
-          "app.api.agent.chat.memories.id.delete.deleteButton.label" as const,
+      deleteButton: scopedSubmitButton(scopedTranslation, {
+        label: "delete.deleteButton.label" as const,
         icon: "trash",
         variant: "destructive",
         inline: true,
@@ -121,75 +118,56 @@ const { DELETE } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.boolean(),
         hidden: true,
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.memories.id.delete.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.memories.id.delete.errors.validation.description" as const,
+      title: "delete.errors.validation.title" as const,
+      description: "delete.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.memories.id.delete.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.memories.id.delete.errors.network.description" as const,
+      title: "delete.errors.network.title" as const,
+      description: "delete.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.memories.id.delete.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.memories.id.delete.errors.unauthorized.description" as const,
+      title: "delete.errors.unauthorized.title" as const,
+      description: "delete.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.memories.id.delete.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.memories.id.delete.errors.forbidden.description" as const,
+      title: "delete.errors.forbidden.title" as const,
+      description: "delete.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.memories.id.delete.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.memories.id.delete.errors.notFound.description" as const,
+      title: "delete.errors.notFound.title" as const,
+      description: "delete.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.memories.id.delete.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.memories.id.delete.errors.server.description" as const,
+      title: "delete.errors.server.title" as const,
+      description: "delete.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.memories.id.delete.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.memories.id.delete.errors.unknown.description" as const,
+      title: "delete.errors.unknown.title" as const,
+      description: "delete.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.memories.id.delete.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.chat.memories.id.delete.errors.unsavedChanges.description" as const,
+      title: "delete.errors.unsavedChanges.title" as const,
+      description: "delete.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.memories.id.delete.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.memories.id.delete.errors.conflict.description" as const,
+      title: "delete.errors.conflict.title" as const,
+      description: "delete.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.agent.chat.memories.id.delete.success.title" as const,
-    description:
-      "app.api.agent.chat.memories.id.delete.success.description" as const,
+    title: "delete.success.title" as const,
+    description: "delete.success.description" as const,
   },
 
   examples: {
@@ -209,16 +187,17 @@ const { DELETE } = createEndpoint({
  * Updates an existing memory by ID
  */
 const { PATCH } = createEndpoint({
+  scopedTranslation,
   method: Methods.PATCH,
   path: ["agent", "chat", "memories", "[id]"],
   aliases: [MEMORY_UPDATE_ALIAS] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  title: "app.api.agent.chat.memories.id.patch.title" as const,
-  description: "app.api.agent.chat.memories.id.patch.description" as const,
+  title: "patch.title" as const,
+  description: "patch.description" as const,
   icon: "brain",
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.memories" as const],
+  category: "category" as const,
+  tags: ["tags.memories" as const],
 
   options: {
     mutationOptions: {
@@ -262,35 +241,31 @@ const { PATCH } = createEndpoint({
     },
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data&urlPathParams", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data&urlPathParams", response: true },
+    children: {
       // === REQUEST URL PARAMS ===
-      id: requestUrlPathParamsField({
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.agent.chat.memories.id.patch.id.label" as const,
-        description:
-          "app.api.agent.chat.memories.id.patch.id.description" as const,
+        label: "patch.id.label" as const,
+        description: "patch.id.description" as const,
         schema: z.coerce.number().int().min(0),
         hidden: true,
       }),
 
-      title: widgetField({
+      title: scopedWidgetField(scopedTranslation, {
         type: WidgetType.TITLE,
-        content: "app.api.agent.chat.memories.id.patch.title" as const,
+        content: "patch.title" as const,
         usage: { request: "data&urlPathParams", response: true } as const,
         inline: true,
       }),
 
       // Delete button configuration
-      deleteButton: deleteButton({
-        label:
-          "app.api.agent.chat.memories.id.patch.deleteButton.label" as const,
+      deleteButton: scopedDeleteButton(scopedTranslation, {
+        label: "patch.deleteButton.label" as const,
         targetEndpoint: DELETE,
         extractParams: (source) => ({
           urlPathParams: {
@@ -306,120 +281,97 @@ const { PATCH } = createEndpoint({
       }),
 
       // === REQUEST DATA ===
-      content: requestField({
+      content: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
-        label: "app.api.agent.chat.memories.id.patch.content.label" as const,
-        description:
-          "app.api.agent.chat.memories.id.patch.content.description" as const,
+        label: "patch.content.label" as const,
+        description: "patch.content.description" as const,
         columns: 12,
         schema: z.string().max(1000).optional(),
       }),
-      tags: requestField({
+      tags: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TAGS,
-        label: "app.api.agent.chat.memories.id.patch.tags.label" as const,
-        description:
-          "app.api.agent.chat.memories.id.patch.tags.description" as const,
+        label: "patch.tags.label" as const,
+        description: "patch.tags.description" as const,
         columns: 6,
         schema: z.array(z.string()).optional(),
       }),
-      priority: requestField({
+      priority: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.agent.chat.memories.id.patch.priority.label" as const,
-        description:
-          "app.api.agent.chat.memories.id.patch.priority.description" as const,
+        label: "patch.priority.label" as const,
+        description: "patch.priority.description" as const,
         columns: 6,
         schema: z.coerce.number().min(0).max(100).optional(),
       }),
 
       // Back button
-      backButton: backButton({
-        label: "app.api.agent.chat.memories.id.patch.backButton.label" as const,
+      backButton: scopedBackButton(scopedTranslation, {
+        label: "patch.backButton.label" as const,
         usage: { request: "data&urlPathParams", response: true } as const,
         className: "ml-auto",
         inline: true,
       }),
 
       // Submit button
-      submitButton: submitButton({
-        label:
-          "app.api.agent.chat.memories.id.patch.submitButton.label" as const,
+      submitButton: scopedSubmitButton(scopedTranslation, {
+        label: "patch.submitButton.label" as const,
         usage: { request: "data&urlPathParams" },
         inline: true,
       }),
 
       // === RESPONSE ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.boolean(),
         hidden: true,
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.memories.id.patch.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.memories.id.patch.errors.validation.description" as const,
+      title: "patch.errors.validation.title" as const,
+      description: "patch.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.memories.id.patch.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.memories.id.patch.errors.network.description" as const,
+      title: "patch.errors.network.title" as const,
+      description: "patch.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.memories.id.patch.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.memories.id.patch.errors.unauthorized.description" as const,
+      title: "patch.errors.unauthorized.title" as const,
+      description: "patch.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.memories.id.patch.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.memories.id.patch.errors.forbidden.description" as const,
+      title: "patch.errors.forbidden.title" as const,
+      description: "patch.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.memories.id.patch.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.memories.id.patch.errors.notFound.description" as const,
+      title: "patch.errors.notFound.title" as const,
+      description: "patch.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.memories.id.patch.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.memories.id.patch.errors.server.description" as const,
+      title: "patch.errors.server.title" as const,
+      description: "patch.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.memories.id.patch.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.memories.id.patch.errors.unknown.description" as const,
+      title: "patch.errors.unknown.title" as const,
+      description: "patch.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.memories.id.patch.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.chat.memories.id.patch.errors.unsavedChanges.description" as const,
+      title: "patch.errors.unsavedChanges.title" as const,
+      description: "patch.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.memories.id.patch.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.memories.id.patch.errors.conflict.description" as const,
+      title: "patch.errors.conflict.title" as const,
+      description: "patch.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.agent.chat.memories.id.patch.success.title" as const,
-    description:
-      "app.api.agent.chat.memories.id.patch.success.description" as const,
+    title: "patch.success.title" as const,
+    description: "patch.success.description" as const,
   },
 
   examples: {

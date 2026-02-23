@@ -14,9 +14,9 @@ import { setupUpdateRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: updateEndpoints,
   [Methods.POST]: {
-    handler: ({ data, user, logger, locale }) => {
+    handler: ({ data, user, logger, t }) => {
       logger.info("Setup update operation started", { verbose: data.verbose });
-      return setupUpdateRepository.updateCli(data, user, locale);
+      return setupUpdateRepository.updateCli(data, user, t);
     },
   },
 });

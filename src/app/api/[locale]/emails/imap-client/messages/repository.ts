@@ -18,6 +18,7 @@ import { type Email, emails } from "@/app/api/[locale]/emails/messages/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { imapAccounts, imapFolders } from "../db";
 import {
@@ -31,6 +32,7 @@ import type {
   ImapMessageByIdResponseOutput,
   ImapMessageUpdateResponseOutput,
 } from "./[id]/definition";
+import { scopedTranslation } from "./i18n";
 import type { ImapMessagesListGetResponseOutput } from "./list/definition";
 import type { ImapMessageSyncPostResponseOutput } from "./sync/definition";
 
@@ -61,41 +63,49 @@ export interface ImapMessagesRepository {
     data: ImapMessageQueryType,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapMessagesListGetResponseOutput>>;
 
   getMessageById(
     data: { id: string },
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapMessageResponseType>>;
 
   getMessageByIdFormatted(
     data: { id: string },
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapMessageByIdResponseOutput>>;
 
   updateMessage(
     data: { messageId: string; updates: Partial<ImapMessageResponseType> },
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapMessageResponseType>>;
 
   updateMessageFormatted(
     data: { messageId: string; updates: Partial<ImapMessageResponseType> },
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapMessageUpdateResponseOutput>>;
 
   syncMessages(
     data: ImapMessageSyncType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapMessageSyncPostResponseOutput>>;
 
   updateMessageSyncStatus(
     data: { messageId: string; syncStatus: string },
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<{ success: boolean }>>;
 
   updateMessageReadStatus(
     data: { messageId: string; isRead: boolean },
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<{ success: boolean }>>;
 }
 
@@ -154,7 +164,9 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     data: ImapMessageQueryType,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapMessagesListGetResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("app.api.emails.imapClient.messages.list.info.start", {
         ...data,
@@ -369,8 +381,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         parsedError,
       );
       return fail({
-        message:
-          "app.api.emails.imapClient.messages.list.get.errors.server.title",
+        message: t("list.get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -383,7 +394,9 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
   async getMessageById(
     data: { id: string },
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapMessageResponseType>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Getting IMAP message by ID", { id: data.id });
 
@@ -396,8 +409,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
       if (!row) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.messages.get.error.not_found.title",
+          message: t("errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -408,8 +420,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     } catch (error) {
       logger.error("Error getting IMAP message by ID", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.messages.get.error.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -421,7 +432,9 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
   async updateMessage(
     data: { messageId: string; updates: Partial<ImapMessageResponseType> },
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapMessageResponseType>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Updating IMAP message", {
         messageId: data.messageId,
@@ -437,8 +450,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
       if (!existingMessage) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.messages.get.error.not_found.title",
+          message: t("errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -470,8 +482,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
       if (!updatedMessage) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.messages.get.error.server.title",
+          message: t("errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -480,8 +491,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     } catch (error) {
       logger.error("Error updating IMAP message", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.messages.get.error.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -493,9 +503,10 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
   async getMessageByIdFormatted(
     data: { id: string },
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapMessageByIdResponseOutput>> {
     logger.debug("Getting message by ID", { id: data.id });
-    const result = await this.getMessageById(data, logger);
+    const result = await this.getMessageById(data, logger, locale);
     if (!result.success) {
       return result;
     }
@@ -510,8 +521,9 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
   async updateMessageFormatted(
     data: { messageId: string; updates: Partial<ImapMessageResponseType> },
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapMessageUpdateResponseOutput>> {
-    const result = await this.updateMessage(data, logger);
+    const result = await this.updateMessage(data, logger, locale);
     if (!result.success) {
       return result;
     }
@@ -526,7 +538,9 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
   async syncMessages(
     data: ImapMessageSyncType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapMessageSyncPostResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Syncing IMAP messages", {
         accountId: data.accountId,
@@ -547,8 +561,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
         if (account.length === 0) {
           return fail({
-            message:
-              "app.api.emails.imapClient.imapErrors.accounts.get.error.not_found.title",
+            message: t("errors.accountNotFound.title"),
             errorType: ErrorResponseTypes.NOT_FOUND,
           });
         }
@@ -557,14 +570,14 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         const syncResult = await imapSyncRepository.syncAccount(
           { account: account[0] },
           logger,
+          locale,
         );
 
         if (syncResult.success) {
           const rawErrors = syncResult.data.result?.results?.errors ?? [];
           return success({
             success: true,
-            message:
-              "app.api.emails.imapClient.messages.sync.response.success.message",
+            message: t("errors.syncSuccess.message"),
             results: {
               messagesProcessed:
                 syncResult.data.result?.results?.messagesProcessed ?? 0,
@@ -583,19 +596,21 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
           });
         }
         return fail({
-          message: "app.api.emails.imapClient.imapErrors.sync.message.failed",
+          message: t("errors.syncFailed.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
       // Sync all accounts
-      const syncResult = await imapSyncRepository.syncAllAccounts(logger);
+      const syncResult = await imapSyncRepository.syncAllAccounts(
+        logger,
+        locale,
+      );
 
       if (syncResult.success) {
         const rawErrors = syncResult.data.result?.results?.errors ?? [];
         return success({
           success: true,
-          message:
-            "app.api.emails.imapClient.messages.sync.response.success.message",
+          message: t("errors.syncSuccess.message"),
           results: {
             messagesProcessed:
               syncResult.data.result?.results?.messagesProcessed ?? 0,
@@ -613,14 +628,13 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
         });
       }
       return fail({
-        message: "app.api.emails.imapClient.imapErrors.sync.message.failed",
+        message: t("errors.syncFailed.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     } catch (error) {
       logger.error("Error syncing IMAP messages", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.sync.post.error.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -632,7 +646,9 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
   async updateMessageSyncStatus(
     data: { messageId: string; syncStatus: string },
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<{ success: boolean }>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Updating message sync status", {
         messageId: data.messageId,
@@ -669,8 +685,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
       if (!updatedMessage) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.messages.get.error.not_found.title",
+          message: t("errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -679,8 +694,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     } catch (error) {
       logger.error("Error updating message sync status", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.messages.get.error.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -692,7 +706,9 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
   async updateMessageReadStatus(
     data: { messageId: string; isRead: boolean },
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<{ success: boolean }>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("Updating message read status", {
         messageId: data.messageId,
@@ -710,8 +726,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
 
       if (!updatedMessage) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.messages.get.error.not_found.title",
+          message: t("errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -720,8 +735,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
     } catch (error) {
       logger.error("Error updating message read status", parseError(error));
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.messages.get.error.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

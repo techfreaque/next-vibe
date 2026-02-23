@@ -5,6 +5,7 @@ import { UnsubscribePage } from "@/app/api/[locale]/newsletter/unsubscribe/_comp
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
+import { scopedTranslation as meScopedTranslation } from "@/app/api/[locale]/user/private/me/i18n";
 import { UserProfileRepository } from "@/app/api/[locale]/user/private/me/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -52,10 +53,12 @@ export default async function NewsletterUnsubscribe({
   // Get user email if authenticated and not public
   let prefilledEmail: string | undefined;
   if (!authUser.isPublic) {
+    const { t } = meScopedTranslation.scopedT(locale);
     const userProfileResponse = await UserProfileRepository.getProfile(
       authUser,
       locale,
       logger,
+      t,
     );
     if (userProfileResponse.success && !userProfileResponse.data.isPublic) {
       prefilledEmail = userProfileResponse.data.email;

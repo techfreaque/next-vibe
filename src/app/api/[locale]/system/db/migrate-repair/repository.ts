@@ -16,10 +16,11 @@ import {
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import type migrateRepairEndpoints from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 // Constants to avoid literal strings
 const MIGRATION_TABLE_NAME = "__drizzle_migrations__";
@@ -47,7 +48,7 @@ interface MigrationState {
 export interface DatabaseMigrateRepairRepository {
   repairMigrations(
     data: MigrateRepairRequestType,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<MigrateRepairResponseType>>;
 }
@@ -58,11 +59,9 @@ export interface DatabaseMigrateRepairRepository {
 export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepairRepository {
   async repairMigrations(
     data: MigrateRepairRequestType,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<MigrateRepairResponseType>> {
-    const { t } = simpleT(locale);
-
     try {
       logger.info("Starting migration repair process", { options: data });
 
@@ -92,7 +91,7 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
         migrationFiles.length - migrationState.trackedMigrations;
 
       if (!needsRepair) {
-        const output = t("app.api.system.db.migrateRepair.messages.upToDate");
+        const output = t("messages.upToDate");
         logger.info("No repair needed - migrations up to date");
 
         return success({
@@ -110,9 +109,7 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
       logger.info("Migration repair needed", { repairedCount });
 
       if (data.dryRun) {
-        const output = t(
-          "app.api.system.db.migrateRepair.messages.dryRunComplete",
-        );
+        const output = t("messages.dryRunComplete");
         logger.info("Dry run completed - no changes made");
 
         return success({
@@ -141,10 +138,10 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
 
       const output =
         repairedCount > 0
-          ? t("app.api.system.db.migrateRepair.messages.repairComplete", {
+          ? t("messages.repairComplete", {
               count: repairedCount,
             })
-          : t("app.api.system.db.migrateRepair.messages.success");
+          : t("messages.success");
 
       logger.info("Migration repair completed successfully", { repairedCount });
 
@@ -161,7 +158,7 @@ export class DatabaseMigrateRepairRepositoryImpl implements DatabaseMigrateRepai
     } catch (error) {
       logger.error("Migration repair failed", { error: String(error) });
       return fail({
-        message: "app.api.system.db.migrateRepair.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: String(error) },
       });

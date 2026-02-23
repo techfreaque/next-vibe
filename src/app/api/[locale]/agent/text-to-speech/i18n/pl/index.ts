@@ -5,6 +5,13 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Agent",
+  tags: {
+    speech: "Mowa",
+    tts: "Tekst na mowę",
+    ai: "AI",
+  },
+
   post: {
     title: "Tekst na mowę",
     description:
@@ -76,6 +83,8 @@ export const translations: typeof enTranslations = {
         description: "Wystąpił konflikt",
       },
       apiKeyMissing: "Klucz API Eden AI nie jest skonfigurowany",
+      notConfigured:
+        "Klucz API {{label}} nie jest skonfigurowany. Dodaj {{envKey}}=<twój-klucz> do pliku .env. Pobierz klucz na {{url}}",
       conversionFailed: "Synteza mowy nie powiodła się: {error}",
       noText: "Nie podano tekstu",
       noAudioUrl: "Nie otrzymano URL audio od dostawcy",

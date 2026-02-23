@@ -20,7 +20,10 @@ import type { CompleteUserType } from "@/app/api/[locale]/user/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { UserRoleValue } from "../user-roles/enum";
+import { scopedTranslation } from "./i18n";
 import type { AuthRepositoryType, InferUserType } from "./repository";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 const AUTH_TOKEN_STORAGE_KEY = "@auth/token";
 const AUTH_EXPIRES_AT_STORAGE_KEY = "@auth/expiresAt";
@@ -82,6 +85,7 @@ export class AuthRepository {
     token: string,
     rememberMe: boolean,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<void>> {
     try {
       const expirationDays = rememberMe ? 30 : 7;
@@ -99,7 +103,7 @@ export class AuthRepository {
     } catch (error) {
       logger.error("Error storing auth token", parseError(error));
       return fail({
-        message: "app.api.user.auth.errors.native.storage_failed",
+        message: t("errors.native.storage_failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: String(error) },
       });
@@ -108,6 +112,7 @@ export class AuthRepository {
 
   static async clearAuthCookies(
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<void>> {
     try {
       await storage.removeItem(AUTH_TOKEN_STORAGE_KEY);
@@ -117,7 +122,7 @@ export class AuthRepository {
     } catch (error) {
       logger.error("Error clearing auth token", parseError(error));
       return fail({
-        message: "app.api.user.auth.errors.native.clear_failed",
+        message: t("errors.native.clear_failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: String(error) },
       });
@@ -129,6 +134,8 @@ export class AuthRepository {
     _payload: JwtPrivatePayloadType,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
   ): Promise<ResponseType<string>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("signJwt is not implemented on native");
@@ -139,6 +146,8 @@ export class AuthRepository {
     _token: string,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
   ): Promise<ResponseType<JwtPrivatePayloadType>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("verifyJwt is not implemented on native");
@@ -186,16 +195,20 @@ export class AuthRepository {
     // oxlint-disable-next-line no-unused-vars
     _platform: Platform,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
-    return await AuthRepository.setAuthCookies(token, true, logger);
+    const { t } = scopedTranslation.scopedT(locale);
+    return await AuthRepository.setAuthCookies(token, true, logger, t);
   }
 
   static async clearAuthTokenForPlatform(
     // oxlint-disable-next-line no-unused-vars
     _platform: Platform,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
-    return await AuthRepository.clearAuthCookies(logger);
+    const { t } = scopedTranslation.scopedT(locale);
+    return await AuthRepository.clearAuthCookies(logger, t);
   }
 
   static createCliToken(
@@ -215,6 +228,8 @@ export class AuthRepository {
     _token: string,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
   ): Promise<JwtPrivatePayloadType | null> {
     return Promise.resolve(null);
   }
@@ -223,7 +238,11 @@ export class AuthRepository {
     return payload.id || null;
   }
 
-  static requireUserId(payload: JwtPrivatePayloadType): string {
+  static requireUserId(
+    payload: JwtPrivatePayloadType,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+  ): string {
     const userId = AuthRepository.extractUserId(payload);
     if (!userId) {
       // oxlint-disable-next-line restricted-syntax

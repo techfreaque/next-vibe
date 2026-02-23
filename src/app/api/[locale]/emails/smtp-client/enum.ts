@@ -2,8 +2,9 @@
  * SMTP Configuration Enums
  * Enums for SMTP account configuration and management
  */
-
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
+
+import { scopedTranslation } from "./i18n";
 
 /**
  * SMTP Account Status
@@ -13,11 +14,11 @@ export const {
   enum: SmtpAccountStatus,
   options: SmtpAccountStatusOptions,
   Value: SmtpAccountStatusValue,
-} = createEnumOptions({
-  ACTIVE: "app.api.emails.enums.smtpAccountStatus.active",
-  INACTIVE: "app.api.emails.enums.smtpAccountStatus.inactive",
-  ERROR: "app.api.emails.enums.smtpAccountStatus.error",
-  TESTING: "app.api.emails.enums.smtpAccountStatus.testing",
+} = createEnumOptions(scopedTranslation, {
+  ACTIVE: "enums.status.active",
+  INACTIVE: "enums.status.inactive",
+  ERROR: "enums.status.error",
+  TESTING: "enums.status.testing",
 });
 
 // Create DB enum array for Drizzle
@@ -36,11 +37,11 @@ export const {
   enum: SmtpSecurityType,
   options: SmtpSecurityTypeOptions,
   Value: SmtpSecurityTypeValue,
-} = createEnumOptions({
-  NONE: "app.api.emails.enums.smtpSecurityType.none",
-  TLS: "app.api.emails.enums.smtpSecurityType.tls",
-  SSL: "app.api.emails.enums.smtpSecurityType.ssl",
-  STARTTLS: "app.api.emails.enums.smtpSecurityType.starttls",
+} = createEnumOptions(scopedTranslation, {
+  NONE: "enums.securityType.none",
+  TLS: "enums.securityType.tls",
+  SSL: "enums.securityType.ssl",
+  STARTTLS: "enums.securityType.starttls",
 });
 
 // Create DB enum array for Drizzle
@@ -59,12 +60,12 @@ export const {
   enum: SmtpAccountStatusFilter,
   options: SmtpAccountStatusFilterOptions,
   Value: SmtpAccountStatusFilterValue,
-} = createEnumOptions({
-  ANY: "app.api.emails.enums.smtpStatusFilter.any",
-  ACTIVE: "app.api.emails.enums.smtpAccountStatus.active",
-  INACTIVE: "app.api.emails.enums.smtpAccountStatus.inactive",
-  ERROR: "app.api.emails.enums.smtpAccountStatus.error",
-  TESTING: "app.api.emails.enums.smtpAccountStatus.testing",
+} = createEnumOptions(scopedTranslation, {
+  ANY: "enums.statusFilter.all",
+  ACTIVE: "enums.status.active",
+  INACTIVE: "enums.status.inactive",
+  ERROR: "enums.status.error",
+  TESTING: "enums.status.testing",
 });
 
 // Create DB enum array for Drizzle
@@ -84,11 +85,11 @@ export const {
   enum: SmtpHealthStatus,
   options: SmtpHealthStatusOptions,
   Value: SmtpHealthStatusValue,
-} = createEnumOptions({
-  HEALTHY: "app.api.emails.enums.smtpHealthStatus.healthy",
-  DEGRADED: "app.api.emails.enums.smtpHealthStatus.degraded",
-  UNHEALTHY: "app.api.emails.enums.smtpHealthStatus.unhealthy",
-  UNKNOWN: "app.api.emails.enums.smtpHealthStatus.unknown",
+} = createEnumOptions(scopedTranslation, {
+  HEALTHY: "enums.healthStatus.healthy",
+  DEGRADED: "enums.healthStatus.degraded",
+  UNHEALTHY: "enums.healthStatus.unhealthy",
+  UNKNOWN: "enums.healthStatus.unknown",
 });
 
 // Create DB enum array for Drizzle
@@ -107,12 +108,12 @@ export const {
   enum: SmtpHealthStatusFilter,
   options: SmtpHealthStatusFilterOptions,
   Value: SmtpHealthStatusFilterValue,
-} = createEnumOptions({
-  ANY: "app.api.emails.enums.smtpHealthStatusFilter.any",
-  HEALTHY: "app.api.emails.enums.smtpHealthStatus.healthy",
-  DEGRADED: "app.api.emails.enums.smtpHealthStatus.degraded",
-  UNHEALTHY: "app.api.emails.enums.smtpHealthStatus.unhealthy",
-  UNKNOWN: "app.api.emails.enums.smtpHealthStatus.unknown",
+} = createEnumOptions(scopedTranslation, {
+  ANY: "enums.healthStatusFilter.all",
+  HEALTHY: "enums.healthStatus.healthy",
+  DEGRADED: "enums.healthStatus.degraded",
+  UNHEALTHY: "enums.healthStatus.unhealthy",
+  UNKNOWN: "enums.healthStatus.unknown",
 });
 
 // Create DB enum array for Drizzle
@@ -132,14 +133,14 @@ export const {
   enum: SmtpAccountSortField,
   options: SmtpAccountSortFieldOptions,
   Value: SmtpAccountSortFieldValue,
-} = createEnumOptions({
-  NAME: "app.api.emails.enums.smtpSortField.name",
-  STATUS: "app.api.emails.enums.smtpSortField.status",
-  CREATED_AT: "app.api.emails.enums.smtpSortField.createdAt",
-  UPDATED_AT: "app.api.emails.enums.smtpSortField.updatedAt",
-  PRIORITY: "app.api.emails.enums.smtpSortField.priority",
-  TOTAL_EMAILS_SENT: "app.api.emails.enums.smtpSortField.totalEmailsSent",
-  LAST_USED_AT: "app.api.emails.enums.smtpSortField.lastUsedAt",
+} = createEnumOptions(scopedTranslation, {
+  NAME: "enums.sortField.name",
+  STATUS: "enums.sortField.status",
+  CREATED_AT: "enums.sortField.createdAt",
+  UPDATED_AT: "enums.sortField.updatedAt",
+  PRIORITY: "enums.sortField.priority",
+  TOTAL_EMAILS_SENT: "enums.sortField.totalEmailsSent",
+  LAST_USED_AT: "enums.sortField.lastUsedAt",
 });
 
 /**
@@ -150,15 +151,15 @@ export const {
   enum: CampaignType,
   options: CampaignTypeOptions,
   Value: CampaignTypeValue,
-} = createEnumOptions({
-  LEAD_CAMPAIGN: "app.api.emails.enums.smtpCampaignType.leadCampaign",
-  NEWSLETTER: "app.api.emails.enums.smtpCampaignType.newsletter",
-  SIGNUP_NURTURE: "app.api.emails.enums.smtpCampaignType.signupNurture",
-  RETENTION: "app.api.emails.enums.smtpCampaignType.retention",
-  WINBACK: "app.api.emails.enums.smtpCampaignType.winback",
-  TRANSACTIONAL: "app.api.emails.enums.smtpCampaignType.transactional",
-  NOTIFICATION: "app.api.emails.enums.smtpCampaignType.notification",
-  SYSTEM: "app.api.emails.enums.smtpCampaignType.system",
+} = createEnumOptions(scopedTranslation, {
+  LEAD_CAMPAIGN: "enums.campaignType.leadCampaign",
+  NEWSLETTER: "enums.campaignType.newsletter",
+  SIGNUP_NURTURE: "enums.campaignType.signupNurture",
+  RETENTION: "enums.campaignType.retention",
+  WINBACK: "enums.campaignType.winback",
+  TRANSACTIONAL: "enums.campaignType.transactional",
+  NOTIFICATION: "enums.campaignType.notification",
+  SYSTEM: "enums.campaignType.system",
 });
 
 /**
@@ -169,16 +170,16 @@ export const {
   enum: CampaignTypeFilter,
   options: CampaignTypeFilterOptions,
   Value: CampaignTypeFilterValue,
-} = createEnumOptions({
-  ANY: "app.api.emails.enums.smtpCampaignTypeFilter.any",
-  LEAD_CAMPAIGN: "app.api.emails.enums.smtpCampaignType.leadCampaign",
-  NEWSLETTER: "app.api.emails.enums.smtpCampaignType.newsletter",
-  SIGNUP_NURTURE: "app.api.emails.enums.smtpCampaignType.signupNurture",
-  RETENTION: "app.api.emails.enums.smtpCampaignType.retention",
-  WINBACK: "app.api.emails.enums.smtpCampaignType.winback",
-  TRANSACTIONAL: "app.api.emails.enums.smtpCampaignType.transactional",
-  NOTIFICATION: "app.api.emails.enums.smtpCampaignType.notification",
-  SYSTEM: "app.api.emails.enums.smtpCampaignType.system",
+} = createEnumOptions(scopedTranslation, {
+  ANY: "enums.campaignTypeFilter.all",
+  LEAD_CAMPAIGN: "enums.campaignType.leadCampaign",
+  NEWSLETTER: "enums.campaignType.newsletter",
+  SIGNUP_NURTURE: "enums.campaignType.signupNurture",
+  RETENTION: "enums.campaignType.retention",
+  WINBACK: "enums.campaignType.winback",
+  TRANSACTIONAL: "enums.campaignType.transactional",
+  NOTIFICATION: "enums.campaignType.notification",
+  SYSTEM: "enums.campaignType.system",
 });
 
 /**
@@ -189,19 +190,19 @@ export const {
   enum: SmtpSelectionRuleSortField,
   options: SmtpSelectionRuleSortFieldOptions,
   Value: SmtpSelectionRuleSortFieldValue,
-} = createEnumOptions({
-  NAME: "app.api.emails.enums.selectionRuleSortField.name",
-  PRIORITY: "app.api.emails.enums.selectionRuleSortField.priority",
-  CAMPAIGN_TYPE: "app.api.emails.enums.selectionRuleSortField.campaignType",
-  JOURNEY_VARIANT: "app.api.emails.enums.selectionRuleSortField.journeyVariant",
-  CAMPAIGN_STAGE: "app.api.emails.enums.selectionRuleSortField.campaignStage",
-  COUNTRY: "app.api.emails.enums.selectionRuleSortField.country",
-  LANGUAGE: "app.api.emails.enums.selectionRuleSortField.language",
-  CREATED_AT: "app.api.emails.enums.selectionRuleSortField.createdAt",
-  UPDATED_AT: "app.api.emails.enums.selectionRuleSortField.updatedAt",
-  EMAILS_SENT: "app.api.emails.enums.selectionRuleSortField.emailsSent",
-  SUCCESS_RATE: "app.api.emails.enums.selectionRuleSortField.successRate",
-  LAST_USED_AT: "app.api.emails.enums.selectionRuleSortField.lastUsedAt",
+} = createEnumOptions(scopedTranslation, {
+  NAME: "enums.selectionRuleSortField.name",
+  PRIORITY: "enums.selectionRuleSortField.priority",
+  CAMPAIGN_TYPE: "enums.selectionRuleSortField.campaignType",
+  JOURNEY_VARIANT: "enums.selectionRuleSortField.journeyVariant",
+  CAMPAIGN_STAGE: "enums.selectionRuleSortField.campaignStage",
+  COUNTRY: "enums.selectionRuleSortField.country",
+  LANGUAGE: "enums.selectionRuleSortField.language",
+  CREATED_AT: "enums.selectionRuleSortField.createdAt",
+  UPDATED_AT: "enums.selectionRuleSortField.updatedAt",
+  EMAILS_SENT: "enums.selectionRuleSortField.emailsSent",
+  SUCCESS_RATE: "enums.selectionRuleSortField.successRate",
+  LAST_USED_AT: "enums.selectionRuleSortField.lastUsedAt",
 });
 
 /**
@@ -212,12 +213,12 @@ export const {
   enum: SmtpSelectionRuleStatusFilter,
   options: SmtpSelectionRuleStatusFilterOptions,
   Value: SmtpSelectionRuleStatusFilterValue,
-} = createEnumOptions({
-  ANY: "app.api.emails.enums.selectionRuleStatusFilter.any",
-  ACTIVE: "app.api.emails.enums.selectionRuleStatusFilter.active",
-  INACTIVE: "app.api.emails.enums.selectionRuleStatusFilter.inactive",
-  DEFAULT: "app.api.emails.enums.selectionRuleStatusFilter.default",
-  FAILOVER: "app.api.emails.enums.selectionRuleStatusFilter.failover",
+} = createEnumOptions(scopedTranslation, {
+  ANY: "enums.selectionRuleStatusFilter.all",
+  ACTIVE: "enums.selectionRuleStatusFilter.active",
+  INACTIVE: "enums.selectionRuleStatusFilter.inactive",
+  DEFAULT: "enums.selectionRuleStatusFilter.default",
+  FAILOVER: "enums.selectionRuleStatusFilter.failover",
 });
 
 /**
@@ -261,11 +262,11 @@ export const {
   enum: LoadBalancingStrategy,
   options: LoadBalancingStrategyOptions,
   Value: LoadBalancingStrategyValue,
-} = createEnumOptions({
-  ROUND_ROBIN: "app.api.emails.enums.loadBalancingStrategy.roundRobin",
-  WEIGHTED: "app.api.emails.enums.loadBalancingStrategy.weighted",
-  PRIORITY: "app.api.emails.enums.loadBalancingStrategy.priority",
-  LEAST_USED: "app.api.emails.enums.loadBalancingStrategy.leastUsed",
+} = createEnumOptions(scopedTranslation, {
+  ROUND_ROBIN: "enums.loadBalancingStrategy.roundRobin",
+  WEIGHTED: "enums.loadBalancingStrategy.weighted",
+  PRIORITY: "enums.loadBalancingStrategy.priority",
+  LEAST_USED: "enums.loadBalancingStrategy.leastUsed",
 });
 
 /**
@@ -276,12 +277,12 @@ export const {
   enum: SmtpTestResult,
   options: SmtpTestResultOptions,
   Value: SmtpTestResultValue,
-} = createEnumOptions({
-  SUCCESS: "app.api.emails.enums.testResult.success",
-  AUTH_FAILED: "app.api.emails.enums.testResult.authFailed",
-  CONNECTION_FAILED: "app.api.emails.enums.testResult.connectionFailed",
-  TIMEOUT: "app.api.emails.enums.testResult.timeout",
-  UNKNOWN_ERROR: "app.api.emails.enums.testResult.unknownError",
+} = createEnumOptions(scopedTranslation, {
+  SUCCESS: "enums.testResult.success",
+  AUTH_FAILED: "enums.testResult.authFailed",
+  CONNECTION_FAILED: "enums.testResult.connectionFailed",
+  TIMEOUT: "enums.testResult.timeout",
+  UNKNOWN_ERROR: "enums.testResult.unknownError",
 });
 
 /**

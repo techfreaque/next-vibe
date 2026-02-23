@@ -21,7 +21,8 @@ import { Span } from "next-vibe-ui/ui/span";
 import { type JSX, useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "../i18n";
 
 interface CompactingMessageProps {
   content: string;
@@ -38,7 +39,7 @@ export function CompactingMessage({
   compactedMessageCount,
   locale,
 }: CompactingMessageProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const contentTokens = Math.ceil(content.length / 4);
@@ -49,9 +50,7 @@ export function CompactingMessage({
         <Div className="flex items-center gap-2 p-3">
           <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0" />
           <Span className="text-sm font-medium text-red-700 dark:text-red-400">
-            {t(
-              "app.api.agent.chat.threads.threadId.messages.compacting.failed",
-            )}
+            {t("compacting.failed")}
           </Span>
           {compactedMessageCount !== undefined && compactedMessageCount > 0 && (
             <Badge
@@ -81,13 +80,7 @@ export function CompactingMessage({
               className={`h-4 w-4 text-purple-500 flex-shrink-0 ${isStreaming ? "animate-pulse" : ""}`}
             />
             <Span className="text-sm font-medium text-purple-700 dark:text-purple-300 truncate">
-              {isStreaming
-                ? t(
-                    "app.api.agent.chat.threads.threadId.messages.compacting.loading",
-                  )
-                : t(
-                    "app.api.agent.chat.threads.threadId.messages.compacting.title",
-                  )}
+              {isStreaming ? t("compacting.loading") : t("compacting.title")}
             </Span>
             {compactedMessageCount !== undefined &&
               compactedMessageCount > 0 && (

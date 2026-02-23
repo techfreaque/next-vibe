@@ -6,10 +6,10 @@
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import { objectField } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,21 +21,20 @@ import {
 
 import { UserRole } from "../../user/user-roles/enum";
 import { NewsletterPreference, NewsletterPreferenceOptions } from "../enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * POST endpoint for newsletter subscription
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["newsletter", "subscribe"],
-  title: "app.api.newsletter.subscribe.post.title" as const,
-  description: "app.api.newsletter.subscribe.post.description" as const,
-  category: "app.api.system.category" as const,
+  title: "post.title",
+  description: "post.description",
+  category: "category",
   icon: "bell",
-  tags: [
-    "app.api.newsletter.subscribe.tags.newsletter" as const,
-    "app.api.newsletter.subscribe.tags.subscription" as const,
-  ],
+  tags: ["tags.newsletter", "tags.subscription"],
   allowedRoles: [
     UserRole.PUBLIC,
     UserRole.CUSTOMER,
@@ -49,47 +48,42 @@ const { POST } = createEndpoint({
   cli: {
     firstCliArgKey: "email",
   },
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.newsletter.subscribe.post.form.title" as const,
-      description:
-        "app.api.newsletter.subscribe.post.form.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.form.title",
+    description: "post.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      email: requestField({
+      email: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
-        label: "app.api.newsletter.subscribe.email.label" as const,
-        description: "app.api.newsletter.subscribe.email.description" as const,
-        placeholder: "app.api.newsletter.subscribe.email.placeholder" as const,
-        helpText: "app.api.newsletter.subscribe.email.helpText" as const,
+        label: "email.label",
+        description: "email.description",
+        placeholder: "email.placeholder",
+        helpText: "email.helpText",
         columns: 12,
         schema: z.string().email(),
       }),
-      name: requestField({
+      name: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.newsletter.subscribe.name.label" as const,
-        description: "app.api.newsletter.subscribe.name.description" as const,
-        placeholder: "app.api.newsletter.subscribe.name.placeholder" as const,
-        helpText: "app.api.newsletter.subscribe.name.helpText" as const,
+        label: "name.label",
+        description: "name.description",
+        placeholder: "name.placeholder",
+        helpText: "name.helpText",
         columns: 12,
         schema: z.string().optional(),
       }),
-      preferences: requestField({
+      preferences: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label: "app.api.newsletter.subscribe.preferences.label" as const,
-        description:
-          "app.api.newsletter.subscribe.preferences.description" as const,
-        placeholder:
-          "app.api.newsletter.subscribe.preferences.placeholder" as const,
-        helpText: "app.api.newsletter.subscribe.preferences.helpText" as const,
+        label: "preferences.label",
+        description: "preferences.description",
+        placeholder: "preferences.placeholder",
+        helpText: "preferences.helpText",
         options: NewsletterPreferenceOptions,
         columns: 12,
         schema: z.array(z.enum(NewsletterPreference)).optional(),
@@ -97,89 +91,75 @@ const { POST } = createEndpoint({
 
       // === RESPONSE FIELDS ===
       // Note: leadId comes from JWT payload (user.leadId) on server-side
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.newsletter.subscribe.response.success" as const,
+        content: "response.success",
         schema: z.boolean(),
       }),
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.newsletter.subscribe.response.message" as const,
+        content: "response.message",
         schema: z.string(),
       }),
-      leadId: responseField({
+      leadId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.newsletter.subscribe.response.leadId" as const,
+        content: "response.leadId",
         schema: z.string(),
       }),
-      subscriptionId: responseField({
+      subscriptionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.newsletter.subscribe.response.subscriptionId" as const,
+        content: "response.subscriptionId",
         schema: z.string(),
       }),
-      userId: responseField({
+      userId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.newsletter.subscribe.response.userId" as const,
+        content: "response.userId",
         schema: z.string().optional(),
       }),
     },
-  ),
+  }),
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.newsletter.subscribe.post.errors.validation.title" as const,
-      description:
-        "app.api.newsletter.subscribe.post.errors.validation.description" as const,
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.newsletter.subscribe.post.errors.internal.title" as const,
-      description:
-        "app.api.newsletter.subscribe.post.errors.internal.description" as const,
+      title: "post.errors.internal.title",
+      description: "post.errors.internal.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.newsletter.subscribe.post.errors.unauthorized.title" as const,
-      description:
-        "app.api.newsletter.subscribe.post.errors.unauthorized.description" as const,
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.newsletter.subscribe.post.errors.forbidden.title" as const,
-      description:
-        "app.api.newsletter.subscribe.post.errors.forbidden.description" as const,
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.newsletter.subscribe.post.errors.internal.title" as const,
-      description:
-        "app.api.newsletter.subscribe.post.errors.internal.description" as const,
+      title: "post.errors.internal.title",
+      description: "post.errors.internal.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.newsletter.subscribe.post.errors.internal.title" as const,
-      description:
-        "app.api.newsletter.subscribe.post.errors.internal.description" as const,
+      title: "post.errors.internal.title",
+      description: "post.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.newsletter.subscribe.post.errors.internal.title" as const,
-      description:
-        "app.api.newsletter.subscribe.post.errors.internal.description" as const,
+      title: "post.errors.internal.title",
+      description: "post.errors.internal.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.newsletter.subscribe.post.errors.internal.title" as const,
-      description:
-        "app.api.newsletter.subscribe.post.errors.internal.description" as const,
+      title: "post.errors.internal.title",
+      description: "post.errors.internal.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.newsletter.subscribe.post.errors.conflict.title" as const,
-      description:
-        "app.api.newsletter.subscribe.post.errors.conflict.description" as const,
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.newsletter.subscribe.post.success.title" as const,
-    description:
-      "app.api.newsletter.subscribe.post.success.description" as const,
+    title: "post.success.title",
+    description: "post.success.description",
   },
   examples: {
     requests: {

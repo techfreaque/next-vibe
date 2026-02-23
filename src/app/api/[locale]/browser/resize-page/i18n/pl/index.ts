@@ -68,4 +68,9 @@ export const translations: typeof enTranslations = {
     title: "Rozmiar strony pomyślnie zmieniony",
     description: "Rozmiar strony został pomyślnie zmieniony",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    viewportAutomation: "Automatyzacja widoku",
+  },
 };

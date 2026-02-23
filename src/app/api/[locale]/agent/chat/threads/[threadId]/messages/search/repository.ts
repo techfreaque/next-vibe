@@ -17,15 +17,14 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import { chatMessages, chatThreads } from "../../../../db";
-import { validateNotIncognito } from "../../../../validation";
 import type {
   MessageSearchRequestOutput,
   MessageSearchResponseOutput,
   MessageSearchUrlVariablesOutput,
 } from "./definition";
+import type { MessageSearchT } from "./i18n";
 
 /**
  * Message Search Repository - Static class pattern
@@ -39,7 +38,7 @@ export class MessageSearchRepository {
     data: MessageSearchRequestOutput,
     urlPathParams: MessageSearchUrlVariablesOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: MessageSearchT,
     logger: EndpointLogger,
   ): Promise<ResponseType<MessageSearchResponseOutput>> {
     try {
@@ -59,8 +58,7 @@ export class MessageSearchRepository {
       // Type guard to ensure user has id
       if (!user.id) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.search.get.errors.unauthorized.title",
+          message: t("search.get.errors.unauthorized.title"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -76,20 +74,17 @@ export class MessageSearchRepository {
 
       if (!thread) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.messages.search.get.errors.notFound.title",
+          message: t("search.get.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
 
       // Reject incognito threads
-      const incognitoError = validateNotIncognito(
-        thread.rootFolderId,
-        locale,
-        "app.api.agent.chat.threads.threadId.messages.search.get",
-      );
-      if (incognitoError) {
-        return incognitoError;
+      if (thread.rootFolderId === "incognito") {
+        return fail({
+          message: t("search.get.errors.forbidden.title"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
       }
 
       // Perform full-text search on messages within the thread
@@ -152,8 +147,7 @@ export class MessageSearchRepository {
     } catch (error) {
       logger.error("Failed to search messages", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.messages.search.get.errors.serverError.title",
+        message: t("search.get.errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

@@ -1,4 +1,10 @@
 export const translations = {
+  category: "Leads",
+  tags: {
+    leads: "Leads",
+    management: "Management",
+  },
+
   get: {
     title: "List Leads",
     description: "Retrieve a paginated list of leads with filtering",

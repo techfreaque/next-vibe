@@ -1,6 +1,11 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Leads",
+  tags: {
+    campaigns: "Campaigns",
+    leads: "Leads",
+  },
   post: {
     title: "Test Mail",
     description: "Wyślij testowy e-mail z niestandardowymi danymi leadu",

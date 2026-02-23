@@ -18,6 +18,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { DbId } from "@/app/api/[locale]/system/db/types";
 import { createDefaultCliUser } from "@/app/api/[locale]/system/unified-interface/cli/auth/cli-user";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { NewUserRole, UserRole } from "../db";
 import { insertUserRoleSchema, userRoles } from "../db";
@@ -26,6 +27,7 @@ import {
   type UserPermissionRoleValue,
   type UserRole as UserRoleEnum,
 } from "./enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * User Roles Repository
@@ -39,6 +41,7 @@ export class UserRolesRepository {
   static async findByUserId(
     userId: DbId,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<UserRole[]>> {
     try {
       // Handle CLI-only user without database access
@@ -64,13 +67,15 @@ export class UserRolesRepository {
         logger.error("Error finding user roles by user ID", parseError(error));
       }
 
+      const { t } = scopedTranslation.scopedT(locale);
+
       // Check if this is a database connection error
       if (
         parsedError.message.includes("ECONNREFUSED") ||
         parsedError.message.includes("connect")
       ) {
         return fail({
-          message: "app.api.user.userRoles.errors.find_failed",
+          message: t("errors.find_failed"),
           errorType: ErrorResponseTypes.DATABASE_ERROR,
           messageParams: {
             userId,
@@ -81,7 +86,7 @@ export class UserRolesRepository {
       }
 
       return fail({
-        message: "app.api.user.userRoles.errors.find_failed",
+        message: t("errors.find_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { userId, error: parsedError.message },
       });
@@ -97,6 +102,7 @@ export class UserRolesRepository {
   static async findByUserIds(
     userIds: DbId[],
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<Map<DbId, UserRole[]>>> {
     try {
       logger.debug("Batch finding user roles for multiple users", {
@@ -147,9 +153,10 @@ export class UserRolesRepository {
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Error batch finding user roles", parsedError);
+      const { t } = scopedTranslation.scopedT(locale);
 
       return fail({
-        message: "app.api.user.userRoles.errors.batch_find_failed",
+        message: t("errors.batch_find_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: {
           count: userIds.length,
@@ -169,6 +176,7 @@ export class UserRolesRepository {
     userId: DbId,
     role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<UserRole>> {
     try {
       // Handle CLI-only user without database access
@@ -177,8 +185,9 @@ export class UserRolesRepository {
         // CLI user has no roles in database
         // Platform markers (CLI_OFF, CLI_AUTH_BYPASS, etc.) are NEVER user roles
         // Access control is handled by platform-access checker, not user roles
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.user.userRoles.errors.not_found",
+          message: t("errors.not_found"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { userId, role },
         });
@@ -195,8 +204,9 @@ export class UserRolesRepository {
         );
 
       if (results.length === 0) {
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.user.userRoles.errors.not_found",
+          message: t("errors.not_found"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { userId, role },
         });
@@ -208,8 +218,9 @@ export class UserRolesRepository {
         "Error finding user role by user ID and role",
         parseError(error),
       );
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.userRoles.errors.lookup_failed",
+        message: t("errors.lookup_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { userId, role, error: parseError(error).message },
       });
@@ -224,6 +235,7 @@ export class UserRolesRepository {
   static async addRole(
     data: NewUserRole,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<UserRole>> {
     try {
       // Check if the role already exists
@@ -231,6 +243,7 @@ export class UserRolesRepository {
         data.userId,
         data.role,
         logger,
+        locale,
       );
 
       if (existingRoleResult.success) {
@@ -251,11 +264,12 @@ export class UserRolesRepository {
         .returning();
 
       if (results.length === 0) {
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.user.userRoles.errors.add_failed",
+          message: t("errors.add_failed"),
           errorType: ErrorResponseTypes.DATABASE_ERROR,
           messageParams: {
-            error: "app.api.user.userRoles.errors.no_data_returned",
+            error: t("errors.no_data_returned"),
           },
         });
       }
@@ -263,8 +277,9 @@ export class UserRolesRepository {
       return success(results[0]);
     } catch (error) {
       logger.error("Error adding role to user", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.userRoles.errors.add_failed",
+        message: t("errors.add_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: {
           userId: data.userId,
@@ -285,6 +300,7 @@ export class UserRolesRepository {
     userId: DbId,
     role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
     try {
       logger.debug("Removing role from user", { userId, role });
@@ -302,8 +318,9 @@ export class UserRolesRepository {
       return success(results.length > 0);
     } catch (error) {
       logger.error("Error removing role from user", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.userRoles.errors.remove_failed",
+        message: t("errors.remove_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { userId, role, error: parseError(error).message },
       });
@@ -320,19 +337,22 @@ export class UserRolesRepository {
     userId: DbId,
     role: (typeof UserRoleEnum)[keyof typeof UserRoleEnum],
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<boolean>> {
     try {
       const existingRoleResult = await UserRolesRepository.findByUserIdAndRole(
         userId,
         role,
         logger,
+        locale,
       );
 
       return success(existingRoleResult.success);
     } catch (error) {
       logger.error("Error checking if user has role", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.userRoles.errors.check_failed",
+        message: t("errors.check_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { userId, role, error: parseError(error).message },
       });
@@ -347,6 +367,7 @@ export class UserRolesRepository {
   static async deleteByUserId(
     userId: DbId,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
     try {
       logger.debug("Deleting user roles by user ID", { userId });
@@ -356,8 +377,9 @@ export class UserRolesRepository {
       return success();
     } catch (error) {
       logger.error("Error deleting user roles by user ID", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.userRoles.errors.delete_failed",
+        message: t("errors.delete_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { userId, error: parseError(error).message },
       });
@@ -372,16 +394,19 @@ export class UserRolesRepository {
   static async getUserRoles(
     userId: DbId,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<(typeof UserPermissionRoleValue)[]>> {
     try {
       const rolesResult = await UserRolesRepository.findByUserId(
         userId,
         logger,
+        locale,
       );
 
       if (!rolesResult.success || !rolesResult.data) {
+        const { t } = scopedTranslation.scopedT(locale);
         return fail({
-          message: "app.api.user.userRoles.errors.find_failed",
+          message: t("errors.find_failed"),
           errorType: ErrorResponseTypes.DATABASE_ERROR,
           messageParams: { userId },
         });
@@ -395,8 +420,9 @@ export class UserRolesRepository {
       return success(roleValues);
     } catch (error) {
       logger.error("Error getting user permission roles", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.user.userRoles.errors.find_failed",
+        message: t("errors.find_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { userId, error: parseError(error).message },
       });

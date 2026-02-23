@@ -99,4 +99,9 @@ export const translations: typeof enTranslations = {
     title: "Screenshot erfolgreich aufgenommen",
     description: "Der Screenshot wurde erfolgreich aufgenommen",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    captureAutomation: "Erfassungs-Automatisierung",
+  },
 };

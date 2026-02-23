@@ -20,13 +20,15 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { type NewUser, userRoles, users } from "@/app/api/[locale]/user/db";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import type {
   UserCreateRequestOutput,
   UserCreateResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
 import { sendWelcomeSms } from "./sms";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 export interface UserCreateRepository {
   createUser(
@@ -34,7 +36,7 @@ export interface UserCreateRepository {
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: TFunction,
+    t: ModuleT,
   ): Promise<ResponseType<UserCreateResponseOutput>>;
 }
 
@@ -44,7 +46,7 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
     user: JwtPrivatePayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
-    t: TFunction,
+    t: ModuleT,
   ): Promise<ResponseType<UserCreateResponseOutput>> {
     try {
       logger.debug("Creating user", {
@@ -77,7 +79,7 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
 
       if (!createdUser) {
         return fail({
-          message: "app.api.users.create.post.errors.internal.title",
+          message: t("post.errors.internal.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -105,7 +107,7 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
       const responseData: UserCreateResponseOutput = {
         success: {
           created: true,
-          message: t("app.api.users.create.post.success.message.content"),
+          message: t("post.success.message.content"),
         },
         userInfo: {
           id: createdUser.id,
@@ -157,7 +159,7 @@ export class UserCreateRepositoryImpl implements UserCreateRepository {
     } catch (error) {
       logger.error("Error creating user", parseError(error));
       return fail({
-        message: "app.api.users.create.post.errors.internal.title",
+        message: t("post.errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { details: parseError(error).message },
       });

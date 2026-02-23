@@ -769,7 +769,7 @@ export interface EndpointFormFieldProps<
   theme?: Partial<RequiredFieldTheme>;
   className?: string;
   /**
-   * Current locale for translations (defaults to "en-GLOBAL" if not provided)
+   * Current locale for translations
    */
   locale: CountryLanguage;
 }

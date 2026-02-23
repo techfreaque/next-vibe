@@ -1,4 +1,15 @@
 export const translations = {
+  category: "Aufgabenverwaltung",
+
+  tags: {
+    pulse: "Pulse",
+    monitoring: "Überwachung",
+  },
+
+  errors: {
+    fetchCronTaskHistory: "Fehler beim Abrufen des Pulse-Ausführungsverlaufs",
+  },
+
   get: {
     title: "Pulse-Ausführungsverlauf",
     description: "Historische Pulse-Ausführungszyklen anzeigen",

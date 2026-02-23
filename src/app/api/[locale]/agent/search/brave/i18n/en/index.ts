@@ -98,6 +98,11 @@ export const translations = {
         title: "Something Went Wrong",
         description: "We couldn't complete your search. Please try again",
       },
+      notConfigured: {
+        title:
+          "{{label}} API key not configured. Add {{envKey}}=<your-key> to your .env file. Get your key at {{url}}",
+        description: "Set up {{label}} to enable web search",
+      },
     },
     success: {
       title: "Search Successful",

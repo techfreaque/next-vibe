@@ -21,6 +21,9 @@ import type {
   LinuxUserCreateRequestOutput,
   LinuxUserCreateResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 const execAsync = promisify(exec);
 
@@ -28,11 +31,12 @@ export class LinuxUserCreateRepository {
   static async create(
     data: LinuxUserCreateRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<LinuxUserCreateResponseOutput>> {
     const isLocalMode = process.env["NEXT_PUBLIC_LOCAL_MODE"] !== "false";
     if (!isLocalMode) {
       return fail({
-        message: "Linux user management is only available in LOCAL_MODE",
+        message: t("errors.localModeOnly.title"),
         errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
@@ -40,8 +44,7 @@ export class LinuxUserCreateRepository {
     const username = data.username;
     if (!/^[a-z][a-z0-9-]*$/.test(username) || username.length > 32) {
       return fail({
-        message:
-          "Invalid username: must be lowercase alphanumeric + hyphen, starting with a letter",
+        message: t("errors.invalidUsername"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
@@ -83,13 +86,13 @@ export class LinuxUserCreateRepository {
         errMsg.includes("uid is already in use")
       ) {
         return fail({
-          message: `User '${username}' already exists`,
+          message: t("errors.userAlreadyExists"),
           errorType: ErrorResponseTypes.CONFLICT,
         });
       }
       logger.error("Failed to create Linux user", errMsg);
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

@@ -2,6 +2,8 @@ import { translations as optionsTranslations } from "../../options/i18n/en";
 import { translations as _componentsTranslations } from "../../_components/i18n/en";
 
 export const translations = {
+  category: "Users",
+
   _components: _componentsTranslations,
   title: "Welcome Back",
   description: "Access uncensored AI models and your conversation history.",

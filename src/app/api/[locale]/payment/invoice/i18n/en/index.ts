@@ -1,4 +1,10 @@
 export const translations = {
+  category: "Billing",
+  tags: {
+    payment: "payment",
+    invoice: "invoice",
+    transactions: "transactions",
+  },
   defaultItem: "Invoice item",
   success: {
     created: "Invoice created successfully",
@@ -88,6 +94,9 @@ export const translations = {
     label: "Currency",
     description: "Currency code",
     placeholder: "Select currency",
+    usd: "US Dollar (USD)",
+    eur: "Euro (EUR)",
+    pln: "Polish Zloty (PLN)",
   },
   description: {
     label: "Description",

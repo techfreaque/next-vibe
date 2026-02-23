@@ -64,4 +64,9 @@ export const translations = {
     title: "Network Request Retrieved Successfully",
     description: "The network request was retrieved successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    networkAnalysis: "Network Analysis",
+  },
 };

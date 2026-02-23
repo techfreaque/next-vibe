@@ -1,4 +1,8 @@
 export const translations = {
+  category: "Chat",
+  tags: {
+    messages: "Messages",
+  },
   search: {
     get: {
       title: "Search Messages",

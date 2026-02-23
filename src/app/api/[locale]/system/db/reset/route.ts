@@ -13,10 +13,10 @@ import resetEndpoints from "./definition";
 export const { POST, tools } = endpointsHandler({
   endpoint: resetEndpoints,
   [Methods.POST]: {
-    handler: async ({ data, locale, logger }) => {
+    handler: async ({ data, t, logger }) => {
       // Lazy import to avoid creating database connections during route discovery
       const { databaseResetRepository } = await import("./repository");
-      return await databaseResetRepository.resetDatabase(data, locale, logger);
+      return await databaseResetRepository.resetDatabase(data, t, logger);
     },
   },
 });

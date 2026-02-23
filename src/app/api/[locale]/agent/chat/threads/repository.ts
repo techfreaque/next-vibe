@@ -29,7 +29,6 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { DefaultFolderId } from "../config";
 import { type ChatFolder, chatFolders, chatThreads } from "../db";
@@ -43,13 +42,13 @@ import {
   canPostInThread,
   canViewThread,
 } from "../permissions/permissions";
-import { validateNotIncognito } from "../validation";
 import type {
   ThreadCreateRequestOutput,
   ThreadCreateResponseOutput,
   ThreadListRequestOutput,
   ThreadListResponseOutput,
 } from "./definition";
+import { scopedTranslation, type ThreadsT } from "./i18n";
 
 /**
  * Generate thread title from first message
@@ -73,11 +72,13 @@ export function generateThreadTitle(content: string): string {
 async function verifyExistingThread(params: {
   threadId: string;
   isIncognito: boolean;
-  userId?: string;
+  userId: string | undefined;
   user: JwtPayloadType;
   logger: EndpointLogger;
+  locale: CountryLanguage;
 }): Promise<ResponseType<string>> {
-  const { threadId, isIncognito, userId, user, logger } = params;
+  const { threadId, isIncognito, userId, user, logger, locale } = params;
+  const { t } = scopedTranslation.scopedT(locale);
 
   if (!isIncognito && userId) {
     const [existing] = await db
@@ -89,7 +90,7 @@ async function verifyExistingThread(params: {
     if (!existing?.id) {
       logger.error("Thread not found", { threadId, userId });
       return fail({
-        message: "app.api.agent.chat.threads.get.errors.notFound.title",
+        message: t("get.errors.notFound.title"),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -104,7 +105,13 @@ async function verifyExistingThread(params: {
       folder = folderResult || null;
     }
 
-    const hasPermission = await canPostInThread(user, existing, folder, logger);
+    const hasPermission = await canPostInThread(
+      user,
+      existing,
+      folder,
+      logger,
+      locale,
+    );
 
     if (!hasPermission) {
       logger.error("User does not have permission to post in thread", {
@@ -114,7 +121,7 @@ async function verifyExistingThread(params: {
         rootFolderId: existing.rootFolderId,
       });
       return fail({
-        message: "app.api.agent.chat.threads.get.errors.forbidden.title",
+        message: t("get.errors.forbidden.title"),
         errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
@@ -144,6 +151,7 @@ export async function ensureThread({
   logger,
   user,
   leadId,
+  locale,
 }: {
   threadId: string;
   rootFolderId: DefaultFolderId;
@@ -154,6 +162,7 @@ export async function ensureThread({
   isIncognito: boolean;
   logger: EndpointLogger;
   user: JwtPayloadType;
+  locale: CountryLanguage;
 }): Promise<{ threadId: string; isNew: boolean }> {
   logger.debug("ensureThread called", {
     threadId,
@@ -182,6 +191,7 @@ export async function ensureThread({
       userId,
       user,
       logger,
+      locale,
     });
 
     if (!verifyResult.success) {
@@ -229,6 +239,7 @@ export async function ensureThread({
         user,
         rootConfig.rolesCreateThread,
         logger,
+        locale,
       );
 
       if (!hasPermission) {
@@ -265,7 +276,12 @@ export async function ensureThread({
       rootFolderId,
       subFolderId,
     });
-    const hasPermission = await canCreateThreadInFolder(user, folder, logger);
+    const hasPermission = await canCreateThreadInFolder(
+      user,
+      folder,
+      logger,
+      locale,
+    );
 
     logger.debug("Permission check result", {
       hasPermission,
@@ -322,7 +338,9 @@ export class ThreadsRepository {
   static async listThreads(
     data: ThreadListRequestOutput,
     user: JwtPayloadType,
+    t: ThreadsT,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ThreadListResponseOutput>> {
     try {
       const page = data.page ?? 1;
@@ -366,7 +384,7 @@ export class ThreadsRepository {
 
       if (!userIdentifier) {
         return fail({
-          message: "app.api.agent.chat.threads.get.errors.unauthorized.title",
+          message: t("get.errors.unauthorized.title"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -522,6 +540,7 @@ export class ThreadsRepository {
           thread,
           folder,
           logger,
+          locale,
           allFolders,
         );
 
@@ -546,15 +565,16 @@ export class ThreadsRepository {
             canDeleteFlag,
             canManagePermsFlag,
           ] = await Promise.all([
-            canEditThread(user, thread, folder, logger, allFolders),
-            canPostInThread(user, thread, folder, logger, allFolders),
-            canHideThread(user, thread, logger, folder, allFolders),
-            canDeleteThread(user, thread, logger),
+            canEditThread(user, thread, folder, logger, locale, allFolders),
+            canPostInThread(user, thread, folder, logger, locale, allFolders),
+            canHideThread(user, thread, logger, locale, folder, allFolders),
+            canDeleteThread(user, thread, logger, locale),
             canManageThreadPermissions(
               user,
               thread,
               folder,
               logger,
+              locale,
               allFolders,
             ),
           ]);
@@ -599,7 +619,7 @@ export class ThreadsRepository {
     } catch (error) {
       logger.error("Error listing threads", parseError(error));
       return fail({
-        message: "app.api.agent.chat.threads.get.errors.server.title",
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -612,8 +632,9 @@ export class ThreadsRepository {
   static async createThread(
     data: ThreadCreateRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: ThreadsT,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ThreadCreateResponseOutput>> {
     try {
       logger.debug("Creating thread", {
@@ -625,16 +646,6 @@ export class ThreadsRepository {
         subFolderId: data.thread?.subFolderId,
       });
 
-      // Reject incognito threads - they should never be created on server
-      const incognitoError = validateNotIncognito(
-        data.thread?.rootFolderId || "",
-        locale,
-        "app.api.agent.chat.threads.post",
-      );
-      if (incognitoError) {
-        return incognitoError;
-      }
-
       // Subfolder validation: subFolderId is optional and validated by schema
 
       // For anonymous users (public), use leadId instead of userId
@@ -643,7 +654,7 @@ export class ThreadsRepository {
 
       if (!userIdentifier) {
         return fail({
-          message: "app.api.agent.chat.threads.post.errors.unauthorized.title",
+          message: t("post.errors.unauthorized.title"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -662,7 +673,7 @@ export class ThreadsRepository {
 
         if (!folderResult) {
           return fail({
-            message: "app.api.agent.chat.threads.post.errors.notFound.title",
+            message: t("post.errors.notFound.title"),
             errorType: ErrorResponseTypes.NOT_FOUND,
             messageParams: {
               message: "Folder not found",
@@ -697,11 +708,16 @@ export class ThreadsRepository {
       }
 
       // Check if user has permission to create thread in this folder
-      const hasPermission = await canCreateThreadInFolder(user, folder, logger);
+      const hasPermission = await canCreateThreadInFolder(
+        user,
+        folder,
+        logger,
+        locale,
+      );
 
       if (!hasPermission) {
         return fail({
-          message: "app.api.agent.chat.threads.post.errors.forbidden.title",
+          message: t("post.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
           messageParams: {
             message: "Cannot create thread in this location",
@@ -711,7 +727,7 @@ export class ThreadsRepository {
 
       if (!data.thread?.id) {
         return fail({
-          message: "app.api.agent.chat.threads.post.errors.validation.title",
+          message: t("post.errors.validation.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: {
             message: "Thread ID must be provided by client",
@@ -724,11 +740,7 @@ export class ThreadsRepository {
       const threadData = {
         id: threadId,
         userId: userIdentifier,
-        title:
-          data.thread?.title ||
-          simpleT(locale).t(
-            "app.api.agent.chat.threads.post.threadTitle.default",
-          ),
+        title: data.thread?.title || t("post.threadTitle.default"),
         rootFolderId: data.thread?.rootFolderId,
         folderId: data.thread?.subFolderId ?? null,
         status: ThreadStatus.ACTIVE,
@@ -767,7 +779,7 @@ export class ThreadsRepository {
     } catch (error) {
       logger.error("Error creating thread", parseError(error));
       return fail({
-        message: "app.api.agent.chat.threads.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -779,6 +791,7 @@ export class ThreadsRepository {
    */
   static async getTotalConversationsCount(
     logger: EndpointLogger,
+    t: ThreadsT,
   ): Promise<ResponseType<number>> {
     try {
       const now = Date.now();
@@ -817,7 +830,7 @@ export class ThreadsRepository {
         parseError(error),
       );
       return fail({
-        message: "app.api.agent.chat.threads.errors.count_failed",
+        message: t("errors.count_failed"),
         errorType: ErrorResponseTypes.DATABASE_ERROR,
         messageParams: { error: parseError(error).message },
       });

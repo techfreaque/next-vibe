@@ -6,12 +6,12 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
+  scopedBackButton,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -30,231 +30,201 @@ import {
   MessagingAccountStatus,
   MessagingAccountStatusDB,
 } from "../../enum";
+import { scopedTranslation } from "./i18n";
 import { MessagingAccountsListContainer } from "./widget";
 
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["emails", "messaging", "accounts", "list"],
-  title: "app.api.emails.messaging.accounts.list.title",
-  description: "app.api.emails.messaging.accounts.list.description",
-  category: "app.api.emails.category",
+  title: "title",
+  description: "description",
+  category: "category",
   icon: "message-circle",
-  tags: ["app.api.emails.messaging.tag"],
+  tags: ["tags.messaging"],
   allowedRoles: [UserRole.ADMIN],
 
   fields: customWidgetObject({
     render: MessagingAccountsListContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({ usage: { request: "data", response: true } }),
+      backButton: scopedBackButton(scopedTranslation, {
+        usage: { request: "data", response: true },
+      }),
 
-      channel: requestField({
+      channel: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.emails.messaging.accounts.list.fields.channel.label",
-        description:
-          "app.api.emails.messaging.accounts.list.fields.channel.description",
+        label: "fields.channel.label",
+        description: "fields.channel.description",
         columns: 3,
         options: MessageChannelFilterOptions,
         schema: z.enum(MessageChannelFilter).default(MessageChannelFilter.ANY),
       }),
 
-      search: requestField({
+      search: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.messaging.accounts.list.fields.search.label",
-        description:
-          "app.api.emails.messaging.accounts.list.fields.search.description",
-        placeholder:
-          "app.api.emails.messaging.accounts.list.fields.search.placeholder",
+        label: "fields.search.label",
+        description: "fields.search.description",
+        placeholder: "fields.search.placeholder",
         columns: 3,
         schema: z.string().optional(),
       }),
 
-      page: requestField({
+      page: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.messaging.accounts.list.fields.page.label",
-        description:
-          "app.api.emails.messaging.accounts.list.fields.page.description",
+        label: "fields.page.label",
+        description: "fields.page.description",
         columns: 3,
         schema: z.coerce.number().int().min(1).default(1),
       }),
 
-      limit: requestField({
+      limit: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.messaging.accounts.list.fields.limit.label",
-        description:
-          "app.api.emails.messaging.accounts.list.fields.limit.description",
+        label: "fields.limit.label",
+        description: "fields.limit.description",
         columns: 3,
         schema: z.coerce.number().int().min(1).max(100).default(20),
       }),
 
       // === RESPONSE FIELDS ===
-      accounts: responseArrayField(
-        { type: WidgetType.CONTAINER },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            title:
-              "app.api.emails.messaging.accounts.list.response.account.title",
-            description:
-              "app.api.emails.messaging.accounts.list.response.account.description",
-            layoutType: LayoutType.GRID,
-            columns: 12,
-          },
-          { response: true },
-          {
-            id: responseField({
+      accounts: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: scopedObjectFieldNew(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          title: "response.account.title",
+          description: "response.account.description",
+          layoutType: LayoutType.GRID,
+          columns: 12,
+          usage: { response: true },
+          children: {
+            id: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messaging.accounts.list.response.account.id",
+              content: "response.account.id",
               schema: z.uuid(),
             }),
-            name: responseField({
+            name: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messaging.accounts.list.response.account.name",
+              content: "response.account.name",
               schema: z.string(),
             }),
-            channel: responseField({
+            channel: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              text: "app.api.emails.messaging.accounts.list.response.account.channel",
+              text: "response.account.channel",
               schema: z.enum(MessageChannel),
             }),
-            provider: responseField({
+            provider: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messaging.accounts.list.response.account.provider",
+              content: "response.account.provider",
               schema: z.string(),
             }),
-            fromId: responseField({
+            fromId: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messaging.accounts.list.response.account.fromId",
+              content: "response.account.fromId",
               schema: z.string().nullable(),
             }),
-            status: responseField({
+            status: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              text: "app.api.emails.messaging.accounts.list.response.account.status",
+              text: "response.account.status",
               schema: z.enum(MessagingAccountStatusDB),
             }),
-            messagesSentTotal: responseField({
+            messagesSentTotal: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messaging.accounts.list.response.account.messagesSentTotal",
+              content: "response.account.messagesSentTotal",
               schema: z.coerce.number().int(),
             }),
-            lastUsedAt: responseField({
+            lastUsedAt: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messaging.accounts.list.response.account.lastUsedAt",
+              content: "response.account.lastUsedAt",
               schema: dateSchema.nullable(),
             }),
-            createdAt: responseField({
+            createdAt: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.emails.messaging.accounts.list.response.account.createdAt",
+              content: "response.account.createdAt",
               schema: dateSchema,
             }),
           },
-        ),
-      ),
+        }),
+      }),
 
-      pagination: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.emails.messaging.accounts.list.response.pagination.title",
-          description:
-            "app.api.emails.messaging.accounts.list.response.pagination.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          page: responseField({
+      pagination: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.pagination.title",
+        description: "response.pagination.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          page: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.emails.messaging.accounts.list.response.pagination.page",
+            content: "response.pagination.page",
             schema: z.coerce.number().int(),
           }),
-          limit: responseField({
+          limit: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.emails.messaging.accounts.list.response.pagination.limit",
+            content: "response.pagination.limit",
             schema: z.coerce.number().int(),
           }),
-          total: responseField({
+          total: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.emails.messaging.accounts.list.response.pagination.total",
+            content: "response.pagination.total",
             schema: z.coerce.number().int(),
           }),
-          totalPages: responseField({
+          totalPages: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.emails.messaging.accounts.list.response.pagination.totalPages",
+            content: "response.pagination.totalPages",
             schema: z.coerce.number().int(),
           }),
         },
-      ),
+      }),
     },
   }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.emails.messaging.accounts.list.errors.validation.title",
-      description:
-        "app.api.emails.messaging.accounts.list.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.emails.messaging.accounts.list.errors.unauthorized.title",
-      description:
-        "app.api.emails.messaging.accounts.list.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.emails.messaging.accounts.list.errors.forbidden.title",
-      description:
-        "app.api.emails.messaging.accounts.list.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.emails.messaging.accounts.list.errors.notFound.title",
-      description:
-        "app.api.emails.messaging.accounts.list.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.emails.messaging.accounts.list.errors.conflict.title",
-      description:
-        "app.api.emails.messaging.accounts.list.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.emails.messaging.accounts.list.errors.server.title",
-      description:
-        "app.api.emails.messaging.accounts.list.errors.server.description",
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.emails.messaging.accounts.list.errors.networkError.title",
-      description:
-        "app.api.emails.messaging.accounts.list.errors.networkError.description",
+      title: "errors.networkError.title",
+      description: "errors.networkError.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.emails.messaging.accounts.list.errors.unsavedChanges.title",
-      description:
-        "app.api.emails.messaging.accounts.list.errors.unsavedChanges.description",
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.emails.messaging.accounts.list.errors.unknown.title",
-      description:
-        "app.api.emails.messaging.accounts.list.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
   },
 
   successTypes: {
-    title: "app.api.emails.messaging.accounts.list.success.title",
-    description: "app.api.emails.messaging.accounts.list.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 
   examples: {

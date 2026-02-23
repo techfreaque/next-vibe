@@ -40,12 +40,15 @@ import type {
   ListImportJobsRequestOutput,
   ListImportJobsResponseOutput,
 } from "./definition";
-import type { DomainRecord, ImportRepository } from "./types";
+import type { scopedTranslation } from "./i18n";
+import type { DomainRecord } from "./types";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Generic Import Repository Implementation
  */
-export class ImportRepositoryImpl implements ImportRepository {
+export class ImportRepositoryImpl {
   /**
    * Import records from CSV (immediate processing)
    */
@@ -54,6 +57,7 @@ export class ImportRepositoryImpl implements ImportRepository {
     uploadedBy: DbId,
     domainRepository: DomainImportRepository<T>,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<LeadsImportResponseOutput>> {
     try {
       logger.debug("Starting CSV import", {
@@ -70,6 +74,7 @@ export class ImportRepositoryImpl implements ImportRepository {
           uploadedBy,
           domainRepository.getDomainName(),
           logger,
+          t,
         );
       }
 
@@ -79,8 +84,7 @@ export class ImportRepositoryImpl implements ImportRepository {
 
       if (rows.length === 0) {
         return fail({
-          message:
-            "app.admin.leads.leadsErrors.leadsImport.post.error.validation.title",
+          message: t("csv.post.errors.validation.title"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
@@ -154,8 +158,7 @@ export class ImportRepositoryImpl implements ImportRepository {
     } catch (error) {
       logger.error("Error importing CSV", parseError(error).message);
       return fail({
-        message:
-          "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        message: t("csv.post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -169,6 +172,7 @@ export class ImportRepositoryImpl implements ImportRepository {
     uploadedBy: DbId,
     domainName: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<LeadsImportResponseOutput>> {
     try {
       // Decode CSV to get total rows
@@ -218,8 +222,7 @@ export class ImportRepositoryImpl implements ImportRepository {
 
       if (!createdJob) {
         return fail({
-          message:
-            "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+          message: t("csv.post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -242,8 +245,7 @@ export class ImportRepositoryImpl implements ImportRepository {
     } catch (error) {
       logger.error("Error creating chunked import job", parseError(error));
       return fail({
-        message:
-          "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        message: t("csv.post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -256,6 +258,7 @@ export class ImportRepositoryImpl implements ImportRepository {
     jobId: string,
     userId: DbId,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<ImportJobsListResponseType[0]>> {
     try {
       const job = await db
@@ -271,8 +274,7 @@ export class ImportRepositoryImpl implements ImportRepository {
 
       if (!job[0]) {
         return fail({
-          message:
-            "app.admin.leads.leadsErrors.leads.get.error.not_found.title",
+          message: t("csv.post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -300,7 +302,7 @@ export class ImportRepositoryImpl implements ImportRepository {
     } catch (error) {
       logger.error("Error getting CSV import job status", parseError(error));
       return fail({
-        message: "app.admin.leads.leadsErrors.leads.get.error.server.title",
+        message: t("jobs.get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -313,6 +315,7 @@ export class ImportRepositoryImpl implements ImportRepository {
     jobId: string,
     domainRepository: DomainImportRepository<T>,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<{ processed: number; hasMore: boolean }>> {
     try {
       // Get the job
@@ -324,8 +327,7 @@ export class ImportRepositoryImpl implements ImportRepository {
 
       if (!job) {
         return fail({
-          message:
-            "app.admin.leads.leadsErrors.leads.get.error.not_found.title",
+          message: t("csv.post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -433,8 +435,7 @@ export class ImportRepositoryImpl implements ImportRepository {
         .where(eq(csvImportJobs.id, jobId));
 
       return fail({
-        message:
-          "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        message: t("csv.post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -579,10 +580,9 @@ export class ImportRepositoryImpl implements ImportRepository {
    * Import CSV wrapper for route handlers
    * NOTE: This is a placeholder. Domain-specific import should use importFromCsv with domain repository
    */
-  importCsv(): ResponseType<ImportCsvResponseOutput> {
+  importCsv(t: ModuleT): ResponseType<ImportCsvResponseOutput> {
     return fail({
-      message:
-        "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+      message: t("csv.post.errors.server.title"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
@@ -594,6 +594,7 @@ export class ImportRepositoryImpl implements ImportRepository {
     userId: DbId,
     options: ListImportJobsRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<ListImportJobsResponseOutput>> {
     try {
       const { status = "all", limit = 50, offset = 0 } = options;
@@ -651,7 +652,7 @@ export class ImportRepositoryImpl implements ImportRepository {
     } catch (error) {
       logger.error("Error listing import jobs", parseError(error).message);
       return fail({
-        message: "app.admin.leads.leadsErrors.leads.get.error.server.title",
+        message: t("jobs.get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -668,6 +669,7 @@ export class ImportRepositoryImpl implements ImportRepository {
       maxRetries?: number;
     },
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<ImportJobUpdateResponseType>> {
     try {
       // First verify the job belongs to the user
@@ -684,7 +686,7 @@ export class ImportRepositoryImpl implements ImportRepository {
 
       if (existingJob.length === 0) {
         return fail({
-          message: "app.admin.leads.leadsErrors.leads.get.error.server.title",
+          message: t("jobs.get.errors.server.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -697,7 +699,7 @@ export class ImportRepositoryImpl implements ImportRepository {
         existingJobData.status === CsvImportJobStatus.FAILED
       ) {
         return fail({
-          message: "app.admin.leads.leadsErrors.leads.get.error.server.title",
+          message: t("jobs.get.errors.server.title"),
           errorType: ErrorResponseTypes.CONFLICT,
         });
       }
@@ -714,8 +716,7 @@ export class ImportRepositoryImpl implements ImportRepository {
 
       if (updatedJobs.length === 0) {
         return fail({
-          message:
-            "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+          message: t("csv.post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -743,8 +744,7 @@ export class ImportRepositoryImpl implements ImportRepository {
     } catch (error) {
       logger.error("Error updating import job", parseError(error).message);
       return fail({
-        message:
-          "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        message: t("csv.post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -757,6 +757,7 @@ export class ImportRepositoryImpl implements ImportRepository {
     userId: DbId,
     jobId: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<{ success: boolean; message: TranslationKey }>> {
     try {
       // Verify job exists and belongs to user
@@ -772,8 +773,7 @@ export class ImportRepositoryImpl implements ImportRepository {
 
       if (existingJob.length === 0) {
         return fail({
-          message:
-            "app.admin.leads.leadsErrors.leadsImport.delete.error.not_found.title",
+          message: t("csv.post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -789,8 +789,7 @@ export class ImportRepositoryImpl implements ImportRepository {
     } catch (error) {
       logger.error("Error deleting import job:", parseError(error).message);
       return fail({
-        message:
-          "app.admin.leads.leadsErrors.leadsImport.delete.error.server.title",
+        message: t("csv.post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -806,8 +805,15 @@ export class ImportRepositoryImpl implements ImportRepository {
     userId: DbId,
     jobId: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<{ result: { success: boolean; message: string } }>> {
-    const response = await this.performJobAction(userId, jobId, "stop", logger);
+    const response = await this.performJobAction(
+      userId,
+      jobId,
+      "stop",
+      logger,
+      t,
+    );
     if (!response.success) {
       return response;
     }
@@ -821,12 +827,14 @@ export class ImportRepositoryImpl implements ImportRepository {
     userId: DbId,
     jobId: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<{ result: { success: boolean; message: string } }>> {
     const response = await this.performJobAction(
       userId,
       jobId,
       "retry",
       logger,
+      t,
     );
     if (!response.success) {
       return response;
@@ -842,6 +850,7 @@ export class ImportRepositoryImpl implements ImportRepository {
     jobId: string,
     action: "stop" | "retry",
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<{ success: boolean; message: TranslationKey }>> {
     try {
       // First verify the job belongs to the user
@@ -858,7 +867,7 @@ export class ImportRepositoryImpl implements ImportRepository {
 
       if (existingJob.length === 0) {
         return fail({
-          message: "app.admin.leads.leadsErrors.leads.get.error.server.title",
+          message: t("jobs.get.errors.server.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -872,8 +881,7 @@ export class ImportRepositoryImpl implements ImportRepository {
             job.status !== CsvImportJobStatus.PENDING
           ) {
             return fail({
-              message:
-                "app.admin.leads.leadsErrors.leads.get.error.server.title",
+              message: t("jobs.get.errors.server.title"),
               errorType: ErrorResponseTypes.CONFLICT,
             });
           }
@@ -898,8 +906,7 @@ export class ImportRepositoryImpl implements ImportRepository {
         case "retry":
           if (job.status !== CsvImportJobStatus.FAILED) {
             return fail({
-              message:
-                "app.admin.leads.leadsErrors.leads.get.error.server.title",
+              message: t("jobs.get.errors.server.title"),
               errorType: ErrorResponseTypes.CONFLICT,
             });
           }
@@ -924,15 +931,14 @@ export class ImportRepositoryImpl implements ImportRepository {
 
         default:
           return fail({
-            message: "app.admin.leads.leadsErrors.leads.get.error.server.title",
+            message: t("jobs.get.errors.server.title"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
           });
       }
     } catch (error) {
       logger.error("Error performing job action", parseError(error).message);
       return fail({
-        message:
-          "app.admin.leads.leadsErrors.leadsImport.post.error.server.title",
+        message: t("csv.post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -18,6 +18,8 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+
+import { scopedTranslation } from "./i18n";
 
 /**
  * Seeds generation response schema
@@ -37,96 +39,95 @@ export const seedsGenerationResponseSchema = z.object({
  * POST endpoint definition - Generate seeds
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "generators", "seeds"],
-  title: "app.api.system.generators.seeds.post.title",
-  description: "app.api.system.generators.seeds.post.description",
-  category: "app.api.system.category",
-  tags: ["app.api.system.generators.seeds.success.generated"],
+  title: "post.title",
+  description: "post.description",
+  category: "category",
+  tags: ["success.generated"],
   icon: "leaf",
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.db.seed.post.title",
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      outputDir: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.title",
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      outputDir: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.system.db.seed.post.title",
-        description: "app.api.system.db.seed.post.description",
+        label: "post.title",
+        description: "post.description",
         columns: 6,
         schema: z.string().default("src/app/api/[locale]/system/generated"),
       }),
 
-      includeTestData: requestField({
+      includeTestData: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.db.seed.post.title",
-        description: "app.api.system.db.seed.post.description",
+        label: "post.title",
+        description: "post.description",
         columns: 3,
         schema: z.boolean().default(true),
       }),
 
-      includeProdData: requestField({
+      includeProdData: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.db.seed.post.title",
-        description: "app.api.system.db.seed.post.description",
+        label: "post.title",
+        description: "post.description",
         columns: 3,
         schema: z.boolean().default(false),
       }),
 
-      verbose: requestField({
+      verbose: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.db.seed.post.title",
-        description: "app.api.system.db.seed.post.description",
+        label: "post.title",
+        description: "post.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
-      dryRun: requestField({
+      dryRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.db.seed.post.title",
-        description: "app.api.system.db.seed.post.description",
+        label: "post.title",
+        description: "post.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.seed.post.title",
+        content: "post.title",
         schema: z.boolean(),
       }),
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.seed.post.title",
+        content: "post.title",
         schema: z.string(),
       }),
-      seedsFound: responseField({
+      seedsFound: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.seed.post.title",
+        content: "post.title",
         schema: z.coerce.number(),
       }),
-      duration: responseField({
+      duration: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.seed.post.title",
+        content: "post.title",
         schema: z.coerce.number(),
       }),
-      outputPath: responseField({
+      outputPath: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.seed.post.title",
+        content: "post.title",
         schema: z.string(),
       }),
     },
-  ),
+  }),
 
   examples: {
     requests: {
@@ -150,54 +151,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.generators.seeds.post.errors.validation.title",
-      description:
-        "app.api.system.generators.seeds.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.generators.seeds.post.errors.unauthorized.title",
-      description:
-        "app.api.system.generators.seeds.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.generators.seeds.post.errors.forbidden.title",
-      description:
-        "app.api.system.generators.seeds.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.generators.seeds.post.errors.notFound.title",
-      description:
-        "app.api.system.generators.seeds.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.generators.seeds.post.errors.server.title",
-      description:
-        "app.api.system.generators.seeds.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.generators.seeds.post.errors.unknown.title",
-      description:
-        "app.api.system.generators.seeds.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.generators.seeds.post.errors.unsavedChanges.title",
-      description:
-        "app.api.system.generators.seeds.post.errors.unsavedChanges.description",
+      title: "post.errors.unsavedChanges.title",
+      description: "post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.generators.seeds.post.errors.conflict.title",
-      description:
-        "app.api.system.generators.seeds.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.generators.seeds.post.errors.network.title",
-      description:
-        "app.api.system.generators.seeds.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
   },
   successTypes: {
-    title: "app.api.system.generators.seeds.post.success.title",
-    description: "app.api.system.generators.seeds.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 });
 

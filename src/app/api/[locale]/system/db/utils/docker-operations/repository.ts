@@ -16,13 +16,14 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { formatDuration } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import type {
   DockerOperationRequestOutput,
   DockerOperationResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Docker command constants
@@ -61,13 +62,13 @@ function shouldHideLogLine(line: string): boolean {
 export interface DockerOperationsRepository {
   executeCommand(
     data: DockerOperationRequestOutput,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<DockerOperationResponseOutput>>;
 
   dockerComposeUp(
     logger: EndpointLogger,
-    locale: CountryLanguage,
+    t: ModuleT,
     composeFile?: string,
     timeout?: number,
     projectName?: string,
@@ -75,7 +76,7 @@ export interface DockerOperationsRepository {
 
   dockerComposeDown(
     logger: EndpointLogger,
-    locale: CountryLanguage,
+    t: ModuleT,
     composeFile?: string,
     timeout?: number,
     projectName?: string,
@@ -91,7 +92,7 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
    */
   async executeCommand(
     data: DockerOperationRequestOutput,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<DockerOperationResponseOutput>> {
     try {
@@ -110,7 +111,7 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
         timeout,
         hideStandardLogs,
         description,
-        locale,
+        t,
         logger,
       });
 
@@ -128,8 +129,7 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
       logger.error("🗄️  Docker command execution failed", parsedError);
 
       return fail({
-        message:
-          "app.api.system.db.utils.dockerOperations.errors.executionFailed.title",
+        message: t("errors.executionFailed.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -141,14 +141,13 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
    */
   async dockerComposeDown(
     logger: EndpointLogger,
-    locale: CountryLanguage,
+    t: ModuleT,
     composeFile = "docker-compose-dev.yml",
     timeout = 30000,
     projectName?: string,
   ): Promise<ResponseType<boolean>> {
     try {
       const startTime = Date.now();
-      const { t } = simpleT(locale);
       const commandParts = [];
       commandParts.push("docker");
       commandParts.push("compose");
@@ -163,8 +162,8 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
       const result = await this.executeDockerCommandInternal(command, {
         timeout,
         hideStandardLogs: true,
-        description: t("app.api.system.db.utils.docker.stopping_containers"),
-        locale,
+        description: "Stopping Docker containers...",
+        t,
         logger,
       });
 
@@ -179,8 +178,7 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
       logger.error("🗄️ Docker Compose down failed", parsedError);
 
       return fail({
-        message:
-          "app.api.system.db.utils.dockerOperations.errors.composeDownFailed.title",
+        message: t("errors.composeDownFailed.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -192,14 +190,13 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
    */
   async dockerComposeUp(
     logger: EndpointLogger,
-    locale: CountryLanguage,
+    t: ModuleT,
     composeFile = "docker-compose-dev.yml",
     timeout = 60000,
     projectName?: string,
   ): Promise<ResponseType<boolean>> {
     try {
       const startTime = Date.now();
-      const { t } = simpleT(locale);
       const commandParts = [];
       commandParts.push("docker");
       commandParts.push("compose");
@@ -215,8 +212,8 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
       const result = await this.executeDockerCommandInternal(command, {
         timeout,
         hideStandardLogs: true,
-        description: t("app.api.system.db.utils.docker.starting_containers"),
-        locale,
+        description: "Starting Docker containers...",
+        t,
         logger,
       });
 
@@ -231,8 +228,7 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
       logger.error("🗄️  Docker Compose up failed", parsedError);
 
       return fail({
-        message:
-          "app.api.system.db.utils.dockerOperations.errors.composeUpFailed.title",
+        message: t("errors.composeUpFailed.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -248,7 +244,7 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
       timeout?: number;
       hideStandardLogs?: boolean;
       description?: string;
-      locale: CountryLanguage;
+      t: ModuleT;
       logger: EndpointLogger;
     },
   ): Promise<{ success: boolean; output: string; error?: string }> {
@@ -256,22 +252,15 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
       timeout = 30000,
       hideStandardLogs = true,
       description,
-      locale,
+      t,
       logger,
     } = options;
-
-    const { t } = simpleT(locale);
 
     return await new Promise((resolve) => {
       if (description) {
         logger.debug(description);
       } else {
-        logger.debug(
-          t(
-            "app.api.system.db.utils.dockerOperations.messages.executingCommand",
-            { command },
-          ),
-        );
+        logger.debug(t("messages.executingCommand", { command }));
       }
 
       const args = command.split(" ");
@@ -293,13 +282,10 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
           }
           resolved = true;
           child.kill("SIGTERM");
-          const errorMessage = t(
-            "app.api.system.db.utils.dockerOperations.messages.timeoutError",
-            {
-              timeout,
-              command,
-            },
-          );
+          const errorMessage = t("messages.timeoutError", {
+            timeout,
+            command,
+          });
           reject(new Error(errorMessage));
         }, timeout);
       });
@@ -357,13 +343,10 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
 
         if (!success && error) {
           logger.error(
-            t(
-              "app.api.system.db.utils.dockerOperations.messages.commandFailed",
-              {
-                code: String(code),
-                command,
-              },
-            ),
+            t("messages.commandFailed", {
+              code: String(code),
+              command,
+            }),
           );
         }
 
@@ -382,13 +365,7 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
         }
         resolved = true;
         clearTimeout(timeoutId);
-        logger.error(
-          t(
-            "app.api.system.db.utils.dockerOperations.messages.executionFailed",
-            { command },
-          ),
-          err,
-        );
+        logger.error(t("messages.executionFailed", { command }), err);
         // eslint-disable-next-line @typescript-eslint/no-floating-promises, eslint-plugin-promise/no-multiple-resolved
         resolve({
           success: false,
@@ -407,7 +384,7 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
         timeoutPromise,
       ]).catch((err: Error) => {
         logger.error(
-          t("app.api.system.db.utils.dockerOperations.messages.commandError", {
+          t("messages.commandError", {
             error: err.message,
           }),
         );

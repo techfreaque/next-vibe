@@ -1,6 +1,12 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Abrechnung",
+  tags: {
+    payment: "zahlung",
+    invoice: "rechnung",
+    transactions: "transaktionen",
+  },
   defaultItem: "Rechnungsposition",
   success: {
     created: "Rechnung erfolgreich erstellt",
@@ -90,6 +96,9 @@ export const translations: typeof enTranslations = {
     label: "Währung",
     description: "Währungscode",
     placeholder: "Währung auswählen",
+    usd: "US-Dollar (USD)",
+    eur: "Euro (EUR)",
+    pln: "Polnischer Zloty (PLN)",
   },
   description: {
     label: "Beschreibung",

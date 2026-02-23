@@ -14,8 +14,7 @@ import {
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
-import { simpleT } from "@/i18n/core/shared";
-
+import { scopedTranslation as reactScopedTranslation } from "../../../../react/i18n";
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import {
   getIconSizeClassName,
@@ -47,7 +46,7 @@ export function PaginationWidget<
 >): JSX.Element {
   const locale = useWidgetLocale();
   const form = useWidgetForm();
-  const { t } = simpleT(locale);
+  const { t } = reactScopedTranslation.scopedT(locale);
   const {
     showBorder = true,
     padding,
@@ -128,14 +127,11 @@ export function PaginationWidget<
         )}
       >
         <Span>
-          {t(
-            "app.api.system.unifiedInterface.react.widgets.pagination.showing",
-            {
-              start: startItem,
-              end: endItem,
-              total,
-            },
-          )}
+          {t("widgets.pagination.showing", {
+            start: startItem,
+            end: endItem,
+            total,
+          })}
         </Span>
       </Div>
 
@@ -144,9 +140,7 @@ export function PaginationWidget<
           <Span
             className={cn("text-muted-foreground", textSizeClass || "text-sm")}
           >
-            {t(
-              "app.api.system.unifiedInterface.react.widgets.pagination.itemsPerPage",
-            )}
+            {t("widgets.pagination.itemsPerPage")}
           </Span>
           <Select value={`${limit}`} onValueChange={handleLimitChange}>
             <SelectTrigger className={selectWidthClass}>
@@ -172,13 +166,10 @@ export function PaginationWidget<
           </Button>
 
           <Span className={cn("font-medium", textSizeClass || "text-sm")}>
-            {t(
-              "app.api.system.unifiedInterface.react.widgets.pagination.page",
-              {
-                current: page,
-                total: totalPages,
-              },
-            )}
+            {t("widgets.pagination.page", {
+              current: page,
+              total: totalPages,
+            })}
           </Span>
 
           <Button

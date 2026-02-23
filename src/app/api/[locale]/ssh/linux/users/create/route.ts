@@ -11,7 +11,7 @@ import { LinuxUserCreateRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger }) =>
-      LinuxUserCreateRepository.create(data, logger),
+    handler: ({ data, logger, t }) =>
+      LinuxUserCreateRepository.create(data, logger, t),
   },
 });

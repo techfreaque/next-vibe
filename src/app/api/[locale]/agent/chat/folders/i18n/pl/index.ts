@@ -7,6 +7,19 @@ import { translations as rootPermissionsTranslations } from "../../root-permissi
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Chat",
+  tags: {
+    folders: "Foldery",
+  },
+  config: {
+    folders: {
+      private: "Prywatne czaty",
+      shared: "Udostępnione czaty",
+      public: "Publiczne czaty",
+      incognito: "Czaty incognito",
+      cron: "Wątki cron",
+    },
+  },
   id: idTranslations,
   rootPermissions: rootPermissionsTranslations,
   get: {

@@ -8,13 +8,13 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import type { JwtPrivatePayloadType } from "../user/auth/types";
 import { UserDetailLevel } from "../user/enum";
 import { UserRepository } from "../user/repository";
 import { UserPermissionRole, UserRole } from "../user/user-roles/enum";
 import type { UserCreateRequestOutput } from "./create/definition";
+import { scopedTranslation as createScopedTranslation } from "./create/i18n";
 import { userCreateRepository } from "./create/repository";
 
 /**
@@ -132,6 +132,7 @@ export async function dev(
         const emailExistsResponse = await UserRepository.emailExists(
           userData.basicInfo.email,
           logger,
+          locale,
         );
 
         if (emailExistsResponse.success && emailExistsResponse.data) {
@@ -140,7 +141,7 @@ export async function dev(
           );
           continue;
         }
-        const { t } = simpleT(locale);
+        const { t } = createScopedTranslation.scopedT(locale);
 
         // Create the user
         const createResponse = await userCreateRepository.createUser(
@@ -241,13 +242,14 @@ export async function test(
     const emailExistsResponse = await UserRepository.emailExists(
       testUserData.basicInfo.email,
       logger,
+      locale,
     );
 
     if (emailExistsResponse.success && emailExistsResponse.data) {
       logger.debug("Test management user already exists, skipping creation");
       return;
     }
-    const { t } = simpleT(locale);
+    const { t } = createScopedTranslation.scopedT(locale);
 
     // Create test user
     const createResponse = await userCreateRepository.createUser(

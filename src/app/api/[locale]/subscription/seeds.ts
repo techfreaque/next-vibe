@@ -12,6 +12,7 @@ import { UserRepository } from "@/app/api/[locale]/user/repository";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { contactClientRepository } from "../contact/repository-client";
+import { scopedTranslation as creditsScopedTranslation } from "../credits/i18n";
 import { CreditRepository } from "../credits/repository";
 import { PaymentProvider } from "../payment/enum";
 import type { NewSubscription } from "./db";
@@ -65,6 +66,7 @@ export async function dev(
   if (!ENABLED) {
     return;
   }
+  const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
   try {
     // NOTE: Demo user intentionally does NOT get a subscription by default
     // This allows testing the subscription purchase flow
@@ -149,6 +151,8 @@ export async function dev(
       const balanceResult = await CreditRepository.getBalance(
         { leadId: userLead.leadId, userId: demoUser.id },
         logger,
+        creditsT,
+        locale,
       );
       const hasCredits = balanceResult.success && balanceResult.data.total > 0;
 
@@ -269,6 +273,8 @@ export async function dev(
         const balanceResult = await CreditRepository.getBalance(
           { leadId: userLead.leadId, userId: adminUser.id },
           logger,
+          creditsT,
+          locale,
         );
         const hasCredits =
           balanceResult.success && balanceResult.data.total > 0;
@@ -293,6 +299,7 @@ export async function dev(
             subscriptionCredits,
             "subscription",
             logger,
+            creditsT,
             expiresAt,
           );
 
@@ -409,6 +416,8 @@ export async function dev(
         const balanceResult = await CreditRepository.getBalance(
           { leadId: userLead.leadId, userId: lowCreditsUser.id },
           logger,
+          creditsT,
+          locale,
         );
         const hasCredits =
           balanceResult.success && balanceResult.data.total > 0;
@@ -425,6 +434,7 @@ export async function dev(
             3,
             "subscription",
             logger,
+            creditsT,
             expiresAt,
           );
 

@@ -57,13 +57,16 @@ const templateLoaders: Record<string, () => Promise<AnyEmailTemplate>> = {
  * Contains only metadata (id, version, name, description, category)
  * Actual components are lazy-loaded
  */
-export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
+export const templateMetadataMap: Record<
+  string,
+  TemplateCachedMetadata<string>
+> = {
   "contact-form": {
     id: "contact-form",
     version: "1.0.0",
-    name: "app.api.emails.templates.contact.form.meta.name",
-    description: "app.api.emails.templates.contact.form.meta.description",
-    category: "contact",
+    name: "emailTemplates.contactForm.meta.name",
+    description: "emailTemplates.contactForm.meta.description",
+    category: "emailTemplates.contactForm.meta.category",
     path: "/src/app/api/[locale]/contact/email.tsx",
     exampleProps: {
       name: "Max Mustermann",
@@ -80,19 +83,18 @@ export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
   "newsletter-unsubscribe": {
     id: "newsletter-unsubscribe",
     version: "1.0.0",
-    name: "app.api.emails.templates.newsletter.unsubscribe.meta.name",
-    description:
-      "app.api.emails.templates.newsletter.unsubscribe.meta.description",
-    category: "newsletter",
+    name: "emailTemplates.unsubscribe.name",
+    description: "emailTemplates.unsubscribe.description",
+    category: "emailTemplates.unsubscribe.category",
     path: "/src/app/api/[locale]/newsletter/unsubscribe/email.tsx",
     exampleProps: { email: "max@example.com" },
   },
   "newsletter-welcome": {
     id: "newsletter-welcome",
     version: "1.0.0",
-    name: "app.api.emails.templates.newsletter.welcome.meta.name",
-    description: "app.api.emails.templates.newsletter.welcome.meta.description",
-    category: "newsletter",
+    name: "emailTemplates.welcome.name",
+    description: "emailTemplates.welcome.description",
+    category: "emailTemplates.welcome.category",
     path: "/src/app/api/[locale]/newsletter/subscribe/email.tsx",
     exampleProps: {
       email: "max@example.com",
@@ -104,10 +106,9 @@ export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
   "password-reset-confirm": {
     id: "password-reset-confirm",
     version: "1.0.0",
-    name: "app.api.emails.templates.password.reset.confirm.meta.name",
-    description:
-      "app.api.emails.templates.password.reset.confirm.meta.description",
-    category: "auth",
+    name: "emailTemplates.confirm.name",
+    description: "emailTemplates.confirm.description",
+    category: "emailTemplates.confirm.category",
     path: "/src/app/api/[locale]/user/public/reset-password/confirm/email.tsx",
     exampleProps: {
       publicName: "Max Mustermann",
@@ -117,10 +118,9 @@ export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
   "password-reset-request": {
     id: "password-reset-request",
     version: "1.0.0",
-    name: "app.api.emails.templates.password.reset.request.meta.name",
-    description:
-      "app.api.emails.templates.password.reset.request.meta.description",
-    category: "auth",
+    name: "emailTemplates.request.name",
+    description: "emailTemplates.request.description",
+    category: "emailTemplates.request.category",
     path: "/src/app/api/[locale]/user/public/reset-password/request/email.tsx",
     exampleProps: {
       publicName: "Max Mustermann",
@@ -131,10 +131,9 @@ export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
   "signup-welcome": {
     id: "signup-welcome",
     version: "1.0.0",
-    name: "app.admin.emails.templates.templates.signup.welcome.meta.name",
-    description:
-      "app.admin.emails.templates.templates.signup.welcome.meta.description",
-    category: "auth",
+    name: "emailTemplates.welcome.name",
+    description: "emailTemplates.welcome.description",
+    category: "emailTemplates.welcome.category",
     path: "/src/app/api/[locale]/user/public/signup/email.tsx",
     exampleProps: {
       privateName: "Max",
@@ -145,10 +144,9 @@ export const templateMetadataMap: Record<string, TemplateCachedMetadata> = {
   "subscription-success": {
     id: "subscription-success",
     version: "1.0.0",
-    name: "app.api.emails.templates.subscription.success.meta.name",
-    description:
-      "app.api.emails.templates.subscription.success.meta.description",
-    category: "subscription",
+    name: "emailTemplates.success.name",
+    description: "emailTemplates.success.description",
+    category: "emailTemplates.success.category",
     path: "/src/app/api/[locale]/subscription/email.tsx",
     exampleProps: {
       privateName: "Max",
@@ -179,7 +177,7 @@ export async function getTemplate(
  */
 export function getTemplateMetadata(
   id: string,
-): TemplateCachedMetadata | undefined {
+): TemplateCachedMetadata<string> | undefined {
   return templateMetadataMap[id];
 }
 
@@ -193,7 +191,7 @@ export function getAllTemplateIds(): string[] {
 /**
  * Get all template metadata (fast, no component loading)
  */
-export function getAllTemplateMetadata(): TemplateCachedMetadata[] {
+export function getAllTemplateMetadata(): TemplateCachedMetadata<string>[] {
   return Object.values(templateMetadataMap);
 }
 
@@ -202,7 +200,7 @@ export function getAllTemplateMetadata(): TemplateCachedMetadata[] {
  */
 export function getTemplatesByCategory(
   category: string,
-): TemplateCachedMetadata[] {
+): TemplateCachedMetadata<string>[] {
   return getAllTemplateMetadata().filter((t) => t.category === category);
 }
 

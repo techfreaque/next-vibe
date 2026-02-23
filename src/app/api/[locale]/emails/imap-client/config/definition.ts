@@ -7,11 +7,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  objectField,
-  requestField,
-  responseField,
+  scopedBackButton,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -23,276 +23,262 @@ import {
 
 import { UserRole } from "../../../user/user-roles/enum";
 import { ImapLoggingLevel, ImapLoggingLevelOptions } from "./enum";
+import { scopedTranslation } from "./i18n";
 import { ImapConfigContainer } from "./widget";
 
 /**
  * Get IMAP Configuration Endpoint (GET)
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["emails", "imap-client", "config"],
-  category: "app.api.emails.category" as const,
+  category: "category" as const,
   allowedRoles: [UserRole.ADMIN],
 
-  title: "app.api.emails.imapClient.config.title" as const,
-  description: "app.api.emails.imapClient.config.description" as const,
+  title: "title" as const,
+  description: "description" as const,
   icon: "settings",
-  tags: ["app.api.emails.imapClient.tags.config" as const],
+  tags: ["tags.config" as const],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.emails.imapClient.config.form.title" as const,
-      description: "app.api.emails.imapClient.config.form.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "form.title" as const,
+    description: "form.description" as const,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { response: true },
+    children: {
       // Host field
-      host: responseField({
+      host: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.host",
+        content: "response.host",
         schema: z.string().min(1),
       }),
 
       // Port field
-      port: responseField({
+      port: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.port",
+        content: "response.port",
         schema: z.coerce.number().int().min(1).max(65535),
       }),
 
       // Username field
-      username: responseField({
+      username: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.username",
+        content: "response.username",
         schema: z.string().min(1),
       }),
 
       // Password field
-      password: responseField({
+      password: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.password",
+        content: "response.password",
         schema: z.string().min(1),
       }),
 
       // TLS field
-      tls: responseField({
+      tls: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.tls",
+        content: "response.tls",
         schema: z.boolean(),
       }),
 
       // Auto-reconnect field
-      autoReconnect: responseField({
+      autoReconnect: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.autoReconnect",
+        content: "response.autoReconnect",
         schema: z.boolean(),
       }),
 
       // Logging level field
-      loggingLevel: responseField({
+      loggingLevel: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.loggingLevel",
+        content: "response.loggingLevel",
         schema: z.enum(ImapLoggingLevel),
       }),
 
       // Server configuration fields
-      serverEnabled: responseField({
+      serverEnabled: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.serverEnabled",
+        content: "response.serverEnabled",
         schema: z.boolean(),
       }),
 
-      maxConnections: responseField({
+      maxConnections: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.maxConnections",
+        content: "response.maxConnections",
         schema: z.coerce.number().int().min(1),
       }),
 
-      connectionTimeout: responseField({
+      connectionTimeout: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.connectionTimeout",
+        content: "response.connectionTimeout",
         schema: z.coerce.number().int().min(1),
       }),
 
-      poolIdleTimeout: responseField({
+      poolIdleTimeout: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.poolIdleTimeout",
+        content: "response.poolIdleTimeout",
         schema: z.coerce.number().int().min(1),
       }),
 
-      keepAlive: responseField({
+      keepAlive: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.keepAlive",
+        content: "response.keepAlive",
         schema: z.boolean(),
       }),
 
       // Sync configuration fields
-      syncEnabled: responseField({
+      syncEnabled: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.syncEnabled",
+        content: "response.syncEnabled",
         schema: z.boolean(),
       }),
 
-      syncInterval: responseField({
+      syncInterval: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.syncInterval",
+        content: "response.syncInterval",
         schema: z.coerce.number().int().min(1),
       }),
 
-      maxMessages: responseField({
+      maxMessages: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.maxMessages",
+        content: "response.maxMessages",
         schema: z.coerce.number().int().min(1),
       }),
 
-      batchSize: responseField({
+      batchSize: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.batchSize",
+        content: "response.batchSize",
         schema: z.coerce.number().int().min(1),
       }),
 
-      concurrentAccounts: responseField({
+      concurrentAccounts: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.concurrentAccounts",
+        content: "response.concurrentAccounts",
         schema: z.coerce.number().int().min(1),
       }),
 
       // Performance configuration fields
-      cacheEnabled: responseField({
+      cacheEnabled: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.cacheEnabled",
+        content: "response.cacheEnabled",
         schema: z.boolean(),
       }),
 
-      cacheMaxSize: responseField({
+      cacheMaxSize: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.cacheMaxSize",
+        content: "response.cacheMaxSize",
         schema: z.coerce.number().int().min(1),
       }),
 
-      cacheTtl: responseField({
+      cacheTtl: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.cacheTtl",
+        content: "response.cacheTtl",
         schema: z.coerce.number().int().min(1),
       }),
 
-      memoryThreshold: responseField({
+      memoryThreshold: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.memoryThreshold",
+        content: "response.memoryThreshold",
         schema: z.coerce.number().int().min(1),
       }),
 
       // Resilience configuration fields
-      maxRetries: responseField({
+      maxRetries: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.maxRetries",
+        content: "response.maxRetries",
         schema: z.coerce.number().int().min(0),
       }),
 
-      retryDelay: responseField({
+      retryDelay: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.retryDelay",
+        content: "response.retryDelay",
         schema: z.coerce.number().int().min(1),
       }),
 
-      circuitBreakerThreshold: responseField({
+      circuitBreakerThreshold: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.config.response.circuitBreakerThreshold",
+        content: "response.circuitBreakerThreshold",
         schema: z.coerce.number().int().min(1),
       }),
 
-      circuitBreakerTimeout: responseField({
+      circuitBreakerTimeout: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.config.response.circuitBreakerTimeout",
+        content: "response.circuitBreakerTimeout",
         schema: z.coerce.number().int().min(1),
       }),
 
       // Monitoring configuration fields
-      healthCheckInterval: responseField({
+      healthCheckInterval: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.emails.imapClient.config.response.healthCheckInterval",
+        content: "response.healthCheckInterval",
         schema: z.coerce.number().int().min(1),
       }),
 
-      metricsEnabled: responseField({
+      metricsEnabled: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.metricsEnabled",
+        content: "response.metricsEnabled",
         schema: z.boolean(),
       }),
 
       // Development configuration fields
-      debugMode: responseField({
+      debugMode: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.debugMode",
+        content: "response.debugMode",
         schema: z.boolean(),
       }),
 
-      testMode: responseField({
+      testMode: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.response.testMode",
+        content: "response.testMode",
         schema: z.boolean(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.emails.imapClient.config.update.errors.validation.title" as const,
-      description:
-        "app.api.emails.imapClient.config.update.errors.validation.description" as const,
+      title: "update.errors.validation.title" as const,
+      description: "update.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description:
-        "app.api.emails.imapClient.config.errors.internal.description" as const,
+      title: "errors.internal.title" as const,
+      description: "errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.emails.imapClient.config.errors.unauthorized.title" as const,
-      description:
-        "app.api.emails.imapClient.config.errors.unauthorized.description" as const,
+      title: "errors.unauthorized.title" as const,
+      description: "errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description:
-        "app.api.emails.imapClient.config.errors.internal.description" as const,
+      title: "errors.internal.title" as const,
+      description: "errors.internal.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description:
-        "app.api.emails.imapClient.config.errors.internal.description" as const,
+      title: "errors.internal.title" as const,
+      description: "errors.internal.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description:
-        "app.api.emails.imapClient.config.errors.internal.description" as const,
+      title: "errors.internal.title" as const,
+      description: "errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description:
-        "app.api.emails.imapClient.config.errors.internal.description" as const,
+      title: "errors.internal.title" as const,
+      description: "errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description:
-        "app.api.emails.imapClient.config.errors.internal.description" as const,
+      title: "errors.internal.title" as const,
+      description: "errors.internal.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description:
-        "app.api.emails.imapClient.config.errors.internal.description" as const,
+      title: "errors.internal.title" as const,
+      description: "errors.internal.description" as const,
     },
   },
   successTypes: {
-    title: "app.api.emails.imapClient.config.title" as const,
-    description: "app.api.emails.imapClient.config.description" as const,
+    title: "title" as const,
+    description: "description" as const,
   },
 
   examples: {
@@ -367,329 +353,308 @@ const { GET } = createEndpoint({
  * Update IMAP Configuration Endpoint (POST)
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["emails", "imap-client", "config"],
-  category: "app.api.emails.category" as const,
+  category: "category" as const,
   allowedRoles: [UserRole.ADMIN],
 
-  title: "app.api.emails.imapClient.config.update.title" as const,
-  description: "app.api.emails.imapClient.config.update.description" as const,
+  title: "update.title" as const,
+  description: "update.description" as const,
   icon: "settings",
-  tags: ["app.api.emails.imapClient.tags.config" as const],
+  tags: ["tags.config" as const],
 
   fields: customWidgetObject({
     render: ImapConfigContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      backButton: backButton({ usage: { request: "data", response: true } }),
+      backButton: scopedBackButton(scopedTranslation, {
+        usage: { request: "data", response: true },
+      }),
 
       // Host field
-      host: requestField({
+      host: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.imapClient.config.serverEnabled.label",
-        description:
-          "app.api.emails.imapClient.config.serverEnabled.description",
-        placeholder:
-          "app.api.emails.imapClient.accounts.create.host.placeholder",
+        label: "serverEnabled.label",
+        description: "serverEnabled.description",
+        placeholder: "accounts.create.host.placeholder",
         columns: 6,
         schema: z.string().min(1),
       }),
 
       // Port field
-      port: requestField({
+      port: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.imapClient.config.maxConnections.label",
-        description:
-          "app.api.emails.imapClient.config.maxConnections.description",
-        placeholder:
-          "app.api.emails.imapClient.accounts.create.port.placeholder",
+        label: "maxConnections.label",
+        description: "maxConnections.description",
+        placeholder: "accounts.create.port.placeholder",
         columns: 6,
         schema: z.coerce.number().int().min(1).max(65535),
       }),
 
       // Username field
-      username: requestField({
+      username: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.emails.imapClient.accounts.create.username.label",
-        description:
-          "app.api.emails.imapClient.accounts.create.username.description",
-        placeholder:
-          "app.api.emails.imapClient.accounts.create.username.placeholder",
+        label: "accounts.create.username.label",
+        description: "accounts.create.username.description",
+        placeholder: "accounts.create.username.placeholder",
         columns: 6,
         schema: z.string().min(1),
       }),
 
       // Password field
-      password: requestField({
+      password: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
-        label: "app.api.emails.imapClient.accounts.create.password.label",
-        description:
-          "app.api.emails.imapClient.accounts.create.password.description",
-        placeholder:
-          "app.api.emails.imapClient.accounts.create.password.placeholder",
+        label: "accounts.create.password.label",
+        description: "accounts.create.password.description",
+        placeholder: "accounts.create.password.placeholder",
         columns: 6,
         schema: z.string().min(1),
       }),
 
       // TLS field
-      tls: requestField({
+      tls: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.emails.imapClient.accounts.create.secure.label",
-        description:
-          "app.api.emails.imapClient.accounts.create.secure.description",
+        label: "accounts.create.secure.label",
+        description: "accounts.create.secure.description",
         columns: 6,
         schema: z.boolean(),
       }),
 
       // Auto-reconnect field
-      autoReconnect: requestField({
+      autoReconnect: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.emails.imapClient.accounts.create.keepAlive.label",
-        description:
-          "app.api.emails.imapClient.accounts.create.keepAlive.description",
+        label: "accounts.create.keepAlive.label",
+        description: "accounts.create.keepAlive.description",
         columns: 6,
         schema: z.boolean(),
       }),
 
       // Logging level field
-      loggingLevel: requestField({
+      loggingLevel: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.emails.imapClient.config.loggingLevel.label",
-        description:
-          "app.api.emails.imapClient.config.loggingLevel.description",
+        label: "loggingLevel.label",
+        description: "loggingLevel.description",
         options: ImapLoggingLevelOptions,
         columns: 6,
         schema: z.enum(ImapLoggingLevel),
       }),
 
       // Server configuration fields
-      serverEnabled: requestField({
+      serverEnabled: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.emails.imapClient.config.serverEnabled.label",
-        description:
-          "app.api.emails.imapClient.config.serverEnabled.description",
+        label: "serverEnabled.label",
+        description: "serverEnabled.description",
         columns: 6,
         schema: z.boolean(),
       }),
 
-      maxConnections: requestField({
+      maxConnections: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.imapClient.config.response.maxConnections",
-        description:
-          "app.api.emails.imapClient.config.maxConnections.description",
+        label: "response.maxConnections",
+        description: "maxConnections.description",
         columns: 6,
         schema: z.coerce.number().int().min(1),
       }),
 
-      connectionTimeout: requestField({
+      connectionTimeout: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.imapClient.config.response.connectionTimeout",
-        description:
-          "app.api.emails.imapClient.config.connectionTimeout.description",
+        label: "response.connectionTimeout",
+        description: "connectionTimeout.description",
         columns: 6,
         schema: z.coerce.number().int().min(1),
       }),
 
-      poolIdleTimeout: requestField({
+      poolIdleTimeout: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.imapClient.config.response.poolIdleTimeout",
-        description:
-          "app.api.emails.imapClient.config.serverEnabled.description",
+        label: "response.poolIdleTimeout",
+        description: "serverEnabled.description",
         columns: 6,
         schema: z.coerce.number().int().min(1),
       }),
 
-      keepAlive: requestField({
+      keepAlive: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.emails.imapClient.config.response.keepAlive",
-        description:
-          "app.api.emails.imapClient.config.serverEnabled.description",
+        label: "response.keepAlive",
+        description: "serverEnabled.description",
         columns: 6,
         schema: z.boolean(),
       }),
 
       // Sync configuration fields
-      syncEnabled: requestField({
+      syncEnabled: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.emails.imapClient.config.syncEnabled.label",
-        description: "app.api.emails.imapClient.config.syncEnabled.description",
+        label: "syncEnabled.label",
+        description: "syncEnabled.description",
         columns: 6,
         schema: z.boolean(),
       }),
 
-      syncInterval: requestField({
+      syncInterval: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.imapClient.config.syncInterval.label",
-        description:
-          "app.api.emails.imapClient.config.syncInterval.description",
+        label: "syncInterval.label",
+        description: "syncInterval.description",
         columns: 6,
         schema: z.coerce.number().int().min(1),
       }),
 
-      maxMessages: requestField({
+      maxMessages: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.imapClient.config.response.maxMessages",
-        description: "app.api.emails.imapClient.sync.maxMessages.description",
+        label: "response.maxMessages",
+        description: "sync.maxMessages.description",
         columns: 6,
         schema: z.coerce.number().int().min(1),
       }),
 
-      batchSize: requestField({
+      batchSize: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.imapClient.config.response.batchSize",
-        description: "app.api.emails.imapClient.config.batchSize.description",
+        label: "response.batchSize",
+        description: "batchSize.description",
         columns: 6,
         schema: z.coerce.number().int().min(1),
       }),
 
-      concurrentAccounts: requestField({
+      concurrentAccounts: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.imapClient.config.response.concurrentAccounts",
-        description: "app.api.emails.imapClient.sync.accountIds.description",
+        label: "response.concurrentAccounts",
+        description: "sync.accountIds.description",
         columns: 6,
         schema: z.coerce.number().int().min(1),
       }),
 
       // Performance configuration fields
-      cacheEnabled: requestField({
+      cacheEnabled: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.emails.imapClient.config.response.cacheEnabled",
-        description:
-          "app.api.emails.imapClient.config.serverEnabled.description",
+        label: "response.cacheEnabled",
+        description: "serverEnabled.description",
         columns: 6,
         schema: z.boolean(),
       }),
 
-      cacheMaxSize: requestField({
+      cacheMaxSize: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.imapClient.config.response.cacheMaxSize",
-        description: "app.api.emails.imapClient.config.batchSize.description",
+        label: "response.cacheMaxSize",
+        description: "batchSize.description",
         columns: 6,
         schema: z.coerce.number().int().min(1),
       }),
 
-      cacheTtl: requestField({
+      cacheTtl: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.imapClient.config.response.cacheTtl",
-        description: "app.api.emails.imapClient.config.form.description",
+        label: "response.cacheTtl",
+        description: "form.description",
         columns: 6,
         schema: z.coerce.number().int().min(1),
       }),
 
-      memoryThreshold: requestField({
+      memoryThreshold: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.imapClient.config.response.memoryThreshold",
-        description: "app.api.emails.imapClient.config.form.description",
+        label: "response.memoryThreshold",
+        description: "form.description",
         columns: 6,
         schema: z.coerce.number().int().min(1),
       }),
 
       // Resilience configuration fields
-      maxRetries: requestField({
+      maxRetries: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.imapClient.config.response.maxRetries",
-        description: "app.api.emails.imapClient.config.response.maxRetries",
+        label: "response.maxRetries",
+        description: "response.maxRetries",
         columns: 6,
         schema: z.coerce.number().int().min(0),
       }),
 
-      retryDelay: requestField({
+      retryDelay: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.imapClient.config.response.retryDelay",
-        description: "app.api.emails.imapClient.config.response.retryDelay",
+        label: "response.retryDelay",
+        description: "response.retryDelay",
         columns: 6,
         schema: z.coerce.number().int().min(1),
       }),
 
-      circuitBreakerThreshold: requestField({
+      circuitBreakerThreshold: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.emails.imapClient.config.response.circuitBreakerThreshold",
-        description:
-          "app.api.emails.imapClient.config.response.circuitBreakerThreshold",
+        label: "response.circuitBreakerThreshold",
+        description: "response.circuitBreakerThreshold",
         columns: 6,
         schema: z.coerce.number().int().min(1),
       }),
 
-      circuitBreakerTimeout: requestField({
+      circuitBreakerTimeout: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.emails.imapClient.config.response.circuitBreakerTimeout",
-        description:
-          "app.api.emails.imapClient.config.response.circuitBreakerTimeout",
+        label: "response.circuitBreakerTimeout",
+        description: "response.circuitBreakerTimeout",
         columns: 6,
         schema: z.coerce.number().int().min(1),
       }),
 
       // Monitoring configuration fields
-      healthCheckInterval: requestField({
+      healthCheckInterval: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.emails.imapClient.config.response.healthCheckInterval",
-        description:
-          "app.api.emails.imapClient.config.syncInterval.description",
+        label: "response.healthCheckInterval",
+        description: "syncInterval.description",
         columns: 6,
         schema: z.coerce.number().int().min(1),
       }),
 
-      metricsEnabled: requestField({
+      metricsEnabled: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.emails.imapClient.config.response.metricsEnabled",
-        description:
-          "app.api.emails.imapClient.config.serverEnabled.description",
+        label: "response.metricsEnabled",
+        description: "serverEnabled.description",
         columns: 6,
         schema: z.boolean(),
       }),
 
       // Development configuration fields
-      debugMode: requestField({
+      debugMode: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.emails.imapClient.config.response.debugMode",
-        description: "app.api.emails.imapClient.config.debugMode.description",
+        label: "response.debugMode",
+        description: "debugMode.description",
         columns: 6,
         schema: z.boolean(),
       }),
 
-      testMode: requestField({
+      testMode: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.emails.imapClient.config.response.testMode",
-        description: "app.api.emails.imapClient.config.debugMode.description",
+        label: "response.testMode",
+        description: "debugMode.description",
         columns: 6,
         schema: z.boolean(),
       }),
 
       // Response message
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.emails.imapClient.config.update.response.message",
+        content: "update.response.message",
         schema: z.string(),
       }),
     },
@@ -697,57 +662,45 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.emails.imapClient.config.update.errors.validation.title" as const,
-      description:
-        "app.api.emails.imapClient.config.update.errors.validation.description" as const,
+      title: "update.errors.validation.title" as const,
+      description: "update.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description:
-        "app.api.emails.imapClient.config.errors.internal.description" as const,
+      title: "errors.internal.title" as const,
+      description: "errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.emails.imapClient.config.errors.unauthorized.title" as const,
-      description:
-        "app.api.emails.imapClient.config.errors.unauthorized.description" as const,
+      title: "errors.unauthorized.title" as const,
+      description: "errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description:
-        "app.api.emails.imapClient.config.errors.internal.description" as const,
+      title: "errors.internal.title" as const,
+      description: "errors.internal.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description:
-        "app.api.emails.imapClient.config.errors.internal.description" as const,
+      title: "errors.internal.title" as const,
+      description: "errors.internal.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description:
-        "app.api.emails.imapClient.config.errors.internal.description" as const,
+      title: "errors.internal.title" as const,
+      description: "errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description:
-        "app.api.emails.imapClient.config.errors.internal.description" as const,
+      title: "errors.internal.title" as const,
+      description: "errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description:
-        "app.api.emails.imapClient.config.errors.internal.description" as const,
+      title: "errors.internal.title" as const,
+      description: "errors.internal.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.emails.imapClient.config.errors.internal.title" as const,
-      description:
-        "app.api.emails.imapClient.config.errors.internal.description" as const,
+      title: "errors.internal.title" as const,
+      description: "errors.internal.description" as const,
     },
   },
   successTypes: {
-    title: "app.api.emails.imapClient.config.update.success.title" as const,
-    description:
-      "app.api.emails.imapClient.config.update.success.description" as const,
+    title: "update.success.title" as const,
+    description: "update.success.description" as const,
   },
 
   examples: {

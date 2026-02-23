@@ -22,12 +22,9 @@ import {
   convertLanguageFilter,
   type Countries,
   type CountryFilter,
-  type CountryLanguage,
   type LanguageFilter,
   type Languages,
 } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import { newsletterSubscriptions } from "../newsletter/db";
 import { NewsletterSubscriptionStatus } from "../newsletter/enum";
@@ -73,6 +70,7 @@ import type {
   LeadExportRequestOutput,
   LeadExportResponseOutput,
 } from "./export/definition";
+import type { scopedTranslation } from "./i18n";
 import type { LeadListGetRequestTypeOutput } from "./list/definition";
 import type { LeadEngagementResponseOutput } from "./tracking/engagement/definition";
 import type {
@@ -83,6 +81,8 @@ import type {
   LeadWithEmailType,
   UnsubscribeType,
 } from "./types";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Utility function to ensure a lead has an email
@@ -127,6 +127,7 @@ export class LeadsRepository {
   static async createLead(
     data: LeadCreateRequestTypeOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<
     ResponseType<{
       lead: {
@@ -171,8 +172,7 @@ export class LeadsRepository {
 
         if (existingLead.length > 0) {
           return fail({
-            message:
-              "app.api.leads.leadsErrors.leads.post.error.duplicate.title",
+            message: t("leadsErrors.leads.post.error.duplicate.title"),
             errorType: ErrorResponseTypes.CONFLICT,
           });
         }
@@ -245,7 +245,7 @@ export class LeadsRepository {
     } catch (error) {
       logger.error("Error creating lead", parseError(error));
       return fail({
-        message: "app.api.leads.leadsErrors.leads.post.error.server.title",
+        message: t("leadsErrors.leads.post.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -257,9 +257,10 @@ export class LeadsRepository {
   static async getLeadById(
     id: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<LeadDetailResponse>> {
     logger.debug("Getting lead by ID", { id });
-    return await LeadsRepository.getLeadByIdInternal(id, logger);
+    return await LeadsRepository.getLeadByIdInternal(id, logger, t);
   }
 
   /**
@@ -268,6 +269,7 @@ export class LeadsRepository {
   static async getLeadByTrackingId(
     leadId: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<LeadResponseType>> {
     try {
       logger.debug("Fetching lead by tracking ID", { leadId });
@@ -280,7 +282,7 @@ export class LeadsRepository {
 
       if (!lead) {
         return fail({
-          message: "app.api.leads.leadsErrors.leads.get.error.not_found.title",
+          message: t("leadsErrors.leads.get.error.not_found.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -289,7 +291,7 @@ export class LeadsRepository {
     } catch (error) {
       logger.error("Error fetching lead by tracking ID", parseError(error));
       return fail({
-        message: "app.api.leads.leadsErrors.leads.get.error.server.title",
+        message: t("leadsErrors.leads.get.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -301,6 +303,7 @@ export class LeadsRepository {
   static async getLeadByEmail(
     email: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<LeadResponseType>> {
     try {
       logger.debug("Fetching lead by email", { email });
@@ -313,7 +316,7 @@ export class LeadsRepository {
 
       if (!lead) {
         return fail({
-          message: "app.api.leads.leadsErrors.leads.get.error.not_found.title",
+          message: t("leadsErrors.leads.get.error.not_found.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -322,7 +325,7 @@ export class LeadsRepository {
     } catch (error) {
       logger.error("Error fetching lead by email", parseError(error));
       return fail({
-        message: "app.api.leads.leadsErrors.leads.get.error.server.title",
+        message: t("leadsErrors.leads.get.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -360,6 +363,7 @@ export class LeadsRepository {
       };
     },
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<LeadDetailResponse>> {
     try {
       logger.debug("Updating lead", {
@@ -396,11 +400,11 @@ export class LeadsRepository {
         const currentLeadResult = await LeadsRepository.getLeadByIdInternal(
           id,
           logger,
+          t,
         );
         if (!currentLeadResult.success) {
           return fail({
-            message:
-              "app.api.leads.leadsErrors.leads.patch.error.not_found.title",
+            message: t("leadsErrors.leads.patch.error.not_found.title"),
             errorType: ErrorResponseTypes.NOT_FOUND,
             cause: currentLeadResult,
           });
@@ -417,7 +421,7 @@ export class LeadsRepository {
             newStatus,
           });
           return fail({
-            message: "app.api.leads.leadsErrors.batch.update.error.default",
+            message: t("leadsErrors.batch.update.error.default"),
             errorType: ErrorResponseTypes.BAD_REQUEST,
           });
         }
@@ -434,11 +438,12 @@ export class LeadsRepository {
         id,
         flattenedData,
         logger,
+        t,
       );
     } catch (error) {
       logger.error("Error updating lead", parseError(error));
       return fail({
-        message: "app.api.leads.leadsErrors.leads.patch.error.server.title",
+        message: t("leadsErrors.leads.patch.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -450,6 +455,7 @@ export class LeadsRepository {
   static async listLeads(
     query: LeadListGetRequestTypeOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<LeadListResponseType>> {
     try {
       // Extract values from nested structure with type safety
@@ -625,7 +631,7 @@ export class LeadsRepository {
     } catch (error) {
       logger.error("Error listing leads", parseError(error));
       return fail({
-        message: "app.api.leads.leadsErrors.leads.get.error.server.title",
+        message: t("leadsErrors.leads.get.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -647,8 +653,14 @@ export class LeadsRepository {
       };
     },
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<LeadResponseType>> {
-    return await LeadsRepository.convertLeadInternal(leadId, options, logger);
+    return await LeadsRepository.convertLeadInternal(
+      leadId,
+      options,
+      logger,
+      t,
+    );
   }
 
   /**
@@ -737,6 +749,7 @@ export class LeadsRepository {
   static async unsubscribeLead(
     data: UnsubscribeType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<
     ResponseType<{ success: boolean; message?: string; unsubscribedAt?: Date }>
   > {
@@ -763,15 +776,16 @@ export class LeadsRepository {
         email = data.email;
       } else {
         return fail({
-          message:
-            "app.api.leads.leadsErrors.leadsUnsubscribe.post.error.validation.title",
+          message: t(
+            "leadsErrors.leadsUnsubscribe.post.error.validation.title",
+          ),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
 
       if (!email) {
         return fail({
-          message: "app.api.leads.leadsErrors.leads.get.error.not_found.title",
+          message: t("leadsErrors.leads.get.error.not_found.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -789,7 +803,7 @@ export class LeadsRepository {
 
       if (!updatedLead) {
         return fail({
-          message: "app.api.leads.leadsErrors.leads.get.error.not_found.title",
+          message: t("leadsErrors.leads.get.error.not_found.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -811,8 +825,7 @@ export class LeadsRepository {
 
       return success({
         success: true,
-        message:
-          "app.api.leads.leadsErrors.leadsUnsubscribe.post.success.description",
+        message: t("leadsErrors.leadsUnsubscribe.post.success.description"),
         unsubscribedAt: updatedLead.unsubscribedAt || undefined,
       });
     } catch (error) {
@@ -821,8 +834,7 @@ export class LeadsRepository {
         parseError(error),
       );
       return fail({
-        message:
-          "app.api.leads.leadsErrors.leadsUnsubscribe.post.error.server.title",
+        message: t("leadsErrors.leadsUnsubscribe.post.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -895,6 +907,7 @@ export class LeadsRepository {
   static async updateLeadStatusOnNewsletterUnsubscribe(
     email: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<{ success: boolean; leadFound: boolean }>> {
     try {
       logger.debug("Updating lead status on newsletter unsubscribe", { email });
@@ -948,7 +961,7 @@ export class LeadsRepository {
         parseError(error).message,
       );
       return fail({
-        message: "app.api.leads.leadsErrors.leads.get.error.server.title",
+        message: t("leadsErrors.leads.get.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -961,6 +974,7 @@ export class LeadsRepository {
   static async getLeadByIdInternal(
     id: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<LeadDetailResponse>> {
     try {
       logger.debug("Fetching lead by ID (internal)", { id });
@@ -973,7 +987,7 @@ export class LeadsRepository {
 
       if (!lead) {
         return fail({
-          message: "app.api.leads.leadsErrors.leads.get.error.not_found.title",
+          message: t("leadsErrors.leads.get.error.not_found.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -982,7 +996,7 @@ export class LeadsRepository {
     } catch (error) {
       logger.error("Error fetching lead by ID (internal)", parseError(error));
       return fail({
-        message: "app.api.leads.leadsErrors.leads.get.error.server.title",
+        message: t("leadsErrors.leads.get.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -997,6 +1011,7 @@ export class LeadsRepository {
     id: string,
     data: Partial<LeadUpdateType>,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<LeadDetailResponse>> {
     try {
       logger.debug("Updating lead (internal)", {
@@ -1032,8 +1047,7 @@ export class LeadsRepository {
 
       if (!updatedLead) {
         return fail({
-          message:
-            "app.api.leads.leadsErrors.leads.patch.error.not_found.title",
+          message: t("leadsErrors.leads.patch.error.not_found.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -1044,7 +1058,7 @@ export class LeadsRepository {
     } catch (error) {
       logger.error("Error updating lead (internal)", parseError(error));
       return fail({
-        message: "app.api.leads.leadsErrors.leads.patch.error.server.title",
+        message: t("leadsErrors.leads.patch.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -1067,6 +1081,7 @@ export class LeadsRepository {
       };
     },
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<LeadResponseType>> {
     try {
       logger.debug("Converting lead (internal)", {
@@ -1089,8 +1104,7 @@ export class LeadsRepository {
 
           if (!existingLead) {
             return fail({
-              message:
-                "app.api.leads.leadsErrors.leads.patch.error.not_found.title",
+              message: t("leadsErrors.leads.patch.error.not_found.title"),
               errorType: ErrorResponseTypes.NOT_FOUND,
             });
           }
@@ -1130,8 +1144,7 @@ export class LeadsRepository {
 
             if (duplicateLead && duplicateLead.id !== existingLead.id) {
               return fail({
-                message:
-                  "app.api.leads.leadsErrors.leads.post.error.duplicate.title",
+                message: t("leadsErrors.leads.post.error.duplicate.title"),
                 errorType: ErrorResponseTypes.CONFLICT,
               });
             }
@@ -1233,7 +1246,7 @@ export class LeadsRepository {
     } catch (error) {
       logger.error("Error converting lead (internal)", parseError(error));
       return fail({
-        message: "app.api.leads.leadsErrors.leads.patch.error.server.title",
+        message: t("leadsErrors.leads.patch.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -1253,6 +1266,7 @@ export class LeadsRepository {
       userAgent?: string;
     },
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<LeadEngagementResponseOutput>> {
     try {
       logger.debug("Recording lead engagement", {
@@ -1270,8 +1284,7 @@ export class LeadsRepository {
 
       if (!lead) {
         return fail({
-          message:
-            "app.api.leads.leadsErrors.leadsEngagement.post.error.validation.title",
+          message: t("leadsErrors.leadsEngagement.post.error.validation.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -1291,8 +1304,7 @@ export class LeadsRepository {
 
       if (!engagement) {
         return fail({
-          message:
-            "app.api.leads.leadsErrors.leadsEngagement.post.error.server.title",
+          message: t("leadsErrors.leadsEngagement.post.error.server.title"),
           errorType: ErrorResponseTypes.DATABASE_ERROR,
         });
       }
@@ -1361,8 +1373,7 @@ export class LeadsRepository {
     } catch (error) {
       logger.error("Error recording engagement", parseError(error));
       return fail({
-        message:
-          "app.api.leads.leadsErrors.leadsEngagement.post.error.server.title",
+        message: t("leadsErrors.leadsEngagement.post.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -1381,8 +1392,9 @@ export class LeadsRepository {
       userAgent?: string;
     },
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<LeadEngagementResponseOutput>> {
-    return await LeadsRepository.recordEngagementInternal(data, logger);
+    return await LeadsRepository.recordEngagementInternal(data, logger, t);
   }
 
   /**
@@ -1391,7 +1403,7 @@ export class LeadsRepository {
   static async exportLeads(
     query: LeadExportRequestOutput,
     logger: EndpointLogger,
-    t: TFunction,
+    t: ModuleT,
   ): Promise<ResponseType<LeadExportResponseOutput>> {
     try {
       logger.debug("Exporting leads", {
@@ -1485,7 +1497,7 @@ export class LeadsRepository {
     } catch (error) {
       logger.error("Error exporting leads", parseError(error));
       return fail({
-        message: "app.api.leads.leadsErrors.leadsExport.get.error.server.title",
+        message: t("leadsErrors.leadsExport.get.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -1498,36 +1510,36 @@ export class LeadsRepository {
     leadsData: Lead[],
     includeMetadata: boolean,
     includeEngagementData: boolean,
-    t: TFunction,
+    t: ModuleT,
   ): string {
     const headers = [
-      t("app.api.leads.export.headers.email"),
-      t("app.api.leads.export.headers.businessName"),
-      t("app.api.leads.export.headers.contactName"),
-      t("app.api.leads.export.headers.phone"),
-      t("app.api.leads.export.headers.website"),
-      t("app.api.leads.export.headers.country"),
-      t("app.api.leads.export.headers.language"),
-      t("app.api.leads.export.headers.status"),
-      t("app.api.leads.export.headers.source"),
-      t("app.api.leads.export.headers.notes"),
-      t("app.api.leads.export.headers.createdAt"),
-      t("app.api.leads.export.headers.updatedAt"),
+      t("export.headers.email"),
+      t("export.headers.businessName"),
+      t("export.headers.contactName"),
+      t("export.headers.phone"),
+      t("export.headers.website"),
+      t("export.headers.country"),
+      t("export.headers.language"),
+      t("export.headers.status"),
+      t("export.headers.source"),
+      t("export.headers.notes"),
+      t("export.headers.createdAt"),
+      t("export.headers.updatedAt"),
     ];
 
     if (includeEngagementData) {
       headers.push(
-        t("app.api.leads.export.headers.emailsSent"),
-        t("app.api.leads.export.headers.emailsOpened"),
-        t("app.api.leads.export.headers.emailsClicked"),
-        t("app.api.leads.export.headers.lastEmailSent"),
-        t("app.api.leads.export.headers.lastEngagement"),
-        t("app.api.leads.export.headers.unsubscribedAt"),
+        t("export.headers.emailsSent"),
+        t("export.headers.emailsOpened"),
+        t("export.headers.emailsClicked"),
+        t("export.headers.lastEmailSent"),
+        t("export.headers.lastEngagement"),
+        t("export.headers.unsubscribedAt"),
       );
     }
 
     if (includeMetadata) {
-      headers.push(t("app.api.leads.export.headers.metadata"));
+      headers.push(t("export.headers.metadata"));
     }
 
     const rows = leadsData.map((lead) => {
@@ -1599,7 +1611,7 @@ export class LeadsRepository {
   static async batchUpdateLeads(
     data: BatchUpdateRequestOutput,
     logger: EndpointLogger,
-    locale: CountryLanguage,
+    t: ModuleT,
   ): Promise<
     ResponseType<{
       success: boolean;
@@ -1803,12 +1815,9 @@ export class LeadsRepository {
               updates.status !== lead.status &&
               !isStatusTransitionAllowed(lead.status, updates.status)
             ) {
-              const { t } = simpleT(locale);
               errors.push({
                 leadId: lead.id,
-                error: t(
-                  "app.api.leads.leadsErrors.batch.update.error.invalidTransition",
-                ),
+                error: t("leadsErrors.batch.update.error.default"),
               });
               continue;
             }
@@ -1845,7 +1854,7 @@ export class LeadsRepository {
     } catch (error) {
       logger.error("Error in batch update", parseError(error));
       return fail({
-        message: "app.api.leads.leadsErrors.batch.update.error.server.title",
+        message: t("leadsErrors.batch.update.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -1878,6 +1887,7 @@ export class LeadsRepository {
       maxRecords?: number;
     },
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<
     ResponseType<{
       success: boolean;
@@ -1932,8 +1942,7 @@ export class LeadsRepository {
       // Validation: confirmDelete must be true for actual deletion
       if (!dryRun && !confirmDelete) {
         return fail({
-          message:
-            "app.api.leads.leadsErrors.batch.update.error.validation.title",
+          message: t("leadsErrors.batch.update.error.validation.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -2208,7 +2217,7 @@ export class LeadsRepository {
     } catch (error) {
       logger.error("Error in batch delete", parseError(error));
       return fail({
-        message: "app.api.leads.leadsErrors.batch.update.error.server.title",
+        message: t("leadsErrors.batch.update.error.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -2223,12 +2232,13 @@ export class LeadsRepository {
     leadId2: string,
     linkReason: "track_page" | "referral" | "manual" | "test",
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<void>> {
     try {
       // Ensure leads are different
       if (leadId1 === leadId2) {
         return fail({
-          message: "app.api.leads.errors.cannotLinkLeadToItself",
+          message: t("errors.cannotLinkLeadToItself"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
         });
       }
@@ -2261,7 +2271,7 @@ export class LeadsRepository {
     } catch (error) {
       logger.error("Failed to link leads", parseError(error));
       return fail({
-        message: "app.api.leads.errors.linkFailed",
+        message: t("errors.linkFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

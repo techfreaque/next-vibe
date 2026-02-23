@@ -11,7 +11,7 @@ import { databaseMigrateRepairRepository as repository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, locale, logger }) =>
-      repository.repairMigrations(data, locale, logger),
+    handler: ({ data, t, logger }) =>
+      repository.repairMigrations(data, t, logger),
   },
 });

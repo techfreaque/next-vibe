@@ -19,6 +19,7 @@ import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { users } from "@/app/api/[locale]/user/db";
 
+import type { ToolConfigItem } from "../settings/definition";
 import type { FavoriteGetModelSelection } from "./[id]/definition";
 
 /**
@@ -55,6 +56,10 @@ export const chatFavorites = pgTable("chat_favorites", {
 
   // Auto-compacting token threshold (null = fall through to character/settings default)
   compactTrigger: integer("compact_trigger"),
+
+  // Tool configuration — null = fall through to character/settings default
+  activeTools: jsonb("active_tools").$type<ToolConfigItem[] | null>(),
+  visibleTools: jsonb("visible_tools").$type<ToolConfigItem[] | null>(),
 
   // Usage stats
   useCount: integer("use_count").default(0).notNull(),

@@ -1,4 +1,9 @@
 export const translations = {
+  category: "Emails",
+  tags: {
+    stats: "Statistics",
+    analytics: "Analytics",
+  },
   dateRange: {
     today: "Today",
     yesterday: "Yesterday",

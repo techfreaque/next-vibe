@@ -3,20 +3,9 @@
  * Handles GET and POST requests for messages in a thread
  */
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-
-import type { ApiHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import type {
-  MessageCreateRequestOutput,
-  MessageCreateResponseOutput,
-  MessageCreateUrlParamsTypeOutput,
-  MessageListRequestOutput,
-  MessageListResponseOutput,
-  MessageListUrlParamsTypeOutput,
-} from "./definition";
 import definitions from "./definition";
 import { MessagesRepository } from "./repository";
 
@@ -24,39 +13,27 @@ export const { GET, POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async (
-      props: ApiHandlerProps<
-        MessageListRequestOutput,
-        MessageListUrlParamsTypeOutput,
-        typeof definitions.GET.allowedRoles
-      >,
-    ): Promise<ResponseType<MessageListResponseOutput>> => {
-      return await MessagesRepository.listMessages(
-        { threadId: props.urlPathParams.threadId },
-        props.user,
-        props.locale,
-        props.logger,
-      );
-    },
+    handler: ({ urlPathParams, user, t, logger, locale }) =>
+      MessagesRepository.listMessages(
+        { threadId: urlPathParams.threadId },
+        user,
+        t,
+        logger,
+        locale,
+      ),
   },
   [Methods.POST]: {
     email: undefined,
-    handler: async (
-      props: ApiHandlerProps<
-        MessageCreateRequestOutput,
-        MessageCreateUrlParamsTypeOutput,
-        typeof definitions.POST.allowedRoles
-      >,
-    ): Promise<ResponseType<MessageCreateResponseOutput>> => {
-      return await MessagesRepository.createMessage(
+    handler: ({ data, urlPathParams, user, t, logger, locale }) =>
+      MessagesRepository.createMessage(
         {
-          ...props.data,
-          threadId: props.urlPathParams.threadId,
+          ...data,
+          threadId: urlPathParams.threadId,
         },
-        props.user,
-        props.locale,
-        props.logger,
-      );
-    },
+        user,
+        t,
+        logger,
+        locale,
+      ),
   },
 });

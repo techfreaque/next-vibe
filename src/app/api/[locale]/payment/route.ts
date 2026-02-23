@@ -14,11 +14,11 @@ import { PaymentRepository } from "./repository";
 export const { GET, POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, user, locale, logger }) =>
-      PaymentRepository.createPaymentSession(data, user, locale, logger),
+    handler: ({ data, user, t, logger, locale }) =>
+      PaymentRepository.createPaymentSession(data, user, t, logger, locale),
   },
   [Methods.GET]: {
-    handler: ({ data, user, locale, logger }) =>
-      PaymentRepository.getPaymentInfo(data, user, locale, logger),
+    handler: ({ data, user, t, logger }) =>
+      PaymentRepository.getPaymentInfo(data, user, t, logger),
   },
 });

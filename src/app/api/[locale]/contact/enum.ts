@@ -5,7 +5,7 @@
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
-import type { ContactTranslationKey } from "./i18n";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Contact Subject options
@@ -15,7 +15,7 @@ export const {
   enum: ContactSubject,
   options: ContactSubjectOptions,
   Value: ContactSubjectValue,
-} = createEnumOptions<ContactTranslationKey>({
+} = createEnumOptions(scopedTranslation, {
   HELP_SUPPORT: "_components.contact.subjects.HELP_SUPPORT",
   GENERAL_INQUIRY: "_components.contact.subjects.GENERAL_INQUIRY",
   TECHNICAL_SUPPORT: "_components.contact.subjects.TECHNICAL_SUPPORT",
@@ -54,7 +54,7 @@ export const {
   enum: ContactPriority,
   options: ContactPriorityOptions,
   Value: ContactPriorityValue,
-} = createEnumOptions<ContactTranslationKey>({
+} = createEnumOptions(scopedTranslation, {
   LOW: "priority.low",
   MEDIUM: "priority.medium",
   HIGH: "priority.high",
@@ -77,7 +77,7 @@ export const {
   enum: ContactStatus,
   options: ContactStatusOptions,
   Value: ContactStatusValue,
-} = createEnumOptions<ContactTranslationKey>({
+} = createEnumOptions(scopedTranslation, {
   NEW: "status.new",
   IN_PROGRESS: "status.inProgress",
   RESOLVED: "status.resolved",

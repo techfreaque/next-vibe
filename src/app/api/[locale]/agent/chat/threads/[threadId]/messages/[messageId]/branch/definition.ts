@@ -9,10 +9,10 @@ import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  requestUrlPathParamsField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedRequestUrlPathParamsField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -24,12 +24,14 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { ChatMessageRole, ChatMessageRoleOptions } from "../../../../../enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Create Branch Endpoint (POST)
  * Creates a new branch from an existing message
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: [
     "agent",
@@ -42,219 +44,169 @@ const { POST } = createEndpoint({
   ],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  title:
-    "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.title" as const,
-  description:
-    "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.description" as const,
+  title: "post.title" as const,
+  description: "post.description" as const,
   icon: "git-branch",
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.messages" as const],
+  category: "category" as const,
+  tags: ["tags.messages" as const],
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.validation.title",
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.network.title",
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.unauthorized.title",
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.forbidden.title",
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.notFound.title",
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.server.title",
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.unknown.title",
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.unsavedChanges.title",
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.unsavedChanges.description",
+      title: "post.errors.unsavedChanges.title",
+      description: "post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.conflict.title",
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.container.title" as const,
-      description:
-        "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.container.description" as const,
-      layoutType: LayoutType.STACKED,
-    },
-    { request: "data&urlPathParams", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.container.title" as const,
+    description: "post.container.description" as const,
+    layoutType: LayoutType.STACKED,
+    usage: { request: "data&urlPathParams", response: true },
+    children: {
       // === URL PARAMS ===
-      threadId: requestUrlPathParamsField({
+      threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label:
-          "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.threadId.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.threadId.description" as const,
+        label: "post.threadId.label" as const,
+        description: "post.threadId.description" as const,
         schema: z.uuid(),
       }),
-      messageId: requestUrlPathParamsField({
+      messageId: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label:
-          "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.messageId.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.messageId.description" as const,
+        label: "post.messageId.label" as const,
+        description: "post.messageId.description" as const,
         schema: z.uuid(),
       }),
 
       // === REQUEST DATA ===
-      content: requestField({
+      content: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.content.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.content.description" as const,
+        label: "post.content.label" as const,
+        description: "post.content.description" as const,
         schema: z.string().min(1),
       }),
-      role: requestField({
+      role: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label:
-          "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.role.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.role.description" as const,
+        label: "post.role.label" as const,
+        description: "post.role.description" as const,
         options: ChatMessageRoleOptions,
         schema: z.enum(ChatMessageRole),
       }),
-      model: requestField({
+      model: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.model.label" as const,
-        description:
-          "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.model.description" as const,
+        label: "post.model.label" as const,
+        description: "post.model.description" as const,
         schema: z.enum(ModelId).optional(),
       }),
 
       // === RESPONSE ===
-      message: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.title" as const,
-          layoutType: LayoutType.GRID,
-          columns: 2,
-        },
-        { response: true },
-        {
-          id: responseField({
+      message: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "post.response.message.title" as const,
+        layoutType: LayoutType.GRID,
+        columns: 2,
+        usage: { response: true },
+        children: {
+          id: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.id.content" as const,
+            content: "post.response.message.id.content" as const,
             schema: z.uuid(),
           }),
-          threadId: responseField({
+          threadId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.threadId.content" as const,
+            content: "post.response.message.threadId.content" as const,
             schema: z.uuid(),
           }),
-          role: responseField({
+          role: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.role.content" as const,
+            content: "post.response.message.role.content" as const,
             schema: z.enum(ChatMessageRole),
           }),
-          content: responseField({
+          content: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.content.content" as const,
+            content: "post.response.message.content.content" as const,
             schema: z.string().nullable(),
           }),
-          parentId: responseField({
+          parentId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.parentId.content" as const,
+            content: "post.response.message.parentId.content" as const,
             schema: z.uuid().nullable(),
           }),
-          depth: responseField({
+          depth: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.depth.content" as const,
+            content: "post.response.message.depth.content" as const,
             schema: z.coerce.number(),
           }),
-          authorId: responseField({
+          authorId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.authorId.content" as const,
+            content: "post.response.message.authorId.content" as const,
             schema: z.string().nullable(),
           }),
-          isAI: responseField({
+          isAI: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.isAI.content" as const,
+            content: "post.response.message.isAI.content" as const,
             schema: z.boolean(),
           }),
-          model: responseField({
+          model: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.model.content" as const,
+            content: "post.response.message.model.content" as const,
             schema: z.string().nullable(),
           }),
-          createdAt: responseField({
+          createdAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.createdAt.content" as const,
+            content: "post.response.message.createdAt.content" as const,
             schema: dateSchema,
           }),
-          updatedAt: responseField({
+          updatedAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.response.message.updatedAt.content" as const,
+            content: "post.response.message.updatedAt.content" as const,
             schema: dateSchema,
           }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   successTypes: {
-    title:
-      "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.success.title",
-    description:
-      "app.api.agent.chat.threads.threadId.messages.messageId.branch.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   examples: {

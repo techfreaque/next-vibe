@@ -1,6 +1,10 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Authentifizierung",
+  search: {
+    tag: "Auth",
+  },
   authClient: {
     errors: {
       status_save_failed:

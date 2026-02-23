@@ -6,7 +6,9 @@ import "server-only";
 
 import type { ReadableStreamDefaultController } from "node:stream/web";
 
+import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolCall } from "../../../chat/db";
 import { StreamContext } from "./stream-context";
@@ -30,6 +32,7 @@ export class StreamContextInitializer {
     logger: EndpointLogger;
     controller: ReadableStreamDefaultController<Uint8Array>;
     encoder: TextEncoder;
+    locale: CountryLanguage;
   }): StreamContext {
     const {
       userMessageId,
@@ -42,7 +45,9 @@ export class StreamContextInitializer {
       logger,
       controller,
       encoder,
+      locale,
     } = params;
+    const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
 
     // Calculate initial parent and depth for AI message
     // IMPORTANT: Always prefer userMessageId when available (works for both incognito and server-persisted threads)
@@ -69,6 +74,8 @@ export class StreamContextInitializer {
       logger,
       controller,
       encoder,
+      creditsT,
+      locale,
     });
 
     // Update last known values for error handling (accessible in catch blocks)

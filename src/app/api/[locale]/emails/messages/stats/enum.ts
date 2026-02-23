@@ -1,5 +1,7 @@
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * Time Period Enum
  */
@@ -7,13 +9,13 @@ export const {
   enum: TimePeriod,
   options: TimePeriodOptions,
   Value: TimePeriodValue,
-} = createEnumOptions({
-  hour: "app.api.emails.messages.stats.get.timePeriod.hour",
-  day: "app.api.emails.messages.stats.get.timePeriod.day",
-  week: "app.api.emails.messages.stats.get.timePeriod.week",
-  month: "app.api.emails.messages.stats.get.timePeriod.month",
-  quarter: "app.api.emails.messages.stats.get.timePeriod.quarter",
-  year: "app.api.emails.messages.stats.get.timePeriod.year",
+} = createEnumOptions(scopedTranslation, {
+  hour: "get.timePeriod.hour",
+  day: "get.timePeriod.day",
+  week: "get.timePeriod.week",
+  month: "get.timePeriod.month",
+  quarter: "get.timePeriod.quarter",
+  year: "get.timePeriod.year",
 });
 
 /**
@@ -23,21 +25,21 @@ export const {
   enum: DateRangePreset,
   options: DateRangePresetOptions,
   Value: DateRangePresetValue,
-} = createEnumOptions({
-  today: "app.api.emails.messages.stats.dateRange.today",
-  yesterday: "app.api.emails.messages.stats.dateRange.yesterday",
-  last_7_days: "app.api.emails.messages.stats.dateRange.last7Days",
-  last_30_days: "app.api.emails.messages.stats.dateRange.last30Days",
-  last_90_days: "app.api.emails.messages.stats.dateRange.last90Days",
-  this_week: "app.api.emails.messages.stats.dateRange.thisWeek",
-  last_week: "app.api.emails.messages.stats.dateRange.lastWeek",
-  this_month: "app.api.emails.messages.stats.dateRange.thisMonth",
-  last_month: "app.api.emails.messages.stats.dateRange.lastMonth",
-  this_quarter: "app.api.emails.messages.stats.dateRange.thisQuarter",
-  last_quarter: "app.api.emails.messages.stats.dateRange.lastQuarter",
-  this_year: "app.api.emails.messages.stats.dateRange.thisYear",
-  last_year: "app.api.emails.messages.stats.dateRange.lastYear",
-  custom: "app.api.emails.messages.stats.dateRange.custom",
+} = createEnumOptions(scopedTranslation, {
+  today: "dateRange.today",
+  yesterday: "dateRange.yesterday",
+  last_7_days: "dateRange.last7Days",
+  last_30_days: "dateRange.last30Days",
+  last_90_days: "dateRange.last90Days",
+  this_week: "dateRange.thisWeek",
+  last_week: "dateRange.lastWeek",
+  this_month: "dateRange.thisMonth",
+  last_month: "dateRange.lastMonth",
+  this_quarter: "dateRange.thisQuarter",
+  last_quarter: "dateRange.lastQuarter",
+  this_year: "dateRange.thisYear",
+  last_year: "dateRange.lastYear",
+  custom: "dateRange.custom",
 });
 
 /**
@@ -47,10 +49,10 @@ export const {
   enum: ChartType,
   options: ChartTypeOptions,
   Value: ChartTypeValue,
-} = createEnumOptions({
-  line: "app.api.emails.messages.stats.get.chartType.line",
-  bar: "app.api.emails.messages.stats.get.chartType.bar",
-  area: "app.api.emails.messages.stats.get.chartType.area",
-  pie: "app.api.emails.messages.stats.get.chartType.pie",
-  donut: "app.api.emails.messages.stats.get.chartType.donut",
+} = createEnumOptions(scopedTranslation, {
+  line: "get.chartType.line",
+  bar: "get.chartType.bar",
+  area: "get.chartType.area",
+  pie: "get.chartType.pie",
+  donut: "get.chartType.donut",
 });

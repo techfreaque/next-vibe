@@ -12,12 +12,13 @@ export const { POST, tools } = endpointsHandler({
   endpoint: performanceStopTraceEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ logger }) =>
+    handler: ({ t, logger }) =>
       executeMCPTool(
         {
           toolName: "performance-stop-trace",
           args: filterUndefinedArgs({}),
         },
+        t,
         logger,
       ),
   },

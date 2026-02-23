@@ -14,8 +14,8 @@ import { envGeneratorRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, logger }) => {
-      return envGeneratorRepository.generateEnv(data, logger);
+    handler: ({ data, logger, t }) => {
+      return envGeneratorRepository.generateEnv(data, logger, t);
     },
   },
 });

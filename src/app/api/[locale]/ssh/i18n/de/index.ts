@@ -10,6 +10,36 @@ export const translations = {
       title: "Nur für Admins",
       description: "Nur Admins können auf Maschinenfunktionen zugreifen",
     },
+    connectionNotFound: "Verbindung nicht gefunden",
+    sessionNotFound: "Sitzung nicht gefunden",
+    fileNotFound: "Datei nicht gefunden",
+    directoryNotFound: "Verzeichnis nicht gefunden",
+    permissionDenied: "Berechtigung verweigert",
+    sshSecretKeyNotSet: "SSH_SECRET_KEY Umgebungsvariable nicht gesetzt.",
+    encryptionFailed: "Verschlüsselung fehlgeschlagen",
+    noRowReturned: "Kein Datensatz vom Insert zurückgegeben",
+    notImplemented: {
+      test: "SSH-Backend noch nicht implementiert. Verbindungstest nicht möglich.",
+      local:
+        "SSH-Backend noch nicht implementiert. connectionId leer lassen für lokale Ausführung.",
+      fileList: "SSH-Backend für Dateilisting noch nicht implementiert",
+      fileRead: "SSH-Backend für Dateilesen noch nicht implementiert",
+      fileWrite: "SSH-Backend für Dateischreiben noch nicht implementiert",
+      session: "SSH-PTY-Sitzungen noch nicht implementiert.",
+    },
+    invalidWorkingDir:
+      "Ungültiges Arbeitsverzeichnis: muss absoluter Pfad ohne '..' sein",
+    invalidPath: "Ungültiger Pfad: muss absolut ohne '..' sein",
+    parentDirNotFound: "Übergeordnetes Verzeichnis nicht gefunden.",
+    commandTimedOut: "Befehl hat Zeitlimit überschritten",
+    cannotDeleteCurrentUser:
+      "Der aktuelle Prozessbenutzer kann nicht gelöscht werden",
+    cannotDeleteSystemUser:
+      "Systembenutzer (uid < 1000) können nicht gelöscht werden",
+    userNotFound: "Benutzer nicht gefunden",
+    userAlreadyExists: "Benutzer existiert bereits",
+    invalidUsername:
+      "Ungültiger Benutzername: muss kleinbuchstabige alphanumerische Zeichen + Bindestrich enthalten",
   },
 
   session: {

@@ -1,4 +1,16 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    invalidWorkingDir:
+      "Ungültiges Arbeitsverzeichnis: Muss absoluter Pfad ohne '..' sein",
+    commandTimedOut: "Befehl hat das Zeitlimit überschritten",
+    notImplemented: {
+      local:
+        "SSH-Backend noch nicht implementiert. Lassen Sie connectionId leer für lokale Ausführung.",
+    },
+  },
+
   post: {
     title: "Befehl ausführen",
     description:
@@ -87,5 +99,6 @@ export const translations = {
     historyLabel: "Verlauf",
     noHistory: "Noch keine Befehle ausgeführt",
     placeholder: "Befehl eingeben...",
+    ctrlEnterHint: "Strg+Enter zum Ausführen",
   },
 };

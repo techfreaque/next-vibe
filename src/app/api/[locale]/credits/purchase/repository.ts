@@ -30,6 +30,9 @@ import type {
   CreditsPurchasePostRequestOutput,
   CreditsPurchasePostResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Credit Purchase Repository
@@ -51,6 +54,7 @@ export class CreditPurchaseRepository {
     userId: string,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<CreditsPurchasePostResponseOutput>> {
     try {
       logger.debug("createCheckoutSession START", {
@@ -95,8 +99,7 @@ export class CreditPurchaseRepository {
           },
         );
         return fail({
-          message:
-            "app.api.credits.purchase.post.errors.noActiveSubscription.title",
+          message: t("post.errors.noActiveSubscription.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
           cause: subscriptionResult,
         });
@@ -112,8 +115,7 @@ export class CreditPurchaseRepository {
           },
         );
         return fail({
-          message:
-            "app.api.credits.purchase.post.errors.noActiveSubscription.title",
+          message: t("post.errors.noActiveSubscription.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -139,6 +141,7 @@ export class CreditPurchaseRepository {
         user.email,
         user.publicName,
         logger,
+        locale,
       );
 
       logger.debug("Customer result", {
@@ -200,6 +203,7 @@ export class CreditPurchaseRepository {
         customer.customerId,
         logger,
         callbackToken,
+        locale,
       );
 
       logger.debug("Checkout session result", {
@@ -225,7 +229,7 @@ export class CreditPurchaseRepository {
         quantity: data.quantity,
       });
       return fail({
-        message: "app.api.agent.chat.credits.purchase.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
         messageParams: { error: parseError(error).message },
       });

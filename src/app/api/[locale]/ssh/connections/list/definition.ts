@@ -7,7 +7,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  responseField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -17,27 +17,27 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { SshAuthType, SshAuthTypeDB } from "../../enum";
-import { scopedTranslation } from "../../i18n";
+import { scopedTranslation } from "./i18n";
 import { ConnectionsListContainer } from "./widget";
 
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["ssh", "connections", "list"],
-  title: "connections.list.get.title",
-  description: "connections.list.get.description",
+  title: "get.title",
+  description: "get.description",
   icon: "server",
   category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["type"],
+  tags: ["category" as const],
 
   fields: customWidgetObject({
     render: ConnectionsListContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      connections: responseField({
+      connections: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "connections.list.get.response.connections.title",
+        content: "get.response.connections.title",
         schema: z.array(
           z.object({
             id: z.string(),
@@ -57,50 +57,50 @@ export const { GET } = createEndpoint({
   }),
 
   successTypes: {
-    title: "connections.list.get.success.title",
-    description: "connections.list.get.success.description",
+    title: "get.success.title",
+    description: "get.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "connections.list.get.errors.validation.title",
-      description: "connections.list.get.errors.validation.description",
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "connections.list.get.errors.unauthorized.title",
-      description: "connections.list.get.errors.unauthorized.description",
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "connections.list.get.errors.forbidden.title",
-      description: "connections.list.get.errors.forbidden.description",
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "connections.list.get.errors.server.title",
-      description: "connections.list.get.errors.server.description",
+      title: "get.errors.server.title",
+      description: "get.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "connections.list.get.errors.notFound.title",
-      description: "connections.list.get.errors.notFound.description",
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "connections.list.get.errors.unknown.title",
-      description: "connections.list.get.errors.unknown.description",
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "connections.list.get.errors.unsavedChanges.title",
-      description: "connections.list.get.errors.unsavedChanges.description",
+      title: "get.errors.unsavedChanges.title",
+      description: "get.errors.unsavedChanges.title",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "connections.list.get.errors.conflict.title",
-      description: "connections.list.get.errors.conflict.description",
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "connections.list.get.errors.network.title",
-      description: "connections.list.get.errors.network.description",
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
     },
   },
 
   examples: {
-    requests: { default: {} },
+    requests: undefined,
     responses: {
       default: {
         connections: [

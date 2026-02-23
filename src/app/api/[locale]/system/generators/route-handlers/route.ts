@@ -11,6 +11,7 @@ export const { POST, tools } = endpointsHandler({
       return await routeHandlersGeneratorRepository.generateRouteHandlers(
         props.data,
         props.logger,
+        props.t,
       );
     },
   },

@@ -23,7 +23,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { useCharacter } from "../../../../characters/[id]/hooks";
 import { SelectorContent } from "./selector-content";
@@ -49,8 +48,6 @@ export function Selector({
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
 }: SelectorProps): JSX.Element {
-  const { t } = simpleT(locale);
-
   // Tour state (for uncontrolled mode)
   const tourPopoverOpen = useTourState((state) => state.modelSelectorOpen);
   const setTourPopoverOpen = useTourState(
@@ -102,7 +99,7 @@ export function Selector({
                 modelSupportsTools ? "hidden @md:inline" : "hidden @xs:inline",
               )}
             >
-              {t(currentCharacter.name)}
+              {currentCharacter.name}
             </Span>
           )}
 

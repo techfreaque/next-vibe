@@ -9,8 +9,8 @@ const repository = new CliNowpaymentsRepositoryImpl();
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: ({ data, locale }) => {
-      return repository.execute(data, locale);
+    handler: ({ data, locale, t }) => {
+      return repository.execute(data, locale, t);
     },
   },
 });

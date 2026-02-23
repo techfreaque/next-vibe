@@ -7,8 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -18,77 +18,77 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["credits", "expire"],
-  title: "app.api.credits.expire.post.title",
-  description: "app.api.credits.expire.post.description",
-  category: "app.api.payment.category",
+  title: "expire.post.title",
+  description: "expire.post.description",
+  category: "category",
   icon: "clock",
-  tags: ["app.api.credits.expire.tag"],
+  tags: ["expire.post.tag"],
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.credits.expire.post.container.title",
-      description: "app.api.credits.expire.post.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { response: true },
-    {
-      expiredCount: responseField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "expire.post.container.title",
+    description: "expire.post.container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { response: true },
+    children: {
+      expiredCount: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.credits.expire.post.response.expiredCount",
+        content: "expire.post.response.expiredCount",
         schema: z.number(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.credits.expire.post.errors.unauthorized.title",
-      description:
-        "app.api.credits.expire.post.errors.unauthorized.description",
+      title: "expire.post.errors.unauthorized.title",
+      description: "expire.post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.credits.expire.post.errors.forbidden.title",
-      description: "app.api.credits.expire.post.errors.forbidden.description",
+      title: "expire.post.errors.forbidden.title",
+      description: "expire.post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.credits.expire.post.errors.server.title",
-      description: "app.api.credits.expire.post.errors.server.description",
+      title: "expire.post.errors.server.title",
+      description: "expire.post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.credits.expire.post.errors.unknown.title",
-      description: "app.api.credits.expire.post.errors.unknown.description",
+      title: "expire.post.errors.unknown.title",
+      description: "expire.post.errors.unknown.description",
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.credits.expire.post.errors.validation.title",
-      description: "app.api.credits.expire.post.errors.validation.description",
+      title: "expire.post.errors.validation.title",
+      description: "expire.post.errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.credits.expire.post.errors.unknown.title",
-      description: "app.api.credits.expire.post.errors.unknown.description",
+      title: "expire.post.errors.unknown.title",
+      description: "expire.post.errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.credits.expire.post.errors.unknown.title",
-      description: "app.api.credits.expire.post.errors.unknown.description",
+      title: "expire.post.errors.unknown.title",
+      description: "expire.post.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.credits.expire.post.errors.unknown.title",
-      description: "app.api.credits.expire.post.errors.unknown.description",
+      title: "expire.post.errors.unknown.title",
+      description: "expire.post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.credits.expire.post.errors.unknown.title",
-      description: "app.api.credits.expire.post.errors.unknown.description",
+      title: "expire.post.errors.unknown.title",
+      description: "expire.post.errors.unknown.description",
     },
   },
 
   successTypes: {
-    title: "app.api.credits.expire.post.success.title",
-    description: "app.api.credits.expire.post.success.description",
+    title: "expire.post.success.title",
+    description: "expire.post.success.description",
   },
 
   examples: {

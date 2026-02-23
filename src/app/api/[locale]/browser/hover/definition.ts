@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,17 +20,17 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["browser", "hover"],
-  title: "app.api.browser.hover.title",
-  description: "app.api.browser.hover.description",
-  category: "app.api.browser.category",
+  title: "hover.title",
+  description: "hover.description",
+  category: "hover.category",
   icon: "mouse-pointer",
-  tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.inputAutomation",
-  ],
+  tags: ["hover.tags.browserAutomation", "hover.tags.inputAutomation"],
 
   allowedRoles: [
     UserRole.ADMIN,
@@ -40,22 +40,20 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.browser.hover.form.label",
-      description: "app.api.browser.hover.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      uid: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "hover.form.label",
+    description: "hover.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      uid: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.browser.hover.form.fields.uid.label",
-        description: "app.api.browser.hover.form.fields.uid.description",
-        placeholder: "app.api.browser.hover.form.fields.uid.placeholder",
+        label: "hover.form.fields.uid.label",
+        description: "hover.form.fields.uid.description",
+        placeholder: "hover.form.fields.uid.placeholder",
         columns: 6,
         schema: z
           .string()
@@ -65,14 +63,14 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.hover.response.success",
+        content: "hover.response.success",
         schema: z.boolean().describe("Whether the hover operation succeeded"),
       }),
-      result: responseField({
+      result: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.hover.response.result",
+        content: "hover.response.result",
         schema: z
           .object({
             hovered: z.boolean().describe("Whether the element was hovered"),
@@ -80,24 +78,24 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Result of the hover operation"),
       }),
-      error: responseField({
+      error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.hover.response.error",
+        content: "hover.response.error",
         schema: z
           .string()
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: responseField({
+      executionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.hover.response.executionId",
+        content: "hover.response.executionId",
         schema: z
           .string()
           .optional()
           .describe("Unique identifier for this execution"),
       }),
     },
-  ),
+  }),
   examples: {
     requests: {
       default: { uid: "element-123" },
@@ -114,45 +112,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.browser.hover.errors.validation.title",
-      description: "app.api.browser.hover.errors.validation.description",
+      title: "hover.errors.validation.title",
+      description: "hover.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.browser.hover.errors.network.title",
-      description: "app.api.browser.hover.errors.network.description",
+      title: "hover.errors.network.title",
+      description: "hover.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.browser.hover.errors.unauthorized.title",
-      description: "app.api.browser.hover.errors.unauthorized.description",
+      title: "hover.errors.unauthorized.title",
+      description: "hover.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.browser.hover.errors.forbidden.title",
-      description: "app.api.browser.hover.errors.forbidden.description",
+      title: "hover.errors.forbidden.title",
+      description: "hover.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.browser.hover.errors.notFound.title",
-      description: "app.api.browser.hover.errors.notFound.description",
+      title: "hover.errors.notFound.title",
+      description: "hover.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.browser.hover.errors.serverError.title",
-      description: "app.api.browser.hover.errors.serverError.description",
+      title: "hover.errors.serverError.title",
+      description: "hover.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.browser.hover.errors.unknown.title",
-      description: "app.api.browser.hover.errors.unknown.description",
+      title: "hover.errors.unknown.title",
+      description: "hover.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.browser.hover.errors.unsavedChanges.title",
-      description: "app.api.browser.hover.errors.unsavedChanges.description",
+      title: "hover.errors.unsavedChanges.title",
+      description: "hover.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.browser.hover.errors.conflict.title",
-      description: "app.api.browser.hover.errors.conflict.description",
+      title: "hover.errors.conflict.title",
+      description: "hover.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.browser.hover.success.title",
-    description: "app.api.browser.hover.success.description",
+    title: "hover.success.title",
+    description: "hover.success.description",
   },
 });
 

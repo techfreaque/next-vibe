@@ -6,6 +6,11 @@ export const translations: typeof enTranslations = {
   enableLightMode: "Włącz tryb jasny",
   enableDarkMode: "Włącz tryb ciemny",
   notifications: "Powiadomienia",
+  welcomeNotification: {
+    title: "Witamy w {{appName}}!",
+    description:
+      "Zacznij od eksplorowania modeli AI i tworzenia swojej pierwszej rozmowy.",
+  },
   company: "Firma",
   about: {
     title: "O nas",

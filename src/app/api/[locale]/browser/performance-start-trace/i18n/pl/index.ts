@@ -73,4 +73,9 @@ export const translations: typeof enTranslations = {
     title: "Trace wydajności rozpoczęty pomyślnie",
     description: "Trace wydajności został pomyślnie rozpoczęty",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    performanceAutomation: "Automatyzacja wydajności",
+  },
 };

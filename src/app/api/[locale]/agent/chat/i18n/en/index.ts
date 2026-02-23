@@ -30,6 +30,7 @@ export const translations = {
     settings: "Settings",
   },
   config: {
+    appName: "unbottled.ai",
     folders: {
       private: "Private",
       shared: "Shared",
@@ -75,6 +76,150 @@ export const translations = {
         balance: "Balance",
         buy: "Buy",
         freeCreditsLeft: "Free credits",
+      },
+    },
+    credits: {
+      credit: "{{count}} credit",
+      credits: "{{count}} credits",
+    },
+    navigation: {
+      subscription: "Subscription & Credits",
+      referral: "Referral Program",
+      help: "Help",
+      about: "About",
+    },
+    confirmations: {
+      deleteMessage: "Are you sure you want to delete this message?",
+    },
+    welcomeTour: {
+      authDialog: {
+        title: "Unlock Private & Shared Folders",
+        description:
+          "Sign up or log in to access private and shared folders. Your chats will sync across devices.",
+        continueTour: "Continue Tour",
+        signUp: "Sign Up / Login",
+      },
+      buttons: {
+        back: "Back",
+        close: "Close",
+        last: "Finish",
+        next: "Next",
+        skip: "Skip",
+      },
+      welcome: {
+        title: "Welcome to {{appName}}!",
+        description:
+          "Your privacy-first AI platform with 40+ models, user-controlled content filtering, and free speech principles.",
+        subtitle: "Let's take a quick tour to get you started.",
+      },
+      aiCompanion: {
+        title: "Choose Your AI Companion",
+        description:
+          "Select from 40+ AI models including mainstream, open-source, and uncensored options.",
+        tip: "Click to open the model selector and pick your companion.",
+      },
+      rootFolders: {
+        title: "Your Chat Folders",
+        description:
+          "Organize your chats in different folders, each with unique privacy settings:",
+        private: {
+          name: "Private",
+          suffix: "— encrypted, only you can see",
+        },
+        incognito: {
+          name: "Incognito",
+          suffix: "— no history saved",
+        },
+        shared: {
+          name: "Shared",
+          suffix: "— collaborate with others",
+        },
+        public: {
+          name: "Public",
+          suffix: "— visible to everyone",
+        },
+      },
+      privateFolder: {
+        name: "Private",
+        suffix: "Folder",
+        description:
+          "Your private chats are encrypted and only visible to you. Perfect for sensitive topics.",
+      },
+      incognitoFolder: {
+        name: "Incognito",
+        suffix: "Folder",
+        description:
+          "Chat without saving history. When you close the session, all messages are gone.",
+        note: "No data is stored on our servers during incognito sessions.",
+      },
+      sharedFolder: {
+        name: "Shared",
+        suffix: "Folder",
+        description:
+          "Collaborate with specific people by sharing access to this folder.",
+      },
+      publicFolder: {
+        name: "Public",
+        suffix: "Folder",
+        description:
+          "Share your AI conversations with the world. Others can view and fork your threads.",
+        note: "Everything in Public is visible to all users and search engines.",
+      },
+      newChatButton: {
+        title: "Start a New Chat",
+        description: "Click here to start a fresh conversation in any folder.",
+        tip: "You can also use keyboard shortcut Ctrl+K to quickly start a new chat.",
+      },
+      sidebarLogin: {
+        title: "Sign In to Unlock More",
+        description:
+          "Create a free account to access Private and Shared folders, sync across devices, and save your conversation history.",
+        tip: "It's free to sign up! You get 100 free credits to start.",
+      },
+      subscriptionButton: {
+        title: "Credits & Subscription",
+        description:
+          "Get {{credits}} credits/month with a Pro subscription for just {{price}}.",
+        price: "$9.99",
+        tip: "Credits are used for AI model interactions. Free users get limited monthly credits.",
+      },
+      chatInput: {
+        title: "Type Your Message",
+        description:
+          "Type your message here and press Enter or click Send to chat with your AI companion.",
+        tip: "Use Shift+Enter for a new line. You can also attach files and images.",
+      },
+      voiceInput: {
+        title: "Voice Input",
+        description: "Use your microphone to speak to your AI companion:",
+        options: {
+          transcribe: "Transcribe speech to text",
+          sendAudio: "Send audio directly to the AI",
+          pauseResume: "Pause and resume recording",
+        },
+      },
+      callMode: {
+        title: "Call Mode",
+        description:
+          "Enable Call Mode for a hands-free, voice-driven conversation experience with real-time AI responses.",
+        tip: "Perfect for when you're on the go or prefer speaking over typing.",
+      },
+      complete: {
+        title: "You're All Set!",
+        description:
+          "You've completed the tour! Start chatting with your AI companion now.",
+        help: "Need help? Click the question mark icon in the sidebar anytime.",
+      },
+      authUnlocked: {
+        unlocked: "Unlocked!",
+        privateDescription:
+          "Your private folder is now available. All chats here are encrypted and only visible to you.",
+        privateNote:
+          "Private chats sync across all your devices automatically.",
+        sharedDescription:
+          "Your shared folder is now available. Invite others to collaborate on AI conversations.",
+        sharedNote:
+          "You control who has access to your shared folders and threads.",
       },
     },
   },
@@ -363,14 +508,65 @@ export const translations = {
         "Kimi K2 - Powerful Chinese AI model with excellent context understanding",
       kimiK2_5:
         "Kimi K2.5 - Enhanced Chinese AI model with improved reasoning and creative capabilities",
+      claudeSonnet45:
+        "Claude Sonnet 4.5 - Anthropic's previous-generation Sonnet model with strong coding and analytical capabilities",
+      grok4:
+        "Grok 4 - xAI's flagship reasoning model with vision and web search capabilities",
+      grok4Fast:
+        "Grok 4 Fast - xAI's high-speed model with 2M token context optimized for quick responses",
+      gpt5Pro:
+        "GPT-5 Pro - OpenAI's premium model with top-tier reasoning and advanced coding capabilities",
+      gpt5Codex:
+        "GPT-5 Codex - OpenAI's specialized coding model with exceptional programming and technical capabilities",
+      gpt51Codex:
+        "GPT 5.1 Codex - Updated OpenAI coding model with improved creative and programming capabilities",
+      gpt51:
+        "GPT 5.1 - OpenAI's efficient general-purpose model with strong reasoning and analysis",
+      gpt5: "GPT-5 - OpenAI's flagship model with broad intelligence and versatile capabilities",
+      gpt5Mini:
+        "GPT-5 Mini - OpenAI's lightweight fast model for quick everyday tasks",
+      gpt5Nano:
+        "GPT-5 Nano - OpenAI's smallest and most affordable model for simple conversational tasks",
+      gptOss120b:
+        "GPT-OSS 120B - OpenAI's open-source 120B parameter model with strong coding capabilities",
+      kimiK2Thinking:
+        "Kimi K2 Thinking - Kimi's reasoning-focused model with enhanced analytical and step-by-step thinking",
+      glm45Air:
+        "GLM 4.5 AIR - Z.AI's ultra-fast lightweight model for quick conversational interactions",
+      glm45v:
+        "GLM 4.5v - Z.AI's vision-capable model with image understanding and chat capabilities",
+      geminiFlash25Lite:
+        "Gemini 2.5 Flash Lite - Google's entry-level Gemini model with large context and fast responses",
+      geminiFlash25Flash:
+        "Gemini 2.5 Flash - Google's efficient multimodal model with 1M token context for fast tasks",
+      geminiFlash25Pro:
+        "Gemini 2.5 Flash Pro - Google's previous-generation Pro model with large context and strong reasoning",
+      deepseekV31:
+        "DeepSeek V3.1 - DeepSeek's previous-generation model with strong coding and analysis capabilities",
+      deepseekR1:
+        "DeepSeek R1 - DeepSeek's reasoning-focused model with advanced step-by-step problem solving",
+      qwen3235bFree:
+        "Qwen3 235B - Alibaba's large open model with 235B parameters for complex coding and reasoning tasks",
+      deepseekR1Distill:
+        "DeepSeek R1 Distill - Compact distilled version of DeepSeek R1 with efficient reasoning capabilities",
+      qwen257b:
+        "Qwen 2.5 7B - Alibaba's compact 7B model for fast and affordable conversational tasks",
     },
   },
   modelUtilities: {
     adultExplicit: "Adult/Explicit Content",
     adultImplied: "Adult/Implied Content",
+    analysis: "Analysis",
+    chat: "Chat",
+    coding: "Coding",
     conspiracy: "Conspiracy Theories",
+    controversial: "Controversial Topics",
+    creative: "Creative Writing",
+    fast: "Fast",
     harmful: "Potentially Harmful Content",
     illegalInfo: "Illegal Information",
+    imageGen: "Image Generation",
+    legacy: "Legacy",
     medicalAdvice: "Medical Advice",
     offensiveLanguage: "Offensive Language",
     politicalLeft: "Left Political Views",
@@ -378,7 +574,10 @@ export const translations = {
     reasoning: "Advanced Reasoning",
     roleplay: "Roleplay",
     roleplayDark: "Dark Roleplay",
+    smart: "Smart",
+    uncensored: "Uncensored",
     violence: "Violence",
+    vision: "Vision",
   },
   input: {
     attachments: {

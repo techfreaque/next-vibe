@@ -3,6 +3,8 @@
  */
 
 export const translations = {
+  category: "Agent",
+
   hotkey: {
     post: {
       title: "Speech-to-Text Hotkey",
@@ -92,6 +94,9 @@ export const translations = {
       },
     },
     tags: {
+      ai: "AI",
+      transcription: "Transcription",
+      speech: "Speech",
       hotkey: "Hotkey",
       cli: "CLI",
     },

@@ -23,11 +23,15 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 import { CampaignType } from "../smtp-client/enum";
+import { scopedTranslation as smtpScopedTranslation } from "../smtp-client/i18n";
 import { SmtpRepository } from "../smtp-client/repository";
 import type {
   SmtpSelectionCriteria,
   SmtpSendParams,
 } from "../smtp-client/sending/types";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Email Service Send Request Type
@@ -87,6 +91,7 @@ export class EmailServiceRepository {
     user: JwtPayloadType,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<EmailServiceSendResponse>> {
     try {
       logger.debug("Email service: Sending email", {
@@ -123,10 +128,11 @@ export class EmailServiceRepository {
         campaignId: data.campaignSettings.campaignId,
       };
 
+      const { t: smtpT } = smtpScopedTranslation.scopedT(locale);
       const result = await SmtpRepository.sendEmail(
         smtpSendData,
         user,
-        locale,
+        smtpT,
         logger,
       );
 
@@ -142,10 +148,10 @@ export class EmailServiceRepository {
       // Safe access to result data since we know result.success is true
       if (!result.data) {
         return fail({
-          message: "app.api.emails.emailService.send.errors.server.title",
+          message: t("send.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
-            error: "app.api.emails.emailService.send.errors.noData.description",
+            error: t("send.errors.noData.description"),
           },
         });
       }
@@ -173,7 +179,7 @@ export class EmailServiceRepository {
     } catch (error) {
       logger.error("Email service: Send failed", parseError(error));
       return fail({
-        message: "app.api.emails.emailService.send.errors.server.title",
+        message: t("send.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

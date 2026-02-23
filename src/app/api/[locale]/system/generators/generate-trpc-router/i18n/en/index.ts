@@ -1,6 +1,63 @@
 import { translations as validationTranslations } from "../../validation/i18n/en";
 
 export const translations = {
+  category: "Generators",
+
+  title: "Generate tRPC Router",
+  description: "Generate tRPC router from API endpoints",
+  tag: "tRPC",
+  container: {
+    title: "tRPC Router Generation",
+    description: "Generate tRPC router configuration",
+  },
+  fields: {
+    apiDir: {
+      title: "API Directory",
+      description: "Directory containing API route files",
+    },
+    outputFile: {
+      title: "Output File",
+      description: "Path to the generated tRPC router file",
+    },
+    includeWarnings: {
+      title: "Include Warnings",
+      description: "Include warning messages in the output",
+    },
+    excludePatterns: {
+      title: "Exclude Patterns",
+      description: "Patterns to exclude from tRPC router generation",
+    },
+    success: {
+      title: "Success",
+    },
+    generationCompleted: {
+      title: "Generation Completed",
+    },
+    output: {
+      title: "Output",
+    },
+    generationStats: {
+      title: "Generation Stats",
+    },
+  },
+  errors: {
+    validation: {
+      title: "Validation Error",
+      description: "Invalid tRPC router generation parameters",
+    },
+    internal: {
+      title: "Internal Error",
+      description: "An error occurred during tRPC router generation",
+    },
+    unauthorized: {
+      title: "Unauthorized",
+      description: "You don't have permission to generate tRPC router",
+    },
+  },
+  success: {
+    title: "tRPC Router Generated",
+    description: "tRPC router has been generated successfully",
+  },
   validation: validationTranslations,
   trpcValidator: {
     apiDirectoryNotFound: "API directory not found: {{resolvedApiDir}}",

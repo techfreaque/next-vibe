@@ -10,7 +10,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import { getIdColor } from "@/app/[locale]/chat/lib/utils/formatting";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -20,7 +20,7 @@ interface MessagePreviewProps {
   shortId: string;
   position: { x: number; y: number };
   locale: CountryLanguage;
-  rootFolderId?: DefaultFolderId;
+  rootFolderId: DefaultFolderId;
 }
 
 /**
@@ -31,7 +31,7 @@ export function MessagePreview({
   shortId,
   position,
   locale,
-  rootFolderId = DefaultFolderId.PRIVATE,
+  rootFolderId,
 }: MessagePreviewProps): JSX.Element {
   const { t } = simpleT(locale);
   const idColor = getIdColor(shortId);
@@ -63,13 +63,10 @@ export function MessagePreview({
             )}
           >
             {isUser
-              ? rootFolderId === "private" ||
-                rootFolderId === "shared" ||
-                rootFolderId === "public" ||
-                rootFolderId === "cron"
-                ? t("app.chat.flatView.youLabel")
-                : t("app.chat.flatView.anonymous")
-              : message.authorName || t("app.chat.flatView.assistantFallback")}
+              ? rootFolderId === "public" || rootFolderId === "shared"
+                ? (message.authorName ?? t("app.chat.flatView.anonymous"))
+                : t("app.chat.flatView.youLabel")
+              : t("app.chat.flatView.assistantFallback")}
           </Span>
           <Span
             style={{

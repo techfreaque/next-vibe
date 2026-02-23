@@ -14,6 +14,7 @@ import { H3, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
 import { emailService } from "@/app/api/[locale]/leads/campaigns/emails";
+import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -28,11 +29,12 @@ export default async function LeadsEmailsPage({
 }: LeadsEmailsPageProps): Promise<React.JSX.Element> {
   const { locale } = await params;
   const { t } = simpleT(locale);
+  const { t: scopedT } = leadsScopedTranslation.scopedT(locale);
 
   // Get all available journeys and their stages server-side
   const availableJourneys = emailService.getAvailableJourneys();
   const journeyData = availableJourneys.map((journey) => {
-    const info = emailService.getJourneyInfo(journey, t);
+    const info = emailService.getJourneyInfo(journey, locale);
     const stages = emailService.getAvailableStages(journey);
     return {
       variant: journey,
@@ -92,7 +94,9 @@ export default async function LeadsEmailsPage({
                       className="hover:shadow-lg transition-shadow"
                     >
                       <CardHeader className="pb-3">
-                        <CardTitle className="text-lg">{t(stage)}</CardTitle>
+                        <CardTitle className="text-lg">
+                          {scopedT(stage)}
+                        </CardTitle>
                       </CardHeader>
                       <CardContent className="flex flex-col gap-3">
                         <Div className="text-sm text-gray-600 dark:text-gray-400">
@@ -100,13 +104,13 @@ export default async function LeadsEmailsPage({
                             <Strong>
                               {t("app.admin.leads.leads.admin.emails.journey")}:
                             </Strong>{" "}
-                            {t(journey.info.name)}
+                            {journey.info.name}
                           </P>
                           <P>
                             <Strong>
                               {t("app.admin.leads.leads.admin.emails.stage")}:
                             </Strong>{" "}
-                            {t(stage)}
+                            {scopedT(stage)}
                           </P>
                         </Div>
 

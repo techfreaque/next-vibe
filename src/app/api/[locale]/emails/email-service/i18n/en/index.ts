@@ -205,4 +205,17 @@ export const translations = {
       description: "Your email has been sent successfully",
     },
   },
+  emailServicePriority: {
+    low: "Low",
+    normal: "Normal",
+    high: "High",
+    urgent: "Urgent",
+  },
+  emailServiceStatus: {
+    idle: "Idle",
+    processing: "Processing",
+    completed: "Completed",
+    failed: "Failed",
+    retrying: "Retrying",
+  },
 };

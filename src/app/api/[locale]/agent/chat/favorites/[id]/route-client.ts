@@ -16,19 +16,28 @@ import definitions from "./definition";
 export const { GET, PATCH, DELETE } = clientEndpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: ({ urlPathParams, logger }) =>
-      ChatFavoritesRepositoryClient.getFavoriteById(urlPathParams.id, logger),
+    handler: ({ urlPathParams, logger, locale }) =>
+      ChatFavoritesRepositoryClient.getFavoriteById(
+        urlPathParams.id,
+        logger,
+        locale,
+      ),
   },
   [Methods.PATCH]: {
-    handler: ({ data, urlPathParams, logger }) =>
+    handler: ({ data, urlPathParams, logger, locale }) =>
       ChatFavoritesRepositoryClient.updateFavorite(
         urlPathParams.id,
         data,
         logger,
+        locale,
       ),
   },
   [Methods.DELETE]: {
-    handler: ({ urlPathParams, logger }) =>
-      ChatFavoritesRepositoryClient.deleteFavorite(urlPathParams.id, logger),
+    handler: ({ urlPathParams, logger, locale }) =>
+      ChatFavoritesRepositoryClient.deleteFavorite(
+        urlPathParams.id,
+        logger,
+        locale,
+      ),
   },
 });

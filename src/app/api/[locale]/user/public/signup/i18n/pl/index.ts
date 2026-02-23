@@ -2,6 +2,8 @@ import { translations as _componentsTranslations } from "../../_components/i18n/
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Użytkownicy",
+
   _components: _componentsTranslations,
   title: "Rejestracja Użytkownika",
   description: "Endpoint rejestracji użytkownika",
@@ -293,6 +295,9 @@ export const translations: typeof enTranslations = {
     privateName: "Nazwa Prywatna",
     publicName: "Nazwa Publiczna",
     email: "E-mail",
+    locale: "Język",
+    creditBalance: "Saldo kredytów",
+    leadCreditBalance: "Saldo kredytów leada",
     signup_preferences: "Preferencje Rejestracji",
     user_details: "Szczegóły użytkownika",
     basic_information: "Podstawowe informacje",
@@ -341,5 +346,50 @@ export const translations: typeof enTranslations = {
     },
     signoff: "Miłych rozmów,\nZespół {{appName}}",
     ps: "P.S. Użyj trybu Incognito, aby zachować rozmowy tylko na swoim urządzeniu – nigdy nie przechowujemy ich na naszych serwerach.",
+  },
+  emailTemplates: {
+    welcome: {
+      name: "E-mail powitalny po rejestracji",
+      description:
+        "E-mail powitalny wysyłany do użytkowników po pomyślnej rejestracji",
+      category: "Uwierzytelnianie",
+      preview: {
+        privateName: {
+          label: "Nazwa prywatna",
+          description: "Prywatna nazwa użytkownika",
+        },
+        userId: {
+          label: "ID użytkownika",
+          description: "Unikalny identyfikator użytkownika",
+        },
+        leadId: {
+          label: "ID leada",
+          description: "Identyfikator leada użytkownika",
+        },
+      },
+    },
+    adminSignup: {
+      name: "E-mail z powiadomieniem administratora o rejestracji",
+      description:
+        "E-mail wysyłany do administratorów gdy nowy użytkownik się rejestruje",
+      category: "Administracja",
+      preview: {
+        privateName: {
+          label: "Nazwa prywatna",
+        },
+        publicName: {
+          label: "Nazwa publiczna",
+        },
+        email: {
+          label: "Adres e-mail",
+        },
+        userId: {
+          label: "ID użytkownika",
+        },
+        subscribeToNewsletter: {
+          label: "Subskrypcja newslettera",
+        },
+      },
+    },
   },
 };

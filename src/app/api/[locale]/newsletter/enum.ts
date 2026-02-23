@@ -5,6 +5,8 @@
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * Newsletter Preferences Enum
  * Defines the possible newsletter preferences
@@ -13,12 +15,12 @@ export const {
   enum: NewsletterPreference,
   options: NewsletterPreferenceOptions,
   Value: NewsletterPreferenceValue,
-} = createEnumOptions({
-  MARKETING: "app.api.newsletter.enum.preferences.marketing",
-  PRODUCT_NEWS: "app.api.newsletter.enum.preferences.productNews",
-  COMPANY_UPDATES: "app.api.newsletter.enum.preferences.companyUpdates",
-  INDUSTRY_INSIGHTS: "app.api.newsletter.enum.preferences.industryInsights",
-  EVENTS: "app.api.newsletter.enum.preferences.events",
+} = createEnumOptions(scopedTranslation, {
+  MARKETING: "enum.preferences.marketing",
+  PRODUCT_NEWS: "enum.preferences.productNews",
+  COMPANY_UPDATES: "enum.preferences.companyUpdates",
+  INDUSTRY_INSIGHTS: "enum.preferences.industryInsights",
+  EVENTS: "enum.preferences.events",
 });
 
 export const NewsletterPreferenceDB = [
@@ -37,12 +39,12 @@ export const {
   enum: NewsletterSubscriptionStatus,
   options: NewsletterSubscriptionStatusOptions,
   Value: NewsletterSubscriptionStatusValue,
-} = createEnumOptions({
-  SUBSCRIBED: "app.api.newsletter.enum.status.subscribed",
-  UNSUBSCRIBED: "app.api.newsletter.enum.status.unsubscribed",
-  PENDING: "app.api.newsletter.enum.status.pending",
-  BOUNCED: "app.api.newsletter.enum.status.bounced",
-  COMPLAINED: "app.api.newsletter.enum.status.complained",
+} = createEnumOptions(scopedTranslation, {
+  SUBSCRIBED: "enum.status.subscribed",
+  UNSUBSCRIBED: "enum.status.unsubscribed",
+  PENDING: "enum.status.pending",
+  BOUNCED: "enum.status.bounced",
+  COMPLAINED: "enum.status.complained",
 });
 
 export const NewsletterSubscriptionStatusDB = [

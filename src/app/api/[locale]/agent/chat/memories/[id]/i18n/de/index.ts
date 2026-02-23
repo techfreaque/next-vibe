@@ -1,9 +1,15 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Chat",
+  tags: {
+    memories: "Erinnerungen",
+  },
+
   patch: {
     title: "Erinnerung aktualisieren",
-    description: "Aktualisiert eine vorhandene Erinnerung anhand der ID",
+    description:
+      "Aktualisiert eine vorhandene Erinnerung. Alle Felder sind optional — weggelassene Felder behalten ihren aktuellen Wert. Um nur Tags oder Priorität zu ändern, einfach den Inhalt weglassen. WICHTIG: Niemals einen leeren String für den Inhalt übergeben — er wird ignoriert und der vorhandene Inhalt bleibt erhalten. Um eine Erinnerung zu löschen, den Delete-Endpunkt verwenden.",
     container: {
       title: "Erinnerung aktualisieren",
       description: "Eine vorhandene Erinnerung ändern",
@@ -15,9 +21,10 @@ export const translations: typeof enTranslations = {
     content: {
       label: "Erinnerungsinhalt",
       description:
-        "Die zu merkende Tatsache (leer lassen, um aktuellen Wert zu behalten)",
+        "Der aktualisierte Inhalt. Optional — weglassen, um den aktuellen Inhalt zu behalten. Leere Strings werden ignoriert (Inhalt wird nie mit leerem Wert überschrieben).",
     },
     tags: {
+      memories: "Erinnerungen",
       label: "Tags",
       description:
         "Tags zur Kategorisierung (leer lassen, um aktuellen Wert zu behalten)",

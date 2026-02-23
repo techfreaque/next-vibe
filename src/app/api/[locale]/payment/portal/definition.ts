@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,21 +20,20 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * POST endpoint for creating customer portal sessions
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["payment", "portal"],
-  title: "app.api.payment.portal.post.title" as const,
-  description: "app.api.payment.portal.post.description" as const,
-  category: "app.api.payment.category" as const,
+  title: "post.title" as const,
+  description: "post.description" as const,
+  category: "post.title" as const,
   icon: "settings" as const,
-  tags: [
-    "app.api.payment.tags.payment" as const,
-    "app.api.payment.tags.info" as const,
-    "app.api.payment.tags.transactions" as const,
-  ],
+  tags: ["post.title" as const, "post.title" as const, "post.title" as const],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
@@ -42,102 +41,88 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.payment.portal.post.form.title" as const,
-      description: "app.api.payment.portal.post.form.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.form.title" as const,
+    description: "post.form.description" as const,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // REQUEST FIELDS
-      returnUrl: requestField({
+      returnUrl: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.URL,
-        label: "app.api.payment.portal.post.returnUrl.label" as const,
-        description:
-          "app.api.payment.portal.post.returnUrl.description" as const,
-        placeholder:
-          "app.api.payment.portal.post.returnUrl.placeholder" as const,
+        label: "post.returnUrl.label" as const,
+        description: "post.returnUrl.description" as const,
+        placeholder: "post.returnUrl.placeholder" as const,
         columns: 12,
         schema: z.string().url().optional(),
       }),
 
       // RESPONSE FIELDS
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.payment.portal.post.response.success" as const,
+        content: "post.response.success" as const,
         schema: z.boolean(),
       }),
 
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.payment.portal.post.response.message" as const,
+        content: "post.response.message" as const,
         schema: z.string().nullable(),
       }),
 
-      customerPortalUrl: responseField({
+      customerPortalUrl: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.payment.portal.post.response.customerPortalUrl" as const,
+        content: "post.response.customerPortalUrl" as const,
         schema: z.string().url().nullable(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.payment.portal.post.errors.validation.title" as const,
-      description:
-        "app.api.payment.portal.post.errors.validation.description" as const,
+      title: "post.errors.validation.title" as const,
+      description: "post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.payment.portal.post.errors.unauthorized.title" as const,
-      description:
-        "app.api.payment.portal.post.errors.unauthorized.description" as const,
+      title: "post.errors.unauthorized.title" as const,
+      description: "post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.payment.portal.post.errors.forbidden.title" as const,
-      description:
-        "app.api.payment.portal.post.errors.forbidden.description" as const,
+      title: "post.errors.forbidden.title" as const,
+      description: "post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.payment.portal.post.errors.notFound.title" as const,
-      description:
-        "app.api.payment.portal.post.errors.notFound.description" as const,
+      title: "post.errors.notFound.title" as const,
+      description: "post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.payment.portal.post.errors.server.title" as const,
-      description:
-        "app.api.payment.portal.post.errors.server.description" as const,
+      title: "post.errors.server.title" as const,
+      description: "post.errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.payment.portal.post.errors.network.title" as const,
-      description:
-        "app.api.payment.portal.post.errors.network.description" as const,
+      title: "post.errors.network.title" as const,
+      description: "post.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.payment.portal.post.errors.unknown.title" as const,
-      description:
-        "app.api.payment.portal.post.errors.unknown.description" as const,
+      title: "post.errors.unknown.title" as const,
+      description: "post.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.payment.portal.post.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.payment.portal.post.errors.unsavedChanges.description" as const,
+      title: "post.errors.unsavedChanges.title" as const,
+      description: "post.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.payment.portal.post.errors.conflict.title" as const,
-      description:
-        "app.api.payment.portal.post.errors.conflict.description" as const,
+      title: "post.errors.conflict.title" as const,
+      description: "post.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.payment.portal.post.success.title" as const,
-    description: "app.api.payment.portal.post.success.description" as const,
+    title: "post.success.title" as const,
+    description: "post.success.description" as const,
   },
 
   examples: {

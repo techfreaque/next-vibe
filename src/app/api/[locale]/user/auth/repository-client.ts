@@ -26,6 +26,10 @@ import { storage } from "next-vibe-ui/lib/storage";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { platform } from "@/config/env-client";
 
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+
 // Storage key for auth token
 const AUTH_TOKEN_STORAGE_KEY = "auth_token";
 
@@ -45,6 +49,7 @@ export interface AuthClientRepository {
   setAuthToken(
     token: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<void>>;
 
   /**
@@ -56,6 +61,7 @@ export interface AuthClientRepository {
    */
   getAuthToken(
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<string | undefined>>;
 
   /**
@@ -65,7 +71,10 @@ export interface AuthClientRepository {
    * @param logger - Optional logger for debugging
    * @returns Promise<ResponseType> indicating success or failure
    */
-  removeAuthToken(logger: EndpointLogger): Promise<ResponseType<void>>;
+  removeAuthToken(
+    logger: EndpointLogger,
+    t: ModuleT,
+  ): Promise<ResponseType<void>>;
 }
 
 /**
@@ -80,12 +89,14 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
   async setAuthToken(
     token: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<void>> {
     try {
       if (platform.isServer) {
         logger.error("setAuthToken cannot be called on the server");
+
         return fail({
-          message: "app.api.user.auth.authClient.errors.token_save_failed",
+          message: t("authClient.errors.token_save_failed"),
           errorType: ErrorResponseTypes.AUTH_ERROR,
         });
       }
@@ -99,8 +110,9 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
       return success();
     } catch (error) {
       logger.error("Error setting auth token", parseError(error));
+
       return fail({
-        message: "app.api.user.auth.authClient.errors.token_save_failed",
+        message: t("authClient.errors.token_save_failed"),
         errorType: ErrorResponseTypes.AUTH_ERROR,
         messageParams: { error: String(error) },
       });
@@ -114,12 +126,14 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
    */
   async getAuthToken(
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<string | undefined>> {
     try {
       if (platform.isServer) {
         logger.error("getAuthToken cannot be called on the server");
+
         return fail({
-          message: "app.api.user.auth.authClient.errors.token_get_failed",
+          message: t("authClient.errors.token_get_failed"),
           errorType: ErrorResponseTypes.AUTH_ERROR,
         });
       }
@@ -134,8 +148,9 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
       return success(token || undefined);
     } catch (error) {
       logger.error("Error getting auth token", parseError(error));
+
       return fail({
-        message: "app.api.user.auth.authClient.errors.token_get_failed",
+        message: t("authClient.errors.token_get_failed"),
         errorType: ErrorResponseTypes.AUTH_ERROR,
         messageParams: { error: String(error) },
       });
@@ -147,12 +162,16 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
    * For web, removes from localStorage
    * For React Native, removes from AsyncStorage automatically via next-vibe-ui
    */
-  async removeAuthToken(logger: EndpointLogger): Promise<ResponseType<void>> {
+  async removeAuthToken(
+    logger: EndpointLogger,
+    t: ModuleT,
+  ): Promise<ResponseType<void>> {
     try {
       if (platform.isServer) {
         logger.error("removeAuthToken cannot be called on the server");
+
         return fail({
-          message: "app.api.user.auth.authClient.errors.token_remove_failed",
+          message: t("authClient.errors.token_remove_failed"),
           errorType: ErrorResponseTypes.AUTH_ERROR,
         });
       }
@@ -166,8 +185,9 @@ export class AuthClientRepositoryImpl implements AuthClientRepository {
       return success();
     } catch (error) {
       logger.error("Error removing auth token", parseError(error));
+
       return fail({
-        message: "app.api.user.auth.authClient.errors.token_remove_failed",
+        message: t("authClient.errors.token_remove_failed"),
         errorType: ErrorResponseTypes.AUTH_ERROR,
         messageParams: { error: String(error) },
       });

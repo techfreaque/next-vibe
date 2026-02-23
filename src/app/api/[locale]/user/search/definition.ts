@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -23,407 +23,358 @@ import {
 import { dateSchema } from "../../shared/types/common.schema";
 import { UserRole, UserRoleDB, UserRoleOptions } from "../user-roles/enum";
 import { UserSearchStatus, UserSearchStatusOptions } from "./enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * GET endpoint for searching users
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["user", "search"],
-  title: "app.api.user.search.title" as const,
-  description: "app.api.user.search.description" as const,
+  title: "title",
+  description: "description",
   icon: "search",
-  category: "app.api.user.category" as const,
-  tags: ["app.api.user.search.tag" as const],
+  category: "category",
+  tags: ["tag"],
   allowedRoles: [UserRole.ADMIN] as const,
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.user.search.container.title" as const,
-      description: "app.api.user.search.container.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "container.title",
+    description: "container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === SEARCH CRITERIA ===
-      searchCriteria: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.user.search.groups.searchCriteria.title" as const,
-          description:
-            "app.api.user.search.groups.searchCriteria.description" as const,
-          layoutType: LayoutType.VERTICAL,
-        },
-        { request: "data" },
-        {
-          search: requestField({
+      searchCriteria: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "groups.searchCriteria.title",
+        description: "groups.searchCriteria.description",
+        layoutType: LayoutType.VERTICAL,
+        usage: { request: "data" },
+        children: {
+          search: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
-            label: "app.api.user.search.fields.search.label" as const,
-            description:
-              "app.api.user.search.fields.search.description" as const,
-            placeholder:
-              "app.api.user.search.fields.search.placeholder" as const,
+            label: "fields.search.label",
+            description: "fields.search.description",
+            placeholder: "fields.search.placeholder",
             columns: 12,
-            helpText: "app.api.user.search.fields.search.help" as const,
+            helpText: "fields.search.help",
             schema: z
               .string()
               .min(2, {
-                message:
-                  "app.api.user.search.fields.search.validation.minLength",
+                message: "fields.search.validation.minLength",
               })
               .optional(),
           }),
         },
-      ),
+      }),
 
       // === SEARCH FILTERS (PROGRESSIVE DISCLOSURE) ===
-      filters: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.user.search.groups.filters.title" as const,
-          description:
-            "app.api.user.search.groups.filters.description" as const,
-          layoutType: LayoutType.VERTICAL,
-        },
-        { request: "data" },
-        {
-          roles: requestField({
+      filters: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "groups.filters.title",
+        description: "groups.filters.description",
+        layoutType: LayoutType.VERTICAL,
+        usage: { request: "data" },
+        children: {
+          roles: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.MULTISELECT,
-            label: "app.api.user.search.fields.roles.label" as const,
-            description:
-              "app.api.user.search.fields.roles.description" as const,
-            placeholder:
-              "app.api.user.search.fields.roles.placeholder" as const,
+            label: "fields.roles.label",
+            description: "fields.roles.description",
+            placeholder: "fields.roles.placeholder",
             options: UserRoleOptions,
             columns: 12,
-            helpText: "app.api.user.search.fields.roles.help" as const,
+            helpText: "fields.roles.help",
             schema: z.array(z.enum(UserRoleDB)).optional(),
           }),
 
-          status: requestField({
+          status: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label: "app.api.user.search.fields.status.label" as const,
-            description:
-              "app.api.user.search.fields.status.description" as const,
-            placeholder:
-              "app.api.user.search.fields.status.placeholder" as const,
+            label: "fields.status.label",
+            description: "fields.status.description",
+            placeholder: "fields.status.placeholder",
             options: UserSearchStatusOptions,
             columns: 12,
-            helpText: "app.api.user.search.fields.status.help" as const,
+            helpText: "fields.status.help",
             schema: z
               .enum(UserSearchStatus)
               .optional()
               .default(UserSearchStatus.ACTIVE),
           }),
         },
-      ),
+      }),
 
       // === PAGINATION CONTROLS ===
-      pagination: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.user.search.groups.pagination.title" as const,
-          description:
-            "app.api.user.search.groups.pagination.description" as const,
-          layoutType: LayoutType.VERTICAL,
-        },
-        { request: "data" },
-        {
-          limit: requestField({
+      pagination: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "groups.pagination.title",
+        description: "groups.pagination.description",
+        layoutType: LayoutType.VERTICAL,
+        usage: { request: "data" },
+        children: {
+          limit: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
-            label: "app.api.user.search.fields.limit.label" as const,
-            description:
-              "app.api.user.search.fields.limit.description" as const,
+            label: "fields.limit.label",
+            description: "fields.limit.description",
             columns: 6,
-            helpText: "app.api.user.search.fields.limit.help" as const,
+            helpText: "fields.limit.help",
             schema: z.coerce.number().min(1).max(100).default(20),
           }),
 
-          offset: requestField({
+          offset: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.NUMBER,
-            label: "app.api.user.search.fields.offset.label" as const,
-            description:
-              "app.api.user.search.fields.offset.description" as const,
+            label: "fields.offset.label",
+            description: "fields.offset.description",
             columns: 6,
-            helpText: "app.api.user.search.fields.offset.help" as const,
+            helpText: "fields.offset.help",
             schema: z.coerce.number().min(0).default(0),
           }),
         },
-      ),
+      }),
 
       // === RESPONSE FIELDS ===
-      response: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.user.search.response.title" as const,
-          description: "app.api.user.search.response.description" as const,
-          layoutType: LayoutType.VERTICAL,
-        },
-        { response: true },
-        {
-          success: responseField({
+      response: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "response.title",
+        description: "response.description",
+        layoutType: LayoutType.VERTICAL,
+        usage: { response: true },
+        children: {
+          success: scopedResponseField(scopedTranslation, {
             type: WidgetType.BADGE,
-            text: "app.api.user.search.response.success.badge" as const,
+            text: "response.success.badge",
             schema: z.boolean().describe("Whether the search was successful"),
           }),
-          message: responseField({
+          message: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.user.search.response.message.content" as const,
+            content: "response.message.content",
             schema: z.string().describe("Human-readable search result summary"),
           }),
-          searchInfo: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.user.search.response.searchInfo.title" as const,
-              description:
-                "app.api.user.search.response.searchInfo.description" as const,
-              layoutType: LayoutType.GRID,
-              columns: 12,
-            },
-            { response: true },
-            {
-              searchTerm: responseField({
+          searchInfo: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "response.searchInfo.title",
+            description: "response.searchInfo.description",
+            layoutType: LayoutType.GRID,
+            columns: 12,
+            usage: { response: true },
+            children: {
+              searchTerm: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.user.search.response.searchInfo.searchTerm" as const,
+                content: "response.searchInfo.searchTerm",
                 schema: z.string().optional().describe("The search term used"),
               }),
-              appliedFilters: responseField({
+              appliedFilters: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.user.search.response.searchInfo.appliedFilters" as const,
+                content: "response.searchInfo.appliedFilters",
                 schema: z.array(z.string()).describe("Active search filters"),
               }),
-              searchTime: responseField({
+              searchTime: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.user.search.response.searchInfo.searchTime" as const,
+                content: "response.searchInfo.searchTime",
                 schema: z.string().describe("How long the search took"),
               }),
-              totalResults: responseField({
+              totalResults: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.user.search.response.searchInfo.totalResults" as const,
+                content: "response.searchInfo.totalResults",
                 schema: z.coerce
                   .number()
                   .describe("Total number of results found"),
               }),
             },
-          ),
-          users: responseArrayField(
-            {
+          }),
+          users: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            child: scopedObjectFieldNew(scopedTranslation, {
               type: WidgetType.CONTAINER,
-            },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                layoutType: LayoutType.GRID,
-                columns: 12,
-              },
-              { response: true },
-              {
-                id: responseField({
+              layoutType: LayoutType.GRID,
+              columns: 12,
+              usage: { response: true },
+              children: {
+                id: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "app.api.user.search.response.users.id" as const,
+                  content: "response.users.id",
                   schema: z.uuid(),
                 }),
-                leadId: responseField({
+                leadId: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "app.api.user.search.response.users.leadId" as const,
+                  content: "response.users.leadId",
                   schema: z.uuid().nullable(),
                 }),
-                isPublic: responseField({
+                isPublic: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  text: "app.api.user.search.response.users.isPublic" as const,
+                  text: "response.users.isPublic",
                   schema: z.literal(false),
                 }),
-                privateName: responseField({
+                privateName: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.user.search.response.users.privateName" as const,
+                  content: "response.users.privateName",
                   schema: z.string(),
                 }),
-                publicName: responseField({
+                publicName: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.user.search.response.users.publicName" as const,
+                  content: "response.users.publicName",
                   schema: z.string(),
                 }),
-                email: responseField({
+                email: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "app.api.user.search.response.users.email" as const,
+                  content: "response.users.email",
                   schema: z.email(),
                 }),
-                isActive: responseField({
+                isActive: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  text: "app.api.user.search.response.users.isActive" as const,
+                  text: "response.users.isActive",
                   schema: z.boolean().nullable(),
                 }),
-                emailVerified: responseField({
+                emailVerified: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  text: "app.api.user.search.response.users.emailVerified" as const,
+                  text: "response.users.emailVerified",
                   schema: z.boolean().nullable(),
                 }),
-                requireTwoFactor: responseField({
+                requireTwoFactor: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  text: "app.api.user.search.response.users.requireTwoFactor" as const,
+                  text: "response.users.requireTwoFactor",
                   schema: z.boolean().optional(),
                 }),
-                marketingConsent: responseField({
+                marketingConsent: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  text: "app.api.user.search.response.users.marketingConsent" as const,
+                  text: "response.users.marketingConsent",
                   schema: z.boolean().optional(),
                 }),
-                userRoles: responseArrayField(
-                  {
+                userRoles: scopedResponseArrayFieldNew(scopedTranslation, {
+                  type: WidgetType.CONTAINER,
+                  groupBy: "role",
+                  child: scopedObjectFieldNew(scopedTranslation, {
                     type: WidgetType.CONTAINER,
-                    groupBy: "role",
-                  },
-                  objectField(
-                    {
-                      type: WidgetType.CONTAINER,
-                      layoutType: LayoutType.HORIZONTAL,
-                    },
-                    { response: true },
-                    {
-                      id: responseField({
+                    layoutType: LayoutType.HORIZONTAL,
+                    usage: { response: true },
+                    children: {
+                      id: scopedResponseField(scopedTranslation, {
                         type: WidgetType.TEXT,
-                        content:
-                          "app.api.user.search.response.users.userRoles.id" as const,
+                        content: "response.users.userRoles.id",
                         schema: z.string(),
                       }),
-                      role: responseField({
+                      role: scopedResponseField(scopedTranslation, {
                         type: WidgetType.BADGE,
-                        text: "app.api.user.search.response.users.userRoles.role" as const,
+                        text: "response.users.userRoles.role",
                         schema: z.enum(UserRole),
                       }),
                     },
-                  ),
-                ),
-                createdAt: responseField({
+                  }),
+                }),
+                createdAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.user.search.response.users.createdAt" as const,
+                  content: "response.users.createdAt",
                   schema: dateSchema,
                 }),
-                updatedAt: responseField({
+                updatedAt: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.user.search.response.users.updatedAt" as const,
+                  content: "response.users.updatedAt",
                   schema: dateSchema,
                 }),
               },
-            ),
-          ),
-          pagination: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title: "app.api.user.search.response.pagination.title" as const,
-              description:
-                "app.api.user.search.response.pagination.description" as const,
-              layoutType: LayoutType.GRID,
-              columns: 12,
-            },
-            { response: true },
-            {
-              currentPage: responseField({
+            }),
+          }),
+          pagination: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "response.pagination.title",
+            description: "response.pagination.description",
+            layoutType: LayoutType.GRID,
+            columns: 12,
+            usage: { response: true },
+            children: {
+              currentPage: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.user.search.response.pagination.currentPage" as const,
+                content: "response.pagination.currentPage",
                 schema: z.coerce
                   .number()
                   .describe("Current page number (1-based)"),
               }),
-              totalPages: responseField({
+              totalPages: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.user.search.response.pagination.totalPages" as const,
+                content: "response.pagination.totalPages",
                 schema: z.coerce.number().describe("Total number of pages"),
               }),
-              itemsPerPage: responseField({
+              itemsPerPage: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.user.search.response.pagination.itemsPerPage" as const,
+                content: "response.pagination.itemsPerPage",
                 schema: z.coerce.number().describe("Number of items per page"),
               }),
-              totalItems: responseField({
+              totalItems: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.user.search.response.pagination.totalItems" as const,
+                content: "response.pagination.totalItems",
                 schema: z.coerce.number().describe("Total number of items"),
               }),
-              hasMore: responseField({
+              hasMore: scopedResponseField(scopedTranslation, {
                 type: WidgetType.BADGE,
-                text: "app.api.user.search.response.pagination.hasMore" as const,
+                text: "response.pagination.hasMore",
                 schema: z.boolean().describe("Whether there are more pages"),
               }),
-              hasPrevious: responseField({
+              hasPrevious: scopedResponseField(scopedTranslation, {
                 type: WidgetType.BADGE,
-                text: "app.api.user.search.response.pagination.hasPrevious" as const,
+                text: "response.pagination.hasPrevious",
                 schema: z
                   .boolean()
                   .describe("Whether there are previous pages"),
               }),
             },
-          ),
+          }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.user.search.errors.validation.title" as const,
-      description: "app.api.user.search.errors.validation.description" as const,
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.user.search.errors.unauthorized.title" as const,
-      description:
-        "app.api.user.search.errors.unauthorized.description" as const,
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.user.search.errors.forbidden.title" as const,
-      description: "app.api.user.search.errors.forbidden.description" as const,
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.user.search.errors.notFound.title" as const,
-      description: "app.api.user.search.errors.notFound.description" as const,
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.user.search.errors.internal.title" as const,
-      description: "app.api.user.search.errors.internal.description" as const,
+      title: "errors.internal.title",
+      description: "errors.internal.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.user.search.errors.network.title" as const,
-      description: "app.api.user.search.errors.network.description" as const,
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.user.search.errors.unknown.title" as const,
-      description: "app.api.user.search.errors.unknown.description" as const,
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.user.search.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.user.search.errors.unsavedChanges.description" as const,
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.user.search.errors.conflict.title" as const,
-      description: "app.api.user.search.errors.conflict.description" as const,
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.user.search.success.title" as const,
-    description: "app.api.user.search.success.description" as const,
+    title: "success.title",
+    description: "success.description",
   },
 
   // === EXAMPLES ===

@@ -15,8 +15,11 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type { ReleaseOptions, VersionInfo } from "../definition";
+import { scopedTranslation } from "../i18n";
 import { MESSAGES } from "./constants";
 import { gitService } from "./git-service";
 
@@ -34,6 +37,7 @@ export interface IChangelogGenerator {
     versionInfo: VersionInfo,
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
   ): ResponseType<void>;
 }
 
@@ -48,6 +52,7 @@ export class ChangelogGenerator implements IChangelogGenerator {
     versionInfo: VersionInfo,
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
   ): ResponseType<void> {
     const changelogConfig = releaseConfig.changelog;
     if (!changelogConfig?.enabled) {
@@ -199,8 +204,9 @@ export class ChangelogGenerator implements IChangelogGenerator {
       return success();
     } catch (error) {
       logger.error(MESSAGES.CHANGELOG_FAILED, parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.changelog.failed",
+        message: t("changelog.failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: String(error) },
       });

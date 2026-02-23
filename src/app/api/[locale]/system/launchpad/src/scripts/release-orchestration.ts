@@ -2,8 +2,9 @@
 import inquirer from "inquirer";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { simpleT } from "@/i18n/core/shared";
+import type { CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation as launchpadScopedTranslation } from "../../i18n";
 import type {
   ReleaseOrchestrationOptions,
   ReleaseTarget,
@@ -23,6 +24,7 @@ import { StateManager } from "../utils/state-manager";
  */
 export async function ciReleaseCommand(
   logger: EndpointLogger,
+  locale: CountryLanguage,
   rootDir: string,
   targetDirectory?: string,
   gitTag?: string,
@@ -78,7 +80,7 @@ export async function ciReleaseCommand(
     ciMode: true,
   };
 
-  const { t } = simpleT("en-GLOBAL");
+  const { t } = launchpadScopedTranslation.scopedT(locale);
   const success = executor.executeReleaseTarget(targetToRelease, options, t);
   if (!success) {
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- CLI script throws for error reporting at startup
@@ -94,6 +96,7 @@ export async function ciReleaseCommand(
 export function forceUpdateAllCommand(
   logger: EndpointLogger,
   rootDir: string,
+  locale: CountryLanguage,
 ): void {
   logger.info("🔄 Force Update All Packages");
 
@@ -112,7 +115,7 @@ export function forceUpdateAllCommand(
   }
 
   const executor = new ReleaseExecutor(logger, rootDir);
-  const { t } = simpleT("en-GLOBAL");
+  const { t } = launchpadScopedTranslation.scopedT(locale);
   executor.executeForceUpdateAll(validTargets, t);
 }
 
@@ -122,6 +125,7 @@ export function forceUpdateAllCommand(
 export async function releaseAllCommand(
   logger: EndpointLogger,
   rootDir: string,
+  locale: CountryLanguage,
 ): Promise<void> {
   logger.info("🚀 Release All Packages");
 
@@ -146,7 +150,7 @@ export async function releaseAllCommand(
   };
 
   const executor = new ReleaseExecutor(logger, rootDir);
-  const { t } = simpleT("en-GLOBAL");
+  const { t } = launchpadScopedTranslation.scopedT(locale);
   await executor.executeReleaseOrchestration(validTargets, options, t);
 }
 
@@ -156,6 +160,7 @@ export async function releaseAllCommand(
 export async function forceReleaseCommand(
   logger: EndpointLogger,
   rootDir: string,
+  locale: CountryLanguage,
   versionBump?: VersionBumpType,
 ): Promise<void> {
   logger.info("⚡ Force Release All Packages");
@@ -214,7 +219,7 @@ export async function forceReleaseCommand(
   }
 
   const executor = new ReleaseExecutor(logger, rootDir);
-  const { t } = simpleT("en-GLOBAL");
+  const { t } = launchpadScopedTranslation.scopedT(locale);
   await executor.executeForceRelease(validTargets, selectedVersionBump, t);
 }
 
@@ -224,7 +229,7 @@ export async function forceReleaseCommand(
 export async function continueReleaseCommand(
   logger: EndpointLogger,
   rootDir: string,
-  t: ReturnType<typeof simpleT>["t"],
+  t: ReturnType<typeof launchpadScopedTranslation.scopedT>["t"],
 ): Promise<void> {
   logger.info("🔄 Continue Release from Previous State");
 
@@ -322,11 +327,12 @@ export function showReleaseStatusCommand(
 export async function weeklyUpdateCommand(
   logger: EndpointLogger,
   rootDir: string,
+  locale: CountryLanguage,
   branchName = "next_version_candidates",
 ): Promise<void> {
   logger.info("📅 Weekly Dependency Update");
 
   const executor = new ReleaseExecutor(logger, rootDir);
-  const { t } = simpleT("en-GLOBAL");
-  await executor.executeWeeklyUpdate(branchName, t);
+  const { t } = launchpadScopedTranslation.scopedT(locale);
+  await executor.executeWeeklyUpdate(branchName, t, locale);
 }

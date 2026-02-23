@@ -1,4 +1,33 @@
 export const translations = {
+  passwordStrength: {
+    label: "Password Strength",
+    weak: "Weak",
+    fair: "Fair",
+    good: "Good",
+    strong: "Strong",
+    requirement: {
+      minLength: {
+        icon: "✗",
+        text: "At least 8 characters",
+      },
+      uppercase: {
+        icon: "✗",
+        text: "At least one uppercase letter",
+      },
+      lowercase: {
+        icon: "✗",
+        text: "At least one lowercase letter",
+      },
+      number: {
+        icon: "✗",
+        text: "At least one number",
+      },
+      special: {
+        icon: "!",
+        text: "Special character (optional, improves strength)",
+      },
+    },
+  },
   post: {
     title: "_components",
     description: "_components endpoint",

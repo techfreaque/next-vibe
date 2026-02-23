@@ -16,6 +16,9 @@ import { parseError } from "next-vibe/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { StudioRequestOutput, StudioResponseOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Open database studio Repository Interface
@@ -23,6 +26,7 @@ import type { StudioRequestOutput, StudioResponseOutput } from "./definition";
 export interface StudioRepositoryInterface {
   execute(
     data: StudioRequestOutput,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<StudioResponseOutput>>;
 }
@@ -33,6 +37,7 @@ export interface StudioRepositoryInterface {
 export class StudioRepository {
   static async execute(
     data: StudioRequestOutput,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<StudioResponseOutput>> {
     const startTime = Date.now();
@@ -111,7 +116,7 @@ export class StudioRepository {
       if (exitResult.error) {
         return await Promise.resolve(
           fail({
-            message: "app.api.system.db.studio.post.errors.server.title",
+            message: t("post.errors.server.title"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: {
               error: exitResult.error.message,
@@ -145,7 +150,7 @@ export class StudioRepository {
 
       return await Promise.resolve(
         fail({
-          message: "app.api.system.db.studio.post.errors.server.title",
+          message: t("post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error: parsedError.message,

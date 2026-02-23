@@ -2,6 +2,11 @@ import { translations as permissionsTranslations } from "../../permissions/i18n/
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Chat",
+  tags: {
+    folders: "Ordner",
+  },
+
   permissions: permissionsTranslations,
   get: {
     title: "Ordner abrufen",

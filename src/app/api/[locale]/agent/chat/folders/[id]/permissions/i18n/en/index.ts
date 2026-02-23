@@ -1,4 +1,9 @@
 export const translations = {
+  category: "Chat",
+  tags: {
+    folders: "Folders",
+    permissions: "Permissions",
+  },
   get: {
     title: "Get Folder Permissions",
     description: "Retrieve the list of moderators for a specific folder",

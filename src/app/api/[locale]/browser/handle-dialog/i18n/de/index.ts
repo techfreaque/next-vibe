@@ -81,4 +81,9 @@ export const translations: typeof enTranslations = {
     title: "Dialogbehandlung erfolgreich",
     description: "Der Browser-Dialog wurde erfolgreich behandelt",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    dialogAutomation: "Dialog-Automatisierung",
+  },
 };

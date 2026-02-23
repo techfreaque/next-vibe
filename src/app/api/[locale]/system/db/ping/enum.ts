@@ -5,23 +5,25 @@
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * Database Ping Status
  */
 export const { enum: DbPingStatus, options: DbPingStatusOptions } =
-  createEnumOptions({
-    SUCCESS: "app.api.system.db.ping.status.success",
-    FAILED: "app.api.system.db.ping.status.failed",
-    TIMEOUT: "app.api.system.db.ping.status.timeout",
-    ERROR: "app.api.system.db.ping.status.error",
+  createEnumOptions(scopedTranslation, {
+    SUCCESS: "status.success",
+    FAILED: "status.failed",
+    TIMEOUT: "status.timeout",
+    ERROR: "status.error",
   });
 
 /**
  * Database Connection Type
  */
 export const { enum: DbConnectionType, options: DbConnectionTypeOptions } =
-  createEnumOptions({
-    PRIMARY: "app.api.system.db.ping.connectionType.primary",
-    REPLICA: "app.api.system.db.ping.connectionType.replica",
-    CACHE: "app.api.system.db.ping.connectionType.cache",
+  createEnumOptions(scopedTranslation, {
+    PRIMARY: "connectionType.primary",
+    REPLICA: "connectionType.replica",
+    CACHE: "connectionType.cache",
   });

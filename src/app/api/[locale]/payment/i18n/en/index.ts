@@ -226,6 +226,8 @@ export const translations = {
     },
     customerCreationFailed: "Failed to create Stripe customer",
     customerNotFound: "Stripe customer not found",
+    localMode: "Payment is disabled in local development mode",
+    webhookVerificationFailed: "Webhook signature verification failed",
   },
 
   // Top-level success

@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Użytkownicy",
+
   title: "Walidacja Tokenu Resetowania Hasła",
   description: "Endpoint walidacji tokenu resetowania hasła",
   tag: "Walidacja Resetowania Hasła",
@@ -16,6 +18,9 @@ export const translations: typeof enTranslations = {
       description: "Token resetowania hasła z emaila",
       placeholder: "Wprowadź token resetowania",
       help: "Wprowadź token, który otrzymałeś w emailu",
+      validation: {
+        required: "Token resetowania jest wymagany",
+      },
     },
   },
   response: {

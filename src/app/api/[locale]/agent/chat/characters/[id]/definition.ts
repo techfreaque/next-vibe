@@ -10,14 +10,14 @@ import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { success } from "@/app/api/[locale]/shared/types/response.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  backButton,
   customWidgetObject,
-  objectField,
-  requestField,
-  requestUrlPathParamsField,
-  responseField,
-  submitButton,
-  widgetField,
+  scopedBackButton,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedRequestUrlPathParamsField,
+  scopedResponseField,
+  scopedSubmitButton,
+  scopedWidgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -50,6 +50,7 @@ import type {
 import type { CharacterListResponseOutput } from "../definition";
 import { CategoryOptions } from "../enum";
 import { CharacterCategory } from "../enum";
+import { scopedTranslation } from "./i18n";
 import { CharacterEditContainer, CharacterViewContainer } from "./widgets";
 
 /**
@@ -57,15 +58,16 @@ import { CharacterEditContainer, CharacterViewContainer } from "./widgets";
  * Deletes a custom character by ID
  */
 const { DELETE } = createEndpoint({
+  scopedTranslation,
   method: Methods.DELETE,
   path: ["agent", "chat", "characters", "[id]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  title: "app.api.agent.chat.characters.id.delete.title" as const,
-  description: "app.api.agent.chat.characters.id.delete.description" as const,
+  title: "delete.title" as const,
+  description: "delete.description" as const,
   icon: "trash" as const,
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.characters" as const],
+  category: "category" as const,
+  tags: ["tags.characters" as const],
 
   options: {
     mutationOptions: {
@@ -101,120 +103,91 @@ const { DELETE } = createEndpoint({
     },
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      layoutType: LayoutType.STACKED,
-      paddingTop: "6",
-      noCard: true,
-    },
-    { request: "urlPathParams", response: true },
-    {
-      title: widgetField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    layoutType: LayoutType.STACKED,
+    paddingTop: "6",
+    noCard: true,
+    usage: { request: "urlPathParams", response: true },
+    children: {
+      title: scopedWidgetField(scopedTranslation, {
         type: WidgetType.TITLE,
         level: 5,
-        content:
-          "app.api.agent.chat.characters.id.delete.container.description" as const,
+        content: "delete.container.description" as const,
         usage: { request: "urlPathParams", response: true },
       }),
       // === URL PARAMETERS ===
-      id: requestUrlPathParamsField({
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label: "app.api.agent.chat.characters.id.delete.id.label" as const,
-        description:
-          "app.api.agent.chat.characters.id.delete.id.description" as const,
+        label: "delete.id.label" as const,
+        description: "delete.id.description" as const,
         hidden: true,
         schema: z.string(),
       }),
 
       // Navigation - back to previous screen
-      backButton: backButton({
-        label:
-          "app.api.agent.chat.characters.id.delete.backButton.label" as const,
+      backButton: scopedBackButton(scopedTranslation, {
+        label: "delete.backButton.label" as const,
         icon: "arrow-left",
         variant: "outline",
         usage: { request: "urlPathParams", response: true },
       }),
-      submitButton: submitButton({
-        label:
-          "app.api.agent.chat.characters.id.delete.actions.delete" as const,
-        loadingText:
-          "app.api.agent.chat.characters.id.delete.actions.deleting" as const,
+      submitButton: scopedSubmitButton(scopedTranslation, {
+        label: "delete.actions.delete" as const,
+        loadingText: "delete.actions.deleting" as const,
         icon: "trash",
         variant: "destructive",
         usage: { request: "urlPathParams", response: true },
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.characters.id.delete.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.delete.errors.validation.description" as const,
+      title: "delete.errors.validation.title" as const,
+      description: "delete.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.characters.id.delete.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.delete.errors.network.description" as const,
+      title: "delete.errors.network.title" as const,
+      description: "delete.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.characters.id.delete.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.delete.errors.unauthorized.description" as const,
+      title: "delete.errors.unauthorized.title" as const,
+      description: "delete.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.characters.id.delete.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.delete.errors.forbidden.description" as const,
+      title: "delete.errors.forbidden.title" as const,
+      description: "delete.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.characters.id.delete.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.delete.errors.notFound.description" as const,
+      title: "delete.errors.notFound.title" as const,
+      description: "delete.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.characters.id.delete.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.delete.errors.server.description" as const,
+      title: "delete.errors.server.title" as const,
+      description: "delete.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.characters.id.delete.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.delete.errors.unknown.description" as const,
+      title: "delete.errors.unknown.title" as const,
+      description: "delete.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.characters.id.delete.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.delete.errors.unsavedChanges.description" as const,
+      title: "delete.errors.unsavedChanges.title" as const,
+      description: "delete.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.characters.id.delete.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.delete.errors.conflict.description" as const,
+      title: "delete.errors.conflict.title" as const,
+      description: "delete.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.agent.chat.characters.id.delete.success.title" as const,
-    description:
-      "app.api.agent.chat.characters.id.delete.success.description" as const,
+    title: "delete.success.title" as const,
+    description: "delete.success.description" as const,
   },
 
   examples: {
-    responses: {
-      delete: {},
-    },
     urlPathParams: {
       delete: { id: "550e8400-e29b-41d4-a716-446655440000" },
     },
@@ -226,16 +199,16 @@ const { DELETE } = createEndpoint({
  * Updates a custom character (only custom characters can be updated)
  */
 const { PATCH } = createEndpoint({
+  scopedTranslation,
   method: Methods.PATCH,
   path: ["agent", "chat", "characters", "[id]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
-  title: "app.api.agent.chat.characters.id.patch.title" as const,
-  description:
-    "app.api.agent.chat.characters.id.patch.container.description" as const,
+  title: "patch.title" as const,
+  description: "patch.container.description" as const,
   icon: "sparkles" as const,
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.characters" as const],
+  category: "category" as const,
+  tags: ["tags.characters" as const],
 
   options: {
     mutationOptions: {
@@ -303,9 +276,10 @@ const { PATCH } = createEndpoint({
 
                     // Update the character with new data from the request
                     // Recalculate model info if modelSelection changed
-                    const bestModel = data.requestData.modelSelection
+                    const modelSel = data.requestData.modelSelection;
+                    const bestModel = modelSel
                       ? CharactersRepositoryClient.getBestModelForCharacter(
-                          data.requestData.modelSelection,
+                          modelSel,
                         )
                       : null;
 
@@ -342,113 +316,98 @@ const { PATCH } = createEndpoint({
     usage: { request: "data&urlPathParams", response: true } as const,
     children: {
       // === URL PARAMETERS ===
-      id: requestUrlPathParamsField({
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.agent.chat.characters.id.patch.id.label" as const,
+        label: "patch.id.label" as const,
         hidden: true,
         schema: z.string(),
       }),
 
       // === RESPONSE ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.ALERT,
         schema: z.string(),
       }),
 
-      name: requestField({
+      name: scopedRequestField(scopedTranslation, {
         schema: z
           .string()
           .min(2, {
-            message:
-              "app.api.agent.chat.characters.id.patch.name.validation.minLength" as const,
+            message: "patch.name.validation.minLength" as const,
           })
           .max(100, {
-            message:
-              "app.api.agent.chat.characters.id.patch.name.validation.maxLength" as const,
+            message: "patch.name.validation.maxLength" as const,
           }),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.agent.chat.characters.id.patch.name.label" as const,
-        description:
-          "app.api.agent.chat.characters.id.patch.name.description" as const,
-        placeholder:
-          "app.api.agent.chat.characters.id.patch.name.placeholder" as const,
+        label: "patch.name.label" as const,
+        description: "patch.name.description" as const,
+        placeholder: "patch.name.placeholder" as const,
         columns: 6,
         order: 0,
         theme: {
           descriptionStyle: "inline",
         } as const,
       }),
-      tagline: requestField({
+      tagline: scopedRequestField(scopedTranslation, {
         schema: z
           .string()
           .min(2, {
-            message:
-              "app.api.agent.chat.characters.id.patch.tagline.validation.minLength" as const,
+            message: "patch.tagline.validation.minLength" as const,
           })
           .max(500, {
-            message:
-              "app.api.agent.chat.characters.id.patch.tagline.validation.maxLength" as const,
+            message: "patch.tagline.validation.maxLength" as const,
           }),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.agent.chat.characters.id.patch.tagline.label" as const,
-        description:
-          "app.api.agent.chat.characters.id.patch.tagline.description" as const,
-        placeholder:
-          "app.api.agent.chat.characters.id.patch.tagline.placeholder" as const,
+        label: "patch.tagline.label" as const,
+        description: "patch.tagline.description" as const,
+        placeholder: "patch.tagline.placeholder" as const,
         columns: 6,
         order: 1,
         theme: {
           descriptionStyle: "inline",
         } as const,
       }),
-      icon: requestField({
+      icon: scopedRequestField(scopedTranslation, {
         schema: iconSchema,
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ICON,
-        label: "app.api.agent.chat.characters.id.patch.icon.label" as const,
-        description:
-          "app.api.agent.chat.characters.id.patch.icon.description" as const,
+        label: "patch.icon.label" as const,
+        description: "patch.icon.description" as const,
         columns: 6,
         order: 2,
         theme: {
           descriptionStyle: "inline",
         } as const,
       }),
-      description: requestField({
+      description: scopedRequestField(scopedTranslation, {
         schema: z
           .string()
           .min(10, {
-            message:
-              "app.api.agent.chat.characters.id.patch.description.validation.minLength" as const,
+            message: "patch.description.validation.minLength" as const,
           })
           .max(500, {
-            message:
-              "app.api.agent.chat.characters.id.patch.description.validation.maxLength" as const,
+            message: "patch.description.validation.maxLength" as const,
           }),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.agent.chat.characters.id.patch.description.label" as const,
-        description:
-          "app.api.agent.chat.characters.id.patch.description.description" as const,
-        placeholder:
-          "app.api.agent.chat.characters.id.patch.description.placeholder" as const,
+        label: "patch.description.label" as const,
+        description: "patch.description.description" as const,
+        placeholder: "patch.description.placeholder" as const,
         columns: 6,
         order: 3,
         theme: {
           descriptionStyle: "inline",
         } as const,
       }),
-      category: requestField({
+      category: scopedRequestField(scopedTranslation, {
         schema: z.enum(CharacterCategory),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.agent.chat.characters.id.patch.category.label" as const,
-        description:
-          "app.api.agent.chat.characters.id.patch.category.description" as const,
+        label: "patch.category.label" as const,
+        description: "patch.category.description" as const,
         options: CategoryOptions,
         columns: 6,
         order: 4,
@@ -456,25 +415,23 @@ const { PATCH } = createEndpoint({
           descriptionStyle: "inline",
         } as const,
       }),
-      isPublic: requestField({
+      isPublic: scopedRequestField(scopedTranslation, {
         schema: z.boolean(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.agent.chat.characters.id.patch.isPublic.label" as const,
-        description:
-          "app.api.agent.chat.characters.id.patch.isPublic.description" as const,
+        label: "patch.isPublic.label" as const,
+        description: "patch.isPublic.description" as const,
         columns: 6,
         order: 5,
         theme: {
           descriptionStyle: "inline",
         } as const,
       }),
-      voice: requestField({
+      voice: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.agent.chat.favorites.id.patch.voice.label" as const,
-        description:
-          "app.api.agent.chat.favorites.id.patch.voice.description" as const,
+        label: "patch.voice.label" as const,
+        description: "patch.voice.description" as const,
         options: TtsVoiceOptions,
         columns: 6,
         theme: {
@@ -483,103 +440,107 @@ const { PATCH } = createEndpoint({
         },
         schema: z.enum(TtsVoiceDB).nullable().optional(),
       }),
-      systemPrompt: requestField({
+      systemPrompt: scopedRequestField(scopedTranslation, {
         schema: z.string().nullable(),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
-        label:
-          "app.api.agent.chat.characters.id.patch.systemPrompt.label" as const,
-        description:
-          "app.api.agent.chat.characters.id.patch.systemPrompt.description" as const,
-        placeholder:
-          "app.api.agent.chat.characters.id.patch.systemPrompt.placeholder" as const,
+        label: "patch.systemPrompt.label" as const,
+        description: "patch.systemPrompt.description" as const,
+        placeholder: "patch.systemPrompt.placeholder" as const,
         columns: 12,
         order: 7,
         theme: {
           descriptionStyle: "inline",
         } as const,
       }),
-      modelSelection: requestField({
+      modelSelection: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.OBJECT,
+        fieldType: FieldDataType.TEXT,
         schema: modelSelectionSchemaSimple.nullable(),
       }),
 
       // Auto-compacting token threshold (null = use global/settings default)
-      compactTrigger: requestField({
+      compactTrigger: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.agent.chat.characters.id.patch.compactTrigger.label" as const,
-        description:
-          "app.api.agent.chat.characters.id.patch.compactTrigger.description" as const,
+        label: "patch.compactTrigger.label" as const,
+        description: "patch.compactTrigger.description" as const,
         columns: 6,
         schema: z.number().int().min(1000).max(200000).nullable().optional(),
+      }),
+
+      // Tool configuration — null = inherit from settings (default)
+      allowedTools: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        schema: z
+          .array(
+            z.object({
+              toolId: z.string(),
+              requiresConfirmation: z.boolean().default(false),
+            }),
+          )
+          .nullable()
+          .optional(),
+      }),
+      pinnedTools: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        schema: z
+          .array(
+            z.object({
+              toolId: z.string(),
+              requiresConfirmation: z.boolean().default(false),
+            }),
+          )
+          .nullable()
+          .optional(),
       }),
     },
   }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.characters.id.patch.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.patch.errors.validation.description" as const,
+      title: "patch.errors.validation.title" as const,
+      description: "patch.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.characters.id.patch.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.patch.errors.network.description" as const,
+      title: "patch.errors.network.title" as const,
+      description: "patch.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.characters.id.patch.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.patch.errors.unauthorized.description" as const,
+      title: "patch.errors.unauthorized.title" as const,
+      description: "patch.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.characters.id.patch.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.patch.errors.forbidden.description" as const,
+      title: "patch.errors.forbidden.title" as const,
+      description: "patch.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.characters.id.patch.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.patch.errors.notFound.description" as const,
+      title: "patch.errors.notFound.title" as const,
+      description: "patch.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.characters.id.patch.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.patch.errors.server.description" as const,
+      title: "patch.errors.server.title" as const,
+      description: "patch.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.characters.id.patch.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.patch.errors.unknown.description" as const,
+      title: "patch.errors.unknown.title" as const,
+      description: "patch.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.characters.id.patch.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.patch.errors.unsavedChanges.description" as const,
+      title: "patch.errors.unsavedChanges.title" as const,
+      description: "patch.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.characters.id.patch.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.patch.errors.conflict.description" as const,
+      title: "patch.errors.conflict.title" as const,
+      description: "patch.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.agent.chat.characters.id.patch.success.title" as const,
-    description:
-      "app.api.agent.chat.characters.id.patch.success.description" as const,
+    title: "patch.success.title" as const,
+    description: "patch.success.description" as const,
   },
 
   examples: {
@@ -601,7 +562,7 @@ const { PATCH } = createEndpoint({
     },
     responses: {
       update: {
-        success: "app.api.agent.chat.characters.id.patch.success.title",
+        success: "patch.success.title",
       },
     },
     urlPathParams: {
@@ -615,160 +576,168 @@ const { PATCH } = createEndpoint({
  * Retrieves a specific character by ID (default or custom)
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["agent", "chat", "characters", "[id]"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN, UserRole.PUBLIC] as const,
 
-  title: "app.api.agent.chat.characters.id.get.title" as const,
-  description: "app.api.agent.chat.characters.id.get.description" as const,
+  title: "get.title" as const,
+  description: "get.description" as const,
   icon: "sparkles" as const,
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.characters" as const],
+  category: "category" as const,
+  tags: ["tags.characters" as const],
 
   fields: customWidgetObject({
     render: CharacterViewContainer,
     usage: { request: "urlPathParams", response: true } as const,
     children: {
       // === URL PARAMETERS ===
-      id: requestUrlPathParamsField({
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.agent.chat.characters.id.get.id.label" as const,
+        label: "get.id.label" as const,
         hidden: true,
         schema: z.string(),
       }),
 
       // Separator (widget only)
-      separator: widgetField({
+      separator: scopedWidgetField(scopedTranslation, {
         type: WidgetType.SEPARATOR,
         spacingTop: SpacingSize.RELAXED,
         spacingBottom: SpacingSize.RELAXED,
         usage: { response: true } as const,
       }),
 
-      icon: responseField({
+      icon: scopedResponseField(scopedTranslation, {
         type: WidgetType.ICON,
         iconSize: "xl",
         containerSize: "sm",
         schema: iconSchema.nullable(),
       }),
-      name: responseField({
+      name: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         size: "xl",
         emphasis: "bold",
         schema: z.string().min(1).max(100).nullable(),
       }),
-      tagline: responseField({
+      tagline: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         size: "sm",
         variant: "muted",
         schema: z.string().min(1).max(500).nullable(),
       }),
-      description: responseField({
+      description: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         size: "base",
         schema: z.string().min(1).max(500).nullable(),
       }),
-      category: responseField({
+      category: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
         variant: "default",
         schema: z.enum(CharacterCategory),
       }),
-      isPublic: responseField({
+      isPublic: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.boolean(),
       }),
-      voice: responseField({
+      voice: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
         variant: "default",
         schema: z.enum(TtsVoiceDB),
       }),
-      systemPrompt: responseField({
+      systemPrompt: scopedResponseField(scopedTranslation, {
         type: WidgetType.MARKDOWN,
         schema: z.string().nullable(),
       }),
-      modelSelection: responseField({
+      modelSelection: scopedResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.OBJECT,
         schema: modelSelectionSchemaSimple,
       }),
-      characterOwnership: responseField({
+      characterOwnership: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.enum(CharacterOwnershipType),
       }),
 
       // Auto-compacting token threshold (null = use global/settings default)
-      compactTrigger: responseField({
+      compactTrigger: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.number().int().nullable(),
+      }),
+
+      // Tool configuration — null = inherit from settings (default)
+      allowedTools: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z
+          .array(
+            z.object({
+              toolId: z.string(),
+              requiresConfirmation: z.boolean().default(false),
+            }),
+          )
+          .nullable(),
+      }),
+      pinnedTools: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z
+          .array(
+            z.object({
+              toolId: z.string(),
+              requiresConfirmation: z.boolean().default(false),
+            }),
+          )
+          .nullable(),
       }),
     },
   }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.characters.id.get.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.get.errors.validation.description" as const,
+      title: "get.errors.validation.title" as const,
+      description: "get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.agent.chat.characters.id.get.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.get.errors.network.description" as const,
+      title: "get.errors.network.title" as const,
+      description: "get.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.characters.id.get.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.get.errors.unauthorized.description" as const,
+      title: "get.errors.unauthorized.title" as const,
+      description: "get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.characters.id.get.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.get.errors.forbidden.description" as const,
+      title: "get.errors.forbidden.title" as const,
+      description: "get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.agent.chat.characters.id.get.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.get.errors.notFound.description" as const,
+      title: "get.errors.notFound.title" as const,
+      description: "get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.agent.chat.characters.id.get.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.get.errors.server.description" as const,
+      title: "get.errors.server.title" as const,
+      description: "get.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.agent.chat.characters.id.get.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.get.errors.unknown.description" as const,
+      title: "get.errors.unknown.title" as const,
+      description: "get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.characters.id.get.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.get.errors.unsavedChanges.description" as const,
+      title: "get.errors.unsavedChanges.title" as const,
+      description: "get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.agent.chat.characters.id.get.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.characters.id.get.errors.conflict.description" as const,
+      title: "get.errors.conflict.title" as const,
+      description: "get.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.agent.chat.characters.id.get.success.title" as const,
-    description:
-      "app.api.agent.chat.characters.id.get.success.description" as const,
+    title: "get.success.title" as const,
+    description: "get.success.description" as const,
   },
 
   examples: {
@@ -781,7 +750,7 @@ const { GET } = createEndpoint({
         category: CharacterCategory.ASSISTANT,
         isPublic: false,
         characterOwnership: CharacterOwnershipType.SYSTEM,
-        voice: "app.api.agent.textToSpeech.voices.FEMALE",
+        voice: TtsVoice.FEMALE,
         systemPrompt: "",
         modelSelection: {
           selectionType: ModelSelectionType.FILTERS,
@@ -803,6 +772,8 @@ const { GET } = createEndpoint({
           },
         },
         compactTrigger: null,
+        allowedTools: null,
+        pinnedTools: null,
       },
       getCustom: {
         icon: "👨‍💻",
@@ -812,7 +783,7 @@ const { GET } = createEndpoint({
         category: CharacterCategory.CODING,
         isPublic: true,
         characterOwnership: CharacterOwnershipType.PUBLIC,
-        voice: "app.api.agent.textToSpeech.voices.MALE",
+        voice: TtsVoice.MALE,
         systemPrompt: "You are an expert code reviewer...",
         modelSelection: {
           selectionType: ModelSelectionType.FILTERS,
@@ -834,6 +805,8 @@ const { GET } = createEndpoint({
           },
         },
         compactTrigger: null,
+        allowedTools: null,
+        pinnedTools: null,
       },
     },
     urlPathParams: {

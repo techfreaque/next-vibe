@@ -71,4 +71,9 @@ export const translations = {
     title: "Performance Trace Started Successfully",
     description: "The performance trace was started successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    performanceAutomation: "Performance Automation",
+  },
 };

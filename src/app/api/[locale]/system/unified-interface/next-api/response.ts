@@ -17,6 +17,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { validateData } from "next-vibe/shared/utils";
 
+import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -96,16 +97,22 @@ export function wrapErrorResponse(
   });
 
   // Validate error response format
-  const validationResult = validateData(error, errorResponseSchema, logger);
+  const validationResult = validateData(
+    error,
+    errorResponseSchema,
+    logger,
+    locale,
+  );
 
   // Handle validation errors in the error response itself
   if (!validationResult.success) {
     logger.error(
       `Error response validation failed: ${validationResult.message ?? "Unknown validation error"}`,
     );
+    const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
     return NextResponse.json(
       fail({
-        message: "app.api.shared.errorTypes.invalid_response_error",
+        message: sharedT("errorTypes.invalid_response_error"),
         errorType: ErrorResponseTypes.INVALID_RESPONSE_ERROR,
         messageParams: { error: validationResult.message },
       }),

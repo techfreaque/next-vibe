@@ -88,6 +88,9 @@ export const translations = {
     campaignType: {
       leadCampaign: "Lead Campaign",
       newsletter: "Newsletter",
+      signupNurture: "Signup Nurture",
+      retention: "Retention",
+      winback: "Winback",
       transactional: "Transactional",
       notification: "Notification",
       system: "System",

@@ -9,11 +9,12 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import { scopedTranslation } from "@/app/api/[locale]/user/public/reset-password/confirm/i18n";
 import resetConfirmDefinitions from "@/app/api/[locale]/user/public/reset-password/confirm/definition";
 import type { ResetPasswordValidateGetResponseOutput } from "@/app/api/[locale]/user/public/reset-password/validate/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "../../../../auth/types";
+import { simpleT } from "@/i18n/core/shared";
 
 interface ResetPasswordConfirmFormProps {
   locale: CountryLanguage;
@@ -28,8 +29,8 @@ export default function ResetPasswordConfirmForm({
   tokenValidationResponse,
   user,
 }: ResetPasswordConfirmFormProps): JSX.Element {
-  const { t } = simpleT(locale);
-
+  const { t } = scopedTranslation.scopedT(locale);
+  const { t: globalT } = simpleT(locale);
   // Extract token validation status
   const tokenValid = tokenValidationResponse.success
     ? tokenValidationResponse.data?.response?.valid
@@ -47,11 +48,9 @@ export default function ResetPasswordConfirmForm({
           <CardContent className="pt-6 space-y-4">
             <Div className="text-destructive text-center">
               {tokenValidationResponse.success
-                ? t(
-                    tokenValidationResponse.data?.response?.message ||
-                      "app.common.errors.unknown",
-                  )
-                : t(
+                ? (tokenValidationResponse.data?.response?.message ??
+                  t("errors.unknown.title"))
+                : globalT(
                     tokenValidationResponse.message,
                     tokenValidationResponse.messageParams,
                   )}
@@ -59,9 +58,7 @@ export default function ResetPasswordConfirmForm({
             <Div className="text-center">
               <Button asChild>
                 <Link href={`/${locale}/user/reset-password`}>
-                  {t(
-                    "app.user.other.resetPassword.auth.resetPassword.requestNewLink",
-                  )}
+                  {t("actions.requestNewLink")}
                 </Link>
               </Button>
             </Div>

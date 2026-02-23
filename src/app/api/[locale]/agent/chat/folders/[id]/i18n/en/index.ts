@@ -1,6 +1,11 @@
 import { translations as permissionsTranslations } from "../../permissions/i18n/en";
 
 export const translations = {
+  category: "Chat",
+  tags: {
+    folders: "Folders",
+  },
+
   permissions: permissionsTranslations,
   get: {
     title: "Get Folder",

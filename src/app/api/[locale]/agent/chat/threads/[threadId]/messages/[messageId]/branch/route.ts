@@ -13,7 +13,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ urlPathParams, data, user, locale, logger }) =>
-      branchRepository.createBranch(urlPathParams, data, user, locale, logger),
+    handler: ({ urlPathParams, data, user, t, logger }) =>
+      branchRepository.createBranch(urlPathParams, data, user, t, logger),
   },
 });

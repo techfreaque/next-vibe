@@ -1,4 +1,15 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    localModeOnly: {
+      title: "Tylko w trybie lokalnym",
+    },
+    invalidUsername:
+      "Nieprawidłowa nazwa użytkownika: musi być małymi literami alfanumerycznymi + myślnik, zaczynając od litery",
+    userAlreadyExists: "Użytkownik już istnieje",
+  },
+
   post: {
     title: "Utwórz użytkownika Linux",
     description: "Utwórz nowe konto użytkownika OS na hoście",

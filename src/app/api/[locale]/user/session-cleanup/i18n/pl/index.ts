@@ -1,6 +1,67 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Użytkownicy",
+
+  post: {
+    title: "Czyszczenie sesji",
+    description: "Oczyszczanie wygasłych sesji i tokenów użytkowników",
+    tag: "Czyszczenie sesji",
+    container: {
+      title: "Czyszczenie sesji",
+      description: "Konfiguracja i uruchamianie czyszczenia sesji",
+    },
+    fields: {
+      sessionRetentionDays: {
+        label: "Dni przechowywania sesji",
+        description: "Liczba dni do przechowywania sesji",
+      },
+      tokenRetentionDays: {
+        label: "Dni przechowywania tokenów",
+        description: "Liczba dni do przechowywania tokenów",
+      },
+      batchSize: {
+        label: "Rozmiar partii",
+        description: "Liczba rekordów na partię",
+      },
+      dryRun: {
+        label: "Próbny przebieg",
+        description: "Uruchom bez rzeczywistego usuwania",
+      },
+    },
+    response: {
+      sessionsDeleted: "Usunięte sesje",
+      tokensDeleted: "Usunięte tokeny",
+      totalProcessed: "Łącznie przetworzono",
+      executionTimeMs: "Czas wykonania (ms)",
+    },
+    errors: {
+      unauthorized: {
+        title: "Nieautoryzowany",
+        description: "Musisz być administratorem",
+      },
+      forbidden: {
+        title: "Zabroniony",
+        description: "Dostęp zabroniony",
+      },
+      server: {
+        title: "Błąd serwera",
+        description: "Wewnętrzny błąd serwera",
+      },
+      unknown: {
+        title: "Nieznany błąd",
+        description: "Wystąpił nieznany błąd",
+      },
+      validation: {
+        title: "Błąd walidacji",
+        description: "Nieprawidłowa konfiguracja czyszczenia",
+      },
+    },
+    success: {
+      title: "Czyszczenie sesji zakończone",
+      description: "Sesje i tokeny wyczyszczone pomyślnie",
+    },
+  },
   task: {
     description:
       "Oczyszczanie wygasłych sesji użytkowników w celu utrzymania bezpieczeństwa systemu",

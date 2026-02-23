@@ -13,45 +13,13 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
+import { scopedTranslation } from "../i18n";
 import { MESSAGES } from "./constants";
 
-// ============================================================================
-// Interface
-// ============================================================================
-
-export interface ISnykService {
-  /**
-   * Run Snyk vulnerability test
-   */
-  runSnykTest(
-    cwd: string,
-    packageName: string,
-    logger: EndpointLogger,
-    dryRun: boolean,
-  ): ResponseType<void>;
-
-  /**
-   * Run Snyk monitor (for CI)
-   */
-  runSnykMonitor(
-    cwd: string,
-    packageName: string,
-    logger: EndpointLogger,
-    dryRun: boolean,
-  ): ResponseType<void>;
-
-  /**
-   * Check if Snyk CLI is available
-   */
-  isAvailable(): boolean;
-}
-
-// ============================================================================
-// Implementation
-// ============================================================================
-
-export class SnykService implements ISnykService {
+export class SnykService {
   isAvailable(): boolean {
     try {
       execSync("snyk --version", { stdio: "pipe" });
@@ -66,6 +34,7 @@ export class SnykService implements ISnykService {
     packageName: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
   ): ResponseType<void> {
     if (dryRun) {
       logger.info(MESSAGES.DRY_RUN_MODE, { action: "snyk test" });
@@ -85,8 +54,9 @@ export class SnykService implements ISnykService {
       return success();
     } catch (error) {
       logger.error(MESSAGES.SNYK_TEST_FAILED, parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.snyk.testFailed",
+        message: t("snyk.testFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { packageName, error: String(error) },
       });
@@ -98,6 +68,7 @@ export class SnykService implements ISnykService {
     packageName: string,
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
   ): ResponseType<void> {
     if (dryRun) {
       logger.info(MESSAGES.DRY_RUN_MODE, { action: "snyk monitor" });
@@ -123,8 +94,9 @@ export class SnykService implements ISnykService {
       return success();
     } catch (error) {
       logger.error(MESSAGES.SNYK_MONITOR_FAILED, parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.snyk.monitorFailed",
+        message: t("snyk.monitorFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { packageName, error: String(error) },
       });

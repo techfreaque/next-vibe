@@ -22,6 +22,9 @@ import type {
   FilesReadRequestOutput,
   FilesReadResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 const DEFAULT_MAX_BYTES = 65536;
 const MAX_ALLOWED_BYTES = 524288;
@@ -41,10 +44,11 @@ export class FilesReadRepository {
   static async read(
     data: FilesReadRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<FilesReadResponseOutput>> {
     if (data.connectionId) {
       return fail({
-        message: "SSH backend not yet implemented for file reading",
+        message: t("errors.notImplemented.fileRead"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
@@ -53,7 +57,7 @@ export class FilesReadRepository {
 
     if (!isValidPath(filePath)) {
       return fail({
-        message: "Invalid path: must be absolute without '..' segments",
+        message: t("errors.invalidPath"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
@@ -97,19 +101,19 @@ export class FilesReadRepository {
       const err = error as NodeJS.ErrnoException;
       if (err.code === "ENOENT") {
         return fail({
-          message: "File not found",
+          message: t("errors.fileNotFound"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
       if (err.code === "EACCES") {
         return fail({
-          message: "Permission denied",
+          message: t("errors.permissionDenied"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
       logger.error("Failed to read file", parseError(error));
       return fail({
-        message: ErrorResponseTypes.INTERNAL_ERROR.errorKey,
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

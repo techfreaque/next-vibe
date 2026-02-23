@@ -6,7 +6,6 @@ import type { ReactElement } from "react";
 import type { z } from "zod";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction, TranslationKey } from "@/i18n/core/static-types";
 
 import type { TrackingContext } from "../smtp-client/components/tracking_context.email";
 
@@ -34,10 +33,10 @@ export interface PreviewSelectOption {
 /**
  * Preview field configuration
  */
-export interface PreviewFieldConfig {
+export interface PreviewFieldConfig<TKey extends string> {
   type: PreviewFieldType;
-  label: string; // Translation key
-  description?: string; // Translation key
+  label: TKey; // Translation key
+  description?: TKey; // Translation key
   defaultValue?: string | number | boolean;
   required?: boolean;
   options?: PreviewSelectOption[]; // For select fields
@@ -49,12 +48,12 @@ export interface PreviewFieldConfig {
 /**
  * Template metadata cache (serializable, in generated registry)
  */
-export interface TemplateCachedMetadata {
+export interface TemplateCachedMetadata<TKey extends string> {
   id: string;
   version: string; // Semver (e.g., "1.2.3")
-  name: TranslationKey; // Translation key
-  description: TranslationKey; // Translation key
-  category: string;
+  name: TKey; // Translation key
+  description: TKey; // Translation key
+  category: TKey;
   path: string; // File path for reference
   exampleProps: Record<string, string | number | boolean>; // Example props for preview (serializable, required)
 }
@@ -62,27 +61,44 @@ export interface TemplateCachedMetadata {
 /**
  * Full template metadata (includes functions, from loaded template)
  */
-export interface TemplateMetadata {
+export interface TemplateMetadata<TKey extends string> {
   id: string;
   version: string;
-  name: TranslationKey;
-  description: TranslationKey;
-  category: string;
+  name: TKey;
+  description: TKey;
+  category: TKey;
   path: string;
-  defaultSubject: string | ((t: TFunction) => string);
-  changelog?: string; // Translation key
-  previewFields?: Record<string, PreviewFieldConfig>;
+  defaultSubject: TKey;
+  changelog?: TKey;
+  previewFields?: Record<string, PreviewFieldConfig<TKey>>;
 }
 
 /**
  * Full template definition (lazy-loaded)
+ * TProps: the props type for the email component
+ * TScopedTranslation: the createScopedTranslation result for this template's module
  */
-export interface EmailTemplateDefinition<TProps = never> {
-  meta: TemplateMetadata;
+export interface EmailTemplateDefinition<
+  TProps = never,
+  // TScopedTranslation must have scopedT that returns an object with t.
+  // We use { t: (...args: never[]) => string } to avoid contravariance issues
+  // with specific key unions — the actual type flows through ReturnType inference.
+  TScopedTranslation extends {
+    scopedT: (locale: CountryLanguage) => { t: (...args: never[]) => string };
+  } = {
+    scopedT: (locale: CountryLanguage) => {
+      t: (key: string, params?: Record<string, string | number>) => string;
+    };
+  },
+> {
+  scopedTranslation: TScopedTranslation;
+  meta: TemplateMetadata<
+    Parameters<ReturnType<TScopedTranslation["scopedT"]>["t"]>[0]
+  >;
   schema: z.ZodType<TProps>;
   component: (params: {
     props: TProps;
-    t: TFunction;
+    t: ReturnType<TScopedTranslation["scopedT"]>["t"];
     locale: CountryLanguage;
     recipientEmail: string;
     tracking: TrackingContext;

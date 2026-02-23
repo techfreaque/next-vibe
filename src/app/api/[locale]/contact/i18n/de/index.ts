@@ -178,6 +178,7 @@ export const translations: typeof enTranslations = {
       description:
         "Ein Konflikt ist bei der Verarbeitung Ihrer Anfrage aufgetreten",
     },
+    email_generation_failed: "E-Mail konnte nicht generiert werden",
   },
 
   sms: {
@@ -345,6 +346,84 @@ export const translations: typeof enTranslations = {
   error: {
     general: {
       internal_server_error: "Interner Serverfehler aufgetreten",
+    },
+  },
+
+  emailTemplates: {
+    contactForm: {
+      meta: {
+        name: "Kontaktformular-Benachrichtigung",
+        description:
+          "E-Mail, die an den Kontakt und das Unternehmensteam gesendet wird, wenn ein Kontaktformular eingereicht wird",
+        category: "Kontakt",
+      },
+      preview: {
+        name: {
+          label: "Name des Absenders",
+          description:
+            "Vollständiger Name der Person, die das Kontaktformular einreicht",
+        },
+        email: {
+          label: "E-Mail des Absenders",
+          description: "E-Mail-Adresse der Person, die das Formular einreicht",
+        },
+        company: {
+          label: "Firmenname",
+          description: "Optionaler Firmenname des Absenders",
+        },
+        subject: {
+          label: "Nachrichtenbetreff",
+          description: "Betreffzeile der Kontaktnachricht",
+        },
+        message: {
+          label: "Nachrichteninhalt",
+          description: "Der Hauptinhalt der Nachricht aus dem Kontaktformular",
+        },
+        isForCompany: {
+          label: "Unternehmens-E-Mail-Flag",
+          description:
+            "Ob diese E-Mail an das Unternehmen (Admin) oder den Absender (Bestätigung) gerichtet ist",
+        },
+        userId: {
+          label: "Benutzer-ID",
+          description: "Optionale Benutzer-ID zur Nachverfolgung",
+        },
+        leadId: {
+          label: "Lead-ID",
+          description: "Optionale Lead-ID für CRM-Tracking",
+        },
+      },
+    },
+    adminContact: {
+      meta: {
+        name: "Admin-Kontaktbenachrichtigung",
+        description:
+          "Interne Benachrichtigungs-E-Mail, die an Admins gesendet wird, wenn ein neues Kontaktformular eingereicht wird",
+        category: "Admin",
+      },
+      preview: {
+        name: {
+          label: "Name des Absenders",
+        },
+        email: {
+          label: "E-Mail des Absenders",
+        },
+        subject: {
+          label: "Nachrichtenbetreff",
+        },
+        message: {
+          label: "Nachrichteninhalt",
+        },
+        company: {
+          label: "Firmenname",
+        },
+        userId: {
+          label: "Benutzer-ID",
+        },
+        leadId: {
+          label: "Lead-ID",
+        },
+      },
     },
   },
 };

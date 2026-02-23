@@ -1,33 +1,70 @@
 import { NextResponse } from "next/server";
 
-import { defaultLocaleConfig } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { CountryLanguageValues } from "@/i18n/core/config";
 
-// Use default locale for API error messages
-const { t } = simpleT(
-  `${defaultLocaleConfig.language}-${defaultLocaleConfig.country}`,
-);
+import { scopedTranslation } from "./i18n";
 
-export function GET(): NextResponse {
-  return new NextResponse(t("app.api.[...slug].not_found"), { status: 404 });
+const allLocales = Object.values(CountryLanguageValues) as CountryLanguage[];
+
+function getLocaleFromRequest(request: Request): CountryLanguage {
+  const acceptLanguage = request.headers.get("accept-language") ?? "";
+  for (const lang of acceptLanguage.split(",")) {
+    const tag = lang.split(";")[0]?.trim();
+    if (!tag) {
+      continue;
+    }
+    const normalized = tag.replace("_", "-");
+    const exact = allLocales.find(
+      (l) => l.toLowerCase() === normalized.toLowerCase(),
+    );
+    if (exact) {
+      return exact;
+    }
+    const langCode = normalized.split("-")[0]?.toLowerCase();
+    if (!langCode) {
+      continue;
+    }
+    const globalLocale = `${langCode}-GLOBAL` as CountryLanguage;
+    if (allLocales.includes(globalLocale)) {
+      return globalLocale;
+    }
+    const match = allLocales.find(
+      (l) => l.split("-")[0]?.toLowerCase() === langCode,
+    );
+    if (match) {
+      return match;
+    }
+  }
+  return allLocales[0];
 }
 
-export function POST(): NextResponse {
-  return new NextResponse(t("app.api.[...slug].not_found"), { status: 404 });
+function notFoundResponse(request: Request): NextResponse {
+  const locale = getLocaleFromRequest(request);
+  const { t } = scopedTranslation.scopedT(locale);
+  return new NextResponse(t("not_found"), { status: 404 });
 }
 
-export function PUT(): NextResponse {
-  return new NextResponse(t("app.api.[...slug].not_found"), { status: 404 });
+export function GET(request: Request): NextResponse {
+  return notFoundResponse(request);
 }
 
-export function DELETE(): NextResponse {
-  return new NextResponse(t("app.api.[...slug].not_found"), { status: 404 });
+export function POST(request: Request): NextResponse {
+  return notFoundResponse(request);
 }
 
-export function PATCH(): NextResponse {
-  return new NextResponse(t("app.api.[...slug].not_found"), { status: 404 });
+export function PUT(request: Request): NextResponse {
+  return notFoundResponse(request);
 }
 
-export function OPTIONS(): NextResponse {
-  return new NextResponse(t("app.api.[...slug].not_found"), { status: 404 });
+export function DELETE(request: Request): NextResponse {
+  return notFoundResponse(request);
+}
+
+export function PATCH(request: Request): NextResponse {
+  return notFoundResponse(request);
+}
+
+export function OPTIONS(request: Request): NextResponse {
+  return notFoundResponse(request);
 }

@@ -15,7 +15,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger }) =>
-      sessionCleanupRepository.executeSessionCleanup(data, logger),
+    handler: ({ data, logger, locale }) =>
+      sessionCleanupRepository.executeSessionCleanup(data, logger, locale),
   },
 });

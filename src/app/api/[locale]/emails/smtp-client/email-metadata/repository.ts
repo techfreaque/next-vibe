@@ -19,12 +19,15 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import { emails } from "../../messages/db";
 import { EmailStatus } from "../../messages/enum";
+import type { scopedTranslation } from "../i18n";
 import type {
   StoreEmailMetadataRequestOutput,
   StoreEmailMetadataResponseOutput,
   UpdateEmailEngagementRequestOutput,
   UpdateEmailEngagementResponseOutput,
 } from "./types";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Email Metadata Repository Interface
@@ -33,11 +36,13 @@ export interface EmailMetadataRepository {
   storeEmailMetadata(
     data: StoreEmailMetadataRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<StoreEmailMetadataResponseOutput>>;
 
   updateEmailEngagement(
     data: UpdateEmailEngagementRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<UpdateEmailEngagementResponseOutput>>;
 }
 
@@ -51,6 +56,7 @@ export class EmailMetadataRepositoryImpl implements EmailMetadataRepository {
   async storeEmailMetadata(
     data: StoreEmailMetadataRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<StoreEmailMetadataResponseOutput>> {
     try {
       logger.debug("Storing email metadata", {
@@ -116,7 +122,7 @@ export class EmailMetadataRepositoryImpl implements EmailMetadataRepository {
       });
 
       return fail({
-        message: "app.api.emails.smtpClient.emailMetadata.errors.server.title",
+        message: t("emailMetadata.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           recipient: data.params.recipientEmail,
@@ -132,6 +138,7 @@ export class EmailMetadataRepositoryImpl implements EmailMetadataRepository {
   async updateEmailEngagement(
     data: UpdateEmailEngagementRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<UpdateEmailEngagementResponseOutput>> {
     try {
       logger.debug("Updating email engagement", {
@@ -210,7 +217,7 @@ export class EmailMetadataRepositoryImpl implements EmailMetadataRepository {
       });
 
       return fail({
-        message: "app.api.emails.smtpClient.emailMetadata.errors.server.title",
+        message: t("emailMetadata.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           emailId: data.params.emailId,

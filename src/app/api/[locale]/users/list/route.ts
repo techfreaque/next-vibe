@@ -3,16 +3,9 @@
  * Handles GET requests for listing users with filtering and pagination
  */
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-
-import type { ApiHandlerProps } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/handler";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import type {
-  UserListRequestOutput,
-  UserListResponseOutput,
-} from "./definition";
 import definitions from "./definition";
 import { UserListRepository } from "./repository";
 
@@ -20,18 +13,8 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: async (
-      props: ApiHandlerProps<
-        UserListRequestOutput,
-        Record<string, never>,
-        typeof definitions.GET.allowedRoles
-      >,
-    ): Promise<ResponseType<UserListResponseOutput>> => {
-      return await UserListRepository.listUsers(
-        props.data,
-        props.user,
-        props.logger,
-      );
+    handler: async ({ data, user, logger, locale }) => {
+      return await UserListRepository.listUsers(data, user, logger, locale);
     },
   },
 });

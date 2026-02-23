@@ -9,8 +9,8 @@ import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/comp
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,12 +21,17 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { iconSchema } from "../../../../shared/types/common.schema";
-import { TtsVoiceDB, TtsVoiceOptions } from "../../../text-to-speech/enum";
+import {
+  TtsVoice,
+  TtsVoiceDB,
+  TtsVoiceOptions,
+} from "../../../text-to-speech/enum";
 import type {
   FiltersModelSelection,
   ManualModelSelection,
 } from "../../characters/create/definition";
 import { IntelligenceLevel, ModelSelectionType } from "../../characters/enum";
+import { scopedTranslation } from "./i18n";
 import { FavoriteCreateContainer } from "./widget";
 
 /**
@@ -34,16 +39,17 @@ import { FavoriteCreateContainer } from "./widget";
  * Creates a new favorite for the current user
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["agent", "chat", "favorites", "create"],
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
   allowedClientRoles: [UserRole.PUBLIC] as const, // Allow public users to use client route
 
-  title: "app.api.agent.chat.favorites.post.title" as const,
-  description: "app.api.agent.chat.favorites.post.description" as const,
+  title: "post.title" as const,
+  description: "post.description" as const,
   icon: "plus" as const,
-  category: "app.api.agent.chat.category" as const,
-  tags: ["app.api.agent.chat.tags.favorites" as const],
+  category: "category" as const,
+  tags: ["tags.favorites" as const],
 
   options: {
     mutationOptions: {
@@ -58,11 +64,7 @@ const { POST } = createEndpoint({
         const { ChatFavoritesRepositoryClient } =
           await import("../repository-client");
 
-        // Get character data from request
         const characterIcon = requestData.icon;
-        const characterName = requestData.name;
-        const characterTagline = requestData.tagline;
-        const characterDescription = requestData.description;
         const character = apiClient.getEndpointData(
           characterSingleDefinitions.default.GET,
           logger,
@@ -104,9 +106,9 @@ const { POST } = createEndpoint({
                 newFavoriteConfig,
                 characterModelSelection,
                 characterIcon ?? null,
-                characterName ?? null,
-                characterTagline ?? null,
-                characterDescription ?? null,
+                character.data.name ?? null,
+                character.data.tagline ?? null,
+                character.data.description ?? null,
                 null,
               );
 
@@ -155,22 +157,22 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true } as const,
     children: {
       // === RESPONSE ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.ALERT,
         schema: z.string(),
       }),
 
       // === REQUEST ===
-      characterId: requestField({
+      characterId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.agent.chat.favorites.post.characterId.label" as const,
+        label: "characterId.label" as const,
         columns: 6,
         hidden: true,
         schema: z.string(),
       }),
 
-      icon: requestField({
+      icon: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ICON,
         schema: iconSchema.optional(),
@@ -179,27 +181,11 @@ const { POST } = createEndpoint({
         } as const,
       }),
 
-      name: requestField({
-        type: WidgetType.TEXT,
-        schema: z.string().nullable().optional(),
-      }),
-
-      tagline: requestField({
-        type: WidgetType.TEXT,
-        schema: z.string().nullable().optional(),
-      }),
-
-      description: requestField({
-        type: WidgetType.TEXT,
-        schema: z.string().nullable().optional(),
-      }),
-
-      voice: requestField({
+      voice: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.agent.chat.favorites.id.patch.voice.label" as const,
-        description:
-          "app.api.agent.chat.favorites.id.patch.voice.description" as const,
+        label: "voice.label" as const,
+        description: "voice.description" as const,
         options: TtsVoiceOptions,
         columns: 6,
         theme: {
@@ -209,14 +195,14 @@ const { POST } = createEndpoint({
         schema: z.enum(TtsVoiceDB).nullable().optional(),
       }),
 
-      modelSelection: requestField({
+      modelSelection: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.OBJECT,
+        fieldType: FieldDataType.TEXT,
         schema: modelSelectionSchemaSimple.nullable(),
       }),
 
       // === RESPONSE ===
-      id: responseField({
+      id: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string().uuid(),
         hidden: true,
@@ -226,60 +212,46 @@ const { POST } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.agent.chat.favorites.post.errors.validation.title" as const,
-      description:
-        "app.api.agent.chat.favorites.post.errors.validation.description" as const,
+      title: "post.errors.validation.title" as const,
+      description: "post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.chat.favorites.post.errors.network.title" as const,
-      description:
-        "app.api.agent.chat.favorites.post.errors.network.description" as const,
+      title: "post.errors.network.title" as const,
+      description: "post.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.agent.chat.favorites.post.errors.unauthorized.title" as const,
-      description:
-        "app.api.agent.chat.favorites.post.errors.unauthorized.description" as const,
+      title: "post.errors.unauthorized.title" as const,
+      description: "post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.agent.chat.favorites.post.errors.forbidden.title" as const,
-      description:
-        "app.api.agent.chat.favorites.post.errors.forbidden.description" as const,
+      title: "post.errors.forbidden.title" as const,
+      description: "post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.agent.chat.favorites.post.errors.notFound.title" as const,
-      description:
-        "app.api.agent.chat.favorites.post.errors.notFound.description" as const,
+      title: "post.errors.notFound.title" as const,
+      description: "post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.chat.favorites.post.errors.server.title" as const,
-      description:
-        "app.api.agent.chat.favorites.post.errors.server.description" as const,
+      title: "post.errors.server.title" as const,
+      description: "post.errors.server.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.chat.favorites.post.errors.unknown.title" as const,
-      description:
-        "app.api.agent.chat.favorites.post.errors.unknown.description" as const,
+      title: "post.errors.unknown.title" as const,
+      description: "post.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.agent.chat.favorites.post.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.agent.chat.favorites.post.errors.unsavedChanges.description" as const,
+      title: "post.errors.unsavedChanges.title" as const,
+      description: "post.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.agent.chat.favorites.post.errors.conflict.title" as const,
-      description:
-        "app.api.agent.chat.favorites.post.errors.conflict.description" as const,
+      title: "post.errors.conflict.title" as const,
+      description: "post.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.agent.chat.favorites.post.success.title" as const,
-    description:
-      "app.api.agent.chat.favorites.post.success.description" as const,
+    title: "post.success.title" as const,
+    description: "post.success.description" as const,
   },
 
   examples: {
@@ -287,10 +259,7 @@ const { POST } = createEndpoint({
       create: {
         characterId: "thea",
         icon: "female" as const,
-        name: "Emma",
-        tagline: "Creative Assistant",
-        description: "A helpful AI assistant",
-        voice: "app.api.agent.textToSpeech.voices.FEMALE" as const,
+        voice: TtsVoice.FEMALE,
         modelSelection: {
           selectionType: ModelSelectionType.FILTERS,
           intelligenceRange: {
@@ -302,7 +271,7 @@ const { POST } = createEndpoint({
     },
     responses: {
       create: {
-        success: "app.api.agent.chat.favorites.post.success.title",
+        success: "success.title",
         id: "550e8400-e29b-41d4-a716-446655440000",
       },
     },

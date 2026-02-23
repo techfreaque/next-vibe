@@ -5,12 +5,12 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import type { JSX } from "react";
 
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type {
   ReactRequestResponseWidgetProps,
   ReactStaticWidgetProps,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
-import { simpleT } from "@/i18n/core/shared";
 
 import type { StringWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
 import type { FieldUsageConfig } from "../../_shared/types";
@@ -72,7 +72,7 @@ export function MarkdownWidget<
   const { field } = props;
   const fieldName = "fieldName" in props ? props.fieldName : undefined;
   const locale = useWidgetLocale();
-  const { t } = simpleT(locale);
+  const { t } = unifiedInterfaceScopedTranslation.scopedT(locale);
   const form = useWidgetForm();
   const usage = "usage" in field ? field.usage : undefined;
 
@@ -90,7 +90,7 @@ export function MarkdownWidget<
   if (!value) {
     return (
       <Div className={cn("text-muted-foreground italic", field.className)}>
-        {t("app.api.system.unifiedInterface.react.widgets.markdown.noContent")}
+        {t("react.widgets.markdown.noContent")}
       </Div>
     );
   }

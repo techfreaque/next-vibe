@@ -38,6 +38,7 @@ export const translations = {
       "This email address is already subscribed to our newsletter",
   },
   errors: {
+    email_generation_failed: "Failed to generate email",
     badRequest: {
       title: "Bad Request",
       description: "Invalid request parameters provided",
@@ -125,6 +126,31 @@ export const translations = {
   },
   route: {
     sms_failed_continuing: "SMS notifications failed but continuing",
+  },
+  emailTemplates: {
+    welcome: {
+      name: "Newsletter Welcome Email",
+      description: "Welcome email sent to new newsletter subscribers",
+      category: "newsletter",
+      preview: {
+        email: {
+          label: "Email Address",
+          description: "Subscriber's email address",
+        },
+        name: {
+          label: "Subscriber Name",
+          description: "Subscriber's name (optional)",
+        },
+        leadId: {
+          label: "Lead ID",
+          description: "Lead tracking identifier for analytics",
+        },
+        userId: {
+          label: "User ID",
+          description: "User account identifier (optional)",
+        },
+      },
+    },
   },
   emailTemplate: {
     welcome: {

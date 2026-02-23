@@ -88,6 +88,7 @@ export const translations = {
     chart: {
       noDataAvailable: "No data available",
       noDataToDisplay: "No data to display",
+      total: "Total",
     },
     creditTransactionList: {
       invalidConfig: "Invalid credit transaction list configuration",

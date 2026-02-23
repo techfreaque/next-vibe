@@ -10,6 +10,7 @@ import {
   type NextHandlerReturnType,
 } from "../../../next-api/handler";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
+import type { Platform } from "../../types/platform";
 import {
   type ApiHandlerOptions,
   createGenericHandler,
@@ -49,7 +50,9 @@ export function endpointHandler<T extends CreateApiEndpointAny>(
     T["types"]["ResponseOutput"],
     T["types"]["UrlVariablesOutput"],
     T["allowedRoles"],
-    T
+    T,
+    Platform,
+    T["types"]["ScopedTranslationKey"]
   >,
 ): EndpointHandlerReturn<T> {
   const nextHandler = createNextHandler(options);

@@ -8,7 +8,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  responseField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -18,6 +18,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema } from "../shared/types/common.schema";
+import { scopedTranslation } from "./i18n";
 import { CreditsBalanceContainer } from "./widget";
 
 /**
@@ -25,12 +26,13 @@ import { CreditsBalanceContainer } from "./widget";
  * Retrieves current user's credit balance with breakdown
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["credits"],
-  title: "app.api.agent.chat.credits.get.title",
-  description: "app.api.agent.chat.credits.get.description",
-  category: "app.api.payment.category",
-  tags: ["app.api.agent.chat.tags.credits", "app.api.agent.chat.tags.balance"],
+  title: "get.title",
+  description: "get.description",
+  category: "category",
+  tags: ["tags.credits", "tags.balance"],
   icon: "coins",
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
@@ -39,44 +41,44 @@ const { GET } = createEndpoint({
     usage: { response: true } as const,
     children: {
       // Total credits available
-      total: responseField({
+      total: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.agent.chat.credits.get.total.content",
+        content: "get.total.content",
         schema: z.coerce.number(),
       }),
 
       // Expiring credits (from subscription)
-      expiring: responseField({
+      expiring: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.agent.chat.credits.get.expiring.content",
+        content: "get.expiring.content",
         schema: z.coerce.number(),
       }),
 
       // Permanent credits (from packs)
-      permanent: responseField({
+      permanent: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.agent.chat.credits.get.permanent.content",
+        content: "get.permanent.content",
         schema: z.coerce.number(),
       }),
 
       // Earned credits (from referrals)
-      earned: responseField({
+      earned: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.agent.chat.credits.get.earned.content",
+        content: "get.earned.content",
         schema: z.coerce.number(),
       }),
 
       // Free tier credits
-      free: responseField({
+      free: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.agent.chat.credits.get.free.content",
+        content: "get.free.content",
         schema: z.coerce.number(),
       }),
 
       // Expiration date for expiring credits
-      expiresAt: responseField({
+      expiresAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.agent.chat.credits.get.expiresAt.content",
+        content: "get.expiresAt.content",
         schema: dateSchema.nullable(),
       }),
     },
@@ -84,51 +86,47 @@ const { GET } = createEndpoint({
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.agent.chat.credits.get.success.title",
-    description: "app.api.agent.chat.credits.get.success.description",
+    title: "get.success.title",
+    description: "get.success.description",
   },
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.agent.chat.credits.get.errors.validation.title",
-      description:
-        "app.api.agent.chat.credits.get.errors.validation.description",
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.chat.credits.get.errors.network.title",
-      description: "app.api.agent.chat.credits.get.errors.network.description",
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.agent.chat.credits.get.errors.unauthorized.title",
-      description:
-        "app.api.agent.chat.credits.get.errors.unauthorized.description",
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.agent.chat.credits.get.errors.forbidden.title",
-      description:
-        "app.api.agent.chat.credits.get.errors.forbidden.description",
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.agent.chat.credits.get.errors.notFound.title",
-      description: "app.api.agent.chat.credits.get.errors.notFound.description",
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.chat.credits.get.errors.server.title",
-      description: "app.api.agent.chat.credits.get.errors.server.description",
+      title: "get.errors.server.title",
+      description: "get.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.chat.credits.get.errors.unknown.title",
-      description: "app.api.agent.chat.credits.get.errors.unknown.description",
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.agent.chat.credits.get.errors.unsavedChanges.title",
-      description:
-        "app.api.agent.chat.credits.get.errors.unsavedChanges.description",
+      title: "get.errors.unsavedChanges.title",
+      description: "get.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.agent.chat.credits.get.errors.conflict.title",
-      description: "app.api.agent.chat.credits.get.errors.conflict.description",
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
     },
   },
 

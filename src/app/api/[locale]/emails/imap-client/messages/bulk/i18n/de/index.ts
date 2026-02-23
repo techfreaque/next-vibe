@@ -1,4 +1,5 @@
 export const translations = {
+  category: "IMAP Management",
   tag: "Massenaktionen",
   post: {
     title: "Nachrichten massenweise aktualisieren",

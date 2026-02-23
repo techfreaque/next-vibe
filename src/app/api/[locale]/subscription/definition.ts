@@ -7,7 +7,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  responseField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -18,23 +18,21 @@ import {
 import { PaymentProvider, PaymentProviderDB } from "../payment/enum";
 import { UserRole } from "../user/user-roles/enum";
 import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "./enum";
+import { scopedTranslation } from "./i18n";
 import { SubscriptionOverviewContainer } from "./widget";
 
 /**
  * GET endpoint for retrieving subscription
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["subscription"],
-  title: "app.api.subscription.get.title" as const,
-  description: "app.api.subscription.get.description" as const,
+  title: "get.title",
+  description: "get.description",
   icon: "crown",
-  category: "app.api.payment.category" as const,
-  tags: [
-    "app.api.subscription.tags.subscription" as const,
-    "app.api.subscription.tags.billing" as const,
-    "app.api.subscription.tags.get" as const,
-  ],
+  category: "category",
+  tags: ["tags.subscription", "tags.billing", "tags.get"],
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
@@ -46,75 +44,74 @@ const { GET } = createEndpoint({
     render: SubscriptionOverviewContainer,
     usage: { response: true } as const,
     children: {
-      id: responseField({
+      id: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.id" as const,
+        content: "response.id",
         schema: z.uuid(),
       }),
-      plan: responseField({
+      plan: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.planId" as const,
+        content: "response.planId",
         schema: z.enum(SubscriptionPlan),
       }),
-      billingInterval: responseField({
+      billingInterval: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.billingInterval" as const,
+        content: "response.billingInterval",
         schema: z.enum(BillingInterval),
       }),
-      status: responseField({
+      status: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.status" as const,
+        content: "response.status",
         schema: z.enum(SubscriptionStatus),
       }),
-      currentPeriodStart: responseField({
+      currentPeriodStart: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.currentPeriodStart" as const,
+        content: "response.currentPeriodStart",
         schema: z.string(),
       }),
-      currentPeriodEnd: responseField({
+      currentPeriodEnd: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.currentPeriodEnd" as const,
+        content: "response.currentPeriodEnd",
         schema: z.string(),
       }),
-      cancelAtPeriodEnd: responseField({
+      cancelAtPeriodEnd: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.cancelAtPeriodEnd" as const,
+        content: "response.cancelAtPeriodEnd",
         schema: z.boolean(),
       }),
-      cancelAt: responseField({
+      cancelAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.cancelAt" as const,
+        content: "response.cancelAt",
         schema: z.string().optional(),
       }),
-      canceledAt: responseField({
+      canceledAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.canceledAt" as const,
+        content: "response.canceledAt",
         schema: z.string().optional(),
       }),
-      endedAt: responseField({
+      endedAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.endedAt" as const,
+        content: "response.endedAt",
         schema: z.string().optional(),
       }),
-      provider: responseField({
+      provider: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.provider" as const,
+        content: "response.provider",
         schema: z.enum(PaymentProviderDB),
       }),
-      providerSubscriptionId: responseField({
+      providerSubscriptionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.subscription.response.providerSubscriptionId" as const,
+        content: "response.providerSubscriptionId",
         schema: z.string().optional(),
       }),
-      createdAt: responseField({
+      createdAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.createdAt" as const,
+        content: "response.createdAt",
         schema: z.string(),
       }),
-      updatedAt: responseField({
+      updatedAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.subscription.response.updatedAt" as const,
+        content: "response.updatedAt",
         schema: z.string(),
       }),
     },
@@ -122,49 +119,46 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.subscription.errors.validation.title" as const,
-      description:
-        "app.api.subscription.errors.validation.description" as const,
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.subscription.errors.notFound.title" as const,
-      description: "app.api.subscription.errors.notFound.description" as const,
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.subscription.errors.unauthorized.title" as const,
-      description:
-        "app.api.subscription.errors.unauthorized.description" as const,
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.subscription.errors.forbidden.title" as const,
-      description: "app.api.subscription.errors.forbidden.description" as const,
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.subscription.errors.server.title" as const,
-      description: "app.api.subscription.errors.server.description" as const,
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.subscription.errors.network.title" as const,
-      description: "app.api.subscription.errors.network.description" as const,
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.subscription.errors.unknown.title" as const,
-      description: "app.api.subscription.errors.unknown.description" as const,
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.subscription.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.subscription.errors.unsavedChanges.description" as const,
+      title: "errors.unsavedChanges.title",
+      description: "errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.subscription.errors.conflict.title" as const,
-      description: "app.api.subscription.errors.conflict.description" as const,
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.subscription.success.title" as const,
-    description: "app.api.subscription.success.description" as const,
+    title: "success.title",
+    description: "success.description",
   },
 
   examples: {

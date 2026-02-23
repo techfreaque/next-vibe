@@ -1,6 +1,10 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Emails",
+  tags: {
+    emails: "Emails",
+  },
   title: "Szczegóły e-maila",
   description:
     "Pobierz pojedynczy email na podstawie jego unikalnego identyfikatora",

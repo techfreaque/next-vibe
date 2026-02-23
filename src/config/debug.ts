@@ -7,7 +7,7 @@ export let mcpSilentMode = false;
 // Shows the translation keys in the UI
 export const translationsKeyMode = false;
 // Speeds up the typecheck by 100x but disables translation typesafety
-export const translationsKeyTypesafety = false;
+export const translationsKeyTypesafety = true;
 
 // Form clearing behavior in development
 export const clearFormsAfterSuccessInDev = false;

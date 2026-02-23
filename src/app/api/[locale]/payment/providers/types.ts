@@ -97,6 +97,7 @@ export interface PaymentProvider {
     email: string,
     name: string | null,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CustomerResult>>;
 
   createCheckoutSession(
@@ -104,17 +105,20 @@ export interface PaymentProvider {
     customerId: string,
     logger: EndpointLogger,
     callbackToken: string,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CheckoutSessionResult>>;
 
   verifyWebhook(
     body: string,
     signature: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<WebhookEvent>>;
 
   retrieveSubscription(
     subscriptionId: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<
     ResponseType<{
       userId: string;
@@ -126,5 +130,6 @@ export interface PaymentProvider {
   cancelSubscription(
     subscriptionId: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<void>>;
 }

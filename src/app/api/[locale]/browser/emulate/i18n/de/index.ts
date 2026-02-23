@@ -80,4 +80,9 @@ export const translations: typeof enTranslations = {
     title: "Emulation erfolgreich",
     description: "Gerätefunktionen wurden erfolgreich emuliert",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    performanceAutomation: "Leistungs-Automatisierung",
+  },
 };

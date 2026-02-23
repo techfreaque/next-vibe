@@ -31,6 +31,9 @@ import type {
   ShareLinkUpdateRequestOutput,
   ShareLinkUpdateResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ShareLinksT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Thread Share Links Repository
@@ -43,12 +46,12 @@ export class ShareLinksRepository {
   static async list(
     urlPathParams: ShareLinksGetUrlVariablesOutput,
     user: JwtPayloadType,
+    t: ShareLinksT,
     logger: EndpointLogger,
   ): Promise<ResponseType<ShareLinksGetResponseOutput>> {
     if (user.isPublic || !user.id) {
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.shareLinks.get.errors.unauthorized.title",
+        message: t("get.errors.unauthorized.title"),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
@@ -65,8 +68,7 @@ export class ShareLinksRepository {
 
       if (!thread) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.shareLinks.get.errors.notFound.title",
+          message: t("get.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -74,8 +76,7 @@ export class ShareLinksRepository {
       // Check if user owns the thread
       if (thread.userId !== user.id) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.shareLinks.get.errors.forbidden.title",
+          message: t("get.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -106,8 +107,7 @@ export class ShareLinksRepository {
     } catch (error) {
       logger.error("Failed to list share links", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.shareLinks.get.errors.server.title",
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -120,12 +120,12 @@ export class ShareLinksRepository {
     data: ShareLinkCreateRequestOutput,
     urlPathParams: ShareLinkCreateUrlVariablesOutput,
     user: JwtPayloadType,
+    t: ShareLinksT,
     logger: EndpointLogger,
   ): Promise<ResponseType<ShareLinkCreateResponseOutput>> {
     if (user.isPublic || !user.id) {
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.shareLinks.post.errors.unauthorized.title",
+        message: t("post.errors.unauthorized.title"),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
@@ -142,8 +142,7 @@ export class ShareLinksRepository {
 
       if (!thread) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.shareLinks.post.errors.notFound.title",
+          message: t("post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -151,8 +150,7 @@ export class ShareLinksRepository {
       // Only allow sharing for SHARED folder threads
       if (thread.rootFolderId !== "shared") {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.shareLinks.post.errors.forbidden.title",
+          message: t("post.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -160,8 +158,7 @@ export class ShareLinksRepository {
       // Check if user owns the thread
       if (thread.userId !== user.id) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.shareLinks.post.errors.forbidden.title",
+          message: t("post.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -200,8 +197,7 @@ export class ShareLinksRepository {
     } catch (error) {
       logger.error("Failed to create share link", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.shareLinks.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -213,12 +209,12 @@ export class ShareLinksRepository {
   static async update(
     data: ShareLinkUpdateRequestOutput,
     user: JwtPayloadType,
+    t: ShareLinksT,
     logger: EndpointLogger,
   ): Promise<ResponseType<ShareLinkUpdateResponseOutput>> {
     if (user.isPublic || !user.id) {
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.unauthorized.title",
+        message: t("patch.errors.unauthorized.title"),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
@@ -235,8 +231,7 @@ export class ShareLinksRepository {
 
       if (!link) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.notFound.title",
+          message: t("patch.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -244,8 +239,7 @@ export class ShareLinksRepository {
       // Check if user created the link
       if (link.createdBy !== user.id) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.forbidden.title",
+          message: t("patch.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -282,8 +276,7 @@ export class ShareLinksRepository {
     } catch (error) {
       logger.error("Failed to update share link", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.shareLinks.patch.errors.server.title",
+        message: t("patch.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -295,12 +288,12 @@ export class ShareLinksRepository {
   static async revoke(
     data: ShareLinkRevokeRequestOutput,
     user: JwtPayloadType,
+    t: ShareLinksT,
     logger: EndpointLogger,
   ): Promise<ResponseType<ShareLinkRevokeResponseOutput>> {
     if (user.isPublic || !user.id) {
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.unauthorized.title",
+        message: t("delete.errors.unauthorized.title"),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
@@ -317,8 +310,7 @@ export class ShareLinksRepository {
 
       if (!link) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.notFound.title",
+          message: t("delete.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -326,8 +318,7 @@ export class ShareLinksRepository {
       // Check if user created the link
       if (link.createdBy !== user.id) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.forbidden.title",
+          message: t("delete.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -351,8 +342,7 @@ export class ShareLinksRepository {
     } catch (error) {
       logger.error("Failed to revoke share link", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.shareLinks.delete.errors.server.title",
+        message: t("delete.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -364,6 +354,7 @@ export class ShareLinksRepository {
    */
   static async getByToken(
     token: string,
+    t: ShareLinksT,
     logger: EndpointLogger,
   ): Promise<
     ResponseType<{
@@ -388,8 +379,7 @@ export class ShareLinksRepository {
 
       if (!shareLink) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.shareLinks.get.errors.notFound.title",
+          message: t("get.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -403,8 +393,7 @@ export class ShareLinksRepository {
 
       if (!thread) {
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.shareLinks.get.errors.notFound.title",
+          message: t("get.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -418,8 +407,7 @@ export class ShareLinksRepository {
           rootFolderId: thread.rootFolderId,
         });
         return fail({
-          message:
-            "app.api.agent.chat.threads.threadId.shareLinks.get.errors.forbidden.title",
+          message: t("get.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -443,8 +431,7 @@ export class ShareLinksRepository {
     } catch (error) {
       logger.error("Failed to get thread by share token", parseError(error));
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.shareLinks.get.errors.server.title",
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

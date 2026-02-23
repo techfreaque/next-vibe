@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Chat",
+
   post: {
     title: "Add Memory",
     description: "Creates a new memory for the current user",
@@ -12,6 +14,7 @@ export const translations = {
         "The fact to remember (e.g., 'Profession: Software engineer')",
     },
     tags: {
+      memories: "Memories",
       label: "Tags",
       description: "Tags for categorization (e.g., profession, preferences)",
     },

@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: listNetworkRequestsEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger }) =>
+    handler: ({ data, t, logger }) =>
       executeMCPTool(
         {
           toolName: "list-network-requests",
@@ -23,6 +23,7 @@ export const { POST, tools } = endpointsHandler({
             includePreservedRequests: data.includePreservedRequests,
           }),
         },
+        t,
         logger,
       ),
   },

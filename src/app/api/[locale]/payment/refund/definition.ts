@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -20,11 +20,14 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * Create Refund Endpoint (POST)
  * Creates a refund for a payment transaction
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["payment", "refund"],
   allowedRoles: [
@@ -34,214 +37,179 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
   ],
 
-  title: "app.api.payment.refund.title" as const,
-  description: "app.api.payment.refund.description" as const,
-  category: "app.api.payment.category" as const,
+  title: "title" as const,
+  description: "description" as const,
+  category: "category" as const,
   icon: "refresh-ccw" as const,
-  tags: [
-    "app.api.payment.refund.tags.refund" as const,
-    "app.api.payment.refund.tags.transaction" as const,
-  ],
+  tags: ["tags.refund" as const, "tags.transaction" as const],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.payment.refund.form.title" as const,
-      description: "app.api.payment.refund.form.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "form.title" as const,
+    description: "form.description" as const,
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // REQUEST FIELDS
-      transactionId: requestField({
+      transactionId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label:
-          "app.api.payment.refund.form.fields.transactionId.label" as const,
-        description:
-          "app.api.payment.refund.form.fields.transactionId.description" as const,
-        placeholder:
-          "app.api.payment.refund.form.fields.transactionId.placeholder" as const,
+        label: "form.fields.transactionId.label" as const,
+        description: "form.fields.transactionId.description" as const,
+        placeholder: "form.fields.transactionId.placeholder" as const,
         columns: 12,
         schema: z.uuid(),
       }),
 
-      amount: requestField({
+      amount: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.payment.refund.form.fields.amount.label" as const,
-        description:
-          "app.api.payment.refund.form.fields.amount.description" as const,
-        placeholder:
-          "app.api.payment.refund.form.fields.amount.placeholder" as const,
+        label: "form.fields.amount.label" as const,
+        description: "form.fields.amount.description" as const,
+        placeholder: "form.fields.amount.placeholder" as const,
         columns: 12,
         schema: z.coerce.number().positive().optional(),
       }),
 
-      reason: requestField({
+      reason: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
-        label: "app.api.payment.refund.form.fields.reason.label" as const,
-        description:
-          "app.api.payment.refund.form.fields.reason.description" as const,
-        placeholder:
-          "app.api.payment.refund.form.fields.reason.placeholder" as const,
+        label: "form.fields.reason.label" as const,
+        description: "form.fields.reason.description" as const,
+        placeholder: "form.fields.reason.placeholder" as const,
         columns: 12,
         schema: z.string().optional(),
       }),
 
-      metadata: requestField({
+      metadata: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
-        label: "app.api.payment.refund.form.fields.metadata.label" as const,
-        description:
-          "app.api.payment.refund.form.fields.metadata.description" as const,
-        placeholder:
-          "app.api.payment.refund.form.fields.metadata.placeholder" as const,
+        label: "form.fields.metadata.label" as const,
+        description: "form.fields.metadata.description" as const,
+        placeholder: "form.fields.metadata.placeholder" as const,
         columns: 12,
         schema: z.record(z.string(), z.string()).optional(),
       }),
 
       // RESPONSE FIELDS
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.payment.refund.post.response.success" as const,
+        content: "post.response.success" as const,
         schema: z.boolean(),
       }),
 
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.payment.refund.post.response.message" as const,
+        content: "post.response.message" as const,
         schema: z.string().nullable(),
       }),
 
-      refund: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.payment.refund.post.response.refund.title" as const,
-          description:
-            "app.api.payment.refund.post.response.refund.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          id: responseField({
+      refund: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "post.response.refund.title" as const,
+        description: "post.response.refund.description" as const,
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          id: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.payment.refund.post.response.refund.id" as const,
+            content: "post.response.refund.id" as const,
             schema: z.uuid(),
           }),
-          userId: responseField({
+          userId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.refund.post.response.refund.userId" as const,
+            content: "post.response.refund.userId" as const,
             schema: z.uuid(),
           }),
-          transactionId: responseField({
+          transactionId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.refund.post.response.refund.transactionId" as const,
+            content: "post.response.refund.transactionId" as const,
             schema: z.uuid(),
           }),
-          stripeRefundId: responseField({
+          stripeRefundId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.refund.post.response.refund.stripeRefundId" as const,
+            content: "post.response.refund.stripeRefundId" as const,
             schema: z.string(),
           }),
-          amount: responseField({
+          amount: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.refund.post.response.refund.amount" as const,
+            content: "post.response.refund.amount" as const,
             schema: z.coerce.number(),
           }),
-          currency: responseField({
+          currency: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.refund.post.response.refund.currency" as const,
+            content: "post.response.refund.currency" as const,
             schema: z.string(),
           }),
-          status: responseField({
+          status: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.refund.post.response.refund.status" as const,
+            content: "post.response.refund.status" as const,
             schema: z.string(),
           }),
-          reason: responseField({
+          reason: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.refund.post.response.refund.reason" as const,
+            content: "post.response.refund.reason" as const,
             schema: z.string(),
           }),
-          createdAt: responseField({
+          createdAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.refund.post.response.refund.createdAt" as const,
+            content: "post.response.refund.createdAt" as const,
             schema: z.string(),
           }),
-          updatedAt: responseField({
+          updatedAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.payment.refund.post.response.refund.updatedAt" as const,
+            content: "post.response.refund.updatedAt" as const,
             schema: z.string(),
           }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.payment.refund.post.errors.validation.title" as const,
-      description:
-        "app.api.payment.refund.post.errors.validation.description" as const,
+      title: "post.errors.validation.title" as const,
+      description: "post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.payment.refund.post.errors.unauthorized.title" as const,
-      description:
-        "app.api.payment.refund.post.errors.unauthorized.description" as const,
+      title: "post.errors.unauthorized.title" as const,
+      description: "post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.payment.refund.post.errors.forbidden.title" as const,
-      description:
-        "app.api.payment.refund.post.errors.forbidden.description" as const,
+      title: "post.errors.forbidden.title" as const,
+      description: "post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.payment.refund.post.errors.notFound.title" as const,
-      description:
-        "app.api.payment.refund.post.errors.notFound.description" as const,
+      title: "post.errors.notFound.title" as const,
+      description: "post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.payment.refund.post.errors.server.title" as const,
-      description:
-        "app.api.payment.refund.post.errors.server.description" as const,
+      title: "post.errors.server.title" as const,
+      description: "post.errors.server.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.payment.refund.post.errors.network.title" as const,
-      description:
-        "app.api.payment.refund.post.errors.network.description" as const,
+      title: "post.errors.network.title" as const,
+      description: "post.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.payment.refund.post.errors.unknown.title" as const,
-      description:
-        "app.api.payment.refund.post.errors.unknown.description" as const,
+      title: "post.errors.unknown.title" as const,
+      description: "post.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.payment.refund.post.errors.conflict.title" as const,
-      description:
-        "app.api.payment.refund.post.errors.conflict.description" as const,
+      title: "post.errors.conflict.title" as const,
+      description: "post.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.payment.refund.post.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.payment.refund.post.errors.unsavedChanges.description" as const,
+      title: "post.errors.unsavedChanges.title" as const,
+      description: "post.errors.unsavedChanges.description" as const,
     },
   },
 
   successTypes: {
-    title: "app.api.payment.refund.post.success.title" as const,
-    description: "app.api.payment.refund.post.success.description" as const,
+    title: "post.success.title" as const,
+    description: "post.success.description" as const,
   },
 
   examples: {

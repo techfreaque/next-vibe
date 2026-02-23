@@ -12,3 +12,5 @@ export const scopedTranslation = createScopedTranslation({
 
 export type SshTranslationKey =
   (typeof scopedTranslation)["ScopedTranslationKey"];
+
+export type SshT = ReturnType<typeof scopedTranslation.scopedT>["t"];

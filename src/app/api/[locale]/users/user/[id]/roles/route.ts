@@ -13,22 +13,24 @@ export const { POST, DELETE, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, urlPathParams, user, logger }) =>
+    handler: ({ data, urlPathParams, user, logger, locale }) =>
       UserRoleManagementRepository.addUserRole(
         data,
         urlPathParams,
         user,
         logger,
+        locale,
       ),
   },
   [Methods.DELETE]: {
     email: undefined,
-    handler: ({ data, urlPathParams, user, logger }) =>
+    handler: ({ data, urlPathParams, user, logger, locale }) =>
       UserRoleManagementRepository.removeUserRole(
         data,
         urlPathParams,
         user,
         logger,
+        locale,
       ),
   },
 });

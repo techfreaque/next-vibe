@@ -18,9 +18,11 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { users } from "@/app/api/[locale]/user/db";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { SortOrder, UserSortField, UserStatusFilter } from "../enum";
 import type { UserListRequestOutput } from "./definition";
+import { scopedTranslation } from "./i18n";
 
 export class UserListRepository {
   /**
@@ -86,6 +88,7 @@ export class UserListRepository {
     data: UserListRequestOutput,
     user: JwtPrivatePayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<
     ResponseType<{
       response: {
@@ -218,8 +221,9 @@ export class UserListRepository {
       });
     } catch (error) {
       logger.error("Error listing users", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.users.list.get.errors.server.title",
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Email Communication",
+  tag: "SMTP",
   get: {
     title: "View SMTP Account",
     description: "Retrieve SMTP account details",

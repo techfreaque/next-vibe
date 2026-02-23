@@ -14,26 +14,28 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedRequestField,
+  scopedResponseField,
+  scopedWidgetField,
   widgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 
+import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../user-roles/enum";
-import type { TranslationKey } from "@/i18n/core/static-types";
 import { SignupFormContainer } from "./widget";
 
 /**
  * POST /signup - User registration
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["user", "public", "signup"],
-  title: "app.api.user.public.signup.title" as const,
-  description: "app.api.user.public.signup.description" as const,
+  title: "title",
+  description: "description",
   icon: "user-plus",
-  category: "app.api.user.category" as const,
-  tags: ["app.api.user.public.signup.tag" as const],
+  category: "category",
+  tags: ["tag"],
   allowedRoles: [
     UserRole.PUBLIC,
     UserRole.AI_TOOL_OFF,
@@ -44,28 +46,26 @@ const { POST } = createEndpoint({
     render: SignupFormContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      title: widgetField({
+      title: scopedWidgetField(scopedTranslation, {
         type: WidgetType.TITLE,
-        content: "app.api.user.public.signup.form.title",
+        content: "form.title",
         order: 0,
         usage: { request: "data", response: true },
       }),
-      subtitle: widgetField({
+      subtitle: scopedWidgetField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.user.public.signup.form.description",
+        content: "form.description",
         variant: "body-lg",
         order: 1,
         usage: { request: "data", response: true },
       }),
 
-      privateName: requestField({
+      privateName: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.user.public.signup.fields.privateName.label",
-        description:
-          "app.api.user.public.signup.fields.privateName.description",
-        placeholder:
-          "app.api.user.public.signup.fields.privateName.placeholder",
+        label: "fields.privateName.label",
+        description: "fields.privateName.description",
+        placeholder: "fields.privateName.placeholder",
         theme: {
           descriptionStyle: "inline",
         },
@@ -73,25 +73,22 @@ const { POST } = createEndpoint({
         order: 3,
         schema: z
           .string({
-            error:
-              "app.api.user.public.signup.fields.privateName.validation.required" satisfies TranslationKey,
+            error: "fields.privateName.validation.required",
           })
           .min(2, {
-            message:
-              "app.api.user.public.signup.fields.privateName.validation.minLength" satisfies TranslationKey,
+            message: "fields.privateName.validation.minLength",
           })
           .max(100, {
-            message:
-              "app.api.user.public.signup.fields.privateName.validation.maxLength" satisfies TranslationKey,
+            message: "fields.privateName.validation.maxLength",
           }),
       }),
 
-      publicName: requestField({
+      publicName: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.user.public.signup.fields.publicName.label",
-        description: "app.api.user.public.signup.fields.publicName.description",
-        placeholder: "app.api.user.public.signup.fields.publicName.placeholder",
+        label: "fields.publicName.label",
+        description: "fields.publicName.description",
+        placeholder: "fields.publicName.placeholder",
         columns: 6,
         order: 5,
         theme: {
@@ -99,25 +96,22 @@ const { POST } = createEndpoint({
         },
         schema: z
           .string({
-            error:
-              "app.api.user.public.signup.fields.publicName.validation.required" satisfies TranslationKey,
+            error: "fields.publicName.validation.required",
           })
           .min(2, {
-            message:
-              "app.api.user.public.signup.fields.publicName.validation.minLength" satisfies TranslationKey,
+            message: "fields.publicName.validation.minLength",
           })
           .max(100, {
-            message:
-              "app.api.user.public.signup.fields.publicName.validation.maxLength" satisfies TranslationKey,
+            message: "fields.publicName.validation.maxLength",
           }),
       }),
 
-      email: requestField({
+      email: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
-        label: "app.api.user.public.signup.fields.email.label",
-        description: "app.api.user.public.signup.fields.email.description",
-        placeholder: "app.api.user.public.signup.fields.email.placeholder",
+        label: "fields.email.label",
+        description: "fields.email.description",
+        placeholder: "fields.email.placeholder",
         columns: 12,
         theme: {
           descriptionStyle: "inline",
@@ -125,26 +119,23 @@ const { POST } = createEndpoint({
         order: 7,
         schema: z
           .string({
-            error:
-              "app.api.user.public.signup.fields.email.validation.required" satisfies TranslationKey,
+            error: "fields.email.validation.required",
           })
           .min(1, {
-            message:
-              "app.api.user.public.signup.fields.email.validation.required" satisfies TranslationKey,
+            message: "fields.email.validation.required",
           })
           .email({
-            message:
-              "app.api.user.public.signup.fields.email.validation.invalid" satisfies TranslationKey,
+            message: "fields.email.validation.invalid",
           })
           .transform((val) => val.toLowerCase().trim()),
       }),
 
-      password: requestField({
+      password: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
-        label: "app.api.user.public.signup.fields.password.label",
-        description: "app.api.user.public.signup.fields.password.description",
-        placeholder: "app.api.user.public.signup.fields.password.placeholder",
+        label: "fields.password.label",
+        description: "fields.password.description",
+        placeholder: "fields.password.placeholder",
         columns: 6,
         order: 9,
         theme: {
@@ -152,23 +143,20 @@ const { POST } = createEndpoint({
         },
         schema: z
           .string({
-            error:
-              "app.api.user.public.signup.fields.password.validation.required" satisfies TranslationKey,
+            error: "fields.password.validation.required",
           })
           .min(8, {
-            message:
-              "app.api.user.public.signup.fields.password.validation.minLength" satisfies TranslationKey,
+            message: "fields.password.validation.minLength",
           })
           .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
-            message:
-              "app.api.user.public.signup.fields.password.validation.complexity" satisfies TranslationKey,
+            message: "fields.password.validation.complexity",
           }),
       }),
 
-      confirmPassword: requestField({
+      confirmPassword: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.PASSWORD,
-        label: "app.api.user.public.signup.fields.confirmPassword.label",
+        label: "fields.confirmPassword.label",
         columns: 6,
         order: 11,
         theme: {
@@ -176,21 +164,18 @@ const { POST } = createEndpoint({
         },
         schema: z
           .string({
-            error:
-              "app.api.user.public.signup.fields.confirmPassword.validation.required" satisfies TranslationKey,
+            error: "fields.confirmPassword.validation.required",
           })
           .min(8, {
-            message:
-              "app.api.user.public.signup.fields.confirmPassword.validation.minLength" satisfies TranslationKey,
+            message: "fields.confirmPassword.validation.minLength",
           }),
       }),
 
-      subscribeToNewsletter: requestField({
+      subscribeToNewsletter: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.user.public.signup.fields.subscribeToNewsletter.label",
-        description:
-          "app.api.user.public.signup.fields.subscribeToNewsletter.description",
+        label: "fields.subscribeToNewsletter.label",
+        description: "fields.subscribeToNewsletter.description",
         columns: 12,
         theme: {
           descriptionStyle: "inline",
@@ -199,31 +184,27 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional().default(true),
       }),
 
-      acceptTerms: requestField({
+      acceptTerms: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.user.public.signup.fields.acceptTerms.label",
-        description:
-          "app.api.user.public.signup.fields.acceptTerms.description",
+        label: "fields.acceptTerms.label",
+        description: "fields.acceptTerms.description",
         columns: 12,
         theme: {
           descriptionStyle: "inline",
         },
         order: 15,
         schema: z.boolean().refine((val) => val === true, {
-          message:
-            "app.api.user.public.signup.fields.acceptTerms.validation.required" satisfies TranslationKey,
+          message: "fields.acceptTerms.validation.required",
         }),
       }),
 
-      referralCode: requestField({
+      referralCode: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.user.public.signup.fields.referralCode.label",
-        description:
-          "app.api.user.public.signup.fields.referralCode.description",
-        placeholder:
-          "app.api.user.public.signup.fields.referralCode.placeholder",
+        label: "fields.referralCode.label",
+        description: "fields.referralCode.description",
+        placeholder: "fields.referralCode.placeholder",
         columns: 12,
         order: 17,
         theme: {
@@ -232,20 +213,20 @@ const { POST } = createEndpoint({
         // Show as readonly card when prefilled from server (only if value unchanged)
         prefillDisplay: {
           variant: "card",
-          labelKey: "app.api.user.public.signup.fields.referralCode.label",
+          labelKey: "fields.referralCode.label",
         },
         schema: z.string().optional(),
       }),
 
       // === FORM ALERT (shows validation and API errors) ===
-      formAlert: widgetField({
+      formAlert: scopedWidgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
         columns: 12,
         order: 18,
         usage: { request: "data" },
       }),
 
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.ALERT,
         variant: "default",
         order: 19,
@@ -253,10 +234,10 @@ const { POST } = createEndpoint({
       }),
 
       // === SUBMIT BUTTON (inside card) ===
-      submitButton: widgetField({
+      submitButton: scopedWidgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
-        text: "app.api.user.public.signup.actions.submit",
-        loadingText: "app.api.user.public.signup.actions.submitting",
+        text: "actions.submit",
+        loadingText: "actions.submitting",
         icon: "user-plus",
         variant: "default",
         size: "default",
@@ -267,9 +248,9 @@ const { POST } = createEndpoint({
       }),
 
       // === FOOTER LINK (inside card, below button) ===
-      alreadyHaveAccount: widgetField({
+      alreadyHaveAccount: scopedWidgetField(scopedTranslation, {
         type: WidgetType.LINK,
-        text: "app.api.user.public.signup.footer.alreadyHaveAccount",
+        text: "footer.alreadyHaveAccount",
         href: "/user/login",
         textAlign: "center",
         external: false,
@@ -283,47 +264,47 @@ const { POST } = createEndpoint({
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.user.public.signup.errors.validation.title",
-      description: "app.api.user.public.signup.errors.validation.description",
+      title: "errors.validation.title",
+      description: "errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.user.public.signup.errors.unauthorized.title",
-      description: "app.api.user.public.signup.errors.unauthorized.description",
+      title: "errors.unauthorized.title",
+      description: "errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.user.public.signup.errors.server.title",
-      description: "app.api.user.public.signup.errors.server.description",
+      title: "errors.server.title",
+      description: "errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.user.public.signup.errors.unknown.title",
-      description: "app.api.user.public.signup.errors.unknown.description",
+      title: "errors.unknown.title",
+      description: "errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.user.public.signup.errors.conflict.title",
-      description: "app.api.user.public.signup.errors.conflict.description",
+      title: "errors.conflict.title",
+      description: "errors.conflict.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.user.public.signup.errors.forbidden.title",
-      description: "app.api.user.public.signup.errors.forbidden.description",
+      title: "errors.forbidden.title",
+      description: "errors.forbidden.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.user.public.signup.errors.network.title",
-      description: "app.api.user.public.signup.errors.network.description",
+      title: "errors.network.title",
+      description: "errors.network.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.user.public.signup.errors.notFound.title",
-      description: "app.api.user.public.signup.errors.notFound.description",
+      title: "errors.notFound.title",
+      description: "errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.user.public.signup.errors.unsaved.title",
-      description: "app.api.user.public.signup.errors.unsaved.description",
+      title: "errors.unsaved.title",
+      description: "errors.unsaved.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.user.public.signup.success.title",
-    description: "app.api.user.public.signup.success.description",
+    title: "success.title",
+    description: "success.description",
   },
 
   // === EXAMPLES ===

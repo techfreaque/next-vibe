@@ -12,13 +12,13 @@ import type React from "react";
 
 import leadsImportEndpoints from "@/app/api/[locale]/leads/import/definition";
 import { useLeadsImportEndpoint } from "@/app/api/[locale]/leads/import/hooks";
+import { scopedTranslation as leadsImportScopedTranslation } from "@/app/api/[locale]/leads/import/i18n";
 import importJobsStatusEndpoints from "@/app/api/[locale]/leads/import/status/definition";
 import { useImportJobsStatusEndpoint } from "@/app/api/[locale]/leads/import/status/hooks";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 interface LeadsImportClientProps {
   locale: CountryLanguage;
@@ -29,7 +29,7 @@ export function LeadsImportClient({
   locale,
   user,
 }: LeadsImportClientProps): React.JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = leadsImportScopedTranslation.scopedT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
 
   const importEndpoint = useLeadsImportEndpoint(user, logger);
@@ -53,7 +53,7 @@ export function LeadsImportClient({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
-            {t("app.api.leads.import.post.title")}
+            {t("post.title")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -68,7 +68,6 @@ export function LeadsImportClient({
                 ? importEndpoint.create.response.data
                 : undefined
             }
-            submitButtonText="app.admin.leads.leads.admin.import.actions.import"
             logger={logger}
           />
         </CardContent>
@@ -78,7 +77,7 @@ export function LeadsImportClient({
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            {t("app.api.leads.import.status.get.title")}
+            {t("status.get.title")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -93,7 +92,6 @@ export function LeadsImportClient({
                 ? statusEndpoint.read.response.data
                 : undefined
             }
-            submitButtonText="app.admin.common.actions.reset"
             logger={logger}
           />
         </CardContent>

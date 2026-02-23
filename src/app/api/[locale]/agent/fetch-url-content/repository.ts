@@ -14,6 +14,9 @@ import { agentEnv } from "@/app/api/[locale]/agent/env";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { FetchUrlContentGetResponseOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Fetch URL error and success messages for AI tool responses
@@ -412,6 +415,7 @@ export class FetchUrlContentRepository {
   static async fetchUrl(
     url: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<FetchUrlContentGetResponseOutput>> {
     const { fail, success, ErrorResponseTypes } =
       await import("next-vibe/shared/types/response.schema");
@@ -419,8 +423,7 @@ export class FetchUrlContentRepository {
     try {
       if (!url || typeof url !== "string" || url.trim() === "") {
         return fail({
-          message:
-            "app.api.agent.chat.tools.fetchUrl.get.errors.validation.title" as const,
+          message: t("get.errors.validation.title"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
           messageParams: { message: FETCH_MESSAGES.URL_REQUIRED },
         });
@@ -450,8 +453,7 @@ export class FetchUrlContentRepository {
       });
 
       return fail({
-        message:
-          "app.api.agent.chat.tools.fetchUrl.get.errors.internal.title" as const,
+        message: t("get.errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { message: fetchError.message },
       });

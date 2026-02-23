@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Czat",
+
   post: {
     title: "Dodaj wspomnienie",
     description: "Tworzy nowe wspomnienie dla bieżącego użytkownika",
@@ -14,6 +16,7 @@ export const translations: typeof enTranslations = {
         "Fakt do zapamiętania (np. 'Zawód: Inżynier oprogramowania')",
     },
     tags: {
+      memories: "Wspomnienia",
       label: "Tagi",
       description: "Tagi do kategoryzacji (np. zawód, preferencje)",
     },

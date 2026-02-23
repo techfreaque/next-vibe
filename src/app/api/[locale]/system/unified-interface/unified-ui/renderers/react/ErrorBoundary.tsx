@@ -10,8 +10,7 @@ import { AlertTriangle } from "next-vibe-ui/ui/icons";
 import { Pre } from "next-vibe-ui/ui/pre";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 
-import { simpleT } from "@/i18n/core/shared";
-
+import { scopedTranslation } from "../../../react/i18n";
 import { type WidgetErrorBoundaryProps } from "../../widgets/_shared/react-types";
 /**
  * Widget Error Boundary State
@@ -71,29 +70,21 @@ export class WidgetErrorBoundary extends Component<
         return this.props.fallback;
       }
 
-      const { t } = simpleT(this.props.locale);
+      const { t } = scopedTranslation.scopedT(this.props.locale);
 
       // Default error UI
       return (
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>
-            {t(
-              "app.api.system.unifiedInterface.react.widgets.errorBoundary.title",
-            )}
-          </AlertTitle>
+          <AlertTitle>{t("widgets.errorBoundary.title")}</AlertTitle>
           <AlertDescription>
             {this.state.error?.message ||
-              t(
-                "app.api.system.unifiedInterface.react.widgets.errorBoundary.defaultMessage",
-              )}
+              t("widgets.errorBoundary.defaultMessage")}
             {this.state.errorInfo && (
               <Accordion type="single" collapsible className="mt-2 text-xs">
                 <AccordionItem value="details">
                   <AccordionTrigger>
-                    {t(
-                      "app.api.system.unifiedInterface.react.widgets.errorBoundary.errorDetails",
-                    )}
+                    {t("widgets.errorBoundary.errorDetails")}
                   </AccordionTrigger>
                   <AccordionContent>
                     <Pre className="mt-2 overflow-auto p-2 bg-muted rounded">

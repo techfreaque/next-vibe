@@ -20,11 +20,11 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-
 import type { JwtPayloadType } from "../../../../../user/auth/types";
 import type { InstallRequestOutput, InstallResponseOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Setup Install Repository Interface
@@ -33,7 +33,7 @@ export interface SetupInstallRepository {
   installCli(
     data: InstallRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: ModuleT,
   ): Promise<ResponseType<InstallResponseOutput>>;
 }
 
@@ -175,20 +175,15 @@ exit 1
   async installCli(
     data: InstallRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: ModuleT,
   ): Promise<ResponseType<InstallResponseOutput>> {
-    const { t } = simpleT(locale);
-
     // Validate user permissions for CLI installation
     if (!user?.id) {
       return fail({
-        message:
-          "app.api.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.title",
+        message: t("post.errors.unauthorized.title"),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
         messageParams: {
-          error: t(
-            "app.api.system.unifiedInterface.cli.setup.install.post.errors.unauthorized.description",
-          ),
+          error: t("post.errors.unauthorized.description"),
         },
       });
     }
@@ -204,12 +199,8 @@ exit 1
           version: status.version,
           path: status.path,
           message: status.path
-            ? t(
-                "app.api.system.unifiedInterface.cli.setup.install.post.success.description",
-              )
-            : t(
-                "app.api.system.unifiedInterface.cli.setup.install.post.success.description",
-              ),
+            ? t("post.success.description")
+            : t("post.success.description"),
         });
       }
 
@@ -217,8 +208,7 @@ exit 1
       const bunAvailable = await this.checkBunAvailable();
       if (!bunAvailable) {
         return fail({
-          message:
-            "app.api.system.unifiedInterface.cli.setup.install.post.errors.server.title",
+          message: t("post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error:
@@ -249,8 +239,7 @@ exit 1
       // Verify vibe-runtime.ts exists
       if (!existsSync(vibeTsAbsolutePath)) {
         return fail({
-          message:
-            "app.api.system.unifiedInterface.cli.setup.install.post.errors.server.title",
+          message: t("post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             // eslint-disable-next-line i18next/no-literal-string
@@ -282,8 +271,7 @@ exit 1
       } catch (error) {
         const parsedError = parseError(error);
         return fail({
-          message:
-            "app.api.system.unifiedInterface.cli.setup.install.post.errors.server.title",
+          message: t("post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             // eslint-disable-next-line i18next/no-literal-string
@@ -328,19 +316,14 @@ exit 1
         version: newStatus.version,
         path: newStatus.path,
         message: newStatus.installed
-          ? t(
-              "app.api.system.unifiedInterface.cli.setup.install.post.success.description",
-            )
-          : t(
-              "app.api.system.unifiedInterface.cli.setup.install.post.errors.server.description",
-            ),
+          ? t("post.success.description")
+          : t("post.errors.server.description"),
         output: data.verbose ? output : undefined,
       });
     } catch (error) {
       const parsedError = parseError(error);
       return fail({
-        message:
-          "app.api.system.unifiedInterface.cli.setup.install.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           // eslint-disable-next-line i18next/no-literal-string

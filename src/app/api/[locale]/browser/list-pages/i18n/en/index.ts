@@ -64,4 +64,9 @@ export const translations = {
     title: "Pages Listed Successfully",
     description: "The open pages were listed successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    navigationAutomation: "Navigation Automation",
+  },
 };

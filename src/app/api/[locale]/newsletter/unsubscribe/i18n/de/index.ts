@@ -37,6 +37,7 @@ export const translations: typeof enTranslations = {
     message: "Erfolgsmeldung",
   },
   errors: {
+    email_generation_failed: "E-Mail konnte nicht generiert werden",
     internal: {
       title: "Interner Fehler",
       description:
@@ -82,6 +83,69 @@ export const translations: typeof enTranslations = {
   sync: {
     failed: "Newsletter-Abmeldung Synchronisation fehlgeschlagen",
     error: "Newsletter-Abmeldung Synchronisation Fehler",
+    tag: "Newsletter-Synchronisation",
+    post: {
+      title: "Newsletter-Abmeldung synchronisieren",
+      description: "Lead-Status für Newsletter-Abmeldungen synchronisieren",
+      container: {
+        title: "Synchronisierungskonfiguration",
+        description: "Synchronisierungsparameter konfigurieren",
+      },
+      fields: {
+        batchSize: {
+          label: "Batch-Größe",
+          description: "Anzahl der Datensätze pro Batch",
+        },
+        dryRun: {
+          label: "Testlauf",
+          description: "Ausführen ohne Änderungen vorzunehmen",
+        },
+      },
+      response: {
+        leadsProcessed: "Verarbeitete Leads",
+        leadsUpdated: "Aktualisierte Leads",
+        executionTimeMs: "Ausführungszeit (ms)",
+      },
+      errors: {
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Authentifizierung erforderlich",
+        },
+        forbidden: {
+          title: "Verboten",
+          description: "Zugriff verweigert",
+        },
+        server: {
+          title: "Serverfehler",
+          description: "Beim Synchronisieren ist ein Fehler aufgetreten",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unbekannter Fehler ist aufgetreten",
+        },
+        validation: {
+          title: "Validierungsfehler",
+          description: "Ungültige Anfrageparameter",
+        },
+      },
+      success: {
+        title: "Synchronisierung abgeschlossen",
+        description: "Newsletter-Abmeldungen erfolgreich synchronisiert",
+      },
+    },
+  },
+  emailTemplates: {
+    unsubscribe: {
+      name: "Newsletter Abmelde-E-Mail",
+      description: "Bestätigungs-E-Mail für Newsletter-Abmeldungen",
+      category: "newsletter",
+      preview: {
+        email: {
+          label: "E-Mail-Adresse",
+          description: "Die abzumeldende E-Mail-Adresse",
+        },
+      },
+    },
   },
   sms: {
     confirmation: {

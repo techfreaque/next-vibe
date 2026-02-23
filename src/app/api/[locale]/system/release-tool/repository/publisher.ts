@@ -13,59 +13,20 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { CountryLanguage } from "@/i18n/core/config";
+
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type { CIEnvironment, PackageJson, ReleaseOptions } from "../definition";
+import { scopedTranslation } from "../i18n";
 import { MESSAGES } from "./constants";
 
-// ============================================================================
-// Interface
-// ============================================================================
-
-export interface IPublisher {
-  /**
-   * Run CI release command
-   */
+export class Publisher {
   runCiReleaseCommand(
     releaseConfig: ReleaseOptions,
     packageName: string,
     logger: EndpointLogger,
     dryRun: boolean,
-  ): ResponseType<void>;
-
-  /**
-   * Publish to npm registry
-   */
-  publishToNpm(
-    cwd: string,
-    packageJson: PackageJson,
-    releaseConfig: ReleaseOptions,
-    logger: EndpointLogger,
-    dryRun: boolean,
-    ciEnv: CIEnvironment,
-  ): ResponseType<void>;
-
-  /**
-   * Publish to JSR registry
-   */
-  publishToJsr(
-    cwd: string,
-    packageJson: PackageJson,
-    releaseConfig: ReleaseOptions,
-    logger: EndpointLogger,
-    dryRun: boolean,
-  ): ResponseType<void>;
-}
-
-// ============================================================================
-// Implementation
-// ============================================================================
-
-export class Publisher implements IPublisher {
-  runCiReleaseCommand(
-    releaseConfig: ReleaseOptions,
-    packageName: string,
-    logger: EndpointLogger,
-    dryRun: boolean,
+    locale: CountryLanguage,
   ): ResponseType<void> {
     if (!releaseConfig.ciReleaseCommand) {
       return success();
@@ -97,8 +58,9 @@ export class Publisher implements IPublisher {
         const envValue = process.env[value];
         if (!envValue) {
           logger.error(`Required environment variable ${value} is not set`);
+          const { t } = scopedTranslation.scopedT(locale);
           return fail({
-            message: "app.api.system.releaseTool.ci.envVarMissing",
+            message: t("ci.envVarMissing"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
             messageParams: { variable: value, package: packageName },
           });
@@ -116,8 +78,9 @@ export class Publisher implements IPublisher {
       return success();
     } catch (error) {
       logger.error(MESSAGES.CI_COMMAND_FAILED, parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.ci.commandFailed",
+        message: t("ci.commandFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { package: packageName, error: String(error) },
       });
@@ -131,6 +94,7 @@ export class Publisher implements IPublisher {
     logger: EndpointLogger,
     dryRun: boolean,
     ciEnv: CIEnvironment,
+    locale: CountryLanguage,
   ): ResponseType<void> {
     // Skip private packages
     if (packageJson.private) {
@@ -196,8 +160,9 @@ export class Publisher implements IPublisher {
       return success();
     } catch (error) {
       logger.error(MESSAGES.NPM_PUBLISH_FAILED, parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.npm.publishFailed",
+        message: t("npm.publishFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { package: packageJson.name, error: String(error) },
       });
@@ -210,6 +175,7 @@ export class Publisher implements IPublisher {
     releaseConfig: ReleaseOptions,
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
   ): ResponseType<void> {
     const jsrConfig = releaseConfig.jsr;
     if (!jsrConfig || jsrConfig.enabled === false) {
@@ -240,8 +206,9 @@ export class Publisher implements IPublisher {
       return success();
     } catch (error) {
       logger.error(MESSAGES.JSR_PUBLISH_FAILED, parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.npm.publishFailed",
+        message: t("npm.publishFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { package: packageJson.name, error: String(error) },
       });

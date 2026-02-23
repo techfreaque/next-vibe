@@ -8,8 +8,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -19,17 +19,18 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../../../user/user-roles/enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Setup Status Endpoint Definition
  */
 const { POST } = createEndpoint({
-  title: "app.api.system.unifiedInterface.cli.setup.status.post.title",
-  description:
-    "app.api.system.unifiedInterface.cli.setup.status.post.description",
+  scopedTranslation,
+  title: "post.title",
+  description: "post.description",
   icon: "terminal",
-  category: "app.api.system.category",
-  tags: ["app.api.system.unifiedInterface.cli.setup.status.post.title"],
+  category: "post.title",
+  tags: ["post.title"],
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],
   aliases: ["status", "setup:status"],
   method: Methods.POST,
@@ -46,119 +47,91 @@ const { POST } = createEndpoint({
     },
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.unifiedInterface.cli.setup.status.post.title",
-      description:
-        "app.api.system.unifiedInterface.cli.setup.status.post.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.title",
+    description: "post.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { response: true },
+    children: {
       // === RESPONSE FIELDS ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.success",
+        content: "post.response.fields.success",
         schema: z.boolean(),
       }),
 
-      installed: responseField({
+      installed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.installed",
+        content: "post.response.fields.installed",
         schema: z.boolean(),
       }),
 
-      version: responseField({
+      version: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.version",
+        content: "post.response.fields.version",
         schema: z.string().optional(),
       }),
 
-      path: responseField({
+      path: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.path",
+        content: "post.response.fields.path",
         schema: z.string().optional(),
       }),
 
-      message: responseField({
+      message: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.cli.setup.status.post.response.fields.message",
+        content: "post.response.fields.message",
         schema: z.string(),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.validation.title",
-      description:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.unauthorized.title",
-      description:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.server.title",
-      description:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.network.title",
-      description:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.forbidden.title",
-      description:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.notFound.title",
-      description:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.unknown.title",
-      description:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.conflict.title",
-      description:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.conflict.title",
-      description:
-        "app.api.system.unifiedInterface.cli.setup.status.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title:
-      "app.api.system.unifiedInterface.cli.setup.status.post.success.title",
-    description:
-      "app.api.system.unifiedInterface.cli.setup.status.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 });
 

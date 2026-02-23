@@ -39,6 +39,8 @@ import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation as reactNativeScopedTranslation } from "./i18n";
+
 /**
  * Next.js 15 async component props format
  */
@@ -158,9 +160,9 @@ export function createPageWrapperWithImport(
               err instanceof Error
                 ? err
                 : new Error(
-                    t(
-                      "app.api.system.unifiedInterface.reactNative.errors.failedToLoadPage",
-                    ),
+                    reactNativeScopedTranslation
+                      .scopedT(params.locale)
+                      .t("errors.failedToLoadPage"),
                   ),
             );
           }
@@ -185,9 +187,9 @@ export function createPageWrapperWithImport(
           }}
         >
           <Span style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
-            {t(
-              "app.api.system.unifiedInterface.reactNative.errors.failedToLoadPage",
-            )}
+            {reactNativeScopedTranslation
+              .scopedT(params.locale)
+              .t("errors.failedToLoadPage")}
           </Span>
           <Span style={{ fontSize: 14, color: "#666", textAlign: "center" }}>
             {error.message}
@@ -279,9 +281,9 @@ export function createPageWrapper(
                 err instanceof Error
                   ? err
                   : new Error(
-                      t(
-                        "app.api.system.unifiedInterface.reactNative.errors.failedToLoadPage",
-                      ),
+                      reactNativeScopedTranslation
+                        .scopedT(params.locale)
+                        .t("errors.failedToLoadPage"),
                     ),
               );
             }
@@ -306,9 +308,9 @@ export function createPageWrapper(
           }}
         >
           <Span style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
-            {t(
-              "app.api.system.unifiedInterface.reactNative.errors.failedToLoadPage",
-            )}
+            {reactNativeScopedTranslation
+              .scopedT(params.locale)
+              .t("errors.failedToLoadPage")}
           </Span>
           <Span style={{ fontSize: 14, color: "#666", textAlign: "center" }}>
             {error.message}

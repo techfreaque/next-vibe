@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Email Communication",
+  tag: "SMTP",
   title: "Create SMTP Account",
   description: "Create a new SMTP account for email sending",
   container: {

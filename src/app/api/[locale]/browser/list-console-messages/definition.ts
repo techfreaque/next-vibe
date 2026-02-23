@@ -7,11 +7,11 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  objectOptionalField,
-  requestField,
-  responseArrayField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedObjectOptionalField,
+  scopedRequestField,
+  scopedResponseArrayField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -22,16 +22,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "../i18n";
+
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["browser", "list-console-messages"],
-  title: "app.api.browser.list-console-messages.title",
-  description: "app.api.browser.list-console-messages.description",
-  category: "app.api.browser.category",
+  title: "list-console-messages.title",
+  description: "list-console-messages.description",
+  category: "list-console-messages.category",
   icon: "terminal",
   tags: [
-    "app.api.browser.tags.browserAutomation",
-    "app.api.browser.tags.debugging",
+    "list-console-messages.tags.browserAutomation",
+    "list-console-messages.tags.debugging",
   ],
 
   allowedRoles: [
@@ -42,25 +45,23 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.browser.list-console-messages.form.label",
-      description: "app.api.browser.list-console-messages.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
-      includePreservedMessages: requestField({
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "list-console-messages.form.label",
+    description: "list-console-messages.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      includePreservedMessages: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         label:
-          "app.api.browser.list-console-messages.form.fields.includePreservedMessages.label",
+          "list-console-messages.form.fields.includePreservedMessages.label",
         description:
-          "app.api.browser.list-console-messages.form.fields.includePreservedMessages.description",
+          "list-console-messages.form.fields.includePreservedMessages.description",
         placeholder:
-          "app.api.browser.list-console-messages.form.fields.includePreservedMessages.placeholder",
+          "list-console-messages.form.fields.includePreservedMessages.placeholder",
         columns: 4,
         schema: z
           .boolean()
@@ -70,15 +71,12 @@ const { POST } = createEndpoint({
             "Set to true to return the preserved messages over the last 3 navigations.",
           ),
       }),
-      pageIdx: requestField({
+      pageIdx: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.browser.list-console-messages.form.fields.pageIdx.label",
-        description:
-          "app.api.browser.list-console-messages.form.fields.pageIdx.description",
-        placeholder:
-          "app.api.browser.list-console-messages.form.fields.pageIdx.placeholder",
+        label: "list-console-messages.form.fields.pageIdx.label",
+        description: "list-console-messages.form.fields.pageIdx.description",
+        placeholder: "list-console-messages.form.fields.pageIdx.placeholder",
         columns: 4,
         schema: z
           .number()
@@ -88,15 +86,12 @@ const { POST } = createEndpoint({
             "Page number to return (0-based). When omitted, returns the first page.",
           ),
       }),
-      pageSize: requestField({
+      pageSize: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.browser.list-console-messages.form.fields.pageSize.label",
-        description:
-          "app.api.browser.list-console-messages.form.fields.pageSize.description",
-        placeholder:
-          "app.api.browser.list-console-messages.form.fields.pageSize.placeholder",
+        label: "list-console-messages.form.fields.pageSize.label",
+        description: "list-console-messages.form.fields.pageSize.description",
+        placeholder: "list-console-messages.form.fields.pageSize.placeholder",
         columns: 4,
         schema: z
           .number()
@@ -106,14 +101,12 @@ const { POST } = createEndpoint({
             "Maximum number of messages to return. When omitted, returns all messages.",
           ),
       }),
-      types: requestField({
+      types: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "app.api.browser.list-console-messages.form.fields.types.label",
-        description:
-          "app.api.browser.list-console-messages.form.fields.types.description",
-        placeholder:
-          "app.api.browser.list-console-messages.form.fields.types.placeholder",
+        label: "list-console-messages.form.fields.types.label",
+        description: "list-console-messages.form.fields.types.description",
+        placeholder: "list-console-messages.form.fields.types.placeholder",
         columns: 12,
         schema: z
           .array(
@@ -147,88 +140,83 @@ const { POST } = createEndpoint({
       }),
 
       // Response fields
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.list-console-messages.response.success",
+        content: "list-console-messages.response.success",
         schema: z
           .boolean()
           .describe("Whether the console messages listing operation succeeded"),
       }),
-      result: objectOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.browser.list-console-messages.response.result.title",
-          description:
-            "app.api.browser.list-console-messages.response.result.description",
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
-          messages: responseArrayField(
+      result: scopedObjectOptionalField(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "list-console-messages.response.result.title",
+        description: "list-console-messages.response.result.description",
+        layoutType: LayoutType.STACKED,
+        usage: { response: true },
+        children: {
+          messages: scopedResponseArrayField(
+            scopedTranslation,
             {
               type: WidgetType.CONTAINER,
             },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                layoutType: LayoutType.GRID,
-                columns: 12,
-              },
-              { response: true },
-              {
-                msgid: responseField({
+            scopedObjectFieldNew(scopedTranslation, {
+              type: WidgetType.CONTAINER,
+              layoutType: LayoutType.GRID,
+              columns: 12,
+              usage: { response: true },
+              children: {
+                msgid: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.browser.list-console-messages.response.result.messages.msgid",
+                    "list-console-messages.response.result.messages.msgid",
                   schema: z.coerce.number(),
                 }),
-                type: responseField({
+                type: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.browser.list-console-messages.response.result.messages.type",
+                    "list-console-messages.response.result.messages.type",
                   schema: z.string(),
                 }),
-                text: responseField({
+                text: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.browser.list-console-messages.response.result.messages.text",
+                    "list-console-messages.response.result.messages.text",
                   schema: z.string(),
                 }),
-                timestamp: responseField({
+                timestamp: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content:
-                    "app.api.browser.list-console-messages.response.result.messages.timestamp",
+                    "list-console-messages.response.result.messages.timestamp",
                   schema: z.string().optional(),
                 }),
               },
-            ),
+            }),
           ),
-          totalCount: responseField({
+          totalCount: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.browser.list-console-messages.response.result.totalCount",
+            content: "list-console-messages.response.result.totalCount",
             schema: z.coerce.number().describe("Total number of messages"),
           }),
         },
-      ),
-      error: responseField({
+      }),
+      error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.list-console-messages.response.error",
+        content: "list-console-messages.response.error",
         schema: z
           .string()
           .optional()
           .describe("Error message if the operation failed"),
       }),
-      executionId: responseField({
+      executionId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.browser.list-console-messages.response.executionId",
+        content: "list-console-messages.response.executionId",
         schema: z
           .string()
           .optional()
           .describe("Unique identifier for this execution"),
       }),
     },
-  ),
+  }),
   examples: {
     requests: {
       default: { pageIdx: 0 },
@@ -252,55 +240,45 @@ const { POST } = createEndpoint({
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.browser.list-console-messages.errors.validation.title",
-      description:
-        "app.api.browser.list-console-messages.errors.validation.description",
+      title: "list-console-messages.errors.validation.title",
+      description: "list-console-messages.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.browser.list-console-messages.errors.network.title",
-      description:
-        "app.api.browser.list-console-messages.errors.network.description",
+      title: "list-console-messages.errors.network.title",
+      description: "list-console-messages.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.browser.list-console-messages.errors.unauthorized.title",
-      description:
-        "app.api.browser.list-console-messages.errors.unauthorized.description",
+      title: "list-console-messages.errors.unauthorized.title",
+      description: "list-console-messages.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.browser.list-console-messages.errors.forbidden.title",
-      description:
-        "app.api.browser.list-console-messages.errors.forbidden.description",
+      title: "list-console-messages.errors.forbidden.title",
+      description: "list-console-messages.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.browser.list-console-messages.errors.notFound.title",
-      description:
-        "app.api.browser.list-console-messages.errors.notFound.description",
+      title: "list-console-messages.errors.notFound.title",
+      description: "list-console-messages.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.browser.list-console-messages.errors.serverError.title",
-      description:
-        "app.api.browser.list-console-messages.errors.serverError.description",
+      title: "list-console-messages.errors.serverError.title",
+      description: "list-console-messages.errors.serverError.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.browser.list-console-messages.errors.unknown.title",
-      description:
-        "app.api.browser.list-console-messages.errors.unknown.description",
+      title: "list-console-messages.errors.unknown.title",
+      description: "list-console-messages.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.browser.list-console-messages.errors.unsavedChanges.title",
-      description:
-        "app.api.browser.list-console-messages.errors.unsavedChanges.description",
+      title: "list-console-messages.errors.unsavedChanges.title",
+      description: "list-console-messages.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.browser.list-console-messages.errors.conflict.title",
-      description:
-        "app.api.browser.list-console-messages.errors.conflict.description",
+      title: "list-console-messages.errors.conflict.title",
+      description: "list-console-messages.errors.conflict.description",
     },
   },
   successTypes: {
-    title: "app.api.browser.list-console-messages.success.title",
-    description: "app.api.browser.list-console-messages.success.description",
+    title: "list-console-messages.success.title",
+    description: "list-console-messages.success.description",
   },
 });
 

@@ -10,10 +10,10 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   backButton,
   customWidgetObject,
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -39,6 +39,7 @@ import {
   TaskOutputModeDB,
 } from "../../enum";
 import { taskInputSchema } from "../db";
+import { scopedTranslation } from "./i18n";
 import { CronTasksContainer } from "./widget";
 
 /** Reusable task response shape — keep in sync with CronTaskResponse in repository.ts */
@@ -87,20 +88,20 @@ export const cronTaskResponseSchema = z.object({
  * GET /cron/tasks - List cron tasks
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["system", "unified-interface", "tasks", "cron", "tasks"],
-  title: "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.title",
-  description:
-    "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.description",
+  title: "get.title",
+  description: "get.description",
   icon: "clock",
-  category: "app.api.system.category",
+  category: "category",
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
     UserRole.ADMIN,
   ],
-  tags: ["app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.title"],
+  tags: ["get.title"],
   fields: customWidgetObject({
     render: CronTasksContainer,
     usage: { request: "data", response: true } as const,
@@ -108,54 +109,42 @@ const { GET } = createEndpoint({
       backButton: backButton({ usage: { request: "data", response: true } }),
 
       // Request fields for filtering
-      status: requestField({
+      status: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.status.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.status.description",
-        placeholder:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.status.placeholder",
+        label: "get.fields.status.label",
+        description: "get.fields.status.description",
+        placeholder: "get.fields.status.placeholder",
         options: CronTaskStatusOptions,
         columns: 6,
         schema: z.array(z.enum(CronTaskStatusDB)).optional(),
       }),
-      priority: requestField({
+      priority: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.priority.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.priority.description",
-        placeholder:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.priority.placeholder",
+        label: "get.fields.priority.label",
+        description: "get.fields.priority.description",
+        placeholder: "get.fields.priority.placeholder",
         options: CronTaskPriorityOptions,
         columns: 6,
         schema: z.array(z.enum(CronTaskPriorityDB)).optional(),
       }),
-      category: requestField({
+      category: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.category.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.category.description",
-        placeholder:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.category.placeholder",
+        label: "get.fields.category.label",
+        description: "get.fields.category.description",
+        placeholder: "get.fields.category.placeholder",
         options: TaskCategoryOptions,
         columns: 6,
         schema: z.array(z.enum(TaskCategoryDB)).optional(),
       }),
-      enabled: requestField({
+      enabled: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.enabled.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.enabled.description",
-        placeholder:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.enabled.placeholder",
+        label: "get.fields.enabled.label",
+        description: "get.fields.enabled.description",
+        placeholder: "get.fields.enabled.placeholder",
         options: CronTaskEnabledFilterOptions,
         columns: 6,
         schema: z
@@ -163,207 +152,170 @@ const { GET } = createEndpoint({
           .optional()
           .default(CronTaskEnabledFilter.ALL),
       }),
-      limit: requestField({
+      limit: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.limit.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.limit.description",
+        label: "get.fields.limit.label",
+        description: "get.fields.limit.description",
         columns: 3,
         schema: z.string().optional(),
       }),
-      offset: requestField({
+      offset: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.offset.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.fields.offset.description",
+        label: "get.fields.offset.label",
+        description: "get.fields.offset.description",
         columns: 3,
         schema: z.string().optional(),
       }),
 
       // Response fields
-      tasks: responseArrayField(
-        {
+      tasks: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-        },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            title:
-              "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.title",
-            description:
-              "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.description",
-            layoutType: LayoutType.GRID,
-            columns: 12,
-          },
-          { response: true },
-          {
-            id: responseField({
+          title: "get.response.task.title",
+          description: "get.response.task.description",
+          layoutType: LayoutType.GRID,
+          columns: 12,
+          usage: { response: true },
+          children: {
+            id: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.id",
+              content: "get.response.task.id",
               schema: z.string(),
             }),
-            routeId: responseField({
+            routeId: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.routeId",
+              content: "get.response.task.routeId",
               schema: z.string(),
             }),
-            displayName: responseField({
+            displayName: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.displayName",
+              content: "get.response.task.displayName",
               schema: z.string(),
             }),
-            description: responseField({
+            description: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.taskDescription",
+              content: "get.response.task.taskDescription",
               schema: z.string().nullable(),
             }),
-            version: responseField({
+            version: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.version",
+              content: "get.response.task.version",
               schema: z.string(),
             }),
-            category: responseField({
+            category: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.category",
+              content: "get.response.task.category",
               schema: z.string(),
             }),
-            schedule: responseField({
+            schedule: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.schedule",
+              content: "get.response.task.schedule",
               schema: z.string(),
             }),
-            timezone: responseField({
+            timezone: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.timezone",
+              content: "get.response.task.timezone",
               schema: z.string().nullable(),
             }),
-            enabled: responseField({
+            enabled: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.enabled",
+              content: "get.response.task.enabled",
               schema: z.boolean(),
             }),
-            priority: responseField({
+            priority: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.priority",
+              content: "get.response.task.priority",
               schema: z.enum(CronTaskPriorityDB),
             }),
-            timeout: responseField({
+            timeout: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.timeout",
+              content: "get.response.task.timeout",
               schema: z.number().nullable(),
             }),
-            retries: responseField({
+            retries: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.retries",
+              content: "get.response.task.retries",
               schema: z.number().nullable(),
             }),
-            retryDelay: responseField({
+            retryDelay: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.retryDelay",
+              content: "get.response.task.retryDelay",
               schema: z.number().nullable(),
             }),
-            outputMode: responseField({
+            outputMode: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.outputMode",
+              content: "get.response.task.outputMode",
               schema: z.enum(TaskOutputModeDB),
             }),
-            userId: responseField({
+            userId: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.userId",
+              content: "get.response.task.userId",
               schema: z.string().nullable(),
             }),
-            lastExecutedAt: responseField({
+            lastExecutedAt: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.lastExecutedAt",
+              content: "get.response.task.lastExecutedAt",
               schema: z.string().nullable(),
             }),
-            lastExecutionStatus: responseField({
+            lastExecutionStatus: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.lastExecutionStatus",
+              content: "get.response.task.lastExecutionStatus",
               schema: z.enum(CronTaskStatusDB).nullable(),
             }),
-            lastExecutionError: responseField({
+            lastExecutionError: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.lastExecutionError",
+              content: "get.response.task.lastExecutionError",
               schema: z.string().nullable(),
             }),
-            lastExecutionDuration: responseField({
+            lastExecutionDuration: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.lastExecutionDuration",
+              content: "get.response.task.lastExecutionDuration",
               schema: z.number().nullable(),
             }),
-            nextExecutionAt: responseField({
+            nextExecutionAt: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.nextExecutionAt",
+              content: "get.response.task.nextExecutionAt",
               schema: z.string().nullable(),
             }),
-            executionCount: responseField({
+            executionCount: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.executionCount",
+              content: "get.response.task.executionCount",
               schema: z.number(),
             }),
-            successCount: responseField({
+            successCount: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.successCount",
+              content: "get.response.task.successCount",
               schema: z.number(),
             }),
-            errorCount: responseField({
+            errorCount: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.errorCount",
+              content: "get.response.task.errorCount",
               schema: z.number(),
             }),
-            averageExecutionTime: responseField({
+            averageExecutionTime: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.averageExecutionTime",
+              content: "get.response.task.averageExecutionTime",
               schema: z.number().nullable(),
             }),
-            createdAt: responseField({
+            createdAt: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.createdAt",
+              content: "get.response.task.createdAt",
               schema: z.string(),
             }),
-            updatedAt: responseField({
+            updatedAt: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.task.updatedAt",
+              content: "get.response.task.updatedAt",
               schema: z.string(),
             }),
           },
-        ),
-      ),
-      totalTasks: responseField({
+        }),
+      }),
+      totalTasks: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.response.totalTasks",
+        content: "get.response.totalTasks",
         schema: z.coerce.number(),
       }),
     },
@@ -371,65 +323,45 @@ const { GET } = createEndpoint({
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.validation.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.validation.description",
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.unauthorized.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.unauthorized.description",
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.internal.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.internal.description",
+      title: "get.errors.internal.title",
+      description: "get.errors.internal.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.forbidden.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.forbidden.description",
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.notFound.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.notFound.description",
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.network.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.network.description",
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.unknown.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.unknown.description",
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.unsaved.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.unsaved.description",
+      title: "get.errors.unsaved.title",
+      description: "get.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.conflict.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.errors.conflict.description",
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
     },
   },
   successTypes: {
-    title:
-      "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.success.retrieved.title",
-    description:
-      "app.api.system.unifiedInterface.tasks.cronSystem.tasks.get.success.retrieved.description",
+    title: "get.success.retrieved.title",
+    description: "get.success.retrieved.description",
   },
   examples: {
     requests: {
@@ -448,245 +380,190 @@ const { GET } = createEndpoint({
  * POST /cron/tasks - Create a new cron task
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["system", "unified-interface", "tasks", "cron", "tasks"],
-  title: "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.title",
-  description:
-    "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.description",
+  title: "post.title",
+  description: "post.description",
   icon: "clock",
-  category: "app.api.system.category",
+  category: "category",
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
     UserRole.ADMIN,
   ],
-  tags: ["app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.title"],
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.container.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.container.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  tags: ["post.title"],
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.container.title",
+    description: "post.container.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // Request fields
-      routeId: requestField({
+      routeId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.routeId.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.routeId.description",
-        placeholder:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.routeId.placeholder",
+        label: "post.fields.routeId.label",
+        description: "post.fields.routeId.description",
+        placeholder: "post.fields.routeId.placeholder",
         columns: 12,
         schema: z.string().min(1),
       }),
-      displayName: requestField({
+      displayName: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.displayName.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.displayName.description",
-        placeholder:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.displayName.placeholder",
+        label: "post.fields.displayName.label",
+        description: "post.fields.displayName.description",
+        placeholder: "post.fields.displayName.placeholder",
         columns: 12,
         schema: z.string().min(1),
       }),
-      description: requestField({
+      description: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
-        label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.description.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.description.description",
-        placeholder:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.description.placeholder",
+        label: "post.fields.description.label",
+        description: "post.fields.description.description",
+        placeholder: "post.fields.description.placeholder",
         columns: 12,
         schema: z.string().optional(),
       }),
-      schedule: requestField({
+      schedule: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.schedule.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.schedule.description",
-        placeholder:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.schedule.placeholder",
+        label: "post.fields.schedule.label",
+        description: "post.fields.schedule.description",
+        placeholder: "post.fields.schedule.placeholder",
         columns: 6,
         schema: z.string().min(1),
       }),
-      priority: requestField({
+      priority: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.priority.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.priority.description",
+        label: "post.fields.priority.label",
+        description: "post.fields.priority.description",
         options: CronTaskPriorityOptions,
         columns: 6,
         schema: z.enum(CronTaskPriorityDB).default(CronTaskPriority.MEDIUM),
       }),
-      category: requestField({
+      category: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.category.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.category.description",
+        label: "post.fields.category.label",
+        description: "post.fields.category.description",
         options: TaskCategoryOptions,
         columns: 6,
         schema: z.enum(TaskCategoryDB).default(TaskCategory.SYSTEM),
       }),
-      enabled: requestField({
+      enabled: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.enabled.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.enabled.description",
+        label: "post.fields.enabled.label",
+        description: "post.fields.enabled.description",
         columns: 6,
         schema: z.boolean().default(true),
       }),
-      outputMode: requestField({
+      outputMode: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.outputMode.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.outputMode.description",
+        label: "post.fields.outputMode.label",
+        description: "post.fields.outputMode.description",
         columns: 6,
         schema: z.enum(TaskOutputModeDB).default(TaskOutputModeDB[0]),
       }),
-      timeout: requestField({
+      timeout: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.timeout.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.timeout.description",
+        label: "post.fields.timeout.label",
+        description: "post.fields.timeout.description",
         columns: 4,
         schema: z.coerce.number().default(300000),
       }),
-      retries: requestField({
+      retries: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.retries.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.retries.description",
+        label: "post.fields.retries.label",
+        description: "post.fields.retries.description",
         columns: 4,
         schema: z.coerce.number().default(3),
       }),
-      retryDelay: requestField({
+      retryDelay: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.retryDelay.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.retryDelay.description",
+        label: "post.fields.retryDelay.label",
+        description: "post.fields.retryDelay.description",
         columns: 4,
         schema: z.coerce.number().default(5000),
       }),
-      taskInput: requestField({
+      taskInput: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
-        label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.taskInput.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.taskInput.description",
+        label: "post.fields.taskInput.label",
+        description: "post.fields.taskInput.description",
         columns: 12,
         schema: taskInputSchema.optional(),
       }),
-      runOnce: requestField({
+      runOnce: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.runOnce.label",
-        description:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.fields.runOnce.description",
+        label: "post.fields.runOnce.label",
+        description: "post.fields.runOnce.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
       // Response - return the created task
-      task: responseField({
+      task: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.response.task.title",
+        content: "post.response.task.title",
         schema: cronTaskResponseSchema,
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.validation.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.unauthorized.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.internal.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.internal.description",
+      title: "post.errors.internal.title",
+      description: "post.errors.internal.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.forbidden.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.conflict.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.network.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.unknown.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.notFound.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.unsaved.title",
-      description:
-        "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.errors.unsaved.description",
+      title: "post.errors.unsaved.title",
+      description: "post.errors.unsaved.description",
     },
   },
   successTypes: {
-    title:
-      "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.success.created.title",
-    description:
-      "app.api.system.unifiedInterface.tasks.cronSystem.tasks.post.success.created.description",
+    title: "post.success.created.title",
+    description: "post.success.created.description",
   },
   examples: {
     requests: {

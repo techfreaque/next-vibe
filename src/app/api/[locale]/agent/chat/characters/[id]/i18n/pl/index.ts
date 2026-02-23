@@ -1,6 +1,11 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Narzędzia AI",
+  tags: {
+    characters: "Postacie",
+  },
+
   get: {
     title: "Pobierz postacię",
     description: "Pobierz konkretną postacię według ID",

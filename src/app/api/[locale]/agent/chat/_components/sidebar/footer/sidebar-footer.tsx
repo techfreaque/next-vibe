@@ -23,9 +23,9 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { TOUR_DATA_ATTRS } from "../../../_components/welcome-tour/tour-config";
+import { scopedTranslation } from "../../../i18n";
 import { useSidebarFooterStore } from "./store";
 import { UserMenu } from "./user-menu";
 
@@ -49,7 +49,7 @@ export function SidebarFooter({
   user,
   logger,
 }: SidebarFooterProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   // Bottom sheet expanded state
   const isExpanded = useSidebarFooterStore(
@@ -85,8 +85,8 @@ export function SidebarFooter({
                     suppressHydrationWarning
                   >
                     {credits.total === 1
-                      ? t("app.chat.credits.credit", { count: 1 })
-                      : t("app.chat.credits.credits", {
+                      ? t("components.credits.credit", { count: 1 })
+                      : t("components.credits.credits", {
                           count: `${Math.floor(credits.total * 100) / 100}`,
                         })}
                   </Span>
@@ -98,8 +98,8 @@ export function SidebarFooter({
                 <User className="h-3.5 w-3.5 text-blue-500 shrink-0" />
                 <Span className="text-sm text-muted-foreground truncate">
                   {isLoggedIn
-                    ? t("app.api.agent.chat.components.sidebar.footer.account")
-                    : t("app.api.agent.chat.components.sidebar.login")}
+                    ? t("components.sidebar.footer.account")
+                    : t("components.sidebar.login")}
                 </Span>
               </Span>
             </Span>
@@ -131,7 +131,7 @@ export function SidebarFooter({
                     aria-label="Login to your account"
                   >
                     <User className="h-3.5 w-3.5 mr-2" />
-                    {t("app.api.agent.chat.components.sidebar.login")}
+                    {t("components.sidebar.login")}
                   </Button>
                 </Link>
               )}
@@ -147,7 +147,7 @@ export function SidebarFooter({
                     data-tour={TOUR_DATA_ATTRS.SUBSCRIPTION_BUTTON}
                   >
                     <ShoppingCart className="h-3.5 w-3.5 mr-2" />
-                    {t("app.chat.credits.navigation.subscription")}
+                    {t("components.navigation.subscription")}
                   </Button>
                 </Link>
               )}
@@ -162,7 +162,7 @@ export function SidebarFooter({
                     aria-label="Referral program"
                   >
                     <Handshake className="h-3.5 w-3.5 mr-2" />
-                    {t("app.chat.credits.navigation.referral")}
+                    {t("components.navigation.referral")}
                   </Button>
                 </Link>
               )}
@@ -176,7 +176,7 @@ export function SidebarFooter({
                   aria-label="Get help"
                 >
                   <HelpCircle className="h-3.5 w-3.5 mr-2" />
-                  {t("app.chat.credits.navigation.help")}
+                  {t("components.navigation.help")}
                 </Button>
               </Link>
 
@@ -189,7 +189,7 @@ export function SidebarFooter({
                   aria-label="About us"
                 >
                   <Info className="h-3.5 w-3.5 mr-2" />
-                  {t("app.chat.credits.navigation.about")}
+                  {t("components.navigation.about")}
                 </Button>
               </Link>
               {/* Logout */}

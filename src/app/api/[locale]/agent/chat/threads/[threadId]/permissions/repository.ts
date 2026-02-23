@@ -14,12 +14,16 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleDB } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
   ThreadPermissionsGetResponseOutput,
   ThreadPermissionsUpdateRequestOutput,
   ThreadPermissionsUpdateResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type PermissionsT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Get thread permissions
@@ -29,12 +33,13 @@ import type {
 export async function getThreadPermissions(
   user: JwtPayloadType,
   data: { threadId: string },
+  t: PermissionsT,
   logger: EndpointLogger,
+  locale: CountryLanguage,
 ): Promise<ResponseType<ThreadPermissionsGetResponseOutput>> {
   if (user.isPublic) {
     return fail({
-      message:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.unauthorized.title",
+      message: t("get.errors.unauthorized.title"),
       errorType: ErrorResponseTypes.UNAUTHORIZED,
     });
   }
@@ -48,8 +53,7 @@ export async function getThreadPermissions(
 
     if (!thread) {
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.permissions.get.errors.notFound.title",
+        message: t("get.errors.notFound.title"),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -60,11 +64,11 @@ export async function getThreadPermissions(
       thread,
       null,
       logger,
+      locale,
     );
     if (!canManage) {
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.permissions.get.errors.forbidden.title",
+        message: t("get.errors.forbidden.title"),
         errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
@@ -79,8 +83,7 @@ export async function getThreadPermissions(
     });
   } catch {
     return fail({
-      message:
-        "app.api.agent.chat.threads.threadId.permissions.get.errors.server.title",
+      message: t("get.errors.server.title"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
@@ -94,12 +97,13 @@ export async function getThreadPermissions(
 export async function updateThreadPermissions(
   user: JwtPayloadType,
   data: ThreadPermissionsUpdateRequestOutput & { threadId: string },
+  t: PermissionsT,
   logger: EndpointLogger,
+  locale: CountryLanguage,
 ): Promise<ResponseType<ThreadPermissionsUpdateResponseOutput>> {
   if (user.isPublic) {
     return fail({
-      message:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.unauthorized.title",
+      message: t("patch.errors.unauthorized.title"),
       errorType: ErrorResponseTypes.UNAUTHORIZED,
     });
   }
@@ -123,8 +127,7 @@ export async function updateThreadPermissions(
 
     if (!existingThread) {
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.permissions.patch.errors.notFound.title",
+        message: t("patch.errors.notFound.title"),
         errorType: ErrorResponseTypes.NOT_FOUND,
       });
     }
@@ -135,11 +138,11 @@ export async function updateThreadPermissions(
       existingThread,
       null,
       logger,
+      locale,
     );
     if (!canManage) {
       return fail({
-        message:
-          "app.api.agent.chat.threads.threadId.permissions.patch.errors.forbidden.title",
+        message: t("patch.errors.forbidden.title"),
         errorType: ErrorResponseTypes.FORBIDDEN,
       });
     }
@@ -203,8 +206,7 @@ export async function updateThreadPermissions(
     });
   } catch {
     return fail({
-      message:
-        "app.api.agent.chat.threads.threadId.permissions.patch.errors.server.title",
+      message: t("patch.errors.server.title"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }

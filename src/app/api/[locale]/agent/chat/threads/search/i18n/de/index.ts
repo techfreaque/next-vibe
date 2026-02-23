@@ -5,6 +5,10 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Chat",
+  tags: {
+    threads: "Threads",
+  },
   search: {
     get: {
       title: "Search Threads",

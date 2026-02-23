@@ -8,10 +8,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -22,15 +22,17 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import { UserRole } from "../../../user/user-roles/enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Database Reset Endpoint Definition
  */
 const { POST } = createEndpoint({
-  title: "app.api.system.db.reset.post.title",
-  description: "app.api.system.db.reset.post.description",
-  category: "app.api.system.category",
-  tags: ["app.api.system.db.reset.tag"],
+  scopedTranslation,
+  title: "post.title",
+  description: "post.description",
+  category: "category",
+  tags: ["tag"],
   icon: "rotate-ccw",
   allowedRoles: [
     UserRole.ADMIN,
@@ -223,186 +225,177 @@ const { POST } = createEndpoint({
     },
   },
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.db.reset.post.form.title",
-      description: "app.api.system.db.reset.post.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.form.title",
+    description: "post.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
 
-      force: requestField({
+      force: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.db.reset.fields.force.title",
-        description: "app.api.system.db.reset.fields.force.description",
+        label: "fields.force.title",
+        description: "fields.force.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
-      skipMigrations: requestField({
+      skipMigrations: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.db.reset.fields.skipMigrations.title",
-        description:
-          "app.api.system.db.reset.fields.skipMigrations.description",
+        label: "fields.skipMigrations.title",
+        description: "fields.skipMigrations.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
-      skipSeeds: requestField({
+      skipSeeds: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.db.reset.fields.skipSeeds.title",
-        description: "app.api.system.db.reset.fields.skipSeeds.description",
+        label: "fields.skipSeeds.title",
+        description: "fields.skipSeeds.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
-      dryRun: requestField({
+      dryRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.db.reset.fields.dryRun.title",
-        description: "app.api.system.db.reset.fields.dryRun.description",
+        label: "fields.dryRun.title",
+        description: "fields.dryRun.description",
         columns: 6,
         schema: z.boolean().default(false),
       }),
 
       // === RESPONSE FIELDS ===
-      success: responseField({
+      success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.reset.fields.success.title",
+        content: "fields.success.title",
         schema: z.boolean(),
       }),
 
-      operations: responseArrayField(
-        {
+      operations: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "fields.operations.title",
+        child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,
-          title: "app.api.system.db.reset.fields.operations.title",
-        },
-        objectField(
-          {
-            type: WidgetType.CONTAINER,
-            layoutType: LayoutType.GRID,
-            columns: 4,
-          },
-          { response: true },
-          {
-            type: responseField({
+          layoutType: LayoutType.GRID,
+          columns: 4,
+          usage: { response: true },
+          children: {
+            type: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.system.db.reset.fields.operations.type.title",
+              content: "fields.operations.type.title",
               fieldType: FieldDataType.TEXT,
               schema: z.enum(["truncate", "migrate", "seed"]),
             }),
-            status: responseField({
+            status: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              text: "app.api.system.db.reset.fields.operations.status.title",
+              text: "fields.operations.status.title",
               schema: z.enum(["success", "skipped", "failed", "pending"]),
             }),
-            details: responseField({
+            details: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.db.reset.fields.operations.details.title",
+              content: "fields.operations.details.title",
               fieldType: FieldDataType.TEXT,
               schema: z.string(),
             }),
-            count: responseField({
+            count: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content: "app.api.system.db.reset.fields.operations.count.title",
+              content: "fields.operations.count.title",
               fieldType: FieldDataType.NUMBER,
               schema: z.coerce.number(),
             }),
           },
-        ),
-      ),
+        }),
+      }),
 
-      tablesAffected: responseField({
+      tablesAffected: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.reset.fields.tablesAffected.title",
+        content: "fields.tablesAffected.title",
         schema: z.coerce.number(),
       }),
 
-      migrationsRun: responseField({
+      migrationsRun: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.reset.fields.migrationsRun.title",
+        content: "fields.migrationsRun.title",
         schema: z.coerce.number(),
       }),
 
-      seedsRun: responseField({
+      seedsRun: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.reset.fields.seedsRun.title",
+        content: "fields.seedsRun.title",
         schema: z.coerce.number(),
       }),
 
-      isDryRun: responseField({
+      isDryRun: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.reset.fields.isDryRun.title",
+        content: "fields.isDryRun.title",
         schema: z.boolean(),
       }),
 
-      requiresForce: responseField({
+      requiresForce: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.reset.fields.requiresForce.title",
+        content: "fields.requiresForce.title",
         schema: z.boolean(),
       }),
 
-      duration: responseField({
+      duration: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.db.reset.fields.duration.title",
+        content: "fields.duration.title",
         schema: z.coerce.number(),
       }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.db.reset.post.errors.validation.title",
-      description: "app.api.system.db.reset.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.db.reset.post.errors.unauthorized.title",
-      description:
-        "app.api.system.db.reset.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.db.reset.post.errors.server.title",
-      description: "app.api.system.db.reset.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.db.reset.post.errors.network.title",
-      description: "app.api.system.db.reset.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.db.reset.post.errors.notFound.title",
-      description: "app.api.system.db.reset.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.db.reset.post.errors.conflict.title",
-      description: "app.api.system.db.reset.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.db.reset.post.errors.forbidden.title",
-      description: "app.api.system.db.reset.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.db.reset.post.errors.unknown.title",
-      description: "app.api.system.db.reset.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.db.reset.post.errors.server.title",
-      description: "app.api.system.db.reset.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.system.db.reset.post.success.title",
-    description: "app.api.system.db.reset.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 });
 

@@ -16,6 +16,7 @@ import { ChatFavoritesRepositoryClient } from "./repository-client";
 export const { GET } = clientEndpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
-    handler: ({ logger }) => ChatFavoritesRepositoryClient.getFavorites(logger),
+    handler: ({ logger, locale }) =>
+      ChatFavoritesRepositoryClient.getFavorites(logger, locale),
   },
 });

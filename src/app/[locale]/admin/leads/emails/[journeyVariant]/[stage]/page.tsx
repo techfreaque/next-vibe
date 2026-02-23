@@ -23,6 +23,7 @@ import {
   EmailCampaignStage,
   EmailJourneyVariant,
 } from "@/app/api/[locale]/leads/enum";
+import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -40,6 +41,7 @@ export default async function EmailPreviewPage({
 }: EmailPreviewPageProps): Promise<React.JSX.Element> {
   const { locale, journeyVariant, stage } = await params;
   const { t } = simpleT(locale);
+  const { t: scopedT } = leadsScopedTranslation.scopedT(locale);
 
   // Require admin user authentication
   const user = await requireAdminUser(
@@ -67,7 +69,6 @@ export default async function EmailPreviewPage({
     journeyVariant,
     stage,
     {
-      t,
       locale,
       companyName: t("config.appName"),
       companyEmail: contactClientRepository.getSupportEmail(locale),
@@ -79,7 +80,7 @@ export default async function EmailPreviewPage({
   }
 
   // Get journey info for display
-  const journeyInfo = emailService.getJourneyInfo(journeyVariant, t);
+  const journeyInfo = emailService.getJourneyInfo(journeyVariant, locale);
 
   // Get navigation data
   const allJourneys = emailService.getAvailableJourneys();
@@ -114,7 +115,7 @@ export default async function EmailPreviewPage({
                   {t("app.admin.leads.leads.admin.emails.preview_title")}
                 </H1>
                 <P className="text-gray-600 dark:text-gray-400">
-                  {t(journeyInfo.name)} - {t(stage)}
+                  {journeyInfo.name} - {stage}
                 </P>
               </Div>
             </Div>
@@ -122,7 +123,7 @@ export default async function EmailPreviewPage({
               <Span className="font-medium">
                 {t("app.admin.leads.leads.admin.emails.subject")}:
               </Span>{" "}
-              {t(emailPreview.subject)}
+              {emailPreview.subject}
             </Div>
           </Div>
         </Div>
@@ -143,7 +144,7 @@ export default async function EmailPreviewPage({
                     className="flex items-center flex flex-row gap-1"
                   >
                     <ChevronLeft className="h-4 w-4" />
-                    <Span>{t(previousStage)}</Span>
+                    <Span>{scopedT(previousStage)}</Span>
                   </Button>
                 </Link>
               ) : (
@@ -178,7 +179,7 @@ export default async function EmailPreviewPage({
                     size="sm"
                     className="flex items-center flex flex-row gap-1"
                   >
-                    <Span>{t(nextStage)}</Span>
+                    <Span>{scopedT(nextStage)}</Span>
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </Link>
@@ -210,7 +211,10 @@ export default async function EmailPreviewPage({
                 const isCurrentJourney = journey === journeyVariant;
                 const journeyStages = emailService.getAvailableStages(journey);
                 const firstStage = journeyStages[0];
-                const journeyInfo = emailService.getJourneyInfo(journey, t);
+                const journeyInfo = emailService.getJourneyInfo(
+                  journey,
+                  locale,
+                );
 
                 return (
                   <Link

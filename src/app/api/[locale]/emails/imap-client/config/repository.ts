@@ -21,6 +21,9 @@ import type {
   ConfigUpdateResponseOutput,
 } from "./definition";
 import { ImapLoggingLevel } from "./enum";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Default IMAP Configuration (matches API definition shape)
@@ -58,16 +61,23 @@ const DEFAULT_IMAP_CONFIG = {
 };
 
 export interface ImapConfigRepository {
-  getConfig(logger: EndpointLogger): ResponseType<ConfigGetResponseOutput>;
+  getConfig(
+    logger: EndpointLogger,
+    t: ModuleT,
+  ): ResponseType<ConfigGetResponseOutput>;
 
   updateConfig(
     data: ConfigUpdateRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): ResponseType<ConfigUpdateResponseOutput>;
 }
 
 export class ImapConfigRepositoryImpl implements ImapConfigRepository {
-  getConfig(logger: EndpointLogger): ResponseType<ConfigGetResponseOutput> {
+  getConfig(
+    logger: EndpointLogger,
+    t: ModuleT,
+  ): ResponseType<ConfigGetResponseOutput> {
     try {
       logger.debug("Getting IMAP configuration");
 
@@ -80,7 +90,7 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
 
       return success({
         ...DEFAULT_IMAP_CONFIG,
-        message: "app.api.emails.imapClient.config.get.response.message",
+        message: t("get.response.message"),
       });
     } catch (error) {
       const parsedError = parseError(error);
@@ -89,7 +99,7 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
       });
 
       return fail({
-        message: "app.api.emails.imapClient.config.errors.internal.title",
+        message: t("errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -99,6 +109,7 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
   updateConfig(
     data: ConfigUpdateRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): ResponseType<ConfigUpdateResponseOutput> {
     try {
       logger.debug("Updating IMAP configuration", {
@@ -117,7 +128,7 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
       return success({
         ...DEFAULT_IMAP_CONFIG,
         ...data,
-        message: "app.api.emails.imapClient.config.update.response.message",
+        message: t("update.response.message"),
       });
     } catch (error) {
       const parsedError = parseError(error);
@@ -127,7 +138,7 @@ export class ImapConfigRepositoryImpl implements ImapConfigRepository {
       });
 
       return fail({
-        message: "app.api.emails.imapClient.config.errors.internal.title",
+        message: t("errors.internal.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });

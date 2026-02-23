@@ -24,7 +24,6 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import type {
   FolderCreateRequestOutput,
@@ -34,6 +33,9 @@ import type {
   FolderListRequestOutput,
   FolderListResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type FoldersT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Chat Folders Repository - Static class pattern
@@ -45,8 +47,9 @@ export class ChatFoldersRepository {
   static async getFolders(
     data: FolderListRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: FoldersT,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<FolderListResponseOutput>> {
     // For anonymous users (public), use leadId instead of userId
     // For authenticated users, use userId
@@ -55,7 +58,7 @@ export class ChatFoldersRepository {
     if (!userIdentifier) {
       logger.error("Missing user identifier", { user });
       return fail({
-        message: "app.api.agent.chat.folders.get.errors.unauthorized.title",
+        message: t("get.errors.unauthorized.title"),
         errorType: ErrorResponseTypes.UNAUTHORIZED,
       });
     }
@@ -103,7 +106,7 @@ export class ChatFoldersRepository {
       // Filter folders based on user permissions using canViewFolder
       const visibleFolders = [];
       for (const folder of allFolders) {
-        if (await canViewFolder(user, folder, logger)) {
+        if (await canViewFolder(user, folder, logger, locale)) {
           visibleFolders.push(folder);
         }
       }
@@ -125,11 +128,11 @@ export class ChatFoldersRepository {
             canDeleteFlag,
             canManagePermsFlag,
           ] = await Promise.all([
-            canManageFolder(user, folder, logger, folderMap),
-            canCreateThreadInFolder(user, folder, logger, folderMap),
-            canHideFolder(user, folder, logger, folderMap),
-            canDeleteFolder(user, folder, logger, folderMap),
-            canManageFolderPermissions(user, folder, logger, folderMap),
+            canManageFolder(user, folder, logger, locale, folderMap),
+            canCreateThreadInFolder(user, folder, logger, locale, folderMap),
+            canHideFolder(user, folder, logger, locale, folderMap),
+            canDeleteFolder(user, folder, logger, locale, folderMap),
+            canManageFolderPermissions(user, folder, logger, locale, folderMap),
           ]);
 
           // System folders (PUBLIC root categories) can have null userId
@@ -207,7 +210,7 @@ export class ChatFoldersRepository {
     } catch (error) {
       logger.error("Failed to fetch folders", parseError(error));
       return fail({
-        message: "app.api.agent.chat.folders.get.errors.server.title",
+        message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -219,8 +222,9 @@ export class ChatFoldersRepository {
   static async createFolder(
     data: FolderCreateRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: FoldersT,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<FolderCreateResponseOutput>> {
     try {
       const { folder: folderData } = data;
@@ -235,6 +239,7 @@ export class ChatFoldersRepository {
         user,
         folderData.rootFolderId,
         logger,
+        locale,
         folderData.parentId,
       );
 
@@ -242,32 +247,30 @@ export class ChatFoldersRepository {
         // Determine the specific error message
         if (user.isPublic) {
           return fail({
-            message: "app.api.agent.chat.folders.post.errors.forbidden.title",
+            message: t("post.errors.forbidden.title"),
             errorType: ErrorResponseTypes.FORBIDDEN,
           });
         }
 
         if (folderData.rootFolderId === "incognito") {
           return fail({
-            message: "app.api.agent.chat.folders.post.errors.forbidden.title",
+            message: t("post.errors.forbidden.title"),
             errorType: ErrorResponseTypes.FORBIDDEN,
             messageParams: {
-              message: simpleT(locale).t(
-                "app.api.agent.chat.folders.post.errors.forbidden.incognitoNotAllowed",
-              ),
+              message: t("post.errors.forbidden.incognitoNotAllowed"),
             },
           });
         }
 
         if (folderData.rootFolderId === "public") {
           return fail({
-            message: "app.api.agent.chat.folders.post.errors.forbidden.title",
+            message: t("post.errors.forbidden.title"),
             errorType: ErrorResponseTypes.FORBIDDEN,
           });
         }
 
         return fail({
-          message: "app.api.agent.chat.folders.post.errors.forbidden.title",
+          message: t("post.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
@@ -278,7 +281,7 @@ export class ChatFoldersRepository {
       if (!userIdentifier) {
         logger.error("Missing user identifier", { user });
         return fail({
-          message: "app.api.agent.chat.folders.post.errors.unauthorized.title",
+          message: t("post.errors.unauthorized.title"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
@@ -322,7 +325,7 @@ export class ChatFoldersRepository {
       if (!newFolder) {
         logger.error("Failed to insert folder into database");
         return fail({
-          message: "app.api.agent.chat.folders.post.errors.server.title",
+          message: t("post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -333,7 +336,7 @@ export class ChatFoldersRepository {
           folderId: newFolder.id,
         });
         return fail({
-          message: "app.api.agent.chat.folders.post.errors.server.title",
+          message: t("post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -364,7 +367,7 @@ export class ChatFoldersRepository {
     } catch (error) {
       logger.error("Failed to create folder", parseError(error));
       return fail({
-        message: "app.api.agent.chat.folders.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

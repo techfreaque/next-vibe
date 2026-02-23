@@ -20,7 +20,7 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import type { EmailTemplateDefinition } from "@/app/api/[locale]/emails/registry/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TFunction } from "@/i18n/core/static-types";
+import { simpleT } from "@/i18n/core/shared";
 
 import { contactClientRepository } from "../contact/repository-client";
 import { EmailTemplate } from "../emails/smtp-client/components/template.email";
@@ -29,6 +29,10 @@ import {
   type TrackingContext,
 } from "../emails/smtp-client/components/tracking_context.email";
 import { SubscriptionPlan, SubscriptionStatus } from "./enum";
+import {
+  scopedTranslation as subscriptionScopedTranslation,
+  type SubscriptionT,
+} from "./i18n";
 
 // ============================================================================
 // TEMPLATE DEFINITION (Pure Component + Schema + Metadata)
@@ -51,28 +55,29 @@ function SubscriptionSuccessEmail({
   tracking,
 }: {
   props: SubscriptionSuccessProps;
-  t: TFunction;
+  t: SubscriptionT;
   locale: CountryLanguage;
   recipientEmail: string;
   tracking: TrackingContext;
 }): ReactElement {
-  const appName = t("config.appName");
+  const { t: globalT } = simpleT(locale);
+  const appName = globalT("config.appName");
 
   const modelCategories = [
     {
-      label: t("app.api.subscription.email.success.models.mainstream"),
+      label: t("email.success.models.mainstream"),
       models: FEATURED_MODELS.mainstream,
       color: "#1e40af",
       bg: "#dbeafe",
     },
     {
-      label: t("app.api.subscription.email.success.models.open"),
+      label: t("email.success.models.open"),
       models: FEATURED_MODELS.open,
       color: "#166534",
       bg: "#dcfce7",
     },
     {
-      label: t("app.api.subscription.email.success.models.uncensored"),
+      label: t("email.success.models.uncensored"),
       models: FEATURED_MODELS.uncensored,
       color: "#7c2d12",
       bg: "#fed7aa",
@@ -81,10 +86,9 @@ function SubscriptionSuccessEmail({
 
   return (
     <EmailTemplate
-      t={t}
       locale={locale}
-      title={t("app.api.subscription.email.success.headline")}
-      previewText={t("app.api.subscription.email.success.previewText", {
+      title={t("email.success.headline")}
+      previewText={t("email.success.previewText", {
         privateName: props.privateName,
         modelCount: TOTAL_MODEL_COUNT,
       })}
@@ -107,7 +111,7 @@ function SubscriptionSuccessEmail({
             textTransform: "uppercase",
           }}
         >
-          {t("app.api.subscription.email.success.activeBadge")}
+          {t("email.success.activeBadge")}
         </span>
       </Section>
 
@@ -121,7 +125,7 @@ function SubscriptionSuccessEmail({
           display: "block",
         }}
       >
-        {t("app.api.subscription.email.success.greeting", {
+        {t("email.success.greeting", {
           privateName: props.privateName,
         })}
       </Span>
@@ -135,7 +139,7 @@ function SubscriptionSuccessEmail({
           display: "block",
         }}
       >
-        {t("app.api.subscription.email.success.intro", { appName })}
+        {t("email.success.intro", { appName })}
       </Span>
 
       {/* Model showcase */}
@@ -158,7 +162,7 @@ function SubscriptionSuccessEmail({
             textAlign: "center",
           }}
         >
-          {t("app.api.subscription.email.success.models.title", {
+          {t("email.success.models.title", {
             modelCount: TOTAL_MODEL_COUNT,
           })}
         </Span>
@@ -221,18 +225,18 @@ function SubscriptionSuccessEmail({
             display: "block",
           }}
         >
-          {t("app.api.subscription.email.success.included.title")}
+          {t("email.success.included.title")}
         </Span>
 
         {[
-          t("app.api.subscription.email.success.included.credits"),
-          t("app.api.subscription.email.success.included.models", {
+          t("email.success.included.credits"),
+          t("email.success.included.models", {
             modelCount: TOTAL_MODEL_COUNT,
           }),
-          t("app.api.subscription.email.success.included.nolimits"),
-          t("app.api.subscription.email.success.included.uncensored"),
-          t("app.api.subscription.email.success.included.packs"),
-          t("app.api.subscription.email.success.included.cancel"),
+          t("email.success.included.nolimits"),
+          t("email.success.included.uncensored"),
+          t("email.success.included.packs"),
+          t("email.success.included.cancel"),
         ].map((item, i) => (
           <Row key={i} style={{ marginBottom: "10px" }}>
             <Column
@@ -285,7 +289,7 @@ function SubscriptionSuccessEmail({
             boxShadow: "0 4px 12px rgba(37, 99, 235, 0.35)",
           }}
         >
-          {t("app.api.subscription.email.success.cta")}
+          {t("email.success.cta")}
         </Button>
       </Section>
 
@@ -308,7 +312,7 @@ function SubscriptionSuccessEmail({
             display: "block",
           }}
         >
-          {t("app.api.subscription.email.success.packs.title")}
+          {t("email.success.packs.title")}
         </Span>
         <Span
           style={{
@@ -319,7 +323,7 @@ function SubscriptionSuccessEmail({
             display: "block",
           }}
         >
-          {t("app.api.subscription.email.success.packs.description")}
+          {t("email.success.packs.description")}
         </Span>
         <Button
           href={`${tracking.baseUrl}/${locale}/subscription`}
@@ -334,7 +338,7 @@ function SubscriptionSuccessEmail({
             textDecoration: "none",
           }}
         >
-          {t("app.api.subscription.email.success.packs.cta")}
+          {t("email.success.packs.cta")}
         </Button>
       </Section>
 
@@ -349,12 +353,12 @@ function SubscriptionSuccessEmail({
           display: "block",
         }}
       >
-        {t("app.api.subscription.email.success.manage", { appName })}{" "}
+        {t("email.success.manage", { appName })}{" "}
         <Link
           href={`${tracking.baseUrl}/${locale}/subscription`}
           style={{ color: "#6b7280", textDecoration: "underline" }}
         >
-          {t("app.api.subscription.email.success.manageLink")}
+          {t("email.success.manageLink")}
         </Link>
       </Span>
 
@@ -368,76 +372,66 @@ function SubscriptionSuccessEmail({
           display: "block",
         }}
       >
-        {t("app.api.subscription.email.success.signoff", { appName })}
+        {t("email.success.signoff", { appName })}
       </Span>
     </EmailTemplate>
   );
 }
 
 // Template Definition Export
-const subscriptionSuccessTemplate: EmailTemplateDefinition<SubscriptionSuccessProps> =
-  {
-    meta: {
-      id: "subscription-success",
-      version: "1.0.0",
-      name: "app.api.emails.templates.subscription.success.meta.name",
-      description:
-        "app.api.emails.templates.subscription.success.meta.description",
-      category: "subscription",
-      path: "/subscription/email.tsx",
-      defaultSubject: (t) =>
-        t("app.api.subscription.email.success.subject", {
-          appName: "",
-          planName: "",
-        }),
-      previewFields: {
-        privateName: {
-          type: "text",
-          label:
-            "app.admin.emails.templates.templates.subscription.success.preview.privateName.label",
-          description:
-            "app.admin.emails.templates.templates.subscription.success.preview.privateName.description",
-          defaultValue: "Max",
-          required: true,
-        },
-        userId: {
-          type: "text",
-          label:
-            "app.admin.emails.templates.templates.subscription.success.preview.userId.label",
-          description:
-            "app.admin.emails.templates.templates.subscription.success.preview.userId.description",
-          defaultValue: "example-user-id-123",
-          required: true,
-        },
-        leadId: {
-          type: "text",
-          label:
-            "app.admin.emails.templates.templates.subscription.success.preview.leadId.label",
-          description:
-            "app.admin.emails.templates.templates.subscription.success.preview.leadId.description",
-          defaultValue: "example-lead-id-456",
-          required: true,
-        },
-        planName: {
-          type: "text",
-          label:
-            "app.admin.emails.templates.templates.subscription.success.preview.planName.label",
-          description:
-            "app.admin.emails.templates.templates.subscription.success.preview.planName.description",
-          defaultValue: "Premium Plan",
-          required: true,
-        },
+const subscriptionSuccessTemplate: EmailTemplateDefinition<
+  SubscriptionSuccessProps,
+  typeof subscriptionScopedTranslation
+> = {
+  scopedTranslation: subscriptionScopedTranslation,
+  meta: {
+    id: "subscription-success",
+    version: "1.0.0",
+    name: "emailTemplates.success.name",
+    description: "emailTemplates.success.description",
+    category: "emailTemplates.success.category",
+    path: "/subscription/email.tsx",
+    defaultSubject: "email.success.subject",
+    previewFields: {
+      privateName: {
+        type: "text",
+        label: "emailTemplates.success.preview.privateName.label",
+        description: "emailTemplates.success.preview.privateName.description",
+        defaultValue: "Max",
+        required: true,
+      },
+      userId: {
+        type: "text",
+        label: "emailTemplates.success.preview.userId.label",
+        description: "emailTemplates.success.preview.userId.description",
+        defaultValue: "example-user-id-123",
+        required: true,
+      },
+      leadId: {
+        type: "text",
+        label: "emailTemplates.success.preview.leadId.label",
+        description: "emailTemplates.success.preview.leadId.description",
+        defaultValue: "example-lead-id-456",
+        required: true,
+      },
+      planName: {
+        type: "text",
+        label: "emailTemplates.success.preview.planName.label",
+        description: "emailTemplates.success.preview.planName.description",
+        defaultValue: "Premium Plan",
+        required: true,
       },
     },
-    schema: subscriptionSuccessPropsSchema,
-    component: SubscriptionSuccessEmail,
-    exampleProps: {
-      privateName: "Max",
-      userId: "example-user-id-123",
-      leadId: "example-lead-id-456",
-      planName: "Premium Plan",
-    },
-  };
+  },
+  schema: subscriptionSuccessPropsSchema,
+  component: SubscriptionSuccessEmail,
+  exampleProps: {
+    privateName: "Max",
+    userId: "example-user-id-123",
+    leadId: "example-lead-id-456",
+    planName: "Premium Plan",
+  },
+};
 
 export default subscriptionSuccessTemplate;
 
@@ -466,19 +460,18 @@ function AdminSubscriptionNotificationEmailContent({
   user: { privateName: string; publicName: string; email: string };
   planName: string;
   statusName: string;
-  t: TFunction;
+  t: SubscriptionT;
   locale: CountryLanguage;
   recipientEmail: string;
 }): ReactElement {
   const tracking = createTrackingContext(locale);
-
+  const { t: globalT } = simpleT(locale);
   return (
     <EmailTemplate
-      t={t}
       locale={locale}
-      title={t("app.api.subscription.email.admin_notification.title")}
-      previewText={t("app.api.subscription.email.admin_notification.preview", {
-        appName: t("config.appName"),
+      title={t("email.admin_notification.title")}
+      previewText={t("email.admin_notification.preview", {
+        appName: globalT("config.appName"),
       })}
       recipientEmail={recipientEmail}
       tracking={tracking}
@@ -493,7 +486,7 @@ function AdminSubscriptionNotificationEmailContent({
           fontWeight: "600",
         }}
       >
-        {t("app.api.subscription.email.admin_notification.title")}
+        {t("email.admin_notification.title")}
       </Span>
 
       <Span
@@ -504,8 +497,8 @@ function AdminSubscriptionNotificationEmailContent({
           marginBottom: "24px",
         }}
       >
-        {t("app.api.subscription.email.admin_notification.message", {
-          appName: t("config.appName"),
+        {t("email.admin_notification.message", {
+          appName: globalT("config.appName"),
         })}
       </Span>
 
@@ -530,7 +523,7 @@ function AdminSubscriptionNotificationEmailContent({
             paddingBottom: "8px",
           }}
         >
-          {t("app.api.subscription.email.admin_notification.details")}
+          {t("email.admin_notification.details")}
         </Span>
 
         <div style={{ marginBottom: "16px" }}>
@@ -543,7 +536,7 @@ function AdminSubscriptionNotificationEmailContent({
             }}
           >
             <Span style={{ fontWeight: "700", color: "#1f2937" }}>
-              {t("app.api.subscription.email.admin_notification.user_name")}:
+              {t("email.admin_notification.user_name")}:
             </Span>{" "}
             {user.privateName} ({user.publicName})
           </Span>
@@ -557,7 +550,7 @@ function AdminSubscriptionNotificationEmailContent({
             }}
           >
             <Span style={{ fontWeight: "700", color: "#1f2937" }}>
-              {t("app.api.subscription.email.admin_notification.user_email")}:
+              {t("email.admin_notification.user_email")}:
             </Span>{" "}
             <Link
               href={`mailto:${user.email}`}
@@ -576,7 +569,7 @@ function AdminSubscriptionNotificationEmailContent({
             }}
           >
             <Span style={{ fontWeight: "700", color: "#1f2937" }}>
-              {t("app.api.subscription.email.admin_notification.plan")}:
+              {t("email.admin_notification.plan")}:
             </Span>{" "}
             <span
               style={{
@@ -601,7 +594,7 @@ function AdminSubscriptionNotificationEmailContent({
             }}
           >
             <Span style={{ fontWeight: "700", color: "#1f2937" }}>
-              {t("app.api.subscription.email.admin_notification.status")}:
+              {t("email.admin_notification.status")}:
             </Span>{" "}
             <span
               style={{
@@ -634,7 +627,7 @@ function AdminSubscriptionNotificationEmailContent({
             display: "inline-block",
           }}
         >
-          {t("app.api.subscription.email.admin_notification.contact_user")}
+          {t("email.admin_notification.contact_user")}
         </Button>
       </Section>
 
@@ -650,8 +643,8 @@ function AdminSubscriptionNotificationEmailContent({
           paddingTop: "16px",
         }}
       >
-        {t("app.api.subscription.email.admin_notification.footer", {
-          appName: t("config.appName"),
+        {t("email.admin_notification.footer", {
+          appName: globalT("config.appName"),
         })}
       </Span>
     </EmailTemplate>
@@ -659,79 +652,74 @@ function AdminSubscriptionNotificationEmailContent({
 }
 
 // Admin notification template definition (for preview registry)
-export const adminSubscriptionNotificationTemplate: EmailTemplateDefinition<AdminSubscriptionProps> =
-  {
-    meta: {
-      id: "admin-subscription-notification",
-      version: "1.0.0",
-      name: "app.api.emails.templates.admin.subscription.meta.name",
-      description:
-        "app.api.emails.templates.admin.subscription.meta.description",
-      category: "admin",
-      path: "/subscription/email.tsx",
-      defaultSubject: (t) =>
-        t("app.api.subscription.email.admin_notification.subject", {
-          userName: "User",
-          planName: "Plan",
-        }),
-      previewFields: {
-        privateName: {
-          type: "text",
-          label:
-            "app.api.emails.templates.admin.subscription.preview.privateName",
-          defaultValue: "Max",
-          required: true,
-        },
-        publicName: {
-          type: "text",
-          label:
-            "app.api.emails.templates.admin.subscription.preview.publicName",
-          defaultValue: "Max Mustermann",
-          required: true,
-        },
-        email: {
-          type: "email",
-          label: "app.api.emails.templates.admin.subscription.preview.email",
-          defaultValue: "max@example.com",
-          required: true,
-        },
-        planName: {
-          type: "text",
-          label: "app.api.emails.templates.admin.subscription.preview.planName",
-          defaultValue: "Premium Plan",
-          required: true,
-        },
-        statusName: {
-          type: "text",
-          label:
-            "app.api.emails.templates.admin.subscription.preview.statusName",
-          defaultValue: "Active",
-          required: true,
-        },
+export const adminSubscriptionNotificationTemplate: EmailTemplateDefinition<
+  AdminSubscriptionProps,
+  typeof subscriptionScopedTranslation
+> = {
+  scopedTranslation: subscriptionScopedTranslation,
+  meta: {
+    id: "admin-subscription-notification",
+    version: "1.0.0",
+    name: "emailTemplates.adminNotification.name",
+    description: "emailTemplates.adminNotification.description",
+    category: "emailTemplates.adminNotification.category",
+    path: "/subscription/email.tsx",
+    defaultSubject: "email.admin_notification.subject",
+    previewFields: {
+      privateName: {
+        type: "text",
+        label: "emailTemplates.adminNotification.preview.privateName.label",
+        defaultValue: "Max",
+        required: true,
+      },
+      publicName: {
+        type: "text",
+        label: "emailTemplates.adminNotification.preview.publicName.label",
+        defaultValue: "Max Mustermann",
+        required: true,
+      },
+      email: {
+        type: "email",
+        label: "emailTemplates.adminNotification.preview.email.label",
+        defaultValue: "max@example.com",
+        required: true,
+      },
+      planName: {
+        type: "text",
+        label: "emailTemplates.adminNotification.preview.planName.label",
+        defaultValue: "Premium Plan",
+        required: true,
+      },
+      statusName: {
+        type: "text",
+        label: "emailTemplates.adminNotification.preview.statusName.label",
+        defaultValue: "Active",
+        required: true,
       },
     },
-    schema: adminSubscriptionPropsSchema,
-    component: ({ props, t, locale, recipientEmail }) =>
-      AdminSubscriptionNotificationEmailContent({
-        user: {
-          privateName: props.privateName,
-          publicName: props.publicName,
-          email: props.email,
-        },
-        planName: props.planName,
-        statusName: props.statusName,
-        t,
-        locale,
-        recipientEmail,
-      }),
-    exampleProps: {
-      privateName: "Max",
-      publicName: "Max Mustermann",
-      email: "max@example.com",
-      planName: "Premium Plan",
-      statusName: "Active",
-    },
-  };
+  },
+  schema: adminSubscriptionPropsSchema,
+  component: ({ props, t, locale, recipientEmail }) =>
+    AdminSubscriptionNotificationEmailContent({
+      user: {
+        privateName: props.privateName,
+        publicName: props.publicName,
+        email: props.email,
+      },
+      planName: props.planName,
+      statusName: props.statusName,
+      t,
+      locale,
+      recipientEmail,
+    }),
+  exampleProps: {
+    privateName: "Max",
+    publicName: "Max Mustermann",
+    email: "max@example.com",
+    planName: "Premium Plan",
+    statusName: "Active",
+  },
+};
 
 // ============================================================================
 // ADAPTERS (Business Logic - Maps custom data to template props)
@@ -755,7 +743,6 @@ interface SubscriptionSuccessEmailParams {
     stripeSubscriptionId: string | null;
   };
   locale: CountryLanguage;
-  t: TFunction;
 }
 
 /**
@@ -763,13 +750,13 @@ interface SubscriptionSuccessEmailParams {
  */
 function getPlanName(
   planId: (typeof SubscriptionPlan)[keyof typeof SubscriptionPlan],
-  t: TFunction,
+  t: SubscriptionT,
 ): string {
   switch (planId) {
     case SubscriptionPlan.SUBSCRIPTION:
-      return t("app.api.products.subscription.name");
+      return t("enums.plan.subscription");
     default:
-      return t("app.api.products.subscription.name");
+      return t("enums.plan.subscription");
   }
 }
 
@@ -778,27 +765,27 @@ function getPlanName(
  */
 function getStatusName(
   status: (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus],
-  t: TFunction,
+  t: SubscriptionT,
 ): string {
   switch (status) {
     case SubscriptionStatus.ACTIVE:
-      return t("app.api.subscription.status.active");
+      return t("enums.status.active");
     case SubscriptionStatus.TRIALING:
-      return t("app.api.subscription.status.trialing");
+      return t("enums.status.trialing");
     case SubscriptionStatus.PAST_DUE:
-      return t("app.api.subscription.status.pastDue");
+      return t("enums.status.pastDue");
     case SubscriptionStatus.CANCELED:
-      return t("app.api.subscription.status.canceled");
+      return t("enums.status.canceled");
     case SubscriptionStatus.INCOMPLETE:
-      return t("app.api.subscription.status.incomplete");
+      return t("enums.status.incomplete");
     case SubscriptionStatus.INCOMPLETE_EXPIRED:
-      return t("app.api.subscription.status.incomplete_expired");
+      return t("enums.status.incompleteExpired");
     case SubscriptionStatus.UNPAID:
-      return t("app.api.subscription.status.unpaid");
+      return t("enums.status.unpaid");
     case SubscriptionStatus.PAUSED:
-      return t("app.api.subscription.status.paused");
+      return t("enums.status.paused");
     default:
-      return t("app.api.subscription.status.incomplete");
+      return t("enums.status.incomplete");
   }
 }
 
@@ -810,7 +797,6 @@ export const renderSubscriptionSuccessEmail = ({
   user,
   subscription,
   locale,
-  t,
 }: SubscriptionSuccessEmailParams): {
   success: boolean;
   data: {
@@ -820,6 +806,7 @@ export const renderSubscriptionSuccessEmail = ({
     jsx: ReactElement;
   };
 } => {
+  const { t } = subscriptionScopedTranslation.scopedT(locale);
   const planName = getPlanName(subscription.planId, t);
 
   const templateProps: SubscriptionSuccessProps = {
@@ -828,14 +815,15 @@ export const renderSubscriptionSuccessEmail = ({
     leadId: user.leadId,
     planName,
   };
+  const { t: globalT } = simpleT(locale);
 
   return {
     success: true,
     data: {
       toEmail: user.email,
       toName: user.privateName,
-      subject: t("app.api.subscription.email.success.subject", {
-        appName: t("config.appName"),
+      subject: t("email.success.subject", {
+        appName: globalT("config.appName"),
         planName,
       }),
       jsx: subscriptionSuccessTemplate.component({
@@ -857,7 +845,6 @@ export const renderAdminSubscriptionNotification = ({
   user,
   subscription,
   locale,
-  t,
 }: SubscriptionSuccessEmailParams): {
   success: boolean;
   data: {
@@ -867,15 +854,16 @@ export const renderAdminSubscriptionNotification = ({
     jsx: ReactElement;
   };
 } => {
+  const { t } = subscriptionScopedTranslation.scopedT(locale);
   const planName = getPlanName(subscription.planId, t);
   const statusName = getStatusName(subscription.status, t);
-
+  const { t: globalT } = simpleT(locale);
   return {
     success: true,
     data: {
       toEmail: contactClientRepository.getSupportEmail(locale),
-      toName: t("config.appName"),
-      subject: t("app.api.subscription.email.admin_notification.subject", {
+      toName: globalT("config.appName"),
+      subject: t("email.admin_notification.subject", {
         userName: user.privateName,
         planName,
       }),

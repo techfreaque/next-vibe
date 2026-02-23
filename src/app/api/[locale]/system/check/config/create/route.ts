@@ -14,8 +14,8 @@ import { ConfigCreateRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: configCreateEndpoints,
   [Methods.POST]: {
-    handler: ({ data, logger, locale, platform }) => {
-      return ConfigCreateRepository.execute(data, logger, locale, platform);
+    handler: ({ data, logger, t, platform, locale }) => {
+      return ConfigCreateRepository.execute(data, logger, t, platform, locale);
     },
   },
 });

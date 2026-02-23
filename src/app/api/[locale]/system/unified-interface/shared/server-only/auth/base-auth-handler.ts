@@ -71,6 +71,7 @@ export abstract class BaseAuthHandler {
     userId: string,
     leadId: string,
     logger: EndpointLogger,
+    locale: CountryLanguage,
     rememberMe?: boolean,
   ): Promise<ResponseType<void>>;
 
@@ -80,5 +81,8 @@ export abstract class BaseAuthHandler {
    * CLI/MCP: Deletes .vibe.session file
    * Native: Clears AsyncStorage
    */
-  abstract clearAuthToken(logger: EndpointLogger): Promise<ResponseType<void>>;
+  abstract clearAuthToken(
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<void>>;
 }

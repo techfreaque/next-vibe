@@ -74,4 +74,9 @@ export const translations: typeof enTranslations = {
     title: "Insight wydajności przeanalizowany pomyślnie",
     description: "Insight wydajności został pomyślnie przeanalizowany",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Automatyzacja przeglądarki",
+    performanceAutomation: "Automatyzacja wydajności",
+  },
 };

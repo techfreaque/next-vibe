@@ -15,32 +15,29 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
 import { getCurrentEnvironmentInfo } from "../environment";
 import type {
   HealthCheckRequestOutput,
   HealthCheckResponseOutput,
 } from "./definition";
+import type { scopedTranslation } from "./i18n";
 
-/**
- * Health Check Repository Interface
- */
-export interface HealthCheckRepositoryInterface {
-  checkHealth(
-    data: HealthCheckRequestOutput,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<HealthCheckResponseOutput>>;
-}
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Health Check Repository Implementation
  */
-export class HealthCheckRepositoryImpl implements HealthCheckRepositoryInterface {
+export class HealthCheckRepositoryImpl {
   private startTime = Date.now();
 
   async checkHealth(
     data: HealthCheckRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<HealthCheckResponseOutput>> {
     const checkStart = performance.now();
     const checks: Array<{
@@ -68,7 +65,7 @@ export class HealthCheckRepositoryImpl implements HealthCheckRepositoryInterface
       // Database health check
       let databaseStatus;
       if (data.includeDatabase) {
-        const dbCheck = await this.performDatabaseCheck(logger);
+        const dbCheck = await this.performDatabaseCheck(logger, locale);
         checks.push(dbCheck);
         databaseStatus = {
           status:
@@ -160,7 +157,7 @@ export class HealthCheckRepositoryImpl implements HealthCheckRepositoryInterface
       logger.error("Health check failed", { error: parsedError.message });
 
       return fail({
-        message: "app.api.system.server.health.get.errors.server.description",
+        message: t("get.errors.server.description"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -212,7 +209,10 @@ export class HealthCheckRepositoryImpl implements HealthCheckRepositoryInterface
   /**
    * Perform database health check
    */
-  private async performDatabaseCheck(logger: EndpointLogger): Promise<{
+  private async performDatabaseCheck(
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<{
     name: string;
     status: "pass" | "fail" | "warn";
     message?: string;
@@ -225,7 +225,11 @@ export class HealthCheckRepositoryImpl implements HealthCheckRepositoryInterface
       const { dbUtilsRepository } = await import("../../db/utils/repository");
 
       // Test database connection
-      const connectionResult = await dbUtilsRepository.testConnection(logger);
+      const { t: dbUtilsT } = dbUtilsScopedTranslation.scopedT(locale);
+      const connectionResult = await dbUtilsRepository.testConnection(
+        dbUtilsT,
+        logger,
+      );
 
       if (connectionResult.success && connectionResult.data) {
         return {

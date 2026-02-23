@@ -9,8 +9,8 @@ import Joyride, { ACTIONS, EVENTS, STATUS } from "react-joyride";
 import { buildFolderUrl } from "@/app/[locale]/chat/lib/utils/navigation";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { scopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { useSidebarFooterStore } from "../sidebar/footer/store";
 import type { TourStepConfig } from "./tour-config";
@@ -45,7 +45,7 @@ export function WelcomeTour({
   locale,
   autoStart = true,
 }: WelcomeTourProps): React.ReactElement | null {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const [run, setRun] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [steps, setSteps] = useState<TourStepConfig[]>([]);

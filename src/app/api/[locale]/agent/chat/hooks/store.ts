@@ -15,13 +15,13 @@ export type { ChatFolder, ChatMessage, ChatThread };
 
 /**
  * UI tool model — used by the tool selection modal.
- * Converted to/from activeTools/visibleTools when persisting to settings.
+ * Converted to/from allowedTools/pinnedTools when persisting to settings.
  */
 export interface EnabledTool {
   id: string;
   requiresConfirmation: boolean;
-  /** true = tool is visible to the AI (in context window) */
-  active: boolean;
+  /** true = tool is pinned to the AI context window (always loaded) */
+  pinned: boolean;
 }
 
 /**

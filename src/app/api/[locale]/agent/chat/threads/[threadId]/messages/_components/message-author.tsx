@@ -6,7 +6,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import { formatRelativeTime } from "@/app/[locale]/chat/lib/utils/formatting";
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import {
   getModelById,
   type ModelId,
@@ -14,8 +14,6 @@ import {
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
-import type { TranslationKey } from "@/i18n/core/static-types";
-
 interface MessageAuthorProps {
   authorName: string | null;
   authorId: string | null;
@@ -28,8 +26,8 @@ interface MessageAuthorProps {
   className?: string;
   /** Character used for this message */
   character?: string | null;
-  /** Character name from API data (translation key) */
-  characterName?: TranslationKey | null;
+  /** Character name from API data */
+  characterName?: string | null;
   locale: CountryLanguage;
   rootFolderId: DefaultFolderId;
 }
@@ -37,7 +35,6 @@ interface MessageAuthorProps {
 export function MessageAuthorInfo({
   authorName,
   authorId,
-  currentUserId,
   isAI,
   model,
   timestamp,
@@ -46,7 +43,7 @@ export function MessageAuthorInfo({
   className,
   characterName,
   locale,
-  rootFolderId = DefaultFolderId.PRIVATE,
+  rootFolderId,
 }: MessageAuthorProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -57,21 +54,16 @@ export function MessageAuthorInfo({
   if (isAI) {
     // AI messages show model name or "Assistant"
     displayName = authorName ?? t("app.chat.messages.assistant");
-  } else if (currentUserId && authorId === currentUserId) {
-    // Current user's messages show "You"
-    displayName = t("app.chat.messages.you");
-  } else if (authorName) {
-    // Other users show their name
-    displayName = authorName;
+  } else if (rootFolderId === "public" || rootFolderId === "shared") {
+    // Public/shared: authorName is stored — show it with ID slice, or Anonymous
+    const name = authorName ?? t("app.chat.messages.anonymous");
+    const idSlice = authorId ? authorId.slice(0, 8) : null;
+    displayName = idSlice
+      ? t("app.chat.messages.authorWithId", { name, id: idSlice })
+      : name;
   } else {
-    // No author info - show "Anonymous" for public/shared, "User" for private/incognito
-    displayName =
-      rootFolderId === "private" ||
-      rootFolderId === "shared" ||
-      rootFolderId === "public" ||
-      rootFolderId === "cron"
-        ? t("app.chat.messages.anonymous")
-        : t("app.chat.messages.user");
+    // Private/incognito/cron: authorName not stored — always "You"
+    displayName = t("app.chat.messages.you");
   }
 
   return (
@@ -99,7 +91,7 @@ export function MessageAuthorInfo({
         {characterName && (
           <Span className="text-xs text-muted-foreground truncate">
             {/* eslint-disable-next-line i18next/no-literal-string -- Formatting characters */}
-            {`(${t(characterName)})`}
+            {`(${characterName})`}
           </Span>
         )}
 

@@ -20,10 +20,12 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ImapFolder } from "../db";
 import { imapAccounts, imapFolders } from "../db";
 import { ImapSyncStatus, ImapSyncStatusFilter } from "../enum";
+import { scopedTranslation } from "./i18n";
 import type { ImapFoldersListResponseOutput } from "./list/definition";
 import type { FoldersSyncResponseOutput } from "./sync/definition";
 
@@ -63,23 +65,27 @@ export interface ImapFoldersRepository {
     data: ImapFolderQueryType,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapFoldersListResponseOutput>>;
 
   getFolderById(
     data: { id: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapFoldersListResponseOutput["folders"][number]>>;
 
   syncFolders(
     data: ImapFolderSyncType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<FoldersSyncResponseOutput>>;
 
   getFoldersByAccountId(
     data: { accountId: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapFoldersListResponseOutput>>;
 
   updateFolderSyncStatus(
@@ -88,6 +94,7 @@ export interface ImapFoldersRepository {
     syncError: ErrorResponseType | null,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<{ success: boolean }>>;
 
   updateFolderMessageCounts(
@@ -95,6 +102,7 @@ export interface ImapFoldersRepository {
     counts: { totalMessages: number; unreadMessages: number },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<{ success: boolean }>>;
 }
 
@@ -130,7 +138,9 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
     data: ImapFolderQueryType,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapFoldersListResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("app.api.emails.imapClient.folders.list.info.start", {
         accountId: data.accountId,
@@ -217,8 +227,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         parseError(error),
       );
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.folders.get.error.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -232,7 +241,9 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
     data: { id: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapFoldersListResponseOutput["folders"][number]>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("app.api.emails.imapClient.folders.get.info.start", {
         id: data.id,
@@ -247,8 +258,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
 
       if (!folder) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.folders.get.error.not_found.title",
+          message: t("errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -260,8 +270,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         parseError(error),
       );
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.folders.get.error.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -274,7 +283,9 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
   async syncFolders(
     data: ImapFolderSyncType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<FoldersSyncResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("app.api.emails.imapClient.folders.sync.info.start", {
         accountId: data.accountId,
@@ -293,8 +304,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
 
         if (account.length === 0) {
           return fail({
-            message:
-              "app.api.emails.imapClient.imapErrors.accounts.get.error.not_found.title",
+            message: t("errors.accountNotFound.title"),
             errorType: ErrorResponseTypes.NOT_FOUND,
           });
         }
@@ -303,6 +313,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         const syncResult = await imapSyncRepository.syncAccountFolders(
           { account: account[0] },
           logger,
+          locale,
         );
 
         if (syncResult.success && syncResult.data?.result) {
@@ -330,13 +341,12 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
           return success(syncResults);
         }
         return fail({
-          message: "app.api.emails.imapClient.imapErrors.sync.folder.failed",
+          message: t("errors.syncFailed.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.folders.sync.error.missing_account.title",
+        message: t("errors.missingAccount.title"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     } catch (error) {
@@ -345,8 +355,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         parseError(error),
       );
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.folders.get.error.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -360,7 +369,9 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
     data: { accountId: string },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<ImapFoldersListResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug("app.api.emails.imapClient.folders.byAccount.info.start", {
         accountId: data.accountId,
@@ -388,8 +399,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         parseError(error),
       );
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.folders.get.error.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -405,7 +415,9 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
     syncError: ErrorResponseType | null,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<{ success: boolean }>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug(
         "app.api.emails.imapClient.folders.updateSyncStatus.info.start",
@@ -429,8 +441,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
 
       if (!updatedFolder) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.folders.get.error.not_found.title",
+          message: t("errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -442,8 +453,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         parseError(error),
       );
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.folders.get.error.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -458,7 +468,9 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
     counts: { totalMessages: number; unreadMessages: number },
     user: JwtPayloadType,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<{ success: boolean }>> {
+    const { t } = scopedTranslation.scopedT(locale);
     try {
       logger.debug(
         "app.api.emails.imapClient.folders.updateCounts.info.start",
@@ -481,8 +493,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
 
       if (!updatedFolder) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.folders.get.error.not_found.title",
+          message: t("errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -494,8 +505,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         parseError(error),
       );
       return fail({
-        message:
-          "app.api.emails.imapClient.imapErrors.folders.get.error.server.title",
+        message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

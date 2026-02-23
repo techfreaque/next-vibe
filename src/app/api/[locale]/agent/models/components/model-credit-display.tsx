@@ -26,6 +26,7 @@ import { useRef, useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
+import type { TFunction } from "@/i18n/core/static-types";
 
 import {
   COMPACT_TRIGGER,
@@ -50,7 +51,7 @@ export interface ModelCreditDisplayProps {
   className?: string;
 
   /** Translation function */
-  t: (key: string, params?: Record<string, string | number>) => string;
+  t: TFunction;
 
   /** User's locale for currency formatting */
   locale: CountryLanguage;

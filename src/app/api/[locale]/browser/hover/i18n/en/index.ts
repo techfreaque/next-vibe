@@ -70,4 +70,9 @@ export const translations = {
     title: "Hover Operation Successful",
     description: "The element was hovered successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    inputAutomation: "Input Automation",
+  },
 };

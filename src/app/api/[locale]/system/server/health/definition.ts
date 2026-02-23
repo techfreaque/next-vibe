@@ -7,10 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseArrayField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,397 +21,333 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * GET endpoint definition - Basic health check
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["system", "server", "health"],
   aliases: ["health", "status"],
-  title: "app.api.system.server.health.get.title",
-  description: "app.api.system.server.health.get.description",
-  category: "app.api.system.category",
-  tags: ["app.api.system.server.health.tag"],
+  title: "get.title",
+  description: "get.description",
+  category: "category",
+  tags: ["tag"],
   icon: "activity",
   allowedRoles: [UserRole.ADMIN],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.system.server.health.get.form.title",
-      description: "app.api.system.server.health.get.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "get.form.title",
+    description: "get.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      detailed: requestField({
+      detailed: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.health.get.fields.detailed.title",
-        description:
-          "app.api.system.server.health.get.fields.detailed.description",
+        label: "get.fields.detailed.title",
+        description: "get.fields.detailed.description",
         schema: z.boolean().default(false),
       }),
 
-      includeDatabase: requestField({
+      includeDatabase: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.health.get.fields.includeDatabase.title",
-        description:
-          "app.api.system.server.health.get.fields.includeDatabase.description",
+        label: "get.fields.includeDatabase.title",
+        description: "get.fields.includeDatabase.description",
         schema: z.boolean().default(true),
       }),
 
-      includeTasks: requestField({
+      includeTasks: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.health.get.fields.includeTasks.title",
-        description:
-          "app.api.system.server.health.get.fields.includeTasks.description",
+        label: "get.fields.includeTasks.title",
+        description: "get.fields.includeTasks.description",
         schema: z.boolean().default(true),
       }),
 
-      includeSystem: requestField({
+      includeSystem: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.system.server.health.get.fields.includeSystem.title",
-        description:
-          "app.api.system.server.health.get.fields.includeSystem.description",
+        label: "get.fields.includeSystem.title",
+        description: "get.fields.includeSystem.description",
         schema: z.boolean().default(false),
       }),
 
       // === RESPONSE FIELDS ===
-      status: responseField({
+      status: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.server.health.get.response.status.title",
+        content: "get.response.status.title",
         schema: z.enum(["healthy", "warning", "critical", "unknown"]),
       }),
 
-      timestamp: responseField({
+      timestamp: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.server.health.get.response.timestamp.title",
+        content: "get.response.timestamp.title",
         schema: z.string(),
       }),
 
-      uptime: responseField({
+      uptime: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.system.server.health.get.response.uptime.title",
+        content: "get.response.uptime.title",
         schema: z.coerce.number(),
       }),
 
-      environment: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.system.server.health.get.response.environment.title",
-          description:
-            "app.api.system.server.health.get.response.environment.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          name: responseField({
+      environment: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.environment.title",
+        description: "get.response.environment.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          name: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.system.server.health.get.response.environment.name.title",
+            content: "get.response.environment.name.title",
             schema: z.string(),
           }),
-          nodeEnv: responseField({
+          nodeEnv: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.system.server.health.get.response.environment.nodeEnv.title",
+            content: "get.response.environment.nodeEnv.title",
             schema: z.string(),
           }),
-          platform: responseField({
+          platform: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.system.server.health.get.response.environment.platform.title",
+            content: "get.response.environment.platform.title",
             schema: z.string(),
           }),
-          supportsTaskRunners: responseField({
+          supportsTaskRunners: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.system.server.health.get.response.environment.supportsTaskRunners.title",
+            content: "get.response.environment.supportsTaskRunners.title",
             schema: z.boolean(),
           }),
         },
-      ),
+      }),
 
       // Note: These fields are conditionally included based on request parameters
       // The repository should handle their optional presence
-      database: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.system.server.health.get.response.database.title",
-          description:
-            "app.api.system.server.health.get.response.database.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          status: responseField({
+      database: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.database.title",
+        description: "get.response.database.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          status: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.system.server.health.get.response.database.status.title",
+            content: "get.response.database.status.title",
             schema: z.enum(["connected", "disconnected", "error", "unknown"]),
           }),
-          responseTime: responseField({
+          responseTime: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.system.server.health.get.response.database.responseTime.title",
+            content: "get.response.database.responseTime.title",
             schema: z.coerce.number().optional(),
           }),
-          error: responseField({
+          error: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.system.server.health.get.response.database.error.title",
+            content: "get.response.database.error.title",
             schema: z.string().optional(),
           }),
         },
-      ),
+      }),
 
-      tasks: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.system.server.health.get.response.tasks.title",
-          description:
-            "app.api.system.server.health.get.response.tasks.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          runnerStatus: responseField({
+      tasks: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.tasks.title",
+        description: "get.response.tasks.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          runnerStatus: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.system.server.health.get.response.tasks.runnerStatus.title",
+            content: "get.response.tasks.runnerStatus.title",
             schema: z.enum(["running", "stopped", "error", "unknown"]),
           }),
-          activeTasks: responseField({
+          activeTasks: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.system.server.health.get.response.tasks.activeTasks.title",
+            content: "get.response.tasks.activeTasks.title",
             schema: z.coerce.number(),
           }),
-          totalTasks: responseField({
+          totalTasks: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.system.server.health.get.response.tasks.totalTasks.title",
+            content: "get.response.tasks.totalTasks.title",
             schema: z.coerce.number(),
           }),
-          errors: responseField({
+          errors: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.system.server.health.get.response.tasks.errors.title",
+            content: "get.response.tasks.errors.title",
             schema: z.coerce.number(),
           }),
-          lastError: responseField({
+          lastError: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.system.server.health.get.response.tasks.lastError.title",
+            content: "get.response.tasks.lastError.title",
             schema: z.string().optional(),
           }),
         },
-      ),
+      }),
 
-      system: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.system.server.health.get.response.system.title",
-          description:
-            "app.api.system.server.health.get.response.system.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          memory: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.system.server.health.get.response.system.memory.title",
-              description:
-                "app.api.system.server.health.get.response.system.memory.description",
-              layoutType: LayoutType.GRID,
-              columns: 12,
-            },
-            { response: true },
-            {
-              used: responseField({
+      system: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.system.title",
+        description: "get.response.system.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          memory: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "get.response.system.memory.title",
+            description: "get.response.system.memory.description",
+            layoutType: LayoutType.GRID,
+            columns: 12,
+            usage: { response: true },
+            children: {
+              used: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.server.health.get.response.system.memory.used.title",
+                content: "get.response.system.memory.used.title",
                 schema: z.coerce.number(),
               }),
-              total: responseField({
+              total: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.server.health.get.response.system.memory.total.title",
+                content: "get.response.system.memory.total.title",
                 schema: z.coerce.number(),
               }),
-              percentage: responseField({
+              percentage: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.server.health.get.response.system.memory.percentage.title",
+                content: "get.response.system.memory.percentage.title",
                 schema: z.coerce.number(),
               }),
             },
-          ),
-          cpu: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.system.server.health.get.response.system.cpu.title",
-              description:
-                "app.api.system.server.health.get.response.system.cpu.description",
-              layoutType: LayoutType.GRID,
-              columns: 12,
-            },
-            { response: true },
-            {
-              usage: responseField({
+          }),
+          cpu: scopedObjectFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "get.response.system.cpu.title",
+            description: "get.response.system.cpu.description",
+            layoutType: LayoutType.GRID,
+            columns: 12,
+            usage: { response: true },
+            children: {
+              usage: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.server.health.get.response.system.cpu.usage.title",
+                content: "get.response.system.cpu.usage.title",
                 schema: z.coerce.number(),
               }),
-              loadAverage: responseField({
+              loadAverage: scopedResponseField(scopedTranslation, {
                 type: WidgetType.TEXT,
-                content:
-                  "app.api.system.server.health.get.response.system.cpu.loadAverage.title",
+                content: "get.response.system.cpu.loadAverage.title",
                 schema: z.array(z.coerce.number()),
               }),
             },
-          ),
-          disk: objectField(
-            {
-              type: WidgetType.CONTAINER,
-              title:
-                "app.api.system.server.health.get.response.system.disk.title",
-              description:
-                "app.api.system.server.health.get.response.system.disk.description",
-              layoutType: LayoutType.GRID,
-              columns: 12,
-            },
-            { response: true },
-            {
-              available: responseField({
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.server.health.get.response.system.disk.available.title",
-                schema: z.coerce.number(),
-              }),
-              total: responseField({
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.server.health.get.response.system.disk.total.title",
-                schema: z.coerce.number(),
-              }),
-              percentage: responseField({
-                type: WidgetType.TEXT,
-                content:
-                  "app.api.system.server.health.get.response.system.disk.percentage.title",
-                schema: z.coerce.number(),
-              }),
-            },
-          ),
-        },
-      ),
-
-      checks: responseArrayField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.system.server.health.get.response.checks.title",
-          description:
-            "app.api.system.server.health.get.response.checks.description",
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        objectField(
-          {
+          }),
+          disk: scopedObjectFieldNew(scopedTranslation, {
             type: WidgetType.CONTAINER,
+            title: "get.response.system.disk.title",
+            description: "get.response.system.disk.description",
             layoutType: LayoutType.GRID,
             columns: 12,
-          },
-          { response: true },
-          {
-            name: responseField({
+            usage: { response: true },
+            children: {
+              available: scopedResponseField(scopedTranslation, {
+                type: WidgetType.TEXT,
+                content: "get.response.system.disk.available.title",
+                schema: z.coerce.number(),
+              }),
+              total: scopedResponseField(scopedTranslation, {
+                type: WidgetType.TEXT,
+                content: "get.response.system.disk.total.title",
+                schema: z.coerce.number(),
+              }),
+              percentage: scopedResponseField(scopedTranslation, {
+                type: WidgetType.TEXT,
+                content: "get.response.system.disk.percentage.title",
+                schema: z.coerce.number(),
+              }),
+            },
+          }),
+        },
+      }),
+
+      checks: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "get.response.checks.title",
+        description: "get.response.checks.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        child: scopedObjectFieldNew(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.GRID,
+          columns: 12,
+          usage: { response: true },
+          children: {
+            name: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.server.health.get.response.checks.item.name.title",
+              content: "get.response.checks.item.name.title",
               schema: z.string(),
             }),
-            status: responseField({
+            status: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.server.health.get.response.checks.item.status.title",
+              content: "get.response.checks.item.status.title",
               schema: z.enum(["pass", "fail", "warn"]),
             }),
-            message: responseField({
+            message: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.server.health.get.response.checks.item.message.title",
+              content: "get.response.checks.item.message.title",
               schema: z.string().optional(),
             }),
-            duration: responseField({
+            duration: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
-              content:
-                "app.api.system.server.health.get.response.checks.item.duration.title",
+              content: "get.response.checks.item.duration.title",
               schema: z.coerce.number().optional(),
             }),
           },
-        ),
-      ),
+        }),
+      }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.system.server.health.get.errors.server.title",
-      description: "app.api.system.server.health.get.errors.server.description",
+      title: "get.errors.server.title",
+      description: "get.errors.server.description",
     },
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.system.server.health.get.errors.validation.title",
-      description:
-        "app.api.system.server.health.get.errors.validation.description",
+      title: "get.errors.validation.title",
+      description: "get.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.system.server.health.get.errors.unauthorized.title",
-      description:
-        "app.api.system.server.health.get.errors.unauthorized.description",
+      title: "get.errors.unauthorized.title",
+      description: "get.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.system.server.health.get.errors.forbidden.title",
-      description:
-        "app.api.system.server.health.get.errors.forbidden.description",
+      title: "get.errors.forbidden.title",
+      description: "get.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.system.server.health.get.errors.notFound.title",
-      description:
-        "app.api.system.server.health.get.errors.notFound.description",
+      title: "get.errors.notFound.title",
+      description: "get.errors.notFound.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.system.server.health.get.errors.network.title",
-      description:
-        "app.api.system.server.health.get.errors.network.description",
+      title: "get.errors.network.title",
+      description: "get.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.system.server.health.get.errors.unknown.title",
-      description:
-        "app.api.system.server.health.get.errors.unknown.description",
+      title: "get.errors.unknown.title",
+      description: "get.errors.unknown.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.system.server.health.get.errors.conflict.title",
-      description:
-        "app.api.system.server.health.get.errors.conflict.description",
+      title: "get.errors.conflict.title",
+      description: "get.errors.conflict.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.system.server.health.get.errors.unsavedChanges.title",
-      description:
-        "app.api.system.server.health.get.errors.unsavedChanges.description",
+      title: "get.errors.unsavedChanges.title",
+      description: "get.errors.unsavedChanges.description",
     },
   },
 
@@ -584,8 +520,8 @@ const { GET } = createEndpoint({
   },
 
   successTypes: {
-    title: "app.api.system.server.health.get.success.title",
-    description: "app.api.system.server.health.get.success.description",
+    title: "get.success.title",
+    description: "get.success.description",
   },
 });
 

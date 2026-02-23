@@ -14,181 +14,142 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 
+import { scopedTranslation } from "../i18n";
 import { UserRole } from "../../../user-roles/enum";
 
 /**
  * GET /reset-password/validate - Validate password reset token
  */
 const { GET } = createEndpoint({
+  scopedTranslation,
   method: Methods.GET,
   path: ["user", "public", "reset-password", "validate"],
-  title: "app.api.user.public.resetPassword.validate.title" as const,
-  description:
-    "app.api.user.public.resetPassword.validate.description" as const,
+  title: "validate.title",
+  description: "validate.description",
   icon: "shield",
-  category: "app.api.user.category" as const,
-  tags: ["app.api.user.public.resetPassword.validate.tag" as const],
+  category: "validate.category",
+  tags: ["validate.tag"],
   allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.user.public.resetPassword.validate.title" as const,
-      description:
-        "app.api.user.public.resetPassword.validate.description" as const,
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "validate.title",
+    description: "validate.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === TOKEN VALIDATION ===
-      tokenInput: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.user.public.resetPassword.validate.groups.tokenInput.title" as const,
-          description:
-            "app.api.user.public.resetPassword.validate.groups.tokenInput.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { request: "data" },
-        {
-          token: requestField({
+      tokenInput: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "validate.groups.tokenInput.title",
+        description: "validate.groups.tokenInput.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { request: "data" },
+        children: {
+          token: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
-            label:
-              "app.api.user.public.resetPassword.validate.fields.token.label" as const,
-            description:
-              "app.api.user.public.resetPassword.validate.fields.token.description" as const,
-            placeholder:
-              "app.api.user.public.resetPassword.validate.fields.token.placeholder" as const,
+            label: "validate.fields.token.label",
+            description: "validate.fields.token.description",
+            placeholder: "validate.fields.token.placeholder",
             columns: 12,
-            helpText:
-              "app.api.user.public.resetPassword.validate.fields.token.help" as const,
+            helpText: "validate.fields.token.help",
             schema: z.string().min(1, {
-              message:
-                "app.api.user.public.resetPassword.validate.fields.token.validation.required",
+              message: "validate.fields.token.validation.required",
             }),
           }),
         },
-      ),
+      }),
 
       // === RESPONSE FIELDS ===
-      response: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title:
-            "app.api.user.public.resetPassword.validate.response.title" as const,
-          description:
-            "app.api.user.public.resetPassword.validate.response.description" as const,
-          layoutType: LayoutType.GRID,
-          columns: 12,
-        },
-        { response: true },
-        {
-          valid: responseField({
+      response: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "validate.response.title",
+        description: "validate.response.description",
+        layoutType: LayoutType.GRID,
+        columns: 12,
+        usage: { response: true },
+        children: {
+          valid: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.public.resetPassword.validate.response.valid" as const,
+            content: "validate.response.valid",
             schema: z.boolean(),
           }),
-          message: responseField({
+          message: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.public.resetPassword.validate.response.message" as const,
+            content: "validate.response.message",
             schema: z.string(),
           }),
-          userId: responseField({
+          userId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.public.resetPassword.validate.response.userId" as const,
+            content: "validate.response.userId",
             schema: z.uuid().optional(),
           }),
-          expiresAt: responseField({
+          expiresAt: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.public.resetPassword.validate.response.expiresAt" as const,
+            content: "validate.response.expiresAt",
             schema: z.string().optional(),
           }),
-          nextSteps: responseField({
+          nextSteps: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.user.public.resetPassword.validate.response.nextSteps.item" as const,
+            content: "validate.response.nextSteps.item",
             schema: z.array(z.string()),
           }),
         },
-      ),
+      }),
     },
-  ),
+  }),
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title:
-        "app.api.user.public.resetPassword.validate.errors.validation.title" as const,
-      description:
-        "app.api.user.public.resetPassword.validate.errors.validation.description" as const,
+      title: "validate.errors.validation.title",
+      description: "validate.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title:
-        "app.api.user.public.resetPassword.validate.errors.unauthorized.title" as const,
-      description:
-        "app.api.user.public.resetPassword.validate.errors.unauthorized.description" as const,
+      title: "validate.errors.unauthorized.title",
+      description: "validate.errors.unauthorized.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title:
-        "app.api.user.public.resetPassword.validate.errors.internal.title" as const,
-      description:
-        "app.api.user.public.resetPassword.validate.errors.internal.description" as const,
+      title: "validate.errors.internal.title",
+      description: "validate.errors.internal.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title:
-        "app.api.user.public.resetPassword.validate.errors.unknown.title" as const,
-      description:
-        "app.api.user.public.resetPassword.validate.errors.unknown.description" as const,
+      title: "validate.errors.unknown.title",
+      description: "validate.errors.unknown.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title:
-        "app.api.user.public.resetPassword.validate.errors.network.title" as const,
-      description:
-        "app.api.user.public.resetPassword.validate.errors.network.description" as const,
+      title: "validate.errors.network.title",
+      description: "validate.errors.network.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title:
-        "app.api.user.public.resetPassword.validate.errors.forbidden.title" as const,
-      description:
-        "app.api.user.public.resetPassword.validate.errors.forbidden.description" as const,
+      title: "validate.errors.forbidden.title",
+      description: "validate.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title:
-        "app.api.user.public.resetPassword.validate.errors.notFound.title" as const,
-      description:
-        "app.api.user.public.resetPassword.validate.errors.notFound.description" as const,
+      title: "validate.errors.notFound.title",
+      description: "validate.errors.notFound.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title:
-        "app.api.user.public.resetPassword.validate.errors.unsaved.title" as const,
-      description:
-        "app.api.user.public.resetPassword.validate.errors.unsaved.description" as const,
+      title: "validate.errors.unsaved.title",
+      description: "validate.errors.unsaved.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title:
-        "app.api.user.public.resetPassword.validate.errors.conflict.title" as const,
-      description:
-        "app.api.user.public.resetPassword.validate.errors.conflict.description" as const,
+      title: "validate.errors.conflict.title",
+      description: "validate.errors.conflict.description",
     },
   },
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.user.public.resetPassword.validate.success.title" as const,
-    description:
-      "app.api.user.public.resetPassword.validate.success.description" as const,
+    title: "validate.success.title",
+    description: "validate.success.description",
   },
 
   // === EXAMPLES ===

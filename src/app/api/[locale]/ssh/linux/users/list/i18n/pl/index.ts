@@ -1,4 +1,12 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    localModeOnly: {
+      title: "Tylko w trybie lokalnym",
+    },
+  },
+
   get: {
     title: "Wylistuj użytkowników Linux",
     description: "Wylistuj konta użytkowników OS na hoście (uid >= 1000)",

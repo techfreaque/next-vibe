@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Database Operations",
+
   post: {
     title: "Production Database Migration",
     description:

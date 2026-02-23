@@ -17,8 +17,8 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ logger }) => {
-      const result = await CreditRepository.expireCredits(logger);
+    handler: async ({ logger, t }) => {
+      const result = await CreditRepository.expireCredits(logger, t);
       if (!result.success) {
         return result;
       }

@@ -15,6 +15,9 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import { db } from "../index";
 import type { SqlRequestOutput, SqlResponseOutput } from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
  * Execute SQL query Repository Interface
@@ -22,6 +25,7 @@ import type { SqlRequestOutput, SqlResponseOutput } from "./definition";
 export interface SqlRepositoryInterface {
   execute(
     data: SqlRequestOutput,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<SqlResponseOutput>>;
 }
@@ -32,6 +36,7 @@ export interface SqlRepositoryInterface {
 export class SqlRepositoryImpl implements SqlRepositoryInterface {
   async execute(
     data: SqlRequestOutput,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<SqlResponseOutput>> {
     let output = "";
@@ -42,7 +47,7 @@ export class SqlRepositoryImpl implements SqlRepositoryInterface {
 
       if (!query) {
         return fail({
-          message: "app.api.system.db.sql.post.errors.validation.title",
+          message: t("post.errors.validation.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -83,7 +88,7 @@ export class SqlRepositoryImpl implements SqlRepositoryInterface {
       parseError(error);
 
       return fail({
-        message: "app.api.system.db.sql.post.errors.server.title",
+        message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

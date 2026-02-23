@@ -3,8 +3,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,96 +21,97 @@ export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["ssh", "session", "read"],
-  title: "session.read.get.title",
-  description: "session.read.get.description",
+  title: "session.read.get.title" as const,
+  description: "session.read.get.description" as const,
   icon: "terminal",
-  category: "category",
+  category: "category" as const,
   allowedRoles: [UserRole.ADMIN],
-  tags: ["type"],
+  tags: ["category" as const],
 
   fields: customWidgetObject({
     render: SessionReadContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      sessionId: requestField({
+      sessionId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "session.read.get.fields.sessionId.label",
-        description: "session.read.get.fields.sessionId.description",
+        label: "session.read.get.fields.sessionId.label" as const,
+        description: "session.read.get.fields.sessionId.description" as const,
         schema: z.string(),
       }),
-      waitMs: requestField({
+      waitMs: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "session.read.get.fields.waitMs.label",
-        description: "session.read.get.fields.waitMs.description",
+        label: "session.read.get.fields.waitMs.label" as const,
+        description: "session.read.get.fields.waitMs.description" as const,
         schema: z.coerce.number().min(0).max(5000).optional(),
       }),
-      maxBytes: requestField({
+      maxBytes: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "session.read.get.fields.maxBytes.label",
-        description: "session.read.get.fields.maxBytes.description",
+        label: "session.read.get.fields.maxBytes.label" as const,
+        description: "session.read.get.fields.maxBytes.description" as const,
         schema: z.coerce.number().min(1).max(65536).optional(),
       }),
-      output: responseField({
+      output: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "session.read.get.response.output.title",
+        content: "session.read.get.response.output.title" as const,
         schema: z.string(),
       }),
-      eof: responseField({
+      eof: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "session.read.get.response.eof.title",
+        content: "session.read.get.response.eof.title" as const,
         schema: z.boolean(),
       }),
-      status: responseField({
+      status: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "session.read.get.response.status.title",
+        content: "session.read.get.response.status.title" as const,
         schema: z.string(),
       }),
     },
   }),
 
   successTypes: {
-    title: "session.read.get.success.title",
-    description: "session.read.get.success.description",
+    title: "session.read.get.success.title" as const,
+    description: "session.read.get.success.description" as const,
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "session.read.get.errors.validation.title",
-      description: "session.read.get.errors.validation.description",
+      title: "session.read.get.errors.validation.title" as const,
+      description: "session.read.get.errors.validation.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "session.read.get.errors.unauthorized.title",
-      description: "session.read.get.errors.unauthorized.description",
+      title: "session.read.get.errors.unauthorized.title" as const,
+      description: "session.read.get.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "session.read.get.errors.forbidden.title",
-      description: "session.read.get.errors.forbidden.description",
+      title: "session.read.get.errors.forbidden.title" as const,
+      description: "session.read.get.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "session.read.get.errors.server.title",
-      description: "session.read.get.errors.server.description",
+      title: "session.read.get.errors.server.title" as const,
+      description: "session.read.get.errors.server.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "session.read.get.errors.notFound.title",
-      description: "session.read.get.errors.notFound.description",
+      title: "session.read.get.errors.notFound.title" as const,
+      description: "session.read.get.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "session.read.get.errors.unknown.title",
-      description: "session.read.get.errors.unknown.description",
+      title: "session.read.get.errors.unknown.title" as const,
+      description: "session.read.get.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "session.read.get.errors.unsavedChanges.title",
-      description: "session.read.get.errors.unsavedChanges.description",
+      title: "session.read.get.errors.unsavedChanges.title" as const,
+      description:
+        "session.read.get.errors.unsavedChanges.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "session.read.get.errors.conflict.title",
-      description: "session.read.get.errors.conflict.description",
+      title: "session.read.get.errors.conflict.title" as const,
+      description: "session.read.get.errors.conflict.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "session.read.get.errors.network.title",
-      description: "session.read.get.errors.network.description",
+      title: "session.read.get.errors.network.title" as const,
+      description: "session.read.get.errors.network.description" as const,
     },
   },
   examples: {

@@ -1,4 +1,16 @@
 export const translations = {
+  category: "SSH",
+
+  errors: {
+    invalidPath:
+      "Nieprawidłowa ścieżka: musi być bezwzględna bez segmentów '..'",
+    directoryNotFound: "Katalog nie znaleziony",
+    notImplemented: {
+      fileList:
+        "Backend SSH jeszcze nie zaimplementowany dla listowania plików",
+    },
+  },
+
   get: {
     title: "Wylistuj pliki",
     description:

@@ -65,4 +65,9 @@ export const translations: typeof enTranslations = {
     title: "Tastendruck erfolgreich",
     description: "Die Taste wurde erfolgreich gedrückt",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser-Automatisierung",
+    inputAutomation: "Eingabe-Automatisierung",
+  },
 };

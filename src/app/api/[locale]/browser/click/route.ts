@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: clickEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger }) =>
+    handler: ({ data, t, logger }) =>
       executeClick<ClickResponseOutput>(
         {
           toolName: "click",
@@ -21,6 +21,7 @@ export const { POST, tools } = endpointsHandler({
             dblClick: data.dblClick,
           }),
         },
+        t,
         logger,
       ),
   },

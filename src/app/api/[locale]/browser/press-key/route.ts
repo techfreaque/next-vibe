@@ -12,7 +12,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: pressKeyEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger }) =>
+    handler: ({ data, t, logger }) =>
       executePressKey(
         {
           toolName: "press-key",
@@ -20,6 +20,7 @@ export const { POST, tools } = endpointsHandler({
             key: data.key,
           }),
         },
+        t,
         logger,
       ),
   },

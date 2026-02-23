@@ -15,19 +15,15 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { type CountryLanguage } from "@/i18n/core/config";
+
 import type { EndpointLogger } from "../../unified-interface/shared/logger/endpoint";
 import type { PackageJson, ReleaseOptions, VersionInfo } from "../definition";
+import { scopedTranslation } from "../i18n";
 import { MESSAGES } from "./constants";
 import { gitService } from "./git-service";
 
-// ============================================================================
-// Interface
-// ============================================================================
-
-export interface IReleaseCreator {
-  /**
-   * Create a GitHub or GitLab release
-   */
+export class ReleaseCreator {
   createGitRelease(
     cwd: string,
     releaseConfig: ReleaseOptions,
@@ -35,21 +31,7 @@ export interface IReleaseCreator {
     versionInfo: VersionInfo,
     logger: EndpointLogger,
     dryRun: boolean,
-  ): ResponseType<string | undefined>;
-}
-
-// ============================================================================
-// Implementation
-// ============================================================================
-
-export class ReleaseCreator implements IReleaseCreator {
-  createGitRelease(
-    cwd: string,
-    releaseConfig: ReleaseOptions,
-    packageJson: PackageJson,
-    versionInfo: VersionInfo,
-    logger: EndpointLogger,
-    dryRun: boolean,
+    locale: CountryLanguage,
   ): ResponseType<string | undefined> {
     const gitReleaseConfig = releaseConfig.gitRelease;
     if (!gitReleaseConfig?.enabled) {
@@ -72,6 +54,7 @@ export class ReleaseCreator implements IReleaseCreator {
         repo,
         logger,
         dryRun,
+        locale,
       );
     }
 
@@ -91,6 +74,7 @@ export class ReleaseCreator implements IReleaseCreator {
       repo,
       logger,
       dryRun,
+      locale,
     );
   }
 
@@ -102,6 +86,7 @@ export class ReleaseCreator implements IReleaseCreator {
     repo: { type: string; url: string },
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
   ): ResponseType<string | undefined> {
     const gitReleaseConfig = releaseConfig.gitRelease;
 
@@ -189,8 +174,9 @@ export class ReleaseCreator implements IReleaseCreator {
       return success(releaseUrl);
     } catch (error) {
       logger.error(MESSAGES.GITHUB_RELEASE_FAILED, parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.gitRelease.failed",
+        message: t("gitRelease.failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: String(error) },
       });
@@ -205,6 +191,7 @@ export class ReleaseCreator implements IReleaseCreator {
     repo: { type: string; url: string },
     logger: EndpointLogger,
     dryRun: boolean,
+    locale: CountryLanguage,
   ): ResponseType<string | undefined> {
     const gitReleaseConfig = releaseConfig.gitRelease;
 
@@ -280,8 +267,9 @@ export class ReleaseCreator implements IReleaseCreator {
       return success(releaseUrl);
     } catch (error) {
       logger.error(MESSAGES.GITLAB_RELEASE_FAILED, parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
       return fail({
-        message: "app.api.system.releaseTool.gitRelease.failed",
+        message: t("gitRelease.failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: String(error) },
       });

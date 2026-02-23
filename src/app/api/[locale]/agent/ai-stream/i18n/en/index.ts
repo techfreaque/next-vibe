@@ -1,9 +1,16 @@
 export const translations = {
+  category: "Agent",
+  tags: {
+    streaming: "Streaming",
+    chat: "Chat",
+    ai: "AI",
+  },
+
   run: {
     post: {
       title: "Run AI Agent",
       description:
-        "Execute pre-calls to gather data, then run a headless AI prompt and return the assistant's response. Ideal for automating tasks, summarising results, or chaining tool outputs into an AI answer.",
+        "Run a headless AI agent and get back the full text response. Use this to delegate tasks, summarise tool results, generate content, or chain tools into a single AI answer. Credits are consumed based on the model. SETUP GUIDE: Before running, set up the right character + favorite for the task. Characters define the persona and system prompt (create with agent_chat_characters_create_POST). Favorites bundle a character with a model override (create with agent_chat_favorites_create_POST, modelSelection: {selectionType:'MANUAL', manualModelId:'...'} or {selectionType:'FILTERS',...}). Workflow: 1) List characters (agent_chat_characters_GET) to see what exists. 2) If none fits, ask the user if they want to create one — collect name, tagline, description, category, systemPrompt, and preferred model. 3) Create character, then create a favorite for it with the desired model. 4) Use the character id in this call. TIP: For recurring tasks (monitoring, reporting, coding help) always set up a dedicated character+favorite first — it makes future runs faster and more consistent. TOOL ACCESS: To give the agent tool access, add tools to allowedTools (execution permission). The standard agentic setup is allowedTools: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool lets the agent run any endpoint, system_help_GET lets it discover what's available. The tools field is optional; omit it (null) to use the user's default tool context.",
       container: {
         title: "AI Agent Run",
         description: "Configure pre-calls and prompt for headless AI execution",
@@ -11,59 +18,66 @@ export const translations = {
       fields: {
         model: {
           label: "Model",
-          description: "AI model to use for generating the response",
+          description:
+            "AI model to use. Fast & cheap: claude-haiku-4.5, gemini-2.5-flash. Balanced: claude-sonnet-4.6, gpt-5. Powerful: claude-opus-4.6, gpt-5-pro. Free: qwen3_235b-free, gpt-oss-120b-free. TIP: The character's modelSelection sets the default — create a favorite with a MANUAL modelSelection override to pin a specific model per use-case without changing the character itself.",
         },
         character: {
           label: "Character",
-          description: "Character persona to use (e.g. 'default')",
+          description:
+            "Character ID (UUID) or 'default'. Characters define the AI persona, system prompt, and default model. Use agent_chat_characters_GET to list available characters. If no suitable character exists, offer to create one with agent_chat_characters_create_POST (fields: name, tagline, description, category, systemPrompt, modelSelection, voice). After creating a character, also create a favorite for it with agent_chat_favorites_create_POST so the user can reuse it easily with a model override.",
           placeholder: "default",
         },
         prompt: {
           label: "Prompt",
-          description: "The user prompt to send to the AI",
+          description:
+            "The main instruction or question for the AI. Be specific — the AI will use preCalls results as context if provided.",
           placeholder: "Enter your prompt...",
         },
         instructions: {
-          label: "Extra Instructions",
-          description: "Optional extra system instructions for this run",
+          label: "Extra System Instructions",
+          description:
+            "Optional extra instructions appended to the system prompt. Use to constrain format, tone, or output length (e.g. 'Be concise. JSON only.').",
           placeholder: "Be concise. One paragraph max.",
         },
         preCalls: {
           label: "Pre-Calls",
           description:
-            "Routes to execute before the AI prompt. Results are injected as context.",
+            "Tool calls to execute before the prompt. Results are injected as context. Use system_help_GET to discover available tools and their args.",
           routeId: {
-            label: "Route ID",
+            label: "Tool ID",
             description:
-              "Endpoint alias or full path (e.g. agent_chat_characters_GET)",
-            placeholder: "agent_chat_characters_GET",
+              "Alias or full tool name to call (e.g. 'web-search', 'agent_chat_characters_GET'). Use system_help_GET to discover tools.",
+            placeholder: "web-search",
           },
           args: {
             label: "Arguments",
             description:
-              "Merged flat args (urlPathParams + data) for this route",
+              'Flat key-value args for the tool — merge urlPathParams and body fields into one object (e.g. {"query": "latest news", "maxResults": 5}).',
           },
         },
-        activeTools: {
-          label: "Active Tools",
+        allowedTools: {
+          label: "Allowed to Execute",
           description:
-            "Tools the AI is allowed to execute. Leave empty to allow all tools.",
+            "Execution permission gate — controls which tools the AI is actually allowed to run. null = all tools permitted. Array = restrict to listed tools only (any other call is blocked with 'disabled by user'). Standard agentic setup: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool dispatches any registered endpoint, system_help_GET lets the agent discover available tools. No need to repeat tools already listed in the tools field.",
           toolId: {
             label: "Tool ID",
-            description: "Tool identifier",
+            description:
+              "Alias or full tool name the AI is permitted to execute (e.g. 'execute-tool', 'system_help_GET', 'web-search')",
           },
           requiresConfirmation: {
             label: "Requires Confirmation",
             description:
-              "Whether this tool requires user confirmation before execution",
+              "If true, execution pauses and waits for user confirmation before running this tool. Use for destructive or expensive actions.",
           },
         },
         tools: {
-          label: "Visible Tools",
-          description: "Tools loaded into the AI context window",
+          label: "In Context (model sees these)",
+          description:
+            "Tools loaded into the model's context window — what the AI knows about and can reason over. null = use the user's default tool set (recommended). Provide an array only if you need a focused, minimal context. Note: allowedTools controls what can actually execute — this field only affects what the model sees.",
           toolId: {
             label: "Tool ID",
-            description: "Tool identifier",
+            description:
+              "Alias or full tool name to load into the model's context (e.g. 'execute-tool', 'system_help_GET')",
           },
           requiresConfirmation: {
             label: "Requires Confirmation",
@@ -73,36 +87,44 @@ export const translations = {
         },
         maxTurns: {
           label: "Max Turns",
-          description: "Maximum number of tool-calling turns before stopping",
+          description:
+            "Maximum agentic turns (tool-call cycles) before stopping. Default: unlimited. Set to 1 for a single prompt+response with no tool calls.",
         },
         appendThreadId: {
-          label: "Thread ID (append)",
+          label: "Thread ID (continue)",
           description:
-            "Continue an existing thread by ID. Omit to start a new one.",
-          placeholder: "uuid",
+            "UUID of an existing thread to continue. The new message is appended to that conversation. Omit to start a fresh thread.",
+          placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         },
         rootFolderId: {
-          label: "Root Folder",
+          label: "Storage Folder",
           description:
-            "Where to store the thread. Use 'incognito' for no persistence, 'cron' (default) for persisted.",
+            "Where to persist the thread. 'cron' (default) = persisted agent runs. 'incognito' = no storage, no history. 'private' = user's private folder. 'shared' = team-accessible.",
           placeholder: "cron",
         },
         subFolderId: {
-          label: "Sub Folder ID",
-          description: "Optional sub-folder UUID within the root folder",
-          placeholder: "uuid",
+          label: "Sub-folder ID",
+          description:
+            "Optional UUID of a sub-folder within the root folder for organising runs.",
+          placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         },
       },
       response: {
-        text: "Assistant response text (think-tags stripped)",
-        promptTokens: "Number of prompt tokens used",
-        completionTokens: "Number of completion tokens generated",
+        text: "The AI's response text (think-tags stripped). Null if the model produced no output.",
+        promptTokens: "Prompt tokens consumed (input cost)",
+        completionTokens: "Completion tokens generated (output cost)",
         threadId:
-          "Thread ID where the conversation was stored (null if incognito)",
-        lastAiMessageId: "ID of the final assistant message",
-        threadTitle: "Auto-generated thread title",
+          "Thread UUID where the run was stored. Null if rootFolderId was 'incognito'. Use this to continue the conversation via appendThreadId.",
+        lastAiMessageId:
+          "UUID of the final assistant message. Useful for branching or referencing the response.",
+        threadTitle: "Auto-generated title for this thread",
         threadCreatedAt: "Thread creation timestamp (ISO 8601)",
-        preCallResults: "Results from pre-call route executions",
+        preCallResults: {
+          title: "Pre-call Results",
+          routeId: "Tool that was called",
+          succeeded: "Whether the call succeeded",
+          errorMessage: "Error message if the call failed",
+        },
       },
       errors: {
         validation: {
@@ -278,21 +300,21 @@ export const translations = {
       description: "Allow AI to search the web for current information",
     },
     activeTool: {
-      label: "Active Tools",
+      label: "Allowed to Execute",
       description:
-        "Tools the model is allowed to execute. Null means all tools are allowed.",
+        "Execution permission gate — which tools the AI is actually allowed to run. null = all tools permitted. Array = restrict to listed tools only.",
       toolId: {
         label: "Tool ID",
-        description: "Unique identifier for the AI tool",
+        description: "Alias or full tool name the AI is permitted to execute",
       },
     },
     tools: {
-      label: "Visible Tools",
+      label: "In Context (model sees these)",
       description:
-        "Tools loaded into the AI context window. The model can see and directly call these.",
+        "Tools loaded into the model's context window — what the AI knows about. null = user's default set. allowedTools controls what can actually execute.",
       toolId: {
         label: "Tool ID",
-        description: "Unique identifier for the AI tool",
+        description: "Alias or full tool name to load into the model's context",
       },
       requiresConfirmation: {
         label: "Requires Confirmation",
@@ -425,6 +447,10 @@ export const translations = {
         processing: "Error processing AI stream",
       },
     },
+  },
+  debugView: {
+    systemPromptTitle: "System Prompt",
+    copied: "Copied!",
   },
   errorTypes: {
     streamError: "Stream Error",

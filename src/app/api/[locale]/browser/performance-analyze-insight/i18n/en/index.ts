@@ -73,4 +73,9 @@ export const translations = {
     title: "Performance Insight Analyzed Successfully",
     description: "The performance insight was analyzed successfully",
   },
+  category: "Browser",
+  tags: {
+    browserAutomation: "Browser Automation",
+    performanceAutomation: "Performance Automation",
+  },
 };

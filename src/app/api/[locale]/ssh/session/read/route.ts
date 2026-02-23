@@ -7,6 +7,7 @@ import { SessionReadRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: ({ data, logger }) => SessionReadRepository.read(data, logger),
+    handler: ({ data, logger, t }) =>
+      SessionReadRepository.read(data, logger, t),
   },
 });

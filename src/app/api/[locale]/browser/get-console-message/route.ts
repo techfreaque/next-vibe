@@ -15,7 +15,7 @@ export const { POST, tools } = endpointsHandler({
   endpoint: getConsoleMessageEndpoints,
   [Methods.POST]: {
     email: undefined,
-    handler: ({ data, logger }) =>
+    handler: ({ data, t, logger }) =>
       executeGetConsoleMessage(
         {
           toolName: "get-console-message",
@@ -23,6 +23,7 @@ export const { POST, tools } = endpointsHandler({
             msgid: data.msgid,
           }),
         },
+        t,
         logger,
       ),
   },

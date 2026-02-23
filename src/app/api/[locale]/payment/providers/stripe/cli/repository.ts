@@ -21,9 +21,10 @@ import { parseError } from "next-vibe/shared/utils";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import type { scopedTranslation } from "../i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 import type {
   CliStripeRequestOutput,
   CliStripeResponseOutput,
@@ -38,16 +39,20 @@ export interface CliStripeRepository {
   processStripe(
     data: CliStripeRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CliStripeResponseOutput>>;
 
-  checkInstallation(logger: EndpointLogger): ResponseType<boolean>;
+  checkInstallation(logger: EndpointLogger, t: ModuleT): ResponseType<boolean>;
   startListener(
     webhookUrl: string | undefined,
     logger: EndpointLogger,
+    t: ModuleT,
   ): ResponseType<string>;
-  checkAuthentication(logger: EndpointLogger): ResponseType<boolean>;
+  checkAuthentication(
+    logger: EndpointLogger,
+    t: ModuleT,
+  ): ResponseType<boolean>;
 }
 
 /**
@@ -62,11 +67,9 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   async processStripe(
     data: CliStripeRequestOutput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
+    t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CliStripeResponseOutput>> {
-    const { t } = simpleT(locale);
-
     try {
       logger.debug("Processing Stripe CLI operation", {
         operation: data.operation,
@@ -115,8 +118,8 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
           break;
         }
         case "login": {
-          logger.debug(t("app.api.stripe.login.instructions"));
-          response.instructions = t("app.api.stripe.login.instructions");
+          logger.debug(t("login.instructions"));
+          response.instructions = t("login.instructions");
           break;
         }
         case "status": {
@@ -125,16 +128,16 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
             response.version = this.getStripeVersion();
             const authenticated = this.checkStripeAuth(logger);
             response.status = authenticated
-              ? t("app.api.stripe.status.authenticated")
-              : t("app.api.stripe.status.not_authenticated");
+              ? t("status.authenticated")
+              : t("status.not_authenticated");
           } else {
-            response.status = t("app.api.stripe.status.not_installed");
+            response.status = t("status.not_installed");
           }
           break;
         }
         default: {
           return fail({
-            message: "app.api.stripe.errors.validation.title",
+            message: t("errors.validation.title"),
             errorType: ErrorResponseTypes.VALIDATION_ERROR,
             messageParams: { operation: data.operation },
           });
@@ -154,12 +157,12 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       logger.error("Error processing Stripe CLI operation:", parseError(error));
       const parsedError = parseError(error);
       return fail({
-        message: "app.api.stripe.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: {
           operation: data.operation,
           error: parsedError.message,
-          details: t("app.api.stripe.errors.execution_failed"),
+          details: t("errors.execution_failed"),
         },
       });
     }
@@ -168,7 +171,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   /**
    * Check if Stripe CLI is installed
    */
-  checkInstallation(logger: EndpointLogger): ResponseType<boolean> {
+  checkInstallation(logger: EndpointLogger, t: ModuleT): ResponseType<boolean> {
     try {
       logger.debug("Checking Stripe CLI installation");
       const installed = this.isStripeCLIInstalled();
@@ -180,7 +183,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
         parseError(error),
       );
       return fail({
-        message: "app.api.stripe.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -193,6 +196,7 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   startListener(
     webhookUrl: string | undefined,
     logger: EndpointLogger,
+    t: ModuleT,
   ): ResponseType<string> {
     try {
       const url =
@@ -204,13 +208,13 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
         return success(url);
       }
       return fail({
-        message: "app.api.stripe.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: "stripe.errors.listener_failed" },
       });
     } catch (error) {
       return fail({
-        message: "app.api.stripe.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });
@@ -220,13 +224,16 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
   /**
    * Check Stripe CLI authentication
    */
-  checkAuthentication(logger: EndpointLogger): ResponseType<boolean> {
+  checkAuthentication(
+    logger: EndpointLogger,
+    t: ModuleT,
+  ): ResponseType<boolean> {
     try {
       const authenticated = this.checkStripeAuth(logger);
       return success(authenticated);
     } catch (error) {
       return fail({
-        message: "app.api.stripe.errors.serverError.title",
+        message: t("errors.serverError.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parseError(error).message },
       });

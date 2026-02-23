@@ -21,12 +21,14 @@ import type { NewEmail } from "@/app/api/[locale]/emails/messages/db";
 import { emails } from "@/app/api/[locale]/emails/messages/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { EmailType } from "../../messages/enum";
 import { imapConnectionRepository } from "../connection/repository";
 import type { NewImapFolder } from "../db";
 import { imapAccounts, imapFolders } from "../db";
 import { ImapSyncStatus } from "../enum";
+import { scopedTranslation } from "../i18n";
 import type {
   SyncAccountFoldersRequestOutput,
   SyncAccountFoldersResponseOutput,
@@ -55,21 +57,25 @@ const IMAP_FLAGS = {
 export interface ImapSyncRepository {
   syncAllAccounts(
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<SyncAllAccountsResponseOutput>>;
 
   syncAccount(
     data: SyncAccountRequestOutput,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<SyncAccountResponseOutput>>;
 
   syncAccountFolders(
     data: SyncAccountFoldersRequestOutput,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<SyncAccountFoldersResponseOutput>>;
 
   syncFolderMessages(
     data: SyncFolderMessagesRequestOutput,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<SyncFolderMessagesResponseOutput>>;
 }
 
@@ -82,7 +88,9 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
    */
   async syncAllAccounts(
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<SyncAllAccountsResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     const startTime = Date.now();
     let accountsProcessed = 0;
     let foldersProcessed = 0;
@@ -121,7 +129,11 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
             .where(eq(imapAccounts.id, account.id));
 
           // Sync account
-          const accountResult = await this.syncAccount({ account }, logger);
+          const accountResult = await this.syncAccount(
+            { account },
+            logger,
+            locale,
+          );
 
           if (accountResult.success) {
             foldersProcessed +=
@@ -153,8 +165,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
           } else {
             errors.push(
               fail({
-                message:
-                  "app.api.emails.imapClient.imap.sync.errors.account_failed",
+                message: t("imap.sync.errors.account_failed"),
                 errorType: ErrorResponseTypes.UNKNOWN_ERROR,
                 messageParams: { error: accountResult.message },
               }),
@@ -179,8 +190,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
           const errorMessage = parseError(error).message;
           errors.push(
             fail({
-              message:
-                "app.api.emails.imapClient.imapErrors.sync.account.failed",
+              message: t("imapErrors.sync.account.failed"),
               errorType: ErrorResponseTypes.INTERNAL_ERROR,
               messageParams: { error: errorMessage },
             }),
@@ -209,8 +219,8 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       const result: SyncResult = {
         success: isSuccessful,
         message: isSuccessful
-          ? "app.api.emails.imapClient.imap.sync.messages.accounts.success"
-          : "app.api.emails.imapClient.imap.sync.messages.accounts.successWithErrors",
+          ? t("imap.sync.messages.accounts.success")
+          : t("imap.sync.messages.accounts.successWithErrors"),
         results: {
           accountsProcessed,
           foldersProcessed,
@@ -232,7 +242,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       logger.error("Error in syncAllAccounts", parseError(error));
 
       return fail({
-        message: "app.api.emails.imapClient.imapErrors.sync.failed",
+        message: t("imapErrors.sync.failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -244,7 +254,9 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
   async syncAccount(
     data: SyncAccountRequestOutput,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<SyncAccountResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     const startTime = Date.now();
     let foldersProcessed = 0;
     let messagesProcessed = 0;
@@ -263,11 +275,11 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       const connectionResult = await imapConnectionRepository.testConnection(
         { account: data.account },
         logger,
+        t, // connection is internal to sync-service, accepts t from same scope
       );
       if (!connectionResult.success) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.connection.test.failed",
+          message: t("imapErrors.connection.test.failed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           cause: connectionResult,
         });
@@ -277,6 +289,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       const folderResult = await this.syncAccountFolders(
         { account: data.account },
         logger,
+        locale,
       );
       if (folderResult.success) {
         foldersProcessed += folderResult.data.result.results.foldersProcessed;
@@ -286,7 +299,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       } else {
         errors.push(
           fail({
-            message: "app.api.emails.imapClient.imapErrors.sync.folder.failed",
+            message: t("imapErrors.sync.folder.failed"),
             errorType: ErrorResponseTypes.INTERNAL_ERROR,
           }),
         );
@@ -303,6 +316,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
           const messageResult = await this.syncFolderMessages(
             { account: data.account, folder },
             logger,
+            locale,
           );
           if (messageResult.success) {
             messagesProcessed +=
@@ -316,8 +330,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
           } else {
             errors.push(
               fail({
-                message:
-                  "app.api.emails.imapClient.imap.sync.errors.message_sync_failed",
+                message: t("imap.sync.errors.message_sync_failed"),
                 errorType: ErrorResponseTypes.UNKNOWN_ERROR,
               }),
             );
@@ -326,8 +339,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
           logger.error("Error syncing folder messages", parseError(error));
           errors.push(
             fail({
-              message:
-                "app.api.emails.imapClient.imap.sync.errors.message_sync_error",
+              message: t("imap.sync.errors.message_sync_error"),
               errorType: ErrorResponseTypes.UNKNOWN_ERROR,
             }),
           );
@@ -344,8 +356,8 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       const result: SyncResult = {
         success: isSuccessful,
         message: isSuccessful
-          ? "app.api.emails.imapClient.imap.sync.messages.account.success"
-          : "app.api.emails.imapClient.imap.sync.messages.account.successWithErrors",
+          ? t("imap.sync.messages.account.success")
+          : t("imap.sync.messages.account.successWithErrors"),
         results: {
           accountsProcessed: 1,
           foldersProcessed,
@@ -370,7 +382,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       );
 
       return fail({
-        message: "app.api.emails.imapClient.imapErrors.sync.account.failed",
+        message: t("imapErrors.sync.account.failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -382,7 +394,9 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
   async syncAccountFolders(
     data: SyncAccountFoldersRequestOutput,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<SyncAccountFoldersResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     const startTime = Date.now();
     let foldersProcessed = 0;
     let foldersAdded = 0;
@@ -396,12 +410,12 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       const remoteFoldersResult = await imapConnectionRepository.listFolders(
         { account: data.account },
         logger,
+        t, // connection is internal to sync-service, accepts t from same scope
       );
 
       if (!remoteFoldersResult.success) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.connection.folders.list.failed",
+          message: t("imapErrors.connection.folders.list.failed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           cause: remoteFoldersResult,
         });
@@ -473,8 +487,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
           logger.error("Error syncing folder", parseError(error));
           errors.push(
             fail({
-              message:
-                "app.api.emails.imapClient.imap.sync.errors.folder_sync_failed",
+              message: t("imap.sync.errors.folder_sync_failed"),
               errorType: ErrorResponseTypes.UNKNOWN_ERROR,
               messageParams: { error: parseError(error).message },
             }),
@@ -492,8 +505,8 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       const result: SyncResult = {
         success: isSuccessful,
         message: isSuccessful
-          ? "app.api.emails.imapClient.imap.sync.messages.folders.success"
-          : "app.api.emails.imapClient.imap.sync.messages.folders.successWithErrors",
+          ? t("imap.sync.messages.folders.success")
+          : t("imap.sync.messages.folders.successWithErrors"),
         results: {
           accountsProcessed: 0,
           foldersProcessed,
@@ -518,7 +531,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       );
 
       return fail({
-        message: "app.api.emails.imapClient.imapErrors.sync.folder.failed",
+        message: t("imapErrors.sync.folder.failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -530,7 +543,9 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
   async syncFolderMessages(
     data: SyncFolderMessagesRequestOutput,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<SyncFolderMessagesResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
     const startTime = Date.now();
     let messagesProcessed = 0;
     let messagesAdded = 0;
@@ -549,11 +564,11 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
             options: { limit: data.account.maxMessages || 1000 },
           },
           logger,
+          t, // connection is internal to sync-service, accepts t from same scope
         );
       if (!remoteMessagesResponse.success) {
         return fail({
-          message:
-            "app.api.emails.imapClient.imapErrors.connection.messages.list.failed",
+          message: t("imapErrors.connection.messages.list.failed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           cause: remoteMessagesResponse,
         });
@@ -638,8 +653,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
           logger.error("Error syncing message", parseError(error));
           errors.push(
             fail({
-              message:
-                "app.api.emails.imapClient.imapErrors.sync.message.failed",
+              message: t("imapErrors.sync.message.failed"),
               errorType: ErrorResponseTypes.INTERNAL_ERROR,
             }),
           );
@@ -656,8 +670,8 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       const result: SyncResult = {
         success: isSuccessful,
         message: isSuccessful
-          ? "app.api.emails.imapClient.imap.sync.messages.messages.success"
-          : "app.api.emails.imapClient.imap.sync.messages.messages.successWithErrors",
+          ? t("imap.sync.messages.messages.success")
+          : t("imap.sync.messages.messages.successWithErrors"),
         results: {
           accountsProcessed: 0,
           foldersProcessed: 0,
@@ -682,7 +696,7 @@ export class ImapSyncRepositoryImpl implements ImapSyncRepository {
       );
 
       return fail({
-        message: "app.api.emails.imapClient.imapErrors.sync.message.failed",
+        message: t("imapErrors.sync.message.failed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

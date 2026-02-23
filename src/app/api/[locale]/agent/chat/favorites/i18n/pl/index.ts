@@ -3,6 +3,10 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   id: idTranslations,
+  category: "Chat",
+  tags: {
+    favorites: "Ulubione",
+  },
   fallbacks: {
     unknownCharacter: "Nieznana postać",
     unknownModel: "Nieznany model",

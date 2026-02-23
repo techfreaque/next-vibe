@@ -21,8 +21,8 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation as leadsScopedTranslation } from "../i18n";
 import { CurrentPageType } from "./admin-leads-layout-client";
 
 interface LeadsNavigationProps {
@@ -34,52 +34,50 @@ export function LeadsNavigation({
   locale,
   currentPage,
 }: LeadsNavigationProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = leadsScopedTranslation.scopedT(locale);
 
   const navigationItems = [
     {
       key: CurrentPageType.stats,
       href: `/${locale}/admin/leads` as const,
       icon: BarChart3,
-      label: t("app.admin.leads.leads.admin.tabs.stats"),
-      description: t("app.admin.leads.leads.admin.tabs.stats_description"),
+      label: t("admin.tabs.stats"),
+      description: t("admin.tabs.stats_description"),
     },
     {
       key: CurrentPageType.list,
       href: `/${locale}/admin/leads/list` as const,
       icon: List,
-      label: t("app.admin.leads.leads.admin.tabs.leads"),
-      description: t("app.admin.leads.leads.admin.tabs.leads_description"),
+      label: t("admin.tabs.leads"),
+      description: t("admin.tabs.leads_description"),
     },
     {
       key: CurrentPageType.emails,
       href: `/${locale}/admin/leads/emails` as const,
       icon: Mail,
-      label: t("app.admin.leads.leads.admin.tabs.emails"),
-      description: t("app.admin.leads.leads.admin.tabs.emails_description"),
+      label: t("admin.tabs.emails"),
+      description: t("admin.tabs.emails_description"),
     },
     {
       key: CurrentPageType.abTesting,
       href: `/${locale}/admin/leads/ab-testing` as const,
       icon: TestTube,
-      label: t("app.admin.leads.leads.admin.tabs.abTesting"),
-      description: t("app.admin.leads.leads.admin.tabs.abTesting_description"),
+      label: t("admin.tabs.abTesting"),
+      description: t("admin.tabs.abTesting_description"),
     },
     {
       key: CurrentPageType.campaignStarter,
       href: `/${locale}/admin/leads/campaign-starter` as const,
       icon: Settings,
-      label: t("app.admin.leads.leads.admin.tabs.campaignStarter"),
-      description: t(
-        "app.admin.leads.leads.admin.tabs.campaignStarter_description",
-      ),
+      label: t("admin.tabs.campaignStarter"),
+      description: t("admin.tabs.campaignStarter_description"),
     },
     {
       key: CurrentPageType.import,
       href: `/${locale}/admin/leads/import` as const,
       icon: Upload,
-      label: t("app.admin.leads.leads.admin.import.label"),
-      description: t("app.admin.leads.leads.admin.import.description"),
+      label: t("admin.import.label"),
+      description: t("admin.import.description"),
     },
   ] as const;
 
@@ -87,7 +85,7 @@ export function LeadsNavigation({
     <Div className="border-b border-gray-200 dark:border-gray-700">
       <Nav
         className="flex flex-row gap-8"
-        aria-label={t("app.admin.leads.leads.admin.tabs.overview")}
+        aria-label={t("admin.tabs.overview")}
       >
         {navigationItems.map((item) => {
           const Icon = item.icon;

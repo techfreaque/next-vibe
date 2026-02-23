@@ -7,9 +7,9 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -21,12 +21,14 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { DEFAULT_TTS_VOICE, TtsVoiceOptions } from "./enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Text-to-Speech Endpoint (POST)
  * Converts text to speech audio using Eden AI
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["agent", "text-to-speech"],
   allowedRoles: [
@@ -36,110 +38,95 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
   ],
 
-  title: "app.api.agent.textToSpeech.post.title",
-  description: "app.api.agent.textToSpeech.post.description",
+  title: "post.title",
+  description: "post.description",
   icon: "volume-2",
-  category: "app.api.agent.chat.category",
-  tags: [
-    "app.api.agent.tags.speech",
-    "app.api.agent.tags.tts",
-    "app.api.agent.tags.ai",
-  ],
+  category: "category" as const,
+  tags: ["tags.speech", "tags.tts", "tags.ai"],
 
-  fields: objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "app.api.agent.textToSpeech.post.form.title",
-      description: "app.api.agent.textToSpeech.post.form.description",
-      layoutType: LayoutType.GRID,
-      columns: 12,
-    },
-    { request: "data", response: true },
-    {
+  fields: scopedObjectFieldNew(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "post.form.title",
+    description: "post.form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
       // === REQUEST FIELDS ===
-      text: requestField({
+      text: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
-        label: "app.api.agent.textToSpeech.post.text.label",
-        description: "app.api.agent.textToSpeech.post.text.description",
+        label: "post.text.label",
+        description: "post.text.description",
         columns: 12,
-        placeholder: "app.api.agent.textToSpeech.post.text.placeholder",
+        placeholder: "post.text.placeholder",
         schema: z.string().min(1).max(5000),
       }),
-      voice: requestField({
+      voice: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.agent.textToSpeech.post.voice.label",
-        description: "app.api.agent.textToSpeech.post.voice.description",
+        label: "post.voice.label",
+        description: "post.voice.description",
         columns: 12,
         options: TtsVoiceOptions,
         schema: z.string().default(DEFAULT_TTS_VOICE),
       }),
 
-      audioUrl: responseField({
+      audioUrl: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.agent.textToSpeech.post.response.audioUrl",
+        content: "post.response.audioUrl",
         schema: z.string(),
       }),
-      creditCost: responseField({
+      creditCost: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.api.agent.textToSpeech.post.response.creditCost",
+        content: "post.response.creditCost",
         schema: z.number().optional(),
       }),
     },
-  ),
+  }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.agent.textToSpeech.post.errors.validation_failed.title",
-      description:
-        "app.api.agent.textToSpeech.post.errors.validation_failed.description",
+      title: "post.errors.validation_failed.title",
+      description: "post.errors.validation_failed.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.agent.textToSpeech.post.errors.network_error.title",
-      description:
-        "app.api.agent.textToSpeech.post.errors.network_error.description",
+      title: "post.errors.network_error.title",
+      description: "post.errors.network_error.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.agent.textToSpeech.post.errors.unauthorized.title",
-      description:
-        "app.api.agent.textToSpeech.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.agent.textToSpeech.post.errors.forbidden.title",
-      description:
-        "app.api.agent.textToSpeech.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.agent.textToSpeech.post.errors.not_found.title",
-      description:
-        "app.api.agent.textToSpeech.post.errors.not_found.description",
+      title: "post.errors.not_found.title",
+      description: "post.errors.not_found.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.agent.textToSpeech.post.errors.server_error.title",
-      description:
-        "app.api.agent.textToSpeech.post.errors.server_error.description",
+      title: "post.errors.server_error.title",
+      description: "post.errors.server_error.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.agent.textToSpeech.post.errors.unknown_error.title",
-      description:
-        "app.api.agent.textToSpeech.post.errors.unknown_error.description",
+      title: "post.errors.unknown_error.title",
+      description: "post.errors.unknown_error.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.agent.textToSpeech.post.errors.unsaved_changes.title",
-      description:
-        "app.api.agent.textToSpeech.post.errors.unsaved_changes.description",
+      title: "post.errors.unsaved_changes.title",
+      description: "post.errors.unsaved_changes.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.agent.textToSpeech.post.errors.conflict.title",
-      description:
-        "app.api.agent.textToSpeech.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
   },
 
   successTypes: {
-    title: "app.api.agent.textToSpeech.post.success.title",
-    description: "app.api.agent.textToSpeech.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   examples: {

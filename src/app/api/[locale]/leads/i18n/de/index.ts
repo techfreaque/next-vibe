@@ -25,6 +25,44 @@ export const translations: typeof enTranslations = {
     jobs: "Jobs",
     list: "Liste",
   },
+  admin: {
+    title: "Leads-Verwaltung",
+    tabs: {
+      overview: "Leads-Navigation",
+      stats: "Übersicht",
+      stats_description: "Lead-Statistiken und -Analysen anzeigen",
+      leads: "Leads",
+      leads_description: "Alle Leads durchsuchen und verwalten",
+      emails: "E-Mail-Kampagnen",
+      emails_description: "E-Mail-Kampagnen und Vorlagen verwalten",
+      abTesting: "A/B-Tests",
+      abTesting_description: "A/B-Test-Varianten konfigurieren",
+      campaignStarter: "Kampagnen-Starter",
+      campaignStarter_description: "Lead-Kampagnen konfigurieren und starten",
+    },
+    import: {
+      label: "Importieren",
+      description: "Leads aus CSV-Dateien importieren",
+    },
+    emails: {
+      preview: {
+        error: "Fehler beim Rendern der E-Mail-Vorschau",
+        live: "Live-Vorschau",
+        actions: {
+          title: "E-Mail-Vorschau",
+          description: "Vorschau, wie die E-Mail bei Empfängern aussehen wird",
+        },
+      },
+      preview_title: "E-Mail-Vorschau",
+      testEmail: {
+        button: "Test-E-Mail senden",
+      },
+      from: "Von",
+      recipient: "Empfänger",
+      subject: "Betreff",
+      email_preview: "E-Mail-Vorschau",
+    },
+  },
   auth: {
     public: {
       validCookie: "Gültiger Cookie-Lead gefunden",
@@ -284,6 +322,16 @@ export const translations: typeof enTranslations = {
       pl: "Polnisch",
       en: "Englisch",
     },
+    emailProvider: {
+      resend: "Resend",
+      sendgrid: "SendGrid",
+      mailgun: "Mailgun",
+      ses: "Amazon SES",
+      smtp: "SMTP",
+      mailjet: "Mailjet",
+      postmark: "Postmark",
+      other: "Sonstiges",
+    },
   },
   error: {
     general: {
@@ -343,6 +391,9 @@ export const translations: typeof enTranslations = {
     },
     leadsUnsubscribe: {
       post: {
+        success: {
+          description: "Erfolgreich abgemeldet",
+        },
         error: {
           validation: {
             title: "Ungültige Abmeldeanfrage",

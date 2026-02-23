@@ -1,4 +1,8 @@
 export const translations = {
+  category: "Chat",
+  tags: {
+    messages: "Messages",
+  },
   get: {
     title: "Get Conversation Path",
     description: "Retrieve messages following a specific conversation path",

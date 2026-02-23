@@ -3,8 +3,8 @@ import { join } from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation as launchpadScopedTranslation } from "../../i18n";
 import type { LaunchpadConfig } from "../types/types.js";
 import {
   cloneRepo,
@@ -22,8 +22,8 @@ export async function updateAllRepos(
   config: LaunchpadConfig,
   locale: CountryLanguage,
 ): Promise<void> {
-  const { t } = simpleT(locale);
-  logger.info("app.api.system.launchpad.updateAll.updating");
+  const { t } = launchpadScopedTranslation.scopedT(locale);
+  logger.info(t("updateAll.updating"));
   const repos = getAllRepos(config);
 
   let clonedCount = 0;
@@ -50,7 +50,7 @@ export async function updateAllRepos(
         const repoPath = join(...repo.path);
         failedCloneRepos.push(repoPath);
         logger.info(
-          t("app.api.system.launchpad.updateAll.failedClone", {
+          t("updateAll.failedClone", {
             repoPath,
           }),
         );
@@ -65,7 +65,7 @@ export async function updateAllRepos(
         const repoPath = join(...repo.path);
         failedUpdateRepos.push(repoPath);
         logger.info(
-          t("app.api.system.launchpad.updateAll.failedUpdate", {
+          t("updateAll.failedUpdate", {
             repoPath,
           }),
         );
@@ -76,36 +76,36 @@ export async function updateAllRepos(
   // Report results
   if (clonedCount > 0) {
     logger.info(
-      t("app.api.system.launchpad.updateAll.clonedSuccess", {
+      t("updateAll.clonedSuccess", {
         count: clonedCount.toString(),
       }),
     );
   }
   if (updatedCount > 0) {
     logger.info(
-      t("app.api.system.launchpad.updateAll.updatedSuccess", {
+      t("updateAll.updatedSuccess", {
         count: updatedCount.toString(),
       }),
     );
   }
   if (failedCloneCount > 0) {
     logger.info(
-      t("app.api.system.launchpad.updateAll.cloneFailed", {
+      t("updateAll.cloneFailed", {
         count: failedCloneCount.toString(),
       }),
     );
     failedCloneRepos.forEach((repo) =>
-      logger.info(t("app.api.system.launchpad.updateAll.failedRepo", { repo })),
+      logger.info(t("updateAll.failedRepo", { repo })),
     );
   }
   if (failedUpdateCount > 0) {
     logger.info(
-      t("app.api.system.launchpad.updateAll.updateFailed", {
+      t("updateAll.updateFailed", {
         count: failedUpdateCount.toString(),
       }),
     );
     failedUpdateRepos.forEach((repo) =>
-      logger.info(t("app.api.system.launchpad.updateAll.failedRepo", { repo })),
+      logger.info(t("updateAll.failedRepo", { repo })),
     );
   }
 

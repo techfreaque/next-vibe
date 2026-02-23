@@ -10,8 +10,10 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { smsEnv } from "../env";
+import { smsScopedT } from "../i18n";
 import type { SendSmsParams, SmsProvider, SmsResult } from "../utils";
 import { SmsProviders } from "../utils";
 
@@ -40,27 +42,29 @@ export function getWhatsAppProvider(
     async sendSms(
       params: SendSmsParams,
       logger: EndpointLogger,
+      locale: CountryLanguage,
     ): Promise<ResponseType<SmsResult>> {
+      const { t } = smsScopedT(locale);
       const numId = phoneNumberId ?? smsEnv.WHATSAPP_PHONE_NUMBER_ID;
       const token = accessToken ?? smsEnv.WHATSAPP_ACCESS_TOKEN;
 
       if (!numId || !token) {
         return fail({
-          message: "app.api.sms.sms.error.missing_recipient",
+          message: t("sms.error.missing_recipient"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
 
       if (!params.to) {
         return fail({
-          message: "app.api.sms.sms.error.invalid_phone_format",
+          message: t("sms.error.invalid_phone_format"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
 
       if (!params.message?.trim()) {
         return fail({
-          message: "app.api.sms.sms.error.empty_message",
+          message: t("sms.error.empty_message"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
         });
       }
@@ -100,7 +104,7 @@ export function getWhatsAppProvider(
           }
 
           return fail({
-            message: "app.api.sms.sms.error.delivery_failed",
+            message: t("sms.error.delivery_failed"),
             errorType: ErrorResponseTypes.SMS_ERROR,
             messageParams: {
               error:
@@ -125,7 +129,7 @@ export function getWhatsAppProvider(
         };
       } catch (error) {
         return fail({
-          message: "app.api.sms.sms.error.delivery_failed",
+          message: t("sms.error.delivery_failed"),
           errorType: ErrorResponseTypes.SMS_ERROR,
           messageParams: {
             error:

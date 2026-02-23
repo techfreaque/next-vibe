@@ -5,7 +5,9 @@
 
 import type { ReadableStreamDefaultController } from "node:stream/web";
 
+import type { ModuleT } from "@/app/api/[locale]/credits/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolCall } from "../../../chat/db";
 import { MessageDbWriter } from "./message-db-writer";
@@ -60,6 +62,9 @@ export class StreamContext {
   lastDepth: number;
   lastSequenceId: string | null;
 
+  // Locale for translations
+  readonly locale: CountryLanguage;
+
   constructor(params: {
     sequenceId: string;
     initialParentId: string | null;
@@ -70,6 +75,8 @@ export class StreamContext {
     logger: EndpointLogger;
     controller: ReadableStreamDefaultController<Uint8Array>;
     encoder: TextEncoder;
+    creditsT: ModuleT;
+    locale: CountryLanguage;
   }) {
     this.sequenceId = params.sequenceId;
     this.currentParentId = params.initialParentId;
@@ -77,6 +84,7 @@ export class StreamContext {
     this.lastParentId = params.initialParentId;
     this.lastDepth = params.initialDepth;
     this.lastSequenceId = params.sequenceId;
+    this.locale = params.locale;
     this.initialAssistantMessageId = params.initialAssistantMessageId;
     this.dbWriter = new MessageDbWriter(
       params.isIncognito,
@@ -84,6 +92,8 @@ export class StreamContext {
       params.controller,
       params.encoder,
       params.isHeadless ?? false,
+      params.creditsT,
+      params.locale,
     );
   }
 

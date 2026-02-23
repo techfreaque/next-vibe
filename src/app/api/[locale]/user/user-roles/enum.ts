@@ -1,5 +1,7 @@
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * User Permission Roles - Actual roles assigned to users in the database
  * These represent what a user is allowed to do (permissions)
@@ -8,12 +10,12 @@ export const {
   enum: UserPermissionRole,
   options: UserPermissionRoleOptions,
   Value: UserPermissionRoleValue,
-} = createEnumOptions({
-  PUBLIC: "app.api.user.userRoles.enums.userRole.public",
-  CUSTOMER: "app.api.user.userRoles.enums.userRole.customer",
-  PARTNER_ADMIN: "app.api.user.userRoles.enums.userRole.partnerAdmin",
-  PARTNER_EMPLOYEE: "app.api.user.userRoles.enums.userRole.partnerEmployee",
-  ADMIN: "app.api.user.userRoles.enums.userRole.admin",
+} = createEnumOptions(scopedTranslation, {
+  PUBLIC: "enums.userRole.public",
+  CUSTOMER: "enums.userRole.customer",
+  PARTNER_ADMIN: "enums.userRole.partnerAdmin",
+  PARTNER_EMPLOYEE: "enums.userRole.partnerEmployee",
+  ADMIN: "enums.userRole.admin",
 });
 
 /**
@@ -37,15 +39,15 @@ export const {
   enum: PlatformMarker,
   options: PlatformMarkerOptions,
   Value: PlatformMarkerValue,
-} = createEnumOptions({
-  CLI_OFF: "app.api.user.userRoles.enums.userRole.cliOff",
-  CLI_AUTH_BYPASS: "app.api.user.userRoles.enums.userRole.cliAuthBypass",
-  AI_TOOL_OFF: "app.api.user.userRoles.enums.userRole.aiToolOff",
-  WEB_OFF: "app.api.user.userRoles.enums.userRole.webOff",
-  MCP_OFF: "app.api.user.userRoles.enums.userRole.mcpOff",
-  MCP_VISIBLE: "app.api.user.userRoles.enums.userRole.mcpVisible",
-  PRODUCTION_OFF: "app.api.user.userRoles.enums.userRole.productionOff",
-  REMOTE_SKILL: "app.api.user.userRoles.enums.userRole.remoteSkill",
+} = createEnumOptions(scopedTranslation, {
+  CLI_OFF: "enums.userRole.cliOff",
+  CLI_AUTH_BYPASS: "enums.userRole.cliAuthBypass",
+  AI_TOOL_OFF: "enums.userRole.aiToolOff",
+  WEB_OFF: "enums.userRole.webOff",
+  MCP_OFF: "enums.userRole.mcpOff",
+  MCP_VISIBLE: "enums.userRole.mcpVisible",
+  PRODUCTION_OFF: "enums.userRole.productionOff",
+  REMOTE_SKILL: "enums.userRole.remoteSkill",
 });
 
 /**

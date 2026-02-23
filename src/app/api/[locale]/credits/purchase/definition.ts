@@ -8,8 +8,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -24,6 +24,7 @@ import {
   PaymentProviderDB,
   PaymentProviderOptions,
 } from "../../payment/enum";
+import { scopedTranslation } from "./i18n";
 import { CreditsPurchaseContainer } from "./widget";
 
 /**
@@ -31,12 +32,13 @@ import { CreditsPurchaseContainer } from "./widget";
  * Creates Stripe checkout session for credit pack purchase
  */
 const { POST } = createEndpoint({
+  scopedTranslation,
   method: Methods.POST,
   path: ["credits", "purchase"],
-  title: "app.api.credits.purchase.post.title",
-  description: "app.api.credits.purchase.post.description",
-  category: "app.api.payment.category",
-  tags: ["app.api.agent.chat.tags.credits", "app.api.agent.chat.tags.balance"],
+  title: "post.title",
+  description: "post.description",
+  category: "post.title",
+  tags: ["post.title"],
   icon: "dollar-sign",
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
@@ -48,98 +50,95 @@ const { POST } = createEndpoint({
     } as const,
     children: {
       // === REQUEST FIELDS ===
-      quantity: requestField({
+      quantity: scopedRequestField(scopedTranslation, {
         schema: z.coerce.number().int().min(1).max(10),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.INT,
-        label: "app.api.credits.purchase.post.quantity.label",
-        description: "app.api.credits.purchase.post.quantity.description",
-        placeholder: "app.api.credits.purchase.post.quantity.placeholder",
+        label: "post.quantity.label",
+        description: "post.quantity.description",
+        placeholder: "post.quantity.placeholder",
       }),
 
-      provider: requestField({
+      provider: scopedRequestField(scopedTranslation, {
         schema: z.enum(PaymentProviderDB).default(PaymentProvider.STRIPE),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.credits.purchase.post.provider.label",
-        description: "app.api.credits.purchase.post.provider.description",
-        placeholder: "app.api.credits.purchase.post.provider.placeholder",
+        label: "post.provider.label",
+        description: "post.provider.description",
+        placeholder: "post.provider.placeholder",
         options: PaymentProviderOptions,
       }),
 
       // === RESPONSE FIELDS ===
-      checkoutUrl: responseField({
+      checkoutUrl: scopedResponseField(scopedTranslation, {
         schema: z.string().url(),
         type: WidgetType.TEXT,
-        content: "app.api.credits.purchase.post.checkoutUrl.content",
+        content: "post.checkoutUrl.content",
       }),
 
-      sessionId: responseField({
+      sessionId: scopedResponseField(scopedTranslation, {
         schema: z.string(),
         type: WidgetType.TEXT,
-        content: "app.api.credits.purchase.post.sessionId.content",
+        content: "post.sessionId.content",
       }),
 
-      totalAmount: responseField({
+      totalAmount: scopedResponseField(scopedTranslation, {
         schema: z.coerce.number().int(),
         type: WidgetType.TEXT,
-        content: "app.api.credits.purchase.post.totalAmount.content",
+        content: "post.totalAmount.content",
       }),
 
-      totalCredits: responseField({
+      totalCredits: scopedResponseField(scopedTranslation, {
         schema: z.coerce.number().int(),
         type: WidgetType.TEXT,
-        content: "app.api.credits.purchase.post.totalCredits.content",
+        content: "post.totalCredits.content",
       }),
     },
   }),
 
   // === SUCCESS HANDLING ===
   successTypes: {
-    title: "app.api.credits.purchase.post.success.title",
-    description: "app.api.credits.purchase.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
 
   // === ERROR HANDLING ===
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.credits.purchase.post.errors.validation.title",
-      description:
-        "app.api.credits.purchase.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.credits.purchase.post.errors.network.title",
-      description: "app.api.credits.purchase.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.credits.purchase.post.errors.unauthorized.title",
-      description:
-        "app.api.credits.purchase.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.credits.purchase.post.errors.forbidden.title",
-      description: "app.api.credits.purchase.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.credits.purchase.post.errors.notFound.title",
-      description: "app.api.credits.purchase.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.credits.purchase.post.errors.server.title",
-      description: "app.api.credits.purchase.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.credits.purchase.post.errors.unknown.title",
-      description: "app.api.credits.purchase.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.credits.purchase.post.errors.unsavedChanges.title",
-      description:
-        "app.api.credits.purchase.post.errors.unsavedChanges.description",
+      title: "post.errors.unsavedChanges.title",
+      description: "post.errors.unsavedChanges.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.credits.purchase.post.errors.conflict.title",
-      description: "app.api.credits.purchase.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
   },
 

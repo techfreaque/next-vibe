@@ -7,8 +7,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
-  requestField,
-  responseField,
+  scopedRequestField,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -18,135 +18,135 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { scopedTranslation } from "../../../i18n";
+import { scopedTranslation } from "./i18n";
 import { LinuxUserCreateContainer } from "./widget";
 
 export const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["ssh", "linux", "users", "create"],
-  title: "linux.users.create.post.title",
-  description: "linux.users.create.post.description",
+  title: "post.title",
+  description: "post.description",
   icon: "user-plus",
   category: "category",
   allowedRoles: [UserRole.ADMIN],
-  tags: ["type"],
+  tags: ["category" as const],
 
   fields: customWidgetObject({
     render: LinuxUserCreateContainer,
     usage: { request: "data", response: true } as const,
     children: {
-      username: requestField({
+      username: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "linux.users.create.post.fields.username.label",
-        description: "linux.users.create.post.fields.username.description",
-        placeholder: "linux.users.create.post.fields.username.placeholder",
+        label: "post.fields.username.label",
+        description: "post.fields.username.description",
+        placeholder: "post.fields.username.placeholder",
         schema: z
           .string()
           .min(1)
           .max(32)
           .regex(/^[a-z][a-z0-9-]*$/),
       }),
-      groups: requestField({
+      groups: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "linux.users.create.post.fields.groups.label",
-        description: "linux.users.create.post.fields.groups.description",
-        placeholder: "linux.users.create.post.fields.groups.placeholder",
+        label: "post.fields.groups.label",
+        description: "post.fields.groups.description",
+        placeholder: "post.fields.groups.placeholder",
         schema: z.array(z.string()).optional(),
       }),
-      loginShell: requestField({
+      loginShell: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "linux.users.create.post.fields.shell.label",
-        description: "linux.users.create.post.fields.shell.description",
-        placeholder: "linux.users.create.post.fields.shell.placeholder",
+        label: "post.fields.shell.label",
+        description: "post.fields.shell.description",
+        placeholder: "post.fields.shell.placeholder",
         schema: z.string().optional(),
       }),
-      homeDir: requestField({
+      homeDir: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "linux.users.create.post.fields.homeDir.label",
-        description: "linux.users.create.post.fields.homeDir.description",
-        placeholder: "linux.users.create.post.fields.homeDir.placeholder",
+        label: "post.fields.homeDir.label",
+        description: "post.fields.homeDir.description",
+        placeholder: "post.fields.homeDir.placeholder",
         schema: z.string().optional(),
       }),
-      sudoAccess: requestField({
+      sudoAccess: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "linux.users.create.post.fields.sudoAccess.label",
-        description: "linux.users.create.post.fields.sudoAccess.description",
+        label: "post.fields.sudoAccess.label",
+        description: "post.fields.sudoAccess.description",
         schema: z.boolean().optional(),
       }),
-      ok: responseField({
+      ok: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "linux.users.create.post.response.ok.title",
+        content: "post.response.ok.title",
         schema: z.boolean(),
       }),
-      uid: responseField({
+      uid: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "linux.users.create.post.response.uid.title",
+        content: "post.response.uid.title",
         schema: z.number(),
       }),
-      gid: responseField({
+      gid: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "linux.users.create.post.response.gid.title",
+        content: "post.response.gid.title",
         schema: z.number(),
       }),
-      homeDirectory: responseField({
+      homeDirectory: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "linux.users.create.post.response.homeDirectory.title",
+        content: "post.response.homeDirectory.title",
         schema: z.string(),
       }),
-      shellPath: responseField({
+      shellPath: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "linux.users.create.post.response.shell.title",
+        content: "post.response.shell.title",
         schema: z.string(),
       }),
     },
   }),
 
   successTypes: {
-    title: "linux.users.create.post.success.title",
-    description: "linux.users.create.post.success.description",
+    title: "post.success.title",
+    description: "post.success.description",
   },
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "linux.users.create.post.errors.validation.title",
-      description: "linux.users.create.post.errors.validation.description",
+      title: "post.errors.validation.title",
+      description: "post.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "linux.users.create.post.errors.unauthorized.title",
-      description: "linux.users.create.post.errors.unauthorized.description",
+      title: "post.errors.unauthorized.title",
+      description: "post.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "linux.users.create.post.errors.forbidden.title",
-      description: "linux.users.create.post.errors.forbidden.description",
+      title: "post.errors.forbidden.title",
+      description: "post.errors.forbidden.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "linux.users.create.post.errors.server.title",
-      description: "linux.users.create.post.errors.server.description",
+      title: "post.errors.server.title",
+      description: "post.errors.server.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "linux.users.create.post.errors.notFound.title",
-      description: "linux.users.create.post.errors.notFound.description",
+      title: "post.errors.notFound.title",
+      description: "post.errors.notFound.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "linux.users.create.post.errors.unknown.title",
-      description: "linux.users.create.post.errors.unknown.description",
+      title: "post.errors.unknown.title",
+      description: "post.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "linux.users.create.post.errors.unsavedChanges.title",
-      description: "linux.users.create.post.errors.unsavedChanges.description",
+      title: "post.errors.unsavedChanges.title",
+      description: "post.errors.unsavedChanges.title",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "linux.users.create.post.errors.conflict.title",
-      description: "linux.users.create.post.errors.conflict.description",
+      title: "post.errors.conflict.title",
+      description: "post.errors.conflict.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "linux.users.create.post.errors.network.title",
-      description: "linux.users.create.post.errors.network.description",
+      title: "post.errors.network.title",
+      description: "post.errors.network.description",
     },
   },
 

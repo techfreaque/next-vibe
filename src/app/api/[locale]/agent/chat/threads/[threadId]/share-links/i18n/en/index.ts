@@ -1,4 +1,8 @@
 export const translations = {
+  category: "Chat",
+  tags: {
+    sharing: "Sharing",
+  },
   // Top-level keys used across methods
   empty: "", // For hidden/internal fields
   linkId: {

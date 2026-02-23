@@ -208,4 +208,17 @@ export const translations: typeof enTranslations = {
       description: "Twój e-mail został wysłany pomyślnie",
     },
   },
+  emailServicePriority: {
+    low: "Niski",
+    normal: "Normalny",
+    high: "Wysoki",
+    urgent: "Pilny",
+  },
+  emailServiceStatus: {
+    idle: "Bezczynny",
+    processing: "Przetwarzanie",
+    completed: "Ukończono",
+    failed: "Niepowodzenie",
+    retrying: "Ponowna próba",
+  },
 };

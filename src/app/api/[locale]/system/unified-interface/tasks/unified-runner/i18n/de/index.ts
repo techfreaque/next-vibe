@@ -1,6 +1,8 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  category: "Aufgabenverwaltung",
+
   description: "Führt Cron-Tasks aus und verwaltet Side-Tasks",
   common: {
     taskName: "Aufgabenname",

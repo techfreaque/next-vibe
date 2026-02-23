@@ -9,11 +9,11 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   backButton,
   customWidgetObject,
-  objectField,
-  requestField,
-  responseArrayField,
-  responseArrayOptionalField,
-  responseField,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedResponseArrayFieldNew,
+  scopedResponseArrayOptionalFieldNew,
+  scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -36,24 +36,23 @@ import {
   LeadStatusOptions,
 } from "../enum";
 import { leadsBatchFilterFields } from "../shared-filter-fields";
+import { scopedTranslation } from "./i18n";
 import { LeadsBatchDeleteContainer, LeadsBatchUpdateContainer } from "./widget";
 
 /**
  * Batch Update Endpoint (PATCH)
  */
 const { PATCH } = createEndpoint({
+  scopedTranslation,
   method: Methods.PATCH,
   path: ["leads", "batch"],
   allowedRoles: [UserRole.ADMIN],
   icon: "users",
 
-  title: "app.api.leads.batch.patch.title" as const,
-  description: "app.api.leads.batch.patch.description" as const,
-  category: "app.api.leads.category" as const,
-  tags: [
-    "app.api.leads.tags.leads" as const,
-    "app.api.leads.tags.batch" as const,
-  ],
+  title: "patch.title",
+  description: "patch.description",
+  category: "category",
+  tags: ["tags.leads", "tags.batch"],
 
   fields: customWidgetObject({
     render: LeadsBatchUpdateContainer,
@@ -62,242 +61,209 @@ const { PATCH } = createEndpoint({
       backButton: backButton({ usage: { response: true } }),
       // Filter criteria — hidden fields prefilled from list widget
       ...leadsBatchFilterFields,
-      scope: requestField({
+      scope: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "app.api.leads.batch.patch.scope.label" as const,
-        description: "app.api.leads.batch.patch.scope.description" as const,
+        label: "patch.scope.label",
+        description: "patch.scope.description",
         options: BatchOperationScopeOptions,
         schema: z
           .enum(BatchOperationScope)
           .default(BatchOperationScope.ALL_PAGES),
       }),
-      dryRun: requestField({
+      dryRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.batch.patch.dryRun.label" as const,
-        description: "app.api.leads.batch.patch.dryRun.description" as const,
+        label: "patch.dryRun.label",
+        description: "patch.dryRun.description",
         schema: z.boolean().optional().default(false),
       }),
-      maxRecords: requestField({
+      maxRecords: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.leads.batch.patch.maxRecords.label" as const,
-        description:
-          "app.api.leads.batch.patch.maxRecords.description" as const,
+        label: "patch.maxRecords.label",
+        description: "patch.maxRecords.description",
         schema: z.coerce.number().min(1).max(10000).optional().default(1000),
       }),
       // Update data
-      updates: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.leads.batch.patch.updates.title" as const,
-          description: "app.api.leads.batch.patch.updates.description" as const,
-          layoutType: LayoutType.GRID_2_COLUMNS,
-        },
-        { request: "data" },
-        {
-          status: requestField({
+      updates: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "patch.updates.title",
+        description: "patch.updates.description",
+        layoutType: LayoutType.GRID_2_COLUMNS,
+        usage: { request: "data" },
+        children: {
+          status: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label: "app.api.leads.batch.patch.updates.status.label" as const,
-            description:
-              "app.api.leads.batch.patch.updates.status.description" as const,
+            label: "patch.updates.status.label",
+            description: "patch.updates.status.description",
             options: LeadStatusOptions,
             schema: z.enum(LeadStatus).optional(),
           }),
-          currentCampaignStage: requestField({
+          currentCampaignStage: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label:
-              "app.api.leads.batch.patch.updates.currentCampaignStage.label" as const,
-            description:
-              "app.api.leads.batch.patch.updates.currentCampaignStage.description" as const,
+            label: "patch.updates.currentCampaignStage.label",
+            description: "patch.updates.currentCampaignStage.description",
             options: EmailCampaignStageOptions,
             schema: z.enum(EmailCampaignStage).optional(),
           }),
-          source: requestField({
+          source: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.SELECT,
-            label: "app.api.leads.batch.patch.updates.source.label" as const,
-            description:
-              "app.api.leads.batch.patch.updates.source.description" as const,
+            label: "patch.updates.source.label",
+            description: "patch.updates.source.description",
             options: LeadSourceOptions,
             schema: z.enum(LeadSource).optional(),
           }),
-          notes: requestField({
+          notes: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,
             fieldType: FieldDataType.TEXT,
-            label: "app.api.leads.batch.patch.updates.notes.label" as const,
-            description:
-              "app.api.leads.batch.patch.updates.notes.description" as const,
+            label: "patch.updates.notes.label",
+            description: "patch.updates.notes.description",
             schema: z.string().optional(),
           }),
         },
-      ),
+      }),
       // Response fields
-      response: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.leads.batch.patch.response.title" as const,
-          description:
-            "app.api.leads.batch.patch.response.description" as const,
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
-          success: responseField({
+      response: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "patch.response.title",
+        description: "patch.response.description",
+        layoutType: LayoutType.STACKED,
+        usage: { response: true },
+        children: {
+          success: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.leads.batch.patch.response.success" as const,
+            content: "patch.response.success",
             schema: z.boolean(),
           }),
-          totalMatched: responseField({
+          totalMatched: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.leads.batch.patch.response.totalMatched" as const,
+            content: "patch.response.totalMatched",
             schema: z.coerce.number(),
           }),
-          totalProcessed: responseField({
+          totalProcessed: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.leads.batch.patch.response.totalProcessed" as const,
+            content: "patch.response.totalProcessed",
             schema: z.coerce.number(),
           }),
-          totalUpdated: responseField({
+          totalUpdated: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.leads.batch.patch.response.totalUpdated" as const,
+            content: "patch.response.totalUpdated",
             schema: z.coerce.number(),
           }),
-          preview: responseArrayOptionalField(
-            {
+          preview: scopedResponseArrayOptionalFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "patch.response.preview",
+            description: "patch.response.preview",
+            child: scopedObjectFieldNew(scopedTranslation, {
               type: WidgetType.CONTAINER,
-              title: "app.api.leads.batch.patch.response.preview" as const,
-              description:
-                "app.api.leads.batch.patch.response.preview" as const,
-            },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                title: "app.api.leads.batch.patch.response.preview" as const,
-                layoutType: LayoutType.GRID,
-                columns: 12,
-              },
-              { response: true },
-              {
-                id: responseField({
+              title: "patch.response.preview",
+              layoutType: LayoutType.GRID,
+              columns: 12,
+              usage: { response: true },
+              children: {
+                id: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.batch.patch.response.preview" as const,
+                  content: "patch.response.preview",
                   schema: z.string(),
                 }),
-                email: responseField({
+                email: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.batch.patch.response.preview" as const,
+                  content: "patch.response.preview",
                   schema: z.string().nullable(),
                 }),
-                businessName: responseField({
+                businessName: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.batch.patch.response.preview" as const,
+                  content: "patch.response.preview",
                   schema: z.string(),
                 }),
-                currentStatus: responseField({
+                currentStatus: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  text: "app.api.leads.batch.patch.response.preview" as const,
+                  text: "patch.response.preview",
                   schema: z.enum(LeadStatus),
                 }),
-                currentCampaignStage: responseField({
+                currentCampaignStage: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  text: "app.api.leads.batch.patch.response.preview" as const,
+                  text: "patch.response.preview",
                   schema: z.enum(EmailCampaignStage).nullable(),
                 }),
               },
-            ),
-          ),
-          errors: responseArrayField(
-            {
+            }),
+          }),
+          errors: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "patch.response.errors",
+            description: "patch.response.errors",
+            child: scopedObjectFieldNew(scopedTranslation, {
               type: WidgetType.CONTAINER,
-              title: "app.api.leads.batch.patch.response.errors" as const,
-              description: "app.api.leads.batch.patch.response.errors" as const,
-            },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                title: "app.api.leads.batch.patch.response.errors" as const,
-                layoutType: LayoutType.GRID,
-                columns: 12,
-              },
-              { response: true },
-              {
-                leadId: responseField({
+              title: "patch.response.errors",
+              layoutType: LayoutType.GRID,
+              columns: 12,
+              usage: { response: true },
+              children: {
+                leadId: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.batch.patch.response.errors" as const,
+                  content: "patch.response.errors",
                   schema: z.string(),
                 }),
-                error: responseField({
+                error: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content: "app.api.leads.batch.patch.response.errors" as const,
+                  content: "patch.response.errors",
                   schema: z.string(),
                 }),
               },
-            ),
-          ),
+            }),
+          }),
         },
-      ),
+      }),
     },
   }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.leads.batch.patch.errors.validation.title" as const,
-      description:
-        "app.api.leads.batch.patch.errors.validation.description" as const,
+      title: "patch.errors.validation.title",
+      description: "patch.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.leads.batch.patch.errors.unauthorized.title" as const,
-      description:
-        "app.api.leads.batch.patch.errors.unauthorized.description" as const,
+      title: "patch.errors.unauthorized.title",
+      description: "patch.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.leads.batch.patch.errors.forbidden.title" as const,
-      description:
-        "app.api.leads.batch.patch.errors.forbidden.description" as const,
+      title: "patch.errors.forbidden.title",
+      description: "patch.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.leads.batch.patch.errors.notFound.title" as const,
-      description:
-        "app.api.leads.batch.patch.errors.notFound.description" as const,
+      title: "patch.errors.notFound.title",
+      description: "patch.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.leads.batch.patch.errors.conflict.title" as const,
-      description:
-        "app.api.leads.batch.patch.errors.conflict.description" as const,
+      title: "patch.errors.conflict.title",
+      description: "patch.errors.conflict.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.leads.batch.patch.errors.server.title" as const,
-      description:
-        "app.api.leads.batch.patch.errors.server.description" as const,
+      title: "patch.errors.server.title",
+      description: "patch.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.leads.batch.patch.errors.network.title" as const,
-      description:
-        "app.api.leads.batch.patch.errors.network.description" as const,
+      title: "patch.errors.network.title",
+      description: "patch.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.leads.batch.patch.errors.unknown.title" as const,
-      description:
-        "app.api.leads.batch.patch.errors.unknown.description" as const,
+      title: "patch.errors.unknown.title",
+      description: "patch.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.leads.batch.patch.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.leads.batch.patch.errors.unsavedChanges.description" as const,
+      title: "patch.errors.unsavedChanges.title",
+      description: "patch.errors.unsavedChanges.description",
     },
   },
 
   successTypes: {
-    title: "app.api.leads.batch.patch.success.title" as const,
-    description: "app.api.leads.batch.patch.success.description" as const,
+    title: "patch.success.title",
+    description: "patch.success.description",
   },
   examples: {
     requests: {
@@ -336,18 +302,16 @@ const { PATCH } = createEndpoint({
  * Batch Delete Endpoint (DELETE)
  */
 const { DELETE } = createEndpoint({
+  scopedTranslation,
   method: Methods.DELETE,
   path: ["leads", "batch"],
   allowedRoles: [UserRole.ADMIN],
 
-  title: "app.api.leads.batch.delete.title" as const,
-  description: "app.api.leads.batch.delete.description" as const,
-  icon: "user-x" as const,
-  category: "app.api.leads.category" as const,
-  tags: [
-    "app.api.leads.tags.leads" as const,
-    "app.api.leads.tags.batch" as const,
-  ],
+  title: "delete.title",
+  description: "delete.description",
+  icon: "user-x",
+  category: "category",
+  tags: ["tags.leads", "tags.batch"],
 
   fields: customWidgetObject({
     render: LeadsBatchDeleteContainer,
@@ -356,199 +320,167 @@ const { DELETE } = createEndpoint({
       backButton: backButton({ usage: { response: true } }),
       // Filter criteria — hidden fields prefilled from list widget
       ...leadsBatchFilterFields,
-      confirmDelete: requestField({
+      confirmDelete: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.batch.delete.confirmDelete.label" as const,
-        description:
-          "app.api.leads.batch.delete.confirmDelete.description" as const,
+        label: "delete.confirmDelete.label",
+        description: "delete.confirmDelete.description",
         schema: z.boolean().refine((val) => val === true, {
           message: "Delete confirmation required",
         }),
       }),
-      dryRun: requestField({
+      dryRun: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "app.api.leads.batch.delete.dryRun.label" as const,
-        description: "app.api.leads.batch.delete.dryRun.description" as const,
+        label: "delete.dryRun.label",
+        description: "delete.dryRun.description",
         schema: z.boolean().optional().default(false),
       }),
-      maxRecords: requestField({
+      maxRecords: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "app.api.leads.batch.delete.maxRecords.label" as const,
-        description:
-          "app.api.leads.batch.delete.maxRecords.description" as const,
+        label: "delete.maxRecords.label",
+        description: "delete.maxRecords.description",
         schema: z.coerce.number().min(1).max(10000).optional().default(1000),
       }),
       // Response fields
-      response: objectField(
-        {
-          type: WidgetType.CONTAINER,
-          title: "app.api.leads.batch.delete.response.title" as const,
-          description:
-            "app.api.leads.batch.delete.response.description" as const,
-          layoutType: LayoutType.STACKED,
-        },
-        { response: true },
-        {
-          success: responseField({
+      response: scopedObjectFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "delete.response.title",
+        description: "delete.response.description",
+        layoutType: LayoutType.STACKED,
+        usage: { response: true },
+        children: {
+          success: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content: "app.api.leads.batch.delete.response.success" as const,
+            content: "delete.response.success",
             schema: z.boolean(),
           }),
-          totalMatched: responseField({
+          totalMatched: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.leads.batch.delete.response.totalMatched" as const,
+            content: "delete.response.totalMatched",
             schema: z.coerce.number(),
           }),
-          totalProcessed: responseField({
+          totalProcessed: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.leads.batch.delete.response.totalProcessed" as const,
+            content: "delete.response.totalProcessed",
             schema: z.coerce.number(),
           }),
-          totalDeleted: responseField({
+          totalDeleted: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
-            content:
-              "app.api.leads.batch.delete.response.totalDeleted" as const,
+            content: "delete.response.totalDeleted",
             schema: z.coerce.number(),
           }),
-          preview: responseArrayOptionalField(
-            {
+          preview: scopedResponseArrayOptionalFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "delete.response.preview",
+            description: "delete.response.preview",
+            child: scopedObjectFieldNew(scopedTranslation, {
               type: WidgetType.CONTAINER,
-              title: "app.api.leads.batch.delete.response.preview" as const,
-              description:
-                "app.api.leads.batch.delete.response.preview" as const,
-            },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                title: "app.api.leads.batch.delete.response.preview" as const,
-                layoutType: LayoutType.GRID,
-                columns: 12,
-              },
-              { response: true },
-              {
-                id: responseField({
+              title: "delete.response.preview",
+              layoutType: LayoutType.GRID,
+              columns: 12,
+              usage: { response: true },
+              children: {
+                id: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.batch.delete.response.preview" as const,
+                  content: "delete.response.preview",
                   schema: z.string(),
                 }),
-                email: responseField({
+                email: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.batch.delete.response.preview" as const,
+                  content: "delete.response.preview",
                   schema: z.string().nullable(),
                 }),
-                businessName: responseField({
+                businessName: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.batch.delete.response.preview" as const,
+                  content: "delete.response.preview",
                   schema: z.string(),
                 }),
-                currentStatus: responseField({
+                currentStatus: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  text: "app.api.leads.batch.delete.response.preview" as const,
+                  text: "delete.response.preview",
                   schema: z.enum(LeadStatus),
                 }),
-                currentCampaignStage: responseField({
+                currentCampaignStage: scopedResponseField(scopedTranslation, {
                   type: WidgetType.BADGE,
-                  text: "app.api.leads.batch.delete.response.preview" as const,
+                  text: "delete.response.preview",
                   schema: z.enum(EmailCampaignStage).nullable(),
                 }),
               },
-            ),
-          ),
-          errors: responseArrayField(
-            {
+            }),
+          }),
+          errors: scopedResponseArrayFieldNew(scopedTranslation, {
+            type: WidgetType.CONTAINER,
+            title: "delete.response.errors",
+            description: "delete.response.errors",
+            child: scopedObjectFieldNew(scopedTranslation, {
               type: WidgetType.CONTAINER,
-              title: "app.api.leads.batch.delete.response.errors" as const,
-              description:
-                "app.api.leads.batch.delete.response.errors" as const,
-            },
-            objectField(
-              {
-                type: WidgetType.CONTAINER,
-                title: "app.api.leads.batch.delete.response.errors" as const,
-                layoutType: LayoutType.GRID,
-                columns: 12,
-              },
-              { response: true },
-              {
-                leadId: responseField({
+              title: "delete.response.errors",
+              layoutType: LayoutType.GRID,
+              columns: 12,
+              usage: { response: true },
+              children: {
+                leadId: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.batch.delete.response.errors" as const,
+                  content: "delete.response.errors",
                   schema: z.string(),
                 }),
-                error: responseField({
+                error: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
-                  content:
-                    "app.api.leads.batch.delete.response.errors" as const,
+                  content: "delete.response.errors",
                   schema: z.string(),
                 }),
               },
-            ),
-          ),
+            }),
+          }),
         },
-      ),
+      }),
     },
   }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "app.api.leads.batch.delete.errors.validation.title" as const,
-      description:
-        "app.api.leads.batch.delete.errors.validation.description" as const,
+      title: "delete.errors.validation.title",
+      description: "delete.errors.validation.description",
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "app.api.leads.batch.delete.errors.unauthorized.title" as const,
-      description:
-        "app.api.leads.batch.delete.errors.unauthorized.description" as const,
+      title: "delete.errors.unauthorized.title",
+      description: "delete.errors.unauthorized.description",
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "app.api.leads.batch.delete.errors.forbidden.title" as const,
-      description:
-        "app.api.leads.batch.delete.errors.forbidden.description" as const,
+      title: "delete.errors.forbidden.title",
+      description: "delete.errors.forbidden.description",
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "app.api.leads.batch.delete.errors.notFound.title" as const,
-      description:
-        "app.api.leads.batch.delete.errors.notFound.description" as const,
+      title: "delete.errors.notFound.title",
+      description: "delete.errors.notFound.description",
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "app.api.leads.batch.delete.errors.conflict.title" as const,
-      description:
-        "app.api.leads.batch.delete.errors.conflict.description" as const,
+      title: "delete.errors.conflict.title",
+      description: "delete.errors.conflict.description",
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "app.api.leads.batch.delete.errors.server.title" as const,
-      description:
-        "app.api.leads.batch.delete.errors.server.description" as const,
+      title: "delete.errors.server.title",
+      description: "delete.errors.server.description",
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "app.api.leads.batch.delete.errors.network.title" as const,
-      description:
-        "app.api.leads.batch.delete.errors.network.description" as const,
+      title: "delete.errors.network.title",
+      description: "delete.errors.network.description",
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "app.api.leads.batch.delete.errors.unknown.title" as const,
-      description:
-        "app.api.leads.batch.delete.errors.unknown.description" as const,
+      title: "delete.errors.unknown.title",
+      description: "delete.errors.unknown.description",
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "app.api.leads.batch.delete.errors.unsavedChanges.title" as const,
-      description:
-        "app.api.leads.batch.delete.errors.unsavedChanges.description" as const,
+      title: "delete.errors.unsavedChanges.title",
+      description: "delete.errors.unsavedChanges.description",
     },
   },
 
   successTypes: {
-    title: "app.api.leads.batch.delete.success.title" as const,
-    description: "app.api.leads.batch.delete.success.description" as const,
+    title: "delete.success.title",
+    description: "delete.success.description",
   },
   examples: {
     requests: {

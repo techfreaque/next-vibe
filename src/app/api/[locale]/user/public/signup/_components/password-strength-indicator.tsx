@@ -4,11 +4,11 @@ import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 
-import { simpleT } from "@/i18n/core/shared";
 import {
   useWidgetForm,
   useWidgetLocale,
 } from "../../../../system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { scopedTranslation } from "./i18n";
 import { calculatePasswordStrength } from "./calculate-password-strenght";
 
 /**
@@ -16,7 +16,7 @@ import { calculatePasswordStrength } from "./calculate-password-strenght";
  */
 export function PasswordStrengthIndicator(): React.JSX.Element | null {
   const locale = useWidgetLocale();
-  const { t: globalT } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const form = useWidgetForm();
   // Watch password value for strength indicator
   const password = form?.watch("password") || "";
@@ -48,16 +48,21 @@ export function PasswordStrengthIndicator(): React.JSX.Element | null {
           ? "text-yellow-500"
           : "text-green-500";
 
-  const labelText = globalT(
-    `app.user.components.auth.common.passwordStrength.${level}`,
-  );
+  const levelKey =
+    level === "weak"
+      ? "passwordStrength.weak"
+      : level === "fair"
+        ? "passwordStrength.fair"
+        : level === "good"
+          ? "passwordStrength.good"
+          : "passwordStrength.strong";
+
+  const labelText = t(levelKey);
 
   return (
     <Div className="flex flex-col gap-2">
       <Div className="flex justify-between items-center text-sm">
-        <Span className="font-medium">
-          {globalT("app.user.components.auth.common.passwordStrength.label")}
-        </Span>
+        <Span className="font-medium">{t("passwordStrength.label")}</Span>
         <Span className={cn("font-semibold", textColorClass)}>{labelText}</Span>
       </Div>
       <Div className="h-2 w-full bg-muted rounded-full overflow-hidden">
@@ -76,71 +81,41 @@ export function PasswordStrengthIndicator(): React.JSX.Element | null {
           {missing.minLength && (
             <Div className="flex items-center gap-2">
               <Span className="text-red-500">
-                {globalT(
-                  "app.user.components.auth.passwordStrength.requirement.minLength.icon",
-                )}
+                {t("passwordStrength.requirement.minLength.icon")}
               </Span>
-              <Span>
-                {globalT(
-                  "app.user.components.auth.passwordStrength.requirement.minLength.text",
-                )}
-              </Span>
+              <Span>{t("passwordStrength.requirement.minLength.text")}</Span>
             </Div>
           )}
           {missing.uppercase && (
             <Div className="flex items-center gap-2">
               <Span className="text-red-500">
-                {globalT(
-                  "app.user.components.auth.passwordStrength.requirement.uppercase.icon",
-                )}
+                {t("passwordStrength.requirement.uppercase.icon")}
               </Span>
-              <Span>
-                {globalT(
-                  "app.user.components.auth.passwordStrength.requirement.uppercase.text",
-                )}
-              </Span>
+              <Span>{t("passwordStrength.requirement.uppercase.text")}</Span>
             </Div>
           )}
           {missing.lowercase && (
             <Div className="flex items-center gap-2">
               <Span className="text-red-500">
-                {globalT(
-                  "app.user.components.auth.passwordStrength.requirement.lowercase.icon",
-                )}
+                {t("passwordStrength.requirement.lowercase.icon")}
               </Span>
-              <Span>
-                {globalT(
-                  "app.user.components.auth.passwordStrength.requirement.lowercase.text",
-                )}
-              </Span>
+              <Span>{t("passwordStrength.requirement.lowercase.text")}</Span>
             </Div>
           )}
           {missing.number && (
             <Div className="flex items-center gap-2">
               <Span className="text-red-500">
-                {globalT(
-                  "app.user.components.auth.passwordStrength.requirement.number.icon",
-                )}
+                {t("passwordStrength.requirement.number.icon")}
               </Span>
-              <Span>
-                {globalT(
-                  "app.user.components.auth.passwordStrength.requirement.number.text",
-                )}
-              </Span>
+              <Span>{t("passwordStrength.requirement.number.text")}</Span>
             </Div>
           )}
           {missing.special && (
             <Div className="flex items-center gap-2">
               <Span className="text-yellow-500">
-                {globalT(
-                  "app.user.components.auth.passwordStrength.requirement.special.icon",
-                )}
+                {t("passwordStrength.requirement.special.icon")}
               </Span>
-              <Span>
-                {globalT(
-                  "app.user.components.auth.passwordStrength.requirement.special.text",
-                )}
-              </Span>
+              <Span>{t("passwordStrength.requirement.special.text")}</Span>
             </Div>
           )}
         </Div>

@@ -20,22 +20,25 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { users } from "@/app/api/[locale]/user/db";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { paymentTransactions } from "../../db";
 import { InvoiceStatus } from "../../enum";
+import { scopedTranslation as paymentScopedTranslation } from "../../i18n";
 import type {
   PaymentInvoiceRequestOutput,
   PaymentInvoiceResponseOutput,
 } from "../../invoice/definition";
+import { scopedTranslation as invoiceScopedTranslation } from "../../invoice/i18n";
 import type {
   PaymentPortalRequestOutput,
   PaymentPortalResponseOutput,
 } from "../../portal/definition";
+import { scopedTranslation as portalScopedTranslation } from "../../portal/i18n";
 import type {
   PaymentRefundRequestOutput,
   PaymentRefundResponseOutput,
 } from "../../refund/definition";
+import { scopedTranslation as refundScopedTranslation } from "../../refund/i18n";
 import { stripe } from "./repository";
 
 export interface StripeAdminTools {
@@ -125,7 +128,8 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<PaymentInvoiceResponseOutput>> {
-    const { t } = simpleT(locale);
+    const { t: tInvoice } = invoiceScopedTranslation.scopedT(locale);
+    const { t: tPayment } = paymentScopedTranslation.scopedT(locale);
 
     try {
       logger.debug("Creating invoice", {
@@ -141,10 +145,10 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
       if (!stripeCustomerId) {
         logger.error("payment.invoice.error.customerNotFound", { userId });
         return fail({
-          message: "app.api.payment.invoice.post.errors.notFound.title",
+          message: tInvoice("post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: {
-            error: t("app.api.payment.errors.customerNotFound"),
+            error: tPayment("errors.customerNotFound"),
           },
         });
       }
@@ -165,8 +169,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         invoice: invoice.id,
         amount: Math.round(data.amount * 100),
         currency: data.currency.toLowerCase(),
-        description:
-          data.description || t("app.api.payment.invoice.defaultItem"),
+        description: data.description || tInvoice("defaultItem"),
       });
 
       const finalizedInvoice = await stripe.invoices.finalizeInvoice(
@@ -183,7 +186,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
 
       return success({
         success: true,
-        message: t("app.api.payment.invoice.success.created"),
+        message: tInvoice("success.created"),
         invoice: {
           id: finalizedInvoice.id,
           userId,
@@ -221,7 +224,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
       });
 
       return fail({
-        message: "app.api.payment.invoice.post.errors.server.title",
+        message: tInvoice("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });
@@ -234,7 +237,8 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<PaymentPortalResponseOutput>> {
-    const { t } = simpleT(locale);
+    const { t: tPortal } = portalScopedTranslation.scopedT(locale);
+    const { t: tPayment } = paymentScopedTranslation.scopedT(locale);
 
     try {
       logger.debug("Creating customer portal session", { userId });
@@ -246,10 +250,10 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
       if (!stripeCustomerId) {
         logger.error("payment.portal.error.customerNotFound", { userId });
         return fail({
-          message: "app.api.payment.portal.post.errors.notFound.title",
+          message: tPortal("post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: {
-            error: t("app.api.payment.errors.customerNotFound"),
+            error: tPayment("errors.customerNotFound"),
           },
         });
       }
@@ -266,7 +270,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
 
       return success({
         success: true,
-        message: t("app.api.payment.portal.success.created"),
+        message: tPortal("success.created"),
         customerPortalUrl: session.url,
       });
     } catch (error) {
@@ -284,7 +288,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
         });
 
         return fail({
-          message: "app.api.payment.errors.server.title",
+          message: tPayment("errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
             error:
@@ -302,7 +306,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
       });
 
       return fail({
-        message: "app.api.payment.portal.post.errors.server.title",
+        message: tPortal("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: errorMessage },
       });
@@ -315,7 +319,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
     locale: CountryLanguage,
     logger: EndpointLogger,
   ): Promise<ResponseType<PaymentRefundResponseOutput>> {
-    const { t } = simpleT(locale);
+    const { t: tRefund } = refundScopedTranslation.scopedT(locale);
 
     try {
       logger.debug("Creating refund", {
@@ -341,7 +345,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
           userId,
         });
         return fail({
-          message: "app.api.payment.refund.post.errors.notFound.title",
+          message: tRefund("post.errors.notFound.title"),
           errorType: ErrorResponseTypes.NOT_FOUND,
           messageParams: { transactionId: data.transactionId },
         });
@@ -354,10 +358,10 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
           transactionId: data.transactionId,
         });
         return fail({
-          message: "app.api.payment.refund.post.errors.server.title",
+          message: tRefund("post.errors.server.title"),
           errorType: ErrorResponseTypes.BAD_REQUEST,
           messageParams: {
-            error: t("app.api.payment.refund.post.errors.server.description"),
+            error: tRefund("post.errors.server.description"),
           },
         });
       }
@@ -384,7 +388,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
 
       return success({
         success: true,
-        message: t("app.api.payment.refund.success.created"),
+        message: tRefund("success.created"),
         refund: {
           id: refund.id,
           userId,
@@ -393,9 +397,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
           amount: (refund.amount || 0) / 100,
           currency: refund.currency.toUpperCase(),
           status: refund.status || "pending",
-          reason:
-            data.reason ||
-            t("app.api.payment.refund.reason.requestedByCustomer"),
+          reason: data.reason || tRefund("reason.requestedByCustomer"),
           createdAt: new Date(refund.created * 1000).toISOString(),
           updatedAt: new Date().toISOString(),
         },
@@ -409,7 +411,7 @@ export class StripeAdminToolsImpl implements StripeAdminTools {
       });
 
       return fail({
-        message: "app.api.payment.refund.post.errors.server.title",
+        message: tRefund("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         messageParams: { error: parsedError.message },
       });

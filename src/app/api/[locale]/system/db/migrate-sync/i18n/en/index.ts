@@ -1,4 +1,6 @@
 export const translations = {
+  category: "Database Operations",
+
   post: {
     title: "Database Migration Sync",
     description:

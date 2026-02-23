@@ -10,7 +10,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ModelId } from "../agent/models/models";
-import { CreditRepository } from "./repository";
+import { CreditRepository, type ModuleT } from "./repository";
 
 /**
  * Validation Result Interface
@@ -31,6 +31,8 @@ export interface CreditValidatorInterface {
     modelId: string,
     modelCost: number,
     logger: EndpointLogger,
+    t: ModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CreditValidationResult>>;
 
   validateLeadCredits(
@@ -38,6 +40,8 @@ export interface CreditValidatorInterface {
     modelId: string,
     modelCost: number,
     logger: EndpointLogger,
+    t: ModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CreditValidationResult>>;
 
   validateLeadByIp(
@@ -46,6 +50,7 @@ export interface CreditValidatorInterface {
     modelCost: number,
     locale: string,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<
     ResponseType<{
       leadId: string;
@@ -63,16 +68,20 @@ class CreditValidator implements CreditValidatorInterface {
     modelId: ModelId,
     modelCost: number,
     logger: EndpointLogger,
+    t: ModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CreditValidationResult>> {
     try {
       const balanceResult = await CreditRepository.getBalance(
         { userId },
         logger,
+        t,
+        locale,
       );
 
       if (!balanceResult.success) {
         return fail({
-          message: "app.api.agent.chat.credits.errors.getBalanceFailed",
+          message: t("errors.getBalanceFailed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           cause: balanceResult,
         });
@@ -101,7 +110,7 @@ class CreditValidator implements CreditValidatorInterface {
         modelId,
       });
       return fail({
-        message: "app.api.agent.chat.credits.errors.getBalanceFailed",
+        message: t("errors.getBalanceFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -112,15 +121,19 @@ class CreditValidator implements CreditValidatorInterface {
     modelId: ModelId,
     modelCost: number,
     logger: EndpointLogger,
+    t: ModuleT,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CreditValidationResult>> {
     try {
       const balanceResult = await CreditRepository.getLeadBalance(
         leadId,
         logger,
+        t,
+        locale,
       );
       if (!balanceResult.success) {
         return fail({
-          message: "app.api.agent.chat.credits.errors.getLeadBalanceFailed",
+          message: t("errors.getLeadBalanceFailed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           cause: balanceResult,
         });
@@ -149,7 +162,7 @@ class CreditValidator implements CreditValidatorInterface {
         modelId,
       });
       return fail({
-        message: "app.api.agent.chat.credits.errors.getLeadBalanceFailed",
+        message: t("errors.getLeadBalanceFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -161,6 +174,7 @@ class CreditValidator implements CreditValidatorInterface {
     modelCost: number,
     locale: CountryLanguage,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<
     ResponseType<{
       leadId: string;
@@ -172,11 +186,12 @@ class CreditValidator implements CreditValidatorInterface {
         ipAddress,
         locale,
         logger,
+        t,
       );
 
       if (!leadResult.success) {
         return fail({
-          message: "app.api.agent.chat.credits.errors.getOrCreateLeadFailed",
+          message: t("errors.getOrCreateLeadFailed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           cause: leadResult,
         });
@@ -209,7 +224,7 @@ class CreditValidator implements CreditValidatorInterface {
         modelId,
       });
       return fail({
-        message: "app.api.agent.chat.credits.errors.getLeadBalanceFailed",
+        message: t("errors.getLeadBalanceFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

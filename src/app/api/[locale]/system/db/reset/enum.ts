@@ -5,14 +5,17 @@
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 
+import { scopedTranslation } from "./i18n";
+
 /**
  * Reset Type
  */
 export const { enum: ResetType, options: ResetTypeOptions } = createEnumOptions(
+  scopedTranslation,
   {
-    TRUNCATE: "app.api.system.db.reset.fields.mode.truncate" as const,
-    DROP: "app.api.system.db.reset.fields.mode.drop" as const,
-    INITIALIZE: "app.api.system.db.reset.fields.mode.initialize" as const,
+    TRUNCATE: "fields.mode.truncate" as const,
+    DROP: "fields.mode.drop" as const,
+    INITIALIZE: "fields.mode.initialize" as const,
   },
 );
 
@@ -20,10 +23,10 @@ export const { enum: ResetType, options: ResetTypeOptions } = createEnumOptions(
  * Reset Status
  */
 export const { enum: ResetStatus, options: ResetStatusOptions } =
-  createEnumOptions({
-    PENDING: "app.api.system.db.reset.status.pending" as const,
-    RUNNING: "app.api.system.db.reset.status.running" as const,
-    SUCCESS: "app.api.system.db.reset.status.success" as const,
-    FAILED: "app.api.system.db.reset.status.failed" as const,
-    CANCELLED: "app.api.system.db.reset.status.cancelled" as const,
+  createEnumOptions(scopedTranslation, {
+    PENDING: "status.pending" as const,
+    RUNNING: "status.running" as const,
+    SUCCESS: "status.success" as const,
+    FAILED: "status.failed" as const,
+    CANCELLED: "status.cancelled" as const,
   });

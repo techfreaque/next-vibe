@@ -31,20 +31,20 @@ export const { POST, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.POST]: {
     email: undefined,
-    handler: async ({ logger }) => {
+    handler: async (props) => {
+      const { logger, t, locale } = props;
       const systemUser = SYSTEM_USER;
 
       const configResult =
         await CampaignStarterConfigRepository.ensureConfigExists(
           systemUser,
-          "en-GLOBAL",
+          locale,
           logger,
         );
 
       if (!configResult.success || !configResult.data) {
         return fail({
-          message:
-            "app.api.leads.leadsErrors.campaigns.common.error.server.title",
+          message: t("errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }
@@ -130,7 +130,11 @@ export const { POST, tools } = endpointsHandler({
         }
 
         const failedLeadsCountResult =
-          await CampaignStarterRepository.getFailedLeadsCount(locale, logger);
+          await CampaignStarterRepository.getFailedLeadsCount(
+            locale,
+            logger,
+            t,
+          );
         const failedLeadsCount = failedLeadsCountResult.success
           ? failedLeadsCountResult.data
           : 0;
@@ -144,12 +148,14 @@ export const { POST, tools } = endpointsHandler({
           config,
           result,
           logger,
+          t,
         );
 
         if (failedLeadsCount > 0) {
           await CampaignStarterRepository.markFailedLeadsAsProcessed(
             locale,
             logger,
+            t,
           );
         }
       }
