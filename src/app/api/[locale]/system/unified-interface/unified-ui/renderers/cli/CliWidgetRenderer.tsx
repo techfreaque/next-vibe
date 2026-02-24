@@ -6,7 +6,7 @@
  * All widgets directly imported for CLI (no lazy loading).
  */
 
-import type { JSX } from "react";
+import React, { type JSX } from "react";
 import type { Path } from "react-hook-form";
 import type { z } from "zod";
 
@@ -81,6 +81,17 @@ import { FormAlertWidgetInk } from "@/app/api/[locale]/system/unified-interface/
 import { NavigateButtonWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/cli";
 import { SubmitButtonWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/cli";
 
+// Dispatch-boundary cast type: switch discriminant guarantees type safety.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyInkWidget = React.ComponentType<any>;
+
+type DispatchableField = DispatchField<
+  string,
+  z.ZodTypeAny,
+  FieldUsageConfig,
+  AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
+>;
+
 /**
  * Ink Widget Renderer Component - Routes to widgets with full type inference.
  * Receives DispatchField (UnifiedField + value) and switches on field.type.
@@ -96,53 +107,13 @@ export function InkWidgetRenderer<TEndpoint extends CreateApiEndpointAny>({
 }
 
 /**
- * Per-case cast: after switch narrowing on field.type, recover the precise
- * BaseWidgetFieldProps<SpecificConfig> for each widget. DispatchField uses
- * WidgetData for value; individual widgets expect schema-inferred value types.
- * Safe: switch discriminant guarantees the narrowed config matches the target widget.
- */
-function asField<T>(
-  field: DispatchField<
-    string,
-    z.ZodTypeAny,
-    FieldUsageConfig,
-    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
-  >,
-): T {
-  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- dispatch boundary: conditional types don't resolve against generic union members
-  return field as T;
-}
-
-/**
- * Props-level dispatch cast for union-InkWidgetProps widgets.
- * `{ field: A | B }` is not assignable to `{ field: A } | { field: B }` —
- * must cast the entire props object so React resolves the union variant.
- */
-function asWidgetProps<TEndpoint extends CreateApiEndpointAny, T>(
-  fieldName: Path<TEndpoint["types"]["RequestOutput"]>,
-  field: DispatchField<
-    string,
-    z.ZodTypeAny,
-    FieldUsageConfig,
-    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
-  >,
-): T {
-  // oxlint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- union-props boundary: { field: A | B } not assignable to { field: A } | { field: B }
-  return { fieldName, field } as T;
-}
-
-/**
  * Render helper - switches on field.type for discriminated union narrowing.
- * Each case receives the narrowed field type with value inferred from schema.
+ * Each case casts the widget function to AnyInkWidget (dispatch boundary pattern,
+ * matching React WidgetRenderer) — switch discriminant guarantees type safety.
  */
 function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
   fieldName: Path<TEndpoint["types"]["RequestOutput"]>;
-  field: DispatchField<
-    string,
-    z.ZodTypeAny,
-    FieldUsageConfig,
-    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
-  >;
+  field: DispatchableField;
 }): JSX.Element {
   const { fieldName, field } = props;
 
@@ -150,553 +121,278 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
   // DispatchField union — handle it before the exhaustive switch to avoid a
   // "not comparable" error while still rendering the widget correctly at runtime.
   if ((field.type as WidgetType) === WidgetType.PAGINATION) {
-    return (
-      <PaginationWidgetInk
-        fieldName={fieldName}
-        field={asField<Parameters<typeof PaginationWidgetInk>[0]["field"]>(
-          field,
-        )}
-      />
-    );
+    const W = PaginationWidgetInk as AnyInkWidget;
+    return <W fieldName={fieldName} field={field} />;
   }
 
   switch (field.type) {
     // === CONTAINER WIDGETS ===
-    case WidgetType.CONTAINER:
-      return (
-        <ContainerWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof ContainerWidgetInk>[0]["field"]>(
-            field,
-          )}
-        />
-      );
+    case WidgetType.CONTAINER: {
+      const W = ContainerWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
 
-    case WidgetType.CUSTOM_WIDGET:
+    case WidgetType.CUSTOM_WIDGET: {
       // Custom React widgets can't run in CLI — fall back to ContainerWidgetInk
       // which iterates over the children (standard widgets) and renders them.
-      return (
-        <ContainerWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof ContainerWidgetInk>[0]["field"]>(
-            field,
-          )}
-        />
-      );
-    case WidgetType.SEPARATOR:
-      return (
-        <SeparatorWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof SeparatorWidgetInk>[0]["field"]>(
-            field,
-          )}
-        />
-      );
-    case WidgetType.CODE_OUTPUT:
-      return (
-        <CodeOutputWidgetInk
-          {...asWidgetProps<
-            TEndpoint,
-            Parameters<typeof CodeOutputWidgetInk>[0]
-          >(fieldName, field)}
-        />
-      );
-    case WidgetType.CODE_QUALITY_LIST:
-      return (
-        <CodeQualityListWidgetInk
-          fieldName={fieldName}
-          field={asField<
-            Parameters<typeof CodeQualityListWidgetInk>[0]["field"]
-          >(field)}
-        />
-      );
-    case WidgetType.CODE_QUALITY_SUMMARY:
-      return (
-        <CodeQualitySummaryWidgetInk
-          fieldName={fieldName}
-          field={asField<
-            Parameters<typeof CodeQualitySummaryWidgetInk>[0]["field"]
-          >(field)}
-        />
-      );
-    case WidgetType.CODE_QUALITY_FILES:
-      return (
-        <CodeQualityFilesWidgetInk
-          fieldName={fieldName}
-          field={asField<
-            Parameters<typeof CodeQualityFilesWidgetInk>[0]["field"]
-          >(field)}
-        />
-      );
-    case WidgetType.KEY_VALUE:
-      return (
-        <KeyValueWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof KeyValueWidgetInk>[0]["field"]>(
-            field,
-          )}
-        />
-      );
+      const W = ContainerWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.SEPARATOR: {
+      const W = SeparatorWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.CODE_OUTPUT: {
+      const W = CodeOutputWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.CODE_QUALITY_LIST: {
+      const W = CodeQualityListWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.CODE_QUALITY_SUMMARY: {
+      const W = CodeQualitySummaryWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.CODE_QUALITY_FILES: {
+      const W = CodeQualityFilesWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.KEY_VALUE: {
+      const W = KeyValueWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
 
     // === DISPLAY-ONLY WIDGETS ===
-    case WidgetType.TEXT:
-      return (
-        <TextWidgetInk
-          {...asWidgetProps<TEndpoint, Parameters<typeof TextWidgetInk>[0]>(
-            fieldName,
-            field,
-          )}
-        />
-      );
-    case WidgetType.TITLE:
-      return (
-        <TitleWidgetInk
-          {...asWidgetProps<TEndpoint, Parameters<typeof TitleWidgetInk>[0]>(
-            fieldName,
-            field,
-          )}
-        />
-      );
-    case WidgetType.DESCRIPTION:
-      return (
-        <DescriptionWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof DescriptionWidgetInk>[0]["field"]>(
-            field,
-          )}
-        />
-      );
-    case WidgetType.METADATA:
-      return (
-        <MetadataWidgetInk
-          {...asWidgetProps<TEndpoint, Parameters<typeof MetadataWidgetInk>[0]>(
-            fieldName,
-            field,
-          )}
-        />
-      );
-    case WidgetType.BADGE:
-      return (
-        <BadgeWidgetInk
-          {...asWidgetProps<TEndpoint, Parameters<typeof BadgeWidgetInk>[0]>(
-            fieldName,
-            field,
-          )}
-        />
-      );
-    case WidgetType.ICON:
-      return (
-        <IconWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof IconWidgetInk>[0]["field"]>(field)}
-        />
-      );
-    case WidgetType.MARKDOWN:
-      return (
-        <MarkdownWidgetInk
-          {...asWidgetProps<TEndpoint, Parameters<typeof MarkdownWidgetInk>[0]>(
-            fieldName,
-            field,
-          )}
-        />
-      );
-    case WidgetType.LINK:
-      return (
-        <LinkWidgetInk
-          {...asWidgetProps<TEndpoint, Parameters<typeof LinkWidgetInk>[0]>(
-            fieldName,
-            field,
-          )}
-        />
-      );
-    case WidgetType.STAT:
-      return (
-        <StatWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof StatWidgetInk>[0]["field"]>(field)}
-        />
-      );
-    case WidgetType.CHART:
-      return (
-        <ChartWidgetInk
-          {...asWidgetProps<TEndpoint, Parameters<typeof ChartWidgetInk>[0]>(
-            fieldName,
-            field,
-          )}
-        />
-      );
-    case WidgetType.STATUS_INDICATOR:
-      return (
-        <StatusIndicatorWidgetInk
-          fieldName={fieldName}
-          field={asField<
-            Parameters<typeof StatusIndicatorWidgetInk>[0]["field"]
-          >(field)}
-        />
-      );
-    case WidgetType.ALERT:
-      return (
-        <AlertWidgetInk
-          {...asWidgetProps<TEndpoint, Parameters<typeof AlertWidgetInk>[0]>(
-            fieldName,
-            field,
-          )}
-        />
-      );
-    case WidgetType.BUTTON:
-      return (
-        <ButtonWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof ButtonWidgetInk>[0]["field"]>(field)}
-        />
-      );
-    case WidgetType.NAVIGATE_BUTTON:
-      return (
-        <NavigateButtonWidgetInk
-          fieldName={fieldName}
-          field={asField<
-            Parameters<typeof NavigateButtonWidgetInk>[0]["field"]
-          >(field)}
-        />
-      );
-    case WidgetType.SUBMIT_BUTTON:
-      return (
-        <SubmitButtonWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof SubmitButtonWidgetInk>[0]["field"]>(
-            field,
-          )}
-        />
-      );
-    case WidgetType.FORM_ALERT:
-      return (
-        <FormAlertWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof FormAlertWidgetInk>[0]["field"]>(
-            field,
-          )}
-        />
-      );
+    case WidgetType.TEXT: {
+      const W = TextWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
 
-    // === CONTENT WIDGETS (continued) ===
-    case WidgetType.MARKDOWN_EDITOR:
-      return (
-        <MarkdownEditorWidgetInk
-          fieldName={fieldName}
-          field={asField<
-            Parameters<typeof MarkdownEditorWidgetInk>[0]["field"]
-          >(field)}
-        />
-      );
+    case WidgetType.TITLE: {
+      const W = TitleWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
 
-    case WidgetType.LOADING:
-      return (
-        <LoadingWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof LoadingWidgetInk>[0]["field"]>(
-            field,
-          )}
-        />
-      );
+    case WidgetType.DESCRIPTION: {
+      const W = DescriptionWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
 
-    case WidgetType.EMPTY_STATE:
-      return (
-        <EmptyStateWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof EmptyStateWidgetInk>[0]["field"]>(
-            field,
-          )}
-        />
-      );
+    case WidgetType.METADATA: {
+      const W = MetadataWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
 
-    case WidgetType.AVATAR:
-      return (
-        <AvatarWidgetInk
-          fieldName={fieldName}
-          field={asField<Parameters<typeof AvatarWidgetInk>[0]["field"]>(field)}
-        />
-      );
+    case WidgetType.BADGE: {
+      const W = BadgeWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.ICON: {
+      const W = IconWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.MARKDOWN: {
+      const W = MarkdownWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.LINK: {
+      const W = LinkWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.STAT: {
+      const W = StatWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.CHART: {
+      const W = ChartWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.STATUS_INDICATOR: {
+      const W = StatusIndicatorWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.ALERT: {
+      const W = AlertWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.BUTTON: {
+      const W = ButtonWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.NAVIGATE_BUTTON: {
+      const W = NavigateButtonWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.SUBMIT_BUTTON: {
+      const W = SubmitButtonWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.FORM_ALERT: {
+      const W = FormAlertWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.MARKDOWN_EDITOR: {
+      const W = MarkdownEditorWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.LOADING: {
+      const W = LoadingWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.EMPTY_STATE: {
+      const W = EmptyStateWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
+
+    case WidgetType.AVATAR: {
+      const W = AvatarWidgetInk as AnyInkWidget;
+      return <W fieldName={fieldName} field={field} />;
+    }
 
     // === FORM WIDGETS ===
     case WidgetType.FORM_FIELD: {
       switch (field.fieldType) {
-        case FieldDataType.TEXT:
-          return (
-            <TextFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<Parameters<typeof TextFieldWidgetInk>[0]["field"]>(
-                field,
-              )}
-            />
-          );
-        case FieldDataType.EMAIL:
-          return (
-            <EmailFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof EmailFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-        case FieldDataType.TEL:
-          return (
-            <PhoneFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof PhoneFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-        case FieldDataType.URL:
-          return (
-            <UrlFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<Parameters<typeof UrlFieldWidgetInk>[0]["field"]>(
-                field,
-              )}
-            />
-          );
-        case FieldDataType.PASSWORD:
-          return (
-            <PasswordFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof PasswordFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-        case FieldDataType.UUID:
-          return (
-            <UuidFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<Parameters<typeof UuidFieldWidgetInk>[0]["field"]>(
-                field,
-              )}
-            />
-          );
-        case FieldDataType.TEXTAREA:
-          return (
-            <TextareaFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof TextareaFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-
-        case FieldDataType.NUMBER:
-          return (
-            <NumberFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof NumberFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-        case FieldDataType.INT:
-          return (
-            <IntFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<Parameters<typeof IntFieldWidgetInk>[0]["field"]>(
-                field,
-              )}
-            />
-          );
-
-        case FieldDataType.BOOLEAN:
-          return (
-            <BooleanFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof BooleanFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-
-        case FieldDataType.DATE:
-          return (
-            <DateFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<Parameters<typeof DateFieldWidgetInk>[0]["field"]>(
-                field,
-              )}
-            />
-          );
-        case FieldDataType.DATETIME:
-          return (
-            <DateTimeFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof DateTimeFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-        case FieldDataType.TIME:
-          return (
-            <TimeFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<Parameters<typeof TimeFieldWidgetInk>[0]["field"]>(
-                field,
-              )}
-            />
-          );
-        case FieldDataType.DATE_RANGE:
-          return (
-            <DateRangeFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof DateRangeFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-        case FieldDataType.TIME_RANGE:
-          return (
-            <TimeRangeFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof TimeRangeFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-        case FieldDataType.TIMEZONE:
-          return (
-            <TimezoneFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof TimezoneFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-
-        case FieldDataType.SELECT:
-          return (
-            <SelectFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof SelectFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-        case FieldDataType.MULTISELECT:
-          return (
-            <MultiSelectFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof MultiSelectFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-        case FieldDataType.CURRENCY_SELECT:
-          return (
-            <CurrencySelectFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof CurrencySelectFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-        case FieldDataType.LANGUAGE_SELECT:
-          return (
-            <LanguageSelectFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof LanguageSelectFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-        case FieldDataType.COUNTRY_SELECT:
-          return (
-            <CountrySelectFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof CountrySelectFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-
-        case FieldDataType.FILE:
-          return (
-            <FileFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<Parameters<typeof FileFieldWidgetInk>[0]["field"]>(
-                field,
-              )}
-            />
-          );
-        case FieldDataType.JSON:
-          return (
-            <JsonFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<Parameters<typeof JsonFieldWidgetInk>[0]["field"]>(
-                field,
-              )}
-            />
-          );
-        case FieldDataType.COLOR:
-          return (
-            <ColorFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof ColorFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-        case FieldDataType.ICON:
-          return (
-            <IconFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<Parameters<typeof IconFieldWidgetInk>[0]["field"]>(
-                field,
-              )}
-            />
-          );
-
-        case FieldDataType.TAGS:
-          return (
-            <TagsFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<Parameters<typeof TagsFieldWidgetInk>[0]["field"]>(
-                field,
-              )}
-            />
-          );
-        case FieldDataType.TEXT_ARRAY:
-          return (
-            <TextArrayFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof TextArrayFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-        case FieldDataType.FILTER_PILLS:
-          return (
-            <FilterPillsFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof FilterPillsFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-
-        case FieldDataType.SLIDER:
-          return (
-            <SliderFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof SliderFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
-        case FieldDataType.RANGE_SLIDER:
-          return (
-            <RangeSliderFieldWidgetInk
-              fieldName={fieldName}
-              field={asField<
-                Parameters<typeof RangeSliderFieldWidgetInk>[0]["field"]
-              >(field)}
-            />
-          );
+        case FieldDataType.TEXT: {
+          const W = TextFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.EMAIL: {
+          const W = EmailFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.TEL: {
+          const W = PhoneFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.URL: {
+          const W = UrlFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.PASSWORD: {
+          const W = PasswordFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.UUID: {
+          const W = UuidFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.TEXTAREA: {
+          const W = TextareaFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.NUMBER: {
+          const W = NumberFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.INT: {
+          const W = IntFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.BOOLEAN: {
+          const W = BooleanFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.DATE: {
+          const W = DateFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.DATETIME: {
+          const W = DateTimeFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.TIME: {
+          const W = TimeFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.DATE_RANGE: {
+          const W = DateRangeFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.TIME_RANGE: {
+          const W = TimeRangeFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.TIMEZONE: {
+          const W = TimezoneFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.SELECT: {
+          const W = SelectFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.MULTISELECT: {
+          const W = MultiSelectFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.CURRENCY_SELECT: {
+          const W = CurrencySelectFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.LANGUAGE_SELECT: {
+          const W = LanguageSelectFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.COUNTRY_SELECT: {
+          const W = CountrySelectFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.FILE: {
+          const W = FileFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.JSON: {
+          const W = JsonFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.COLOR: {
+          const W = ColorFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.ICON: {
+          const W = IconFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.TAGS: {
+          const W = TagsFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.TEXT_ARRAY: {
+          const W = TextArrayFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.FILTER_PILLS: {
+          const W = FilterPillsFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.SLIDER: {
+          const W = SliderFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
+        case FieldDataType.RANGE_SLIDER: {
+          const W = RangeSliderFieldWidgetInk as AnyInkWidget;
+          return <W fieldName={fieldName} field={field} />;
+        }
         default:
           const _exhaustiveCheck: never = field;
           return _exhaustiveCheck;

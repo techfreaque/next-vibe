@@ -57,7 +57,6 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
     UserRole.ADMIN,
-    UserRole.WEB_OFF,
     UserRole.MCP_VISIBLE,
   ] as const,
 

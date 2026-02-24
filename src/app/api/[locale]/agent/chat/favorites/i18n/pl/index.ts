@@ -7,6 +7,7 @@ export const translations: typeof enTranslations = {
   tags: {
     favorites: "Ulubione",
   },
+  active: "Aktywny",
   fallbacks: {
     unknownCharacter: "Nieznana postać",
     unknownModel: "Nieznany model",

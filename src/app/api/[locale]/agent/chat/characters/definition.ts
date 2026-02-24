@@ -35,7 +35,6 @@ import {
   ModelSortDirection,
   ModelSortField,
 } from "./enum";
-import type { CharactersTranslationKey } from "./i18n";
 import { scopedTranslation } from "./i18n";
 import { CharactersListContainer } from "./widget";
 
@@ -229,20 +228,20 @@ const { GET } = createEndpoint({
                     size: "base",
                     emphasis: "bold",
                     inline: true,
-                    schema: z.string() as z.ZodType<CharactersTranslationKey>,
+                    schema: z.string(),
                   }),
                   tagline: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     size: "xs",
                     variant: "muted",
                     inline: true,
-                    schema: z.string() as z.ZodType<CharactersTranslationKey>,
+                    schema: z.string(),
                   }),
                   description: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     size: "xs",
                     variant: "muted",
-                    schema: z.string() as z.ZodType<CharactersTranslationKey>,
+                    schema: z.string(),
                   }),
                   modelIcon: scopedResponseField(scopedTranslation, {
                     type: WidgetType.ICON,

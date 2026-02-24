@@ -45,7 +45,7 @@ import {
   ModelSelectionType,
 } from "./enum";
 import { CATEGORY_CONFIG } from "./enum";
-import type { CharactersT, CharactersTranslationKey } from "./i18n";
+import type { CharactersT } from "./i18n";
 import { scopedTranslation } from "./i18n";
 import { CharactersRepositoryClient } from "./repository-client";
 
@@ -262,9 +262,9 @@ export class CharactersRepository {
         // Flattened response - no container/character/badges/systemPromptSection nesting
         return success({
           icon: defaultCharacter.icon,
-          name: defaultCharacter.name,
-          tagline: defaultCharacter.tagline,
-          description: defaultCharacter.description,
+          name: t(defaultCharacter.name),
+          tagline: t(defaultCharacter.tagline),
+          description: t(defaultCharacter.description),
           category: defaultCharacter.category,
           isPublic: false,
           voice: defaultCharacter.voice,
@@ -334,10 +334,9 @@ export class CharactersRepository {
       // Flattened response
       return success<CharacterGetResponseOutput>({
         icon: customCharacter.icon,
-        name: customCharacter.name as CharactersTranslationKey | null,
-        tagline: customCharacter.tagline as CharactersTranslationKey | null,
-        description:
-          customCharacter.description as CharactersTranslationKey | null,
+        name: customCharacter.name,
+        tagline: customCharacter.tagline,
+        description: customCharacter.description,
         category: customCharacter.category,
         isPublic:
           customCharacter.ownershipType === CharacterOwnershipType.PUBLIC,
@@ -654,13 +653,9 @@ export class CharactersRepository {
       category: char.category,
       icon: char.icon ?? "sparkles",
       modelId,
-      name: (char.name ??
-        bestModel?.name ??
-        t("fallbacks.unknownModel")) as CharactersTranslationKey,
-      description: (char.description ??
-        t("fallbacks.noDescription")) as CharactersTranslationKey,
-      tagline: (char.tagline ??
-        t("fallbacks.noTagline")) as CharactersTranslationKey,
+      name: char.name ?? bestModel?.name ?? t("fallbacks.unknownModel"),
+      description: char.description ?? t("fallbacks.noDescription"),
+      tagline: char.tagline ?? t("fallbacks.noTagline"),
       ...modelRow,
     };
   }

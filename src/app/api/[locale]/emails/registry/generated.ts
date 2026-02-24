@@ -12,7 +12,6 @@ import type emailTemplate3 from "@/app/api/[locale]/subscription/email";
 import type emailTemplate4 from "@/app/api/[locale]/user/public/reset-password/confirm/email";
 import type emailTemplate5 from "@/app/api/[locale]/user/public/reset-password/request/email";
 import type emailTemplate6 from "@/app/api/[locale]/user/public/signup/email";
-
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
@@ -225,7 +224,10 @@ export async function getTranslatedTemplateMetadata(
   id: string,
   locale: CountryLanguage,
 ): Promise<
-  | (Omit<TemplateCachedMetadata<string>, "name" | "description" | "category"> & {
+  | (Omit<
+      TemplateCachedMetadata<string>,
+      "name" | "description" | "category"
+    > & {
       name: string;
       description: string;
       category: string;
@@ -294,7 +296,10 @@ export async function getAllTranslatedTemplateMetadata(
   locale: CountryLanguage,
 ): Promise<
   Array<
-    Omit<TemplateCachedMetadata<string>, "name" | "description" | "category"> & {
+    Omit<
+      TemplateCachedMetadata<string>,
+      "name" | "description" | "category"
+    > & {
       name: string;
       description: string;
       category: string;
@@ -305,7 +310,5 @@ export async function getAllTranslatedTemplateMetadata(
   const results = await Promise.all(
     ids.map((id) => getTranslatedTemplateMetadata(id, locale)),
   );
-  return results.filter(
-    (r): r is NonNullable<typeof r> => r !== undefined,
-  );
+  return results.filter((r): r is NonNullable<typeof r> => r !== undefined);
 }

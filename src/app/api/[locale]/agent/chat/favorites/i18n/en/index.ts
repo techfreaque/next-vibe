@@ -6,6 +6,7 @@ export const translations = {
   tags: {
     favorites: "Favorites",
   },
+  active: "Active",
   fallbacks: {
     unknownCharacter: "Unknown Character",
     unknownModel: "Unknown Model",

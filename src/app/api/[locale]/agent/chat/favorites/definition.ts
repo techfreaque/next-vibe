@@ -27,6 +27,7 @@ import { iconSchema } from "../../../shared/types/common.schema";
 import { ModelId } from "../../models/models";
 import { TtsVoiceValue } from "../../text-to-speech/enum";
 import charactersDefinitions from "../characters/definition";
+import type { FavoritesTranslationKey } from "./i18n";
 import { scopedTranslation } from "./i18n";
 import { FavoritesListContainer } from "./widget";
 
@@ -133,7 +134,9 @@ const { GET } = createEndpoint({
               type: WidgetType.BADGE,
               variant: "default",
               size: "xs",
-              schema: z.string().nullable(),
+              schema: z
+                .string()
+                .nullable() as z.ZodType<FavoritesTranslationKey | null>,
             }),
             description: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,

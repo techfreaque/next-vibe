@@ -619,30 +619,18 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         size: "xl",
         emphasis: "bold",
-        schema: z
-          .string()
-          .min(1)
-          .max(100)
-          .nullable() as z.ZodType<CharactersTranslationKey | null>,
+        schema: z.string().min(1).max(100).nullable(),
       }),
       tagline: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         size: "sm",
         variant: "muted",
-        schema: z
-          .string()
-          .min(1)
-          .max(500)
-          .nullable() as z.ZodType<CharactersTranslationKey | null>,
+        schema: z.string().min(1).max(500).nullable(),
       }),
       description: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         size: "base",
-        schema: z
-          .string()
-          .min(1)
-          .max(500)
-          .nullable() as z.ZodType<CharactersTranslationKey | null>,
+        schema: z.string().min(1).max(500).nullable(),
       }),
       category: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,

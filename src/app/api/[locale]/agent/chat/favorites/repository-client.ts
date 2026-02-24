@@ -27,6 +27,7 @@ import {
 } from "../../text-to-speech/enum";
 import { DEFAULT_CHARACTERS } from "../characters/config";
 import { ModelSelectionType } from "../characters/enum";
+import { scopedTranslation as charactersScopedTranslation } from "../characters/i18n";
 import { CharactersRepositoryClient } from "../characters/repository-client";
 import { STORAGE_KEYS } from "../constants";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
@@ -78,6 +79,7 @@ export class ChatFavoritesRepositoryClient {
       const storedConfigs = this.loadAllLocalFavorites();
 
       // For PUBLIC users (localStorage), get character data from DEFAULT_CHARACTERS
+      const { t: tChar } = charactersScopedTranslation.scopedT(locale);
       const cards = storedConfigs.map((config): FavoriteCard => {
         const character = DEFAULT_CHARACTERS.find(
           (c) => c.id === config.characterId,
@@ -86,9 +88,9 @@ export class ChatFavoritesRepositoryClient {
           config,
           character?.modelSelection,
           character?.icon ?? null,
-          character?.name ?? null,
-          character?.tagline ?? null,
-          character?.description ?? null,
+          character?.name ? tChar(character.name) : null,
+          character?.tagline ? tChar(character.tagline) : null,
+          character?.description ? tChar(character.description) : null,
           activeFavoriteId,
           character?.voice ?? null,
           locale,
@@ -323,10 +325,7 @@ export class ChatFavoritesRepositoryClient {
       icon: stored.customIcon ?? characterIcon ?? bestModel?.icon ?? "bot",
       name: characterName ?? bestModel?.name ?? t("fallbacks.unknown"),
       tagline: characterTagline ?? null,
-      activeBadge:
-        stored.id === activeFavoriteId
-          ? ("app.chat.selector.active" as const)
-          : null,
+      activeBadge: stored.id === activeFavoriteId ? ("active" as const) : null,
       description: characterDescription ?? null,
       ...(bestModel
         ? {
@@ -353,6 +352,7 @@ export class ChatFavoritesRepositoryClient {
     locale: CountryLanguage,
   ): FavoriteGetResponseOutput {
     const { t } = scopedTranslation.scopedT(locale);
+    const { t: tChar } = charactersScopedTranslation.scopedT(locale);
     const character = DEFAULT_CHARACTERS.find(
       (c) => c.id === stored.characterId,
     );
@@ -374,13 +374,13 @@ export class ChatFavoritesRepositoryClient {
       };
     }
 
-    // Flattened structure
+    // Flattened structure — translate default character keys using characters scope
     return {
       characterId: stored.characterId,
       icon: stored.customIcon ?? character.icon,
-      name: character.name ?? t("fallbacks.unknown"),
-      tagline: character.tagline ?? null,
-      description: character.description ?? null,
+      name: character.name ? tChar(character.name) : t("fallbacks.unknown"),
+      tagline: character.tagline ? tChar(character.tagline) : "",
+      description: character.description ? tChar(character.description) : "",
       voice: stored.voice ?? character.voice,
       modelSelection: stored.modelSelection, // null = use character defaults
       characterModelSelection: character.modelSelection ?? {

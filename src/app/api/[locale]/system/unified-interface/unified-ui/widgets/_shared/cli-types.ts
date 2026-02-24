@@ -54,15 +54,21 @@ export type InkWidgetContext<TEndpoint extends CreateApiEndpointAny> =
  * react-hook-form branded paths.
  */
 export interface InkWidgetRendererProps<
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- TEndpoint needed for generic constraint
   TEndpoint extends CreateApiEndpointAny,
 > {
   fieldName: string;
   field: DispatchField<
-    string,
+    TEndpoint extends CreateApiEndpointAny
+      ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+      : never,
     z.ZodTypeAny,
     FieldUsageConfig,
-    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
+    AnyChildrenConstrain<
+      TEndpoint extends CreateApiEndpointAny
+        ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+        : never,
+      ConstrainedChildUsage<FieldUsageConfig>
+    >
   >;
 }
 
