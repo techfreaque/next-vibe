@@ -23,6 +23,7 @@ import {
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetResponse,
+  useWidgetTranslation,
   useWidgetUser,
 } from "../../_shared/use-widget-context";
 import type { NavigateButtonWidgetConfig } from "./types";
@@ -60,7 +61,7 @@ export function NavigateButtonWidget<
     TGetEndpoint
   >
 >): JSX.Element {
-  const t = useWidgetTranslation<TEndpoint>();
+  const tField = useWidgetTranslation<TEndpoint>();
   const navigation = useWidgetNavigation();
   const logger = useWidgetLogger();
   const user = useWidgetUser();

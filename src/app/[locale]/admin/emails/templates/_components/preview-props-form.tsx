@@ -25,11 +25,11 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { ReactElement } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import type { PreviewFieldConfig } from "@/app/api/[locale]/emails/registry/types";
+import type { TranslatedPreviewFieldConfig } from "@/app/api/[locale]/emails/registry/types";
 import { useTranslation } from "@/i18n/core/client";
 
 interface PreviewPropsFormProps {
-  previewFields?: Record<string, PreviewFieldConfig<string>>;
+  previewFields?: Record<string, TranslatedPreviewFieldConfig>;
   defaultProps: Record<string, string | number | boolean>;
   onPropsChange: (props: Record<string, string | number | boolean>) => void;
 }
@@ -64,14 +64,12 @@ export function PreviewPropsForm({
   }, [defaultProps, onPropsChange]);
 
   const renderField = useCallback(
-    (fieldName: string, config: PreviewFieldConfig<string>) => {
+    (fieldName: string, config: TranslatedPreviewFieldConfig) => {
       const fieldValue = props[fieldName];
       const fieldId = `preview-field-${fieldName}`;
 
-      const labelText = t(config.label);
-      const descriptionText = config.description
-        ? t(config.description)
-        : undefined;
+      const labelText = config.label;
+      const descriptionText = config.description;
 
       switch (config.type) {
         case "text":
@@ -244,7 +242,7 @@ export function PreviewPropsForm({
                 <SelectContent>
                   {config.options?.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
-                      {t(option.label)}
+                      {option.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

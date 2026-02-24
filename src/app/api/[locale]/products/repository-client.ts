@@ -13,7 +13,8 @@ import type {
   Currencies,
 } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
-import type { TranslationKey } from "@/i18n/core/static-types";
+
+import type { ProductsTranslationKey } from "./i18n";
 
 /**
  * ============================================================================
@@ -164,8 +165,8 @@ export type PaymentInterval = "month" | "year" | "one_time";
  * Product definition with pricing per country
  */
 export interface ProductDefinition {
-  name: TranslationKey;
-  description: TranslationKey;
+  name: ProductsTranslationKey;
+  description: ProductsTranslationKey;
   priceByCountry: {
     [key in Countries]: {
       price: number;
@@ -197,8 +198,8 @@ export interface ProductDefinition {
  */
 export interface Product {
   id: ProductIds;
-  name: TranslationKey;
-  description: TranslationKey;
+  name: ProductsTranslationKey;
+  description: ProductsTranslationKey;
   price: number;
   currency: Currencies;
   isSubscription: boolean;
@@ -468,11 +469,11 @@ export const productsRepository = new ProductsRepositoryImpl();
  */
 export interface PricingPlan {
   id: typeof SubscriptionPlanValue;
-  name: TranslationKey;
-  description: TranslationKey;
-  features: TranslationKey[];
+  name: ProductsTranslationKey;
+  description: ProductsTranslationKey;
+  features: ProductsTranslationKey[];
   premiumFeatures?: {
-    feature: TranslationKey;
+    feature: ProductsTranslationKey;
     className?: string;
     icon: JSX.Element;
   }[];
@@ -483,11 +484,11 @@ export interface PricingPlan {
       currency: Currencies;
     };
   };
-  pricing: TranslationKey;
-  cta: TranslationKey;
+  pricing: ProductsTranslationKey;
+  cta: ProductsTranslationKey;
   highlighted: boolean;
   icon?: JSX.Element; // Optional - must be provided by client components
-  badge?: TranslationKey;
+  badge?: ProductsTranslationKey;
 }
 
 /**
@@ -622,14 +623,14 @@ export function getPricingPlansArray(icon?: JSX.Element): PricingPlan[] {
  * Pricing comparison feature interfaces
  */
 export interface PricingFeature {
-  name: TranslationKey;
+  name: ProductsTranslationKey;
   [SubscriptionPlan.SUBSCRIPTION]: boolean;
 }
 
 export interface PricingTextFeature {
-  name: TranslationKey;
+  name: ProductsTranslationKey;
   type: "text";
-  [SubscriptionPlan.SUBSCRIPTION]: TranslationKey;
+  [SubscriptionPlan.SUBSCRIPTION]: ProductsTranslationKey;
 }
 
 export type PricingComparisonFeature = PricingFeature | PricingTextFeature;

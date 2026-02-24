@@ -12,18 +12,14 @@ import type emailTemplate3 from "@/app/api/[locale]/subscription/email";
 import type emailTemplate4 from "@/app/api/[locale]/user/public/reset-password/confirm/email";
 import type emailTemplate5 from "@/app/api/[locale]/user/public/reset-password/request/email";
 import type emailTemplate6 from "@/app/api/[locale]/user/public/signup/email";
-import type { CountryLanguage } from "@/i18n/core/config";
 
-import type {
-  TemplateCachedMetadata,
-  TranslatedPreviewFieldConfig,
-} from "./types";
+import type { TemplateCachedMetadata } from "./types";
 
 /**
  * Union type of all email template definitions
  * Each template has its own specific props type
  */
-export type AnyEmailTemplate =
+type AnyEmailTemplate =
   | typeof emailTemplate0
   | typeof emailTemplate1
   | typeof emailTemplate2
@@ -213,94 +209,4 @@ export function getTemplatesByCategory(
  */
 export function hasTemplate(id: string): boolean {
   return id in templateLoaders;
-}
-
-/**
- * Translate previewFields using the template's own scoped translation.
- * Returns plain-string labels/descriptions safe to pass to client components.
- */
-export function translatePreviewFields(
-  template: AnyEmailTemplate,
-  locale: CountryLanguage,
-): Record<string, TranslatedPreviewFieldConfig> | undefined {
-  const fields = template.meta.previewFields;
-  if (!fields) {
-    return undefined;
-  }
-  const { t } = template.scopedTranslation.scopedT(locale);
-  const result: Record<string, TranslatedPreviewFieldConfig> = {};
-  for (const [key, config] of Object.entries(fields)) {
-    result[key] = {
-      ...config,
-      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- config keys are scoped to this template's own scopedT
-      label: t(config.label as never) as unknown as string,
-      description: config.description
-        ? // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- config keys are scoped to this template's own scopedT
-          (t(config.description as never) as unknown as string)
-        : undefined,
-      options: config.options?.map((opt: { value: string; label: string }) => ({
-        ...opt,
-        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- config keys are scoped to this template's own scopedT
-        label: t(opt.label as never) as unknown as string,
-      })),
-    };
-  }
-  return result;
-}
-
-/**
- * Translated template metadata using the template's own scoped translation
- */
-export interface TranslatedTemplateMetadata {
-  id: string;
-  version: string;
-  name: string;
-  description: string;
-  category: string;
-  path: string;
-}
-
-/**
- * Get template metadata with name/description translated via the template's own scopedT.
- * Async because it lazy-loads the template module.
- */
-export async function getTranslatedTemplateMetadata(
-  id: string,
-  locale: CountryLanguage,
-): Promise<TranslatedTemplateMetadata | undefined> {
-  const template = await getTemplate(id);
-  if (!template) {
-    return undefined;
-  }
-  const cached = getTemplateMetadata(id);
-  if (!cached) {
-    return undefined;
-  }
-  const { t } = template.scopedTranslation.scopedT(locale);
-  return {
-    id: cached.id,
-    version: cached.version,
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- template meta keys are scoped to this template's own scopedT
-    name: t(cached.name as never) as unknown as string,
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- template meta keys are scoped to this template's own scopedT
-    description: t(cached.description as never) as unknown as string,
-    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- template meta keys are scoped to this template's own scopedT
-    category: t(cached.category as never) as unknown as string,
-    path: cached.path,
-  };
-}
-
-/**
- * Get all templates with metadata translated via each template's own scopedT.
- */
-export async function getAllTranslatedTemplateMetadata(
-  locale: CountryLanguage,
-): Promise<TranslatedTemplateMetadata[]> {
-  const ids = getAllTemplateIds();
-  const results = await Promise.all(
-    ids.map((id) => getTranslatedTemplateMetadata(id, locale)),
-  );
-  return results.filter(
-    (m): m is TranslatedTemplateMetadata => m !== undefined,
-  );
 }

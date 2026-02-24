@@ -19,6 +19,7 @@ import {
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback } from "react";
 
+import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
@@ -62,6 +63,7 @@ export function LeadsBatchUpdateContainer({
   const locale = useWidgetLocale();
   const router = useRouter();
   const t = useWidgetTranslation<typeof definition.PATCH>();
+  const leadsT = leadsScopedTranslation.scopedT(locale).t;
   const form = useWidgetForm<typeof definition.PATCH>();
   const isSubmitting = endpointMutations?.update?.isSubmitting;
 
@@ -78,10 +80,9 @@ export function LeadsBatchUpdateContainer({
 
   // Read active filters from the hidden prefilled fields
   const activeSearch = form?.watch("search") ?? "";
-  const activeStatus: string[] = form?.watch("status") ?? [];
-  const activeCampaignStage: string[] =
-    form?.watch("currentCampaignStage") ?? [];
-  const activeSource: string[] = form?.watch("source") ?? [];
+  const activeStatus = form?.watch("status") ?? [];
+  const activeCampaignStage = form?.watch("currentCampaignStage") ?? [];
+  const activeSource = form?.watch("source") ?? [];
   const hasActiveFilters =
     Boolean(activeSearch) ||
     activeStatus.length > 0 ||
@@ -132,7 +133,7 @@ export function LeadsBatchUpdateContainer({
                 key={s}
                 className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200"
               >
-                {t(s)}
+                {leadsT(s)}
               </Span>
             ))}
             {activeCampaignStage.map((s) => (
@@ -140,7 +141,7 @@ export function LeadsBatchUpdateContainer({
                 key={s}
                 className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200"
               >
-                {t(s)}
+                {leadsT(s)}
               </Span>
             ))}
             {activeSource.map((s) => (
@@ -148,7 +149,7 @@ export function LeadsBatchUpdateContainer({
                 key={s}
                 className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200"
               >
-                {t(s)}
+                {leadsT(s)}
               </Span>
             ))}
           </Div>
@@ -344,7 +345,7 @@ export function LeadsBatchUpdateContainer({
                 )}
                 {lead.currentStatus && (
                   <Span className="flex-shrink-0 text-xs px-2 py-0.5 rounded-full bg-muted">
-                    {t(`widget.update.status.${String(lead.currentStatus)}`)}
+                    {leadsT(lead.currentStatus)}
                   </Span>
                 )}
                 {lead.id && (
@@ -388,6 +389,7 @@ export function LeadsBatchDeleteContainer({
   const locale = useWidgetLocale();
   const router = useRouter();
   const t = useWidgetTranslation<typeof definition.DELETE>();
+  const leadsT = leadsScopedTranslation.scopedT(locale).t;
   const form = useWidgetForm<typeof definition.DELETE>();
 
   const response = data?.response;
@@ -398,10 +400,9 @@ export function LeadsBatchDeleteContainer({
 
   // Read active filters from the hidden prefilled fields
   const activeSearch = form?.watch("search") ?? "";
-  const activeStatus: string[] = form?.watch("status") ?? [];
-  const activeCampaignStage: string[] =
-    form?.watch("currentCampaignStage") ?? [];
-  const activeSource: string[] = form?.watch("source") ?? [];
+  const activeStatus = form?.watch("status") ?? [];
+  const activeCampaignStage = form?.watch("currentCampaignStage") ?? [];
+  const activeSource = form?.watch("source") ?? [];
   const hasActiveFilters =
     Boolean(activeSearch) ||
     activeStatus.length > 0 ||
@@ -448,7 +449,7 @@ export function LeadsBatchDeleteContainer({
                 key={s}
                 className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-200"
               >
-                {t(s)}
+                {leadsT(s)}
               </Span>
             ))}
             {activeCampaignStage.map((s) => (
@@ -456,7 +457,7 @@ export function LeadsBatchDeleteContainer({
                 key={s}
                 className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-200"
               >
-                {t(s)}
+                {leadsT(s)}
               </Span>
             ))}
             {activeSource.map((s) => (
@@ -464,7 +465,7 @@ export function LeadsBatchDeleteContainer({
                 key={s}
                 className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-200"
               >
-                {t(s)}
+                {leadsT(s)}
               </Span>
             ))}
           </Div>

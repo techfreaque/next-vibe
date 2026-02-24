@@ -35,7 +35,6 @@ import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-bas
 import type { ReactFormFieldProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
-  useWidgetContext,
   useWidgetDisabled,
   useWidgetForm,
   useWidgetLocale,

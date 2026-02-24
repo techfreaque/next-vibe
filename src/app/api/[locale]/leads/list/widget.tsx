@@ -33,6 +33,7 @@ import {
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo } from "react";
 
+import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
@@ -146,6 +147,7 @@ function LeadRow({
   onEdit,
   onDelete,
   t,
+  leadsT,
 }: {
   lead: Lead;
   locale: CountryLanguage;
@@ -153,6 +155,7 @@ function LeadRow({
   onEdit: (lead: Lead) => void;
   onDelete: (lead: Lead) => void;
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+  leadsT: ReturnType<typeof leadsScopedTranslation.scopedT>["t"];
 }): React.JSX.Element {
   const isConverted = Boolean(lead.convertedUserId);
 
@@ -180,7 +183,7 @@ function LeadRow({
                   "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
               )}
             >
-              {t(lead.status)}
+              {leadsT(lead.status)}
             </Span>
           )}
           {isConverted && (
@@ -196,7 +199,7 @@ function LeadRow({
                   "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
               )}
             >
-              {t(lead.currentCampaignStage)}
+              {leadsT(lead.currentCampaignStage)}
             </Span>
           )}
         </Div>
@@ -208,7 +211,7 @@ function LeadRow({
             <Span className="flex-shrink-0">{lead.country}</Span>
           )}
           {lead.source && (
-            <Span className="flex-shrink-0">{t(lead.source)}</Span>
+            <Span className="flex-shrink-0">{leadsT(lead.source)}</Span>
           )}
         </Div>
         {lead.createdAt && (
@@ -297,6 +300,7 @@ export function LeadsListContainer({
   const locale = useWidgetLocale();
   const router = useRouter();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const leadsT = leadsScopedTranslation.scopedT(locale).t;
   const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
   const navigation = useWidgetNavigation();
@@ -652,7 +656,7 @@ export function LeadsListContainer({
           <SelectContent>
             {LeadSourceFilterOptions.map((opt) => (
               <SelectItem key={opt.value} value={opt.value}>
-                {t(opt.label)}
+                {leadsT(opt.label)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -666,7 +670,7 @@ export function LeadsListContainer({
           <SelectContent>
             {LeadSortFieldOptions.map((opt) => (
               <SelectItem key={opt.value} value={opt.value}>
-                {t(opt.label)}
+                {leadsT(opt.label)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -680,7 +684,7 @@ export function LeadsListContainer({
           <SelectContent>
             {SortOrderOptions.map((opt) => (
               <SelectItem key={opt.value} value={opt.value}>
-                {t(opt.label)}
+                {leadsT(opt.label)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -712,7 +716,7 @@ export function LeadsListContainer({
                     STATUS_COLORS[status]?.split(" ")[0] ?? "bg-gray-400",
                   )}
                 />
-                {t(status)}: {count}
+                {leadsT(status)}: {count}
               </Button>
             ))}
         </Div>
@@ -735,6 +739,7 @@ export function LeadsListContainer({
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 t={t}
+                leadsT={leadsT}
               />
             ))}
           </Div>

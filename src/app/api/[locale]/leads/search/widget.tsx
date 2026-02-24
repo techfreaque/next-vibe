@@ -72,8 +72,11 @@ const STATUS_COLORS: Record<string, string> = {
   INVALID: "bg-red-200 text-red-900 dark:bg-red-900/50 dark:text-red-200",
 };
 
+type SearchTranslationKey =
+  (typeof definition.GET)["scopedTranslation"]["ScopedTranslationKey"];
+
 // Status label i18n keys for filter chips (concise)
-const STATUS_LABEL_KEYS: Record<string, string> = {
+const STATUS_LABEL_KEYS: Record<string, SearchTranslationKey> = {
   NEW: "widget.statusNew",
   PENDING: "widget.statusPending",
   CAMPAIGN_RUNNING: "widget.statusCampaign",

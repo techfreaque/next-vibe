@@ -28,6 +28,10 @@ import { Label } from "next-vibe-ui/ui/label";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo, useState } from "react";
 
+import {
+  type LeadsTranslationKey,
+  scopedTranslation as leadsScopedTranslation,
+} from "@/app/api/[locale]/leads/i18n";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
@@ -205,15 +209,15 @@ function ClickableBarRow({
   barColor,
   max,
   onClick,
-  t,
+  leadsT,
 }: {
-  category: string;
+  category: LeadsTranslationKey;
   value: number;
   percentage?: number;
   barColor: string;
   max: number;
   onClick?: () => void;
-  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+  leadsT: ReturnType<typeof leadsScopedTranslation.scopedT>["t"];
 }): React.JSX.Element {
   const widthPercent = `${(value / max) * 100}%`;
   return (
@@ -236,7 +240,7 @@ function ClickableBarRow({
       }
     >
       <Span className="text-xs text-muted-foreground w-28 truncate flex-shrink-0">
-        {t(category)}
+        {leadsT(category)}
       </Span>
       <Div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
         <Div
@@ -267,14 +271,14 @@ function GroupedStatsSection({
   title,
   items,
   colorMap,
-  t,
+  leadsT,
 }: {
   title: string;
   items:
-    | Array<{ category: string; value: number; percentage?: number }>
+    | Array<{ category: LeadsTranslationKey; value: number; percentage?: number }>
     | undefined;
   colorMap?: Record<string, string>;
-  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+  leadsT: ReturnType<typeof leadsScopedTranslation.scopedT>["t"];
 }): React.JSX.Element | null {
   if (!items?.length) {
     return null;
@@ -289,12 +293,12 @@ function GroupedStatsSection({
         {top.map((item) => (
           <ClickableBarRow
             key={item.category}
-            category={item.category}
+            category={item.category as LeadsTranslationKey}
             value={item.value}
             percentage={item.percentage}
             barColor={colorMap?.[item.category] ?? "hsl(var(--primary))"}
             max={max}
-            t={t}
+            leadsT={leadsT}
           />
         ))}
       </Div>
@@ -469,6 +473,7 @@ export function LeadsStatsContainer({
   const router = useRouter();
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const leadsT = leadsScopedTranslation.scopedT(locale).t;
   const onSubmit = useWidgetOnSubmit();
   const form = useWidgetForm<typeof definition.GET>();
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -870,7 +875,7 @@ export function LeadsStatsContainer({
                     }
                     max={byStatusMax}
                     onClick={() => handleNavigateToStatus()}
-                    t={t}
+                    leadsT={leadsT}
                   />
                 ))}
               </Div>
@@ -900,7 +905,7 @@ export function LeadsStatsContainer({
                     }
                     max={bySourceMax}
                     onClick={() => handleNavigateToSource()}
-                    t={t}
+                    leadsT={leadsT}
                   />
                 ))}
               </Div>
@@ -910,12 +915,12 @@ export function LeadsStatsContainer({
           <GroupedStatsSection
             title={t("widget.byCountry")}
             items={groupedStats.byCountry}
-            t={t}
+            leadsT={leadsT}
           />
           <GroupedStatsSection
             title={t("widget.byCampaignStage")}
             items={groupedStats.byCampaignStage}
-            t={t}
+            leadsT={leadsT}
           />
         </Div>
       )}

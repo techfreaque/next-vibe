@@ -44,6 +44,7 @@ import {
   useWidgetDisabled,
   useWidgetForm,
   useWidgetLocale,
+  useWidgetTranslation,
 } from "../../_shared/use-widget-context";
 import { getTheme } from "../_shared/constants";
 import { getFieldStyleClassName } from "../_shared/styling";

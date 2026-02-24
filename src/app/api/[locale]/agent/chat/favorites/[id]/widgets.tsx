@@ -30,6 +30,7 @@ import {
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
+  useWidgetTranslation,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { AlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/react";

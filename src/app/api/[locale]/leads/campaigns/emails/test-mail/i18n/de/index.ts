@@ -146,6 +146,7 @@ export const translations: typeof enTranslations = {
       title: "Erfolg",
       description: "Test-E-Mail erfolgreich gesendet",
     },
+    selectionCriteria: "SMTP-Auswahlkriterien",
     widget: {
       title: "Test-E-Mail senden",
       send: "Test-E-Mail senden",

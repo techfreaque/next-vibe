@@ -144,6 +144,7 @@ export const translations = {
       title: "Success",
       description: "Test email sent successfully",
     },
+    selectionCriteria: "SMTP Selection Criteria",
     widget: {
       title: "Send Test Email",
       send: "Send Test Email",

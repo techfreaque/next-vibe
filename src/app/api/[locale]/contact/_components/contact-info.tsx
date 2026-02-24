@@ -72,7 +72,7 @@ export default function ContactInfo({
 
       {/* <Div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
         <H2 className="text-2xl font-bold mb-6">
-          {t("app.api.contact._components.pages.help.info.community")}
+          {t("pages.help.info.community")}
         </H2>
 
         <Div className="flex flex-col gap-6">
@@ -80,12 +80,12 @@ export default function ContactInfo({
             <Div className="flex items-start mb-2">
               <MessageCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3" />
               <H3 className="font-medium">
-                {t("app.api.contact._components.pages.help.info.discord")}
+                {t("pages.help.info.discord")}
               </H3>
             </Div>
             <P className="text-gray-600 dark:text-gray-300 ml-8 mb-2">
               {t(
-                "app.api.contact._components.pages.help.info.discordDescription",
+                "pages.help.info.discordDescription",
               )}
             </P>
             <Link
@@ -102,7 +102,7 @@ export default function ContactInfo({
             <Div className="flex items-start mb-2">
               <Twitter className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3" />
               <H3 className="font-medium">
-                {t("app.api.contact._components.pages.help.info.twitter")}
+                {t("pages.help.info.twitter")}
               </H3>
             </Div>
             <Link

@@ -167,8 +167,7 @@ class MessagingAccountEditRepositoryImpl {
           message: t("errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
-            error:
-              "app.api.emails.messaging.accounts.edit.id.errors.server.description",
+            error: t("errors.server.description"),
           },
         });
       }

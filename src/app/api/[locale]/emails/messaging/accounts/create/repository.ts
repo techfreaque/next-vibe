@@ -86,8 +86,7 @@ class MessagingAccountCreateRepositoryImpl implements MessagingAccountCreateRepo
           message: t("errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
-            error:
-              "app.api.emails.messaging.accounts.create.errors.server.description",
+            error: t("errors.server.description"),
           },
         });
       }
@@ -128,8 +127,7 @@ class MessagingAccountCreateRepositoryImpl implements MessagingAccountCreateRepo
           message: t("errors.conflict.title"),
           errorType: ErrorResponseTypes.CONFLICT,
           messageParams: {
-            error:
-              "app.api.emails.messaging.accounts.create.errors.conflict.description",
+            error: t("errors.conflict.description"),
           },
         });
       }
