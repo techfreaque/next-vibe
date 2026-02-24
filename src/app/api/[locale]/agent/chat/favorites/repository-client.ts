@@ -217,7 +217,7 @@ export class ChatFavoritesRepositoryClient {
       logger.debug("Updated favorite", { id });
 
       return success({
-        success: "app.api.agent.chat.favorites.id.patch.success.title",
+        success: t("id.patch.success.title"),
       });
     } catch (error) {
       logger.error("Failed to update favorite", { ...parseError(error), id });

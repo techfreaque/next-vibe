@@ -23,7 +23,7 @@ export function ButtonWidgetInk<
   TUsage,
   ButtonWidgetConfig<TKey, TUsage, "widget">
 >): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
 
   const text = field.text;
 

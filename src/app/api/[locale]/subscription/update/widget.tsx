@@ -35,7 +35,7 @@ interface CustomWidgetProps {
 export function SubscriptionUpdateContainer({
   field,
 }: CustomWidgetProps): JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.PUT>();
   const children = field.children;
 
   return (
@@ -52,8 +52,8 @@ export function SubscriptionUpdateContainer({
       {/* Submit Button */}
       <SubmitButtonWidget
         field={{
-          text: "app.api.subscription.put.submit.label",
-          loadingText: "app.api.subscription.put.submit.loading",
+          text: "put.submit.label",
+          loadingText: "put.submit.loading",
           icon: "package-check",
           variant: "primary",
         }}
@@ -67,10 +67,10 @@ export function SubscriptionUpdateContainer({
               <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
               <Div>
                 <P className="font-medium text-green-900 dark:text-green-100">
-                  {t("app.api.subscription.put.success.title")}
+                  {t("put.success.title")}
                 </P>
                 <P className="text-sm text-green-700 dark:text-green-300">
-                  {t("app.api.subscription.put.success.description")}
+                  {t("put.success.description")}
                 </P>
               </Div>
             </Div>

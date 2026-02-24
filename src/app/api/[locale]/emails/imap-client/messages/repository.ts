@@ -168,7 +168,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
   ): Promise<ResponseType<ImapMessagesListGetResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      logger.debug("app.api.emails.imapClient.messages.list.info.start", {
+      logger.debug("Listing IMAP messages", {
         ...data,
         userId: user.id,
       });
@@ -376,10 +376,7 @@ class ImapMessagesRepositoryImpl implements ImapMessagesRepository {
       });
     } catch (error) {
       const parsedError = parseError(error);
-      logger.error(
-        "app.api.emails.imapClient.messages.list.error.server",
-        parsedError,
-      );
+      logger.error("Failed to list IMAP messages", parsedError);
       return fail({
         message: t("list.get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

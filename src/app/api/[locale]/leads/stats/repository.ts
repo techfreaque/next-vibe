@@ -813,127 +813,127 @@ export class LeadStatsRepository {
 
       return {
         totalLeads: {
-          name: "app.api.leads.admin.stats.total_leads" as const,
+          name: "response.totalLeads",
           type: "line" as ChartType,
           data: totalLeadsData,
           color: "#3b82f6",
         },
         newLeads: {
-          name: "app.api.leads.admin.stats.new_leads" as const,
+          name: "response.newLeads",
           type: "line" as ChartType,
           data: newLeadsData,
           color: "#10b981",
         },
         activeLeads: {
-          name: "app.api.leads.admin.stats.active_leads" as const,
+          name: "response.activeLeads",
           type: "line" as ChartType,
           data: activeLeadsData,
           color: "#f59e0b",
         },
         campaignRunningLeads: {
-          name: "app.api.leads.admin.stats.metrics.campaign_running_leads" as const,
+          name: "response.campaignRunningLeads",
           type: "line" as ChartType,
           data: campaignRunningLeadsData,
           color: "#10b981",
         },
         websiteUserLeads: {
-          name: "app.api.leads.admin.stats.metrics.website_user_leads" as const,
+          name: "response.websiteUserLeads",
           type: "line" as ChartType,
           data: websiteUserLeadsData,
           color: "#8b5cf6",
         },
         newsletterSubscriberLeads: {
-          name: "app.api.leads.admin.stats.metrics.newsletter_subscriber_leads" as const,
+          name: "response.newsletterSubscriberLeads",
           type: "line" as ChartType,
           data: newsletterSubscriberLeadsData,
           color: "#06b6d4",
         },
         convertedLeads: {
-          name: "app.api.leads.admin.stats.converted_leads" as const,
+          name: "response.convertedLeads",
           type: "line" as ChartType,
           data: convertedLeadsData,
           color: "#06b6d4",
         },
         signedUpLeads: {
-          name: "app.api.leads.admin.stats.metrics.signed_up_leads" as const,
+          name: "response.signedUpLeads",
           type: "line" as ChartType,
           data: signedUpLeadsData,
           color: "#84cc16",
         },
         subscriptionConfirmedLeads: {
-          name: "app.api.leads.admin.stats.metrics.subscription_confirmed_leads" as const,
+          name: "response.subscriptionConfirmedLeads",
           type: "line" as ChartType,
           data: subscriptionConfirmedLeadsData,
           color: "#ef4444",
         },
         unsubscribedLeads: {
-          name: "app.api.leads.admin.stats.metrics.unsubscribed_leads" as const,
+          name: "response.unsubscribedLeads",
           type: "line" as ChartType,
           data: unsubscribedLeadsData,
           color: "#6b7280",
         },
         bouncedLeads: {
-          name: "app.api.leads.admin.stats.metrics.bounced_leads" as const,
+          name: "response.bouncedLeads",
           type: "line" as ChartType,
           data: bouncedLeadsData,
           color: "#dc2626",
         },
         invalidLeads: {
-          name: "app.api.leads.admin.stats.metrics.invalid_leads" as const,
+          name: "response.invalidLeads",
           type: "line" as ChartType,
           data: invalidLeadsData,
           color: "#9ca3af",
         },
         emailsSent: {
-          name: "app.api.leads.admin.stats.metrics.emails_sent" as const,
+          name: "response.totalEmailsSent",
           type: "line" as ChartType,
           data: emailsSentData,
           color: "#3b82f6",
         },
         emailsOpened: {
-          name: "app.api.leads.admin.stats.metrics.emails_opened" as const,
+          name: "response.totalEmailsOpened",
           type: "line" as ChartType,
           data: emailsOpenedData,
           color: "#10b981",
         },
         emailsClicked: {
-          name: "app.api.leads.admin.stats.metrics.emails_clicked" as const,
+          name: "response.totalEmailsClicked",
           type: "line" as ChartType,
           data: emailsClickedData,
           color: "#f59e0b",
         },
         openRate: {
-          name: "app.api.leads.admin.stats.metrics.open_rate" as const,
+          name: "response.averageOpenRate",
           type: "line" as ChartType,
           data: openRateData,
           color: "#8b5cf6",
         },
         clickRate: {
-          name: "app.api.leads.admin.stats.metrics.click_rate" as const,
+          name: "response.averageClickRate",
           type: "line" as ChartType,
           data: clickRateData,
           color: "#06b6d4",
         },
         conversionRate: {
-          name: "app.api.leads.admin.stats.metrics.conversion_rate" as const,
+          name: "response.conversionRate",
           type: "line" as ChartType,
           data: conversionRateData,
           color: "#84cc16",
         },
         signupRate: {
-          name: "app.api.leads.admin.stats.metrics.signup_rate" as const,
+          name: "response.signupRate",
           type: "line" as ChartType,
           data: signupRateData,
           color: "#f97316",
         },
         subscriptionConfirmationRate: {
-          name: "app.api.leads.admin.stats.metrics.subscription_confirmation_rate" as const,
+          name: "response.subscriptionConfirmationRate",
           type: "line" as ChartType,
           data: subscriptionConfirmationRateData,
           color: "#6b7280",
         },
         averageEmailEngagementScore: {
-          name: "app.api.leads.admin.stats.metrics.average_email_engagement_score" as const,
+          name: "response.averageEmailEngagementScore",
           type: "line" as ChartType,
           data: await LeadStatsRepository.calculateEngagementScore(
             intervals,
@@ -944,7 +944,7 @@ export class LeadStatsRepository {
           color: "#dc2626",
         },
         leadVelocity: {
-          name: "app.api.leads.admin.stats.metrics.lead_velocity" as const,
+          name: "response.leadVelocity",
           type: "line" as ChartType,
           data: await LeadStatsRepository.calculateLeadVelocity(
             intervals,
@@ -955,7 +955,7 @@ export class LeadStatsRepository {
           color: "#3b82f6",
         },
         dataCompletenessRate: {
-          name: "app.api.leads.admin.stats.metrics.data_completeness_rate" as const,
+          name: "response.dataCompletenessRate",
           type: "line" as ChartType,
           data: await LeadStatsRepository.calculateDataCompleteness(
             intervals,
@@ -976,7 +976,7 @@ export class LeadStatsRepository {
 
       // Return empty historical data structure to prevent UI crashes
       const emptyData = {
-        name: "app.api.leads.admin.stats.error" as const,
+        name: "errors.server.title" as const,
         type: "line" as ChartType,
         data: [],
         color: "#ef4444",
@@ -3050,10 +3050,10 @@ export class LeadStatsRepository {
 
     // Map engagement levels to translation keys
     const levelToTranslationKey: Record<string, string> = {
-      high: "app.api.leads.stats.engagementLevel.high",
-      medium: "app.api.leads.stats.engagementLevel.medium",
-      low: "app.api.leads.stats.engagementLevel.low",
-      none: "app.api.leads.stats.engagementLevel.none",
+      high: "engagementLevel.high",
+      medium: "engagementLevel.medium",
+      low: "engagementLevel.low",
+      none: "engagementLevel.none",
     };
 
     return engagementGroups.map((group) => ({
@@ -3116,7 +3116,7 @@ export class LeadStatsRepository {
    */
   private static createEmptyHistoricalDataStructure(): LeadsStatsResponseOutput["historicalData"] {
     const emptyData = {
-      name: "app.api.leads.admin.stats.error" as const,
+      name: "errors.server.title" as const,
       type: "line" as ChartType,
       data: [],
       color: "#ef4444",

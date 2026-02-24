@@ -92,7 +92,7 @@ function ImportGuideNote({
 }): React.JSX.Element {
   return (
     <Span className="text-xs text-muted-foreground mt-1">
-      {t("app.api.leads.import.post.widget.importGuideNote", {
+      {t("post.widget.importGuideNote", {
         email: "email",
       })}
     </Span>
@@ -107,10 +107,8 @@ function FileRequirementChunked({
 }): React.JSX.Element {
   return (
     <Li>
-      {t("app.api.leads.import.post.widget.fileRequirementChunked", {
-        chunkedProcessing: t(
-          "app.api.leads.import.post.widget.chunkedProcessingLabel",
-        ),
+      {t("post.widget.fileRequirementChunked", {
+        chunkedProcessing: t("post.widget.chunkedProcessingLabel"),
       })}
     </Li>
   );
@@ -128,7 +126,7 @@ function BackgroundProcessingNote({
 }): React.JSX.Element {
   return (
     <Span className="text-xs text-blue-600 dark:text-blue-400">
-      {t("app.api.leads.import.post.widget.backgroundProcessingNote", {
+      {t("post.widget.backgroundProcessingNote", {
         jobId,
         totalRows,
       })}
@@ -141,7 +139,7 @@ export function LeadsImportContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const data = field.value;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
   const { endpointMutations } = useWidgetContext();
   const router = useRouter();
   const locale = useWidgetLocale();
@@ -191,7 +189,7 @@ export function LeadsImportContainer({
         <Div className="flex items-center gap-2 mr-auto">
           <Upload className="h-5 w-5 text-muted-foreground" />
           <Span className="font-semibold text-base">
-            {t("app.api.leads.import.post.widget.headerTitle")}
+            {t("post.widget.headerTitle")}
           </Span>
         </Div>
         <Link
@@ -200,7 +198,7 @@ export function LeadsImportContainer({
           className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors border rounded-md px-2.5 py-1.5"
         >
           <Download className="h-3.5 w-3.5" />
-          {t("app.api.leads.import.post.widget.exportTemplateButton")}
+          {t("post.widget.exportTemplateButton")}
         </Link>
       </Div>
 
@@ -213,10 +211,10 @@ export function LeadsImportContainer({
               <Info className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
               <Div className="flex flex-col gap-1">
                 <Span className="font-medium text-sm">
-                  {t("app.api.leads.import.post.widget.importGuideTitle")}
+                  {t("post.widget.importGuideTitle")}
                 </Span>
                 <Span className="text-xs text-muted-foreground">
-                  {t("app.api.leads.import.post.widget.importGuideSubtitle")}
+                  {t("post.widget.importGuideSubtitle")}
                 </Span>
                 <Div className="flex flex-wrap gap-1 mt-1">
                   {CSV_COLUMNS.map((col) => (
@@ -231,22 +229,12 @@ export function LeadsImportContainer({
               <FileText className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
               <Div className="flex flex-col gap-0.5">
                 <Span className="font-medium text-sm">
-                  {t("app.api.leads.import.post.widget.fileRequirementsTitle")}
+                  {t("post.widget.fileRequirementsTitle")}
                 </Span>
                 <Ul className="text-xs text-muted-foreground list-disc list-inside space-y-0.5">
-                  <Li>
-                    {t(
-                      "app.api.leads.import.post.widget.fileRequirementFormat",
-                    )}
-                  </Li>
-                  <Li>
-                    {t(
-                      "app.api.leads.import.post.widget.fileRequirementHeader",
-                    )}
-                  </Li>
-                  <Li>
-                    {t("app.api.leads.import.post.widget.fileRequirementSize")}
-                  </Li>
+                  <Li>{t("post.widget.fileRequirementFormat")}</Li>
+                  <Li>{t("post.widget.fileRequirementHeader")}</Li>
+                  <Li>{t("post.widget.fileRequirementSize")}</Li>
                   <FileRequirementChunked t={t} />
                 </Ul>
               </Div>
@@ -293,8 +281,8 @@ export function LeadsImportContainer({
 
           <SubmitButtonWidget
             field={{
-              text: "app.api.leads.import.post.widget.headerTitle",
-              loadingText: "app.api.leads.import.post.widget.loadingText",
+              text: "post.widget.headerTitle",
+              loadingText: "post.widget.loadingText",
               icon: "upload",
               variant: "primary",
             }}
@@ -307,7 +295,7 @@ export function LeadsImportContainer({
         <Div className="h-32 flex flex-col items-center justify-center gap-3">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           <Span className="text-sm text-muted-foreground">
-            {t("app.api.leads.import.post.widget.loadingText")}
+            {t("post.widget.loadingText")}
           </Span>
         </Div>
       )}
@@ -319,9 +307,7 @@ export function LeadsImportContainer({
             <Loader2 className="h-5 w-5 text-blue-500 animate-spin flex-shrink-0 mt-0.5" />
             <Div>
               <Span className="font-medium text-sm block text-blue-700 dark:text-blue-300">
-                {t(
-                  "app.api.leads.import.post.widget.backgroundProcessingTitle",
-                )}
+                {t("post.widget.backgroundProcessingTitle")}
               </Span>
               <BackgroundProcessingNote
                 t={t}
@@ -341,7 +327,7 @@ export function LeadsImportContainer({
               }}
             >
               <ExternalLink className="h-3.5 w-3.5" />
-              {t("app.api.leads.import.post.widget.checkJobStatusButton")}
+              {t("post.widget.checkJobStatusButton")}
             </Button>
 
             <Button
@@ -353,7 +339,7 @@ export function LeadsImportContainer({
               }}
             >
               <Square className="h-3.5 w-3.5" />
-              {t("app.api.leads.import.post.widget.stopJobButton")}
+              {t("post.widget.stopJobButton")}
             </Button>
 
             {hasFailures && (
@@ -366,7 +352,7 @@ export function LeadsImportContainer({
                 }}
               >
                 <RefreshCcw className="h-3.5 w-3.5" />
-                {t("app.api.leads.import.post.widget.retryFailedButton")}
+                {t("post.widget.retryFailedButton")}
               </Button>
             )}
           </Div>
@@ -382,7 +368,7 @@ export function LeadsImportContainer({
                 {data.totalRows}
               </Span>
               <Span className="text-xs text-muted-foreground">
-                {t("app.api.leads.import.post.widget.statTotalRows")}
+                {t("post.widget.statTotalRows")}
               </Span>
             </Div>
             <Div className="rounded-lg border bg-card p-4 text-center">
@@ -390,7 +376,7 @@ export function LeadsImportContainer({
                 {data.successfulImports}
               </Span>
               <Span className="text-xs text-muted-foreground">
-                {t("app.api.leads.import.post.widget.statImported")}
+                {t("post.widget.statImported")}
               </Span>
             </Div>
             <Div className="rounded-lg border bg-card p-4 text-center">
@@ -398,7 +384,7 @@ export function LeadsImportContainer({
                 {data.duplicateEmails}
               </Span>
               <Span className="text-xs text-muted-foreground">
-                {t("app.api.leads.import.post.widget.statDuplicates")}
+                {t("post.widget.statDuplicates")}
               </Span>
             </Div>
             <Div className="rounded-lg border bg-card p-4 text-center">
@@ -406,7 +392,7 @@ export function LeadsImportContainer({
                 {data.failedImports}
               </Span>
               <Span className="text-xs text-muted-foreground">
-                {t("app.api.leads.import.post.widget.statFailed")}
+                {t("post.widget.statFailed")}
               </Span>
             </Div>
           </Div>
@@ -420,7 +406,7 @@ export function LeadsImportContainer({
                 onClick={handleViewList}
               >
                 <List className="h-3.5 w-3.5" />
-                {t("app.api.leads.import.post.widget.viewImportedLeadsButton")}
+                {t("post.widget.viewImportedLeadsButton")}
               </Button>
             )}
 
@@ -434,10 +420,9 @@ export function LeadsImportContainer({
                 }}
               >
                 <RefreshCcw className="h-3.5 w-3.5" />
-                {t(
-                  "app.api.leads.import.post.widget.retryFailedWithCountButton",
-                  { count: data.failedImports },
-                )}
+                {t("post.widget.retryFailedWithCountButton", {
+                  count: data.failedImports,
+                })}
               </Button>
             )}
           </Div>
@@ -445,7 +430,7 @@ export function LeadsImportContainer({
           {summary && (
             <Div className="rounded-lg border bg-card p-4">
               <Span className="text-sm font-semibold block mb-3">
-                {t("app.api.leads.import.post.widget.summaryTitle")}
+                {t("post.widget.summaryTitle")}
               </Span>
               <Div className="grid grid-cols-3 gap-4">
                 <Div className="flex items-center gap-2">
@@ -455,7 +440,7 @@ export function LeadsImportContainer({
                       {summary.newLeads}
                     </Span>
                     <Span className="text-xs text-muted-foreground block">
-                      {t("app.api.leads.import.post.widget.summaryNewLeads")}
+                      {t("post.widget.summaryNewLeads")}
                     </Span>
                   </Div>
                 </Div>
@@ -466,7 +451,7 @@ export function LeadsImportContainer({
                       {summary.updatedLeads}
                     </Span>
                     <Span className="text-xs text-muted-foreground block">
-                      {t("app.api.leads.import.post.widget.summaryUpdated")}
+                      {t("post.widget.summaryUpdated")}
                     </Span>
                   </Div>
                 </Div>
@@ -477,7 +462,7 @@ export function LeadsImportContainer({
                       {summary.skippedDuplicates}
                     </Span>
                     <Span className="text-xs text-muted-foreground block">
-                      {t("app.api.leads.import.post.widget.summarySkipped")}
+                      {t("post.widget.summarySkipped")}
                     </Span>
                   </Div>
                 </Div>
@@ -485,9 +470,7 @@ export function LeadsImportContainer({
               {successRate !== null && (
                 <Div className="mt-3">
                   <Div className="flex justify-between text-xs text-muted-foreground mb-1">
-                    <Span>
-                      {t("app.api.leads.import.post.widget.successRateLabel")}
-                    </Span>
+                    <Span>{t("post.widget.successRateLabel")}</Span>
                     <Span>{successRate}%</Span>
                   </Div>
                   <Div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -510,7 +493,7 @@ export function LeadsImportContainer({
               <Div className="px-4 py-3 border-b border-red-200 flex items-center gap-2">
                 <XCircle className="h-4 w-4 text-red-500" />
                 <Span className="text-sm font-medium text-red-700 dark:text-red-300">
-                  {t("app.api.leads.import.post.widget.importErrorsTitle", {
+                  {t("post.widget.importErrorsTitle", {
                     count: errors.length,
                   })}
                 </Span>
@@ -522,7 +505,7 @@ export function LeadsImportContainer({
                     className="px-4 py-2 flex items-center gap-3 text-xs"
                   >
                     <Span className="text-muted-foreground w-12 flex-shrink-0">
-                      {t("app.api.leads.import.post.widget.errorRowLabel", {
+                      {t("post.widget.errorRowLabel", {
                         row: err.row,
                       })}
                     </Span>
@@ -544,7 +527,7 @@ export function LeadsImportContainer({
                         }}
                       >
                         <Search className="h-3 w-3" />
-                        {t("app.api.leads.import.post.widget.findLeadButton")}
+                        {t("post.widget.findLeadButton")}
                       </Button>
                     )}
                   </Div>

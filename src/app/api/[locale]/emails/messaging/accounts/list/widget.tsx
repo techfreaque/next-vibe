@@ -78,7 +78,7 @@ function AccountRow({
 }: {
   account: MessagingAccount;
   onEdit: (account: MessagingAccount) => void;
-  t: (key: string) => string;
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
 }): React.JSX.Element {
   const statusColor =
     STATUS_COLORS[account.status] ??
@@ -122,8 +122,7 @@ function AccountRow({
             <Span className="truncate max-w-[160px]">{account.fromId}</Span>
           )}
           <Span>
-            {t("app.api.emails.messaging.accounts.list.widget.sent")}:{" "}
-            {account.messagesSentTotal}
+            {t("widget.sent")}: {account.messagesSentTotal}
           </Span>
         </Div>
       </Div>
@@ -136,7 +135,7 @@ export function MessagingAccountsListContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const router = useRouter();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
@@ -198,7 +197,7 @@ export function MessagingAccountsListContainer({
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
         <Span className="font-semibold text-base">
-          {t("app.api.emails.messaging.accounts.list.title")}
+          {t("title")}
           {total > 0 && (
             <Span className="ml-2 text-sm text-muted-foreground font-normal">
               ({total})
@@ -211,7 +210,7 @@ export function MessagingAccountsListContainer({
           variant="ghost"
           size="sm"
           onClick={handleRefresh}
-          title={t("app.api.emails.messaging.accounts.list.widget.refresh")}
+          title={t("widget.refresh")}
         >
           <RefreshCw className="h-4 w-4" />
         </Button>
@@ -223,7 +222,7 @@ export function MessagingAccountsListContainer({
           className="gap-1"
         >
           <Plus className="h-4 w-4" />
-          {t("app.api.emails.messaging.accounts.list.widget.create")}
+          {t("widget.create")}
         </Button>
       </Div>
 
@@ -263,9 +262,7 @@ export function MessagingAccountsListContainer({
                 onSubmit();
               }
             }}
-            placeholder={t(
-              "app.api.emails.messaging.accounts.list.widget.searchPlaceholder",
-            )}
+            placeholder={t("widget.searchPlaceholder")}
             className="pl-9 h-9"
           />
         </Div>
@@ -290,9 +287,7 @@ export function MessagingAccountsListContainer({
           </Div>
         ) : (
           <Div className="text-center text-muted-foreground py-12">
-            <Div className="mb-4">
-              {t("app.api.emails.messaging.accounts.list.widget.emptyState")}
-            </Div>
+            <Div className="mb-4">{t("widget.emptyState")}</Div>
             <Button
               type="button"
               variant="outline"
@@ -301,7 +296,7 @@ export function MessagingAccountsListContainer({
               className="gap-1"
             >
               <Plus className="h-4 w-4" />
-              {t("app.api.emails.messaging.accounts.list.widget.create")}
+              {t("widget.create")}
             </Button>
           </Div>
         )}

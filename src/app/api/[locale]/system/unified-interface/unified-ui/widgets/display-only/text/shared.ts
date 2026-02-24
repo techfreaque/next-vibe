@@ -8,7 +8,6 @@ import type z from "zod";
 
 import type { FieldDataType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { WidgetData } from "../../../../shared/widgets/widget-data";
 import type { BaseWidgetContext } from "../../_shared/types";
 import type { TextFormat, TextWidgetSchema } from "./types";
@@ -32,20 +31,12 @@ export interface ProcessedText {
  */
 export function extractTextData(
   value: z.output<TextWidgetSchema>,
-  t: BaseWidgetContext<CreateApiEndpointAny>["t"],
+  t: BaseWidgetContext<never>["t"],
 ): ProcessedText | null {
   // Handle string value with translation
   if (typeof value === "string") {
     return {
       text: t(value),
-      format: "plain",
-    };
-  }
-
-  // Handle plain string without translation context
-  if (typeof value === "string") {
-    return {
-      text: value,
       format: "plain",
     };
   }

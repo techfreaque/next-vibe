@@ -16,10 +16,7 @@ import {
 } from "../../../../shared/widgets/utils/widget-helpers";
 import type { ReactDisplayWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
-import {
-  useWidgetContext,
-  useWidgetTranslation,
-} from "../../_shared/use-widget-context";
+import { useWidgetContext } from "../../_shared/use-widget-context";
 import type { ButtonWidgetConfig } from "./types";
 
 /**
@@ -28,7 +25,9 @@ import type { ButtonWidgetConfig } from "./types";
  */
 export function ButtonWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "widget",
 >({
@@ -38,8 +37,8 @@ export function ButtonWidget<
   TUsage,
   ButtonWidgetConfig<TKey, TUsage, TSchemaType>
 >): JSX.Element {
-  const t = useWidgetTranslation();
   const context = useWidgetContext();
+  const { t: tField } = context;
 
   const {
     text: textKey,
@@ -66,7 +65,7 @@ export function ButtonWidget<
   const iconSpacingClass = getSpacingClassName("margin", iconSpacing);
 
   const buttonIcon = icon ? (icon as IconKey) : undefined;
-  const buttonText = textKey ? t(textKey) : undefined;
+  const buttonText = textKey ? tField(textKey) : undefined;
 
   const handleClick = (e: { stopPropagation: () => void }): void => {
     e.stopPropagation(); // Prevent card click when clicking action buttons

@@ -71,7 +71,7 @@ function ExitCodeBadge({ code }: { code: number | null }): React.JSX.Element {
 }
 
 export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof endpoints.POST>();
   const form = useWidgetForm<typeof endpoints.POST>();
   const onSubmit = useWidgetOnSubmit();
   const { endpointMutations } = useWidgetContext();
@@ -135,7 +135,7 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
       <Div className="flex items-center gap-2 px-4 py-3 border-b">
         <Terminal className="h-4 w-4 text-muted-foreground" />
         <Span className="font-semibold text-sm mr-auto">
-          {t("app.api.ssh.exec.widget.title")}
+          {t("widget.title")}
         </Span>
         <Button
           type="button"
@@ -144,7 +144,7 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
           onClick={() => setShowHistory((v) => !v)}
           className="text-xs text-muted-foreground"
         >
-          {t("app.api.ssh.exec.widget.historyLabel")} ({history.length})
+          {t("widget.historyLabel")} ({history.length})
         </Button>
       </Div>
 
@@ -153,7 +153,7 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
         <Div className="border-b bg-muted/30 max-h-40 overflow-y-auto">
           {history.length === 0 ? (
             <P className="px-4 py-3 text-xs text-muted-foreground">
-              {t("app.api.ssh.exec.widget.noHistory")}
+              {t("widget.noHistory")}
             </P>
           ) : (
             history.map((h, i) => (
@@ -181,7 +181,7 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
           value={command}
           onChange={(e) => form?.setValue("command", e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={t("app.api.ssh.exec.widget.placeholder")}
+          placeholder={t("widget.placeholder")}
           className="font-mono text-sm min-h-[80px] resize-none"
           disabled={isLoading}
         />
@@ -194,9 +194,7 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
             className="gap-1.5"
           >
             <Play className="h-3.5 w-3.5" />
-            {isLoading
-              ? t("app.api.ssh.exec.widget.running")
-              : t("app.api.ssh.exec.widget.runButton")}
+            {isLoading ? t("widget.running") : t("widget.runButton")}
           </Button>
           <Button
             type="button"
@@ -207,10 +205,10 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
             className="gap-1.5"
           >
             <RotateCcw className="h-3.5 w-3.5" />
-            {t("app.api.ssh.exec.widget.clearButton")}
+            {t("widget.clearButton")}
           </Button>
           <Span className="text-[10px] text-muted-foreground ml-auto">
-            {t("app.api.ssh.exec.widget.ctrlEnterHint")}
+            {t("widget.ctrlEnterHint")}
           </Span>
         </Div>
       </Div>
@@ -223,19 +221,19 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
             <Div className="flex items-center gap-3 px-4 py-2 border-b bg-muted/20 flex-wrap text-xs">
               <Div className="flex items-center gap-1.5">
                 <Span className="text-muted-foreground">
-                  {t("app.api.ssh.exec.widget.exitCodeLabel")}:
+                  {t("widget.exitCodeLabel")}:
                 </Span>
                 <ExitCodeBadge code={value.exitCode} />
               </Div>
               <Div className="flex items-center gap-1.5">
                 <Span className="text-muted-foreground">
-                  {t("app.api.ssh.exec.widget.durationLabel")}:
+                  {t("widget.durationLabel")}:
                 </Span>
                 <Span className="font-mono">{value.durationMs}ms</Span>
               </Div>
               <Div className="flex items-center gap-1.5">
                 <Span className="text-muted-foreground">
-                  {t("app.api.ssh.exec.widget.backendLabel")}:
+                  {t("widget.backendLabel")}:
                 </Span>
                 <Span
                   className={cn(
@@ -250,7 +248,7 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
               </Div>
               {value.truncated && (
                 <Span className="text-amber-600 dark:text-amber-400">
-                  {t("app.api.ssh.exec.widget.truncatedWarning")}
+                  {t("widget.truncatedWarning")}
                 </Span>
               )}
             </Div>
@@ -260,7 +258,7 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
               <Div className="flex flex-col gap-0 border-b">
                 <Div className="px-4 py-1 bg-muted/10 border-b">
                   <Span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
-                    {t("app.api.ssh.exec.widget.stdoutLabel")}
+                    {t("widget.stdoutLabel")}
                   </Span>
                 </Div>
                 <Pre className="px-4 py-3 text-xs font-mono whitespace-pre-wrap break-words overflow-x-auto max-h-64 overflow-y-auto">
@@ -274,7 +272,7 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
               <Div className="flex flex-col gap-0">
                 <Div className="px-4 py-1 bg-amber-50 dark:bg-amber-900/10 border-b">
                   <Span className="text-[10px] font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wide">
-                    {t("app.api.ssh.exec.widget.stderrLabel")}
+                    {t("widget.stderrLabel")}
                   </Span>
                 </Div>
                 <Pre className="px-4 py-3 text-xs font-mono whitespace-pre-wrap break-words overflow-x-auto max-h-48 overflow-y-auto text-amber-800 dark:text-amber-300">
@@ -286,7 +284,7 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
             {!value.stdout && !value.stderr && (
               <Div className="flex items-center justify-center py-10">
                 <Span className="text-xs text-muted-foreground">
-                  {t("app.api.ssh.exec.widget.emptyOutput")}
+                  {t("widget.emptyOutput")}
                 </Span>
               </Div>
             )}
@@ -295,7 +293,7 @@ export function SshExecContainer({ field }: WidgetProps): React.JSX.Element {
           <Div className="flex flex-col items-center justify-center flex-1 gap-2 py-16 text-center">
             <Terminal className="h-8 w-8 text-muted-foreground/40" />
             <Span className="text-xs text-muted-foreground">
-              {t("app.api.ssh.exec.widget.outputLabel")}
+              {t("widget.outputLabel")}
             </Span>
           </Div>
         )}

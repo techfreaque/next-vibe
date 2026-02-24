@@ -24,8 +24,8 @@ const creditExpirationTask = createCronTask(
   creditExpirationTaskDefinition.POST,
   tools.POST,
   {
-    name: "credit-expiration",
-    description: "app.api.agent.chat.credits.expire.task.description",
+    name: "expire.post.title",
+    description: "expire.task.description",
     schedule: CRON_SCHEDULES.DAILY_MIDNIGHT,
     category: TaskCategory.MAINTENANCE,
     enabled: true,

@@ -20,6 +20,10 @@ export const translations: typeof enTranslations = {
       label: "Favorit erstellen",
       loadingText: "Erstellen...",
     },
+    useWithoutSavingButton: {
+      label: "Ohne Speichern verwenden",
+      loadingText: "Anwenden...",
+    },
     characterId: {
       label: "Charakter",
       description: "Wählen Sie den Charakter für diesen Favoriten",

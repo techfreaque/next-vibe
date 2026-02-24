@@ -46,6 +46,7 @@ import type {
 } from "../../_shared/types";
 import {
   useWidgetCancelButton,
+  useWidgetContext,
   useWidgetForm,
   useWidgetIsSubmitting,
   useWidgetLocale,
@@ -53,7 +54,6 @@ import {
   useWidgetOnSubmit,
   useWidgetResponse,
   useWidgetSubmitButton,
-  useWidgetTranslation,
 } from "../../_shared/use-widget-context";
 import type {
   ContainerArrayWidgetConfig,
@@ -86,7 +86,9 @@ import type {
  */
 export function ContainerWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
   TSchemaType extends
     | "object"
@@ -135,13 +137,13 @@ export function ContainerWidget<
 >): JSX.Element {
   // Get context from hooks
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const { t: tField } = useWidgetContext();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
   const onCancel = useWidgetOnCancel();
   const isSubmitting = useWidgetIsSubmitting() ?? false;
-  const submitButton = useWidgetSubmitButton();
-  const cancelButton = useWidgetCancelButton();
+  const submitButton = useWidgetSubmitButton<TEndpoint>();
+  const cancelButton = useWidgetCancelButton<TEndpoint>();
   const response = useWidgetResponse();
 
   const { t: globalT } = reactScopedTranslation.scopedT(locale);
@@ -317,8 +319,8 @@ export function ContainerWidget<
   const layoutClass = getLayoutClassName(layoutConfig);
 
   // Translate title and description early (before any early returns)
-  const title = titleKey ? t(titleKey) : undefined;
-  const description = descriptionKey ? t(descriptionKey) : undefined;
+  const title = titleKey ? tField(titleKey) : undefined;
+  const description = descriptionKey ? tField(descriptionKey) : undefined;
 
   let displayTitle: string | undefined = title;
   if (countFromField !== undefined && displayTitle) {
@@ -352,11 +354,11 @@ export function ContainerWidget<
   const headerGapClass = getSpacingClassName("gap", headerGap);
 
   const buttonText = submitButtonConfig?.text
-    ? t(submitButtonConfig.text)
+    ? tField(submitButtonConfig.text)
     : globalT("widgets.endpointRenderer.submit");
 
   const loadingText = submitButtonConfig?.loadingText
-    ? t(submitButtonConfig.loadingText)
+    ? tField(submitButtonConfig.loadingText)
     : globalT("widgets.endpointRenderer.submitting");
 
   // Check if children are present for validation
@@ -494,7 +496,7 @@ export function ContainerWidget<
                 className="flex-1"
               >
                 {cancelButton?.text
-                  ? t(cancelButton.text)
+                  ? tField(cancelButton.text)
                   : globalT("widgets.endpointRenderer.cancel")}
               </Button>
             )}

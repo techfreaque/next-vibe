@@ -7,9 +7,11 @@ import TextInput from "ink-text-input";
 import type { JSX } from "react";
 import { useState } from "react";
 
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { DateWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import {
   useInkWidgetForm,
+  useInkWidgetLocale,
   useInkWidgetResponse,
   useInkWidgetShowLabels,
   useInkWidgetTranslation,
@@ -32,7 +34,8 @@ export function TimeFieldWidgetInk<
   TUsage,
   TimeFieldWidgetConfig<TKey, DateWidgetSchema, TUsage>
 >): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
+  const locale = useInkWidgetLocale();
   const form = useInkWidgetForm();
   const response = useInkWidgetResponse();
   const showLabels = useInkWidgetShowLabels();
@@ -41,6 +44,8 @@ export function TimeFieldWidgetInk<
       ? `${String(field.value.getHours()).padStart(2, "0")}:${String(field.value.getMinutes()).padStart(2, "0")}`
       : "",
   );
+
+  const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
   // Response mode - just display the value
   if (response) {
@@ -66,9 +71,7 @@ export function TimeFieldWidgetInk<
     return (
       <Box>
         <Text color="red">
-          {t(
-            "app.api.system.unifiedInterface.react.widgets.formField.requiresContext",
-          )}
+          {widgetT("react.widgets.formField.requiresContext")}
         </Text>
       </Box>
     );
@@ -78,8 +81,8 @@ export function TimeFieldWidgetInk<
     return (
       <Box>
         <Text color="red">
-          {t(
-            "app.api.system.unifiedInterface.cli.widgets.formField.invalidFormType",
+          {widgetT(
+            "cli.vibe.endpoints.renderers.cliUi.widgets.common.invalidFormType",
           )}
         </Text>
       </Box>

@@ -57,7 +57,7 @@ export function StatusIndicatorWidgetInk<
   TUsage,
   StatusIndicatorWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
 >): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const { status, label } = field;
 
   const color = getStatusColor(status);

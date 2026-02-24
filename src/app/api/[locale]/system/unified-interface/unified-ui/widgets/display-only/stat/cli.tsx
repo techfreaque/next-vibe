@@ -35,7 +35,7 @@ export function StatWidgetInk<
   TUsage,
   StatWidgetConfig<TKey, TSchema, TUsage, "primitive">
 >): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const locale = useInkWidgetLocale();
   const { label: labelKey, format, trend, trendValue } = field;
 

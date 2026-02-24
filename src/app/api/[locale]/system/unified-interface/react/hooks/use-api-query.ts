@@ -13,6 +13,7 @@ import { useTranslation } from "@/i18n/core/client";
 
 import type { EndpointReadOptions } from "../../shared/endpoints/definition/create";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
+import type { ReactHooksTranslationKey } from "./i18n";
 import { executeQuery } from "./query-executor";
 import { buildKey } from "./query-key-builder";
 import {
@@ -264,9 +265,9 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
           : isCachedData && !isFetching
             ? "app.error.api.store.status.cached_data"
             : isSuccess
-              ? "app.api.system.unifiedInterface.react.hooks.store.status.success"
+              ? ("store.status.success" satisfies ReactHooksTranslationKey)
               : isError
-                ? "app.api.system.unifiedInterface.react.hooks.store.errors.request_failed"
+                ? ("store.errors.request_failed" satisfies ReactHooksTranslationKey)
                 : undefined
     ) as ApiQueryReturn<TEndpoint["types"]["ResponseOutput"]>["statusMessage"];
 

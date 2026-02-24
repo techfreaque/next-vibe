@@ -34,16 +34,14 @@ export function ImapAccountCreateContainer({
   fieldName,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
 
   return (
     <Div className="flex flex-col gap-0">
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
         <NavigateButtonWidget field={children.backButton} />
-        <Span className="font-semibold text-base">
-          {t("app.api.emails.imapClient.accounts.create.title")}
-        </Span>
+        <Span className="font-semibold text-base">{t("title")}</Span>
       </Div>
 
       <Div className="p-4 flex flex-col gap-6">
@@ -52,7 +50,7 @@ export function ImapAccountCreateContainer({
         {/* Basic Info */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.imapClient.accounts.create.basicInfo")}
+            {t("basicInfo")}
           </Span>
           <TextFieldWidget
             fieldName={`${fieldName}.basicInfo.name`}
@@ -67,7 +65,7 @@ export function ImapAccountCreateContainer({
         {/* Server */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.imapClient.accounts.create.serverConnection")}
+            {t("serverConnection")}
           </Span>
           <TextFieldWidget
             fieldName={`${fieldName}.serverConnection.host`}
@@ -88,7 +86,7 @@ export function ImapAccountCreateContainer({
         {/* Auth */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.imapClient.accounts.create.authentication")}
+            {t("authentication")}
           </Span>
           <TextFieldWidget
             fieldName={`${fieldName}.authentication.username`}
@@ -109,7 +107,7 @@ export function ImapAccountCreateContainer({
         {/* Sync config */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.imapClient.accounts.create.syncConfiguration")}
+            {t("syncConfiguration")}
           </Span>
           <Div className="grid grid-cols-2 gap-3">
             <BooleanFieldWidget
@@ -131,9 +129,8 @@ export function ImapAccountCreateContainer({
         <Div className="flex items-center justify-end pt-2">
           <SubmitButtonWidget
             field={{
-              text: "app.api.emails.imapClient.accounts.create.submit",
-              loadingText:
-                "app.api.emails.imapClient.accounts.create.submitting",
+              text: "submit",
+              loadingText: "submitting",
               icon: "plus",
               variant: "primary",
               size: "sm",

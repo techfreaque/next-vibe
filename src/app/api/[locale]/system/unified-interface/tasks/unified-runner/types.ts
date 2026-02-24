@@ -224,10 +224,10 @@ export interface CronTaskAny {
 /**
  * Task Runner — long-running background process with graceful shutdown support.
  */
-export interface TaskRunner {
+export interface TaskRunner<TScopedTranslationKey extends string> {
   type: "task-runner";
-  name: string;
-  description: string;
+  name: TScopedTranslationKey;
+  description: TScopedTranslationKey;
   category: (typeof TaskCategory)[keyof typeof TaskCategory];
   enabled: boolean;
   priority?: (typeof CronTaskPriority)[keyof typeof CronTaskPriority];
@@ -256,7 +256,7 @@ export interface TaskRunner {
 }
 
 /** Union type for heterogeneous task collections */
-export type Task = CronTaskAny | TaskRunner;
+export type Task = CronTaskAny | TaskRunner<string>;
 
 // ─── Factory Functions ───────────────────────────────────────────────────────
 
@@ -275,8 +275,8 @@ export function createCronTask<const T extends CreateApiEndpointAny>(
     T["allowedRoles"]
   >,
   config: {
-    name: string;
-    description: string;
+    name: T["types"]["ScopedTranslationKey"];
+    description: T["types"]["ScopedTranslationKey"];
     schedule: string;
     category: (typeof TaskCategory)[keyof typeof TaskCategory];
     enabled: boolean;
@@ -308,7 +308,9 @@ export function createCronTask<const T extends CreateApiEndpointAny>(
  *
  * Usage: `createTaskRunner({ name: "pulse", run: async ({ signal }) => { ... } })`
  */
-export function createTaskRunner(config: Omit<TaskRunner, "type">): TaskRunner {
+export function createTaskRunner<TScopedTranslationKey extends string>(
+  config: Omit<TaskRunner<TScopedTranslationKey>, "type">,
+): TaskRunner<TScopedTranslationKey> {
   return {
     type: "task-runner",
     ...config,
@@ -330,7 +332,7 @@ export interface TaskFile {
 
 export interface TaskRegistry {
   cronTasks: CronTaskAny[];
-  taskRunners: TaskRunner[];
+  taskRunners: TaskRunner<string>[];
   allTasks: Task[];
   tasksByCategory: Record<
     (typeof TaskCategory)[keyof typeof TaskCategory],

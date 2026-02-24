@@ -64,9 +64,8 @@ export function BraveSearchResultsContainer({
 
           <SubmitButtonWidget
             field={{
-              text: "app.api.agent.search.brave.get.submitButton.label",
-              loadingText:
-                "app.api.agent.search.brave.get.submitButton.loadingText",
+              text: "get.submitButton.label",
+              loadingText: "get.submitButton.loadingText",
               icon: "search",
               variant: "primary",
             }}

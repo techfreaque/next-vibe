@@ -52,8 +52,8 @@ export function FavoriteCreateContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const form = useWidgetForm();
-  const t = useWidgetTranslation();
+  const form = useWidgetForm<typeof definition.POST>();
+  const t = useWidgetTranslation<typeof definition.POST>();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
@@ -65,7 +65,7 @@ export function FavoriteCreateContainer({
   const isNoCharacter = characterId === NO_CHARACTER_ID;
 
   const favoriteModelSelection: ModelSelectionSimple | undefined =
-    form?.watch("modelSelection");
+    form?.watch("modelSelection") ?? undefined;
 
   const characterEndpoint = useCharacter(characterId ?? "", user, logger);
   const characterData = characterEndpoint.read?.data;
@@ -97,7 +97,7 @@ export function FavoriteCreateContainer({
         activeFavoriteId: null,
         selectedCharacter: characterId,
         selectedModel,
-        ttsVoice: voice ?? characterData?.voice ?? null,
+        ttsVoice: voice ?? characterData?.voice ?? undefined,
       });
 
       // Navigate back
@@ -129,18 +129,13 @@ export function FavoriteCreateContainer({
           className="ml-auto h-8 text-xs"
         >
           {isApplying
-            ? t(
-                "app.api.agent.chat.favorites.post.useWithoutSavingButton.loadingText",
-              )
-            : t(
-                "app.api.agent.chat.favorites.post.useWithoutSavingButton.label",
-              )}
+            ? t("post.useWithoutSavingButton.loadingText")
+            : t("post.useWithoutSavingButton.label")}
         </Button>
         <SubmitButtonWidget
           field={{
-            text: "app.api.agent.chat.favorites.post.submitButton.label",
-            loadingText:
-              "app.api.agent.chat.favorites.post.submitButton.loadingText",
+            text: "post.submitButton.label",
+            loadingText: "post.submitButton.loadingText",
             icon: "plus",
             variant: "primary",
             size: "sm",

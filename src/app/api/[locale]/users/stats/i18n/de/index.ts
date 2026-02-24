@@ -448,5 +448,10 @@ export const translations: typeof enTranslations = {
     rowThisMonth: "Diesen Monat",
     rowLastMonth: "Letzten Monat",
     generatedAt: "Generiert am:",
+    filters: "Filter",
+    filtersTitle: "Filteroptionen",
+    applyFilters: "Filter anwenden",
+    viewUsers: "Benutzer anzeigen",
+    createUser: "Benutzer erstellen",
   },
 };

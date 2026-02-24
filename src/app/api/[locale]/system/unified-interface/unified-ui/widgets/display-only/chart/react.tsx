@@ -21,9 +21,9 @@ import type {
 } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
-  useWidgetTranslation,
 } from "../../_shared/use-widget-context";
 import { type ChartDataPoint, extractChartData } from "./shared";
 import type { ChartWidgetConfig, ChartWidgetSchema } from "./types";
@@ -63,7 +63,9 @@ const CHART_COLORS = [
  */
 export function ChartWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive" | "widget",
 >(
@@ -82,7 +84,7 @@ export function ChartWidget<
   const { field } = props;
   const fieldName = "fieldName" in props ? props.fieldName : undefined;
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const { t: tField } = useWidgetContext();
   const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
   const form = useWidgetForm();
   const {
@@ -128,8 +130,8 @@ export function ChartWidget<
 
   // Support both 'label' and 'title' for backwards compatibility (label takes precedence)
   const chartTitleKey = labelKey || titleKey;
-  const title = chartTitleKey ? t(chartTitleKey) : undefined;
-  const description = descriptionKey ? t(descriptionKey) : undefined;
+  const title = chartTitleKey ? tField(chartTitleKey) : undefined;
+  const description = descriptionKey ? tField(descriptionKey) : undefined;
 
   // Extract chart data using shared logic
   const chartData = extractChartData(value);
@@ -186,9 +188,9 @@ export function ChartWidget<
         firstSeries?.data
           .filter((d: ChartDataPoint) => d.y > 0) // Filter out zero values for pie chart
           .map((d: ChartDataPoint) => {
-            // Translate labels - t() returns original string if key not found
+            // Translate labels - tField() returns original string if key not found
             const rawLabel = String(d.label ?? d.x ?? "Unknown");
-            const translatedLabel = t(rawLabel);
+            const translatedLabel = tField(rawLabel);
 
             // Store color if available
             if (typeof d.color === "string") {
@@ -283,7 +285,7 @@ export function ChartWidget<
     } else {
       // Categorical data - translate labels
       const allXValues = chartData.data.flatMap((series) =>
-        series.data.map((d) => (d.label ? t(d.label) : (d.x ?? ""))),
+        series.data.map((d) => (d.label ? tField(d.label) : (d.x ?? ""))),
       );
       xTickLabels = [...new Set(allXValues)];
     }
@@ -373,7 +375,7 @@ export function ChartWidget<
           const data = isTimeSeries
             ? series.data.map((d, idx) => ({ x: idx, y: d.y }))
             : series.data.map((d) => ({
-                x: d.label ? t(d.label) : (d.x ?? ""),
+                x: d.label ? tField(d.label) : (d.x ?? ""),
                 y: d.y,
               }));
 

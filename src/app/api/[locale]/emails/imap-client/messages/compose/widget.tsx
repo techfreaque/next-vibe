@@ -37,7 +37,7 @@ export function ComposeEmailContainer({
   field,
   fieldName,
 }: CustomWidgetProps): React.JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
   const locale = useWidgetLocale();
   const router = useRouter();
   const form = useWidgetForm();
@@ -75,11 +75,9 @@ export function ComposeEmailContainer({
         <Div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
           <Send className="h-6 w-6 text-green-600 dark:text-green-400" />
         </Div>
-        <Span className="font-semibold text-lg">
-          {t("app.api.emails.imapClient.messages.compose.widget.sent")}
-        </Span>
+        <Span className="font-semibold text-lg">{t("widget.sent")}</Span>
         <Button type="button" variant="outline" onClick={handleCancel}>
-          {t("app.api.emails.imapClient.messages.compose.widget.cancel")}
+          {t("widget.cancel")}
         </Button>
       </Div>
     );
@@ -90,14 +88,14 @@ export function ComposeEmailContainer({
       {/* Header */}
       <Div className="flex items-center gap-2 px-4 py-3 border-b">
         <Span className="font-semibold text-base flex-1">
-          {t("app.api.emails.imapClient.messages.compose.widget.title")}
+          {t("widget.title")}
         </Span>
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={handleCancel}
-          title={t("app.api.emails.imapClient.messages.compose.widget.cancel")}
+          title={t("widget.cancel")}
         >
           <X className="h-4 w-4" />
         </Button>
@@ -108,14 +106,12 @@ export function ComposeEmailContainer({
         {/* To */}
         <Div className="flex items-center gap-3 px-4 py-2.5">
           <Span className="text-sm font-medium text-muted-foreground w-32 flex-shrink-0">
-            {t("app.api.emails.imapClient.messages.compose.post.to.label")}
+            {t("post.to.label")}
           </Span>
           <Input
             type="email"
             className={inputClass}
-            placeholder={t(
-              "app.api.emails.imapClient.messages.compose.post.to.placeholder",
-            )}
+            placeholder={t("post.to.placeholder")}
             value={toValue}
             onChangeText={(text) => form?.setValue(`${fieldName}.to`, text)}
           />
@@ -124,13 +120,11 @@ export function ComposeEmailContainer({
         {/* To Name */}
         <Div className="flex items-center gap-3 px-4 py-2.5">
           <Span className="text-sm font-medium text-muted-foreground w-32 flex-shrink-0">
-            {t("app.api.emails.imapClient.messages.compose.post.toName.label")}
+            {t("post.toName.label")}
           </Span>
           <Input
             className={inputClass}
-            placeholder={t(
-              "app.api.emails.imapClient.messages.compose.post.toName.placeholder",
-            )}
+            placeholder={t("post.toName.placeholder")}
             value={toNameValue}
             onChangeText={(text) => form?.setValue(`${fieldName}.toName`, text)}
           />
@@ -139,13 +133,11 @@ export function ComposeEmailContainer({
         {/* Subject */}
         <Div className="flex items-center gap-3 px-4 py-2.5">
           <Span className="text-sm font-medium text-muted-foreground w-32 flex-shrink-0">
-            {t("app.api.emails.imapClient.messages.compose.post.subject.label")}
+            {t("post.subject.label")}
           </Span>
           <Input
             className={`${inputClass} font-medium`}
-            placeholder={t(
-              "app.api.emails.imapClient.messages.compose.post.subject.placeholder",
-            )}
+            placeholder={t("post.subject.placeholder")}
             value={subjectValue}
             onChangeText={(text) =>
               form?.setValue(`${fieldName}.subject`, text)
@@ -157,9 +149,7 @@ export function ComposeEmailContainer({
         <Div className="flex-1 px-4 py-3">
           <Textarea
             className={`${inputClass} min-h-[300px] resize-none block`}
-            placeholder={t(
-              "app.api.emails.imapClient.messages.compose.post.body.placeholder",
-            )}
+            placeholder={t("post.body.placeholder")}
             value={bodyValue}
             onChangeText={(text) => form?.setValue(`${fieldName}.body`, text)}
           />
@@ -177,17 +167,17 @@ export function ComposeEmailContainer({
           {isSending ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              {t("app.api.emails.imapClient.messages.compose.widget.sending")}
+              {t("widget.sending")}
             </>
           ) : (
             <>
               <Send className="h-4 w-4" />
-              {t("app.api.emails.imapClient.messages.compose.widget.send")}
+              {t("widget.send")}
             </>
           )}
         </Button>
         <Button type="button" variant="ghost" onClick={handleCancel}>
-          {t("app.api.emails.imapClient.messages.compose.widget.cancel")}
+          {t("widget.cancel")}
         </Button>
       </Div>
     </Div>

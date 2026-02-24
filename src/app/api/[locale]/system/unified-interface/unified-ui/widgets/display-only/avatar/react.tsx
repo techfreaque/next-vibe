@@ -52,7 +52,9 @@ import type { AvatarWidgetConfig } from "./types";
 
 export default function AvatarWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
   TSchema extends StringWidgetSchema,
 >(
@@ -68,7 +70,7 @@ export default function AvatarWidget<
         AvatarWidgetConfig<TKey, TUsage, "primitive", TSchema>
       >,
 ): JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<TEndpoint>();
   const form = useWidgetForm();
   const { field } = props;
   const fieldName = "fieldName" in props ? props.fieldName : undefined;

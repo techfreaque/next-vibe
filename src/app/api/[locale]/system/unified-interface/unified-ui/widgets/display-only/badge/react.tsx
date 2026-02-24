@@ -18,8 +18,8 @@ import type {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 import {
+  useWidgetContext,
   useWidgetForm,
-  useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import { findEnumLabel } from "./shared";
@@ -73,7 +73,9 @@ function getBadgeSizeClass(size?: string): string {
 
 export function BadgeWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
 >(
   props: TUsage extends { response: true }
@@ -96,7 +98,7 @@ export function BadgeWidget<
 ): JSX.Element {
   const { field } = props;
   const fieldName = "fieldName" in props ? props.fieldName : undefined;
-  const t = useWidgetTranslation();
+  const { t: tField } = useWidgetContext();
   const form = useWidgetForm();
   const {
     text: staticText,
@@ -123,7 +125,7 @@ export function BadgeWidget<
   // value is properly typed from schema - no assertions needed
   // Handle enum options - find matching label for value
   if (enumOptions) {
-    const enumLabel = findEnumLabel(value, enumOptions, t);
+    const enumLabel = findEnumLabel(value, enumOptions, tField);
     if (enumLabel) {
       return (
         <Badge variant={badgeVariant} className={cn(sizeClass, className)}>
@@ -137,7 +139,7 @@ export function BadgeWidget<
   if (!value) {
     // Handle static text from UI config
     if (staticText) {
-      const translatedText = t(staticText);
+      const translatedText = tField(staticText);
 
       return (
         <Badge variant={badgeVariant} className={cn(sizeClass, className)}>
@@ -150,7 +152,7 @@ export function BadgeWidget<
 
   // Handle string value as translation key
   if (typeof value === "string") {
-    const translatedText = t(value);
+    const translatedText = tField(value);
 
     return (
       <Badge variant={badgeVariant} className={cn(sizeClass, className)}>

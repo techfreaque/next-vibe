@@ -66,7 +66,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
       const adminPhone: string | undefined = undefined;
 
       if (!adminPhone) {
-        logger.debug("app.api.contact.sms.admin.phone.missing", {
+        logger.debug("Admin phone not configured, skipping SMS notification", {
           contactEmail: contactData.email,
         });
         return success({
@@ -75,7 +75,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         });
       }
 
-      logger.debug("app.api.contact.sms.admin.send.start", {
+      logger.debug("Sending admin SMS notification for contact submission", {
         contactEmail: contactData.email,
         contactName: contactData.name,
         adminPhone,
@@ -109,7 +109,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         sent: true,
       });
     } catch (error) {
-      logger.error("app.api.contact.sms.admin.send.error", parseError(error));
+      logger.error("Failed to send admin SMS notification", parseError(error));
       return fail({
         message: t("error.general.internal_server_error"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -133,7 +133,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
       const userPhone = (user as { phone?: string } | null)?.phone;
 
       if (!userPhone) {
-        logger.debug("app.api.contact.sms.confirmation.phone.missing", {
+        logger.debug("User phone not available, skipping confirmation SMS", {
           contactEmail: contactData.email,
           userId: user?.id,
         });
@@ -143,7 +143,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         });
       }
 
-      logger.debug("app.api.contact.sms.confirmation.send.start", {
+      logger.debug("Sending confirmation SMS to contact form submitter", {
         contactEmail: contactData.email,
         contactName: contactData.name,
         userPhone,
@@ -176,10 +176,7 @@ export class ContactSmsServiceImpl implements ContactSmsService {
         sent: true,
       });
     } catch (error) {
-      logger.error(
-        "app.api.contact.sms.confirmation.send.error",
-        parseError(error),
-      );
+      logger.error("Failed to send confirmation SMS", parseError(error));
       return fail({
         message: t("error.general.internal_server_error"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

@@ -19,7 +19,9 @@ import type { SeparatorWidgetConfig } from "./types";
  */
 export function SeparatorWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TSchemaType extends "widget",
 >({
   field,
@@ -28,7 +30,7 @@ export function SeparatorWidget<
   FieldUsageConfig,
   SeparatorWidgetConfig<TKey, FieldUsageConfig, TSchemaType>
 >): JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<TEndpoint>();
   const { spacingTop = "normal", spacingBottom = "normal", label } = field;
 
   const topSpacing =

@@ -18,12 +18,12 @@ import {
 import type { ReactStaticWidgetProps } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetContext,
   useWidgetDisabled,
   useWidgetForm,
   useWidgetIsSubmitting,
   useWidgetLocale,
   useWidgetOnSubmit,
-  useWidgetTranslation,
 } from "../../_shared/use-widget-context";
 import type { SubmitButtonWidgetConfig } from "./types";
 
@@ -32,7 +32,6 @@ import type { SubmitButtonWidgetConfig } from "./types";
  */
 export function SubmitButtonWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "widget",
 >({
@@ -40,10 +39,14 @@ export function SubmitButtonWidget<
 }: ReactStaticWidgetProps<
   TEndpoint,
   TUsage,
-  SubmitButtonWidgetConfig<TKey, TUsage, TSchemaType>
+  SubmitButtonWidgetConfig<
+    TEndpoint["scopedTranslation"]["ScopedTranslationKey"],
+    TUsage,
+    TSchemaType
+  >
 >): JSX.Element | null {
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const { t: tField } = useWidgetContext();
   const isDisabled = useWidgetDisabled();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
@@ -67,11 +70,11 @@ export function SubmitButtonWidget<
   const buttonIcon = icon ? (icon as IconKey) : undefined;
 
   const buttonText = textKey
-    ? t(textKey)
+    ? tField(textKey)
     : globalT("react.widgets.endpointRenderer.submit");
 
   const loadingText = loadingTextKey
-    ? t(loadingTextKey)
+    ? tField(loadingTextKey)
     : globalT("react.widgets.endpointRenderer.submitting");
 
   // Hide submit button when form is undefined (e.g., when data is already loaded)

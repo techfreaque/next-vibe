@@ -172,6 +172,8 @@ export const translations: typeof enTranslations = {
   delete: {
     title: "Abonnement kündigen",
     description: "Ihr Abonnement kündigen",
+    warning:
+      "Das Kündigen Ihres Abonnements beendet Ihren Zugang am Ende des Abrechnungszeitraums.",
     form: {
       title: "Abonnement-Kündigung",
       description: "Ihr Abonnement mit optionalen Einstellungen kündigen",
@@ -471,6 +473,36 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  // Widget display keys
+  title: "Ihr Abonnement",
+  description: "Verwalten Sie Ihr Abonnement und Ihre Abrechnung",
+  notAvailable: "N/A",
+  canceledOn: "Gekündigt am",
+  endedOn: "Beendet am",
+  billingInterval: "Abrechnungsintervall",
+  currentPeriodStart: "Aktuelle Periode Start",
+  endsOn: "Endet am",
+  nextBillingDate: "Nächster Abrechnungstermin",
+  cancellation: {
+    title: "Abonnementkündigung geplant",
+    description:
+      "Ihr Abonnement wird am {{date}} gekündigt. Bis dahin haben Sie weiterhin Zugriff.",
+  },
+  canceled: {
+    title: "Abonnement beendet",
+    description:
+      "Ihr Abonnement wurde beendet. Erneuern Sie es, um wieder Zugriff auf alle Funktionen zu erhalten.",
+  },
+  manage: {
+    nowpayments: {
+      info: "Bitte kontaktieren Sie den Support, um Ihr NowPayments-Abonnement zu verwalten.",
+      button: "Abonnement verwalten",
+    },
+    stripe: {
+      button: "Abonnement verwalten",
+    },
+  },
+
   // Enum translations
   enums: {
     plan: {
@@ -502,6 +534,38 @@ export const translations: typeof enTranslations = {
       temporaryPause: "Temporäre Pause",
       other: "Andere",
     },
+    paymentProvider: {
+      nowpayments: "NowPayments",
+      stripe: "Stripe",
+    },
+  },
+
+  // Buy / pricing page translations
+  buy: {
+    provider: {
+      stripe: "Kredit- / Debitkarte",
+      stripeDescription: "Sicher mit Stripe bezahlen",
+      nowpayments: "Krypto (NowPayments)",
+      nowpaymentsDescription: "Mit Bitcoin, Ethereum u.v.m. bezahlen",
+      cryptoMonthlyDisabled:
+        "Kryptowährungszahlungen sind nur für Jahresabonnements verfügbar",
+    },
+    subscription: {
+      title: "Abonnement",
+      description: "{{subCredits}} Credits/Monat für {{modelCount}} KI-Modelle",
+      perYear: "/ Jahr",
+      perMonth: "/ Monat",
+      yearlyEquivalent: "{{monthlyPrice}} / Monat bei jährlicher Abrechnung",
+      button: "Jetzt abonnieren",
+      buttonAlreadySubscribed: "Sie haben bereits ein aktives Abonnement",
+      features: {
+        credits: "{{count}} Credits pro Monat",
+        expiry: "Zugriff auf {{modelCount}}+ KI-Modelle",
+        bestFor: "Am besten für regelmäßige Nutzung",
+      },
+    },
+    login: "Anmelden",
+    signup: "Kostenlos registrieren",
   },
 
   // Page metadata

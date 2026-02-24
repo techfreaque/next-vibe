@@ -11,8 +11,8 @@
 import { z } from "zod";
 
 import {
-  objectOptionalField,
-  requestField,
+  scopedObjectOptionalField,
+  scopedRequestField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   FieldDataType,
@@ -38,6 +38,7 @@ import {
   SortOrder,
   SortOrderOptions,
 } from "./enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Core filter fields used in list and batch operations.
@@ -46,46 +47,44 @@ import {
  * Usage: import and spread into your endpoint's fields children.
  */
 export const leadsListFilterFields = {
-  search: requestField({
+  search: scopedRequestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXT,
-    label: "app.api.leads.filters.search.label" as const,
-    description: "app.api.leads.filters.search.description" as const,
-    placeholder: "app.api.leads.filters.search.placeholder" as const,
+    label: "filters.search.label",
+    description: "filters.search.description",
+    placeholder: "filters.search.placeholder",
     columns: 6,
     schema: z.string().optional(),
   }),
 
-  status: requestField({
+  status: scopedRequestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.MULTISELECT,
-    label: "app.api.leads.filters.status.label" as const,
-    description: "app.api.leads.filters.status.description" as const,
-    placeholder: "app.api.leads.filters.status.placeholder" as const,
+    label: "filters.status.label",
+    description: "filters.status.description",
+    placeholder: "filters.status.placeholder",
     options: LeadStatusFilterOptions,
     columns: 3,
     schema: z.array(z.enum(LeadStatusFilter)).optional(),
   }),
 
-  currentCampaignStage: requestField({
+  currentCampaignStage: scopedRequestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.MULTISELECT,
-    label: "app.api.leads.filters.currentCampaignStage.label" as const,
-    description:
-      "app.api.leads.filters.currentCampaignStage.description" as const,
-    placeholder:
-      "app.api.leads.filters.currentCampaignStage.placeholder" as const,
+    label: "filters.currentCampaignStage.label",
+    description: "filters.currentCampaignStage.description",
+    placeholder: "filters.currentCampaignStage.placeholder",
     options: EmailCampaignStageFilterOptions,
     columns: 3,
     schema: z.array(z.enum(EmailCampaignStageFilter)).optional(),
   }),
 
-  source: requestField({
+  source: scopedRequestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.MULTISELECT,
-    label: "app.api.leads.filters.source.label" as const,
-    description: "app.api.leads.filters.source.description" as const,
-    placeholder: "app.api.leads.filters.source.placeholder" as const,
+    label: "filters.source.label",
+    description: "filters.source.description",
+    placeholder: "filters.source.placeholder",
     options: LeadSourceFilterOptions,
     columns: 6,
     schema: z.array(z.enum(LeadSourceFilter)).optional(),
@@ -96,22 +95,22 @@ export const leadsListFilterFields = {
  * Location filter fields used in list and export operations.
  */
 export const leadsLocationFilterFields = {
-  country: requestField({
+  country: scopedRequestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.MULTISELECT,
-    label: "app.api.leads.filters.country.label" as const,
-    description: "app.api.leads.filters.country.description" as const,
-    placeholder: "app.api.leads.filters.country.placeholder" as const,
+    label: "filters.country.label",
+    description: "filters.country.description",
+    placeholder: "filters.country.placeholder",
     options: CountriesOptions,
     schema: z.array(z.enum(Countries)).optional(),
   }),
 
-  language: requestField({
+  language: scopedRequestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.MULTISELECT,
-    label: "app.api.leads.filters.language.label" as const,
-    description: "app.api.leads.filters.language.description" as const,
-    placeholder: "app.api.leads.filters.language.placeholder" as const,
+    label: "filters.language.label",
+    description: "filters.language.description",
+    placeholder: "filters.language.placeholder",
     options: LanguagesOptions,
     schema: z.array(z.enum(Languages)).optional(),
   }),
@@ -121,22 +120,22 @@ export const leadsLocationFilterFields = {
  * Sorting field definitions used in list and export operations.
  */
 export const leadsSortingFields = {
-  sortBy: requestField({
+  sortBy: scopedRequestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SELECT,
-    label: "app.api.leads.filters.sortBy.label" as const,
-    description: "app.api.leads.filters.sortBy.description" as const,
-    placeholder: "app.api.leads.filters.sortBy.placeholder" as const,
+    label: "filters.sortBy.label",
+    description: "filters.sortBy.description",
+    placeholder: "filters.sortBy.placeholder",
     options: LeadSortFieldOptions,
     schema: z.enum(LeadSortField).optional().default(LeadSortField.CREATED_AT),
   }),
 
-  sortOrder: requestField({
+  sortOrder: scopedRequestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.SELECT,
-    label: "app.api.leads.filters.sortOrder.label" as const,
-    description: "app.api.leads.filters.sortOrder.description" as const,
-    placeholder: "app.api.leads.filters.sortOrder.placeholder" as const,
+    label: "filters.sortOrder.label",
+    description: "filters.sortOrder.description",
+    placeholder: "filters.sortOrder.placeholder",
     options: SortOrderOptions,
     schema: z.enum(SortOrder).optional().default(SortOrder.DESC),
   }),
@@ -148,46 +147,44 @@ export const leadsSortingFields = {
  * Schema uses arrays to match the list filter format for easy prefilling.
  */
 export const leadsBatchFilterFields = {
-  search: requestField({
+  search: scopedRequestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.TEXT,
-    label: "app.api.leads.filters.search.label" as const,
-    description: "app.api.leads.filters.search.description" as const,
-    placeholder: "app.api.leads.filters.search.placeholder" as const,
+    label: "filters.search.label",
+    description: "filters.search.description",
+    placeholder: "filters.search.placeholder",
     hidden: true,
     schema: z.string().optional(),
   }),
 
-  status: requestField({
+  status: scopedRequestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.MULTISELECT,
-    label: "app.api.leads.filters.status.label" as const,
-    description: "app.api.leads.filters.status.description" as const,
-    placeholder: "app.api.leads.filters.status.placeholder" as const,
+    label: "filters.status.label",
+    description: "filters.status.description",
+    placeholder: "filters.status.placeholder",
     options: LeadStatusFilterOptions,
     hidden: true,
     schema: z.array(z.enum(LeadStatusFilter)).optional(),
   }),
 
-  currentCampaignStage: requestField({
+  currentCampaignStage: scopedRequestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.MULTISELECT,
-    label: "app.api.leads.filters.currentCampaignStage.label" as const,
-    description:
-      "app.api.leads.filters.currentCampaignStage.description" as const,
-    placeholder:
-      "app.api.leads.filters.currentCampaignStage.placeholder" as const,
+    label: "filters.currentCampaignStage.label",
+    description: "filters.currentCampaignStage.description",
+    placeholder: "filters.currentCampaignStage.placeholder",
     options: EmailCampaignStageFilterOptions,
     hidden: true,
     schema: z.array(z.enum(EmailCampaignStageFilter)).optional(),
   }),
 
-  source: requestField({
+  source: scopedRequestField(scopedTranslation, {
     type: WidgetType.FORM_FIELD,
     fieldType: FieldDataType.MULTISELECT,
-    label: "app.api.leads.filters.source.label" as const,
-    description: "app.api.leads.filters.source.description" as const,
-    placeholder: "app.api.leads.filters.source.placeholder" as const,
+    label: "filters.source.label",
+    description: "filters.source.description",
+    placeholder: "filters.source.placeholder",
     options: LeadSourceFilterOptions,
     hidden: true,
     schema: z.array(z.enum(LeadSourceFilter)).optional(),
@@ -196,46 +193,49 @@ export const leadsBatchFilterFields = {
 
 /**
  * Pre-composed filter containers for use in endpoint field definitions.
- * These are objectOptionalField wrappers around the filter field sets.
+ * These are scopedObjectOptionalField wrappers around the filter field sets.
  */
-export const leadsStatusFiltersContainer = objectOptionalField(
+export const leadsStatusFiltersContainer = scopedObjectOptionalField(
+  scopedTranslation,
   {
     type: WidgetType.CONTAINER,
-    title: "app.api.leads.filters.statusFilters.title" as const,
-    description: "app.api.leads.filters.statusFilters.description" as const,
+    title: "filters.statusFilters.title",
+    description: "filters.statusFilters.description",
     layoutType: LayoutType.GRID,
     columns: 6,
     order: 1,
     showSubmitButton: false,
+    usage: { request: "data" },
+    children: leadsListFilterFields,
   },
-  { request: "data" },
-  leadsListFilterFields,
 );
 
-export const leadsLocationFiltersContainer = objectOptionalField(
+export const leadsLocationFiltersContainer = scopedObjectOptionalField(
+  scopedTranslation,
   {
     type: WidgetType.CONTAINER,
-    title: "app.api.leads.filters.locationFilters.title" as const,
-    description: "app.api.leads.filters.locationFilters.description" as const,
+    title: "filters.locationFilters.title",
+    description: "filters.locationFilters.description",
     layoutType: LayoutType.GRID,
     columns: 2,
     order: 2,
     showSubmitButton: false,
+    usage: { request: "data" },
+    children: leadsLocationFilterFields,
   },
-  { request: "data" },
-  leadsLocationFilterFields,
 );
 
-export const leadsSortingOptionsContainer = objectOptionalField(
+export const leadsSortingOptionsContainer = scopedObjectOptionalField(
+  scopedTranslation,
   {
     type: WidgetType.CONTAINER,
-    title: "app.api.leads.filters.sortingOptions.title" as const,
-    description: "app.api.leads.filters.sortingOptions.description" as const,
+    title: "filters.sortingOptions.title",
+    description: "filters.sortingOptions.description",
     layoutType: LayoutType.GRID,
     columns: 2,
     order: 3,
     showSubmitButton: false,
+    usage: { request: "data" },
+    children: leadsSortingFields,
   },
-  { request: "data" },
-  leadsSortingFields,
 );

@@ -53,7 +53,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { NavigationStackProvider } from "../../../react/hooks/use-navigation-stack";
-import { scopedTranslation as reactScopedTranslation } from "../../../react/i18n";
+import {
+  type ReactTranslationKey,
+  scopedTranslation as reactScopedTranslation,
+} from "../../../react/i18n";
 import { EndpointRenderer } from "./EndpointRenderer";
 
 type ToolDecision =
@@ -650,7 +653,7 @@ export function ToolCallRenderer({
                         submitButton={
                           needsConfirmation
                             ? {
-                                text: "app.api.system.unifiedInterface.react.widgets.toolCall.actions.confirm",
+                                text: "widgets.toolCall.actions.confirm" satisfies ReactTranslationKey,
                                 variant:
                                   decision?.type === "confirmed"
                                     ? "default"

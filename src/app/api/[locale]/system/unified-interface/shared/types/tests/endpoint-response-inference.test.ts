@@ -43,6 +43,16 @@ type Equal<X, Y> =
 // Helper to check assignability
 type AssertAssignable<T, U extends T> = U;
 
+// Minimal mock scopedTranslation for test endpoints (all keys use `as any`)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockScopedTranslation = {
+  ScopedTranslationKey: "test" as any,
+  scopedT: (_locale: any): { t(_key: any, _params?: any): any } => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    t: (_key: any, _params?: any): any => "test" as any,
+  }),
+};
+
 /**
  * UNIT TESTS: Test individual field inference
  */
@@ -560,6 +570,7 @@ const testSingleRequestLiteral = createEndpoint({
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
+  scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
@@ -640,6 +651,7 @@ const testSingleRequestEnum = createEndpoint({
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
+  scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
@@ -720,6 +732,7 @@ const testSingleResponseString = createEndpoint({
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
+  scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
@@ -799,6 +812,7 @@ const testMultipleRequestFields = createEndpoint({
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
+  scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
@@ -899,6 +913,7 @@ const testPublicEndpoint = createEndpoint({
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
+  scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
@@ -967,6 +982,7 @@ const testAdminEndpoint = createEndpoint({
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
+  scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.ADMIN] as const,
   fields: objectField(
@@ -1055,6 +1071,7 @@ const testResponseEndpoint = createEndpoint({
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
+  scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
@@ -1150,6 +1167,7 @@ const testRequestEndpoint = createEndpoint({
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
+  scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(

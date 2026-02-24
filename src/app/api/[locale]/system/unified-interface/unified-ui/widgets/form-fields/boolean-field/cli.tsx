@@ -27,7 +27,7 @@ export function BooleanFieldWidgetInk<
   TUsage,
   BooleanFieldWidgetConfig<TKey, BooleanWidgetSchema, TUsage>
 >): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const showLabels = useInkWidgetShowLabels();
   const isChecked = field.value;
 

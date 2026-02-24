@@ -87,4 +87,15 @@ export const translations = {
     sent: "Sent",
     searchPlaceholder: "Search accounts...",
   },
+  enums: {
+    channel: {
+      email: "Email",
+      sms: "SMS",
+      whatsapp: "WhatsApp",
+      telegram: "Telegram",
+    },
+    channelFilter: {
+      any: "All Channels",
+    },
+  },
 };

@@ -20,7 +20,7 @@ interface WidgetProps {
 export function ConnectionDetailContainer({
   field,
 }: WidgetProps): React.JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof endpoints.GET>();
   const value = field.value;
 
   return (
@@ -28,28 +28,20 @@ export function ConnectionDetailContainer({
       <Div className="flex items-center gap-2 px-4 py-3 border-b">
         <Server className="h-4 w-4 text-muted-foreground" />
         <Span className="font-semibold text-sm">
-          {value?.label ?? t("app.api.ssh.connections.id.widget.title")}
+          {value?.label ?? t("widget.title")}
         </Span>
       </Div>
       {value && (
         <Div className="px-4 py-3 grid grid-cols-2 gap-y-2 gap-x-4 text-sm">
-          <Span className="text-muted-foreground">
-            {t("app.api.ssh.connections.id.widget.host")}
-          </Span>
+          <Span className="text-muted-foreground">{t("widget.host")}</Span>
           <Span className="font-mono">{`${value.host}:${value.port}`}</Span>
-          <Span className="text-muted-foreground">
-            {t("app.api.ssh.connections.id.widget.user")}
-          </Span>
+          <Span className="text-muted-foreground">{t("widget.user")}</Span>
           <Span className="font-mono">{value.username}</Span>
-          <Span className="text-muted-foreground">
-            {t("app.api.ssh.connections.id.widget.auth")}
-          </Span>
+          <Span className="text-muted-foreground">{t("widget.auth")}</Span>
           <Span>{value.authType}</Span>
           {value.notes && (
             <>
-              <Span className="text-muted-foreground">
-                {t("app.api.ssh.connections.id.widget.notes")}
-              </Span>
+              <Span className="text-muted-foreground">{t("widget.notes")}</Span>
               <Span>{value.notes}</Span>
             </>
           )}

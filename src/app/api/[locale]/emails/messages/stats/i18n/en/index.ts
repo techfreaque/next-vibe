@@ -253,4 +253,43 @@ export const translations = {
     refresh: "Refresh",
     search: "Search emails...",
   },
+  enums: {
+    status: {
+      pending: "Pending",
+      sent: "Sent",
+      delivered: "Delivered",
+      opened: "Opened",
+      clicked: "Clicked",
+      bounced: "Bounced",
+      failed: "Failed",
+      unsubscribed: "Unsubscribed",
+    },
+    statusFilter: {
+      any: "All Statuses",
+    },
+    type: {
+      transactional: "Transactional",
+      marketing: "Marketing",
+      notification: "Notification",
+      system: "System",
+      leadCampaign: "Lead Campaign",
+      userCommunication: "User Communication",
+    },
+    typeFilter: {
+      any: "All Types",
+    },
+    sortField: {
+      subject: "Subject",
+      recipientEmail: "Recipient Email",
+      recipientName: "Recipient Name",
+      type: "Type",
+      status: "Status",
+      sentAt: "Sent At",
+      createdAt: "Created At",
+    },
+    sortOrder: {
+      asc: "Ascending",
+      desc: "Descending",
+    },
+  },
 };

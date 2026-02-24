@@ -126,4 +126,12 @@ export const translations = {
     totalSyncs: "Total Syncs",
     lastSyncTime: "Last Sync Time",
   },
+  enums: {
+    healthStatus: {
+      healthy: "Healthy",
+      warning: "Warning",
+      error: "Error",
+      maintenance: "Maintenance",
+    },
+  },
 };

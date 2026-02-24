@@ -29,7 +29,7 @@ interface WidgetProps {
 }
 
 export function FilesWriteContainer({ field }: WidgetProps): React.JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof endpoints.POST>();
   const form = useWidgetForm<typeof endpoints.POST>();
   const onSubmit = useWidgetOnSubmit();
   const { endpointMutations } = useWidgetContext();
@@ -48,7 +48,7 @@ export function FilesWriteContainer({ field }: WidgetProps): React.JSX.Element {
       <Div className="flex items-center gap-2 px-4 py-3 border-b">
         <Edit className="h-4 w-4 text-muted-foreground" />
         <Span className="font-semibold text-sm mr-auto">
-          {t("app.api.ssh.files.write.widget.title")}
+          {t("widget.title")}
         </Span>
         <Button
           type="button"
@@ -56,9 +56,7 @@ export function FilesWriteContainer({ field }: WidgetProps): React.JSX.Element {
           onClick={handleWrite}
           disabled={isLoading}
         >
-          {isLoading
-            ? t("app.api.ssh.files.write.widget.writing")
-            : t("app.api.ssh.files.write.widget.writeButton")}
+          {isLoading ? t("widget.writing") : t("widget.writeButton")}
         </Button>
       </Div>
 
@@ -66,8 +64,7 @@ export function FilesWriteContainer({ field }: WidgetProps): React.JSX.Element {
       {value && (
         <Div className="flex items-center gap-2 px-4 py-2 border-b bg-green-50 dark:bg-green-950/20 text-xs text-green-700 dark:text-green-300">
           <Span>
-            ✓ {t("app.api.ssh.files.write.widget.bytesWritten")}:{" "}
-            {value.bytesWritten.toLocaleString()}
+            ✓ {t("widget.bytesWritten")}: {value.bytesWritten.toLocaleString()}
           </Span>
         </Div>
       )}
@@ -76,7 +73,7 @@ export function FilesWriteContainer({ field }: WidgetProps): React.JSX.Element {
       <Textarea
         value={content}
         onChange={(e) => form?.setValue("content", e.target.value)}
-        placeholder={t("app.api.ssh.files.write.widget.placeholder")}
+        placeholder={t("widget.placeholder")}
         className="flex-1 font-mono text-xs rounded-none border-0 resize-none min-h-[300px]"
         disabled={isLoading}
       />

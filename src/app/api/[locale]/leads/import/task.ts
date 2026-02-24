@@ -21,8 +21,8 @@ import definitions from "./process/definition";
 import { tools } from "./process/route";
 
 const csvProcessorTask = createCronTask(definitions.POST, tools.POST, {
-  name: "csv-processor",
-  description: "app.api.system.unifiedInterface.tasks.csvProcessor.description",
+  name: "import.process.post.title",
+  description: "import.process.post.description",
   schedule: CRON_SCHEDULES.EVERY_MINUTE,
   category: TaskCategory.MAINTENANCE,
   enabled: false,

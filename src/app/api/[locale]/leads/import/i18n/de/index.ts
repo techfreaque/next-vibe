@@ -26,7 +26,7 @@ export const translations: typeof enTranslations = {
     fileName: {
       label: "Dateiname",
       description: "Name der CSV-Datei",
-      placeholder: "app.api.leads.csv",
+      placeholder: "leads.csv",
       helpText: "Aussagekräftigen Dateinamen angeben",
     },
     skipDuplicates: {
@@ -226,6 +226,27 @@ export const translations: typeof enTranslations = {
         title: "Importverarbeitung abgeschlossen",
         description: "Importaufträge erfolgreich verarbeitet",
       },
+    },
+  },
+  widget: {
+    header: {
+      title: "Importaufträge",
+      newImport: "Neuer Import",
+    },
+    filter: {
+      all: "Alle",
+      completed: "Abgeschlossen",
+      failed: "Fehlgeschlagen",
+      pending: "Ausstehend",
+      running: "In Bearbeitung",
+    },
+    loading: "Importauftr\u00e4ge werden geladen\u2026",
+    empty: {
+      title: "Keine Importauftr\u00e4ge gefunden",
+      withFilter:
+        "Versuchen Sie einen anderen Filter oder starten Sie einen neuen Import.",
+      withoutFilter: "Starten Sie Ihren ersten Import, um ihn hier zu sehen.",
+      newImport: "Neuer Import",
     },
   },
   jobs: jobsTranslations,

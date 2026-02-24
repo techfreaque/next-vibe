@@ -75,9 +75,6 @@ export async function closeDatabase(logger: EndpointLogger): Promise<void> {
     await pool.end();
   } catch (error) {
     // Ignore errors during shutdown - this is expected when pool is already closed
-    logger.error(
-      "app.api.system.db.errors.pool_close_failed",
-      parseError(error),
-    );
+    logger.error("Database pool close failed", parseError(error));
   }
 }

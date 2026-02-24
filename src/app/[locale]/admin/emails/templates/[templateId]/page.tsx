@@ -16,7 +16,8 @@ import type React from "react";
 import {
   getAllTemplateIds,
   getTemplate,
-  getTemplateMetadata,
+  getTranslatedTemplateMetadata,
+  translatePreviewFields,
 } from "@/app/api/[locale]/emails/registry/generated";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -45,27 +46,22 @@ export default async function EmailTemplatePreviewPage({
   const { t } = simpleT(locale);
   const user = await requireAdminUser(locale);
 
-  // Get template metadata
-  const templateMetadata = getTemplateMetadata(templateId);
+  // Load full template and metadata in parallel (server-side only)
+  const [template, translatedMeta] = await Promise.all([
+    getTemplate(templateId),
+    getTranslatedTemplateMetadata(templateId, locale),
+  ]);
 
-  if (!templateMetadata) {
+  if (!template || !translatedMeta) {
     notFound();
   }
 
-  // Load full template to get previewFields (server-side only)
-  const template = await getTemplate(templateId);
-
-  if (!template) {
-    notFound();
-  }
-
-  // Extract serializable data for client component
-  const previewFields = template.meta.previewFields;
+  // Extract serializable data for client component (pre-translated)
+  const previewFields = translatePreviewFields(template, locale);
   const exampleProps = template.exampleProps;
 
-  // Translate metadata fields (they contain translation keys)
-  const translatedName = t(templateMetadata.name);
-  const translatedDescription = t(templateMetadata.description);
+  const translatedName = translatedMeta.name;
+  const translatedDescription = translatedMeta.description;
 
   // Get all templates for navigation
   const allTemplateIds = getAllTemplateIds();
@@ -124,20 +120,20 @@ export default async function EmailTemplatePreviewPage({
               <P className="text-gray-500 dark:text-gray-400">
                 {t("app.admin.emails.templates.preview.id")}
               </P>
-              <P className="font-medium">{templateMetadata.id}</P>
+              <P className="font-medium">{translatedMeta.id}</P>
             </Div>
             <Div>
               <P className="text-gray-500 dark:text-gray-400">
                 {t("app.admin.emails.templates.preview.version")}
               </P>
-              <P className="font-medium">{templateMetadata.version}</P>
+              <P className="font-medium">{translatedMeta.version}</P>
             </Div>
             <Div>
               <P className="text-gray-500 dark:text-gray-400">
                 {t("app.admin.emails.templates.preview.category")}
               </P>
               <P className="font-medium capitalize">
-                {templateMetadata.category}
+                {translatedMeta.category}
               </P>
             </Div>
             <Div>
@@ -145,7 +141,7 @@ export default async function EmailTemplatePreviewPage({
                 {t("app.admin.emails.templates.preview.path")}
               </P>
               <Span className="font-mono text-xs text-gray-600">
-                {templateMetadata.path}
+                {translatedMeta.path}
               </Span>
             </Div>
           </Div>

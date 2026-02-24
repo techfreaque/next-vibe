@@ -55,7 +55,7 @@ function formatDate(date: string, locale: string): string {
 export function SubscriptionOverviewContainer({
   field,
 }: CustomWidgetProps): JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const subscription = field.value;
   const { locale } = useTranslation();
 
@@ -75,14 +75,14 @@ export function SubscriptionOverviewContainer({
 
   const getProviderName = (provider?: string): string => {
     if (provider === PaymentProvider.NOWPAYMENTS) {
-      return t("app.api.payment.enums.paymentProvider.nowpayments");
+      return t("enums.paymentProvider.nowpayments");
     }
-    return t("app.api.payment.enums.paymentProvider.stripe");
+    return t("enums.paymentProvider.stripe");
   };
 
   const handleManageSubscription = async (): Promise<void> => {
     if (subscription.provider === PaymentProvider.NOWPAYMENTS) {
-      alert(t("app.subscription.subscription.manage.nowpayments.info"));
+      alert(t("manage.nowpayments.info"));
       return;
     }
 
@@ -123,11 +123,9 @@ export function SubscriptionOverviewContainer({
                 <Div className="p-2 rounded-lg bg-primary/10">
                   <CreditCard className="h-6 w-6 text-primary" />
                 </Div>
-                {t("app.subscription.subscription.title")}
+                {t("title")}
               </CardTitle>
-              <CardDescription>
-                {t("app.subscription.subscription.description")}
-              </CardDescription>
+              <CardDescription>{t("description")}</CardDescription>
             </Div>
             <Div className="flex gap-2">
               <Badge
@@ -142,7 +140,7 @@ export function SubscriptionOverviewContainer({
                 {isCanceled
                   ? t(subscription.status)
                   : isCanceling
-                    ? t("app.api.subscription.enums.status.canceling")
+                    ? t("enums.status.canceling")
                     : t(subscription.status)}
               </Badge>
               <Badge variant="outline" className="flex items-center gap-1">
@@ -157,26 +155,26 @@ export function SubscriptionOverviewContainer({
             <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Div className="p-4 rounded-lg bg-accent border">
                 <Div className="text-sm text-muted-foreground mb-1">
-                  {t("app.subscription.subscription.canceledOn")}
+                  {t("canceledOn")}
                 </Div>
                 <Div className="text-lg font-semibold">
                   {subscription.canceledAt
                     ? formatDate(subscription.canceledAt, locale)
                     : subscription.endedAt
                       ? formatDate(subscription.endedAt, locale)
-                      : t("app.common.notAvailable")}
+                      : t("notAvailable")}
                 </Div>
               </Div>
               <Div className="p-4 rounded-lg bg-accent border">
                 <Div className="text-sm text-muted-foreground mb-1">
-                  {t("app.subscription.subscription.endedOn")}
+                  {t("endedOn")}
                 </Div>
                 <Div className="text-lg font-semibold">
                   {subscription.endedAt
                     ? formatDate(subscription.endedAt, locale)
                     : subscription.currentPeriodEnd
                       ? formatDate(subscription.currentPeriodEnd, locale)
-                      : t("app.common.notAvailable")}
+                      : t("notAvailable")}
                 </Div>
               </Div>
             </Div>
@@ -184,7 +182,7 @@ export function SubscriptionOverviewContainer({
             <Div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Div className="p-4 rounded-lg bg-accent border">
                 <Div className="text-sm text-muted-foreground mb-1">
-                  {t("app.subscription.subscription.billingInterval")}
+                  {t("billingInterval")}
                 </Div>
                 <Div className="text-lg font-semibold capitalize">
                   {t(subscription.billingInterval)}
@@ -192,7 +190,7 @@ export function SubscriptionOverviewContainer({
               </Div>
               <Div className="p-4 rounded-lg bg-accent border">
                 <Div className="text-sm text-muted-foreground mb-1">
-                  {t("app.subscription.subscription.currentPeriodStart")}
+                  {t("currentPeriodStart")}
                 </Div>
                 <Div className="text-lg font-semibold">
                   {formatDate(subscription.currentPeriodStart, locale)}
@@ -200,16 +198,14 @@ export function SubscriptionOverviewContainer({
               </Div>
               <Div className="p-4 rounded-lg bg-accent border">
                 <Div className="text-sm text-muted-foreground mb-1">
-                  {isCanceling
-                    ? t("app.subscription.subscription.endsOn")
-                    : t("app.subscription.subscription.nextBillingDate")}
+                  {isCanceling ? t("endsOn") : t("nextBillingDate")}
                 </Div>
                 <Div className="text-lg font-semibold">
                   {isCanceling
                     ? formatDate(subscription.cancelAt!, locale)
                     : subscription.currentPeriodEnd
                       ? formatDate(subscription.currentPeriodEnd, locale)
-                      : t("app.common.notAvailable")}
+                      : t("notAvailable")}
                 </Div>
               </Div>
             </Div>
@@ -222,17 +218,14 @@ export function SubscriptionOverviewContainer({
                 <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                 <Div className="text-sm text-amber-800 dark:text-amber-200">
                   <Div className="font-semibold mb-1">
-                    {t("app.subscription.subscription.cancellation.title")}
+                    {t("cancellation.title")}
                   </Div>
                   <Div>
-                    {t(
-                      "app.subscription.subscription.cancellation.description",
-                      {
-                        date: subscription.cancelAt
-                          ? formatDate(subscription.cancelAt, locale)
-                          : t("app.common.notAvailable"),
-                      },
-                    )}
+                    {t("cancellation.description", {
+                      date: subscription.cancelAt
+                        ? formatDate(subscription.cancelAt, locale)
+                        : t("notAvailable"),
+                    })}
                   </Div>
                 </Div>
               </Div>
@@ -246,11 +239,9 @@ export function SubscriptionOverviewContainer({
                 <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
                 <Div className="text-sm text-red-800 dark:text-red-200">
                   <Div className="font-semibold mb-1">
-                    {t("app.subscription.subscription.canceled.title")}
+                    {t("canceled.title")}
                   </Div>
-                  <Div>
-                    {t("app.subscription.subscription.canceled.description")}
-                  </Div>
+                  <Div>{t("canceled.description")}</Div>
                 </Div>
               </Div>
             </Div>
@@ -266,8 +257,8 @@ export function SubscriptionOverviewContainer({
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
                 {subscription.provider === PaymentProvider.NOWPAYMENTS
-                  ? t("app.subscription.subscription.manage.nowpayments.button")
-                  : t("app.subscription.subscription.manage.stripe.button")}
+                  ? t("manage.nowpayments.button")
+                  : t("manage.stripe.button")}
               </Button>
             </Div>
           )}

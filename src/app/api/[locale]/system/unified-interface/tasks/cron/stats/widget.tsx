@@ -228,7 +228,7 @@ function StatusBadge({
   t,
 }: {
   status: string;
-  t: ReturnType<typeof useWidgetTranslation>;
+  t: ReturnType<typeof useWidgetTranslation<typeof statsEndpoints.GET>>;
 }): React.JSX.Element {
   const cls =
     status === CronTaskStatus.COMPLETED
@@ -251,7 +251,7 @@ function StatusBadge({
         cls,
       )}
     >
-      {t(status)}
+      {t(status as Parameters<typeof t>[0])}
     </Span>
   );
 }
@@ -263,7 +263,7 @@ function PriorityBadge({
   t,
 }: {
   priority: string;
-  t: ReturnType<typeof useWidgetTranslation>;
+  t: ReturnType<typeof useWidgetTranslation<typeof statsEndpoints.GET>>;
 }): React.JSX.Element {
   const cls =
     priority === CronTaskPriority.CRITICAL
@@ -283,7 +283,7 @@ function PriorityBadge({
         cls,
       )}
     >
-      {t(priority)}
+      {t(priority as Parameters<typeof t>[0])}
     </Span>
   );
 }
@@ -358,7 +358,7 @@ function TopPerformingTable({
   t,
 }: {
   tasks: NonNullable<StatsData["topPerformingTasks"]>;
-  t: ReturnType<typeof useWidgetTranslation>;
+  t: ReturnType<typeof useWidgetTranslation<typeof statsEndpoints.GET>>;
 }): React.JSX.Element {
   const sorted = useMemo(
     () =>
@@ -369,26 +369,10 @@ function TopPerformingTable({
   return (
     <Div className="flex flex-col gap-1">
       <Div className="grid grid-cols-4 gap-2 text-xs text-muted-foreground font-medium pb-1 border-b">
-        <Span>
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.col.rank",
-          )}
-        </Span>
-        <Span>
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.col.taskName",
-          )}
-        </Span>
-        <Span className="text-right">
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.col.executions",
-          )}
-        </Span>
-        <Span className="text-right">
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.col.avgDuration",
-          )}
-        </Span>
+        <Span>{t("widget.col.rank")}</Span>
+        <Span>{t("widget.col.taskName")}</Span>
+        <Span className="text-right">{t("widget.col.executions")}</Span>
+        <Span className="text-right">{t("widget.col.avgDuration")}</Span>
       </Div>
       {sorted.map((task, i) => {
         const ratePct = Math.min(100, Math.max(0, task.successRate));
@@ -444,7 +428,7 @@ function ProblemTasksTable({
   t,
 }: {
   tasks: NonNullable<StatsData["problemTasks"]>;
-  t: ReturnType<typeof useWidgetTranslation>;
+  t: ReturnType<typeof useWidgetTranslation<typeof statsEndpoints.GET>>;
 }): React.JSX.Element {
   const sorted = useMemo(
     () => [...tasks].toSorted((a, b) => b.failures - a.failures).slice(0, 10),
@@ -454,26 +438,10 @@ function ProblemTasksTable({
   return (
     <Div className="flex flex-col gap-1">
       <Div className="grid grid-cols-5 gap-2 text-xs text-muted-foreground font-medium pb-1 border-b">
-        <Span className="col-span-2">
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.col.taskName",
-          )}
-        </Span>
-        <Span className="text-right">
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.col.failures",
-          )}
-        </Span>
-        <Span className="text-right">
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.col.executions",
-          )}
-        </Span>
-        <Span className="text-right">
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.col.failureRate",
-          )}
-        </Span>
+        <Span className="col-span-2">{t("widget.col.taskName")}</Span>
+        <Span className="text-right">{t("widget.col.failures")}</Span>
+        <Span className="text-right">{t("widget.col.executions")}</Span>
+        <Span className="text-right">{t("widget.col.failureRate")}</Span>
       </Div>
       {sorted.map((task) => {
         const ratePct = Math.min(100, Math.max(0, task.failureRate));
@@ -533,7 +501,7 @@ function RecentActivityFeed({
   t,
 }: {
   items: NonNullable<StatsData["recentActivity"]>;
-  t: ReturnType<typeof useWidgetTranslation>;
+  t: ReturnType<typeof useWidgetTranslation<typeof statsEndpoints.GET>>;
 }): React.JSX.Element {
   return (
     <Div className="flex flex-col divide-y">
@@ -572,42 +540,18 @@ function DailyStatsTable({
   t,
 }: {
   rows: NonNullable<StatsData["dailyStats"]>;
-  t: ReturnType<typeof useWidgetTranslation>;
+  t: ReturnType<typeof useWidgetTranslation<typeof statsEndpoints.GET>>;
 }): React.JSX.Element {
   const last7 = rows.slice(-7);
   return (
     <Div className="flex flex-col gap-1">
       <Div className="grid grid-cols-6 gap-2 text-xs text-muted-foreground font-medium pb-1 border-b">
-        <Span>
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.col.date",
-          )}
-        </Span>
-        <Span className="text-right">
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.col.executions",
-          )}
-        </Span>
-        <Span className="text-right">
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.col.successes",
-          )}
-        </Span>
-        <Span className="text-right">
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.col.failures",
-          )}
-        </Span>
-        <Span className="text-right">
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.col.avgDuration",
-          )}
-        </Span>
-        <Span className="text-right">
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.col.uniqueTasks",
-          )}
-        </Span>
+        <Span>{t("widget.col.date")}</Span>
+        <Span className="text-right">{t("widget.col.executions")}</Span>
+        <Span className="text-right">{t("widget.col.successes")}</Span>
+        <Span className="text-right">{t("widget.col.failures")}</Span>
+        <Span className="text-right">{t("widget.col.avgDuration")}</Span>
+        <Span className="text-right">{t("widget.col.uniqueTasks")}</Span>
       </Div>
       {last7.map((row) => (
         <Div
@@ -643,7 +587,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
   const { endpointMutations } = useWidgetContext();
   const router = useRouter();
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof statsEndpoints.GET>();
 
   const data = field.value;
   const isLoading = endpointMutations?.read?.isLoading;
@@ -713,9 +657,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
       <Div className="flex flex-col items-center justify-center gap-3 p-12">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         <Span className="text-sm text-muted-foreground">
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.loading",
-          )}
+          {t("widget.loading")}
         </Span>
       </Div>
     );
@@ -730,11 +672,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
         <NavigateButtonWidget field={children.backButton} />
         <Div className="flex items-center gap-2 mr-auto">
           <BarChart3 className="h-5 w-5 text-muted-foreground" />
-          <Span className="font-semibold text-base">
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.title",
-            )}
-          </Span>
+          <Span className="font-semibold text-base">{t("widget.title")}</Span>
         </Div>
         <Button
           type="button"
@@ -743,9 +681,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
           onClick={handleViewTasks}
         >
           <List className="h-4 w-4 mr-1" />
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.viewTasks",
-          )}
+          {t("widget.viewTasks")}
         </Button>
         <Button
           type="button"
@@ -754,9 +690,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
           onClick={handleViewHistory}
         >
           <Clock className="h-4 w-4 mr-1" />
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.viewHistory",
-          )}
+          {t("widget.viewHistory")}
         </Button>
         <Button
           type="button"
@@ -765,18 +699,14 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
           onClick={handleViewPulse}
         >
           <Activity className="h-4 w-4 mr-1" />
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.viewPulse",
-          )}
+          {t("widget.viewPulse")}
         </Button>
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={handleRefresh}
-          title={t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.refresh",
-          )}
+          title={t("widget.refresh")}
         >
           <RefreshCw className="h-4 w-4" />
         </Button>
@@ -811,15 +741,11 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
                   : "text-red-700 dark:text-red-300",
             )}
           >
-            {t(
-              `app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.systemStatus.${data.systemStatus}`,
-            )}
+            {t(`widget.systemStatus.${data.systemStatus}`)}
           </Span>
           {data.uptime && (
             <Span className="text-xs text-muted-foreground ml-auto">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.uptime",
-              )}
+              {t("widget.uptime")}
               {`: ${data.uptime}`}
             </Span>
           )}
@@ -829,9 +755,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
       {/* ── Primary KPI Cards ──────────────────────────────────────────────── */}
       <Div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <StatCard
-          label={t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.totalTasks",
-          )}
+          label={t("widget.totalTasks")}
           value={
             data?.activeTasks !== undefined && data?.totalTasks !== undefined
               ? `${data.activeTasks}/${data.totalTasks}`
@@ -840,33 +764,25 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
           icon={<Activity className="h-3.5 w-3.5 text-muted-foreground" />}
         />
         <StatCard
-          label={t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.executedTasks",
-          )}
+          label={t("widget.executedTasks")}
           value={data?.executedTasks}
           icon={<TrendingUp className="h-3.5 w-3.5 text-blue-500" />}
           variant="info"
         />
         <StatCard
-          label={t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.successfulTasks",
-          )}
+          label={t("widget.successfulTasks")}
           value={data?.successfulTasks}
           icon={<CheckCircle className="h-3.5 w-3.5 text-green-500" />}
           variant="success"
         />
         <StatCard
-          label={t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.failedTasks",
-          )}
+          label={t("widget.failedTasks")}
           value={data?.failedTasks}
           icon={<XCircle className="h-3.5 w-3.5 text-red-500" />}
           variant="danger"
         />
         <StatCard
-          label={t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.successRate",
-          )}
+          label={t("widget.successRate")}
           value={
             successRate !== null
               ? `${Math.round(
@@ -881,9 +797,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
           variant="success"
         />
         <StatCard
-          label={t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.avgDuration",
-          )}
+          label={t("widget.avgDuration")}
           value={formatDuration(data?.averageExecutionTime)}
           icon={<Clock className="h-3.5 w-3.5 text-muted-foreground" />}
         />
@@ -894,9 +808,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
         <Div className="rounded-lg border bg-card p-4">
           <Div className="flex items-center justify-between mb-2">
             <Span className="text-sm font-semibold">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.overallSuccessRate",
-              )}
+              {t("widget.overallSuccessRate")}
             </Span>
             <Span className="text-sm font-bold tabular-nums">
               {Math.round(successRate)}
@@ -912,71 +824,55 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
         <Div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {data.activeTasks !== undefined && (
             <SmallStatCard
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.activeTasks",
-              )}
+              label={t("widget.activeTasks")}
               value={data.activeTasks}
               icon={<Activity className="h-3 w-3 text-muted-foreground" />}
             />
           )}
           {data.runningExecutions !== undefined && (
             <SmallStatCard
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.runningExecutions",
-              )}
+              label={t("widget.runningExecutions")}
               value={data.runningExecutions}
               icon={<TrendingUp className="h-3 w-3 text-blue-500" />}
             />
           )}
           {data.pendingExecutions !== undefined && (
             <SmallStatCard
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.pendingExecutions",
-              )}
+              label={t("widget.pendingExecutions")}
               value={data.pendingExecutions}
               icon={<Clock className="h-3 w-3 text-yellow-500" />}
             />
           )}
           {data.healthyTasks !== undefined && (
             <SmallStatCard
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.healthyTasks",
-              )}
+              label={t("widget.healthyTasks")}
               value={data.healthyTasks}
               icon={<CheckCircle className="h-3 w-3 text-green-500" />}
             />
           )}
           {data.degradedTasks !== undefined && (
             <SmallStatCard
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.degradedTasks",
-              )}
+              label={t("widget.degradedTasks")}
               value={data.degradedTasks}
               icon={<AlertTriangle className="h-3 w-3 text-yellow-500" />}
             />
           )}
           {data.systemLoad !== undefined && (
             <SmallStatCard
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.systemLoad",
-              )}
+              label={t("widget.systemLoad")}
               value={`${Math.round(data.systemLoad)}%`}
               icon={<TrendingDown className="h-3 w-3 text-muted-foreground" />}
             />
           )}
           {data.queueSize !== undefined && (
             <SmallStatCard
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.queueSize",
-              )}
+              label={t("widget.queueSize")}
               value={data.queueSize}
             />
           )}
           {data.executionsLast24h !== undefined && (
             <SmallStatCard
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.executionsLast24h",
-              )}
+              label={t("widget.executionsLast24h")}
               value={data.executionsLast24h}
               icon={<Activity className="h-3 w-3 text-blue-500" />}
             />
@@ -987,9 +883,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
       {/* ── Tasks By Status ────────────────────────────────────────────────── */}
       {tasksByStatusEntries.length > 0 && (
         <DistributionSection
-          title={t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.tasksByStatus",
-          )}
+          title={t("widget.tasksByStatus")}
           entries={tasksByStatusEntries}
           total={tasksByStatusTotal}
           getBadge={(key) => <StatusBadge status={key} t={t} />}
@@ -1000,9 +894,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
       {/* ── Tasks By Priority ──────────────────────────────────────────────── */}
       {tasksByPriorityEntries.length > 0 && (
         <DistributionSection
-          title={t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.tasksByPriority",
-          )}
+          title={t("widget.tasksByPriority")}
           entries={tasksByPriorityEntries}
           total={tasksByPriorityTotal}
           getBadge={(key) => <PriorityBadge priority={key} t={t} />}
@@ -1016,9 +908,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
           <Div className="flex items-center gap-2 mb-3">
             <TrendingUp className="h-4 w-4 text-green-500" />
             <Span className="text-sm font-semibold">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.topPerforming",
-              )}
+              {t("widget.topPerforming")}
             </Span>
           </Div>
           <TopPerformingTable tasks={topPerformingTasks} t={t} />
@@ -1031,9 +921,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
           <Div className="flex items-center gap-2 mb-3">
             <AlertTriangle className="h-4 w-4 text-red-500" />
             <Span className="text-sm font-semibold">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.problemTasks",
-              )}
+              {t("widget.problemTasks")}
             </Span>
           </Div>
           <ProblemTasksTable tasks={problemTasks} t={t} />
@@ -1044,9 +932,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
       {recentActivity.length > 0 && (
         <Div className="rounded-lg border bg-card p-4">
           <Span className="text-sm font-semibold mb-3 block">
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.recentActivity",
-            )}
+            {t("widget.recentActivity")}
           </Span>
           <RecentActivityFeed items={recentActivity} t={t} />
         </Div>
@@ -1056,9 +942,7 @@ export function CronStatsContainer({ field }: WidgetProps): React.JSX.Element {
       {dailyStats.length > 0 && (
         <Div className="rounded-lg border bg-card p-4">
           <Span className="text-sm font-semibold mb-3 block">
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.stats.widget.dailyStats",
-            )}
+            {t("widget.dailyStats")}
           </Span>
           <DailyStatsTable rows={dailyStats} t={t} />
         </Div>

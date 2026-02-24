@@ -9,12 +9,13 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H3 } from "next-vibe-ui/ui/typography";
 import type { ReactElement } from "react";
 
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { ReactRequestResponseWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 import {
   useWidgetForm,
-  useWidgetTranslation,
+  useWidgetLocale,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type {
@@ -37,9 +38,11 @@ export default function CodeQualitySummaryWidget<
   TUsage,
   CodeQualitySummaryWidgetConfig<TSchema, TUsage, "primitive">
 >): ReactElement {
-  const t = useWidgetTranslation();
+  const locale = useWidgetLocale();
   const form = useWidgetForm();
   const { usage } = field;
+
+  const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
   // Get value from form for request fields, otherwise from field.value
   let value: typeof field.value | undefined;
@@ -66,49 +69,32 @@ export default function CodeQualitySummaryWidget<
 
   const filesDisplay =
     displayedFiles < totalFiles
-      ? `${displayedFiles} ${t("app.api.system.unifiedInterface.widgets.codeQualitySummary.of")} ${totalFiles}`
+      ? `${displayedFiles} ${widgetT("widgets.codeQualitySummary.of")} ${totalFiles}`
       : totalFiles;
 
   const issuesDisplay =
     displayedIssues < totalIssues
-      ? `${displayedIssues} ${t("app.api.system.unifiedInterface.widgets.codeQualitySummary.of")} ${totalIssues}`
+      ? `${displayedIssues} ${widgetT("widgets.codeQualitySummary.of")} ${totalIssues}`
       : totalIssues;
 
   return (
     <Div className="mt-4 space-y-2 rounded border p-4">
       <H3 className="text-sm font-semibold">
-        {t(
-          "app.api.system.unifiedInterface.widgets.codeQualitySummary.summary",
-        )}
+        {widgetT("widgets.codeQualitySummary.summary")}
       </H3>
       <Div className="border-t pt-2 text-sm">
         <Div className="space-y-1">
           <Div>
-            <Span>
-              {t(
-                "app.api.system.unifiedInterface.widgets.codeQualitySummary.files",
-              )}
-              :{" "}
-            </Span>
+            <Span>{widgetT("widgets.codeQualitySummary.files")}: </Span>
             <Span className="font-semibold">{filesDisplay}</Span>
           </Div>
           <Div>
-            <Span>
-              {t(
-                "app.api.system.unifiedInterface.widgets.codeQualitySummary.issues",
-              )}
-              :{" "}
-            </Span>
+            <Span>{widgetT("widgets.codeQualitySummary.issues")}: </Span>
             <Span className="font-semibold">{issuesDisplay}</Span>
           </Div>
           {totalErrors > 0 && (
             <Div>
-              <Span>
-                {t(
-                  "app.api.system.unifiedInterface.widgets.codeQualitySummary.errors",
-                )}
-                :{" "}
-              </Span>
+              <Span>{widgetT("widgets.codeQualitySummary.errors")}: </Span>
               <Span className="font-semibold text-red-600">{totalErrors}</Span>
             </Div>
           )}

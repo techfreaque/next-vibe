@@ -75,7 +75,7 @@ function AccountRow({
 }: {
   account: ImapAccount;
   onEdit: (account: ImapAccount) => void;
-  t: (key: string) => string;
+  t: ReturnType<typeof useWidgetContext>["t"];
 }): React.JSX.Element {
   const syncColor =
     SYNC_STATUS_COLORS[account.syncStatus] ??
@@ -99,7 +99,7 @@ function AccountRow({
           </Span>
           {!account.enabled && (
             <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-              {t("app.api.emails.imapClient.accounts.list.disabled")}
+              {t("disabled")}
             </Span>
           )}
         </Div>
@@ -110,7 +110,7 @@ function AccountRow({
           </Span>
           {account.lastSyncAt !== null && account.lastSyncAt !== undefined && (
             <Span>
-              {t("app.api.emails.imapClient.accounts.list.lastSync")}:{" "}
+              {t("lastSync")}:{" "}
               {new Date(account.lastSyncAt).toLocaleString([], {
                 month: "short",
                 day: "numeric",
@@ -130,7 +130,7 @@ export function ImapAccountsListContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const { push: navigate } = useWidgetNavigation();
   const { endpointMutations } = useWidgetContext();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
 
@@ -236,7 +236,7 @@ export function ImapAccountsListContainer({
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
         <Span className="font-semibold text-base">
-          {t("app.api.emails.imapClient.accounts.list.title")}
+          {t("title")}
           {total > 0 && (
             <Span className="ml-2 text-sm text-muted-foreground font-normal">
               ({total})
@@ -249,7 +249,7 @@ export function ImapAccountsListContainer({
           variant="ghost"
           size="sm"
           onClick={handleRefresh}
-          title={t("app.api.emails.imapClient.accounts.list.refresh")}
+          title={t("refresh")}
         >
           <RefreshCw className="h-4 w-4" />
         </Button>
@@ -261,7 +261,7 @@ export function ImapAccountsListContainer({
           className="gap-1"
         >
           <Plus className="h-4 w-4" />
-          {t("app.api.emails.imapClient.accounts.list.create")}
+          {t("create")}
         </Button>
       </Div>
 
@@ -277,9 +277,7 @@ export function ImapAccountsListContainer({
                 onSubmit();
               }
             }}
-            placeholder={t(
-              "app.api.emails.imapClient.accounts.list.searchPlaceholder",
-            )}
+            placeholder={t("searchPlaceholder")}
             className="pl-9 h-9"
           />
         </Div>
@@ -346,7 +344,7 @@ export function ImapAccountsListContainer({
               : "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
           }
         >
-          {t("app.api.emails.imapClient.accounts.list.enabledOnly")}
+          {t("enabledOnly")}
         </Button>
       </Div>
 
@@ -369,9 +367,7 @@ export function ImapAccountsListContainer({
           </Div>
         ) : (
           <Div className="text-center text-muted-foreground py-12">
-            <Div className="mb-4">
-              {t("app.api.emails.imapClient.accounts.list.empty")}
-            </Div>
+            <Div className="mb-4">{t("empty")}</Div>
             <Button
               type="button"
               variant="outline"
@@ -380,7 +376,7 @@ export function ImapAccountsListContainer({
               className="gap-1"
             >
               <Plus className="h-4 w-4" />
-              {t("app.api.emails.imapClient.accounts.list.create")}
+              {t("create")}
             </Button>
           </Div>
         )}

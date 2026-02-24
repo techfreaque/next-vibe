@@ -66,7 +66,7 @@ function formatPrice(price: number, locale: string, currency: string): string {
 export function CreditsPurchaseContainer({
   field,
 }: CustomWidgetProps): JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
   const children = field.children;
   const { locale } = useTranslation();
 
@@ -87,12 +87,8 @@ export function CreditsPurchaseContainer({
   return (
     <Card className="relative overflow-hidden">
       <CardHeader>
-        <CardTitle className="text-2xl">
-          {t("app.subscription.subscription.buy.pack.title")}
-        </CardTitle>
-        <CardDescription>
-          {t("app.subscription.subscription.buy.pack.description")}
-        </CardDescription>
+        <CardTitle className="text-2xl">{t("post.pack.title")}</CardTitle>
+        <CardDescription>{t("post.pack.description")}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
         {/* Pricing Display */}
@@ -101,7 +97,7 @@ export function CreditsPurchaseContainer({
             {formatPrice(packPrice, locale, packProduct.currency)}
           </Div>
           <Div className="text-sm text-muted-foreground">
-            {t("app.subscription.subscription.buy.pack.perPack")}
+            {t("post.pack.perPack")}
           </Div>
         </Div>
 
@@ -110,22 +106,18 @@ export function CreditsPurchaseContainer({
           <Div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-green-600" />
             <Span>
-              {t("app.subscription.subscription.buy.pack.features.credits", {
+              {t("post.pack.features.credits", {
                 count: packCredits,
               })}
             </Span>
           </Div>
           <Div className="flex items-center gap-2">
             <AlertCircle className="h-4 w-4 text-green-600" />
-            <Span>
-              {t("app.subscription.subscription.buy.pack.features.expiry")}
-            </Span>
+            <Span>{t("post.pack.features.expiry")}</Span>
           </Div>
           <Div className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4 text-blue-600" />
-            <Span>
-              {t("app.subscription.subscription.buy.pack.features.bestFor")}
-            </Span>
+            <Span>{t("post.pack.features.bestFor")}</Span>
           </Div>
         </Div>
 
@@ -143,7 +135,7 @@ export function CreditsPurchaseContainer({
             <SubmitButtonWidget
               field={{
                 text: "app.subscription.subscription.buy.pack.button.submit",
-                loadingText: "app.api.credits.purchase.post.submit.loading",
+                loadingText: "post.submit.loading",
                 icon: "credit-card",
                 variant: "outline",
               }}
@@ -153,7 +145,7 @@ export function CreditsPurchaseContainer({
             {field.value?.checkoutUrl && (
               <Div className="mt-4 p-4 rounded-lg bg-primary/10 border border-primary/20">
                 <Div className="text-sm font-medium mb-2">
-                  {t("app.api.credits.purchase.post.redirecting")}
+                  {t("post.redirecting")}
                 </Div>
                 <Button asChild variant="outline" className="w-full">
                   <Link
@@ -163,7 +155,7 @@ export function CreditsPurchaseContainer({
                     className="flex items-center gap-2"
                   >
                     <ExternalLink className="h-4 w-4" />
-                    {t("app.api.credits.purchase.post.openCheckout")}
+                    {t("post.openCheckout")}
                   </Link>
                 </Button>
               </Div>
@@ -173,7 +165,7 @@ export function CreditsPurchaseContainer({
           <Div className="mt-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
             <Div className="text-sm text-amber-700 dark:text-amber-300">
               <Info className="h-4 w-4 inline mr-2" />
-              {t("app.subscription.subscription.buy.pack.requiresSubscription")}
+              {t("post.pack.requiresSubscription")}
             </Div>
           </Div>
         )}

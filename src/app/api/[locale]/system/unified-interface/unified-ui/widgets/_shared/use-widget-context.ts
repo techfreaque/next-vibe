@@ -201,10 +201,17 @@ export function useWidgetEndpoint<
 }
 
 /**
- * Hook to get translation function from context
+ * Hook to get translation function from context.
+ * Pass the endpoint type to enforce scoped key validation:
+ *   const t = useWidgetTranslation<typeof definition.GET>();
+ * Without a type arg, uses TranslationKey (enforced by translationsKeyTypesafety flag).
  */
-export function useWidgetTranslation(): <K extends string>(
-  key: K,
+export function useWidgetTranslation<
+  TEndpoint extends CreateApiEndpointAny | never = never,
+>(): (
+  key: TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   params?: TParams,
 ) => TranslatedKeyType {
   const store = useWidgetContextStore();
@@ -314,30 +321,26 @@ export function useWidgetIsSubmitting(): boolean | undefined {
 /**
  * Hook to get submitButton config from context
  */
-export function useWidgetSubmitButton(): ReactWidgetContext<CreateApiEndpointAny>["submitButton"] {
-  const store = useWidgetContextStore();
+export function useWidgetSubmitButton<
+  TEndpoint extends CreateApiEndpointAny = CreateApiEndpointAny,
+>(): ReactWidgetContext<TEndpoint>["submitButton"] {
+  const store = useWidgetContextStore<TEndpoint>();
   return store(
-    (
-      state: WidgetContextStore<
-        CreateApiEndpointAny,
-        ReactWidgetContext<CreateApiEndpointAny>
-      >,
-    ) => state.context.submitButton,
+    (state: WidgetContextStore<TEndpoint, ReactWidgetContext<TEndpoint>>) =>
+      state.context.submitButton,
   );
 }
 
 /**
  * Hook to get cancelButton config from context
  */
-export function useWidgetCancelButton(): ReactWidgetContext<CreateApiEndpointAny>["cancelButton"] {
-  const store = useWidgetContextStore();
+export function useWidgetCancelButton<
+  TEndpoint extends CreateApiEndpointAny = CreateApiEndpointAny,
+>(): ReactWidgetContext<TEndpoint>["cancelButton"] {
+  const store = useWidgetContextStore<TEndpoint>();
   return store(
-    (
-      state: WidgetContextStore<
-        CreateApiEndpointAny,
-        ReactWidgetContext<CreateApiEndpointAny>
-      >,
-    ) => state.context.cancelButton,
+    (state: WidgetContextStore<TEndpoint, ReactWidgetContext<TEndpoint>>) =>
+      state.context.cancelButton,
   );
 }
 

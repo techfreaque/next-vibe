@@ -69,7 +69,7 @@ export function LeadsExportContainer({
   const { endpointMutations } = useWidgetContext();
   const router = useRouter();
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
   const form = useWidgetForm<typeof definition.GET>();
   const isLoading = endpointMutations?.read?.isLoading;
@@ -134,8 +134,8 @@ export function LeadsExportContainer({
 
   const fileLabel =
     data?.mimeType === MimeType.XLSX
-      ? t("app.api.leads.export.widget.excelSpreadsheet")
-      : t("app.api.leads.export.widget.csvFile");
+      ? t("widget.excelSpreadsheet")
+      : t("widget.csvFile");
 
   const exportedAtFormatted = data?.exportedAt
     ? new Date(data.exportedAt).toLocaleString()
@@ -149,7 +149,7 @@ export function LeadsExportContainer({
         <Div className="flex items-center gap-2 mr-auto">
           <Download className="h-5 w-5 text-muted-foreground" />
           <Span className="font-semibold text-base">
-            {t("app.api.leads.export.widget.exportLeads")}
+            {t("widget.exportLeads")}
           </Span>
         </Div>
         {/* Navigation shortcuts always visible in header */}
@@ -159,10 +159,10 @@ export function LeadsExportContainer({
           size="sm"
           onClick={handleImport}
           className="gap-1 text-xs"
-          title={t("app.api.leads.export.widget.importLeadsTitle")}
+          title={t("widget.importLeadsTitle")}
         >
           <Upload className="h-4 w-4" />
-          {t("app.api.leads.export.widget.import")}
+          {t("widget.import")}
         </Button>
         <Button
           type="button"
@@ -170,17 +170,17 @@ export function LeadsExportContainer({
           size="sm"
           onClick={handleViewList}
           className="gap-1 text-xs"
-          title={t("app.api.leads.export.widget.viewLeadsListTitle")}
+          title={t("widget.viewLeadsListTitle")}
         >
           <List className="h-4 w-4" />
-          {t("app.api.leads.export.widget.viewList")}
+          {t("widget.viewList")}
         </Button>
       </Div>
 
       {/* Export configuration form */}
       <Div className="rounded-lg border p-4 flex flex-col gap-3">
         <Span className="text-sm font-semibold">
-          {t("app.api.leads.export.widget.configureExport")}
+          {t("widget.configureExport")}
         </Span>
         <Div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <SelectFieldWidget fieldName="format" field={children.format} />
@@ -246,7 +246,7 @@ export function LeadsExportContainer({
           className="self-start gap-1"
         >
           <Download className="h-4 w-4" />
-          {t("app.api.leads.export.widget.download")}
+          {t("widget.download")}
         </Button>
       </Div>
 
@@ -255,10 +255,10 @@ export function LeadsExportContainer({
         <Div className="h-40 flex flex-col items-center justify-center gap-3">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           <Span className="text-sm text-muted-foreground">
-            {t("app.api.leads.export.widget.generatingExport")}
+            {t("widget.generatingExport")}
           </Span>
           <Span className="text-xs text-muted-foreground">
-            {t("app.api.leads.export.widget.generatingExportHint")}
+            {t("widget.generatingExportHint")}
           </Span>
         </Div>
       )}
@@ -271,10 +271,10 @@ export function LeadsExportContainer({
             <CheckCircle className="h-8 w-8 text-green-500 flex-shrink-0" />
             <Div>
               <Span className="font-semibold block">
-                {t("app.api.leads.export.widget.exportReady")}
+                {t("widget.exportReady")}
               </Span>
               <Span className="text-sm text-muted-foreground">
-                {t("app.api.leads.export.widget.fileReadyToDownload")}
+                {t("widget.fileReadyToDownload")}
               </Span>
             </Div>
           </Div>
@@ -283,7 +283,7 @@ export function LeadsExportContainer({
           <Div className="grid grid-cols-3 gap-3">
             <Div className="rounded-md border bg-muted/30 p-3 flex flex-col gap-1">
               <Span className="text-xs text-muted-foreground uppercase tracking-wide">
-                {t("app.api.leads.export.widget.records")}
+                {t("widget.records")}
               </Span>
               <Span className="text-xl font-bold tabular-nums">
                 {data.totalRecords?.toLocaleString() ?? "—"}
@@ -291,13 +291,13 @@ export function LeadsExportContainer({
             </Div>
             <Div className="rounded-md border bg-muted/30 p-3 flex flex-col gap-1">
               <Span className="text-xs text-muted-foreground uppercase tracking-wide">
-                {t("app.api.leads.export.widget.format")}
+                {t("widget.format")}
               </Span>
               <Span className="text-xl font-bold">{fileLabel}</Span>
             </Div>
             <Div className="rounded-md border bg-muted/30 p-3 flex flex-col gap-1">
               <Span className="text-xs text-muted-foreground uppercase tracking-wide">
-                {t("app.api.leads.export.widget.fileSize")}
+                {t("widget.fileSize")}
               </Span>
               <Span className="text-xl font-bold tabular-nums">
                 {formatFileSize(data.fileContent.length)}
@@ -325,12 +325,10 @@ export function LeadsExportContainer({
                   size="sm"
                   onClick={handleCopyToClipboard}
                   className="gap-1"
-                  title={t("app.api.leads.export.widget.copyCsvTitle")}
+                  title={t("widget.copyCsvTitle")}
                 >
                   <Copy className="h-4 w-4" />
-                  {copied
-                    ? t("app.api.leads.export.widget.copied")
-                    : t("app.api.leads.export.widget.copy")}
+                  {copied ? t("widget.copied") : t("widget.copy")}
                 </Button>
               )}
               <Button
@@ -341,7 +339,7 @@ export function LeadsExportContainer({
                 className="gap-1"
               >
                 <Download className="h-4 w-4" />
-                {t("app.api.leads.export.widget.download")}
+                {t("widget.download")}
               </Button>
             </Div>
           </Div>
@@ -351,8 +349,7 @@ export function LeadsExportContainer({
             <Div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Clock className="h-3.5 w-3.5 flex-shrink-0" />
               <Span>
-                {t("app.api.leads.export.widget.exportedAt")}{" "}
-                {exportedAtFormatted}
+                {t("widget.exportedAt")} {exportedAtFormatted}
               </Span>
             </Div>
           )}
@@ -360,7 +357,7 @@ export function LeadsExportContainer({
           {/* Post-export actions */}
           <Div className="flex items-center gap-2 pt-1 border-t">
             <Span className="text-xs text-muted-foreground mr-auto">
-              {t("app.api.leads.export.widget.nextSteps")}
+              {t("widget.nextSteps")}
             </Span>
             <Button
               type="button"
@@ -370,7 +367,7 @@ export function LeadsExportContainer({
               className="gap-1"
             >
               <List className="h-4 w-4" />
-              {t("app.api.leads.export.widget.viewLeads")}
+              {t("widget.viewLeads")}
               <ArrowRight className="h-3.5 w-3.5" />
             </Button>
             <Button
@@ -381,7 +378,7 @@ export function LeadsExportContainer({
               className="gap-1"
             >
               <Upload className="h-4 w-4" />
-              {t("app.api.leads.export.widget.importLeads")}
+              {t("widget.importLeads")}
               <ArrowRight className="h-3.5 w-3.5" />
             </Button>
           </Div>

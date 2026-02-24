@@ -17,6 +17,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation as cliScopedTranslation } from "../../../cli/i18n";
 import { Platform } from "../../../shared/types/platform";
 import type { WidgetData } from "../../../shared/widgets/widget-data";
 import { InkEndpointRenderer } from "./CliEndpointRenderer";
@@ -114,6 +115,7 @@ export function InkEndpointPage<
   }
 
   const { t } = activeEndpoint.scopedTranslation.scopedT(locale);
+  const { t: cliT } = cliScopedTranslation.scopedT(locale);
 
   const responseData = response?.success === true ? response.data : initialData;
 
@@ -128,7 +130,7 @@ export function InkEndpointPage<
         flexDirection="column"
       >
         <Text bold color="blue">
-          {t("app.api.system.unifiedInterface.cli.request")}
+          {cliT("request")}
         </Text>
         <InkEndpointRenderer
           endpoint={activeEndpoint}
@@ -157,8 +159,8 @@ export function InkEndpointPage<
         >
           <Text bold color={response.success ? "green" : "red"}>
             {response.success
-              ? t("app.api.system.unifiedInterface.cli.response.success")
-              : t("app.api.system.unifiedInterface.cli.response.error")}
+              ? cliT("response.success")
+              : cliT("response.error")}
           </Text>
           {response.success && (
             <InkEndpointRenderer

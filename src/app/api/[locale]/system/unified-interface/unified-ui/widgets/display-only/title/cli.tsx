@@ -42,7 +42,7 @@ export function TitleWidgetInk<
       >,
 ): JSX.Element {
   const { field } = props;
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const locale = useInkWidgetLocale();
   const { content, level: configLevel, fieldType } = field;
 

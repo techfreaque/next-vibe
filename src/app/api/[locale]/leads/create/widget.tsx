@@ -53,7 +53,7 @@ export function LeadCreateContainer({
   const data = field.value;
   const router = useRouter();
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
 
   const createdLeadId = data?.lead?.summary?.id;
   const businessName = data?.lead?.summary?.businessName;
@@ -96,7 +96,7 @@ export function LeadCreateContainer({
           <Div className="flex items-center gap-2 mr-auto">
             <CheckCircle className="h-5 w-5 text-green-500" />
             <Span className="font-semibold text-base">
-              {t("app.api.leads.create.widget.headerLeadCreated")}
+              {t("widget.headerLeadCreated")}
             </Span>
           </Div>
         </Div>
@@ -147,20 +147,20 @@ export function LeadCreateContainer({
                   className="text-xs h-auto p-0"
                   onClick={handleCopyId}
                 >
-                  {t("app.api.leads.create.widget.buttonCopyId")}
+                  {t("widget.buttonCopyId")}
                 </Button>
               </Div>
             )}
           </Div>
           <Div className="flex flex-col gap-2">
             <Button type="button" variant="default" onClick={handleViewLead}>
-              {t("app.api.leads.create.widget.buttonViewLead")}
+              {t("widget.buttonViewLead")}
             </Button>
             <Button type="button" variant="outline" onClick={handleEditLead}>
-              {t("app.api.leads.create.widget.buttonEditLead")}
+              {t("widget.buttonEditLead")}
             </Button>
             <Button type="button" variant="outline" onClick={handleBackToList}>
-              {t("app.api.leads.create.widget.buttonBackToList")}
+              {t("widget.buttonBackToList")}
             </Button>
           </Div>
         </Div>
@@ -177,13 +177,13 @@ export function LeadCreateContainer({
         <Div className="flex items-center gap-1 mr-auto">
           <Plus className="h-4 w-4 text-muted-foreground" />
           <Span className="font-semibold text-base">
-            {t("app.api.leads.create.widget.headerCreateLead")}
+            {t("widget.headerCreateLead")}
           </Span>
         </Div>
         <SubmitButtonWidget
           field={{
-            text: "app.api.leads.create.post.submitButton.label",
-            loadingText: "app.api.leads.create.post.submitButton.loadingText",
+            text: "post.submitButton.label",
+            loadingText: "post.submitButton.loadingText",
             icon: "user-plus",
             variant: "primary",
           }}

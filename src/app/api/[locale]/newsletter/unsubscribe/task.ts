@@ -24,9 +24,8 @@ const newsletterUnsubscribeSyncTask = createCronTask(
   definitions.POST,
   tools.POST,
   {
-    name: "newsletter-unsubscribe-sync",
-    description:
-      "app.api.system.unifiedInterface.tasks.newsletterUnsubscribeSync.description",
+    name: "unsubscribe.sync.post.title",
+    description: "unsubscribe.sync.post.description",
     schedule: CRON_SCHEDULES.EVERY_6_HOURS,
     category: TaskCategory.MAINTENANCE,
     enabled: false,

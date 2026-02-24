@@ -35,7 +35,7 @@ export function ChartWidgetInk<
       >,
 ): JSX.Element {
   const { field } = props;
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const locale = useInkWidgetLocale();
   const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
   const {

@@ -154,6 +154,13 @@ export const translations: typeof enTranslations = {
       description: "Statystyki zadań cron pomyślnie pobrane",
     },
   },
+  priority: {
+    critical: "Krytyczny",
+    high: "Wysoki",
+    medium: "Średni",
+    low: "Niski",
+    background: "Tło",
+  },
   widget: {
     title: "Statystyki Cron",
     loading: "Ładowanie statystyk...",

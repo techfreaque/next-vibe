@@ -36,7 +36,7 @@ export async function dev(
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<void> {
-  logger.debug("app.api.contact.seeds.dev.start");
+  logger.debug("Seeding contact submissions for dev environment");
 
   try {
     // Create sample contact submissions for testing
@@ -78,13 +78,13 @@ export async function dev(
         if (result.success) {
           createdCount++;
         } else {
-          logger.error("app.api.contact.seeds.dev.submission.failed", {
+          logger.error("Failed to create dev contact submission", {
             message: result.message,
           });
         }
       } catch (error) {
         logger.error(
-          "app.api.contact.seeds.dev.submission.error",
+          "Unexpected error creating dev contact submission",
           parseError(error),
           {
             email: contact.email,
@@ -93,11 +93,11 @@ export async function dev(
       }
     }
 
-    logger.debug("app.api.contact.seeds.dev.complete", {
+    logger.debug("Dev contact seeding complete", {
       created: createdCount,
     });
   } catch (error) {
-    logger.error("app.api.contact.seeds.dev.error", parseError(error));
+    logger.error("Dev contact seeding failed", parseError(error));
   }
 }
 
@@ -108,7 +108,7 @@ export async function test(
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<void> {
-  logger.debug("app.api.contact.seeds.test.start");
+  logger.debug("Seeding contact submissions for test environment");
 
   try {
     // Create minimal test contact data
@@ -123,14 +123,14 @@ export async function test(
     const { t } = scopedTranslation.scopedT(locale);
     const result = await ContactRepository.create(testContact, logger, t);
     if (result.success) {
-      logger.debug("app.api.contact.seeds.test.submission.created");
+      logger.debug("Test contact submission created successfully");
     } else {
-      logger.error("app.api.contact.seeds.test.submission.failed", {
+      logger.error("Failed to create test contact submission", {
         message: result.message,
       });
     }
   } catch (error) {
-    logger.error("app.api.contact.seeds.test.error", parseError(error));
+    logger.error("Test contact seeding failed", parseError(error));
   }
 }
 
@@ -138,15 +138,15 @@ export async function test(
  * Production seed function for contact module
  */
 export async function prod(logger: EndpointLogger): Promise<void> {
-  logger.debug("app.api.contact.seeds.prod.start");
+  logger.debug("Seeding contact submissions for prod environment");
 
   try {
     // Production doesn't need pre-seeded contact data
     // Contact submissions will be created by actual users
     await Promise.resolve(); // Ensure async behavior for consistency
-    logger.debug("app.api.contact.seeds.prod.ready");
+    logger.debug("Prod contact seeding ready (no data needed)");
   } catch (error) {
-    logger.error("app.api.contact.seeds.prod.error", parseError(error));
+    logger.error("Prod contact seeding failed", parseError(error));
   }
 }
 

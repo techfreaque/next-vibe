@@ -23,13 +23,13 @@ import { CompactTriggerEdit } from "@/app/api/[locale]/agent/chat/_shared/compac
 import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/config";
 import { ModelSelector } from "@/app/api/[locale]/agent/models/components/model-selector";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
+import type { useWidgetContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import {
   useWidgetForm,
   useWidgetIsSubmitting,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
-  useWidgetTranslation,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { AlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/react";
@@ -63,8 +63,8 @@ export function FavoriteEditContainer({
   field,
 }: PatchWidgetProps): React.JSX.Element {
   const children = field.children;
-  const form = useWidgetForm();
-  const t = useWidgetTranslation();
+  const form = useWidgetForm<typeof definitionPatch.PATCH>();
+  const t = useWidgetTranslation<typeof definitionPatch.PATCH>();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
@@ -77,7 +77,7 @@ export function FavoriteEditContainer({
   const isPublic = user.isPublic;
 
   const favoriteModelSelection: ModelSelectionSimple | undefined =
-    form?.watch("modelSelection");
+    form?.watch("modelSelection") ?? undefined;
 
   const characterEndpoint = useCharacter(characterId ?? "", user, logger);
   const characterData = characterEndpoint.read?.data;
@@ -176,7 +176,7 @@ export function FavoriteEditContainer({
             className="gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            {t("app.api.agent.chat.favorites.id.patch.signupPrompt.backButton")}
+            {t("patch.signupPrompt.backButton")}
           </Button>
         </Div>
 
@@ -184,12 +184,10 @@ export function FavoriteEditContainer({
         <Div className="overflow-y-auto max-h-[min(800px,calc(100dvh-180px))] px-4 pb-4">
           <Div className="max-w-md mx-auto flex flex-col gap-6 text-center">
             <Div className="text-xl font-semibold">
-              {t("app.api.agent.chat.favorites.id.patch.signupPrompt.title")}
+              {t("patch.signupPrompt.title")}
             </Div>
             <Div className="text-muted-foreground">
-              {t(
-                "app.api.agent.chat.favorites.id.patch.signupPrompt.description",
-              )}
+              {t("patch.signupPrompt.description")}
             </Div>
 
             {/* CTA Buttons */}
@@ -202,9 +200,7 @@ export function FavoriteEditContainer({
                 className="gap-2"
               >
                 <UserPlus className="h-4 w-4" />
-                {t(
-                  "app.api.agent.chat.favorites.id.patch.signupPrompt.signupButton",
-                )}
+                {t("patch.signupPrompt.signupButton")}
               </Button>
               <Button
                 type="button"
@@ -214,9 +210,7 @@ export function FavoriteEditContainer({
                 className="gap-2"
               >
                 <LogIn className="h-4 w-4" />
-                {t(
-                  "app.api.agent.chat.favorites.id.patch.signupPrompt.loginButton",
-                )}
+                {t("patch.signupPrompt.loginButton")}
               </Button>
             </Div>
           </Div>
@@ -245,9 +239,8 @@ export function FavoriteEditContainer({
           <>
             <SubmitButtonWidget
               field={{
-                text: "app.api.agent.chat.favorites.id.patch.saveButton.label",
-                loadingText:
-                  "app.api.agent.chat.favorites.id.patch.saveButton.loadingText",
+                text: "patch.saveButton.label",
+                loadingText: "patch.saveButton.loadingText",
                 icon: "save",
                 variant: "outline",
               }}
@@ -328,9 +321,7 @@ export function FavoriteEditContainer({
                   className="gap-2"
                 >
                   <Settings className="h-4 w-4" />
-                  {t(
-                    "app.api.agent.chat.favorites.id.patch.customizeCharacterButton.label",
-                  )}
+                  {t("patch.customizeCharacterButton.label")}
                 </Button>
               </Div>
             </Div>
@@ -347,16 +338,10 @@ export function FavoriteEditContainer({
           >
             <CheckCircle className="h-4 w-4" />
             {isActiveFavorite
-              ? t(
-                  "app.api.agent.chat.favorites.id.patch.currentlyActiveButton.label",
-                )
+              ? t("patch.currentlyActiveButton.label")
               : isNoCharacter
-                ? t(
-                    "app.api.agent.chat.favorites.id.patch.useThisModelButton.label",
-                  )
-                : t(
-                    "app.api.agent.chat.favorites.id.patch.useThisCharacterButton.label",
-                  )}
+                ? t("patch.useThisModelButton.label")
+                : t("patch.useThisCharacterButton.label")}
           </Button>
 
           <SelectFieldWidget fieldName="voice" field={children.voice} />
@@ -424,7 +409,7 @@ function SaveAndUseButton({
   locale: ReturnType<typeof useWidgetLocale>;
   user: ReturnType<typeof useWidgetUser>;
   isSubmitting: boolean | undefined;
-  t: ReturnType<typeof useWidgetTranslation>;
+  t: ReturnType<typeof useWidgetContext>["t"];
 }): JSX.Element {
   const [isActivating, setIsActivating] = useState(false);
 
@@ -501,14 +486,12 @@ function SaveAndUseButton({
       {isSubmitting || isActivating ? (
         <>
           <Loader2 className="h-4 w-4 animate-spin" />
-          {t(
-            "app.api.agent.chat.favorites.id.patch.saveAndUseButton.loadingText",
-          )}
+          {t("patch.saveAndUseButton.loadingText")}
         </>
       ) : (
         <>
           <Zap className="h-4 w-4" />
-          {t("app.api.agent.chat.favorites.id.patch.saveAndUseButton.label")}
+          {t("patch.saveAndUseButton.label")}
         </>
       )}
     </Button>

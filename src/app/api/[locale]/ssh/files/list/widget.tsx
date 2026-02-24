@@ -55,7 +55,7 @@ function formatDate(s: string | null): string {
 }
 
 export function FilesListContainer({ field }: WidgetProps): React.JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof endpoints.GET>();
   const form = useWidgetForm<typeof endpoints.GET>();
   const onSubmit = useWidgetOnSubmit();
   const { endpointMutations } = useWidgetContext();
@@ -86,7 +86,7 @@ export function FilesListContainer({ field }: WidgetProps): React.JSX.Element {
       <Div className="flex items-center gap-2 px-4 py-3 border-b">
         <Folder className="h-4 w-4 text-muted-foreground" />
         <Span className="font-semibold text-sm mr-auto">
-          {t("app.api.ssh.files.list.widget.title")}
+          {t("widget.title")}
         </Span>
         <Button
           type="button"
@@ -111,7 +111,7 @@ export function FilesListContainer({ field }: WidgetProps): React.JSX.Element {
         ))}
         {pathParts.length === 0 && (
           <Span className="font-mono text-muted-foreground">
-            {t("app.api.ssh.files.list.widget.home")}
+            {t("widget.home")}
           </Span>
         )}
       </Div>
@@ -119,9 +119,7 @@ export function FilesListContainer({ field }: WidgetProps): React.JSX.Element {
       {/* File list */}
       {isLoading ? (
         <Div className="flex items-center justify-center flex-1 py-12">
-          <P className="text-sm text-muted-foreground">
-            {t("app.api.ssh.files.list.widget.loading")}
-          </P>
+          <P className="text-sm text-muted-foreground">{t("widget.loading")}</P>
         </Div>
       ) : value?.entries && value.entries.length > 0 ? (
         <Div className="flex flex-col divide-y overflow-y-auto flex-1">
@@ -157,7 +155,7 @@ export function FilesListContainer({ field }: WidgetProps): React.JSX.Element {
       ) : (
         <Div className="flex items-center justify-center flex-1 py-12">
           <P className="text-sm text-muted-foreground">
-            {t("app.api.ssh.files.list.widget.emptyDir")}
+            {t("widget.emptyDir")}
           </P>
         </Div>
       )}

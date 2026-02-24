@@ -46,17 +46,13 @@ export function ResetPasswordConfirmContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const form = useWidgetForm();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
-          {t("app.api.user.public.resetPassword.confirm.title")}
-        </CardTitle>
-        <CardDescription>
-          {t("app.api.user.public.resetPassword.confirm.description")}
-        </CardDescription>
+        <CardTitle>{t("confirm.title")}</CardTitle>
+        <CardDescription>{t("confirm.description")}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
         {/* Verification Section */}
@@ -81,9 +77,8 @@ export function ResetPasswordConfirmContainer({
         {/* Submit Button */}
         <SubmitButtonWidget
           field={{
-            text: "app.api.user.public.resetPassword.confirm.actions.submit",
-            loadingText:
-              "app.api.user.public.resetPassword.confirm.actions.submitting",
+            text: "actions.submit",
+            loadingText: "actions.submitting",
             icon: "lock",
             variant: "default",
             size: "default",

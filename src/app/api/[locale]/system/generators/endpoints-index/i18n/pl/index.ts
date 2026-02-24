@@ -70,4 +70,7 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  success: {
+    generated: "Indeks endpointów wygenerowany pomyślnie",
+  },
 };

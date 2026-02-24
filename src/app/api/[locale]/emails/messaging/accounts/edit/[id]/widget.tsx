@@ -11,10 +11,12 @@ import {
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
+import type messagingAccountEditEndpoints from "./definition";
+
 export function MessagingAccountEditContainer(): React.JSX.Element {
   const router = useRouter();
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof messagingAccountEditEndpoints.PUT>();
 
   return (
     <Div className="flex flex-col gap-4 p-4">
@@ -29,14 +31,12 @@ export function MessagingAccountEditContainer(): React.JSX.Element {
           className="gap-1"
         >
           <ArrowLeft className="h-4 w-4" />
-          {t("app.api.emails.messaging.accounts.list.title")}
+          {t("get.title")}
         </Button>
       </Div>
       <Div className="flex items-center gap-2">
         <Edit className="h-5 w-5" />
-        <Div className="text-lg font-semibold">
-          {t("app.api.emails.messaging.accounts.edit.id.put.title")}
-        </Div>
+        <Div className="text-lg font-semibold">{t("put.title")}</Div>
       </Div>
     </Div>
   );

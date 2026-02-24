@@ -143,9 +143,9 @@ export function UsersStatsContainer({
   const { endpointMutations } = useWidgetContext();
   const router = useRouter();
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
-  const form = useWidgetForm();
+  const form = useWidgetForm<typeof definition.GET>();
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const data = field.value;
@@ -213,7 +213,7 @@ export function UsersStatsContainer({
         <Div className="flex items-center gap-2 mr-auto">
           <Users className="h-5 w-5 text-muted-foreground" />
           <Span className="font-semibold text-base">
-            {t("app.api.users.stats.widget.headerTitle")}
+            {t("widget.headerTitle")}
           </Span>
         </Div>
         <Button
@@ -223,7 +223,7 @@ export function UsersStatsContainer({
           onClick={() => {
             setFiltersOpen((v) => !v);
           }}
-          title={t("app.api.users.stats.widget.filters")}
+          title={t("widget.filters")}
         >
           <Filter className="h-4 w-4" />
         </Button>
@@ -232,7 +232,7 @@ export function UsersStatsContainer({
           variant="ghost"
           size="sm"
           onClick={handleRefresh}
-          title={t("app.api.users.stats.widget.refresh")}
+          title={t("widget.refresh")}
         >
           <RefreshCw className="h-4 w-4" />
         </Button>
@@ -242,7 +242,7 @@ export function UsersStatsContainer({
       {filtersOpen && (
         <Div className="rounded-lg border p-4 flex flex-col gap-3">
           <Span className="text-sm font-semibold">
-            {t("app.api.users.stats.widget.filtersTitle")}
+            {t("widget.filtersTitle")}
           </Span>
           <Div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             <TextFieldWidget
@@ -307,7 +307,7 @@ export function UsersStatsContainer({
             onClick={handleApplyFilters}
             className="self-start"
           >
-            {t("app.api.users.stats.widget.applyFilters")}
+            {t("widget.applyFilters")}
           </Button>
         </Div>
       )}
@@ -321,7 +321,7 @@ export function UsersStatsContainer({
           onClick={handleViewUsers}
         >
           <Users className="h-4 w-4 mr-1" />
-          {t("app.api.users.stats.widget.viewUsers")}
+          {t("widget.viewUsers")}
         </Button>
         <Button
           type="button"
@@ -330,33 +330,33 @@ export function UsersStatsContainer({
           onClick={handleCreateUser}
         >
           <UserPlus className="h-4 w-4 mr-1" />
-          {t("app.api.users.stats.widget.createUser")}
+          {t("widget.createUser")}
         </Button>
       </Div>
 
       {/* KPI overview: user counts */}
       <Div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         <StatCard
-          label={t("app.api.users.stats.widget.labelTotalUsers")}
+          label={t("widget.labelTotalUsers")}
           value={overviewStats?.totalUsers}
         />
         <StatCard
-          label={t("app.api.users.stats.widget.labelActiveUsers")}
+          label={t("widget.labelActiveUsers")}
           value={overviewStats?.activeUsers}
           variant="success"
         />
         <StatCard
-          label={t("app.api.users.stats.widget.labelNewToday")}
+          label={t("widget.labelNewToday")}
           value={growthMetrics?.timeSeriesData?.usersCreatedToday}
           variant="info"
         />
         <StatCard
-          label={t("app.api.users.stats.widget.labelNewThisWeek")}
+          label={t("widget.labelNewThisWeek")}
           value={growthMetrics?.timeSeriesData?.usersCreatedThisWeek}
           variant="info"
         />
         <StatCard
-          label={t("app.api.users.stats.widget.labelNewThisMonth")}
+          label={t("widget.labelNewThisMonth")}
           value={growthMetrics?.timeSeriesData?.usersCreatedThisMonth}
           variant="info"
         />
@@ -365,13 +365,13 @@ export function UsersStatsContainer({
       {/* KPI revenue */}
       <Div className="grid grid-cols-2 gap-3">
         <StatCard
-          label={t("app.api.users.stats.widget.labelTotalRevenue")}
+          label={t("widget.labelTotalRevenue")}
           value={paymentStats?.totalRevenue}
           format="currency"
           variant="success"
         />
         <StatCard
-          label={t("app.api.users.stats.widget.labelAvgRevenuePerUser")}
+          label={t("widget.labelAvgRevenuePerUser")}
           value={averageRevenuePerUser}
           format="currency"
           variant="info"
@@ -381,18 +381,18 @@ export function UsersStatsContainer({
       {/* Email / newsletter stats */}
       <Div className="grid grid-cols-3 gap-3">
         <StatCard
-          label={t("app.api.users.stats.widget.labelEmailVerified")}
+          label={t("widget.labelEmailVerified")}
           value={emailStats?.emailVerifiedUsers}
           variant="success"
         />
         <StatCard
-          label={t("app.api.users.stats.widget.labelVerificationRate")}
+          label={t("widget.labelVerificationRate")}
           value={emailStats?.verificationRate}
           format="percent"
           variant="info"
         />
         <StatCard
-          label={t("app.api.users.stats.widget.labelEmailUnverified")}
+          label={t("widget.labelEmailUnverified")}
           value={emailStats?.emailUnverifiedUsers}
           variant="warning"
         />
@@ -401,19 +401,19 @@ export function UsersStatsContainer({
       {/* Performance rates */}
       <Div className="grid grid-cols-3 gap-3">
         <StatCard
-          label={t("app.api.users.stats.widget.labelGrowthRate")}
+          label={t("widget.labelGrowthRate")}
           value={growthMetrics?.performanceRates?.growthRate}
           format="percent"
           variant="success"
         />
         <StatCard
-          label={t("app.api.users.stats.widget.labelLeadUserCvr")}
+          label={t("widget.labelLeadUserCvr")}
           value={growthMetrics?.performanceRates?.leadToUserConversionRate}
           format="percent"
           variant="info"
         />
         <StatCard
-          label={t("app.api.users.stats.widget.labelRetentionRate")}
+          label={t("widget.labelRetentionRate")}
           value={growthMetrics?.performanceRates?.retentionRate}
           format="percent"
           variant="success"
@@ -423,15 +423,15 @@ export function UsersStatsContainer({
       {/* Grouped breakdowns as bar charts */}
       <Div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <BarChartSection
-          title={t("app.api.users.stats.widget.chartByRole")}
+          title={t("widget.chartByRole")}
           items={roleChartItems}
         />
         <BarChartSection
-          title={t("app.api.users.stats.widget.chartBySubscriptionStatus")}
+          title={t("widget.chartBySubscriptionStatus")}
           items={subscriptionChartItems}
         />
         <BarChartSection
-          title={t("app.api.users.stats.widget.chartGrowthOverTime")}
+          title={t("widget.chartGrowthOverTime")}
           items={growthChartItems}
         />
       </Div>
@@ -439,24 +439,24 @@ export function UsersStatsContainer({
       {/* Recent signups (time-series summary) */}
       <Div className="rounded-lg border bg-card p-4">
         <Span className="text-sm font-semibold mb-3 block">
-          {t("app.api.users.stats.widget.recentSignupsSummary")}
+          {t("widget.recentSignupsSummary")}
         </Span>
         <Div className="flex flex-col gap-2">
           {[
             {
-              label: t("app.api.users.stats.widget.rowToday"),
+              label: t("widget.rowToday"),
               value: growthMetrics?.timeSeriesData?.usersCreatedToday,
             },
             {
-              label: t("app.api.users.stats.widget.rowThisWeek"),
+              label: t("widget.rowThisWeek"),
               value: growthMetrics?.timeSeriesData?.usersCreatedThisWeek,
             },
             {
-              label: t("app.api.users.stats.widget.rowThisMonth"),
+              label: t("widget.rowThisMonth"),
               value: growthMetrics?.timeSeriesData?.usersCreatedThisMonth,
             },
             {
-              label: t("app.api.users.stats.widget.rowLastMonth"),
+              label: t("widget.rowLastMonth"),
               value: growthMetrics?.timeSeriesData?.usersCreatedLastMonth,
             },
           ].map((row) => (
@@ -478,8 +478,7 @@ export function UsersStatsContainer({
       {/* Generated at */}
       {generatedAt && (
         <Div className="text-xs text-muted-foreground text-right">
-          {t("app.api.users.stats.widget.generatedAt")}{" "}
-          {generatedAt.toLocaleString()}
+          {t("widget.generatedAt")} {generatedAt.toLocaleString()}
         </Div>
       )}
     </Div>

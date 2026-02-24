@@ -26,6 +26,7 @@ import type { InkWidgetContext } from "@/app/api/[locale]/system/unified-interfa
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { scopedTranslation as cliScopedTranslation } from "../../../cli/i18n";
 import type { InkFormState } from "../../widgets/_shared/cli-types";
 import {
   extractAllFields,
@@ -271,11 +272,11 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     return true;
   });
 
+  const { t: cliT } = cliScopedTranslation.scopedT(locale);
+
   // Render all visible fields
   return !visibleFields.length ? (
-    <Text dimColor>
-      {context.t("app.api.system.unifiedInterface.cli.vibe.noFields")}
-    </Text>
+    <Text dimColor>{cliT("vibe.noFields")}</Text>
   ) : (
     <InkWidgetContextProvider context={context}>
       <Box flexDirection="column">

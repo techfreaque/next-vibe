@@ -12,8 +12,8 @@ import {
 import type { ReactRequestResponseWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 import {
+  useWidgetContext,
   useWidgetForm,
-  useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { StringWidgetSchema } from "../../../../shared/widgets/utils/schema-constraints";
@@ -52,8 +52,8 @@ export function DescriptionWidget<
   TUsage,
   DescriptionWidgetConfig<TSchema, TUsage, "primitive">
 >): JSX.Element {
-  const t = useWidgetTranslation();
   const form = useWidgetForm();
+  const { t } = useWidgetContext();
   const { textSize, spacing, lineClamp, className, usage } = field;
 
   // Get value from form for request fields, otherwise from field.value
@@ -103,7 +103,7 @@ export function DescriptionWidget<
         className,
       )}
     >
-      {t(value)}
+      {typeof value === "string" ? t(value) : value}
     </Div>
   );
 }

@@ -91,7 +91,9 @@ const variantClasses: Record<StatVariant, string> = {
  */
 export function StatWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
 >(
   props:
@@ -107,7 +109,7 @@ export function StatWidget<
       >,
 ): JSX.Element {
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<TEndpoint>();
   const form = useWidgetForm();
   const { field } = props;
   const fieldName = "fieldName" in props ? props.fieldName : undefined;

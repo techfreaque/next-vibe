@@ -24,8 +24,8 @@ import endpoints from "./pull/definition";
 import { tools } from "./pull/route";
 
 const syncTask = createCronTask(endpoints.POST, tools.POST, {
-  name: "task-sync",
-  description: "app.api.system.unifiedInterface.tasks.taskSync.description",
+  name: "taskSync.name",
+  description: "taskSync.description",
   schedule: CRON_SCHEDULES.EVERY_MINUTE,
   category: TaskCategory.SYSTEM,
   enabled: true,

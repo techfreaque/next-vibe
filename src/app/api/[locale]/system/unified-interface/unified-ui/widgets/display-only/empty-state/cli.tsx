@@ -29,7 +29,7 @@ export function EmptyStateWidgetInk<
   TUsage,
   EmptyStateWidgetConfig<TKey, TUsage, "widget">
 >): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const { title: titleKey, message: messageKey, icon } = field;
 
   const title = t(titleKey);

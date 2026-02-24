@@ -79,7 +79,7 @@ export async function dev(
         },
       }),
       createNewsletterSeed({
-        email: "app.api.newsletter.test@example.com",
+        email: "newsletter.test@example.com",
         status: NewsletterSubscriptionStatus.PENDING,
         preferences: {
           frequency: "monthly",

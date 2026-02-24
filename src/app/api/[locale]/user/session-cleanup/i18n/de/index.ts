@@ -61,6 +61,7 @@ export const translations = {
     },
   },
   task: {
+    name: "user-session-cleanup",
     description:
       "Abgelaufene Benutzersitzungen bereinigen, um die Systemsicherheit zu gewährleisten",
     purpose:

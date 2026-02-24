@@ -50,15 +50,13 @@ export function SignupFormContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const form = useWidgetForm();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("app.api.user.public.signup.form.title")}</CardTitle>
-        <CardDescription>
-          {t("app.api.user.public.signup.form.description")}
-        </CardDescription>
+        <CardTitle>{t("form.title")}</CardTitle>
+        <CardDescription>{t("form.description")}</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
         {/* Name Fields - Grid 2 columns */}

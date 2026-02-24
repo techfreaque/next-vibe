@@ -35,16 +35,14 @@ export function SmtpCreateContainer({
   fieldName,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
 
   return (
     <Div className="flex flex-col gap-0">
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
         <NavigateButtonWidget field={children.backButton} />
-        <Span className="font-semibold text-base">
-          {t("app.api.emails.smtpClient.create.title")}
-        </Span>
+        <Span className="font-semibold text-base">{t("title")}</Span>
       </Div>
 
       {/* Scrollable form */}
@@ -54,7 +52,7 @@ export function SmtpCreateContainer({
         {/* Account Information */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.smtpClient.create.container.title")}
+            {t("container.title")}
           </Span>
           <TextFieldWidget
             fieldName={`${fieldName}.accountInfo.name`}
@@ -69,7 +67,7 @@ export function SmtpCreateContainer({
         {/* Server Configuration */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.smtpClient.create.host.label")}
+            {t("host.label")}
           </Span>
           <TextFieldWidget
             fieldName={`${fieldName}.serverConfig.host`}
@@ -90,7 +88,7 @@ export function SmtpCreateContainer({
         {/* Authentication */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.smtpClient.create.username.label")}
+            {t("username.label")}
           </Span>
           <Div className="grid grid-cols-2 gap-3">
             <TextFieldWidget
@@ -107,7 +105,7 @@ export function SmtpCreateContainer({
         {/* Email Configuration */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.smtpClient.create.fromEmail.label")}
+            {t("fromEmail.label")}
           </Span>
           <EmailFieldWidget
             fieldName={`${fieldName}.emailConfig.fromEmail`}
@@ -141,8 +139,8 @@ export function SmtpCreateContainer({
         <Div className="flex items-center justify-end pt-2">
           <SubmitButtonWidget
             field={{
-              text: "app.api.emails.smtpClient.create.title",
-              loadingText: "app.api.emails.smtpClient.create.title",
+              text: "title",
+              loadingText: "title",
               icon: "plus",
               variant: "primary",
               size: "sm",

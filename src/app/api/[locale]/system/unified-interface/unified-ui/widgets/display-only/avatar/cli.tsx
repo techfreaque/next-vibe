@@ -43,7 +43,7 @@ export default function AvatarWidgetInk<
   TUsage,
   AvatarWidgetConfig<TKey, TUsage, "widget", never>
 >): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const { alt: altKey, fallback: configFallback } = field;
 
   // Get avatar data from field value

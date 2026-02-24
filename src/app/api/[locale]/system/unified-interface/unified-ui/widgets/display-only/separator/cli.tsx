@@ -29,7 +29,7 @@ export function SeparatorWidgetInk<
   TUsage,
   SeparatorWidgetConfig<TKey, TUsage, "widget">
 >): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const { label: labelKey } = field;
 
   const label = labelKey ? t(labelKey) : undefined;

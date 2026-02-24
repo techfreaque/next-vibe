@@ -256,7 +256,7 @@ export function ImapMessagesListContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const { endpointMutations, locale, logger, user } = useWidgetContext();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const widgetLocale = useWidgetLocale();
   const router = useRouter();
   const form = useWidgetForm();
@@ -455,7 +455,7 @@ export function ImapMessagesListContainer({
       {/* Header */}
       <Div className="flex items-center gap-2 px-4 py-3 border-b flex-wrap">
         <Span className="font-semibold text-base">
-          {t("app.api.emails.imapClient.messages.list.title")}
+          {t("title")}
           {total > 0 && (
             <Span className="ml-2 text-sm text-muted-foreground font-normal">
               ({total})
@@ -463,9 +463,7 @@ export function ImapMessagesListContainer({
           )}
           {unreadCount > 0 && (
             <Span className="ml-1.5 text-sm text-blue-600 dark:text-blue-400 font-medium">
-              {t("app.api.emails.imapClient.messages.list.unreadDot")}{" "}
-              {unreadCount}{" "}
-              {t("app.api.emails.imapClient.messages.list.unread")}
+              {t("unreadDot")} {unreadCount} {t("unread")}
             </Span>
           )}
         </Span>
@@ -475,7 +473,7 @@ export function ImapMessagesListContainer({
           variant="ghost"
           size="sm"
           onClick={handleRefresh}
-          title={t("app.api.emails.imapClient.messages.list.refresh")}
+          title={t("refresh")}
         >
           <RefreshCw className="h-4 w-4" />
         </Button>
@@ -485,8 +483,7 @@ export function ImapMessagesListContainer({
       {someSelected && (
         <Div className="flex items-center gap-2 px-4 py-2 bg-primary/5 border-b">
           <Span className="text-sm font-medium text-foreground">
-            {selectedIds.size}{" "}
-            {t("app.api.emails.imapClient.messages.list.selected")}
+            {selectedIds.size} {t("selected")}
           </Span>
           <Div className="flex-1" />
           {isBulkLoading ? (
@@ -500,7 +497,7 @@ export function ImapMessagesListContainer({
                 onClick={() =>
                   void handleBulkAction(BulkMessageAction.MARK_READ)
                 }
-                title={t("app.api.emails.enums.bulkMessageAction.markRead")}
+                title={t("enums.bulkAction.markRead")}
               >
                 <MailOpen className="h-4 w-4" />
               </Button>
@@ -511,7 +508,7 @@ export function ImapMessagesListContainer({
                 onClick={() =>
                   void handleBulkAction(BulkMessageAction.MARK_UNREAD)
                 }
-                title={t("app.api.emails.enums.bulkMessageAction.markUnread")}
+                title={t("enums.bulkAction.markUnread")}
               >
                 <Mail className="h-4 w-4" />
               </Button>
@@ -520,7 +517,7 @@ export function ImapMessagesListContainer({
                 variant="ghost"
                 size="sm"
                 onClick={() => void handleBulkAction(BulkMessageAction.FLAG)}
-                title={t("app.api.emails.enums.bulkMessageAction.flag")}
+                title={t("enums.bulkAction.flag")}
               >
                 <Bookmark className="h-4 w-4" />
               </Button>
@@ -529,7 +526,7 @@ export function ImapMessagesListContainer({
                 variant="ghost"
                 size="sm"
                 onClick={() => void handleBulkAction(BulkMessageAction.DELETE)}
-                title={t("app.api.emails.enums.bulkMessageAction.delete")}
+                title={t("enums.bulkAction.delete")}
                 className="text-destructive hover:text-destructive"
               >
                 <Trash2 className="h-4 w-4" />
@@ -541,7 +538,7 @@ export function ImapMessagesListContainer({
                 onClick={() => setSelectedIds(new Set())}
                 className="text-xs text-muted-foreground"
               >
-                {t("app.api.emails.imapClient.messages.list.deselect")}
+                {t("deselect")}
               </Button>
             </>
           )}
@@ -555,9 +552,7 @@ export function ImapMessagesListContainer({
           <Input
             type="text"
             className="pl-9 pr-9 h-9 w-full bg-muted/40 border-muted hover:bg-muted/60 focus:bg-background focus:border-primary/50 transition-colors"
-            placeholder={t(
-              "app.api.emails.imapClient.messages.list.get.search.placeholder",
-            )}
+            placeholder={t("get.search.placeholder")}
             value={searchValue}
             onChangeText={handleSearchChange}
           />
@@ -647,9 +642,7 @@ export function ImapMessagesListContainer({
                   : "border-muted text-muted-foreground",
               )}
               onClick={() => setShowDateFilters((v) => !v)}
-              title={t(
-                "app.api.emails.imapClient.messages.list.get.dateFrom.label",
-              )}
+              title={t("get.dateFrom.label")}
             >
               <Calendar className="h-3.5 w-3.5" />
               {hasDateFilter && <Span className="sr-only">active</Span>}
@@ -662,12 +655,7 @@ export function ImapMessagesListContainer({
           <Div className="mt-2 flex items-center gap-2 flex-wrap">
             <Div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <Filter className="h-3.5 w-3.5" />
-              <Span>
-                {t(
-                  "app.api.emails.imapClient.messages.list.get.dateFrom.label",
-                )}
-                :
-              </Span>
+              <Span>{t("get.dateFrom.label")}:</Span>
             </Div>
             <Input
               type="date"
@@ -691,7 +679,7 @@ export function ImapMessagesListContainer({
                 onClick={handleClearDateFilters}
               >
                 <X className="h-3.5 w-3.5 mr-1" />
-                {t("app.api.emails.imapClient.messages.list.deselect")}
+                {t("deselect")}
               </Button>
             )}
           </Div>
@@ -717,17 +705,13 @@ export function ImapMessagesListContainer({
             {dateFromValue && (
               <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-medium">
                 <Calendar className="h-3 w-3" />
-                {t(
-                  "app.api.emails.imapClient.messages.list.get.dateFrom.label",
-                )}
-                : {dateFromValue}
+                {t("get.dateFrom.label")}: {dateFromValue}
               </Span>
             )}
             {dateToValue && (
               <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-medium">
                 <Calendar className="h-3 w-3" />
-                {t("app.api.emails.imapClient.messages.list.get.dateTo.label")}:{" "}
-                {dateToValue}
+                {t("get.dateTo.label")}: {dateToValue}
               </Span>
             )}
           </Div>
@@ -749,18 +733,14 @@ export function ImapMessagesListContainer({
             )}
           </Div>
           <Div className="w-9 flex-shrink-0" />
-          <Div className="w-40 flex-shrink-0">
-            {t("app.api.emails.imapClient.messages.list.from")}
-          </Div>
-          <Div className="flex-1 min-w-0">
-            {t("app.api.emails.imapClient.messages.list.subject")}
-          </Div>
+          <Div className="w-40 flex-shrink-0">{t("from")}</Div>
+          <Div className="flex-1 min-w-0">{t("subject")}</Div>
           <Div className="flex-shrink-0 w-6" />
           <Div
             className="flex-shrink-0 min-w-[52px] text-right flex items-center justify-end gap-0.5 cursor-pointer hover:text-foreground"
             onClick={handleSortOrderToggle}
           >
-            {t("app.api.emails.imapClient.messages.list.date")}
+            {t("date")}
             {sortOrder === SortOrder.DESC ? (
               <ArrowDown className="h-3 w-3" />
             ) : (
@@ -793,7 +773,7 @@ export function ImapMessagesListContainer({
             <Div className="text-4xl mb-3 text-muted-foreground">
               <Mail className="h-10 w-10 mx-auto" />
             </Div>
-            <Div>{t("app.api.emails.imapClient.messages.list.empty")}</Div>
+            <Div>{t("empty")}</Div>
           </Div>
         )}
       </Div>
@@ -802,8 +782,7 @@ export function ImapMessagesListContainer({
       {totalPages > 1 && (
         <Div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">
           <Span>
-            {t("app.api.emails.imapClient.messages.list.page")} {currentPage} /{" "}
-            {totalPages}
+            {t("page")} {currentPage} / {totalPages}
           </Span>
           <Div className="flex gap-1">
             <Button

@@ -27,7 +27,7 @@ export function TextArrayFieldWidgetInk<
   TUsage,
   TextArrayFieldWidgetConfig<TKey, ArrayWidgetSchema, TUsage>
 >): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const showLabels = useInkWidgetShowLabels();
   const items = field.value;
   const displayValue = items?.length ? items.join(", ") : "—";

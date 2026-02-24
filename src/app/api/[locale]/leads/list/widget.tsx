@@ -71,69 +71,69 @@ interface CustomWidgetProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  "app.api.leads.enums.leadStatus.new":
+  "enums.leadStatus.new":
     "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  "app.api.leads.enums.leadStatus.pending":
+  "enums.leadStatus.pending":
     "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-  "app.api.leads.enums.leadStatus.campaignRunning":
+  "enums.leadStatus.campaignRunning":
     "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-  "app.api.leads.enums.leadStatus.websiteUser":
+  "enums.leadStatus.websiteUser":
     "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
-  "app.api.leads.enums.leadStatus.newsletterSubscriber":
+  "enums.leadStatus.newsletterSubscriber":
     "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
-  "app.api.leads.enums.leadStatus.inContact":
+  "enums.leadStatus.inContact":
     "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  "app.api.leads.enums.leadStatus.signedUp":
+  "enums.leadStatus.signedUp":
     "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
-  "app.api.leads.enums.leadStatus.subscriptionConfirmed":
+  "enums.leadStatus.subscriptionConfirmed":
     "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  "app.api.leads.enums.leadStatus.unsubscribed":
+  "enums.leadStatus.unsubscribed":
     "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300",
-  "app.api.leads.enums.leadStatus.bounced":
+  "enums.leadStatus.bounced":
     "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  "app.api.leads.enums.leadStatus.invalid":
+  "enums.leadStatus.invalid":
     "bg-red-200 text-red-900 dark:bg-red-900/50 dark:text-red-200",
 };
 
 const CAMPAIGN_STAGE_COLORS: Record<string, string> = {
-  "app.api.leads.enums.emailCampaignStage.notStarted":
+  "enums.emailCampaignStage.notStarted":
     "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300",
-  "app.api.leads.enums.emailCampaignStage.initial":
+  "enums.emailCampaignStage.initial":
     "bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300",
-  "app.api.leads.enums.emailCampaignStage.followup1":
+  "enums.emailCampaignStage.followup1":
     "bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300",
-  "app.api.leads.enums.emailCampaignStage.followup2":
+  "enums.emailCampaignStage.followup2":
     "bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-900/30 dark:text-fuchsia-300",
-  "app.api.leads.enums.emailCampaignStage.followup3":
+  "enums.emailCampaignStage.followup3":
     "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
-  "app.api.leads.enums.emailCampaignStage.nurture":
+  "enums.emailCampaignStage.nurture":
     "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
-  "app.api.leads.enums.emailCampaignStage.reactivation":
+  "enums.emailCampaignStage.reactivation":
     "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
 };
 
 /** Status tab values for quick filtering */
 const STATUS_TAB_VALUES = [
-  { labelKey: "app.api.leads.list.widget.tabAll", value: null },
+  { labelKey: "widget.tabAll", value: null },
   {
-    labelKey: "app.api.leads.list.widget.tabNew",
-    value: "app.api.leads.enums.leadStatusFilter.new",
+    labelKey: "widget.tabNew",
+    value: "enums.leadStatusFilter.new",
   },
   {
-    labelKey: "app.api.leads.list.widget.tabCampaign",
-    value: "app.api.leads.enums.leadStatusFilter.campaignRunning",
+    labelKey: "widget.tabCampaign",
+    value: "enums.leadStatusFilter.campaignRunning",
   },
   {
-    labelKey: "app.api.leads.list.widget.tabConfirmed",
-    value: "app.api.leads.enums.leadStatusFilter.subscriptionConfirmed",
+    labelKey: "widget.tabConfirmed",
+    value: "enums.leadStatusFilter.subscriptionConfirmed",
   },
   {
-    labelKey: "app.api.leads.list.widget.tabUnsubscribed",
-    value: "app.api.leads.enums.leadStatusFilter.unsubscribed",
+    labelKey: "widget.tabUnsubscribed",
+    value: "enums.leadStatusFilter.unsubscribed",
   },
   {
-    labelKey: "app.api.leads.list.widget.tabBounced",
-    value: "app.api.leads.enums.leadStatusFilter.bounced",
+    labelKey: "widget.tabBounced",
+    value: "enums.leadStatusFilter.bounced",
   },
 ] as const;
 
@@ -152,7 +152,7 @@ function LeadRow({
   onView: (lead: Lead) => void;
   onEdit: (lead: Lead) => void;
   onDelete: (lead: Lead) => void;
-  t: (key: string, params?: Record<string, string | number>) => string;
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
 }): React.JSX.Element {
   const isConverted = Boolean(lead.convertedUserId);
 
@@ -185,7 +185,7 @@ function LeadRow({
           )}
           {isConverted && (
             <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
-              {t("app.api.leads.list.widget.converted")}
+              {t("widget.converted")}
             </Span>
           )}
           {lead.currentCampaignStage && (
@@ -222,7 +222,7 @@ function LeadRow({
       <Div className="hidden md:flex flex-col items-end gap-1 flex-shrink-0 text-xs text-muted-foreground">
         {lead.emailsSent !== null && lead.emailsSent !== undefined && (
           <Span>
-            {t("app.api.leads.list.widget.emailsSent", {
+            {t("widget.emailsSent", {
               count: lead.emailsSent,
             })}
           </Span>
@@ -232,7 +232,7 @@ function LeadRow({
           lead.emailsSent !== null &&
           lead.emailsSent !== undefined && (
             <Span>
-              {t("app.api.leads.list.widget.openRate", {
+              {t("widget.openRate", {
                 percent:
                   lead.emailsSent > 0
                     ? Math.round((lead.emailsOpened / lead.emailsSent) * 100)
@@ -244,7 +244,7 @@ function LeadRow({
           lead.emailsClicked !== undefined &&
           lead.emailsClicked > 0 && (
             <Span>
-              {t("app.api.leads.list.widget.clicks", {
+              {t("widget.clicks", {
                 count: lead.emailsClicked,
               })}
             </Span>
@@ -261,7 +261,7 @@ function LeadRow({
           variant="ghost"
           size="sm"
           onClick={() => onView(lead)}
-          title={t("app.api.leads.list.widget.view")}
+          title={t("widget.view")}
         >
           <Eye className="h-4 w-4" />
         </Button>
@@ -270,7 +270,7 @@ function LeadRow({
           variant="ghost"
           size="sm"
           onClick={() => onEdit(lead)}
-          title={t("app.api.leads.list.widget.edit")}
+          title={t("widget.edit")}
         >
           <Pencil className="h-4 w-4" />
         </Button>
@@ -280,7 +280,7 @@ function LeadRow({
           size="sm"
           className="text-destructive hover:text-destructive"
           onClick={() => onDelete(lead)}
-          title={t("app.api.leads.list.widget.delete")}
+          title={t("widget.delete")}
         >
           <Trash2 className="h-4 w-4" />
         </Button>
@@ -296,7 +296,7 @@ export function LeadsListContainer({
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
   const router = useRouter();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
   const navigation = useWidgetNavigation();
@@ -496,7 +496,7 @@ export function LeadsListContainer({
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
         <NavigateButtonWidget field={children.backButton} />
         <Span className="font-semibold text-base">
-          {t("app.api.leads.list.get.title")}
+          {t("get.title")}
           {totalCount > 0 && (
             <Span className="ml-2 text-sm text-muted-foreground font-normal">
               ({totalCount})
@@ -513,72 +513,62 @@ export function LeadsListContainer({
           variant="ghost"
           size="sm"
           onClick={handleStats}
-          title={t("app.api.leads.list.widget.stats")}
+          title={t("widget.stats")}
           className="gap-1"
         >
           <BarChart3 className="h-4 w-4" />
-          <Span className="hidden sm:inline">
-            {t("app.api.leads.list.widget.stats")}
-          </Span>
+          <Span className="hidden sm:inline">{t("widget.stats")}</Span>
         </Button>
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={handleSearch}
-          title={t("app.api.leads.list.widget.search")}
+          title={t("widget.search")}
           className="gap-1"
         >
           <Search className="h-4 w-4" />
-          <Span className="hidden sm:inline">
-            {t("app.api.leads.list.widget.search")}
-          </Span>
+          <Span className="hidden sm:inline">{t("widget.search")}</Span>
         </Button>
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={handleExport}
-          title={t("app.api.leads.list.widget.export")}
+          title={t("widget.export")}
           className="gap-1"
         >
           <Download className="h-4 w-4" />
-          <Span className="hidden sm:inline">
-            {t("app.api.leads.list.widget.export")}
-          </Span>
+          <Span className="hidden sm:inline">{t("widget.export")}</Span>
         </Button>
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={handleImport}
-          title={t("app.api.leads.list.widget.import")}
+          title={t("widget.import")}
           className="gap-1"
         >
           <Upload className="h-4 w-4" />
-          <Span className="hidden sm:inline">
-            {t("app.api.leads.list.widget.import")}
-          </Span>
+          <Span className="hidden sm:inline">{t("widget.import")}</Span>
         </Button>
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={handleBatchUpdate}
-          title={t("app.api.leads.list.widget.batch")}
+          title={t("widget.batch")}
           className="gap-1"
         >
           <Users className="h-4 w-4" />
-          <Span className="hidden sm:inline">
-            {t("app.api.leads.list.widget.batch")}
-          </Span>
+          <Span className="hidden sm:inline">{t("widget.batch")}</Span>
         </Button>
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={handleRefresh}
-          title={t("app.api.leads.list.widget.refresh")}
+          title={t("widget.refresh")}
         >
           <RefreshCw className="h-4 w-4" />
         </Button>
@@ -590,7 +580,7 @@ export function LeadsListContainer({
           className="gap-1"
         >
           <Plus className="h-4 w-4" />
-          {t("app.api.leads.list.get.createButton.label")}
+          {t("get.createButton.label")}
         </Button>
       </Div>
 
@@ -657,9 +647,7 @@ export function LeadsListContainer({
         {/* Source filter */}
         <Select value={activeSource} onValueChange={handleSourceChange}>
           <SelectTrigger className="h-9 min-w-[120px]">
-            <SelectValue
-              placeholder={t("app.api.leads.list.widget.allSources")}
-            />
+            <SelectValue placeholder={t("widget.allSources")} />
           </SelectTrigger>
           <SelectContent>
             {LeadSourceFilterOptions.map((opt) => (
@@ -753,9 +741,7 @@ export function LeadsListContainer({
         ) : (
           <Div className="text-center text-muted-foreground py-12">
             <Div className="mb-2">
-              {hasActiveFilters
-                ? t("app.api.leads.list.get.emptySearch")
-                : t("app.api.leads.list.get.emptyState")}
+              {hasActiveFilters ? t("get.emptySearch") : t("get.emptyState")}
             </Div>
             {!hasActiveFilters && (
               <Div className="mt-4 flex items-center justify-center gap-2">
@@ -767,7 +753,7 @@ export function LeadsListContainer({
                   className="gap-1"
                 >
                   <Plus className="h-4 w-4" />
-                  {t("app.api.leads.list.widget.addLead")}
+                  {t("widget.addLead")}
                 </Button>
                 <Button
                   type="button"
@@ -777,7 +763,7 @@ export function LeadsListContainer({
                   className="gap-1"
                 >
                   <Upload className="h-4 w-4" />
-                  {t("app.api.leads.list.widget.importCsv")}
+                  {t("widget.importCsv")}
                 </Button>
               </Div>
             )}
@@ -789,7 +775,7 @@ export function LeadsListContainer({
       {totalPages > 1 && (
         <Div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">
           <Span>
-            {t("app.api.leads.list.widget.pagination", {
+            {t("widget.pagination", {
               page: currentPage,
               totalPages,
               total: totalCount,

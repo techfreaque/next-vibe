@@ -213,7 +213,7 @@ function ClickableBarRow({
   barColor: string;
   max: number;
   onClick?: () => void;
-  t: (key: string) => string;
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
 }): React.JSX.Element {
   const widthPercent = `${(value / max) * 100}%`;
   return (
@@ -274,7 +274,7 @@ function GroupedStatsSection({
     | Array<{ category: string; value: number; percentage?: number }>
     | undefined;
   colorMap?: Record<string, string>;
-  t: (key: string) => string;
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
 }): React.JSX.Element | null {
   if (!items?.length) {
     return null;
@@ -409,25 +409,25 @@ function ConversionFunnel({
 // ─── Status color map matching list widget ────────────────────────────────────
 
 const STATUS_BAR_COLORS: Record<string, string> = {
-  "app.api.leads.enums.leadStatus.new": "#3b82f6",
-  "app.api.leads.enums.leadStatus.pending": "#eab308",
-  "app.api.leads.enums.leadStatus.campaignRunning": "#a855f7",
-  "app.api.leads.enums.leadStatus.websiteUser": "#06b6d4",
-  "app.api.leads.enums.leadStatus.newsletterSubscriber": "#6366f1",
-  "app.api.leads.enums.leadStatus.inContact": "#f97316",
-  "app.api.leads.enums.leadStatus.signedUp": "#14b8a6",
-  "app.api.leads.enums.leadStatus.subscriptionConfirmed": "#22c55e",
-  "app.api.leads.enums.leadStatus.unsubscribed": "#9ca3af",
-  "app.api.leads.enums.leadStatus.bounced": "#ef4444",
-  "app.api.leads.enums.leadStatus.invalid": "#b91c1c",
+  "enums.leadStatus.new": "#3b82f6",
+  "enums.leadStatus.pending": "#eab308",
+  "enums.leadStatus.campaignRunning": "#a855f7",
+  "enums.leadStatus.websiteUser": "#06b6d4",
+  "enums.leadStatus.newsletterSubscriber": "#6366f1",
+  "enums.leadStatus.inContact": "#f97316",
+  "enums.leadStatus.signedUp": "#14b8a6",
+  "enums.leadStatus.subscriptionConfirmed": "#22c55e",
+  "enums.leadStatus.unsubscribed": "#9ca3af",
+  "enums.leadStatus.bounced": "#ef4444",
+  "enums.leadStatus.invalid": "#b91c1c",
 };
 
 const SOURCE_BAR_COLORS: Record<string, string> = {
-  "app.api.leads.enums.leadSource.website": "#3b82f6",
-  "app.api.leads.enums.leadSource.referral": "#22c55e",
-  "app.api.leads.enums.leadSource.socialMedia": "#ec4899",
-  "app.api.leads.enums.leadSource.emailCampaign": "#eab308",
-  "app.api.leads.enums.leadSource.csvImport": "#f97316",
+  "enums.leadSource.website": "#3b82f6",
+  "enums.leadSource.referral": "#22c55e",
+  "enums.leadSource.socialMedia": "#ec4899",
+  "enums.leadSource.emailCampaign": "#eab308",
+  "enums.leadSource.csvImport": "#f97316",
 };
 
 // ─── Quick action buttons ─────────────────────────────────────────────────────
@@ -468,7 +468,7 @@ export function LeadsStatsContainer({
   const { endpointMutations } = useWidgetContext();
   const router = useRouter();
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
   const form = useWidgetForm<typeof definition.GET>();
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -558,16 +558,14 @@ export function LeadsStatsContainer({
         <NavigateButtonWidget field={children.backButton} />
         <Div className="flex items-center gap-2 mr-auto">
           <BarChart2 className="h-5 w-5 text-muted-foreground" />
-          <Span className="font-semibold text-base">
-            {t("app.api.leads.stats.widget.title")}
-          </Span>
+          <Span className="font-semibold text-base">{t("widget.title")}</Span>
         </Div>
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={handleRefresh}
-          title={t("app.api.leads.stats.widget.refresh")}
+          title={t("widget.refresh")}
         >
           <RefreshCw className="h-4 w-4" />
         </Button>
@@ -576,28 +574,28 @@ export function LeadsStatsContainer({
       {/* Quick action buttons */}
       <Div className="flex flex-wrap gap-2">
         <QuickActionButton
-          label={t("app.api.leads.stats.widget.viewAllLeads")}
+          label={t("widget.viewAllLeads")}
           icon={<List className="h-3.5 w-3.5" />}
           onClick={handleViewAllLeads}
           variant="default"
         />
         <QuickActionButton
-          label={t("app.api.leads.stats.widget.searchLeads")}
+          label={t("widget.searchLeads")}
           icon={<Search className="h-3.5 w-3.5" />}
           onClick={handleSearchLeads}
         />
         <QuickActionButton
-          label={t("app.api.leads.stats.widget.export")}
+          label={t("widget.export")}
           icon={<Download className="h-3.5 w-3.5" />}
           onClick={handleExportLeads}
         />
         <QuickActionButton
-          label={t("app.api.leads.stats.widget.import")}
+          label={t("widget.import")}
           icon={<Upload className="h-3.5 w-3.5" />}
           onClick={handleImportLeads}
         />
         <QuickActionButton
-          label={t("app.api.leads.stats.widget.batchUpdate")}
+          label={t("widget.batchUpdate")}
           icon={<Zap className="h-3.5 w-3.5" />}
           onClick={handleBatchUpdate}
         />
@@ -615,7 +613,7 @@ export function LeadsStatsContainer({
           className="flex items-center gap-1.5 h-8 text-xs"
         >
           <Filter className="h-3.5 w-3.5" />
-          {t("app.api.leads.stats.widget.filters")}
+          {t("widget.filters")}
         </Button>
       </Div>
 
@@ -732,7 +730,7 @@ export function LeadsStatsContainer({
             onClick={handleApplyFilters}
             className="self-start"
           >
-            {t("app.api.leads.stats.widget.applyFilters")}
+            {t("widget.applyFilters")}
           </Button>
         </Div>
       )}
@@ -740,24 +738,24 @@ export function LeadsStatsContainer({
       {/* KPI overview */}
       <Div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <StatCard
-          label={t("app.api.leads.stats.widget.totalLeads")}
+          label={t("widget.totalLeads")}
           value={data?.totalLeads}
           trend={trend}
         />
         <StatCard
-          label={t("app.api.leads.stats.widget.activeLeads")}
+          label={t("widget.activeLeads")}
           value={data?.activeLeads}
           variant="info"
           trend={trend}
         />
         <StatCard
-          label={t("app.api.leads.stats.widget.converted")}
+          label={t("widget.converted")}
           value={data?.convertedLeads}
           variant="success"
           trend={trend}
         />
         <StatCard
-          label={t("app.api.leads.stats.widget.conversionRate")}
+          label={t("widget.conversionRate")}
           value={data?.conversionRate}
           format="percent"
           variant="success"
@@ -768,25 +766,25 @@ export function LeadsStatsContainer({
       {/* Email performance */}
       <Div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <StatCard
-          label={t("app.api.leads.stats.widget.openRate")}
+          label={t("widget.openRate")}
           value={data?.averageOpenRate}
           format="percent"
           variant="info"
         />
         <StatCard
-          label={t("app.api.leads.stats.widget.clickRate")}
+          label={t("widget.clickRate")}
           value={data?.averageClickRate}
           format="percent"
           variant="info"
         />
         <StatCard
-          label={t("app.api.leads.stats.widget.unsubscribeRate")}
+          label={t("widget.unsubscribeRate")}
           value={data?.signupRate}
           format="percent"
           variant="default"
         />
         <StatCard
-          label={t("app.api.leads.stats.widget.newThisMonth")}
+          label={t("widget.newThisMonth")}
           value={data?.leadsCreatedThisMonth}
           variant="info"
         />
@@ -795,12 +793,12 @@ export function LeadsStatsContainer({
       {/* New leads timeline — with explicit date ranges */}
       <Div className="rounded-lg border bg-card p-4">
         <Span className="text-sm font-semibold mb-3 block">
-          {t("app.api.leads.stats.widget.newLeadsTimeline")}
+          {t("widget.newLeadsTimeline")}
         </Span>
         <Div className="grid grid-cols-3 gap-3">
           <Div className="flex flex-col gap-1">
             <Span className="text-xs text-muted-foreground">
-              {t("app.api.leads.stats.widget.today")} (
+              {t("widget.today")} (
               {new Date().toLocaleDateString(undefined, {
                 month: "short",
                 day: "numeric",
@@ -808,28 +806,27 @@ export function LeadsStatsContainer({
               )
             </Span>
             <Span className="text-2xl font-bold tabular-nums">
-              {data?.leadsCreatedToday?.toLocaleString() ??
-                t("app.api.leads.stats.widget.emDash")}
+              {data?.leadsCreatedToday?.toLocaleString() ?? t("widget.emDash")}
             </Span>
           </Div>
           <Div className="flex flex-col gap-1">
             <Span className="text-xs text-muted-foreground">
-              {t("app.api.leads.stats.widget.thisWeek")} ({weekRange.from}{" "}
-              {t("app.api.leads.stats.widget.dateSeparator")} {weekRange.to})
+              {t("widget.thisWeek")} ({weekRange.from}{" "}
+              {t("widget.dateSeparator")} {weekRange.to})
             </Span>
             <Span className="text-2xl font-bold tabular-nums">
               {data?.leadsCreatedThisWeek?.toLocaleString() ??
-                t("app.api.leads.stats.widget.emDash")}
+                t("widget.emDash")}
             </Span>
           </Div>
           <Div className="flex flex-col gap-1">
             <Span className="text-xs text-muted-foreground">
-              {t("app.api.leads.stats.widget.thisMonth")} ({monthRange.from}{" "}
-              {t("app.api.leads.stats.widget.dateSeparator")} {monthRange.to})
+              {t("widget.thisMonth")} ({monthRange.from}{" "}
+              {t("widget.dateSeparator")} {monthRange.to})
             </Span>
             <Span className="text-2xl font-bold tabular-nums">
               {data?.leadsCreatedThisMonth?.toLocaleString() ??
-                t("app.api.leads.stats.widget.emDash")}
+                t("widget.emDash")}
             </Span>
           </Div>
         </Div>
@@ -838,16 +835,12 @@ export function LeadsStatsContainer({
       {/* Conversion funnel */}
       <ConversionFunnel
         data={data}
-        funnelTitle={t("app.api.leads.stats.widget.conversionFunnel")}
+        funnelTitle={t("widget.conversionFunnel")}
         stageLabels={{
-          totalLeads: t("app.api.leads.stats.widget.funnelTotalLeads"),
-          campaignRunning: t(
-            "app.api.leads.stats.widget.funnelCampaignRunning",
-          ),
-          signedUp: t("app.api.leads.stats.widget.funnelSignedUp"),
-          subscriptionConfirmed: t(
-            "app.api.leads.stats.widget.funnelSubscriptionConfirmed",
-          ),
+          totalLeads: t("widget.funnelTotalLeads"),
+          campaignRunning: t("widget.funnelCampaignRunning"),
+          signedUp: t("widget.funnelSignedUp"),
+          subscriptionConfirmed: t("widget.funnelSubscriptionConfirmed"),
         }}
       />
 
@@ -859,10 +852,10 @@ export function LeadsStatsContainer({
             <Div className="rounded-lg border bg-card p-4">
               <Div className="flex items-center gap-2 mb-3">
                 <Span className="text-sm font-semibold">
-                  {t("app.api.leads.stats.widget.byStatus")}
+                  {t("widget.byStatus")}
                 </Span>
                 <Span className="text-xs text-muted-foreground">
-                  {t("app.api.leads.stats.widget.clickToFilter")}
+                  {t("widget.clickToFilter")}
                 </Span>
               </Div>
               <Div className="flex flex-col gap-1">
@@ -889,10 +882,10 @@ export function LeadsStatsContainer({
             <Div className="rounded-lg border bg-card p-4">
               <Div className="flex items-center gap-2 mb-3">
                 <Span className="text-sm font-semibold">
-                  {t("app.api.leads.stats.widget.bySource")}
+                  {t("widget.bySource")}
                 </Span>
                 <Span className="text-xs text-muted-foreground">
-                  {t("app.api.leads.stats.widget.clickToFilter")}
+                  {t("widget.clickToFilter")}
                 </Span>
               </Div>
               <Div className="flex flex-col gap-1">
@@ -915,12 +908,12 @@ export function LeadsStatsContainer({
           )}
 
           <GroupedStatsSection
-            title={t("app.api.leads.stats.widget.byCountry")}
+            title={t("widget.byCountry")}
             items={groupedStats.byCountry}
             t={t}
           />
           <GroupedStatsSection
-            title={t("app.api.leads.stats.widget.byCampaignStage")}
+            title={t("widget.byCampaignStage")}
             items={groupedStats.byCampaignStage}
             t={t}
           />
@@ -931,7 +924,7 @@ export function LeadsStatsContainer({
       {topCampaigns.length > 0 && (
         <Div className="rounded-lg border bg-card p-4">
           <Span className="text-sm font-semibold mb-3 block">
-            {t("app.api.leads.stats.widget.topPerformingCampaigns")}
+            {t("widget.topPerformingCampaigns")}
           </Span>
           <Div className="flex flex-col gap-2">
             {topCampaigns.slice(0, 5).map((campaign, i) => {
@@ -941,13 +934,13 @@ export function LeadsStatsContainer({
                     {i + 1}.
                   </Span>
                   <Span className="flex-1 truncate">
-                    {t(campaign.campaignName)}
+                    {campaign.campaignName}
                   </Span>
                   {campaign.openRate !== null &&
                     campaign.openRate !== undefined && (
                       <Span className="text-xs text-muted-foreground">
                         {(campaign.openRate * 100).toFixed(1)}
-                        {t("app.api.leads.stats.widget.openRateSuffix")}
+                        {t("widget.openRateSuffix")}
                       </Span>
                     )}
                   {campaign.leadsGenerated !== null &&
@@ -968,7 +961,7 @@ export function LeadsStatsContainer({
         <Div className="rounded-lg border bg-card p-4">
           <Div className="flex items-center justify-between mb-3">
             <Span className="text-sm font-semibold">
-              {t("app.api.leads.stats.widget.topSources")}
+              {t("widget.topSources")}
             </Span>
             <Button
               type="button"
@@ -978,7 +971,7 @@ export function LeadsStatsContainer({
               onClick={handleViewAllLeads}
             >
               <Users className="h-3 w-3 mr-1" />
-              {t("app.api.leads.stats.widget.viewAll")}
+              {t("widget.viewAll")}
             </Button>
           </Div>
           <Div className="flex flex-col gap-2">
@@ -1002,7 +995,7 @@ export function LeadsStatsContainer({
                     src.conversionRate !== undefined && (
                       <Span className="text-xs text-muted-foreground">
                         {(src.conversionRate * 100).toFixed(1)}
-                        {t("app.api.leads.stats.widget.conversionRateSuffix")}
+                        {t("widget.conversionRateSuffix")}
                       </Span>
                     )}
                   {src.leadsGenerated !== null &&
@@ -1023,7 +1016,7 @@ export function LeadsStatsContainer({
       {recentActivity.length > 0 && (
         <Div className="rounded-lg border bg-card p-4">
           <Span className="text-sm font-semibold mb-3 block">
-            {t("app.api.leads.stats.widget.recentActivity")}
+            {t("widget.recentActivity")}
           </Span>
           <Div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
             {recentActivity.slice(0, 20).map((act, i) => {

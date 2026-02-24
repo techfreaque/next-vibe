@@ -32,7 +32,7 @@ export function EmailPreviewSendTestContainer({
   fieldName,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
   const result = field.value;
 
   return (
@@ -41,7 +41,7 @@ export function EmailPreviewSendTestContainer({
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
         <NavigateButtonWidget field={children.backButton} />
         <Span className="font-semibold text-base">
-          {t("app.api.emails.preview.sendTest.title")}
+          {t("preview.sendTest.title")}
         </Span>
       </Div>
 
@@ -80,8 +80,8 @@ export function EmailPreviewSendTestContainer({
               }}
             >
               {result.success
-                ? t("app.api.emails.preview.sendTest.success")
-                : t("app.api.emails.preview.sendTest.failed")}
+                ? t("preview.sendTest.success")
+                : t("preview.sendTest.failed")}
             </Div>
             <Span className="text-sm">{result.message}</Span>
           </Div>
@@ -90,8 +90,8 @@ export function EmailPreviewSendTestContainer({
         <Div className="flex items-center justify-end pt-2">
           <SubmitButtonWidget
             field={{
-              text: "app.api.emails.preview.sendTest.submit",
-              loadingText: "app.api.emails.preview.sendTest.submitting",
+              text: "submit",
+              loadingText: "submitting",
               icon: "send",
               variant: "primary",
               size: "sm",

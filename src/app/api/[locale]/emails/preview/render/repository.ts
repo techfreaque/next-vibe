@@ -13,6 +13,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
+import type { ReactElement } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Countries, Languages } from "@/i18n/core/config";
@@ -20,6 +21,10 @@ import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
 
 import type { scopedTranslation } from "../../i18n";
 import { getTemplate } from "../../registry/generated";
+import {
+  getTemplateSubject,
+  renderTemplateComponent,
+} from "../../registry/types";
 import { createTrackingContext } from "../../smtp-client/components/tracking_context.email";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
@@ -85,29 +90,23 @@ class EmailPreviewRenderRepositoryImpl implements EmailPreviewRenderRepository {
         data.country,
       );
 
-      // Get scoped t for this template's own module scope
-      const { t: templateT } = template.scopedTranslation.scopedT(locale);
+      // Extract email from props if available
+      const recipientEmail =
+        typeof data.props.email === "string"
+          ? data.props.email
+          : typeof data.props.recipientEmail === "string"
+            ? data.props.recipientEmail
+            : typeof data.props.toEmail === "string"
+              ? data.props.toEmail
+              : "preview@example.com";
 
-      // Validate and render the email component
-      // TypeScript can't verify the props match because EmailTemplateDefinition uses generics
-      // But we know they match because we validate with template.schema
-      let jsx;
+      // Validate and render the email component.
+      // renderTemplateComponent seals schema.parse + component call together so
+      // TypeScript never has to match a union-inferred props type to a union-inferred component.
+      let jsx: ReactElement;
       try {
-        const validatedProps = template.schema.parse(data.props);
-        // Extract email from props if available
-        const recipientEmail =
-          typeof data.props.email === "string"
-            ? data.props.email
-            : typeof data.props.recipientEmail === "string"
-              ? data.props.recipientEmail
-              : typeof data.props.toEmail === "string"
-                ? data.props.toEmail
-                : "preview@example.com";
-
-        jsx = template.component({
-          // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure: validatedProps/templateT types are unions from generic template loading, but we know they match the specific template because we loaded and parsed with template.schema
-          props: validatedProps as never,
-          t: templateT,
+        jsx = renderTemplateComponent(template, {
+          rawProps: data.props,
           locale,
           recipientEmail,
           tracking: createTrackingContext(locale),
@@ -130,7 +129,7 @@ class EmailPreviewRenderRepositoryImpl implements EmailPreviewRenderRepository {
       // Render to HTML
       const html = await render(jsx);
 
-      const subject = templateT(template.meta.defaultSubject);
+      const subject = getTemplateSubject(template, locale);
 
       logger.info("Email preview rendered successfully", {
         templateId: data.templateId,

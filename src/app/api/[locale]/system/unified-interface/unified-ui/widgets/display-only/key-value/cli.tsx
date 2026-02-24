@@ -34,7 +34,7 @@ export function KeyValueWidgetInk<
   TUsage,
   KeyValueWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
 >): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const locale = useInkWidgetLocale();
   const { label: labelKey } = field;
 

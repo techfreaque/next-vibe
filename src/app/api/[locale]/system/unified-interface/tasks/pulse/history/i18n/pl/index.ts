@@ -86,6 +86,15 @@ export const translations = {
       description: "Historia wykonań Pulse pobrana pomyślnie",
     },
   },
+  pulse: {
+    execution: {
+      success: "Sukces",
+      failure: "Niepowodzenie",
+      timeout: "Przekroczenie czasu",
+      cancelled: "Anulowane",
+      pending: "Oczekujące",
+    },
+  },
   widget: {
     title: "Historia Pulse",
     empty: "Nie znaleziono wykonań Pulse",

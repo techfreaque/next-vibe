@@ -6,9 +6,13 @@
 import { Text } from "ink";
 import type { JSX } from "react";
 
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
-import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+import {
+  useInkWidgetLocale,
+  useInkWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import { extractLinkData } from "./shared";
@@ -38,7 +42,9 @@ export function LinkWidgetInk<
       >,
 ): JSX.Element {
   const { field } = props;
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
+  const locale = useInkWidgetLocale();
+  const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
   const { href, text } = field;
 
   // Priority 1: Dynamic value from field.value
@@ -74,8 +80,8 @@ export function LinkWidgetInk<
   // Priority 3: No data available
   return (
     <Text dimColor>
-      {t(
-        "app.api.system.unifiedInterface.cli.vibe.endpoints.renderers.cliUi.widgets.common.noDataAvailable",
+      {widgetT(
+        "cli.vibe.endpoints.renderers.cliUi.widgets.common.noDataAvailable",
       )}
     </Text>
   );

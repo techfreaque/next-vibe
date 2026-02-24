@@ -20,6 +20,7 @@ import {
 } from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
 
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import type { ReactFormFieldProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
@@ -34,10 +35,10 @@ import {
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetContext,
   useWidgetDisabled,
   useWidgetForm,
   useWidgetLocale,
-  useWidgetTranslation,
 } from "../../_shared/use-widget-context";
 import { getTheme } from "../_shared/constants";
 import { renderPrefillDisplay } from "../_shared/prefill";
@@ -57,7 +58,9 @@ const formatDate = (date: Date | undefined): string => {
 
 export function DateRangeFieldWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TSchema extends StringWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({
@@ -68,21 +71,17 @@ export function DateRangeFieldWidget<
   TUsage,
   DateRangeFieldWidgetConfig<TKey, TSchema, TUsage>
 >): JSX.Element {
-  const t = useWidgetTranslation();
+  const { t: tField } = useWidgetContext();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
   const isDisabled = useWidgetDisabled();
-  if (!form || !fieldName) {
-    return (
-      <Div>
-        {t(
-          "app.api.system.unifiedInterface.react.widgets.formField.requiresContext",
-        )}
-      </Div>
-    );
-  }
 
+  const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
   const { t: globalT } = simpleT(locale);
+
+  if (!form || !fieldName) {
+    return <Div>{widgetT("react.widgets.formField.requiresContext")}</Div>;
+  }
   const theme = getTheme(field.theme);
   const descriptionStyle = theme.descriptionStyle;
   const isRequired = !field.schema.isOptional();
@@ -112,7 +111,7 @@ export function DateRangeFieldWidget<
                     "flex items-center gap-1.5",
                   )}
                 >
-                  <Span>{field.label && t(field.label)}</Span>
+                  <Span>{field.label && tField(field.label)}</Span>
                   {field.label && style === "asterisk" && isRequired && (
                     <Span className="text-blue-600 dark:text-blue-400 font-bold">
                       *
@@ -132,7 +131,7 @@ export function DateRangeFieldWidget<
                         </TooltipTrigger>
                         <TooltipContent className="max-w-[250px]">
                           <Span className="text-sm">
-                            {t(field.description)}
+                            {tField(field.description)}
                           </Span>
                         </TooltipContent>
                       </Tooltip>
@@ -151,7 +150,7 @@ export function DateRangeFieldWidget<
               {field.description && descriptionStyle === "inline" && (
                 <Div className={styleClassName.inlineDescriptionClassName}>
                   <Info className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
-                  <Span>{t(field.description)}</Span>
+                  <Span>{tField(field.description)}</Span>
                 </Div>
               )}
             </Div>
@@ -164,7 +163,7 @@ export function DateRangeFieldWidget<
                   formField.value,
                   field.label,
                   field.prefillDisplay,
-                  t,
+                  tField,
                 )
               ) : (
                 <Div className="flex gap-2 items-center">

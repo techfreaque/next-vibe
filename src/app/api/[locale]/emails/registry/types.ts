@@ -46,6 +46,22 @@ export interface PreviewFieldConfig<TKey extends string> {
 }
 
 /**
+ * Pre-translated preview field config (for passing through server→client boundary).
+ * All translation keys have been resolved to plain strings.
+ */
+export interface TranslatedPreviewFieldConfig {
+  type: PreviewFieldType;
+  label: string;
+  description?: string;
+  defaultValue?: string | number | boolean;
+  required?: boolean;
+  options?: { value: string; label: string }[];
+  min?: number;
+  max?: number;
+  rows?: number;
+}
+
+/**
  * Template metadata cache (serializable, in generated registry)
  */
 export interface TemplateCachedMetadata<TKey extends string> {
@@ -111,4 +127,54 @@ export interface EmailTemplateDefinition<
  */
 export interface TemplateExport<TProps = never> {
   default: EmailTemplateDefinition<TProps>;
+}
+
+/**
+ * Sealed dispatch helpers for EmailTemplateDefinition union types.
+ *
+ * When `template` is `AnyEmailTemplate` (a union), TypeScript widens both
+ * `template.schema.parse(rawProps)` and `t` to intersections of all union
+ * members — making them unusable directly at call sites. These helpers seal the
+ * schema.parse + component call (and the subject lookup) inside a dispatch
+ * boundary. The `as never` casts are intentional and unavoidable — they exist
+ * solely here so that every caller gets full structural type safety with zero
+ * assertions of their own.
+ */
+
+type AnyTemplateConstraint = EmailTemplateDefinition<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  any,
+  { scopedT: (locale: CountryLanguage) => { t: (...args: never[]) => string } }
+>;
+
+/**
+ * Parse rawProps with the template's own schema, invoke template.component
+ * with the matched t function, and return the ReactElement.
+ */
+export function renderTemplateComponent(
+  template: AnyTemplateConstraint,
+  params: {
+    rawProps: Record<string, string | number | boolean>;
+    locale: CountryLanguage;
+    recipientEmail: string;
+    tracking: TrackingContext;
+  },
+): ReactElement {
+  const { t } = template.scopedTranslation.scopedT(params.locale);
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- sealed dispatch: props and t are from the same template instance, verified at runtime by schema.parse
+  const props = template.schema.parse(params.rawProps) as never;
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- sealed dispatch: t is from template.scopedTranslation.scopedT so it matches this template's t type
+  return template.component({ props, t: t as never, ...params });
+}
+
+/**
+ * Get the translated subject line for a template using its own t function.
+ */
+export function getTemplateSubject(
+  template: AnyTemplateConstraint,
+  locale: CountryLanguage,
+): string {
+  const { t } = template.scopedTranslation.scopedT(locale);
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- sealed dispatch: defaultSubject key and t are from the same template instance
+  return t(template.meta.defaultSubject as never);
 }

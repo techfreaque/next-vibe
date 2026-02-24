@@ -30,7 +30,7 @@ export function ImapFoldersSyncContainer({
   fieldName,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
   const result = field.value;
 
   return (
@@ -38,9 +38,7 @@ export function ImapFoldersSyncContainer({
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
         <NavigateButtonWidget field={children.backButton} />
-        <Span className="font-semibold text-base">
-          {t("app.api.emails.imapClient.folders.sync.widget.title")}
-        </Span>
+        <Span className="font-semibold text-base">{t("widget.title")}</Span>
       </Div>
 
       <Div className="p-4 flex flex-col gap-6">
@@ -64,9 +62,7 @@ export function ImapFoldersSyncContainer({
         {/* Result */}
         {result !== null && result !== undefined && (
           <Div className="rounded-lg border p-4 flex flex-col gap-2">
-            <Span className="text-sm font-semibold">
-              {t("app.api.emails.imapClient.folders.sync.widget.result")}
-            </Span>
+            <Span className="text-sm font-semibold">{t("widget.result")}</Span>
             {[
               ["foldersProcessed", result.foldersProcessed],
               ["foldersAdded", result.foldersAdded],
@@ -78,16 +74,14 @@ export function ImapFoldersSyncContainer({
                 className="flex items-center justify-between text-sm"
               >
                 <Span className="text-muted-foreground">
-                  {t(
-                    `app.api.emails.imapClient.folders.sync.widget.${String(key)}`,
-                  )}
+                  {t(`widget.${String(key)}`)}
                 </Span>
                 <Span className="font-semibold">{String(val)}</Span>
               </Div>
             ))}
             <Div className="flex items-center justify-between text-sm">
               <Span className="text-muted-foreground">
-                {t("app.api.emails.imapClient.folders.sync.widget.duration")}
+                {t("widget.duration")}
               </Span>
               <Span className="font-semibold">
                 {result.duration}
@@ -100,9 +94,8 @@ export function ImapFoldersSyncContainer({
         <Div className="flex items-center justify-end pt-2">
           <SubmitButtonWidget
             field={{
-              text: "app.api.emails.imapClient.folders.sync.widget.submit",
-              loadingText:
-                "app.api.emails.imapClient.folders.sync.widget.submitting",
+              text: "widget.submit",
+              loadingText: "widget.submitting",
               icon: "refresh-cw",
               variant: "primary",
               size: "sm",

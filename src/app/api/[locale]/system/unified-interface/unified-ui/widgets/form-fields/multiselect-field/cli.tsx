@@ -27,7 +27,7 @@ export function MultiSelectFieldWidgetInk<
   TUsage,
   MultiSelectFieldWidgetConfig<TKey, ArrayWidgetSchema, TUsage>
 >): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const showLabels = useInkWidgetShowLabels();
 
   // value is array of selected values

@@ -27,7 +27,7 @@ export function TagsFieldWidgetInk<
   TUsage,
   TagsFieldWidgetConfig<TKey, ArrayWidgetSchema, TUsage>
 >): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const showLabels = useInkWidgetShowLabels();
   const tags = field.value;
   const displayValue = tags?.length ? tags.join(", ") : "—";

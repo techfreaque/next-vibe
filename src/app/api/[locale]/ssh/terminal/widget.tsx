@@ -16,8 +16,10 @@ import React, { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
+import type endpoints from "./definition";
+
 export function TerminalContainer(): React.JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof endpoints.GET>();
   const outputId = useId();
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [output, setOutput] = useState<string>("");
@@ -150,11 +152,11 @@ export function TerminalContainer(): React.JSX.Element {
       <Div className="flex items-center gap-2 px-4 py-2 bg-gray-900 border-b border-gray-700">
         <Terminal className="h-4 w-4 text-green-400" />
         <Span className="font-semibold text-sm text-gray-200 mr-auto">
-          {t("app.api.ssh.terminal.widget.title")}
+          {t("widget.title")}
         </Span>
         <Span className={`text-xs ${statusColor}`}>
           {t(
-            `app.api.ssh.terminal.widget.${status === "idle" ? "disconnected" : status === "connecting" ? "connecting" : status === "connected" ? "connected" : "sessionError"}`,
+            `widget.${status === "idle" ? "disconnected" : status === "connecting" ? "connecting" : status === "connected" ? "connected" : "sessionError"}`,
           )}
         </Span>
         {status === "idle" || status === "error" ? (
@@ -165,7 +167,7 @@ export function TerminalContainer(): React.JSX.Element {
             onClick={() => void connect()}
             className="text-xs border-gray-600 text-gray-300 hover:bg-gray-700"
           >
-            {t("app.api.ssh.terminal.widget.connectButton")}
+            {t("widget.connectButton")}
           </Button>
         ) : (
           <Button
@@ -175,7 +177,7 @@ export function TerminalContainer(): React.JSX.Element {
             onClick={() => void disconnect()}
             className="text-xs border-gray-600 text-gray-300 hover:bg-gray-700"
           >
-            {t("app.api.ssh.terminal.widget.disconnectButton")}
+            {t("widget.disconnectButton")}
           </Button>
         )}
       </Div>
@@ -185,17 +187,14 @@ export function TerminalContainer(): React.JSX.Element {
         id={outputId}
         className="flex-1 px-4 py-3 text-xs font-mono text-green-300 whitespace-pre-wrap break-words overflow-y-auto bg-black"
       >
-        {output ||
-          (status === "idle"
-            ? t("app.api.ssh.terminal.widget.connectPrompt")
-            : "")}
+        {output || (status === "idle" ? t("widget.connectPrompt") : "")}
       </Pre>
 
       {/* Input */}
       {status === "connected" && (
         <Div className="flex items-center gap-2 px-4 py-2 bg-gray-900 border-t border-gray-700">
           <Span className="text-green-400 font-mono text-xs flex-shrink-0">
-            {t("app.api.ssh.terminal.widget.prompt")}
+            {t("widget.prompt")}
           </Span>
           <Input
             type="text"
@@ -203,7 +202,7 @@ export function TerminalContainer(): React.JSX.Element {
             onChange={(e) => setInput(String(e.target.value))}
             onKeyDown={handleKeyDown}
             className="flex-1 bg-transparent text-green-300 font-mono text-xs outline-none border-0"
-            placeholder={t("app.api.ssh.terminal.widget.inputPlaceholder")}
+            placeholder={t("widget.inputPlaceholder")}
           />
         </Div>
       )}

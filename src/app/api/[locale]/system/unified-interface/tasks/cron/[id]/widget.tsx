@@ -180,7 +180,7 @@ function InfoRow({
 export function CronTaskDetailContainer({
   field,
 }: WidgetProps): React.JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof endpoints.GET>();
   const { push: navigate } = useWidgetNavigation();
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
@@ -249,9 +249,7 @@ export function CronTaskDetailContainer({
       <Div className="flex flex-col items-center justify-center py-16 text-center gap-3">
         <XCircle className="h-8 w-8 text-muted-foreground" />
         <Div className="text-sm text-muted-foreground">
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.notFound",
-          )}
+          {t("widget.notFound")}
         </Div>
       </Div>
     );
@@ -272,9 +270,7 @@ export function CronTaskDetailContainer({
       ? Math.round((task.successCount / task.executionCount) * 100)
       : 0;
 
-  const neverLabel = t(
-    "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.never",
-  );
+  const neverLabel = t("widget.never");
 
   const statusColorClass = task.lastExecutionStatus
     ? (STATUS_COLORS[task.lastExecutionStatus] ??
@@ -325,9 +321,7 @@ export function CronTaskDetailContainer({
             className="gap-1.5"
           >
             <Clock className="h-4 w-4" />
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.history",
-            )}
+            {t("widget.history")}
           </Button>
           <Button
             type="button"
@@ -337,9 +331,7 @@ export function CronTaskDetailContainer({
             className="gap-1.5"
           >
             <Pencil className="h-4 w-4" />
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.edit",
-            )}
+            {t("widget.edit")}
           </Button>
           <Button
             type="button"
@@ -349,9 +341,7 @@ export function CronTaskDetailContainer({
             className="gap-1.5 text-destructive border-destructive/40 hover:bg-destructive/10"
           >
             <Trash2 className="h-4 w-4" />
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.delete",
-            )}
+            {t("widget.delete")}
           </Button>
         </Div>
       </Div>
@@ -375,15 +365,7 @@ export function CronTaskDetailContainer({
             {task.routeId}
           </Div>
           <Badge
-            label={
-              task.enabled
-                ? t(
-                    "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.enabled",
-                  )
-                : t(
-                    "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.disabled",
-                  )
-            }
+            label={task.enabled ? t("widget.enabled") : t("widget.disabled")}
             className={
               task.enabled
                 ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
@@ -394,23 +376,17 @@ export function CronTaskDetailContainer({
 
         {task.description && (
           <Div className="text-sm text-muted-foreground -mt-2">
-            {t(task.description)}
+            {task.description}
           </Div>
         )}
 
         {/* ── Identity section ── */}
         <Div className="rounded-lg border p-4 flex flex-col gap-3">
           <Div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground pb-1 border-b">
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.identity",
-            )}
+            {t("widget.identity")}
           </Div>
           <Div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            <InfoRow
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.id",
-              )}
-            >
+            <InfoRow label={t("widget.id")}>
               <Div
                 style={{
                   fontFamily: "monospace",
@@ -422,35 +398,19 @@ export function CronTaskDetailContainer({
                 {task.id}
               </Div>
             </InfoRow>
-            <InfoRow
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.version",
-              )}
-            >
+            <InfoRow label={t("widget.version")}>
               <Div>{task.version}</Div>
             </InfoRow>
-            <InfoRow
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.category",
-              )}
-            >
+            <InfoRow label={t("widget.category")}>
               <Badge
-                label={t(task.category)}
+                label={t(task.category as Parameters<typeof t>[0])}
                 className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
               />
             </InfoRow>
-            <InfoRow
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.priority",
-              )}
-            >
+            <InfoRow label={t("widget.priority")}>
               <Badge label={t(task.priority)} className={priorityColorClass} />
             </InfoRow>
-            <InfoRow
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.schedule",
-              )}
-            >
+            <InfoRow label={t("widget.schedule")}>
               <Div
                 style={{
                   fontFamily: "monospace",
@@ -465,57 +425,33 @@ export function CronTaskDetailContainer({
               </Div>
             </InfoRow>
             {task.timezone && (
-              <InfoRow
-                label={t(
-                  "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.timezone",
-                )}
-              >
+              <InfoRow label={t("widget.timezone")}>
                 <Div>{task.timezone}</Div>
               </InfoRow>
             )}
-            <InfoRow
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.owner",
-              )}
-            >
+            <InfoRow label={t("widget.owner")}>
               {task.userId === null ? (
                 <Badge
-                  label={t(
-                    "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.ownerSystem",
-                  )}
+                  label={t("widget.ownerSystem")}
                   className="bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300"
                 />
               ) : (
                 <Badge
-                  label={t(
-                    "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.ownerUser",
-                  )}
+                  label={t("widget.ownerUser")}
                   className="bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300"
                 />
               )}
             </InfoRow>
-            <InfoRow
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.outputMode",
-              )}
-            >
+            <InfoRow label={t("widget.outputMode")}>
               <Badge
                 label={t(task.outputMode)}
                 className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
               />
             </InfoRow>
-            <InfoRow
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.createdAt",
-              )}
-            >
+            <InfoRow label={t("widget.createdAt")}>
               <Div>{formatDate(task.createdAt, neverLabel)}</Div>
             </InfoRow>
-            <InfoRow
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.updatedAt",
-              )}
-            >
+            <InfoRow label={t("widget.updatedAt")}>
               <Div>{formatDate(task.updatedAt, neverLabel)}</Div>
             </InfoRow>
           </Div>
@@ -526,33 +462,25 @@ export function CronTaskDetailContainer({
           <StatCard
             icon={<Activity className="h-5 w-5" />}
             value={task.executionCount}
-            label={t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.stats.totalExecutions",
-            )}
+            label={t("widget.stats.totalExecutions")}
             iconColor="#2563eb"
           />
           <StatCard
             icon={<CheckCircle className="h-5 w-5" />}
             value={task.successCount}
-            label={t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.stats.successful",
-            )}
+            label={t("widget.stats.successful")}
             iconColor="#16a34a"
           />
           <StatCard
             icon={<XCircle className="h-5 w-5" />}
             value={task.errorCount}
-            label={t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.stats.errors",
-            )}
+            label={t("widget.stats.errors")}
             iconColor="#dc2626"
           />
           <StatCard
             icon={<TrendingUp className="h-5 w-5" />}
             value={`${successRate}%`}
-            label={t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.stats.successRate",
-            )}
+            label={t("widget.stats.successRate")}
             iconColor="#9333ea"
           />
         </Div>
@@ -561,9 +489,7 @@ export function CronTaskDetailContainer({
         <Div className="rounded-lg border p-4 flex flex-col gap-2">
           <Div className="flex items-center justify-between">
             <Div className="text-xs font-medium text-muted-foreground">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.stats.successRate",
-              )}
+              {t("widget.stats.successRate")}
             </Div>
             <Div
               style={{
@@ -592,30 +518,16 @@ export function CronTaskDetailContainer({
         {/* ── Timing section ── */}
         <Div className="rounded-lg border p-4 flex flex-col gap-3">
           <Div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground pb-1 border-b">
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.timingSection",
-            )}
+            {t("widget.timingSection")}
           </Div>
           <Div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            <InfoRow
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.timing.avgDuration",
-              )}
-            >
+            <InfoRow label={t("widget.timing.avgDuration")}>
               <Div>{formatDuration(task.averageExecutionTime)}</Div>
             </InfoRow>
-            <InfoRow
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.timing.lastDuration",
-              )}
-            >
+            <InfoRow label={t("widget.timing.lastDuration")}>
               <Div>{formatDuration(task.lastExecutionDuration)}</Div>
             </InfoRow>
-            <InfoRow
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.timing.lastRun",
-              )}
-            >
+            <InfoRow label={t("widget.timing.lastRun")}>
               <Div className="flex flex-wrap items-center gap-1">
                 <Div>{formatDate(task.lastExecutedAt, neverLabel)}</Div>
                 {task.lastExecutionStatus && (
@@ -626,32 +538,16 @@ export function CronTaskDetailContainer({
                 )}
               </Div>
             </InfoRow>
-            <InfoRow
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.timing.nextRun",
-              )}
-            >
+            <InfoRow label={t("widget.timing.nextRun")}>
               <Div>{formatDate(task.nextExecutionAt, neverLabel)}</Div>
             </InfoRow>
-            <InfoRow
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.timing.timeout",
-              )}
-            >
+            <InfoRow label={t("widget.timing.timeout")}>
               <Div>{formatDuration(task.timeout)}</Div>
             </InfoRow>
-            <InfoRow
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.timing.retries",
-              )}
-            >
+            <InfoRow label={t("widget.timing.retries")}>
               <Div>{task.retries ?? "—"}</Div>
             </InfoRow>
-            <InfoRow
-              label={t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.timing.retryDelay",
-              )}
-            >
+            <InfoRow label={t("widget.timing.retryDelay")}>
               <Div>{formatDuration(task.retryDelay)}</Div>
             </InfoRow>
           </Div>
@@ -673,9 +569,7 @@ export function CronTaskDetailContainer({
             <Div className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 flex-shrink-0 text-red-600" />
               <Div className="text-xs font-semibold uppercase tracking-wide text-red-600">
-                {t(
-                  "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.lastExecutionError",
-                )}
+                {t("widget.lastExecutionError")}
               </Div>
             </Div>
             <Div
@@ -702,9 +596,7 @@ export function CronTaskDetailContainer({
             className="gap-1.5"
           >
             <Pencil className="h-4 w-4" />
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.edit",
-            )}
+            {t("widget.edit")}
           </Button>
           <Button
             type="button"
@@ -714,9 +606,7 @@ export function CronTaskDetailContainer({
             className="gap-1.5"
           >
             <Clock className="h-4 w-4" />
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.history",
-            )}
+            {t("widget.history")}
           </Button>
           <Button
             type="button"
@@ -726,9 +616,7 @@ export function CronTaskDetailContainer({
             className="gap-1.5"
           >
             <RefreshCw className="h-4 w-4" />
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.refresh",
-            )}
+            {t("widget.refresh")}
           </Button>
           <Button
             type="button"
@@ -738,9 +626,7 @@ export function CronTaskDetailContainer({
             className="gap-1.5 text-destructive border-destructive/40 hover:bg-destructive/10"
           >
             <Trash2 className="h-4 w-4" />
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.task.widget.delete",
-            )}
+            {t("widget.delete")}
           </Button>
         </Div>
       </Div>

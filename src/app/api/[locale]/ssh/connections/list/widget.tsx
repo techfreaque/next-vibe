@@ -30,7 +30,7 @@ interface WidgetProps {
 export function ConnectionsListContainer({
   field,
 }: WidgetProps): React.JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof endpoints.GET>();
   const locale = useWidgetLocale();
   const router = useRouter();
 
@@ -43,7 +43,7 @@ export function ConnectionsListContainer({
       <Div className="flex items-center gap-2 px-4 py-3 border-b">
         <Server className="h-4 w-4 text-muted-foreground" />
         <Span className="font-semibold text-sm mr-auto">
-          {t("app.api.ssh.connections.list.widget.title")}
+          {t("widget.title")}
         </Span>
         <Button
           type="button"
@@ -51,7 +51,7 @@ export function ConnectionsListContainer({
           onClick={() => router.push(`/${locale}/admin/ssh/connections/create`)}
         >
           <Plus className="h-3.5 w-3.5 mr-1" />
-          {t("app.api.ssh.connections.list.widget.addButton")}
+          {t("widget.addButton")}
         </Button>
       </Div>
 
@@ -60,7 +60,7 @@ export function ConnectionsListContainer({
         <Div className="flex flex-col items-center justify-center flex-1 gap-3 py-16 px-8 text-center">
           <Server className="h-8 w-8 text-muted-foreground/40" />
           <P className="text-sm text-muted-foreground">
-            {t("app.api.ssh.connections.list.widget.emptyState")}
+            {t("widget.emptyState")}
           </P>
         </Div>
       ) : (
@@ -81,7 +81,7 @@ export function ConnectionsListContainer({
                   </Span>
                   {conn.isDefault && (
                     <Span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                      {t("app.api.ssh.connections.list.widget.defaultBadge")}
+                      {t("widget.defaultBadge")}
                     </Span>
                   )}
                 </Div>

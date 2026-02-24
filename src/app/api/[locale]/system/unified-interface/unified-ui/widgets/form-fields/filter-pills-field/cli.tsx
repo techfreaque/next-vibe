@@ -27,7 +27,7 @@ export function FilterPillsFieldWidgetInk<
   TUsage,
   FilterPillsFieldWidgetConfig<TKey, EnumWidgetSchema, TUsage>
 >): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const showLabels = useInkWidgetShowLabels();
 
   // Find selected option

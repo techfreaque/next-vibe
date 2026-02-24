@@ -86,6 +86,15 @@ export const translations = {
       description: "Pulse execution history retrieved successfully",
     },
   },
+  pulse: {
+    execution: {
+      success: "Success",
+      failure: "Failure",
+      timeout: "Timeout",
+      cancelled: "Cancelled",
+      pending: "Pending",
+    },
+  },
   widget: {
     title: "Pulse History",
     empty: "No pulse executions found",

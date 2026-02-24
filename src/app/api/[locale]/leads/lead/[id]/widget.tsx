@@ -87,15 +87,15 @@ const STATUS_COLORS: Record<string, string> = {
 
 /** Campaign funnel stage keys in order */
 const CAMPAIGN_FUNNEL_STAGE_KEYS = [
-  { key: "NOT_STARTED", labelKey: "app.api.leads.lead.widget.stageNotStarted" },
-  { key: "INITIAL", labelKey: "app.api.leads.lead.widget.stageInitial" },
-  { key: "FOLLOWUP_1", labelKey: "app.api.leads.lead.widget.stageFollowup1" },
-  { key: "FOLLOWUP_2", labelKey: "app.api.leads.lead.widget.stageFollowup2" },
-  { key: "FOLLOWUP_3", labelKey: "app.api.leads.lead.widget.stageFollowup3" },
-  { key: "NURTURE", labelKey: "app.api.leads.lead.widget.stageNurture" },
+  { key: "NOT_STARTED", labelKey: "widget.stageNotStarted" },
+  { key: "INITIAL", labelKey: "widget.stageInitial" },
+  { key: "FOLLOWUP_1", labelKey: "widget.stageFollowup1" },
+  { key: "FOLLOWUP_2", labelKey: "widget.stageFollowup2" },
+  { key: "FOLLOWUP_3", labelKey: "widget.stageFollowup3" },
+  { key: "NURTURE", labelKey: "widget.stageNurture" },
   {
     key: "REACTIVATION",
-    labelKey: "app.api.leads.lead.widget.stageReactivation",
+    labelKey: "widget.stageReactivation",
   },
 ] as const;
 
@@ -238,7 +238,7 @@ function CampaignFunnel({
 }: {
   currentStage: string | null | undefined;
 }): React.JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const currentIndex = CAMPAIGN_FUNNEL_STAGE_KEYS.findIndex(
     (s) => s.key === currentStage,
   );
@@ -292,7 +292,7 @@ export function LeadDetailContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const locale = useWidgetLocale();
   const router = useRouter();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
 
   const data = field.value?.lead;
   const leadId = data?.basicInfo?.id;
@@ -359,9 +359,7 @@ export function LeadDetailContainer({
         <Div className="rounded-full bg-muted p-4">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </Div>
-        <P className="text-sm text-muted-foreground">
-          {t("app.api.leads.lead.widget.loading")}
-        </P>
+        <P className="text-sm text-muted-foreground">{t("widget.loading")}</P>
       </Div>
     );
   }
@@ -373,12 +371,10 @@ export function LeadDetailContainer({
         <Div className="rounded-full bg-muted p-4">
           <AlertCircle className="h-8 w-8 text-muted-foreground" />
         </Div>
-        <P className="text-sm text-muted-foreground">
-          {t("app.api.leads.lead.widget.notFound")}
-        </P>
+        <P className="text-sm text-muted-foreground">{t("widget.notFound")}</P>
         <Button variant="outline" size="sm" onClick={handleBack}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          {t("app.api.leads.lead.widget.back")}
+          {t("widget.back")}
         </Button>
       </Div>
     );
@@ -434,13 +430,13 @@ export function LeadDetailContainer({
       <Div className="flex items-center gap-2 p-4 border-b sticky top-0 bg-background z-10">
         <Button variant="outline" size="sm" onClick={handleBack}>
           <ArrowLeft className="h-4 w-4 mr-1" />
-          {t("app.api.leads.lead.widget.back")}
+          {t("widget.back")}
         </Button>
         <Div className="flex-1 min-w-0">
           <P className="font-semibold text-base truncate">
             {basicInfo.businessName ??
               basicInfo.email ??
-              t("app.api.leads.lead.widget.leadFallbackTitle")}
+              t("widget.leadFallbackTitle")}
           </P>
         </Div>
         <Button
@@ -450,7 +446,7 @@ export function LeadDetailContainer({
           className="gap-1"
         >
           <Pencil className="h-4 w-4" />
-          {t("app.api.leads.lead.widget.edit")}
+          {t("widget.edit")}
         </Button>
         <Button
           variant="ghost"
@@ -459,7 +455,7 @@ export function LeadDetailContainer({
           className="gap-1 text-destructive hover:text-destructive"
         >
           <Trash2 className="h-4 w-4" />
-          {t("app.api.leads.lead.widget.delete")}
+          {t("widget.delete")}
         </Button>
       </Div>
 
@@ -492,7 +488,7 @@ export function LeadDetailContainer({
                   {isConverted && (
                     <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
                       <CheckCircle className="h-3 w-3" />
-                      {t("app.api.leads.lead.widget.converted")}
+                      {t("widget.converted")}
                     </Span>
                   )}
                 </Div>
@@ -510,7 +506,7 @@ export function LeadDetailContainer({
                     </P>
                     <CopyButton
                       text={basicInfo.email}
-                      label={t("app.api.leads.lead.widget.copyEmail")}
+                      label={t("widget.copyEmail")}
                     />
                   </Div>
                 )}
@@ -519,10 +515,7 @@ export function LeadDetailContainer({
                     <P className="text-xs text-muted-foreground/60 font-mono">
                       {leadId}
                     </P>
-                    <CopyButton
-                      text={leadId}
-                      label={t("app.api.leads.lead.widget.copyId")}
-                    />
+                    <CopyButton text={leadId} label={t("widget.copyId")} />
                   </Div>
                 )}
               </Div>
@@ -537,7 +530,7 @@ export function LeadDetailContainer({
                     <Strong className="font-semibold text-foreground">
                       {leadAgeDays}
                     </Strong>{" "}
-                    {t("app.api.leads.lead.widget.daysOld")}
+                    {t("widget.daysOld")}
                   </Span>
                 </Div>
               )}
@@ -545,11 +538,11 @@ export function LeadDetailContainer({
                 <Div className="flex items-center gap-1">
                   <Activity className="h-3 w-3" />
                   <Span>
-                    {t("app.api.leads.lead.widget.lastEngaged")}{" "}
+                    {t("widget.lastEngaged")}{" "}
                     <Strong className="font-semibold text-foreground">
                       {daysSinceEngagement}d
                     </Strong>{" "}
-                    {t("app.api.leads.lead.widget.ago")}
+                    {t("widget.ago")}
                   </Span>
                 </Div>
               )}
@@ -557,7 +550,7 @@ export function LeadDetailContainer({
                 <Div className="flex items-center gap-1">
                   <Info className="h-3 w-3" />
                   <Span>
-                    {t("app.api.leads.lead.widget.variant")}{" "}
+                    {t("widget.variant")}{" "}
                     <Strong className="font-semibold text-foreground">
                       {campaignTracking.emailJourneyVariant.replace(/_/g, " ")}
                     </Strong>
@@ -572,7 +565,7 @@ export function LeadDetailContainer({
         <Card>
           <CardContent className="pt-4">
             <P className="text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wide">
-              {t("app.api.leads.lead.widget.quickActions")}
+              {t("widget.quickActions")}
             </P>
             <Div className="flex flex-wrap gap-2">
               <Button
@@ -583,7 +576,7 @@ export function LeadDetailContainer({
                 className="gap-1.5"
               >
                 <Pencil className="h-3.5 w-3.5" />
-                {t("app.api.leads.lead.widget.editLead")}
+                {t("widget.editLead")}
               </Button>
               {basicInfo.email && (
                 <>
@@ -595,7 +588,7 @@ export function LeadDetailContainer({
                     className="gap-1.5"
                   >
                     <Send className="h-3.5 w-3.5" />
-                    {t("app.api.leads.lead.widget.sendTestEmail")}
+                    {t("widget.sendTestEmail")}
                   </Button>
                   <Button
                     type="button"
@@ -605,7 +598,7 @@ export function LeadDetailContainer({
                     className="gap-1.5"
                   >
                     <Search className="h-3.5 w-3.5" />
-                    {t("app.api.leads.lead.widget.viewInSearch")}
+                    {t("widget.viewInSearch")}
                   </Button>
                 </>
               )}
@@ -621,7 +614,7 @@ export function LeadDetailContainer({
                     className="gap-1.5"
                   >
                     <User className="h-3.5 w-3.5" />
-                    {t("app.api.leads.lead.widget.userProfile")}
+                    {t("widget.userProfile")}
                   </Button>
                   <Button
                     type="button"
@@ -633,7 +626,7 @@ export function LeadDetailContainer({
                     className="gap-1.5"
                   >
                     <UserSearch className="h-3.5 w-3.5" />
-                    {t("app.api.leads.lead.widget.userDetail")}
+                    {t("widget.userDetail")}
                   </Button>
                   <Button
                     type="button"
@@ -645,7 +638,7 @@ export function LeadDetailContainer({
                     className="gap-1.5"
                   >
                     <History className="h-3.5 w-3.5" />
-                    {t("app.api.leads.lead.widget.creditHistory")}
+                    {t("widget.creditHistory")}
                   </Button>
                 </>
               )}
@@ -657,7 +650,7 @@ export function LeadDetailContainer({
                 className="gap-1.5 text-destructive hover:text-destructive ml-auto"
               >
                 <Trash2 className="h-3.5 w-3.5" />
-                {t("app.api.leads.lead.widget.delete")}
+                {t("widget.delete")}
               </Button>
             </Div>
           </CardContent>
@@ -668,7 +661,7 @@ export function LeadDetailContainer({
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <Target className="h-4 w-4" />
-              {t("app.api.leads.lead.widget.campaignFunnel")}
+              {t("widget.campaignFunnel")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -678,7 +671,7 @@ export function LeadDetailContainer({
             {campaignTracking.source && (
               <Div className="mt-2 flex items-center gap-2">
                 <P className="text-xs text-muted-foreground">
-                  {t("app.api.leads.lead.widget.sourceLabel")}
+                  {t("widget.sourceLabel")}
                 </P>
                 <Badge variant="outline" className="text-xs">
                   {campaignTracking.source.replace(/_/g, " ")}
@@ -687,7 +680,7 @@ export function LeadDetailContainer({
             )}
             {campaignTracking.lastEmailSentAt && (
               <P className="text-xs text-muted-foreground mt-2">
-                {t("app.api.leads.lead.widget.lastEmailLabel")}{" "}
+                {t("widget.lastEmailLabel")}{" "}
                 {formatSimpleDate(campaignTracking.lastEmailSentAt, locale)}
               </P>
             )}
@@ -699,23 +692,23 @@ export function LeadDetailContainer({
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <Activity className="h-4 w-4" />
-              {t("app.api.leads.lead.widget.campaignPerformance")}
+              {t("widget.campaignPerformance")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <Div className="grid grid-cols-3 gap-3 mb-4">
               <StatBadge
-                label={t("app.api.leads.lead.widget.emailsSent")}
+                label={t("widget.emailsSent")}
                 value={campaignTracking.emailsSent}
                 color="#2563eb"
               />
               <StatBadge
-                label={t("app.api.leads.lead.widget.opened")}
+                label={t("widget.opened")}
                 value={engagement.emailsOpened}
                 color="#16a34a"
               />
               <StatBadge
-                label={t("app.api.leads.lead.widget.clicked")}
+                label={t("widget.clicked")}
                 value={engagement.emailsClicked}
                 color="#9333ea"
               />
@@ -726,18 +719,18 @@ export function LeadDetailContainer({
               <RateBar
                 rate={openRate}
                 color="#16a34a"
-                label={t("app.api.leads.lead.widget.openRate")}
+                label={t("widget.openRate")}
               />
               <RateBar
                 rate={clickRate}
                 color="#9333ea"
-                label={t("app.api.leads.lead.widget.clickRate")}
+                label={t("widget.clickRate")}
               />
               {engagement.emailsOpened > 0 && (
                 <RateBar
                   rate={clickToOpenRate}
                   color="#ea580c"
-                  label={t("app.api.leads.lead.widget.clickToOpenRate")}
+                  label={t("widget.clickToOpenRate")}
                 />
               )}
             </Div>
@@ -749,7 +742,7 @@ export function LeadDetailContainer({
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <User className="h-4 w-4" />
-              {t("app.api.leads.lead.widget.contactDetails")}
+              {t("widget.contactDetails")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -760,7 +753,7 @@ export function LeadDetailContainer({
                   <P className="text-sm">{contactDetails.phone}</P>
                   <CopyButton
                     text={contactDetails.phone}
-                    label={t("app.api.leads.lead.widget.copyPhone")}
+                    label={t("widget.copyPhone")}
                   />
                 </Div>
               )}
@@ -779,11 +772,11 @@ export function LeadDetailContainer({
                 </Div>
               )}
               <InfoRow
-                label={t("app.api.leads.lead.widget.country")}
+                label={t("widget.country")}
                 value={contactDetails.country}
               />
               <InfoRow
-                label={t("app.api.leads.lead.widget.language")}
+                label={t("widget.language")}
                 value={contactDetails.language}
               />
             </Div>
@@ -795,7 +788,7 @@ export function LeadDetailContainer({
           <CardHeader className="pb-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
-              {t("app.api.leads.lead.widget.engagement")}
+              {t("widget.engagement")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -803,21 +796,21 @@ export function LeadDetailContainer({
               <Div className="flex items-center gap-2">
                 <BarChart2 className="h-3.5 w-3.5 text-green-500 flex-shrink-0" />
                 <InfoRow
-                  label={t("app.api.leads.lead.widget.emailsOpened")}
+                  label={t("widget.emailsOpened")}
                   value={engagement.emailsOpened}
                 />
               </Div>
               <Div className="flex items-center gap-2">
                 <MousePointer className="h-3.5 w-3.5 text-purple-500 flex-shrink-0" />
                 <InfoRow
-                  label={t("app.api.leads.lead.widget.emailsClicked")}
+                  label={t("widget.emailsClicked")}
                   value={engagement.emailsClicked}
                 />
               </Div>
               {engagement.lastEngagementAt && (
                 <Div className="col-span-2">
                   <InfoRow
-                    label={t("app.api.leads.lead.widget.lastEngagement")}
+                    label={t("widget.lastEngagement")}
                     value={formatSimpleDate(
                       engagement.lastEngagementAt,
                       locale,
@@ -830,7 +823,7 @@ export function LeadDetailContainer({
                   <AlertTriangle className="h-3.5 w-3.5 text-red-500 mt-0.5 flex-shrink-0" />
                   <Div>
                     <P className="text-xs text-muted-foreground">
-                      {t("app.api.leads.lead.widget.unsubscribed")}
+                      {t("widget.unsubscribed")}
                     </P>
                     <P className="text-sm text-red-600 dark:text-red-400">
                       {formatSimpleDate(engagement.unsubscribedAt, locale)}
@@ -851,26 +844,26 @@ export function LeadDetailContainer({
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Check className="h-4 w-4 text-green-600" />
-                {t("app.api.leads.lead.widget.conversion")}
+                {t("widget.conversion")}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <Div className="grid grid-cols-2 gap-3">
                 {conversion.signedUpAt && (
                   <InfoRow
-                    label={t("app.api.leads.lead.widget.signedUp")}
+                    label={t("widget.signedUp")}
                     value={formatSimpleDate(conversion.signedUpAt, locale)}
                   />
                 )}
                 {conversion.convertedAt && (
                   <InfoRow
-                    label={t("app.api.leads.lead.widget.convertedAt")}
+                    label={t("widget.convertedAt")}
                     value={formatSimpleDate(conversion.convertedAt, locale)}
                   />
                 )}
                 {conversion.subscriptionConfirmedAt && (
                   <InfoRow
-                    label={t("app.api.leads.lead.widget.subscriptionConfirmed")}
+                    label={t("widget.subscriptionConfirmed")}
                     value={formatSimpleDate(
                       conversion.subscriptionConfirmedAt,
                       locale,
@@ -880,7 +873,7 @@ export function LeadDetailContainer({
                 {conversion.convertedUserId && (
                   <Div className="col-span-2">
                     <P className="text-xs text-muted-foreground">
-                      {t("app.api.leads.lead.widget.convertedUserId")}
+                      {t("widget.convertedUserId")}
                     </P>
                     <Div className="flex items-center gap-1 mt-0.5">
                       <P className="text-sm font-mono truncate">
@@ -888,7 +881,7 @@ export function LeadDetailContainer({
                       </P>
                       <CopyButton
                         text={conversion.convertedUserId}
-                        label={t("app.api.leads.lead.widget.copyUserId")}
+                        label={t("widget.copyUserId")}
                       />
                     </Div>
                   </Div>
@@ -900,7 +893,7 @@ export function LeadDetailContainer({
                 <Div className="mt-3 pt-3 border-t flex items-center gap-2 p-2 rounded-lg bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800">
                   <CreditCard className="h-4 w-4 text-green-600 dark:text-green-400" />
                   <P className="text-sm text-green-700 dark:text-green-400 font-medium">
-                    {t("app.api.leads.lead.widget.activeSubscriberSince")}{" "}
+                    {t("widget.activeSubscriberSince")}{" "}
                     {formatSimpleDate(
                       conversion.subscriptionConfirmedAt!,
                       locale,
@@ -922,7 +915,7 @@ export function LeadDetailContainer({
                     className="gap-1"
                   >
                     <User className="h-3.5 w-3.5" />
-                    {t("app.api.leads.lead.widget.viewUserProfile")}
+                    {t("widget.viewUserProfile")}
                   </Button>
                   <Button
                     type="button"
@@ -934,7 +927,7 @@ export function LeadDetailContainer({
                     className="gap-1"
                   >
                     <UserSearch className="h-3.5 w-3.5" />
-                    {t("app.api.leads.lead.widget.viewUserDetail")}
+                    {t("widget.viewUserDetail")}
                   </Button>
                   <Button
                     type="button"
@@ -946,7 +939,7 @@ export function LeadDetailContainer({
                     className="gap-1"
                   >
                     <History className="h-3.5 w-3.5" />
-                    {t("app.api.leads.lead.widget.creditHistory")}
+                    {t("widget.creditHistory")}
                   </Button>
                 </Div>
               )}
@@ -961,14 +954,14 @@ export function LeadDetailContainer({
             <CardHeader className="pb-3">
               <CardTitle className="text-sm flex items-center gap-2">
                 <Tag className="h-4 w-4" />
-                {t("app.api.leads.lead.widget.notesAndMetadata")}
+                {t("widget.notesAndMetadata")}
               </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
               {metadata.notes && (
                 <Div>
                   <P className="text-xs text-muted-foreground mb-1">
-                    {t("app.api.leads.lead.widget.notes")}
+                    {t("widget.notes")}
                   </P>
                   <P className="text-sm whitespace-pre-wrap">
                     {metadata.notes}
@@ -981,7 +974,7 @@ export function LeadDetailContainer({
                     <Separator />
                     <Div>
                       <P className="text-xs text-muted-foreground mb-2">
-                        {t("app.api.leads.lead.widget.metadata")}
+                        {t("widget.metadata")}
                       </P>
                       <Div className="grid grid-cols-2 gap-2">
                         {Object.entries(metadata.metadata).map(([key, val]) => (
@@ -1001,19 +994,19 @@ export function LeadDetailContainer({
             <Div className="grid grid-cols-2 gap-3">
               <Div>
                 <P className="text-xs text-muted-foreground">
-                  {t("app.api.leads.lead.widget.created")}
+                  {t("widget.created")}
                 </P>
                 <P className="text-sm">
                   {formatSimpleDate(metadata.createdAt, locale)}
                 </P>
                 {leadAgeDays !== null && (
                   <P className="text-xs text-muted-foreground">
-                    ({leadAgeDays} {t("app.api.leads.lead.widget.daysOld")})
+                    ({leadAgeDays} {t("widget.daysOld")})
                   </P>
                 )}
               </Div>
               <InfoRow
-                label={t("app.api.leads.lead.widget.lastUpdated")}
+                label={t("widget.lastUpdated")}
                 value={formatSimpleDate(metadata.updatedAt, locale)}
               />
             </Div>

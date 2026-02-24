@@ -25,7 +25,7 @@ export const translations = {
     fileName: {
       label: "File Name",
       description: "Name of the CSV file",
-      placeholder: "app.api.leads.csv",
+      placeholder: "leads.csv",
       helpText: "Provide a descriptive file name",
     },
     skipDuplicates: {
@@ -221,6 +221,26 @@ export const translations = {
         title: "Import Processing Complete",
         description: "Import jobs processed successfully",
       },
+    },
+  },
+  widget: {
+    header: {
+      title: "Import Jobs",
+      newImport: "New Import",
+    },
+    filter: {
+      all: "All",
+      completed: "Completed",
+      failed: "Failed",
+      pending: "Pending",
+      running: "Running",
+    },
+    loading: "Loading import jobs\u2026",
+    empty: {
+      title: "No import jobs found",
+      withFilter: "Try a different filter or start a new import.",
+      withoutFilter: "Start your first import to see it here.",
+      newImport: "New Import",
     },
   },
   jobs: jobsTranslations,

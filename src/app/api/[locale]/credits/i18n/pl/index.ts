@@ -138,6 +138,29 @@ export const translations: typeof enTranslations = {
       title: "Saldo kredytów",
       description: "Twoje aktualne saldo kredytów i podział",
     },
+    balance: {
+      title: "Twoje saldo kredytów",
+      description: "Używaj kredytów w {{modelCount}} modelach AI",
+      credit: "{{count}} kredyt",
+      credits: "{{count}} kredytów",
+      expiring: {
+        title: "Wygasające kredyty",
+        description: "{{subCredits}} nowych kredytów na cykl subskrypcji",
+      },
+      permanent: {
+        title: "Stałe kredyty",
+        description: "Nie wygasają — należą do Ciebie",
+      },
+      free: {
+        title: "Darmowe kredyty",
+        description: "{{count}} darmowych kredytów odnawiane co miesiąc",
+      },
+      earned: {
+        title: "Zarobione kredyty",
+        description:
+          "Zarobione przez polecenia — kliknij, aby zaprosić znajomych",
+      },
+    },
     total: {
       content: "Łączne kredyty",
     },
@@ -218,6 +241,7 @@ export const translations: typeof enTranslations = {
         description: "Zobacz swoją historię transakcji kredytowych",
       },
       emptyState: "Brak transakcji kredytowych",
+      balance: "Saldo po: {{count}}",
       limit: {
         label: "Limit",
         description: "Maksymalna liczba transakcji do zwrócenia (1-100)",

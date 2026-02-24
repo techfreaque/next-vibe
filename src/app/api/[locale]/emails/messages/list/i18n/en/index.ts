@@ -202,4 +202,39 @@ export const translations = {
       bounced: "Bounced",
     },
   },
+  enums: {
+    type: {
+      transactional: "Transactional",
+      marketing: "Marketing",
+      notification: "Notification",
+      system: "System",
+      leadCampaign: "Lead Campaign",
+      userCommunication: "User Communication",
+    },
+    typeFilter: {
+      any: "All Types",
+    },
+    channel: {
+      email: "Email",
+      sms: "SMS",
+      whatsapp: "WhatsApp",
+      telegram: "Telegram",
+    },
+    channelFilter: {
+      any: "All Channels",
+    },
+    sortField: {
+      subject: "Subject",
+      recipientEmail: "Recipient Email",
+      recipientName: "Recipient Name",
+      type: "Type",
+      status: "Status",
+      sentAt: "Sent At",
+      createdAt: "Created At",
+    },
+    sortOrder: {
+      asc: "Ascending",
+      desc: "Descending",
+    },
+  },
 };

@@ -31,7 +31,7 @@ export function EmailPreviewRenderContainer({
   fieldName,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
   const result = field.value;
 
   return (
@@ -40,7 +40,7 @@ export function EmailPreviewRenderContainer({
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
         <NavigateButtonWidget field={children.backButton} />
         <Span className="font-semibold text-base">
-          {t("app.api.emails.preview.render.title")}
+          {t("preview.render.title")}
         </Span>
       </Div>
 
@@ -69,7 +69,7 @@ export function EmailPreviewRenderContainer({
           <Div className="rounded-lg border flex flex-col gap-0">
             <Div className="p-3 border-b flex items-center gap-2">
               <Span className="text-sm font-semibold">
-                {t("app.api.emails.preview.render.preview")}
+                {t("preview.render.preview")}
               </Span>
               <Span className="text-xs text-muted-foreground ml-auto">
                 {result.subject}
@@ -77,8 +77,7 @@ export function EmailPreviewRenderContainer({
             </Div>
             <Div className="p-3">
               <Div style={{ fontSize: "12px", color: "#6b7280" }}>
-                {t("app.api.emails.preview.render.version")}:{" "}
-                {result.templateVersion}
+                {t("preview.render.version")}: {result.templateVersion}
               </Div>
             </Div>
             <Div
@@ -91,8 +90,8 @@ export function EmailPreviewRenderContainer({
         <Div className="flex items-center justify-end pt-2">
           <SubmitButtonWidget
             field={{
-              text: "app.api.emails.preview.render.submit",
-              loadingText: "app.api.emails.preview.render.submitting",
+              text: "submit",
+              loadingText: "submitting",
               icon: "eye",
               variant: "primary",
               size: "sm",

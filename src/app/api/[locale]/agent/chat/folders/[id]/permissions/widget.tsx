@@ -21,6 +21,7 @@ import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/wid
 
 import type definition from "./definition";
 import type { FolderPermissionsGetResponseOutput } from "./definition";
+import type { FolderPermissionsTranslationKey } from "./i18n";
 
 /**
  * Props for custom widget
@@ -39,8 +40,8 @@ import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unifie
 interface PermissionSection {
   key: keyof FolderPermissionsGetResponseOutput;
   icon: IconKey;
-  labelKey: string;
-  descriptionKey: string;
+  labelKey: FolderPermissionsTranslationKey;
+  descriptionKey: FolderPermissionsTranslationKey;
 }
 
 /**
@@ -50,14 +51,14 @@ export function FolderPermissionsContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const { push: navigate } = useWidgetNavigation();
   const logger = useWidgetLogger();
 
   if (!field.value) {
     return (
       <Div className="flex items-center justify-center p-8 text-muted-foreground">
-        <Span>{t("app.chat.common.noData")}</Span>
+        <Span>{t("get.noData")}</Span>
       </Div>
     );
   }
@@ -66,50 +67,38 @@ export function FolderPermissionsContainer({
     {
       key: "rolesView",
       icon: "eye",
-      labelKey:
-        "app.api.agent.chat.folders.id.permissions.get.response.rolesView.label",
-      descriptionKey:
-        "app.api.agent.chat.folders.id.permissions.patch.rolesView.description",
+      labelKey: "get.response.rolesView.label",
+      descriptionKey: "patch.rolesView.description",
     },
     {
       key: "rolesManage",
       icon: "settings",
-      labelKey:
-        "app.api.agent.chat.folders.id.permissions.get.response.rolesManage.label",
-      descriptionKey:
-        "app.api.agent.chat.folders.id.permissions.patch.rolesManage.description",
+      labelKey: "get.response.rolesManage.label",
+      descriptionKey: "patch.rolesManage.description",
     },
     {
       key: "rolesCreateThread",
       icon: "message-square-plus",
-      labelKey:
-        "app.api.agent.chat.folders.id.permissions.get.response.rolesCreateThread.label",
-      descriptionKey:
-        "app.api.agent.chat.folders.id.permissions.patch.rolesCreateThread.description",
+      labelKey: "get.response.rolesCreateThread.label",
+      descriptionKey: "patch.rolesCreateThread.description",
     },
     {
       key: "rolesPost",
       icon: "send",
-      labelKey:
-        "app.api.agent.chat.folders.id.permissions.get.response.rolesPost.label",
-      descriptionKey:
-        "app.api.agent.chat.folders.id.permissions.patch.rolesPost.description",
+      labelKey: "get.response.rolesPost.label",
+      descriptionKey: "patch.rolesPost.description",
     },
     {
       key: "rolesModerate",
       icon: "shield-plus",
-      labelKey:
-        "app.api.agent.chat.folders.id.permissions.get.response.rolesModerate.label",
-      descriptionKey:
-        "app.api.agent.chat.folders.id.permissions.patch.rolesModerate.description",
+      labelKey: "get.response.rolesModerate.label",
+      descriptionKey: "patch.rolesModerate.description",
     },
     {
       key: "rolesAdmin",
       icon: "shield",
-      labelKey:
-        "app.api.agent.chat.folders.id.permissions.get.response.rolesAdmin.label",
-      descriptionKey:
-        "app.api.agent.chat.folders.id.permissions.patch.rolesAdmin.description",
+      labelKey: "get.response.rolesAdmin.label",
+      descriptionKey: "patch.rolesAdmin.description",
     },
   ];
 
@@ -134,7 +123,7 @@ export function FolderPermissionsContainer({
       <Div className="flex flex-row items-center gap-2 p-6 border-b border-border sticky top-0 bg-background z-10">
         <Shield className="h-5 w-5 text-primary" />
         <Span className="text-lg font-semibold flex-1">
-          {t("app.api.agent.chat.folders.id.permissions.get.container.title")}
+          {t("get.container.title")}
         </Span>
         <Button
           variant="default"
@@ -142,7 +131,7 @@ export function FolderPermissionsContainer({
           onClick={handleEdit}
           className="ml-auto"
         >
-          {t("app.chat.common.edit")}
+          {t("get.edit")}
         </Button>
       </Div>
 
@@ -152,12 +141,10 @@ export function FolderPermissionsContainer({
           <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
           <Div className="flex flex-col gap-1">
             <Span className="text-sm font-medium text-blue-900 dark:text-blue-100">
-              {t("app.chat.permissions.about")}
+              {t("get.about")}
             </Span>
             <Span className="text-sm text-blue-800 dark:text-blue-200">
-              {t(
-                "app.api.agent.chat.folders.id.permissions.get.container.description",
-              )}
+              {t("get.container.description")}
             </Span>
           </Div>
         </Div>
@@ -208,7 +195,7 @@ export function FolderPermissionsContainer({
                       <Div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-muted/50 border border-dashed border-muted-foreground/30">
                         <Info className="h-3.5 w-3.5 text-muted-foreground" />
                         <Span className="text-xs text-muted-foreground italic">
-                          {t("app.chat.permissions.inheritFromParent")}
+                          {t("get.inheritFromParent")}
                         </Span>
                       </Div>
                     )}

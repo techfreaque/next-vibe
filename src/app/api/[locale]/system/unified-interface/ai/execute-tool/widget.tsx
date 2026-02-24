@@ -41,7 +41,7 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
   const form = useWidgetForm<typeof definition.POST>();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
 
   const children = field.children;
   const toolName = form?.watch("toolName") ?? "";
@@ -70,12 +70,7 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
         setResolveError(null);
       } else {
         setResolvedEndpoint(null);
-        setResolveError(
-          t(
-            "app.api.system.unifiedInterface.ai.executeTool.post.widget.unknownTool",
-            { toolName },
-          ),
-        );
+        setResolveError(t("executeTool.post.widget.unknownTool", { toolName }));
       }
     };
 
@@ -100,9 +95,7 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
 
       {!toolName && (
         <P className="text-sm text-muted-foreground">
-          {t(
-            "app.api.system.unifiedInterface.ai.executeTool.post.widget.enterToolName",
-          )}
+          {t("executeTool.post.widget.enterToolName")}
         </P>
       )}
 
@@ -112,9 +105,7 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
 
       {toolName && !resolvedEndpoint && !resolveError && (
         <P className="text-sm text-muted-foreground">
-          {t(
-            "app.api.system.unifiedInterface.ai.executeTool.post.widget.resolving",
-          )}
+          {t("executeTool.post.widget.resolving")}
         </P>
       )}
 

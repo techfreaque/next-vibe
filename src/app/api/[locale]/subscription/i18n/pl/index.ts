@@ -158,6 +158,8 @@ export const translations: typeof enTranslations = {
   // DELETE endpoint
   delete: {
     title: "Anuluj subskrypcję",
+    warning:
+      "Anulowanie subskrypcji zakończy dostęp na koniec okresu rozliczeniowego.",
     description: "Anuluj swoją subskrypcję",
     form: {
       title: "Anulowanie subskrypcji",
@@ -449,6 +451,36 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  // Widget display keys
+  title: "Twoja subskrypcja",
+  description: "Zarządzaj swoją subskrypcją i rozliczeniami",
+  notAvailable: "N/D",
+  canceledOn: "Anulowano",
+  endedOn: "Zakończono",
+  billingInterval: "Okres rozliczeniowy",
+  currentPeriodStart: "Początek bieżącego okresu",
+  endsOn: "Kończy się",
+  nextBillingDate: "Następna data rozliczenia",
+  cancellation: {
+    title: "Zaplanowane anulowanie subskrypcji",
+    description:
+      "Twoja subskrypcja zostanie anulowana {{date}}. Do tego czasu zachowasz dostęp.",
+  },
+  canceled: {
+    title: "Subskrypcja zakończona",
+    description:
+      "Twoja subskrypcja dobiegła końca. Odnów ją, aby odzyskać dostęp do wszystkich funkcji.",
+  },
+  manage: {
+    nowpayments: {
+      info: "Skontaktuj się z pomocą techniczną, aby zarządzać subskrypcją NowPayments.",
+      button: "Zarządzaj subskrypcją",
+    },
+    stripe: {
+      button: "Zarządzaj subskrypcją",
+    },
+  },
+
   // Enum translations
   enums: {
     plan: {
@@ -480,6 +512,39 @@ export const translations: typeof enTranslations = {
       temporaryPause: "Tymczasowa przerwa",
       other: "Inne",
     },
+    paymentProvider: {
+      nowpayments: "NowPayments",
+      stripe: "Stripe",
+    },
+  },
+
+  // Buy / pricing page translations
+  buy: {
+    provider: {
+      stripe: "Karta kredytowa / debetowa",
+      stripeDescription: "Zapłać bezpiecznie przez Stripe",
+      nowpayments: "Krypto (NowPayments)",
+      nowpaymentsDescription: "Zapłać Bitcoinem, Ethereum i innymi",
+      cryptoMonthlyDisabled:
+        "Płatności krypto są dostępne tylko dla subskrypcji rocznych",
+    },
+    subscription: {
+      title: "Subskrypcja",
+      description:
+        "{{subCredits}} creditów/miesiąc dla {{modelCount}} modeli AI",
+      perYear: "/ rok",
+      perMonth: "/ miesiąc",
+      yearlyEquivalent: "{{monthlyPrice}} / miesiąc przy rozliczeniu rocznym",
+      button: "Subskrybuj teraz",
+      buttonAlreadySubscribed: "Masz już aktywną subskrypcję",
+      features: {
+        credits: "{{count}} creditów miesięcznie",
+        expiry: "Dostęp do {{modelCount}}+ modeli AI",
+        bestFor: "Najlepszy do regularnego użycia",
+      },
+    },
+    login: "Zaloguj się",
+    signup: "Zarejestruj się za darmo",
   },
 
   // Page metadata

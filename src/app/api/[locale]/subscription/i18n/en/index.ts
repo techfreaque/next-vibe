@@ -158,6 +158,8 @@ export const translations = {
   delete: {
     title: "Cancel Subscription",
     description: "Cancel your subscription",
+    warning:
+      "Canceling your subscription will end your access at the end of the billing period.",
     form: {
       title: "Subscription Cancellation",
       description: "Cancel your subscription with optional settings",
@@ -448,6 +450,36 @@ export const translations = {
     },
   },
 
+  // Widget display keys
+  title: "Your Subscription",
+  description: "Manage your subscription and billing",
+  notAvailable: "N/A",
+  canceledOn: "Canceled On",
+  endedOn: "Ended On",
+  billingInterval: "Billing Interval",
+  currentPeriodStart: "Current Period Start",
+  endsOn: "Ends On",
+  nextBillingDate: "Next Billing Date",
+  cancellation: {
+    title: "Subscription Cancellation Scheduled",
+    description:
+      "Your subscription will be canceled on {{date}}. You will continue to have access until then.",
+  },
+  canceled: {
+    title: "Subscription Ended",
+    description:
+      "Your subscription has ended. Renew to regain access to all features.",
+  },
+  manage: {
+    nowpayments: {
+      info: "Please contact support to manage your NowPayments subscription.",
+      button: "Manage Subscription",
+    },
+    stripe: {
+      button: "Manage Subscription",
+    },
+  },
+
   // Enum translations
   enums: {
     plan: {
@@ -479,6 +511,39 @@ export const translations = {
       temporaryPause: "Temporary Pause",
       other: "Other",
     },
+    paymentProvider: {
+      nowpayments: "NowPayments",
+      stripe: "Stripe",
+    },
+  },
+
+  // Buy / pricing page translations
+  buy: {
+    provider: {
+      stripe: "Credit / Debit Card",
+      stripeDescription: "Pay securely with Stripe",
+      nowpayments: "Crypto (NowPayments)",
+      nowpaymentsDescription: "Pay with Bitcoin, Ethereum, and more",
+      cryptoMonthlyDisabled:
+        "Crypto payments are only available for yearly subscriptions",
+    },
+    subscription: {
+      title: "Subscription",
+      description:
+        "{{subCredits}} credits/month across {{modelCount}} AI models",
+      perYear: "/ year",
+      perMonth: "/ month",
+      yearlyEquivalent: "{{monthlyPrice}} / month when billed yearly",
+      button: "Subscribe Now",
+      buttonAlreadySubscribed: "You already have an active subscription",
+      features: {
+        credits: "{{count}} credits per month",
+        expiry: "Access to {{modelCount}}+ AI models",
+        bestFor: "Best for regular use",
+      },
+    },
+    login: "Sign In",
+    signup: "Sign Up Free",
   },
 
   // Page metadata

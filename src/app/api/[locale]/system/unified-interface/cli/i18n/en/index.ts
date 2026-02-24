@@ -2,6 +2,11 @@ import { translations as setupTranslations } from "../../setup/i18n/en";
 
 export const translations = {
   setup: setupTranslations,
+  request: "Request",
+  response: {
+    success: "Response",
+    error: "Error",
+  },
   auth: {
     errors: {
       userNotFound:
@@ -11,6 +16,7 @@ export const translations = {
     },
   },
   vibe: {
+    noFields: "No fields to display",
     startingUp: "Starting up Vibe CLI...",
     executeCommand: "Executing command",
     executing: "Executing",
@@ -91,6 +97,8 @@ export const translations = {
               noDataAvailable: "No data available",
               noIssuesFound: "No issues found",
               invalidDataFormat: "Invalid data format",
+              invalidFormType:
+                "Form context is not an Ink form state. Cannot render interactive input.",
               info: "Info",
               items: "items",
               andMoreItems: "and {{count}} more items",
@@ -103,6 +111,10 @@ export const translations = {
               errors: "Errors",
               warning: "Warning",
               warnings: "Warnings",
+            },
+            pagination: {
+              notImplemented:
+                "Pagination not implemented for CLI. Use filters to narrow results.",
             },
           },
         },

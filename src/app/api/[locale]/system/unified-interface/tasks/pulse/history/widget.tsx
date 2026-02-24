@@ -55,14 +55,24 @@ interface WidgetProps {
 
 const LIMIT = 50;
 
-type StatusFilter = "ALL" | "SUCCESS" | "FAILURE" | "TIMEOUT";
+type StatusFilter =
+  | "widget.filter.all"
+  | "widget.filter.success"
+  | "widget.filter.failure"
+  | "widget.filter.timeout";
 
 const STATUS_FILTER_KEYS: StatusFilter[] = [
-  "ALL",
-  "SUCCESS",
-  "FAILURE",
-  "TIMEOUT",
+  "widget.filter.all",
+  "widget.filter.success",
+  "widget.filter.failure",
+  "widget.filter.timeout",
 ];
+
+const FILTER_TO_PULSE_STATUS: Partial<Record<StatusFilter, string>> = {
+  "widget.filter.success": PulseExecutionStatus.SUCCESS,
+  "widget.filter.failure": PulseExecutionStatus.FAILURE,
+  "widget.filter.timeout": PulseExecutionStatus.TIMEOUT,
+};
 
 const STATUS_COLOR_MAP: Record<string, string> = {
   [PulseExecutionStatus.SUCCESS]:
@@ -227,7 +237,7 @@ function ExecutionCard({
   execution: Execution;
   isExpanded: boolean;
   onToggle: () => void;
-  t: ReturnType<typeof useWidgetTranslation>;
+  t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
 }): React.JSX.Element {
   const hasDetail =
     execution.tasksExecuted.length > 0 ||
@@ -261,33 +271,25 @@ function ExecutionCard({
           </Div>
           <Div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
             <Span>
-              {t(
-                "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.discovered",
-                { count: execution.totalTasksDiscovered },
-              )}
+              {t("widget.discovered", {
+                count: execution.totalTasksDiscovered,
+              })}
             </Span>
             {execution.tasksDue.length > 0 && (
               <Span>
-                {t(
-                  "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.due",
-                  { count: execution.tasksDue.length },
-                )}
+                {t("widget.due", { count: execution.tasksDue.length })}
               </Span>
             )}
             {execution.tasksSucceeded.length > 0 && (
               <Span className="text-green-600 dark:text-green-400">
-                {t(
-                  "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.succeeded",
-                  { count: execution.tasksSucceeded.length },
-                )}
+                {t("widget.succeeded", {
+                  count: execution.tasksSucceeded.length,
+                })}
               </Span>
             )}
             {execution.tasksFailed.length > 0 && (
               <Span className="text-red-600 dark:text-red-400">
-                {t(
-                  "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.failed",
-                  { count: execution.tasksFailed.length },
-                )}
+                {t("widget.failed", { count: execution.tasksFailed.length })}
               </Span>
             )}
           </Div>
@@ -302,9 +304,7 @@ function ExecutionCard({
             onClick={onToggle}
             className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground flex-shrink-0"
           >
-            {t(
-              "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.details",
-            )}
+            {t("widget.details")}
             {isExpanded ? (
               <ChevronUp className="h-3 w-3" />
             ) : (
@@ -318,30 +318,22 @@ function ExecutionCard({
       {isExpanded && hasDetail && (
         <Div className="border-t bg-muted/30 p-3 flex flex-col gap-2">
           <TaskList
-            label={t(
-              "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.tasksExecuted",
-            )}
+            label={t("widget.tasksExecuted")}
             tasks={execution.tasksExecuted}
             color="blue"
           />
           <TaskList
-            label={t(
-              "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.tasksSucceeded",
-            )}
+            label={t("widget.tasksSucceeded")}
             tasks={execution.tasksSucceeded}
             color="green"
           />
           <TaskList
-            label={t(
-              "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.tasksFailed",
-            )}
+            label={t("widget.tasksFailed")}
             tasks={execution.tasksFailed}
             color="red"
           />
           <TaskList
-            label={t(
-              "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.tasksSkipped",
-            )}
+            label={t("widget.tasksSkipped")}
             tasks={execution.tasksSkipped}
             color="muted"
           />
@@ -359,7 +351,7 @@ export function PulseHistoryContainer({
   field,
   fieldName,
 }: WidgetProps): React.JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof endpoints.GET>();
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
   const router = useRouter();
@@ -384,18 +376,18 @@ export function PulseHistoryContainer({
 
   const statusCounts = useMemo((): Record<StatusFilter, number> => {
     const counts: Record<StatusFilter, number> = {
-      ALL: executions.length,
-      SUCCESS: 0,
-      FAILURE: 0,
-      TIMEOUT: 0,
+      "widget.filter.all": executions.length,
+      "widget.filter.success": 0,
+      "widget.filter.failure": 0,
+      "widget.filter.timeout": 0,
     };
     for (const e of executions) {
       if (e.status === PulseExecutionStatus.SUCCESS) {
-        counts.SUCCESS++;
+        counts["widget.filter.success"]++;
       } else if (e.status === PulseExecutionStatus.FAILURE) {
-        counts.FAILURE++;
+        counts["widget.filter.failure"]++;
       } else if (e.status === PulseExecutionStatus.TIMEOUT) {
-        counts.TIMEOUT++;
+        counts["widget.filter.timeout"]++;
       }
     }
     return counts;
@@ -430,7 +422,10 @@ export function PulseHistoryContainer({
 
   const handleStatusFilterChange = useCallback(
     (filter: StatusFilter): void => {
-      const statusValue = filter === "ALL" ? "" : PulseExecutionStatus[filter];
+      const statusValue =
+        filter === "widget.filter.all"
+          ? ""
+          : (FILTER_TO_PULSE_STATUS[filter] ?? "");
       form?.setValue("status", statusValue);
       setExpandedId(null);
       endpointMutations?.read?.refetch?.();
@@ -445,9 +440,7 @@ export function PulseHistoryContainer({
         <NavigateButtonWidget field={children.backButton} />
 
         <Span className="font-semibold text-base mr-auto">
-          {t(
-            "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.title",
-          )}
+          {t("widget.title")}
           {totalCount > 0 && (
             <Span className="ml-2 text-sm text-muted-foreground font-normal">
               ({totalCount})
@@ -464,9 +457,7 @@ export function PulseHistoryContainer({
         >
           <Clock className="h-4 w-4" />
           <Span className="hidden sm:inline">
-            {t(
-              "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.header.cronHistory",
-            )}
+            {t("widget.header.cronHistory")}
           </Span>
         </Button>
 
@@ -478,11 +469,7 @@ export function PulseHistoryContainer({
           className="gap-1.5"
         >
           <BarChart3 className="h-4 w-4" />
-          <Span className="hidden sm:inline">
-            {t(
-              "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.header.stats",
-            )}
-          </Span>
+          <Span className="hidden sm:inline">{t("widget.header.stats")}</Span>
         </Button>
 
         <Button
@@ -490,9 +477,7 @@ export function PulseHistoryContainer({
           variant="ghost"
           size="sm"
           onClick={handleRefresh}
-          title={t(
-            "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.header.refresh",
-          )}
+          title={t("widget.header.refresh")}
         >
           <RefreshCw className="h-4 w-4" />
         </Button>
@@ -502,40 +487,30 @@ export function PulseHistoryContainer({
       {summary && (
         <Div className="grid grid-cols-2 sm:grid-cols-5 gap-2 px-4 py-3 border-b">
           <SummaryCard
-            label={t(
-              "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.summary.total",
-            )}
+            label={t("widget.summary.total")}
             value={summary.totalExecutions}
             icon={<Activity className="h-3.5 w-3.5 text-muted-foreground" />}
           />
           <SummaryCard
-            label={t(
-              "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.summary.successful",
-            )}
+            label={t("widget.summary.successful")}
             value={summary.successfulExecutions}
             icon={<CheckCircle className="h-3.5 w-3.5 text-green-500" />}
             variant="success"
           />
           <SummaryCard
-            label={t(
-              "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.summary.failed",
-            )}
+            label={t("widget.summary.failed")}
             value={summary.failedExecutions}
             icon={<XCircle className="h-3.5 w-3.5 text-red-500" />}
             variant="danger"
           />
           <SummaryCard
-            label={t(
-              "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.summary.successRate",
-            )}
+            label={t("widget.summary.successRate")}
             value={`${Math.round(summary.successRate)}%`}
             icon={<TrendingUp className="h-3.5 w-3.5 text-green-500" />}
             variant="success"
           />
           <SummaryCard
-            label={t(
-              "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.summary.avgDuration",
-            )}
+            label={t("widget.summary.avgDuration")}
             value={formatDuration(summary.averageDuration)}
             icon={<Clock className="h-3.5 w-3.5 text-muted-foreground" />}
           />
@@ -560,14 +535,12 @@ export function PulseHistoryContainer({
           {STATUS_FILTER_KEYS.map((filter) => (
             <StatusChip
               key={filter}
-              label={t(
-                `app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.filter.${filter.toLowerCase()}`,
-              )}
+              label={t(filter)}
               count={statusCounts[filter]}
               isActive={
-                filter === "ALL"
-                  ? !statusFilter || statusFilter === "ALL"
-                  : statusFilter === PulseExecutionStatus[filter]
+                filter === "widget.filter.all"
+                  ? !statusFilter || statusFilter === "widget.filter.all"
+                  : statusFilter === (FILTER_TO_PULSE_STATUS[filter] ?? "")
               }
               onClick={() => handleStatusFilterChange(filter)}
             />
@@ -589,9 +562,7 @@ export function PulseHistoryContainer({
             <Div className="flex flex-col items-center justify-center py-14 gap-3 text-center">
               <Activity className="h-8 w-8 text-muted-foreground" />
               <Span className="text-sm text-muted-foreground">
-                {t(
-                  "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.empty",
-                )}
+                {t("widget.empty")}
               </Span>
             </Div>
           ) : (
@@ -615,10 +586,11 @@ export function PulseHistoryContainer({
       {/* ── Pagination ── */}
       <Div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">
         <Span>
-          {t(
-            "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.pagination.info",
-            { page: currentPage, totalPages, total: totalCount },
-          )}
+          {t("widget.pagination.info", {
+            page: currentPage,
+            totalPages,
+            total: totalCount,
+          })}
         </Span>
         <Div className="flex gap-1">
           <Button
@@ -630,9 +602,7 @@ export function PulseHistoryContainer({
           >
             <ChevronLeft className="h-4 w-4" />
             <Span className="hidden sm:inline ml-1">
-              {t(
-                "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.pagination.prev",
-              )}
+              {t("widget.pagination.prev")}
             </Span>
           </Button>
           <Button
@@ -643,9 +613,7 @@ export function PulseHistoryContainer({
             onClick={() => handlePageChange(offset + LIMIT)}
           >
             <Span className="hidden sm:inline mr-1">
-              {t(
-                "app.api.system.unifiedInterface.tasks.pulseSystem.history.widget.pagination.next",
-              )}
+              {t("widget.pagination.next")}
             </Span>
             <ChevronRight className="h-4 w-4" />
           </Button>

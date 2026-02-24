@@ -30,7 +30,7 @@ export function ImapMessagesSyncContainer({
   fieldName,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
   const result = field.value;
 
   return (
@@ -38,9 +38,7 @@ export function ImapMessagesSyncContainer({
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
         <NavigateButtonWidget field={children.backButton} />
-        <Span className="font-semibold text-base">
-          {t("app.api.emails.imapClient.messages.sync.title")}
-        </Span>
+        <Span className="font-semibold text-base">{t("title")}</Span>
       </Div>
 
       <Div className="p-4 flex flex-col gap-6">
@@ -64,9 +62,7 @@ export function ImapMessagesSyncContainer({
         {/* Result */}
         {result !== null && result !== undefined && (
           <Div className="rounded-lg border p-4 flex flex-col gap-2">
-            <Span className="text-sm font-semibold">
-              {t("app.api.emails.imapClient.messages.sync.widget.result")}
-            </Span>
+            <Span className="text-sm font-semibold">{t("widget.result")}</Span>
             <Span className="text-sm">{result.message}</Span>
             <Div className="flex flex-col gap-1 mt-2">
               {[
@@ -79,18 +75,12 @@ export function ImapMessagesSyncContainer({
                   key={String(key)}
                   className="flex items-center justify-between text-sm"
                 >
-                  <Span className="text-muted-foreground">
-                    {t(
-                      `app.api.emails.imapClient.messages.sync.${String(key)}`,
-                    )}
-                  </Span>
+                  <Span className="text-muted-foreground">{t(key)}</Span>
                   <Span className="font-semibold">{String(val)}</Span>
                 </Div>
               ))}
               <Div className="flex items-center justify-between text-sm">
-                <Span className="text-muted-foreground">
-                  {t("app.api.emails.imapClient.messages.sync.duration")}
-                </Span>
+                <Span className="text-muted-foreground">{t("duration")}</Span>
                 <Span className="font-semibold">
                   {result.results.duration}
                   {"ms"}
@@ -112,9 +102,8 @@ export function ImapMessagesSyncContainer({
         <Div className="flex items-center justify-end pt-2">
           <SubmitButtonWidget
             field={{
-              text: "app.api.emails.imapClient.messages.sync.widget.submit",
-              loadingText:
-                "app.api.emails.imapClient.messages.sync.widget.submitting",
+              text: "widget.submit",
+              loadingText: "widget.submitting",
               icon: "refresh-cw",
               variant: "primary",
               size: "sm",

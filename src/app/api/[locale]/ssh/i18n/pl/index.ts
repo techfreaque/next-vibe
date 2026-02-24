@@ -252,6 +252,7 @@ export const translations = {
             description: "Wysokość terminala w wierszach",
           },
         },
+        disconnected: "Rozłączono",
         response: {
           sessionId: { title: "ID sesji" },
           status: { title: "Status" },

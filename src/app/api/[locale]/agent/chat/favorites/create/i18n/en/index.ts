@@ -18,6 +18,10 @@ export const translations = {
       label: "Create Favorite",
       loadingText: "Creating...",
     },
+    useWithoutSavingButton: {
+      label: "Use Without Saving",
+      loadingText: "Applying...",
+    },
     characterId: {
       label: "Character",
       description: "Select the character for this favorite",

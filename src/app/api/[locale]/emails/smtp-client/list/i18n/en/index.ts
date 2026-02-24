@@ -119,4 +119,50 @@ export const translations = {
     sent: "Sent",
     searchPlaceholder: "Search accounts...",
   },
+  enums: {
+    sortField: {
+      name: "Name",
+      status: "Status",
+      createdAt: "Created At",
+      updatedAt: "Updated At",
+      priority: "Priority",
+      totalEmailsSent: "Total Emails Sent",
+      lastUsedAt: "Last Used At",
+    },
+    sortOrder: {
+      asc: "Ascending",
+      desc: "Descending",
+    },
+    status: {
+      active: "Active",
+      inactive: "Inactive",
+      error: "Error",
+      testing: "Testing",
+    },
+    statusFilter: {
+      all: "All Statuses",
+    },
+    healthStatus: {
+      healthy: "Healthy",
+      degraded: "Degraded",
+      unhealthy: "Unhealthy",
+      unknown: "Unknown",
+    },
+    healthStatusFilter: {
+      all: "All Health Statuses",
+    },
+    campaignType: {
+      leadCampaign: "Lead Campaign",
+      newsletter: "Newsletter",
+      signupNurture: "Signup Nurture",
+      retention: "Retention",
+      winback: "Winback",
+      transactional: "Transactional",
+      notification: "Notification",
+      system: "System",
+    },
+    campaignTypeFilter: {
+      all: "All Campaign Types",
+    },
+  },
 };

@@ -36,7 +36,7 @@ export function SmtpEditContainer({
   fieldName,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.PUT>();
   const isLoading = field.value === null || field.value === undefined;
 
   return (
@@ -44,9 +44,7 @@ export function SmtpEditContainer({
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
         <NavigateButtonWidget field={children.backButton} />
-        <Span className="font-semibold text-base">
-          {t("app.api.emails.smtpClient.edit.id.put.title")}
-        </Span>
+        <Span className="font-semibold text-base">{t("put.title")}</Span>
       </Div>
 
       {isLoading ? (
@@ -60,7 +58,7 @@ export function SmtpEditContainer({
           {/* Account Information */}
           <Div className="flex flex-col gap-3">
             <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              {t("app.api.emails.smtpClient.edit.id.put.container.title")}
+              {t("put.container.title")}
             </Span>
             <TextFieldWidget
               fieldName={`${fieldName}.name`}
@@ -75,7 +73,7 @@ export function SmtpEditContainer({
           {/* Server Configuration */}
           <Div className="flex flex-col gap-3">
             <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              {t("app.api.emails.smtpClient.edit.id.fields.host.label")}
+              {t("fields.host.label")}
             </Span>
             <TextFieldWidget
               fieldName={`${fieldName}.host`}
@@ -96,7 +94,7 @@ export function SmtpEditContainer({
           {/* Authentication */}
           <Div className="flex flex-col gap-3">
             <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              {t("app.api.emails.smtpClient.edit.id.fields.username.label")}
+              {t("fields.username.label")}
             </Span>
             <Div className="grid grid-cols-2 gap-3">
               <TextFieldWidget
@@ -113,7 +111,7 @@ export function SmtpEditContainer({
           {/* Email + Priority */}
           <Div className="flex flex-col gap-3">
             <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              {t("app.api.emails.smtpClient.edit.id.fields.fromEmail.label")}
+              {t("fields.fromEmail.label")}
             </Span>
             <Div className="grid grid-cols-2 gap-3">
               <EmailFieldWidget
@@ -130,9 +128,7 @@ export function SmtpEditContainer({
           {/* Targeting */}
           <Div className="flex flex-col gap-3">
             <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              {t(
-                "app.api.emails.smtpClient.edit.id.fields.campaignTypes.label",
-              )}
+              {t("fields.campaignTypes.label")}
             </Span>
             <Div className="grid grid-cols-2 gap-3">
               <MultiSelectFieldWidget
@@ -162,8 +158,8 @@ export function SmtpEditContainer({
           <Div className="flex items-center justify-end pt-2">
             <SubmitButtonWidget
               field={{
-                text: "app.api.emails.smtpClient.edit.id.put.title",
-                loadingText: "app.api.emails.smtpClient.edit.id.put.title",
+                text: "put.title",
+                loadingText: "put.title",
                 icon: "save",
                 variant: "primary",
                 size: "sm",

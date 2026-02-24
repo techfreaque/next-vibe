@@ -30,7 +30,7 @@ export function AlertWidgetInk<
       >,
 ): JSX.Element {
   const { field } = props;
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const { content, variant = "default" } = field;
 
   const message = content ? t(content) : field.value;

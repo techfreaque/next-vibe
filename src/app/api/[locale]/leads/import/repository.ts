@@ -21,6 +21,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import type { Countries, CountryLanguage, Languages } from "@/i18n/core/config";
+import { getLocaleFromLanguageAndCountry } from "@/i18n/core/language-utils";
 
 import type { scopedTranslation as importScopedTranslation } from "../../import/i18n";
 import { importRepository } from "../../import/repository";
@@ -269,10 +270,13 @@ export class LeadsImportRepository implements DomainImportRepository<LeadRecord>
   validateCsvRow(
     row: Record<string, string>,
     config: CsvImportConfig,
-    locale: CountryLanguage,
   ): CsvRowValidationResult {
     const errors: ErrorResponseType[] = [];
     const data: Record<string, string | number | boolean | null> = {};
+    const locale = getLocaleFromLanguageAndCountry(
+      config.defaultLanguage,
+      config.defaultCountry,
+    );
     const t = scopedTranslation.scopedT(locale).t;
 
     // Email is required
@@ -333,7 +337,6 @@ export class LeadsImportRepository implements DomainImportRepository<LeadRecord>
     data: LeadRecord,
     config: CsvImportConfig,
     logger: EndpointLogger,
-    locale: CountryLanguage,
   ): Promise<
     ResponseType<{ created: boolean; updated: boolean; duplicate: boolean }>
   > {
@@ -434,6 +437,10 @@ export class LeadsImportRepository implements DomainImportRepository<LeadRecord>
       });
     } catch (error) {
       logger.error("Error creating/updating lead", parseError(error));
+      const locale = getLocaleFromLanguageAndCountry(
+        config.defaultLanguage,
+        config.defaultCountry,
+      );
       const t = scopedTranslation.scopedT(locale).t;
       return fail({
         message: t("post.errors.server.title"),

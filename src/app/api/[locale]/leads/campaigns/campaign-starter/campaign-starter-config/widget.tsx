@@ -44,7 +44,7 @@ export function CampaignStarterConfigContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.PUT>();
   const locale = useWidgetLocale();
   const form = useWidgetForm<typeof definition.PUT>();
 
@@ -64,20 +64,12 @@ export function CampaignStarterConfigContainer({
             <Settings className="h-5 w-5 text-muted-foreground" />
           )}
           <Span className="font-semibold text-base">
-            {hasBeenSaved
-              ? t(
-                  "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.widget.titleSaved",
-                )
-              : t(
-                  "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.widget.title",
-                )}
+            {hasBeenSaved ? t("widget.titleSaved") : t("widget.title")}
           </Span>
         </Div>
         {isPending && (
           <Span className="text-xs text-muted-foreground animate-pulse">
-            {t(
-              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.widget.saving",
-            )}
+            {t("widget.saving")}
           </Span>
         )}
       </Div>
@@ -89,14 +81,10 @@ export function CampaignStarterConfigContainer({
             <Rocket className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
             <Div className="flex flex-col gap-1">
               <Span className="text-sm font-medium">
-                {t(
-                  "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.widget.guidanceTitle",
-                )}
+                {t("widget.guidanceTitle")}
               </Span>
               <Span className="text-xs text-muted-foreground">
-                {t(
-                  "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.widget.guidanceDescription",
-                )}
+                {t("widget.guidanceDescription")}
               </Span>
             </Div>
           </Div>
@@ -128,14 +116,10 @@ export function CampaignStarterConfigContainer({
         {/* Leads per week — one number input per locale */}
         <Div className="flex flex-col gap-1.5">
           <Span className="text-sm font-medium">
-            {t(
-              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.leadsPerWeek.label",
-            )}
+            {t("post.leadsPerWeek.label")}
           </Span>
           <Span className="text-xs text-muted-foreground">
-            {t(
-              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.leadsPerWeek.description",
-            )}
+            {t("post.leadsPerWeek.description")}
           </Span>
           <Div className="flex flex-col gap-2">
             {Object.values(CountryLanguageValues).map((loc) => (
@@ -164,14 +148,10 @@ export function CampaignStarterConfigContainer({
         {/* Schedule — ScheduleAutocomplete */}
         <Div className="flex flex-col gap-1.5">
           <Span className="text-sm font-medium">
-            {t(
-              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.schedule.label",
-            )}
+            {t("post.schedule.label")}
           </Span>
           <Span className="text-xs text-muted-foreground">
-            {t(
-              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.schedule.description",
-            )}
+            {t("post.schedule.description")}
           </Span>
           <ScheduleAutocomplete
             value={form?.watch("schedule") ?? ""}
@@ -190,9 +170,8 @@ export function CampaignStarterConfigContainer({
         <NumberFieldWidget fieldName="retryDelay" field={children.retryDelay} />
         <SubmitButtonWidget
           field={{
-            text: "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.post.success.title",
-            loadingText:
-              "app.api.leads.campaigns.campaignStarter.campaignStarterConfig.widget.saving",
+            text: "post.success.title",
+            loadingText: "widget.saving",
             icon: "save",
             variant: "primary",
           }}

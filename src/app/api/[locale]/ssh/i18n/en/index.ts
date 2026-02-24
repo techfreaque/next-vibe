@@ -237,6 +237,7 @@ export const translations = {
             description: "Terminal height in rows",
           },
         },
+        disconnected: "Disconnected",
         response: {
           sessionId: { title: "Session ID" },
           status: { title: "Status" },

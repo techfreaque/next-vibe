@@ -96,7 +96,7 @@ export function CharacterEditContainer({
 }: PatchWidgetProps): React.JSX.Element {
   const children = field.children;
   const navigation = useWidgetNavigation();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definitionPatch.PATCH>();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
@@ -141,16 +141,15 @@ export function CharacterEditContainer({
             className="ml-auto"
           >
             <Trash2 className="h-4 w-4" />
-            {/* {t("app.api.agent.chat.characters.id.patch.deleteButton.label")} */}
+            {/* {t("patch.deleteButton.label")} */}
           </Button>
         )}
 
         {/* Submit Button */}
         <SubmitButtonWidget
           field={{
-            text: "app.api.agent.chat.characters.id.patch.submitButton.label",
-            loadingText:
-              "app.api.agent.chat.characters.id.patch.submitButton.loadingText",
+            text: "patch.submitButton.label",
+            loadingText: "patch.submitButton.loadingText",
             icon: "save",
             variant: "primary",
             className:
@@ -229,7 +228,7 @@ export function CharacterViewContainer({
   const context = useWidgetContext();
   const { logger, user } = context;
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definitionGet.GET>();
   const modelSelection = field.value?.modelSelection;
   const characterOwnership = field.value?.characterOwnership;
   const characterId = navigation?.current?.params?.urlPathParams?.id as
@@ -273,9 +272,7 @@ export function CharacterViewContainer({
               <Div className="flex items-start gap-4 p-4 cursor-pointer hover:bg-accent transition-colors">
                 <Div className="flex-1 flex items-center justify-between">
                   <Div className="text-base font-bold">
-                    {t(
-                      "app.api.agent.chat.characters.id.get.systemPrompt.label",
-                    )}
+                    {t("get.systemPrompt.label")}
                   </Div>
                   <ChevronDown
                     className={cn(
@@ -476,7 +473,7 @@ export function CharacterCard({
               ) : (
                 <Zap className="h-4 w-4" />
               )}
-              {t("app.api.agent.chat.characters.id.get.quickAdd")}
+              {t("get.quickAdd")}
             </Button>
           )}
           <CustomizeAndAddButton
@@ -508,7 +505,7 @@ export function CharacterCard({
                 onClick={handleDelete}
               >
                 <Trash2 className="h-4 w-4" />
-                {t("app.api.agent.chat.characters.id.get.delete")}
+                {t("get.delete")}
               </Button>
             </>
           ) : (
@@ -643,7 +640,7 @@ function CustomizeAndAddButton({
       ) : (
         <Plus className={iconSize} />
       )}
-      {!iconOnly && t("app.api.agent.chat.characters.id.get.tweakAndAdd")}
+      {!iconOnly && t("get.tweakAndAdd")}
     </Button>
   );
 }
@@ -709,12 +706,7 @@ function EditCharacterButton({
       ) : (
         <Pencil className={iconSize} />
       )}
-      {!iconOnly &&
-        t(
-          isOwner
-            ? "app.api.agent.chat.characters.id.get.edit"
-            : "app.api.agent.chat.characters.id.get.copyAndCustomize",
-        )}
+      {!iconOnly && t(isOwner ? "get.edit" : "get.copyAndCustomize")}
     </Button>
   );
 }

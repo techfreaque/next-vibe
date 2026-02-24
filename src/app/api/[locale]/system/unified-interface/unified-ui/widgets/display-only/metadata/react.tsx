@@ -11,8 +11,8 @@ import type {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 import {
+  useWidgetContext,
   useWidgetForm,
-  useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { MetadataWidgetConfig, MetadataWidgetSchema } from "./types";
@@ -37,7 +37,9 @@ import type { MetadataWidgetConfig, MetadataWidgetSchema } from "./types";
  */
 export function MetadataWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
 >(
   props:
@@ -52,8 +54,8 @@ export function MetadataWidget<
         MetadataWidgetConfig<TKey, MetadataWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
-  const t = useWidgetTranslation();
   const form = useWidgetForm();
+  const { t } = useWidgetContext();
   const { field } = props;
   const fieldName = "fieldName" in props ? props.fieldName : undefined;
   const usage = "usage" in field ? field.usage : undefined;

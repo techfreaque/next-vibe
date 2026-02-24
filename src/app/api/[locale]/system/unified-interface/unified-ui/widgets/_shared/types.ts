@@ -142,7 +142,10 @@ export interface BaseWidgetContext<TEndpoint extends CreateApiEndpointAny> {
    * Automatically falls back to global translation if no scoped translation is defined
    * Widgets should ALWAYS use context.t for all translations
    */
-  t: <K extends string>(key: K, params?: TParams) => TranslatedKeyType;
+  t: (
+    key: TEndpoint["scopedTranslation"]["ScopedTranslationKey"],
+    params?: TParams,
+  ) => TranslatedKeyType;
   /**
    * Endpoint mutations available for widgets to trigger directly
    * Widgets can call these methods to perform CRUD operations

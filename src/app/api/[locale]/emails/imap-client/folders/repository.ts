@@ -142,7 +142,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
   ): Promise<ResponseType<ImapFoldersListResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      logger.debug("app.api.emails.imapClient.folders.list.info.start", {
+      logger.debug("Listing IMAP folders", {
         accountId: data.accountId,
         userId: user.id,
       });
@@ -222,10 +222,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         },
       });
     } catch (error) {
-      logger.error(
-        "app.api.emails.imapClient.folders.list.error.server",
-        parseError(error),
-      );
+      logger.error("Failed to list IMAP folders", parseError(error));
       return fail({
         message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -245,7 +242,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
   ): Promise<ResponseType<ImapFoldersListResponseOutput["folders"][number]>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      logger.debug("app.api.emails.imapClient.folders.get.info.start", {
+      logger.debug("Getting IMAP folder by ID", {
         id: data.id,
         userId: user.id,
       });
@@ -265,10 +262,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
 
       return success(this.formatFolderResponse(folder));
     } catch (error) {
-      logger.error(
-        "app.api.emails.imapClient.folders.get.error.server",
-        parseError(error),
-      );
+      logger.error("Error fetching IMAP folder", parseError(error));
       return fail({
         message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -287,7 +281,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
   ): Promise<ResponseType<FoldersSyncResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      logger.debug("app.api.emails.imapClient.folders.sync.info.start", {
+      logger.debug("Syncing IMAP folders for account", {
         accountId: data.accountId,
       });
 
@@ -350,10 +344,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     } catch (error) {
-      logger.error(
-        "app.api.emails.imapClient.folders.sync.error.server",
-        parseError(error),
-      );
+      logger.error("Failed to sync IMAP folders", parseError(error));
       return fail({
         message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -373,7 +364,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
   ): Promise<ResponseType<ImapFoldersListResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      logger.debug("app.api.emails.imapClient.folders.byAccount.info.start", {
+      logger.debug("Getting IMAP folders by account", {
         accountId: data.accountId,
         userId: user.id,
       });
@@ -394,10 +385,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
         },
       });
     } catch (error) {
-      logger.error(
-        "app.api.emails.imapClient.folders.byAccount.error.server",
-        parseError(error),
-      );
+      logger.error("Failed to get IMAP folders by account", parseError(error));
       return fail({
         message: t("errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -419,14 +407,11 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
   ): Promise<ResponseType<{ success: boolean }>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      logger.debug(
-        "app.api.emails.imapClient.folders.updateSyncStatus.info.start",
-        {
-          folderId,
-          syncStatus,
-          userId: user.id,
-        },
-      );
+      logger.debug("Updating IMAP folder sync status", {
+        folderId,
+        syncStatus,
+        userId: user.id,
+      });
 
       const [updatedFolder] = await db
         .update(imapFolders)
@@ -449,7 +434,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
       return success({ success: true });
     } catch (error) {
       logger.error(
-        "app.api.emails.imapClient.folders.updateSyncStatus.error.server",
+        "Failed to update IMAP folder sync status",
         parseError(error),
       );
       return fail({
@@ -472,14 +457,11 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
   ): Promise<ResponseType<{ success: boolean }>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      logger.debug(
-        "app.api.emails.imapClient.folders.updateCounts.info.start",
-        {
-          folderId,
-          counts,
-          userId: user.id,
-        },
-      );
+      logger.debug("Updating IMAP folder message counts", {
+        folderId,
+        counts,
+        userId: user.id,
+      });
 
       const [updatedFolder] = await db
         .update(imapFolders)
@@ -501,7 +483,7 @@ class ImapFoldersRepositoryImpl implements ImapFoldersRepository {
       return success({ success: true });
     } catch (error) {
       logger.error(
-        "app.api.emails.imapClient.folders.updateCounts.error.server",
+        "Failed to update IMAP folder message counts",
         parseError(error),
       );
       return fail({

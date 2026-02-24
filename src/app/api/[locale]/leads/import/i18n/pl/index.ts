@@ -26,7 +26,7 @@ export const translations: typeof enTranslations = {
     fileName: {
       label: "Nazwa pliku",
       description: "Nazwa pliku CSV",
-      placeholder: "app.api.leads.csv",
+      placeholder: "leads.csv",
       helpText: "Podaj opisową nazwę pliku",
     },
     skipDuplicates: {
@@ -222,6 +222,27 @@ export const translations: typeof enTranslations = {
         title: "Przetwarzanie importu zakończone",
         description: "Zadania importu zostały pomyślnie przetworzone",
       },
+    },
+  },
+  widget: {
+    header: {
+      title: "Zadania importu",
+      newImport: "Nowy import",
+    },
+    filter: {
+      all: "Wszystkie",
+      completed: "Zako\u0144czone",
+      failed: "Nieudane",
+      pending: "Oczekuj\u0105ce",
+      running: "W trakcie",
+    },
+    loading: "Wczytywanie zada\u0144 importu\u2026",
+    empty: {
+      title: "Nie znaleziono zada\u0144 importu",
+      withFilter: "Spr\u00f3buj innego filtru lub rozpocznij nowy import.",
+      withoutFilter:
+        "Rozpocznij sw\u00f3j pierwszy import, aby zobaczy\u0107 go tutaj.",
+      newImport: "Nowy import",
     },
   },
   jobs: jobsTranslations,

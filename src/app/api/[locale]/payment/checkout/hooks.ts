@@ -55,13 +55,13 @@ export function useSubscriptionCheckout(
       responseData: CheckoutResponseOutput;
     }) => {
       try {
-        logger.debug("app.api.payment.checkout.onSuccess.start");
+        logger.debug("Payment checkout success callback triggered");
 
         // Handle redirect to Stripe checkout
         const redirected = handleCheckoutRedirect(
           { success: true, data: data.responseData },
           (errorMessage) => {
-            logger.error("app.api.payment.checkout.redirect.failed", {
+            logger.error("Stripe checkout redirect failed", {
               error: errorMessage,
             });
             toast({
@@ -73,13 +73,10 @@ export function useSubscriptionCheckout(
         );
 
         if (!redirected) {
-          logger.error("app.api.payment.checkout.redirect.failed");
+          logger.error("Stripe checkout redirect returned false");
         }
       } catch (error) {
-        logger.error(
-          "app.api.payment.checkout.process.failed",
-          parseError(error),
-        );
+        logger.error("Payment checkout processing failed", parseError(error));
         toast({
           title: t("app.common.error.title"),
           description: t("app.common.error.description"),
@@ -97,7 +94,7 @@ export function useSubscriptionCheckout(
       requestData: CheckoutRequestOutput;
       pathParams: Record<string, never>;
     }) => {
-      logger.error("app.api.payment.checkout.error", parseError(data.error));
+      logger.error("Payment checkout endpoint error", parseError(data.error));
       // Toast is handled by useEndpoint's alert system
     },
     [logger],

@@ -260,6 +260,7 @@ export function useIncognitoChat(
         depth: 0,
         sequenceId: null,
         authorId: "incognito",
+        authorName: null,
         isAI: role === "assistant",
         model,
         character,

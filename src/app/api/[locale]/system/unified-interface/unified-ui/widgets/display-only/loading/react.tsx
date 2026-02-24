@@ -55,7 +55,9 @@ import type { LoadingWidgetConfig } from "./types";
  */
 export function LoadingWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
 >({
   field,
@@ -64,7 +66,7 @@ export function LoadingWidget<
   TUsage,
   LoadingWidgetConfig<TKey, TUsage, "widget">
 >): JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<TEndpoint>();
   const {
     padding,
     gap,

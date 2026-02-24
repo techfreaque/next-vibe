@@ -11,6 +11,11 @@ export const translations = {
   get: {
     title: "Get Import Job",
     description: "Get details of a specific import job",
+    actions: {
+      retry: "Retry",
+      stop: "Stop",
+      viewLeads: "View Leads",
+    },
     jobId: {
       label: "Job ID",
       description: "Unique identifier for the import job",
@@ -356,18 +361,32 @@ export const translations = {
       created: "Created",
       started: "Started",
       completed: "Completed",
+      jobStatus: {
+        enums: {
+          csvImportJobStatus: {
+            pending: "Pending",
+            processing: "Processing",
+            completed: "Completed",
+            failed: "Failed",
+          },
+        },
+      },
     },
     retry: {
       title: "Retry Import Job",
       loadingRetrying: "Retrying job…",
       successMessage: "Job Retried Successfully",
       failureMessage: "Retry Failed",
+      viewJobStatus: "View Job Status",
+      viewLeads: "View Leads",
     },
     stop: {
       title: "Stop Import Job",
       loadingStopping: "Stopping job…",
       successMessage: "Job Stopped Successfully",
       failureMessage: "Stop Failed",
+      viewLeads: "View Leads",
+      startNewImport: "Start New Import",
     },
   },
 };

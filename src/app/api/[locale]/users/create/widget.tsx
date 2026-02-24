@@ -58,7 +58,7 @@ export function UserCreateContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const data = field.value;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
   const router = useRouter();
   const locale = useWidgetLocale();
 
@@ -115,7 +115,7 @@ export function UserCreateContainer({
           <Div className="flex items-center gap-2 mr-auto">
             <CheckCircle className="h-5 w-5 text-green-500" />
             <Span className="font-semibold text-base">
-              {t("app.api.users.create.widget.headerCreated")}
+              {t("widget.headerCreated")}
             </Span>
           </Div>
         </Div>
@@ -149,13 +149,13 @@ export function UserCreateContainer({
                 )}
                 {isActive && (
                   <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
-                    {t("app.api.users.create.widget.activeBadge")}
+                    {t("widget.activeBadge")}
                   </Span>
                 )}
                 {emailVerified && (
                   <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
                     <Mail className="h-3 w-3" />
-                    {t("app.api.users.create.widget.verifiedBadge")}
+                    {t("widget.verifiedBadge")}
                   </Span>
                 )}
               </Div>
@@ -205,7 +205,7 @@ export function UserCreateContainer({
               <Div className="flex flex-wrap gap-3 mt-2 text-xs text-muted-foreground items-center">
                 {createdAt && (
                   <Span>
-                    {t("app.api.users.create.widget.createdPrefix")}{" "}
+                    {t("widget.createdPrefix")}{" "}
                     {formatSimpleDate(createdAt, locale)}
                   </Span>
                 )}
@@ -218,8 +218,8 @@ export function UserCreateContainer({
                       type="button"
                       title={
                         idCopied
-                          ? t("app.api.users.create.widget.copiedTooltip")
-                          : t("app.api.users.create.widget.copyUserIdTooltip")
+                          ? t("widget.copiedTooltip")
+                          : t("widget.copyUserIdTooltip")
                       }
                       onClick={() => {
                         handleCopyId(userId);
@@ -233,8 +233,8 @@ export function UserCreateContainer({
                     >
                       <Copy className="h-3 w-3" />
                       {idCopied
-                        ? t("app.api.users.create.widget.copiedButton")
-                        : t("app.api.users.create.widget.copyIdButton")}
+                        ? t("widget.copiedButton")
+                        : t("widget.copyIdButton")}
                     </Button>
                   </Div>
                 )}
@@ -255,7 +255,7 @@ export function UserCreateContainer({
                   }}
                 >
                   <UserPlus className="h-4 w-4" />
-                  {t("app.api.users.create.widget.viewUserButton")}
+                  {t("widget.viewUserButton")}
                 </Button>
                 <Button
                   type="button"
@@ -265,7 +265,7 @@ export function UserCreateContainer({
                   }}
                 >
                   <UserCheck className="h-4 w-4" />
-                  {t("app.api.users.create.widget.fullProfileButton")}
+                  {t("widget.fullProfileButton")}
                 </Button>
               </Div>
 
@@ -278,7 +278,7 @@ export function UserCreateContainer({
                 }}
               >
                 <History className="h-4 w-4 text-muted-foreground" />
-                {t("app.api.users.create.widget.creditHistoryButton")}
+                {t("widget.creditHistoryButton")}
                 <ExternalLink className="h-3.5 w-3.5 text-muted-foreground ml-auto" />
               </Button>
             </Div>
@@ -294,7 +294,7 @@ export function UserCreateContainer({
             onClick={handleCreateAnother}
           >
             <RotateCcw className="h-4 w-4" />
-            {t("app.api.users.create.widget.createAnotherButton")}
+            {t("widget.createAnotherButton")}
           </Button>
         </Div>
       </Div>
@@ -310,11 +310,11 @@ export function UserCreateContainer({
         <Div className="flex items-center gap-2 mr-auto">
           <UserPlus className="h-5 w-5 text-muted-foreground" />
           <Span className="font-semibold text-base">
-            {t("app.api.users.create.widget.headerCreate")}
+            {t("widget.headerCreate")}
           </Span>
         </Div>
         <Span className="text-xs text-muted-foreground hidden sm:block">
-          {t("app.api.users.create.widget.headerSubtitle")}
+          {t("widget.headerSubtitle")}
         </Span>
       </Div>
     </Div>

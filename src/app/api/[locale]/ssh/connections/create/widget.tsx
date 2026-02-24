@@ -16,8 +16,10 @@ import {
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
+import type endpoints from "./definition";
+
 export function ConnectionCreateContainer(): React.JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof endpoints.POST>();
   const onSubmit = useWidgetOnSubmit();
   const { endpointMutations } = useWidgetContext();
   const isLoading = endpointMutations?.read?.isLoading ?? false;
@@ -31,7 +33,7 @@ export function ConnectionCreateContainer(): React.JSX.Element {
       <Div className="flex items-center gap-2 px-4 py-3 border-b">
         <Plus className="h-4 w-4 text-muted-foreground" />
         <Span className="font-semibold text-sm mr-auto">
-          {t("app.api.ssh.connections.create.widget.title")}
+          {t("widget.title")}
         </Span>
         <Button
           type="button"
@@ -39,9 +41,7 @@ export function ConnectionCreateContainer(): React.JSX.Element {
           onClick={handleCreate}
           disabled={isLoading}
         >
-          {isLoading
-            ? t("app.api.ssh.connections.create.widget.creating")
-            : t("app.api.ssh.connections.create.widget.createButton")}
+          {isLoading ? t("widget.creating") : t("widget.createButton")}
         </Button>
       </Div>
     </Div>

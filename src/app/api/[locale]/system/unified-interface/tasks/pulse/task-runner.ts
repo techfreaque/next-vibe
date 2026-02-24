@@ -20,16 +20,17 @@ import {
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { TasksTranslationKey } from "../i18n";
 import type { TaskRunner } from "../unified-runner/types";
 
 /**
  * Pulse Task Runner Implementation
  * Calls the pulse repository every minute to trigger scheduled tasks
  */
-const pulseTaskRunner: TaskRunner = {
+const pulseTaskRunner: TaskRunner<TasksTranslationKey> = {
   type: "task-runner",
-  name: "pulse-runner",
-  description: "app.api.system.unifiedInterface.tasks.pulseRunner.description",
+  name: "pulseRunner.name",
+  description: "pulseRunner.description",
   category: TaskCategory.SYSTEM,
   enabled: true,
   priority: CronTaskPriority.HIGH,
@@ -151,6 +152,6 @@ const pulseTaskRunner: TaskRunner = {
 /**
  * Export task runners for discovery
  */
-export const taskRunners: TaskRunner[] = [pulseTaskRunner];
+export const taskRunners: TaskRunner<string>[] = [pulseTaskRunner];
 
 export default taskRunners;

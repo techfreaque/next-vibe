@@ -61,7 +61,9 @@ function mapStatusToBadgeVariant(
  */
 export function StatusIndicatorWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TSchema extends StatusIndicatorWidgetSchema,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive",
@@ -73,7 +75,7 @@ export function StatusIndicatorWidget<
   TUsage,
   StatusIndicatorWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
 >): JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<TEndpoint>();
   const form = useWidgetForm();
   const { status, label, className, usage } = field;
 

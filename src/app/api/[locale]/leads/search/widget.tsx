@@ -74,17 +74,17 @@ const STATUS_COLORS: Record<string, string> = {
 
 // Status label i18n keys for filter chips (concise)
 const STATUS_LABEL_KEYS: Record<string, string> = {
-  NEW: "app.api.leads.search.widget.statusNew",
-  PENDING: "app.api.leads.search.widget.statusPending",
-  CAMPAIGN_RUNNING: "app.api.leads.search.widget.statusCampaign",
-  WEBSITE_USER: "app.api.leads.search.widget.statusWebUser",
-  NEWSLETTER_SUBSCRIBER: "app.api.leads.search.widget.statusNewsletter",
-  IN_CONTACT: "app.api.leads.search.widget.statusInContact",
-  SIGNED_UP: "app.api.leads.search.widget.statusSignedUp",
-  SUBSCRIPTION_CONFIRMED: "app.api.leads.search.widget.statusSubscribed",
-  UNSUBSCRIBED: "app.api.leads.search.widget.statusUnsub",
-  BOUNCED: "app.api.leads.search.widget.statusBounced",
-  INVALID: "app.api.leads.search.widget.statusInvalid",
+  NEW: "widget.statusNew",
+  PENDING: "widget.statusPending",
+  CAMPAIGN_RUNNING: "widget.statusCampaign",
+  WEBSITE_USER: "widget.statusWebUser",
+  NEWSLETTER_SUBSCRIBER: "widget.statusNewsletter",
+  IN_CONTACT: "widget.statusInContact",
+  SIGNED_UP: "widget.statusSignedUp",
+  SUBSCRIPTION_CONFIRMED: "widget.statusSubscribed",
+  UNSUBSCRIBED: "widget.statusUnsub",
+  BOUNCED: "widget.statusBounced",
+  INVALID: "widget.statusInvalid",
 };
 
 // ─── Bar colour helper ─────────────────────────────────────────────────────────
@@ -204,7 +204,7 @@ export function LeadsSearchContainer({
   const onSubmit = useWidgetOnSubmit();
   const isLoading = endpointMutations?.read?.isLoading ?? false;
 
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
 
   const leads = data?.response?.leads ?? [];
   const total = data?.response?.total ?? 0;
@@ -294,9 +294,7 @@ export function LeadsSearchContainer({
         <NavigateButtonWidget field={children.backButton} />
         <Div className="flex items-center gap-2 mr-auto">
           <Search className="h-4 w-4 text-muted-foreground" />
-          <Span className="font-semibold text-base">
-            {t("app.api.leads.search.widget.title")}
-          </Span>
+          <Span className="font-semibold text-base">{t("widget.title")}</Span>
           {total > 0 && (
             <Span className="text-sm text-muted-foreground font-normal">
               ({total}
@@ -316,8 +314,8 @@ export function LeadsSearchContainer({
         </Div>
         <SubmitButtonWidget
           field={{
-            text: "app.api.leads.search.get.search.label",
-            loadingText: "app.api.leads.search.get.search.label",
+            text: "get.search.label",
+            loadingText: "get.search.label",
             icon: "search",
             variant: "primary",
           }}
@@ -331,7 +329,7 @@ export function LeadsSearchContainer({
         {presentStatuses.length > 1 && (
           <Div className="flex flex-wrap items-center gap-1.5 pt-3 pb-1">
             <Span className="text-xs text-muted-foreground mr-0.5">
-              {t("app.api.leads.search.widget.filterLabel")}
+              {t("widget.filterLabel")}
             </Span>
             {presentStatuses.map((status) => {
               const isActive = activeStatuses.has(status);
@@ -362,7 +360,7 @@ export function LeadsSearchContainer({
                 onClick={clearStatusFilter}
                 className="text-xs text-muted-foreground hover:text-foreground underline ml-1"
               >
-                {t("app.api.leads.search.widget.clearFilter")}
+                {t("widget.clearFilter")}
               </Button>
             )}
           </Div>
@@ -385,10 +383,10 @@ export function LeadsSearchContainer({
             </Div>
             <Div className="flex flex-col gap-1">
               <Span className="text-sm font-medium">
-                {t("app.api.leads.search.widget.noResultsTitle")}
+                {t("widget.noResultsTitle")}
               </Span>
               <Span className="text-xs text-muted-foreground">
-                {t("app.api.leads.search.widget.noResultsSubtitle")}
+                {t("widget.noResultsSubtitle")}
               </Span>
             </Div>
             <Button
@@ -399,7 +397,7 @@ export function LeadsSearchContainer({
               onClick={handleCreateLead}
             >
               <Plus className="h-3.5 w-3.5" />
-              {t("app.api.leads.search.widget.createLead")}
+              {t("widget.createLead")}
             </Button>
           </Div>
         )}
@@ -407,13 +405,13 @@ export function LeadsSearchContainer({
         {/* No results after client-side filter */}
         {!isLoading && leads.length > 0 && filteredLeads.length === 0 && (
           <Div className="text-center text-muted-foreground py-8 text-sm">
-            {t("app.api.leads.search.widget.noLeadsMatchFilter")}{" "}
+            {t("widget.noLeadsMatchFilter")}{" "}
             <Button
               type="button"
               className="underline"
               onClick={clearStatusFilter}
             >
-              {t("app.api.leads.search.widget.clearFilters")}
+              {t("widget.clearFilters")}
             </Button>
           </Div>
         )}
@@ -473,7 +471,7 @@ export function LeadsSearchContainer({
                       {lead.convertedUserId && (
                         <Span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-500 text-white dark:bg-green-600">
                           <Check className="h-3 w-3" />
-                          {t("app.api.leads.search.widget.converted")}
+                          {t("widget.converted")}
                         </Span>
                       )}
 
@@ -490,9 +488,7 @@ export function LeadsSearchContainer({
                       {lead.email && (
                         <CopyEmail
                           email={lead.email}
-                          copyEmailTitle={t(
-                            "app.api.leads.search.widget.copyEmailTitle",
-                          )}
+                          copyEmailTitle={t("widget.copyEmailTitle")}
                         />
                       )}
                       {lead.country && <Span>{lead.country}</Span>}
@@ -513,22 +509,19 @@ export function LeadsSearchContainer({
                   <Div className="hidden md:flex flex-col items-end gap-1.5 flex-shrink-0 text-xs text-muted-foreground">
                     {lead.emailsSent !== null && (
                       <Span>
-                        {lead.emailsSent}{" "}
-                        {t("app.api.leads.search.widget.emailsSentSuffix")}
+                        {lead.emailsSent} {t("widget.emailsSentSuffix")}
                       </Span>
                     )}
                     {openRate !== null ? (
                       <OpenRateBar
                         pct={openRate}
-                        openRateSuffix={t(
-                          "app.api.leads.search.widget.openRateSuffix",
-                        )}
+                        openRateSuffix={t("widget.openRateSuffix")}
                       />
                     ) : (
                       lead.emailsSent !== null &&
                       lead.emailsSent === 0 && (
                         <Span className="text-muted-foreground/50">
-                          {t("app.api.leads.search.widget.noEmails")}
+                          {t("widget.noEmails")}
                         </Span>
                       )
                     )}
@@ -543,7 +536,7 @@ export function LeadsSearchContainer({
                   >
                     <Button
                       type="button"
-                      title={t("app.api.leads.search.widget.editLeadTitle")}
+                      title={t("widget.editLeadTitle")}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleEditLead(lead);
@@ -554,7 +547,7 @@ export function LeadsSearchContainer({
                     </Button>
                     <Button
                       type="button"
-                      title={t("app.api.leads.search.widget.deleteLeadTitle")}
+                      title={t("widget.deleteLeadTitle")}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDeleteLead(lead);
@@ -581,7 +574,7 @@ export function LeadsSearchContainer({
               onClick={handleLoadMore}
             >
               <ChevronDown className="h-4 w-4" />
-              {t("app.api.leads.search.widget.loadMore")}
+              {t("widget.loadMore")}
             </Button>
           </Div>
         )}

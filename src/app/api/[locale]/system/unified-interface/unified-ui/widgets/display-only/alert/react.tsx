@@ -11,8 +11,8 @@ import type {
 } from "../../_shared/react-types";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetContext,
   useWidgetForm,
-  useWidgetTranslation,
 } from "../../_shared/use-widget-context";
 import type { AlertWidgetConfig, AlertWidgetSchema } from "./types";
 
@@ -22,7 +22,9 @@ import type { AlertWidgetConfig, AlertWidgetSchema } from "./types";
  */
 export function AlertWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
 >(
   props: TUsage extends { response: true }
@@ -43,7 +45,7 @@ export function AlertWidget<
           AlertWidgetConfig<TKey, AlertWidgetSchema, TUsage, "primitive">
         >,
 ): JSX.Element | null {
-  const t = useWidgetTranslation();
+  const { t: tField } = useWidgetContext();
   const form = useWidgetForm();
   const { field } = props;
   const fieldName = "fieldName" in props ? props.fieldName : undefined;
@@ -67,9 +69,9 @@ export function AlertWidget<
 
   let content: string | undefined;
   if (value) {
-    content = t(value);
+    content = tField(value);
   } else if (hardcodedContent) {
-    content = t(hardcodedContent);
+    content = tField(hardcodedContent);
   }
 
   if (!content) {

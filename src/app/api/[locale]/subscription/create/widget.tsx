@@ -89,7 +89,7 @@ function formatPrice(price: number, locale: string, currency: string): string {
 export function SubscriptionCreateContainer({
   field,
 }: CustomWidgetProps): JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
   const { locale } = useTranslation();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
@@ -170,12 +170,10 @@ export function SubscriptionCreateContainer({
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {t("app.api.subscription.checkout.form.fields.provider.label")}
+              {t("checkout.form.fields.provider.label")}
             </DialogTitle>
             <DialogDescription>
-              {t(
-                "app.api.subscription.checkout.form.fields.provider.description",
-              )}
+              {t("checkout.form.fields.provider.description")}
             </DialogDescription>
           </DialogHeader>
           <Div className="grid gap-4 py-4">
@@ -186,13 +184,9 @@ export function SubscriptionCreateContainer({
             >
               <CreditCard className="h-6 w-6 text-blue-600 mr-3" />
               <Div className="text-left">
-                <Div className="font-semibold">
-                  {t("app.api.payment.enums.paymentProvider.stripe")}
-                </Div>
+                <Div className="font-semibold">{t("buy.provider.stripe")}</Div>
                 <Div className="text-sm text-muted-foreground">
-                  {t(
-                    "app.subscription.subscription.buy.provider.stripe.description",
-                  )}
+                  {t("buy.provider.stripeDescription")}
                 </Div>
               </Div>
             </Button>
@@ -205,12 +199,10 @@ export function SubscriptionCreateContainer({
               <Bitcoin className="h-6 w-6 text-orange-500 mr-3" />
               <Div className="text-left">
                 <Div className="font-semibold">
-                  {t("app.api.payment.enums.paymentProvider.nowpayments")}
+                  {t("buy.provider.nowpayments")}
                 </Div>
                 <Div className="text-sm text-muted-foreground">
-                  {t(
-                    "app.subscription.subscription.buy.provider.nowpayments.description",
-                  )}
+                  {t("buy.provider.nowpaymentsDescription")}
                 </Div>
               </Div>
             </Button>
@@ -218,11 +210,7 @@ export function SubscriptionCreateContainer({
               <Div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
                 <Div className="text-sm text-amber-700 dark:text-amber-300 flex items-start gap-2">
                   <Info className="h-4 w-4 mt-0.5 shrink-0" />
-                  <Span>
-                    {t(
-                      "app.subscription.subscription.buy.provider.cryptoMonthlyDisabled",
-                    )}
-                  </Span>
+                  <Span>{t("buy.provider.cryptoMonthlyDisabled")}</Span>
                 </Div>
               </Div>
             )}
@@ -233,10 +221,10 @@ export function SubscriptionCreateContainer({
       <Card className="relative overflow-hidden border-2 border-primary">
         <CardHeader>
           <CardTitle className="text-2xl">
-            {t("app.subscription.subscription.buy.subscription.title")}
+            {t("buy.subscription.title")}
           </CardTitle>
           <CardDescription>
-            {t("app.subscription.subscription.buy.subscription.description", {
+            {t("buy.subscription.description", {
               subPrice: formatPrice(
                 currentSubscriptionPrice,
                 locale,
@@ -260,7 +248,7 @@ export function SubscriptionCreateContainer({
               onClick={() => setBillingInterval(BillingInterval.MONTHLY)}
               className="flex-1"
             >
-              {t("app.api.subscription.billing.monthly")}
+              {t("billing.monthly")}
             </Button>
             <Button
               variant={
@@ -270,7 +258,7 @@ export function SubscriptionCreateContainer({
               onClick={() => setBillingInterval(BillingInterval.YEARLY)}
               className="flex-1"
             >
-              {t("app.api.subscription.billing.yearly")}
+              {t("billing.yearly")}
             </Button>
           </Div>
 
@@ -286,24 +274,19 @@ export function SubscriptionCreateContainer({
               </Div>
               <Div className="text-sm text-muted-foreground">
                 {billingInterval === BillingInterval.YEARLY
-                  ? t("app.subscription.subscription.buy.subscription.perYear")
-                  : t(
-                      "app.subscription.subscription.buy.subscription.perMonth",
-                    )}
+                  ? t("buy.subscription.perYear")
+                  : t("buy.subscription.perMonth")}
               </Div>
             </Div>
             {billingInterval === BillingInterval.YEARLY && (
               <Div className="text-sm text-green-600 dark:text-green-400">
-                {t(
-                  "app.subscription.subscription.buy.subscription.yearlyEquivalent",
-                  {
-                    monthlyPrice: formatPrice(
-                      monthlyEquivalent,
-                      locale,
-                      subscriptionProduct.currency,
-                    ),
-                  },
-                )}
+                {t("buy.subscription.yearlyEquivalent", {
+                  monthlyPrice: formatPrice(
+                    monthlyEquivalent,
+                    locale,
+                    subscriptionProduct.currency,
+                  ),
+                })}
               </Div>
             )}
           </Div>
@@ -313,32 +296,22 @@ export function SubscriptionCreateContainer({
             <Div className="flex items-center gap-2">
               <Zap className="h-4 w-4 text-primary" />
               <Span>
-                {t(
-                  "app.subscription.subscription.buy.subscription.features.credits",
-                  {
-                    count: subscriptionCredits,
-                  },
-                )}
+                {t("buy.subscription.features.credits", {
+                  count: subscriptionCredits,
+                })}
               </Span>
             </Div>
             <Div className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-amber-600" />
               <Span>
-                {t(
-                  "app.subscription.subscription.buy.subscription.features.expiry",
-                  {
-                    modelCount: TOTAL_MODEL_COUNT,
-                  },
-                )}
+                {t("buy.subscription.features.expiry", {
+                  modelCount: TOTAL_MODEL_COUNT,
+                })}
               </Span>
             </Div>
             <Div className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-green-600" />
-              <Span>
-                {t(
-                  "app.subscription.subscription.buy.subscription.features.bestFor",
-                )}
-              </Span>
+              <Span>{t("buy.subscription.features.bestFor")}</Span>
             </Div>
           </Div>
 
@@ -346,33 +319,27 @@ export function SubscriptionCreateContainer({
           {!isAuthenticated ? (
             <Div className="flex gap-2">
               <Button variant="ghost" asChild className="flex-1 hidden sm:flex">
-                <Link href={`/${locale}/user/login`}>
-                  {t("app.story._components.nav.user.login")}
-                </Link>
+                <Link href={`/${locale}/user/login`}>{t("buy.login")}</Link>
               </Button>
               <Button
                 asChild
                 className="flex-1 bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600 hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700"
                 size="lg"
               >
-                <Link href={`/${locale}/user/signup`}>
-                  {t("app.story._components.nav.user.signup")}
-                </Link>
+                <Link href={`/${locale}/user/signup`}>{t("buy.signup")}</Link>
               </Button>
             </Div>
           ) : isLoadingSubscription ? null : hasActiveSubscription ? (
             <Div className="p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
               <Div className="text-sm text-green-700 dark:text-green-300">
-                {t(
-                  "app.subscription.subscription.buy.subscription.buttonAlreadySubscribed",
-                )}
+                {t("buy.subscription.buttonAlreadySubscribed")}
               </Div>
             </Div>
           ) : (
             <>
               <FormAlertWidget field={{}} />
               <Button className="w-full" size="lg" onClick={handleSubscribe}>
-                {t("app.subscription.subscription.buy.subscription.button")}
+                {t("buy.subscription.button")}
               </Button>
             </>
           )}

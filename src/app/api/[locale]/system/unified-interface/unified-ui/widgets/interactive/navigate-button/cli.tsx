@@ -31,7 +31,7 @@ export function NavigateButtonWidgetInk<
     TGetEndpoint
   >
 >): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
 
   return (
     <Box>

@@ -140,7 +140,7 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
 
       return success({
         success: true,
-        message: "app.api.system.generators.emailTemplates.success.generated",
+        message: t("success.generated"),
         templatesFound: templates.length,
         duration,
         outputFile: data.dryRun ? undefined : outputFile,

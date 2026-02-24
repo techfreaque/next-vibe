@@ -57,7 +57,9 @@ import type { EmptyStateWidgetConfig } from "./types";
  */
 export default function EmptyStateWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
 >({
   field,
@@ -66,7 +68,7 @@ export default function EmptyStateWidget<
   TUsage,
   EmptyStateWidgetConfig<TKey, TUsage, "widget">
 >): JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<TEndpoint>();
   const logger = useWidgetLogger();
   const {
     title: titleKey,

@@ -35,6 +35,16 @@ type Equal<X, Y> =
     ? true
     : false;
 
+// Minimal mock scopedTranslation for test endpoints (all keys use `as any`)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockScopedTranslation = {
+  ScopedTranslationKey: "test" as any,
+  scopedT: (_locale: any): { t(_key: any, _params?: any): any } => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    t: (_key: any, _params?: any): any => "test" as any,
+  }),
+};
+
 /**
  * HANDLER TYPE INFERENCE TESTS
  * Test that handler functions receive the correct user type based on endpoint roles
@@ -48,6 +58,7 @@ const testPublicOnlyEndpoint = createEndpoint({
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
+  scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC] as const,
   fields: objectField(
@@ -105,6 +116,7 @@ const testAdminOnlyEndpoint = createEndpoint({
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
+  scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.ADMIN] as const,
   fields: objectField(
@@ -162,6 +174,7 @@ const testMixedRolesEndpoint = createEndpoint({
   description: "test" as any,
   category: "test" as any,
   icon: "test-tube",
+  scopedTranslation: mockScopedTranslation,
   tags: [],
   allowedRoles: [UserRole.PUBLIC, UserRole.ADMIN] as const,
   fields: objectField(

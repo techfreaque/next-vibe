@@ -36,7 +36,7 @@ export function CreditHistoryContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const context = useWidgetContext();
   const { locale } = context;
-  const t = useWidgetTranslation();
+  const tField = useWidgetTranslation<typeof definition.GET>();
   const children = field.children;
 
   const transactions = field.value?.transactions ?? [];
@@ -64,7 +64,7 @@ export function CreditHistoryContainer({
                 {/* Left side - type and date */}
                 <Div className="flex flex-col gap-1">
                   {transaction.type && (
-                    <Div className="text-sm">{t(transaction.type)}</Div>
+                    <Div className="text-sm">{tField(transaction.type)}</Div>
                   )}
                   <Div className="text-sm">
                     {formatSimpleDate(transaction.createdAt, locale)}
@@ -85,7 +85,7 @@ export function CreditHistoryContainer({
                     {transaction.amount}
                   </Div>
                   <Div className="text-xs text-muted-foreground">
-                    {t("app.subscription.subscription.history.balance", {
+                    {tField("history.get.balance", {
                       count: transaction.balanceAfter,
                     })}
                   </Div>
@@ -95,7 +95,7 @@ export function CreditHistoryContainer({
           })
         ) : (
           <Div className="text-center text-muted-foreground py-8">
-            {t("app.api.agent.chat.credits.history.get.emptyState")}
+            {tField("history.get.emptyState")}
           </Div>
         )}
       </Div>

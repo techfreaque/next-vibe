@@ -182,8 +182,12 @@ export function useInkWidgetResponseOnly(): boolean {
 /**
  * Hook to get translation function from Ink context
  */
-export function useInkWidgetTranslation(): <K extends string>(
-  key: K,
+export function useInkWidgetTranslation<
+  TEndpoint extends CreateApiEndpointAny | never = never,
+>(): (
+  key: TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   params?: TParams,
 ) => TranslatedKeyType {
   const store = useInkWidgetContextStore();

@@ -92,7 +92,7 @@ function AccountRow({
 }: {
   account: SmtpAccount;
   onEdit: (account: SmtpAccount) => void;
-  t: (key: string) => string;
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
 }): React.JSX.Element {
   const statusColor =
     STATUS_COLORS[account.status] ??
@@ -137,12 +137,10 @@ function AccountRow({
         </Div>
         <Div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
           <Span>
-            {t("app.api.emails.smtpClient.list.widget.priority")}:{" "}
-            {account.priority}
+            {t("widget.priority")}: {account.priority}
           </Span>
           <Span>
-            {t("app.api.emails.smtpClient.list.widget.sent")}:{" "}
-            {account.totalEmailsSent}
+            {t("widget.sent")}: {account.totalEmailsSent}
           </Span>
         </Div>
       </Div>
@@ -155,7 +153,7 @@ export function SmtpAccountsListContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const router = useRouter();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
@@ -264,7 +262,7 @@ export function SmtpAccountsListContainer({
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
         <Span className="font-semibold text-base">
-          {t("app.api.emails.smtpClient.list.title")}
+          {t("title")}
           {total > 0 && (
             <Span className="ml-2 text-sm text-muted-foreground font-normal">
               ({total})
@@ -277,7 +275,7 @@ export function SmtpAccountsListContainer({
           variant="ghost"
           size="sm"
           onClick={handleRefresh}
-          title={t("app.api.emails.smtpClient.list.widget.refresh")}
+          title={t("widget.refresh")}
         >
           <RefreshCw className="h-4 w-4" />
         </Button>
@@ -289,7 +287,7 @@ export function SmtpAccountsListContainer({
           className="gap-1"
         >
           <Plus className="h-4 w-4" />
-          {t("app.api.emails.smtpClient.list.widget.create")}
+          {t("widget.create")}
         </Button>
       </Div>
 
@@ -305,9 +303,7 @@ export function SmtpAccountsListContainer({
                 onSubmit();
               }
             }}
-            placeholder={t(
-              "app.api.emails.smtpClient.list.widget.searchPlaceholder",
-            )}
+            placeholder={t("widget.searchPlaceholder")}
             className="pl-9 h-9"
           />
         </Div>
@@ -414,9 +410,7 @@ export function SmtpAccountsListContainer({
           </Div>
         ) : (
           <Div className="text-center text-muted-foreground py-12">
-            <Div className="mb-4">
-              {t("app.api.emails.smtpClient.list.widget.emptyState")}
-            </Div>
+            <Div className="mb-4">{t("widget.emptyState")}</Div>
             <Button
               type="button"
               variant="outline"
@@ -425,7 +419,7 @@ export function SmtpAccountsListContainer({
               className="gap-1"
             >
               <Plus className="h-4 w-4" />
-              {t("app.api.emails.smtpClient.list.widget.create")}
+              {t("widget.create")}
             </Button>
           </Div>
         )}

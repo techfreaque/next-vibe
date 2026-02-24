@@ -82,8 +82,7 @@ const CRON_SYSTEM_USER: JwtPrivatePayloadType = {
  */
 export class UnifiedTaskRunnerRepositoryImpl {
   name = "unified-task-runner" as const;
-  description =
-    "app.api.system.unifiedInterface.tasks.unifiedRunner.description" as const;
+  description = "description" as const;
   environment: "development" | "production" | "serverless" = "development";
 
   private runningTasks = new Map<string, TaskStatus>();
@@ -465,7 +464,7 @@ export class UnifiedTaskRunnerRepositoryImpl {
   }
 
   async startTaskRunner(
-    task: TaskRunner,
+    task: TaskRunner<string>,
     signal: AbortSignal,
   ): Promise<ResponseType<void>> {
     const { t } = tasksScopedTranslation.scopedT(this.systemLocale);
@@ -598,7 +597,7 @@ export class UnifiedTaskRunnerRepositoryImpl {
     try {
       // Start all task runners
       const taskRunners = tasks.filter(
-        (task): task is TaskRunner => task.type === "task-runner",
+        (task): task is TaskRunner<string> => task.type === "task-runner",
       );
 
       this.logger.debug("Starting task runners", {

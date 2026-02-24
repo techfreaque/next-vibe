@@ -37,10 +37,10 @@ import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-bas
 import { FieldDataType } from "../../../../shared/types/enums";
 import type { FieldUsageConfig } from "../../_shared/types";
 import {
+  useWidgetContext,
   useWidgetDisabled,
   useWidgetForm,
   useWidgetLocale,
-  useWidgetTranslation,
 } from "../../_shared/use-widget-context";
 import { getTheme } from "../_shared/constants";
 import { renderPrefillDisplay } from "../_shared/prefill";
@@ -67,7 +67,9 @@ import type { TextFieldWidgetConfig } from "./types";
  */
 export function TextFieldWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TSchema extends StringWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({
@@ -85,7 +87,7 @@ export function TextFieldWidget<
     TextFieldWidgetConfig<TKey, TSchema, TUsage>
   >["field"];
 }): JSX.Element {
-  const t = useWidgetTranslation();
+  const { t: tField } = useWidgetContext();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
   const isDisabled = useWidgetDisabled();
@@ -129,7 +131,7 @@ export function TextFieldWidget<
                     "flex items-center gap-1.5",
                   )}
                 >
-                  <Span>{field.label && t(field.label)}</Span>
+                  <Span>{field.label && tField(field.label)}</Span>
                   {field.label && style === "asterisk" && isRequired && (
                     <Span className="text-blue-600 dark:text-blue-400 font-bold">
                       *
@@ -149,7 +151,7 @@ export function TextFieldWidget<
                         </TooltipTrigger>
                         <TooltipContent className="max-w-[250px]">
                           <Span className="text-sm">
-                            {t(field.description)}
+                            {tField(field.description)}
                           </Span>
                         </TooltipContent>
                       </Tooltip>
@@ -168,7 +170,7 @@ export function TextFieldWidget<
               {field.description && descriptionStyle === "inline" && (
                 <Div className={styleClassName.inlineDescriptionClassName}>
                   <Info className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
-                  <Span>{t(field.description)}</Span>
+                  <Span>{tField(field.description)}</Span>
                 </Div>
               )}
             </Div>
@@ -182,18 +184,18 @@ export function TextFieldWidget<
                   formField.value,
                   field.label,
                   field.prefillDisplay,
-                  t,
+                  tField,
                 )
               ) : (
                 // Render normal text input
                 <Input
                   name={formField.name}
-                  value={formField.value ? t(formField.value) : ""}
+                  value={formField.value ? tField(formField.value) : ""}
                   onChange={(e) => formField.onChange(e.target.value)}
                   onBlur={formField.onBlur}
                   type={FieldDataType.TEXT}
                   placeholder={
-                    field.placeholder ? t(field.placeholder) : undefined
+                    field.placeholder ? tField(field.placeholder) : undefined
                   }
                   disabled={isDisabled || field.disabled || field.readonly}
                   className={cn(styleClassName.inputClassName, "h-10")}

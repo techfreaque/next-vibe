@@ -7,9 +7,11 @@ import TextInput from "ink-text-input";
 import type { JSX } from "react";
 import { useState } from "react";
 
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import {
   useInkWidgetForm,
+  useInkWidgetLocale,
   useInkWidgetResponse,
   useInkWidgetShowLabels,
   useInkWidgetTranslation,
@@ -32,13 +34,16 @@ export function JsonFieldWidgetInk<
   TUsage,
   JsonFieldWidgetConfig<TKey, StringWidgetSchema, TUsage>
 >): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
+  const locale = useInkWidgetLocale();
   const form = useInkWidgetForm();
   const response = useInkWidgetResponse();
   const showLabels = useInkWidgetShowLabels();
   const [inputValue, setInputValue] = useState(
     field.value ? JSON.stringify(field.value, null, 2) : "",
   );
+
+  const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
   // Response mode - just display the value
   if (response) {
@@ -63,9 +68,7 @@ export function JsonFieldWidgetInk<
     return (
       <Box>
         <Text color="red">
-          {t(
-            "app.api.system.unifiedInterface.react.widgets.formField.requiresContext",
-          )}
+          {widgetT("react.widgets.formField.requiresContext")}
         </Text>
       </Box>
     );

@@ -209,7 +209,7 @@ function ExecutionCard({
   execution: Execution;
   expandedSection: "error" | "result" | null;
   onToggle: (section: "error" | "result") => void;
-  t: ReturnType<typeof useWidgetTranslation>;
+  t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
 }): React.JSX.Element {
   const hasError = Boolean(execution.error);
   const hasResult =
@@ -226,7 +226,7 @@ function ExecutionCard({
             getStatusColorClass(execution.status),
           )}
         >
-          {t(execution.status)}
+          {t(execution.status as Parameters<typeof t>[0])}
         </Span>
 
         {/* Task name + meta */}
@@ -259,9 +259,7 @@ function ExecutionCard({
               onClick={() => onToggle("result")}
               className="h-7 px-2 text-xs gap-1 text-muted-foreground hover:text-foreground"
             >
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.result",
-              )}
+              {t("widget.result")}
               {expandedSection === "result" ? (
                 <ChevronUp className="h-3 w-3" />
               ) : (
@@ -277,9 +275,7 @@ function ExecutionCard({
               onClick={() => onToggle("error")}
               className="h-7 px-2 text-xs gap-1 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
             >
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.error.label",
-              )}
+              {t("widget.error.label")}
               {expandedSection === "error" ? (
                 <ChevronUp className="h-3 w-3" />
               ) : (
@@ -345,7 +341,7 @@ export function CronHistoryContainer({
   field,
   fieldName,
 }: WidgetProps): React.JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof endpoints.GET>();
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
   const router = useRouter();
@@ -456,9 +452,7 @@ export function CronHistoryContainer({
         <NavigateButtonWidget field={children.backButton} />
 
         <Span className="font-semibold text-base mr-auto">
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.title",
-          )}
+          {t("widget.title")}
           {totalCount > 0 && (
             <Span className="ml-2 text-sm text-muted-foreground font-normal">
               ({totalCount})
@@ -474,11 +468,7 @@ export function CronHistoryContainer({
           className="gap-1.5"
         >
           <Clock className="h-4 w-4" />
-          <Span className="hidden sm:inline">
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.header.tasks",
-            )}
-          </Span>
+          <Span className="hidden sm:inline">{t("widget.header.tasks")}</Span>
         </Button>
 
         <Button
@@ -489,11 +479,7 @@ export function CronHistoryContainer({
           className="gap-1.5"
         >
           <BarChart3 className="h-4 w-4" />
-          <Span className="hidden sm:inline">
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.header.stats",
-            )}
-          </Span>
+          <Span className="hidden sm:inline">{t("widget.header.stats")}</Span>
         </Button>
 
         <Button
@@ -504,11 +490,7 @@ export function CronHistoryContainer({
           className="gap-1.5"
         >
           <Activity className="h-4 w-4" />
-          <Span className="hidden sm:inline">
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.header.pulse",
-            )}
-          </Span>
+          <Span className="hidden sm:inline">{t("widget.header.pulse")}</Span>
         </Button>
 
         <Button
@@ -516,9 +498,7 @@ export function CronHistoryContainer({
           variant="ghost"
           size="sm"
           onClick={handleRefresh}
-          title={t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.header.refresh",
-          )}
+          title={t("widget.header.refresh")}
         >
           <RefreshCw className="h-4 w-4" />
         </Button>
@@ -528,40 +508,30 @@ export function CronHistoryContainer({
       {summary && (
         <Div className="grid grid-cols-2 sm:grid-cols-5 gap-2 px-4 py-3 border-b">
           <SummaryCard
-            label={t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.summary.total",
-            )}
+            label={t("widget.summary.total")}
             value={summary.totalExecutions}
             icon={<Clock className="h-3.5 w-3.5 text-muted-foreground" />}
           />
           <SummaryCard
-            label={t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.summary.successful",
-            )}
+            label={t("widget.summary.successful")}
             value={summary.successfulExecutions}
             icon={<CheckCircle className="h-3.5 w-3.5 text-green-500" />}
             variant="success"
           />
           <SummaryCard
-            label={t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.summary.failed",
-            )}
+            label={t("widget.summary.failed")}
             value={summary.failedExecutions}
             icon={<XCircle className="h-3.5 w-3.5 text-red-500" />}
             variant="danger"
           />
           <SummaryCard
-            label={t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.summary.successRate",
-            )}
+            label={t("widget.summary.successRate")}
             value={`${Math.round(summary.successRate)}%`}
             icon={<TrendingUp className="h-3.5 w-3.5 text-green-500" />}
             variant="success"
           />
           <SummaryCard
-            label={t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.summary.avgDuration",
-            )}
+            label={t("widget.summary.avgDuration")}
             value={formatDuration(summary.averageDuration)}
             icon={<Clock className="h-3.5 w-3.5 text-muted-foreground" />}
           />
@@ -593,9 +563,7 @@ export function CronHistoryContainer({
           {STATUS_FILTER_KEYS.map((filter) => (
             <StatusChip
               key={filter}
-              label={t(
-                `app.api.system.unifiedInterface.tasks.cronSystem.history.widget.filter.${filter.toLowerCase()}`,
-              )}
+              label={t(filter)}
               count={statusCounts[filter]}
               isActive={
                 filter === "ALL"
@@ -623,9 +591,7 @@ export function CronHistoryContainer({
             <Div className="flex flex-col items-center justify-center py-14 gap-3 text-center">
               <RefreshCw className="h-8 w-8 text-muted-foreground" />
               <Span className="text-sm text-muted-foreground">
-                {t(
-                  "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.empty",
-                )}
+                {t("widget.empty")}
               </Span>
             </Div>
           ) : (
@@ -650,14 +616,11 @@ export function CronHistoryContainer({
       {/* ── Pagination footer ── */}
       <Div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">
         <Span>
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.pagination.info",
-            {
-              page: currentPage,
-              totalPages,
-              total: totalCount,
-            },
-          )}
+          {t("widget.pagination.info", {
+            page: currentPage,
+            totalPages,
+            total: totalCount,
+          })}
         </Span>
         <Div className="flex gap-1">
           <Button
@@ -669,9 +632,7 @@ export function CronHistoryContainer({
           >
             <ChevronLeft className="h-4 w-4" />
             <Span className="hidden sm:inline ml-1">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.pagination.prev",
-              )}
+              {t("widget.pagination.prev")}
             </Span>
           </Button>
           <Button
@@ -682,9 +643,7 @@ export function CronHistoryContainer({
             onClick={() => handlePageChange(offset + LIMIT)}
           >
             <Span className="hidden sm:inline mr-1">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.history.widget.pagination.next",
-              )}
+              {t("widget.pagination.next")}
             </Span>
             <ChevronRight className="h-4 w-4" />
           </Button>

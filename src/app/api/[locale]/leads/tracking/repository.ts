@@ -235,7 +235,7 @@ export class LeadTrackingRepository {
         } catch (error) {
           // Don't fail the engagement recording if status transition fails
           logger.warn(
-            "app.api.leads.tracking.engagement.status.transition.failed",
+            "Engagement status transition failed",
             parseError(error).message,
           );
         }
@@ -254,10 +254,7 @@ export class LeadTrackingRepository {
         createdAt: engagementData.createdAt,
       });
     } catch (error) {
-      logger.error(
-        "app.api.leads.tracking.engagement.record.error",
-        parseError(error).message,
-      );
+      logger.error("Engagement record error", parseError(error).message);
       return fail({
         message: t("tracking.errors.default"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -318,10 +315,7 @@ export class LeadTrackingRepository {
         );
       }
     } catch (error) {
-      logger.error(
-        "app.api.leads.tracking.email.engagement.update.error",
-        parseError(error).message,
-      );
+      logger.error("Email engagement update error", parseError(error).message);
       // Don't throw - this is a secondary operation
     }
   }
@@ -351,10 +345,7 @@ export class LeadTrackingRepository {
         leadStatusUpdated: true,
       });
     } catch (error) {
-      logger.error(
-        "app.api.leads.tracking.subscription.failed",
-        parseError(error).message,
-      );
+      logger.error("Subscription tracking failed", parseError(error).message);
       return fail({
         message: t("tracking.errors.default"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -372,7 +363,7 @@ export class LeadTrackingRepository {
     t: ModuleT,
   ): Promise<ResponseType<{ leadId: string }>> {
     try {
-      logger.debug("app.api.leads.tracking.anonymous.creating", {
+      logger.debug("Creating anonymous lead for tracking", {
         userAgent: clientInfo.userAgent,
         ipAddress: clientInfo.ipAddress,
         locale,
@@ -430,8 +421,7 @@ export class LeadTrackingRepository {
       const [createdLead] = await db.insert(leads).values(newLead).returning();
 
       if (!createdLead) {
-        logger.error("app.api.leads.tracking.anonymous.create.failed", {
-          errorKey: "app.api.leads.tracking.anonymous.create.noLeadReturned",
+        logger.error("Failed to create anonymous lead - no record returned", {
           userAgent: clientInfo.userAgent,
           referer: clientInfo.referer,
           locale,
@@ -448,10 +438,7 @@ export class LeadTrackingRepository {
         leadId: createdLead.id,
       });
     } catch (error) {
-      logger.error(
-        "app.api.leads.tracking.anonymous.error",
-        parseError(error).message,
-      );
+      logger.error("Anonymous lead tracking error", parseError(error).message);
       return fail({
         message: t("tracking.errors.default"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -507,7 +494,7 @@ export class LeadTrackingRepository {
     }>
   > {
     try {
-      logger.debug("app.api.leads.tracking.status.transition.processing", {
+      logger.debug("Processing lead status transition", {
         leadId,
         action,
         metadata,
@@ -556,7 +543,7 @@ export class LeadTrackingRepository {
           statusChanged = currentStatus !== newStatus;
 
           if (statusChanged) {
-            logger.debug("app.api.leads.tracking.status.transitioning", {
+            logger.debug("Transitioning lead status", {
               leadId,
               action,
               from: currentStatus,
@@ -607,7 +594,7 @@ export class LeadTrackingRepository {
             );
 
             if (!updateResult.success) {
-              logger.error("app.api.leads.tracking.status.update.failed", {
+              logger.error("Failed to update lead status in database", {
                 leadId,
                 action,
                 from: currentStatus,
@@ -621,21 +608,21 @@ export class LeadTrackingRepository {
               });
             }
 
-            logger.debug("app.api.leads.tracking.status.transitioned", {
+            logger.debug("Lead status transitioned successfully", {
               leadId,
               action,
               from: currentStatus,
               to: newStatus,
             });
           } else {
-            logger.debug("app.api.leads.tracking.status.unchanged", {
+            logger.debug("Lead status unchanged for action", {
               leadId,
               action,
               currentStatus,
             });
           }
         } else {
-          logger.debug("app.api.leads.tracking.status.transition.notAllowed", {
+          logger.debug("Lead status transition not allowed", {
             leadId,
             action,
             currentStatus,
@@ -643,7 +630,7 @@ export class LeadTrackingRepository {
           });
         }
       } else {
-        logger.debug("app.api.leads.tracking.status.unknownAction", {
+        logger.debug("Unknown tracking action for lead status update", {
           leadId,
           action,
           currentStatus,
@@ -656,7 +643,7 @@ export class LeadTrackingRepository {
         previousStatus: currentStatus,
       });
     } catch (error) {
-      logger.error("app.api.leads.tracking.status.error", {
+      logger.error("Error processing lead status transition", {
         error: parseError(error),
         leadId,
         action,
@@ -685,7 +672,7 @@ export class LeadTrackingRepository {
       // Fallback to data.leadId for backward compatibility (tracking links)
       let leadId: string | undefined = data.leadId || user.leadId;
 
-      logger.debug("app.api.leads.tracking.engagement.relationship.handling", {
+      logger.debug("Handling lead engagement and relationship", {
         leadId,
         engagementType: data.engagementType,
         userId: data.userId || user.id,
@@ -703,7 +690,7 @@ export class LeadTrackingRepository {
           t,
         );
         if (!leadResult.success) {
-          logger.debug("app.api.leads.tracking.engagement.invalidLeadId", {
+          logger.debug("Provided lead ID not found, will create new lead", {
             invalidLeadId: leadId,
           });
           leadId = undefined; // Clear invalid lead ID
@@ -723,7 +710,7 @@ export class LeadTrackingRepository {
         if (anonymousLeadResult.success && anonymousLeadResult.data) {
           leadId = anonymousLeadResult.data.leadId;
           leadCreated = true;
-          logger.debug("app.api.leads.tracking.engagement.anonymousCreated", {
+          logger.debug("Anonymous lead created for engagement tracking", {
             newLeadId: leadId,
           });
         } else {
@@ -775,22 +762,22 @@ export class LeadTrackingRepository {
             );
             if (convertResult.success) {
               relationshipEstablished = true;
-              logger.debug(
-                "app.api.leads.tracking.engagement.relationshipEstablished",
-                {
-                  leadId,
-                  userId: currentUserId,
-                },
-              );
+              logger.debug("Lead-user relationship established", {
+                leadId,
+                userId: currentUserId,
+              });
             }
           }
         } catch (error) {
           // Don't fail the engagement if relationship establishment fails
-          logger.debug("app.api.leads.tracking.engagement.relationshipFailed", {
-            error: parseError(error),
-            leadId,
-            userId: currentUserId,
-          });
+          logger.debug(
+            "Failed to establish lead-user relationship, continuing",
+            {
+              error: parseError(error),
+              leadId,
+              userId: currentUserId,
+            },
+          );
         }
       }
 
@@ -878,7 +865,7 @@ export class LeadTrackingRepository {
 
       return result;
     } catch (error) {
-      logger.error("app.api.leads.tracking.engagement.relationship.error", {
+      logger.error("Error handling lead engagement relationship", {
         error: parseError(error),
       });
       return fail({
@@ -921,7 +908,7 @@ export class LeadTrackingRepository {
         engagementRecorded = engagementResult.success;
       }
 
-      logger.debug("app.api.leads.tracking.pixel.processed", {
+      logger.debug("Tracking pixel processed", {
         leadId,
         campaignId,
         engagementRecorded,
@@ -934,10 +921,7 @@ export class LeadTrackingRepository {
         engagementRecorded,
       });
     } catch (error) {
-      logger.error(
-        "app.api.leads.tracking.pixel.failed",
-        parseError(error).message,
-      );
+      logger.error("Pixel tracking failed", parseError(error).message);
       return fail({
         message: t("tracking.errors.default"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -976,14 +960,14 @@ export class LeadTrackingRepository {
             locale,
           );
           if (referralResult.success) {
-            logger.debug("app.api.leads.tracking.click.referralLinked", {
+            logger.debug("Referral code linked to lead", {
               referralCode: ref,
               leadId: currentLeadId,
             });
           }
         } catch (error) {
           logger.error(
-            "app.api.leads.tracking.click.referralLinkFailed",
+            "Failed to link referral code to lead",
             parseError(error).message,
             { ref, leadId: currentLeadId },
           );
@@ -1020,7 +1004,7 @@ export class LeadTrackingRepository {
               logger,
             );
             leadsLinked = true;
-            logger.debug("app.api.leads.tracking.click.linkedToUser", {
+            logger.debug("Tracking lead linked to authenticated user", {
               trackingLeadId,
               userId: user.id,
               currentLeadId,
@@ -1034,7 +1018,7 @@ export class LeadTrackingRepository {
               t,
             );
             leadsLinked = true;
-            logger.debug("app.api.leads.tracking.click.leadLinked", {
+            logger.debug("Tracking lead linked to current lead", {
               currentLeadId,
               trackingLeadId,
               campaignId: campaignId,
@@ -1043,7 +1027,7 @@ export class LeadTrackingRepository {
           }
         } catch (error) {
           logger.error(
-            "app.api.leads.tracking.click.linkFailed",
+            "Failed to link tracking lead",
             parseError(error).message,
           );
         }
@@ -1090,7 +1074,7 @@ export class LeadTrackingRepository {
           }
         } catch (error) {
           logger.error(
-            "app.api.leads.tracking.click.status.failed",
+            "Click tracking status update failed",
             parseError(error).message,
           );
         }
@@ -1106,7 +1090,7 @@ export class LeadTrackingRepository {
         isLoggedIn,
       });
     } catch (error) {
-      logger.error("app.api.leads.tracking.click.failed", {
+      logger.error("Error processing tracking click", {
         error: error instanceof Error ? error.message : String(error),
       });
       return fail({

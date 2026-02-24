@@ -250,7 +250,7 @@ export class AuthRepository {
         locale,
       );
       if (!userExistsResponse.success || !userExistsResponse.data) {
-        logger.debug("app.api.user.auth.debug.userIdNotExistsInDb", {
+        logger.debug("User ID not found in database", {
           userId,
         });
         return null;
@@ -263,7 +263,7 @@ export class AuthRepository {
         sessionT,
       );
       if (!sessionResponse.success) {
-        logger.debug("app.api.user.auth.debug.sessionNotFound", {
+        logger.debug("Session token not found in database", {
           userId,
           tokenExists: false,
         });
@@ -273,7 +273,7 @@ export class AuthRepository {
       // Check if session is expired
       const session = sessionResponse.data;
       if (session.expiresAt < new Date()) {
-        logger.debug("app.api.user.auth.debug.sessionExpired", {
+        logger.debug("Session expired, deleting from database", {
           userId,
           expiresAt: session.expiresAt,
         });
@@ -305,10 +305,7 @@ export class AuthRepository {
 
       return { isPublic: false, id: userId, leadId, roles };
     } catch (error) {
-      logger.error(
-        "app.api.user.auth.debug.errorValidatingUserSession",
-        parseError(error),
-      );
+      logger.error("Error validating user session", parseError(error));
       return null;
     }
   }
@@ -373,10 +370,7 @@ export class AuthRepository {
 
       return roles;
     } catch (error) {
-      logger.error(
-        "app.api.user.auth.debug.errorGettingUserRoles",
-        parseError(error),
-      );
+      logger.error("Error getting user roles", parseError(error));
       return [];
     }
   }
@@ -409,10 +403,7 @@ export class AuthRepository {
       // Create new lead if none exists
       return await AuthRepository.createLeadForUser(userId, locale, logger);
     } catch (error) {
-      logger.error(
-        "app.api.user.auth.debug.errorGettingLeadId",
-        parseError(error),
-      );
+      logger.error("Error getting lead ID for user", parseError(error));
       // Try to create lead as fallback
       return await AuthRepository.createLeadForUser(userId, locale, logger);
     }
@@ -519,10 +510,7 @@ export class AuthRepository {
       logger.debug("Created public lead", { leadId: newLead.id });
       return newLead.id;
     } catch (error) {
-      logger.error(
-        "app.api.user.auth.debug.errorGettingPublicLeadId",
-        parseError(error),
-      );
+      logger.error("Error getting public lead ID", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       throwErrorResponse(
         t("errors.failed_to_create_lead"),
@@ -619,7 +607,7 @@ export class AuthRepository {
       if (!userRolesResponse.success) {
         // If we can't get user roles, but the user is authenticated,
         // treat them as a CUSTOMER (all authenticated users have CUSTOMER role)
-        logger.warn("app.api.user.auth.debug.failedToGetUserRoles", {
+        logger.warn("Failed to get user roles, defaulting to CUSTOMER", {
           userId,
           leadId,
         });
@@ -642,8 +630,7 @@ export class AuthRepository {
         }
         // Otherwise, user doesn't have required roles
         logger.warn("User does not have required permission roles", {
-          translationKey:
-            "app.api.user.auth.debug.userDoesNotHaveRequiredRoles",
+          translationKey: "debug.userDoesNotHaveRequiredRoles",
           userId,
           leadId,
           requiredRoles: permissionRoles.join(", "),
@@ -681,7 +668,7 @@ export class AuthRepository {
 
       // User doesn't have required roles and PUBLIC is not allowed
       logger.warn("User does not have required permission roles", {
-        translationKey: "app.api.user.auth.debug.userDoesNotHaveRequiredRoles",
+        translationKey: "debug.userDoesNotHaveRequiredRoles",
         userId,
         leadId,
         requiredRoles: permissionRoles.join(", "),
@@ -690,7 +677,7 @@ export class AuthRepository {
       return createPublicUser<TRoles>(leadId);
     } catch (error) {
       logger.error("Error checking user authentication", {
-        translationKey: "app.api.user.auth.debug.errorCheckingUserAuth",
+        translationKey: "debug.errorCheckingUserAuth",
         error: parseError(error).message,
         userId,
         leadId,
@@ -735,10 +722,7 @@ export class AuthRepository {
 
       return success(token);
     } catch (error) {
-      logger.error(
-        "app.api.user.auth.debug.errorSigningJwt",
-        parseError(error),
-      );
+      logger.error("Error signing JWT token", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
         message: t("errors.jwt_signing_failed"),
@@ -766,7 +750,7 @@ export class AuthRepository {
 
       // Validate the payload structure
       if (!payload.id || typeof payload.id !== "string") {
-        logger.debug("app.api.user.auth.debug.invalidTokenPayload");
+        logger.debug("Invalid JWT token payload structure");
         const { t } = scopedTranslation.scopedT(locale);
         return fail({
           message: t("errors.invalid_token_signature"),
@@ -776,7 +760,7 @@ export class AuthRepository {
 
       // Validate leadId is present
       if (!payload.leadId || typeof payload.leadId !== "string") {
-        logger.debug("app.api.user.auth.debug.invalidTokenPayload");
+        logger.debug("Invalid JWT token payload structure");
         const { t } = scopedTranslation.scopedT(locale);
         return fail({
           message: t("errors.invalid_token_signature"),
@@ -786,7 +770,7 @@ export class AuthRepository {
 
       // Validate roles are present
       if (!payload.roles || !Array.isArray(payload.roles)) {
-        logger.debug("app.api.user.auth.debug.invalidTokenPayload");
+        logger.debug("Invalid JWT token payload structure");
         const { t } = scopedTranslation.scopedT(locale);
         return fail({
           message: t("errors.invalid_token_signature"),
@@ -801,7 +785,7 @@ export class AuthRepository {
         roles: payload.roles,
       });
     } catch (error) {
-      logger.debug("app.api.user.auth.debug.errorVerifyingJwt", {
+      logger.debug("Error verifying JWT token", {
         error: parseError(error),
       });
       const { t } = scopedTranslation.scopedT(locale);
@@ -1101,10 +1085,7 @@ export class AuthRepository {
         logger,
       );
     } catch (error) {
-      logger.debug(
-        "app.api.user.auth.debug.errorInUnifiedGetAuthMinimalUser",
-        parseError(error),
-      );
+      logger.debug("debug.errorInUnifiedGetAuthMinimalUser", parseError(error));
       const { leadId, shouldUpdateCookie } =
         await AuthRepository.getLeadIdFromDb(
           undefined,
@@ -1186,7 +1167,7 @@ export class AuthRepository {
       );
     } catch (error) {
       logger.error(
-        "app.api.user.auth.debug.errorAuthenticatingCliUserWithPayload",
+        "debug.errorAuthenticatingCliUserWithPayload",
         parseError(error),
       );
       const leadId = await AuthRepository.getLeadIdForPublicUser(
@@ -1245,7 +1226,7 @@ export class AuthRepository {
     try {
       // Locale is required for lead creation
       if (!context.locale) {
-        logger.error("app.api.user.auth.debug.missingLocaleInContext");
+        logger.error("Missing locale in request context");
         return [];
       }
 
@@ -1268,10 +1249,7 @@ export class AuthRepository {
 
       return [];
     } catch (error) {
-      logger.error(
-        "app.api.user.auth.debug.errorGettingUserRoles",
-        parseError(error),
-      );
+      logger.error("Error getting user roles", parseError(error));
       return [];
     }
   }
@@ -1393,10 +1371,7 @@ export class AuthRepository {
 
       return await AuthRepository.signJwt(payload, logger, locale);
     } catch (error) {
-      logger.error(
-        "app.api.user.auth.debug.errorCreatingCliToken",
-        parseError(error),
-      );
+      logger.error("Error creating CLI token", parseError(error));
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
         message: t("errors.jwt_signing_failed"),
@@ -1415,7 +1390,7 @@ export class AuthRepository {
     locale: CountryLanguage,
   ): Promise<JwtPrivatePayloadType | null> {
     try {
-      logger.debug("app.api.user.auth.debug.validatingCliToken");
+      logger.debug("Validating CLI authentication token");
 
       // Verify the token
       const verifyResult = await AuthRepository.verifyJwt(
@@ -1436,10 +1411,7 @@ export class AuthRepository {
 
       return user;
     } catch (error) {
-      logger.error(
-        "app.api.user.auth.debug.errorValidatingCliToken",
-        parseError(error),
-      );
+      logger.error("Error validating CLI token", parseError(error));
       return null;
     }
   }

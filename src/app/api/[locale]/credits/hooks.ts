@@ -223,13 +223,13 @@ export function useCreditPurchase(
       responseData: CreditsPurchasePostResponseOutput;
     }) => {
       try {
-        logger.debug("app.api.credits.purchase.onSuccess.start");
+        logger.debug("Credits purchase success callback triggered");
 
         // Handle redirect to Stripe checkout
         const redirected = handleCheckoutRedirect(
           { success: true, data: data.responseData },
           (errorMessage) => {
-            logger.error("app.api.credits.purchase.redirect.failed", {
+            logger.error("Credits purchase Stripe redirect failed", {
               error: errorMessage,
             });
             toast({
@@ -241,13 +241,10 @@ export function useCreditPurchase(
         );
 
         if (!redirected) {
-          logger.error("app.api.credits.purchase.redirect.failed");
+          logger.error("Credits purchase Stripe redirect returned false");
         }
       } catch (error) {
-        logger.error(
-          "app.api.credits.purchase.process.failed",
-          parseError(error),
-        );
+        logger.error("Credits purchase processing failed", parseError(error));
         toast({
           title: t("app.common.error.title"),
           description: t("app.common.error.description"),
@@ -265,7 +262,7 @@ export function useCreditPurchase(
       requestData: CreditsPurchasePostRequestOutput;
       pathParams: Record<string, never>;
     }) => {
-      logger.error("app.api.credits.purchase.error", parseError(data.error));
+      logger.error("Credits purchase endpoint error", parseError(data.error));
       // Toast is handled by useEndpoint's alert system
     },
     [logger],

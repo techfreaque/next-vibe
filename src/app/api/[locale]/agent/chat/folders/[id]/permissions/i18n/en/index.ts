@@ -7,6 +7,10 @@ export const translations = {
   get: {
     title: "Get Folder Permissions",
     description: "Retrieve the list of moderators for a specific folder",
+    noData: "No data available",
+    edit: "Edit",
+    about: "About Permissions",
+    inheritFromParent: "Inherits from parent",
     container: {
       title: "Folder Permissions",
       description: "View and manage folder access permissions",

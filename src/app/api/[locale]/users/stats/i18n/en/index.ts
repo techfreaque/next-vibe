@@ -442,5 +442,10 @@ export const translations = {
     rowThisMonth: "This Month",
     rowLastMonth: "Last Month",
     generatedAt: "Generated at:",
+    filters: "Filters",
+    filtersTitle: "Filter Options",
+    applyFilters: "Apply Filters",
+    viewUsers: "View Users",
+    createUser: "Create User",
   },
 };

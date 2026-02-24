@@ -152,6 +152,13 @@ export const translations = {
       description: "Cron task statistics retrieved successfully",
     },
   },
+  priority: {
+    critical: "Critical",
+    high: "High",
+    medium: "Medium",
+    low: "Low",
+    background: "Background",
+  },
   widget: {
     title: "Cron Statistics",
     loading: "Loading statistics...",

@@ -74,7 +74,7 @@ export function ReferralStatsContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const stats = field.value;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
 
   if (!stats) {
     return <Div />;

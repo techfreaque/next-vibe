@@ -46,7 +46,7 @@ import {
   SortOrder,
   SortOrderOptions,
 } from "../enum";
-import { scopedTranslation } from "./i18n";
+import { type LeadsStatsTranslationKey, scopedTranslation } from "./i18n";
 import { LeadsStatsContainer } from "./widget";
 
 // ========== Zod Schemas for Complex Response Types ==========
@@ -60,7 +60,7 @@ const chartDataPointSchema = z.object({
 });
 
 const chartDataSchema = z.object({
-  name: z.string(),
+  name: z.string() as z.ZodType<LeadsStatsTranslationKey>,
   type: z.enum(ChartType),
   data: z.array(chartDataPointSchema),
   color: z.string(),

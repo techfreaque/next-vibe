@@ -22,6 +22,7 @@ import type {
   ReactWidgetPropsNoValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import {
+  useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
@@ -76,7 +77,9 @@ function getAlignmentClass(
  */
 export function TitleWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
 >(
   props: TUsage extends { response: true }
@@ -100,7 +103,8 @@ export function TitleWidget<
   const { field } = props;
   const fieldName = "fieldName" in props ? props.fieldName : undefined;
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<TEndpoint>();
+  const { t: tContext } = useWidgetContext();
   const response = useWidgetResponse();
   const logger = useWidgetLogger();
   const form = useWidgetForm();
@@ -192,7 +196,7 @@ export function TitleWidget<
 
   // value is properly typed from schema - no assertions needed
   // Extract data using shared logic with translation context
-  const data = extractTitleData(value, { t });
+  const data = extractTitleData(value, { t: tContext });
 
   if (!data) {
     return (

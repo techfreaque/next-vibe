@@ -126,7 +126,7 @@ function StatCard({
 export function UserViewContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const router = useRouter();
   const locale = useWidgetLocale();
   const [editLoading, setEditLoading] = useState(false);
@@ -202,7 +202,7 @@ export function UserViewContainer({
           <User className="h-6 w-6 text-muted-foreground" />
         </Div>
         <Div className="text-sm font-medium text-muted-foreground">
-          {t("app.api.users.view.empty")}
+          {t("empty")}
         </Div>
       </Div>
     );
@@ -240,7 +240,7 @@ export function UserViewContainer({
               ) : (
                 <Pencil className="h-4 w-4" />
               )}
-              {t("app.api.users.view.widget.actions.edit")}
+              {t("widget.actions.edit")}
             </Button>
             <Button
               type="button"
@@ -255,7 +255,7 @@ export function UserViewContainer({
               ) : (
                 <Trash2 className="h-4 w-4" />
               )}
-              {t("app.api.users.view.widget.actions.delete")}
+              {t("widget.actions.delete")}
             </Button>
           </>
         )}
@@ -265,7 +265,7 @@ export function UserViewContainer({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5" />
-            {t("app.api.users.view.sections.basicInfo")}
+            {t("sections.basicInfo")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -289,19 +289,19 @@ export function UserViewContainer({
                 {basicInfo.isBanned && (
                   <Badge variant="destructive" className="gap-1">
                     <XCircle className="h-3 w-3" />
-                    {t("app.api.users.view.status.banned")}
+                    {t("status.banned")}
                   </Badge>
                 )}
                 {!basicInfo.isActive && (
                   <Badge variant="secondary" className="gap-1">
                     <XCircle className="h-3 w-3" />
-                    {t("app.api.users.view.status.inactive")}
+                    {t("status.inactive")}
                   </Badge>
                 )}
                 {basicInfo.emailVerified && (
                   <Badge variant="default" className="gap-1">
                     <CheckCircle className="h-3 w-3" />
-                    {t("app.api.users.view.status.verified")}
+                    {t("status.verified")}
                   </Badge>
                 )}
               </Div>
@@ -321,33 +321,31 @@ export function UserViewContainer({
           <Div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <Div>
               <P className="text-xs text-muted-foreground">
-                {t("app.api.users.view.fields.userId")}
+                {t("fields.userId")}
               </P>
               <P className="text-sm font-mono">{basicInfo.id.slice(0, 8)}...</P>
             </Div>
             <Div>
               <P className="text-xs text-muted-foreground">
-                {t("app.api.users.view.fields.locale")}
+                {t("fields.locale")}
               </P>
               <P className="text-sm">{basicInfo.locale}</P>
             </Div>
             <Div>
               <P className="text-xs text-muted-foreground">
-                {t("app.api.users.view.fields.twoFactor")}
+                {t("fields.twoFactor")}
               </P>
               <Div className="flex items-center gap-1">
                 {basicInfo.twoFactorEnabled ? (
                   <>
                     <Shield className="h-3 w-3 text-green-600" />
-                    <P className="text-sm">
-                      {t("app.api.users.view.fields.enabled")}
-                    </P>
+                    <P className="text-sm">{t("fields.enabled")}</P>
                   </>
                 ) : (
                   <>
                     <Shield className="h-3 w-3 text-muted-foreground" />
                     <P className="text-sm text-muted-foreground">
-                      {t("app.api.users.view.fields.disabled")}
+                      {t("fields.disabled")}
                     </P>
                   </>
                 )}
@@ -355,23 +353,23 @@ export function UserViewContainer({
             </Div>
             <Div>
               <P className="text-xs text-muted-foreground">
-                {t("app.api.users.view.fields.marketing")}
+                {t("fields.marketing")}
               </P>
               <P className="text-sm">
                 {basicInfo.marketingConsent
-                  ? t("app.api.users.view.fields.optedIn")
-                  : t("app.api.users.view.fields.optedOut")}
+                  ? t("fields.optedIn")
+                  : t("fields.optedOut")}
               </P>
             </Div>
             <Div>
               <P className="text-xs text-muted-foreground">
-                {t("app.api.users.view.fields.created")}
+                {t("fields.created")}
               </P>
               <P className="text-sm">{formatDate(basicInfo.createdAt)}</P>
             </Div>
             <Div>
               <P className="text-xs text-muted-foreground">
-                {t("app.api.users.view.fields.lastUpdated")}
+                {t("fields.lastUpdated")}
               </P>
               <P className="text-sm">{formatDate(basicInfo.updatedAt)}</P>
             </Div>
@@ -386,7 +384,7 @@ export function UserViewContainer({
                   <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 mt-0.5" />
                   <Div>
                     <P className="text-sm font-medium text-red-600 dark:text-red-400">
-                      {t("app.api.users.view.fields.banReason")}
+                      {t("fields.banReason")}
                     </P>
                     <P className="text-sm text-red-600/80 dark:text-red-400/80">
                       {basicInfo.bannedReason}
@@ -403,7 +401,7 @@ export function UserViewContainer({
               <Separator />
               <Div>
                 <P className="text-xs text-muted-foreground mb-2">
-                  {t("app.api.users.view.fields.roles")}
+                  {t("fields.roles")}
                 </P>
                 <Div className="flex flex-wrap gap-2">
                   {roles.map((roleItem, index) => (
@@ -423,37 +421,37 @@ export function UserViewContainer({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MessageSquare className="h-5 w-5" />
-            {t("app.api.users.view.sections.chatActivity")}
+            {t("sections.chatActivity")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard
-              title={t("app.api.users.view.widget.stats.totalThreads")}
+              title={t("widget.stats.totalThreads")}
               value={chatStats.totalThreads}
               description={`${chatStats.activeThreads} active, ${chatStats.archivedThreads} archived`}
               icon={MessageSquare}
               colorClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
             />
             <StatCard
-              title={t("app.api.users.view.widget.stats.totalMessages")}
+              title={t("widget.stats.totalMessages")}
               value={chatStats.totalMessages}
               description={`${chatStats.userMessages} user, ${chatStats.aiMessages} AI`}
               icon={Activity}
               colorClassName="bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400"
             />
             <StatCard
-              title={t("app.api.users.view.widget.stats.userMessages")}
+              title={t("widget.stats.userMessages")}
               value={chatStats.userMessages}
               icon={User}
               colorClassName="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
             />
             <StatCard
-              title={t("app.api.users.view.widget.stats.lastActivity")}
+              title={t("widget.stats.lastActivity")}
               value={
                 chatStats.lastActivityAt
                   ? formatDate(chatStats.lastActivityAt)
-                  : t("app.api.users.view.widget.stats.never")
+                  : t("widget.stats.never")
               }
               icon={Clock}
               colorClassName="bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400"
@@ -467,33 +465,33 @@ export function UserViewContainer({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Coins className="h-5 w-5" />
-            {t("app.api.users.view.sections.credits")}
+            {t("sections.credits")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard
-              title={t("app.api.users.view.credits.currentBalance")}
+              title={t("credits.currentBalance")}
               value={creditInfo.currentBalance.toFixed(2)}
-              description={t("app.api.users.view.credits.availableCredits")}
+              description={t("credits.availableCredits")}
               icon={Coins}
               colorClassName="bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400"
             />
             <StatCard
-              title={t("app.api.users.view.widget.stats.freeCredits")}
+              title={t("widget.stats.freeCredits")}
               value={creditInfo.freeCreditsRemaining.toFixed(2)}
-              description={`${t("app.api.users.view.widget.stats.freePeriod")}: ${creditInfo.freePeriodId || "N/A"}`}
+              description={`${t("widget.stats.freePeriod")}: ${creditInfo.freePeriodId || "N/A"}`}
               icon={Gift}
               colorClassName="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
             />
             <StatCard
-              title={t("app.api.users.view.widget.stats.totalSpent")}
+              title={t("widget.stats.totalSpent")}
               value={creditInfo.totalCreditsSpent.toFixed(2)}
               icon={TrendingUp}
               colorClassName="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
             />
             <StatCard
-              title={t("app.api.users.view.widget.stats.totalPurchased")}
+              title={t("widget.stats.totalPurchased")}
               value={creditInfo.totalCreditsPurchased.toFixed(2)}
               icon={CreditCard}
               colorClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
@@ -507,37 +505,37 @@ export function UserViewContainer({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <DollarSign className="h-5 w-5" />
-            {t("app.api.users.view.sections.payments")}
+            {t("sections.payments")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
             <StatCard
-              title={t("app.api.users.view.widget.stats.totalRevenue")}
+              title={t("widget.stats.totalRevenue")}
               value={formatCurrency(paymentStats.totalRevenueCents)}
-              description={`${paymentStats.totalPayments} ${t("app.api.users.view.widget.stats.payments")}`}
+              description={`${paymentStats.totalPayments} ${t("widget.stats.payments")}`}
               icon={DollarSign}
               colorClassName="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400"
             />
             <StatCard
-              title={t("app.api.users.view.widget.stats.successful")}
+              title={t("widget.stats.successful")}
               value={paymentStats.successfulPayments}
-              description={`${t("app.api.users.view.widget.stats.failed")}: ${paymentStats.failedPayments}`}
+              description={`${t("widget.stats.failed")}: ${paymentStats.failedPayments}`}
               icon={CheckCircle}
               colorClassName="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
             />
             <StatCard
-              title={t("app.api.users.view.widget.stats.totalRefunds")}
+              title={t("widget.stats.totalRefunds")}
               value={formatCurrency(paymentStats.totalRefundsCents)}
               icon={XCircle}
               colorClassName="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400"
             />
             <StatCard
-              title={t("app.api.users.view.widget.stats.lastPayment")}
+              title={t("widget.stats.lastPayment")}
               value={
                 paymentStats.lastPaymentAt
                   ? formatDate(paymentStats.lastPaymentAt)
-                  : t("app.api.users.view.widget.stats.never")
+                  : t("widget.stats.never")
               }
               icon={Calendar}
               colorClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
@@ -549,7 +547,7 @@ export function UserViewContainer({
           <Div className="grid grid-cols-2 gap-4">
             <Div>
               <P className="text-xs text-muted-foreground mb-1">
-                {t("app.api.users.view.payment.stripeCustomerId")}
+                {t("payment.stripeCustomerId")}
               </P>
               <P className="text-sm font-mono">
                 {paymentStats.stripeCustomerId || "N/A"}
@@ -557,21 +555,19 @@ export function UserViewContainer({
             </Div>
             <Div>
               <P className="text-xs text-muted-foreground mb-1">
-                {t("app.api.users.view.payment.activeSubscription")}
+                {t("payment.activeSubscription")}
               </P>
               <Div className="flex items-center gap-1">
                 {paymentStats.hasActiveSubscription ? (
                   <>
                     <CheckCircle className="h-3 w-3 text-green-600" />
-                    <P className="text-sm">
-                      {t("app.api.users.view.common.yes")}
-                    </P>
+                    <P className="text-sm">{t("common.yes")}</P>
                   </>
                 ) : (
                   <>
                     <XCircle className="h-3 w-3 text-muted-foreground" />
                     <P className="text-sm text-muted-foreground">
-                      {t("app.api.users.view.common.no")}
+                      {t("common.no")}
                     </P>
                   </>
                 )}
@@ -588,30 +584,30 @@ export function UserViewContainer({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Mail className="h-5 w-5" />
-              {t("app.api.users.view.sections.newsletter")}
+              {t("sections.newsletter")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <Div className="flex items-center justify-between">
               <P className="text-sm text-muted-foreground">
-                {t("app.api.users.view.newsletter.status")}
+                {t("newsletter.status")}
               </P>
               {newsletterInfo.isSubscribed ? (
                 <Badge variant="default" className="gap-1">
                   <CheckCircle className="h-3 w-3" />
-                  {t("app.api.users.view.newsletter.subscribed")}
+                  {t("newsletter.subscribed")}
                 </Badge>
               ) : (
                 <Badge variant="secondary" className="gap-1">
                   <XCircle className="h-3 w-3" />
-                  {t("app.api.users.view.newsletter.notSubscribed")}
+                  {t("newsletter.notSubscribed")}
                 </Badge>
               )}
             </Div>
             {newsletterInfo.subscribedAt && (
               <Div>
                 <P className="text-xs text-muted-foreground">
-                  {t("app.api.users.view.newsletter.subscribedAt")}
+                  {t("newsletter.subscribedAt")}
                 </P>
                 <P className="text-sm">
                   {formatDate(newsletterInfo.subscribedAt)}
@@ -621,7 +617,7 @@ export function UserViewContainer({
             {newsletterInfo.confirmedAt && (
               <Div>
                 <P className="text-xs text-muted-foreground">
-                  {t("app.api.users.view.newsletter.confirmedAt")}
+                  {t("newsletter.confirmedAt")}
                 </P>
                 <P className="text-sm">
                   {formatDate(newsletterInfo.confirmedAt)}
@@ -631,7 +627,7 @@ export function UserViewContainer({
             {newsletterInfo.lastEmailSentAt && (
               <Div>
                 <P className="text-xs text-muted-foreground">
-                  {t("app.api.users.view.newsletter.lastEmailSent")}
+                  {t("newsletter.lastEmailSent")}
                 </P>
                 <P className="text-sm">
                   {formatDate(newsletterInfo.lastEmailSentAt)}
@@ -646,14 +642,14 @@ export function UserViewContainer({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5" />
-              {t("app.api.users.view.sections.referrals")}
+              {t("sections.referrals")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <Div className="grid grid-cols-2 gap-3">
               <Div>
                 <P className="text-xs text-muted-foreground">
-                  {t("app.api.users.view.referrals.totalReferrals")}
+                  {t("referrals.totalReferrals")}
                 </P>
                 <P className="text-2xl font-bold tabular-nums">
                   {referralStats.totalReferrals}
@@ -661,7 +657,7 @@ export function UserViewContainer({
               </Div>
               <Div>
                 <P className="text-xs text-muted-foreground">
-                  {t("app.api.users.view.referrals.activeCodes")}
+                  {t("referrals.activeCodes")}
                 </P>
                 <P className="text-2xl font-bold tabular-nums">
                   {referralStats.activeReferralCodes}
@@ -671,7 +667,7 @@ export function UserViewContainer({
             <Separator />
             <Div>
               <P className="text-xs text-muted-foreground">
-                {t("app.api.users.view.referrals.revenue")}
+                {t("referrals.revenue")}
               </P>
               <P className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
                 {formatCurrency(referralStats.totalReferralRevenueCents)}
@@ -679,7 +675,7 @@ export function UserViewContainer({
             </Div>
             <Div>
               <P className="text-xs text-muted-foreground">
-                {t("app.api.users.view.referrals.earnings")}
+                {t("referrals.earnings")}
               </P>
               <P className="text-xl font-bold text-blue-600 dark:text-blue-400">
                 {formatCurrency(referralStats.totalReferralEarningsCents)}
@@ -694,20 +690,20 @@ export function UserViewContainer({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5" />
-            {t("app.api.users.view.sections.recentActivity")}
+            {t("sections.recentActivity")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Div>
               <P className="text-xs text-muted-foreground">
-                {t("app.api.users.view.activity.lastLogin")}
+                {t("activity.lastLogin")}
               </P>
               <P className="text-sm">{formatDate(recentActivity.lastLogin)}</P>
             </Div>
             <Div>
               <P className="text-xs text-muted-foreground">
-                {t("app.api.users.view.activity.lastThread")}
+                {t("activity.lastThread")}
               </P>
               <P className="text-sm">
                 {formatDate(recentActivity.lastThreadCreated)}
@@ -715,7 +711,7 @@ export function UserViewContainer({
             </Div>
             <Div>
               <P className="text-xs text-muted-foreground">
-                {t("app.api.users.view.activity.lastMessage")}
+                {t("activity.lastMessage")}
               </P>
               <P className="text-sm">
                 {formatDate(recentActivity.lastMessageSent)}
@@ -723,7 +719,7 @@ export function UserViewContainer({
             </Div>
             <Div>
               <P className="text-xs text-muted-foreground">
-                {t("app.api.users.view.activity.lastPayment")}
+                {t("activity.lastPayment")}
               </P>
               <P className="text-sm">
                 {formatDate(recentActivity.lastPayment)}
@@ -738,7 +734,7 @@ export function UserViewContainer({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ExternalLink className="h-5 w-5" />
-            {t("app.api.users.view.widget.sections.quickActions")}
+            {t("widget.sections.quickActions")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -751,7 +747,7 @@ export function UserViewContainer({
               className="gap-2"
             >
               <History className="h-4 w-4" />
-              {t("app.api.users.view.widget.actions.viewCreditHistory")}
+              {t("widget.actions.viewCreditHistory")}
             </Button>
 
             {paymentStats.hasActiveSubscription && (
@@ -763,7 +759,7 @@ export function UserViewContainer({
                 className="gap-2"
               >
                 <CreditCard className="h-4 w-4" />
-                {t("app.api.users.view.widget.actions.viewSubscription")}
+                {t("widget.actions.viewSubscription")}
               </Button>
             )}
 
@@ -776,7 +772,7 @@ export function UserViewContainer({
                 className="gap-2"
               >
                 <Gift className="h-4 w-4" />
-                {t("app.api.users.view.widget.actions.viewReferralCodes")}
+                {t("widget.actions.viewReferralCodes")}
               </Button>
             )}
 
@@ -788,7 +784,7 @@ export function UserViewContainer({
               className="gap-2"
             >
               <TrendingUp className="h-4 w-4" />
-              {t("app.api.users.view.widget.actions.viewReferralEarnings")}
+              {t("widget.actions.viewReferralEarnings")}
             </Button>
 
             <Button
@@ -799,7 +795,7 @@ export function UserViewContainer({
               className="gap-2"
             >
               <ShoppingCart className="h-4 w-4" />
-              {t("app.api.users.view.widget.actions.addCredits")}
+              {t("widget.actions.addCredits")}
             </Button>
 
             {basicInfo.email && (
@@ -811,7 +807,7 @@ export function UserViewContainer({
                 className="gap-2"
               >
                 <Users className="h-4 w-4" />
-                {t("app.api.users.view.widget.actions.viewLead")}
+                {t("widget.actions.viewLead")}
               </Button>
             )}
 
@@ -825,8 +821,8 @@ export function UserViewContainer({
               >
                 <Copy className="h-4 w-4" />
                 {copyIdSuccess
-                  ? t("app.api.users.view.widget.actions.copied")
-                  : t("app.api.users.view.widget.actions.copyUserId")}
+                  ? t("widget.actions.copied")
+                  : t("widget.actions.copyUserId")}
               </Button>
             )}
           </Div>

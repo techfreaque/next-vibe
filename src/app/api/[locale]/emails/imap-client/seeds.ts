@@ -21,8 +21,7 @@ function getImapSeedConfig(): NewImapAccount {
   const name =
     imapClientEnv.IMAP_SEED_ACCOUNT_NAME || "Development IMAP Account";
   const email = imapClientEnv.IMAP_SEED_EMAIL || "test@example.com";
-  const host =
-    imapClientEnv.IMAP_SEED_HOST || "app.api.emails.imapClient.imap.gmail.com";
+  const host = imapClientEnv.IMAP_SEED_HOST || "imap.gmail.com";
   const username = imapClientEnv.IMAP_SEED_USERNAME || "";
   const password = imapClientEnv.IMAP_SEED_PASSWORD || "";
   const port = imapClientEnv.IMAP_SEED_PORT || 993;

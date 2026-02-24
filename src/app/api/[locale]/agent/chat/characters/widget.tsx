@@ -75,7 +75,7 @@ export function CharactersListContainer({
   const { push: navigate } = useWidgetNavigation();
   const context = useWidgetContext();
   const { logger, locale, user } = context;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const isTouch = useTouchDevice();
   const isPublic = user.isPublic;
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
@@ -147,7 +147,7 @@ export function CharactersListContainer({
             className="gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            {t("app.api.agent.chat.characters.get.signupPrompt.backButton")}
+            {t("get.signupPrompt.backButton")}
           </Button>
         </Div>
 
@@ -155,10 +155,10 @@ export function CharactersListContainer({
         <Div className="border-t border-border p-6 overflow-y-auto max-h-[min(800px,calc(100dvh-180px))]">
           <Div className="max-w-md mx-auto flex flex-col gap-6 text-center">
             <Div className="text-xl font-semibold">
-              {t("app.api.agent.chat.characters.get.signupPrompt.title")}
+              {t("get.signupPrompt.title")}
             </Div>
             <Div className="text-muted-foreground">
-              {t("app.api.agent.chat.characters.get.signupPrompt.description")}
+              {t("get.signupPrompt.description")}
             </Div>
 
             {/* CTA Buttons */}
@@ -171,9 +171,7 @@ export function CharactersListContainer({
                 className="gap-2"
               >
                 <UserPlus className="h-4 w-4" />
-                {t(
-                  "app.api.agent.chat.characters.get.signupPrompt.signupButton",
-                )}
+                {t("get.signupPrompt.signupButton")}
               </Button>
               <Button
                 type="button"
@@ -183,9 +181,7 @@ export function CharactersListContainer({
                 className="gap-2"
               >
                 <LogIn className="h-4 w-4" />
-                {t(
-                  "app.api.agent.chat.characters.get.signupPrompt.loginButton",
-                )}
+                {t("get.signupPrompt.loginButton")}
               </Button>
             </Div>
           </Div>
@@ -209,7 +205,7 @@ export function CharactersListContainer({
               onClick={handleCreateCustomClick}
               className="ml-auto"
             >
-              {t("app.api.agent.chat.characters.get.createButton.label")}
+              {t("get.createButton.label")}
             </Button>
           </Div>
         )}
@@ -236,7 +232,7 @@ export function CharactersListContainer({
             onClick={handleCreateCustomClick}
             className="ml-auto"
           >
-            {t("app.api.agent.chat.characters.get.createButton.label")}
+            {t("get.createButton.label")}
           </Button>
         </Div>
       )}
@@ -253,17 +249,12 @@ export function CharactersListContainer({
                 </Div>
                 <Div className="flex flex-col gap-1">
                   <Div className="text-base font-semibold text-primary">
-                    {t(
-                      "app.api.agent.chat.characters.onboarding.success.title",
-                      {
-                        companion: t(companionCharacter.name),
-                      },
-                    )}
+                    {t("onboarding.success.title", {
+                      companion: t(companionCharacter.name),
+                    })}
                   </Div>
                   <Div className="text-sm text-muted-foreground">
-                    {t(
-                      "app.api.agent.chat.characters.onboarding.success.subtitle",
-                    )}
+                    {t("onboarding.success.subtitle")}
                   </Div>
                 </Div>
               </Div>
@@ -370,7 +361,7 @@ export function CharactersListContainer({
             onClick={handleCreateCustomClick}
             className="ml-auto"
           >
-            {t("app.api.agent.chat.characters.get.createButton.label")}
+            {t("get.createButton.label")}
           </Button>
           <Button
             type="button"
@@ -383,7 +374,7 @@ export function CharactersListContainer({
               logger.info("Onboarding complete");
             }}
           >
-            {t("app.api.agent.chat.characters.onboarding.bottom.button")}
+            {t("onboarding.bottom.button")}
           </Button>
         </Div>
       )}
@@ -482,15 +473,13 @@ function CollapsibleCharacterSection({
           {isExpanded ? (
             <>
               <ChevronUp className="h-4 w-4" />
-              <Span>
-                {t("app.api.agent.chat.characters.get.section.showLess")}
-              </Span>
+              <Span>{t("get.section.showLess")}</Span>
             </>
           ) : (
             <>
               <ChevronDown className="h-4 w-4" />
               <Span>
-                {t("app.api.agent.chat.characters.get.section.showMore", {
+                {t("get.section.showMore", {
                   count: String(hiddenCount),
                 })}
               </Span>
@@ -715,9 +704,7 @@ function CharacterCard({
           ) : (
             <>
               <Div className="text-xs text-muted-foreground flex-shrink-0">
-                {t(
-                  "app.api.agent.chat.characters.get.card.actions.addToCollection",
-                )}
+                {t("get.card.actions.addToCollection")}
               </Div>
               <Div className="flex items-center gap-2 ml-auto flex-shrink-0">
                 <AddToFavoritesButton
@@ -730,7 +717,7 @@ function CharacterCard({
                   disabled={isInCollection}
                 >
                   <Zap className="h-3.5 w-3.5" />
-                  {t("app.api.agent.chat.characters.get.card.actions.quick")}
+                  {t("get.card.actions.quick")}
                 </AddToFavoritesButton>
                 <EditFavBeforeAddButton
                   char={char}
@@ -742,9 +729,7 @@ function CharacterCard({
                   className="h-7 gap-1.5 text-xs"
                 >
                   <Pencil className="h-3.5 w-3.5" />
-                  {t(
-                    "app.api.agent.chat.characters.get.card.actions.customize",
-                  )}
+                  {t("get.card.actions.customize")}
                 </EditFavBeforeAddButton>
               </Div>
             </>
@@ -1117,7 +1102,7 @@ function CharacterFavoriteActions({
     return (
       <>
         <Div className="text-xs text-muted-foreground flex-shrink-0">
-          {t("app.api.agent.chat.characters.get.card.actions.inCollection")}
+          {t("get.card.actions.inCollection")}
         </Div>
         <Div className="flex items-center gap-2 ml-auto flex-shrink-0">
           <Button
@@ -1135,8 +1120,8 @@ function CharacterFavoriteActions({
               <Zap className="h-3.5 w-3.5" />
             )}
             {isCurrentlyActive
-              ? t("app.api.agent.chat.characters.get.card.actions.inUse")
-              : t("app.api.agent.chat.characters.get.card.actions.useNow")}
+              ? t("get.card.actions.inUse")
+              : t("get.card.actions.useNow")}
           </Button>
           <Button
             variant="ghost"
@@ -1145,7 +1130,7 @@ function CharacterFavoriteActions({
             onClick={handleAddAnother}
           >
             <Plus className="h-3.5 w-3.5" />
-            {t("app.api.agent.chat.characters.get.card.actions.addAnother")}
+            {t("get.card.actions.addAnother")}
           </Button>
         </Div>
       </>
@@ -1156,7 +1141,7 @@ function CharacterFavoriteActions({
   return (
     <>
       <Div className="text-xs text-muted-foreground flex-shrink-0">
-        {t("app.api.agent.chat.characters.get.card.actions.inCollection")}
+        {t("get.card.actions.inCollection")}
       </Div>
       <Div className="flex items-center gap-2 ml-auto flex-shrink-0">
         <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
@@ -1171,18 +1156,13 @@ function CharacterFavoriteActions({
               }}
             >
               <Star className="h-3.5 w-3.5" />
-              {t(
-                "app.api.agent.chat.characters.get.card.actions.chooseFavorite",
-              )}{" "}
-              ({favoriteCount})
+              {t("get.card.actions.chooseFavorite")} ({favoriteCount})
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-80 p-2">
             <Div className="flex flex-col gap-2">
               <Div className="text-xs font-medium px-2 py-1 text-muted-foreground">
-                {t(
-                  "app.api.agent.chat.characters.get.card.actions.selectFavorite",
-                )}
+                {t("get.card.actions.selectFavorite")}
               </Div>
               <FavoritesList
                 favoriteIds={favoriteIds}
@@ -1203,7 +1183,7 @@ function CharacterFavoriteActions({
           onClick={handleAddAnother}
         >
           <Plus className="h-3.5 w-3.5" />
-          {t("app.api.agent.chat.characters.get.card.actions.addAnother")}
+          {t("get.card.actions.addAnother")}
         </Button>
       </Div>
     </>

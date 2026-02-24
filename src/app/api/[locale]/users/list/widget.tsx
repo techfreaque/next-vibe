@@ -96,16 +96,16 @@ function UserRow({
           </Span>
           {user.isActive ? (
             <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
-              {t("app.api.users.list.widget.statusActive")}
+              {t("widget.statusActive")}
             </Span>
           ) : (
             <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-              {t("app.api.users.list.widget.statusInactive")}
+              {t("widget.statusInactive")}
             </Span>
           )}
           {!user.emailVerified && (
             <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
-              {t("app.api.users.list.widget.statusUnverified")}
+              {t("widget.statusUnverified")}
             </Span>
           )}
         </Div>
@@ -121,8 +121,7 @@ function UserRow({
 
         {user.createdAt && (
           <Div className="text-xs text-muted-foreground mt-0.5">
-            {t("app.api.users.list.widget.joined")}{" "}
-            {formatSimpleDate(user.createdAt, locale)}
+            {t("widget.joined")} {formatSimpleDate(user.createdAt, locale)}
           </Div>
         )}
       </Div>
@@ -136,7 +135,7 @@ function UserRow({
           variant="ghost"
           size="sm"
           onClick={() => onCreditHistory(user.id)}
-          title={t("app.api.users.list.widget.creditHistory")}
+          title={t("widget.creditHistory")}
         >
           <CreditCard className="h-4 w-4" />
         </Button>
@@ -145,7 +144,7 @@ function UserRow({
           variant="ghost"
           size="sm"
           onClick={() => onView(user)}
-          title={t("app.api.users.list.widget.view")}
+          title={t("widget.view")}
         >
           <Eye className="h-4 w-4" />
         </Button>
@@ -154,7 +153,7 @@ function UserRow({
           variant="ghost"
           size="sm"
           onClick={() => onEdit(user)}
-          title={t("app.api.users.list.widget.edit")}
+          title={t("widget.edit")}
         >
           <Pencil className="h-4 w-4" />
         </Button>
@@ -164,7 +163,7 @@ function UserRow({
           size="sm"
           className="text-destructive hover:text-destructive"
           onClick={() => onDelete(user)}
-          title={t("app.api.users.list.widget.delete")}
+          title={t("widget.delete")}
         >
           <Trash2 className="h-4 w-4" />
         </Button>
@@ -181,8 +180,8 @@ export function UsersListContainer({
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
   const router = useRouter();
-  const t = useWidgetTranslation();
-  const form = useWidgetForm();
+  const t = useWidgetTranslation<typeof definition.GET>();
+  const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
 
   const activeStatuses: (typeof UserStatusFilter)[keyof typeof UserStatusFilter][] =
@@ -317,15 +316,15 @@ export function UsersListContainer({
     value: (typeof UserStatusFilter)[keyof typeof UserStatusFilter];
   }[] = [
     {
-      label: t("app.api.users.list.widget.statusActive"),
+      label: t("widget.statusActive"),
       value: UserStatusFilter.ACTIVE,
     },
     {
-      label: t("app.api.users.list.widget.statusInactive"),
+      label: t("widget.statusInactive"),
       value: UserStatusFilter.INACTIVE,
     },
     {
-      label: t("app.api.users.list.widget.statusUnverified"),
+      label: t("widget.statusUnverified"),
       value: UserStatusFilter.EMAIL_UNVERIFIED,
     },
   ];
@@ -335,19 +334,19 @@ export function UsersListContainer({
     value: (typeof UserRoleFilter)[keyof typeof UserRoleFilter];
   }[] = [
     {
-      label: t("app.api.users.list.widget.roleAdmin"),
+      label: t("widget.roleAdmin"),
       value: UserRoleFilter.ADMIN,
     },
     {
-      label: t("app.api.users.list.widget.roleCustomer"),
+      label: t("widget.roleCustomer"),
       value: UserRoleFilter.CUSTOMER,
     },
     {
-      label: t("app.api.users.list.widget.rolePartnerAdmin"),
+      label: t("widget.rolePartnerAdmin"),
       value: UserRoleFilter.PARTNER_ADMIN,
     },
     {
-      label: t("app.api.users.list.widget.rolePartnerEmployee"),
+      label: t("widget.rolePartnerEmployee"),
       value: UserRoleFilter.PARTNER_EMPLOYEE,
     },
   ];
@@ -360,7 +359,7 @@ export function UsersListContainer({
       <Div className="flex items-center gap-2 p-4 border-b">
         <NavigateButtonWidget field={children.backButton} />
         <Span className="font-semibold text-base mr-auto">
-          {t("app.api.users.list.get.title")}
+          {t("get.title")}
           {totalCount > 0 && (
             <Span className="ml-2 text-sm text-muted-foreground font-normal">
               ({totalCount})
@@ -372,20 +371,18 @@ export function UsersListContainer({
           variant="ghost"
           size="sm"
           onClick={handleViewStats}
-          title={t("app.api.users.list.widget.userStatistics")}
+          title={t("widget.userStatistics")}
           className="gap-1"
         >
           <BarChart3 className="h-4 w-4" />
-          <Span className="hidden sm:inline text-xs">
-            {t("app.api.users.list.widget.stats")}
-          </Span>
+          <Span className="hidden sm:inline text-xs">{t("widget.stats")}</Span>
         </Button>
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={handleRefresh}
-          title={t("app.api.users.list.widget.refresh")}
+          title={t("widget.refresh")}
         >
           <RefreshCw className="h-4 w-4" />
         </Button>
@@ -397,7 +394,7 @@ export function UsersListContainer({
           className="gap-1"
         >
           <UserPlus className="h-4 w-4" />
-          {t("app.api.users.list.widget.newUser")}
+          {t("widget.newUser")}
         </Button>
       </Div>
 
@@ -412,7 +409,7 @@ export function UsersListContainer({
       {/* Status filter chips */}
       <Div className="px-4 pt-2 pb-1 flex items-center gap-1.5 flex-wrap">
         <Span className="text-xs text-muted-foreground select-none">
-          {t("app.api.users.list.widget.roleFilterLabel")}
+          {t("widget.roleFilterLabel")}
         </Span>
         {statusChips.map((chip) => (
           <Button
@@ -436,7 +433,7 @@ export function UsersListContainer({
       {/* Role filter chips */}
       <Div className="px-4 pb-2 flex items-center gap-1.5 flex-wrap">
         <Span className="text-xs text-muted-foreground select-none">
-          {t("app.api.users.list.widget.roleFilterLabel")}
+          {t("widget.roleFilterLabel")}
         </Span>
         {roleChips.map((chip) => (
           <Button
@@ -491,7 +488,7 @@ export function UsersListContainer({
             className="ml-auto text-xs underline underline-offset-2 hover:text-foreground"
             onClick={handleClearFilters}
           >
-            {t("app.api.users.list.widget.clearFilters")}
+            {t("widget.clearFilters")}
           </Button>
         )}
       </Div>
@@ -520,8 +517,8 @@ export function UsersListContainer({
         ) : (
           <Div className="text-center text-muted-foreground py-12">
             {hasActiveFilters
-              ? t("app.api.users.list.widget.noUsersMatchFilters")
-              : t("app.api.users.list.widget.noUsersFound")}
+              ? t("widget.noUsersMatchFilters")
+              : t("widget.noUsersFound")}
           </Div>
         )}
       </Div>
@@ -530,10 +527,10 @@ export function UsersListContainer({
       {totalPages > 1 && (
         <Div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">
           <Span>
-            {t("app.api.users.list.widget.paginationPage")} {currentPage}{" "}
-            {t("app.api.users.list.widget.paginationOf")} {totalPages}{" "}
-            {t("app.api.users.list.widget.paginationSeparator")} {totalCount}{" "}
-            {t("app.api.users.list.widget.paginationUsers")}
+            {t("widget.paginationPage")} {currentPage}{" "}
+            {t("widget.paginationOf")} {totalPages}{" "}
+            {t("widget.paginationSeparator")} {totalCount}{" "}
+            {t("widget.paginationUsers")}
           </Span>
           <Div className="flex gap-1">
             <Button

@@ -41,7 +41,7 @@ export function KagiSearchResultsContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const value = field.value;
   const children = field.children;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const disabled = useWidgetDisabled();
 
   const references = value?.references ?? [];
@@ -66,9 +66,8 @@ export function KagiSearchResultsContainer({
           <FormAlertWidget field={{}} />
           <SubmitButtonWidget
             field={{
-              text: "app.api.agent.search.kagi.get.submitButton.label",
-              loadingText:
-                "app.api.agent.search.kagi.get.submitButton.loadingText",
+              text: "get.submitButton.label",
+              loadingText: "get.submitButton.loadingText",
               icon: "search",
               variant: "primary",
             }}
@@ -88,7 +87,7 @@ export function KagiSearchResultsContainer({
                 <Div className="flex items-center gap-2 px-4 py-3 border-b border-blue-200 dark:border-blue-800 bg-blue-100/50 dark:bg-blue-900/20">
                   <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                   <Span className="text-sm font-semibold text-blue-900 dark:text-blue-100">
-                    {t("app.api.agent.search.kagi.get.response.output.title")}
+                    {t("get.response.output.title")}
                   </Span>
                 </Div>
                 <Div className="p-4">
@@ -105,7 +104,7 @@ export function KagiSearchResultsContainer({
           {references.length > 0 && (
             <Div className="flex flex-col gap-2">
               <Div className="text-sm font-semibold text-muted-foreground px-1">
-                {t("app.api.agent.search.kagi.get.response.references.title")}
+                {t("get.response.references.title")}
               </Div>
               <Div className="flex flex-col gap-2">
                 {references.map((ref, index) => (

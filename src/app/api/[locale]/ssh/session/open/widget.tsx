@@ -22,12 +22,11 @@ interface WidgetProps {
 export function SessionOpenContainer({
   field,
 }: WidgetProps): React.JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof endpoints.POST>();
   return (
     <Div className="px-4 py-3">
       <Span className="text-sm text-muted-foreground">
-        {field.value?.sessionId ??
-          t("app.api.ssh.terminal.widget.disconnected")}
+        {field.value?.sessionId ?? t("session.open.post.disconnected")}
       </Span>
     </Div>
   );

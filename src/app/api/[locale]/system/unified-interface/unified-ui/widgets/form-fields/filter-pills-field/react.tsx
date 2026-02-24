@@ -20,6 +20,7 @@ import {
 } from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
 
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { EnumWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import type { ReactFormFieldProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
@@ -50,7 +51,9 @@ import type { FilterPillsFieldWidgetConfig } from "./types";
 
 export function FilterPillsFieldWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TSchema extends EnumWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({
@@ -61,22 +64,17 @@ export function FilterPillsFieldWidget<
   TUsage,
   FilterPillsFieldWidgetConfig<TKey, TSchema, TUsage>
 >): JSX.Element {
-  const t = useWidgetTranslation();
+  const tField = useWidgetTranslation<TEndpoint>();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
   const isDisabled = useWidgetDisabled();
 
-  if (!form || !fieldName) {
-    return (
-      <Div>
-        {t(
-          "app.api.system.unifiedInterface.react.widgets.formField.requiresContext",
-        )}
-      </Div>
-    );
-  }
-
+  const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
   const { t: globalT } = simpleT(locale);
+
+  if (!form || !fieldName) {
+    return <Div>{widgetT("react.widgets.formField.requiresContext")}</Div>;
+  }
   const theme = getTheme(field.theme);
   const isRequired = !field.schema.isOptional();
 
@@ -104,7 +102,7 @@ export function FilterPillsFieldWidget<
                   "flex items-center gap-1.5",
                 )}
               >
-                <Span>{field.label && t(field.label)}</Span>
+                <Span>{field.label && tField(field.label)}</Span>
                 {field.label && style === "asterisk" && isRequired && (
                   <Span className="text-blue-600 dark:text-blue-400 font-bold">
                     *
@@ -124,7 +122,9 @@ export function FilterPillsFieldWidget<
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent className="max-w-[250px]">
-                        <Span className="text-sm">{t(field.description)}</Span>
+                        <Span className="text-sm">
+                          {tField(field.description)}
+                        </Span>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -185,7 +185,7 @@ export function FilterPillsFieldWidget<
                           />
                         )}
                         <Span className="text-xs font-medium">
-                          {t(option.label)}
+                          {tField(option.label)}
                         </Span>
                       </Button>
                     );

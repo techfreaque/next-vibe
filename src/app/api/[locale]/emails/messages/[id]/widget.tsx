@@ -70,7 +70,7 @@ export function EmailDetailContainer({
   const children = field.children;
   const email = field.value?.email;
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const router = useRouter();
   const isLoading = field.value === null || field.value === undefined;
 
@@ -86,9 +86,7 @@ export function EmailDetailContainer({
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
         <NavigateButtonWidget field={children.backButton} />
-        <Span className="font-semibold text-base">
-          {t("app.api.emails.messages.id.title")}
-        </Span>
+        <Span className="font-semibold text-base">{t("title")}</Span>
       </Div>
 
       {isLoading ? (
@@ -97,7 +95,7 @@ export function EmailDetailContainer({
         </Div>
       ) : email === null || email === undefined ? (
         <Div className="p-8 text-center text-muted-foreground">
-          {t("app.api.emails.messages.id.widget.notFound")}
+          {t("widget.notFound")}
         </Div>
       ) : (
         <Div className="p-4 flex flex-col gap-4">
@@ -127,10 +125,10 @@ export function EmailDetailContainer({
           {/* Parties */}
           <Div className="rounded-lg border p-3">
             <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide block mb-2">
-              {t("app.api.emails.messages.id.widget.parties")}
+              {t("widget.parties")}
             </Span>
             <MetaRow
-              label={t("app.api.emails.messages.id.widget.to")}
+              label={t("widget.to")}
               value={
                 <>
                   {email.recipientEmail}
@@ -144,7 +142,7 @@ export function EmailDetailContainer({
               }
             />
             <MetaRow
-              label={t("app.api.emails.messages.id.widget.from")}
+              label={t("widget.from")}
               value={
                 <>
                   {email.senderEmail}
@@ -162,10 +160,10 @@ export function EmailDetailContainer({
           {/* Timestamps */}
           <Div className="rounded-lg border p-3">
             <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide block mb-2">
-              {t("app.api.emails.messages.id.widget.timestamps")}
+              {t("widget.timestamps")}
             </Span>
             <MetaRow
-              label={t("app.api.emails.messages.id.widget.sentAt")}
+              label={t("widget.sentAt")}
               value={
                 email.sentAt !== null && email.sentAt !== undefined
                   ? formatSimpleDate(email.sentAt, locale as never)
@@ -173,7 +171,7 @@ export function EmailDetailContainer({
               }
             />
             <MetaRow
-              label={t("app.api.emails.messages.id.widget.deliveredAt")}
+              label={t("widget.deliveredAt")}
               value={
                 email.deliveredAt !== null && email.deliveredAt !== undefined
                   ? formatSimpleDate(email.deliveredAt, locale as never)
@@ -181,7 +179,7 @@ export function EmailDetailContainer({
               }
             />
             <MetaRow
-              label={t("app.api.emails.messages.id.widget.openedAt")}
+              label={t("widget.openedAt")}
               value={
                 email.openedAt !== null && email.openedAt !== undefined
                   ? formatSimpleDate(email.openedAt, locale as never)
@@ -189,7 +187,7 @@ export function EmailDetailContainer({
               }
             />
             <MetaRow
-              label={t("app.api.emails.messages.id.widget.clickedAt")}
+              label={t("widget.clickedAt")}
               value={
                 email.clickedAt !== null && email.clickedAt !== undefined
                   ? formatSimpleDate(email.clickedAt, locale as never)
@@ -201,35 +199,35 @@ export function EmailDetailContainer({
           {/* Technical details */}
           <Div className="rounded-lg border p-3">
             <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide block mb-2">
-              {t("app.api.emails.messages.id.widget.technical")}
+              {t("widget.technical")}
             </Span>
             {email.templateName !== null &&
               email.templateName !== undefined && (
                 <MetaRow
-                  label={t("app.api.emails.messages.id.widget.template")}
+                  label={t("widget.template")}
                   value={email.templateName}
                 />
               )}
             {email.emailProvider !== null &&
               email.emailProvider !== undefined && (
                 <MetaRow
-                  label={t("app.api.emails.messages.id.widget.provider")}
+                  label={t("widget.provider")}
                   value={t(email.emailProvider)}
                 />
               )}
             {email.externalId !== null && email.externalId !== undefined && (
               <MetaRow
-                label={t("app.api.emails.messages.id.widget.externalId")}
+                label={t("widget.externalId")}
                 value={email.externalId}
               />
             )}
             <MetaRow
-              label={t("app.api.emails.messages.id.widget.retryCount")}
+              label={t("widget.retryCount")}
               value={String(email.retryCount)}
             />
             {email.error !== null && email.error !== undefined && (
               <MetaRow
-                label={t("app.api.emails.messages.id.widget.error")}
+                label={t("widget.error")}
                 value={<Div style={{ color: "#ef4444" }}>{email.error}</Div>}
               />
             )}
@@ -240,12 +238,12 @@ export function EmailDetailContainer({
             (email.userId !== null && email.userId !== undefined)) && (
             <Div className="rounded-lg border p-3">
               <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide block mb-2">
-                {t("app.api.emails.messages.id.widget.associations")}
+                {t("widget.associations")}
               </Span>
               {email.leadId !== null && email.leadId !== undefined && (
                 <Div className="flex items-center gap-2">
                   <Span className="text-xs text-muted-foreground min-w-[120px]">
-                    {t("app.api.emails.messages.id.widget.lead")}
+                    {t("widget.lead")}
                   </Span>
                   <Button
                     type="button"
@@ -259,10 +257,7 @@ export function EmailDetailContainer({
                 </Div>
               )}
               {email.userId !== null && email.userId !== undefined && (
-                <MetaRow
-                  label={t("app.api.emails.messages.id.widget.user")}
-                  value={email.userId}
-                />
+                <MetaRow label={t("widget.user")} value={email.userId} />
               )}
             </Div>
           )}

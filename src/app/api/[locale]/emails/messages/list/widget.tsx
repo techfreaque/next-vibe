@@ -83,27 +83,27 @@ const STATUS_STYLE: Record<string, string> = {
 
 const STATUS_TABS = [
   {
-    label: "app.api.emails.messages.list.widget.tabs.all",
+    label: "widget.tabs.all",
     value: EmailStatusFilter.ANY,
   },
   {
-    label: "app.api.emails.messages.list.widget.tabs.sent",
+    label: "widget.tabs.sent",
     value: EmailStatusFilter.SENT,
   },
   {
-    label: "app.api.emails.messages.list.widget.tabs.delivered",
+    label: "widget.tabs.delivered",
     value: EmailStatusFilter.DELIVERED,
   },
   {
-    label: "app.api.emails.messages.list.widget.tabs.opened",
+    label: "widget.tabs.opened",
     value: EmailStatusFilter.OPENED,
   },
   {
-    label: "app.api.emails.messages.list.widget.tabs.failed",
+    label: "widget.tabs.failed",
     value: EmailStatusFilter.FAILED,
   },
   {
-    label: "app.api.emails.messages.list.widget.tabs.bounced",
+    label: "widget.tabs.bounced",
     value: EmailStatusFilter.BOUNCED,
   },
 ] as const;
@@ -125,7 +125,7 @@ function EmailRow({
 }: {
   email: EmailItem;
   onView: (email: EmailItem) => void;
-  t: (key: string) => string;
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
 }): React.JSX.Element {
   const status = email.emailCore.status;
   const channel = email.emailCore.channel ?? MessageChannel.EMAIL;
@@ -159,8 +159,7 @@ function EmailRow({
         </Div>
         <Div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5 flex-wrap">
           <Span className="truncate max-w-[180px]">
-            {t("app.api.emails.messages.list.widget.to")}:{" "}
-            {email.emailParties.recipient.recipientEmail}
+            {t("widget.to")}: {email.emailParties.recipient.recipientEmail}
           </Span>
           {email.emailMetadata.type !== null &&
             email.emailMetadata.type !== undefined && (
@@ -174,20 +173,19 @@ function EmailRow({
       <Div className="hidden md:flex flex-col items-end gap-1 flex-shrink-0 text-xs text-muted-foreground">
         {email.technicalDetails.retryCount > 0 && (
           <Span>
-            {t("app.api.emails.messages.list.widget.retries")}:{" "}
-            {email.technicalDetails.retryCount}
+            {t("widget.retries")}: {email.technicalDetails.retryCount}
           </Span>
         )}
         {email.emailEngagement.openedAt !== null &&
           email.emailEngagement.openedAt !== undefined && (
             <Div style={{ color: "#22c55e", fontSize: "11px" }}>
-              {t("app.api.emails.messages.list.widget.opened")}
+              {t("widget.opened")}
             </Div>
           )}
         {email.emailEngagement.clickedAt !== null &&
           email.emailEngagement.clickedAt !== undefined && (
             <Div style={{ color: "#8b5cf6", fontSize: "11px" }}>
-              {t("app.api.emails.messages.list.widget.clicked")}
+              {t("widget.clicked")}
             </Div>
           )}
       </Div>
@@ -200,7 +198,7 @@ export function EmailsListContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const router = useRouter();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
@@ -320,7 +318,7 @@ export function EmailsListContainer({
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
         <Span className="font-semibold text-base">
-          {t("app.api.emails.messages.list.title")}
+          {t("title")}
           {total > 0 && (
             <Span className="ml-2 text-sm text-muted-foreground font-normal">
               ({total})
@@ -335,16 +333,14 @@ export function EmailsListContainer({
           onClick={handleStats}
           className="gap-1"
         >
-          <Span className="hidden sm:inline">
-            {t("app.api.emails.messages.list.widget.stats")}
-          </Span>
+          <Span className="hidden sm:inline">{t("widget.stats")}</Span>
         </Button>
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={handleRefresh}
-          title={t("app.api.emails.messages.list.widget.refresh")}
+          title={t("widget.refresh")}
         >
           <RefreshCw className="h-4 w-4" />
         </Button>
@@ -450,9 +446,7 @@ export function EmailsListContainer({
                 onSubmit();
               }
             }}
-            placeholder={t(
-              "app.api.emails.messages.list.widget.searchPlaceholder",
-            )}
+            placeholder={t("widget.searchPlaceholder")}
             className="pl-9 h-9"
           />
         </Div>
@@ -502,8 +496,8 @@ export function EmailsListContainer({
         ) : (
           <Div className="text-center text-muted-foreground py-12">
             {activeStatus !== EmailStatusFilter.ANY
-              ? t("app.api.emails.messages.list.widget.emptyFiltered")
-              : t("app.api.emails.messages.list.widget.emptyState")}
+              ? t("widget.emptyFiltered")
+              : t("widget.emptyState")}
           </Div>
         )}
       </Div>
@@ -512,8 +506,7 @@ export function EmailsListContainer({
       {totalPages > 1 && (
         <Div className="flex items-center justify-between px-4 py-3 border-t text-sm text-muted-foreground">
           <Span>
-            {t("app.api.emails.messages.list.widget.page")} {currentPage} /{" "}
-            {totalPages}
+            {t("widget.page")} {currentPage} / {totalPages}
           </Span>
           <Div className="flex gap-1">
             <Button

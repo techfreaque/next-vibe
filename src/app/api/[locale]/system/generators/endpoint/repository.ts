@@ -106,7 +106,7 @@ class EndpointGeneratorRepositoryImpl {
 
       return success({
         success: true,
-        message: "app.api.system.generators.endpoints.success.generated",
+        message: t("post.success.generated"),
         endpointsFound: definitionFiles.length,
         duration,
         outputFile: data.dryRun ? undefined : outputFile,

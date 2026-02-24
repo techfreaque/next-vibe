@@ -143,4 +143,36 @@ export const translations = {
     disabled: "Disabled",
     lastSync: "Last sync",
   },
+  enums: {
+    syncStatus: {
+      pending: "Pending",
+      syncing: "Syncing",
+      synced: "Synced",
+      error: "Error",
+    },
+    sortOrder: {
+      asc: "Ascending",
+      desc: "Descending",
+    },
+    accountSortField: {
+      name: "Name",
+      email: "Email",
+      host: "Host",
+      enabled: "Enabled",
+      lastSyncAt: "Last Sync At",
+      createdAt: "Created At",
+    },
+    accountStatusFilter: {
+      all: "All Account Statuses",
+      enabled: "Enabled",
+      disabled: "Disabled",
+    },
+    connectionStatus: {
+      connected: "Connected",
+      disconnected: "Disconnected",
+      connecting: "Connecting",
+      error: "Error",
+      timeout: "Timeout",
+    },
+  },
 };

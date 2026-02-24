@@ -95,7 +95,7 @@ export function ContainerWidgetInk<
       >
     >
 >): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const responseOnly = useInkWidgetResponseOnly();
   const showLabels = useInkWidgetShowLabels();
   const { title: titleKey, description: descriptionKey } = field;

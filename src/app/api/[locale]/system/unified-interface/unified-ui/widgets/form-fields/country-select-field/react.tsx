@@ -26,6 +26,7 @@ import {
 } from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
 
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import type { ReactFormFieldProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
@@ -70,7 +71,9 @@ const COUNTRIES = [
 
 export function CountrySelectFieldWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TSchema extends StringWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({
@@ -81,21 +84,17 @@ export function CountrySelectFieldWidget<
   TUsage,
   CountrySelectFieldWidgetConfig<TKey, TSchema, TUsage>
 >): JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<TEndpoint>();
   const locale = useWidgetLocale();
   const form = useWidgetForm();
   const isDisabled = useWidgetDisabled();
-  if (!form || !fieldName) {
-    return (
-      <Div>
-        {t(
-          "app.api.system.unifiedInterface.react.widgets.formField.requiresContext",
-        )}
-      </Div>
-    );
-  }
 
+  const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
   const { t: globalT } = simpleT(locale);
+
+  if (!form || !fieldName) {
+    return <Div>{widgetT("react.widgets.formField.requiresContext")}</Div>;
+  }
   const theme = getTheme(field.theme);
   const descriptionStyle = theme.descriptionStyle;
   const isRequired = !field.schema.isOptional();

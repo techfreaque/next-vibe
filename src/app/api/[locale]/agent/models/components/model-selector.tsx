@@ -57,6 +57,7 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
 import { DEFAULT_INPUT_TOKENS, DEFAULT_OUTPUT_TOKENS } from "../constants";
@@ -244,7 +245,7 @@ export interface ModelSelectorProps {
   /**
    * Translation function
    */
-  t: (key: string, params?: TParams) => string;
+  t: (key: string, params?: TParams) => string | TranslatedKeyType;
 
   /**
    * User's locale for currency formatting
@@ -256,11 +257,12 @@ export interface ModelSelectorProps {
 function getSetupRequiredMessage(
   model: ModelOption,
   envAvailability: AgentEnvAvailability | undefined,
-  t: (key: string) => string,
+  locale: CountryLanguage,
 ): string | null {
   if (!envAvailability) {
     return null;
   }
+  const t = scopedTranslation.scopedT(locale).t;
   switch (model.apiProvider) {
     case ApiProvider.OPENROUTER:
       return envAvailability.openRouter
@@ -953,12 +955,8 @@ export function ModelSelector({
             minIndex={intelligenceIndices.min}
             maxIndex={intelligenceIndices.max}
             onChange={handleIntelligenceChange}
-            minLabel={t(
-              "app.api.agent.chat.characters.post.intelligenceRange.minLabel",
-            )}
-            maxLabel={t(
-              "app.api.agent.chat.characters.post.intelligenceRange.maxLabel",
-            )}
+            minLabel={t("post.intelligenceRange.minLabel")}
+            maxLabel={t("post.intelligenceRange.maxLabel")}
             disabled={readOnly}
             t={t}
           />
@@ -968,12 +966,8 @@ export function ModelSelector({
             minIndex={contentIndices.min}
             maxIndex={contentIndices.max}
             onChange={handleContentChange}
-            minLabel={t(
-              "app.api.agent.chat.characters.post.contentRange.minLabel",
-            )}
-            maxLabel={t(
-              "app.api.agent.chat.characters.post.contentRange.maxLabel",
-            )}
+            minLabel={t("post.contentRange.minLabel")}
+            maxLabel={t("post.contentRange.maxLabel")}
             disabled={readOnly}
             t={t}
           />
@@ -983,12 +977,8 @@ export function ModelSelector({
             minIndex={speedIndices.min}
             maxIndex={speedIndices.max}
             onChange={handleSpeedChange}
-            minLabel={t(
-              "app.api.agent.chat.characters.post.speedRange.minLabel",
-            )}
-            maxLabel={t(
-              "app.api.agent.chat.characters.post.speedRange.maxLabel",
-            )}
+            minLabel={t("post.speedRange.minLabel")}
+            maxLabel={t("post.speedRange.maxLabel")}
             disabled={readOnly}
             t={t}
           />
@@ -998,12 +988,8 @@ export function ModelSelector({
             minIndex={priceIndices.min}
             maxIndex={priceIndices.max}
             onChange={handlePriceChange}
-            minLabel={t(
-              "app.api.agent.chat.characters.post.priceRange.minLabel",
-            )}
-            maxLabel={t(
-              "app.api.agent.chat.characters.post.priceRange.maxLabel",
-            )}
+            minLabel={t("post.priceRange.minLabel")}
+            maxLabel={t("post.priceRange.maxLabel")}
             disabled={readOnly}
             t={t}
           />

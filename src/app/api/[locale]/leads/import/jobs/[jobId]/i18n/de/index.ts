@@ -12,6 +12,11 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Import-Job abrufen",
     description: "Details eines bestimmten Import-Jobs abrufen",
+    actions: {
+      retry: "Wiederholen",
+      stop: "Stoppen",
+      viewLeads: "Leads anzeigen",
+    },
     jobId: {
       label: "Job-ID",
       description: "Eindeutige Kennung für den Import-Job",
@@ -361,18 +366,32 @@ export const translations: typeof enTranslations = {
       created: "Erstellt",
       started: "Gestartet",
       completed: "Abgeschlossen",
+      jobStatus: {
+        enums: {
+          csvImportJobStatus: {
+            pending: "Ausstehend",
+            processing: "Wird verarbeitet",
+            completed: "Abgeschlossen",
+            failed: "Fehlgeschlagen",
+          },
+        },
+      },
     },
     retry: {
       title: "Import-Job wiederholen",
       loadingRetrying: "Job wird wiederholt…",
       successMessage: "Job erfolgreich wiederholt",
       failureMessage: "Wiederholung fehlgeschlagen",
+      viewJobStatus: "Job-Status anzeigen",
+      viewLeads: "Leads anzeigen",
     },
     stop: {
       title: "Import-Job stoppen",
       loadingStopping: "Job wird gestoppt…",
       successMessage: "Job erfolgreich gestoppt",
       failureMessage: "Stoppen fehlgeschlagen",
+      viewLeads: "Leads anzeigen",
+      startNewImport: "Neuen Import starten",
     },
   },
 };

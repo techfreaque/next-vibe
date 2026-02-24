@@ -50,7 +50,7 @@ export function ImapHealthContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const data = field.value;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const isLoading = data === null || data === undefined;
 
   const statusColor =
@@ -62,9 +62,7 @@ export function ImapHealthContainer({
     <Div className="flex flex-col gap-0">
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
-        <Span className="font-semibold text-base">
-          {t("app.api.emails.imapClient.health.widget.title")}
-        </Span>
+        <Span className="font-semibold text-base">{t("widget.title")}</Span>
         {!isLoading && (
           <Div
             style={{
@@ -93,25 +91,19 @@ export function ImapHealthContainer({
           {/* Accounts */}
           <Div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <StatCard
-              label={t(
-                "app.api.emails.imapClient.health.widget.accountsHealthy",
-              )}
+              label={t("widget.accountsHealthy")}
               value={data.accountsHealthy}
             />
             <StatCard
-              label={t("app.api.emails.imapClient.health.widget.accountsTotal")}
+              label={t("widget.accountsTotal")}
               value={data.accountsTotal}
             />
             <StatCard
-              label={t(
-                "app.api.emails.imapClient.health.widget.connectionsActive",
-              )}
+              label={t("widget.connectionsActive")}
               value={data.connectionsActive}
             />
             <StatCard
-              label={t(
-                "app.api.emails.imapClient.health.widget.connectionErrors",
-              )}
+              label={t("widget.connectionErrors")}
               value={data.connectionErrors}
             />
           </Div>
@@ -119,11 +111,11 @@ export function ImapHealthContainer({
           {/* Performance */}
           <Div className="rounded-lg border p-4 flex flex-col gap-2">
             <Span className="text-sm font-semibold">
-              {t("app.api.emails.imapClient.health.widget.performance")}
+              {t("widget.performance")}
             </Span>
             <Div className="flex items-center justify-between text-sm">
               <Span className="text-muted-foreground">
-                {t("app.api.emails.imapClient.health.widget.avgResponseTime")}
+                {t("widget.avgResponseTime")}
               </Span>
               <Span className="font-semibold">
                 {Math.round(data.avgResponseTime)}
@@ -132,13 +124,13 @@ export function ImapHealthContainer({
             </Div>
             <Div className="flex items-center justify-between text-sm">
               <Span className="text-muted-foreground">
-                {t("app.api.emails.imapClient.health.widget.uptime")}
+                {t("widget.uptime")}
               </Span>
               <Span className="font-semibold">{data.uptime}</Span>
             </Div>
             <Div className="flex items-center justify-between text-sm">
               <Span className="text-muted-foreground">
-                {t("app.api.emails.imapClient.health.widget.serverStatus")}
+                {t("widget.serverStatus")}
               </Span>
               <Span className="font-semibold">{t(data.serverStatus)}</Span>
             </Div>
@@ -147,11 +139,11 @@ export function ImapHealthContainer({
           {/* Sync stats */}
           <Div className="rounded-lg border p-4 flex flex-col gap-2">
             <Span className="text-sm font-semibold">
-              {t("app.api.emails.imapClient.health.widget.syncStats")}
+              {t("widget.syncStats")}
             </Span>
             <Div className="flex items-center justify-between text-sm">
               <Span className="text-muted-foreground">
-                {t("app.api.emails.imapClient.health.widget.totalSyncs")}
+                {t("widget.totalSyncs")}
               </Span>
               <Span className="font-semibold">{data.syncStats.totalSyncs}</Span>
             </Div>
@@ -159,7 +151,7 @@ export function ImapHealthContainer({
               data.syncStats.lastSyncTime !== undefined && (
                 <Div className="flex items-center justify-between text-sm">
                   <Span className="text-muted-foreground">
-                    {t("app.api.emails.imapClient.health.widget.lastSyncTime")}
+                    {t("widget.lastSyncTime")}
                   </Span>
                   <Span className="font-semibold">
                     {new Date(data.syncStats.lastSyncTime).toLocaleString([], {

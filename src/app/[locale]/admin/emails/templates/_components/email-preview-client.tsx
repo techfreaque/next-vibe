@@ -24,7 +24,7 @@ import type { ReactElement } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useEmailPreviewRender } from "@/app/api/[locale]/emails/preview/render/hooks/hooks";
-import type { PreviewFieldConfig } from "@/app/api/[locale]/emails/registry/types";
+import type { TranslatedPreviewFieldConfig } from "@/app/api/[locale]/emails/registry/types";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
@@ -38,7 +38,7 @@ interface EmailPreviewClientProps {
   locale: CountryLanguage;
   templateId: string;
   templateName: string;
-  previewFields?: Record<string, PreviewFieldConfig<string>>;
+  previewFields?: Record<string, TranslatedPreviewFieldConfig>;
   exampleProps: Record<string, string | number | boolean>;
   user: JwtPayloadType;
 }

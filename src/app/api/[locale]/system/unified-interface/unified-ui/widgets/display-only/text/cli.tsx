@@ -41,7 +41,7 @@ export function TextWidgetInk<
       >,
 ): JSX.Element {
   const { field } = props;
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const locale = useInkWidgetLocale();
   const {
     content,

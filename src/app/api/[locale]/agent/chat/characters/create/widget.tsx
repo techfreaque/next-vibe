@@ -24,7 +24,6 @@ import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TParams } from "@/i18n/core/static-types";
 
 import type { ModelSelectionSimple } from "../../../models/components/types";
 import type defintion from "./definition";
@@ -49,7 +48,7 @@ export function CharacterCreateContainer({
 }: CustomWidgetProps): JSX.Element {
   const children = field.children;
   const form = useWidgetForm<typeof defintion.POST>();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof defintion.POST>();
   const locale = useWidgetLocale();
 
   return (
@@ -67,9 +66,8 @@ export function CharacterCreateContainer({
         {/* Submit Button */}
         <SubmitButtonWidget
           field={{
-            text: "app.api.agent.chat.characters.post.submitButton.text",
-            loadingText:
-              "app.api.agent.chat.characters.post.submitButton.loadingText",
+            text: "post.submitButton.text",
+            loadingText: "post.submitButton.loadingText",
             icon: "plus",
             variant: "primary",
             className: "ml-auto",
@@ -117,7 +115,7 @@ function ModelSelectorWrapper({
   locale,
 }: {
   form: ReturnType<typeof useWidgetForm<typeof defintion.POST>>;
-  t: (key: string, params?: TParams) => string;
+  t: ReturnType<typeof useWidgetTranslation<typeof defintion.POST>>;
   locale: CountryLanguage;
 }): JSX.Element {
   const modelSelection = form.watch("modelSelection");

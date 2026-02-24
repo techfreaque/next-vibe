@@ -28,7 +28,7 @@ export function IconFieldWidgetInk<
   TUsage,
   IconFieldWidgetConfig<TKey, TSchema, TUsage>
 >): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const showLabels = useInkWidgetShowLabels();
   const displayValue = field.value ? field.value : "—";
 

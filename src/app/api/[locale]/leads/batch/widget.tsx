@@ -61,7 +61,7 @@ export function LeadsBatchUpdateContainer({
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
   const router = useRouter();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.PATCH>();
   const form = useWidgetForm<typeof definition.PATCH>();
   const isSubmitting = endpointMutations?.update?.isSubmitting;
 
@@ -108,7 +108,7 @@ export function LeadsBatchUpdateContainer({
       <Div className="flex items-center gap-2 pb-2 border-b">
         <NavigateButtonWidget field={children.backButton} />
         <Span className="font-semibold text-base mr-auto">
-          {t("app.api.leads.batch.widget.update.headerTitle")}
+          {t("widget.update.headerTitle")}
         </Span>
         {isSubmitting && (
           <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -119,13 +119,12 @@ export function LeadsBatchUpdateContainer({
       {hasActiveFilters && (
         <Div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30 p-3 flex flex-col gap-2">
           <Span className="text-xs font-medium text-blue-700 dark:text-blue-300">
-            {t("app.api.leads.batch.widget.update.activeFiltersLabel")}
+            {t("widget.update.activeFiltersLabel")}
           </Span>
           <Div className="flex flex-wrap gap-1.5">
             {activeSearch && (
               <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200">
-                {t("app.api.leads.batch.widget.update.filterSearch")}:{" "}
-                {activeSearch}
+                {t("widget.update.filterSearch")}: {activeSearch}
               </Span>
             )}
             {activeStatus.map((s) => (
@@ -159,7 +158,7 @@ export function LeadsBatchUpdateContainer({
       {/* Updates Section */}
       <Div className="rounded-lg border bg-card p-4 flex flex-col gap-3">
         <Span className="font-medium text-sm text-muted-foreground">
-          {t("app.api.leads.batch.widget.update.sectionUpdates")}
+          {t("widget.update.sectionUpdates")}
         </Span>
         <Div className="grid grid-cols-2 gap-3">
           <SelectFieldWidget
@@ -186,7 +185,7 @@ export function LeadsBatchUpdateContainer({
       {/* Operation Settings Section */}
       <Div className="rounded-lg border bg-card p-4 flex flex-col gap-3">
         <Span className="font-medium text-sm text-muted-foreground">
-          {t("app.api.leads.batch.widget.update.sectionSettings")}
+          {t("widget.update.sectionSettings")}
         </Span>
         <Div className="grid grid-cols-2 gap-3">
           <SelectFieldWidget field={children.scope} fieldName="scope" />
@@ -201,9 +200,8 @@ export function LeadsBatchUpdateContainer({
       <FormAlertWidget field={{}} />
       <SubmitButtonWidget
         field={{
-          text: "app.api.leads.batch.widget.update.submitButton" as const,
-          loadingText:
-            "app.api.leads.batch.widget.update.submitButtonLoading" as const,
+          text: "widget.update.submitButton" as const,
+          loadingText: "widget.update.submitButtonLoading" as const,
           icon: "refresh-cw",
           variant: "primary",
         }}
@@ -215,12 +213,12 @@ export function LeadsBatchUpdateContainer({
           <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
           <Div className="flex flex-col gap-0.5">
             <Span className="text-sm font-medium text-yellow-800 dark:text-yellow-300">
-              {t("app.api.leads.batch.widget.update.highVolumeTitle", {
+              {t("widget.update.highVolumeTitle", {
                 count: totalMatched,
               })}
             </Span>
             <Span className="text-xs text-yellow-700 dark:text-yellow-400">
-              {t("app.api.leads.batch.widget.update.highVolumeDescription")}
+              {t("widget.update.highVolumeDescription")}
             </Span>
           </Div>
         </Div>
@@ -230,10 +228,10 @@ export function LeadsBatchUpdateContainer({
       {isPartialBatch && (
         <Div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30 p-3 flex items-start gap-2">
           <Span className="text-sm font-medium text-blue-800 dark:text-blue-300">
-            {t("app.api.leads.batch.widget.update.partialBatchTitle")}
+            {t("widget.update.partialBatchTitle")}
           </Span>
           <Span className="text-xs text-blue-700 dark:text-blue-400">
-            {t("app.api.leads.batch.widget.update.partialBatchDescription", {
+            {t("widget.update.partialBatchDescription", {
               processed: totalProcessed,
               matched: totalMatched,
             })}
@@ -259,8 +257,8 @@ export function LeadsBatchUpdateContainer({
             )}
             <Span className="font-medium text-sm">
               {response.success
-                ? t("app.api.leads.batch.widget.update.successTitle")
-                : t("app.api.leads.batch.widget.update.failureTitle")}
+                ? t("widget.update.successTitle")
+                : t("widget.update.failureTitle")}
             </Span>
           </Div>
           <Div className="grid grid-cols-3 gap-3">
@@ -269,7 +267,7 @@ export function LeadsBatchUpdateContainer({
                 {totalMatched}
               </Span>
               <Span className="text-xs text-muted-foreground">
-                {t("app.api.leads.batch.widget.update.statMatched")}
+                {t("widget.update.statMatched")}
               </Span>
             </Div>
             <Div className="text-center">
@@ -277,7 +275,7 @@ export function LeadsBatchUpdateContainer({
                 {totalProcessed}
               </Span>
               <Span className="text-xs text-muted-foreground">
-                {t("app.api.leads.batch.widget.update.statProcessed")}
+                {t("widget.update.statProcessed")}
               </Span>
             </Div>
             <Div className="text-center">
@@ -285,7 +283,7 @@ export function LeadsBatchUpdateContainer({
                 {response.totalUpdated ?? 0}
               </Span>
               <Span className="text-xs text-muted-foreground">
-                {t("app.api.leads.batch.widget.update.statUpdated")}
+                {t("widget.update.statUpdated")}
               </Span>
             </Div>
           </Div>
@@ -300,7 +298,7 @@ export function LeadsBatchUpdateContainer({
                 onClick={handleViewAllAffected}
               >
                 <List className="h-3.5 w-3.5" />
-                {t("app.api.leads.batch.widget.update.btnViewAllAffected")}
+                {t("widget.update.btnViewAllAffected")}
               </Button>
             </Div>
           )}
@@ -313,7 +311,7 @@ export function LeadsBatchUpdateContainer({
           <Div className="px-4 py-3 border-b flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-yellow-500" />
             <Span className="text-sm font-medium">
-              {t("app.api.leads.batch.widget.update.dryRunPreviewTitle", {
+              {t("widget.update.dryRunPreviewTitle", {
                 count: preview.length,
               })}
             </Span>
@@ -335,7 +333,7 @@ export function LeadsBatchUpdateContainer({
                 <Span className="flex-1 truncate text-muted-foreground">
                   {lead.email ??
                     lead.id ??
-                    t("app.api.leads.batch.widget.update.leadFallback", {
+                    t("widget.update.leadFallback", {
                       number: i + 1,
                     })}
                 </Span>
@@ -346,9 +344,7 @@ export function LeadsBatchUpdateContainer({
                 )}
                 {lead.currentStatus && (
                   <Span className="flex-shrink-0 text-xs px-2 py-0.5 rounded-full bg-muted">
-                    {t(
-                      `app.api.leads.batch.widget.update.status.${String(lead.currentStatus)}`,
-                    )}
+                    {t(`widget.update.status.${String(lead.currentStatus)}`)}
                   </Span>
                 )}
                 {lead.id && (
@@ -364,14 +360,14 @@ export function LeadsBatchUpdateContainer({
       {errors.length > 0 && (
         <Div className="rounded-lg border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/20 p-4">
           <Span className="text-sm font-medium text-red-700 dark:text-red-300 block mb-2">
-            {t("app.api.leads.batch.widget.update.errorsTitle", {
+            {t("widget.update.errorsTitle", {
               count: errors.length,
             })}
           </Span>
           <Div className="flex flex-col gap-1">
             {errors.map((err, i) => (
               <Div key={i} className="text-xs text-red-600 dark:text-red-400">
-                {t("app.api.leads.batch.widget.update.errorRow", {
+                {t("widget.update.errorRow", {
                   leadId: err.leadId,
                   error: err.error,
                 })}
@@ -391,7 +387,7 @@ export function LeadsBatchDeleteContainer({
   const data = field.value;
   const locale = useWidgetLocale();
   const router = useRouter();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.DELETE>();
   const form = useWidgetForm<typeof definition.DELETE>();
 
   const response = data?.response;
@@ -431,7 +427,7 @@ export function LeadsBatchDeleteContainer({
       <Div className="flex items-center gap-2 pb-2 border-b">
         <NavigateButtonWidget field={children.backButton} />
         <Span className="font-semibold text-base mr-auto text-destructive">
-          {t("app.api.leads.batch.widget.delete.headerTitle")}
+          {t("widget.delete.headerTitle")}
         </Span>
       </Div>
 
@@ -439,13 +435,12 @@ export function LeadsBatchDeleteContainer({
       {hasActiveFilters && (
         <Div className="rounded-lg border border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950/30 p-3 flex flex-col gap-2">
           <Span className="text-xs font-medium text-orange-700 dark:text-orange-300">
-            {t("app.api.leads.batch.widget.delete.activeFiltersLabel")}
+            {t("widget.delete.activeFiltersLabel")}
           </Span>
           <Div className="flex flex-wrap gap-1.5">
             {activeSearch && (
               <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-200">
-                {t("app.api.leads.batch.widget.delete.filterSearch")}:{" "}
-                {activeSearch}
+                {t("widget.delete.filterSearch")}: {activeSearch}
               </Span>
             )}
             {activeStatus.map((s) => (
@@ -479,7 +474,7 @@ export function LeadsBatchDeleteContainer({
       {/* Operation Settings Section */}
       <Div className="rounded-lg border bg-card p-4 flex flex-col gap-3">
         <Span className="font-medium text-sm text-muted-foreground">
-          {t("app.api.leads.batch.widget.delete.sectionSettings")}
+          {t("widget.delete.sectionSettings")}
         </Span>
         <Div className="flex flex-col gap-3">
           <NumberFieldWidget
@@ -497,9 +492,8 @@ export function LeadsBatchDeleteContainer({
       <FormAlertWidget field={{}} />
       <SubmitButtonWidget
         field={{
-          text: "app.api.leads.batch.widget.delete.submitButton" as const,
-          loadingText:
-            "app.api.leads.batch.widget.delete.submitButtonLoading" as const,
+          text: "widget.delete.submitButton" as const,
+          loadingText: "widget.delete.submitButtonLoading" as const,
           icon: "trash",
           variant: "destructive",
         }}
@@ -514,15 +508,15 @@ export function LeadsBatchDeleteContainer({
           <Div className="flex flex-col gap-1">
             <Span className="font-semibold text-sm text-red-800 dark:text-red-200">
               {preview.length !== 1
-                ? t("app.api.leads.batch.widget.delete.warningTitlePlural", {
+                ? t("widget.delete.warningTitlePlural", {
                     count: preview.length,
                   })
-                : t("app.api.leads.batch.widget.delete.warningTitle", {
+                : t("widget.delete.warningTitle", {
                     count: preview.length,
                   })}
             </Span>
             <Span className="text-xs text-red-700 dark:text-red-300">
-              {t("app.api.leads.batch.widget.delete.warningDescription")}
+              {t("widget.delete.warningDescription")}
             </Span>
           </Div>
         </Div>
@@ -545,8 +539,8 @@ export function LeadsBatchDeleteContainer({
             )}
             <Span className="font-medium text-sm">
               {response.success
-                ? t("app.api.leads.batch.widget.delete.successTitle")
-                : t("app.api.leads.batch.widget.delete.failureTitle")}
+                ? t("widget.delete.successTitle")
+                : t("widget.delete.failureTitle")}
             </Span>
           </Div>
           <Div className="grid grid-cols-2 gap-3">
@@ -555,7 +549,7 @@ export function LeadsBatchDeleteContainer({
                 {totalMatched}
               </Span>
               <Span className="text-xs text-muted-foreground">
-                {t("app.api.leads.batch.widget.delete.statMatched")}
+                {t("widget.delete.statMatched")}
               </Span>
             </Div>
             <Div className="text-center">
@@ -563,7 +557,7 @@ export function LeadsBatchDeleteContainer({
                 {response.totalDeleted ?? 0}
               </Span>
               <Span className="text-xs text-muted-foreground">
-                {t("app.api.leads.batch.widget.delete.statDeleted")}
+                {t("widget.delete.statDeleted")}
               </Span>
             </Div>
           </Div>
@@ -578,7 +572,7 @@ export function LeadsBatchDeleteContainer({
                 onClick={handleViewRemainingLeads}
               >
                 <List className="h-3.5 w-3.5" />
-                {t("app.api.leads.batch.widget.delete.btnViewRemainingLeads")}
+                {t("widget.delete.btnViewRemainingLeads")}
               </Button>
             </Div>
           )}
@@ -590,7 +584,7 @@ export function LeadsBatchDeleteContainer({
           <Div className="px-4 py-3 border-b border-red-200 flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-red-500" />
             <Span className="text-sm font-medium text-red-700 dark:text-red-300">
-              {t("app.api.leads.batch.widget.delete.previewTitle", {
+              {t("widget.delete.previewTitle", {
                 count: preview.length,
               })}
             </Span>
@@ -612,7 +606,7 @@ export function LeadsBatchDeleteContainer({
                 <Span className="flex-1 truncate">
                   {lead.email ??
                     lead.id ??
-                    t("app.api.leads.batch.widget.delete.leadFallback", {
+                    t("widget.delete.leadFallback", {
                       number: i + 1,
                     })}
                 </Span>
@@ -634,7 +628,7 @@ export function LeadsBatchDeleteContainer({
         <Div className="text-xs text-red-600 dark:text-red-400 flex flex-col gap-1">
           {errors.map((err, i) => (
             <Span key={i}>
-              {t("app.api.leads.batch.widget.delete.errorRow", {
+              {t("widget.delete.errorRow", {
                 leadId: err.leadId,
                 error: err.error,
               })}

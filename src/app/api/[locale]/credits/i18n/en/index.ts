@@ -134,6 +134,28 @@ export const translations = {
       title: "Credit Balance",
       description: "Your current credit balance and breakdown",
     },
+    balance: {
+      title: "Your Credit Balance",
+      description: "Use your credits across {{modelCount}} AI models",
+      credit: "{{count}} credit",
+      credits: "{{count}} credits",
+      expiring: {
+        title: "Expiring Credits",
+        description: "{{subCredits}} new credits per subscription cycle",
+      },
+      permanent: {
+        title: "Permanent Credits",
+        description: "Never expire — yours to keep",
+      },
+      free: {
+        title: "Free Credits",
+        description: "{{count}} free credits refreshed monthly",
+      },
+      earned: {
+        title: "Earned Credits",
+        description: "Earned via referrals — click to invite friends",
+      },
+    },
     total: {
       content: "Total Credits",
     },
@@ -214,6 +236,7 @@ export const translations = {
         description: "View your credit transaction history",
       },
       emptyState: "No credit transactions yet",
+      balance: "Balance after: {{count}}",
       limit: {
         label: "Limit",
         description: "Maximum number of transactions to return (1-100)",

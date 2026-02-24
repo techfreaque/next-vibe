@@ -30,16 +30,14 @@ export function ImapSyncContainer({
   fieldName,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
   const result = field.value;
 
   return (
     <Div className="flex flex-col gap-0">
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
-        <Span className="font-semibold text-base">
-          {t("app.api.emails.imapClient.sync.title")}
-        </Span>
+        <Span className="font-semibold text-base">{t("title")}</Span>
       </Div>
 
       <Div className="p-4 flex flex-col gap-6">
@@ -48,7 +46,7 @@ export function ImapSyncContainer({
         {/* Options */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.imapClient.sync.widget.options")}
+            {t("widget.options")}
           </Span>
           <TextArrayFieldWidget
             fieldName={`${fieldName}.accountIds`}
@@ -73,30 +71,26 @@ export function ImapSyncContainer({
         {/* Result */}
         {result !== null && result !== undefined && (
           <Div className="rounded-lg border p-4 flex flex-col gap-2">
-            <Span className="text-sm font-semibold">
-              {t("app.api.emails.imapClient.sync.widget.result")}
-            </Span>
+            <Span className="text-sm font-semibold">{t("widget.result")}</Span>
             {[
-              ["accountsProcessed", result.accountsProcessed],
-              ["foldersProcessed", result.foldersProcessed],
-              ["messagesProcessed", result.messagesProcessed],
-              ["messagesAdded", result.messagesAdded],
-              ["messagesUpdated", result.messagesUpdated],
-              ["messagesDeleted", result.messagesDeleted],
+              ["widget.accountsProcessed", result.accountsProcessed],
+              ["widget.foldersProcessed", result.foldersProcessed],
+              ["widget.messagesProcessed", result.messagesProcessed],
+              ["widget.messagesAdded", result.messagesAdded],
+              ["widget.messagesUpdated", result.messagesUpdated],
+              ["widget.messagesDeleted", result.messagesDeleted],
             ].map(([key, val]) => (
               <Div
                 key={String(key)}
                 className="flex items-center justify-between text-sm"
               >
-                <Span className="text-muted-foreground">
-                  {t(`app.api.emails.imapClient.sync.widget.${String(key)}`)}
-                </Span>
+                <Span className="text-muted-foreground">{t(key)}</Span>
                 <Span className="font-semibold">{String(val)}</Span>
               </Div>
             ))}
             <Div className="flex items-center justify-between text-sm">
               <Span className="text-muted-foreground">
-                {t("app.api.emails.imapClient.sync.widget.duration")}
+                {t("widget.duration")}
               </Span>
               <Span className="font-semibold">
                 {result.duration}
@@ -106,7 +100,7 @@ export function ImapSyncContainer({
             {result.errors.length > 0 && (
               <Div className="mt-2">
                 <Span className="text-xs font-semibold text-red-600">
-                  {t("app.api.emails.imapClient.sync.widget.errors")}
+                  {t("widget.errors")}
                 </Span>
                 {result.errors.map((err, i) => (
                   <Div key={i} style={{ color: "#ef4444", fontSize: "12px" }}>
@@ -122,8 +116,8 @@ export function ImapSyncContainer({
         <Div className="flex items-center justify-end pt-2">
           <SubmitButtonWidget
             field={{
-              text: "app.api.emails.imapClient.sync.widget.submit",
-              loadingText: "app.api.emails.imapClient.sync.widget.submitting",
+              text: "widget.submit",
+              loadingText: "widget.submitting",
               icon: "refresh-cw",
               variant: "primary",
               size: "sm",

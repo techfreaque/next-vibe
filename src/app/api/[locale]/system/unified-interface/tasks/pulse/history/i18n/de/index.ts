@@ -88,6 +88,15 @@ export const translations = {
       description: "Pulse-Ausführungsverlauf erfolgreich abgerufen",
     },
   },
+  pulse: {
+    execution: {
+      success: "Erfolgreich",
+      failure: "Fehlgeschlagen",
+      timeout: "Zeitüberschreitung",
+      cancelled: "Abgebrochen",
+      pending: "Ausstehend",
+    },
+  },
   widget: {
     title: "Pulse-Verlauf",
     empty: "Keine Pulse-Ausführungen gefunden",

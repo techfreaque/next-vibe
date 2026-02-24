@@ -72,7 +72,7 @@ export function LeadEngagementTrackingContainer({
   const { endpointMutations } = useWidgetContext();
   const router = useRouter();
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
 
   const isLoading = endpointMutations?.create?.isSubmitting;
   const hasResult = data?.id !== null && data?.id !== undefined;
@@ -105,7 +105,7 @@ export function LeadEngagementTrackingContainer({
         <Div className="flex items-center gap-2 mr-auto">
           <Activity className="h-5 w-5 text-muted-foreground" />
           <Span className="font-semibold text-base">
-            {t("app.api.leads.tracking.engagement.widget.post.headerTitle")}
+            {t("widget.post.headerTitle")}
           </Span>
         </Div>
         <Button
@@ -114,12 +114,10 @@ export function LeadEngagementTrackingContainer({
           size="sm"
           onClick={handleViewStats}
           className="gap-1 text-xs"
-          title={t(
-            "app.api.leads.tracking.engagement.widget.post.viewStatsTitle",
-          )}
+          title={t("widget.post.viewStatsTitle")}
         >
           <BarChart2 className="h-4 w-4" />
-          {t("app.api.leads.tracking.engagement.widget.post.statsButton")}
+          {t("widget.post.statsButton")}
         </Button>
       </Div>
 
@@ -128,7 +126,7 @@ export function LeadEngagementTrackingContainer({
         <Div className="h-32 flex flex-col items-center justify-center gap-3">
           <Activity className="h-8 w-8 animate-pulse text-muted-foreground" />
           <Span className="text-sm text-muted-foreground">
-            {t("app.api.leads.tracking.engagement.widget.post.loading")}
+            {t("widget.post.loading")}
           </Span>
         </Div>
       )}
@@ -141,16 +139,11 @@ export function LeadEngagementTrackingContainer({
             <CheckCircle className="h-8 w-8 text-green-500 flex-shrink-0" />
             <Div>
               <Span className="font-semibold block">
-                {t(
-                  "app.api.leads.tracking.engagement.widget.post.successTitle",
-                )}
+                {t("widget.post.successTitle")}
               </Span>
               <Span className="text-sm text-muted-foreground">
-                {engagementTypeLabel ??
-                  t("app.api.leads.tracking.engagement.widget.post.event")}{" "}
-                {t(
-                  "app.api.leads.tracking.engagement.widget.post.successSubtitle",
-                )}
+                {engagementTypeLabel ?? t("widget.post.event")}{" "}
+                {t("widget.post.successSubtitle")}
               </Span>
             </Div>
           </Div>
@@ -158,75 +151,51 @@ export function LeadEngagementTrackingContainer({
           {/* Key fields */}
           <Div className="flex flex-col gap-0">
             <MetadataRow
-              label={t(
-                "app.api.leads.tracking.engagement.widget.post.labels.engagementId",
-              )}
+              label={t("widget.post.labels.engagementId")}
               value={data?.id}
               mono
             />
             <MetadataRow
-              label={t(
-                "app.api.leads.tracking.engagement.widget.post.labels.type",
-              )}
+              label={t("widget.post.labels.type")}
               value={engagementTypeLabel}
             />
             <MetadataRow
-              label={t(
-                "app.api.leads.tracking.engagement.widget.post.labels.leadId",
-              )}
+              label={t("widget.post.labels.leadId")}
               value={leadId}
               mono
             />
             <MetadataRow
-              label={t(
-                "app.api.leads.tracking.engagement.widget.post.labels.campaignId",
-              )}
+              label={t("widget.post.labels.campaignId")}
               value={data?.responseCampaignId}
               mono
             />
             <MetadataRow
-              label={t(
-                "app.api.leads.tracking.engagement.widget.post.labels.ipAddress",
-              )}
+              label={t("widget.post.labels.ipAddress")}
               value={data?.ipAddress}
               mono
             />
             <MetadataRow
-              label={t(
-                "app.api.leads.tracking.engagement.widget.post.labels.recordedAt",
-              )}
+              label={t("widget.post.labels.recordedAt")}
               value={createdAtFormatted}
             />
             {data?.leadCreated !== null && data?.leadCreated !== undefined && (
               <MetadataRow
-                label={t(
-                  "app.api.leads.tracking.engagement.widget.post.labels.leadCreated",
-                )}
+                label={t("widget.post.labels.leadCreated")}
                 value={
                   data.leadCreated
-                    ? t(
-                        "app.api.leads.tracking.engagement.widget.post.labels.leadCreatedYes",
-                      )
-                    : t(
-                        "app.api.leads.tracking.engagement.widget.post.labels.leadCreatedNo",
-                      )
+                    ? t("widget.post.labels.leadCreatedYes")
+                    : t("widget.post.labels.leadCreatedNo")
                 }
               />
             )}
             {data?.relationshipEstablished !== null &&
               data?.relationshipEstablished !== undefined && (
                 <MetadataRow
-                  label={t(
-                    "app.api.leads.tracking.engagement.widget.post.labels.relationshipEst",
-                  )}
+                  label={t("widget.post.labels.relationshipEst")}
                   value={
                     data.relationshipEstablished
-                      ? t(
-                          "app.api.leads.tracking.engagement.widget.post.labels.relationshipYes",
-                        )
-                      : t(
-                          "app.api.leads.tracking.engagement.widget.post.labels.relationshipNo",
-                        )
+                      ? t("widget.post.labels.relationshipYes")
+                      : t("widget.post.labels.relationshipNo")
                   }
                 />
               )}
@@ -237,9 +206,7 @@ export function LeadEngagementTrackingContainer({
             Object.keys(data.responseMetadata).length > 0 && (
               <Div className="rounded-md border bg-muted/30 p-3">
                 <Span className="text-xs font-medium text-muted-foreground uppercase tracking-wide block mb-2">
-                  {t(
-                    "app.api.leads.tracking.engagement.widget.post.labels.metadata",
-                  )}
+                  {t("widget.post.labels.metadata")}
                 </Span>
                 <Div className="flex flex-col gap-0">
                   {Object.entries(data.responseMetadata)
@@ -254,7 +221,7 @@ export function LeadEngagementTrackingContainer({
           {/* Post-action navigation */}
           <Div className="flex items-center gap-2 pt-1 border-t flex-wrap">
             <Span className="text-xs text-muted-foreground mr-auto">
-              {t("app.api.leads.tracking.engagement.widget.post.nextSteps")}
+              {t("widget.post.nextSteps")}
             </Span>
             {leadId && (
               <Button
@@ -265,9 +232,7 @@ export function LeadEngagementTrackingContainer({
                 className="gap-1"
               >
                 <User className="h-4 w-4" />
-                {t(
-                  "app.api.leads.tracking.engagement.widget.post.viewLeadButton",
-                )}
+                {t("widget.post.viewLeadButton")}
                 <ArrowRight className="h-3.5 w-3.5" />
               </Button>
             )}
@@ -279,9 +244,7 @@ export function LeadEngagementTrackingContainer({
               className="gap-1"
             >
               <BarChart2 className="h-4 w-4" />
-              {t(
-                "app.api.leads.tracking.engagement.widget.post.leadStatsButton",
-              )}
+              {t("widget.post.leadStatsButton")}
               <ArrowRight className="h-3.5 w-3.5" />
             </Button>
           </Div>
@@ -294,12 +257,10 @@ export function LeadEngagementTrackingContainer({
           <Activity className="h-10 w-10 text-muted-foreground" />
           <Div>
             <Span className="font-medium block text-base">
-              {t("app.api.leads.tracking.engagement.widget.post.emptyTitle")}
+              {t("widget.post.emptyTitle")}
             </Span>
             <Span className="text-sm text-muted-foreground">
-              {t(
-                "app.api.leads.tracking.engagement.widget.post.emptyDescription",
-              )}
+              {t("widget.post.emptyDescription")}
             </Span>
           </Div>
           <Div className="flex items-center gap-2 pt-1">
@@ -311,9 +272,7 @@ export function LeadEngagementTrackingContainer({
               className="gap-1 text-xs"
             >
               <BarChart2 className="h-4 w-4" />
-              {t(
-                "app.api.leads.tracking.engagement.widget.post.viewLeadStatsButton",
-              )}
+              {t("widget.post.viewLeadStatsButton")}
             </Button>
           </Div>
         </Div>
@@ -341,7 +300,7 @@ export function LeadClickTrackingContainer({
   const { endpointMutations } = useWidgetContext();
   const router = useRouter();
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
 
   const isLoading = endpointMutations?.read?.isLoading;
   const hasResult = data?.success !== null && data?.success !== undefined;
@@ -374,7 +333,7 @@ export function LeadClickTrackingContainer({
         <Div className="flex items-center gap-2 mr-auto">
           <MousePointerClick className="h-5 w-5 text-muted-foreground" />
           <Span className="font-semibold text-base">
-            {t("app.api.leads.tracking.engagement.widget.get.headerTitle")}
+            {t("widget.get.headerTitle")}
           </Span>
         </Div>
         <Button
@@ -383,12 +342,10 @@ export function LeadClickTrackingContainer({
           size="sm"
           onClick={handleViewStats}
           className="gap-1 text-xs"
-          title={t(
-            "app.api.leads.tracking.engagement.widget.get.viewStatsTitle",
-          )}
+          title={t("widget.get.viewStatsTitle")}
         >
           <BarChart2 className="h-4 w-4" />
-          {t("app.api.leads.tracking.engagement.widget.get.statsButton")}
+          {t("widget.get.statsButton")}
         </Button>
       </Div>
 
@@ -397,7 +354,7 @@ export function LeadClickTrackingContainer({
         <Div className="h-32 flex flex-col items-center justify-center gap-3">
           <MousePointerClick className="h-8 w-8 animate-pulse text-muted-foreground" />
           <Span className="text-sm text-muted-foreground">
-            {t("app.api.leads.tracking.engagement.widget.get.loading")}
+            {t("widget.get.loading")}
           </Span>
         </Div>
       )}
@@ -412,14 +369,10 @@ export function LeadClickTrackingContainer({
                 <CheckCircle className="h-8 w-8 text-green-500 flex-shrink-0" />
                 <Div>
                   <Span className="font-semibold block">
-                    {t(
-                      "app.api.leads.tracking.engagement.widget.get.successTitle",
-                    )}
+                    {t("widget.get.successTitle")}
                   </Span>
                   <Span className="text-sm text-muted-foreground">
-                    {t(
-                      "app.api.leads.tracking.engagement.widget.get.successSubtitle",
-                    )}
+                    {t("widget.get.successSubtitle")}
                   </Span>
                 </Div>
               </>
@@ -428,14 +381,10 @@ export function LeadClickTrackingContainer({
                 <XCircle className="h-8 w-8 text-red-500 flex-shrink-0" />
                 <Div>
                   <Span className="font-semibold block">
-                    {t(
-                      "app.api.leads.tracking.engagement.widget.get.failTitle",
-                    )}
+                    {t("widget.get.failTitle")}
                   </Span>
                   <Span className="text-sm text-muted-foreground">
-                    {t(
-                      "app.api.leads.tracking.engagement.widget.get.failSubtitle",
-                    )}
+                    {t("widget.get.failSubtitle")}
                   </Span>
                 </Div>
               </>
@@ -446,9 +395,7 @@ export function LeadClickTrackingContainer({
           <Div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <Div className="rounded-md border bg-muted/30 p-3 flex flex-col gap-1">
               <Span className="text-xs text-muted-foreground uppercase tracking-wide">
-                {t(
-                  "app.api.leads.tracking.engagement.widget.get.labels.engagementLabel",
-                )}
+                {t("widget.get.labels.engagementLabel")}
               </Span>
               <Span
                 className={cn(
@@ -459,19 +406,13 @@ export function LeadClickTrackingContainer({
                 )}
               >
                 {data?.engagementRecorded
-                  ? t(
-                      "app.api.leads.tracking.engagement.widget.get.labels.recorded",
-                    )
-                  : t(
-                      "app.api.leads.tracking.engagement.widget.get.labels.notRecorded",
-                    )}
+                  ? t("widget.get.labels.recorded")
+                  : t("widget.get.labels.notRecorded")}
               </Span>
             </Div>
             <Div className="rounded-md border bg-muted/30 p-3 flex flex-col gap-1">
               <Span className="text-xs text-muted-foreground uppercase tracking-wide">
-                {t(
-                  "app.api.leads.tracking.engagement.widget.get.labels.leadStatusLabel",
-                )}
+                {t("widget.get.labels.leadStatusLabel")}
               </Span>
               <Span
                 className={cn(
@@ -482,28 +423,18 @@ export function LeadClickTrackingContainer({
                 )}
               >
                 {data?.leadStatusUpdated
-                  ? t(
-                      "app.api.leads.tracking.engagement.widget.get.labels.updated",
-                    )
-                  : t(
-                      "app.api.leads.tracking.engagement.widget.get.labels.unchanged",
-                    )}
+                  ? t("widget.get.labels.updated")
+                  : t("widget.get.labels.unchanged")}
               </Span>
             </Div>
             <Div className="rounded-md border bg-muted/30 p-3 flex flex-col gap-1">
               <Span className="text-xs text-muted-foreground uppercase tracking-wide">
-                {t(
-                  "app.api.leads.tracking.engagement.widget.get.labels.userLabel",
-                )}
+                {t("widget.get.labels.userLabel")}
               </Span>
               <Span className="text-sm font-semibold">
                 {data?.isLoggedIn
-                  ? t(
-                      "app.api.leads.tracking.engagement.widget.get.labels.loggedIn",
-                    )
-                  : t(
-                      "app.api.leads.tracking.engagement.widget.get.labels.anonymous",
-                    )}
+                  ? t("widget.get.labels.loggedIn")
+                  : t("widget.get.labels.anonymous")}
               </Span>
             </Div>
           </Div>
@@ -511,24 +442,18 @@ export function LeadClickTrackingContainer({
           {/* Details */}
           <Div className="flex flex-col gap-0">
             <MetadataRow
-              label={t(
-                "app.api.leads.tracking.engagement.widget.get.labels.leadId",
-              )}
+              label={t("widget.get.labels.leadId")}
               value={leadId}
               mono
             />
             <MetadataRow
-              label={t(
-                "app.api.leads.tracking.engagement.widget.get.labels.campaignId",
-              )}
+              label={t("widget.get.labels.campaignId")}
               value={data?.responseCampaignId}
               mono
             />
             {data?.redirectUrl && (
               <MetadataRow
-                label={t(
-                  "app.api.leads.tracking.engagement.widget.get.labels.redirectUrl",
-                )}
+                label={t("widget.get.labels.redirectUrl")}
                 value={data.redirectUrl}
                 mono
               />
@@ -538,7 +463,7 @@ export function LeadClickTrackingContainer({
           {/* Post-action navigation */}
           <Div className="flex items-center gap-2 pt-1 border-t flex-wrap">
             <Span className="text-xs text-muted-foreground mr-auto">
-              {t("app.api.leads.tracking.engagement.widget.get.nextSteps")}
+              {t("widget.get.nextSteps")}
             </Span>
             {data?.redirectUrl && (
               <Button
@@ -549,9 +474,7 @@ export function LeadClickTrackingContainer({
                 className="gap-1"
               >
                 <ExternalLink className="h-4 w-4" />
-                {t(
-                  "app.api.leads.tracking.engagement.widget.get.openUrlButton",
-                )}
+                {t("widget.get.openUrlButton")}
               </Button>
             )}
             {leadId && (
@@ -563,9 +486,7 @@ export function LeadClickTrackingContainer({
                 className="gap-1"
               >
                 <User className="h-4 w-4" />
-                {t(
-                  "app.api.leads.tracking.engagement.widget.get.viewLeadButton",
-                )}
+                {t("widget.get.viewLeadButton")}
                 <ArrowRight className="h-3.5 w-3.5" />
               </Button>
             )}
@@ -577,9 +498,7 @@ export function LeadClickTrackingContainer({
               className="gap-1"
             >
               <BarChart2 className="h-4 w-4" />
-              {t(
-                "app.api.leads.tracking.engagement.widget.get.leadStatsButton",
-              )}
+              {t("widget.get.leadStatsButton")}
               <ArrowRight className="h-3.5 w-3.5" />
             </Button>
           </Div>
@@ -592,12 +511,10 @@ export function LeadClickTrackingContainer({
           <MousePointerClick className="h-10 w-10 text-muted-foreground" />
           <Div>
             <Span className="font-medium block text-base">
-              {t("app.api.leads.tracking.engagement.widget.get.emptyTitle")}
+              {t("widget.get.emptyTitle")}
             </Span>
             <Span className="text-sm text-muted-foreground">
-              {t(
-                "app.api.leads.tracking.engagement.widget.get.emptyDescription",
-              )}
+              {t("widget.get.emptyDescription")}
             </Span>
           </Div>
           <Div className="flex items-center gap-2 pt-1">
@@ -609,9 +526,7 @@ export function LeadClickTrackingContainer({
               className="gap-1 text-xs"
             >
               <BarChart2 className="h-4 w-4" />
-              {t(
-                "app.api.leads.tracking.engagement.widget.get.viewLeadStatsButton",
-              )}
+              {t("widget.get.viewLeadStatsButton")}
             </Button>
           </Div>
         </Div>

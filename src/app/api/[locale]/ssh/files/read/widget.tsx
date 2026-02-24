@@ -29,7 +29,7 @@ interface WidgetProps {
 }
 
 export function FilesReadContainer({ field }: WidgetProps): React.JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof endpoints.GET>();
   const { endpointMutations } = useWidgetContext();
   const [editMode, setEditMode] = useState(false);
   const [editContent, setEditContent] = useState("");
@@ -52,7 +52,7 @@ export function FilesReadContainer({ field }: WidgetProps): React.JSX.Element {
       <Div className="flex items-center gap-2 px-4 py-3 border-b">
         <FileText className="h-4 w-4 text-muted-foreground" />
         <Span className="font-semibold text-sm mr-auto">
-          {t("app.api.ssh.files.read.widget.title")}
+          {t("widget.title")}
         </Span>
         {value && !editMode && (
           <Button
@@ -61,7 +61,7 @@ export function FilesReadContainer({ field }: WidgetProps): React.JSX.Element {
             variant="outline"
             onClick={handleEdit}
           >
-            {t("app.api.ssh.files.read.widget.editButton")}
+            {t("widget.editButton")}
           </Button>
         )}
         {editMode && (
@@ -72,10 +72,10 @@ export function FilesReadContainer({ field }: WidgetProps): React.JSX.Element {
               variant="outline"
               onClick={handleCancel}
             >
-              {t("app.api.ssh.files.read.widget.cancelButton")}
+              {t("widget.cancelButton")}
             </Button>
             <Button type="button" size="sm">
-              {t("app.api.ssh.files.read.widget.saveButton")}
+              {t("widget.saveButton")}
             </Button>
           </>
         )}
@@ -85,15 +85,14 @@ export function FilesReadContainer({ field }: WidgetProps): React.JSX.Element {
       {value && (
         <Div className="flex items-center gap-4 px-4 py-1.5 border-b bg-muted/20 text-xs text-muted-foreground">
           <Span>
-            {t("app.api.ssh.files.read.widget.size")}:{" "}
-            {value.size.toLocaleString()} B
+            {t("widget.size")}: {value.size.toLocaleString()} B
           </Span>
           <Span>
-            {t("app.api.ssh.files.read.widget.encoding")}: {value.encoding}
+            {t("widget.encoding")}: {value.encoding}
           </Span>
           {value.truncated && (
             <Span className="text-amber-600 dark:text-amber-400">
-              {t("app.api.ssh.files.read.widget.truncatedWarning")}
+              {t("widget.truncatedWarning")}
             </Span>
           )}
         </Div>
@@ -102,9 +101,7 @@ export function FilesReadContainer({ field }: WidgetProps): React.JSX.Element {
       {/* Content */}
       {isLoading ? (
         <Div className="flex items-center justify-center flex-1 py-12">
-          <P className="text-sm text-muted-foreground">
-            {t("app.api.ssh.files.read.widget.loading")}
-          </P>
+          <P className="text-sm text-muted-foreground">{t("widget.loading")}</P>
         </Div>
       ) : editMode ? (
         <Textarea
@@ -118,9 +115,7 @@ export function FilesReadContainer({ field }: WidgetProps): React.JSX.Element {
         </Pre>
       ) : (
         <Div className="flex items-center justify-center flex-1 py-12">
-          <P className="text-sm text-muted-foreground">
-            {t("app.api.ssh.files.read.widget.empty")}
-          </P>
+          <P className="text-sm text-muted-foreground">{t("widget.empty")}</P>
         </Div>
       )}
     </Div>

@@ -10,10 +10,7 @@ import { Link } from "next-vibe-ui/ui/link";
 import { P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
-import {
-  getAllTemplateMetadata,
-  getTemplatesByCategory,
-} from "@/app/api/[locale]/emails/registry/generated";
+import { getAllTranslatedTemplateMetadata } from "@/app/api/[locale]/emails/registry/generated";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -31,15 +28,15 @@ export default async function EmailTemplatesPage({
   const { t } = simpleT(locale);
   await requireAdminUser(locale, `/${locale}/admin/emails/templates`);
 
-  // Get all templates and group by category
-  const allTemplates = getAllTemplateMetadata();
+  // Get all templates with translated metadata (using each template's own scopedT)
+  const allTemplates = await getAllTranslatedTemplateMetadata(locale);
   const categories = [
     ...new Set(allTemplates.map((template) => template.category)),
   ].toSorted();
 
   const templatesByCategory = categories.map((category) => ({
     category,
-    templates: getTemplatesByCategory(category),
+    templates: allTemplates.filter((t) => t.category === category),
   }));
 
   return (
@@ -66,23 +63,17 @@ export default async function EmailTemplatesPage({
           <CardContent>
             <Div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {templates.map((template) => {
-                // Translate metadata fields (they contain translation keys)
-                const translatedName = t(template.name);
-                const translatedDescription = t(template.description);
-
                 return (
                   <Card
                     key={template.id}
                     className="hover:shadow-lg transition-shadow"
                   >
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-lg">
-                        {translatedName}
-                      </CardTitle>
+                      <CardTitle className="text-lg">{template.name}</CardTitle>
                     </CardHeader>
                     <CardContent className="flex flex-col gap-3">
                       <P className="text-sm text-gray-600 dark:text-gray-400">
-                        {translatedDescription}
+                        {template.description}
                       </P>
 
                       <Div className="text-xs text-gray-500 dark:text-gray-500 space-y-1">

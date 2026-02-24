@@ -10,6 +10,10 @@ export const translations: typeof enTranslations = {
     title: "Ordnerberechtigungen abrufen",
     description:
       "Die Liste der Moderatoren für einen bestimmten Ordner abrufen",
+    noData: "Keine Daten verfügbar",
+    edit: "Bearbeiten",
+    about: "Über Berechtigungen",
+    inheritFromParent: "Wird vom übergeordneten Element geerbt",
     container: {
       title: "Ordnerberechtigungen",
       description: "Ordnerzugriffsberechtigungen anzeigen und verwalten",

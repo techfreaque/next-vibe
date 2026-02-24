@@ -28,6 +28,20 @@ export const translations = {
     totalCredits: {
       content: "Total Credits",
     },
+    pack: {
+      title: "Credit Pack",
+      description: "One-time credit pack for AI usage",
+      perPack: "/ pack",
+      features: {
+        credits: "{{count}} credits included",
+        expiry: "Credits never expire",
+        bestFor: "Best for occasional usage",
+      },
+      requiresSubscription:
+        "An active subscription is required to purchase credit packs",
+    },
+    redirecting: "Redirecting to checkout...",
+    openCheckout: "Open Checkout",
     success: {
       title: "Checkout Created",
       description: "Stripe checkout session created successfully",

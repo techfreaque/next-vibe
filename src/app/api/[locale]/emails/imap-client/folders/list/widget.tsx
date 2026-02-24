@@ -126,7 +126,7 @@ export function ImapFoldersListContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const router = useRouter();
 
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
@@ -182,7 +182,7 @@ export function ImapFoldersListContainer({
       {/* Section header */}
       <Div className="flex items-center gap-1 px-5 py-2">
         <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex-1">
-          {t("app.api.emails.imapClient.folders.list.title")}
+          {t("title")}
         </Span>
         <Button
           type="button"
@@ -190,7 +190,7 @@ export function ImapFoldersListContainer({
           size="sm"
           className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
           onClick={handleRefresh}
-          title={t("app.api.emails.imapClient.folders.list.refresh")}
+          title={t("refresh")}
         >
           <RefreshCw className="h-3 w-3" />
         </Button>
@@ -200,7 +200,7 @@ export function ImapFoldersListContainer({
           size="sm"
           className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground"
           onClick={handleSync}
-          title={t("app.api.emails.imapClient.folders.list.sync")}
+          title={t("sync")}
         >
           <Settings className="h-3 w-3" />
         </Button>
@@ -213,7 +213,7 @@ export function ImapFoldersListContainer({
         </Div>
       ) : folders.length === 0 ? (
         <Div className="px-5 py-2 text-xs text-muted-foreground">
-          {t("app.api.emails.imapClient.folders.list.empty")}
+          {t("empty")}
         </Div>
       ) : (
         <Div className="flex flex-col gap-0.5 pb-2">
@@ -237,8 +237,8 @@ export function ImapFoldersListContainer({
               )}
               <Span>
                 {showAll
-                  ? t("app.api.emails.imapClient.folders.list.showLess")
-                  : `${String(sortedFolders.length - 8)} ${t("app.api.emails.imapClient.folders.list.more")}`}
+                  ? t("showLess")
+                  : `${String(sortedFolders.length - 8)} ${t("more")}`}
               </Span>
             </Div>
           )}

@@ -33,16 +33,14 @@ export function ImapConfigContainer({
   fieldName,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
 
   return (
     <Div className="flex flex-col gap-0">
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
         <NavigateButtonWidget field={children.backButton} />
-        <Span className="font-semibold text-base">
-          {t("app.api.emails.imapClient.config.title")}
-        </Span>
+        <Span className="font-semibold text-base">{t("title")}</Span>
       </Div>
 
       <Div className="p-4 flex flex-col gap-6">
@@ -51,7 +49,7 @@ export function ImapConfigContainer({
         {/* Connection */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.imapClient.config.widget.connection")}
+            {t("widget.connection")}
           </Span>
           <TextFieldWidget
             fieldName={`${fieldName}.host`}
@@ -90,7 +88,7 @@ export function ImapConfigContainer({
         {/* Server */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.imapClient.config.widget.server")}
+            {t("widget.server")}
           </Span>
           <Div className="grid grid-cols-2 gap-3">
             <BooleanFieldWidget
@@ -119,7 +117,7 @@ export function ImapConfigContainer({
         {/* Sync */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.imapClient.config.widget.sync")}
+            {t("widget.sync")}
           </Span>
           <Div className="grid grid-cols-2 gap-3">
             <BooleanFieldWidget
@@ -148,7 +146,7 @@ export function ImapConfigContainer({
         {/* Cache */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.imapClient.config.widget.cache")}
+            {t("widget.cache")}
           </Span>
           <Div className="grid grid-cols-2 gap-3">
             <BooleanFieldWidget
@@ -173,7 +171,7 @@ export function ImapConfigContainer({
         {/* Resilience */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.imapClient.config.widget.resilience")}
+            {t("widget.resilience")}
           </Span>
           <Div className="grid grid-cols-2 gap-3">
             <NumberFieldWidget
@@ -198,7 +196,7 @@ export function ImapConfigContainer({
         {/* Monitoring + Dev */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.imapClient.config.widget.monitoring")}
+            {t("widget.monitoring")}
           </Span>
           <Div className="grid grid-cols-2 gap-3">
             <BooleanFieldWidget
@@ -224,8 +222,8 @@ export function ImapConfigContainer({
         <Div className="flex items-center justify-end pt-2">
           <SubmitButtonWidget
             field={{
-              text: "app.api.emails.imapClient.config.widget.submit",
-              loadingText: "app.api.emails.imapClient.config.widget.submitting",
+              text: "widget.submit",
+              loadingText: "widget.submitting",
               icon: "save",
               variant: "primary",
               size: "sm",

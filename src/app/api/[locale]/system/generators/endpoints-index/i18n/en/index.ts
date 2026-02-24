@@ -68,4 +68,7 @@ export const translations = {
       },
     },
   },
+  success: {
+    generated: "Endpoints index generated successfully",
+  },
 };

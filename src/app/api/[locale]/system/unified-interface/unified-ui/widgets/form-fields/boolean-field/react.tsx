@@ -22,6 +22,7 @@ import {
 } from "next-vibe-ui/ui/tooltip";
 import type { JSX } from "react";
 
+import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { BooleanWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import type { ReactFormFieldProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
@@ -36,6 +37,7 @@ import type { FieldUsageConfig } from "../../_shared/types";
 import {
   useWidgetDisabled,
   useWidgetForm,
+  useWidgetLocale,
   useWidgetTranslation,
 } from "../../_shared/use-widget-context";
 import { getTheme } from "../_shared/constants";
@@ -43,7 +45,9 @@ import type { BooleanFieldWidgetConfig } from "./types";
 
 export function BooleanFieldWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TSchema extends BooleanWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({
@@ -54,17 +58,15 @@ export function BooleanFieldWidget<
   TUsage,
   BooleanFieldWidgetConfig<TKey, TSchema, TUsage>
 >): JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<TEndpoint>();
+  const locale = useWidgetLocale();
   const form = useWidgetForm();
   const isDisabled = useWidgetDisabled();
+
+  const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
+
   if (!form || !fieldName) {
-    return (
-      <Div>
-        {t(
-          "app.api.system.unifiedInterface.react.widgets.formField.requiresContext",
-        )}
-      </Div>
-    );
+    return <Div>{widgetT("react.widgets.formField.requiresContext")}</Div>;
   }
 
   const variant = field.variant || "checkbox";

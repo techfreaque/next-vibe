@@ -66,10 +66,10 @@ export function extractBadgeData(
 /**
  * Find matching enum option label for a value
  */
-export function findEnumLabel(
+export function findEnumLabel<TKey extends string>(
   value: z.output<BadgeWidgetSchema>,
-  enumOptions: BadgeEnumOption<string>[],
-  t: <K extends string>(key: K, params?: TParams) => TranslatedKeyType,
+  enumOptions: BadgeEnumOption<TKey>[],
+  t: (key: TKey, params?: TParams) => TranslatedKeyType,
 ): string | null {
   for (const option of enumOptions) {
     if (option.value === value) {

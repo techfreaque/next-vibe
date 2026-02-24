@@ -221,8 +221,8 @@ export enum ProductIds {
  */
 const productDefinitions = {
   free_tier: {
-    name: "app.api.products.free.name" as const,
-    description: "app.api.products.free.description" as const,
+    name: "free.name",
+    description: "free.description",
     priceByCountry: {
       DE: { price: 0, currency: "EUR" as const },
       PL: { price: 0, currency: "PLN" as const },
@@ -235,8 +235,8 @@ const productDefinitions = {
     status: "active" as const,
   },
   subscription: {
-    name: "app.api.products.subscription.name" as const,
-    description: "app.api.products.subscription.description" as const,
+    name: "subscription.name",
+    description: "subscription.description",
     priceByCountry: {
       DE: { price: 8, currency: "EUR" as const },
       PL: { price: 30, currency: "PLN" as const },
@@ -255,8 +255,8 @@ const productDefinitions = {
     status: "active" as const,
   },
   credit_pack: {
-    name: "app.api.products.creditPack.name" as const,
-    description: "app.api.products.creditPack.description" as const,
+    name: "creditPack.name",
+    description: "creditPack.description",
     priceByCountry: {
       DE: { price: 5, currency: "EUR" as const },
       PL: { price: 5, currency: "PLN" as const },
@@ -442,7 +442,7 @@ export class ProductsRepositoryImpl implements ProductsRepository {
     const packCurrencySymbol =
       packCurrency === "EUR" ? "€" : packCurrency === "PLN" ? "zł" : "$";
 
-    return t("app.api.products.summary", {
+    return t("summary", {
       freeCredits: freeTier.credits,
       packCurrency: packCurrencySymbol,
       packPrice: packPrice,
@@ -557,10 +557,10 @@ function buildPricingPlans(
       name: subscriptionDef.name,
       description: subscriptionDef.description,
       features: [
-        "app.api.products.subscription.features.credits",
-        "app.api.products.subscription.features.allModels",
-        "app.api.products.subscription.features.allFeatures",
-        "app.api.products.subscription.features.cancel",
+        "subscription.features.credits",
+        "subscription.features.allModels",
+        "subscription.features.allFeatures",
+        "subscription.features.cancel",
       ],
       priceByCountry: {
         DE: {
@@ -584,8 +584,8 @@ function buildPricingPlans(
           currency: getPriceData("GLOBAL", "month").currency,
         },
       },
-      pricing: "app.api.products.subscription.price",
-      cta: "app.api.products.subscription.cta",
+      pricing: "subscription.price",
+      cta: "subscription.cta",
       highlighted: false,
       icon: icon,
     },

@@ -380,6 +380,7 @@ export async function createIncognitoMessage(
     depth: 0,
     sequenceId: null,
     authorId: "incognito",
+    authorName: null,
     isAI: role === "assistant",
     model,
     character,

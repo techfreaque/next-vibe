@@ -31,7 +31,7 @@ export function FolderCreateContainer({
 }: CustomWidgetProps): JSX.Element {
   const children = field.children;
   useWidgetForm<typeof definition.POST>();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
 
   return (
     <Div className="flex flex-col gap-4 p-4">
@@ -47,12 +47,8 @@ export function FolderCreateContainer({
 
       <SubmitButtonWidget
         field={{
-          text: t(
-            "app.api.agent.chat.folders.post.sections.folder.name.label",
-          ) as string,
-          loadingText: t(
-            "app.api.agent.chat.folders.post.sections.folder.name.label",
-          ) as string,
+          text: t("sections.folder.name.label"),
+          loadingText: t("sections.folder.name.label"),
           icon: "folder-plus",
           variant: "primary",
           className: "w-full",

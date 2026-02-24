@@ -63,6 +63,7 @@ export const translations: typeof enTranslations = {
     },
   },
   task: {
+    name: "user-session-cleanup",
     description:
       "Oczyszczanie wygasłych sesji użytkowników w celu utrzymania bezpieczeństwa systemu",
     purpose:

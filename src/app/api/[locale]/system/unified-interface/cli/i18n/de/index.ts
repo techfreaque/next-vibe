@@ -3,6 +3,11 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   setup: setupTranslations,
+  request: "Anfrage",
+  response: {
+    success: "Antwort",
+    error: "Fehler",
+  },
   auth: {
     errors: {
       userNotFound:
@@ -13,6 +18,7 @@ export const translations: typeof enTranslations = {
     },
   },
   vibe: {
+    noFields: "Keine Felder anzuzeigen",
     startingUp: "Vibe CLI wird gestartet...",
     executeCommand: "Befehl wird ausgeführt",
     executing: "Wird ausgeführt",
@@ -93,6 +99,8 @@ export const translations: typeof enTranslations = {
               noDataAvailable: "Keine Daten verfügbar",
               noIssuesFound: "Keine Probleme gefunden",
               invalidDataFormat: "Ungültiges Datenformat",
+              invalidFormType:
+                "Formularkontext ist kein Ink-Formularstatus. Interaktive Eingabe kann nicht gerendert werden.",
               info: "Info",
               items: "Elemente",
               andMoreItems: "und {{count}} weitere Elemente",
@@ -105,6 +113,10 @@ export const translations: typeof enTranslations = {
               errors: "Fehler",
               warning: "Warnung",
               warnings: "Warnungen",
+            },
+            pagination: {
+              notImplemented:
+                "Paginierung nicht für CLI implementiert. Verwenden Sie Filter, um Ergebnisse einzuschränken.",
             },
           },
         },

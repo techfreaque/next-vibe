@@ -26,7 +26,7 @@ export function FormAlertWidgetInk<
     FormAlertWidgetConfig<TUsage, "widget">
   >,
 ): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const response = useInkWidgetResponse();
 
   if (!response || response.success) {

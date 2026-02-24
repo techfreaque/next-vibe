@@ -37,7 +37,7 @@ interface CustomWidgetProps {
 export function TestEmailContainer({ field }: CustomWidgetProps): JSX.Element {
   const children = field.children;
   const data = field.value;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
   const navigation = useWidgetNavigation();
 
   const sentAtFormatted = data?.result?.sentAt
@@ -66,14 +66,13 @@ export function TestEmailContainer({ field }: CustomWidgetProps): JSX.Element {
         <Div className="flex items-center gap-2 flex-1">
           <Mail className="h-5 w-5 text-muted-foreground" />
           <Span className="font-semibold text-base">
-            {t("app.api.leads.campaigns.emails.testMail.post.widget.title")}
+            {t("post.widget.title")}
           </Span>
         </Div>
         <SubmitButtonWidget
           field={{
-            text: "app.api.leads.campaigns.emails.testMail.post.widget.send",
-            loadingText:
-              "app.api.leads.campaigns.emails.testMail.post.widget.sending",
+            text: "post.widget.send",
+            loadingText: "post.widget.sending",
             icon: "send",
             variant: "primary",
           }}
@@ -90,32 +89,24 @@ export function TestEmailContainer({ field }: CustomWidgetProps): JSX.Element {
               <Div className="flex items-center gap-3">
                 <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
                 <Span className="text-sm font-medium text-green-700 dark:text-green-300">
-                  {t(
-                    "app.api.leads.campaigns.emails.testMail.post.widget.successMessage",
-                  )}
+                  {t("post.widget.successMessage")}
                 </Span>
               </Div>
               {data.result.testEmail && (
                 <Span className="text-xs text-muted-foreground pl-8">
-                  {t(
-                    "app.api.leads.campaigns.emails.testMail.post.widget.sentTo",
-                  )}
+                  {t("post.widget.sentTo")}
                   {data.result.testEmail}
                 </Span>
               )}
               {data.result.subject && (
                 <Span className="text-xs text-muted-foreground pl-8">
-                  {t(
-                    "app.api.leads.campaigns.emails.testMail.post.widget.subject",
-                  )}
+                  {t("post.widget.subject")}
                   {data.result.subject}
                 </Span>
               )}
               {sentAtFormatted && (
                 <Span className="text-xs text-muted-foreground pl-8">
-                  {t(
-                    "app.api.leads.campaigns.emails.testMail.post.widget.sentAt",
-                  )}
+                  {t("post.widget.sentAt")}
                   {sentAtFormatted}
                 </Span>
               )}
@@ -129,9 +120,7 @@ export function TestEmailContainer({ field }: CustomWidgetProps): JSX.Element {
                 className="flex items-center gap-1.5"
               >
                 <Settings className="h-4 w-4" />
-                {t(
-                  "app.api.leads.campaigns.emails.testMail.post.widget.campaignConfig",
-                )}
+                {t("post.widget.campaignConfig")}
               </Button>
               <Button
                 type="button"
@@ -141,9 +130,7 @@ export function TestEmailContainer({ field }: CustomWidgetProps): JSX.Element {
                 className="flex items-center gap-1.5"
               >
                 <Send className="h-4 w-4" />
-                {t(
-                  "app.api.leads.campaigns.emails.testMail.post.widget.sendAnother",
-                )}
+                {t("post.widget.sendAnother")}
               </Button>
             </Div>
             <Separator />
@@ -157,7 +144,7 @@ export function TestEmailContainer({ field }: CustomWidgetProps): JSX.Element {
 
         {/* SMTP selection criteria */}
         <H3 className="text-sm font-medium text-muted-foreground">
-          {t("app.admin.emails.smtp.admin.form.selectionCriteria")}
+          {t("selectionCriteria")}
         </H3>
         <Div className="flex flex-col gap-4">
           <SelectFieldWidget
@@ -178,7 +165,7 @@ export function TestEmailContainer({ field }: CustomWidgetProps): JSX.Element {
 
         {/* Lead data */}
         <H3 className="text-sm font-medium text-muted-foreground">
-          {t("app.api.leads.campaigns.emails.testMail.post.leadData.title")}
+          {t("post.leadData.title")}
         </H3>
         <Div className="flex flex-col gap-4">
           <TextFieldWidget

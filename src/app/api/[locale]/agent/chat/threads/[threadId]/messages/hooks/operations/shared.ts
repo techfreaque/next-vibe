@@ -157,6 +157,7 @@ export async function createAndSendUserMessage(
           currentRootFolderId === DefaultFolderId.INCOGNITO
             ? "incognito"
             : null,
+        authorName: null,
         isAI: false,
         model: settings.selectedModel,
         character: settings.selectedCharacter,

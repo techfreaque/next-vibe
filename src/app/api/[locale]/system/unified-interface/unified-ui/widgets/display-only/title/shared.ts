@@ -21,7 +21,7 @@ export interface ProcessedTitle {
  */
 export function extractTitleData(
   value: z.output<TitleWidgetSchema>,
-  context?: { t: (key: string) => string },
+  context?: { t: <K extends string>(key: K) => string },
 ): ProcessedTitle | null {
   // Handle null/undefined
   if (value === null || value === undefined) {

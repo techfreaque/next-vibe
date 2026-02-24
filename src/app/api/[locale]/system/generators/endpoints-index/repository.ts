@@ -121,7 +121,7 @@ class EndpointsIndexGeneratorRepositoryImpl {
 
       return success({
         success: true,
-        message: "app.api.system.generators.endpoints.success.generated",
+        message: t("success.generated"),
         endpointsFound: definitionFiles.length,
         duration,
         outputFile: data.dryRun ? undefined : outputFile,

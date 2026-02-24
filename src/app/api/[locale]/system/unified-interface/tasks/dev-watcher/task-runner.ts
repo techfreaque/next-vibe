@@ -16,6 +16,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { Environment } from "../../../../shared/utils";
 import { generateAllRepository } from "../../../generators/generate-all/repository";
 import { CronTaskPriority, TaskCategory } from "../enum";
+import type { TasksTranslationKey } from "../i18n";
 import type { TaskRunner } from "../unified-runner/types";
 
 /**
@@ -55,15 +56,15 @@ const shouldTriggerGeneration = (filename: string): boolean => {
   return hasRelevantExtension;
 };
 
-export const DEV_WATCHER_TASK_NAME = "dev-file-watcher";
+export const DEV_WATCHER_TASK_NAME = "devWatcher.name" as const;
 /**
  * Development File Watcher Task Runner
  * Only runs in development mode
  */
-const devWatcherTaskRunner: TaskRunner = {
+const devWatcherTaskRunner: TaskRunner<TasksTranslationKey> = {
   type: "task-runner",
-  name: DEV_WATCHER_TASK_NAME,
-  description: "app.api.system.unifiedInterface.tasks.devWatcher.description",
+  name: "devWatcher.name",
+  description: "devWatcher.description",
   category: TaskCategory.DEVELOPMENT,
   enabled: env.NODE_ENV === Environment.DEVELOPMENT,
   priority: CronTaskPriority.MEDIUM,
@@ -300,6 +301,6 @@ const startPollingWatcher = async (
 /**
  * Export task runners for discovery
  */
-export const taskRunners: TaskRunner[] = [devWatcherTaskRunner];
+export const taskRunners: TaskRunner<string>[] = [devWatcherTaskRunner];
 
 export default taskRunners;

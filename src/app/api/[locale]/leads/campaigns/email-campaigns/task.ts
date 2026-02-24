@@ -25,8 +25,8 @@ import definitions from "./definition";
 import { tools } from "./route";
 
 const emailCampaignsTask = createCronTask(definitions.POST, tools.POST, {
-  name: "lead-email-campaigns",
-  description: "app.api.leads.campaigns.emailCampaigns.task.description",
+  name: "post.title",
+  description: "task.description",
   schedule:
     env.NODE_ENV === Environment.PRODUCTION
       ? getSchedule()

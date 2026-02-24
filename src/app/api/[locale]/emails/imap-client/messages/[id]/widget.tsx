@@ -348,7 +348,7 @@ function ThreadPanel({
     return (
       <Div className="mt-4 rounded-lg border bg-muted/20 p-3 flex items-center gap-2 text-sm text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" />
-        <Span>{t("app.api.emails.imapClient.messages.id.widget.thread")}</Span>
+        <Span>{t("widget.thread")}</Span>
       </Div>
     );
   }
@@ -366,17 +366,14 @@ function ThreadPanel({
       >
         <Mail className="h-4 w-4 text-muted-foreground" />
         <Span className="text-sm font-medium text-foreground">
-          {t("app.api.emails.imapClient.messages.id.widget.thread")}
+          {t("widget.thread")}
         </Span>
         <Span className="text-xs text-muted-foreground ml-0.5">
-          ({threadMessages.length}{" "}
-          {t("app.api.emails.imapClient.messages.id.widget.threadMessages")})
+          ({threadMessages.length} {t("widget.threadMessages")})
         </Span>
         <Div className="flex-1" />
         <Span className="text-xs text-muted-foreground">
-          {isExpanded
-            ? t("app.api.emails.imapClient.messages.id.widget.threadCollapse")
-            : t("app.api.emails.imapClient.messages.id.widget.threadExpand")}
+          {isExpanded ? t("widget.threadCollapse") : t("widget.threadExpand")}
         </Span>
         {isExpanded ? (
           <ChevronUp className="h-4 w-4 text-muted-foreground" />
@@ -406,7 +403,7 @@ export function ImapMessageDetailContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const email = field.value?.message;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const { locale, logger, user } = useWidgetContext();
   const widgetLocale = useWidgetLocale();
   const isLoading = field.value === null || field.value === undefined;
@@ -551,11 +548,7 @@ export function ImapMessageDetailContainer({
               onClick={handleToggleFlag}
               disabled={isUpdating}
               className="text-muted-foreground"
-              title={
-                isFlagged
-                  ? t("app.api.emails.imapClient.messages.id.widget.unflag")
-                  : t("app.api.emails.imapClient.messages.id.widget.flag")
-              }
+              title={isFlagged ? t("widget.unflag") : t("widget.flag")}
             >
               {isFlagged ? (
                 <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
@@ -570,11 +563,7 @@ export function ImapMessageDetailContainer({
               onClick={handleToggleRead}
               disabled={isUpdating}
               className="text-muted-foreground"
-              title={
-                isRead
-                  ? t("app.api.emails.imapClient.messages.id.widget.markUnread")
-                  : t("app.api.emails.imapClient.messages.id.widget.markRead")
-              }
+              title={isRead ? t("widget.markUnread") : t("widget.markRead")}
             >
               {isRead ? (
                 <MailOpen className="h-4 w-4" />
@@ -601,7 +590,7 @@ export function ImapMessageDetailContainer({
         </Div>
       ) : email === null || email === undefined ? (
         <Div className="p-8 text-center text-muted-foreground">
-          {t("app.api.emails.imapClient.messages.id.widget.notFound")}
+          {t("widget.notFound")}
         </Div>
       ) : (
         <Div className="p-4 flex flex-col gap-4 overflow-auto">
@@ -613,12 +602,12 @@ export function ImapMessageDetailContainer({
             <Div className="flex items-center gap-2 flex-wrap">
               {!isRead && (
                 <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                  {t("app.api.emails.imapClient.messages.id.widget.unread")}
+                  {t("widget.unread")}
                 </Span>
               )}
               {isFlagged && (
                 <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
-                  {t("app.api.emails.imapClient.messages.id.widget.flagged")}
+                  {t("widget.flagged")}
                 </Span>
               )}
               {email.hasAttachments && (
@@ -627,10 +616,8 @@ export function ImapMessageDetailContainer({
                   {email.attachmentCount !== null &&
                   email.attachmentCount !== undefined &&
                   email.attachmentCount > 0
-                    ? `${email.attachmentCount} ${t("app.api.emails.imapClient.messages.id.widget.attachments")}`
-                    : t(
-                        "app.api.emails.imapClient.messages.id.widget.hasAttachments",
-                      )}
+                    ? `${email.attachmentCount} ${t("widget.attachments")}`
+                    : t("widget.hasAttachments")}
                 </Span>
               )}
               {email.folderName && (
@@ -645,7 +632,7 @@ export function ImapMessageDetailContainer({
           <Div className="rounded-lg border bg-muted/20 p-3">
             <Div className="flex items-start gap-2 py-1.5 border-b">
               <Span className="text-xs text-muted-foreground w-16 flex-shrink-0 pt-0.5 font-medium">
-                {t("app.api.emails.imapClient.messages.id.widget.from")}
+                {t("widget.from")}
               </Span>
               <Span className="text-sm break-all">
                 {email.senderName ? (
@@ -664,7 +651,7 @@ export function ImapMessageDetailContainer({
             </Div>
             <Div className="flex items-start gap-2 py-1.5">
               <Span className="text-xs text-muted-foreground w-16 flex-shrink-0 pt-0.5 font-medium">
-                {t("app.api.emails.imapClient.messages.id.widget.to")}
+                {t("widget.to")}
               </Span>
               <Span className="text-sm break-all">
                 {email.recipientName ? (
@@ -687,17 +674,13 @@ export function ImapMessageDetailContainer({
           <Div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
             {email.sentAt && (
               <Span>
-                <Span className="font-medium">
-                  {t("app.api.emails.imapClient.messages.id.widget.sent")}:
-                </Span>{" "}
+                <Span className="font-medium">{t("widget.sent")}:</Span>{" "}
                 {formatFullDate(email.sentAt)}
               </Span>
             )}
             {email.receivedAt && (
               <Span>
-                <Span className="font-medium">
-                  {t("app.api.emails.imapClient.messages.id.widget.received")}:
-                </Span>{" "}
+                <Span className="font-medium">{t("widget.received")}:</Span>{" "}
                 {formatFullDate(email.receivedAt)}
               </Span>
             )}
@@ -713,7 +696,7 @@ export function ImapMessageDetailContainer({
               </Div>
             ) : (
               <Div className="p-8 text-center text-muted-foreground text-sm">
-                {t("app.api.emails.imapClient.messages.id.widget.noBody")}
+                {t("widget.noBody")}
               </Div>
             )}
           </Div>

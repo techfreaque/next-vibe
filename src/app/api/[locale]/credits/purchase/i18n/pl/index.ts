@@ -29,6 +29,20 @@ export const translations: typeof enTranslations = {
     totalCredits: {
       content: "Całkowita liczba kredytów",
     },
+    pack: {
+      title: "Pakiet kredytów",
+      description: "Jednorazowy pakiet kredytów do użycia AI",
+      perPack: "/ pakiet",
+      features: {
+        credits: "{{count}} kredytów w zestawie",
+        expiry: "Kredyty nigdy nie wygasają",
+        bestFor: "Najlepsze do okazjonalnego użycia",
+      },
+      requiresSubscription:
+        "Aktywna subskrypcja jest wymagana do zakupu pakietów kredytów",
+    },
+    redirecting: "Przekierowanie do płatności...",
+    openCheckout: "Otwórz płatność",
     success: {
       title: "Płatność utworzona",
       description: "Sesja płatności Stripe została pomyślnie utworzona",

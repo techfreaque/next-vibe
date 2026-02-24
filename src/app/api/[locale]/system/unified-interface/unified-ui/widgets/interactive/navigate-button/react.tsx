@@ -23,7 +23,6 @@ import {
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetResponse,
-  useWidgetTranslation,
   useWidgetUser,
 } from "../../_shared/use-widget-context";
 import type { NavigateButtonWidgetConfig } from "./types";
@@ -42,7 +41,9 @@ import type { NavigateButtonWidgetConfig } from "./types";
 export function NavigateButtonWidget<
   TEndpoint extends CreateApiEndpointAny,
   TUsage extends FieldUsageConfig,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TSchemaType extends "widget",
   TTargetEndpoint extends CreateApiEndpointAny | undefined,
   TGetEndpoint extends CreateApiEndpointAny | undefined,
@@ -59,7 +60,7 @@ export function NavigateButtonWidget<
     TGetEndpoint
   >
 >): JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<TEndpoint>();
   const navigation = useWidgetNavigation();
   const logger = useWidgetLogger();
   const user = useWidgetUser();
@@ -87,7 +88,7 @@ export function NavigateButtonWidget<
   const iconSpacingClass = getSpacingClassName("margin", iconSpacing);
 
   const buttonIcon = icon ? (icon as IconKey) : undefined;
-  const buttonText = label ? t(label) : undefined;
+  const buttonText = label ? tField(label) : undefined;
 
   // Back navigation
   if (targetEndpoint === null || targetEndpoint === undefined) {

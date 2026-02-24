@@ -35,16 +35,14 @@ export function ImapAccountEditContainer({
   fieldName,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.PUT>();
 
   return (
     <Div className="flex flex-col gap-0">
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
         <NavigateButtonWidget field={children.backButton} />
-        <Span className="font-semibold text-base">
-          {t("app.api.emails.imapClient.accounts.id.put.title")}
-        </Span>
+        <Span className="font-semibold text-base">{t("put.title")}</Span>
       </Div>
 
       <Div className="p-4 flex flex-col gap-6">
@@ -53,7 +51,7 @@ export function ImapAccountEditContainer({
         {/* Basic Info */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.imapClient.accounts.id.put.basicInfo")}
+            {t("put.basicInfo")}
           </Span>
           <TextFieldWidget
             fieldName={`${fieldName}.name`}
@@ -68,7 +66,7 @@ export function ImapAccountEditContainer({
         {/* Server */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.imapClient.accounts.id.put.server")}
+            {t("put.server")}
           </Span>
           <TextFieldWidget
             fieldName={`${fieldName}.host`}
@@ -89,7 +87,7 @@ export function ImapAccountEditContainer({
         {/* Auth */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.imapClient.accounts.id.put.auth")}
+            {t("put.auth")}
           </Span>
           <TextFieldWidget
             fieldName={`${fieldName}.username`}
@@ -110,7 +108,7 @@ export function ImapAccountEditContainer({
         {/* Sync */}
         <Div className="flex flex-col gap-3">
           <Span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-            {t("app.api.emails.imapClient.accounts.id.put.sync")}
+            {t("put.sync")}
           </Span>
           <Div className="grid grid-cols-2 gap-3">
             <BooleanFieldWidget
@@ -144,9 +142,8 @@ export function ImapAccountEditContainer({
         <Div className="flex items-center justify-end pt-2">
           <SubmitButtonWidget
             field={{
-              text: "app.api.emails.imapClient.accounts.id.put.submit",
-              loadingText:
-                "app.api.emails.imapClient.accounts.id.put.submitting",
+              text: "put.submit",
+              loadingText: "put.submitting",
               icon: "save",
               variant: "primary",
               size: "sm",

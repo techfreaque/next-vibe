@@ -162,6 +162,13 @@ export const translations: typeof enTranslations = {
       description: "Cron-Task-Statistiken erfolgreich abgerufen",
     },
   },
+  priority: {
+    critical: "Kritisch",
+    high: "Hoch",
+    medium: "Mittel",
+    low: "Niedrig",
+    background: "Hintergrund",
+  },
   widget: {
     title: "Cron-Statistiken",
     loading: "Statistiken werden geladen...",

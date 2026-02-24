@@ -18,6 +18,7 @@ import type {
   ReactWidgetPropsNoValue,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import {
+  useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
   useWidgetTranslation,
@@ -101,7 +102,9 @@ function getTextEmphasisClassName(emphasis: TextEmphasis): string {
  */
 export function TextWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
 >(
   props:
@@ -124,7 +127,8 @@ export function TextWidget<
   const { field } = props;
   const fieldName = "fieldName" in props ? props.fieldName : undefined;
   const locale = useWidgetLocale();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<TEndpoint>();
+  const { t: tContext } = useWidgetContext();
   const form = useWidgetForm();
   const {
     content,
@@ -200,7 +204,7 @@ export function TextWidget<
 
   // Extract data using shared logic with translation context
   // value is properly typed from schema - no assertions needed
-  const data = extractTextData(value, t);
+  const data = extractTextData(value, tContext);
 
   // No data - show empty placeholder
   if (!data) {

@@ -98,6 +98,16 @@ export const translations: typeof enTranslations = {
         title: "Codes abgerufen",
         description: "Ihre Empfehlungscodes erfolgreich abgerufen",
       },
+      widget: {
+        empty: "Sie haben noch keine Empfehlungscodes",
+        copied: "Kopiert!",
+        copy: "Link kopieren",
+        uses: "Verwendungen",
+        signups: "Anmeldungen",
+        revenue: "Umsatz",
+        earnings: "Einnahmen",
+        inactive: "Dieser Empfehlungscode ist inaktiv",
+      },
     },
   },
 

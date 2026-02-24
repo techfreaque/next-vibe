@@ -23,9 +23,8 @@ import definitions from "./definition";
 import { tools } from "./route";
 
 const dbHealthTask = createCronTask(definitions.POST, tools.POST, {
-  name: "db-health-check",
-  description:
-    "app.api.system.unifiedInterface.tasks.dbHealthCheck.description",
+  name: "dbHealthCheck.name",
+  description: "dbHealthCheck.description",
   schedule: CRON_SCHEDULES.EVERY_MINUTE,
   category: TaskCategory.MONITORING,
   enabled: true,

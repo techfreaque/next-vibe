@@ -41,7 +41,7 @@ export function ReferralCodesListContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const codes = field.value?.codes ?? [];
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   const handleCopy = async (code: string, index: number): Promise<void> => {
@@ -63,7 +63,7 @@ export function ReferralCodesListContainer({
           <Link2 className="h-6 w-6 text-muted-foreground" />
         </Div>
         <Div className="text-sm font-medium text-muted-foreground">
-          {t("app.user.referral.myCodes.empty")}
+          {t("codes.list.widget.empty")}
         </Div>
       </Div>
     );
@@ -100,12 +100,12 @@ export function ReferralCodesListContainer({
                 {copiedIndex === index ? (
                   <>
                     <Check className="h-4 w-4 mr-2" />
-                    {t("app.user.referral.myCodes.copied")}
+                    {t("codes.list.widget.copied")}
                   </>
                 ) : (
                   <>
                     <Copy className="h-4 w-4 mr-2" />
-                    {t("app.user.referral.myCodes.copy")}
+                    {t("codes.list.widget.copy")}
                   </>
                 )}
               </Button>
@@ -117,7 +117,7 @@ export function ReferralCodesListContainer({
               <Div className="p-4 flex flex-col gap-1">
                 <Div className="flex items-center gap-2 text-muted-foreground text-xs font-medium">
                   <Users className="h-3.5 w-3.5" />
-                  {t("app.user.referral.myCodes.uses")}
+                  {t("codes.list.widget.uses")}
                 </Div>
                 <Div className="text-lg font-semibold tabular-nums">
                   {code.currentUses}
@@ -128,7 +128,7 @@ export function ReferralCodesListContainer({
               <Div className="p-4 flex flex-col gap-1">
                 <Div className="flex items-center gap-2 text-muted-foreground text-xs font-medium">
                   <TrendingUp className="h-3.5 w-3.5" />
-                  {t("app.user.referral.myCodes.signups")}
+                  {t("codes.list.widget.signups")}
                 </Div>
                 <Div className="text-lg font-semibold tabular-nums">
                   {code.totalSignups}
@@ -139,7 +139,7 @@ export function ReferralCodesListContainer({
               <Div className="p-4 flex flex-col gap-1">
                 <Div className="flex items-center gap-2 text-muted-foreground text-xs font-medium">
                   <DollarSign className="h-3.5 w-3.5" />
-                  {t("app.user.referral.myCodes.revenue")}
+                  {t("codes.list.widget.revenue")}
                 </Div>
                 <Div className="text-lg font-semibold tabular-nums text-emerald-600 dark:text-emerald-400">
                   {code.totalRevenueCents}
@@ -150,7 +150,7 @@ export function ReferralCodesListContainer({
               <Div className="p-4 flex flex-col gap-1">
                 <Div className="flex items-center gap-2 text-muted-foreground text-xs font-medium">
                   <DollarSign className="h-3.5 w-3.5" />
-                  {t("app.user.referral.myCodes.earnings")}
+                  {t("codes.list.widget.earnings")}
                 </Div>
                 <Div className="text-lg font-semibold tabular-nums text-blue-600 dark:text-blue-400">
                   {code.totalEarningsCents}
@@ -163,7 +163,7 @@ export function ReferralCodesListContainer({
               <Div className="px-4 py-3 border-t bg-red-50 dark:bg-red-950/20">
                 <Div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
                   <AlertCircle className="h-4 w-4 shrink-0" />
-                  <Span>{t("app.user.referral.myCodes.inactive")}</Span>
+                  <Span>{t("codes.list.widget.inactive")}</Span>
                 </Div>
               </Div>
             )}

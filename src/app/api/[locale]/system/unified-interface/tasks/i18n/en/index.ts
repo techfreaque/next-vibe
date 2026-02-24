@@ -213,7 +213,18 @@ export const translations = {
     notifyAlways: "Notify Always",
   },
   dbHealthCheck: {
+    name: "db-health-check",
     description: "Verifies database connection health every minute",
+  },
+  pulseRunner: {
+    name: "pulse-runner",
+    description:
+      "Calls the pulse repository once per minute to trigger scheduled tasks",
+  },
+  devWatcher: {
+    name: "dev-file-watcher",
+    description:
+      "Watches for file changes and triggers generators in development mode",
   },
   dbHealth: {
     tag: "Database",
@@ -367,6 +378,8 @@ export const translations = {
     },
   },
   taskSync: {
+    name: "task-sync",
+    description: "Periodically pulls new tasks from remote Thea instance",
     post: {
       title: "Sync Tasks",
       description: "Sync tasks from remote Thea instance",

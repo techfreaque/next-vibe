@@ -20,9 +20,9 @@ import type {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 import {
+  useWidgetContext,
   useWidgetForm,
   useWidgetIsInteractive,
-  useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import { extractLinkData } from "./shared";
@@ -55,7 +55,9 @@ import type { LinkWidgetConfig, LinkWidgetSchema } from "./types";
  */
 export function LinkWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
 >(
   props:
@@ -72,7 +74,7 @@ export function LinkWidget<
 ): JSX.Element {
   const { field } = props;
   const fieldName = "fieldName" in props ? props.fieldName : undefined;
-  const t = useWidgetTranslation();
+  const { t: tField } = useWidgetContext();
   const isInteractive = useWidgetIsInteractive();
   const form = useWidgetForm();
   const { size, gap, iconSize, href, text, external, textAlign, className } =
@@ -107,7 +109,7 @@ export function LinkWidget<
 
     if (data) {
       const { url, text: dataText, openInNewTab } = data;
-      const translatedText = t(dataText);
+      const translatedText = tField(dataText);
       const isExternal = isExternalUrl(url);
 
       return (
@@ -139,7 +141,7 @@ export function LinkWidget<
 
   // Priority 2: Static text and href props
   if (text && href) {
-    const translatedText = t(text);
+    const translatedText = tField(text);
     const openInNewTab = external === true; // only true if explicitly true
     const isExternal = isExternalUrl(href);
 

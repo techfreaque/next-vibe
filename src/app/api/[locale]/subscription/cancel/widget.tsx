@@ -37,7 +37,7 @@ interface CustomWidgetProps {
 export function SubscriptionCancelContainer({
   field,
 }: CustomWidgetProps): JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.DELETE>();
   const children = field.children;
 
   return (
@@ -45,9 +45,7 @@ export function SubscriptionCancelContainer({
       {/* Warning Alert */}
       <Alert variant="destructive">
         <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>
-          {t("app.api.subscription.delete.warning")}
-        </AlertDescription>
+        <AlertDescription>{t("delete.warning")}</AlertDescription>
       </Alert>
 
       <FormAlertWidget field={{}} />
@@ -62,8 +60,8 @@ export function SubscriptionCancelContainer({
       {/* Submit Button */}
       <SubmitButtonWidget
         field={{
-          text: "app.api.subscription.delete.submit.label",
-          loadingText: "app.api.subscription.delete.submit.loading",
+          text: "delete.submit.label",
+          loadingText: "delete.submit.loading",
           icon: "package-x",
           variant: "destructive",
         }}
@@ -77,7 +75,7 @@ export function SubscriptionCancelContainer({
               <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
               <Div>
                 <P className="font-medium text-green-900 dark:text-green-100">
-                  {t("app.api.subscription.delete.success.title")}
+                  {t("delete.success.title")}
                 </P>
                 <P className="text-sm text-green-700 dark:text-green-300">
                   {field.value.message}

@@ -27,7 +27,7 @@ export function SliderFieldWidgetInk<
   TUsage,
   SliderFieldWidgetConfig<TKey, NumberWidgetSchema, TUsage>
 >): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const showLabels = useInkWidgetShowLabels();
   const displayValue =
     field.value !== null && field.value !== undefined ? field.value : "—";

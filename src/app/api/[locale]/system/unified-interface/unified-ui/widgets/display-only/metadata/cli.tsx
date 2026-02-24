@@ -35,7 +35,7 @@ export function MetadataWidgetInk<
         MetadataWidgetConfig<TKey, MetadataWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const { field } = props;
   const { title: titleKey } = field;
 

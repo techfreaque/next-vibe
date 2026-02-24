@@ -55,7 +55,7 @@ export function ImportJobStatusContainer({
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
   const router = useRouter();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const isLoading = endpointMutations?.read?.isLoading;
 
   const job = data?.job;
@@ -120,7 +120,7 @@ export function ImportJobStatusContainer({
             )}
           />
           <Span className="font-semibold text-base">
-            {t("app.api.leads.import.jobs.widget.status.title")}
+            {t("widget.status.title")}
           </Span>
           {info?.fileName && (
             <Span className="text-sm text-muted-foreground">
@@ -138,7 +138,7 @@ export function ImportJobStatusContainer({
               className="gap-1.5"
             >
               <RotateCcw className="h-4 w-4" />
-              {t("app.api.leads.import.jobs.jobId.get.actions.retry")}
+              {t("get.actions.retry")}
             </Button>
           )}
           {isRunning && (
@@ -149,7 +149,7 @@ export function ImportJobStatusContainer({
               className="gap-1.5"
             >
               <XCircle className="h-4 w-4" />
-              {t("app.api.leads.import.jobs.jobId.get.actions.stop")}
+              {t("get.actions.stop")}
             </Button>
           )}
           <Button
@@ -159,7 +159,7 @@ export function ImportJobStatusContainer({
             className="gap-1.5"
           >
             <List className="h-4 w-4" />
-            {t("app.api.leads.import.jobs.jobId.get.actions.viewLeads")}
+            {t("get.actions.viewLeads")}
           </Button>
         </Div>
       </Div>
@@ -169,7 +169,7 @@ export function ImportJobStatusContainer({
         <Div className="h-32 flex flex-col items-center justify-center gap-3">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           <Span className="text-sm text-muted-foreground">
-            {t("app.api.leads.import.jobs.widget.status.loadingJobStatus")}
+            {t("widget.status.loadingJobStatus")}
           </Span>
         </Div>
       )}
@@ -200,9 +200,7 @@ export function ImportJobStatusContainer({
                   )}
                 >
                   {info?.status
-                    ? t(
-                        `app.api.leads.import.jobs.widget.status.jobStatus.${info.status}`,
-                      )
+                    ? t(`widget.status.jobStatus.${info.status}`)
                     : "—"}
                 </Span>
               </Div>
@@ -228,7 +226,7 @@ export function ImportJobStatusContainer({
                   {progress.totalRows ?? "—"}
                 </Span>
                 <Span className="text-xs text-muted-foreground">
-                  {t("app.api.leads.import.jobs.widget.status.totalRows")}
+                  {t("widget.status.totalRows")}
                 </Span>
               </Div>
               <Div className="rounded-lg border bg-card p-4 text-center">
@@ -236,7 +234,7 @@ export function ImportJobStatusContainer({
                   {progress.processedRows}
                 </Span>
                 <Span className="text-xs text-muted-foreground">
-                  {t("app.api.leads.import.jobs.widget.status.processed")}
+                  {t("widget.status.processed")}
                 </Span>
               </Div>
               <Div className="rounded-lg border bg-card p-4 text-center">
@@ -244,7 +242,7 @@ export function ImportJobStatusContainer({
                   {progress.successfulImports}
                 </Span>
                 <Span className="text-xs text-muted-foreground">
-                  {t("app.api.leads.import.jobs.widget.status.imported")}
+                  {t("widget.status.imported")}
                 </Span>
               </Div>
               <Div className="rounded-lg border bg-card p-4 text-center">
@@ -252,7 +250,7 @@ export function ImportJobStatusContainer({
                   {progress.failedImports}
                 </Span>
                 <Span className="text-xs text-muted-foreground">
-                  {t("app.api.leads.import.jobs.widget.status.failed")}
+                  {t("widget.status.failed")}
                 </Span>
               </Div>
               <Div className="rounded-lg border bg-card p-4 text-center">
@@ -260,7 +258,7 @@ export function ImportJobStatusContainer({
                   {progress.duplicateEmails}
                 </Span>
                 <Span className="text-xs text-muted-foreground">
-                  {t("app.api.leads.import.jobs.widget.status.duplicates")}
+                  {t("widget.status.duplicates")}
                 </Span>
               </Div>
             </Div>
@@ -270,9 +268,7 @@ export function ImportJobStatusContainer({
           {progressPercent !== null && (
             <Div className="rounded-lg border bg-card p-4">
               <Div className="flex justify-between text-xs text-muted-foreground mb-2">
-                <Span>
-                  {t("app.api.leads.import.jobs.widget.status.progress")}
-                </Span>
+                <Span>{t("widget.status.progress")}</Span>
                 <Span>{progressPercent}%</Span>
               </Div>
               <Div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -300,25 +296,23 @@ export function ImportJobStatusContainer({
               {configuration && (
                 <Div className="rounded-lg border bg-card p-4 flex flex-col gap-2">
                   <Span className="text-sm font-semibold">
-                    {t(
-                      "app.api.leads.import.jobs.widget.status.configurationTitle",
-                    )}
+                    {t("widget.status.configurationTitle")}
                   </Span>
                   <Div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
                     <Span className="text-muted-foreground">
-                      {t("app.api.leads.import.jobs.widget.status.batchSize")}
+                      {t("widget.status.batchSize")}
                     </Span>
                     <Span className="tabular-nums">
                       {configuration.batchSize}
                     </Span>
                     <Span className="text-muted-foreground">
-                      {t("app.api.leads.import.jobs.widget.status.batchStart")}
+                      {t("widget.status.batchStart")}
                     </Span>
                     <Span className="tabular-nums">
                       {configuration.currentBatchStart}
                     </Span>
                     <Span className="text-muted-foreground">
-                      {t("app.api.leads.import.jobs.widget.status.retries")}
+                      {t("widget.status.retries")}
                     </Span>
                     <Span className="tabular-nums">
                       {configuration.retryCount} / {configuration.maxRetries}
@@ -329,21 +323,19 @@ export function ImportJobStatusContainer({
               {timestamps && (
                 <Div className="rounded-lg border bg-card p-4 flex flex-col gap-2">
                   <Span className="text-sm font-semibold">
-                    {t(
-                      "app.api.leads.import.jobs.widget.status.timestampsTitle",
-                    )}
+                    {t("widget.status.timestampsTitle")}
                   </Span>
                   <Div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
                     <Span className="text-muted-foreground">
-                      {t("app.api.leads.import.jobs.widget.status.created")}
+                      {t("widget.status.created")}
                     </Span>
                     <Span>{timestamps.createdAt ?? "—"}</Span>
                     <Span className="text-muted-foreground">
-                      {t("app.api.leads.import.jobs.widget.status.started")}
+                      {t("widget.status.started")}
                     </Span>
                     <Span>{timestamps.startedAt ?? "—"}</Span>
                     <Span className="text-muted-foreground">
-                      {t("app.api.leads.import.jobs.widget.status.completed")}
+                      {t("widget.status.completed")}
                     </Span>
                     <Span>{timestamps.completedAt ?? "—"}</Span>
                   </Div>
@@ -378,7 +370,7 @@ export function ImportJobRetryContainer({
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
   const router = useRouter();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const isLoading = endpointMutations?.create?.isSubmitting;
 
   const result = data?.result;
@@ -405,7 +397,7 @@ export function ImportJobRetryContainer({
         <Div className="flex items-center gap-2 mr-auto">
           <RefreshCw className="h-5 w-5 text-muted-foreground" />
           <Span className="font-semibold text-base">
-            {t("app.api.leads.import.jobs.widget.retry.title")}
+            {t("widget.retry.title")}
           </Span>
         </Div>
       </Div>
@@ -415,7 +407,7 @@ export function ImportJobRetryContainer({
         <Div className="h-32 flex flex-col items-center justify-center gap-3">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           <Span className="text-sm text-muted-foreground">
-            {t("app.api.leads.import.jobs.widget.retry.loadingRetrying")}
+            {t("widget.retry.loadingRetrying")}
           </Span>
         </Div>
       )}
@@ -445,8 +437,8 @@ export function ImportJobRetryContainer({
               )}
             >
               {result.success
-                ? t("app.api.leads.import.jobs.widget.retry.successMessage")
-                : t("app.api.leads.import.jobs.widget.retry.failureMessage")}
+                ? t("widget.retry.successMessage")
+                : t("widget.retry.failureMessage")}
             </Span>
             {result.message && (
               <Span
@@ -469,7 +461,7 @@ export function ImportJobRetryContainer({
                   className="gap-1.5 text-xs"
                 >
                   <RefreshCw className="h-3.5 w-3.5" />
-                  {t("app.api.leads.import.jobs.widget.retry.viewJobStatus")}
+                  {t("widget.retry.viewJobStatus")}
                 </Button>
                 <Button
                   size="sm"
@@ -478,7 +470,7 @@ export function ImportJobRetryContainer({
                   className="gap-1.5 text-xs"
                 >
                   <List className="h-3.5 w-3.5" />
-                  {t("app.api.leads.import.jobs.widget.retry.viewLeads")}
+                  {t("widget.retry.viewLeads")}
                 </Button>
               </Div>
             )}
@@ -510,7 +502,7 @@ export function ImportJobStopContainer({
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
   const router = useRouter();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const isLoading = endpointMutations?.create?.isSubmitting;
 
   const result = data?.result;
@@ -531,7 +523,7 @@ export function ImportJobStopContainer({
         <Div className="flex items-center gap-2 mr-auto">
           <XCircle className="h-5 w-5 text-muted-foreground" />
           <Span className="font-semibold text-base">
-            {t("app.api.leads.import.jobs.widget.stop.title")}
+            {t("widget.stop.title")}
           </Span>
         </Div>
       </Div>
@@ -541,7 +533,7 @@ export function ImportJobStopContainer({
         <Div className="h-32 flex flex-col items-center justify-center gap-3">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           <Span className="text-sm text-muted-foreground">
-            {t("app.api.leads.import.jobs.widget.stop.loadingStopping")}
+            {t("widget.stop.loadingStopping")}
           </Span>
         </Div>
       )}
@@ -571,8 +563,8 @@ export function ImportJobStopContainer({
               )}
             >
               {result.success
-                ? t("app.api.leads.import.jobs.widget.stop.successMessage")
-                : t("app.api.leads.import.jobs.widget.stop.failureMessage")}
+                ? t("widget.stop.successMessage")
+                : t("widget.stop.failureMessage")}
             </Span>
             {result.message && (
               <Span
@@ -595,7 +587,7 @@ export function ImportJobStopContainer({
                   className="gap-1.5 text-xs"
                 >
                   <List className="h-3.5 w-3.5" />
-                  {t("app.api.leads.import.jobs.widget.stop.viewLeads")}
+                  {t("widget.stop.viewLeads")}
                 </Button>
                 <Button
                   size="sm"
@@ -604,7 +596,7 @@ export function ImportJobStopContainer({
                   className="gap-1.5 text-xs"
                 >
                   <RefreshCw className="h-3.5 w-3.5" />
-                  {t("app.api.leads.import.jobs.widget.stop.startNewImport")}
+                  {t("widget.stop.startNewImport")}
                 </Button>
               </Div>
             )}

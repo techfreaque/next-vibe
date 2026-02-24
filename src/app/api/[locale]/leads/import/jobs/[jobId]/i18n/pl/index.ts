@@ -12,6 +12,11 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Pobierz zadanie importu",
     description: "Pobierz szczegóły konkretnego zadania importu",
+    actions: {
+      retry: "Ponów",
+      stop: "Zatrzymaj",
+      viewLeads: "Zobacz leady",
+    },
     jobId: {
       label: "ID zadania",
       description: "Unikalny identyfikator zadania importu",
@@ -358,18 +363,32 @@ export const translations: typeof enTranslations = {
       created: "Utworzono",
       started: "Rozpoczęto",
       completed: "Ukończono",
+      jobStatus: {
+        enums: {
+          csvImportJobStatus: {
+            pending: "Oczekujące",
+            processing: "W trakcie przetwarzania",
+            completed: "Ukończone",
+            failed: "Nieudane",
+          },
+        },
+      },
     },
     retry: {
       title: "Powtórz zadanie importu",
       loadingRetrying: "Powtarzanie zadania…",
       successMessage: "Zadanie powtórzone pomyślnie",
       failureMessage: "Powtarzanie nieudane",
+      viewJobStatus: "Zobacz status zadania",
+      viewLeads: "Zobacz leady",
     },
     stop: {
       title: "Zatrzymaj zadanie importu",
       loadingStopping: "Zatrzymywanie zadania…",
       successMessage: "Zadanie zatrzymane pomyślnie",
       failureMessage: "Zatrzymanie nieudane",
+      viewLeads: "Zobacz leady",
+      startNewImport: "Rozpocznij nowy import",
     },
   },
 };

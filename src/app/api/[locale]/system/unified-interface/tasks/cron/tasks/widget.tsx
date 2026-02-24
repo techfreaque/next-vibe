@@ -155,7 +155,7 @@ function StatusBadge({
   t,
 }: {
   status: string | null;
-  t: ReturnType<typeof useWidgetTranslation>;
+  t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
 }): React.JSX.Element {
   return (
     <Span
@@ -164,7 +164,7 @@ function StatusBadge({
         getStatusColorClass(status),
       )}
     >
-      {status ? t(status) : "—"}
+      {status ? t(status as Parameters<typeof t>[0]) : "—"}
     </Span>
   );
 }
@@ -196,7 +196,7 @@ function TaskRow({
   onEdit: (task: Task) => void;
   onDelete: (task: Task) => void;
   onHistory: () => void;
-  t: ReturnType<typeof useWidgetTranslation>;
+  t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
 }): React.JSX.Element {
   const rate = successRate(task);
   const lastRunText = formatDate(task.lastExecutedAt);
@@ -232,15 +232,11 @@ function TaskRow({
           {/* System vs user owner chip */}
           {task.userId === null ? (
             <Span className="px-1.5 py-0.5 rounded text-xs font-medium bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.owner.system",
-              )}
+              {t("widget.task.owner.system")}
             </Span>
           ) : (
             <Span className="px-1.5 py-0.5 rounded text-xs font-medium bg-sky-100 text-sky-800 dark:bg-sky-900/30 dark:text-sky-300">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.owner.user",
-              )}
+              {t("widget.task.owner.user")}
             </Span>
           )}
           <Span
@@ -249,7 +245,7 @@ function TaskRow({
               "bg-muted text-muted-foreground",
             )}
           >
-            {t(task.category)}
+            {t(task.category as Parameters<typeof t>[0])}
           </Span>
           {task.priority && (
             <Span
@@ -265,7 +261,7 @@ function TaskRow({
 
         {task.description && (
           <Span className="text-xs text-muted-foreground block truncate mb-1">
-            {t(task.description)}
+            {task.description}
           </Span>
         )}
 
@@ -276,9 +272,7 @@ function TaskRow({
         {/* Stats row (hidden on small screens) */}
         <Div className="hidden sm:flex items-center gap-3 mt-1 text-xs text-muted-foreground">
           <Span>
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.task.executions",
-            )}
+            {t("widget.task.executions")}
             {` ${task.executionCount}/${task.successCount}`}
           </Span>
           <Span>{`${rate}%`}</Span>
@@ -289,9 +283,7 @@ function TaskRow({
       {/* Last run */}
       <Div className="hidden sm:flex flex-col items-end gap-1 flex-shrink-0 min-w-[100px]">
         <Span className="text-xs text-muted-foreground">
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.task.lastRun",
-          )}
+          {t("widget.task.lastRun")}
         </Span>
         {lastRunText ? (
           <Span
@@ -301,9 +293,7 @@ function TaskRow({
           </Span>
         ) : (
           <Span className="text-xs text-muted-foreground">
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.task.never",
-            )}
+            {t("widget.task.never")}
           </Span>
         )}
       </Div>
@@ -311,15 +301,10 @@ function TaskRow({
       {/* Next run */}
       <Div className="hidden md:flex flex-col items-end gap-1 flex-shrink-0 min-w-[100px]">
         <Span className="text-xs text-muted-foreground">
-          {t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.task.nextRun",
-          )}
+          {t("widget.task.nextRun")}
         </Span>
         <Span className="text-xs">
-          {nextRunText ||
-            t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.task.notScheduled",
-            )}
+          {nextRunText || t("widget.task.notScheduled")}
         </Span>
       </Div>
 
@@ -336,9 +321,7 @@ function TaskRow({
           size="sm"
           className="h-7 w-7 p-0"
           onClick={() => onView(task)}
-          title={t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.action.view",
-          )}
+          title={t("widget.action.view")}
         >
           <Eye className="h-3.5 w-3.5" />
         </Button>
@@ -348,9 +331,7 @@ function TaskRow({
           size="sm"
           className="h-7 w-7 p-0"
           onClick={() => onHistory()}
-          title={t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.action.history",
-          )}
+          title={t("widget.action.history")}
         >
           <Clock className="h-3.5 w-3.5" />
         </Button>
@@ -360,9 +341,7 @@ function TaskRow({
           size="sm"
           className="h-7 w-7 p-0"
           onClick={() => onEdit(task)}
-          title={t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.action.edit",
-          )}
+          title={t("widget.action.edit")}
         >
           <Pencil className="h-3.5 w-3.5" />
         </Button>
@@ -372,9 +351,7 @@ function TaskRow({
           size="sm"
           className="h-7 w-7 p-0 text-destructive hover:text-destructive"
           onClick={() => onDelete(task)}
-          title={t(
-            "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.action.delete",
-          )}
+          title={t("widget.action.delete")}
         >
           <Trash2 className="h-3.5 w-3.5" />
         </Button>
@@ -435,7 +412,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   const data = field.value;
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof endpoints.GET>();
   const router = useRouter();
   const locale = useWidgetLocale();
   const form = useWidgetForm<typeof endpoints.GET>();
@@ -727,45 +704,42 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   }, [patchForm]);
 
   // ── Tab definitions ───────────────────────────────────────────────────────
-  const tabs: Array<{ key: StatusFilterKey; labelKey: string; count: number }> =
-    [
-      {
-        key: "ALL",
-        labelKey:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.filter.all",
-        count: counts.all,
-      },
-      {
-        key: "RUNNING",
-        labelKey:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.filter.running",
-        count: counts.running,
-      },
-      {
-        key: "COMPLETED",
-        labelKey:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.filter.completed",
-        count: counts.completed,
-      },
-      {
-        key: "FAILED",
-        labelKey:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.filter.failed",
-        count: counts.failed,
-      },
-      {
-        key: "PENDING",
-        labelKey:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.filter.pending",
-        count: counts.pending,
-      },
-      {
-        key: "DISABLED",
-        labelKey:
-          "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.filter.disabled",
-        count: counts.disabled,
-      },
-    ];
+  const tabs: Array<{
+    key: StatusFilterKey;
+    labelKey: TModuleKey;
+    count: number;
+  }> = [
+    {
+      key: "ALL",
+      labelKey: "widget.filter.all",
+      count: counts.all,
+    },
+    {
+      key: "RUNNING",
+      labelKey: "widget.filter.running",
+      count: counts.running,
+    },
+    {
+      key: "COMPLETED",
+      labelKey: "widget.filter.completed",
+      count: counts.completed,
+    },
+    {
+      key: "FAILED",
+      labelKey: "widget.filter.failed",
+      count: counts.failed,
+    },
+    {
+      key: "PENDING",
+      labelKey: "widget.filter.pending",
+      count: counts.pending,
+    },
+    {
+      key: "DISABLED",
+      labelKey: "widget.filter.disabled",
+      count: counts.disabled,
+    },
+  ];
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -777,9 +751,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
         {/* Title + count */}
         <Div className="flex items-center gap-2 mr-auto min-w-0">
           <Span className="font-semibold text-base truncate">
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.title",
-            )}
+            {t("widget.title")}
           </Span>
           <Span className="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full flex-shrink-0">
             {totalTasks}
@@ -796,11 +768,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
             onClick={handleNavigateStats}
           >
             <BarChart3 className="h-3.5 w-3.5" />
-            <Span className="hidden sm:inline">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.header.stats",
-              )}
-            </Span>
+            <Span className="hidden sm:inline">{t("widget.header.stats")}</Span>
           </Button>
           <Button
             type="button"
@@ -811,9 +779,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
           >
             <History className="h-3.5 w-3.5" />
             <Span className="hidden sm:inline">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.header.history",
-              )}
+              {t("widget.header.history")}
             </Span>
           </Button>
           <Button
@@ -822,9 +788,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
             size="sm"
             className="h-8 w-8 p-0"
             onClick={handleRefresh}
-            title={t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.header.refresh",
-            )}
+            title={t("widget.header.refresh")}
           >
             <RefreshCw className="h-3.5 w-3.5" />
           </Button>
@@ -837,9 +801,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
           >
             <Plus className="h-3.5 w-3.5" />
             <Span className="hidden sm:inline">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.header.create",
-              )}
+              {t("widget.header.create")}
             </Span>
           </Button>
         </Div>
@@ -850,7 +812,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
         {tabs.map((tab) => (
           <FilterTab
             key={tab.key}
-            label={t(tab.labelKey)}
+            label={t(tab.labelKey as Parameters<typeof t>[0])}
             count={tab.count}
             active={activeStatusTab === tab.key}
             onClick={() => handleStatusTabChange(tab.key)}
@@ -869,9 +831,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
             type="text"
             value={search}
             onChangeText={setSearch}
-            placeholder={t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.search.placeholder",
-            )}
+            placeholder={t("widget.search.placeholder")}
             className="pl-8 h-8 text-sm"
           />
         </Div>
@@ -890,13 +850,11 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.filter.allPriorities",
-              )}
+              {t("widget.filter.allPriorities")}
             </SelectItem>
             {CronTaskPriorityOptions.map((opt) => (
               <SelectItem key={opt.value} value={opt.value}>
-                {t(opt.label)}
+                {t(opt.label as Parameters<typeof t>[0])}
               </SelectItem>
             ))}
           </SelectContent>
@@ -916,13 +874,11 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="ALL">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.filter.allCategories",
-              )}
+              {t("widget.filter.allCategories")}
             </SelectItem>
             {TaskCategoryOptions.map((opt) => (
               <SelectItem key={opt.value} value={opt.value}>
-                {t(opt.label)}
+                {t(opt.label as Parameters<typeof t>[0])}
               </SelectItem>
             ))}
           </SelectContent>
@@ -935,33 +891,21 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
           </SelectTrigger>
           <SelectContent>
             {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- internal sort key */}
-            <SelectItem value="name_asc">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.sort.nameAsc",
-              )}
-            </SelectItem>
+            <SelectItem value="name_asc">{t("widget.sort.nameAsc")}</SelectItem>
             {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- internal sort key */}
             <SelectItem value="name_desc">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.sort.nameDesc",
-              )}
+              {t("widget.sort.nameDesc")}
             </SelectItem>
             <SelectItem value="schedule">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.sort.schedule",
-              )}
+              {t("widget.sort.schedule")}
             </SelectItem>
             {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- internal sort key */}
             <SelectItem value="last_run_desc">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.sort.lastRunNewest",
-              )}
+              {t("widget.sort.lastRunNewest")}
             </SelectItem>
             {/* oxlint-disable-next-line oxlint-plugin-i18n/no-literal-string -- internal sort key */}
             <SelectItem value="executions_desc">
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.sort.executionsMost",
-              )}
+              {t("widget.sort.executionsMost")}
             </SelectItem>
           </SelectContent>
         </Select>
@@ -972,9 +916,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
         <Div className="flex flex-col items-center justify-center gap-3 py-16">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           <Span className="text-sm text-muted-foreground">
-            {t(
-              "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.loading",
-            )}
+            {t("widget.loading")}
           </Span>
         </Div>
       )}
@@ -1007,21 +949,13 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
           <Div className="flex flex-col gap-1">
             <Span className="font-medium text-sm">
               {tasks.length === 0
-                ? t(
-                    "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.empty.noTasks",
-                  )
-                : t(
-                    "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.empty.noMatches",
-                  )}
+                ? t("widget.empty.noTasks")
+                : t("widget.empty.noMatches")}
             </Span>
             <Span className="text-xs text-muted-foreground">
               {tasks.length === 0
-                ? t(
-                    "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.empty.noTasksDesc",
-                  )
-                : t(
-                    "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.empty.noMatchesDesc",
-                  )}
+                ? t("widget.empty.noTasksDesc")
+                : t("widget.empty.noMatchesDesc")}
             </Span>
           </Div>
           <Div className="flex gap-2">
@@ -1033,9 +967,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
                 onClick={handleClearFilters}
               >
                 <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
-                {t(
-                  "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.empty.clearFilters",
-                )}
+                {t("widget.empty.clearFilters")}
               </Button>
             )}
             <Button
@@ -1045,9 +977,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
               onClick={handleCreate}
             >
               <Plus className="h-3.5 w-3.5 mr-1.5" />
-              {t(
-                "app.api.system.unifiedInterface.tasks.cronSystem.tasks.widget.header.create",
-              )}
+              {t("widget.header.create")}
             </Button>
           </Div>
         </Div>

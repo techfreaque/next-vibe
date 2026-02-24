@@ -117,7 +117,7 @@ export function EmailStatsContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const data = field.value;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.GET>();
   const locale = useWidgetLocale();
   const router = useRouter();
   const { endpointMutations } = useWidgetContext();
@@ -224,9 +224,7 @@ export function EmailStatsContainer({
     <Div className="flex flex-col gap-0">
       {/* Header */}
       <Div className="flex items-center gap-2 p-4 border-b flex-wrap">
-        <Span className="font-semibold text-base">
-          {t("app.api.emails.messages.stats.get.title")}
-        </Span>
+        <Span className="font-semibold text-base">{t("get.title")}</Span>
         <Div className="flex-1" />
         <Button
           type="button"
@@ -234,14 +232,14 @@ export function EmailStatsContainer({
           size="sm"
           onClick={handleViewList}
         >
-          {t("app.api.emails.messages.stats.widget.viewList")}
+          {t("widget.viewList")}
         </Button>
         <Button
           type="button"
           variant="ghost"
           size="sm"
           onClick={handleRefresh}
-          title={t("app.api.emails.messages.stats.widget.refresh")}
+          title={t("widget.refresh")}
         >
           <RefreshCw className="h-4 w-4" />
         </Button>
@@ -302,7 +300,7 @@ export function EmailStatsContainer({
                 : "bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-foreground",
             )}
           >
-            {t("app.api.emails.messages.stats.get.includeComparison.label")}
+            {t("get.includeComparison.label")}
           </Button>
         </Div>
 
@@ -394,7 +392,7 @@ export function EmailStatsContainer({
                   onSubmit();
                 }
               }}
-              placeholder={t("app.api.emails.messages.stats.widget.search")}
+              placeholder={t("widget.search")}
               className="pl-9 h-9"
             />
           </Div>
@@ -433,42 +431,39 @@ export function EmailStatsContainer({
         <Div className="p-4 flex flex-col gap-6">
           {/* Volume stats */}
           <Div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <StatCard label={t("widget.total")} value={data.totalEmails} />
             <StatCard
-              label={t("app.api.emails.messages.stats.widget.total")}
-              value={data.totalEmails}
-            />
-            <StatCard
-              label={t("app.api.emails.messages.stats.widget.sent")}
+              label={t("widget.sent")}
               value={data.sentEmails}
               color="#22c55e"
             />
             <StatCard
-              label={t("app.api.emails.messages.stats.widget.delivered")}
+              label={t("widget.delivered")}
               value={data.deliveredEmails}
               color="#10b981"
             />
             <StatCard
-              label={t("app.api.emails.messages.stats.widget.opened")}
+              label={t("widget.opened")}
               value={data.openedEmails}
               color="#3b82f6"
             />
             <StatCard
-              label={t("app.api.emails.messages.stats.widget.clicked")}
+              label={t("widget.clicked")}
               value={data.clickedEmails}
               color="#8b5cf6"
             />
             <StatCard
-              label={t("app.api.emails.messages.stats.widget.bounced")}
+              label={t("widget.bounced")}
               value={data.bouncedEmails}
               color="#f97316"
             />
             <StatCard
-              label={t("app.api.emails.messages.stats.widget.failed")}
+              label={t("widget.failed")}
               value={data.failedEmails}
               color="#ef4444"
             />
             <StatCard
-              label={t("app.api.emails.messages.stats.widget.errors")}
+              label={t("widget.errors")}
               value={data.emailsWithErrors}
               color="#dc2626"
             />
@@ -477,30 +472,30 @@ export function EmailStatsContainer({
           {/* Engagement rates */}
           <Div className="rounded-lg border p-4 flex flex-col gap-3">
             <Span className="text-sm font-semibold">
-              {t("app.api.emails.messages.stats.widget.engagementRates")}
+              {t("widget.engagementRates")}
             </Span>
             <RateBar
-              label={t("app.api.emails.messages.stats.widget.deliveryRate")}
+              label={t("widget.deliveryRate")}
               rate={data.deliveryRate}
               color="#10b981"
             />
             <RateBar
-              label={t("app.api.emails.messages.stats.widget.openRate")}
+              label={t("widget.openRate")}
               rate={data.openRate}
               color="#3b82f6"
             />
             <RateBar
-              label={t("app.api.emails.messages.stats.widget.clickRate")}
+              label={t("widget.clickRate")}
               rate={data.clickRate}
               color="#8b5cf6"
             />
             <RateBar
-              label={t("app.api.emails.messages.stats.widget.bounceRate")}
+              label={t("widget.bounceRate")}
               rate={data.bounceRate}
               color="#f97316"
             />
             <RateBar
-              label={t("app.api.emails.messages.stats.widget.failureRate")}
+              label={t("widget.failureRate")}
               rate={data.failureRate}
               color="#ef4444"
             />
@@ -510,7 +505,7 @@ export function EmailStatsContainer({
           {data.groupedStats.byStatus.length > 0 && (
             <Div className="rounded-lg border p-4">
               <Span className="text-sm font-semibold block mb-3">
-                {t("app.api.emails.messages.stats.widget.byStatus")}
+                {t("widget.byStatus")}
               </Span>
               <Div className="flex flex-col gap-2">
                 {data.groupedStats.byStatus.map((row) => (
@@ -530,7 +525,7 @@ export function EmailStatsContainer({
           {Object.keys(data.emailsByType).length > 0 && (
             <Div className="rounded-lg border p-4">
               <Span className="text-sm font-semibold block mb-3">
-                {t("app.api.emails.messages.stats.widget.byType")}
+                {t("widget.byType")}
               </Span>
               <Div className="flex flex-col gap-2">
                 {Object.entries(data.emailsByType).map(([type, count]) => (
@@ -549,11 +544,11 @@ export function EmailStatsContainer({
           {/* Performance */}
           <Div className="grid grid-cols-2 gap-3">
             <StatCard
-              label={t("app.api.emails.messages.stats.widget.avgRetries")}
+              label={t("widget.avgRetries")}
               value={data.averageRetryCount.toFixed(2)}
             />
             <StatCard
-              label={t("app.api.emails.messages.stats.widget.avgDeliveryMs")}
+              label={t("widget.avgDeliveryMs")}
               value={
                 data.averageDeliveryTime > 0
                   ? `${Math.round(data.averageDeliveryTime)}ms`

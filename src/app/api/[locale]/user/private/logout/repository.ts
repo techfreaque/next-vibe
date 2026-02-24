@@ -92,11 +92,6 @@ export class LogoutRepository {
       return success({
         success: true,
         message: t("success.message"),
-        sessionsCleaned: 1, // We cleaned one session
-        nextSteps: [
-          "app.api.user.private.logout.nextSteps.redirectToLogin",
-          "app.api.user.private.logout.nextSteps.clearBrowserData",
-        ],
       });
     } catch (error) {
       logger.error("Error during logout process", parseError(error));

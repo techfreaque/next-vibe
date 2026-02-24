@@ -96,6 +96,16 @@ export const translations = {
         title: "Codes Retrieved",
         description: "Successfully retrieved your referral codes",
       },
+      widget: {
+        empty: "You don't have any referral codes yet",
+        copied: "Copied!",
+        copy: "Copy Link",
+        uses: "Uses",
+        signups: "Signups",
+        revenue: "Revenue",
+        earnings: "Earnings",
+        inactive: "This referral code is inactive",
+      },
     },
   },
 

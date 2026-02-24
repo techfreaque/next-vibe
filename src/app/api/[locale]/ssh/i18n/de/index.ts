@@ -254,6 +254,7 @@ export const translations = {
             description: "Terminalhöhe in Zeilen",
           },
         },
+        disconnected: "Getrennt",
         response: {
           sessionId: { title: "Sitzungs-ID" },
           status: { title: "Status" },

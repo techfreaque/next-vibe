@@ -221,7 +221,18 @@ export const translations: typeof enTranslations = {
     notifyAlways: "Immer benachrichtigen",
   },
   dbHealthCheck: {
+    name: "db-health-check",
     description: "Überprüft die Datenbankverbindungsgesundheit jede Minute",
+  },
+  pulseRunner: {
+    name: "pulse-runner",
+    description:
+      "Ruft das Pulse-Repository einmal pro Minute auf, um geplante Aufgaben auszulösen",
+  },
+  devWatcher: {
+    name: "dev-file-watcher",
+    description:
+      "Überwacht Dateiänderungen und löst Generatoren im Entwicklungsmodus aus",
   },
   dbHealth: {
     tag: "Datenbank",
@@ -377,6 +388,9 @@ export const translations: typeof enTranslations = {
     },
   },
   taskSync: {
+    name: "task-sync",
+    description:
+      "Ruft regelmäßig neue Aufgaben von der entfernten Thea-Instanz ab",
     post: {
       title: "Aufgaben synchronisieren",
       description: "Aufgaben von entfernter Thea-Instanz synchronisieren",

@@ -338,7 +338,7 @@ class EnvGeneratorRepositoryImpl {
 
       return success({
         success: true,
-        message: "app.api.system.generators.env.success.generated",
+        message: t("success.generated"),
         serverEnvFiles: validServerModules.length,
         clientEnvFiles: validClientModules.length,
         duration,

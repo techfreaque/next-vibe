@@ -98,6 +98,16 @@ export const translations: typeof enTranslations = {
         title: "Kody pobrane",
         description: "Pomyślnie pobrano Twoje kody polecające",
       },
+      widget: {
+        empty: "Nie masz jeszcze żadnych kodów polecających",
+        copied: "Skopiowano!",
+        copy: "Kopiuj link",
+        uses: "Użycia",
+        signups: "Rejestracje",
+        revenue: "Przychód",
+        earnings: "Zarobki",
+        inactive: "Ten kod polecający jest nieaktywny",
+      },
     },
   },
 

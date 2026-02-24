@@ -27,7 +27,7 @@ export function ImportJobStopContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const data = field.value;
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof definition.POST>();
 
   return (
     <Div className="flex flex-col gap-4 p-4">
@@ -36,7 +36,7 @@ export function ImportJobStopContainer({
         <Div className="flex items-center gap-2 mr-auto">
           <XCircle className="h-5 w-5 text-destructive" />
           <Span className="font-semibold text-base text-destructive">
-            {t("app.api.leads.import.jobs.stop.widget.title")}
+            {t("widget.title")}
           </Span>
         </Div>
       </Div>
@@ -44,7 +44,7 @@ export function ImportJobStopContainer({
         <Div className="rounded-lg border border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/20 p-4 flex items-center gap-3">
           <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
           <Span className="text-sm font-medium text-green-700 dark:text-green-300">
-            {t("app.api.leads.import.jobs.stop.widget.successMessage")}
+            {t("widget.successMessage")}
           </Span>
         </Div>
       )}

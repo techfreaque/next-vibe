@@ -517,25 +517,21 @@ export class ReferralRepository {
       const availableCredits = totalEarnedCredits - totalPaidOutCredits;
 
       return success({
-        totalSignupsTitle: "app.api.referral.stats.fields.totalSignups",
+        totalSignupsTitle: "stats.fields.totalSignups",
         totalSignupsValue: totalSignups,
-        totalSignupsDescription:
-          "app.api.referral.stats.fields.totalSignupsDescription",
+        totalSignupsDescription: "stats.fields.totalSignupsDescription",
 
-        totalRevenueTitle: "app.api.referral.stats.fields.totalRevenue",
+        totalRevenueTitle: "stats.fields.totalRevenue",
         totalRevenueValue: totalRevenueCredits,
-        totalRevenueDescription:
-          "app.api.referral.stats.fields.totalRevenueDescription",
+        totalRevenueDescription: "stats.fields.totalRevenueDescription",
 
-        totalEarnedTitle: "app.api.referral.stats.fields.totalEarned",
+        totalEarnedTitle: "stats.fields.totalEarned",
         totalEarnedValue: totalEarnedCredits,
-        totalEarnedDescription:
-          "app.api.referral.stats.fields.totalEarnedDescription",
+        totalEarnedDescription: "stats.fields.totalEarnedDescription",
 
-        availableCreditsTitle: "app.api.referral.stats.fields.availableBalance",
+        availableCreditsTitle: "stats.fields.availableBalance",
         availableCreditsValue: availableCredits,
-        availableCreditsDescription:
-          "app.api.referral.stats.fields.availableBalanceDescription",
+        availableCreditsDescription: "stats.fields.availableBalanceDescription",
       });
     } catch (error) {
       logger.error("Failed to get referral stats", parseError(error));

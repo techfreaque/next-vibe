@@ -208,7 +208,7 @@ export function useBatchOperations(
       batchDeleteEndpoint.create?.response?.data?.response?.preview &&
       !batchDialogOpen
     ) {
-      logger.debug("app.api.leads.batch.delete.preview.modal.auto.open", {
+      logger.debug("Auto-opening batch delete preview modal", {
         previewCount:
           batchDeleteEndpoint.create.response.data.response.preview.length,
       });
@@ -232,7 +232,7 @@ export function useBatchOperations(
       batchUpdateEndpoint.create?.response?.data?.response?.preview &&
       !batchDialogOpen
     ) {
-      logger.debug("app.api.leads.batch.update.preview.modal.auto.open", {
+      logger.debug("Auto-opening batch update preview modal", {
         previewCount:
           batchUpdateEndpoint.create.response.data.response.preview.length,
       });
@@ -278,10 +278,7 @@ export function useBatchOperations(
 
         // Response will be handled by useEffect
       } catch (error) {
-        logger.error(
-          "app.api.leads.batch.preview.failed",
-          parseError(error).message,
-        );
+        logger.error("Batch preview failed", parseError(error).message);
       }
     },
     [batchUpdateEndpoint.create, logger],
@@ -302,7 +299,9 @@ export function useBatchOperations(
       try {
         // Prevent double calls by checking if already submitting
         if (batchUpdateEndpoint.create.isSubmitting) {
-          logger.debug("app.api.leads.batch.update.in.progress.ignored");
+          logger.debug(
+            "Batch update already in progress, ignoring duplicate call",
+          );
           return;
         }
 
@@ -333,10 +332,7 @@ export function useBatchOperations(
           setBatchDialogOpen(true);
         }
       } catch (error) {
-        logger.error(
-          "app.api.leads.batch.update.failed",
-          parseError(error).message,
-        );
+        logger.error("Batch update failed", parseError(error).message);
       }
     },
     [batchUpdateEndpoint.create, logger],
@@ -368,10 +364,7 @@ export function useBatchOperations(
           onOperationComplete?.();
         }
       } catch (error) {
-        logger.error(
-          "app.api.leads.batch.update.failed",
-          parseError(error).message,
-        );
+        logger.error("Batch update failed", parseError(error).message);
       }
     },
     [batchUpdateEndpoint.create, pendingUpdates, onOperationComplete, logger],
@@ -406,10 +399,7 @@ export function useBatchOperations(
           setBatchDialogOpen(true);
         }
       } catch (error) {
-        logger.error(
-          "app.api.leads.batch.delete.preview.failed",
-          parseError(error).message,
-        );
+        logger.error("Batch delete preview failed", parseError(error).message);
       }
     },
     [batchDeleteEndpoint.create, logger],
@@ -424,11 +414,13 @@ export function useBatchOperations(
       try {
         // Prevent double calls by checking if already submitting
         if (batchDeleteEndpoint.create.isSubmitting) {
-          logger.debug("app.api.leads.batch.delete.in.progress.ignored");
+          logger.debug(
+            "Batch delete already in progress, ignoring duplicate call",
+          );
           return;
         }
 
-        logger.debug("app.api.leads.batch.delete.hook.called", {
+        logger.debug("Batch delete hook called", {
           currentFilters,
         });
         setOperationType("delete");
@@ -442,24 +434,19 @@ export function useBatchOperations(
           maxRecords: 1000,
         };
 
-        logger.debug("app.api.leads.batch.delete.form.data.set", {
+        logger.debug("Setting batch delete form data", {
           formData,
         });
         batchDeleteEndpoint.create.form.reset(formData);
 
         // Submit the form
-        logger.debug("app.api.leads.batch.delete.form.submitting");
+        logger.debug("Submitting batch delete form");
         await batchDeleteEndpoint.create.submitForm();
 
         // Response will be handled by useEffect
-        logger.debug(
-          "app.api.leads.batch.delete.form.submitted.waiting.response",
-        );
+        logger.debug("Batch delete form submitted, waiting for response");
       } catch (error) {
-        logger.error(
-          "app.api.leads.batch.delete.preview.failed",
-          parseError(error).message,
-        );
+        logger.error("Batch delete preview failed", parseError(error).message);
       }
     },
     [batchDeleteEndpoint.create, logger],
@@ -491,10 +478,7 @@ export function useBatchOperations(
           onOperationComplete?.();
         }
       } catch (error) {
-        logger.error(
-          "app.api.leads.batch.delete.failed",
-          parseError(error).message,
-        );
+        logger.error("Batch delete failed", parseError(error).message);
       }
     },
     [batchDeleteEndpoint.create, onOperationComplete, logger],

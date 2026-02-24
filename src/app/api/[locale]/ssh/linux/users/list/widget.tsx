@@ -38,7 +38,7 @@ interface WidgetProps {
 export function LinuxUsersListContainer({
   field,
 }: WidgetProps): React.JSX.Element {
-  const t = useWidgetTranslation();
+  const t = useWidgetTranslation<typeof endpoints.GET>();
   const locale = useWidgetLocale();
   const router = useRouter();
   const value = field.value;
@@ -49,7 +49,7 @@ export function LinuxUsersListContainer({
       <Div className="flex items-center gap-2 px-4 py-3 border-b">
         <Users className="h-4 w-4 text-muted-foreground" />
         <Span className="font-semibold text-sm mr-auto">
-          {t("app.api.ssh.linux.users.list.widget.title")}
+          {t("widget.title")}
         </Span>
         <Button
           type="button"
@@ -57,14 +57,14 @@ export function LinuxUsersListContainer({
           onClick={() => router.push(`/${locale}/admin/ssh/users/create`)}
         >
           <Plus className="h-3.5 w-3.5 mr-1" />
-          {t("app.api.ssh.linux.users.list.widget.createButton")}
+          {t("widget.createButton")}
         </Button>
       </Div>
 
       {users.length === 0 ? (
         <Div className="flex items-center justify-center flex-1 py-12">
           <P className="text-sm text-muted-foreground">
-            {t("app.api.ssh.linux.users.list.widget.localModeOnly")}
+            {t("widget.localModeOnly")}
           </P>
         </Div>
       ) : (
@@ -73,19 +73,19 @@ export function LinuxUsersListContainer({
             <TableHeader>
               <TableRow className="border-b bg-muted/20">
                 <TableHead className="px-4 py-2 text-left font-medium text-muted-foreground">
-                  {t("app.api.ssh.linux.users.list.widget.usernameCol")}
+                  {t("widget.usernameCol")}
                 </TableHead>
                 <TableHead className="px-4 py-2 text-left font-medium text-muted-foreground">
-                  {t("app.api.ssh.linux.users.list.widget.uidCol")}
+                  {t("widget.uidCol")}
                 </TableHead>
                 <TableHead className="px-4 py-2 text-left font-medium text-muted-foreground">
-                  {t("app.api.ssh.linux.users.list.widget.homeDirCol")}
+                  {t("widget.homeDirCol")}
                 </TableHead>
                 <TableHead className="px-4 py-2 text-left font-medium text-muted-foreground">
-                  {t("app.api.ssh.linux.users.list.widget.shellCol")}
+                  {t("widget.shellCol")}
                 </TableHead>
                 <TableHead className="px-4 py-2 text-left font-medium text-muted-foreground">
-                  {t("app.api.ssh.linux.users.list.widget.statusCol")}
+                  {t("widget.statusCol")}
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -115,9 +115,7 @@ export function LinuxUsersListContainer({
                           : "text-green-600 dark:text-green-400"
                       }
                     >
-                      {user.locked
-                        ? t("app.api.ssh.linux.users.list.widget.locked")
-                        : t("app.api.ssh.linux.users.list.widget.active")}
+                      {user.locked ? t("widget.locked") : t("widget.active")}
                     </Span>
                   </TableCell>
                 </TableRow>

@@ -27,7 +27,7 @@ export function LanguageSelectFieldWidgetInk<
   TUsage,
   LanguageSelectFieldWidgetConfig<TKey, StringWidgetSchema, TUsage>
 >): JSX.Element {
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const showLabels = useInkWidgetShowLabels();
   const displayValue = field.value ? field.value : "—";
 

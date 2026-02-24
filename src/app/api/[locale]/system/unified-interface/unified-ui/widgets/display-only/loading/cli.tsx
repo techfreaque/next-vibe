@@ -30,7 +30,7 @@ export function LoadingWidgetInk<
   LoadingWidgetConfig<TKey, TUsage, "widget">
 >): JSX.Element {
   const { message: messageKey } = field;
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
 
   const message = messageKey ? t(messageKey) : "Loading...";
 

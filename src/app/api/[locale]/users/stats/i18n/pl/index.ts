@@ -445,5 +445,10 @@ export const translations: typeof enTranslations = {
     rowThisMonth: "Ten miesi\u0105c",
     rowLastMonth: "Zesz\u0142y miesi\u0105c",
     generatedAt: "Wygenerowano:",
+    filters: "Filtry",
+    filtersTitle: "Opcje filtrowania",
+    applyFilters: "Zastosuj filtry",
+    viewUsers: "Zobacz użytkowników",
+    createUser: "Utwórz użytkownika",
   },
 };

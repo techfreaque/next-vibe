@@ -88,7 +88,7 @@ export function useLeadsImportEndpoint(
         await form.create.form.trigger(["file", "fileName"]);
       } catch (error) {
         logger.error(
-          "app.api.leads.import.file.processing.error",
+          "File processing error",
           error instanceof Error ? error.message : String(error),
         );
       }

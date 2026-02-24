@@ -24,8 +24,8 @@ import { tools } from "./route";
 const cronSettings = getDefaultCronSettings();
 
 const campaignStarterTask = createCronTask(definitions.POST, tools.POST, {
-  name: "lead-campaign-starter",
-  description: "app.api.leads.campaigns.campaignStarter.task.description",
+  name: "post.title",
+  description: "task.description",
   schedule:
     env.NODE_ENV === Environment.PRODUCTION
       ? cronSettings.schedule

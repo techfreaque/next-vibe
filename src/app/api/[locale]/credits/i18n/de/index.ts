@@ -140,6 +140,29 @@ export const translations: typeof enTranslations = {
       title: "Credit-Guthaben",
       description: "Ihr aktuelles Credit-Guthaben und Aufschlüsselung",
     },
+    balance: {
+      title: "Ihr Credit-Guthaben",
+      description: "Nutzen Sie Ihre Credits bei {{modelCount}} KI-Modellen",
+      credit: "{{count}} Credit",
+      credits: "{{count}} Credits",
+      expiring: {
+        title: "Ablaufende Credits",
+        description: "{{subCredits}} neue Credits pro Abonnementzyklus",
+      },
+      permanent: {
+        title: "Permanente Credits",
+        description: "Laufen nie ab – gehören Ihnen",
+      },
+      free: {
+        title: "Kostenlose Credits",
+        description: "{{count}} kostenlose Credits monatlich aufgefrischt",
+      },
+      earned: {
+        title: "Verdiente Credits",
+        description:
+          "Durch Empfehlungen verdient – klicken Sie, um Freunde einzuladen",
+      },
+    },
     total: {
       content: "Gesamt-Credits",
     },
@@ -221,6 +244,7 @@ export const translations: typeof enTranslations = {
         description: "Ihren Credit-Transaktionsverlauf anzeigen",
       },
       emptyState: "Noch keine Credit-Transaktionen",
+      balance: "Guthaben danach: {{count}}",
       limit: {
         label: "Limit",
         description: "Maximale Anzahl zurückzugebender Transaktionen (1-100)",

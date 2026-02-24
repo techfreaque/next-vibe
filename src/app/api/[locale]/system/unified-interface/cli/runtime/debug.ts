@@ -103,12 +103,9 @@ class ResourceCleanupRegistry {
           cleanupError instanceof Error
             ? { message: cleanupError.message, stack: cleanupError.stack }
             : { message: String(cleanupError) };
-        logger.warn(
-          "app.api.system.unifiedInterface.cli.vibe.utils.debug.cleanupFunctionFailed",
-          {
-            cleanupError: error,
-          },
-        );
+        logger.warn("Cleanup function failed", {
+          cleanupError: error,
+        });
       }
     }
 
@@ -471,15 +468,10 @@ export class CliResourceManager {
       if (breakdown) {
         if (verbose) {
           const totalSeconds = (breakdown.totalDuration / 1000).toFixed(2);
-          logger.info(
-            "app.api.system.unifiedInterface.cli.vibe.utils.debug.executionTime",
-            {
-              totalSeconds,
-            },
-          );
-          logger.info(
-            "app.api.system.unifiedInterface.cli.vibe.utils.debug.performanceBreakdown",
-          );
+          logger.info("CLI execution time", {
+            totalSeconds,
+          });
+          logger.info("CLI performance breakdown");
           logger.info(formatPerformanceBreakdown(breakdown));
         }
         if (mcpSilentMode) {
@@ -504,21 +496,13 @@ export class CliResourceManager {
         const requests = this.resourceMonitor.getActiveRequestsCount();
 
         if (handles.length > 0 || requests > 0) {
-          logger.info(
-            "app.api.system.unifiedInterface.cli.vibe.utils.debug.remainingResources",
-          );
-          logger.info(
-            "app.api.system.unifiedInterface.cli.vibe.utils.debug.activeHandles",
-            {
-              handles: formatActiveHandles(handles),
-            },
-          );
-          logger.info(
-            "app.api.system.unifiedInterface.cli.vibe.utils.debug.activeRequests",
-            {
-              requests: requests.toString(),
-            },
-          );
+          logger.info("CLI remaining resources after cleanup");
+          logger.info("CLI active handles", {
+            handles: formatActiveHandles(handles),
+          });
+          logger.info("CLI active requests", {
+            requests: requests.toString(),
+          });
         }
       }
 
@@ -531,9 +515,7 @@ export class CliResourceManager {
       const hasProblematic = this.resourceMonitor.hasProblematicHandles();
       if (hasProblematic) {
         if (verbose) {
-          logger.warn(
-            "app.api.system.unifiedInterface.cli.vibe.utils.debug.problematicHandlesDetected",
-          );
+          logger.warn("CLI problematic handles detected, forcing exit");
         }
         setTimeout(() => this.exit(result), 100);
       } else {
@@ -545,12 +527,9 @@ export class CliResourceManager {
         cleanupError instanceof Error
           ? { message: cleanupError.message, stack: cleanupError.stack }
           : { message: String(cleanupError) };
-      logger.warn(
-        "app.api.system.unifiedInterface.cli.vibe.utils.debug.cleanupError",
-        {
-          cleanupError: error,
-        },
-      );
+      logger.warn("CLI cleanup error", {
+        cleanupError: error,
+      });
       process.exit(1);
     }
   }

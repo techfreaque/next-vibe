@@ -9,6 +9,10 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Pobierz uprawnienia folderu",
     description: "Pobierz listę moderatorów dla konkretnego folderu",
+    noData: "Brak dostępnych danych",
+    edit: "Edytuj",
+    about: "O uprawnieniach",
+    inheritFromParent: "Dziedziczy z elementu nadrzędnego",
     container: {
       title: "Uprawnienia folderu",
       description: "Wyświetl i zarządzaj uprawnieniami dostępu do folderu",

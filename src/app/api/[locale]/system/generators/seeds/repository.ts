@@ -102,7 +102,7 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
 
       return success({
         success: true,
-        message: "app.api.system.generators.seeds.success.generated",
+        message: t("success.generated"),
         seedsFound: seedFiles.length,
         duration,
         outputPath: data.dryRun ? data.outputDir : outputFile,

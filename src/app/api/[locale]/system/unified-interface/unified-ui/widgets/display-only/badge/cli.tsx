@@ -38,7 +38,7 @@ export function BadgeWidgetInk<
       >,
 ): JSX.Element {
   const { field } = props;
-  const t = useInkWidgetTranslation();
+  const t = useInkWidgetTranslation<TEndpoint>();
   const { text: staticText, enumOptions, variant: semanticVariant } = field;
 
   // Handle static text from UI config

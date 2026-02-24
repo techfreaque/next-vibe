@@ -30,6 +30,20 @@ export const translations: typeof enTranslations = {
     totalCredits: {
       content: "Gesamt-Credits",
     },
+    pack: {
+      title: "Credit-Paket",
+      description: "Einmaliges Credit-Paket für KI-Nutzung",
+      perPack: "/ Paket",
+      features: {
+        credits: "{{count}} Credits enthalten",
+        expiry: "Credits verfallen nie",
+        bestFor: "Ideal für gelegentliche Nutzung",
+      },
+      requiresSubscription:
+        "Ein aktives Abonnement ist erforderlich, um Credit-Pakete zu kaufen",
+    },
+    redirecting: "Weiterleitung zum Checkout...",
+    openCheckout: "Checkout öffnen",
     success: {
       title: "Checkout erstellt",
       description: "Stripe-Checkout-Sitzung erfolgreich erstellt",
