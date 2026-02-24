@@ -297,8 +297,7 @@ export class ChatSettingsRepositoryClient {
         // Update all favorites: remove active badge from others, add to selected one
         const updatedList = oldData.data.favorites.map((fav) => ({
           ...fav,
-          activeBadge:
-            fav.id === favoriteId ? ("active" as const) : null,
+          activeBadge: fav.id === favoriteId ? ("active" as const) : null,
         }));
 
         return {

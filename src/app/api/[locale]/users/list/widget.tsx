@@ -50,9 +50,14 @@ import {
   UserSortField,
   UserSortFieldOptions,
   UserStatusFilter,
+  type SortOrderValue,
+  type UserSortFieldValue,
+  type UserStatusFilterValue,
 } from "../enum";
+import { scopedTranslation as usersScopedTranslation } from "../i18n";
 import type definition from "./definition";
 import type { UserListResponseOutput } from "./definition";
+import type { UsersListT } from "./i18n";
 
 type User = NonNullable<UserListResponseOutput["response"]>["users"][number];
 
@@ -78,7 +83,7 @@ function UserRow({
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
   onCreditHistory: (userId: string) => void;
-  t: (key: string) => string;
+  t: UsersListT;
 }): React.JSX.Element {
   return (
     <Div
@@ -181,17 +186,18 @@ export function UsersListContainer({
   const locale = useWidgetLocale();
   const router = useRouter();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const usersT = usersScopedTranslation.scopedT(locale).t;
   const form = useWidgetForm<typeof definition.GET>();
   const onSubmit = useWidgetOnSubmit();
 
-  const activeStatuses: (typeof UserStatusFilter)[keyof typeof UserStatusFilter][] =
-    form?.watch("searchFilters.status") ?? [];
+  const activeStatuses: (typeof UserStatusFilterValue)[] =
+    form.watch("searchFilters.status") ?? [];
   const activeRoles: (typeof UserRoleFilter)[keyof typeof UserRoleFilter][] =
-    form?.watch("searchFilters.role") ?? [];
-  const sortBy: string =
-    form?.watch("sortingOptions.sortBy") ?? UserSortField.CREATED_AT;
-  const sortOrder: string =
-    form?.watch("sortingOptions.sortOrder") ?? SortOrder.DESC;
+    form.watch("searchFilters.role") ?? [];
+  const sortBy: typeof UserSortFieldValue =
+    form.watch("sortingOptions.sortBy") ?? UserSortField.CREATED_AT;
+  const sortOrder: typeof SortOrderValue =
+    form.watch("sortingOptions.sortOrder") ?? SortOrder.DESC;
 
   const users = field.value?.response?.users ?? [];
   const isLoading = field.value === null || field.value === undefined;
@@ -242,7 +248,7 @@ export function UsersListContainer({
   }, [form, onSubmit]);
 
   const handleSortByChange = useCallback(
-    (value: string): void => {
+    (value: typeof UserSortFieldValue): void => {
       form?.setValue("sortingOptions.sortBy", value);
       if (onSubmit) {
         onSubmit();
@@ -252,8 +258,8 @@ export function UsersListContainer({
   );
 
   const handleSortOrderChange = useCallback(
-    (value: string): void => {
-      form?.setValue("sortingOptions.sortOrder", value);
+    (value: typeof SortOrderValue): void => {
+      form.setValue("sortingOptions.sortOrder", value);
       if (onSubmit) {
         onSubmit();
       }
@@ -463,7 +469,7 @@ export function UsersListContainer({
           <SelectContent>
             {UserSortFieldOptions.map((opt) => (
               <SelectItem key={opt.value} value={opt.value}>
-                {t(opt.label)}
+                {usersT(opt.label)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -475,7 +481,7 @@ export function UsersListContainer({
           <SelectContent>
             {SortOrderOptions.map((opt) => (
               <SelectItem key={opt.value} value={opt.value}>
-                {t(opt.label)}
+                {usersT(opt.label)}
               </SelectItem>
             ))}
           </SelectContent>

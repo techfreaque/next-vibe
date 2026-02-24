@@ -17,13 +17,13 @@ export interface SelectOption {
   label: string;
 }
 
-export interface SelectRootProps {
+export interface SelectRootProps<TValue extends string> {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  value?: string;
-  defaultValue?: string;
-  onValueChange?: (value: string) => void;
+  value?: TValue;
+  defaultValue?: TValue;
+  onValueChange?: (value: TValue) => void;
   disabled?: boolean;
   name?: string;
   required?: boolean;
@@ -62,10 +62,10 @@ export type SelectItemProps = {
 
 export type SelectSeparatorProps = StyleType;
 
-export function Select({
+export function Select<TValue extends string>({
   children,
   ...props
-}: SelectRootProps): React.JSX.Element {
+}: SelectRootProps<TValue>): React.JSX.Element {
   return <SelectPrimitive.Root {...props}>{children}</SelectPrimitive.Root>;
 }
 Select.displayName = SelectPrimitive.Root.displayName;

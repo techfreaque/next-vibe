@@ -198,7 +198,7 @@ export function UserDetailContainer({
       <Div className="flex items-center gap-2 p-4 border-b">
         <NavigateButtonWidget field={children.backButton} />
         <Span className="font-semibold text-base mr-auto">
-          {t("widget.userProfile")}
+          {t("id.widget.userProfile")}
         </Span>
         <Button
           type="button"
@@ -240,11 +240,11 @@ export function UserDetailContainer({
               <Div className="flex gap-1 flex-wrap">
                 {isActive ? (
                   <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
-                    <CheckCircle className="h-3 w-3" /> {t("widget.active")}
+                    <CheckCircle className="h-3 w-3" /> {t("id.widget.active")}
                   </Span>
                 ) : (
                   <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
-                    <XCircle className="h-3 w-3" /> {t("widget.inactive")}
+                    <XCircle className="h-3 w-3" /> {t("id.widget.inactive")}
                   </Span>
                 )}
               </Div>
@@ -317,7 +317,7 @@ export function UserDetailContainer({
           <Div className="flex items-center gap-2 text-sm">
             <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
             <Span className="text-muted-foreground text-xs">
-              {t("widget.leadId")}
+              {t("id.widget.leadId")}
             </Span>
             <Span className="font-mono text-xs truncate max-w-[160px] text-muted-foreground">
               {leadId}
@@ -343,7 +343,7 @@ export function UserDetailContainer({
               className="h-5 px-1 text-xs text-muted-foreground hover:text-foreground"
               onClick={handleViewLead}
             >
-              {t("widget.viewLead")}
+              {t("id.widget.viewLead")}
             </Button>
           </Div>
         )}
@@ -353,7 +353,7 @@ export function UserDetailContainer({
           {createdAt && (
             <Div>
               <Span className="block font-medium text-foreground">
-                {t("widget.created")}
+                {t("id.widget.created")}
               </Span>
               {formatSimpleDate(createdAt, locale)}
             </Div>
@@ -361,7 +361,7 @@ export function UserDetailContainer({
           {updatedAt && (
             <Div>
               <Span className="block font-medium text-foreground">
-                {t("widget.lastUpdated")}
+                {t("id.widget.lastUpdated")}
               </Span>
               {formatSimpleDate(updatedAt, locale)}
             </Div>
@@ -379,7 +379,7 @@ export function UserDetailContainer({
             title="View full profile with stats"
           >
             <BarChart2 className="h-3.5 w-3.5" />
-            {t("widget.fullProfile")}
+            {t("id.widget.fullProfile")}
           </Button>
           <Button
             type="button"
@@ -390,7 +390,7 @@ export function UserDetailContainer({
             title="View referral codes and stats"
           >
             <Link className="h-3.5 w-3.5" />
-            {t("widget.referrals")}
+            {t("id.widget.referrals")}
           </Button>
           <Button
             type="button"
@@ -401,7 +401,7 @@ export function UserDetailContainer({
             title="View subscription"
           >
             <Package className="h-3.5 w-3.5" />
-            {t("widget.subscription")}
+            {t("id.widget.subscription")}
           </Button>
           <Button
             type="button"
@@ -411,7 +411,7 @@ export function UserDetailContainer({
             className="gap-1"
           >
             <CreditCard className="h-3.5 w-3.5" />
-            {t("widget.creditHistory")}
+            {t("id.widget.creditHistory")}
           </Button>
         </Div>
       </Div>
@@ -510,11 +510,12 @@ export function UserEditContainer({
                 <Div className="flex gap-1 flex-wrap">
                   {data?.isActive ? (
                     <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
-                      <CheckCircle className="h-3 w-3" /> {t("widget.active")}
+                      <CheckCircle className="h-3 w-3" />{" "}
+                      {t("id.widget.active")}
                     </Span>
                   ) : (
                     <Span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
-                      <XCircle className="h-3 w-3" /> {t("widget.inactive")}
+                      <XCircle className="h-3 w-3" /> {t("id.widget.inactive")}
                     </Span>
                   )}
                 </Div>
@@ -606,14 +607,14 @@ export function UserEditContainer({
                   className="h-5 px-1 text-xs text-muted-foreground hover:text-foreground"
                   onClick={handleViewLead}
                 >
-                  {t("widget.viewLead")}
+                  {t("id.widget.viewLead")}
                 </Button>
               </Div>
             )}
             {createdAt && (
               <Div className="flex items-center gap-1.5">
                 <Span className="font-medium text-foreground">
-                  {t("widget.created")}
+                  {t("id.widget.created")}
                 </Span>
                 {formatSimpleDate(createdAt, locale)}
               </Div>
@@ -621,7 +622,7 @@ export function UserEditContainer({
             {updatedAt && (
               <Div className="flex items-center gap-1.5">
                 <Span className="font-medium text-foreground">
-                  {t("widget.lastUpdated")}
+                  {t("id.widget.lastUpdated")}
                 </Span>
                 {formatSimpleDate(updatedAt, locale)}
               </Div>
@@ -705,7 +706,7 @@ export function UserDeleteContainer({
       <Div className="flex items-center gap-2 pb-2 border-b">
         <NavigateButtonWidget field={children.backButton} />
         <Span className="font-semibold text-base mr-auto text-destructive">
-          {t("widget.deleteUser")}
+          {t("id.widget.deleteUser")}
         </Span>
       </Div>
 
@@ -714,11 +715,11 @@ export function UserDeleteContainer({
           <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
           <Div>
             <Span className="font-medium text-sm block text-green-700 dark:text-green-300">
-              {data.message ?? t("widget.userDeletedSuccessfully")}
+              {data.message ?? t("id.widget.userDeletedSuccessfully")}
             </Span>
             {data.deletedAt && (
               <Span className="text-xs text-green-600 dark:text-green-400">
-                {t("widget.deletedAt")}{" "}
+                {t("id.widget.deletedAt")}{" "}
                 {new Date(data.deletedAt).toLocaleString()}
               </Span>
             )}
@@ -731,11 +732,11 @@ export function UserDeleteContainer({
           <Div className="flex items-center gap-2 mb-2">
             <Trash2 className="h-5 w-5 text-destructive flex-shrink-0" />
             <Span className="font-medium text-sm text-destructive">
-              {t("widget.confirmDeletion")}
+              {t("id.widget.confirmDeletion")}
             </Span>
           </Div>
           <P className="text-sm text-muted-foreground">
-            {t("widget.confirmDeletionMessage")}
+            {t("id.widget.confirmDeletionMessage")}
           </P>
         </Div>
       )}
