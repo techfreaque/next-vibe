@@ -3,6 +3,10 @@ export const translations = {
   tags: {
     settings: "Settings",
   },
+  voices: {
+    MALE: "Male voice",
+    FEMALE: "Female voice",
+  },
   get: {
     title: "Get Chat Settings",
     description: "Retrieve user's chat settings and preferences",

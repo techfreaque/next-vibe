@@ -26,6 +26,7 @@ export const translations: typeof enTranslations = {
       response: {
         result:
           "Dane wynikowe zwrócone przez docelową trasę. W przypadku błędu pole to jest nieobecne — sama odpowiedź zawiera błąd.",
+        resultLabel: "Wynik",
       },
       errors: {
         validation: {

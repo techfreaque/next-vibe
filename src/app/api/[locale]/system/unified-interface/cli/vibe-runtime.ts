@@ -101,6 +101,7 @@ program
   )
   .option("-i, --interactive", earlyT("vibe.help.interactive"), false)
   .option("--dry-run", earlyT("vibe.help.dryRun"), false)
+  .option("--preview", earlyT("vibe.help.preview"), false)
   .option(
     "--platform <platform>", // eslint-disable-line i18next/no-literal-string
     `Override detected platform. Valid values: ${Object.values(Platform).join(", ")}`, // eslint-disable-line i18next/no-literal-string

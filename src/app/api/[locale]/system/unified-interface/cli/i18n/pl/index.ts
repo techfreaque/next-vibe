@@ -41,6 +41,7 @@ export const translations: typeof enTranslations = {
       locale: "Określ lokalizację (en-GLOBAL, de-DE, pl-PL)",
       verbose: "Włącz szczegółowe wyjście",
       dryRun: "Wykonaj próbny przebieg bez wykonywania",
+      preview: "Użyj podglądowej bazy danych i URL aplikacji (LOCAL_MODE_*)",
       interactive: "Włącz tryb interaktywny",
     },
     errors: {

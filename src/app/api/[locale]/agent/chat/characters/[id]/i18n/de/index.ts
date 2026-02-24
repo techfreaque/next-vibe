@@ -5,6 +5,10 @@ export const translations: typeof enTranslations = {
   tags: {
     characters: "Charaktere",
   },
+  voices: {
+    MALE: "Männliche Stimme",
+    FEMALE: "Weibliche Stimme",
+  },
 
   get: {
     title: "Charakter abrufen",

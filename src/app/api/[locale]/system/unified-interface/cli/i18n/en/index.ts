@@ -39,6 +39,7 @@ export const translations = {
       locale: "Specify locale (en-GLOBAL, de-DE, pl-PL)",
       verbose: "Enable verbose output",
       dryRun: "Perform a dry run without executing",
+      preview: "Use preview database and app URL (LOCAL_MODE_*)",
       interactive: "Enter interactive mode",
     },
     errors: {

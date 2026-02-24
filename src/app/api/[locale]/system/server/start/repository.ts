@@ -146,6 +146,27 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
               "   ⚠️ Docker unavailable (continuing without managed DB)",
             );
           }
+
+          // Run migrations against the preview database
+          output.push("   🔄 Running database migrations...");
+          try {
+            const migrateResult = execSync("bunx drizzle-kit migrate", {
+              encoding: "utf-8",
+              cwd: process.cwd(),
+              env: { ...process.env },
+            });
+            logger.info("Migrations completed", {
+              output: migrateResult.trim(),
+            });
+            output.push("   ✅ Database migrations completed");
+          } catch (migrateError) {
+            const migrateMsg = parseError(migrateError).message;
+            errors.push(`Migration failed: ${migrateMsg}`);
+            output.push(`   ❌ Migration failed: ${migrateMsg}`);
+            logger.error("Migration failed during start", {
+              error: migrateMsg,
+            });
+          }
         } catch (error) {
           const errorMsg = parseError(error).message;
           output.push(`   ⚠️ Database setup failed: ${errorMsg}`);

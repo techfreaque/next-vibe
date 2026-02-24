@@ -554,6 +554,7 @@ export class CliInputParser {
       "debug",
       "output",
       "locale",
+      "preview",
     ]);
 
     for (const [key, value] of Object.entries(expandedNamedArgs)) {

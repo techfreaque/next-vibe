@@ -5,6 +5,10 @@ export const translations: typeof enTranslations = {
   tags: {
     favorites: "Ulubione",
   },
+  voices: {
+    MALE: "Męski głos",
+    FEMALE: "Damski głos",
+  },
 
   post: {
     title: "Utwórz ulubiony",

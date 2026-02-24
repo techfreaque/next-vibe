@@ -3,6 +3,10 @@ export const translations = {
   tags: {
     favorites: "Favorites",
   },
+  voices: {
+    MALE: "Male voice",
+    FEMALE: "Female voice",
+  },
 
   post: {
     title: "Create Favorite",

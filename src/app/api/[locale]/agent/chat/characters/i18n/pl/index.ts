@@ -7,6 +7,10 @@ export const translations: typeof enTranslations = {
   tags: {
     characters: "Postacie",
   },
+  voices: {
+    MALE: "Męski głos",
+    FEMALE: "Damski głos",
+  },
   separator: {
     or: "lub",
   },

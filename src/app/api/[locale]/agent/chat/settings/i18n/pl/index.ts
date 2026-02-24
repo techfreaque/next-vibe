@@ -5,6 +5,10 @@ export const translations: typeof enTranslations = {
   tags: {
     settings: "Ustawienia",
   },
+  voices: {
+    MALE: "Męski głos",
+    FEMALE: "Damski głos",
+  },
   get: {
     title: "Pobierz ustawienia czatu",
     description: "Pobierz ustawienia i preferencje użytkownika",

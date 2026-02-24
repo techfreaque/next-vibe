@@ -3,6 +3,10 @@ export const translations = {
   tags: {
     characters: "Characters",
   },
+  voices: {
+    MALE: "Male voice",
+    FEMALE: "Female voice",
+  },
 
   get: {
     title: "Get Character",

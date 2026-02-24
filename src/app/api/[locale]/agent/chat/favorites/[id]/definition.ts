@@ -25,6 +25,7 @@ import {
   scopedRequestField,
   scopedRequestUrlPathParamsField,
   scopedResponseField,
+  scopedSubmitButton,
   scopedWidgetField,
   scopedWidgetObjectField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
@@ -189,7 +190,7 @@ const { DELETE } = createEndpoint({
             variant: "outline",
             usage: { request: "urlPathParams" },
           }),
-          deleteButton: scopedDeleteButton(scopedTranslation, {
+          deleteButton: scopedSubmitButton(scopedTranslation, {
             label: "delete.actions.delete" as const,
             loadingText: "delete.actions.deleting" as const,
             icon: "trash",

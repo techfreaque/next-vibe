@@ -6,7 +6,7 @@
 
 import { MEMORY_DELETE_ALIAS, MEMORY_UPDATE_ALIAS } from "./[id]/definition";
 import { MEMORY_ADD_ALIAS } from "./create/definition";
-import { MEMORY_LIST_ALIAS, type MemoriesList } from "./definition";
+import { type MemoriesList, MEMORY_LIST_ALIAS } from "./definition";
 
 /** Max characters for the full memory summary (approx 5k tokens) */
 const MEMORY_BUDGET = 20000;

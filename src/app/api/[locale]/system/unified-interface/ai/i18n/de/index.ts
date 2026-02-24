@@ -26,6 +26,7 @@ export const translations: typeof enTranslations = {
       response: {
         result:
           "Das von der Zielroute zurückgegebene Ergebnis. Bei Fehler ist dieses Feld nicht vorhanden — die Antwort selbst enthält den Fehler.",
+        resultLabel: "Ergebnis",
       },
       errors: {
         validation: {

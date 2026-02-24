@@ -132,14 +132,21 @@ export function loadEnvironment(): EnvironmentResult {
     config({ quiet: true });
   }
 
-  // For `vibe start`, override DATABASE_URL with LOCAL_MODE_DATABASE_URL
-  // so it never conflicts with dev postgres.
+  // Override DATABASE_URL and NEXT_PUBLIC_APP_URL with LOCAL_MODE variants
+  // when running in preview mode. This is triggered automatically for
+  // `vibe build` / `vibe start`, or explicitly via `--preview` on any command.
   // Must happen BEFORE the env singleton is created by defineEnv().
   const args = process.argv.slice(2);
-  if (args.includes("start") || args.includes("server:start")) {
-    const skipDbSetup = args.includes("--skip-db-setup");
+  const isPreviewMode =
+    args.includes("--preview") ||
+    args.includes("start") ||
+    args.includes("server:start") ||
+    args.includes("build") ||
+    args.includes("server:build");
+
+  if (isPreviewMode && !args.includes("--skip-db-setup")) {
     const localDbUrl = process.env["LOCAL_MODE_DATABASE_URL"];
-    if (!skipDbSetup && localDbUrl) {
+    if (localDbUrl) {
       process.env["DATABASE_URL"] = localDbUrl;
     }
 

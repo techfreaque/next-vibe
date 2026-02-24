@@ -193,6 +193,11 @@ function handleMessageCreatedEvent(params: {
         const serverMetadata = {
           ...(eventData.metadata || {}),
           ...(toolCall ? { toolCall } : {}),
+          // When a USER message arrives with content, transcription is done.
+          // Explicitly clear isTranscribing so the metadata merge in updateMessage
+          // overwrites the optimistic `true` value (e.g. when compacting skips
+          // the VOICE_TRANSCRIBED event).
+          ...(isUserRole && eventData.content ? { isTranscribing: false } : {}),
         };
 
         // For USER messages: replace the optimistic entry with the server's

@@ -5,6 +5,10 @@ export const translations: typeof enTranslations = {
   tags: {
     settings: "Einstellungen",
   },
+  voices: {
+    MALE: "Männliche Stimme",
+    FEMALE: "Weibliche Stimme",
+  },
   get: {
     title: "Chat-Einstellungen abrufen",
     description: "Benutzereinstellungen und Präferenzen abrufen",

@@ -24,6 +24,7 @@ export const translations = {
       response: {
         result:
           "The result data returned by the target route. On failure this field is absent — the response itself will be an error.",
+        resultLabel: "Result",
       },
       errors: {
         validation: {
