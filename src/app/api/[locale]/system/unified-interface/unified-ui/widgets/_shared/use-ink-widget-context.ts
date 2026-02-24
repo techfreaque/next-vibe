@@ -152,7 +152,9 @@ export function useInkWidgetForm():
 /**
  * Hook to get response from Ink context
  */
-export function useInkWidgetResponse(): InkWidgetContext<CreateApiEndpointAny>["response"] {
+export function useInkWidgetResponse<
+  TEndpoint extends CreateApiEndpointAny,
+>(): InkWidgetContext<TEndpoint>["response"] {
   const store = useInkWidgetContextStore();
   return store(
     (
@@ -187,7 +189,7 @@ export function useInkWidgetTranslation<
 >(): (
   key: TEndpoint extends CreateApiEndpointAny
     ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-    : never,
+    : string,
   params?: TParams,
 ) => TranslatedKeyType {
   const store = useInkWidgetContextStore();

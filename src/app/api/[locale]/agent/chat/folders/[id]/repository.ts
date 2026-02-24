@@ -65,26 +65,21 @@ export class FolderRepository {
       }
 
       return success({
-        response: {
-          folder: {
-            id: folder.id,
-            userId: folder.userId,
-            name: folder.name,
-            icon: folder.icon,
-            color: folder.color,
-            parentId: folder.parentId,
-            expanded: folder.expanded,
-            sortOrder: folder.sortOrder,
-            rolesView: folder.rolesView,
-            rolesManage: folder.rolesManage,
-            rolesCreateThread: folder.rolesCreateThread,
-            rolesPost: folder.rolesPost,
-            rolesModerate: folder.rolesModerate,
-            rolesAdmin: folder.rolesAdmin,
-            createdAt: folder.createdAt,
-            updatedAt: folder.updatedAt,
-          },
-        },
+        userId: folder.userId,
+        name: folder.name,
+        icon: folder.icon,
+        color: folder.color,
+        parentId: folder.parentId,
+        expanded: folder.expanded,
+        sortOrder: folder.sortOrder,
+        rolesView: folder.rolesView,
+        rolesManage: folder.rolesManage,
+        rolesCreateThread: folder.rolesCreateThread,
+        rolesPost: folder.rolesPost,
+        rolesModerate: folder.rolesModerate,
+        rolesAdmin: folder.rolesAdmin,
+        createdAt: folder.createdAt,
+        updatedAt: folder.updatedAt,
       });
     } catch {
       return fail({
@@ -105,7 +100,7 @@ export class FolderRepository {
   ): Promise<ResponseType<FolderUpdateResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
-      const { id, updates } = data;
+      const { id } = data;
 
       // Verify folder exists
       const [existingFolder] = await db
@@ -130,7 +125,7 @@ export class FolderRepository {
       }
 
       // Prevent circular parent references
-      if (updates.parentId === id) {
+      if (data.parentId === id) {
         return fail({
           message: t("patch.errors.validation.circularReference"),
           errorType: ErrorResponseTypes.VALIDATION_ERROR,
@@ -146,41 +141,41 @@ export class FolderRepository {
       };
 
       // Only include fields that are actually being updated
-      if (updates.name !== undefined) {
-        updateData.name = updates.name;
+      if (data.name !== undefined) {
+        updateData.name = data.name;
       }
-      if (updates.icon !== undefined) {
-        updateData.icon = updates.icon;
+      if (data.icon !== undefined) {
+        updateData.icon = data.icon;
       }
-      if (updates.color !== undefined) {
-        updateData.color = updates.color;
+      if (data.color !== undefined) {
+        updateData.color = data.color;
       }
-      if (updates.parentId !== undefined) {
-        updateData.parentId = updates.parentId;
+      if (data.parentId !== undefined) {
+        updateData.parentId = data.parentId;
       }
-      if (updates.expanded !== undefined) {
-        updateData.expanded = updates.expanded;
+      if (data.expanded !== undefined) {
+        updateData.expanded = data.expanded;
       }
-      if (updates.sortOrder !== undefined) {
-        updateData.sortOrder = updates.sortOrder;
+      if (data.sortOrder !== undefined) {
+        updateData.sortOrder = data.sortOrder;
       }
-      if (updates.rolesView !== undefined) {
-        updateData.rolesView = updates.rolesView;
+      if (data.rolesView !== undefined) {
+        updateData.rolesView = data.rolesView;
       }
-      if (updates.rolesManage !== undefined) {
-        updateData.rolesManage = updates.rolesManage;
+      if (data.rolesManage !== undefined) {
+        updateData.rolesManage = data.rolesManage;
       }
-      if (updates.rolesCreateThread !== undefined) {
-        updateData.rolesCreateThread = updates.rolesCreateThread;
+      if (data.rolesCreateThread !== undefined) {
+        updateData.rolesCreateThread = data.rolesCreateThread;
       }
-      if (updates.rolesPost !== undefined) {
-        updateData.rolesPost = updates.rolesPost;
+      if (data.rolesPost !== undefined) {
+        updateData.rolesPost = data.rolesPost;
       }
-      if (updates.rolesModerate !== undefined) {
-        updateData.rolesModerate = updates.rolesModerate;
+      if (data.rolesModerate !== undefined) {
+        updateData.rolesModerate = data.rolesModerate;
       }
-      if (updates.rolesAdmin !== undefined) {
-        updateData.rolesAdmin = updates.rolesAdmin;
+      if (data.rolesAdmin !== undefined) {
+        updateData.rolesAdmin = data.rolesAdmin;
       }
 
       const [updatedFolder] = await db
@@ -200,26 +195,8 @@ export class FolderRepository {
       }
 
       return success({
-        response: {
-          folder: {
-            id: updatedFolder.id,
-            userId: updatedFolder.userId,
-            name: updatedFolder.name,
-            icon: updatedFolder.icon,
-            color: updatedFolder.color,
-            parentId: updatedFolder.parentId,
-            expanded: updatedFolder.expanded,
-            sortOrder: updatedFolder.sortOrder,
-            rolesView: updatedFolder.rolesView,
-            rolesManage: updatedFolder.rolesManage,
-            rolesCreateThread: updatedFolder.rolesCreateThread,
-            rolesPost: updatedFolder.rolesPost,
-            rolesModerate: updatedFolder.rolesModerate,
-            rolesAdmin: updatedFolder.rolesAdmin,
-            createdAt: updatedFolder.createdAt,
-            updatedAt: updatedFolder.updatedAt,
-          },
-        },
+        folderId: updatedFolder.id,
+        updatedAt: updatedFolder.updatedAt,
       });
     } catch {
       return fail({
@@ -283,13 +260,20 @@ export class FolderRepository {
       }
 
       // Delete the folder (cascade will handle child folders and threads)
-      await db.delete(chatFolders).where(eq(chatFolders.id, id));
+      const [deletedFolder] = await db
+        .delete(chatFolders)
+        .where(eq(chatFolders.id, id))
+        .returning();
 
       return success({
-        response: {
-          success: true,
-          deletedFolderId: id,
-        },
+        userId: deletedFolder.userId,
+        name: deletedFolder.name,
+        icon: deletedFolder.icon,
+        color: deletedFolder.color,
+        parentId: deletedFolder.parentId,
+        rootFolderId: deletedFolder.rootFolderId,
+        createdAt: deletedFolder.createdAt,
+        updatedAt: deletedFolder.updatedAt,
       });
     } catch {
       return fail({

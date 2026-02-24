@@ -207,6 +207,7 @@ export const translations: typeof enTranslations = {
     },
     modelSelection: {
       title: "Wybór modelu",
+      label: "Wybór modelu",
       description:
         "Wybierz sposób wyboru modelu AI - wybierz konkretny model lub pozwól systemowi wybrać na podstawie filtrów",
     },
@@ -280,6 +281,25 @@ export const translations: typeof enTranslations = {
       label: "Niestandardowa ikona",
       description: "Niestandardowa ikona dla tego ulubionego",
     },
+    icon: {
+      label: "Niestandardowa ikona",
+      description: "Zastąp domyślną ikonę postaci dla tego slotu ulubionych",
+    },
+    compactTrigger: {
+      label: "Próg kompresji (tokeny)",
+      description:
+        "Liczba tokenów wyzwalająca automatyczną kompresję rozmowy. Null = postać lub domyślna globalna.",
+    },
+    allowedTools: {
+      label: "Dozwolone narzędzia",
+      description:
+        "Zastąp narzędzia dla tego slotu. Każdy wpis wymaga toolId. Null = postać lub ustawienia globalne.",
+    },
+    pinnedTools: {
+      label: "Przypięte narzędzia",
+      description:
+        "Zastąp przypięte narzędzia paska narzędzi dla tego slotu. Null = postać lub ustawienia globalne.",
+    },
     changeCharacter: {
       label: "Zmień postać",
     },
@@ -328,6 +348,12 @@ export const translations: typeof enTranslations = {
         title: "Konflikt",
         description: "Wystąpił konflikt podczas aktualizacji ulubionego",
       },
+    },
+    slotOverride: {
+      label: "Nadpisanie dla tego slotu",
+    },
+    globalDefault: {
+      label: "Mój domyślny (zapasowy)",
     },
     success: {
       title: "Sukces",

@@ -46,6 +46,7 @@ export const translations: typeof enTranslations = {
     },
     modelSelection: {
       title: "Wybór modelu",
+      label: "Wybór modelu",
       description:
         "Wybierz sposób wyboru modelu AI - wybierz konkretny model lub pozwól systemowi wybrać na podstawie filtrów",
     },
@@ -132,6 +133,25 @@ export const translations: typeof enTranslations = {
     manualModelId: {
       label: "Model ręczny",
       description: "Konkretny model (dla trybu ręcznego)",
+    },
+    icon: {
+      label: "Niestandardowa ikona",
+      description: "Zastąp domyślną ikonę postaci dla tego slotu ulubionych",
+    },
+    compactTrigger: {
+      label: "Próg kompresji (tokeny)",
+      description:
+        "Liczba tokenów wyzwalająca kompresję rozmowy. Null = postać lub domyślna globalna.",
+    },
+    allowedTools: {
+      label: "Dozwolone narzędzia",
+      description:
+        "Narzędzia dla tego slotu. Każdy wpis wymaga toolId. Null = postać lub ustawienia globalne.",
+    },
+    pinnedTools: {
+      label: "Przypięte narzędzia",
+      description:
+        "Przypięte narzędzia paska narzędzi. Null = postać lub ustawienia globalne.",
     },
     response: {
       id: {

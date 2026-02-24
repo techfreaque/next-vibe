@@ -11,7 +11,10 @@ import {
   TtsVoiceDB,
   TtsVoiceOptions,
 } from "@/app/api/[locale]/agent/text-to-speech/enum";
-import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
+import {
+  dateSchema,
+  iconSchema,
+} from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -153,7 +156,7 @@ const { DELETE } = createEndpoint({
     layoutType: LayoutType.STACKED,
     gap: "4",
     noCard: true,
-    usage: { request: "urlPathParams" },
+    usage: { request: "urlPathParams", response: true },
     children: {
       title: scopedWidgetField(scopedTranslation, {
         type: WidgetType.TITLE,
@@ -195,6 +198,29 @@ const { DELETE } = createEndpoint({
             usage: { request: "urlPathParams" },
           }),
         },
+      }),
+
+      // === RESPONSE ===
+      // Note: id is already known from the URL param, not repeated
+      characterId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string(),
+      }),
+      voice: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.enum(TtsVoiceDB).nullable(),
+      }),
+      modelSelection: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: modelSelectionSchemaSimple.nullable(),
+      }),
+      createdAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: dateSchema,
+      }),
+      updatedAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: dateSchema,
       }),
     },
   }),
@@ -246,6 +272,15 @@ const { DELETE } = createEndpoint({
   examples: {
     urlPathParams: {
       delete: { id: "550e8400-e29b-41d4-a716-446655440000" },
+    },
+    responses: {
+      delete: {
+        characterId: "thea",
+        voice: null,
+        modelSelection: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
     },
   },
 });
@@ -493,7 +528,9 @@ const { PATCH } = createEndpoint({
       icon: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ICON,
-        schema: iconSchema,
+        label: "patch.icon.label" as const,
+        description: "patch.icon.description" as const,
+        schema: iconSchema.optional(),
         theme: {
           style: "none",
         } as const,
@@ -516,6 +553,8 @@ const { PATCH } = createEndpoint({
       modelSelection: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
+        label: "patch.modelSelection.label" as const,
+        description: "patch.modelSelection.description" as const,
         schema: modelSelectionSchemaSimple.nullable(),
       }),
 
@@ -533,6 +572,8 @@ const { PATCH } = createEndpoint({
       allowedTools: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
+        label: "patch.allowedTools.label" as const,
+        description: "patch.allowedTools.description" as const,
         schema: z
           .array(
             z.object({
@@ -546,6 +587,8 @@ const { PATCH } = createEndpoint({
       pinnedTools: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
+        label: "patch.pinnedTools.label" as const,
+        description: "patch.pinnedTools.description" as const,
         schema: z
           .array(
             z.object({
@@ -628,6 +671,9 @@ const { PATCH } = createEndpoint({
             max: SpeedLevel.THOROUGH,
           },
         },
+        compactTrigger: null,
+        allowedTools: [{ toolId: "execute-tool", requiresConfirmation: false }],
+        pinnedTools: null,
       },
     },
     responses: {
@@ -769,6 +815,32 @@ const { GET } = createEndpoint({
         hidden: true,
         schema: z.number().int().nullable(),
       }),
+
+      // Tool configuration — null = fall through to character/settings default
+      allowedTools: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z
+          .array(
+            z.object({
+              toolId: z.string(),
+              requiresConfirmation: z.boolean().optional(),
+            }),
+          )
+          .nullable(),
+      }),
+      pinnedTools: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z
+          .array(
+            z.object({
+              toolId: z.string(),
+              requiresConfirmation: z.boolean().optional(),
+            }),
+          )
+          .nullable(),
+      }),
     },
   }),
 
@@ -864,6 +936,8 @@ const { GET } = createEndpoint({
           },
         },
         compactTrigger: null,
+        allowedTools: null,
+        pinnedTools: null,
       },
     },
     urlPathParams: {

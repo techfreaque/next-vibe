@@ -61,7 +61,8 @@ function formatTokens(n: number): string {
 
 /**
  * Derive the context window from a model selection.
- * Falls back to MAX_ABSOLUTE when no model is resolvable.
+ * Falls back to characterModelSelection when favoriteModelSelection is null/undefined,
+ * then falls back to MAX_ABSOLUTE when no model is resolvable.
  */
 function getModelContextWindow(
   modelSelection:
@@ -71,11 +72,8 @@ function getModelContextWindow(
     | string
     | null
     | undefined,
+  characterModelSelection?: FiltersModelSelection | ManualModelSelection | null,
 ): number {
-  if (!modelSelection) {
-    return MAX_ABSOLUTE;
-  }
-
   // String = direct model ID
   if (typeof modelSelection === "string") {
     const model = Object.values(modelOptions).find(
@@ -84,10 +82,12 @@ function getModelContextWindow(
     return model?.contextWindow ?? MAX_ABSOLUTE;
   }
 
-  // Use the same resolution logic already in use throughout the codebase
+  // Use the same resolution logic as getBestModelForFavorite:
+  // favorite override → character default → MAX_ABSOLUTE
   const best = CharactersRepositoryClient.getBestModelForFavorite(
-    modelSelection as FiltersModelSelection | ManualModelSelection,
-    undefined,
+    (modelSelection as FiltersModelSelection | ManualModelSelection | null) ??
+      null,
+    characterModelSelection ?? undefined,
   );
   return best?.contextWindow ?? MAX_ABSOLUTE;
 }
@@ -195,8 +195,8 @@ export interface CompactTriggerEditProps {
   /** Called when user changes the value. null = reset to default */
   onChange: (value: number | null) => void;
   /**
-   * Currently selected model/model-selection — used to cap the slider max
-   * at the model's real context window.
+   * Favorite's own model selection override — used to cap the slider.
+   * When null/undefined, falls back to characterModelSelection.
    */
   modelSelection?:
     | FiltersModelSelection
@@ -204,6 +204,11 @@ export interface CompactTriggerEditProps {
     | ModelSelectionSimple
     | string
     | null;
+  /**
+   * Character's model selection — fallback when favoriteModelSelection is null.
+   * Ensures the slider cap reflects the actual resolved model.
+   */
+  characterModelSelection?: FiltersModelSelection | ManualModelSelection | null;
   /** Optional sub-label shown in the header (e.g. "Override for this slot") */
   label?: ReactNode;
   className?: string;
@@ -217,12 +222,17 @@ export function CompactTriggerEdit({
   value,
   onChange,
   modelSelection,
+  characterModelSelection,
   label,
   className,
 }: CompactTriggerEditProps): JSX.Element {
   const modelCap = useMemo(
-    () => Math.min(getModelContextWindow(modelSelection), MAX_ABSOLUTE),
-    [modelSelection],
+    () =>
+      Math.min(
+        getModelContextWindow(modelSelection, characterModelSelection),
+        MAX_ABSOLUTE,
+      ),
+    [modelSelection, characterModelSelection],
   );
 
   const effectiveValue = value ?? COMPACT_TRIGGER;
@@ -398,6 +408,7 @@ export interface CompactTriggerViewProps {
     | ModelSelectionSimple
     | string
     | null;
+  characterModelSelection?: FiltersModelSelection | ManualModelSelection | null;
   label?: ReactNode;
   className?: string;
 }
@@ -410,12 +421,17 @@ export function CompactTriggerView({
   value,
   isInherited = false,
   modelSelection,
+  characterModelSelection,
   label,
   className,
 }: CompactTriggerViewProps): JSX.Element {
   const modelCap = useMemo(
-    () => Math.min(getModelContextWindow(modelSelection), MAX_ABSOLUTE),
-    [modelSelection],
+    () =>
+      Math.min(
+        getModelContextWindow(modelSelection, characterModelSelection),
+        MAX_ABSOLUTE,
+      ),
+    [modelSelection, characterModelSelection],
   );
   const cappedValue = Math.min(value, modelCap);
   const isDefault = value === COMPACT_TRIGGER;

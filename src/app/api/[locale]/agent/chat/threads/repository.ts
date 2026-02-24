@@ -608,13 +608,11 @@ export class ThreadsRepository {
       const pageCount = Math.ceil(total / limit);
 
       return success({
-        response: {
-          threads,
-          totalCount: total,
-          pageCount,
-          page,
-          limit,
-        },
+        threads,
+        totalCount: total,
+        pageCount,
+        currentPage: page,
+        pageSize: limit,
       });
     } catch (error) {
       logger.error("Error listing threads", parseError(error));
@@ -641,9 +639,9 @@ export class ThreadsRepository {
         userId: user.id,
         leadId: user.leadId,
         isPublic: user.isPublic,
-        title: data.thread?.title,
-        rootFolderId: data.thread?.rootFolderId,
-        subFolderId: data.thread?.subFolderId,
+        title: data.title,
+        rootFolderId: data.rootFolderId,
+        subFolderId: data.subFolderId,
       });
 
       // Subfolder validation: subFolderId is optional and validated by schema
@@ -660,7 +658,7 @@ export class ThreadsRepository {
       }
 
       // Check permissions: get folder if subFolderId is provided
-      const folderId = data.thread?.subFolderId;
+      const folderId = data.subFolderId;
       let folder: ChatFolder | null = null;
 
       if (folderId) {
@@ -682,7 +680,7 @@ export class ThreadsRepository {
         }
 
         folder = folderResult;
-      } else if (data.thread?.rootFolderId === DefaultFolderId.PUBLIC) {
+      } else if (data.rootFolderId === DefaultFolderId.PUBLIC) {
         // Creating thread in PUBLIC root - need to check ADMIN permission
         // Create a virtual folder object for permission check
         folder = {
@@ -725,28 +723,18 @@ export class ThreadsRepository {
         });
       }
 
-      if (!data.thread?.id) {
-        return fail({
-          message: t("post.errors.validation.title"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: {
-            message: "Thread ID must be provided by client",
-          },
-        });
-      }
-
-      const threadId = data.thread.id;
+      const threadId = data.id ?? crypto.randomUUID();
 
       const threadData = {
         id: threadId,
         userId: userIdentifier,
-        title: data.thread?.title || t("post.threadTitle.default"),
-        rootFolderId: data.thread?.rootFolderId,
-        folderId: data.thread?.subFolderId ?? null,
+        title: data.title || t("post.threadTitle.default"),
+        rootFolderId: data.rootFolderId,
+        folderId: data.subFolderId ?? null,
         status: ThreadStatus.ACTIVE,
-        defaultModel: data.thread?.model ?? null,
-        defaultCharacter: data.thread?.character ?? null,
-        systemPrompt: data.thread?.systemPrompt ?? null,
+        defaultModel: data.model ?? null,
+        defaultCharacter: data.character ?? null,
+        systemPrompt: data.systemPrompt ?? null,
         pinned: false,
         archived: false,
         tags: [],
@@ -758,23 +746,13 @@ export class ThreadsRepository {
         .values(threadData)
         .returning();
 
-      // Map DB fields to API response format (DB has rootFolderId as DefaultFolderId, folderId as UUID)
-      const thread = {
-        id: dbThread.id,
-        title: dbThread.title,
-        rootFolderId: dbThread.rootFolderId, // Already typed as DefaultFolderId from DB schema
-        subFolderId: dbThread.folderId,
+      logger.debug("Thread created successfully", { threadId: dbThread.id });
+
+      return success({
+        threadId: dbThread.id,
         status: dbThread.status,
         createdAt: dbThread.createdAt,
         updatedAt: dbThread.updatedAt,
-      };
-
-      logger.debug("Thread created successfully", { threadId: thread.id });
-
-      return success({
-        response: {
-          thread,
-        },
       });
     } catch (error) {
       logger.error("Error creating thread", parseError(error));

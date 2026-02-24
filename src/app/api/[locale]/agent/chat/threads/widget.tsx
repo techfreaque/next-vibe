@@ -49,8 +49,7 @@ import type { InputKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/input";
 import type definition from "./definition";
 import type { ThreadListResponseOutput } from "./definition";
 
-type ThreadFromResponse =
-  ThreadListResponseOutput["response"]["threads"][number];
+type ThreadFromResponse = ThreadListResponseOutput["threads"][number];
 
 /**
  * Props for custom widget — matches the customWidgetObject pattern
@@ -110,7 +109,7 @@ function ThreadRow({
       threadDef.default.PATCH,
       logger,
       user,
-      { updates },
+      updates,
       { threadId: thread.id },
       locale,
     );
@@ -426,7 +425,7 @@ export function ThreadsListContainer({
   const { locale } = useWidgetContext();
   const { t } = simpleT(locale);
 
-  const threads = field.value?.response?.threads ?? [];
+  const threads = field.value?.threads ?? [];
 
   // Sort: pinned first, then by updatedAt desc
   const sorted = [...threads].toSorted((a, b) => {

@@ -22,6 +22,7 @@ import {
 } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema, iconSchema } from "../../../../shared/types/common.schema";
+import { DefaultFolderId } from "../../config";
 import { scopedTranslation } from "./i18n";
 
 /**
@@ -57,128 +58,93 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      response: scopedObjectFieldNew(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "get.response.title" as const,
-        description: "get.response.description" as const,
-        layoutType: LayoutType.STACKED,
-        usage: { response: true },
-        children: {
-          folder: scopedObjectFieldNew(scopedTranslation, {
-            type: WidgetType.CONTAINER,
-            title: "get.response.folder.title" as const,
-            layoutType: LayoutType.GRID,
-            columns: 2,
-            usage: { response: true },
-            children: {
-              id: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "get.response.folder.id.content" as const,
-                schema: z.uuid(),
-              }),
-              userId: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "get.response.folder.userId.content" as const,
-                schema: z.uuid().nullable(),
-              }),
-              name: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "get.response.folder.name.content" as const,
-                schema: z.string(),
-              }),
-              icon: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "get.response.folder.icon.content" as const,
-                // Runtime: accepts any string (emoji, IconKey), Type: IconKey | null
-                schema: iconSchema.nullable(),
-              }),
-              color: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "get.response.folder.color.content" as const,
-                schema: z.string().nullable(),
-              }),
-              parentId: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "get.response.folder.parentId.content" as const,
-                schema: z.uuid().nullable(),
-              }),
-              expanded: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "get.response.folder.expanded.content" as const,
-                schema: z.boolean(),
-              }),
-              sortOrder: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "get.response.folder.sortOrder.content" as const,
-                schema: z.coerce.number(),
-              }),
-              rolesView: responseArrayOptionalField(
-                {
-                  type: WidgetType.CONTAINER,
-                },
-                scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  schema: z.enum(UserRoleDB),
-                }),
-              ),
-              rolesManage: responseArrayOptionalField(
-                {
-                  type: WidgetType.CONTAINER,
-                },
-                scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  schema: z.enum(UserRoleDB),
-                }),
-              ),
-              rolesCreateThread: responseArrayOptionalField(
-                {
-                  type: WidgetType.CONTAINER,
-                },
-                scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  schema: z.enum(UserRoleDB),
-                }),
-              ),
-              rolesPost: responseArrayOptionalField(
-                {
-                  type: WidgetType.CONTAINER,
-                },
-                scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  schema: z.enum(UserRoleDB),
-                }),
-              ),
-              rolesModerate: responseArrayOptionalField(
-                {
-                  type: WidgetType.CONTAINER,
-                },
-                scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  schema: z.enum(UserRoleDB),
-                }),
-              ),
-              rolesAdmin: responseArrayOptionalField(
-                {
-                  type: WidgetType.CONTAINER,
-                },
-                scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  schema: z.enum(UserRoleDB),
-                }),
-              ),
-              createdAt: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "get.response.folder.createdAt.content" as const,
-                schema: dateSchema,
-              }),
-              updatedAt: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "get.response.folder.updatedAt.content" as const,
-                schema: dateSchema,
-              }),
-            },
-          }),
-        },
+      userId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.folder.userId.content" as const,
+        schema: z.uuid().nullable(),
+      }),
+      name: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.folder.name.content" as const,
+        schema: z.string(),
+      }),
+      icon: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.folder.icon.content" as const,
+        // Runtime: accepts any string (emoji, IconKey), Type: IconKey | null
+        schema: iconSchema.nullable(),
+      }),
+      color: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.folder.color.content" as const,
+        schema: z.string().nullable(),
+      }),
+      parentId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.folder.parentId.content" as const,
+        schema: z.uuid().nullable(),
+      }),
+      expanded: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.folder.expanded.content" as const,
+        schema: z.boolean(),
+      }),
+      sortOrder: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.folder.sortOrder.content" as const,
+        schema: z.coerce.number(),
+      }),
+      rolesView: responseArrayOptionalField(
+        { type: WidgetType.CONTAINER },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.TEXT,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      rolesManage: responseArrayOptionalField(
+        { type: WidgetType.CONTAINER },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.TEXT,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      rolesCreateThread: responseArrayOptionalField(
+        { type: WidgetType.CONTAINER },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.TEXT,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      rolesPost: responseArrayOptionalField(
+        { type: WidgetType.CONTAINER },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.TEXT,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      rolesModerate: responseArrayOptionalField(
+        { type: WidgetType.CONTAINER },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.TEXT,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      rolesAdmin: responseArrayOptionalField(
+        { type: WidgetType.CONTAINER },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.TEXT,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      createdAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.folder.createdAt.content" as const,
+        schema: dateSchema,
+      }),
+      updatedAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.folder.updatedAt.content" as const,
+        schema: dateSchema,
       }),
     },
   }),
@@ -233,26 +199,21 @@ const { GET } = createEndpoint({
     },
     responses: {
       default: {
-        response: {
-          folder: {
-            id: "123e4567-e89b-12d3-a456-426614174000",
-            userId: "123e4567-e89b-12d3-a456-426614174001",
-            name: "Work",
-            icon: "folder",
-            color: "#3b82f6",
-            parentId: null,
-            expanded: true,
-            sortOrder: 0,
-            rolesView: [UserRole.PUBLIC, UserRole.CUSTOMER],
-            rolesManage: [UserRole.CUSTOMER],
-            rolesCreateThread: [UserRole.CUSTOMER],
-            rolesPost: [UserRole.PUBLIC, UserRole.CUSTOMER],
-            rolesModerate: [UserRole.ADMIN],
-            rolesAdmin: [UserRole.ADMIN],
-            createdAt: new Date("2024-01-01T00:00:00Z").toISOString(),
-            updatedAt: new Date("2024-01-01T00:00:00Z").toISOString(),
-          },
-        },
+        userId: "123e4567-e89b-12d3-a456-426614174001",
+        name: "Work",
+        icon: "folder",
+        color: "#3b82f6",
+        parentId: null,
+        expanded: true,
+        sortOrder: 0,
+        rolesView: [UserRole.PUBLIC, UserRole.CUSTOMER],
+        rolesManage: [UserRole.CUSTOMER],
+        rolesCreateThread: [UserRole.CUSTOMER],
+        rolesPost: [UserRole.PUBLIC, UserRole.CUSTOMER],
+        rolesModerate: [UserRole.ADMIN],
+        rolesAdmin: [UserRole.ADMIN],
+        createdAt: new Date("2024-01-01T00:00:00Z").toISOString(),
+        updatedAt: new Date("2024-01-01T00:00:00Z").toISOString(),
       },
     },
   },
@@ -291,243 +252,120 @@ const { PATCH } = createEndpoint({
       }),
 
       // === REQUEST DATA ===
-      updates: scopedObjectFieldNew(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "patch.sections.updates.title" as const,
-        description: "patch.sections.updates.description" as const,
-        layoutType: LayoutType.GRID,
-        columns: 2,
-        usage: { request: "data" },
-        children: {
-          name: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label: "patch.name.label" as const,
-            description: "patch.name.description" as const,
-            columns: 12,
-            schema: z.string().min(1).max(255).optional(),
-          }),
-          icon: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label: "patch.icon.label" as const,
-            description: "patch.icon.description" as const,
-            columns: 6,
-            // Runtime: accepts any string (emoji, IconKey), Type: IconKey | null | undefined
-            schema: iconSchema.nullish(),
-          }),
-          color: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label: "patch.color.label" as const,
-            description: "patch.color.description" as const,
-            columns: 6,
-            schema: z.string().optional(),
-          }),
-          parentId: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.UUID,
-            label: "patch.parentId.label" as const,
-            description: "patch.parentId.description" as const,
-            columns: 6,
-            schema: z.uuid().nullable().optional(),
-          }),
-          expanded: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.BOOLEAN,
-            label: "patch.expanded.label" as const,
-            description: "patch.expanded.description" as const,
-            columns: 6,
-            schema: z.boolean().optional(),
-          }),
-          sortOrder: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.NUMBER,
-            label: "patch.sortOrder.label" as const,
-            description: "patch.sortOrder.description" as const,
-            columns: 6,
-            schema: z.coerce.number().optional(),
-          }),
-          rolesView: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.MULTISELECT,
-            label: "patch.rolesView.label" as const,
-            description: "patch.rolesView.description" as const,
-            columns: 6,
-            options: UserPermissionRoleOptions,
-            schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
-          }),
-          rolesManage: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.MULTISELECT,
-            label: "patch.rolesManage.label" as const,
-            description: "patch.rolesManage.description" as const,
-            columns: 6,
-            options: UserPermissionRoleOptions,
-            schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
-          }),
-          rolesCreateThread: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.MULTISELECT,
-            label: "patch.rolesCreateThread.label" as const,
-            description: "patch.rolesCreateThread.description" as const,
-            columns: 6,
-            options: UserPermissionRoleOptions,
-            schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
-          }),
-          rolesPost: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.MULTISELECT,
-            label: "patch.rolesPost.label" as const,
-            description: "patch.rolesPost.description" as const,
-            columns: 6,
-            options: UserPermissionRoleOptions,
-            schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
-          }),
-          rolesModerate: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.MULTISELECT,
-            label: "patch.rolesModerate.label" as const,
-            description: "patch.rolesModerate.description" as const,
-            columns: 6,
-            options: UserPermissionRoleOptions,
-            schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
-          }),
-          rolesAdmin: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.MULTISELECT,
-            label: "patch.rolesAdmin.label" as const,
-            description: "patch.rolesAdmin.description" as const,
-            columns: 6,
-            options: UserPermissionRoleOptions,
-            schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
-          }),
-        },
+      name: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.name.label" as const,
+        description: "patch.name.description" as const,
+        columns: 12,
+        schema: z.string().min(1).max(255).optional(),
+      }),
+      icon: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.icon.label" as const,
+        description: "patch.icon.description" as const,
+        columns: 6,
+        // Runtime: accepts any string (emoji, IconKey), Type: IconKey | null | undefined
+        schema: iconSchema.nullish(),
+      }),
+      color: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.color.label" as const,
+        description: "patch.color.description" as const,
+        columns: 6,
+        schema: z.string().optional(),
+      }),
+      parentId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "patch.parentId.label" as const,
+        description: "patch.parentId.description" as const,
+        columns: 6,
+        schema: z.uuid().nullable().optional(),
+      }),
+      expanded: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "patch.expanded.label" as const,
+        description: "patch.expanded.description" as const,
+        columns: 6,
+        schema: z.boolean().optional(),
+      }),
+      sortOrder: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "patch.sortOrder.label" as const,
+        description: "patch.sortOrder.description" as const,
+        columns: 6,
+        schema: z.coerce.number().optional(),
+      }),
+      rolesView: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label: "patch.rolesView.label" as const,
+        description: "patch.rolesView.description" as const,
+        columns: 6,
+        options: UserPermissionRoleOptions,
+        schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
+      }),
+      rolesManage: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label: "patch.rolesManage.label" as const,
+        description: "patch.rolesManage.description" as const,
+        columns: 6,
+        options: UserPermissionRoleOptions,
+        schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
+      }),
+      rolesCreateThread: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label: "patch.rolesCreateThread.label" as const,
+        description: "patch.rolesCreateThread.description" as const,
+        columns: 6,
+        options: UserPermissionRoleOptions,
+        schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
+      }),
+      rolesPost: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label: "patch.rolesPost.label" as const,
+        description: "patch.rolesPost.description" as const,
+        columns: 6,
+        options: UserPermissionRoleOptions,
+        schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
+      }),
+      rolesModerate: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label: "patch.rolesModerate.label" as const,
+        description: "patch.rolesModerate.description" as const,
+        columns: 6,
+        options: UserPermissionRoleOptions,
+        schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
+      }),
+      rolesAdmin: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.MULTISELECT,
+        label: "patch.rolesAdmin.label" as const,
+        description: "patch.rolesAdmin.description" as const,
+        columns: 6,
+        options: UserPermissionRoleOptions,
+        schema: z.array(z.enum(UserRoleDB)).nullable().optional(),
       }),
 
       // === RESPONSE ===
-      response: scopedObjectFieldNew(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "patch.response.title" as const,
-        description: "patch.response.description" as const,
-        layoutType: LayoutType.STACKED,
-        usage: { response: true },
-        children: {
-          folder: scopedObjectFieldNew(scopedTranslation, {
-            type: WidgetType.CONTAINER,
-            title: "patch.response.folder.title" as const,
-            layoutType: LayoutType.GRID,
-            columns: 2,
-            usage: { response: true },
-            children: {
-              id: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "patch.response.folder.id.content" as const,
-                schema: z.uuid(),
-              }),
-              userId: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "patch.response.folder.userId.content" as const,
-                schema: z.uuid().nullable(),
-              }),
-              name: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "patch.response.folder.name.content" as const,
-                schema: z.string(),
-              }),
-              icon: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "patch.response.folder.icon.content" as const,
-                // Runtime: accepts any string (emoji, IconKey), Type: IconKey | null
-                schema: iconSchema.nullable(),
-              }),
-              color: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "patch.response.folder.color.content" as const,
-                schema: z.string().nullable(),
-              }),
-              parentId: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "patch.response.folder.parentId.content" as const,
-                schema: z.uuid().nullable(),
-              }),
-              expanded: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "patch.response.folder.expanded.content" as const,
-                schema: z.boolean(),
-              }),
-              sortOrder: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "patch.response.folder.sortOrder.content" as const,
-                schema: z.coerce.number(),
-              }),
-              rolesView: responseArrayOptionalField(
-                {
-                  type: WidgetType.CONTAINER,
-                },
-                scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  schema: z.enum(UserRoleDB),
-                }),
-              ),
-              rolesManage: responseArrayOptionalField(
-                {
-                  type: WidgetType.CONTAINER,
-                },
-                scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  schema: z.enum(UserRoleDB),
-                }),
-              ),
-              rolesCreateThread: responseArrayOptionalField(
-                {
-                  type: WidgetType.CONTAINER,
-                },
-                scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  schema: z.enum(UserRoleDB),
-                }),
-              ),
-              rolesPost: responseArrayOptionalField(
-                {
-                  type: WidgetType.CONTAINER,
-                },
-                scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  schema: z.enum(UserRoleDB),
-                }),
-              ),
-              rolesModerate: responseArrayOptionalField(
-                {
-                  type: WidgetType.CONTAINER,
-                },
-                scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  schema: z.enum(UserRoleDB),
-                }),
-              ),
-              rolesAdmin: responseArrayOptionalField(
-                {
-                  type: WidgetType.CONTAINER,
-                },
-                scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  schema: z.enum(UserRoleDB),
-                }),
-              ),
-              createdAt: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "patch.response.folder.createdAt.content" as const,
-                schema: dateSchema,
-              }),
-              updatedAt: scopedResponseField(scopedTranslation, {
-                type: WidgetType.TEXT,
-                content: "patch.response.folder.updatedAt.content" as const,
-                schema: dateSchema,
-              }),
-            },
-          }),
-        },
+      folderId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "patch.response.folder.id.content" as const,
+        schema: z.uuid(),
+      }),
+      updatedAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "patch.response.folder.updatedAt.content" as const,
+        schema: dateSchema,
       }),
     },
   }),
@@ -582,35 +420,15 @@ const { PATCH } = createEndpoint({
     },
     requests: {
       default: {
-        updates: {
-          name: "Personal",
-          color: "#10b981",
-          icon: "folder-heart",
-        },
+        name: "Personal",
+        color: "#10b981",
+        icon: "folder-heart",
       },
     },
     responses: {
       default: {
-        response: {
-          folder: {
-            id: "123e4567-e89b-12d3-a456-426614174000",
-            userId: "123e4567-e89b-12d3-a456-426614174001",
-            name: "Personal",
-            icon: "folder",
-            color: "#10b981",
-            parentId: null,
-            expanded: true,
-            sortOrder: 0,
-            rolesView: [UserRole.PUBLIC, UserRole.CUSTOMER],
-            rolesManage: [UserRole.CUSTOMER],
-            rolesCreateThread: [UserRole.CUSTOMER],
-            rolesPost: [UserRole.PUBLIC, UserRole.CUSTOMER],
-            rolesModerate: [UserRole.ADMIN],
-            rolesAdmin: [UserRole.ADMIN],
-            createdAt: new Date("2024-01-01T00:00:00Z").toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-        },
+        folderId: "123e4567-e89b-12d3-a456-426614174000",
+        updatedAt: new Date().toISOString(),
       },
     },
   },
@@ -649,24 +467,46 @@ const { DELETE } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      response: scopedObjectFieldNew(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "delete.response.title" as const,
-        description: "delete.response.description" as const,
-        layoutType: LayoutType.STACKED,
-        usage: { response: true },
-        children: {
-          success: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "delete.response.success.content" as const,
-            schema: z.boolean(),
-          }),
-          deletedFolderId: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "delete.response.deletedFolderId.content" as const,
-            schema: z.uuid(),
-          }),
-        },
+      // Note: id is already known from the URL param, not repeated
+      userId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.userId.content" as const,
+        schema: z.uuid().nullable(),
+      }),
+      name: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.name.content" as const,
+        schema: z.string(),
+      }),
+      icon: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.icon.content" as const,
+        schema: iconSchema.nullable(),
+      }),
+      color: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.color.content" as const,
+        schema: z.string().nullable(),
+      }),
+      parentId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.parentId.content" as const,
+        schema: z.uuid().nullable(),
+      }),
+      rootFolderId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.rootFolderId.content" as const,
+        schema: z.enum(Object.values(DefaultFolderId)),
+      }),
+      createdAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.createdAt.content" as const,
+        schema: dateSchema,
+      }),
+      updatedAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.updatedAt.content" as const,
+        schema: dateSchema,
       }),
     },
   }),
@@ -721,10 +561,14 @@ const { DELETE } = createEndpoint({
     },
     responses: {
       default: {
-        response: {
-          success: true,
-          deletedFolderId: "123e4567-e89b-12d3-a456-426614174000",
-        },
+        userId: "660e8400-e29b-41d4-a716-446655440000",
+        name: "Work Projects",
+        icon: "folder",
+        color: "#3b82f6",
+        parentId: null,
+        rootFolderId: DefaultFolderId.PRIVATE,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     },
   },

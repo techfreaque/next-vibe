@@ -121,9 +121,9 @@ export const errorResponseSchema = z.object({
   }),
 });
 
-export type ResponseType<TResponseData> =
+export type ResponseType<TResponseData, TKey extends string = TranslationKey> =
   | SuccessResponseType<TResponseData>
-  | ErrorResponseType;
+  | ErrorResponseType<TKey>;
 
 /**
  * Streaming response marker
@@ -209,9 +209,9 @@ export function isFileResponse<T>(
 
 export type MessageResponseType = z.infer<typeof messageResponseSchema>;
 
-export interface ErrorResponseType {
+export interface ErrorResponseType<TKey extends string = TranslationKey> {
   success: false;
-  message: TranslationKey;
+  message: TKey;
   messageParams?: TParams;
   errorType: ErrorResponseTypesElements[keyof ErrorResponseTypesElements];
   cause?: ErrorResponseType;

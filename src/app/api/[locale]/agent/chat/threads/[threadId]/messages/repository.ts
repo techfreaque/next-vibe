@@ -609,9 +609,9 @@ export class MessagesRepository {
 
       // SECURITY: Force role to USER for all user-created messages
       // Only the AI stream system can create ASSISTANT/SYSTEM/TOOL/ERROR messages
-      if (data.message?.role && data.message.role !== ChatMessageRole.USER) {
+      if (data.role && data.role !== ChatMessageRole.USER) {
         logger.warn("Attempted to create message with non-USER role", {
-          attemptedRole: data.message.role,
+          attemptedRole: data.role,
           userId: userIdentifier,
           isPublic: user.isPublic,
         });
@@ -626,9 +626,9 @@ export class MessagesRepository {
       const safeRole = ChatMessageRole.USER;
 
       // SECURITY: PUBLIC users cannot set model
-      if (user.isPublic && data.message?.model) {
+      if (user.isPublic && data.model) {
         logger.warn("PUBLIC user attempted to set model", {
-          model: data.message.model,
+          model: data.model,
           leadId: user.leadId,
         });
 
@@ -687,13 +687,13 @@ export class MessagesRepository {
 
       // Calculate depth if parent exists
       let depth = 0;
-      if (data.message?.parentId) {
+      if (data.parentId) {
         const [parentMessage] = await db
           .select()
           .from(chatMessages)
           .where(
             and(
-              eq(chatMessages.id, data.message.parentId),
+              eq(chatMessages.id, data.parentId),
               eq(chatMessages.threadId, data.threadId),
             ),
           )
@@ -712,29 +712,21 @@ export class MessagesRepository {
         depth = parentMessage.depth + 1;
       }
 
-      if (!data.message?.id) {
-        return fail({
-          message: t("post.errors.validation.title"),
-          errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          messageParams: {
-            message: "Message ID must be provided by client",
-          },
-        });
-      }
+      const messageId = data.id ?? crypto.randomUUID();
 
       const [message] = await db
         .insert(chatMessages)
         .values({
-          id: data.message.id,
+          id: messageId,
           threadId: data.threadId,
           role: safeRole,
-          content: data.message?.content || "",
-          parentId: data.message?.parentId || null,
+          content: data.content || "",
+          parentId: data.parentId || null,
           depth,
           authorId: userIdentifier,
           isAI: false,
-          model: user.isPublic ? null : data.message?.model || null,
-          metadata: data.message?.metadata || {},
+          model: user.isPublic ? null : data.model || null,
+          metadata: data.metadata || {},
         })
         .returning({
           id: chatMessages.id,
@@ -760,7 +752,7 @@ export class MessagesRepository {
       });
 
       return success({
-        id: message.id,
+        messageId: message.id,
         createdAt: message.createdAt,
       });
     } catch (error) {

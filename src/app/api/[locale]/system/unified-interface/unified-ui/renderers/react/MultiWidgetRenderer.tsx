@@ -32,8 +32,12 @@ import { WidgetRenderer } from "./WidgetRenderer";
  * Maps columns number to Tailwind col-span classes
  * IMPORTANT: FULL class strings for Tailwind purge!
  */
-function getColumnSpanClass(columns: number | undefined): string {
-  if (!columns || columns <= 0) {
+function getColumnSpanClass(
+  columns: number | undefined,
+  defaultColumns?: number,
+): string {
+  const effective = columns && columns > 0 ? columns : defaultColumns;
+  if (!effective || effective <= 0) {
     return "";
   }
 
@@ -53,7 +57,7 @@ function getColumnSpanClass(columns: number | undefined): string {
     12: "col-span-12",
   };
 
-  return colSpanMap[columns] ?? "";
+  return colSpanMap[effective] ?? "";
 }
 
 /**
@@ -64,12 +68,13 @@ function renderInlineGroup<TEndpoint extends CreateApiEndpointAny>(
     ? G
     : never,
   fieldName: string | undefined,
+  defaultColumns?: number,
 ): JSX.Element {
   return (
     <Div className="flex items-center gap-2">
       {group.fields.map(({ name, field, data, columns }) => {
         const childFieldName = fieldName ? `${fieldName}.${name}` : name;
-        const columnSpanClass = getColumnSpanClass(columns);
+        const columnSpanClass = getColumnSpanClass(columns, defaultColumns);
 
         const element = (
           <WidgetRenderer<TEndpoint>
@@ -109,6 +114,8 @@ interface ObjectChildrenRendererProps<
     | null
     | undefined;
   fieldName: string | undefined;
+  /** Default column span for children without an explicit columns prop (e.g. 12 in grid layout) */
+  defaultColumns?: number;
 }
 
 /**
@@ -159,6 +166,7 @@ export function ObjectChildrenRenderer<
   childrenSchema,
   value,
   fieldName,
+  defaultColumns,
 }: ObjectChildrenRendererProps<TKey, TUsage, TChildren>): JSX.Element {
   const form = useWidgetForm();
 
@@ -215,8 +223,15 @@ export function ObjectChildrenRenderer<
         g.fields.some((f) => f.name === child.name),
       );
       if (group && group.fields[0].name === child.name) {
-        const groupColumnSpanClass = getColumnSpanClass(group.totalColumns);
-        const groupElement = renderInlineGroup<TEndpoint>(group, fieldName);
+        const groupColumnSpanClass = getColumnSpanClass(
+          group.totalColumns,
+          defaultColumns,
+        );
+        const groupElement = renderInlineGroup<TEndpoint>(
+          group,
+          fieldName,
+          defaultColumns,
+        );
 
         result.push(
           groupColumnSpanClass ? (
@@ -238,7 +253,7 @@ export function ObjectChildrenRenderer<
     const childFieldName = fieldName
       ? `${fieldName}.${child.name}`
       : child.name;
-    const columnSpanClass = getColumnSpanClass(child.columns);
+    const columnSpanClass = getColumnSpanClass(child.columns, defaultColumns);
 
     const element = (
       <WidgetRenderer<TEndpoint>
@@ -488,6 +503,8 @@ export interface MultiWidgetRendererProps<
   fieldName: string | undefined;
   discriminator?: string;
   watchedDiscriminatorValue?: string;
+  /** Default column span for children without an explicit columns prop (e.g. 12 in grid layout) */
+  defaultColumns?: number;
   /** Optional render callback for array items to customize rendering */
   renderItem?: (props: {
     itemData: InferResponseOutput<AnyChildrenConstrain<TKey, TUsage>>;
@@ -551,6 +568,7 @@ export function MultiWidgetRenderer<
   fieldName,
   discriminator,
   watchedDiscriminatorValue,
+  defaultColumns,
   renderItem,
 }: MultiWidgetRendererProps<TKey, TUsage, TChildren>): JSX.Element {
   if (!childrenSchema) {
@@ -612,6 +630,7 @@ export function MultiWidgetRenderer<
       childrenSchema={objectChildren}
       value={objectValue}
       fieldName={fieldName}
+      defaultColumns={defaultColumns}
     />
   );
 }

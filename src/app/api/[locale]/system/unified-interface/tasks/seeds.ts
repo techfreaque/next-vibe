@@ -43,7 +43,7 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
     routeId: task.name,
     displayName: task.name,
     description: task.description,
-    category: String(task.category),
+    category: task.category,
     schedule: task.schedule,
     enabled: task.enabled,
     priority: task.priority ?? CronTaskPriority.MEDIUM,

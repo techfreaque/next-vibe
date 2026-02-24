@@ -126,7 +126,7 @@ export class PaymentRepository {
       // Create Stripe checkout session
       // Map enum translation keys to Stripe API values
       const paymentMethodTypes = (data.paymentMethodTypes?.map((type) => {
-        // Extract last part of translation key (e.g., "card" from "app.api.payment.enums.paymentMethodType.card")
+        // Extract last part of translation key (e.g., "card" from "enums.paymentMethodType.card")
         const parts = type.split(".");
         const value = parts.at(-1);
         if (!value) {

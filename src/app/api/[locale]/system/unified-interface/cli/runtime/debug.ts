@@ -340,7 +340,7 @@ function formatExecutionSummary(
     for (const key of sortedKeys) {
       const value = performanceMetadata[key];
       if (value !== undefined) {
-        // Extract the last part of the translation key (e.g., "oxlint" from "app.api.system.check.vibeCheck.performance.oxlint")
+        // Extract the last part of the translation key (e.g., "oxlint" from "vibeCheck.performance.oxlint")
         const label = key.split(".").pop() || key;
 
         // Capitalize first letter for display

@@ -12,6 +12,7 @@ import {
   useInkWidgetLocale,
   useInkWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+import type { TParams } from "@/i18n/core/static-types";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import { extractTextData, formatIfDate, formatText } from "./shared";
@@ -43,7 +44,8 @@ export function TextWidgetInk<
       >,
 ): JSX.Element {
   const { field } = props;
-  const t = useInkWidgetTranslation<TEndpoint>();
+  const tScoped = useInkWidgetTranslation<TEndpoint>();
+  const t = tScoped as (key: string, params?: TParams) => string;
   const locale = useInkWidgetLocale();
   const {
     content,

@@ -196,13 +196,11 @@ export async function updateThreadPermissions(
 
     // Return updated values (use provided values or keep existing)
     return success({
-      response: {
-        rolesView: rolesView ?? existingThread.rolesView,
-        rolesEdit: rolesEdit ?? existingThread.rolesEdit,
-        rolesPost: rolesPost ?? existingThread.rolesPost,
-        rolesModerate: rolesModerate ?? existingThread.rolesModerate,
-        rolesAdmin: rolesAdmin ?? existingThread.rolesAdmin,
-      },
+      rolesViewResult: rolesView ?? existingThread.rolesView,
+      rolesEditResult: rolesEdit ?? existingThread.rolesEdit,
+      rolesPostResult: rolesPost ?? existingThread.rolesPost,
+      rolesModerateResult: rolesModerate ?? existingThread.rolesModerate,
+      rolesAdminResult: rolesAdmin ?? existingThread.rolesAdmin,
     });
   } catch {
     return fail({

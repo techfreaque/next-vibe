@@ -16,9 +16,9 @@ import type Stripe from "stripe";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Countries, CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { TOTAL_MODEL_COUNT } from "../../../agent/models/models";
+import { scopedTranslation as productsScopedTranslation } from "../../../products/i18n";
 import {
   type ProductIds,
   productsRepository,
@@ -60,7 +60,7 @@ export class StripePriceManager {
         interval,
       );
 
-      const { t } = simpleT(locale);
+      const { t } = productsScopedTranslation.scopedT(locale);
 
       // Translate product name and description with interpolation
       const productName = t(product.name);

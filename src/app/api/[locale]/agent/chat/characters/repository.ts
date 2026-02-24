@@ -601,7 +601,17 @@ export class CharactersRepository {
         });
       }
 
-      return success();
+      const deleted = result[0];
+      return success({
+        name: deleted.name,
+        tagline: deleted.tagline,
+        icon: deleted.icon,
+        category: deleted.category,
+        ownershipType: deleted.ownershipType,
+        systemPrompt: deleted.systemPrompt,
+        createdAt: deleted.createdAt,
+        updatedAt: deleted.updatedAt,
+      });
     } catch (error) {
       logger.error("Failed to delete character", parseError(error));
       return fail({

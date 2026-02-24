@@ -58,7 +58,6 @@ const { POST } = createEndpoint({
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
-    UserRole.MCP_VISIBLE,
   ],
   title: "run.post.title",
   description: "run.post.description",
@@ -122,6 +121,8 @@ const { POST } = createEndpoint({
         scopedTranslation,
         {
           type: WidgetType.CONTAINER,
+          layoutType: LayoutType.GRID,
+          columns: 12,
           title: "run.post.fields.preCalls.label",
           description: "run.post.fields.preCalls.description",
         },
@@ -158,6 +159,8 @@ const { POST } = createEndpoint({
         scopedTranslation,
         {
           type: WidgetType.CONTAINER,
+          layoutType: LayoutType.GRID,
+          columns: 12,
           title: "run.post.fields.allowedTools.label",
           description: "run.post.fields.allowedTools.description",
         },
@@ -192,6 +195,8 @@ const { POST } = createEndpoint({
         scopedTranslation,
         {
           type: WidgetType.CONTAINER,
+          layoutType: LayoutType.GRID,
+          columns: 12,
           title: "run.post.fields.tools.label",
           description: "run.post.fields.tools.description",
         },
@@ -269,18 +274,21 @@ const { POST } = createEndpoint({
       text: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "run.post.response.text",
+        columns: 12,
         schema: z.string().nullable(),
       }),
 
       promptTokens: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "run.post.response.promptTokens",
+        columns: 6,
         schema: z.number().nullable(),
       }),
 
       completionTokens: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "run.post.response.completionTokens",
+        columns: 6,
         schema: z.number().nullable(),
       }),
 
@@ -288,12 +296,14 @@ const { POST } = createEndpoint({
       threadId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "run.post.response.threadId",
+        columns: 6,
         schema: z.string().uuid().nullable(),
       }),
 
       lastAiMessageId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "run.post.response.lastAiMessageId",
+        columns: 6,
         schema: z.string().uuid().nullable(),
       }),
 
@@ -301,16 +311,19 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "run.post.response.threadTitle",
         schema: z.string().nullable(),
+        columns: 6,
       }),
 
       threadCreatedAt: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "run.post.response.threadCreatedAt",
         schema: z.string().datetime().nullable(),
+        columns: 6,
       }),
 
       preCallResults: scopedResponseArrayFieldNew(scopedTranslation, {
         type: WidgetType.CONTAINER,
+        layoutType: LayoutType.STACKED,
         title: "run.post.response.preCallResults.title",
         child: scopedObjectFieldNew(scopedTranslation, {
           type: WidgetType.CONTAINER,

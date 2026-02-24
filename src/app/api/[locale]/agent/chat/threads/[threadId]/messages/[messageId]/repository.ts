@@ -113,19 +113,15 @@ export class MessageRepository {
       }
 
       return success({
-        message: {
-          id: message.id,
-          threadId: message.threadId,
-          role: message.role,
-          content: message.content,
-          parentId: message.parentId,
-          depth: message.depth,
-          authorId: message.authorId,
-          isAI: message.isAI,
-          model: message.model,
-          createdAt: message.createdAt,
-          updatedAt: message.updatedAt,
-        },
+        role: message.role,
+        content: message.content,
+        parentId: message.parentId,
+        depth: message.depth,
+        authorId: message.authorId,
+        isAI: message.isAI,
+        model: message.model,
+        createdAt: message.createdAt,
+        updatedAt: message.updatedAt,
       });
     } catch (error) {
       logger.error("Error getting message:", parseError(error));
@@ -238,12 +234,9 @@ export class MessageRepository {
         .returning();
 
       return success({
-        message: {
-          id: updatedMessage.id,
-          content: updatedMessage.content,
-          role: updatedMessage.role,
-          updatedAt: updatedMessage.updatedAt,
-        },
+        updatedContent: updatedMessage.content,
+        updatedRole: updatedMessage.role,
+        updatedAt: updatedMessage.updatedAt,
       });
     } catch (error) {
       logger.error("Error updating message:", parseError(error));
@@ -346,12 +339,19 @@ export class MessageRepository {
         .where(eq(chatMessages.parentId, urlPathParams.messageId));
 
       // Delete message
-      await db
+      const [deletedMessage] = await db
         .delete(chatMessages)
-        .where(eq(chatMessages.id, urlPathParams.messageId));
+        .where(eq(chatMessages.id, urlPathParams.messageId))
+        .returning();
 
       return success({
-        success: true,
+        role: deletedMessage.role,
+        content: deletedMessage.content,
+        parentId: deletedMessage.parentId,
+        authorId: deletedMessage.authorId,
+        isAI: deletedMessage.isAI,
+        model: deletedMessage.model,
+        createdAt: deletedMessage.createdAt,
       });
     } catch (error) {
       logger.error("Error deleting message:", parseError(error));

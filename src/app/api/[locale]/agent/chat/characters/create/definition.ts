@@ -291,7 +291,43 @@ const { POST } = createEndpoint({
       modelSelection: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
+        label: "post.modelSelection.label" as const,
+        description: "post.modelSelection.description" as const,
         schema: modelSelectionSchemaSimple.nullable(),
+      }),
+
+      // Tool configuration — which tools this character can use (null = use global settings default)
+      allowedTools: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.allowedTools.label" as const,
+        description: "post.allowedTools.description" as const,
+        schema: z
+          .array(
+            z.object({
+              toolId: z.string(),
+              requiresConfirmation: z.boolean().default(false),
+            }),
+          )
+          .nullable()
+          .optional(),
+      }),
+
+      // Pinned tools — tools that are always shown in the toolbar for this character
+      pinnedTools: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.pinnedTools.label" as const,
+        description: "post.pinnedTools.description" as const,
+        schema: z
+          .array(
+            z.object({
+              toolId: z.string(),
+              requiresConfirmation: z.boolean().default(false),
+            }),
+          )
+          .nullable()
+          .optional(),
       }),
 
       // Auto-compacting token threshold (null = use global/settings default)
@@ -375,6 +411,8 @@ const { POST } = createEndpoint({
           manualModelId: ModelId.GPT_5,
         },
         voice: undefined,
+        allowedTools: [{ toolId: "execute-tool", requiresConfirmation: false }],
+        pinnedTools: null,
       },
       createManual: {
         name: "Code Reviewer",
@@ -390,6 +428,8 @@ const { POST } = createEndpoint({
           manualModelId: ModelId.GPT_5,
         },
         voice: undefined,
+        allowedTools: [{ toolId: "execute-tool", requiresConfirmation: false }],
+        pinnedTools: null,
       },
       // Example with filter-based model selection
       createFilters: {
@@ -421,6 +461,8 @@ const { POST } = createEndpoint({
           },
         },
         voice: undefined,
+        allowedTools: null,
+        pinnedTools: null,
       },
     },
     responses: {

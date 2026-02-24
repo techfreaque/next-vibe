@@ -154,7 +154,7 @@ export function UuidFieldWidget<
                   formField.value,
                   field.label,
                   field.prefillDisplay,
-                  tField,
+                  tField as <K extends string>(key: K) => string,
                 )
               ) : (
                 <Input

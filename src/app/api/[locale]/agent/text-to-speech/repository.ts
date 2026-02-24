@@ -60,7 +60,7 @@ function mapLocaleToLanguage(locale: CountryLanguage): string {
 
 /**
  * Convert localized TtsVoiceValue to raw API string
- * Converts "app.api.agent.textToSpeech.voices.MALE" -> "MALE"
+ * Converts "voices.MALE" -> "MALE"
  */
 function convertVoiceToApiFormat(voice: string): "MALE" | "FEMALE" {
   switch (voice) {

@@ -881,8 +881,12 @@ export class MessageDbWriter {
   }
 
   /**
-   * Emit MESSAGE_CREATED SSE for an ERROR message, save to DB, then emit ERROR SSE.
+   * Emit MESSAGE_CREATED SSE for an ERROR message, save to DB.
    * Used by error handlers to show errors in the chat UI.
+   *
+   * The MESSAGE_CREATED event is sufficient for the client to display the error bubble.
+   * Do NOT emit a trailing ERROR SSE here — that would cause a duplicate message
+   * because the client's ERROR handler also creates a new chat message.
    *
    * Pass `content` to override the default serialized ErrorResponseType content.
    * When `content` is a plain translation key string, the bubble renders it without
@@ -904,6 +908,8 @@ export class MessageDbWriter {
     const serializedError = params.content ?? serializeError(error);
 
     // SSE: MESSAGE_CREATED for the error message
+    // The client's MESSAGE_CREATED handler adds this to the chat store with the
+    // correct parentId/depth/sequenceId — no additional ERROR event needed.
     const errorMessageEvent = createStreamEvent.messageCreated({
       messageId: errorMessageId,
       threadId,
@@ -931,9 +937,6 @@ export class MessageDbWriter {
         logger: this.logger,
       });
     }
-
-    // SSE: ERROR event
-    this.emitError(error);
   }
 
   /**

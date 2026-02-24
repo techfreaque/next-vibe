@@ -174,7 +174,15 @@ export async function deleteMemory(params: {
   userId: string;
   logger: EndpointLogger;
   t: MemoriesT;
-}): Promise<ResponseType<{ success: true }>> {
+}): Promise<
+  ResponseType<{
+    content: string;
+    tags: string[];
+    priority: number;
+    createdAt: Date;
+    updatedAt: Date;
+  }>
+> {
   const { memoryNumber, userId, logger, t } = params;
 
   const result = await db
@@ -191,8 +199,15 @@ export async function deleteMemory(params: {
     });
   }
 
+  const deleted = result[0];
   logger.info("Deleted memory", { memoryNumber });
-  return success({ success: true });
+  return success({
+    content: deleted.content,
+    tags: deleted.tags ?? [],
+    priority: deleted.priority,
+    createdAt: deleted.createdAt,
+    updatedAt: deleted.updatedAt,
+  });
 }
 
 /**

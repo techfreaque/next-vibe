@@ -211,6 +211,7 @@ export const translations: typeof enTranslations = {
     },
     modelSelection: {
       title: "Modellauswahl",
+      label: "Modellauswahl",
       description:
         "Wählen Sie, wie das KI-Modell ausgewählt werden soll - entweder ein bestimmtes Modell auswählen oder das System basierend auf Filtern wählen lassen",
     },
@@ -286,6 +287,26 @@ export const translations: typeof enTranslations = {
       label: "Benutzerdefiniertes Symbol",
       description: "Benutzerdefiniertes Symbol für diesen Favoriten",
     },
+    icon: {
+      label: "Benutzerdefiniertes Symbol",
+      description:
+        "Symbol des Charakters für diesen Favoriten-Slot überschreiben",
+    },
+    compactTrigger: {
+      label: "Komprimierungs-Schwellenwert (Token)",
+      description:
+        "Token-Anzahl, die eine automatische Gesprächskomprimierung auslöst. Null = Charakter oder globaler Standard.",
+    },
+    allowedTools: {
+      label: "Erlaubte Tools",
+      description:
+        "Tools für diesen Slot überschreiben. Jeder Eintrag benötigt eine toolId. Null = Charakter oder globale Einstellungen.",
+    },
+    pinnedTools: {
+      label: "Angeheftete Tools",
+      description:
+        "Angeheftete Toolbar-Tools für diesen Slot überschreiben. Null = Charakter oder globale Einstellungen.",
+    },
     changeCharacter: {
       label: "Charakter wechseln",
     },
@@ -339,6 +360,12 @@ export const translations: typeof enTranslations = {
         description:
           "Beim Aktualisieren des Favoriten ist ein Konflikt aufgetreten",
       },
+    },
+    slotOverride: {
+      label: "Überschreibung für diesen Slot",
+    },
+    globalDefault: {
+      label: "Mein Standard (Fallback)",
     },
     success: {
       title: "Erfolg",

@@ -108,69 +108,50 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      message: scopedObjectFieldNew(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "get.response.message.title" as const,
-        layoutType: LayoutType.GRID,
-        columns: 2,
-        usage: { response: true },
-        children: {
-          id: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.message.id.content" as const,
-            schema: z.uuid(),
-          }),
-          threadId: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.message.threadId.content" as const,
-            schema: z.uuid(),
-          }),
-          role: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.message.role.content" as const,
-            schema: z.enum(ChatMessageRole),
-          }),
-          content: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.message.content.content" as const,
-            schema: z.string().nullable(),
-          }),
-          parentId: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.message.parentId.content" as const,
-            schema: z.uuid().nullable(),
-          }),
-          depth: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.message.depth.content" as const,
-            schema: z.coerce.number(),
-          }),
-          authorId: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.message.authorId.content" as const,
-            schema: z.string().nullable(),
-          }),
-          isAI: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.message.isAI.content" as const,
-            schema: z.boolean(),
-          }),
-          model: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.message.model.content" as const,
-            schema: z.string().nullable(),
-          }),
-          createdAt: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.message.createdAt.content" as const,
-            schema: dateSchema,
-          }),
-          updatedAt: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.message.updatedAt.content" as const,
-            schema: dateSchema,
-          }),
-        },
+      role: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.message.role.content" as const,
+        schema: z.enum(ChatMessageRole),
+      }),
+      content: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.message.content.content" as const,
+        schema: z.string().nullable(),
+      }),
+      parentId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.message.parentId.content" as const,
+        schema: z.uuid().nullable(),
+      }),
+      depth: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.message.depth.content" as const,
+        schema: z.coerce.number(),
+      }),
+      authorId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.message.authorId.content" as const,
+        schema: z.string().nullable(),
+      }),
+      isAI: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.message.isAI.content" as const,
+        schema: z.boolean(),
+      }),
+      model: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.message.model.content" as const,
+        schema: z.string().nullable(),
+      }),
+      createdAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.message.createdAt.content" as const,
+        schema: dateSchema,
+      }),
+      updatedAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.message.updatedAt.content" as const,
+        schema: dateSchema,
       }),
     },
   }),
@@ -189,19 +170,15 @@ const { GET } = createEndpoint({
     },
     responses: {
       default: {
-        message: {
-          id: "660e8400-e29b-41d4-a716-446655440000",
-          threadId: "550e8400-e29b-41d4-a716-446655440000",
-          role: ChatMessageRole.USER,
-          content: "Hello, how can you help me?",
-          parentId: null,
-          depth: 0,
-          authorId: "770e8400-e29b-41d4-a716-446655440000",
-          isAI: false,
-          model: null,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
+        role: ChatMessageRole.USER,
+        content: "Hello, how can you help me?",
+        parentId: null,
+        depth: 0,
+        authorId: "770e8400-e29b-41d4-a716-446655440000",
+        isAI: false,
+        model: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     },
   },
@@ -307,34 +284,20 @@ const { PATCH } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      message: scopedObjectFieldNew(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "patch.response.message.title" as const,
-        layoutType: LayoutType.GRID,
-        columns: 2,
-        usage: { response: true },
-        children: {
-          id: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.message.id.content" as const,
-            schema: z.uuid(),
-          }),
-          content: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.message.content.content" as const,
-            schema: z.string().nullable(),
-          }),
-          role: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.message.role.content" as const,
-            schema: z.enum(ChatMessageRole),
-          }),
-          updatedAt: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.message.updatedAt.content" as const,
-            schema: dateSchema,
-          }),
-        },
+      updatedContent: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "patch.response.message.content.content" as const,
+        schema: z.string().nullable(),
+      }),
+      updatedRole: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "patch.response.message.role.content" as const,
+        schema: z.enum(ChatMessageRole),
+      }),
+      updatedAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "patch.response.message.updatedAt.content" as const,
+        schema: dateSchema,
       }),
     },
   }),
@@ -359,12 +322,9 @@ const { PATCH } = createEndpoint({
     },
     responses: {
       default: {
-        message: {
-          id: "660e8400-e29b-41d4-a716-446655440000",
-          content: "Updated message content",
-          role: ChatMessageRole.USER,
-          updatedAt: new Date().toISOString(),
-        },
+        updatedContent: "Updated message content",
+        updatedRole: ChatMessageRole.USER,
+        updatedAt: new Date().toISOString(),
       },
     },
   },
@@ -449,10 +409,41 @@ const { DELETE } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      success: scopedResponseField(scopedTranslation, {
+      // Note: threadId and messageId are already known from URL params, not repeated
+      role: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.success.content" as const,
+        content: "delete.response.role.content" as const,
+        schema: z.enum(ChatMessageRole),
+      }),
+      content: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.content.content" as const,
+        schema: z.string().nullable(),
+      }),
+      parentId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.parentId.content" as const,
+        schema: z.uuid().nullable(),
+      }),
+      authorId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.authorId.content" as const,
+        schema: z.string().nullable(),
+      }),
+      isAI: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.isAI.content" as const,
         schema: z.boolean(),
+      }),
+      model: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.model.content" as const,
+        schema: z.string().nullable(),
+      }),
+      createdAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.createdAt.content" as const,
+        schema: dateSchema,
       }),
     },
   }),
@@ -471,7 +462,13 @@ const { DELETE } = createEndpoint({
     },
     responses: {
       default: {
-        success: true,
+        role: ChatMessageRole.USER,
+        content: "Hello, how can you help me?",
+        parentId: null,
+        authorId: "770e8400-e29b-41d4-a716-446655440000",
+        isAI: false,
+        model: null,
+        createdAt: new Date().toISOString(),
       },
     },
   },

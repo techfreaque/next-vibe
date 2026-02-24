@@ -6,6 +6,7 @@
 import { Environment } from "next-vibe/shared/utils/env-util";
 
 import { CronTaskPriority } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import { env } from "@/config/env";
 
 import type { CampaignStarterConfigPutRequestOutput } from "./definition";
@@ -20,6 +21,7 @@ export interface CronSettings {
   timeout: number;
   retries: number;
   retryDelay: number;
+  taskInput: Record<string, JsonValue>;
 }
 
 /**
@@ -102,6 +104,7 @@ export function getDefaultCronSettings(): CronSettings {
     timeout: isProduction ? 300000 : 180000, // 5 min (prod) or 3 min (dev)
     retries: isProduction ? 3 : 2,
     retryDelay: isProduction ? 30000 : 15000, // 30s (prod) or 15s (dev)
+    taskInput: {},
   };
 }
 

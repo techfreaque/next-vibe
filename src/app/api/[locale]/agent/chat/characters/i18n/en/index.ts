@@ -890,8 +890,24 @@ export const translations = {
     },
     modelSelection: {
       title: "Model Selection",
+      label: "Model Selection",
       description:
         "Choose how to select the AI model for this character - either pick a specific model or let the system choose based on filters",
+    },
+    allowedTools: {
+      label: "Allowed Tools",
+      description:
+        "List of tools this character can use. Each entry needs a toolId (use system_help_GET to discover available tool IDs). Set requiresConfirmation: true to prompt before executing. Pass null to inherit from global settings.",
+    },
+    pinnedTools: {
+      label: "Pinned Tools",
+      description:
+        "Tools pinned to the toolbar for quick access when using this character. Subset of allowedTools. Pass null to use default pinned tools.",
+    },
+    compactTrigger: {
+      label: "Compact Trigger (tokens)",
+      description:
+        "Token count that triggers automatic conversation compaction. Set to null to use global default.",
     },
     selectionType: {
       label: "Selection Type",

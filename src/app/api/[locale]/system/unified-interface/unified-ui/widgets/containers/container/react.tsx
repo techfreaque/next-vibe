@@ -439,6 +439,7 @@ export function ContainerWidget<
             fieldName={fieldName}
             discriminator={discriminator}
             watchedDiscriminatorValue={watchedDiscriminator}
+            defaultColumns={layoutType === "grid" ? 12 : undefined}
           />
         </Div>
         {/* Explicit submitButton config at bottom position */}
@@ -593,6 +594,7 @@ export function ContainerWidget<
             fieldName={fieldName}
             discriminator={discriminator}
             watchedDiscriminatorValue={watchedDiscriminator}
+            defaultColumns={layoutType === "grid" ? 12 : undefined}
           />
         </Div>
       </CardContent>

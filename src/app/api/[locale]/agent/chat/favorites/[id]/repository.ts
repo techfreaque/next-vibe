@@ -145,6 +145,8 @@ export class SingleFavoriteRepository {
         modelSelection,
         characterModelSelection,
         compactTrigger: favorite.compactTrigger ?? null,
+        allowedTools: favorite.activeTools ?? null,
+        pinnedTools: favorite.visibleTools ?? null,
       });
     } catch (error) {
       logger.error("Failed to fetch favorite", parseError(error));
@@ -239,6 +241,8 @@ export class SingleFavoriteRepository {
           voice: voiceToStore,
           modelSelection: modelSelectionToStore,
           compactTrigger: data.compactTrigger ?? null,
+          activeTools: data.allowedTools ?? null,
+          visibleTools: data.pinnedTools ?? null,
           updatedAt: new Date(),
         })
         .where(
@@ -331,7 +335,14 @@ export class SingleFavoriteRepository {
         });
       }
 
-      return success();
+      const deleted = result[0];
+      return success({
+        characterId: deleted.characterId,
+        voice: deleted.voice,
+        modelSelection: deleted.modelSelection,
+        createdAt: deleted.createdAt,
+        updatedAt: deleted.updatedAt,
+      });
     } catch (error) {
       logger.error("Failed to delete favorite", parseError(error));
       return fail({

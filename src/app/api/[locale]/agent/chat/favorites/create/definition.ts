@@ -177,6 +177,8 @@ const { POST } = createEndpoint({
       icon: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.ICON,
+        label: "post.icon.label" as const,
+        description: "post.icon.description" as const,
         schema: iconSchema.optional(),
         theme: {
           style: "none",
@@ -200,7 +202,53 @@ const { POST } = createEndpoint({
       modelSelection: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
+        label: "post.modelSelection.label" as const,
+        description: "post.modelSelection.description" as const,
         schema: modelSelectionSchemaSimple.nullable(),
+      }),
+
+      // Auto-compacting token threshold (null = fall through to character/settings default)
+      compactTrigger: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "post.compactTrigger.label" as const,
+        description: "post.compactTrigger.description" as const,
+        columns: 6,
+        schema: z.number().int().min(1000).max(200000).nullable().optional(),
+      }),
+
+      // Tool configuration — null = fall through to character/settings default
+      allowedTools: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.allowedTools.label" as const,
+        description: "post.allowedTools.description" as const,
+        schema: z
+          .array(
+            z.object({
+              toolId: z.string(),
+              requiresConfirmation: z.boolean().default(false),
+            }),
+          )
+          .nullable()
+          .optional(),
+      }),
+
+      // Pinned tools — always shown in the toolbar for this slot
+      pinnedTools: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.pinnedTools.label" as const,
+        description: "post.pinnedTools.description" as const,
+        schema: z
+          .array(
+            z.object({
+              toolId: z.string(),
+              requiresConfirmation: z.boolean().default(false),
+            }),
+          )
+          .nullable()
+          .optional(),
       }),
 
       // === RESPONSE ===
@@ -269,6 +317,9 @@ const { POST } = createEndpoint({
             max: IntelligenceLevel.BRILLIANT,
           },
         },
+        compactTrigger: null,
+        allowedTools: null,
+        pinnedTools: null,
       },
     },
     responses: {

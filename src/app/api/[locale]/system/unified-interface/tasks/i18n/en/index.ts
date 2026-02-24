@@ -49,6 +49,7 @@ export const translations = {
     database: "Database",
     system: "System",
     monitoring: "Monitoring",
+    leadManagement: "Lead Management",
   },
   enabledFilter: {
     all: "All",

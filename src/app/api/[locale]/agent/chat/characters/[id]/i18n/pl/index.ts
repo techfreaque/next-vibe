@@ -227,6 +227,21 @@ export const translations: typeof enTranslations = {
       label: "Preferowany model",
       description: "Preferowany model AI dla tej postaciy",
     },
+    allowedTools: {
+      label: "Dozwolone narzędzia",
+      description:
+        "Narzędzia dla tej postaci. Każdy wpis wymaga toolId. Null = ustawienia globalne.",
+    },
+    pinnedTools: {
+      label: "Przypięte narzędzia",
+      description:
+        "Przypięte narzędzia paska narzędzi dla tej postaci. Null = ustawienia globalne.",
+    },
+    compactTrigger: {
+      label: "Próg kompresji (tokeny)",
+      description:
+        "Liczba tokenów wyzwalająca kompresję rozmowy. Null = domyślna globalna.",
+    },
 
     errors: {
       validation: {

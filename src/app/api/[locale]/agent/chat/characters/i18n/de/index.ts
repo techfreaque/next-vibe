@@ -887,6 +887,7 @@ export const translations: typeof enTranslations = {
     },
     modelSelection: {
       title: "Modellauswahl",
+      label: "Modellauswahl",
       description:
         "Wählen Sie, wie das KI-Modell für diesen Charakter ausgewählt werden soll - entweder ein bestimmtes Modell auswählen oder das System basierend auf Filtern wählen lassen",
     },
@@ -978,6 +979,21 @@ export const translations: typeof enTranslations = {
       label: "Manuelles Modell",
       description:
         "Spezifisches Modell, das immer mit diesem Charakter verwendet werden soll",
+    },
+    allowedTools: {
+      label: "Erlaubte Tools",
+      description:
+        "Tools für diesen Charakter. Jeder Eintrag benötigt eine toolId (system_help_GET für IDs). Null = globale Einstellungen.",
+    },
+    pinnedTools: {
+      label: "Angeheftete Tools",
+      description:
+        "Angeheftete Toolbar-Tools für diesen Charakter. Null = globale Einstellungen.",
+    },
+    compactTrigger: {
+      label: "Komprimierungs-Schwellenwert (Token)",
+      description:
+        "Token-Anzahl für automatische Gesprächskomprimierung. Null = globaler Standard.",
     },
     voice: {
       label: "Stimme",

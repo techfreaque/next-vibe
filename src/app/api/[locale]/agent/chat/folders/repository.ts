@@ -227,20 +227,18 @@ export class ChatFoldersRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<FolderCreateResponseOutput>> {
     try {
-      const { folder: folderData } = data;
-
       logger.debug("Creating folder", {
-        rootFolderId: folderData.rootFolderId,
-        name: folderData.name,
+        rootFolderId: data.rootFolderId,
+        name: data.name,
       });
 
       // Check permissions using the permission system
       const hasPermission = await canCreateFolder(
         user,
-        folderData.rootFolderId,
+        data.rootFolderId,
         logger,
         locale,
-        folderData.parentId,
+        data.parentId,
       );
 
       if (!hasPermission) {
@@ -252,7 +250,7 @@ export class ChatFoldersRepository {
           });
         }
 
-        if (folderData.rootFolderId === "incognito") {
+        if (data.rootFolderId === "incognito") {
           return fail({
             message: t("post.errors.forbidden.title"),
             errorType: ErrorResponseTypes.FORBIDDEN,
@@ -262,7 +260,7 @@ export class ChatFoldersRepository {
           });
         }
 
-        if (folderData.rootFolderId === "public") {
+        if (data.rootFolderId === "public") {
           return fail({
             message: t("post.errors.forbidden.title"),
             errorType: ErrorResponseTypes.FORBIDDEN,
@@ -293,9 +291,9 @@ export class ChatFoldersRepository {
         .where(
           and(
             eq(chatFolders.userId, userIdentifier),
-            eq(chatFolders.rootFolderId, folderData.rootFolderId),
-            folderData.parentId
-              ? eq(chatFolders.parentId, folderData.parentId)
+            eq(chatFolders.rootFolderId, data.rootFolderId),
+            data.parentId
+              ? eq(chatFolders.parentId, data.parentId)
               : isNull(chatFolders.parentId),
           ),
         );
@@ -310,11 +308,11 @@ export class ChatFoldersRepository {
         .insert(chatFolders)
         .values({
           userId: userIdentifier,
-          rootFolderId: folderData.rootFolderId,
-          name: folderData.name,
-          icon: folderData.icon || null,
-          color: folderData.color || null,
-          parentId: folderData.parentId || null,
+          rootFolderId: data.rootFolderId,
+          name: data.name,
+          icon: data.icon || null,
+          color: data.color || null,
+          parentId: data.parentId || null,
           expanded: true,
           sortOrder: nextSortOrder,
           // rolesView, rolesManage, rolesCreateThread, rolesPost, rolesModerate, rolesAdmin are NOT set
@@ -342,27 +340,9 @@ export class ChatFoldersRepository {
       }
 
       return success({
-        response: {
-          folder: {
-            id: newFolder.id,
-            userId: newFolder.userId,
-            rootFolderId: newFolder.rootFolderId,
-            name: newFolder.name,
-            icon: newFolder.icon,
-            color: newFolder.color,
-            parentId: newFolder.parentId,
-            expanded: newFolder.expanded,
-            sortOrder: newFolder.sortOrder,
-            rolesView: newFolder.rolesView || [],
-            rolesManage: newFolder.rolesManage || [],
-            rolesCreateThread: newFolder.rolesCreateThread || [],
-            rolesPost: newFolder.rolesPost || [],
-            rolesModerate: newFolder.rolesModerate || [],
-            rolesAdmin: newFolder.rolesAdmin || [],
-            createdAt: newFolder.createdAt,
-            updatedAt: newFolder.updatedAt,
-          },
-        },
+        folderId: newFolder.id,
+        createdAt: newFolder.createdAt,
+        updatedAt: newFolder.updatedAt,
       });
     } catch (error) {
       logger.error("Failed to create folder", parseError(error));

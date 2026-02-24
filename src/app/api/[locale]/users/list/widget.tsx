@@ -46,12 +46,12 @@ import { formatSimpleDate } from "@/i18n/core/localization-utils";
 import {
   SortOrder,
   SortOrderOptions,
+  type SortOrderValue,
   UserRoleFilter,
   UserSortField,
   UserSortFieldOptions,
-  UserStatusFilter,
-  type SortOrderValue,
   type UserSortFieldValue,
+  UserStatusFilter,
   type UserStatusFilterValue,
 } from "../enum";
 import { scopedTranslation as usersScopedTranslation } from "../i18n";

@@ -205,8 +205,9 @@ export const translations = {
     },
     modelSelection: {
       title: "Model Selection",
+      label: "Model Selection",
       description:
-        "Choose how to select the AI model - either pick a specific model or let the system choose based on filters",
+        "Override the model for this slot. Use filters or pick a specific model. Pass null to use the character's default model.",
     },
     selectionType: {
       label: "Selection Type",
@@ -279,6 +280,26 @@ export const translations = {
       label: "Custom Icon",
       description: "Custom icon for this favorite",
     },
+    icon: {
+      label: "Custom Icon",
+      description:
+        "Override the character's default icon for this favorite slot",
+    },
+    allowedTools: {
+      label: "Allowed Tools",
+      description:
+        "Override allowed tools for this slot. Each entry needs a toolId (use system_help_GET to discover available tool IDs). Set requiresConfirmation: true to prompt before executing. Pass null to fall through to character or global settings.",
+    },
+    pinnedTools: {
+      label: "Pinned Tools",
+      description:
+        "Override pinned toolbar tools for this slot. Pass null to fall through to character or global settings.",
+    },
+    compactTrigger: {
+      label: "Compact Trigger (tokens)",
+      description:
+        "Override the token count that triggers conversation compaction for this slot. Pass null to fall through to character or global default.",
+    },
     changeCharacter: {
       label: "Change Character",
     },
@@ -327,6 +348,12 @@ export const translations = {
         title: "Conflict",
         description: "A conflict occurred while updating the favorite",
       },
+    },
+    slotOverride: {
+      label: "Override for this slot",
+    },
+    globalDefault: {
+      label: "My default (fallback)",
     },
     success: {
       title: "Success",

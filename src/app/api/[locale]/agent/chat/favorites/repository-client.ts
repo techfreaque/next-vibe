@@ -371,6 +371,8 @@ export class ChatFavoritesRepositoryClient {
           selectionType: ModelSelectionType.FILTERS,
         },
         compactTrigger: null,
+        allowedTools: null,
+        pinnedTools: null,
       };
     }
 
@@ -387,6 +389,8 @@ export class ChatFavoritesRepositoryClient {
         selectionType: ModelSelectionType.FILTERS,
       },
       compactTrigger: null,
+      allowedTools: null,
+      pinnedTools: null,
     };
   }
 

@@ -268,74 +268,54 @@ const { PATCH } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      response: scopedObjectFieldNew(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "patch.response.title" as const,
-        layoutType: LayoutType.STACKED,
-        usage: { response: true },
-        children: {
-          rolesView: responseArrayOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            scopedResponseField(scopedTranslation, {
-              type: WidgetType.BADGE,
-              text: "patch.response.rolesView.label" as const,
-              schema: z.enum(UserRoleDB),
-            }),
-          ),
-          rolesManage: responseArrayOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            scopedResponseField(scopedTranslation, {
-              type: WidgetType.BADGE,
-              text: "patch.response.rolesManage.label" as const,
-              schema: z.enum(UserRoleDB),
-            }),
-          ),
-          rolesCreateThread: responseArrayOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            scopedResponseField(scopedTranslation, {
-              type: WidgetType.BADGE,
-              text: "patch.response.rolesCreateThread.label" as const,
-              schema: z.enum(UserRoleDB),
-            }),
-          ),
-          rolesPost: responseArrayOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            scopedResponseField(scopedTranslation, {
-              type: WidgetType.BADGE,
-              text: "patch.response.rolesPost.label" as const,
-              schema: z.enum(UserRoleDB),
-            }),
-          ),
-          rolesModerate: responseArrayOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            scopedResponseField(scopedTranslation, {
-              type: WidgetType.BADGE,
-              text: "patch.response.rolesModerate.label" as const,
-              schema: z.enum(UserRoleDB),
-            }),
-          ),
-          rolesAdmin: responseArrayOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            scopedResponseField(scopedTranslation, {
-              type: WidgetType.BADGE,
-              text: "patch.response.rolesAdmin.label" as const,
-              schema: z.enum(UserRoleDB),
-            }),
-          ),
-        },
-      }),
+      rolesViewResult: responseArrayOptionalField(
+        { type: WidgetType.CONTAINER },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.BADGE,
+          text: "patch.response.rolesView.label" as const,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      rolesManageResult: responseArrayOptionalField(
+        { type: WidgetType.CONTAINER },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.BADGE,
+          text: "patch.response.rolesManage.label" as const,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      rolesCreateThreadResult: responseArrayOptionalField(
+        { type: WidgetType.CONTAINER },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.BADGE,
+          text: "patch.response.rolesCreateThread.label" as const,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      rolesPostResult: responseArrayOptionalField(
+        { type: WidgetType.CONTAINER },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.BADGE,
+          text: "patch.response.rolesPost.label" as const,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      rolesModerateResult: responseArrayOptionalField(
+        { type: WidgetType.CONTAINER },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.BADGE,
+          text: "patch.response.rolesModerate.label" as const,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      rolesAdminResult: responseArrayOptionalField(
+        { type: WidgetType.CONTAINER },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.BADGE,
+          text: "patch.response.rolesAdmin.label" as const,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
     },
   }),
 
@@ -399,14 +379,12 @@ const { PATCH } = createEndpoint({
     },
     responses: {
       default: {
-        response: {
-          rolesView: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
-          rolesManage: [UserRole.CUSTOMER, UserRole.ADMIN],
-          rolesCreateThread: [UserRole.CUSTOMER, UserRole.ADMIN],
-          rolesPost: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
-          rolesModerate: [UserRole.PARTNER_ADMIN, UserRole.ADMIN],
-          rolesAdmin: [UserRole.ADMIN],
-        },
+        rolesViewResult: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
+        rolesManageResult: [UserRole.CUSTOMER, UserRole.ADMIN],
+        rolesCreateThreadResult: [UserRole.CUSTOMER, UserRole.ADMIN],
+        rolesPostResult: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
+        rolesModerateResult: [UserRole.PARTNER_ADMIN, UserRole.ADMIN],
+        rolesAdminResult: [UserRole.ADMIN],
       },
     },
   },

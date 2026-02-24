@@ -12,6 +12,7 @@ import {
   useInkWidgetLocale,
   useInkWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import { formatIfDate } from "../text/shared";
@@ -44,7 +45,8 @@ export function TitleWidgetInk<
       >,
 ): JSX.Element {
   const { field } = props;
-  const t = useInkWidgetTranslation<TEndpoint>();
+  const tScoped = useInkWidgetTranslation<TEndpoint>();
+  const t = tScoped as <K extends string>(key: K) => TranslatedKeyType;
   const locale = useInkWidgetLocale();
   const { content, level: configLevel, fieldType } = field;
 

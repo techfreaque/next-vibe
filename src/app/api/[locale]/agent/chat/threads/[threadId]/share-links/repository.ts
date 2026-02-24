@@ -338,7 +338,14 @@ export class ShareLinksRepository {
         userId: user.id,
       });
 
-      return success({ id: updatedLink!.id });
+      return success({
+        id: updatedLink!.id,
+        token: updatedLink!.token,
+        label: updatedLink!.label,
+        allowPosting: updatedLink!.allowPosting,
+        requireAuth: updatedLink!.requireAuth,
+        createdAt: updatedLink!.createdAt,
+      });
     } catch (error) {
       logger.error("Failed to revoke share link", parseError(error));
       return fail({

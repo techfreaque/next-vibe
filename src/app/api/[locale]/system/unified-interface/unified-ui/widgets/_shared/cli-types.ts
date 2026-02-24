@@ -53,22 +53,14 @@ export type InkWidgetContext<TEndpoint extends CreateApiEndpointAny> =
  * fieldName is `string` (not Path) — CLI forms use plain string keys, not
  * react-hook-form branded paths.
  */
-export interface InkWidgetRendererProps<
-  TEndpoint extends CreateApiEndpointAny,
-> {
+export interface InkWidgetRendererProps {
   fieldName: string;
+  // TKey is string at the dispatch boundary — individual widgets narrow to ScopedKey
   field: DispatchField<
-    TEndpoint extends CreateApiEndpointAny
-      ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-      : never,
+    string,
     z.ZodTypeAny,
     FieldUsageConfig,
-    AnyChildrenConstrain<
-      TEndpoint extends CreateApiEndpointAny
-        ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
-        : never,
-      ConstrainedChildUsage<FieldUsageConfig>
-    >
+    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
   >;
 }
 

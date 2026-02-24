@@ -884,6 +884,7 @@ export const translations: typeof enTranslations = {
     },
     modelSelection: {
       title: "Wybór modelu",
+      label: "Wybór modelu",
       description:
         "Wybierz sposób wyboru modelu AI dla tej postaciy - wybierz konkretny model lub pozwól systemowi wybrać na podstawie filtrów",
     },
@@ -973,6 +974,21 @@ export const translations: typeof enTranslations = {
     manualModelId: {
       label: "Model ręczny",
       description: "Konkretny model zawsze używany z tą postacią",
+    },
+    allowedTools: {
+      label: "Dozwolone narzędzia",
+      description:
+        "Narzędzia dla tej postaci. Każdy wpis wymaga toolId (system_help_GET dla ID). Null = ustawienia globalne.",
+    },
+    pinnedTools: {
+      label: "Przypięte narzędzia",
+      description:
+        "Przypięte narzędzia paska narzędzi dla tej postaci. Null = ustawienia globalne.",
+    },
+    compactTrigger: {
+      label: "Próg kompresji (tokeny)",
+      description:
+        "Liczba tokenów wyzwalająca kompresję rozmowy. Null = domyślna globalna.",
     },
     voice: {
       label: "Głos",

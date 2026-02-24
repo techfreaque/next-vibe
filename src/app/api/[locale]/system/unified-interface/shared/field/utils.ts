@@ -2182,8 +2182,8 @@ export function scopedBackButton<
  * @example
  * ```typescript
  * submitButton: submitButton({
- *   label: "app.api.user.public.login.actions.submit",
- *   loadingText: "app.api.user.public.login.actions.submitting",
+ *   label: "actions.submit",
+ *   loadingText: "login.actions.submitting",
  *   icon: "save",
  *   variant: "primary",
  *   className: "ml-auto"

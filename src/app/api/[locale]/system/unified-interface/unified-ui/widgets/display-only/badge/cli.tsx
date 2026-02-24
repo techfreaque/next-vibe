@@ -9,6 +9,8 @@ import type { JSX } from "react";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { InkWidgetProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
 import { useInkWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import type { TParams } from "@/i18n/core/static-types";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import { extractBadgeData, findEnumLabel, getBadgeColor } from "./shared";
@@ -40,7 +42,8 @@ export function BadgeWidgetInk<
       >,
 ): JSX.Element {
   const { field } = props;
-  const t = useInkWidgetTranslation<TEndpoint>();
+  const tScoped = useInkWidgetTranslation<TEndpoint>();
+  const t = tScoped as (key: string, params?: TParams) => TranslatedKeyType;
   const { text: staticText, enumOptions, variant: semanticVariant } = field;
 
   // Handle static text from UI config

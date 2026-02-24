@@ -342,66 +342,60 @@ const { POST } = createEndpoint({
       }),
 
       // === REQUEST DATA ===
-      message: scopedObjectFieldNew(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "post.sections.message.title" as const,
-        description: "post.sections.message.description" as const,
-        layoutType: LayoutType.STACKED,
-        usage: { request: "data" },
-        children: {
-          id: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.UUID,
-            label: "post.id.label" as const,
-            description: "post.id.description" as const,
-            schema: z.uuid(),
-          }),
-          role: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "post.role.label" as const,
-            description: "post.role.description" as const,
-            options: [
-              {
-                value: ChatMessageRole.USER,
-                label: "enums.role.user" as const,
-              },
-            ],
-            schema: z.literal(ChatMessageRole.USER),
-          }),
-          content: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXTAREA,
-            label: "post.content.label" as const,
-            description: "post.content.description" as const,
-            schema: z.string().min(1),
-          }),
-          parentId: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label: "post.parentId.label" as const,
-            description: "post.parentId.description" as const,
-            schema: z.uuid().optional(),
-          }),
-          model: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label: "post.model.label" as const,
-            description: "post.model.description" as const,
-            schema: z.enum(ModelId).optional(),
-          }),
-          metadata: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.JSON,
-            label: "post.metadata.label" as const,
-            description: "post.metadata.description" as const,
-            schema: z.custom<MessageMetadata>().optional(),
-          }),
-        },
+      id: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "post.id.label" as const,
+        description: "post.id.description" as const,
+        schema: z.string().uuid().optional(),
+      }),
+      role: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.role.label" as const,
+        description: "post.role.description" as const,
+        options: [
+          {
+            value: ChatMessageRole.USER,
+            label: "enums.role.user" as const,
+          },
+        ],
+        schema: z
+          .literal(ChatMessageRole.USER)
+          .optional()
+          .default(ChatMessageRole.USER),
+      }),
+      content: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "post.content.label" as const,
+        description: "post.content.description" as const,
+        schema: z.string().min(1),
+      }),
+      parentId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.parentId.label" as const,
+        description: "post.parentId.description" as const,
+        schema: z.string().uuid().optional(),
+      }),
+      model: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.model.label" as const,
+        description: "post.model.description" as const,
+        schema: z.enum(ModelId).optional(),
+      }),
+      metadata: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.JSON,
+        label: "post.metadata.label" as const,
+        description: "post.metadata.description" as const,
+        schema: z.custom<MessageMetadata>().optional(),
       }),
 
       // === RESPONSE ===
-      id: scopedResponseField(scopedTranslation, {
+      messageId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.message.id.content" as const,
         schema: z.uuid(),
@@ -425,16 +419,14 @@ const { POST } = createEndpoint({
     },
     requests: {
       default: {
-        message: {
-          id: "770e8400-e29b-41d4-a716-446655440000",
-          role: ChatMessageRole.USER,
-          content: "Hello, how can you help me?",
-        },
+        id: "770e8400-e29b-41d4-a716-446655440000",
+        role: ChatMessageRole.USER,
+        content: "Hello, how can you help me?",
       },
     },
     responses: {
       default: {
-        id: "660e8400-e29b-41d4-a716-446655440000",
+        messageId: "660e8400-e29b-41d4-a716-446655440000",
         createdAt: new Date().toISOString(),
       },
     },

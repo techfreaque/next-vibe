@@ -10,6 +10,7 @@ import {
   useInkWidgetResponse,
   useInkWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
+import type { TParams } from "@/i18n/core/static-types";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { FieldUsageConfig } from "../../_shared/types";
@@ -26,7 +27,8 @@ export function FormAlertWidgetInk<
     FormAlertWidgetConfig<TUsage, "widget">
   >,
 ): JSX.Element {
-  const t = useInkWidgetTranslation<TEndpoint>();
+  const tScoped = useInkWidgetTranslation<TEndpoint>();
+  const t = tScoped as (key: string, params?: TParams) => string;
   const response = useInkWidgetResponse();
 
   if (!response || response.success) {

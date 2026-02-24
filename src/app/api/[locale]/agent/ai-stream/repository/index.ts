@@ -36,7 +36,7 @@ import { setupAiStream } from "./stream-setup";
 /**
  * Maximum duration for streaming responses (in seconds)
  */
-export const maxDuration = 300; // 5 minutes for multi-step tool calling
+export const maxDuration = 900; // 15 minutes for multi-step tool calling
 
 export interface HeadlessAiStreamResult {
   /** Thread ID where the conversation was stored */

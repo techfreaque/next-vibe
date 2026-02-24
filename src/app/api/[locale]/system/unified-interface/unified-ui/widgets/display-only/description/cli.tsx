@@ -31,7 +31,8 @@ export function DescriptionWidgetInk<
   TUsage,
   DescriptionWidgetConfig<TSchema, TUsage, TSchemaType>
 >): JSX.Element {
-  const t = useInkWidgetTranslation<TEndpoint>();
+  const tScoped = useInkWidgetTranslation<TEndpoint>();
+  const t = tScoped as (key: string) => string;
 
   // Handle null case
   if (!field.value) {

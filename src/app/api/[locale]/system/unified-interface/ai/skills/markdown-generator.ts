@@ -147,21 +147,6 @@ function renderJsonSchemaAsMarkdown(
   return lines.join("\n");
 }
 
-/**
- * Shorten an enum value for display.
- * If the value looks like an i18n key (contains dots), return only the last segment.
- * E.g. "app.api.agent.chat.enums.threadStatus.active" → "active"
- *      "priority.low" → "low"
- *      "private" → "private"  (unchanged — no dot)
- */
-function displayEnumValue(v: JsonValue): string {
-  const s = String(v);
-  if (s.includes(".") && !s.includes(" ")) {
-    return s.split(".").pop() ?? s;
-  }
-  return s;
-}
-
 function formatType(prop: JsonSchemaObject): string {
   if (Array.isArray(prop.type)) {
     // Deduplicate types (e.g. "string | string | null" → "string | null")
@@ -178,7 +163,7 @@ function formatType(prop: JsonSchemaObject): string {
     const enumVals = prop.enum;
     // Show up to 8 enum values inline (using shortened display names); beyond that summarise
     if (enumVals.length <= 8) {
-      return enumVals.map((v) => `"${displayEnumValue(v)}"`).join(" | ");
+      return enumVals.map((v) => `"${v}"`).join(" | ");
     }
     return `enum(${enumVals.length} values)`;
   }

@@ -32,7 +32,8 @@ export function LoadingWidgetInk<
   LoadingWidgetConfig<TKey, TUsage, "widget">
 >): JSX.Element {
   const { message: messageKey } = field;
-  const t = useInkWidgetTranslation<TEndpoint>();
+  const tScoped = useInkWidgetTranslation<TEndpoint>();
+  const t = tScoped as (key: string) => string;
 
   const message = messageKey ? t(messageKey) : "Loading...";
 

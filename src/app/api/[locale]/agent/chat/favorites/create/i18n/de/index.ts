@@ -46,6 +46,7 @@ export const translations: typeof enTranslations = {
     },
     modelSelection: {
       title: "Modellauswahl",
+      label: "Modellauswahl",
       description:
         "Wählen Sie, wie das KI-Modell ausgewählt werden soll - entweder ein bestimmtes Modell auswählen oder das System basierend auf Filtern wählen lassen",
     },
@@ -134,6 +135,26 @@ export const translations: typeof enTranslations = {
     manualModelId: {
       label: "Manuelles Modell",
       description: "Spezifisches Modell (für manuellen Modus)",
+    },
+    icon: {
+      label: "Benutzerdefiniertes Symbol",
+      description:
+        "Symbol des Charakters für diesen Favoriten-Slot überschreiben",
+    },
+    compactTrigger: {
+      label: "Komprimierungs-Schwellenwert (Token)",
+      description:
+        "Token-Anzahl für automatische Gesprächskomprimierung. Null = Charakter oder globaler Standard.",
+    },
+    allowedTools: {
+      label: "Erlaubte Tools",
+      description:
+        "Tools für diesen Slot. Jeder Eintrag benötigt eine toolId. Null = Charakter oder globale Einstellungen.",
+    },
+    pinnedTools: {
+      label: "Angeheftete Tools",
+      description:
+        "Angeheftete Toolbar-Tools für diesen Slot. Null = Charakter oder globale Einstellungen.",
     },
     response: {
       id: {

@@ -139,8 +139,8 @@ async function loadThreadsFromServer(
 
     if (threadsResponse.success && threadsResponse.data) {
       const data = threadsResponse.data as ThreadListResponseOutput;
-      if (data.response?.threads) {
-        data.response.threads.forEach((thread) => {
+      if (data.threads) {
+        data.threads.forEach((thread) => {
           addThread({
             id: thread.id,
             userId: "",
@@ -174,7 +174,7 @@ async function loadThreadsFromServer(
           });
         });
         logger.debug("Chat: Threads loaded successfully", {
-          count: data.response.threads.length,
+          count: data.threads.length,
         });
       }
     }

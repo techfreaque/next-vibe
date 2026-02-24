@@ -23,6 +23,7 @@ import { users } from "@/app/api/[locale]/user/db";
 import {
   CronTaskPriorityDB,
   CronTaskStatusDB,
+  TaskCategoryDB,
   TaskOutputModeDB,
 } from "../enum";
 import type { JsonValue, NotificationTarget } from "../unified-runner/types";
@@ -45,7 +46,7 @@ export const cronTasks = pgTable(
     displayName: text("display_name").notNull(),
     description: text("description"),
     version: text("version").notNull().default("1.0.0"),
-    category: text("category").notNull(),
+    category: text("category", { enum: TaskCategoryDB }).notNull(),
     schedule: text("schedule").notNull(), // Cron expression
     timezone: text("timezone").default("UTC"),
     enabled: boolean("enabled").notNull().default(true),

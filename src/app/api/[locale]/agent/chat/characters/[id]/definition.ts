@@ -29,7 +29,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { iconSchema } from "../../../../shared/types/common.schema";
+import { dateSchema, iconSchema } from "../../../../shared/types/common.schema";
 import {
   TtsVoice,
   TtsVoiceDB,
@@ -141,6 +141,41 @@ const { DELETE } = createEndpoint({
         variant: "destructive",
         usage: { request: "urlPathParams", response: true },
       }),
+
+      // === RESPONSE ===
+      // Note: id is already known from the URL param, not repeated
+      name: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string(),
+      }),
+      tagline: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string(),
+      }),
+      icon: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: iconSchema,
+      }),
+      category: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.enum(CharacterCategory),
+      }),
+      ownershipType: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.enum(CharacterOwnershipType),
+      }),
+      systemPrompt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string().nullable(),
+      }),
+      createdAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: dateSchema,
+      }),
+      updatedAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: dateSchema,
+      }),
     },
   }),
 
@@ -191,6 +226,18 @@ const { DELETE } = createEndpoint({
   examples: {
     urlPathParams: {
       delete: { id: "550e8400-e29b-41d4-a716-446655440000" },
+    },
+    responses: {
+      delete: {
+        name: "Code Reviewer",
+        tagline: "Code Review Expert",
+        icon: "👨‍💻",
+        category: CharacterCategory.CODING,
+        ownershipType: CharacterOwnershipType.USER,
+        systemPrompt: "You are an expert code reviewer...",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
     },
   },
 });
@@ -457,6 +504,8 @@ const { PATCH } = createEndpoint({
       modelSelection: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
+        label: "patch.modelSelection.label" as const,
+        description: "patch.modelSelection.description" as const,
         schema: modelSelectionSchemaSimple.nullable(),
       }),
 
@@ -474,6 +523,8 @@ const { PATCH } = createEndpoint({
       allowedTools: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
+        label: "patch.allowedTools.label" as const,
+        description: "patch.allowedTools.description" as const,
         schema: z
           .array(
             z.object({
@@ -487,6 +538,8 @@ const { PATCH } = createEndpoint({
       pinnedTools: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
+        label: "patch.pinnedTools.label" as const,
+        description: "patch.pinnedTools.description" as const,
         schema: z
           .array(
             z.object({
@@ -559,6 +612,11 @@ const { PATCH } = createEndpoint({
           selectionType: ModelSelectionType.MANUAL,
           manualModelId: ModelId.GPT_5,
         },
+        allowedTools: [
+          { toolId: "execute-tool", requiresConfirmation: false },
+          { toolId: "system_help_GET", requiresConfirmation: false },
+        ],
+        pinnedTools: [{ toolId: "execute-tool", requiresConfirmation: false }],
       },
     },
     responses: {

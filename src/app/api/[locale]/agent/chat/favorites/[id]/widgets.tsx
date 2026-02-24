@@ -19,7 +19,6 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useState } from "react";
 
-import { CompactTriggerEdit } from "@/app/api/[locale]/agent/chat/_shared/compact-trigger-widget";
 import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/config";
 import { ModelSelector } from "@/app/api/[locale]/agent/models/components/model-selector";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
@@ -40,7 +39,9 @@ import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interfac
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import type { ModelSelectionSimple } from "../../../models/components/types";
+import { ToolsConfigEdit } from "../../../tools/tools-config-widget";
 import { useCharacter } from "../../characters/[id]/hooks";
+import { CompactTriggerEdit } from "../../settings/_components/compact-trigger-widget";
 import { useChatSettings } from "../../settings/hooks";
 import { ChatSettingsRepositoryClient } from "../../settings/repository-client";
 import type definitionPatch from "./definition";
@@ -369,21 +370,33 @@ export function FavoriteEditContainer({
                 form.setValue("compactTrigger", v, { shouldDirty: true })
               }
               modelSelection={favoriteModelSelection ?? null}
-              /* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */
-              label="Override for this slot"
+              characterModelSelection={characterData?.modelSelection ?? null}
+              label={t("patch.slotOverride.label")}
             />
           )}
 
-          {/* Context Memory Budget — global fallback default */}
-          <CompactTriggerEdit
-            value={settingsOps.settings?.compactTrigger ?? null}
-            onChange={(v) => {
-              void settingsOps.setCompactTrigger(v);
-            }}
-            modelSelection={favoriteModelSelection ?? null}
-            /* eslint-disable-next-line oxlint-plugin-i18n/no-literal-string */
-            label="My default (fallback)"
-          />
+          {/* Tool configuration — per-slot override */}
+          {form && (
+            <ToolsConfigEdit
+              value={{
+                allowedTools: form.watch("allowedTools") ?? null,
+                pinnedTools: form.watch("pinnedTools") ?? null,
+              }}
+              onChange={({ allowedTools, pinnedTools }) => {
+                form.setValue("allowedTools", allowedTools, {
+                  shouldDirty: true,
+                });
+                form.setValue("pinnedTools", pinnedTools, {
+                  shouldDirty: true,
+                });
+              }}
+              user={user}
+              logger={logger}
+              label={t("patch.slotOverride.label")}
+              characterAllowedTools={characterData?.allowedTools ?? null}
+              characterPinnedTools={characterData?.pinnedTools ?? null}
+            />
+          )}
         </Div>
       </Div>
     </Div>

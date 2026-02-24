@@ -231,6 +231,21 @@ export const translations: typeof enTranslations = {
       label: "Bevorzugtes Modell",
       description: "Das bevorzugte KI-Modell für diese Charakter",
     },
+    allowedTools: {
+      label: "Erlaubte Tools",
+      description:
+        "Tools für diesen Charakter. Jeder Eintrag benötigt eine toolId. Null = globale Einstellungen.",
+    },
+    pinnedTools: {
+      label: "Angeheftete Tools",
+      description:
+        "Angeheftete Toolbar-Tools für diesen Charakter. Null = globale Einstellungen.",
+    },
+    compactTrigger: {
+      label: "Komprimierungs-Schwellenwert (Token)",
+      description:
+        "Token-Anzahl für automatische Gesprächskomprimierung. Null = globaler Standard.",
+    },
 
     errors: {
       validation: {

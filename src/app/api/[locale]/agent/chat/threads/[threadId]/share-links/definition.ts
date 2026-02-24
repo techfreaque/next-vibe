@@ -481,10 +481,36 @@ const { DELETE } = createEndpoint({
         label: "linkId.label" as const,
         schema: z.string().uuid(),
       }),
+      // === RESPONSE ===
       id: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "empty" as const,
         schema: z.string().uuid(),
+      }),
+      token: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "empty" as const,
+        schema: z.string(),
+      }),
+      label: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "empty" as const,
+        schema: z.string().nullable(),
+      }),
+      allowPosting: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "empty" as const,
+        schema: z.boolean(),
+      }),
+      requireAuth: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "empty" as const,
+        schema: z.boolean(),
+      }),
+      createdAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "empty" as const,
+        schema: dateSchema,
       }),
     },
   }),
@@ -547,7 +573,12 @@ const { DELETE } = createEndpoint({
     responses: {
       default: {
         id: "123e4567-e89b-12d3-a456-426614174001",
-      } as const,
+        token: "abc123def456",
+        label: "Public share",
+        allowPosting: false,
+        requireAuth: false,
+        createdAt: new Date().toISOString(),
+      },
     },
   },
 });

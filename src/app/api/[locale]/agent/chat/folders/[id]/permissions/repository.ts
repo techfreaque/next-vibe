@@ -203,15 +203,13 @@ export async function updateFolderPermissions(
 
     // Return updated values (use provided values or keep existing)
     return success({
-      response: {
-        rolesView: rolesView ?? existingFolder.rolesView,
-        rolesManage: rolesManage ?? existingFolder.rolesManage,
-        rolesCreateThread:
-          rolesCreateThread ?? existingFolder.rolesCreateThread,
-        rolesPost: rolesPost ?? existingFolder.rolesPost,
-        rolesModerate: rolesModerate ?? existingFolder.rolesModerate,
-        rolesAdmin: rolesAdmin ?? existingFolder.rolesAdmin,
-      },
+      rolesViewResult: rolesView ?? existingFolder.rolesView,
+      rolesManageResult: rolesManage ?? existingFolder.rolesManage,
+      rolesCreateThreadResult:
+        rolesCreateThread ?? existingFolder.rolesCreateThread,
+      rolesPostResult: rolesPost ?? existingFolder.rolesPost,
+      rolesModerateResult: rolesModerate ?? existingFolder.rolesModerate,
+      rolesAdminResult: rolesAdmin ?? existingFolder.rolesAdmin,
     });
   } catch {
     return fail({

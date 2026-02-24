@@ -52,9 +52,8 @@ export class TimeoutErrorHandler {
     });
 
     const timeoutError = fail({
-      message: t("errors.timeout"),
+      message: t("errors.timeout", { maxDuration: maxDuration.toString() }),
       errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-      messageParams: { maxDuration: maxDuration.toString() },
     });
 
     // Emit MESSAGE_CREATED SSE + save to DB + emit ERROR SSE

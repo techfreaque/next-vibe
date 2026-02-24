@@ -99,7 +99,7 @@ type DispatchableField = DispatchField<
 export function InkWidgetRenderer<TEndpoint extends CreateApiEndpointAny>({
   fieldName,
   field,
-}: InkWidgetRendererProps<TEndpoint>): JSX.Element {
+}: InkWidgetRendererProps): JSX.Element {
   return renderWidget({
     fieldName: fieldName as Path<TEndpoint["types"]["RequestOutput"]>,
     field,

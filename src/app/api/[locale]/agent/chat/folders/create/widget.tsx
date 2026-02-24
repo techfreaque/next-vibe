@@ -35,15 +35,9 @@ export function FolderCreateContainer({
 
   return (
     <Div className="flex flex-col gap-4 p-4">
-      <TextFieldWidget
-        field={children.folder.children.name}
-        fieldName="folder.name"
-      />
+      <TextFieldWidget field={children.name} fieldName="name" />
 
-      <IconFieldWidget
-        field={children.folder.children.icon}
-        fieldName="folder.icon"
-      />
+      <IconFieldWidget field={children.icon} fieldName="icon" />
 
       <SubmitButtonWidget
         field={{

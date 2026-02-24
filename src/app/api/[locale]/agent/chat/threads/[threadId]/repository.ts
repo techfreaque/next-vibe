@@ -90,32 +90,28 @@ export class ThreadByIdRepository {
       logger.debug("Thread found successfully", { threadId: thread.id });
 
       return success({
-        thread: {
-          id: thread.id,
-          userId: thread.userId,
-          title: thread.title,
-          folderId: thread.folderId,
-          status: thread.status,
-          defaultModel: thread.defaultModel,
-          defaultCharacter: thread.defaultCharacter,
-          systemPrompt: thread.systemPrompt,
-          pinned: thread.pinned,
-          archived: thread.archived,
-          tags: thread.tags ?? [],
-          preview: thread.preview,
-          metadata: thread.metadata ?? {},
-          createdAt: thread.createdAt,
-          updatedAt: thread.updatedAt,
-          leadId: thread.leadId,
-          rootFolderId: thread.rootFolderId,
-          rolesView: thread.rolesView,
-          rolesEdit: thread.rolesEdit,
-          rolesPost: thread.rolesPost,
-          rolesModerate: thread.rolesModerate,
-          rolesAdmin: thread.rolesAdmin,
-          published: thread.published,
-          searchVector: thread.searchVector,
-        },
+        userId: thread.userId,
+        title: thread.title,
+        folderId: thread.folderId,
+        status: thread.status,
+        defaultModel: thread.defaultModel,
+        defaultCharacter: thread.defaultCharacter,
+        systemPrompt: thread.systemPrompt,
+        pinned: thread.pinned,
+        archived: thread.archived,
+        tags: thread.tags ?? [],
+        preview: thread.preview,
+        metadata: thread.metadata ?? {},
+        createdAt: thread.createdAt,
+        updatedAt: thread.updatedAt,
+        leadId: thread.leadId,
+        rootFolderId: thread.rootFolderId,
+        rolesView: thread.rolesView,
+        rolesEdit: thread.rolesEdit,
+        rolesPost: thread.rolesPost,
+        rolesModerate: thread.rolesModerate,
+        rolesAdmin: thread.rolesAdmin,
+        published: thread.published,
       });
     } catch (error) {
       logger.error("Error getting thread by ID", parseError(error));
@@ -143,7 +139,7 @@ export class ThreadByIdRepository {
         threadId,
         userId: user.id,
         isPublic: user.isPublic,
-        updates: data.updates,
+        updates: data,
       });
 
       // Get thread without user filter to allow permission check
@@ -185,7 +181,7 @@ export class ThreadByIdRepository {
       // Update the thread (user ownership already verified)
       const [updatedThread] = await db
         .update(chatThreads)
-        .set(data.updates)
+        .set(data)
         .where(eq(chatThreads.id, threadId))
         .returning();
 
@@ -194,32 +190,7 @@ export class ThreadByIdRepository {
       });
 
       return success({
-        thread: {
-          id: updatedThread.id,
-          userId: updatedThread.userId,
-          title: updatedThread.title,
-          folderId: updatedThread.folderId,
-          status: updatedThread.status,
-          defaultModel: updatedThread.defaultModel,
-          defaultCharacter: updatedThread.defaultCharacter,
-          systemPrompt: updatedThread.systemPrompt,
-          pinned: updatedThread.pinned,
-          archived: updatedThread.archived,
-          tags: updatedThread.tags ?? [],
-          preview: updatedThread.preview,
-          metadata: updatedThread.metadata ?? {},
-          createdAt: updatedThread.createdAt,
-          updatedAt: updatedThread.updatedAt,
-          leadId: updatedThread.leadId,
-          rootFolderId: updatedThread.rootFolderId,
-          rolesView: updatedThread.rolesView,
-          rolesEdit: updatedThread.rolesEdit,
-          rolesPost: updatedThread.rolesPost,
-          rolesModerate: updatedThread.rolesModerate,
-          rolesAdmin: updatedThread.rolesAdmin,
-          published: updatedThread.published,
-          searchVector: updatedThread.searchVector,
-        },
+        updatedAt: updatedThread.updatedAt,
       });
     } catch (error) {
       logger.error("Error updating thread", parseError(error));
@@ -305,13 +276,22 @@ export class ThreadByIdRepository {
       }
 
       // Delete the thread (cascade will handle messages)
-      await db.delete(chatThreads).where(eq(chatThreads.id, threadId));
+      const [deletedThread] = await db
+        .delete(chatThreads)
+        .where(eq(chatThreads.id, threadId))
+        .returning();
 
       logger.debug("Thread deleted successfully", { threadId });
 
       return success({
-        success: true,
-        deletedId: threadId,
+        userId: deletedThread.userId,
+        title: deletedThread.title,
+        rootFolderId: deletedThread.rootFolderId,
+        folderId: deletedThread.folderId,
+        status: deletedThread.status,
+        preview: deletedThread.preview,
+        createdAt: deletedThread.createdAt,
+        updatedAt: deletedThread.updatedAt,
       });
     } catch (error) {
       logger.error("Error deleting thread", parseError(error));

@@ -20,7 +20,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { env } from "@/config/env";
 
 import { cronTasks } from "../cron/db";
-import type { CronTaskPriorityDB } from "../enum";
+import type { CronTaskPriorityDB, TaskCategoryDB } from "../enum";
 import type { scopedTranslation } from "../i18n";
 import type { JsonValue } from "../unified-runner/types";
 
@@ -36,7 +36,7 @@ export interface SyncedCronTask {
   routeId: string;
   displayName: string;
   description: string | null;
-  category: string;
+  category: (typeof TaskCategoryDB)[number];
   schedule: string;
   enabled: boolean;
   priority: (typeof CronTaskPriorityDB)[number];

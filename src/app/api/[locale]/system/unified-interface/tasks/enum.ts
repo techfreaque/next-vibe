@@ -134,6 +134,7 @@ export const {
   DATABASE: "taskCategory.database" as const,
   SYSTEM: "taskCategory.system" as const,
   MONITORING: "taskCategory.monitoring" as const,
+  LEAD_MANAGEMENT: "taskCategory.leadManagement" as const,
 });
 export const TaskCategoryDB = [
   TaskCategory.DEVELOPMENT,
@@ -145,6 +146,7 @@ export const TaskCategoryDB = [
   TaskCategory.DATABASE,
   TaskCategory.SYSTEM,
   TaskCategory.MONITORING,
+  TaskCategory.LEAD_MANAGEMENT,
 ] as const;
 
 /**

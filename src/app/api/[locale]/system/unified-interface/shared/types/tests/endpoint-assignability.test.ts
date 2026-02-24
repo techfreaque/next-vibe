@@ -698,7 +698,7 @@ type Test3_27_WithErrorTypes =
   ApiEndpointWithErrorTypes<
     Methods.POST,
     readonly ["enums.userRole.admin"],
-    "app.api.someScope.title",
+    "someScope.title",
     SimpleObjectField
   > extends ApiEndpointWithErrorTypes<
     Methods,

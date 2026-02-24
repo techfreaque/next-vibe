@@ -328,12 +328,10 @@ export function FoldersListContainer({
         logger,
         user,
         {
-          folder: {
-            rootFolderId: activeRootFolderId,
-            name,
-            icon,
-            parentId: activeFolderId ?? undefined,
-          },
+          rootFolderId: activeRootFolderId,
+          name,
+          icon,
+          parentId: activeFolderId ?? undefined,
         },
         undefined,
         locale,

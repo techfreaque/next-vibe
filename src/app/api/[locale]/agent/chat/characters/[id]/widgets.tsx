@@ -23,7 +23,6 @@ import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Span } from "next-vibe-ui/ui/span";
 import { useState } from "react";
 
-import { CompactTriggerEdit } from "@/app/api/[locale]/agent/chat/_shared/compact-trigger-widget";
 import { ModelSelector } from "@/app/api/[locale]/agent/models/components/model-selector";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { cn } from "@/app/api/[locale]/shared/utils";
@@ -54,12 +53,14 @@ import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import { ToolsConfigEdit } from "../../../tools/tools-config-widget";
 import {
   CharacterOwnershipType,
   type CharacterOwnershipTypeValue,
 } from "../../characters/enum";
 import { useAddToFavorites } from "../../favorites/create/hooks";
 import { useChatFavorites } from "../../favorites/hooks";
+import { CompactTriggerEdit } from "../../settings/_components/compact-trigger-widget";
 import type definitionGet from "./definition";
 import type definitionPatch from "./definition";
 import type {
@@ -206,6 +207,26 @@ export function CharacterEditContainer({
                 form.setValue("compactTrigger", v, { shouldDirty: true })
               }
               modelSelection={form.watch("modelSelection") ?? null}
+            />
+          )}
+
+          {/* Tool configuration — per-character override */}
+          {form && (
+            <ToolsConfigEdit
+              value={{
+                allowedTools: form.watch("allowedTools") ?? null,
+                pinnedTools: form.watch("pinnedTools") ?? null,
+              }}
+              onChange={({ allowedTools, pinnedTools }) => {
+                form.setValue("allowedTools", allowedTools, {
+                  shouldDirty: true,
+                });
+                form.setValue("pinnedTools", pinnedTools, {
+                  shouldDirty: true,
+                });
+              }}
+              user={user}
+              logger={logger}
             />
           )}
         </Div>

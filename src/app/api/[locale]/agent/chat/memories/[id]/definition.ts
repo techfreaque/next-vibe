@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   scopedBackButton,
@@ -118,10 +119,26 @@ const { DELETE } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      success: scopedResponseField(scopedTranslation, {
+      // Note: id (memoryNumber) is already known from the URL param, not repeated
+      content: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        schema: z.boolean(),
-        hidden: true,
+        schema: z.string(),
+      }),
+      tags: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.array(z.string()),
+      }),
+      priority: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number(),
+      }),
+      createdAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: dateSchema,
+      }),
+      updatedAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: dateSchema,
       }),
     },
   }),
@@ -173,7 +190,12 @@ const { DELETE } = createEndpoint({
   examples: {
     responses: {
       delete: {
-        success: true,
+        content:
+          "Profession: Senior Software Engineer specializing in TypeScript",
+        tags: ["profession", "skills"],
+        priority: 80,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     },
     urlPathParams: {

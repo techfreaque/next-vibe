@@ -66,155 +66,136 @@ const { GET } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      thread: scopedObjectFieldNew(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "get.response.thread.title" as const,
-        description: "get.response.thread.description" as const,
-        layoutType: LayoutType.GRID,
-        columns: 2,
-        usage: { response: true },
-        children: {
-          id: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.thread.id.content" as const,
-            schema: z.uuid(),
-          }),
-          userId: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.thread.userId.content" as const,
-            schema: z.uuid().nullable(),
-          }),
-          title: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.thread.threadTitle.content" as const,
-            schema: z.string(),
-          }),
-          folderId: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.thread.folderId.content" as const,
-            schema: z.uuid().nullable(),
-          }),
-          status: scopedResponseField(scopedTranslation, {
-            type: WidgetType.BADGE,
-            text: "get.response.thread.status.content" as const,
-            schema: z.enum(ThreadStatus),
-          }),
-          defaultModel: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.thread.defaultModel.content" as const,
-            schema: z.string().nullable(),
-          }),
-          defaultCharacter: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.thread.defaultTone.content" as const,
-            schema: z.string().nullable(),
-          }),
-          systemPrompt: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.thread.systemPrompt.content" as const,
-            schema: z.string().nullable(),
-          }),
-          pinned: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.thread.pinned.content" as const,
-            schema: z.boolean(),
-          }),
-          archived: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.thread.archived.content" as const,
-            schema: z.boolean(),
-          }),
-          tags: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.thread.tags.content" as const,
-            schema: z.array(z.string()),
-          }),
-          preview: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.thread.preview.content" as const,
-            schema: z.string().nullable(),
-          }),
-          metadata: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.thread.metadata.content" as const,
-            schema: z.record(z.string(), z.any()),
-          }),
-          createdAt: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.thread.createdAt.content" as const,
-            schema: dateSchema,
-          }),
-          updatedAt: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.thread.updatedAt.content" as const,
-            schema: dateSchema,
-          }),
-          leadId: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.thread.leadId.content" as const,
-            schema: z.uuid().nullable(),
-          }),
-          rootFolderId: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.thread.rootFolderId.content" as const,
-            schema: z.enum(Object.values(DefaultFolderId)),
-          }),
-          rolesView: responseArrayOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            scopedResponseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              schema: z.enum(UserRoleDB),
-            }),
-          ),
-          rolesEdit: responseArrayOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            scopedResponseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              schema: z.enum(UserRoleDB),
-            }),
-          ),
-          rolesPost: responseArrayOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            scopedResponseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              schema: z.enum(UserRoleDB),
-            }),
-          ),
-          rolesModerate: responseArrayOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            scopedResponseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              schema: z.enum(UserRoleDB),
-            }),
-          ),
-          rolesAdmin: responseArrayOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            scopedResponseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              schema: z.enum(UserRoleDB),
-            }),
-          ),
-          published: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.thread.published.content" as const,
-            schema: z.boolean(),
-          }),
-          searchVector: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "get.response.thread.searchVector.content" as const,
-            schema: z.string().nullable(),
-          }),
+      // Note: threadId is already known from the URL param, not repeated here
+      userId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.thread.userId.content" as const,
+        schema: z.uuid().nullable(),
+      }),
+      title: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.thread.threadTitle.content" as const,
+        schema: z.string(),
+      }),
+      folderId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.thread.folderId.content" as const,
+        schema: z.uuid().nullable(),
+      }),
+      status: scopedResponseField(scopedTranslation, {
+        type: WidgetType.BADGE,
+        text: "get.response.thread.status.content" as const,
+        schema: z.enum(ThreadStatus),
+      }),
+      defaultModel: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.thread.defaultModel.content" as const,
+        schema: z.string().nullable(),
+      }),
+      defaultCharacter: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.thread.defaultTone.content" as const,
+        schema: z.string().nullable(),
+      }),
+      systemPrompt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.thread.systemPrompt.content" as const,
+        schema: z.string().nullable(),
+      }),
+      pinned: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.thread.pinned.content" as const,
+        schema: z.boolean(),
+      }),
+      archived: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.thread.archived.content" as const,
+        schema: z.boolean(),
+      }),
+      tags: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.thread.tags.content" as const,
+        schema: z.array(z.string()),
+      }),
+      preview: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.thread.preview.content" as const,
+        schema: z.string().nullable(),
+      }),
+      metadata: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.thread.metadata.content" as const,
+        schema: z.record(z.string(), z.any()),
+      }),
+      createdAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.thread.createdAt.content" as const,
+        schema: dateSchema,
+      }),
+      updatedAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.thread.updatedAt.content" as const,
+        schema: dateSchema,
+      }),
+      leadId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.thread.leadId.content" as const,
+        schema: z.uuid().nullable(),
+      }),
+      rootFolderId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.thread.rootFolderId.content" as const,
+        schema: z.enum(Object.values(DefaultFolderId)),
+      }),
+      rolesView: responseArrayOptionalField(
+        {
+          type: WidgetType.CONTAINER,
         },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.TEXT,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      rolesEdit: responseArrayOptionalField(
+        {
+          type: WidgetType.CONTAINER,
+        },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.TEXT,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      rolesPost: responseArrayOptionalField(
+        {
+          type: WidgetType.CONTAINER,
+        },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.TEXT,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      rolesModerate: responseArrayOptionalField(
+        {
+          type: WidgetType.CONTAINER,
+        },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.TEXT,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      rolesAdmin: responseArrayOptionalField(
+        {
+          type: WidgetType.CONTAINER,
+        },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.TEXT,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      published: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.thread.published.content" as const,
+        schema: z.boolean(),
       }),
     },
   }),
@@ -269,32 +250,28 @@ const { GET } = createEndpoint({
     },
     responses: {
       default: {
-        thread: {
-          id: "550e8400-e29b-41d4-a716-446655440000",
-          userId: "660e8400-e29b-41d4-a716-446655440000",
-          title: "My Chat Thread",
-          folderId: null,
-          status: ThreadStatus.ACTIVE,
-          defaultModel: "gpt-4o",
-          defaultCharacter: "professional",
-          systemPrompt: null,
-          pinned: false,
-          archived: false,
-          tags: [],
-          preview: "Hello, how can I help you?",
-          metadata: {},
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          leadId: null,
-          rootFolderId: DefaultFolderId.PRIVATE,
-          rolesView: null,
-          rolesEdit: null,
-          rolesPost: null,
-          rolesModerate: null,
-          rolesAdmin: null,
-          published: false,
-          searchVector: null,
-        },
+        userId: "660e8400-e29b-41d4-a716-446655440000",
+        title: "My Chat Thread",
+        folderId: null,
+        status: ThreadStatus.ACTIVE,
+        defaultModel: "gpt-4o",
+        defaultCharacter: "professional",
+        systemPrompt: null,
+        pinned: false,
+        archived: false,
+        tags: [],
+        preview: "Hello, how can I help you?",
+        metadata: {},
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        leadId: null,
+        rootFolderId: DefaultFolderId.PRIVATE,
+        rolesView: null,
+        rolesEdit: null,
+        rolesPost: null,
+        rolesModerate: null,
+        rolesAdmin: null,
+        published: false,
       },
     },
   },
@@ -334,248 +311,94 @@ const { PATCH } = createEndpoint({
       }),
 
       // === UPDATE FIELDS ===
-      updates: scopedObjectFieldNew(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "patch.sections.updates.title" as const,
-        description: "patch.sections.updates.description" as const,
-        layoutType: LayoutType.GRID,
-        columns: 2,
-        usage: { request: "data" },
-        children: {
-          title: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label: "patch.threadTitle.label" as const,
-            description: "patch.threadTitle.description" as const,
-            columns: 12,
-            schema: z.string().min(1).max(255).optional(),
-          }),
-          folderId: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.UUID,
-            label: "patch.folderId.label" as const,
-            description: "patch.folderId.description" as const,
-            columns: 6,
-            schema: z.uuid().optional().nullable(),
-          }),
-          status: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.SELECT,
-            label: "patch.status.label" as const,
-            description: "patch.status.description" as const,
-            columns: 6,
-            options: ThreadStatusOptions,
-            schema: z.enum(ThreadStatus).optional(),
-          }),
-          defaultModel: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label: "patch.defaultModel.label" as const,
-            description: "patch.defaultModel.description" as const,
-            columns: 6,
-            schema: z.enum(ModelId).nullable().optional(),
-          }),
-          defaultCharacter: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label: "patch.defaultTone.label" as const,
-            description: "patch.defaultTone.description" as const,
-            columns: 6,
-            schema: z.string().nullable().optional(),
-          }),
-          systemPrompt: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXTAREA,
-            label: "patch.systemPrompt.label" as const,
-            description: "patch.systemPrompt.description" as const,
-            columns: 12,
-            schema: z.string().optional(),
-          }),
-          pinned: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.BOOLEAN,
-            label: "patch.pinned.label" as const,
-            description: "patch.pinned.description" as const,
-            columns: 6,
-            schema: z.boolean().optional(),
-          }),
-          archived: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.BOOLEAN,
-            label: "patch.archived.label" as const,
-            description: "patch.archived.description" as const,
-            columns: 6,
-            schema: z.boolean().optional(),
-          }),
-          tags: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.TEXT,
-            label: "patch.tags.label" as const,
-            description: "patch.tags.description" as const,
-            columns: 12,
-            schema: z.array(z.string()).optional(),
-          }),
-          published: scopedRequestField(scopedTranslation, {
-            type: WidgetType.FORM_FIELD,
-            fieldType: FieldDataType.BOOLEAN,
-            label: "patch.published.label" as const,
-            description: "patch.published.description" as const,
-            columns: 6,
-            schema: z.boolean().optional(),
-          }),
-        },
+      title: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.threadTitle.label" as const,
+        description: "patch.threadTitle.description" as const,
+        columns: 12,
+        schema: z.string().min(1).max(255).optional(),
+      }),
+      folderId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "patch.folderId.label" as const,
+        description: "patch.folderId.description" as const,
+        columns: 6,
+        schema: z.string().uuid().nullish(),
+      }),
+      status: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "patch.status.label" as const,
+        description: "patch.status.description" as const,
+        columns: 6,
+        options: ThreadStatusOptions,
+        schema: z.enum(ThreadStatus).optional(),
+      }),
+      defaultModel: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.defaultModel.label" as const,
+        description: "patch.defaultModel.description" as const,
+        columns: 6,
+        schema: z.enum(ModelId).nullable().optional(),
+      }),
+      defaultCharacter: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.defaultTone.label" as const,
+        description: "patch.defaultTone.description" as const,
+        columns: 6,
+        schema: z.string().nullable().optional(),
+      }),
+      systemPrompt: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "patch.systemPrompt.label" as const,
+        description: "patch.systemPrompt.description" as const,
+        columns: 12,
+        schema: z.string().optional(),
+      }),
+      pinned: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "patch.pinned.label" as const,
+        description: "patch.pinned.description" as const,
+        columns: 6,
+        schema: z.boolean().optional(),
+      }),
+      archived: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "patch.archived.label" as const,
+        description: "patch.archived.description" as const,
+        columns: 6,
+        schema: z.boolean().optional(),
+      }),
+      tags: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "patch.tags.label" as const,
+        description: "patch.tags.description" as const,
+        columns: 12,
+        schema: z.array(z.string()).optional(),
+      }),
+      published: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "patch.published.label" as const,
+        description: "patch.published.description" as const,
+        columns: 6,
+        schema: z.boolean().optional(),
       }),
 
-      // === RESPONSE (same as GET) ===
-      thread: scopedObjectFieldNew(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "patch.response.thread.title" as const,
-        description: "patch.response.thread.description" as const,
-        layoutType: LayoutType.GRID,
-        columns: 2,
-        usage: { response: true },
-        children: {
-          id: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.thread.id.content" as const,
-            schema: z.uuid(),
-          }),
-          userId: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.thread.userId.content" as const,
-            schema: z.uuid().nullable(),
-          }),
-          title: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.thread.threadTitle.content" as const,
-            schema: z.string(),
-          }),
-          folderId: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.thread.folderId.content" as const,
-            schema: z.uuid().nullable(),
-          }),
-          status: scopedResponseField(scopedTranslation, {
-            type: WidgetType.BADGE,
-            text: "patch.response.thread.status.content" as const,
-            schema: z.enum(ThreadStatus),
-          }),
-          defaultModel: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.thread.defaultModel.content" as const,
-            schema: z.string().nullable(),
-          }),
-          defaultCharacter: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.thread.defaultTone.content" as const,
-            schema: z.string().nullable(),
-          }),
-          systemPrompt: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.thread.systemPrompt.content" as const,
-            schema: z.string().nullable(),
-          }),
-          pinned: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.thread.pinned.content" as const,
-            schema: z.boolean(),
-          }),
-          archived: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.thread.archived.content" as const,
-            schema: z.boolean(),
-          }),
-          tags: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.thread.tags.content" as const,
-            schema: z.array(z.string()),
-          }),
-          published: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.thread.published.content" as const,
-            schema: z.boolean(),
-          }),
-          preview: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.thread.preview.content" as const,
-            schema: z.string().nullable(),
-          }),
-          metadata: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.thread.metadata.content" as const,
-            schema: z.record(z.string(), z.any()),
-          }),
-          createdAt: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.thread.createdAt.content" as const,
-            schema: dateSchema,
-          }),
-          updatedAt: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.thread.updatedAt.content" as const,
-            schema: dateSchema,
-          }),
-          leadId: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.thread.leadId.content" as const,
-            schema: z.uuid().nullable(),
-          }),
-          rootFolderId: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.thread.rootFolderId.content" as const,
-            schema: z.enum(Object.values(DefaultFolderId)),
-          }),
-          rolesView: responseArrayOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            scopedResponseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              schema: z.enum(UserRoleDB),
-            }),
-          ),
-          rolesEdit: responseArrayOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            scopedResponseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              schema: z.enum(UserRoleDB),
-            }),
-          ),
-          rolesPost: responseArrayOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            scopedResponseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              schema: z.enum(UserRoleDB),
-            }),
-          ),
-          rolesModerate: responseArrayOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            scopedResponseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              schema: z.enum(UserRoleDB),
-            }),
-          ),
-          rolesAdmin: responseArrayOptionalField(
-            {
-              type: WidgetType.CONTAINER,
-            },
-            scopedResponseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              schema: z.enum(UserRoleDB),
-            }),
-          ),
-          searchVector: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "patch.response.thread.searchVector.content" as const,
-            schema: z.string().nullable(),
-          }),
-        },
+      // === RESPONSE ===
+      // Note: threadId already known from URL param, not repeated
+      updatedAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "patch.response.thread.updatedAt.content" as const,
+        schema: dateSchema,
       }),
     },
   }),
@@ -630,40 +453,13 @@ const { PATCH } = createEndpoint({
     },
     requests: {
       default: {
-        updates: {
-          title: "Updated Thread Title",
-          pinned: true,
-        },
+        title: "Updated Thread Title",
+        pinned: true,
       },
     },
     responses: {
       default: {
-        thread: {
-          id: "550e8400-e29b-41d4-a716-446655440000",
-          userId: "660e8400-e29b-41d4-a716-446655440000",
-          title: "Updated Thread Title",
-          folderId: null,
-          status: ThreadStatus.ACTIVE,
-          defaultModel: "gpt-4o",
-          defaultCharacter: "professional",
-          systemPrompt: null,
-          pinned: true,
-          archived: false,
-          tags: [],
-          published: false,
-          preview: "Hello, how can I help you?",
-          metadata: {},
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          leadId: null,
-          rootFolderId: DefaultFolderId.PRIVATE,
-          rolesView: null,
-          rolesEdit: null,
-          rolesPost: null,
-          rolesModerate: null,
-          rolesAdmin: null,
-          searchVector: null,
-        },
+        updatedAt: new Date().toISOString(),
       },
     },
   },
@@ -703,15 +499,46 @@ const { DELETE } = createEndpoint({
       }),
 
       // === RESPONSE ===
-      success: scopedResponseField(scopedTranslation, {
+      // Note: threadId already known from URL param, not repeated
+      userId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.success.content" as const,
-        schema: z.boolean(),
+        content: "delete.response.userId.content" as const,
+        schema: z.uuid().nullable(),
       }),
-      deletedId: scopedResponseField(scopedTranslation, {
+      title: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "delete.response.deletedId.content" as const,
-        schema: z.uuid(),
+        content: "delete.response.title.content" as const,
+        schema: z.string(),
+      }),
+      rootFolderId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.rootFolderId.content" as const,
+        schema: z.enum(Object.values(DefaultFolderId)),
+      }),
+      folderId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.folderId.content" as const,
+        schema: z.uuid().nullable(),
+      }),
+      status: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.status.content" as const,
+        schema: z.enum(ThreadStatus),
+      }),
+      preview: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.preview.content" as const,
+        schema: z.string().nullable(),
+      }),
+      createdAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.createdAt.content" as const,
+        schema: dateSchema,
+      }),
+      updatedAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "delete.response.updatedAt.content" as const,
+        schema: dateSchema,
       }),
     },
   }),
@@ -766,8 +593,14 @@ const { DELETE } = createEndpoint({
     },
     responses: {
       default: {
-        success: true,
-        deletedId: "550e8400-e29b-41d4-a716-446655440000",
+        userId: "660e8400-e29b-41d4-a716-446655440000",
+        title: "My Chat Thread",
+        rootFolderId: DefaultFolderId.PRIVATE,
+        folderId: null,
+        status: ThreadStatus.ACTIVE,
+        preview: "Hello, how can I help you?",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     },
   },

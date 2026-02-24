@@ -32,7 +32,8 @@ export function CodeOutputWidgetInk<
         CodeOutputWidgetConfig<TKey, StringWidgetSchema, TUsage, "primitive">
       >,
 ): JSX.Element {
-  const t = useInkWidgetTranslation<TEndpoint>();
+  const tScoped = useInkWidgetTranslation<TEndpoint>();
+  const t = tScoped as (key: string) => string;
   const { field } = props;
   const code = field.value;
 

@@ -126,7 +126,12 @@ export interface BaseWidgetContext<TEndpoint extends CreateApiEndpointAny> {
     | typeof Platform.MCP;
   endpointFields: TEndpoint["fields"]; // Original endpoint fields for nested path lookup
   disabled: boolean; // Disable all form inputs
-  response: ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined; // Full ResponseType from endpoint (includes success/error state)
+  response:
+    | ResponseType<
+        TEndpoint["types"]["ResponseOutput"],
+        TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+      >
+    | undefined; // Full ResponseType from endpoint (includes success/error state)
   /**
    * Navigation context for cross-definition navigation
    * Provides type-safe navigation methods (push/pop) for endpoint navigation

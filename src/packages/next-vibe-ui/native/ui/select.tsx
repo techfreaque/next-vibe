@@ -29,7 +29,7 @@ const StyledPressable = styledNative(Pressable);
 
 type Option = SelectPrimitive.Option;
 
-export function Select({
+export function Select<TValue extends string>({
   children,
   value,
   defaultValue,
@@ -42,7 +42,7 @@ export function Select({
   name, // Intentionally extracted - not used in React Native
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Web-only props extracted for React Native compatibility
   required, // Intentionally extracted - not used in React Native
-}: SelectRootProps): React.JSX.Element {
+}: SelectRootProps<TValue>): React.JSX.Element {
   // Convert string value to Option for native primitive
   const nativeValue = value ? { label: value, value } : undefined;
   const nativeDefaultValue = defaultValue
@@ -51,7 +51,7 @@ export function Select({
   const nativeOnValueChange = onValueChange
     ? (option?: SelectPrimitive.Option): void => {
         if (option?.value) {
-          onValueChange(option.value);
+          onValueChange(option.value as TValue);
         }
       }
     : undefined;

@@ -7,9 +7,9 @@
 import type z from "zod";
 
 import type { FieldDataType } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { TParams } from "@/i18n/core/static-types";
 
 import type { WidgetData } from "../../../../shared/widgets/widget-data";
-import type { BaseWidgetContext } from "../../_shared/types";
 import type { TextFormat, TextWidgetSchema } from "./types";
 
 /**
@@ -31,7 +31,7 @@ export interface ProcessedText {
  */
 export function extractTextData(
   value: z.output<TextWidgetSchema>,
-  t: BaseWidgetContext<never>["t"],
+  t: (key: string, params?: TParams) => string,
 ): ProcessedText | null {
   // Handle string value with translation
   if (typeof value === "string") {

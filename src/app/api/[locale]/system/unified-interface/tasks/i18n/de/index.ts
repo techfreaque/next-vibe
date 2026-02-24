@@ -50,6 +50,7 @@ export const translations: typeof enTranslations = {
     database: "Datenbank",
     system: "System",
     monitoring: "Monitoring",
+    leadManagement: "Lead-Verwaltung",
   },
   enabledFilter: {
     all: "Alle",

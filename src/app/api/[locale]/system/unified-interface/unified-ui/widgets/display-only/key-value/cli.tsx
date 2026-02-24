@@ -36,7 +36,8 @@ export function KeyValueWidgetInk<
   TUsage,
   KeyValueWidgetConfig<TKey, TSchema, TUsage, TSchemaType>
 >): JSX.Element {
-  const t = useInkWidgetTranslation<TEndpoint>();
+  const tScoped = useInkWidgetTranslation<TEndpoint>();
+  const t = tScoped as (key: string) => string;
   const locale = useInkWidgetLocale();
   const { label: labelKey } = field;
 

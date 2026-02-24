@@ -15,10 +15,14 @@ import { Environment } from "next-vibe/shared/utils/env-util";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
+import {
+  cronTasks,
+  type NewCronTask,
+} from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import {
   CronTaskPriority,
   type CronTaskPriorityValue,
+  TaskCategory,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -97,6 +101,7 @@ export class CampaignStarterConfigRepository {
       timeout: cronTask.timeout ?? defaults.timeout,
       retries: cronTask.retries ?? defaults.retries,
       retryDelay: cronTask.retryDelay ?? defaults.retryDelay,
+      taskInput: cronTask.taskInput ?? defaults.taskInput,
     };
   }
 
@@ -141,12 +146,12 @@ export class CampaignStarterConfigRepository {
       .where(eq(cronTasks.routeId, "campaign-starter"))
       .limit(1);
 
-    const cronData = {
+    const cronData: NewCronTask = {
       routeId: "campaign-starter",
       displayName: "campaign-starter",
 
       version: "1.0.0", // Required field
-      category: "LEAD_MANAGEMENT",
+      category: TaskCategory.LEAD_MANAGEMENT,
       // eslint-disable-next-line i18next/no-literal-string
       description: "Campaign starter cron task",
       schedule: cronSettings.schedule,
@@ -155,7 +160,7 @@ export class CampaignStarterConfigRepository {
       timeout: cronSettings.timeout,
       retries: cronSettings.retries,
       retryDelay: cronSettings.retryDelay,
-      defaultConfig: {},
+      taskInput: cronSettings.taskInput,
       updatedAt: new Date(),
     };
 
@@ -299,6 +304,7 @@ export class CampaignStarterConfigRepository {
         timeout: data.timeout ?? defaults.timeout,
         retries: data.retries ?? defaults.retries,
         retryDelay: data.retryDelay ?? defaults.retryDelay,
+        taskInput: defaults.taskInput,
       };
       await CampaignStarterConfigRepository.saveCronTaskSettings(cronSettings);
 
