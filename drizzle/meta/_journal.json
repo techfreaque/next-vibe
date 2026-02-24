@@ -219,6 +219,13 @@
       "when": 1772055459000,
       "tag": "20260224135739_migrate_legacy_enums",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1772115268000,
+      "tag": "20260224211428_migrate_remaining_legacy_enums",
+      "breakpoints": true
     }
   ]
 }
