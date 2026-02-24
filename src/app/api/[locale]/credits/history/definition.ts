@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
@@ -22,13 +23,11 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { ModelId } from "../../agent/models/models";
 import { dateSchema } from "../../shared/types/common.schema";
 import { paginationField } from "../../system/unified-interface/unified-ui/widgets/containers/pagination/types";
 import { CreditTransactionType } from "../enum";
 import { scopedTranslation } from "../i18n";
 import { CreditHistoryContainer } from "./widget";
-
 /**
  * Get Credit History Endpoint (GET)
  * Retrieves paginated credit transaction history

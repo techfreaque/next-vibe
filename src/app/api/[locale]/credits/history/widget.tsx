@@ -64,7 +64,7 @@ export function CreditHistoryContainer({
                 {/* Left side - type and date */}
                 <Div className="flex flex-col gap-1">
                   {transaction.type && (
-                    <Div className="text-sm">{tField(transaction.type)}</Div>
+                    <Div className="text-sm">{transaction.type}</Div>
                   )}
                   <Div className="text-sm">
                     {formatSimpleDate(transaction.createdAt, locale)}

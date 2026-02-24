@@ -33,8 +33,11 @@ import {
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo } from "react";
 
-import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
-import { cn } from "@/app/api/[locale]/shared/utils";
+import {
+  type LeadsTranslationKey,
+  scopedTranslation as leadsScopedTranslation,
+} from "@/app/api/[locale]/leads/i18n";
+import { cn, objectEntries } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -320,8 +323,10 @@ export function LeadsListContainer({
   const isLoading = field.value === null || field.value === undefined;
 
   // Status breakdown counts from current page (display only)
-  const statusCounts = useMemo((): Record<string, number> => {
-    const counts: Record<string, number> = {};
+  const statusCounts = useMemo((): Partial<
+    Record<LeadsTranslationKey, number>
+  > => {
+    const counts: Partial<Record<LeadsTranslationKey, number>> = {};
     for (const lead of leads) {
       if (lead.status) {
         counts[lead.status] = (counts[lead.status] ?? 0) + 1;
@@ -694,7 +699,7 @@ export function LeadsListContainer({
       {/* Status breakdown subtitle */}
       {!isLoading && leads.length > 0 && (
         <Div className="px-4 pb-1 flex items-center gap-3 flex-wrap">
-          {Object.entries(statusCounts)
+          {objectEntries(statusCounts)
             .toSorted(([, a], [, b]) => b - a)
             .slice(0, 5)
             .map(([status, count]) => (

@@ -28,6 +28,7 @@ import {
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo } from "react";
 
+import { scopedTranslation as messagesScopedTranslation } from "@/app/api/[locale]/emails/messages/i18n";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
@@ -122,10 +123,12 @@ function EmailRow({
   email,
   onView,
   t,
+  messagesT,
 }: {
   email: EmailItem;
   onView: (email: EmailItem) => void;
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+  messagesT: ReturnType<typeof messagesScopedTranslation.scopedT>["t"];
 }): React.JSX.Element {
   const status = email.emailCore.status;
   const channel = email.emailCore.channel ?? MessageChannel.EMAIL;
@@ -154,7 +157,7 @@ function EmailRow({
               statusClassName,
             )}
           >
-            {t(status)}
+            {messagesT(status)}
           </Span>
         </Div>
         <Div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5 flex-wrap">
@@ -164,7 +167,7 @@ function EmailRow({
           {email.emailMetadata.type !== null &&
             email.emailMetadata.type !== undefined && (
               <Span className="flex-shrink-0">
-                {t(email.emailMetadata.type)}
+                {messagesT(email.emailMetadata.type)}
               </Span>
             )}
         </Div>
@@ -199,6 +202,7 @@ export function EmailsListContainer({
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const messagesT = messagesScopedTranslation.scopedT(locale).t;
   const router = useRouter();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
@@ -490,6 +494,7 @@ export function EmailsListContainer({
                 email={email}
                 onView={handleView}
                 t={t}
+                messagesT={messagesT}
               />
             ))}
           </Div>

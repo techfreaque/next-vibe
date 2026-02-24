@@ -186,6 +186,41 @@ export const translations: typeof enTranslations = {
     title: "Erfolg",
     description: "E-Mails erfolgreich abgerufen",
   },
+  enums: {
+    type: {
+      transactional: "Transaktional",
+      marketing: "Marketing",
+      notification: "Benachrichtigung",
+      system: "System",
+      leadCampaign: "Lead-Kampagne",
+      userCommunication: "Benutzerkommunikation",
+    },
+    typeFilter: {
+      any: "Alle Typen",
+    },
+    channel: {
+      email: "E-Mail",
+      sms: "SMS",
+      whatsapp: "WhatsApp",
+      telegram: "Telegram",
+    },
+    channelFilter: {
+      any: "Alle Kanäle",
+    },
+    sortField: {
+      subject: "Betreff",
+      recipientEmail: "Empfänger-E-Mail",
+      recipientName: "Empfängername",
+      type: "Typ",
+      status: "Status",
+      sentAt: "Gesendet am",
+      createdAt: "Erstellt am",
+    },
+    sortOrder: {
+      asc: "Aufsteigend",
+      desc: "Absteigend",
+    },
+  },
   widget: {
     to: "An",
     retries: "Wiederholungen",

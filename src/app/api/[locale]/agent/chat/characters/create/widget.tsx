@@ -12,7 +12,6 @@ import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-u
 import {
   useWidgetForm,
   useWidgetLocale,
-  useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { AlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/alert/react";
 import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
@@ -48,7 +47,6 @@ export function CharacterCreateContainer({
 }: CustomWidgetProps): JSX.Element {
   const children = field.children;
   const form = useWidgetForm<typeof defintion.POST>();
-  const t = useWidgetTranslation<typeof defintion.POST>();
   const locale = useWidgetLocale();
 
   return (
@@ -102,7 +100,7 @@ export function CharacterCreateContainer({
             fieldName="systemPrompt"
             field={children.systemPrompt}
           />
-          <ModelSelectorWrapper form={form} t={t} locale={locale} />
+          <ModelSelectorWrapper form={form} locale={locale} />
         </Div>
       </Div>
     </Div>
@@ -111,11 +109,9 @@ export function CharacterCreateContainer({
 
 function ModelSelectorWrapper({
   form,
-  t,
   locale,
 }: {
   form: ReturnType<typeof useWidgetForm<typeof defintion.POST>>;
-  t: ReturnType<typeof useWidgetTranslation<typeof defintion.POST>>;
   locale: CountryLanguage;
 }): JSX.Element {
   const modelSelection = form.watch("modelSelection");
@@ -133,7 +129,6 @@ function ModelSelectorWrapper({
       <ModelSelector
         modelSelection={modelSelection ?? undefined}
         onChange={onChange}
-        t={t}
         locale={locale}
       />
     </>

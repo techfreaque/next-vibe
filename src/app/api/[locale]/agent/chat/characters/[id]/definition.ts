@@ -50,6 +50,7 @@ import type {
 import type { CharacterListResponseOutput } from "../definition";
 import { CategoryOptions } from "../enum";
 import { CharacterCategory } from "../enum";
+import type { CharactersTranslationKey } from "../i18n";
 import { scopedTranslation } from "./i18n";
 import { CharacterEditContainer, CharacterViewContainer } from "./widgets";
 
@@ -338,7 +339,7 @@ const { PATCH } = createEndpoint({
           })
           .max(100, {
             message: "patch.name.validation.maxLength" as const,
-          }),
+          }) as z.ZodType<CharactersTranslationKey>,
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.name.label" as const,
@@ -358,7 +359,7 @@ const { PATCH } = createEndpoint({
           })
           .max(500, {
             message: "patch.tagline.validation.maxLength" as const,
-          }),
+          }) as z.ZodType<CharactersTranslationKey>,
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.tagline.label" as const,
@@ -390,7 +391,7 @@ const { PATCH } = createEndpoint({
           })
           .max(500, {
             message: "patch.description.validation.maxLength" as const,
-          }),
+          }) as z.ZodType<CharactersTranslationKey>,
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "patch.description.label" as const,
@@ -618,18 +619,30 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         size: "xl",
         emphasis: "bold",
-        schema: z.string().min(1).max(100).nullable(),
+        schema: z
+          .string()
+          .min(1)
+          .max(100)
+          .nullable() as z.ZodType<CharactersTranslationKey | null>,
       }),
       tagline: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         size: "sm",
         variant: "muted",
-        schema: z.string().min(1).max(500).nullable(),
+        schema: z
+          .string()
+          .min(1)
+          .max(500)
+          .nullable() as z.ZodType<CharactersTranslationKey | null>,
       }),
       description: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         size: "base",
-        schema: z.string().min(1).max(500).nullable(),
+        schema: z
+          .string()
+          .min(1)
+          .max(500)
+          .nullable() as z.ZodType<CharactersTranslationKey | null>,
       }),
       category: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,

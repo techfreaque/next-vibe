@@ -112,6 +112,7 @@ export class ChatFavoritesRepository {
             characterDescription,
             activeFavoriteId,
             characterVoice,
+            locale,
           );
         }),
       );

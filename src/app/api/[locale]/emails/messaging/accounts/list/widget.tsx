@@ -20,6 +20,7 @@ import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo } from "react";
 
+import { scopedTranslation as messagingScopedTranslation } from "@/app/api/[locale]/emails/messaging/i18n";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
@@ -75,10 +76,12 @@ function AccountRow({
   account,
   onEdit,
   t,
+  messagingT,
 }: {
   account: MessagingAccount;
   onEdit: (account: MessagingAccount) => void;
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+  messagingT: ReturnType<typeof messagingScopedTranslation.scopedT>["t"];
 }): React.JSX.Element {
   const statusColor =
     STATUS_COLORS[account.status] ??
@@ -105,7 +108,7 @@ function AccountRow({
               channelColor,
             )}
           >
-            {t(account.channel)}
+            {messagingT(account.channel)}
           </Span>
           <Span
             className={cn(
@@ -113,7 +116,7 @@ function AccountRow({
               statusColor,
             )}
           >
-            {t(account.status)}
+            {messagingT(account.status)}
           </Span>
         </Div>
         <Div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
@@ -136,6 +139,7 @@ export function MessagingAccountsListContainer({
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const messagingT = messagingScopedTranslation.scopedT(locale).t;
   const router = useRouter();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
@@ -282,6 +286,7 @@ export function MessagingAccountsListContainer({
                 account={account}
                 onEdit={handleEdit}
                 t={t}
+                messagingT={messagingT}
               />
             ))}
           </Div>

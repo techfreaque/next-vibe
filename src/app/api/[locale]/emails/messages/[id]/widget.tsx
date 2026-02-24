@@ -20,6 +20,7 @@ import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interfac
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import { EmailStatus } from "../enum";
+import { scopedTranslation as messagesScopedTranslation } from "../i18n";
 import type definition from "./definition";
 import type { EmailGetResponseOutput } from "./definition";
 
@@ -71,6 +72,7 @@ export function EmailDetailContainer({
   const email = field.value?.email;
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const messagesT = messagesScopedTranslation.scopedT(locale).t;
   const router = useRouter();
   const isLoading = field.value === null || field.value === undefined;
 
@@ -212,7 +214,7 @@ export function EmailDetailContainer({
               email.emailProvider !== undefined && (
                 <MetaRow
                   label={t("widget.provider")}
-                  value={t(email.emailProvider)}
+                  value={messagesT(email.emailProvider)}
                 />
               )}
             {email.externalId !== null && email.externalId !== undefined && (

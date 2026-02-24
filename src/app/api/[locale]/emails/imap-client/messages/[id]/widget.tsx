@@ -273,7 +273,7 @@ function ThreadPanel({
   logger: EndpointLogger;
   user: JwtPayloadType;
   widgetLocale: string;
-  t: (key: string) => string;
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
 }): React.JSX.Element | null {
   const router = useRouter();
   const [threadMessages, setThreadMessages] = useState<ThreadMessage[]>([]);

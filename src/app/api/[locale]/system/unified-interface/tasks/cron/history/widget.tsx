@@ -75,6 +75,23 @@ const STATUS_FILTER_KEYS: StatusFilter[] = [
   "CANCELLED",
 ];
 
+const STATUS_FILTER_LABEL_KEYS: Record<
+  StatusFilter,
+  | "widget.filter.all"
+  | "widget.filter.running"
+  | "widget.filter.completed"
+  | "widget.filter.failed"
+  | "widget.filter.timeout"
+  | "widget.filter.cancelled"
+> = {
+  ALL: "widget.filter.all",
+  RUNNING: "widget.filter.running",
+  COMPLETED: "widget.filter.completed",
+  FAILED: "widget.filter.failed",
+  TIMEOUT: "widget.filter.timeout",
+  CANCELLED: "widget.filter.cancelled",
+};
+
 const STATUS_COLOR_MAP: Record<string, string> = {
   [CronTaskStatus.RUNNING]:
     "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
@@ -563,7 +580,7 @@ export function CronHistoryContainer({
           {STATUS_FILTER_KEYS.map((filter) => (
             <StatusChip
               key={filter}
-              label={t(filter)}
+              label={t(STATUS_FILTER_LABEL_KEYS[filter])}
               count={statusCounts[filter]}
               isActive={
                 filter === "ALL"

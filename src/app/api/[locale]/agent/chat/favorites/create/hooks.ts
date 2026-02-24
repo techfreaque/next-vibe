@@ -219,6 +219,8 @@ export function useAddToFavorites({
               charData.tagline,
               charData.description,
               null,
+              null,
+              locale,
             );
 
           return {

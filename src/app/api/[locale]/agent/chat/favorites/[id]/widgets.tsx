@@ -23,7 +23,6 @@ import { CompactTriggerEdit } from "@/app/api/[locale]/agent/chat/_shared/compac
 import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/config";
 import { ModelSelector } from "@/app/api/[locale]/agent/models/components/model-selector";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
-import type { useWidgetContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import {
   useWidgetForm,
   useWidgetIsSubmitting,
@@ -69,6 +68,7 @@ export function FavoriteEditContainer({
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
+
   const navigation = useWidgetNavigation();
   const router = useRouter();
   const isSubmitting = useWidgetIsSubmitting();
@@ -285,14 +285,14 @@ export function FavoriteEditContainer({
                   <Div className="flex items-baseline gap-2 flex-wrap">
                     <Span className="text-lg font-semibold text-foreground">
                       {characterData?.name ? (
-                        t(characterData.name)
+                        characterData.name
                       ) : (
                         <Skeleton className="h-6 w-48" />
                       )}
                     </Span>
                     <Span className="text-sm text-muted-foreground">
                       {characterData?.tagline ? (
-                        t(characterData.tagline)
+                        characterData.tagline
                       ) : (
                         <Skeleton className="h-4 w-64" />
                       )}
@@ -300,7 +300,7 @@ export function FavoriteEditContainer({
                   </Div>
                   <Div className="text-sm text-foreground/80">
                     {characterData?.description ? (
-                      t(characterData.description)
+                      characterData.description
                     ) : (
                       <>
                         <Skeleton className="h-4 w-full" />
@@ -357,7 +357,6 @@ export function FavoriteEditContainer({
               characterModelSelection={
                 isNoCharacter ? undefined : characterData?.modelSelection
               }
-              t={t}
               locale={locale}
             />
           )}
@@ -410,7 +409,7 @@ function SaveAndUseButton({
   locale: ReturnType<typeof useWidgetLocale>;
   user: ReturnType<typeof useWidgetUser>;
   isSubmitting: boolean | undefined;
-  t: ReturnType<typeof useWidgetContext>["t"];
+  t: ReturnType<typeof useWidgetTranslation<typeof definitionPatch.PATCH>>;
 }): JSX.Element {
   const [isActivating, setIsActivating] = useState(false);
 

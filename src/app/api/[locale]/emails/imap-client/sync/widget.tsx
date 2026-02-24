@@ -72,16 +72,18 @@ export function ImapSyncContainer({
         {result !== null && result !== undefined && (
           <Div className="rounded-lg border p-4 flex flex-col gap-2">
             <Span className="text-sm font-semibold">{t("widget.result")}</Span>
-            {[
-              ["widget.accountsProcessed", result.accountsProcessed],
-              ["widget.foldersProcessed", result.foldersProcessed],
-              ["widget.messagesProcessed", result.messagesProcessed],
-              ["widget.messagesAdded", result.messagesAdded],
-              ["widget.messagesUpdated", result.messagesUpdated],
-              ["widget.messagesDeleted", result.messagesDeleted],
-            ].map(([key, val]) => (
+            {(
+              [
+                ["widget.accountsProcessed", result.accountsProcessed],
+                ["widget.foldersProcessed", result.foldersProcessed],
+                ["widget.messagesProcessed", result.messagesProcessed],
+                ["widget.messagesAdded", result.messagesAdded],
+                ["widget.messagesUpdated", result.messagesUpdated],
+                ["widget.messagesDeleted", result.messagesDeleted],
+              ] as const
+            ).map(([key, val]) => (
               <Div
-                key={String(key)}
+                key={key}
                 className="flex items-center justify-between text-sm"
               >
                 <Span className="text-muted-foreground">{t(key)}</Span>

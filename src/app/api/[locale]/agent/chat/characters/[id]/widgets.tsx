@@ -96,7 +96,6 @@ export function CharacterEditContainer({
 }: PatchWidgetProps): React.JSX.Element {
   const children = field.children;
   const navigation = useWidgetNavigation();
-  const t = useWidgetTranslation<typeof definitionPatch.PATCH>();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
@@ -195,7 +194,6 @@ export function CharacterEditContainer({
               onChange={(selection) =>
                 form.setValue("modelSelection", selection)
               }
-              t={t}
               locale={locale}
             />
           )}
@@ -303,7 +301,6 @@ export function CharacterViewContainer({
       <ModelSelector
         modelSelection={modelSelection}
         readOnly={true}
-        t={t}
         locale={locale}
       />
     </>

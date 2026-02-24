@@ -19,7 +19,7 @@ import {
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback } from "react";
 
-import { cn } from "@/app/api/[locale]/shared/utils";
+import { cn, objectEntries } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetForm,
@@ -37,6 +37,7 @@ import {
   EmailTypeFilter,
   EmailTypeFilterOptions,
 } from "../enum";
+import { scopedTranslation as messagesScopedTranslation } from "../i18n";
 import type definition from "./definition";
 import type { EmailStatsGetResponseTypeOutput } from "./definition";
 import {
@@ -119,6 +120,7 @@ export function EmailStatsContainer({
   const data = field.value;
   const t = useWidgetTranslation<typeof definition.GET>();
   const locale = useWidgetLocale();
+  const messagesT = messagesScopedTranslation.scopedT(locale).t;
   const router = useRouter();
   const { endpointMutations } = useWidgetContext();
   const form = useWidgetForm();
@@ -513,7 +515,7 @@ export function EmailStatsContainer({
                     key={row.status}
                     className="flex items-center justify-between text-sm"
                   >
-                    <Span>{t(row.status)}</Span>
+                    <Span>{messagesT(row.status)}</Span>
                     <Span className="font-semibold">{row.count}</Span>
                   </Div>
                 ))}
@@ -528,12 +530,12 @@ export function EmailStatsContainer({
                 {t("widget.byType")}
               </Span>
               <Div className="flex flex-col gap-2">
-                {Object.entries(data.emailsByType).map(([type, count]) => (
+                {objectEntries(data.emailsByType).map(([type, count]) => (
                   <Div
                     key={type}
                     className="flex items-center justify-between text-sm"
                   >
-                    <Span>{t(type)}</Span>
+                    <Span>{messagesT(type)}</Span>
                     <Span className="font-semibold">{count}</Span>
                   </Div>
                 ))}

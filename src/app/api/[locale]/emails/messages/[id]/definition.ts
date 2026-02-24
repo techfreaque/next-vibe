@@ -23,7 +23,7 @@ import {
 
 import { dateSchema } from "../../../shared/types/common.schema";
 import { UserRole } from "../../../user/user-roles/enum";
-import { EmailStatus, EmailType } from "../enum";
+import { EmailProvider, EmailStatus, EmailType } from "../enum";
 import { scopedTranslation } from "./i18n";
 import { EmailDetailContainer } from "./widget";
 
@@ -112,7 +112,7 @@ const { GET } = createEndpoint({
           emailProvider: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
             content: "response.email.emailProvider",
-            schema: z.string().nullable(),
+            schema: z.enum(EmailProvider).nullable(),
           }),
           externalId: scopedResponseField(scopedTranslation, {
             type: WidgetType.TEXT,
@@ -239,7 +239,7 @@ const { GET } = createEndpoint({
           type: EmailType.TRANSACTIONAL,
           status: EmailStatus.SENT,
           templateName: "welcome_email",
-          emailProvider: "resend",
+          emailProvider: EmailProvider.RESEND,
           externalId: "ext_123456",
           sentAt: "2023-01-01T10:05:00.000Z",
           deliveredAt: "2023-01-01T10:06:00.000Z",

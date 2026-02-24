@@ -22,6 +22,7 @@ import { ImapSyncStatus, ImapSyncStatusDB } from "../imap-client/enum";
 import { messagingAccounts } from "../messaging/db";
 import { MessageChannel, MessageChannelDB } from "../messaging/enum";
 import { smtpAccounts } from "../smtp-client/db";
+import type { EmailProviderValue } from "./enum";
 import { EmailProvider, EmailStatus, EmailStatusDB, EmailTypeDB } from "./enum";
 
 /**
@@ -64,7 +65,9 @@ export const emails = pgTable(
       .default(EmailStatus.PENDING),
 
     // Provider information
-    emailProvider: text("email_provider").default(EmailProvider.SMTP),
+    emailProvider: text("email_provider")
+      .$type<typeof EmailProviderValue>()
+      .default(EmailProvider.SMTP),
     externalId: text("external_id"), // Provider's email ID
 
     // Engagement tracking

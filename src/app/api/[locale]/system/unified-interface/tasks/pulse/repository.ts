@@ -5,13 +5,13 @@
  */
 
 import { and, count, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
-
-import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "@/app/api/[locale]/shared/types/response.schema";
+} from "next-vibe/shared/types/response.schema";
+
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -32,7 +32,12 @@ import type {
   PulseHealth,
   PulseNotification,
 } from "./db";
-import { pulseExecutions, pulseHealth, pulseNotifications } from "./db";
+import {
+  pulseExecutions,
+  pulseHealth,
+  pulseNotifications,
+  selectPulseNotificationSchema,
+} from "./db";
 import type { PulseStatusResponseOutput } from "./status/definition";
 
 /**
@@ -263,7 +268,7 @@ export class PulseHealthRepository {
         });
       }
 
-      return success(updatedNotification);
+      return success(selectPulseNotificationSchema.parse(updatedNotification));
     } catch {
       const { t } = tasksScopedTranslation.scopedT(locale);
       return fail({

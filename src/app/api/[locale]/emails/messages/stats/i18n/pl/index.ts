@@ -254,4 +254,43 @@ export const translations: typeof enTranslations = {
     refresh: "Odśwież",
     search: "Szukaj e-maili...",
   },
+  enums: {
+    status: {
+      pending: "Oczekujące",
+      sent: "Wysłane",
+      delivered: "Dostarczone",
+      opened: "Otwarte",
+      clicked: "Kliknięte",
+      bounced: "Odrzucone",
+      failed: "Nieudane",
+      unsubscribed: "Wypisane",
+    },
+    statusFilter: {
+      any: "Wszystkie statusy",
+    },
+    type: {
+      transactional: "Transakcyjny",
+      marketing: "Marketingowy",
+      notification: "Powiadomienie",
+      system: "Systemowy",
+      leadCampaign: "Kampania leadów",
+      userCommunication: "Komunikacja z użytkownikiem",
+    },
+    typeFilter: {
+      any: "Wszystkie typy",
+    },
+    sortField: {
+      subject: "Temat",
+      recipientEmail: "E-mail odbiorcy",
+      recipientName: "Nazwa odbiorcy",
+      type: "Typ",
+      status: "Status",
+      sentAt: "Wysłano o",
+      createdAt: "Utworzono o",
+    },
+    sortOrder: {
+      asc: "Rosnąco",
+      desc: "Malejąco",
+    },
+  },
 };

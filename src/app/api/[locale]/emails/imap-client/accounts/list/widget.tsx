@@ -29,6 +29,7 @@ import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetContext,
   useWidgetForm,
+  useWidgetLocale,
   useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
@@ -43,6 +44,7 @@ import {
   SortOrder,
   SortOrderOptions,
 } from "../../enum";
+import { scopedTranslation as imapClientScopedTranslation } from "../../i18n";
 import type definition from "./definition";
 import type { ImapAccountsListResponseOutput } from "./definition";
 
@@ -72,10 +74,12 @@ function AccountRow({
   account,
   onEdit,
   t,
+  imapClientT,
 }: {
   account: ImapAccount;
   onEdit: (account: ImapAccount) => void;
-  t: ReturnType<typeof useWidgetContext>["t"];
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+  imapClientT: ReturnType<typeof imapClientScopedTranslation.scopedT>["t"];
 }): React.JSX.Element {
   const syncColor =
     SYNC_STATUS_COLORS[account.syncStatus] ??
@@ -95,7 +99,7 @@ function AccountRow({
               syncColor,
             )}
           >
-            {t(account.syncStatus)}
+            {imapClientT(account.syncStatus)}
           </Span>
           {!account.enabled && (
             <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
@@ -130,7 +134,9 @@ export function ImapAccountsListContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const { push: navigate } = useWidgetNavigation();
   const { endpointMutations } = useWidgetContext();
+  const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const imapClientT = imapClientScopedTranslation.scopedT(locale).t;
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
 
@@ -362,6 +368,7 @@ export function ImapAccountsListContainer({
                 account={account}
                 onEdit={handleEdit}
                 t={t}
+                imapClientT={imapClientT}
               />
             ))}
           </Div>

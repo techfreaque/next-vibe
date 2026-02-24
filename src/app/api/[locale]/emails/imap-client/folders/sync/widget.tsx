@@ -63,19 +63,19 @@ export function ImapFoldersSyncContainer({
         {result !== null && result !== undefined && (
           <Div className="rounded-lg border p-4 flex flex-col gap-2">
             <Span className="text-sm font-semibold">{t("widget.result")}</Span>
-            {[
-              ["foldersProcessed", result.foldersProcessed],
-              ["foldersAdded", result.foldersAdded],
-              ["foldersUpdated", result.foldersUpdated],
-              ["foldersDeleted", result.foldersDeleted],
-            ].map(([key, val]) => (
+            {(
+              [
+                ["widget.foldersProcessed", result.foldersProcessed],
+                ["widget.foldersAdded", result.foldersAdded],
+                ["widget.foldersUpdated", result.foldersUpdated],
+                ["widget.foldersDeleted", result.foldersDeleted],
+              ] as const
+            ).map(([key, val]) => (
               <Div
-                key={String(key)}
+                key={key}
                 className="flex items-center justify-between text-sm"
               >
-                <Span className="text-muted-foreground">
-                  {t(`widget.${String(key)}`)}
-                </Span>
+                <Span className="text-muted-foreground">{t(key)}</Span>
                 <Span className="font-semibold">{String(val)}</Span>
               </Div>
             ))}

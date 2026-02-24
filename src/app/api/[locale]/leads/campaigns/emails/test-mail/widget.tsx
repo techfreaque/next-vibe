@@ -144,7 +144,7 @@ export function TestEmailContainer({ field }: CustomWidgetProps): JSX.Element {
 
         {/* SMTP selection criteria */}
         <H3 className="text-sm font-medium text-muted-foreground">
-          {t("selectionCriteria")}
+          {t("post.selectionCriteria")}
         </H3>
         <Div className="flex flex-col gap-4">
           <SelectFieldWidget

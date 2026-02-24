@@ -2262,7 +2262,7 @@ export class CreditRepository {
             balanceAfter: transaction.balanceAfter,
             type: featureLabel
               ? `${t(transaction.type)} (${featureLabel})`
-              : transaction.type,
+              : t(transaction.type),
             modelId: transaction.modelId,
             messageId: transaction.messageId,
             createdAt: transaction.createdAt,
@@ -2509,7 +2509,7 @@ export class CreditRepository {
             balanceAfter: transaction.balanceAfter,
             type: featureLabel
               ? `${t(transaction.type)} (${featureLabel})`
-              : transaction.type,
+              : t(transaction.type),
             messageId: transaction.messageId,
             createdAt: transaction.createdAt,
           };

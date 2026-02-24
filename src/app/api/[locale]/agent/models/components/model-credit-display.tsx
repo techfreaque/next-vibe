@@ -26,12 +26,12 @@ import { useRef, useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getCountryFromLocale } from "@/i18n/core/language-utils";
-import type { TFunction } from "@/i18n/core/static-types";
 
 import {
   COMPACT_TRIGGER,
   COMPACT_TRIGGER_PERCENTAGE,
 } from "../../ai-stream/repository/core/constants";
+import { scopedTranslation } from "../i18n";
 import { getCreditCostFromModel, getModelById, type ModelId } from "../models";
 
 /**
@@ -49,9 +49,6 @@ export interface ModelCreditDisplayProps {
 
   /** Additional CSS classes */
   className?: string;
-
-  /** Translation function */
-  t: TFunction;
 
   /** User's locale for currency formatting */
   locale: CountryLanguage;
@@ -130,9 +127,9 @@ export function ModelCreditDisplay({
   variant = "badge",
   badgeVariant = "secondary",
   className,
-  t,
   locale,
 }: ModelCreditDisplayProps): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   const model = getModelById(modelId);
   const [isOpen, setIsOpen] = useState(false);
   const openTimeoutRef = useRef<number | null>(null);
@@ -165,7 +162,7 @@ export function ModelCreditDisplay({
   // Format cost text - show middle value with range indicator for token-based models
   let costText: string;
   if (isTrulyFree) {
-    costText = t("app.chat.selector.free");
+    costText = t("selector.free");
   } else if (isTokenBased) {
     // Show middle value with ~ to indicate it varies
     costText = `~${midCost} credits`;
@@ -173,9 +170,9 @@ export function ModelCreditDisplay({
     // Fixed cost models
     const cost = typeof model.creditCost === "number" ? model.creditCost : 0;
     if (cost === 1) {
-      costText = t("app.chat.credits.credit", { count: cost });
+      costText = t("credits.credit", { count: cost });
     } else {
-      costText = t("app.chat.credits.credits", { count: cost });
+      costText = t("credits.credits", { count: cost });
     }
   }
 
@@ -255,39 +252,36 @@ export function ModelCreditDisplay({
                   {model.name}
                 </Span>
                 <Span className="text-xs text-muted-foreground block leading-relaxed">
-                  {t("app.chat.selector.modelCreditDisplay.tokenBased.header")}
+                  {t("creditDisplay.tokenBased.header")}
                 </Span>
               </Div>
 
               {/* Cost range highlight */}
               <Div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                 <Span className="text-xs font-medium text-muted-foreground">
-                  {t(
-                    "app.chat.selector.modelCreditDisplay.tokenBased.costRangeLabel",
-                  )}
+                  {t("creditDisplay.tokenBased.costRangeLabel")}
                 </Span>
                 <Span className="text-sm font-bold">
-                  {t(
-                    "app.chat.selector.modelCreditDisplay.tokenBased.costRangeValue",
-                    {
-                      min: minCost,
-                      max: maxCost,
-                    },
-                  )}
+                  {t("creditDisplay.tokenBased.costRangeValue", {
+                    min: minCost,
+                    max: maxCost,
+                  })}
                 </Span>
               </Div>
 
               {/* Example scenarios */}
               <Div className="space-y-2.5">
                 <Span className="text-xs font-medium text-muted-foreground block">
-                  {t(
-                    "app.chat.selector.modelCreditDisplay.tokenBased.examplesLabel",
-                  )}
+                  {t("creditDisplay.tokenBased.examplesLabel")}
                 </Span>
                 <Div className="space-y-2">
                   {costRanges.map((scenario, idx) => {
-                    const descriptionKey =
-                      idx === 0 ? "short" : idx === 1 ? "medium" : "long";
+                    const exampleKey =
+                      idx === 0
+                        ? "creditDisplay.tokenBased.examples.short"
+                        : idx === 1
+                          ? "creditDisplay.tokenBased.examples.medium"
+                          : "creditDisplay.tokenBased.examples.long";
 
                     return (
                       <Div
@@ -296,31 +290,24 @@ export function ModelCreditDisplay({
                       >
                         <Div className="flex-1 space-y-0.5">
                           <Div className="flex items-center gap-1.5">
-                            <Span className="font-medium">
-                              {t(
-                                `app.chat.selector.modelCreditDisplay.tokenBased.examples.${descriptionKey}`,
-                              )}
-                            </Span>
+                            <Span className="font-medium">{t(exampleKey)}</Span>
                             {scenario.willCompact && (
                               <Badge
                                 variant="outline"
                                 className="text-[9px] h-4 px-1 bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20"
                               >
                                 {t(
-                                  "app.chat.selector.modelCreditDisplay.tokenBased.triggersCompacting",
+                                  "creditDisplay.tokenBased.triggersCompacting",
                                 )}
                               </Badge>
                             )}
                           </Div>
                           <Span className="text-muted-foreground block text-[10px] leading-tight">
-                            {t(
-                              "app.chat.selector.modelCreditDisplay.tokenBased.tokensCount",
-                              {
-                                count: formatNumber(
-                                  scenario.input + scenario.output,
-                                ),
-                              },
-                            )}
+                            {t("creditDisplay.tokenBased.tokensCount", {
+                              count: formatNumber(
+                                scenario.input + scenario.output,
+                              ),
+                            })}
                           </Span>
                         </Div>
                         <Span className="font-mono font-semibold text-sm">
@@ -335,25 +322,18 @@ export function ModelCreditDisplay({
               {/* Footer explanation */}
               <Div className="pt-3 border-t space-y-2.5">
                 <Span className="text-[10px] text-muted-foreground block leading-relaxed">
-                  {t(
-                    "app.chat.selector.modelCreditDisplay.tokenBased.explanation",
-                  )}
+                  {t("creditDisplay.tokenBased.explanation")}
                 </Span>
                 <Span className="text-[10px] text-muted-foreground block leading-relaxed">
                   <Strong>
-                    {t(
-                      "app.chat.selector.modelCreditDisplay.tokenBased.compactingLabel",
-                    )}
+                    {t("creditDisplay.tokenBased.compactingLabel")}
                   </Strong>
-                  {t(
-                    "app.chat.selector.modelCreditDisplay.tokenBased.compactingExplanation",
-                    {
-                      threshold: formatTokenThreshold(effectiveTrigger),
-                    },
-                  )}
+                  {t("creditDisplay.tokenBased.compactingExplanation", {
+                    threshold: formatTokenThreshold(effectiveTrigger),
+                  })}
                 </Span>
                 <Span className="text-[10px] text-muted-foreground block">
-                  {t("app.chat.selector.modelCreditDisplay.creditValue", {
+                  {t("creditDisplay.creditValue", {
                     value: creditValue,
                   })}
                 </Span>
@@ -365,18 +345,14 @@ export function ModelCreditDisplay({
               {/* Header */}
               <Div className="space-y-1.5">
                 <Span className="font-semibold text-sm block">
-                  {t("app.chat.selector.modelCreditDisplay.fixed.title", {
+                  {t("creditDisplay.fixed.title", {
                     model: model.name,
                   })}
                 </Span>
                 <Span className="text-xs text-muted-foreground block leading-relaxed">
                   {isTrulyFree
-                    ? t(
-                        "app.chat.selector.modelCreditDisplay.fixed.freeDescription",
-                      )
-                    : t(
-                        "app.chat.selector.modelCreditDisplay.fixed.fixedDescription",
-                      )}
+                    ? t("creditDisplay.fixed.freeDescription")
+                    : t("creditDisplay.fixed.fixedDescription")}
                 </Span>
               </Div>
 
@@ -384,9 +360,7 @@ export function ModelCreditDisplay({
               {!isTrulyFree && (
                 <Div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                   <Span className="text-xs font-medium text-muted-foreground">
-                    {t(
-                      "app.chat.selector.modelCreditDisplay.fixed.costPerMessage",
-                    )}
+                    {t("creditDisplay.fixed.costPerMessage")}
                   </Span>
                   <Span className="text-sm font-bold">{costText}</Span>
                 </Div>
@@ -397,25 +371,13 @@ export function ModelCreditDisplay({
                 <Span className="text-xs text-muted-foreground block leading-relaxed">
                   {isTrulyFree ? (
                     <>
-                      {t(
-                        "app.chat.selector.modelCreditDisplay.fixed.freeExplanation",
-                      )}{" "}
-                      <Strong>
-                        {t(
-                          "app.chat.selector.modelCreditDisplay.fixed.freeHighlight",
-                        )}
-                      </Strong>
+                      {t("creditDisplay.fixed.freeExplanation")}{" "}
+                      <Strong>{t("creditDisplay.fixed.freeHighlight")}</Strong>
                     </>
                   ) : (
                     <>
-                      <Strong>
-                        {t(
-                          "app.chat.selector.modelCreditDisplay.fixed.simpleLabel",
-                        )}
-                      </Strong>
-                      {t(
-                        "app.chat.selector.modelCreditDisplay.fixed.simpleExplanation",
-                      )}
+                      <Strong>{t("creditDisplay.fixed.simpleLabel")}</Strong>
+                      {t("creditDisplay.fixed.simpleExplanation")}
                     </>
                   )}
                 </Span>
@@ -424,7 +386,7 @@ export function ModelCreditDisplay({
               {/* Footer */}
               <Div className="pt-3 border-t">
                 <Span className="text-[10px] text-muted-foreground block">
-                  {t("app.chat.selector.modelCreditDisplay.creditValue", {
+                  {t("creditDisplay.creditValue", {
                     value: creditValue,
                   })}
                 </Span>

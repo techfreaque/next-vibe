@@ -35,6 +35,7 @@ import {
   ModelSortDirection,
   ModelSortField,
 } from "./enum";
+import type { CharactersTranslationKey } from "./i18n";
 import { scopedTranslation } from "./i18n";
 import { CharactersListContainer } from "./widget";
 
@@ -228,20 +229,20 @@ const { GET } = createEndpoint({
                     size: "base",
                     emphasis: "bold",
                     inline: true,
-                    schema: z.string(),
+                    schema: z.string() as z.ZodType<CharactersTranslationKey>,
                   }),
                   tagline: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     size: "xs",
                     variant: "muted",
                     inline: true,
-                    schema: z.string(),
+                    schema: z.string() as z.ZodType<CharactersTranslationKey>,
                   }),
                   description: scopedResponseField(scopedTranslation, {
                     type: WidgetType.TEXT,
                     size: "xs",
                     variant: "muted",
-                    schema: z.string(),
+                    schema: z.string() as z.ZodType<CharactersTranslationKey>,
                   }),
                   modelIcon: scopedResponseField(scopedTranslation, {
                     type: WidgetType.ICON,
@@ -366,9 +367,9 @@ const { GET } = createEndpoint({
                 icon: "robot-face",
                 modelId: ModelId.CLAUDE_SONNET_4_5,
                 category: CharacterCategory.ASSISTANT,
-                name: "default.name",
-                tagline: "default.tagline",
-                description: "default.description",
+                name: "characters.thea.name",
+                tagline: "characters.thea.tagline",
+                description: "characters.thea.description",
                 modelIcon: "sparkles",
                 modelInfo: "Claude Sonnet 4.5",
                 modelProvider: "Anthropic",
@@ -385,9 +386,9 @@ const { GET } = createEndpoint({
                 icon: "direct-hit",
                 modelId: ModelId.GPT_5,
                 category: CharacterCategory.CODING,
-                name: "custom.name",
-                tagline: "custom.tagline",
-                description: "custom.description",
+                name: "characters.hermes.name",
+                tagline: "characters.hermes.tagline",
+                description: "characters.hermes.description",
                 modelIcon: "sparkles",
                 modelInfo: "GPT-5",
                 modelProvider: "OpenAI",

@@ -53,7 +53,7 @@ const { POST } = createEndpoint({
 
   options: {
     mutationOptions: {
-      onSuccess: async ({ requestData, responseData, logger }) => {
+      onSuccess: async ({ requestData, responseData, logger, locale }) => {
         const { apiClient } =
           await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
         const favoritesDefinition = await import("../definition");
@@ -110,6 +110,8 @@ const { POST } = createEndpoint({
                 character.data.tagline ?? null,
                 character.data.description ?? null,
                 null,
+                null,
+                locale,
               );
 
             return {

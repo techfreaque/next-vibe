@@ -403,6 +403,8 @@ const { PATCH } = createEndpoint({
                       characterTagline,
                       characterDescription,
                       null,
+                      null,
+                      locale,
                     );
 
                   updatedFavorite.activeBadge = fav.activeBadge;

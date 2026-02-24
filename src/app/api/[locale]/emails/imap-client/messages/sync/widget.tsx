@@ -65,14 +65,28 @@ export function ImapMessagesSyncContainer({
             <Span className="text-sm font-semibold">{t("widget.result")}</Span>
             <Span className="text-sm">{result.message}</Span>
             <Div className="flex flex-col gap-1 mt-2">
-              {[
-                ["messagesProcessed", result.results.messagesProcessed],
-                ["messagesAdded", result.results.messagesAdded],
-                ["messagesUpdated", result.results.messagesUpdated],
-                ["messagesDeleted", result.results.messagesDeleted],
-              ].map(([key, val]) => (
+              {(
+                [
+                  [
+                    "response.results.messagesProcessed",
+                    result.results.messagesProcessed,
+                  ],
+                  [
+                    "response.results.messagesAdded",
+                    result.results.messagesAdded,
+                  ],
+                  [
+                    "response.results.messagesUpdated",
+                    result.results.messagesUpdated,
+                  ],
+                  [
+                    "response.results.messagesDeleted",
+                    result.results.messagesDeleted,
+                  ],
+                ] as const
+              ).map(([key, val]) => (
                 <Div
-                  key={String(key)}
+                  key={key}
                   className="flex items-center justify-between text-sm"
                 >
                   <Span className="text-muted-foreground">{t(key)}</Span>
@@ -80,7 +94,9 @@ export function ImapMessagesSyncContainer({
                 </Div>
               ))}
               <Div className="flex items-center justify-between text-sm">
-                <Span className="text-muted-foreground">{t("duration")}</Span>
+                <Span className="text-muted-foreground">
+                  {t("response.results.duration")}
+                </Span>
                 <Span className="font-semibold">
                   {result.results.duration}
                   {"ms"}

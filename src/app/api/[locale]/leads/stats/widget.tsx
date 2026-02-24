@@ -275,7 +275,11 @@ function GroupedStatsSection({
 }: {
   title: string;
   items:
-    | Array<{ category: LeadsTranslationKey; value: number; percentage?: number }>
+    | Array<{
+        category: LeadsTranslationKey;
+        value: number;
+        percentage?: number;
+      }>
     | undefined;
   colorMap?: Record<string, string>;
   leadsT: ReturnType<typeof leadsScopedTranslation.scopedT>["t"];
@@ -293,13 +297,68 @@ function GroupedStatsSection({
         {top.map((item) => (
           <ClickableBarRow
             key={item.category}
-            category={item.category as LeadsTranslationKey}
+            category={item.category}
             value={item.value}
             percentage={item.percentage}
             barColor={colorMap?.[item.category] ?? "hsl(var(--primary))"}
             max={max}
             leadsT={leadsT}
           />
+        ))}
+      </Div>
+    </Div>
+  );
+}
+
+function RawGroupedStatsSection({
+  title,
+  items,
+  colorMap,
+}: {
+  title: string;
+  items:
+    | Array<{ category: string; value: number; percentage?: number }>
+    | undefined;
+  colorMap?: Record<string, string>;
+}): React.JSX.Element | null {
+  if (!items?.length) {
+    return null;
+  }
+  const top = items.slice(0, 8);
+  const max = Math.max(...top.map((i) => i.value), 1);
+
+  return (
+    <Div className="rounded-lg border bg-card p-4">
+      <Span className="text-sm font-semibold mb-3 block">{title}</Span>
+      <Div className="flex flex-col gap-1">
+        {top.map((item) => (
+          <Div
+            key={item.category}
+            className="flex items-center gap-2 rounded px-1 py-0.5"
+          >
+            <Span className="text-xs text-muted-foreground w-28 truncate flex-shrink-0">
+              {item.category}
+            </Span>
+            <Div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+              <Div
+                style={{
+                  width: `${(item.value / max) * 100}%`,
+                  height: "100%",
+                  borderRadius: "9999px",
+                  backgroundColor:
+                    colorMap?.[item.category] ?? "hsl(var(--primary))",
+                }}
+              />
+            </Div>
+            <Span className="text-xs tabular-nums w-10 text-right">
+              {item.value}
+            </Span>
+            {item.percentage !== null && item.percentage !== undefined && (
+              <Span className="text-xs text-muted-foreground w-10 text-right">
+                {item.percentage.toFixed(0)}%
+              </Span>
+            )}
+          </Div>
         ))}
       </Div>
     </Div>
@@ -912,10 +971,9 @@ export function LeadsStatsContainer({
             </Div>
           )}
 
-          <GroupedStatsSection
+          <RawGroupedStatsSection
             title={t("widget.byCountry")}
             items={groupedStats.byCountry}
-            leadsT={leadsT}
           />
           <GroupedStatsSection
             title={t("widget.byCampaignStage")}
@@ -981,7 +1039,7 @@ export function LeadsStatsContainer({
           </Div>
           <Div className="flex flex-col gap-2">
             {topSources.slice(0, 5).map((src, i) => {
-              const sourceName = t(src.source);
+              const sourceName = leadsT(src.source);
               return (
                 <Button
                   key={i}
@@ -1033,14 +1091,14 @@ export function LeadsStatsContainer({
                   <Div className="flex-shrink-0 w-2 h-2 rounded-full bg-primary mt-1.5" />
                   <Div className="flex-1 min-w-0">
                     <Span className="text-muted-foreground text-xs">
-                      {t(act.type)}
+                      {leadsT(act.type)}
                     </Span>
                     {act.leadEmail && (
                       <Span className="ml-2 truncate">{act.leadEmail}</Span>
                     )}
                     {act.details?.status && (
                       <Span className="ml-2 text-xs text-muted-foreground">
-                        ({t(act.details.status)})
+                        ({leadsT(act.details.status)})
                       </Span>
                     )}
                   </Div>

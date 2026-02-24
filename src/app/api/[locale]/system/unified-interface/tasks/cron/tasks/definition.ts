@@ -49,7 +49,7 @@ export const cronTaskResponseSchema = z.object({
   displayName: z.string(),
   description: z.string().nullable(),
   version: z.string(),
-  category: z.string(),
+  category: z.enum(TaskCategoryDB),
   schedule: z.string(),
   timezone: z.string().nullable(),
   enabled: z.boolean(),
@@ -208,7 +208,7 @@ const { GET } = createEndpoint({
             category: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.category",
-              schema: z.string(),
+              schema: z.enum(TaskCategoryDB),
             }),
             schedule: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,

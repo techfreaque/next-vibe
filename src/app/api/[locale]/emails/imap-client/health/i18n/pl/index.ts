@@ -132,4 +132,12 @@ export const translations: typeof enTranslations = {
     totalSyncs: "Synchronizacje łącznie",
     lastSyncTime: "Ostatnia synchronizacja",
   },
+  enums: {
+    healthStatus: {
+      healthy: "Zdrowy",
+      warning: "Ostrzeżenie",
+      error: "Błąd",
+      maintenance: "Konserwacja",
+    },
+  },
 };

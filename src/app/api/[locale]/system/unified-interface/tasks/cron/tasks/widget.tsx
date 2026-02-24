@@ -52,8 +52,10 @@ import {
   CronTaskStatus,
   TaskCategoryOptions,
 } from "../../enum";
+import { scopedTranslation as tasksScopedTranslation } from "../../i18n";
 import type endpoints from "./definition";
 import type { CronTaskListResponseOutput } from "./definition";
+import type { CronTasksTranslationKey } from "./i18n";
 
 type Task = CronTaskListResponseOutput["tasks"][number];
 
@@ -190,6 +192,7 @@ function TaskRow({
   onDelete,
   onHistory,
   t,
+  tTasks,
 }: {
   task: Task;
   onView: (task: Task) => void;
@@ -197,6 +200,7 @@ function TaskRow({
   onDelete: (task: Task) => void;
   onHistory: () => void;
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
+  tTasks: ReturnType<typeof tasksScopedTranslation.scopedT>["t"];
 }): React.JSX.Element {
   const rate = successRate(task);
   const lastRunText = formatDate(task.lastExecutedAt);
@@ -245,7 +249,7 @@ function TaskRow({
               "bg-muted text-muted-foreground",
             )}
           >
-            {t(task.category as Parameters<typeof t>[0])}
+            {tTasks(task.category)}
           </Span>
           {task.priority && (
             <Span
@@ -254,7 +258,7 @@ function TaskRow({
                 PRIORITY_COLORS[task.priority] ?? "text-muted-foreground",
               )}
             >
-              {t(task.priority)}
+              {tTasks(task.priority)}
             </Span>
           )}
         </Div>
@@ -415,6 +419,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const router = useRouter();
   const locale = useWidgetLocale();
+  const { t: tTasks } = tasksScopedTranslation.scopedT(locale);
   const form = useWidgetForm<typeof endpoints.GET>();
 
   const isLoading = endpointMutations?.read?.isLoading;
@@ -706,7 +711,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   // ── Tab definitions ───────────────────────────────────────────────────────
   const tabs: Array<{
     key: StatusFilterKey;
-    labelKey: TModuleKey;
+    labelKey: CronTasksTranslationKey;
     count: number;
   }> = [
     {
@@ -933,6 +938,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
               onDelete={handleDelete}
               onHistory={handleTaskHistory}
               t={t}
+              tTasks={tTasks}
             />
           ))}
         </Div>

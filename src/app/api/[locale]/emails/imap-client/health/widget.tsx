@@ -9,9 +9,13 @@ import { Loader2 } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import React from "react";
 
-import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import {
+  useWidgetLocale,
+  useWidgetTranslation,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import { ImapHealthStatus } from "../enum";
+import { scopedTranslation as imapClientScopedTranslation } from "../i18n";
 import type definition from "./definition";
 import type { ImapHealthGetResponseOutput } from "./definition";
 
@@ -50,7 +54,9 @@ export function ImapHealthContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const data = field.value;
+  const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
+  const imapClientT = imapClientScopedTranslation.scopedT(locale).t;
   const isLoading = data === null || data === undefined;
 
   const statusColor =
@@ -77,7 +83,7 @@ export function ImapHealthContainer({
               color: statusColor,
             }}
           >
-            {t(data.status)}
+            {imapClientT(data.status)}
           </Div>
         )}
       </Div>
@@ -132,7 +138,9 @@ export function ImapHealthContainer({
               <Span className="text-muted-foreground">
                 {t("widget.serverStatus")}
               </Span>
-              <Span className="font-semibold">{t(data.serverStatus)}</Span>
+              <Span className="font-semibold">
+                {imapClientT(data.serverStatus)}
+              </Span>
             </Div>
           </Div>
 

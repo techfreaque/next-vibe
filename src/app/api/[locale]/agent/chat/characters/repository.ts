@@ -262,9 +262,9 @@ export class CharactersRepository {
         // Flattened response - no container/character/badges/systemPromptSection nesting
         return success({
           icon: defaultCharacter.icon,
-          name: defaultCharacter.name,
-          tagline: defaultCharacter.tagline,
-          description: defaultCharacter.description,
+          name: t(defaultCharacter.name),
+          tagline: t(defaultCharacter.tagline),
+          description: t(defaultCharacter.description),
           category: defaultCharacter.category,
           isPublic: false,
           voice: defaultCharacter.voice,

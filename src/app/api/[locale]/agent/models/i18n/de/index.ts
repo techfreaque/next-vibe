@@ -1,0 +1,131 @@
+export const translations = {
+  selector: {
+    bestForFilter: "Bestes für diesen Filter",
+    setupRequired: "Einrichtung erforderlich",
+    providerUnconfigured: "Anbieter-API-Schlüssel nicht konfiguriert",
+    addEnvKey: "Zur .env hinzufügen",
+    noMatchingModels: "Keine Modelle entsprechen deinen Filtern",
+    noModelsWarning:
+      "Keine Modelle entsprechen diesen Filtern. Passe deine Einstellungen an.",
+    allModelsCount: "{{count}} Modelle verfügbar",
+    filteredModelsCount: "{{count}} passende Modelle",
+    showAllModels: "Alle {{count}} Modelle zeigen",
+    showFiltered: "Gefiltert zeigen",
+    creditsExact: "{{cost}} Credits",
+    creditsSingle: "1 Credit",
+    free: "Kostenlos",
+    autoSelectedModel: "Auto-ausgewählt:",
+    manualSelectedModel: "Ausgewählt:",
+    characterSelectedModel: "Charakter-Modell:",
+    selectModelBelow: "Wählen Sie unten ein Modell aus",
+    sortBy: "Sortieren nach",
+    showLess: "Weniger anzeigen",
+    showMore: "{{count}} weitere anzeigen",
+    showLegacyModels: "{{count}} Legacy-Modelle anzeigen",
+    autoMode: "Automatisch",
+    manualMode: "Manuell wählen",
+    characterMode: "Charakter-Standard",
+    autoModeDescription:
+      "Wählt automatisch das beste Modell basierend auf deinen Einstellungen",
+    manualModeDescription: "Wähle selbst ein beliebiges Modell aus",
+    characterBasedModeDescription:
+      "Nutzt das Modell, für das dieser Charakter entwickelt wurde",
+  },
+  tiers: {
+    intelligence: {
+      quick: "Schnell",
+      smart: "Intelligent",
+      brilliant: "Brillant",
+      quickDesc: "Schnell & effizient",
+      smartDesc: "Ausgewogene Qualität",
+      brilliantDesc: "Tiefes Denken",
+    },
+    price: {
+      cheap: "Günstig",
+      standard: "Standard",
+      premium: "Premium",
+      cheapDesc: "0-3 Credits pro Nachricht",
+      standardDesc: "3-9 Credits pro Nachricht",
+      premiumDesc: "9+ Credits pro Nachricht",
+    },
+    content: {
+      mainstream: "Mainstream",
+      open: "Offen",
+      uncensored: "Unzensiert",
+      mainstreamDesc: "Standard-Sicherheit",
+      openDesc: "Weniger Einschränkungen",
+      uncensoredDesc: "Keine Einschränkungen",
+    },
+    speed: {
+      fast: "Schnell",
+      balanced: "Ausgewogen",
+      thorough: "Gründlich",
+      fastDesc: "Schnelle Antworten",
+      balancedDesc: "Gute Balance",
+      thoroughDesc: "Detaillierte Analyse",
+    },
+  },
+  sort: {
+    intelligence: "Intelligenz",
+    price: "Preis",
+    speed: "Geschwindigkeit",
+    content: "Inhalt",
+  },
+  ranges: {
+    intelligenceRange: {
+      minLabel: "Min. Intelligenz",
+      maxLabel: "Max. Intelligenz",
+    },
+    priceRange: {
+      minLabel: "Min. Preis",
+      maxLabel: "Max. Preis",
+    },
+    contentRange: {
+      minLabel: "Min. Inhalt",
+      maxLabel: "Max. Inhalt",
+    },
+    speedRange: {
+      minLabel: "Min. Geschwindigkeit",
+      maxLabel: "Max. Geschwindigkeit",
+    },
+  },
+  credits: {
+    credit: "{{count}} Credit",
+    credits: "{{count}} Credits",
+  },
+  creditDisplay: {
+    tokenBased: {
+      header: "Kosten pro Nachricht",
+      costRangeLabel: "Typischer Bereich:",
+      costRangeValue: "{{min}} - {{max}} Credits",
+      examplesLabel: "Beispiele:",
+      examples: {
+        short: "Kurzes Gespräch",
+        medium: "Mittleres Gespräch",
+        long: "Langes Gespräch",
+      },
+      triggersCompacting: "⚡ Aktiviert Komprimierung",
+      tokensCount: "{{count}} Tokens",
+      explanation:
+        "Die KI verarbeitet bei jeder Nachricht den gesamten Gesprächsverlauf. Längere Gespräche kosten mehr, weil mehr Kontext verarbeitet werden muss.",
+      compactingLabel: "✨ Auto-Komprimierung:",
+      compactingExplanation:
+        " Bei {{threshold}} Tokens werden ältere Nachrichten automatisch zusammengefasst, um Kosten zu reduzieren und gleichzeitig den Kontext zu bewahren.",
+    },
+    fixed: {
+      title: "Preise für {{model}}",
+      freeDescription:
+        "Dieses Modell ist vollständig kostenlos ohne Credit-Kosten.",
+      fixedDescription:
+        "Dieses Modell hat fixe Kosten pro Nachricht, unabhängig von der Länge.",
+      costPerMessage: "Kosten pro Nachricht:",
+      freeExplanation:
+        "Dies ist ein kostenloses Modell ohne Nutzungsbeschränkungen.",
+      freeHighlight: "Perfekt zum Testen und Experimentieren.",
+      simpleLabel: "Einfache Preise:",
+      simpleExplanation:
+        " Jede Nachricht kostet gleich viel, egal ob kurz oder lang. Kein Token-Zählen erforderlich.",
+    },
+    creditValue: "1 Credit = {{value}}",
+  },
+} as const;

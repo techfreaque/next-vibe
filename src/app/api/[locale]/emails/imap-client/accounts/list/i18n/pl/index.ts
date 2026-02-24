@@ -146,4 +146,36 @@ export const translations: typeof enTranslations = {
     disabled: "Wyłączone",
     lastSync: "Ostatnia synchronizacja",
   },
+  enums: {
+    syncStatus: {
+      pending: "Oczekujące",
+      syncing: "Synchronizowanie",
+      synced: "Zsynchronizowane",
+      error: "Błąd",
+    },
+    sortOrder: {
+      asc: "Rosnąco",
+      desc: "Malejąco",
+    },
+    accountSortField: {
+      name: "Nazwa",
+      email: "E-mail",
+      host: "Host",
+      enabled: "Włączone",
+      lastSyncAt: "Ostatnia synchronizacja",
+      createdAt: "Utworzono o",
+    },
+    accountStatusFilter: {
+      all: "Wszystkie statusy kont",
+      enabled: "Włączone",
+      disabled: "Wyłączone",
+    },
+    connectionStatus: {
+      connected: "Połączone",
+      disconnected: "Rozłączone",
+      connecting: "Łączenie",
+      error: "Błąd",
+      timeout: "Przekroczono czas",
+    },
+  },
 };

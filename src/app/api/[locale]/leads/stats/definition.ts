@@ -32,6 +32,7 @@ import { CountryFilter, LanguageFilter } from "@/i18n/core/config";
 import { UserRole } from "../../user/user-roles/enum";
 import {
   ActivityType,
+  EmailCampaignStage,
   EmailCampaignStageFilter,
   EmailCampaignStageFilterOptions,
   EmailJourneyVariant,
@@ -69,23 +70,38 @@ const chartDataSchema = z.object({
 // Historical data schema
 const historicalDataSchema = z.record(z.string(), chartDataSchema);
 
-// Grouped stats item schema
-const groupedStatsItemSchema = z.object({
-  category: z.string(),
+// Grouped stats item schema helpers
+const groupedStatsItemBase = {
   value: z.coerce.number(),
   percentage: z.coerce.number().optional(),
-});
+};
 
 // Grouped stats schema
 const groupedStatsSchema = z.object({
-  byStatus: z.array(groupedStatsItemSchema),
-  bySource: z.array(groupedStatsItemSchema),
-  byCountry: z.array(groupedStatsItemSchema),
-  byLanguage: z.array(groupedStatsItemSchema),
-  byCampaignStage: z.array(groupedStatsItemSchema),
-  byJourneyVariant: z.array(groupedStatsItemSchema),
-  byEngagementLevel: z.array(groupedStatsItemSchema),
-  byConversionFunnel: z.array(groupedStatsItemSchema),
+  byStatus: z.array(
+    z.object({ category: z.enum(LeadStatus), ...groupedStatsItemBase }),
+  ),
+  bySource: z.array(
+    z.object({ category: z.enum(LeadSource), ...groupedStatsItemBase }),
+  ),
+  byCountry: z.array(
+    z.object({ category: z.string(), ...groupedStatsItemBase }),
+  ),
+  byLanguage: z.array(
+    z.object({ category: z.string(), ...groupedStatsItemBase }),
+  ),
+  byCampaignStage: z.array(
+    z.object({ category: z.enum(EmailCampaignStage), ...groupedStatsItemBase }),
+  ),
+  byJourneyVariant: z.array(
+    z.object({ category: z.string(), ...groupedStatsItemBase }),
+  ),
+  byEngagementLevel: z.array(
+    z.object({ category: z.string(), ...groupedStatsItemBase }),
+  ),
+  byConversionFunnel: z.array(
+    z.object({ category: z.string(), ...groupedStatsItemBase }),
+  ),
 });
 
 // Data range schema

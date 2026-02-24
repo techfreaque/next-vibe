@@ -141,7 +141,7 @@ export interface TemplateExport<TProps = never> {
  * assertions of their own.
  */
 
-type AnyTemplateConstraint = EmailTemplateDefinition<
+export type AnyTemplateConstraint = EmailTemplateDefinition<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   any,
   { scopedT: (locale: CountryLanguage) => { t: (...args: never[]) => string } }

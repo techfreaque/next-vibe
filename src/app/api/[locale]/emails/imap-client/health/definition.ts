@@ -102,7 +102,7 @@ const { GET } = createEndpoint({
       serverStatus: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
         text: "health.get.response.data.serverStatus",
-        schema: z.string(),
+        schema: z.enum(ImapHealthStatus),
       }),
       uptime: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -189,7 +189,7 @@ const { GET } = createEndpoint({
           totalSyncs: 1250,
           lastSyncTime: "2023-12-01T10:32:15Z",
         },
-        serverStatus: "healthy",
+        serverStatus: ImapHealthStatus.HEALTHY,
         uptime: "5d 12h 30m",
         syncedAccounts: 5,
         totalAccounts: 8,

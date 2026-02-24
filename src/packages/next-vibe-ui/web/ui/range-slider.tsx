@@ -12,22 +12,19 @@ import {
   Icon,
   type IconKey,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import type { TParams, TranslationKey } from "@/i18n/core/static-types";
+import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
+import type { TParams } from "@/i18n/core/static-types";
 
 import { Span } from "./span";
 
-export interface RangeSliderOption<
-  TTranslationKey extends string = TranslationKey,
-> {
-  label: NoInfer<TTranslationKey>;
+export interface RangeSliderOption<TTranslationKey extends string> {
+  label: TTranslationKey;
   value: string | number;
   icon?: IconKey;
-  description?: NoInfer<TTranslationKey>;
+  description?: TTranslationKey;
 }
 
-export interface RangeSliderProps<
-  TTranslationKey extends string = TranslationKey,
-> {
+export interface RangeSliderProps<TTranslationKey extends string> {
   options: RangeSliderOption<TTranslationKey>[];
   minIndex: number;
   maxIndex: number;
@@ -35,11 +32,11 @@ export interface RangeSliderProps<
   disabled?: boolean;
   minLabel?: string;
   maxLabel?: string;
-  t: <K extends string>(key: K, params?: TParams) => string; // Adapted translation for definition keys (uses scopedT when available)
+  t: (key: TTranslationKey, params?: TParams) => TranslatedKeyType;
   className?: string;
 }
 
-export function RangeSlider<TTranslationKey extends string = TranslationKey>({
+export function RangeSlider<TTranslationKey extends string = string>({
   options,
   minIndex,
   maxIndex,

@@ -31,6 +31,7 @@ import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interfac
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import { useCharacter } from "../../characters/[id]/hooks";
+import { scopedTranslation as charactersScopedTranslation } from "../../characters/i18n";
 import { useChatSettings } from "../../settings/hooks";
 import type definition from "./definition";
 import type { FavoriteCreateResponseOutput } from "./definition";
@@ -55,6 +56,7 @@ export function FavoriteCreateContainer({
   const form = useWidgetForm<typeof definition.POST>();
   const t = useWidgetTranslation<typeof definition.POST>();
   const locale = useWidgetLocale();
+  const { t: tCharacters } = charactersScopedTranslation.scopedT(locale);
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const navigate = useWidgetNavigation();
@@ -160,16 +162,20 @@ export function FavoriteCreateContainer({
               <Div className="flex-1 flex flex-col gap-2">
                 <Div className="flex flex-col gap-1">
                   {characterData?.name && (
-                    <Span className="font-medium">{characterData.name}</Span>
+                    <Span className="font-medium">
+                      {tCharacters(characterData.name)}
+                    </Span>
                   )}
                   {characterData?.tagline && (
                     <Span className="text-sm text-muted-foreground">
-                      {characterData.tagline}
+                      {tCharacters(characterData.tagline)}
                     </Span>
                   )}
                 </Div>
                 {characterData?.description && (
-                  <Span className="text-sm">{characterData.description}</Span>
+                  <Span className="text-sm">
+                    {tCharacters(characterData.description)}
+                  </Span>
                 )}
               </Div>
             </Div>
@@ -185,7 +191,6 @@ export function FavoriteCreateContainer({
               characterModelSelection={
                 isNoCharacter ? undefined : characterData?.modelSelection
               }
-              t={t}
               locale={locale}
             />
           )}

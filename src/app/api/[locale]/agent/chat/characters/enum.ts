@@ -23,6 +23,8 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 import type { IconComponent } from "@/packages/next-vibe-ui/web/lib/helper";
 
 import { ModelUtility, type ModelUtilityValue } from "../../models/enum";
+import type { ModelsTranslationKey } from "../../models/i18n";
+import { scopedTranslation as modelsScopedTranslation } from "../../models/i18n";
 import { scopedTranslation } from "./i18n";
 
 /**
@@ -160,11 +162,11 @@ export const {
   enum: ModelSortField,
   options: ModelSortFieldOptions,
   Value: ModelSortFieldValue,
-} = createEnumOptions(scopedTranslation, {
-  INTELLIGENCE: "modelSelection.sort.intelligence",
-  PRICE: "modelSelection.sort.price",
-  SPEED: "modelSelection.sort.speed",
-  CONTENT: "modelSelection.sort.content",
+} = createEnumOptions(modelsScopedTranslation, {
+  INTELLIGENCE: "sort.intelligence",
+  PRICE: "sort.price",
+  SPEED: "sort.speed",
+  CONTENT: "sort.content",
 });
 
 export const ModelSortFieldDB = [
@@ -191,11 +193,11 @@ export const ModelSortDirectionDB = [
   ModelSortDirection.DESC,
 ] as const;
 
-interface TierDisplayConfig<T extends string> {
+interface TierDisplayConfig<T extends string = string> {
   value: T;
-  label: TranslationKey;
+  label: ModelsTranslationKey;
   icon: IconKey;
-  description?: TranslationKey;
+  description?: ModelsTranslationKey;
 }
 
 export const INTELLIGENCE_DISPLAY: TierDisplayConfig<
@@ -203,84 +205,84 @@ export const INTELLIGENCE_DISPLAY: TierDisplayConfig<
 >[] = [
   {
     value: IntelligenceLevel.QUICK,
-    label: "app.chat.tiers.intelligence.quick",
+    label: "tiers.intelligence.quick",
     icon: "zap",
-    description: "app.chat.tiers.intelligence.quickDesc",
+    description: "tiers.intelligence.quickDesc",
   },
   {
     value: IntelligenceLevel.SMART,
-    label: "app.chat.tiers.intelligence.smart",
+    label: "tiers.intelligence.smart",
     icon: "lightbulb",
-    description: "app.chat.tiers.intelligence.smartDesc",
+    description: "tiers.intelligence.smartDesc",
   },
   {
     value: IntelligenceLevel.BRILLIANT,
-    label: "app.chat.tiers.intelligence.brilliant",
+    label: "tiers.intelligence.brilliant",
     icon: "sparkles",
-    description: "app.chat.tiers.intelligence.brilliantDesc",
+    description: "tiers.intelligence.brilliantDesc",
   },
 ];
 
 export const PRICE_DISPLAY: TierDisplayConfig<typeof PriceLevelValue>[] = [
   {
     value: PriceLevel.CHEAP,
-    label: "app.chat.tiers.price.cheap",
+    label: "tiers.price.cheap",
     icon: "coins",
-    description: "app.chat.tiers.price.cheapDesc",
+    description: "tiers.price.cheapDesc",
   },
   {
     value: PriceLevel.STANDARD,
-    label: "app.chat.tiers.price.standard",
+    label: "tiers.price.standard",
     icon: "coins",
-    description: "app.chat.tiers.price.standardDesc",
+    description: "tiers.price.standardDesc",
   },
   {
     value: PriceLevel.PREMIUM,
-    label: "app.chat.tiers.price.premium",
+    label: "tiers.price.premium",
     icon: "crown",
-    description: "app.chat.tiers.price.premiumDesc",
+    description: "tiers.price.premiumDesc",
   },
 ];
 
 export const CONTENT_DISPLAY: TierDisplayConfig<typeof ContentLevelValue>[] = [
   {
     value: ContentLevel.MAINSTREAM,
-    label: "app.chat.tiers.content.mainstream",
+    label: "tiers.content.mainstream",
     icon: "home",
-    description: "app.chat.tiers.content.mainstreamDesc",
+    description: "tiers.content.mainstreamDesc",
   },
   {
     value: ContentLevel.OPEN,
-    label: "app.chat.tiers.content.open",
+    label: "tiers.content.open",
     icon: "log-out",
-    description: "app.chat.tiers.content.openDesc",
+    description: "tiers.content.openDesc",
   },
   {
     value: ContentLevel.UNCENSORED,
-    label: "app.chat.tiers.content.uncensored",
+    label: "tiers.content.uncensored",
     icon: "shield-off",
-    description: "app.chat.tiers.content.uncensoredDesc",
+    description: "tiers.content.uncensoredDesc",
   },
 ];
 
 export const SPEED_DISPLAY: TierDisplayConfig<typeof SpeedLevelValue>[] = [
   {
     value: SpeedLevel.FAST,
-    label: "app.chat.tiers.speed.fast",
+    label: "tiers.speed.fast",
     icon: "zap",
-    description: "app.chat.tiers.speed.fastDesc",
+    description: "tiers.speed.fastDesc",
   },
   {
     value: SpeedLevel.BALANCED,
-    label: "app.chat.tiers.speed.balanced",
+    label: "tiers.speed.balanced",
     icon: "scale",
-    description: "app.chat.tiers.speed.balancedDesc",
+    description: "tiers.speed.balancedDesc",
   },
   {
     value: SpeedLevel.THOROUGH,
-    label: "app.chat.tiers.speed.thorough",
+    label: "tiers.speed.thorough",
     icon: "microscope",
-    description: "app.chat.tiers.speed.thoroughDesc",
+    description: "tiers.speed.thoroughDesc",
   },
 ];
 

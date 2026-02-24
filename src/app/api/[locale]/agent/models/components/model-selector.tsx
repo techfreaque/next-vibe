@@ -57,10 +57,9 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { TParams } from "@/i18n/core/static-types";
 
 import { DEFAULT_INPUT_TOKENS, DEFAULT_OUTPUT_TOKENS } from "../constants";
+import { scopedTranslation } from "../i18n";
 import { ModelCreditDisplay } from "./model-credit-display";
 import type { FiltersModelSelection, ModelSelectionSimple } from "./types";
 
@@ -72,7 +71,7 @@ interface ModelCardProps {
   dimmed?: boolean;
   disabled?: boolean;
   setupRequired?: string | null;
-  t: (key: string, params?: Record<string, string | number>) => string;
+  t: ReturnType<typeof scopedTranslation.scopedT>["t"];
   locale: CountryLanguage;
 }
 
@@ -125,7 +124,7 @@ function ModelCard({
           </Span>
           {isBest && (
             <Badge variant="default" className="text-[9px] h-4 px-1.5 shrink-0">
-              {t("app.chat.selector.bestForFilter")}
+              {t("selector.bestForFilter")}
             </Badge>
           )}
         </Div>
@@ -140,7 +139,7 @@ function ModelCard({
             variant="outline"
             className="text-[9px] h-4 px-1.5 shrink-0 border-amber-400 text-amber-600"
           >
-            {t("app.chat.selector.setupRequired")}
+            {t("selector.setupRequired")}
           </Badge>
         ) : (
           <ModelCreditDisplay
@@ -148,7 +147,6 @@ function ModelCard({
             variant="badge"
             badgeVariant={selected ? "outline" : "secondary"}
             className="text-[10px] h-5"
-            t={t}
             locale={locale}
           />
         )}
@@ -168,7 +166,7 @@ function ModelCard({
       <TooltipTrigger asChild>{card}</TooltipTrigger>
       <TooltipContent className="max-w-xs text-xs">
         <P className="font-semibold mb-1">
-          {t("app.chat.selector.providerUnconfigured")}
+          {t("selector.providerUnconfigured")}
         </P>
         <P>{setupRequired}</P>
       </TooltipContent>
@@ -243,11 +241,6 @@ export interface ModelSelectorProps {
   envAvailability?: AgentEnvAvailability;
 
   /**
-   * Translation function
-   */
-  t: (key: string, params?: TParams) => string | TranslatedKeyType;
-
-  /**
    * User's locale for currency formatting
    */
   locale: CountryLanguage;
@@ -267,23 +260,23 @@ function getSetupRequiredMessage(
     case ApiProvider.OPENROUTER:
       return envAvailability.openRouter
         ? null
-        : `${t("app.chat.selector.addEnvKey")}: OPENROUTER_API_KEY → openrouter.ai/keys`;
+        : `${t("selector.addEnvKey")}: OPENROUTER_API_KEY → openrouter.ai/keys`;
     case ApiProvider.UNCENSORED_AI:
       return envAvailability.uncensoredAI
         ? null
-        : `${t("app.chat.selector.addEnvKey")}: UNCENSORED_AI_API_KEY`;
+        : `${t("selector.addEnvKey")}: UNCENSORED_AI_API_KEY`;
     case ApiProvider.FREEDOMGPT:
       return envAvailability.freedomGPT
         ? null
-        : `${t("app.chat.selector.addEnvKey")}: FREEDOMGPT_API_KEY`;
+        : `${t("selector.addEnvKey")}: FREEDOMGPT_API_KEY`;
     case ApiProvider.GAB_AI:
       return envAvailability.gabAI
         ? null
-        : `${t("app.chat.selector.addEnvKey")}: GAB_AI_API_KEY`;
+        : `${t("selector.addEnvKey")}: GAB_AI_API_KEY`;
     case ApiProvider.VENICE_AI:
       return envAvailability.veniceAI
         ? null
-        : `${t("app.chat.selector.addEnvKey")}: VENICE_AI_API_KEY → venice.ai`;
+        : `${t("selector.addEnvKey")}: VENICE_AI_API_KEY → venice.ai`;
     default:
       return null;
   }
@@ -295,9 +288,9 @@ export function ModelSelector({
   characterModelSelection,
   readOnly = false,
   envAvailability: envAvailabilityProp,
-  t,
   locale,
 }: ModelSelectorProps): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
   // Prefer prop (for non-chat contexts), fall back to context (chat pages)
   const envAvailabilityCtx = useEnvAvailability();
   const envAvailability = envAvailabilityProp ?? envAvailabilityCtx;
@@ -792,10 +785,10 @@ export function ModelSelector({
             value: cost,
             label:
               cost === 0
-                ? t("app.chat.selector.free")
+                ? t("selector.free")
                 : cost === 1
-                  ? t("app.chat.selector.creditsSingle")
-                  : t("app.chat.selector.creditsExact", { cost }),
+                  ? t("selector.creditsSingle")
+                  : t("selector.creditsExact", { cost }),
           };
         }
         case ModelSortField.CONTENT: {
@@ -869,7 +862,7 @@ export function ModelSelector({
               }
               disabled={readOnly}
             >
-              {t("app.chat.selector.characterMode")}
+              {t("selector.characterMode")}
             </Button>
           )}
           <Button
@@ -880,7 +873,7 @@ export function ModelSelector({
             onClick={() => handleModeChange(ModelSelectionType.FILTERS)}
             disabled={readOnly}
           >
-            {t("app.chat.selector.autoMode")}
+            {t("selector.autoMode")}
           </Button>
           <Button
             type="button"
@@ -890,17 +883,17 @@ export function ModelSelector({
             onClick={() => handleModeChange(ModelSelectionType.MANUAL)}
             disabled={readOnly}
           >
-            {t("app.chat.selector.manualMode")}
+            {t("selector.manualMode")}
           </Button>
         </Div>
 
         {/* Mode description */}
         <Span className="text-xs text-center text-muted-foreground/70 -mt-2">
           {mode === ModelSelectionType.CHARACTER_BASED
-            ? t("app.chat.selector.characterBasedModeDescription")
+            ? t("selector.characterBasedModeDescription")
             : mode === ModelSelectionType.FILTERS
-              ? t("app.chat.selector.autoModeDescription")
-              : t("app.chat.selector.manualModeDescription")}
+              ? t("selector.autoModeDescription")
+              : t("selector.manualModeDescription")}
         </Span>
 
         <Separator className="my-1" />
@@ -914,10 +907,10 @@ export function ModelSelector({
             <Div className="flex-1 min-w-0">
               <Span className="block text-[10px] text-primary/80 uppercase tracking-wider font-bold mb-1">
                 {mode === ModelSelectionType.FILTERS
-                  ? t("app.chat.selector.autoSelectedModel")
+                  ? t("selector.autoSelectedModel")
                   : mode === ModelSelectionType.MANUAL
-                    ? t("app.chat.selector.manualSelectedModel")
-                    : t("app.chat.selector.characterSelectedModel")}
+                    ? t("selector.manualSelectedModel")
+                    : t("selector.characterSelectedModel")}
               </Span>
               <Span className="text-sm font-bold text-primary block truncate">
                 {bestModel.name}
@@ -933,7 +926,6 @@ export function ModelSelector({
               variant="badge"
               badgeVariant="secondary"
               className="text-[10px] h-5 shrink-0 bg-background/60"
-              t={t}
               locale={locale}
             />
           </Div>
@@ -942,8 +934,8 @@ export function ModelSelector({
             <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
             <Span className="text-xs font-medium text-destructive">
               {mode === ModelSelectionType.MANUAL
-                ? t("app.chat.selector.selectModelBelow")
-                : t("app.chat.selector.noModelsWarning")}
+                ? t("selector.selectModelBelow")
+                : t("selector.noModelsWarning")}
             </Span>
           </Div>
         )}
@@ -955,8 +947,8 @@ export function ModelSelector({
             minIndex={intelligenceIndices.min}
             maxIndex={intelligenceIndices.max}
             onChange={handleIntelligenceChange}
-            minLabel={t("post.intelligenceRange.minLabel")}
-            maxLabel={t("post.intelligenceRange.maxLabel")}
+            minLabel={t("ranges.intelligenceRange.minLabel")}
+            maxLabel={t("ranges.intelligenceRange.maxLabel")}
             disabled={readOnly}
             t={t}
           />
@@ -966,8 +958,8 @@ export function ModelSelector({
             minIndex={contentIndices.min}
             maxIndex={contentIndices.max}
             onChange={handleContentChange}
-            minLabel={t("post.contentRange.minLabel")}
-            maxLabel={t("post.contentRange.maxLabel")}
+            minLabel={t("ranges.contentRange.minLabel")}
+            maxLabel={t("ranges.contentRange.maxLabel")}
             disabled={readOnly}
             t={t}
           />
@@ -977,8 +969,8 @@ export function ModelSelector({
             minIndex={speedIndices.min}
             maxIndex={speedIndices.max}
             onChange={handleSpeedChange}
-            minLabel={t("post.speedRange.minLabel")}
-            maxLabel={t("post.speedRange.maxLabel")}
+            minLabel={t("ranges.speedRange.minLabel")}
+            maxLabel={t("ranges.speedRange.maxLabel")}
             disabled={readOnly}
             t={t}
           />
@@ -988,8 +980,8 @@ export function ModelSelector({
             minIndex={priceIndices.min}
             maxIndex={priceIndices.max}
             onChange={handlePriceChange}
-            minLabel={t("post.priceRange.minLabel")}
-            maxLabel={t("post.priceRange.maxLabel")}
+            minLabel={t("ranges.priceRange.minLabel")}
+            maxLabel={t("ranges.priceRange.maxLabel")}
             disabled={readOnly}
             t={t}
           />
@@ -1001,10 +993,10 @@ export function ModelSelector({
           <Div className="flex items-center justify-between gap-2 px-1">
             <Label className="text-xs font-medium text-muted-foreground">
               {showUnfilteredModels
-                ? t("app.chat.selector.allModelsCount", {
+                ? t("selector.allModelsCount", {
                     count: Object.values(modelOptions).length,
                   })
-                : t("app.chat.selector.filteredModelsCount", {
+                : t("selector.filteredModelsCount", {
                     count: filteredModels.length,
                   })}
             </Label>
@@ -1021,8 +1013,8 @@ export function ModelSelector({
               >
                 <Filter className="h-3 w-3" />
                 {showUnfilteredModels
-                  ? t("app.chat.selector.showFiltered")
-                  : t("app.chat.selector.showAllModels", {
+                  ? t("selector.showFiltered")
+                  : t("selector.showAllModels", {
                       count: Object.values(modelOptions).length,
                     })}
               </Button>
@@ -1032,7 +1024,7 @@ export function ModelSelector({
           {/* Sort Controls */}
           <Div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg border">
             <Label className="text-[11px] font-medium text-muted-foreground shrink-0">
-              {t("app.chat.selector.sortBy")}:
+              {t("selector.sortBy")}:
             </Label>
             <Div className="flex items-center gap-1 flex-wrap flex-1">
               {ModelSortFieldOptions.map((option) => (
@@ -1077,7 +1069,7 @@ export function ModelSelector({
                   const setupRequired = getSetupRequiredMessage(
                     model,
                     envAvailability,
-                    t,
+                    locale,
                   );
                   return (
                     <ModelCard
@@ -1109,12 +1101,12 @@ export function ModelSelector({
                     {showAllModels ? (
                       <>
                         <ChevronUp className="h-3 w-3 mr-1" />
-                        {t("app.chat.selector.showLess")}
+                        {t("selector.showLess")}
                       </>
                     ) : (
                       <>
                         <ChevronDown className="h-3 w-3 mr-1" />
-                        {t("app.chat.selector.showMore", {
+                        {t("selector.showMore", {
                           count: modelsToShow.length - 3,
                         })}
                       </>
@@ -1124,7 +1116,7 @@ export function ModelSelector({
               </Div>
             ) : (
               <Div className="p-4 text-center text-sm text-muted-foreground border rounded-lg">
-                {t("app.chat.selector.noMatchingModels")}
+                {t("selector.noMatchingModels")}
               </Div>
             )
           ) : (
@@ -1166,7 +1158,7 @@ export function ModelSelector({
                           const setupRequired = getSetupRequiredMessage(
                             model,
                             envAvailability,
-                            t,
+                            locale,
                           );
                           return (
                             <ModelCard
@@ -1200,14 +1192,9 @@ export function ModelSelector({
                           >
                             <ChevronRight className="h-4 w-4" />
                             <Span className="text-sm font-medium">
-                              {t(
-                                legacyModels.length === 1
-                                  ? "app.chat.selector.showLegacyModels_one"
-                                  : "app.chat.selector.showLegacyModels_other",
-                                {
-                                  count: legacyModels.length,
-                                },
-                              )}
+                              {t("selector.showLegacyModels", {
+                                count: legacyModels.length,
+                              })}
                             </Span>
                           </Div>
                         )}

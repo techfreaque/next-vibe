@@ -91,6 +91,7 @@ export class ChatFavoritesRepositoryClient {
           character?.description ?? null,
           activeFavoriteId,
           character?.voice ?? null,
+          locale,
         );
       });
 
@@ -163,7 +164,7 @@ export class ChatFavoritesRepositoryClient {
         });
       }
 
-      const enriched = this.enrichLocalFavorite(config);
+      const enriched = this.enrichLocalFavorite(config, locale);
       return success(enriched);
     } catch (error) {
       logger.error("Failed to get favorite", { ...parseError(error), id });
@@ -302,8 +303,10 @@ export class ChatFavoritesRepositoryClient {
     characterTagline: string | null,
     characterDescription: string | null,
     activeFavoriteId: string | null,
-    characterVoice?: typeof TtsVoiceValue | null,
+    characterVoice: typeof TtsVoiceValue | null,
+    locale: CountryLanguage,
   ): FavoriteCard {
+    const { t } = scopedTranslation.scopedT(locale);
     const bestModel = CharactersRepositoryClient.getBestModelForFavorite(
       stored.modelSelection,
       characterModelSelection ?? undefined,
@@ -318,7 +321,7 @@ export class ChatFavoritesRepositoryClient {
       voice: stored.voice ?? characterVoice ?? DEFAULT_TTS_VOICE,
       position: stored.position,
       icon: stored.customIcon ?? characterIcon ?? bestModel?.icon ?? "bot",
-      name: characterName ?? bestModel?.name ?? "Unknown",
+      name: characterName ?? bestModel?.name ?? t("fallbacks.unknown"),
       tagline: characterTagline ?? null,
       activeBadge:
         stored.id === activeFavoriteId
@@ -330,12 +333,13 @@ export class ChatFavoritesRepositoryClient {
             modelIcon: hasCharacter ? bestModel.icon : ("sparkles" as const),
             modelInfo: bestModel.name,
             modelProvider:
-              modelProviders[bestModel.provider]?.name ?? "Unknown",
+              modelProviders[bestModel.provider]?.name ??
+              t("fallbacks.unknownProvider"),
           }
         : {
             modelIcon: "sparkles" as const,
-            modelInfo: "No model found",
-            modelProvider: "Unknown",
+            modelInfo: t("fallbacks.noModel"),
+            modelProvider: t("fallbacks.unknownProvider"),
           }),
     };
   }
@@ -346,7 +350,9 @@ export class ChatFavoritesRepositoryClient {
    */
   static enrichLocalFavorite(
     stored: StoredLocalFavorite,
+    locale: CountryLanguage,
   ): FavoriteGetResponseOutput {
+    const { t } = scopedTranslation.scopedT(locale);
     const character = DEFAULT_CHARACTERS.find(
       (c) => c.id === stored.characterId,
     );
@@ -356,9 +362,9 @@ export class ChatFavoritesRepositoryClient {
       return {
         characterId: stored.characterId,
         icon: "user" as const,
-        name: "Unknown Character",
-        tagline: "",
-        description: "",
+        name: t("fallbacks.unknownCharacter"),
+        tagline: t("fallbacks.noTagline"),
+        description: t("fallbacks.noDescription"),
         voice: stored.voice,
         modelSelection: stored.modelSelection, // null or actual selection
         characterModelSelection: {
@@ -372,7 +378,7 @@ export class ChatFavoritesRepositoryClient {
     return {
       characterId: stored.characterId,
       icon: stored.customIcon ?? character.icon,
-      name: character.name ?? "Unknown",
+      name: character.name ?? t("fallbacks.unknown"),
       tagline: character.tagline ?? null,
       description: character.description ?? null,
       voice: stored.voice ?? character.voice,

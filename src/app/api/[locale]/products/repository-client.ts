@@ -220,7 +220,7 @@ export enum ProductIds {
 /**
  * Internal product definitions with pricing for all countries
  */
-const productDefinitions = {
+const productDefinitions: Record<ProductIds, ProductDefinition> = {
   free_tier: {
     name: "free.name",
     description: "free.description",
@@ -343,9 +343,9 @@ export class ProductsRepositoryImpl implements ProductsRepository {
     // Get price and currency based on interval and country
     // Let TypeScript infer the literal type from the data
     const priceData =
-      interval === "year" && "yearlyPriceByCountry" in definition
+      interval === "year" && definition.yearlyPriceByCountry
         ? definition.yearlyPriceByCountry[country]
-        : interval === "one_time" && "oneTimePriceByCountry" in definition
+        : interval === "one_time" && definition.oneTimePriceByCountry
           ? definition.oneTimePriceByCountry[country]
           : definition.priceByCountry[country];
 

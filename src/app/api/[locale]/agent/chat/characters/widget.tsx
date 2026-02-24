@@ -652,7 +652,6 @@ function CharacterCard({
               modelId={char.modelId}
               variant="text"
               className="text-xs text-muted-foreground"
-              t={t}
               locale={locale}
             />
           </Div>
@@ -1277,7 +1276,6 @@ function FavoritesList({
                       modelId={fav.modelId}
                       variant="text"
                       className="text-xs flex-shrink-0"
-                      t={t}
                       locale={locale}
                     />
                   </>

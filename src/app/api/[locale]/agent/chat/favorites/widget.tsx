@@ -41,7 +41,6 @@ import IconWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/w
 import TextWidget from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { cn } from "../../../shared/utils";
 import BadgeWidget from "../../../system/unified-interface/unified-ui/widgets/display-only/badge/react";
@@ -208,7 +207,6 @@ const SortableItem = React.memo(function SortableItem({
                 modelId={item.modelId}
                 variant="text"
                 className="text-xs text-muted-foreground"
-                t={simpleT(locale).t}
                 locale={locale}
               />
             )}

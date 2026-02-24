@@ -28,8 +28,10 @@ import { SortOrder, SortOrderOptions } from "../../imap-client/enum";
 import {
   EmailSortField,
   EmailSortFieldOptions,
+  EmailStatus,
   EmailStatusFilter,
   EmailStatusFilterOptions,
+  EmailType,
   EmailTypeFilter,
   EmailTypeFilterOptions,
 } from "../enum";
@@ -283,7 +285,7 @@ const { GET } = createEndpoint({
       emailsByType: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.emailsByType",
-        schema: z.record(z.string(), z.coerce.number()),
+        schema: z.record(z.enum(EmailType), z.coerce.number()),
       }),
 
       // User association metrics
@@ -364,7 +366,7 @@ const { GET } = createEndpoint({
                 status: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
                   content: "get.response.groupedStats.status",
-                  schema: z.string(),
+                  schema: z.enum(EmailStatus),
                 }),
                 count: scopedResponseField(scopedTranslation, {
                   type: WidgetType.TEXT,
@@ -720,7 +722,14 @@ const { GET } = createEndpoint({
         emailsByProvider: {},
         emailsByTemplate: {},
         emailsByStatus: {},
-        emailsByType: {},
+        emailsByType: {
+          [EmailType.TRANSACTIONAL]: 500,
+          [EmailType.MARKETING]: 300,
+          [EmailType.NOTIFICATION]: 150,
+          [EmailType.SYSTEM]: 50,
+          [EmailType.LEAD_CAMPAIGN]: 0,
+          [EmailType.USER_COMMUNICATION]: 0,
+        },
         emailsWithUserId: 800,
         emailsWithoutUserId: 200,
         emailsWithLeadId: 600,

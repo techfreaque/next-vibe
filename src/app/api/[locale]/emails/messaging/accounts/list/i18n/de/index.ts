@@ -86,4 +86,15 @@ export const translations: typeof enTranslations = {
     sent: "Gesendet",
     searchPlaceholder: "Konten suchen...",
   },
+  enums: {
+    channel: {
+      email: "E-Mail",
+      sms: "SMS",
+      whatsapp: "WhatsApp",
+      telegram: "Telegram",
+    },
+    channelFilter: {
+      any: "Alle Kanäle",
+    },
+  },
 };
