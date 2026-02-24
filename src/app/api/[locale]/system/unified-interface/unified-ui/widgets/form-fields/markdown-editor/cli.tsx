@@ -23,7 +23,9 @@ import type {
  */
 export function MarkdownEditorWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TSchema extends MarkdownEditorWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({

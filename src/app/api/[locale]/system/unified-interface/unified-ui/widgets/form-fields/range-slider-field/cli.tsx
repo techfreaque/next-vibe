@@ -20,7 +20,9 @@ import type { RangeSliderFieldWidgetConfig } from "./types";
 export function RangeSliderFieldWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TUsage extends FieldUsageConfig,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
 >({
   field,
 }: InkWidgetProps<

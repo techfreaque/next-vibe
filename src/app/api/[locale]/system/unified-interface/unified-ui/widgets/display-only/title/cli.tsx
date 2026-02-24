@@ -26,7 +26,9 @@ import type { TitleWidgetConfig, TitleWidgetSchema } from "./types";
  */
 export function TitleWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
 >(
   props:

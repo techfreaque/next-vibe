@@ -14,7 +14,9 @@ import type { NavigateButtonWidgetConfig } from "./types";
 
 export function NavigateButtonWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
   TTargetEndpoint extends CreateApiEndpointAny | undefined,
   TGetEndpoint extends CreateApiEndpointAny | undefined,

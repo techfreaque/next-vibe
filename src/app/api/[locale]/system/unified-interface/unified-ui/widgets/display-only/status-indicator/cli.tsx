@@ -46,7 +46,9 @@ function getStatusColor(
  */
 export function StatusIndicatorWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TSchema extends StatusIndicatorWidgetSchema,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive",

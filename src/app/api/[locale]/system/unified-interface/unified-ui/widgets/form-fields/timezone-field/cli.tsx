@@ -19,7 +19,9 @@ import type { TimezoneFieldWidgetConfig } from "./types";
 export function TimezoneFieldWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TUsage extends FieldUsageConfig,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
 >({
   field,
 }: InkWidgetProps<

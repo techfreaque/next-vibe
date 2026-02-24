@@ -19,7 +19,9 @@ import type { IconFieldWidgetConfig } from "./types";
 export function IconFieldWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TUsage extends FieldUsageConfig,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TSchema extends IconSchemaType,
 >({
   field,

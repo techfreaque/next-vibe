@@ -19,7 +19,9 @@ import type { DateRangeFieldWidgetConfig } from "./types";
 export function DateRangeFieldWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TUsage extends FieldUsageConfig,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
 >({
   field,
 }: InkWidgetProps<

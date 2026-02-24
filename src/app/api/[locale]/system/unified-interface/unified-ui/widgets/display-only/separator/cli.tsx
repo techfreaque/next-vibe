@@ -20,7 +20,9 @@ import type { SeparatorWidgetConfig } from "./types";
  */
 export function SeparatorWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
 >({
   field,

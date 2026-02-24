@@ -23,7 +23,9 @@ import type { FieldUsageConfig } from "../../_shared/types";
 import type { UuidFieldWidgetConfig } from "./types";
 
 export function UuidFieldWidgetInk<
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
   TEndpoint extends CreateApiEndpointAny,
 >({

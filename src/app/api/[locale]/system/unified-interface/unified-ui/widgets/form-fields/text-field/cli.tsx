@@ -34,7 +34,9 @@ import type { TextFieldWidgetConfig } from "./types";
  */
 export function TextFieldWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TSchema extends StringWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({

@@ -23,7 +23,9 @@ import type { KeyValueWidgetConfig, KeyValueWidgetSchema } from "./types";
  */
 export function KeyValueWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TSchema extends KeyValueWidgetSchema,
   TUsage extends FieldUsageConfig,
   TSchemaType extends "primitive",

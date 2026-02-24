@@ -13,7 +13,9 @@ import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-bas
 import type { SubmitButtonWidgetConfig } from "./types";
 
 export function SubmitButtonWidgetInk<
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
   TEndpoint extends CreateApiEndpointAny,
 >({

@@ -26,7 +26,9 @@ import type { LinkWidgetConfig, LinkWidgetSchema } from "./types";
  */
 export function LinkWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
 >(
   props:

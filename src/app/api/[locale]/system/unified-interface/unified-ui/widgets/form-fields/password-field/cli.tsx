@@ -25,7 +25,9 @@ import type { PasswordFieldWidgetConfig } from "./types";
 export function PasswordFieldWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TUsage extends FieldUsageConfig,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
 >({
   field,
   fieldName,

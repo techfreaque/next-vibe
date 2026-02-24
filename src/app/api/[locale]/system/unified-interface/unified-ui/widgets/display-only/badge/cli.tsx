@@ -22,7 +22,9 @@ import type { BadgeWidgetConfig, BadgeWidgetSchema } from "./types";
  */
 export function BadgeWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
 >(
   props:

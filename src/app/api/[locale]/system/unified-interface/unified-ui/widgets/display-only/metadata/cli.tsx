@@ -20,7 +20,9 @@ import type { MetadataWidgetConfig, MetadataWidgetSchema } from "./types";
  */
 export function MetadataWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
 >(
   props:

@@ -25,7 +25,9 @@ import type { StatWidgetConfig } from "./types";
  */
 export function StatWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TSchema extends NumberWidgetSchema,
   TUsage extends FieldUsageConfig,
 >({

@@ -179,8 +179,7 @@ export class CharactersRepositoryClient {
     modelSelection: FiltersModelSelection | ManualModelSelection,
   ): ModelOption[] {
     if (modelSelection.selectionType === ModelSelectionType.MANUAL) {
-      const manualSelection = modelSelection;
-      const model = modelOptions[manualSelection.manualModelId];
+      const model = modelOptions[modelSelection.manualModelId];
       return model ? [model] : [];
     }
 

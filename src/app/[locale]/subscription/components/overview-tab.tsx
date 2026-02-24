@@ -264,7 +264,6 @@ export function OverviewTab({
                                   modelId={model.id}
                                   variant="text"
                                   className="font-mono"
-                                  t={t}
                                   locale={locale}
                                 />
                               </Div>

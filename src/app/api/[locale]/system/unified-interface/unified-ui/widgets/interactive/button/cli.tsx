@@ -13,7 +13,9 @@ import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-bas
 import type { ButtonWidgetConfig } from "./types";
 
 export function ButtonWidgetInk<
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TEndpoint extends CreateApiEndpointAny,
   TUsage extends FieldUsageConfig,
 >({

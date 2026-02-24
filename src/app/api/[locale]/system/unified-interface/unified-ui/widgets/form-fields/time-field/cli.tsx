@@ -23,7 +23,9 @@ import type { FieldUsageConfig } from "../../_shared/types";
 import type { TimeFieldWidgetConfig } from "./types";
 
 export function TimeFieldWidgetInk<
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
   TEndpoint extends CreateApiEndpointAny,
 >({

@@ -23,7 +23,9 @@ import type { FieldUsageConfig } from "../../_shared/types";
 import type { PhoneFieldWidgetConfig } from "./types";
 
 export function PhoneFieldWidgetInk<
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
   TEndpoint extends CreateApiEndpointAny,
 >({

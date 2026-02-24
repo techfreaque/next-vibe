@@ -25,7 +25,9 @@ import type { IntFieldWidgetConfig } from "./types";
 export function IntFieldWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TUsage extends FieldUsageConfig,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
 >({
   field,
   fieldName,

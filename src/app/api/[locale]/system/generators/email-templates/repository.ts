@@ -338,7 +338,13 @@ ${descriptionStr}
 
 ${importStatements}
 
-import type { TemplateCachedMetadata } from "./types";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import type {
+  AnyTemplateConstraint,
+  TemplateCachedMetadata,
+  TranslatedPreviewFieldConfig,
+} from "./types";
 
 /**
  * Union type of all email template definitions
@@ -418,6 +424,99 @@ export function getTemplatesByCategory(
  */
 export function hasTemplate(id: string): boolean {
   return id in templateLoaders;
+}
+
+/**
+ * Translate template metadata using the template's own scopedT.
+ * Returns plain strings instead of translation keys.
+ */
+export async function getTranslatedTemplateMetadata(
+  id: string,
+  locale: CountryLanguage,
+): Promise<
+  | (Omit<TemplateCachedMetadata<string>, "name" | "description" | "category"> & {
+      name: string;
+      description: string;
+      category: string;
+    })
+  | undefined
+> {
+  const template = await getTemplate(id);
+  if (!template) {
+    return undefined;
+  }
+  const cached = templateMetadataMap[id];
+  if (!cached) {
+    return undefined;
+  }
+  const asConstraint = template as AnyTemplateConstraint;
+  const { t } = asConstraint.scopedTranslation.scopedT(locale);
+  return {
+    ...cached,
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
+    name: t(asConstraint.meta.name as never),
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
+    description: t(asConstraint.meta.description as never),
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
+    category: t(asConstraint.meta.category as never),
+  };
+}
+
+/**
+ * Translate preview fields using the template's own scopedT.
+ * Returns configs with plain label/description strings.
+ */
+export function translatePreviewFields(
+  template: AnyEmailTemplate,
+  locale: CountryLanguage,
+): Record<string, TranslatedPreviewFieldConfig> | undefined {
+  const asConstraint = template as AnyTemplateConstraint;
+  const fields = asConstraint.meta.previewFields;
+  if (!fields) {
+    return undefined;
+  }
+  const { t } = asConstraint.scopedTranslation.scopedT(locale);
+  const result: Record<string, TranslatedPreviewFieldConfig> = {};
+  for (const [key, field] of Object.entries(fields)) {
+    result[key] = {
+      ...field,
+      // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
+      label: t(field.label as never),
+      description: field.description
+        ? // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
+          t(field.description as never)
+        : undefined,
+      options: field.options?.map((opt) => ({
+        value: opt.value,
+        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- sealed dispatch: keys come from the same template's own translation scope
+        label: t(opt.label as never),
+      })),
+    };
+  }
+  return result;
+}
+
+/**
+ * Load all templates and return translated metadata for each.
+ */
+export async function getAllTranslatedTemplateMetadata(
+  locale: CountryLanguage,
+): Promise<
+  Array<
+    Omit<TemplateCachedMetadata<string>, "name" | "description" | "category"> & {
+      name: string;
+      description: string;
+      category: string;
+    }
+  >
+> {
+  const ids = getAllTemplateIds();
+  const results = await Promise.all(
+    ids.map((id) => getTranslatedTemplateMetadata(id, locale)),
+  );
+  return results.filter(
+    (r): r is NonNullable<typeof r> => r !== undefined,
+  );
 }
 `;
   }

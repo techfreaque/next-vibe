@@ -19,7 +19,9 @@ import type { TagsFieldWidgetConfig } from "./types";
 export function TagsFieldWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TUsage extends FieldUsageConfig,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
 >({
   field,
 }: InkWidgetProps<

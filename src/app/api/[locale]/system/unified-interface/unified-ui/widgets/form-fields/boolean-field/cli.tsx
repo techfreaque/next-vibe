@@ -19,7 +19,9 @@ import type { BooleanFieldWidgetConfig } from "./types";
 export function BooleanFieldWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
   TUsage extends FieldUsageConfig,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
 >({
   field,
 }: InkWidgetProps<

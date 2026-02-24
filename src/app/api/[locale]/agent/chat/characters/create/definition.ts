@@ -41,6 +41,7 @@ import {
 } from "../../characters/enum";
 import { CategoryOptions } from "../enum";
 import { CharacterCategory, CharacterCategoryDB } from "../enum";
+import type { CharactersTranslationKey } from "../i18n";
 import { scopedTranslation } from "../i18n";
 import { CharactersRepositoryClient } from "../repository-client";
 import { CharacterCreateContainer } from "./widget";
@@ -102,9 +103,10 @@ const { POST } = createEndpoint({
               icon: data.requestData.icon,
               category: data.requestData.category,
               modelId: bestModel.id,
-              name: data.requestData.name,
-              tagline: data.requestData.tagline,
-              description: data.requestData.description,
+              name: data.requestData.name as CharactersTranslationKey,
+              tagline: data.requestData.tagline as CharactersTranslationKey,
+              description: data.requestData
+                .description as CharactersTranslationKey,
               modelIcon: bestModel.icon,
               modelInfo: bestModel.name,
               modelProvider: bestModel.provider,

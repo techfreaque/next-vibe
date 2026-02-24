@@ -18,7 +18,9 @@ import type { CountrySelectFieldWidgetConfig } from "./types";
 
 export function CountrySelectFieldWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
 >({
   field,

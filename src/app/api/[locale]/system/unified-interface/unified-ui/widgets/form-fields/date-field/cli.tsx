@@ -24,7 +24,9 @@ import type { DateFieldWidgetConfig } from "./types";
 
 export function DateFieldWidgetInk<
   TEndpoint extends CreateApiEndpointAny,
-  TKey extends string,
+  TKey extends TEndpoint extends CreateApiEndpointAny
+    ? TEndpoint["scopedTranslation"]["ScopedTranslationKey"]
+    : never,
   TUsage extends FieldUsageConfig,
 >({
   field,
