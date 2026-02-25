@@ -28,20 +28,14 @@ const { POST } = createEndpoint({
   path: ["browser", "handle-dialog"],
   title: "handle-dialog.title",
   description: "handle-dialog.description",
-  category: "handle-dialog.category",
+  category: "app.endpointCategories.browserAutomation",
   icon: "message-square",
   tags: [
     "handle-dialog.tags.browserAutomation",
     "handle-dialog.tags.dialogAutomation",
   ],
 
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.PARTNER_ADMIN,
-    UserRole.PARTNER_EMPLOYEE,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

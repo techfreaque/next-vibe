@@ -36,7 +36,7 @@ const { POST } = createEndpoint({
   path: ["emails", "imap-client", "messages", "sync"],
   title: "title",
   description: "description",
-  category: "category",
+  category: "app.endpointCategories.email",
   icon: "message-square",
   tags: ["category" as const],
   allowedRoles: [UserRole.ADMIN],

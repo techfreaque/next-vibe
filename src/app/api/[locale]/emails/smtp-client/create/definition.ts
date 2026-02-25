@@ -54,7 +54,7 @@ const { POST } = createEndpoint({
   path: ["emails", "smtp-client", "create"],
   title: "title",
   description: "description",
-  category: "category",
+  category: "app.endpointCategories.email",
   icon: "server",
   tags: ["tag"],
   allowedRoles: [UserRole.ADMIN],

@@ -31,7 +31,7 @@ const { POST } = createEndpoint({
   title: "claudeCode.run.post.title",
   description: "claudeCode.run.post.description",
   icon: "terminal",
-  category: "category",
+  category: "app.endpointCategories.ai",
   tags: ["claudeCode.tags.tasks" as const],
   allowedRoles: [UserRole.ADMIN],
   aliases: ["claude-code", "claude"],

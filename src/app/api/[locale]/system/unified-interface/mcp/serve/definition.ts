@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   title: "serve.post.title" as const,
   description: "serve.post.description" as const,
   icon: "plug",
-  category: "serve.category" as const,
+  category: "app.endpointCategories.system",
   tags: ["serve.tags.mcp" as const],
   allowedRoles: [
     UserRole.ADMIN,

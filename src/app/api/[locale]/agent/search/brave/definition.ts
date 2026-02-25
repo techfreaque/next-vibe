@@ -47,7 +47,7 @@ const { GET } = createEndpoint({
   path: ["agent", "search", "brave"],
   title: "get.title" as const,
   description: "get.description" as const,
-  category: "category" as const,
+  category: "app.endpointCategories.ai",
   tags: ["tags.search" as const, "tags.web" as const, "tags.internet" as const],
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 

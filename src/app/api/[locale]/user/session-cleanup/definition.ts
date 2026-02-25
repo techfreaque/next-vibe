@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   path: ["user", "session-cleanup"],
   title: "post.title",
   description: "post.description",
-  category: "category",
+  category: "app.endpointCategories.userAuth",
   icon: "trash",
   tags: ["post.tag"],
   allowedRoles: [UserRole.ADMIN],

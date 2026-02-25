@@ -51,7 +51,7 @@ const { PATCH } = createEndpoint({
 
   title: "patch.title",
   description: "patch.description",
-  category: "category",
+  category: "app.endpointCategories.leads",
   tags: ["tags.leads", "tags.batch"],
 
   fields: customWidgetObject({
@@ -310,7 +310,7 @@ const { DELETE } = createEndpoint({
   title: "delete.title",
   description: "delete.description",
   icon: "user-x",
-  category: "category",
+  category: "app.endpointCategories.leads",
   tags: ["tags.leads", "tags.batch"],
 
   fields: customWidgetObject({

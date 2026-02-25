@@ -28,7 +28,7 @@ const { POST } = createEndpoint({
   path: ["system", "db", "ping"],
   title: "post.title",
   description: "post.description",
-  category: "category",
+  category: "app.endpointCategories.system",
   tags: ["tag"],
   icon: "database",
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],

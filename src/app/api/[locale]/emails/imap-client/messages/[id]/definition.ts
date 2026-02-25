@@ -35,7 +35,7 @@ const { GET } = createEndpoint({
   path: ["emails", "imap-client", "messages", "[id]"],
   title: "get.title",
   description: "get.description",
-  category: "category",
+  category: "app.endpointCategories.email",
   icon: "message-square",
   tags: ["tag"],
 
@@ -343,7 +343,7 @@ const { PATCH } = createEndpoint({
   path: ["emails", "imap-client", "messages", "[id]"],
   title: "patch.title",
   description: "patch.description",
-  category: "category",
+  category: "app.endpointCategories.email",
   icon: "message-square",
   tags: ["tag"],
 

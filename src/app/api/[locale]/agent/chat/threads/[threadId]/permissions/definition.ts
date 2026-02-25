@@ -31,7 +31,7 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "shield",
-  category: "category" as const,
+  category: "app.endpointCategories.chat",
   tags: ["tags.threads" as const, "tags.permissions" as const],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
@@ -167,7 +167,7 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "shield",
-  category: "category" as const,
+  category: "app.endpointCategories.chat",
   tags: ["tags.threads" as const, "tags.permissions" as const],
 
   fields: scopedObjectFieldNew(scopedTranslation, {

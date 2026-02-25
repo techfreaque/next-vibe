@@ -768,23 +768,32 @@ function StackEntryLayer({
   const method = entry.endpoint.method;
 
   // Hooks called at top level of this component (before any conditional returns)
-  const modalNavigationOverride = useMemo(() => {
-    if (!isModal) {
-      return undefined;
+  const navigationOverride = useMemo(() => {
+    if (isModal) {
+      return {
+        pop: (): void => {
+          setModalOpenState(
+            (prev: Record<number, boolean>): Record<number, boolean> => ({
+              ...prev,
+              [entry.timestamp]: false,
+            }),
+          );
+          finalNavigation.pop();
+        },
+        canGoBack: true,
+      };
     }
-    return {
-      pop: (): void => {
-        setModalOpenState(
-          (prev: Record<number, boolean>): Record<number, boolean> => ({
-            ...prev,
-            [entry.timestamp]: false,
-          }),
-        );
-        finalNavigation.pop();
-      },
-      canGoBack: true,
-    };
-  }, [isModal, entry.timestamp, finalNavigation, setModalOpenState]);
+    // Non-modal: allow back navigation when there's a stack to go back to
+    if (index > 0) {
+      return {
+        pop: (): void => {
+          finalNavigation.pop();
+        },
+        canGoBack: true,
+      };
+    }
+    return undefined;
+  }, [isModal, index, entry.timestamp, finalNavigation, setModalOpenState]);
 
   // Don't render if not visible
   if (!isVisible) {
@@ -815,7 +824,7 @@ function StackEntryLayer({
           debug={debug}
           user={user}
           _disableNavigationStack={true}
-          navigationOverride={isModal ? modalNavigationOverride : undefined}
+          navigationOverride={navigationOverride}
         />
       </StackEntryRenderer>
     );
@@ -846,7 +855,7 @@ function StackEntryLayer({
           submitButton={submitButton}
           debug={debug}
           _disableNavigationStack={true}
-          navigationOverride={isModal ? modalNavigationOverride : undefined}
+          navigationOverride={navigationOverride}
         />
       </StackEntryRenderer>
     );
@@ -881,7 +890,7 @@ function StackEntryLayer({
           submitButton={submitButton}
           debug={debug}
           _disableNavigationStack={true}
-          navigationOverride={isModal ? modalNavigationOverride : undefined}
+          navigationOverride={navigationOverride}
         />
       </StackEntryRenderer>
     );
@@ -913,7 +922,7 @@ function StackEntryLayer({
           submitButton={submitButton}
           debug={debug}
           _disableNavigationStack={true}
-          navigationOverride={isModal ? modalNavigationOverride : undefined}
+          navigationOverride={navigationOverride}
         />
       </StackEntryRenderer>
     );
@@ -943,7 +952,7 @@ function StackEntryLayer({
           }}
           debug={debug}
           _disableNavigationStack={true}
-          navigationOverride={isModal ? modalNavigationOverride : undefined}
+          navigationOverride={navigationOverride}
         />
       </StackEntryRenderer>
     );
@@ -986,7 +995,7 @@ function StackEntryLayer({
           submitButton={submitButton}
           debug={debug}
           _disableNavigationStack={true}
-          navigationOverride={isModal ? modalNavigationOverride : undefined}
+          navigationOverride={navigationOverride}
         />
       </StackEntryRenderer>
     );

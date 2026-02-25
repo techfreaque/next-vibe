@@ -61,7 +61,7 @@ const { GET } = createEndpoint({
 
   title: "get.title",
   description: "get.description",
-  category: "category",
+  category: "app.endpointCategories.leads",
   tags: ["tags.leads", "tags.management"],
   icon: "list",
 

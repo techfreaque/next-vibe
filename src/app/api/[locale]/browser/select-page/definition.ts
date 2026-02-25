@@ -28,20 +28,14 @@ const { POST } = createEndpoint({
   path: ["browser", "select-page"],
   title: "select-page.title",
   description: "select-page.description",
-  category: "select-page.category",
+  category: "app.endpointCategories.browserAutomation",
   icon: "square-check",
   tags: [
     "select-page.tags.browserAutomation",
     "select-page.tags.navigationAutomation",
   ],
 
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.PARTNER_ADMIN,
-    UserRole.PARTNER_EMPLOYEE,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

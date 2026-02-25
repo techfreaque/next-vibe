@@ -80,7 +80,7 @@ const { POST } = createEndpoint({
   path: ["leads", "tracking", "engagement"],
   title: "post.title",
   description: "post.description",
-  category: "category",
+  category: "app.endpointCategories.leads",
   icon: "activity",
   tags: ["tags.tracking", "tags.engagement"],
   allowedRoles: [
@@ -327,7 +327,7 @@ const { GET } = createEndpoint({
   path: ["leads", "tracking", "engagement"],
   title: "get.title",
   description: "get.description",
-  category: "category",
+  category: "app.endpointCategories.leads",
   icon: "bar-chart",
   tags: ["tags.tracking", "tags.engagement"],
   allowedRoles: [

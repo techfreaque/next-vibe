@@ -35,7 +35,7 @@ const { POST } = createEndpoint({
   path: ["emails", "preview", "render"],
   title: "preview.render.post.title" as const,
   description: "preview.render.post.description" as const,
-  category: "category" as const,
+  category: "app.endpointCategories.email",
   tags: ["preview.render.post.title" as const],
   icon: "mail",
   allowedRoles: [UserRole.ADMIN] as const,

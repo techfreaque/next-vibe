@@ -43,6 +43,7 @@ import { WidgetErrorBoundary } from "./ErrorBoundary";
 export function WidgetRenderer<TEndpoint extends CreateApiEndpointAny>({
   fieldName,
   field,
+  inlineButtonInfo,
 }: ReactWidgetProps<
   TEndpoint,
   FieldUsageConfig,
@@ -60,6 +61,7 @@ export function WidgetRenderer<TEndpoint extends CreateApiEndpointAny>({
       {renderWidget({
         fieldName,
         field,
+        inlineButtonInfo,
       })}
     </WidgetErrorBoundary>
   );

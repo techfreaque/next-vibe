@@ -67,7 +67,7 @@ const { DELETE } = createEndpoint({
   title: "delete.title" as const,
   description: "delete.description" as const,
   icon: "trash" as const,
-  category: "category" as const,
+  category: "app.endpointCategories.chat",
   tags: ["tags.characters" as const],
 
   options: {
@@ -255,7 +255,7 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.container.description" as const,
   icon: "sparkles" as const,
-  category: "category" as const,
+  category: "app.endpointCategories.chat",
   tags: ["tags.characters" as const],
 
   options: {
@@ -643,7 +643,7 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "sparkles" as const,
-  category: "category" as const,
+  category: "app.endpointCategories.chat",
   tags: ["tags.characters" as const],
 
   fields: customWidgetObject({

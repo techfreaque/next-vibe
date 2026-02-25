@@ -48,7 +48,7 @@ const { GET } = createEndpoint({
   path: ["leads", "export"],
   title: "get.title",
   description: "get.description",
-  category: "category",
+  category: "app.endpointCategories.leads",
   tags: ["tags.leads", "tags.export"],
   allowedRoles: [UserRole.ADMIN],
   icon: "download",

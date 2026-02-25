@@ -28,20 +28,14 @@ const { POST } = createEndpoint({
   path: ["browser", "take-screenshot"],
   title: "take-screenshot.title",
   description: "take-screenshot.description",
-  category: "take-screenshot.category",
+  category: "app.endpointCategories.browserAutomation",
   icon: "camera",
   tags: [
     "take-screenshot.tags.browserAutomation",
     "take-screenshot.tags.captureAutomation",
   ],
 
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.PARTNER_ADMIN,
-    UserRole.PARTNER_EMPLOYEE,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

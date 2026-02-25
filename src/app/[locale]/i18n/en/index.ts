@@ -367,6 +367,24 @@ export const translations = {
     },
   },
 
+  endpointCategories: {
+    ai: "AI",
+    chat: "Chat",
+    browserAutomation: "Browser Automation",
+    contact: "Contact",
+    credits: "Credits",
+    email: "Email",
+    dataImport: "Data Import",
+    leads: "Leads",
+    newsletter: "Newsletter",
+    payment: "Payment",
+    referral: "Referral",
+    ssh: "SSH",
+    subscription: "Subscription",
+    system: "System",
+    userAuth: "User Authentication",
+    userManagement: "User Management",
+  },
   ui: {
     iconPicker: {
       title: "Select Icon",

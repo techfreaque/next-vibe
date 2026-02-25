@@ -37,7 +37,7 @@ const { GET } = createEndpoint({
   path: ["agent", "search", "kagi"],
   title: "get.title" as const,
   description: "get.description" as const,
-  category: "category" as const,
+  category: "app.endpointCategories.ai",
   tags: ["tags.search" as const, "tags.web" as const, "tags.ai" as const],
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 

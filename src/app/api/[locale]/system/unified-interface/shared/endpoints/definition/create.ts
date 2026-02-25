@@ -190,7 +190,7 @@ export interface ApiEndpoint<
   // This makes errors appear on the specific property with the invalid key
   readonly title: NoInfer<TScopedTranslationKey>;
   readonly description: NoInfer<TScopedTranslationKey>;
-  readonly category: NoInfer<TScopedTranslationKey>;
+  readonly category: TranslationKey;
   readonly tags: readonly NoInfer<TScopedTranslationKey>[];
 
   /**

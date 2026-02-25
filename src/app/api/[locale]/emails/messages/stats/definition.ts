@@ -58,7 +58,7 @@ const { GET } = createEndpoint({
 
   title: "get.title",
   description: "get.description",
-  category: "category",
+  category: "app.endpointCategories.email",
   icon: "bar-chart-3",
   tags: ["tags.stats", "tags.analytics"],
 

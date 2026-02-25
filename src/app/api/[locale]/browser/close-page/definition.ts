@@ -28,18 +28,11 @@ const { POST } = createEndpoint({
   path: ["browser", "close-page"],
   title: "close-page.title",
   description: "close-page.description",
-  category: "close-page.category",
+  category: "app.endpointCategories.browserAutomation",
   icon: "x-square",
   tags: ["close-page.tags.browserAutomation", "close-page.tags.chromeDevTools"],
 
-  allowedRoles: [
-    UserRole.PUBLIC,
-    UserRole.ADMIN,
-    UserRole.PARTNER_ADMIN,
-    UserRole.PARTNER_EMPLOYEE,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

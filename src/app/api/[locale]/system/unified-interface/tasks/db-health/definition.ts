@@ -26,7 +26,7 @@ const { POST } = createEndpoint({
   path: ["system", "unified-interface", "tasks", "db-health"],
   title: "dbHealth.post.title",
   description: "dbHealth.post.description",
-  category: "category",
+  category: "app.endpointCategories.system",
   icon: "database",
   tags: ["dbHealth.tag" as const],
   allowedRoles: [UserRole.ADMIN],

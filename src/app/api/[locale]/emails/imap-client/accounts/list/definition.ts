@@ -47,7 +47,7 @@ const { GET } = createEndpoint({
   path: ["emails", "imap-client", "accounts", "list"],
   title: "title",
   description: "description",
-  category: "category",
+  category: "app.endpointCategories.email",
   tags: ["tags.accounts"],
 
   icon: "inbox",

@@ -372,6 +372,24 @@ export const translations: typeof enTranslations = {
     },
   },
 
+  endpointCategories: {
+    ai: "AI",
+    chat: "Czat",
+    browserAutomation: "Automatyzacja przeglądarki",
+    contact: "Kontakt",
+    credits: "Kredyty",
+    email: "E-mail",
+    dataImport: "Import danych",
+    leads: "Leady",
+    newsletter: "Newsletter",
+    payment: "Płatność",
+    referral: "Polecenie",
+    ssh: "SSH",
+    subscription: "Subskrypcja",
+    system: "System",
+    userAuth: "Uwierzytelnianie użytkownika",
+    userManagement: "Zarządzanie użytkownikami",
+  },
   ui: {
     iconPicker: {
       title: "Wybierz ikonę",

@@ -48,7 +48,7 @@ const { POST } = createEndpoint({
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "plus" as const,
-  category: "category" as const,
+  category: "app.endpointCategories.chat",
   tags: ["tags.favorites" as const],
 
   options: {

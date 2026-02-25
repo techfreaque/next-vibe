@@ -42,7 +42,7 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "message-circle",
-  category: "category" as const,
+  category: "app.endpointCategories.chat",
   tags: ["tags.messages" as const],
 
   errorTypes: {
@@ -201,7 +201,7 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "message-circle",
-  category: "category" as const,
+  category: "app.endpointCategories.chat",
   tags: ["tags.messages" as const],
 
   errorTypes: {
@@ -343,7 +343,7 @@ const { DELETE } = createEndpoint({
   title: "delete.title" as const,
   description: "delete.description" as const,
   icon: "message-circle",
-  category: "category" as const,
+  category: "app.endpointCategories.chat",
   tags: ["tags.messages" as const],
 
   errorTypes: {

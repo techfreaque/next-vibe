@@ -41,7 +41,7 @@ const { GET } = createEndpoint({
 
   title: "get.title",
   description: "get.description",
-  category: "category",
+  category: "app.endpointCategories.leads",
   tags: ["tags.leads", "tags.campaigns"],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
@@ -210,7 +210,7 @@ const { PUT } = createEndpoint({
 
   title: "post.title",
   description: "post.description",
-  category: "category",
+  category: "app.endpointCategories.leads",
   tags: ["tags.leads", "tags.campaigns"],
 
   fields: customWidgetObject({

@@ -33,7 +33,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["emails", "imap-client", "config"],
-  category: "category" as const,
+  category: "app.endpointCategories.email",
   allowedRoles: [UserRole.ADMIN],
 
   title: "title" as const,
@@ -356,7 +356,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["emails", "imap-client", "config"],
-  category: "category" as const,
+  category: "app.endpointCategories.email",
   allowedRoles: [UserRole.ADMIN],
 
   title: "update.title" as const,

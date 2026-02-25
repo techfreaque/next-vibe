@@ -31,7 +31,7 @@ export const { GET } = createEndpoint({
   title: "get.title",
   description: "get.description",
   icon: "activity",
-  category: "category",
+  category: "app.endpointCategories.system",
   allowedRoles: [UserRole.ADMIN],
   tags: ["tags.pulse" as const],
 

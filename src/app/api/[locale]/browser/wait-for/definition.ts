@@ -28,17 +28,11 @@ const { POST } = createEndpoint({
   path: ["browser", "wait-for"],
   title: "wait-for.title",
   description: "wait-for.description",
-  category: "wait-for.category",
+  category: "app.endpointCategories.browserAutomation",
   icon: "clock",
   tags: ["wait-for.tags.browserAutomation", "wait-for.tags.waitAutomation"],
 
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.PARTNER_ADMIN,
-    UserRole.PARTNER_EMPLOYEE,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

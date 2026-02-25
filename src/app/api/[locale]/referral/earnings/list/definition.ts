@@ -32,7 +32,7 @@ export const { GET } = createEndpoint({
   path: ["referral", "earnings", "list"],
   title: "get.title",
   description: "get.description",
-  category: "category",
+  category: "app.endpointCategories.referral",
   icon: "dollar-sign",
   tags: ["tags.referral", "tags.earnings", "tags.list"],
   allowedRoles: [

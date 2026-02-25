@@ -28,17 +28,11 @@ const { POST } = createEndpoint({
   path: ["browser", "press-key"],
   title: "press-key.title",
   description: "press-key.description",
-  category: "press-key.category",
+  category: "app.endpointCategories.browserAutomation",
   icon: "keyboard",
   tags: ["press-key.tags.browserAutomation", "press-key.tags.inputAutomation"],
 
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.PARTNER_ADMIN,
-    UserRole.PARTNER_EMPLOYEE,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

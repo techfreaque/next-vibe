@@ -28,20 +28,14 @@ const { POST } = createEndpoint({
   path: ["browser", "take-snapshot"],
   title: "take-snapshot.title",
   description: "take-snapshot.description",
-  category: "take-snapshot.category",
+  category: "app.endpointCategories.browserAutomation",
   icon: "file-text",
   tags: [
     "take-snapshot.tags.browserAutomation",
     "take-snapshot.tags.captureAutomation",
   ],
 
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.PARTNER_ADMIN,
-    UserRole.PARTNER_EMPLOYEE,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

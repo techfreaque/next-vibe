@@ -34,7 +34,7 @@ const { POST } = createEndpoint({
   aliases: ["dev", "d"],
   title: "post.title",
   description: "post.description",
-  category: "category",
+  category: "app.endpointCategories.system",
   tags: ["category"],
   icon: "code",
   allowedRoles: [

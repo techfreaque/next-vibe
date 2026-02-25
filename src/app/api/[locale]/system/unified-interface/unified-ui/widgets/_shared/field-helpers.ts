@@ -19,6 +19,7 @@ import type {
 } from "../../../shared/types/endpoint";
 import type { CreateApiEndpointAny } from "../../../shared/types/endpoint-base";
 import type { FieldUsage } from "../../../shared/types/enums";
+import { WidgetType } from "../../../shared/types/enums";
 import type { WidgetData } from "../../../shared/widgets/widget-data";
 import { hasChildren } from "./type-guards";
 import type {
@@ -242,6 +243,26 @@ export function scanForInlineButtons<const TKey extends string>(
       // Check if this child is a backButton field
       if (fieldName === "backButton") {
         result.hasBackButton = true;
+      }
+
+      // Check if this child is a submit button widget
+      if (
+        typeof childField === "object" &&
+        childField !== null &&
+        "type" in childField &&
+        childField.type === WidgetType.SUBMIT_BUTTON
+      ) {
+        result.hasSubmitButton = true;
+      }
+
+      // Check if this child is a form alert widget
+      if (
+        typeof childField === "object" &&
+        childField !== null &&
+        "type" in childField &&
+        childField.type === WidgetType.FORM_ALERT
+      ) {
+        result.hasFormAlert = true;
       }
 
       // Recursively scan child

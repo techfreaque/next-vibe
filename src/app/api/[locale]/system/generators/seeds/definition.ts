@@ -44,7 +44,7 @@ const { POST } = createEndpoint({
   path: ["system", "generators", "seeds"],
   title: "post.title",
   description: "post.description",
-  category: "category",
+  category: "app.endpointCategories.system",
   tags: ["success.generated"],
   icon: "leaf",
   allowedRoles: [UserRole.ADMIN, UserRole.WEB_OFF, UserRole.AI_TOOL_OFF],

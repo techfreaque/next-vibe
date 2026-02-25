@@ -95,7 +95,7 @@ const { GET } = createEndpoint({
   title: "get.title",
   description: "get.description",
   icon: "clock",
-  category: "category",
+  category: "app.endpointCategories.system",
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
@@ -387,7 +387,7 @@ const { POST } = createEndpoint({
   title: "post.title",
   description: "post.description",
   icon: "clock",
-  category: "category",
+  category: "app.endpointCategories.system",
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,

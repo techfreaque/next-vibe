@@ -37,7 +37,7 @@ const { GET } = createEndpoint({
 
   title: "get.title" as const,
   description: "get.description" as const,
-  category: "category" as const,
+  category: "app.endpointCategories.chat",
   tags: ["tags.folders" as const],
   icon: "folder-open" as const,
 
@@ -231,7 +231,7 @@ const { PATCH } = createEndpoint({
 
   title: "patch.title" as const,
   description: "patch.description" as const,
-  category: "category" as const,
+  category: "app.endpointCategories.chat",
   tags: ["tags.folders" as const],
   icon: "folder-pen" as const,
 
@@ -446,7 +446,7 @@ const { DELETE } = createEndpoint({
 
   title: "delete.title" as const,
   description: "delete.description" as const,
-  category: "category" as const,
+  category: "app.endpointCategories.chat",
   tags: ["tags.folders" as const],
   icon: "folder-x" as const,
 

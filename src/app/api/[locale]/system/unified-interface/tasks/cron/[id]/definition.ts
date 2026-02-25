@@ -47,7 +47,7 @@ const { GET } = createEndpoint({
   title: "get.title",
   description: "get.description",
   icon: "clock",
-  category: "category",
+  category: "app.endpointCategories.system",
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
@@ -177,7 +177,7 @@ const { PUT } = createEndpoint({
   title: "put.title",
   description: "put.description",
   icon: "clock",
-  category: "category",
+  category: "app.endpointCategories.system",
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
@@ -458,7 +458,7 @@ const { DELETE } = createEndpoint({
   title: "delete.title",
   description: "delete.description",
   icon: "clock",
-  category: "category",
+  category: "app.endpointCategories.system",
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.PARTNER_ADMIN,
@@ -483,16 +483,8 @@ const { DELETE } = createEndpoint({
         schema: z.string(),
       }),
 
-      // Response fields
-      success: scopedResponseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "delete.response.success.title",
-        schema: z.boolean(),
-      }),
-
       message: scopedResponseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "delete.response.message.title",
+        type: WidgetType.ALERT,
         schema: z.string(),
       }),
     },

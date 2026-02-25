@@ -29,7 +29,7 @@ const { GET } = createEndpoint({
   path: ["agent", "chat", "files", "[threadId]", "[filename]"],
   title: "get.title" as const,
   description: "get.description" as const,
-  category: "category" as const,
+  category: "app.endpointCategories.chat",
   icon: "download" as const,
   tags: ["tags.files" as const],
   allowedRoles: [

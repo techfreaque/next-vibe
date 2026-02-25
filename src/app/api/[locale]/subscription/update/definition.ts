@@ -38,7 +38,7 @@ const { PUT } = createEndpoint({
   title: "put.title" as const,
   description: "put.description" as const,
   icon: "package-check",
-  category: "category" as const,
+  category: "app.endpointCategories.subscription",
   tags: ["tags.subscription" as const, "tags.update" as const],
   allowedRoles: [
     UserRole.CUSTOMER,

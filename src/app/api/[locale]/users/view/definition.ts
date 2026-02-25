@@ -33,7 +33,7 @@ export const { GET } = createEndpoint({
   path: ["users", "view"],
   title: "get.title",
   description: "get.description",
-  category: "category",
+  category: "app.endpointCategories.userManagement",
   icon: "user" as const,
   tags: ["tags.user" as const, "tags.view" as const],
   allowedRoles: [UserRole.ADMIN] as const,

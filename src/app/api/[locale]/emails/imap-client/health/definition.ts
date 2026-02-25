@@ -36,7 +36,7 @@ const { GET } = createEndpoint({
 
   title: "health.get.title",
   description: "health.get.description",
-  category: "category",
+  category: "app.endpointCategories.email",
   icon: "activity",
   tags: ["tags.health", "tags.monitoring"],
 

@@ -26,7 +26,7 @@ const { POST } = createEndpoint({
   path: ["credits", "expire"],
   title: "expire.post.title",
   description: "expire.post.description",
-  category: "category",
+  category: "app.endpointCategories.credits",
   icon: "clock",
   tags: ["expire.post.tag"],
   allowedRoles: [UserRole.ADMIN],

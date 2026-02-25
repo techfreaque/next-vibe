@@ -31,7 +31,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   title: "post.title",
   description: "post.description",
-  category: "category",
+  category: "app.endpointCategories.system",
   tags: ["tag"],
   icon: "rotate-ccw",
   allowedRoles: [

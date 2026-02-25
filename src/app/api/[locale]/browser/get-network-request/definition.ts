@@ -28,20 +28,14 @@ const { POST } = createEndpoint({
   path: ["browser", "get-network-request"],
   title: "get-network-request.title",
   description: "get-network-request.description",
-  category: "get-network-request.category",
+  category: "app.endpointCategories.browserAutomation",
   icon: "network",
   tags: [
     "get-network-request.tags.browserAutomation",
     "get-network-request.tags.networkAnalysis",
   ],
 
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.PARTNER_ADMIN,
-    UserRole.PARTNER_EMPLOYEE,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

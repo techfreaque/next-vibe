@@ -35,15 +35,18 @@ import {
 } from "next-vibe-ui/ui/tooltip";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { DEFAULT_TOOL_IDS } from "@/app/api/[locale]/agent/chat/constants";
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
+import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
+import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import {
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetNavigation,
+  useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type definition from "./definition";
@@ -181,8 +184,61 @@ async function navigateToTool(
 
 export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   const { push: navigate } = useWidgetNavigation();
-  const { enabledTools, setEnabledTools } = useChatContext();
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
   const locale = useWidgetLocale();
+
+  // Use settings directly (no ChatProvider dependency)
+  const settingsOps = useChatSettings(user, logger);
+  const effectiveSettings = useMemo(
+    () => settingsOps.settings ?? ChatSettingsRepositoryClient.getDefaults(),
+    [settingsOps.settings],
+  );
+  const enabledTools = useMemo((): EnabledTool[] | null => {
+    const { allowedTools, pinnedTools } = effectiveSettings;
+    if (allowedTools === null && pinnedTools === null) {
+      return null;
+    }
+    const allIds = new Set([
+      ...(allowedTools ?? []).map((t) => t.toolId),
+      ...(pinnedTools ?? []).map((t) => t.toolId),
+    ]);
+    return [...allIds].map((id) => {
+      const allowed = allowedTools?.find((t) => t.toolId === id);
+      const pinned = pinnedTools?.find((t) => t.toolId === id);
+      return {
+        id,
+        requiresConfirmation:
+          allowed?.requiresConfirmation ??
+          pinned?.requiresConfirmation ??
+          false,
+        pinned:
+          pinnedTools !== null
+            ? pinnedTools.some((t) => t.toolId === id)
+            : true,
+      };
+    });
+  }, [effectiveSettings]);
+  const setEnabledTools = useCallback(
+    (tools: EnabledTool[] | null): void => {
+      if (tools === null) {
+        settingsOps.setTools(null, null);
+        return;
+      }
+      const allowedTools = tools.map(({ id, requiresConfirmation }) => ({
+        toolId: id,
+        requiresConfirmation,
+      }));
+      const pinnedTools = tools
+        .filter((t) => t.pinned)
+        .map(({ id, requiresConfirmation }) => ({
+          toolId: id,
+          requiresConfirmation,
+        }));
+      settingsOps.setTools(allowedTools, pinnedTools);
+    },
+    [settingsOps],
+  );
   const { t } = scopedTranslation.scopedT(locale);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -574,7 +630,12 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
 
         {/* Tools List */}
         <Div
-          style={{ maxHeight: "45dvh", overflowY: "auto", paddingRight: "4px" }}
+          style={{
+            maxHeight: "45dvh",
+            overflowY: "auto",
+            paddingRight: "4px",
+            contain: "layout",
+          }}
         >
           {filteredTools.length === 0 ? (
             <Div className="text-center py-8 text-muted-foreground text-sm">

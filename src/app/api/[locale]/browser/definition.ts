@@ -33,7 +33,7 @@ const { POST } = createEndpoint({
   path: ["browser"],
   title: "title",
   description: "description",
-  category: "category",
+  category: "app.endpointCategories.browserAutomation",
   icon: "monitor",
   tags: [
     "tags.browserAutomation",
@@ -44,13 +44,7 @@ const { POST } = createEndpoint({
   ],
   aliases: ["chrome"],
 
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.PARTNER_ADMIN,
-    UserRole.PARTNER_EMPLOYEE,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

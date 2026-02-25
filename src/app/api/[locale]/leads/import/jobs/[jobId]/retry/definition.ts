@@ -35,7 +35,7 @@ const { POST } = createEndpoint({
   path: ["leads", "import", "jobs", ":jobId", "retry"],
   title: "post.title",
   description: "post.description",
-  category: "category",
+  category: "app.endpointCategories.leads",
   tags: ["tags.leads", "tags.management"],
   allowedRoles: [UserRole.ADMIN],
   icon: "rotate-ccw",

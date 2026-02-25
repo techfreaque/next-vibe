@@ -48,7 +48,7 @@ const { POST } = createEndpoint({
   path: ["leads", "create"],
   title: "post.title",
   description: "post.description",
-  category: "category",
+  category: "app.endpointCategories.leads",
   tags: ["tags.leads", "tags.create"],
   allowedRoles: [UserRole.ADMIN],
   icon: "user-plus",

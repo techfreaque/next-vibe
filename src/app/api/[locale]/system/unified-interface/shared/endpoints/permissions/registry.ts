@@ -110,8 +110,10 @@ class PermissionsRegistry implements IPermissionsRegistry {
     const platformMarkers = filterPlatformMarkers(allowedRoles);
 
     // Check production environment restrictions
+    // Skip when local mode is active (LOCAL_MODE_DATABASE_URL / LOCAL_MODE_APP_URL set)
     if (
       envClient.NODE_ENV === "production" &&
+      !envClient.NEXT_PUBLIC_LOCAL_MODE &&
       platformMarkers.includes(PlatformMarker.PRODUCTION_OFF)
     ) {
       return {
@@ -230,6 +232,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
 
     if (
       envClient.NODE_ENV === "production" &&
+      !envClient.NEXT_PUBLIC_LOCAL_MODE &&
       platformMarkers.includes(PlatformMarker.PRODUCTION_OFF)
     ) {
       return {
@@ -350,12 +353,11 @@ class PermissionsRegistry implements IPermissionsRegistry {
           success: false,
           message: scopedTranslation
             .scopedT(locale)
-            .t("shared.permissions.errors.platformAccessDenied"),
+            .t("shared.permissions.errors.platformAccessDenied", {
+              platform: String(platform),
+              reason: platformAccess.reason || "Platform not allowed",
+            }),
           errorType: ErrorResponseTypes.FORBIDDEN,
-          messageParams: {
-            platform: String(platform),
-            reason: platformAccess.reason || "Platform not allowed",
-          },
         };
       }
 
@@ -370,17 +372,16 @@ class PermissionsRegistry implements IPermissionsRegistry {
           success: false,
           message: scopedTranslation
             .scopedT(locale)
-            .t("shared.permissions.errors.insufficientRoles"),
+            .t("shared.permissions.errors.insufficientRoles", {
+              userId: user.isPublic ? "public" : user.id,
+              requiredRoles: localModeRoles
+                .map((role) => tRoles(role))
+                .join(", "),
+              userRoles: user.roles?.length
+                ? user.roles.map((role) => tRoles(role)).join(", ")
+                : "none",
+            }),
           errorType: ErrorResponseTypes.FORBIDDEN,
-          messageParams: {
-            userId: user.isPublic ? "public" : user.id,
-            requiredRoles: localModeRoles
-              .map((role) => tRoles(role))
-              .join(", "),
-            userRoles: user.roles?.length
-              ? user.roles.map((role) => tRoles(role)).join(", ")
-              : "none",
-          },
         };
       }
 
@@ -397,12 +398,11 @@ class PermissionsRegistry implements IPermissionsRegistry {
         success: false,
         message: scopedTranslation
           .scopedT(locale)
-          .t("shared.permissions.errors.platformAccessDenied"),
+          .t("shared.permissions.errors.platformAccessDenied", {
+            platform: String(platform),
+            reason: platformAccess.reason || "Platform not allowed",
+          }),
         errorType: ErrorResponseTypes.FORBIDDEN,
-        messageParams: {
-          platform: String(platform),
-          reason: platformAccess.reason || "Platform not allowed",
-        },
       };
     }
 
@@ -414,17 +414,16 @@ class PermissionsRegistry implements IPermissionsRegistry {
         success: false,
         message: scopedTranslation
           .scopedT(locale)
-          .t("shared.permissions.errors.insufficientRoles"),
+          .t("shared.permissions.errors.insufficientRoles", {
+            userId: user.isPublic ? "public" : user.id,
+            requiredRoles: endpoint.allowedRoles
+              .map((role) => tRoles(role))
+              .join(", "),
+            userRoles: user.roles?.length
+              ? user.roles.map((role) => tRoles(role)).join(", ")
+              : "none",
+          }),
         errorType: ErrorResponseTypes.FORBIDDEN,
-        messageParams: {
-          userId: user.isPublic ? "public" : user.id,
-          requiredRoles: endpoint.allowedRoles
-            .map((role) => tRoles(role))
-            .join(", "),
-          userRoles: user.roles?.length
-            ? user.roles.map((role) => tRoles(role)).join(", ")
-            : "none",
-        },
       };
     }
 
@@ -684,8 +683,10 @@ class PermissionsRegistry implements IPermissionsRegistry {
     }
 
     // Check if endpoint is disabled in production environment
+    // Skip when local mode is active (LOCAL_MODE_DATABASE_URL / LOCAL_MODE_APP_URL set)
     if (
       process.env.NODE_ENV === "production" &&
+      !envClient.NEXT_PUBLIC_LOCAL_MODE &&
       endpoint.allowedRoles.includes(UserRole.PRODUCTION_OFF)
     ) {
       return true;

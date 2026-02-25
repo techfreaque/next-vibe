@@ -47,7 +47,7 @@ const { POST } = createEndpoint({
   title: "executeTool.post.title" as const,
   description: "executeTool.post.description" as const,
   icon: "zap",
-  category: "tools.get.category" as const,
+  category: "app.endpointCategories.system",
   tags: ["tools.get.tags.tools" as const],
 
   // Public — the target route enforces its own auth

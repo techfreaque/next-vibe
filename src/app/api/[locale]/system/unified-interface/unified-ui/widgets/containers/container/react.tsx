@@ -50,6 +50,7 @@ import {
   useWidgetForm,
   useWidgetIsSubmitting,
   useWidgetLocale,
+  useWidgetNavigation,
   useWidgetOnCancel,
   useWidgetOnSubmit,
   useWidgetResponse,
@@ -145,6 +146,7 @@ export function ContainerWidget<
   const submitButton = useWidgetSubmitButton<TEndpoint>();
   const cancelButton = useWidgetCancelButton<TEndpoint>();
   const response = useWidgetResponse();
+  const navigation = useWidgetNavigation();
 
   const { t: globalT } = reactScopedTranslation.scopedT(locale);
 
@@ -266,6 +268,16 @@ export function ContainerWidget<
     !submitButtonConfig &&
     !(inlineButtonInfo?.hasSubmitButton ?? false) &&
     hasFormInputs;
+
+  // Auto BackButton logic:
+  // Show auto back button when:
+  // 1. Root container with auto submit button showing
+  // 2. No inline back button already defined in the field tree
+  // 3. Navigation stack exists and can go back
+  const shouldShowAutoBackButton =
+    shouldShowAutoSubmitButton &&
+    !(inlineButtonInfo?.hasBackButton ?? false) &&
+    navigation?.canGoBack;
 
   // Auto FormAlert logic: only in root container
   const shouldShowAutoFormAlert =
@@ -487,7 +499,20 @@ export function ContainerWidget<
         {/* Auto SubmitButton when no explicit config */}
         {shouldShowAutoSubmitButton && (
           <Div className={cn("flex", buttonGapClass || "gap-2")}>
-            {onCancel && (
+            {shouldShowAutoBackButton && (
+              <Button
+                type="button"
+                onClick={(): void => {
+                  navigation?.pop();
+                }}
+                disabled={isSubmitting}
+                variant="outline"
+              >
+                <Icon icon="arrow-left" className="h-4 w-4 mr-2" />
+                {globalT("widgets.endpointRenderer.cancel")}
+              </Button>
+            )}
+            {onCancel && !shouldShowAutoBackButton && (
               <Button
                 type="button"
                 onClick={onCancel}
@@ -511,7 +536,9 @@ export function ContainerWidget<
               disabled={isSubmitting}
               variant={submitButton?.variant}
               size={submitButton?.size}
-              className={onCancel ? "flex-1" : "w-full"}
+              className={
+                onCancel || shouldShowAutoBackButton ? "flex-1" : "w-full"
+              }
             >
               {isSubmitting ? autoSubmitLoadingText : autoSubmitText}
             </Button>
@@ -654,7 +681,20 @@ export function ContainerWidget<
           }
         >
           <Div className={cn("flex", buttonGapClass || "gap-2")}>
-            {onCancel && (
+            {shouldShowAutoBackButton && (
+              <Button
+                type="button"
+                onClick={(): void => {
+                  navigation?.pop();
+                }}
+                disabled={isSubmitting}
+                variant="outline"
+              >
+                <Icon icon="arrow-left" className="h-4 w-4 mr-2" />
+                {globalT("widgets.endpointRenderer.cancel")}
+              </Button>
+            )}
+            {onCancel && !shouldShowAutoBackButton && (
               <Button
                 type="button"
                 onClick={onCancel}
@@ -673,7 +713,9 @@ export function ContainerWidget<
                 }
               }}
               disabled={isSubmitting}
-              className={onCancel ? "flex-1" : "w-full"}
+              className={
+                onCancel || shouldShowAutoBackButton ? "flex-1" : "w-full"
+              }
             >
               {isSubmitting ? autoSubmitLoadingText : autoSubmitText}
             </Button>

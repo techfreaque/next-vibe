@@ -27,7 +27,7 @@ const { GET } = createEndpoint({
   path: ["agent", "models", "openrouter"],
   title: "get.title" as const,
   description: "get.description" as const,
-  category: "category" as const,
+  category: "app.endpointCategories.ai",
   tags: ["tags.models" as const],
   allowedRoles: [
     UserRole.ADMIN,

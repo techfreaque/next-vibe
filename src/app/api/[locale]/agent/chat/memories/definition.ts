@@ -47,7 +47,7 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "brain",
-  category: "category" as const,
+  category: "app.endpointCategories.chat",
   tags: ["tags.memories" as const],
 
   fields: customWidgetObject({

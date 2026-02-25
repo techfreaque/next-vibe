@@ -28,20 +28,14 @@ const { POST } = createEndpoint({
   path: ["browser", "get-console-message"],
   title: "get-console-message.title",
   description: "get-console-message.description",
-  category: "get-console-message.category",
+  category: "app.endpointCategories.browserAutomation",
   icon: "terminal",
   tags: [
     "get-console-message.tags.browserAutomation",
     "get-console-message.tags.debugging",
   ],
 
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.PARTNER_ADMIN,
-    UserRole.PARTNER_EMPLOYEE,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

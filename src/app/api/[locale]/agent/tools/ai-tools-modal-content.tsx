@@ -6,9 +6,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "next-vibe-ui/ui/dialog";
-import { Zap } from "next-vibe-ui/ui/icons";
+import { Maximize, Zap } from "next-vibe-ui/ui/icons";
+import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
+import { scopedTranslation } from "@/app/[locale]/tools/i18n";
 import helpDefinitions from "@/app/api/[locale]/system/help/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -30,9 +32,18 @@ export function AIToolsModalContent({
   user,
 }: AIToolsModalContentProps): JSX.Element {
   const { t } = simpleT(locale);
+  const { t: toolsT } = scopedTranslation.scopedT(locale);
 
   return (
     <DialogContent className="sm:max-w-[750px] max-h-[90dvh] flex flex-col overflow-hidden p-0">
+      <Link
+        href={`/${locale}/tools`}
+        className="absolute right-12 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        title={toolsT("openFullPage")}
+      >
+        <Maximize className="h-4 w-4" />
+      </Link>
+
       <DialogHeader className="px-6 pt-6 pb-0 shrink-0">
         <DialogTitle className="flex items-center gap-2">
           <Zap className="h-5 w-5" />

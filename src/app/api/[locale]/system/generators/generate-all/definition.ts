@@ -27,7 +27,7 @@ const { POST } = createEndpoint({
   path: ["system", "generators", "generate-all"],
   title: "post.title",
   description: "post.description",
-  category: "category",
+  category: "app.endpointCategories.system",
   tags: ["post.title"],
   icon: "sparkles",
   allowedRoles: [

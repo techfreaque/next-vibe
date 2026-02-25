@@ -28,20 +28,14 @@ const { POST } = createEndpoint({
   path: ["browser", "performance-start-trace"],
   title: "performance-start-trace.title",
   description: "performance-start-trace.description",
-  category: "performance-start-trace.category",
+  category: "app.endpointCategories.browserAutomation",
   icon: "activity",
   tags: [
     "performance-start-trace.tags.browserAutomation",
     "performance-start-trace.tags.performanceAutomation",
   ],
 
-  allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.PARTNER_ADMIN,
-    UserRole.PARTNER_EMPLOYEE,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.PRODUCTION_OFF],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

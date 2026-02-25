@@ -33,7 +33,7 @@ const { GET } = createEndpoint({
   path: ["emails", "messages", "[id]"],
   title: "title",
   description: "description",
-  category: "category",
+  category: "app.endpointCategories.email",
   icon: "message-square",
   tags: ["tags.emails"],
   allowedRoles: [UserRole.ADMIN],

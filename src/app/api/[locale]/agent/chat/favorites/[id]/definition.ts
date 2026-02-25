@@ -66,7 +66,7 @@ const { DELETE } = createEndpoint({
   title: "delete.title" as const,
   description: "delete.description" as const,
   icon: "trash" as const,
-  category: "category" as const,
+  category: "app.endpointCategories.chat",
   tags: ["tags.favorites" as const],
 
   options: {
@@ -299,7 +299,7 @@ const { PATCH } = createEndpoint({
   title: "patch.title" as const,
   description: "patch.description" as const,
   icon: "edit" as const,
-  category: "category" as const,
+  category: "app.endpointCategories.chat",
   tags: ["tags.favorites" as const],
 
   options: {
@@ -701,7 +701,7 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "star" as const,
-  category: "category" as const,
+  category: "app.endpointCategories.chat",
   tags: ["tags.favorites" as const],
 
   fields: scopedObjectFieldNew(scopedTranslation, {

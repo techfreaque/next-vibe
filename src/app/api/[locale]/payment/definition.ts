@@ -38,7 +38,7 @@ const { GET } = createEndpoint({
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "credit-card",
-  category: "category" as const,
+  category: "app.endpointCategories.payment",
   tags: ["tags.payment" as const, "tags.stripe" as const, "tags.info" as const],
   allowedRoles: [
     UserRole.CUSTOMER,
@@ -198,7 +198,7 @@ const { POST } = createEndpoint({
   title: "create.title" as const,
   description: "create.description" as const,
   icon: "shopping-cart",
-  category: "category" as const,
+  category: "app.endpointCategories.payment",
   tags: [
     "tags.payment" as const,
     "tags.stripe" as const,

@@ -38,7 +38,7 @@ const { GET } = createEndpoint({
   path: ["credits", "history"],
   title: "history.get.title",
   description: "history.get.description",
-  category: "category",
+  category: "app.endpointCategories.credits",
   tags: ["tags.credits", "tags.balance"],
   icon: "wallet",
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,

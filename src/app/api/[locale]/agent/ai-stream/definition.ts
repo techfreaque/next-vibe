@@ -52,7 +52,7 @@ const { POST } = createEndpoint({
   title: "post.title",
   description: "post.description",
   icon: "sparkles",
-  category: "category",
+  category: "app.endpointCategories.ai",
   tags: ["tags.streaming", "tags.chat", "tags.ai"],
 
   fields: scopedObjectFieldNew(scopedTranslation, {

@@ -47,7 +47,7 @@ const { POST } = createEndpoint({
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "git-branch",
-  category: "category" as const,
+  category: "app.endpointCategories.chat",
   tags: ["tags.messages" as const],
 
   errorTypes: {

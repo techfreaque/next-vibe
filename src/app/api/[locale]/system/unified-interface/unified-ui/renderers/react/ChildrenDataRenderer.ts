@@ -233,11 +233,12 @@ export class ChildrenDataRenderer {
       const isWidgetField =
         "schemaType" in field && field.schemaType === "widget";
 
-      // Check data existence for response-only fields
-      // Widget-only fields should always render (they have static content)
-      // Regular response fields need their own field-specific data
-      if (config.responseOnly && !isWidgetField && !isWidgetOnly) {
-        // Regular response field: check if field data exists
+      // Hide response-only fields that have no data.
+      // Widget-only fields always render (static content, no data dependency).
+      // This applies universally — not just in responseOnly mode — so that
+      // response fields inside mixed containers don't render empty labels.
+      const isResponseOnly = isResponseField(field) && !isRequestField(field);
+      if (isResponseOnly && !isWidgetField && !isWidgetOnly) {
         if (data === null || data === undefined) {
           continue;
         }
