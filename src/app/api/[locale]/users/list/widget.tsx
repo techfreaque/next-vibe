@@ -35,6 +35,7 @@ import {
   useWidgetContext,
   useWidgetForm,
   useWidgetLocale,
+  useWidgetNavigation,
   useWidgetOnSubmit,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -79,16 +80,16 @@ function UserRow({
 }: {
   user: User;
   locale: CountryLanguage;
-  onView: (user: User) => void;
-  onEdit: (user: User) => void;
-  onDelete: (user: User) => void;
+  onView: (user: User) => void | Promise<void>;
+  onEdit: (user: User) => void | Promise<void>;
+  onDelete: (user: User) => void | Promise<void>;
   onCreditHistory: (userId: string) => void;
   t: UsersListT;
 }): React.JSX.Element {
   return (
     <Div
       className="group flex items-center gap-3 p-3 rounded-lg border hover:bg-accent cursor-pointer transition-colors"
-      onClick={() => onView(user)}
+      onClick={() => void onView(user)}
     >
       <Div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary">
         {((user.privateName ?? user.email) || "?").slice(0, 2).toUpperCase()}
@@ -148,7 +149,7 @@ function UserRow({
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() => onView(user)}
+          onClick={() => void onView(user)}
           title={t("widget.view")}
         >
           <Eye className="h-4 w-4" />
@@ -157,7 +158,7 @@ function UserRow({
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() => onEdit(user)}
+          onClick={() => void onEdit(user)}
           title={t("widget.edit")}
         >
           <Pencil className="h-4 w-4" />
@@ -167,7 +168,7 @@ function UserRow({
           variant="ghost"
           size="sm"
           className="text-destructive hover:text-destructive"
-          onClick={() => onDelete(user)}
+          onClick={() => void onDelete(user)}
           title={t("widget.delete")}
         >
           <Trash2 className="h-4 w-4" />
@@ -185,6 +186,7 @@ export function UsersListContainer({
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
   const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
   const usersT = usersScopedTranslation.scopedT(locale).t;
   const form = useWidgetForm<typeof definition.GET>();
@@ -278,24 +280,37 @@ export function UsersListContainer({
   );
 
   const handleView = useCallback(
-    (user: User): void => {
-      router.push(`/${locale}/admin/users/${user.id}/edit`);
+    async (user: User): Promise<void> => {
+      const userDefinitions = await import("../user/[id]/definition");
+      navigate(userDefinitions.default.GET, {
+        urlPathParams: { id: user.id },
+      });
     },
-    [router, locale],
+    [navigate],
   );
 
   const handleEdit = useCallback(
-    (user: User): void => {
-      router.push(`/${locale}/admin/users/${user.id}/edit`);
+    async (user: User): Promise<void> => {
+      const userDefinitions = await import("../user/[id]/definition");
+      navigate(userDefinitions.default.PUT, {
+        urlPathParams: { id: user.id },
+        prefillFromGet: true,
+        getEndpoint: userDefinitions.default.GET,
+        popNavigationOnSuccess: 1,
+      });
     },
-    [router, locale],
+    [navigate],
   );
 
   const handleDelete = useCallback(
-    (user: User): void => {
-      router.push(`/${locale}/admin/users/${user.id}/edit`);
+    async (user: User): Promise<void> => {
+      const userDefinitions = await import("../user/[id]/definition");
+      navigate(userDefinitions.default.DELETE, {
+        urlPathParams: { id: user.id },
+        popNavigationOnSuccess: 1,
+      });
     },
-    [router, locale],
+    [navigate],
   );
 
   const handleCreate = useCallback((): void => {

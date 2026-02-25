@@ -30,6 +30,7 @@ import React, { useCallback, useState } from "react";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetLocale,
+  useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
@@ -87,6 +88,7 @@ export function UserDetailContainer({
   const locale = useWidgetLocale();
   const t = useWidgetTranslation<typeof definition.GET>();
   const router = useRouter();
+  const { push: navigate } = useWidgetNavigation();
   const isLoading = !data;
   const [copiedId, setCopiedId] = useState(false);
   const [copiedLeadId, setCopiedLeadId] = useState(false);
@@ -108,25 +110,35 @@ export function UserDetailContainer({
   const updatedAt = data?.updatedAt ?? data?.timestamps?.updatedAt;
   const leadId = data?.leadId;
 
-  const handleEdit = useCallback((): void => {
+  const handleEdit = useCallback(async (): Promise<void> => {
     if (!userId) {
       return;
     }
-    router.push(`/${locale}/admin/users/${userId}/edit`);
-  }, [router, locale, userId]);
+    const defs = await import("./definition");
+    navigate(defs.default.PUT, {
+      urlPathParams: { id: userId },
+      prefillFromGet: true,
+      getEndpoint: defs.default.GET,
+      popNavigationOnSuccess: 1,
+    });
+  }, [navigate, userId]);
 
-  const handleDelete = useCallback((): void => {
+  const handleDelete = useCallback(async (): Promise<void> => {
     if (!userId) {
       return;
     }
-    router.push(`/${locale}/admin/users/${userId}/edit`);
-  }, [router, locale, userId]);
+    const defs = await import("./definition");
+    navigate(defs.default.DELETE, {
+      urlPathParams: { id: userId },
+      popNavigationOnSuccess: 1,
+    });
+  }, [navigate, userId]);
 
   const handleViewCreditHistory = useCallback((): void => {
     if (!userId) {
       return;
     }
-    router.push(`/${locale}/admin/users/${userId}/edit`);
+    router.push(`/${locale}/admin/users/${userId}/credits`);
   }, [router, locale, userId]);
 
   const handleViewLead = useCallback((): void => {
@@ -140,15 +152,15 @@ export function UserDetailContainer({
     if (!userId) {
       return;
     }
-    router.push(`/${locale}/admin/users/${userId}/edit`);
+    router.push(`/${locale}/admin/users/${userId}/profile`);
   }, [router, locale, userId]);
 
   const handleReferralStats = useCallback((): void => {
-    router.push(`/${locale}/admin/users/${userId ?? ""}/edit`);
+    router.push(`/${locale}/admin/users/${userId ?? ""}/referrals`);
   }, [router, locale, userId]);
 
   const handleSubscription = useCallback((): void => {
-    router.push(`/${locale}/admin/users/${userId ?? ""}/edit`);
+    router.push(`/${locale}/admin/users/${userId ?? ""}/subscription`);
   }, [router, locale, userId]);
 
   const handleCopyUserId = useCallback((): void => {
@@ -204,7 +216,7 @@ export function UserDetailContainer({
           type="button"
           variant="ghost"
           size="sm"
-          onClick={handleEdit}
+          onClick={() => void handleEdit()}
           title="Edit"
         >
           <Edit className="h-4 w-4" />
@@ -214,7 +226,7 @@ export function UserDetailContainer({
           variant="ghost"
           size="sm"
           className="text-destructive hover:text-destructive"
-          onClick={handleDelete}
+          onClick={() => void handleDelete()}
           title="Delete"
         >
           <Trash2 className="h-4 w-4" />

@@ -152,7 +152,9 @@ export function loadEnvironment(): EnvironmentResult {
     args.includes(BUILD_ALIAS) ||
     args.includes(BUILD_SERVER_ALIAS);
 
-  if (isPreviewMode && !args.includes("--skip-db-setup")) {
+  const isProduction = process.env["NODE_ENV"] === "production";
+
+  if (isPreviewMode && !isProduction && !args.includes("--skip-db-setup")) {
     const previewDbPort = process.env["PREVIEW_DB_PORT"] || "5433";
     const previewPort = process.env["PREVIEW_PORT"] || "3001";
 
