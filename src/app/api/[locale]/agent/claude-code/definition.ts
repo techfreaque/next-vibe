@@ -24,6 +24,8 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
 
+export const CLAUDE_CODE_ALIAS = "claude-code" as const;
+
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
@@ -34,7 +36,7 @@ const { POST } = createEndpoint({
   category: "app.endpointCategories.ai",
   tags: ["claudeCode.tags.tasks" as const],
   allowedRoles: [UserRole.ADMIN],
-  aliases: ["claude-code", "claude"],
+  aliases: [CLAUDE_CODE_ALIAS, "claude"],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

@@ -349,5 +349,14 @@ export const translations: typeof enTranslations = {
     },
     lastExecutionError: "Ostatni błąd",
     refresh: "Odśwież",
+    taskInput: {
+      title: "Dane wejściowe zadania",
+      loading: "Ładowanie definicji endpointu...",
+      notFound: "Nie znaleziono definicji endpointu dla tego zadania",
+      empty: "Brak skonfigurowanych parametrów wejściowych",
+      editTitle: "Parametry wejściowe zadania",
+      editDescription:
+        "Skonfiguruj parametry wejściowe dla tego endpointu zadania",
+    },
   },
 };

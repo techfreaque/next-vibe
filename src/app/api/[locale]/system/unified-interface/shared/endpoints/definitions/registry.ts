@@ -3,6 +3,7 @@ import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import { Methods } from "../../types/enums";
@@ -21,8 +22,9 @@ type EndpointNode =
 export interface SerializableToolMetadata {
   name: string;
   method: Methods;
+  title: string;
   description: string;
-  category?: string;
+  category: string;
   tags: string[];
   toolName: string;
   allowedRoles: UserRoleValue[];
@@ -62,7 +64,25 @@ export interface IDefinitionsRegistry {
   ): SerializableToolMetadata[];
 }
 
+const TOOLS_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+interface ToolsCacheEntry {
+  data: SerializableToolMetadata[];
+  expiresAt: number;
+}
+
 export class DefinitionsRegistry implements IDefinitionsRegistry {
+  private toolsCache = new Map<string, ToolsCacheEntry>();
+
+  private getToolsCacheKey(
+    platform: Platform,
+    user: JwtPayloadType,
+    locale: CountryLanguage,
+  ): string {
+    const roles = user.isPublic ? "public" : user.roles.toSorted().join(",");
+    return `${platform}:${locale}:${roles}`;
+  }
+
   /**
    * Get all endpoints for a platform (metadata only, no permission filtering)
    */
@@ -150,7 +170,7 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
     const counts: Record<string, number> = {};
 
     for (const endpoint of allEndpoints) {
-      const category = endpoint.category || "Other";
+      const category = endpoint.category;
       counts[category] = (counts[category] || 0) + 1;
     }
 
@@ -191,45 +211,25 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
   ): SerializableToolMetadata[] {
     return endpoints.map((definition) => {
       const { t } = definition.scopedTranslation.scopedT(locale);
-
+      const { t: globalT } = simpleT(locale);
       const method = definition.method;
       const toolName = endpointToToolName(definition);
 
-      const descriptionKey = definition.description || definition.title;
-      const categoryKey = definition.category;
+      const title = t(definition.title);
+      const description = t(definition.description);
+      const category = globalT(definition.category);
       const tags = definition.tags;
 
-      let description = "";
-      try {
-        if (descriptionKey) {
-          description = t(descriptionKey);
-        }
-      } catch {
-        description = String(descriptionKey);
-      }
-
-      let category = "";
-      try {
-        if (categoryKey) {
-          category = t(categoryKey);
-        }
-      } catch {
-        category = String(categoryKey);
-      }
-
       const translatedTags = tags.map((tag) => {
-        try {
-          return t(tag);
-        } catch {
-          return String(tag);
-        }
+        return t(tag);
       });
 
       return {
         name: toolName,
         method,
-        description: description || "",
-        category: category || undefined,
+        title: title,
+        description: description,
+        category,
         tags: translatedTags,
         toolName,
         allowedRoles: definition.allowedRoles
@@ -270,8 +270,23 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
     user: JwtPayloadType,
     locale: CountryLanguage,
   ): SerializableToolMetadata[] {
+    const cacheKey = this.getToolsCacheKey(platform, user, locale);
+    const cached = this.toolsCache.get(cacheKey);
+    const now = Date.now();
+
+    if (cached && cached.expiresAt > now) {
+      return cached.data;
+    }
+
     const filteredEndpoints = this.getEndpointsForUser(platform, user);
-    return this.serializeEndpoints(filteredEndpoints, locale);
+    const result = this.serializeEndpoints(filteredEndpoints, locale);
+
+    this.toolsCache.set(cacheKey, {
+      data: result,
+      expiresAt: now + TOOLS_CACHE_TTL_MS,
+    });
+
+    return result;
   }
 }
 

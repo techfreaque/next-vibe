@@ -23,6 +23,8 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
 
+export const PULSE_EXECUTE_ALIAS = "pulse-execute" as const;
+
 /**
  * Pulse Execute Endpoint (POST)
  * Executes pulse health check cycles
@@ -31,6 +33,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["system", "unified-interface", "tasks", "pulse", "execute"],
+  aliases: [PULSE_EXECUTE_ALIAS, "pulse:execute"],
   allowedRoles: [UserRole.ADMIN],
 
   title: "post.title",

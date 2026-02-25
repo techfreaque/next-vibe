@@ -10,6 +10,8 @@ export interface FavoriteSummaryItem {
   id: string;
   name: string;
   characterId: string;
+  /** Localized character display name (resolved from i18n or custom character name) */
+  characterName: string | null;
   modelId: string | null;
   modelInfo: string;
   isActive: boolean;
@@ -31,7 +33,10 @@ function fullLine(fav: FavoriteSummaryItem): string {
   const lastUsed = fav.lastUsedAt
     ? ` last:${typeof fav.lastUsedAt === "string" ? fav.lastUsedAt.slice(0, 10) : fav.lastUsedAt.toISOString().slice(0, 10)}`
     : "";
-  return `- [${fav.id.slice(-8)}] ${fav.name}${active} | char:${fav.characterId} | ${model}${uses}${lastUsed}`;
+  const charLabel = fav.characterName
+    ? `char:${fav.characterName} (${fav.characterId})`
+    : `char:${fav.characterId}`;
+  return `- [${fav.id.slice(-8)}] ${fav.name}${active} | ${charLabel} | ${model}${uses}${lastUsed}`;
 }
 
 /**

@@ -36,7 +36,11 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { taskInputSchema } from "../db";
 import { cronTaskResponseSchema } from "../tasks/definition";
 import { scopedTranslation } from "./i18n";
-import { CronTaskDetailContainer } from "./widget";
+import { CronTaskDetailContainer, CronTaskEditContainer } from "./widget";
+
+export const CRON_GET_ALIAS = "cron-get" as const;
+export const CRON_UPDATE_ALIAS = "cron-update" as const;
+export const CRON_DELETE_ALIAS = "cron-delete" as const;
 
 /**
  * GET /cron/task/[id] - Get individual task
@@ -45,6 +49,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["system", "unified-interface", "tasks", "cron", "[id]"],
+  aliases: [CRON_GET_ALIAS],
   title: "get.title",
   description: "get.description",
   icon: "clock",
@@ -175,6 +180,7 @@ const { PUT } = createEndpoint({
   scopedTranslation,
   method: Methods.PUT,
   path: ["system", "unified-interface", "tasks", "cron", "[id]"],
+  aliases: [CRON_UPDATE_ALIAS],
   title: "put.title",
   description: "put.description",
   icon: "clock",
@@ -186,13 +192,10 @@ const { PUT } = createEndpoint({
     UserRole.ADMIN,
   ],
   tags: ["put.title"],
-  fields: scopedObjectFieldNew(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "put.container.title",
-    description: "put.container.description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data&urlPathParams", response: true },
+  fields: customWidgetObject({
+    render: CronTaskEditContainer,
+    noFormElement: true,
+    usage: { request: "data&urlPathParams", response: true } as const,
     children: {
       actions: widgetObjectField(
         {
@@ -314,8 +317,10 @@ const { PUT } = createEndpoint({
         label: "put.fields.taskInput.label",
         description: "put.fields.taskInput.description",
         columns: 12,
+        hidden: true,
         schema: taskInputSchema.optional(),
       }),
+
       runOnce: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
@@ -457,6 +462,7 @@ const { DELETE } = createEndpoint({
   scopedTranslation,
   method: Methods.DELETE,
   path: ["system", "unified-interface", "tasks", "cron", "[id]"],
+  aliases: [CRON_DELETE_ALIAS],
   title: "delete.title",
   description: "delete.description",
   icon: "clock",

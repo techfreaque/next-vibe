@@ -681,10 +681,114 @@ export const translations = {
         3: "Develop a complex character relationship",
       },
     },
+    researchAgent: {
+      name: "Research Agent",
+      description:
+        "Web research specialist with search, fetch, and memory tools for gathering and synthesizing information",
+      tagline: "Find & Synthesize",
+      shortDesc: "Web research and information gathering",
+      suggestedPrompts: {
+        0: "Research the latest developments in AI regulation",
+        1: "Find and summarize key facts about a topic",
+        2: "Compare different sources on a subject",
+        3: "Compile a research brief with citations",
+      },
+    },
+    statsAnalyst: {
+      name: "Stats Analyst",
+      description:
+        "Analytics specialist with access to leads, users, email, and referral statistics for data-driven insights",
+      tagline: "Data-Driven Insights",
+      shortDesc: "Platform analytics and reporting",
+      suggestedPrompts: {
+        0: "Show me an overview of today's lead activity",
+        1: "How are our user signups trending this week?",
+        2: "Summarize email campaign performance",
+        3: "Give me a referral program status report",
+      },
+    },
+    cronManager: {
+      name: "Cron Manager",
+      description:
+        "Task scheduler specialist that can create, update, delete, and monitor cron jobs and their execution history",
+      tagline: "Schedule & Monitor",
+      shortDesc: "Cron task management and monitoring",
+      suggestedPrompts: {
+        0: "List all active cron tasks and their schedules",
+        1: "Create a new cron task that runs every hour",
+        2: "Show me recent task failures and errors",
+        3: "Check the overall health of the task system",
+      },
+    },
+    systemMonitor: {
+      name: "System Monitor",
+      description:
+        "Infrastructure health specialist monitoring server status, database connectivity, pulse checks, and task execution",
+      tagline: "Watch & Alert",
+      shortDesc: "Infrastructure health monitoring",
+      suggestedPrompts: {
+        0: "Run a full system health check",
+        1: "Show me the pulse monitoring status",
+        2: "Check database connectivity",
+        3: "What's the current cron task health?",
+      },
+    },
+    publicCurator: {
+      name: "Public Curator",
+      description:
+        "Content management specialist for managing public threads, messages, and community content",
+      tagline: "Curate & Organize",
+      shortDesc: "Public content and thread management",
+      suggestedPrompts: {
+        0: "List recent public threads",
+        1: "Search threads for a specific topic",
+        2: "Help me organize community content",
+        3: "Find messages matching certain criteria",
+      },
+    },
+    codeArchitect: {
+      name: "Code Architect",
+      description:
+        "Architecture specialist that delegates coding tasks to Claude Code for implementation. Available on Hermes only.",
+      tagline: "Design & Delegate",
+      shortDesc: "Architecture decisions via Claude Code",
+      suggestedPrompts: {
+        0: "Plan the implementation of a new feature",
+        1: "Review the architecture of a module",
+        2: "Delegate a coding task to Claude Code",
+        3: "Design a migration strategy",
+      },
+    },
+    deploymentAgent: {
+      name: "Deployment Agent",
+      description:
+        "Deployment specialist that handles builds, releases, and server management via SSH. Available on Hermes only.",
+      tagline: "Build & Deploy",
+      shortDesc: "Deployments and server management",
+      suggestedPrompts: {
+        0: "Build the application for production",
+        1: "Check server health status",
+        2: "Run a deployment to production",
+        3: "Show me the current server status",
+      },
+    },
   },
   get: {
     title: "List Characters",
     description: "Get all available characters (default + custom)",
+    fields: {
+      query: {
+        label: "Search",
+        description:
+          "Search characters by name, description, or category. Returns compact results.",
+        placeholder: "e.g. research, coding, stats",
+      },
+      characterId: {
+        label: "Character ID",
+        description:
+          "Get full details for a specific character by its ID. Returns system prompt, tools, and model config.",
+      },
+    },
     container: {
       title: "Characters List",
       description: "All available characters for the user",

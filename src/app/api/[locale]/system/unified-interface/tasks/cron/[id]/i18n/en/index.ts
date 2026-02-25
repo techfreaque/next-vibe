@@ -347,5 +347,13 @@ export const translations = {
     },
     lastExecutionError: "Last Error",
     refresh: "Refresh",
+    taskInput: {
+      title: "Task Input",
+      loading: "Loading endpoint definition...",
+      notFound: "Endpoint definition not found for this task",
+      empty: "No input parameters configured",
+      editTitle: "Task Input Parameters",
+      editDescription: "Configure the input parameters for this task endpoint",
+    },
   },
 };

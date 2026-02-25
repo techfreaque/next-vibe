@@ -568,14 +568,18 @@ function renderFieldInput<
           value={String(field.value || "")}
           onChange={(value) => field.onChange(value)}
           onBlur={field.onBlur}
-          options={config.options || []}
-          placeholder={config.placeholder}
-          searchPlaceholder={config.searchPlaceholder}
+          options={(config.options || []).map((opt) => ({
+            ...opt,
+            label: t(opt.label),
+          }))}
+          placeholder={config.placeholder ? t(config.placeholder) : undefined}
+          searchPlaceholder={
+            config.searchPlaceholder ? t(config.searchPlaceholder) : undefined
+          }
           allowCustom={config.allowCustom ?? true}
           disabled={disabled || config.disabled}
           className={inputClassName}
           name={field.name}
-          t={t}
         />
       );
 

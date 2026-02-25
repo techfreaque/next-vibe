@@ -3,6 +3,14 @@ import { dirname, join, resolve } from "node:path";
 
 import { config } from "dotenv";
 
+import {
+  BUILD_ALIAS,
+  BUILD_SERVER_ALIAS,
+} from "../../../server/build/definition";
+import {
+  START_ALIAS,
+  START_SERVER_ALIAS,
+} from "../../../server/start/definition";
 import { Platform } from "../../shared/types/platform";
 
 /** CLI-specific platforms (subset of Platform that applies to CLI environments) */
@@ -139,17 +147,17 @@ export function loadEnvironment(): EnvironmentResult {
   const args = process.argv.slice(2);
   const isPreviewMode =
     args.includes("--preview") ||
-    args.includes("start") ||
-    args.includes("server:start") ||
-    args.includes("build") ||
-    args.includes("server:build");
+    args.includes(START_ALIAS) ||
+    args.includes(START_SERVER_ALIAS) ||
+    args.includes(BUILD_ALIAS) ||
+    args.includes(BUILD_SERVER_ALIAS);
 
   if (isPreviewMode && !args.includes("--skip-db-setup")) {
     const localDbUrl = process.env["LOCAL_MODE_DATABASE_URL"];
     if (localDbUrl) {
       process.env["DATABASE_URL"] = localDbUrl;
     }
-
+    process.env["NEXT_PUBLIC_LOCAL_MODE"] = "true";
     // Override NEXT_PUBLIC_APP_URL with LOCAL_MODE_APP_URL so local mode
     // uses its own URL (different port than dev). Must happen before Next.js
     // server spawns so it picks up the correct value for SSR + client hydration.

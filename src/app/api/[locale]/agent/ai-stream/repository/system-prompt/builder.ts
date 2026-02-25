@@ -128,7 +128,7 @@ export async function buildSystemPrompt(params: {
         : Promise.resolve(""),
       // Favorites: skip in incognito
       !isIncognito
-        ? generateFavoritesSummary({ userId, logger })
+        ? generateFavoritesSummary({ userId, locale, logger })
         : Promise.resolve(""),
       // Character: only if a characterId was provided
       characterId

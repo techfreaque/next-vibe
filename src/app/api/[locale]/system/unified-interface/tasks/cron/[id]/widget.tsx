@@ -1,6 +1,7 @@
 /**
  * Custom Widget for Cron Task Detail View
  * Full-featured task profile with execution stats, navigation, edit, delete, and history.
+ * Also exports TaskInputEditWidget for dynamic task input editing in PUT form.
  */
 
 "use client";
@@ -21,20 +22,43 @@ import {
   XCircle,
 } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import type { FieldValues } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
+  getEndpoint,
+  getFullPath,
+} from "@/app/api/[locale]/system/generated/endpoint";
+import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
+import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
+import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
+import {
   useWidgetContext,
+  useWidgetForm,
   useWidgetLocale,
   useWidgetNavigation,
+  useWidgetResponse,
   useWidgetTranslation,
+  useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
+import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
+import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
+import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
+import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
 import { CronTaskPriority, CronTaskStatus } from "../../enum";
 import type endpoints from "./definition";
-import type { CronTaskGetResponseOutput } from "./definition";
+import type {
+  CronTaskGetResponseOutput,
+  CronTaskPutRequestOutput,
+} from "./definition";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -174,6 +198,327 @@ function InfoRow({
 }
 
 // ---------------------------------------------------------------------------
+// Shared hook: resolve endpoint definition by routeId
+// ---------------------------------------------------------------------------
+
+function useResolvedEndpoint(routeId: string | null | undefined): {
+  definition: CreateApiEndpointAny | null;
+  isLoading: boolean;
+  error: string | null;
+} {
+  const [definition, setDefinition] = useState<CreateApiEndpointAny | null>(
+    null,
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect((): (() => void) => {
+    if (!routeId) {
+      setDefinition(null);
+      setError(null);
+      return () => undefined;
+    }
+
+    let cancelled = false;
+    setIsLoading(true);
+
+    const resolve = async (): Promise<void> => {
+      const canonicalId = getFullPath(routeId) ?? routeId;
+      const ep = await getEndpoint(canonicalId);
+      if (cancelled) {
+        return;
+      }
+      if (ep) {
+        setDefinition(ep);
+        setError(null);
+      } else {
+        setDefinition(null);
+        setError(routeId);
+      }
+      setIsLoading(false);
+    };
+
+    void resolve();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [routeId]);
+
+  return { definition, isLoading, error };
+}
+
+// ---------------------------------------------------------------------------
+// TaskInputViewSection — read-only display for GET detail view
+// ---------------------------------------------------------------------------
+
+function TaskInputViewSection({
+  routeId,
+  taskInput,
+  t,
+}: {
+  routeId: string;
+  taskInput: Record<string, WidgetData>;
+  t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
+}): React.JSX.Element {
+  const locale = useWidgetLocale();
+  const user = useWidgetUser();
+  const { definition, isLoading, error } = useResolvedEndpoint(routeId);
+
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
+
+  const hasInput = Object.keys(taskInput).length > 0;
+
+  if (!hasInput) {
+    return (
+      <Div className="rounded-lg border p-4 flex flex-col gap-3">
+        <Div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground pb-1 border-b">
+          {t("widget.taskInput.title")}
+        </Div>
+        <Div className="text-sm text-muted-foreground">
+          {t("widget.taskInput.empty")}
+        </Div>
+      </Div>
+    );
+  }
+
+  return (
+    <Div className="rounded-lg border p-4 flex flex-col gap-3">
+      <Div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground pb-1 border-b">
+        {t("widget.taskInput.title")}
+      </Div>
+
+      {isLoading && (
+        <Div className="flex items-center gap-2 py-2">
+          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          <Span className="text-sm text-muted-foreground">
+            {t("widget.taskInput.loading")}
+          </Span>
+        </Div>
+      )}
+
+      {error && (
+        <Div className="text-sm text-muted-foreground">
+          {t("widget.taskInput.notFound")}
+        </Div>
+      )}
+
+      {definition && (
+        <NavigationStackProvider>
+          <EndpointRenderer
+            endpoint={definition}
+            locale={locale}
+            data={taskInput}
+            disabled={true}
+            logger={logger}
+            user={user}
+          />
+        </NavigationStackProvider>
+      )}
+    </Div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// TaskInputEditWidget — editable widget for PUT form (custom widget render)
+// Loads endpoint definition by routeId from GET response, renders its fields,
+// and propagates changes back to the parent form's taskInput field.
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// TaskInputEditSection — dynamic task input section for PUT form
+// Loads endpoint definition by routeId, renders its fields,
+// and propagates changes back to the parent form's taskInput field.
+// ---------------------------------------------------------------------------
+
+function TaskInputEditSection({
+  t,
+}: {
+  t: ReturnType<typeof useWidgetTranslation<typeof endpoints.PUT>>;
+}): React.JSX.Element {
+  const locale = useWidgetLocale();
+  const user = useWidgetUser();
+  const parentForm = useWidgetForm<typeof endpoints.PUT>();
+  const response = useWidgetResponse();
+
+  // Get routeId from GET response (available via prefillFromGet)
+  const responseData = response?.success === true ? response.data : undefined;
+  const routeId =
+    responseData &&
+    typeof responseData === "object" &&
+    !Array.isArray(responseData) &&
+    "task" in responseData
+      ? (responseData as { task?: { routeId?: string } }).task?.routeId
+      : undefined;
+
+  const { definition, isLoading, error } = useResolvedEndpoint(routeId);
+
+  const logger = useMemo(
+    () => createEndpointLogger(false, Date.now(), locale),
+    [locale],
+  );
+
+  // Get current taskInput value from parent form
+  const currentTaskInput = parentForm?.watch(
+    "taskInput" as keyof CronTaskPutRequestOutput,
+  ) as Record<string, WidgetData> | undefined;
+
+  // Create inner form for editing the endpoint's fields
+  const innerForm = useForm<FieldValues>({
+    defaultValues: currentTaskInput ?? {},
+  });
+
+  // Watch inner form changes and propagate back to parent taskInput
+  useEffect(() => {
+    if (!parentForm || !definition) {
+      return undefined;
+    }
+
+    const subscription = innerForm.watch((values) => {
+      parentForm.setValue(
+        "taskInput" as keyof CronTaskPutRequestOutput,
+        values as CronTaskPutRequestOutput[keyof CronTaskPutRequestOutput],
+        {
+          shouldDirty: true,
+          shouldTouch: true,
+        },
+      );
+    });
+
+    return (): void => {
+      subscription.unsubscribe();
+    };
+  }, [innerForm, parentForm, definition]);
+
+  if (!routeId) {
+    return <></>;
+  }
+
+  if (isLoading) {
+    return (
+      <Div className="rounded-lg border p-4 flex items-center gap-2">
+        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+        <Span className="text-sm text-muted-foreground">
+          {t("widget.taskInput.loading")}
+        </Span>
+      </Div>
+    );
+  }
+
+  if (error || !definition) {
+    return (
+      <Div className="rounded-lg border p-4 text-sm text-muted-foreground">
+        {t("widget.taskInput.notFound")}
+      </Div>
+    );
+  }
+
+  return (
+    <Div className="rounded-lg border p-4 flex flex-col gap-3">
+      <Div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground pb-1 border-b">
+        {t("widget.taskInput.editTitle")}
+      </Div>
+      <Div className="text-xs text-muted-foreground">
+        {t("widget.taskInput.editDescription")}
+      </Div>
+      <NavigationStackProvider>
+        <EndpointRenderer
+          endpoint={definition}
+          locale={locale}
+          data={currentTaskInput}
+          form={innerForm as never}
+          logger={logger}
+          user={user}
+        />
+      </NavigationStackProvider>
+    </Div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// CronTaskEditContainer — root custom widget for PUT form
+// Renders all form fields + dynamic task input section
+// ---------------------------------------------------------------------------
+
+interface EditWidgetProps {
+  field: {
+    value: WidgetData | null | undefined;
+  } & (typeof endpoints.PUT)["fields"];
+  fieldName: string;
+}
+
+export function CronTaskEditContainer({
+  field,
+}: EditWidgetProps): React.JSX.Element {
+  const t = useWidgetTranslation<typeof endpoints.PUT>();
+  const children = field.children;
+
+  return (
+    <Div className="flex flex-col gap-4 p-4">
+      {/* Actions bar: back + submit */}
+      <Div className="flex items-center gap-2">
+        <NavigateButtonWidget field={children.actions.children.backButton} />
+        <SubmitButtonWidget<typeof endpoints.PUT>
+          field={children.actions.children.submitButton}
+        />
+      </Div>
+
+      {/* Form fields in a grid */}
+      <Div className="grid grid-cols-12 gap-4">
+        <Div className="col-span-12">
+          <TextFieldWidget
+            field={children.displayName}
+            fieldName="displayName"
+          />
+        </Div>
+        <Div className="col-span-12">
+          <TextareaFieldWidget
+            field={children.description}
+            fieldName="description"
+          />
+        </Div>
+        <Div className="col-span-6">
+          <TextFieldWidget field={children.schedule} fieldName="schedule" />
+        </Div>
+        <Div className="col-span-6">
+          <BooleanFieldWidget field={children.enabled} fieldName="enabled" />
+        </Div>
+        <Div className="col-span-6">
+          <SelectFieldWidget field={children.priority} fieldName="priority" />
+        </Div>
+        <Div className="col-span-6">
+          <SelectFieldWidget
+            field={children.outputMode}
+            fieldName="outputMode"
+          />
+        </Div>
+        <Div className="col-span-6">
+          <NumberFieldWidget field={children.timeout} fieldName="timeout" />
+        </Div>
+        <Div className="col-span-6">
+          <NumberFieldWidget field={children.retries} fieldName="retries" />
+        </Div>
+        <Div className="col-span-6">
+          <BooleanFieldWidget field={children.runOnce} fieldName="runOnce" />
+        </Div>
+        <Div className="col-span-6">
+          <TextFieldWidget
+            field={children.targetInstance}
+            fieldName="targetInstance"
+          />
+        </Div>
+      </Div>
+
+      {/* Dynamic task input section */}
+      <TaskInputEditSection t={t} />
+    </Div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main widget
 // ---------------------------------------------------------------------------
 
@@ -199,6 +544,7 @@ export function CronTaskDetailContainer({
       const m = await import("./definition");
       navigate(m.default.PUT, {
         urlPathParams: { id: task.id },
+        data: task as never,
         prefillFromGet: true,
         getEndpoint: m.default.GET,
         popNavigationOnSuccess: 1,
@@ -552,6 +898,13 @@ export function CronTaskDetailContainer({
             </InfoRow>
           </Div>
         </Div>
+
+        {/* ── Task Input section ── */}
+        <TaskInputViewSection
+          routeId={task.routeId}
+          taskInput={task.taskInput}
+          t={t}
+        />
 
         {/* ── Last execution error (conditional) ── */}
         {task.lastExecutionError && (

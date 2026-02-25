@@ -49,6 +49,8 @@ import {
 import { scopedTranslation } from "./i18n";
 import { LeadsListContainer } from "./widget";
 
+export const LEADS_LIST_ALIAS = "leads-list" as const;
+
 /**
  * Get Leads List Endpoint (GET)
  * Retrieves a paginated list of leads with filtering
@@ -57,6 +59,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["leads", "list"],
+  aliases: [LEADS_LIST_ALIAS],
   allowedRoles: [UserRole.ADMIN],
 
   title: "get.title",

@@ -20,10 +20,13 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../i18n";
 
+export const DB_HEALTH_ALIAS = "db-health" as const;
+
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["system", "unified-interface", "tasks", "db-health"],
+  aliases: [DB_HEALTH_ALIAS, "db-ping"],
   title: "dbHealth.post.title",
   description: "dbHealth.post.description",
   category: "app.endpointCategories.system",

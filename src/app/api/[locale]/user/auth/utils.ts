@@ -44,7 +44,7 @@ export async function requireAdminUser(
     return minimalUser;
   } catch (error) {
     logger.error("Error in requireAdminUser", parseError(error));
-    redirect(`/${locale}}`);
+    redirect(`/${locale}`);
   }
 }
 

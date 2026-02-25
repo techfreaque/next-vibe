@@ -41,7 +41,7 @@ export const {
     schema: z
       .string()
       .optional()
-      .default("true")
+      .default("false")
       .transform((v) => v !== "false"),
     example: "true",
   },

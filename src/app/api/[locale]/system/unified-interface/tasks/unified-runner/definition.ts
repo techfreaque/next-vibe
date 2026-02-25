@@ -35,7 +35,12 @@ const { POST } = createEndpoint({
   description: "post.description",
   icon: "check-circle",
   category: "app.endpointCategories.system",
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [
+    UserRole.ADMIN,
+    UserRole.MCP_OFF,
+    UserRole.WEB_OFF,
+    UserRole.AI_TOOL_OFF,
+  ],
   tags: ["post.title"],
   cli: {
     firstCliArgKey: "action",

@@ -3,6 +3,7 @@ import type { translations as enTranslations } from "../en";
 export const translations: typeof enTranslations = {
   category: "Pomoc i Dokumentacja",
   tag: "Pomoc",
+  uncategorized: "Inne",
   get: {
     title: "Pomoc narzędzi — odkryj dostępne narzędzia",
     description:

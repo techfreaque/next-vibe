@@ -21,6 +21,8 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
 
+export const PULSE_STATUS_ALIAS = "pulse-status" as const;
+
 /**
  * GET endpoint definition - Get pulse status
  * Retrieves current pulse health status
@@ -34,7 +36,7 @@ const pulseStatusEndpoint = createEndpoint({
   icon: "activity",
   category: "app.endpointCategories.system",
   allowedRoles: [UserRole.ADMIN],
-  aliases: ["pulse:status"],
+  aliases: [PULSE_STATUS_ALIAS, "pulse:status"],
   tags: ["tags.status"],
 
   fields: scopedObjectFieldNew(scopedTranslation, {

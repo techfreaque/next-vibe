@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, inArray } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -19,6 +19,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { DEFAULT_CHARACTERS } from "../characters/config";
+import { scopedTranslation as charactersScopedTranslation } from "../characters/i18n";
 import { CharactersRepository } from "../characters/repository";
 import { chatSettings } from "../settings/db";
 import { scopedTranslation as settingsScopedTranslation } from "../settings/i18n";
@@ -134,9 +136,10 @@ export class ChatFavoritesRepository {
  */
 export async function generateFavoritesSummary(params: {
   userId: string;
+  locale: CountryLanguage;
   logger: EndpointLogger;
 }): Promise<string> {
-  const { userId, logger } = params;
+  const { userId, locale, logger } = params;
 
   try {
     const [settingsRow] = await db
@@ -157,10 +160,34 @@ export async function generateFavoritesSummary(params: {
       return "";
     }
 
+    // Resolve localized character names
+    const { t: charT } = charactersScopedTranslation.scopedT(locale);
+    const characterNameMap = new Map<string, string>();
+    for (const char of DEFAULT_CHARACTERS) {
+      characterNameMap.set(char.id, charT(char.name));
+    }
+
+    // Look up custom character names for any non-default characterIds
+    const customCharIds = rows
+      .map((r) => r.characterId)
+      .filter((id) => !characterNameMap.has(id));
+    if (customCharIds.length > 0) {
+      const { customCharacters: customCharsTable } =
+        await import("../characters/db");
+      const customChars = await db
+        .select({ id: customCharsTable.id, name: customCharsTable.name })
+        .from(customCharsTable)
+        .where(inArray(customCharsTable.id, customCharIds));
+      for (const cc of customChars) {
+        characterNameMap.set(cc.id, cc.name);
+      }
+    }
+
     const items = rows.map((row) => ({
       id: row.id,
       name: row.customName ?? row.characterId,
       characterId: row.characterId,
+      characterName: characterNameMap.get(row.characterId) ?? null,
       modelId: null as string | null, // model resolved client-side; not stored server-side
       modelInfo: "",
       isActive: row.id === activeFavoriteId,

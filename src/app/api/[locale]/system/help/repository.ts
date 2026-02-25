@@ -153,6 +153,7 @@ function serializeTool(
 ): ToolItem {
   return {
     name: tool.name,
+    title: tool.title,
     toolName: tool.toolName,
     tags: tool.tags,
     method: tool.method,
@@ -176,9 +177,11 @@ function serializeToolMinimal(
     tool.aliases && tool.aliases.length > 0 ? tool.aliases[0] : tool.toolName;
   return {
     name: callName,
+    title: tool.title,
     toolName: tool.toolName,
     tags: tool.tags,
     description: tool.description,
+    category: tool.category,
     credits: tool.credits,
   };
 }
@@ -547,7 +550,7 @@ class InteractiveSession {
     const allRoutes = InteractiveSession.getAllRoutes(nav.routeTree);
     const byCategory = new Map<string, CreateApiEndpointAny[]>();
     for (const route of allRoutes) {
-      const cat = route.category ?? "Other";
+      const cat = route.category;
       if (!byCategory.has(cat)) {
         byCategory.set(cat, []);
       }
@@ -558,7 +561,7 @@ class InteractiveSession {
     for (const cat of [...byCategory.keys()].toSorted()) {
       const routes = byCategory.get(cat)!;
       let translatedCat = cat;
-      if (routes.length > 0 && cat !== "Other") {
+      if (routes.length > 0) {
         try {
           translatedCat = InteractiveSession.routeT(
             routes[0],
@@ -1102,8 +1105,7 @@ export class HelpRepository {
 
     const categoryMap = new Map<string, number>();
     for (const tool of allTools) {
-      const cat = tool.category || "Other";
-      categoryMap.set(cat, (categoryMap.get(cat) ?? 0) + 1);
+      categoryMap.set(tool.category, (categoryMap.get(tool.category) ?? 0) + 1);
     }
     const categories = [...categoryMap.entries()]
       .toSorted((a, b) => b[1] - a[1])

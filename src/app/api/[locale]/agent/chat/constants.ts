@@ -8,7 +8,7 @@ import { aliasToPathMap } from "../../system/generated/endpoint";
 import { TOOL_HELP_ALIAS } from "../../system/help/constants";
 import { EXECUTE_TOOL_ALIAS } from "../../system/unified-interface/ai/execute-tool/definition";
 import { FETCH_URL_ALIAS } from "../fetch-url-content/definition";
-import { SEARCH_ALIAS } from "../search/brave/definition";
+import { BRAVE_SEARCH_ALIAS } from "../search/brave/definition";
 import {
   MEMORY_DELETE_ALIAS,
   MEMORY_UPDATE_ALIAS,
@@ -49,7 +49,7 @@ export const AGENT_MESSAGE_LENGTH = 40000; // TODO find a better way and also be
 export const DEFAULT_TOOL_IDS = [
   aliasToPathMap[TOOL_HELP_ALIAS],
   aliasToPathMap[EXECUTE_TOOL_ALIAS],
-  aliasToPathMap[SEARCH_ALIAS],
+  aliasToPathMap[BRAVE_SEARCH_ALIAS],
   aliasToPathMap[FETCH_URL_ALIAS],
   aliasToPathMap[MEMORY_LIST_ALIAS],
   aliasToPathMap[MEMORY_ADD_ALIAS],

@@ -20,6 +20,8 @@ import { UserRole } from "../../user/user-roles/enum";
 import { type ReferralTranslationKey, scopedTranslation } from "../i18n";
 import { ReferralStatsContainer } from "./widget";
 
+export const REFERRAL_STATS_ALIAS = "referral-stats" as const;
+
 /**
  * GET endpoint for referral stats
  */
@@ -27,6 +29,7 @@ export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["referral", "stats"],
+  aliases: [REFERRAL_STATS_ALIAS],
   title: "get.title",
   description: "get.description",
   category: "app.endpointCategories.referral",

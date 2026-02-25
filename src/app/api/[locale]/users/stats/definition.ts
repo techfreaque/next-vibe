@@ -52,10 +52,13 @@ import {
 import { scopedTranslation } from "./i18n";
 import { UsersStatsContainer } from "./widget";
 
+export const USERS_STATS_ALIAS = "users-stats" as const;
+
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["users", "stats"],
+  aliases: [USERS_STATS_ALIAS],
   title: "title" as const,
   description: "description" as const,
   icon: "bar-chart-3",

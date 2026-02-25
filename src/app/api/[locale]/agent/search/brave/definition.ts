@@ -37,6 +37,7 @@ const FRESHNESS_OPTIONS = [
 ] as const;
 
 export const SEARCH_ALIAS = "web-search" as const;
+export const BRAVE_SEARCH_ALIAS = "search" as const;
 
 /**
  * GET /brave-search - Search the web
@@ -52,7 +53,7 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   // CLI alias for better UX
-  aliases: [SEARCH_ALIAS, "search"] as const,
+  aliases: [SEARCH_ALIAS, BRAVE_SEARCH_ALIAS] as const,
   cli: {
     firstCliArgKey: "query",
   },

@@ -684,11 +684,115 @@ export const translations: typeof enTranslations = {
         3: "Entwickle eine komplexe Charakterbeziehung",
       },
     },
+    researchAgent: {
+      name: "Recherche-Agent",
+      description:
+        "Web-Recherche-Spezialist mit Such-, Abruf- und Erinnerungs-Tools für Informationssammlung und -synthese",
+      tagline: "Finden & Zusammenfassen",
+      shortDesc: "Web-Recherche und Informationssammlung",
+      suggestedPrompts: {
+        0: "Recherchiere die neuesten Entwicklungen in der KI-Regulierung",
+        1: "Finde und fasse wichtige Fakten zu einem Thema zusammen",
+        2: "Vergleiche verschiedene Quellen zu einem Thema",
+        3: "Erstelle ein Recherche-Briefing mit Quellenangaben",
+      },
+    },
+    statsAnalyst: {
+      name: "Statistik-Analyst",
+      description:
+        "Analyse-Spezialist mit Zugang zu Lead-, Benutzer-, E-Mail- und Empfehlungsstatistiken für datengestützte Einblicke",
+      tagline: "Datengestützte Einblicke",
+      shortDesc: "Plattform-Analytik und Berichterstattung",
+      suggestedPrompts: {
+        0: "Zeige mir eine Übersicht der heutigen Lead-Aktivität",
+        1: "Wie entwickeln sich unsere Benutzeranmeldungen diese Woche?",
+        2: "Fasse die E-Mail-Kampagnen-Performance zusammen",
+        3: "Gib mir einen Statusbericht des Empfehlungsprogramms",
+      },
+    },
+    cronManager: {
+      name: "Cron-Manager",
+      description:
+        "Aufgabenplanungs-Spezialist zum Erstellen, Aktualisieren, Löschen und Überwachen von Cron-Jobs und deren Ausführungshistorie",
+      tagline: "Planen & Überwachen",
+      shortDesc: "Cron-Aufgabenverwaltung und Überwachung",
+      suggestedPrompts: {
+        0: "Liste alle aktiven Cron-Aufgaben und ihre Zeitpläne auf",
+        1: "Erstelle eine neue Cron-Aufgabe, die stündlich läuft",
+        2: "Zeige mir aktuelle Aufgabenfehler und Probleme",
+        3: "Prüfe den Gesamtzustand des Aufgabensystems",
+      },
+    },
+    systemMonitor: {
+      name: "System-Monitor",
+      description:
+        "Infrastruktur-Spezialist zur Überwachung von Serverstatus, Datenbankverbindung, Pulse-Checks und Aufgabenausführung",
+      tagline: "Überwachen & Alarmieren",
+      shortDesc: "Infrastruktur-Gesundheitsüberwachung",
+      suggestedPrompts: {
+        0: "Führe einen vollständigen System-Gesundheitscheck durch",
+        1: "Zeige mir den Pulse-Überwachungsstatus",
+        2: "Prüfe die Datenbankverbindung",
+        3: "Wie ist der aktuelle Cron-Aufgaben-Zustand?",
+      },
+    },
+    publicCurator: {
+      name: "Öffentlicher Kurator",
+      description:
+        "Content-Management-Spezialist für die Verwaltung öffentlicher Threads, Nachrichten und Community-Inhalte",
+      tagline: "Kuratieren & Organisieren",
+      shortDesc: "Öffentliche Inhalte und Thread-Verwaltung",
+      suggestedPrompts: {
+        0: "Liste aktuelle öffentliche Threads auf",
+        1: "Suche Threads zu einem bestimmten Thema",
+        2: "Hilf mir, Community-Inhalte zu organisieren",
+        3: "Finde Nachrichten, die bestimmten Kriterien entsprechen",
+      },
+    },
+    codeArchitect: {
+      name: "Code-Architekt",
+      description:
+        "Architektur-Spezialist, der Programmieraufgaben an Claude Code zur Umsetzung delegiert. Nur auf Hermes verfügbar.",
+      tagline: "Entwerfen & Delegieren",
+      shortDesc: "Architekturentscheidungen über Claude Code",
+      suggestedPrompts: {
+        0: "Plane die Implementierung eines neuen Features",
+        1: "Überprüfe die Architektur eines Moduls",
+        2: "Delegiere eine Programmieraufgabe an Claude Code",
+        3: "Entwirf eine Migrationsstrategie",
+      },
+    },
+    deploymentAgent: {
+      name: "Deployment-Agent",
+      description:
+        "Deployment-Spezialist für Builds, Releases und Serververwaltung über SSH. Nur auf Hermes verfügbar.",
+      tagline: "Bauen & Bereitstellen",
+      shortDesc: "Deployments und Serververwaltung",
+      suggestedPrompts: {
+        0: "Baue die Anwendung für Produktion",
+        1: "Prüfe den Server-Gesundheitsstatus",
+        2: "Führe ein Deployment in Produktion durch",
+        3: "Zeige mir den aktuellen Serverstatus",
+      },
+    },
   },
   get: {
     title: "Charaktere auflisten",
     description:
       "Alle verfügbaren Charaktere abrufen (Standard + benutzerdefiniert)",
+    fields: {
+      query: {
+        label: "Suche",
+        description:
+          "Charaktere nach Name, Beschreibung oder Kategorie suchen. Gibt kompakte Ergebnisse zurück.",
+        placeholder: "z.B. Recherche, Programmierung, Statistik",
+      },
+      characterId: {
+        label: "Charakter-ID",
+        description:
+          "Vollständige Details für einen bestimmten Charakter abrufen. Gibt System-Prompt, Tools und Modellkonfiguration zurück.",
+      },
+    },
     container: {
       title: "Charaktere-Liste",
       description: "Alle verfügbaren Charaktere für den Benutzer",

@@ -18,7 +18,7 @@ import FETCH_URL_DEFINITION, {
   FETCH_URL_ALIAS,
 } from "../../../fetch-url-content/definition";
 import SEARCH_DEFINITION, {
-  SEARCH_ALIAS,
+  BRAVE_SEARCH_ALIAS,
 } from "../../../search/brave/definition";
 
 /**
@@ -111,9 +111,9 @@ CRITICAL INSTRUCTIONS FOR TOOL USAGE:
    - Example: {"name": "${MEMORY_ADD_ALIAS}", "arguments": {"content": "...", "noLoop": true}}
 
 Examples:
-- Single tool: <tool_calls>[{"name": "${SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}]</tool_calls>
-- Multiple tools: <tool_calls>[{"name": "${SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}, {"name": "${FETCH_URL_ALIAS}", "arguments": ${JSON.stringify(fetchExample)}}]</tool_calls>
-- With text: Let me search for that.\\n<tool_calls>[{"name": "${SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}]</tool_calls>
+- Single tool: <tool_calls>[{"name": "${BRAVE_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}]</tool_calls>
+- Multiple tools: <tool_calls>[{"name": "${BRAVE_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}, {"name": "${FETCH_URL_ALIAS}", "arguments": ${JSON.stringify(fetchExample)}}]</tool_calls>
+- With text: Let me search for that.\\n<tool_calls>[{"name": "${BRAVE_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}]</tool_calls>
 - With noLoop: I'll remember that.\\n<tool_calls>[{"name": "${MEMORY_ADD_ALIAS}", "arguments": ${JSON.stringify({ ...memoryExample, noLoop: true })}}]</tool_calls>`;
 }
 

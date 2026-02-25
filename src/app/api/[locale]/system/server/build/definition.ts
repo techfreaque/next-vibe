@@ -21,6 +21,9 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
 
+export const BUILD_ALIAS = "build" as const;
+export const BUILD_SERVER_ALIAS = "b" as const;
+
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
@@ -36,7 +39,7 @@ const { POST } = createEndpoint({
     UserRole.WEB_OFF,
     UserRole.CLI_AUTH_BYPASS,
   ],
-  aliases: ["build", "b"],
+  aliases: [BUILD_ALIAS, BUILD_SERVER_ALIAS],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

@@ -12,8 +12,10 @@
 
 "use client";
 
+import type { AutocompleteOption } from "next-vibe-ui/ui/autocomplete-field";
+import { AutocompleteField } from "next-vibe-ui/ui/autocomplete-field";
 import { Div } from "next-vibe-ui/ui/div";
-import { Pre } from "next-vibe-ui/ui/pre";
+import { FormField, FormItem, FormLabel } from "next-vibe-ui/ui/form/form";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -22,17 +24,19 @@ import {
   getEndpoint,
   getFullPath,
 } from "@/app/api/[locale]/system/generated/endpoint";
+import helpEndpoints from "@/app/api/[locale]/system/help/definition";
 import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
   useWidgetForm,
   useWidgetLocale,
+  useWidgetLogger,
   useWidgetTranslation,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 
 import type definition from "./definition";
 import type { RouteExecuteResponseInput } from "./definition";
@@ -52,14 +56,51 @@ interface CustomWidgetProps {
   fieldName: string;
 }
 
-export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
+export function ExecuteToolWidget({
+  // oxlint-disable-next-line no-unused-vars
+  field,
+}: CustomWidgetProps): JSX.Element {
   const form = useWidgetForm<typeof definition.POST>();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
+  const logger = useWidgetLogger();
   const t = useWidgetTranslation<typeof definition.POST>();
 
-  const children = field.children;
   const toolName = form?.watch("toolName") ?? "";
+
+  // Fetch available tools from help endpoint (role-based filtering)
+  const helpState = useEndpoint(
+    helpEndpoints,
+    {
+      read: {
+        initialState: { pageSize: 500 },
+        queryOptions: {
+          refetchOnWindowFocus: false,
+          staleTime: 5 * 60 * 1000, // 5 minutes
+        },
+      },
+    },
+    logger,
+    user,
+  );
+
+  const toolOptions = useMemo((): AutocompleteOption<string>[] => {
+    const response = helpState?.read?.response;
+    if (!response || response.success !== true) {
+      return [];
+    }
+    return response.data.tools.map((tool) => {
+      const alias = tool.aliases?.[0];
+      const label = alias ?? tool.toolName;
+      return {
+        value: tool.toolName,
+        label,
+        description: tool.description,
+        category: tool.category,
+      };
+    });
+  }, [helpState?.read?.response]);
+
   const inputData = form?.watch("input") as
     | Record<string, WidgetData>
     | undefined;
@@ -167,12 +208,34 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
     return undefined;
   }, [hasInput, method, inputData]);
 
-  // Response data from the parent execute-tool endpoint
-  const responseResult = field.value?.result;
-
   return (
     <Div className="flex flex-col gap-4 p-4">
-      <TextFieldWidget fieldName="toolName" field={children.toolName} />
+      {form && (
+        <FormField
+          control={form.control}
+          name="toolName"
+          render={({ field: formField }) => (
+            <FormItem>
+              <FormLabel>
+                {t("executeTool.post.fields.toolName.label")}
+              </FormLabel>
+              <AutocompleteField
+                value={formField.value}
+                onChange={(val) => {
+                  formField.onChange(val);
+                }}
+                onBlur={formField.onBlur}
+                options={toolOptions}
+                placeholder={t("executeTool.post.fields.toolName.placeholder")}
+                searchPlaceholder={t(
+                  "executeTool.post.fields.toolName.description",
+                )}
+                allowCustom={true}
+              />
+            </FormItem>
+          )}
+        />
+      )}
 
       {!toolName && (
         <P className="text-sm text-muted-foreground">
@@ -197,19 +260,6 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
           user={user}
           endpointOptions={endpointOptions}
         />
-      )}
-
-      {responseResult !== undefined && responseResult !== null && (
-        <Div className="flex flex-col gap-2">
-          <P className="text-sm font-medium">
-            {t("executeTool.post.response.resultLabel")}
-          </P>
-          <Pre className="overflow-auto rounded-md bg-muted p-4 text-xs">
-            {typeof responseResult === "string"
-              ? responseResult
-              : JSON.stringify(responseResult, null, 2)}
-          </Pre>
-        </Div>
       )}
     </Div>
   );

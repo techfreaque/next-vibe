@@ -185,6 +185,11 @@ export const translations: typeof enTranslations = {
     pulseExecutionFailed: "Pulse-Ausführung fehlgeschlagen",
     pulseInternalError: "Interner Fehler im Pulse-System",
 
+    // Validation errors
+    invalidTaskInput:
+      "Task-Eingabe stimmt nicht mit dem Anforderungsschema des Endpunkts überein",
+    endpointNotFound: "Endpunkt für die angegebene Route-ID nicht gefunden",
+
     // Repository errors
     repositoryNotFound: "Ressource nicht gefunden",
     repositoryInternalError: "Ein interner Fehler ist aufgetreten",

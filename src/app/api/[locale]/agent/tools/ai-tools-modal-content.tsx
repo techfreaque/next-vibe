@@ -66,7 +66,7 @@ export function AIToolsModalContent({
             },
           },
         }}
-        className="flex-1 overflow-hidden"
+        className="flex-1 overflow-scroll max-h-[75dvh]"
       />
     </DialogContent>
   );

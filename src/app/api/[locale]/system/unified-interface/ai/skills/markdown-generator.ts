@@ -33,6 +33,7 @@ import {
 } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { simpleT } from "@/i18n/core/shared";
 
 // ============================================================================
 // SKILL TIER DEFINITIONS
@@ -349,13 +350,8 @@ function groupByCategory(
   const groups = new Map<string, CreateApiEndpointAny[]>();
 
   for (const endpoint of endpoints) {
-    let category = "Other";
-    try {
-      const { t } = endpoint.scopedTranslation.scopedT(locale);
-      category = t(endpoint.category) || "Other";
-    } catch {
-      category = String(endpoint.category) || "Other";
-    }
+    const { t } = simpleT(locale);
+    const category = t(endpoint.category);
 
     const existing = groups.get(category) ?? [];
     existing.push(endpoint);

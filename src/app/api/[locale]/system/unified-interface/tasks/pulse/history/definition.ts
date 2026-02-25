@@ -24,10 +24,13 @@ import { PulseExecutionStatusDB, PulseHealthStatusDB } from "../../enum";
 import { scopedTranslation } from "./i18n";
 import { PulseHistoryContainer } from "./widget";
 
+export const PULSE_HISTORY_ALIAS = "pulse-history" as const;
+
 export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["system", "unified-interface", "tasks", "pulse", "history"],
+  aliases: [PULSE_HISTORY_ALIAS, "pulse:history"],
   title: "get.title",
   description: "get.description",
   icon: "activity",

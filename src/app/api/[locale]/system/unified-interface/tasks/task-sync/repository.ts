@@ -19,10 +19,15 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
 
+import type { NewCronTask } from "../cron/db";
 import { cronTasks } from "../cron/db";
-import type { CronTaskPriorityDB, TaskCategoryDB } from "../enum";
+import type {
+  CronTaskPriorityDB,
+  TaskCategoryDB,
+  TaskOutputModeDB,
+} from "../enum";
 import type { scopedTranslation } from "../i18n";
-import type { JsonValue } from "../unified-runner/types";
+import type { JsonValue, NotificationTarget } from "../unified-runner/types";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
@@ -36,12 +41,19 @@ export interface SyncedCronTask {
   routeId: string;
   displayName: string;
   description: string | null;
+  version: string;
   category: (typeof TaskCategoryDB)[number];
   schedule: string;
+  timezone: string | null;
   enabled: boolean;
   priority: (typeof CronTaskPriorityDB)[number];
   timeout: number | null;
+  retries: number | null;
+  retryDelay: number | null;
   taskInput: Record<string, JsonValue>;
+  runOnce: boolean;
+  outputMode: (typeof TaskOutputModeDB)[number];
+  notificationTargets: NotificationTarget[];
   tags: string[];
   targetInstance: string | null;
 }
@@ -52,12 +64,19 @@ function serializeForSync(task: CronTaskSelect): SyncedCronTask {
     routeId: task.routeId,
     displayName: task.displayName,
     description: task.description,
+    version: task.version,
     category: task.category,
     schedule: task.schedule,
+    timezone: task.timezone,
     enabled: task.enabled,
     priority: task.priority,
     timeout: task.timeout,
+    retries: task.retries,
+    retryDelay: task.retryDelay,
     taskInput: task.taskInput,
+    runOnce: task.runOnce,
+    outputMode: task.outputMode,
+    notificationTargets: task.notificationTargets as NotificationTarget[],
     tags: task.tags as string[],
     targetInstance: task.targetInstance,
   };
@@ -83,33 +102,65 @@ export async function upsertRemoteTasks(params: {
         .where(eq(cronTasks.routeId, remoteTask.routeId))
         .limit(1);
 
+      // Build update payload from fields actually present in the remote payload.
+      // Old remotes may not send newer fields — skip undefined to avoid
+      // overwriting local values with null/defaults.
+      const definitionFields: Partial<NewCronTask> & { updatedAt: Date } = {
+        displayName: remoteTask.displayName,
+        description: remoteTask.description,
+        category: remoteTask.category,
+        schedule: remoteTask.schedule,
+        priority: remoteTask.priority,
+        taskInput: remoteTask.taskInput,
+        tags: remoteTask.tags,
+        targetInstance: remoteTask.targetInstance,
+        updatedAt: new Date(),
+      };
+      // Only include fields the remote explicitly sent
+      if (remoteTask.version !== undefined) {
+        definitionFields.version = remoteTask.version;
+      }
+      if (remoteTask.timezone !== undefined) {
+        definitionFields.timezone = remoteTask.timezone;
+      }
+      if (remoteTask.timeout !== undefined) {
+        definitionFields.timeout = remoteTask.timeout;
+      }
+      if (remoteTask.retries !== undefined) {
+        definitionFields.retries = remoteTask.retries;
+      }
+      if (remoteTask.retryDelay !== undefined) {
+        definitionFields.retryDelay = remoteTask.retryDelay;
+      }
+      if (remoteTask.runOnce !== undefined) {
+        definitionFields.runOnce = remoteTask.runOnce;
+      }
+      if (remoteTask.outputMode !== undefined) {
+        definitionFields.outputMode = remoteTask.outputMode;
+      }
+      if (remoteTask.notificationTargets !== undefined) {
+        definitionFields.notificationTargets =
+          remoteTask.notificationTargets as NotificationTarget[];
+      }
+
       if (existing) {
-        // Update schedule/config if changed
+        // Update definition fields only — never overwrite local execution state
+        // (enabled, lastExecutionStatus, counts, etc. are managed by the local pulse runner)
         await db
           .update(cronTasks)
-          .set({
-            schedule: remoteTask.schedule,
-            enabled: remoteTask.enabled,
-            priority: remoteTask.priority,
-            taskInput: remoteTask.taskInput,
-            targetInstance: remoteTask.targetInstance,
-            updatedAt: new Date(),
-          })
+          .set(definitionFields)
           .where(eq(cronTasks.id, existing.id));
         synced++;
       } else {
+        // New task — use remote enabled state as initial value
         await db.insert(cronTasks).values({
           routeId: remoteTask.routeId,
-          displayName: remoteTask.displayName,
-          description: remoteTask.description,
-          category: remoteTask.category,
-          schedule: remoteTask.schedule,
+          displayName: definitionFields.displayName ?? remoteTask.routeId,
+          category: definitionFields.category ?? remoteTask.category,
+          schedule: definitionFields.schedule ?? remoteTask.schedule,
+          priority: definitionFields.priority ?? remoteTask.priority,
           enabled: remoteTask.enabled,
-          priority: remoteTask.priority,
-          timeout: remoteTask.timeout,
-          taskInput: remoteTask.taskInput,
-          tags: remoteTask.tags,
-          targetInstance: remoteTask.targetInstance,
+          ...definitionFields,
         });
         synced++;
       }

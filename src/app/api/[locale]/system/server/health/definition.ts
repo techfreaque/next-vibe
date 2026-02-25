@@ -23,6 +23,8 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
 
+export const HEALTH_ALIAS = "health" as const;
+
 /**
  * GET endpoint definition - Basic health check
  */
@@ -30,7 +32,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["system", "server", "health"],
-  aliases: ["health", "status"],
+  aliases: [HEALTH_ALIAS, "status"],
   title: "get.title",
   description: "get.description",
   category: "app.endpointCategories.system",

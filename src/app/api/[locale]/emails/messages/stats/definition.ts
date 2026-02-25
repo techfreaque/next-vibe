@@ -46,6 +46,8 @@ import {
 import { scopedTranslation } from "./i18n";
 import { EmailStatsContainer } from "./widget";
 
+export const EMAIL_STATS_ALIAS = "email-stats" as const;
+
 /**
  * Get Email Stats Endpoint (GET)
  * Retrieves comprehensive email statistics as historical charts only
@@ -54,6 +56,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["emails", "messages", "stats"],
+  aliases: [EMAIL_STATS_ALIAS],
   allowedRoles: [UserRole.ADMIN],
 
   title: "get.title",

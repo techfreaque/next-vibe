@@ -22,7 +22,7 @@ import { Text as UIText } from "./text";
 // Re-export enum for type parity with web
 export { FormFieldCategory } from "@/packages/next-vibe-ui/web/ui/autocomplete-field";
 
-export function AutocompleteField<TKey extends string>({
+export function AutocompleteField({
   value = "",
   onChange,
   onBlur,
@@ -32,8 +32,7 @@ export function AutocompleteField<TKey extends string>({
   allowCustom = true,
   disabled = false,
   className,
-  t,
-}: AutocompleteFieldProps<TKey>): React.JSX.Element {
+}: AutocompleteFieldProps): React.JSX.Element {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [isCustomValue, setIsCustomValue] = useState(false);
@@ -41,7 +40,7 @@ export function AutocompleteField<TKey extends string>({
 
   // Group options by category
   const groupedOptions = useMemo(() => {
-    const groups: Record<string, AutocompleteOption<TKey>[]> = {};
+    const groups: Record<string, AutocompleteOption<string>[]> = {};
 
     options.forEach((option) => {
       const category = option.category || "other";
@@ -60,12 +59,12 @@ export function AutocompleteField<TKey extends string>({
       return groupedOptions;
     }
 
-    const filtered: Record<string, AutocompleteOption<TKey>[]> = {};
+    const filtered: Record<string, AutocompleteOption<string>[]> = {};
 
     Object.entries(groupedOptions).forEach(([category, categoryOptions]) => {
       const matchingOptions = categoryOptions.filter(
         (option) =>
-          t(option.label).toLowerCase().includes(searchValue.toLowerCase()) ||
+          option.label.toLowerCase().includes(searchValue.toLowerCase()) ||
           option.value.toLowerCase().includes(searchValue.toLowerCase()),
       );
 
@@ -75,11 +74,11 @@ export function AutocompleteField<TKey extends string>({
     });
 
     return filtered;
-  }, [groupedOptions, searchValue, t]);
+  }, [groupedOptions, searchValue]);
 
   // Check if current value is a custom value
   const selectedOption = options.find((option) => option.value === value);
-  const displayValue = selectedOption ? t(selectedOption.label) : value;
+  const displayValue = selectedOption ? selectedOption.label : value;
 
   React.useEffect(() => {
     setIsCustomValue(!selectedOption && value !== "");
@@ -144,7 +143,7 @@ export function AutocompleteField<TKey extends string>({
                   !value && "text-muted-foreground",
                 )}
               >
-                {value ? displayValue : placeholder ? t(placeholder) : ""}
+                {value ? displayValue : (placeholder ?? "")}
               </RNText>
             </View>
             <View className="flex-row items-center gap-1">
@@ -172,7 +171,7 @@ export function AutocompleteField<TKey extends string>({
                 className="mr-2 text-muted-foreground opacity-50"
               />
               <Input
-                placeholder={searchPlaceholder ? t(searchPlaceholder) : ""}
+                placeholder={searchPlaceholder ?? ""}
                 value={searchValue}
                 onChangeText={setSearchValue}
                 className="h-10 flex-1 border-0 bg-transparent"
@@ -221,9 +220,7 @@ export function AutocompleteField<TKey extends string>({
                             "flex-row items-center justify-between rounded-sm px-2 py-2 active:bg-accent",
                           )}
                         >
-                          <UIText className="text-base">
-                            {t(option.label)}
-                          </UIText>
+                          <UIText className="text-base">{option.label}</UIText>
                           {value === option.value && (
                             <Check size={16} className="text-foreground" />
                           )}

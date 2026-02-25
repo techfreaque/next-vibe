@@ -23,11 +23,14 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { scopedTranslation } from "./i18n";
 
+export const START_ALIAS = "start" as const;
+export const START_SERVER_ALIAS = "server:start" as const;
+
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["system", "server", "start"],
-  aliases: ["start", "server:start"],
+  aliases: [START_ALIAS, START_SERVER_ALIAS],
   title: "post.title",
   description: "post.description",
   category: "app.endpointCategories.system",

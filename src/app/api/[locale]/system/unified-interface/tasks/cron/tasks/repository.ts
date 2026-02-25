@@ -15,11 +15,16 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
+import {
+  getEndpoint,
+  getFullPath,
+} from "@/app/api/[locale]/system/generated/endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { calculateNextExecutionTime } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import type { NotificationTarget } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { cronTasks } from "../../cron/db";
 import {
@@ -44,6 +49,37 @@ type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
  * Database error message pattern for unique constraint violations
  */
 const UNIQUE_CONSTRAINT_ERROR = "unique constraint";
+
+/**
+ * Translate task displayName and description using the endpoint's scoped translation.
+ * System tasks store scoped translation keys (e.g. "taskSync.name") as displayName/description.
+ * Falls back to the raw DB value if the endpoint can't be resolved or translation fails.
+ */
+async function translateTaskFields(
+  task: CronTaskResponseType,
+  locale: CountryLanguage,
+): Promise<CronTaskResponseType> {
+  const endpoint = await getEndpoint(task.routeId);
+  if (!endpoint) {
+    return task;
+  }
+
+  const { t } = endpoint.scopedTranslation.scopedT(locale);
+  const translatedName = t(task.displayName as Parameters<typeof t>[0]);
+  const translatedDesc = task.description
+    ? t(task.description as Parameters<typeof t>[0])
+    : null;
+
+  return {
+    ...task,
+    displayName:
+      translatedName !== task.displayName ? translatedName : task.displayName,
+    description:
+      translatedDesc && translatedDesc !== task.description
+        ? translatedDesc
+        : task.description,
+  };
+}
 
 /**
  * Format task response with DB fields
@@ -105,6 +141,7 @@ export interface ICronTasksListRepository {
   getTasks(
     data: CronTaskListRequestOutput,
     user: JwtPayloadType,
+    locale: CountryLanguage,
     t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskListResponseOutput>>;
@@ -112,6 +149,7 @@ export interface ICronTasksListRepository {
   createTask(
     data: CronTaskCreateRequestOutput,
     user: JwtPayloadType,
+    locale: CountryLanguage,
     t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskCreateResponseOutput>>;
@@ -124,6 +162,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
   async getTasks(
     data: CronTaskListRequestOutput,
     user: JwtPayloadType,
+    locale: CountryLanguage,
     t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskListResponseOutput>> {
@@ -192,9 +231,12 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
 
       logger.info("Retrieved tasks from database", { count: tasks.length });
 
-      // Format tasks with computed fields
-      const formattedTasks = tasks.map((task) =>
-        formatTaskResponse(task, logger),
+      // Format tasks with computed fields and translate displayName/description
+      const formattedTasks = await Promise.all(
+        tasks.map(async (task) => {
+          const formatted = formatTaskResponse(task, logger);
+          return translateTaskFields(formatted, locale);
+        }),
       );
 
       const response: CronTaskListResponseOutput = {
@@ -218,11 +260,44 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
   async createTask(
     data: CronTaskCreateRequestOutput,
     user: JwtPayloadType,
+    locale: CountryLanguage,
     t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<CronTaskCreateResponseOutput>> {
     try {
       logger.info("Starting cron task creation", { routeId: data.routeId });
+
+      // Validate routeId points to a real endpoint
+      const canonicalId = getFullPath(data.routeId) ?? data.routeId;
+      const endpoint = await getEndpoint(canonicalId);
+      if (!endpoint) {
+        logger.warn("Endpoint not found for routeId", {
+          routeId: data.routeId,
+        });
+        return fail({
+          message: t("errors.endpointNotFound"),
+          errorType: ErrorResponseTypes.VALIDATION_ERROR,
+        });
+      }
+
+      // Validate taskInput against the endpoint's request schema
+      if (
+        data.taskInput &&
+        Object.keys(data.taskInput).length > 0 &&
+        endpoint.requestSchema
+      ) {
+        const parsed = endpoint.requestSchema.safeParse(data.taskInput);
+        if (!parsed.success) {
+          logger.warn("Task input validation failed", {
+            routeId: data.routeId,
+            errors: parsed.error.issues.map((i) => i.message).join(", "),
+          });
+          return fail({
+            message: t("errors.invalidTaskInput"),
+            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+          });
+        }
+      }
 
       const userId = !user.isPublic ? user.id : null;
 
@@ -274,9 +349,10 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         routeId: createdTask.routeId,
       });
 
-      // Format the response
+      // Format the response with translated fields
+      const formatted = formatTaskResponse(createdTask, logger);
       const response: CronTaskCreateResponseOutput = {
-        task: formatTaskResponse(createdTask, logger),
+        task: await translateTaskFields(formatted, locale),
       };
 
       logger.vibe("🚀 Successfully created cron task");

@@ -46,6 +46,7 @@ export function useFavoritesSummary(params: {
         id: fav.id,
         name: fav.name,
         characterId: fav.characterId,
+        characterName: fav.name ?? null,
         modelId: fav.modelId,
         modelInfo: fav.modelInfo,
         isActive: fav.activeBadge !== null,

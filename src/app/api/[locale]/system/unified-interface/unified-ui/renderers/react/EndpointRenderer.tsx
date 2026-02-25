@@ -121,6 +121,9 @@ export interface EndpointRendererProps<TEndpoint extends CreateApiEndpointAny> {
   logger: EndpointLogger;
   /** User object for permission checks */
   user: JwtPayloadType;
+  /** When true, renders FormProvider without a <form> element.
+   *  Use this to embed endpoint fields inside an existing form (avoids nested <form>). */
+  _noFormElement?: boolean;
 }
 
 /**
@@ -144,9 +147,16 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   cancelButton,
   logger,
   user,
+  _noFormElement: noFormElementProp = false,
 }: EndpointRendererProps<TEndpoint>): JSX.Element {
   // Initialize navigation stack for cross-definition navigation
   const navigation = useNavigationStack();
+
+  // Check if the root fields config requests noFormElement (e.g. customWidgetObject)
+  const _noFormElement =
+    noFormElementProp ||
+    ("noFormElement" in endpoint.fields &&
+      endpoint.fields.noFormElement === true);
 
   // Check if endpoint.fields itself is a container or array widget (render directly)
   const isRootContainer =
@@ -249,7 +259,12 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     if (hasRequest) {
       return (
         <WidgetContextProvider context={context}>
-          <Form form={form} onSubmit={handleFormSubmit} className={className}>
+          <Form
+            form={form}
+            onSubmit={handleFormSubmit}
+            className={className}
+            noFormElement={_noFormElement}
+          >
             {rootWidget}
             {children}
           </Form>
@@ -334,7 +349,12 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   if (hasRequest) {
     return (
       <WidgetContextProvider context={context}>
-        <Form form={form} onSubmit={handleWidgetSubmit} className={className}>
+        <Form
+          form={form}
+          onSubmit={handleWidgetSubmit}
+          className={className}
+          noFormElement={_noFormElement}
+        >
           <Div className="flex flex-col gap-6">
             {allWidgets}
             {children}

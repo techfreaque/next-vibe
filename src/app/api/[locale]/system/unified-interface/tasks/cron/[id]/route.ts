@@ -18,6 +18,7 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
       return await CronTasksRepository.getTaskById(
         urlPathParams.id,
         user,
+        locale,
         tasksT,
         logger,
       );
@@ -66,6 +67,7 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
         urlPathParams.id,
         updates,
         user,
+        locale,
         tasksT,
         logger,
       );

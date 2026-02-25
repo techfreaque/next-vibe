@@ -885,6 +885,9 @@ function StackEntryLayer({
               urlPathParams: entry.params.urlPathParams,
               autoPrefillData: entry.params.data,
               mutationOptions: extractMutationOptions(entry.endpoint),
+              // When prefillFromGet provides data, also pass as initialState
+              // so it takes priority over the GET response shape
+              ...(entry.params.data ? { initialState: entry.params.data } : {}),
             },
           }}
           submitButton={submitButton}
@@ -990,6 +993,12 @@ function StackEntryLayer({
             create: {
               urlPathParams: entry.params.urlPathParams,
               autoPrefillData: entry.params.data,
+              // When prefillFromGet provides data, also pass as initialState
+              // so it takes priority over the GET response shape
+              // (GET may nest data differently than the PUT form expects)
+              ...(entry.prefillFromGet && entry.params.data
+                ? { initialState: entry.params.data }
+                : {}),
             },
           }}
           submitButton={submitButton}

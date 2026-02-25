@@ -26,7 +26,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
 import { KagiSearchResultsContainer } from "./widget";
 
-export const SEARCH_ALIAS = "kagi-search" as const;
+export const KAGI_ALIAS = "kagi" as const;
 
 /**
  * GET /kagi - Get AI-powered answers with Kagi FastGPT
@@ -42,7 +42,7 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   // CLI alias for better UX
-  aliases: [SEARCH_ALIAS, "kagi"] as const,
+  aliases: [KAGI_ALIAS] as const,
   cli: {
     firstCliArgKey: "query",
   },

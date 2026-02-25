@@ -8,6 +8,10 @@ export const translations: typeof enTranslations = {
   errors: {
     fetchCronTasks: "Nie udało się pobrać zadań cron",
     createCronTask: "Nie udało się utworzyć zadania cron",
+    invalidTaskInput:
+      "Dane wejściowe zadania nie pasują do schematu żądania endpointu",
+    endpointNotFound:
+      "Nie znaleziono endpointu dla podanego identyfikatora trasy",
   },
   list: {
     columns: {

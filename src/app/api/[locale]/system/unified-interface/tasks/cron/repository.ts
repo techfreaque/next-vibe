@@ -14,11 +14,13 @@ import {
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { formatTasksSummary } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks-formatter";
 import { calculateNextExecutionTime } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { TaskCategory, TaskCategoryDB } from "../enum";
 import type { scopedTranslation } from "../i18n";
@@ -34,6 +36,37 @@ import { cronTaskExecutions, cronTasks } from "./db";
 import type { CronTaskResponseType as CronTaskResponse } from "./tasks/definition";
 
 export type { CronTaskResponse };
+
+/**
+ * Translate task displayName and description using the endpoint's scoped translation.
+ * System tasks store scoped translation keys (e.g. "taskSync.name") as displayName/description.
+ * Falls back to the raw DB value if the endpoint can't be resolved or translation fails.
+ */
+async function translateTaskFields(
+  task: CronTaskResponse,
+  locale: CountryLanguage,
+): Promise<CronTaskResponse> {
+  const endpoint = await getEndpoint(task.routeId);
+  if (!endpoint) {
+    return task;
+  }
+
+  const { t } = endpoint.scopedTranslation.scopedT(locale);
+  const translatedName = t(task.displayName as Parameters<typeof t>[0]);
+  const translatedDesc = task.description
+    ? t(task.description as Parameters<typeof t>[0])
+    : null;
+
+  return {
+    ...task,
+    displayName:
+      translatedName !== task.displayName ? translatedName : task.displayName,
+    description:
+      translatedDesc && translatedDesc !== task.description
+        ? translatedDesc
+        : task.description,
+  };
+}
 
 function serializeTask(
   task: CronTaskRow,
@@ -114,6 +147,7 @@ export class CronTasksRepository {
   static async getTaskById(
     id: string,
     user: JwtPayloadType,
+    locale: CountryLanguage,
     t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ task: CronTaskResponse }>> {
@@ -146,7 +180,10 @@ export class CronTasksRepository {
         });
       }
 
-      return success({ task: serializeTask(task as CronTaskRow, logger) });
+      const serialized = serializeTask(task, logger);
+      return success({
+        task: await translateTaskFields(serialized, locale),
+      });
     } catch (error) {
       const parsedError = parseError(error);
       logger.error("Failed to fetch cron task by ID", {
@@ -246,6 +283,7 @@ export class CronTasksRepository {
     id: string,
     updates: Partial<CronTaskRow>,
     user: JwtPayloadType | null,
+    locale: CountryLanguage,
     t: ModuleT,
     logger: EndpointLogger,
   ): Promise<ResponseType<{ task: CronTaskResponse; success: boolean }>> {
@@ -295,8 +333,9 @@ export class CronTasksRepository {
         });
       }
 
+      const serialized = serializeTask(task, logger);
       return success({
-        task: serializeTask(task as CronTaskRow, logger),
+        task: await translateTaskFields(serialized, locale),
         success: true,
       });
     } catch (error) {

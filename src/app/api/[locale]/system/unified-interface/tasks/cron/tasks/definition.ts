@@ -37,10 +37,14 @@ import {
   TaskCategoryDB,
   TaskCategoryOptions,
   TaskOutputModeDB,
+  TaskOutputModeOptions,
 } from "../../enum";
 import { taskInputSchema } from "../db";
 import { scopedTranslation } from "./i18n";
 import { CronTasksContainer } from "./widget";
+
+export const CRON_LIST_ALIAS = "cron-list" as const;
+export const CRON_CREATE_ALIAS = "cron-create" as const;
 
 /** Reusable task response shape — keep in sync with CronTaskResponse in repository.ts */
 export const cronTaskResponseSchema = z.object({
@@ -92,6 +96,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["system", "unified-interface", "tasks", "cron", "tasks"],
+  aliases: [CRON_LIST_ALIAS, "cron-tasks"],
   title: "get.title",
   description: "get.description",
   icon: "clock",
@@ -384,6 +389,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["system", "unified-interface", "tasks", "cron", "tasks"],
+  aliases: [CRON_CREATE_ALIAS],
   title: "post.title",
   description: "post.description",
   icon: "clock",
@@ -469,6 +475,7 @@ const { POST } = createEndpoint({
       outputMode: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
+        options: TaskOutputModeOptions,
         label: "post.fields.outputMode.label",
         description: "post.fields.outputMode.description",
         columns: 6,

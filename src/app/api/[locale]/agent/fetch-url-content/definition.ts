@@ -24,6 +24,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
 
 export const FETCH_URL_ALIAS = "fetch-url-content" as const;
+export const FETCH_URL_SHORT_ALIAS = "fetch-url" as const;
 
 /**
  * GET /fetch_url_content - Fetch and convert URL content to markdown
@@ -43,7 +44,7 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   // CLI alias for better UX
-  aliases: [FETCH_URL_ALIAS, "fetch", "fetch-url"] as const,
+  aliases: [FETCH_URL_ALIAS, "fetch", FETCH_URL_SHORT_ALIAS] as const,
   cli: {
     firstCliArgKey: "url",
   },

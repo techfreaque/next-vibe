@@ -1,6 +1,7 @@
 export const translations = {
   category: "Help & Documentation",
   tag: "Help",
+  uncategorized: "Other",
   get: {
     title: "Tool Help — Discover Available Tools",
     description:

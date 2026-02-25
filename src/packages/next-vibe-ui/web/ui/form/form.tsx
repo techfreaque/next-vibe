@@ -23,6 +23,9 @@ export interface FormProps<TRequest extends FieldValues = FieldValues> {
   form?: UseFormReturn<TRequest>;
   onSubmit?: () => void | Promise<void>;
   className?: string;
+  /** When true, renders FormProvider without a <form> element.
+   *  Use this to embed form fields inside an existing form (avoids nested <form>). */
+  noFormElement?: boolean;
 }
 
 export interface FormFieldContextValue<
@@ -101,6 +104,16 @@ export function Form<TRequest extends FieldValues>(
 
   // If form is provided, wrap with FormProvider for react-hook-form integration
   if (props.form) {
+    // noFormElement: provide FormProvider context without a <form> element
+    // Use this when embedding inside an existing form to avoid nested <form>
+    if (props.noFormElement) {
+      return (
+        <FormProvider {...props.form}>
+          <div className={cn(props.className)}>{props.children}</div>
+        </FormProvider>
+      );
+    }
+
     return (
       <FormProvider {...props.form}>
         <form className={cn(props.className)} onSubmit={handleSubmit}>

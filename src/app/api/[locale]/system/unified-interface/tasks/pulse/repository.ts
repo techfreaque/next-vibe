@@ -19,6 +19,9 @@ import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
+  CronTaskStatus,
+  type CronTaskStatusValue,
+  getPriorityWeight,
   PulseExecutionStatus,
   PulseHealthStatus,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
@@ -471,13 +474,17 @@ export class PulseHealthRepository {
         .from(cronTasksTable)
         .where(and(...whereConditions));
 
+      // Sort by priority: CRITICAL first, BACKGROUND last
+      allTasks.sort(
+        (a, b) => getPriorityWeight(b.priority) - getPriorityWeight(a.priority),
+      );
+
       // Discover which tasks are due
       for (const dbTask of allTasks) {
-        // Instance routing: null targetInstance = host only (no INSTANCE_ID set),
+        // Instance routing: null targetInstance = runs on any instance,
         // specific targetInstance = only on that named instance
         const taskTarget = dbTask.targetInstance ?? null;
-        const currentInstance = instanceId ?? null;
-        if (taskTarget !== currentInstance) {
+        if (taskTarget !== null && taskTarget !== instanceId) {
           tasksSkipped.push(dbTask.displayName);
           continue;
         }
@@ -486,6 +493,15 @@ export class PulseHealthRepository {
           options.force || isCronTaskDue(logger, dbTask.schedule, now);
         if (!isDue) {
           tasksSkipped.push(dbTask.displayName);
+          continue;
+        }
+
+        // Overlap prevention: skip if this task is still running from a previous pulse
+        if (dbTask.lastExecutionStatus === CronTaskStatus.RUNNING) {
+          tasksSkipped.push(dbTask.displayName);
+          logger.debug(
+            `Pulse: skipping task "${dbTask.displayName}" — still running from previous pulse`,
+          );
           continue;
         }
 
@@ -521,64 +537,221 @@ export class PulseHealthRepository {
         }
 
         const { user: cronUser, locale: userLocale } = taskUserContext;
+        const { t: tTask } = scopedTranslation.scopedT(userLocale);
+        const startedAt = new Date();
 
         // Resolve routeId → endpoint path → handler
         const path = getFullPath(dbTask.routeId);
-        if (!path) {
+        const handler = path ? await getRouteHandler(path) : null;
+        let taskSucceeded = false;
+
+        if (!path || !handler) {
           tasksFailed.push(dbTask.displayName);
           logger.error(
-            `Pulse: unknown routeId "${dbTask.routeId}" for task "${dbTask.displayName}"`,
+            `Pulse: ${!path ? "unknown routeId" : "no handler"} "${dbTask.routeId}" for task "${dbTask.displayName}"`,
           );
         } else {
-          const handler = await getRouteHandler(path);
-          if (!handler) {
-            tasksFailed.push(dbTask.displayName);
-            logger.error(`Pulse: no handler for routeId "${dbTask.routeId}"`);
-          } else {
+          // Mark task as RUNNING in DB (overlap prevention + run-once pre-disable)
+          await CronTasksRepository.updateTask(
+            dbTask.id,
+            {
+              lastExecutionStatus: CronTaskStatus.RUNNING,
+              // Run-once: disable before execution so a crash won't re-trigger
+              ...(dbTask.runOnce ? { enabled: false } : {}),
+            },
+            null,
+            userLocale,
+            tTask,
+            logger,
+          );
+          if (dbTask.runOnce) {
+            logger.info(
+              `[run-once] Task "${dbTask.displayName}" disabled before execution`,
+            );
+          }
+
+          try {
             const taskInput = dbTask.taskInput ?? {};
             const { urlPathParams, data } = await splitTaskArgs(
               path,
               taskInput,
             );
+            const timeoutMs = dbTask.timeout ?? 300000;
+            const maxRetries = dbTask.retries ?? 0;
+            const retryDelayMs = dbTask.retryDelay ?? 30000;
 
-            const result = await handler({
-              data,
-              urlPathParams,
-              user: cronUser,
-              locale: userLocale,
-              logger,
-              platform: Platform.CRON,
-            });
+            let firstExecutionId: string | null = null;
+            let finalStatus: typeof CronTaskStatusValue = CronTaskStatus.FAILED;
+            let finalMessage: string | null = null;
+            let finalDurationMs = 0;
 
-            if (isStreamingResponse(result) || isFileResponse(result)) {
-              tasksFailed.push(dbTask.displayName);
-              logger.error(
-                `Pulse: task "${dbTask.displayName}" returned streaming/file response`,
+            for (let attempt = 0; attempt <= maxRetries; attempt++) {
+              if (attempt > 0) {
+                logger.debug(
+                  `Pulse: retrying task "${dbTask.displayName}" (attempt ${attempt + 1}/${maxRetries + 1}) after ${retryDelayMs}ms`,
+                );
+                await new Promise<void>((resolve) => {
+                  setTimeout(resolve, retryDelayMs);
+                });
+              }
+
+              const attemptStart = Date.now();
+              let typedResult: ResponseType<
+                Record<string, string | number | boolean>
+              >;
+
+              try {
+                // Execute with timeout
+                const result = (await Promise.race([
+                  handler({
+                    data,
+                    urlPathParams,
+                    user: cronUser,
+                    locale: userLocale,
+                    logger,
+                    platform: Platform.CRON,
+                  }),
+                  new Promise<never>((...[, reject]) => {
+                    setTimeout(
+                      () => reject(new Error("TASK_TIMEOUT")),
+                      timeoutMs,
+                    );
+                  }),
+                ])) as Awaited<ReturnType<typeof handler>>;
+
+                // Normalize non-standard responses
+                typedResult =
+                  isStreamingResponse(result) || isFileResponse(result)
+                    ? (fail({
+                        message: tTask("errors.repositoryInternalError"),
+                        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                      }) as ResponseType<
+                        Record<string, string | number | boolean>
+                      >)
+                    : (result as ResponseType<
+                        Record<string, string | number | boolean>
+                      >);
+              } catch (err) {
+                const isTimeout =
+                  err instanceof Error && err.message === "TASK_TIMEOUT";
+                typedResult = fail({
+                  message: isTimeout
+                    ? tTask("errors.repositoryInternalError")
+                    : tTask("errors.repositoryInternalError"),
+                  errorType: ErrorResponseTypes.INTERNAL_ERROR,
+                }) as ResponseType<Record<string, string | number | boolean>>;
+                finalStatus = isTimeout
+                  ? CronTaskStatus.TIMEOUT
+                  : CronTaskStatus.FAILED;
+              }
+
+              const attemptDuration = Date.now() - attemptStart;
+              const attemptStatus: typeof CronTaskStatusValue =
+                typedResult.success
+                  ? CronTaskStatus.COMPLETED
+                  : finalStatus === CronTaskStatus.TIMEOUT
+                    ? CronTaskStatus.TIMEOUT
+                    : CronTaskStatus.FAILED;
+
+              // Record execution for this attempt
+              const execResponse = await CronTasksRepository.createExecution(
+                {
+                  taskId: dbTask.id,
+                  taskName: dbTask.displayName,
+                  executionId: crypto.randomUUID(),
+                  status: attemptStatus,
+                  priority: dbTask.priority,
+                  startedAt: new Date(attemptStart),
+                  completedAt: new Date(),
+                  durationMs: attemptDuration,
+                  config: taskInput,
+                  result: typedResult.success
+                    ? (typedResult.data ?? null)
+                    : null,
+                  retryAttempt: attempt,
+                  parentExecutionId: firstExecutionId,
+                  triggeredBy: "pulse",
+                },
+                tTask,
+                logger,
               );
-            } else if (!result.success) {
-              tasksFailed.push(dbTask.displayName);
-              logger.error(`Pulse: task "${dbTask.displayName}" failed`, {
-                message: result.message,
-              });
-            } else {
-              tasksSucceeded.push(dbTask.displayName);
-            }
-          }
-        }
 
-        // Run-once: disable after first execution regardless of outcome
-        if (dbTask.runOnce) {
-          const { t: tPulse } = scopedTranslation.scopedT(userLocale);
-          await CronTasksRepository.updateTask(
-            dbTask.id,
-            { enabled: false },
-            null,
-            tPulse,
-            logger,
-          );
-          logger.info(
-            `[run-once] Task "${dbTask.displayName}" disabled after single execution`,
-          );
+              // Track first execution ID for retry chain
+              if (attempt === 0 && execResponse.success) {
+                firstExecutionId = execResponse.data.id;
+              }
+
+              finalDurationMs += attemptDuration;
+
+              if (typedResult.success) {
+                taskSucceeded = true;
+                finalStatus = CronTaskStatus.COMPLETED;
+                finalMessage = null;
+                break;
+              }
+
+              finalStatus = attemptStatus;
+              finalMessage = typedResult.message ?? null;
+
+              if (attempt < maxRetries) {
+                logger.warn(
+                  `Pulse: task "${dbTask.displayName}" failed (attempt ${attempt + 1}/${maxRetries + 1}), will retry`,
+                  { message: finalMessage },
+                );
+              } else {
+                logger.error(
+                  `Pulse: task "${dbTask.displayName}" failed after ${maxRetries + 1} attempt(s)`,
+                  { message: finalMessage },
+                );
+              }
+            }
+
+            if (taskSucceeded) {
+              tasksSucceeded.push(dbTask.displayName);
+            } else {
+              tasksFailed.push(dbTask.displayName);
+            }
+
+            // Update task stats (once, after all attempts)
+            await CronTasksRepository.updateTask(
+              dbTask.id,
+              {
+                lastExecutedAt: startedAt,
+                lastExecutionStatus: finalStatus,
+                lastExecutionError: finalMessage,
+                lastExecutionDuration: finalDurationMs,
+                executionCount: dbTask.executionCount + 1,
+                ...(taskSucceeded
+                  ? { successCount: dbTask.successCount + 1 }
+                  : { errorCount: dbTask.errorCount + 1 }),
+              },
+              null,
+              userLocale,
+              tTask,
+              logger,
+            );
+          } catch (unexpectedError) {
+            // Catch-all: if something goes wrong outside the retry loop,
+            // ensure the task doesn't stay stuck in RUNNING state forever
+            logger.error(
+              `Pulse: unexpected error for task "${dbTask.displayName}"`,
+              parseError(unexpectedError),
+            );
+            tasksFailed.push(dbTask.displayName);
+            await CronTasksRepository.updateTask(
+              dbTask.id,
+              {
+                lastExecutionStatus: CronTaskStatus.FAILED,
+                lastExecutionError: parseError(unexpectedError).message,
+                executionCount: dbTask.executionCount + 1,
+                errorCount: dbTask.errorCount + 1,
+              },
+              null,
+              userLocale,
+              tTask,
+              logger,
+            );
+          }
         }
       }
 

@@ -186,6 +186,10 @@ export const translations = {
     pulseExecutionFailed: "Pulse execution failed",
     pulseInternalError: "Internal error in pulse system",
 
+    // Validation errors
+    invalidTaskInput: "Task input does not match the endpoint's request schema",
+    endpointNotFound: "Endpoint not found for the given route ID",
+
     // Repository errors
     repositoryNotFound: "Resource not found",
     repositoryInternalError: "An internal error occurred",

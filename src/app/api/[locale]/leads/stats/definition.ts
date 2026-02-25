@@ -50,6 +50,8 @@ import {
 import { type LeadsStatsTranslationKey, scopedTranslation } from "./i18n";
 import { LeadsStatsContainer } from "./widget";
 
+export const LEADS_STATS_ALIAS = "leads-stats" as const;
+
 // ========== Zod Schemas for Complex Response Types ==========
 
 // Chart data schema for historical data
@@ -266,6 +268,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["leads", "stats"],
+  aliases: [LEADS_STATS_ALIAS],
   title: "title",
   description: "description",
   category: "app.endpointCategories.leads",

@@ -26,6 +26,8 @@ import { CronTaskPriorityDB, CronTaskStatusDB } from "../../enum";
 import { scopedTranslation } from "./i18n";
 import { CronHistoryContainer } from "./widget";
 
+export const CRON_HISTORY_ALIAS = "cron-history" as const;
+
 /**
  * GET endpoint definition - Get task execution history
  * Retrieves task execution history with filtering and pagination
@@ -34,6 +36,7 @@ export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["system", "unified-interface", "tasks", "cron", "history"],
+  aliases: [CRON_HISTORY_ALIAS],
   title: "get.title",
   description: "get.description",
   icon: "clock",

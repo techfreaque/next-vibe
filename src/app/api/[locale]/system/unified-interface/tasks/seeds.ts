@@ -11,6 +11,7 @@ import { isNull, sql } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 
 import type { NewCronTask } from "./cron/db";
 import { cronTasks } from "./cron/db";
@@ -39,8 +40,8 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
   );
 
   const taskRows: NewCronTask[] = cronTaskDefs.map((task) => ({
-    // System tasks: routeId stores the task name as unique identifier
-    routeId: task.name,
+    // routeId: first alias or canonical endpoint path — both resolve via getFullPath()
+    routeId: getPreferredToolName(task.definition),
     displayName: task.name,
     description: task.description,
     category: task.category,

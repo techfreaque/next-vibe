@@ -33,12 +33,13 @@ import { HelpToolsWidget } from "./widget";
 const aiToolMetadataSchema = z.object({
   // Always present
   name: z.string(),
+  title: z.string(),
   description: z.string(),
   toolName: z.string(),
   tags: z.array(z.string()),
   // Present in list mode with query/category
   method: z.string().optional(),
-  category: z.string().optional(),
+  category: z.string(),
   aliases: z.array(z.string()).optional(),
   // Only present in detail mode (toolName param)
   requiresConfirmation: z.boolean().optional(),
@@ -271,6 +272,7 @@ const { GET } = createEndpoint({
         tools: [
           {
             name: "Brave Search",
+            title: "Brave Search",
             method: "GET",
             description: "Search the web using Brave Search API",
             category: "Search",

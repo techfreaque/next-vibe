@@ -42,6 +42,7 @@ import type { scopedTranslation as sttScopedTranslation } from "../../speech-to-
 
 type SttModuleT = ReturnType<typeof sttScopedTranslation.scopedT>["t"];
 
+import { DEFAULT_CHARACTERS } from "../../chat/characters/config";
 import { customCharacters } from "../../chat/characters/db";
 import type { ToolCall } from "../../chat/db";
 import type { ChatMessageRole } from "../../chat/enum";
@@ -544,11 +545,12 @@ export async function setupAiStream(params: {
       }
     }
 
-    // 2. Check character tool config (custom characters only — UUIDs)
+    // 2. Check character tool config
     if (data.character) {
       const uuidPattern =
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       if (uuidPattern.test(data.character)) {
+        // Custom character (DB-stored, UUID)
         const [char] = await db
           .select({
             activeTools: customCharacters.activeTools,
@@ -559,12 +561,27 @@ export async function setupAiStream(params: {
           .limit(1);
 
         if (char && (char.activeTools !== null || char.visibleTools !== null)) {
-          logger.debug("[Setup] Tool config resolved from character", {
+          logger.debug("[Setup] Tool config resolved from custom character", {
             characterId: data.character,
           });
           return {
             activeTools: normalizeToolConfig(char.activeTools),
             visibleTools: normalizeToolConfig(char.visibleTools),
+          };
+        }
+      } else {
+        // Default character (config-based, string ID like "research-agent")
+        const defaultChar = DEFAULT_CHARACTERS.find(
+          (c) => c.id === data.character,
+        );
+        if (defaultChar?.activeTools) {
+          logger.debug(
+            "[Setup] Tool config resolved from default character config",
+            { characterId: data.character },
+          );
+          return {
+            activeTools: normalizeToolConfig(defaultChar.activeTools),
+            visibleTools: null,
           };
         }
       }

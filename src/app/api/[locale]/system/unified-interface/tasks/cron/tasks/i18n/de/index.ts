@@ -8,6 +8,9 @@ export const translations: typeof enTranslations = {
   errors: {
     fetchCronTasks: "Fehler beim Abrufen der Cron-Aufgaben",
     createCronTask: "Fehler beim Erstellen der Cron-Aufgabe",
+    invalidTaskInput:
+      "Task-Eingabe stimmt nicht mit dem Anforderungsschema des Endpunkts überein",
+    endpointNotFound: "Endpunkt für die angegebene Route-ID nicht gefunden",
   },
   list: {
     columns: {

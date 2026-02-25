@@ -262,7 +262,9 @@ export class UnifiedTaskRunnerRepositoryImpl {
     try {
       // Split flat taskInput into { data, urlPathParams } using the endpoint's URL-param schema.
       const { splitTaskArgs } = await import("../cron/arg-splitter");
-      const path = `${task.definition.path.join("_")}_${task.definition.method}`;
+      const { getPreferredToolName } =
+        await import("@/app/api/[locale]/system/unified-interface/shared/utils/path");
+      const path = getPreferredToolName(task.definition);
       const { data, urlPathParams } = await splitTaskArgs(path, resolvedInput);
 
       // Call the route handler directly — no more string-based resolution
@@ -324,6 +326,7 @@ export class UnifiedTaskRunnerRepositoryImpl {
               errorCount: dbTask.errorCount + 1,
             },
             null,
+            this.systemLocale,
             t,
             this.logger,
           );
@@ -334,6 +337,7 @@ export class UnifiedTaskRunnerRepositoryImpl {
               dbTask.id,
               { enabled: false },
               null,
+              this.systemLocale,
               t,
               this.logger,
             );
@@ -380,6 +384,7 @@ export class UnifiedTaskRunnerRepositoryImpl {
             successCount: dbTask.successCount + 1,
           },
           null,
+          this.systemLocale,
           t,
           this.logger,
         );
@@ -390,6 +395,7 @@ export class UnifiedTaskRunnerRepositoryImpl {
             dbTask.id,
             { enabled: false },
             null,
+            this.systemLocale,
             t,
             this.logger,
           );
@@ -436,6 +442,7 @@ export class UnifiedTaskRunnerRepositoryImpl {
             errorCount: dbTask.errorCount + 1,
           },
           null,
+          this.systemLocale,
           t,
           this.logger,
         );
@@ -446,6 +453,7 @@ export class UnifiedTaskRunnerRepositoryImpl {
             dbTask.id,
             { enabled: false },
             null,
+            this.systemLocale,
             t,
             this.logger,
           );

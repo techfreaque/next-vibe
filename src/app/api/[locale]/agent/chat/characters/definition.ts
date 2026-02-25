@@ -11,12 +11,14 @@ import {
   scopedBackButton,
   scopedNavigateButtonField,
   scopedObjectFieldNew,
+  scopedRequestField,
   scopedResponseArrayFieldNew,
   scopedResponseField,
   scopedWidgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
+  FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
@@ -38,6 +40,8 @@ import {
 import { scopedTranslation } from "./i18n";
 import { CharactersListContainer } from "./widget";
 
+export const CHARACTERS_LIST_ALIAS = "characters" as const;
+
 /**
  * Get Characters List Endpoint (GET)
  * Retrieves all characters (default + custom) for the current user
@@ -56,10 +60,35 @@ const { GET } = createEndpoint({
 
   options: {},
 
+  aliases: [CHARACTERS_LIST_ALIAS],
+
+  cli: {
+    firstCliArgKey: "query",
+  },
+
   fields: customWidgetObject({
     render: CharactersListContainer,
-    usage: { response: true },
+    usage: { request: "data", response: true } as const,
     children: {
+      // === REQUEST FIELDS (for AI/CLI filtering) ===
+      query: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.query.label" as const,
+        description: "get.fields.query.description" as const,
+        placeholder: "get.fields.query.placeholder" as const,
+        columns: 8,
+        schema: z.string().optional(),
+      }),
+      characterId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.characterId.label" as const,
+        description: "get.fields.characterId.description" as const,
+        columns: 4,
+        schema: z.string().optional(),
+      }),
+
       // Flattened top action buttons (no container wrapper)
       backButton: scopedBackButton(scopedTranslation, {
         usage: { response: true },
@@ -353,6 +382,11 @@ const { GET } = createEndpoint({
   },
 
   examples: {
+    requests: {
+      listAll: {},
+      search: { query: "coding" },
+      detail: { characterId: "research-agent" },
+    },
     responses: {
       listAll: {
         sections: [

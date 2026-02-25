@@ -18,6 +18,8 @@ import {
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
@@ -29,7 +31,12 @@ import type {
   CharacterUpdateRequestOutput,
   CharacterUpdateResponseOutput,
 } from "./[id]/definition";
-import { DEFAULT_CHARACTERS, NO_CHARACTER, NO_CHARACTER_ID } from "./config";
+import {
+  type Character,
+  DEFAULT_CHARACTERS,
+  NO_CHARACTER,
+  NO_CHARACTER_ID,
+} from "./config";
 import type {
   CharacterCreateRequestOutput,
   CharacterCreateResponseOutput,
@@ -37,6 +44,7 @@ import type {
 import { customCharacters } from "./db";
 import type {
   CharacterListItem,
+  CharacterListRequestOutput,
   CharacterListResponseOutput,
 } from "./definition";
 import {
@@ -56,6 +64,38 @@ const DEFAULT_MODEL_SELECTION: ModelSelectionSimple = {
 };
 
 /**
+ * Filter default characters based on user roles and current instance.
+ * - userRole: only show characters the user's role can access (defaults to [CUSTOMER, ADMIN])
+ * - instanceFilter: only show characters matching INSTANCE_ID (undefined = all instances)
+ */
+function filterDefaultCharacters(user: JwtPayloadType): Character[] {
+  const instanceId = env.INSTANCE_ID;
+  const userRoles = user.roles;
+
+  return DEFAULT_CHARACTERS.filter((char) => {
+    // Check user role access
+    const allowedRoles = char.userRole ?? [
+      UserPermissionRole.CUSTOMER,
+      UserPermissionRole.ADMIN,
+    ];
+    const hasRole = userRoles.some((role) =>
+      (allowedRoles as string[]).includes(role),
+    );
+    if (!hasRole) {
+      return false;
+    }
+
+    // Check instance filter
+    if (char.instanceFilter && instanceId) {
+      return char.instanceFilter.includes(instanceId);
+    }
+    // If no instance filter, show on all instances
+    // If no INSTANCE_ID set, show all characters (dev mode)
+    return true;
+  });
+}
+
+/**
  * Characters Repository - Static class pattern
  * All methods return ResponseType for consistent error handling
  */
@@ -70,6 +110,7 @@ export class CharactersRepository {
    * - SYSTEM/built-in characters (via DEFAULT_CHARACTERS)
    */
   static async getCharacters(
+    data: CharacterListRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
     locale: CountryLanguage,
@@ -77,6 +118,8 @@ export class CharactersRepository {
     const { t } = scopedTranslation.scopedT(locale);
     try {
       const userId = user.id;
+      const query = data?.query?.trim().toLowerCase();
+      const requestedCharId = data?.characterId?.trim();
 
       // For authenticated users, return default + user's own + public from others
       if (userId) {
@@ -128,8 +171,9 @@ export class CharactersRepository {
           );
         });
 
-        // Map default characters to card display fields
-        const defaultCharactersCards = DEFAULT_CHARACTERS.map((char) => {
+        // Map default characters to card display fields (filtered by role + instance)
+        const filteredDefaults = filterDefaultCharacters(user);
+        const defaultCharactersCards = filteredDefaults.map((char) => {
           return CharactersRepository.mapCharacterToListItem(
             char.id,
             {
@@ -145,10 +189,29 @@ export class CharactersRepository {
         });
 
         // Combine all characters
-        const allCharacters = [
+        let allCharacters = [
           ...defaultCharactersCards,
           ...customCharactersCards,
         ];
+
+        // Apply search filter if query is provided
+        if (query) {
+          allCharacters = allCharacters.filter(
+            (char) =>
+              char.name.toLowerCase().includes(query) ||
+              char.description.toLowerCase().includes(query) ||
+              char.tagline.toLowerCase().includes(query) ||
+              char.category.toLowerCase().includes(query) ||
+              char.id.toLowerCase().includes(query),
+          );
+        }
+
+        // Apply character ID filter if requested
+        if (requestedCharId) {
+          allCharacters = allCharacters.filter(
+            (char) => char.id === requestedCharId,
+          );
+        }
 
         // Group characters by category into sections
         const sections = this.groupCharactersIntoSections(allCharacters, t);
@@ -159,9 +222,10 @@ export class CharactersRepository {
         });
       }
 
-      // For public/lead users, return only default characters as card display fields
+      // For public/lead users, return only default characters as card display fields (filtered)
       logger.debug("Getting default characters for public user");
-      const defaultCharactersCards = DEFAULT_CHARACTERS.map((char) => {
+      const filteredDefaults = filterDefaultCharacters(user);
+      let defaultCharactersCards = filteredDefaults.map((char) => {
         return CharactersRepository.mapCharacterToListItem(
           char.id,
           {
@@ -175,6 +239,25 @@ export class CharactersRepository {
           t,
         );
       });
+
+      // Apply search filter if query is provided
+      if (query) {
+        defaultCharactersCards = defaultCharactersCards.filter(
+          (char) =>
+            char.name.toLowerCase().includes(query) ||
+            char.description.toLowerCase().includes(query) ||
+            char.tagline.toLowerCase().includes(query) ||
+            char.category.toLowerCase().includes(query) ||
+            char.id.toLowerCase().includes(query),
+        );
+      }
+
+      // Apply character ID filter if requested
+      if (requestedCharId) {
+        defaultCharactersCards = defaultCharactersCards.filter(
+          (char) => char.id === requestedCharId,
+        );
+      }
 
       // Group characters by category into sections
       const sections = this.groupCharactersIntoSections(
@@ -272,7 +355,12 @@ export class CharactersRepository {
           modelSelection: defaultCharacter.modelSelection,
           characterOwnership: CharacterOwnershipType.SYSTEM,
           compactTrigger: null,
-          allowedTools: null,
+          allowedTools: defaultCharacter.activeTools
+            ? defaultCharacter.activeTools.map((t) => ({
+                toolId: t.toolId,
+                requiresConfirmation: t.requiresConfirmation ?? false,
+              }))
+            : null,
           pinnedTools: null,
         });
       }

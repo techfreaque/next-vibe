@@ -66,62 +66,10 @@ interface CustomWidgetProps {
   fieldName: string;
 }
 
-// ─── Category/label helpers ─────────────────────────────────────────────────
-
-function humanizeCategory(category: string): string {
-  if (!category.startsWith("app.")) {
-    return category;
-  }
-  const parts = category.split(".");
-  const apiIdx = parts.indexOf("api");
-  const catIdx = parts.indexOf("category");
-  if (apiIdx >= 0 && catIdx > apiIdx + 1) {
-    const segments = parts.slice(apiIdx + 1, catIdx);
-    return segments
-      .map((s) =>
-        s
-          .replace(/([A-Z])/g, " $1")
-          .replace(/[-_]/g, " ")
-          .trim()
-          .replace(/^\w/, (c) => c.toUpperCase()),
-      )
-      .join(" > ");
-  }
-  return parts[parts.length - 1].replace(/^\w/, (c) => c.toUpperCase());
-}
+// ─── Label helpers ──────────────────────────────────────────────────────────
 
 function getToolLabel(tool: HelpToolMetadataSerialized): string {
-  if (tool.aliases && tool.aliases.length > 0) {
-    return tool.aliases[0]
-      .replace(/[-_:]/g, " ")
-      .replace(/\b\w/g, (c) => c.toUpperCase());
-  }
-  const parts = tool.toolName.split("_");
-  const method = parts[parts.length - 1];
-  const pathParts = parts.slice(0, -1);
-  const meaningful = pathParts.slice(-2);
-  const verb =
-    method === "GET"
-      ? "Get"
-      : method === "POST"
-        ? "Create"
-        : method === "PUT"
-          ? "Update"
-          : method === "PATCH"
-            ? "Edit"
-            : method === "DELETE"
-              ? "Delete"
-              : method;
-  const resource = meaningful
-    .map((s) =>
-      s
-        .replace(/([A-Z])/g, " $1")
-        .replace(/[-]/g, " ")
-        .trim()
-        .replace(/^\w/, (c) => c.toUpperCase()),
-    )
-    .join(" ");
-  return `${verb} ${resource}`;
+  return tool.title || tool.aliases?.[0] || tool.toolName;
 }
 
 const isIdSegment = (s: string): boolean =>
@@ -293,7 +241,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
       }
     > = {};
     for (const tool of filteredTools) {
-      const category = humanizeCategory(tool.category ?? "Other");
+      const category = tool.category;
       if (!grouped[category]) {
         grouped[category] = { tools: [], subcategories: {} };
       }
@@ -442,7 +390,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
                 })();
               }}
             >
-              <Span className="capitalize">{humanizeCategory(name)}</Span>
+              <Span className="capitalize">{name}</Span>
               <Badge variant="secondary" className="text-[10px]">
                 {count}
               </Badge>
@@ -465,9 +413,11 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
           <Div className="flex-1 min-w-0">
             <Div className="flex items-center gap-2 flex-wrap">
               <Span className="font-bold text-base">{getToolLabel(tool)}</Span>
-              <Badge variant="outline" className="font-mono text-xs">
-                {tool.method}
-              </Badge>
+              {tool.aliases?.[0] && (
+                <Badge variant="secondary" className="font-mono text-xs">
+                  {tool.aliases[0]}
+                </Badge>
+              )}
             </Div>
             <P className="text-sm text-muted-foreground mt-1">
               {tool.description}
@@ -837,12 +787,14 @@ function ToolRow({
         <Div className="flex-1 min-w-0">
           <Div className="flex items-center gap-2">
             <P className="text-sm font-medium truncate">{getToolLabel(tool)}</P>
-            <Badge
-              variant="outline"
-              className="text-[10px] px-1 py-0 font-mono shrink-0"
-            >
-              {tool.method}
-            </Badge>
+            {tool.aliases?.[0] && (
+              <Badge
+                variant="secondary"
+                className="text-[10px] px-1 py-0 font-mono shrink-0"
+              >
+                {tool.aliases[0]}
+              </Badge>
+            )}
           </Div>
           <P className="text-[11px] text-muted-foreground/70 truncate">
             {tool.description}

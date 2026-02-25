@@ -38,6 +38,8 @@ import {
 import { scopedTranslation } from "./i18n";
 import { UsersListContainer } from "./widget";
 
+export const USERS_LIST_ALIAS = "users-list" as const;
+
 /**
  * Get Users List Endpoint (GET)
  * Retrieves a paginated list of users with filtering
@@ -46,6 +48,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["users", "list"],
+  aliases: [USERS_LIST_ALIAS],
   allowedRoles: [UserRole.ADMIN] as const,
 
   title: "get.title" as const,

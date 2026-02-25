@@ -28,6 +28,10 @@ export interface CustomWidgetObjectConfig<
   type: WidgetType.CUSTOM_WIDGET;
   // oxlint-disable-next-line typescript/no-explicit-any
   render?: React.ComponentType<any>;
+  /** Skip the outer <form> element. FormProvider is still provided so form
+   *  fields work, but the widget is responsible for its own <form> boundaries.
+   *  Use this when the widget embeds sub-endpoints that need their own forms. */
+  noFormElement?: boolean;
 }
 
 /**

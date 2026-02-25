@@ -6,6 +6,8 @@ export const translations = {
   errors: {
     fetchCronTasks: "Failed to fetch cron tasks",
     createCronTask: "Failed to create cron task",
+    invalidTaskInput: "Task input does not match the endpoint's request schema",
+    endpointNotFound: "Endpoint not found for the given route ID",
   },
   list: {
     columns: {

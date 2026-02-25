@@ -11,8 +11,7 @@ import type { JSX } from "react";
 import React, { useMemo, useState } from "react";
 
 import { useTranslation } from "@/i18n/core/client";
-import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
-import type { TParams, TranslationKey } from "@/i18n/core/static-types";
+import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { Badge } from "./badge";
 import { Button } from "./button";
@@ -38,30 +37,34 @@ const CATEGORY_TRANSLATION_KEYS: Record<FormFieldCategory, TranslationKey> = {
 export interface AutocompleteOptionBase<TKey extends string> {
   value: string;
   label: TKey;
-  category?: string;
+  category?: TranslationKey;
+  description?: TKey;
 }
 
 export interface AutocompleteOption<TKey extends string> {
   value: string;
   label: TKey;
   category?: string;
+  /** Optional secondary text shown below the label */
+  description?: TKey;
 }
 
-export interface AutocompleteFieldProps<TKey extends string> {
+export interface AutocompleteFieldProps {
   value?: string;
   onChange: (value: string) => void;
   onBlur?: () => void;
-  options: AutocompleteOption<TKey>[];
-  placeholder?: TKey;
-  searchPlaceholder?: TKey;
+  options: AutocompleteOption<string>[];
+  /** Already-translated placeholder text */
+  placeholder?: string;
+  /** Already-translated search placeholder text */
+  searchPlaceholder?: string;
   allowCustom?: boolean;
   disabled?: boolean;
   name?: string;
-  t: <K extends string>(key: K, params?: TParams) => TranslatedKeyType;
   className?: string;
 }
 
-export function AutocompleteField<TKey extends string>({
+export function AutocompleteField({
   value = "",
   onChange,
   onBlur,
@@ -72,8 +75,7 @@ export function AutocompleteField<TKey extends string>({
   disabled = false,
   className,
   name,
-  t,
-}: AutocompleteFieldProps<TKey>): JSX.Element {
+}: AutocompleteFieldProps): JSX.Element {
   const { t: globalT } = useTranslation();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -81,7 +83,7 @@ export function AutocompleteField<TKey extends string>({
 
   // Group options by category
   const groupedOptions = useMemo(() => {
-    const groups: Record<string, AutocompleteOption<TKey>[]> = {};
+    const groups: Record<string, AutocompleteOption<string>[]> = {};
 
     options.forEach((option) => {
       const category = option.category || FormFieldCategory.OTHER;
@@ -100,13 +102,16 @@ export function AutocompleteField<TKey extends string>({
       return groupedOptions;
     }
 
-    const filtered: Record<string, AutocompleteOption<TKey>[]> = {};
+    const filtered: Record<string, AutocompleteOption<string>[]> = {};
 
     Object.entries(groupedOptions).forEach(([category, categoryOptions]) => {
+      const lowerSearch = searchValue.toLowerCase();
       const matchingOptions = categoryOptions.filter(
         (option) =>
-          t(option.label).toLowerCase().includes(searchValue.toLowerCase()) ||
-          option.value.toLowerCase().includes(searchValue.toLowerCase()),
+          option.label.toLowerCase().includes(lowerSearch) ||
+          option.value.toLowerCase().includes(lowerSearch) ||
+          (option.description &&
+            option.description.toLowerCase().includes(lowerSearch)),
       );
 
       if (matchingOptions.length > 0) {
@@ -115,11 +120,11 @@ export function AutocompleteField<TKey extends string>({
     });
 
     return filtered;
-  }, [groupedOptions, searchValue, t]);
+  }, [groupedOptions, searchValue]);
 
   // Check if current value is a custom value
   const selectedOption = options.find((option) => option.value === value);
-  const displayValue = selectedOption ? t(selectedOption.label) : value;
+  const displayValue = selectedOption ? selectedOption.label : value;
 
   React.useEffect(() => {
     setIsCustomValue(!selectedOption && value !== "");
@@ -169,7 +174,7 @@ export function AutocompleteField<TKey extends string>({
                 </Badge>
               )}
               <span className="truncate">
-                {value ? displayValue : placeholder ? t(placeholder) : ""}
+                {value ? displayValue : (placeholder ?? "")}
               </span>
             </div>
             <div className="flex items-center gap-1">
@@ -195,7 +200,7 @@ export function AutocompleteField<TKey extends string>({
             <div className="flex items-center border-b px-3">
               <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
               <CommandInput
-                placeholder={searchPlaceholder ? t(searchPlaceholder) : ""}
+                placeholder={searchPlaceholder ?? ""}
                 value={searchValue}
                 onValueChange={setSearchValue}
                 className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
@@ -246,9 +251,16 @@ export function AutocompleteField<TKey extends string>({
                         onSelect={() => handleSelect(option.value)}
                         className="flex items-center justify-between"
                       >
-                        <span>{t(option.label)}</span>
+                        <div className="flex flex-col min-w-0">
+                          <span className="truncate">{option.label}</span>
+                          {option.description && (
+                            <span className="text-xs text-muted-foreground truncate">
+                              {option.description}
+                            </span>
+                          )}
+                        </div>
                         {value === option.value && (
-                          <Check className="h-4 w-4" />
+                          <Check className="h-4 w-4 shrink-0" />
                         )}
                       </CommandItem>
                     ))}

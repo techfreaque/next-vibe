@@ -356,5 +356,14 @@ export const translations: typeof enTranslations = {
     },
     lastExecutionError: "Letzter Fehler",
     refresh: "Aktualisieren",
+    taskInput: {
+      title: "Aufgabeneingabe",
+      loading: "Endpunkt-Definition wird geladen...",
+      notFound: "Endpunkt-Definition für diese Aufgabe nicht gefunden",
+      empty: "Keine Eingabeparameter konfiguriert",
+      editTitle: "Aufgaben-Eingabeparameter",
+      editDescription:
+        "Eingabeparameter für diesen Aufgaben-Endpunkt konfigurieren",
+    },
   },
 };

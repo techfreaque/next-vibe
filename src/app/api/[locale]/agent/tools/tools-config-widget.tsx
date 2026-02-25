@@ -122,62 +122,10 @@ function fromEnabledTools(tools: EnabledTool[] | null): ToolsConfigValue {
   };
 }
 
-// ─── Category helpers (copied from HelpToolsWidget) ─────────────────────────
-
-function humanizeCategory(category: string): string {
-  if (!category.startsWith("app.")) {
-    return category;
-  }
-  const parts = category.split(".");
-  const apiIdx = parts.indexOf("api");
-  const catIdx = parts.indexOf("category");
-  if (apiIdx >= 0 && catIdx > apiIdx + 1) {
-    const segments = parts.slice(apiIdx + 1, catIdx);
-    return segments
-      .map((s: string) =>
-        s
-          .replace(/([A-Z])/g, " $1")
-          .replace(/[-_]/g, " ")
-          .trim()
-          .replace(/^\w/, (c: string) => c.toUpperCase()),
-      )
-      .join(" > ");
-  }
-  return parts[parts.length - 1].replace(/^\w/, (c: string) => c.toUpperCase());
-}
+// ─── Label helpers ──────────────────────────────────────────────────────────
 
 function getToolLabel(tool: HelpToolMetadataSerialized): string {
-  if (tool.aliases && tool.aliases.length > 0) {
-    return tool.aliases[0]
-      .replace(/[-_:]/g, " ")
-      .replace(/\b\w/g, (c: string) => c.toUpperCase());
-  }
-  const parts = tool.toolName.split("_");
-  const method = parts[parts.length - 1];
-  const pathParts = parts.slice(0, -1);
-  const meaningful = pathParts.slice(-2);
-  const verb =
-    method === "GET"
-      ? "Get"
-      : method === "POST"
-        ? "Create"
-        : method === "PUT"
-          ? "Update"
-          : method === "PATCH"
-            ? "Edit"
-            : method === "DELETE"
-              ? "Delete"
-              : method;
-  const resource = meaningful
-    .map((s: string) =>
-      s
-        .replace(/([A-Z])/g, " $1")
-        .replace(/[-]/g, " ")
-        .trim()
-        .replace(/^\w/, (c: string) => c.toUpperCase()),
-    )
-    .join(" ");
-  return `${verb} ${resource}`;
+  return tool.title || tool.aliases?.[0] || tool.toolName;
 }
 
 const isIdSegment = (s: string): boolean =>
@@ -310,7 +258,7 @@ export function ToolsConfigEdit({
       }
     > = {};
     for (const tool of filteredTools) {
-      const category = humanizeCategory(tool.category ?? "Other");
+      const category = tool.category;
       if (!grouped[category]) {
         grouped[category] = { tools: [], subcategories: {} };
       }
@@ -805,12 +753,14 @@ function ToolConfigRow({
         <Div className="flex-1 min-w-0">
           <Div className="flex items-center gap-1.5">
             <P className="text-xs font-medium truncate">{getToolLabel(tool)}</P>
-            <Badge
-              variant="outline"
-              className="text-[10px] px-1 py-0 font-mono shrink-0"
-            >
-              {tool.method}
-            </Badge>
+            {tool.aliases?.[0] && (
+              <Badge
+                variant="secondary"
+                className="text-[10px] px-1 py-0 font-mono shrink-0"
+              >
+                {tool.aliases[0]}
+              </Badge>
+            )}
           </Div>
           <P className="text-[10px] text-muted-foreground/70 truncate">
             {tool.description}

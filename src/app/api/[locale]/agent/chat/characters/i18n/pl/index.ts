@@ -686,11 +686,115 @@ export const translations: typeof enTranslations = {
         3: "Rozwiń złożoną relację między postaciami",
       },
     },
+    researchAgent: {
+      name: "Agent Badawczy",
+      description:
+        "Specjalista od badań internetowych z narzędziami do wyszukiwania, pobierania i pamięci do zbierania i syntezy informacji",
+      tagline: "Szukaj i Syntetyzuj",
+      shortDesc: "Badania internetowe i zbieranie informacji",
+      suggestedPrompts: {
+        0: "Zbadaj najnowsze wydarzenia w regulacji AI",
+        1: "Znajdź i podsumuj kluczowe fakty na dany temat",
+        2: "Porównaj różne źródła na dany temat",
+        3: "Opracuj briefing badawczy z cytatami",
+      },
+    },
+    statsAnalyst: {
+      name: "Analityk Statystyk",
+      description:
+        "Specjalista analityczny z dostępem do statystyk leadów, użytkowników, e-maili i poleceń dla wglądów opartych na danych",
+      tagline: "Wglądy Oparte na Danych",
+      shortDesc: "Analityka platformy i raportowanie",
+      suggestedPrompts: {
+        0: "Pokaż mi przegląd dzisiejszej aktywności leadów",
+        1: "Jak wyglądają trendy rejestracji użytkowników w tym tygodniu?",
+        2: "Podsumuj wydajność kampanii e-mailowych",
+        3: "Daj mi raport statusu programu poleceń",
+      },
+    },
+    cronManager: {
+      name: "Menedżer Cron",
+      description:
+        "Specjalista od planowania zadań, który może tworzyć, aktualizować, usuwać i monitorować zadania cron oraz ich historię wykonania",
+      tagline: "Planuj i Monitoruj",
+      shortDesc: "Zarządzanie i monitorowanie zadań cron",
+      suggestedPrompts: {
+        0: "Wymień wszystkie aktywne zadania cron i ich harmonogramy",
+        1: "Utwórz nowe zadanie cron uruchamiane co godzinę",
+        2: "Pokaż mi ostatnie błędy i awarie zadań",
+        3: "Sprawdź ogólny stan systemu zadań",
+      },
+    },
+    systemMonitor: {
+      name: "Monitor Systemu",
+      description:
+        "Specjalista od infrastruktury monitorujący status serwera, łączność bazy danych, kontrole pulse i wykonanie zadań",
+      tagline: "Obserwuj i Alarmuj",
+      shortDesc: "Monitorowanie stanu infrastruktury",
+      suggestedPrompts: {
+        0: "Przeprowadź pełną kontrolę stanu systemu",
+        1: "Pokaż mi status monitoringu pulse",
+        2: "Sprawdź łączność z bazą danych",
+        3: "Jaki jest aktualny stan zadań cron?",
+      },
+    },
+    publicCurator: {
+      name: "Kurator Publiczny",
+      description:
+        "Specjalista od zarządzania treścią do zarządzania publicznymi wątkami, wiadomościami i treściami społeczności",
+      tagline: "Kuratoruj i Organizuj",
+      shortDesc: "Zarządzanie treściami publicznymi i wątkami",
+      suggestedPrompts: {
+        0: "Wymień ostatnie publiczne wątki",
+        1: "Szukaj wątków na określony temat",
+        2: "Pomóż mi zorganizować treści społeczności",
+        3: "Znajdź wiadomości pasujące do określonych kryteriów",
+      },
+    },
+    codeArchitect: {
+      name: "Architekt Kodu",
+      description:
+        "Specjalista od architektury delegujący zadania programistyczne do Claude Code. Dostępny tylko na Hermes.",
+      tagline: "Projektuj i Deleguj",
+      shortDesc: "Decyzje architektoniczne przez Claude Code",
+      suggestedPrompts: {
+        0: "Zaplanuj implementację nowej funkcji",
+        1: "Przejrzyj architekturę modułu",
+        2: "Deleguj zadanie programistyczne do Claude Code",
+        3: "Zaprojektuj strategię migracji",
+      },
+    },
+    deploymentAgent: {
+      name: "Agent Wdrożeń",
+      description:
+        "Specjalista od wdrożeń obsługujący buildy, wydania i zarządzanie serwerem przez SSH. Dostępny tylko na Hermes.",
+      tagline: "Buduj i Wdrażaj",
+      shortDesc: "Wdrożenia i zarządzanie serwerem",
+      suggestedPrompts: {
+        0: "Zbuduj aplikację do produkcji",
+        1: "Sprawdź stan serwera",
+        2: "Przeprowadź wdrożenie na produkcję",
+        3: "Pokaż mi aktualny status serwera",
+      },
+    },
   },
   get: {
     title: "Lista postaci",
     description:
       "Pobierz wszystkie dostępne postaciy (domyślne + niestandardowe)",
+    fields: {
+      query: {
+        label: "Szukaj",
+        description:
+          "Szukaj postaci po nazwie, opisie lub kategorii. Zwraca kompaktowe wyniki.",
+        placeholder: "np. badania, programowanie, statystyki",
+      },
+      characterId: {
+        label: "ID postaci",
+        description:
+          "Pobierz pełne szczegóły dla konkretnej postaci. Zwraca prompt systemowy, narzędzia i konfigurację modelu.",
+      },
+    },
     container: {
       title: "Lista postaci",
       description: "Wszystkie dostępne postaciy dla użytkownika",
