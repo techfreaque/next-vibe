@@ -159,7 +159,7 @@ export function NumberFieldWidget<
               ) : (
                 <NumberInput
                   name={formField.name}
-                  value={formField.value || field.min || 1}
+                  value={formField.value ?? field.min ?? 0}
                   onChange={(value) => formField.onChange(value)}
                   onBlur={formField.onBlur}
                   min={field.min}

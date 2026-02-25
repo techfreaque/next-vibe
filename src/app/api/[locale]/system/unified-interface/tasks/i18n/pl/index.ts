@@ -383,6 +383,174 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  completeTask: {
+    post: {
+      title: "Zakończ zadanie",
+      description:
+        "Oznacza zadanie cron jako ukończone lub nieudane i wysyła wynik do instancji źródłowej. Narzędzie MCP tylko dla dev, przeznaczone do interaktywnych sesji Claude Code. Gdy Thea tworzy zadanie dla Hermesa, Claude Code wywołuje to narzędzie po potwierdzeniu przez użytkownika.",
+      fields: {
+        taskId: {
+          title: "ID zadania",
+          description:
+            "ID zadania cron w bazie danych do oznaczenia jako ukończone.",
+        },
+        status: {
+          title: "Status",
+          description:
+            "Status końcowy: 'completed' dla sukcesu, 'failed' dla niepowodzenia.",
+        },
+        summary: {
+          title: "Podsumowanie",
+          description:
+            "Krótki opis tego, co zostało zrobione lub dlaczego się nie powiodło.",
+        },
+        completed: {
+          title: "Ukończone",
+          description: "Czy zadanie zostało pomyślnie oznaczone jako wykonane.",
+        },
+        pushedToRemote: {
+          title: "Wysłane do zdalnej instancji",
+          description:
+            "Czy ukończenie zostało pomyślnie zgłoszone do instancji źródłowej.",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe ID zadania lub wartość statusu",
+        },
+        unauthorized: {
+          title: "Brak autoryzacji",
+          description: "Wymagane uwierzytelnienie",
+        },
+        internal: {
+          title: "Nie udało się zakończyć",
+          description: "Nie udało się oznaczyć zadania jako ukończone",
+        },
+        forbidden: {
+          title: "Zabronione",
+          description: "Odmowa dostępu",
+        },
+        notFound: {
+          title: "Zadanie nie znalezione",
+          description: "Nie znaleziono zadania o podanym ID",
+        },
+        network: {
+          title: "Błąd sieci",
+          description: "Nie udało się wysłać ukończenia do zdalnej instancji",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieoczekiwany błąd",
+        },
+        unsaved: {
+          title: "Niezapisane zmiany",
+          description: "Wykryto niezapisane zmiany",
+        },
+        conflict: {
+          title: "Konflikt",
+          description: "Zadanie nie jest w stanie umożliwiającym ukończenie",
+        },
+      },
+      success: {
+        title: "Zadanie ukończone",
+        description:
+          "Zadanie oznaczone jako wykonane i wynik wysłany do instancji źródłowej",
+      },
+    },
+  },
+  taskReport: {
+    post: {
+      title: "Zgłoś wynik zadania",
+      description:
+        "Przyjmuje wyniki wykonania ze zdalnej instancji. Wywoływane przez instancje dev do raportowania ukończenia zadań do instancji prod.",
+      fields: {
+        apiKey: {
+          title: "Klucz API",
+          description: "Wspólny sekret do uwierzytelniania instancji.",
+        },
+        taskRouteId: {
+          title: "ID trasy zadania",
+          description: "routeId ukończonego zadania.",
+        },
+        executionId: {
+          title: "ID wykonania",
+          description: "Unikalny identyfikator wykonania do deduplikacji.",
+        },
+        status: {
+          title: "Status",
+          description: "Końcowy status wykonania.",
+        },
+        durationMs: {
+          title: "Czas trwania (ms)",
+          description: "Całkowity czas wykonania w milisekundach.",
+        },
+        summary: {
+          title: "Podsumowanie",
+          description: "Czytelne podsumowanie wyniku wykonania.",
+        },
+        error: {
+          title: "Błąd",
+          description: "Komunikat błędu, jeśli zadanie nie powiodło się.",
+        },
+        serverTimezone: {
+          title: "Strefa czasowa serwera",
+          description:
+            "Strefa czasowa IANA serwera wykonującego (np. Europe/Vienna).",
+        },
+        executedByInstance: {
+          title: "Wykonane przez",
+          description: "ID instancji, która wykonała zadanie (np. hermes).",
+        },
+        processed: {
+          title: "Przetworzone",
+          description: "Czy raport został zaakceptowany i zastosowany.",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe dane raportu",
+        },
+        unauthorized: {
+          title: "Brak autoryzacji",
+          description: "Nieprawidłowy klucz API",
+        },
+        internal: {
+          title: "Błąd wewnętrzny",
+          description: "Nie udało się przetworzyć raportu",
+        },
+        forbidden: {
+          title: "Zabronione",
+          description: "Odmowa dostępu",
+        },
+        notFound: {
+          title: "Nie znaleziono",
+          description: "Zadanie nie znalezione na tej instancji",
+        },
+        network: {
+          title: "Błąd sieci",
+          description: "Wystąpił błąd sieci",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieoczekiwany błąd",
+        },
+        unsaved: {
+          title: "Niezapisane zmiany",
+          description: "Wykryto niezapisane zmiany",
+        },
+        conflict: {
+          title: "Konflikt",
+          description: "Wystąpił konflikt",
+        },
+      },
+      success: {
+        title: "Raport zaakceptowany",
+        description: "Wynik wykonania zastosowany do rekordu zadania",
+      },
+    },
+  },
   csvProcessor: {
     description: "Przetwarza zadania importu CSV w partiach",
   },

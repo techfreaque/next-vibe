@@ -13,9 +13,7 @@ import { LEADS_LIST_ALIAS } from "@/app/api/[locale]/leads/list/definition";
 import { LEADS_STATS_ALIAS } from "@/app/api/[locale]/leads/stats/definition";
 import { REFERRAL_STATS_ALIAS } from "@/app/api/[locale]/referral/stats/definition";
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
-import { BUILD_ALIAS } from "@/app/api/[locale]/system/server/build/definition";
 import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/definition";
-import { START_ALIAS } from "@/app/api/[locale]/system/server/start/definition";
 import {
   CRON_DELETE_ALIAS,
   CRON_GET_ALIAS,

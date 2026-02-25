@@ -54,17 +54,17 @@ export const {
     example: "postgres://localhost:5432/postgres",
     comment: "Database",
   },
-  LOCAL_MODE_DATABASE_URL: {
-    schema: z.string().url().optional(),
-    example: "postgres://postgres:postgres@localhost:5433/postgres",
+  PREVIEW_DB_PORT: {
+    schema: z.coerce.number().int().positive().optional().default(5433),
+    example: "5433",
     comment:
-      "Database for local mode (vibe start). Defaults to preview postgres on port 5433.",
+      "Preview database port for local mode (vibe build/start). Derives DATABASE_URL by swapping the port.",
   },
-  LOCAL_MODE_APP_URL: {
-    schema: z.string().url().optional(),
-    example: "http://localhost:3001",
+  PREVIEW_PORT: {
+    schema: z.coerce.number().int().positive().optional().default(3001),
+    example: "3001",
     comment:
-      "App URL for local mode (vibe start). Overrides NEXT_PUBLIC_APP_URL so local instance uses its own port.",
+      "Preview app port for local mode (vibe build/start). Derives NEXT_PUBLIC_APP_URL by swapping the port.",
   },
   JWT_SECRET_KEY: {
     schema: createSchema(z.string().min(32), z.string().min(32).optional()),

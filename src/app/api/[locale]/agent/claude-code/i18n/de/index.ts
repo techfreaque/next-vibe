@@ -42,11 +42,6 @@ export const translations: typeof enTranslations = {
             description:
               "BEVORZUGE false (Standard). headless:false öffnet eine vollständige interaktive Claude Code-Sitzung — Max sieht die Ausgabe live und kann teilnehmen. Nur auf true setzen für vollautomatisierte Batch-Aufgaben (Cron-Jobs, Pipelines) ohne menschliche Interaktion.",
           },
-          workingDir: {
-            title: "Arbeitsverzeichnis",
-            description:
-              "Absoluter Pfad für den Claude Code-Prozess. Standard: aktuelles Server-Verzeichnis.",
-          },
           timeoutMs: {
             title: "Timeout (ms)",
             description:

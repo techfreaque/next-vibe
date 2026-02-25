@@ -145,6 +145,12 @@ export const cronTaskExecutions = pgTable("cron_task_executions", {
   retryAttempt: integer("retry_attempt").notNull().default(0),
   parentExecutionId: text("parent_execution_id"), // For retry chains
 
+  // Instance context
+  /** IANA timezone of the server that executed this task (e.g. "Europe/Vienna") */
+  serverTimezone: text("server_timezone"),
+  /** Instance ID that executed this task (e.g. "hermes") */
+  executedByInstance: text("executed_by_instance"),
+
   // Metadata
   triggeredBy: text("triggered_by"), // user, schedule, dependency, manual
   environment: text("environment").default("production"),

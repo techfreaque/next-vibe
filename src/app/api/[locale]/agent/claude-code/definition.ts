@@ -38,6 +38,10 @@ const { POST } = createEndpoint({
   allowedRoles: [UserRole.ADMIN],
   aliases: [CLAUDE_CODE_ALIAS, "claude"],
 
+  cli: {
+    firstCliArgKey: "prompt",
+  },
+
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.GRID,
@@ -75,13 +79,7 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().optional(),
       }),
-      workingDir: scopedRequestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        columns: 6,
-        schema: z.string().optional(),
-      }),
-      interactive: scopedRequestField(scopedTranslation, {
+      interactiveMode: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         columns: 6,
@@ -159,12 +157,12 @@ const { POST } = createEndpoint({
       default: {
         prompt:
           "Add a new feature to the claude-code endpoint that tracks how many times it has been called.",
-        interactive: false,
+        interactiveMode: false,
       },
       batch: {
         prompt:
           "Read src/app/api/[locale]/system/agent/claude-code/repository.ts and summarize what it does in 2 sentences.",
-        interactive: true,
+        interactiveMode: true,
         timeoutMs: 60000,
       },
     },

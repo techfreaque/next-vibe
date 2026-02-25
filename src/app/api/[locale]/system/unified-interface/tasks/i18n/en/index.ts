@@ -372,6 +372,173 @@ export const translations = {
       },
     },
   },
+  completeTask: {
+    post: {
+      title: "Complete Task",
+      description:
+        "Mark a cron task as completed or failed and push the result to the originating remote instance. Dev-only MCP tool designed for interactive Claude Code sessions. When Thea creates a task for Hermes, Claude Code calls this tool after the user confirms the work is done.",
+      fields: {
+        taskId: {
+          title: "Task ID",
+          description: "The cron task database ID to mark as complete.",
+        },
+        status: {
+          title: "Status",
+          description:
+            "Final status: 'completed' for success, 'failed' for failure.",
+        },
+        summary: {
+          title: "Summary",
+          description:
+            "Brief description of what was accomplished or why it failed.",
+        },
+        completed: {
+          title: "Completed",
+          description: "Whether the task was successfully marked as done.",
+        },
+        pushedToRemote: {
+          title: "Pushed to Remote",
+          description:
+            "Whether the completion was successfully reported to the originating instance.",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Validation Error",
+          description: "Invalid task ID or status value",
+        },
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+        internal: {
+          title: "Completion Failed",
+          description: "Failed to mark task as complete",
+        },
+        forbidden: {
+          title: "Forbidden",
+          description: "Access denied",
+        },
+        notFound: {
+          title: "Task Not Found",
+          description: "No task found with the given ID",
+        },
+        network: {
+          title: "Network Error",
+          description: "Failed to push completion to remote instance",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unexpected error occurred",
+        },
+        unsaved: {
+          title: "Unsaved Changes",
+          description: "Unsaved changes detected",
+        },
+        conflict: {
+          title: "Conflict",
+          description: "Task is not in a completable state",
+        },
+      },
+      success: {
+        title: "Task Completed",
+        description:
+          "Task marked as done and result pushed to originating instance",
+      },
+    },
+  },
+  taskReport: {
+    post: {
+      title: "Report Task Result",
+      description:
+        "Accept execution results from a remote instance. Called by dev instances to report task completion back to the originating prod instance.",
+      fields: {
+        apiKey: {
+          title: "API Key",
+          description: "Shared secret for instance authentication.",
+        },
+        taskRouteId: {
+          title: "Task Route ID",
+          description: "The routeId of the completed task.",
+        },
+        executionId: {
+          title: "Execution ID",
+          description: "Unique execution identifier for deduplication.",
+        },
+        status: {
+          title: "Status",
+          description: "Final execution status.",
+        },
+        durationMs: {
+          title: "Duration (ms)",
+          description: "Total execution time in milliseconds.",
+        },
+        summary: {
+          title: "Summary",
+          description: "Human-readable summary of the execution result.",
+        },
+        error: {
+          title: "Error",
+          description: "Error message if the task failed.",
+        },
+        serverTimezone: {
+          title: "Server Timezone",
+          description:
+            "IANA timezone of the executing server (e.g. Europe/Vienna).",
+        },
+        executedByInstance: {
+          title: "Executed By",
+          description: "Instance ID that ran the task (e.g. hermes).",
+        },
+        processed: {
+          title: "Processed",
+          description: "Whether the report was accepted and applied.",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Validation Error",
+          description: "Invalid report payload",
+        },
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Invalid API key",
+        },
+        internal: {
+          title: "Internal Error",
+          description: "Failed to process the report",
+        },
+        forbidden: {
+          title: "Forbidden",
+          description: "Access denied",
+        },
+        notFound: {
+          title: "Not Found",
+          description: "Task not found on this instance",
+        },
+        network: {
+          title: "Network Error",
+          description: "Network error occurred",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unexpected error occurred",
+        },
+        unsaved: {
+          title: "Unsaved Changes",
+          description: "Unsaved changes detected",
+        },
+        conflict: {
+          title: "Conflict",
+          description: "A conflict occurred",
+        },
+      },
+      success: {
+        title: "Report Accepted",
+        description: "Execution result applied to the task record",
+      },
+    },
+  },
   csvProcessor: {
     description: "Processes CSV import jobs in chunks",
   },

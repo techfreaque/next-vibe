@@ -42,11 +42,6 @@ export const translations: typeof enTranslations = {
             description:
               "PREFERUJ false (domyślnie). headless:false otwiera pełną interaktywną sesję Claude Code — Max widzi wyniki na żywo i może uczestniczyć. Ustaw true tylko dla w pełni zautomatyzowanych zadań wsadowych (cron-joby, pipeline'y) bez interakcji człowieka.",
           },
-          workingDir: {
-            title: "Katalog roboczy",
-            description:
-              "Bezwzględna ścieżka dla procesu Claude Code. Domyślnie: bieżący katalog serwera.",
-          },
           timeoutMs: {
             title: "Timeout (ms)",
             description:

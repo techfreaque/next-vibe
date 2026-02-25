@@ -94,10 +94,10 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
         output.push("");
         output.push("🗄️  Database Setup");
 
-        // DATABASE_URL was already set to LOCAL_MODE_DATABASE_URL by the CLI
+        // DATABASE_URL port was already swapped to PREVIEW_DB_PORT by the CLI
         // environment loader (runtime/environment.ts) before any module loaded.
         output.push(
-          `   🔗 Using LOCAL_MODE_DATABASE_URL: ${process.env["DATABASE_URL"]}`,
+          `   🔗 Using preview DATABASE_URL: ${process.env["DATABASE_URL"]}`,
         );
 
         try {
@@ -129,7 +129,9 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
               );
 
             if (dbStartResult.success) {
-              output.push("   ✅ Preview PostgreSQL started (port 5433)");
+              output.push(
+                `   ✅ Preview PostgreSQL started (port ${process.env["PREVIEW_DB_PORT"] || "5433"})`,
+              );
             } else {
               output.push(
                 "   ⚠️ Failed to start preview PostgreSQL, continuing anyway",

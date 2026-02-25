@@ -30,6 +30,7 @@ import type {
 } from "@/app/api/[locale]/user/auth/types";
 import { users as usersTable } from "@/app/api/[locale]/user/db";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CronTaskExecution } from "../cron/db";
@@ -235,6 +236,8 @@ export class UnifiedTaskRunnerRepositoryImpl {
           startedAt,
           config: resolvedInput,
           triggeredBy: "schedule",
+          serverTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          executedByInstance: env.INSTANCE_ID ?? null,
         },
         t,
         this.logger,
@@ -275,6 +278,7 @@ export class UnifiedTaskRunnerRepositoryImpl {
         locale: userLocale,
         logger: this.logger,
         platform: Platform.CRON,
+        cronTaskId: dbTask?.id,
       });
 
       const durationMs = Date.now() - startTime;
@@ -351,6 +355,18 @@ export class UnifiedTaskRunnerRepositoryImpl {
           message: t("errors.executeCronTask"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: { error: errorMsg, taskName },
+        });
+      }
+
+      // If the handler manages its own lifecycle (e.g. interactive Claude Code sessions),
+      // leave the task as RUNNING — the handler will mark it done via complete-task.
+      if (result.taskLifecycleManagedExternally) {
+        this.logger.info(
+          `Task "${taskName}" lifecycle managed externally — skipping automatic completion`,
+        );
+        return success({
+          status: CronTaskStatus.RUNNING,
+          message: `Task "${taskName}" running with external lifecycle management`,
         });
       }
 

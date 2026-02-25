@@ -110,7 +110,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
     const platformMarkers = filterPlatformMarkers(allowedRoles);
 
     // Check production environment restrictions
-    // Skip when local mode is active (LOCAL_MODE_DATABASE_URL / LOCAL_MODE_APP_URL set)
+    // Skip when local mode is active (NEXT_PUBLIC_LOCAL_MODE=true)
     if (
       envClient.NODE_ENV === "production" &&
       !envClient.NEXT_PUBLIC_LOCAL_MODE &&
@@ -684,7 +684,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
     }
 
     // Check if endpoint is disabled in production environment
-    // Skip when local mode is active (LOCAL_MODE_DATABASE_URL / LOCAL_MODE_APP_URL set)
+    // Skip when local mode is active (NEXT_PUBLIC_LOCAL_MODE=true)
     if (
       process.env.NODE_ENV === "production" &&
       !envClient.NEXT_PUBLIC_LOCAL_MODE &&

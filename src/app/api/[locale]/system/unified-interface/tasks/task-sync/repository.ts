@@ -18,7 +18,9 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
+import { defaultLocale } from "@/i18n/core/config";
 
+import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import type { NewCronTask } from "../cron/db";
 import { cronTasks } from "../cron/db";
 import type {
@@ -28,6 +30,16 @@ import type {
 } from "../enum";
 import type { scopedTranslation } from "../i18n";
 import type { JsonValue, NotificationTarget } from "../unified-runner/types";
+
+/**
+ * Build the remote API URL for an endpoint from its definition path.
+ */
+function buildRemoteEndpointUrl(
+  remoteBaseUrl: string,
+  endpoint: CreateApiEndpointAny,
+): string {
+  return `${remoteBaseUrl}/api/${defaultLocale}/${endpoint.path.join("/")}`;
+}
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
@@ -310,7 +322,8 @@ export async function pullFromRemote(
   }
 
   try {
-    const syncUrl = `${remoteUrl}/api/en-GLOBAL/system/unified-interface/tasks/task-sync`;
+    const { endpoints: syncEndpoints } = await import("./definition");
+    const syncUrl = buildRemoteEndpointUrl(remoteUrl, syncEndpoints.POST);
 
     const response = await fetch(syncUrl, {
       method: "POST",
@@ -380,5 +393,58 @@ export async function pullFromRemote(
       message: t("errors.taskSyncSyncFailed"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
+  }
+}
+
+/**
+ * Push a task completion result to the remote Thea instance.
+ * Fire-and-forget — logs errors but never fails the caller.
+ */
+export async function pushCompletionToRemote(params: {
+  taskRouteId: string;
+  status: string;
+  summary: string;
+  durationMs: number | null;
+  serverTimezone: string;
+  executedByInstance: string | null;
+  logger: EndpointLogger;
+}): Promise<ResponseType<{ pushed: boolean }>> {
+  const { logger, ...payload } = params;
+  const remoteUrl = env.THEA_REMOTE_URL;
+  const apiKey = env.THEA_REMOTE_API_KEY;
+
+  if (!remoteUrl || !apiKey) {
+    logger.debug("No remote configured, skipping completion push");
+    return success({ pushed: false });
+  }
+
+  try {
+    const { endpoints: reportEndpoints } = await import("./report/definition");
+    const reportUrl = buildRemoteEndpointUrl(remoteUrl, reportEndpoints.POST);
+
+    const response = await fetch(reportUrl, {
+      method: "POST",
+      headers: await buildRemoteSyncHeaders(remoteUrl, logger),
+      body: JSON.stringify({ apiKey, ...payload }),
+      signal: AbortSignal.timeout(15000),
+    });
+
+    if (!response.ok) {
+      logger.error("Push completion to remote failed", {
+        status: response.status,
+        statusText: response.statusText,
+        taskRouteId: payload.taskRouteId,
+      });
+      return success({ pushed: false });
+    }
+
+    logger.info("Completion pushed to remote", {
+      taskRouteId: payload.taskRouteId,
+      status: payload.status,
+    });
+    return success({ pushed: true });
+  } catch (error) {
+    logger.error("Push completion to remote error", parseError(error));
+    return success({ pushed: false });
   }
 }

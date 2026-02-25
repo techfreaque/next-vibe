@@ -209,10 +209,10 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
       }
 
       // Ensure preview database is running when in local/preview mode
-      // (LOCAL_MODE_DATABASE_URL is set by environment.ts for build/start)
+      // (environment.ts swaps DATABASE_URL port for build/start)
       if (
         (data.migrate || data.seed) &&
-        process.env["LOCAL_MODE_DATABASE_URL"]
+        process.env["NEXT_PUBLIC_LOCAL_MODE"] === "true"
       ) {
         try {
           const { dbUtilsRepository } =
@@ -243,7 +243,9 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
               );
 
             if (dbStartResult.success) {
-              output.push("✅ Preview PostgreSQL started (port 5433)");
+              output.push(
+                `✅ Preview PostgreSQL started (port ${process.env["PREVIEW_DB_PORT"] || "5433"})`,
+              );
             } else {
               output.push(
                 "⚠️ Failed to start preview PostgreSQL, continuing anyway",

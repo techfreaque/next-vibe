@@ -28,7 +28,7 @@ export type NumberInputProps = {
 
 export function NumberInput(props: NumberInputProps): JSX.Element {
   const {
-    value = 1,
+    value = 0,
     onChange,
     onBlur,
     min,
@@ -63,7 +63,7 @@ export function NumberInput(props: NumberInputProps): JSX.Element {
   const handleInputChange = (e: InputChangeEvent<"number">): void => {
     const inputValue = e.target.value;
     if (inputValue === 0 || !inputValue) {
-      onChange?.(min || 0);
+      onChange?.(min ?? 0);
       return;
     }
     if (min === undefined && max === undefined) {
@@ -93,7 +93,7 @@ export function NumberInput(props: NumberInputProps): JSX.Element {
         variant="ghost"
         size="sm"
         onClick={handleDecrement}
-        disabled={disabled || (min ? value <= min : false)}
+        disabled={disabled || (min !== undefined ? value <= min : false)}
         tabIndex={-1}
         className="border-r rounded-r-none"
       >
@@ -116,7 +116,7 @@ export function NumberInput(props: NumberInputProps): JSX.Element {
         variant="ghost"
         size="sm"
         onClick={handleIncrement}
-        disabled={disabled || (max ? value >= max : false)}
+        disabled={disabled || (max !== undefined ? value >= max : false)}
         tabIndex={-1}
         className="border-l rounded-l-none"
       >

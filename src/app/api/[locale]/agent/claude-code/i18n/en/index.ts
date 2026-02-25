@@ -40,11 +40,6 @@ export const translations = {
             description:
               "PREFER false (default). Headless:false opens a full interactive Claude Code session — Max can see output live and participate. Set to true only for fully automated batch tasks (cron jobs, pipelines) where no human interaction is needed and output must be returned as a value.",
           },
-          workingDir: {
-            title: "Working Directory",
-            description:
-              "Absolute path to set as the working directory for the Claude Code process. Defaults to the server's current working directory.",
-          },
           timeoutMs: {
             title: "Timeout (ms)",
             description:

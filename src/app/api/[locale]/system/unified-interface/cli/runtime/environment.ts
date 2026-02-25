@@ -140,9 +140,9 @@ export function loadEnvironment(): EnvironmentResult {
     config({ quiet: true });
   }
 
-  // Override DATABASE_URL and NEXT_PUBLIC_APP_URL with LOCAL_MODE variants
-  // when running in preview mode. This is triggered automatically for
-  // `vibe build` / `vibe start`, or explicitly via `--preview` on any command.
+  // Activate local/preview mode for `vibe build` / `vibe start` (or --preview).
+  // Derives preview DATABASE_URL and NEXT_PUBLIC_APP_URL by swapping ports,
+  // using PREVIEW_DB_PORT (default 5433) and PREVIEW_PORT (default 3001).
   // Must happen BEFORE the env singleton is created by defineEnv().
   const args = process.argv.slice(2);
   const isPreviewMode =
@@ -153,17 +153,33 @@ export function loadEnvironment(): EnvironmentResult {
     args.includes(BUILD_SERVER_ALIAS);
 
   if (isPreviewMode && !args.includes("--skip-db-setup")) {
-    const localDbUrl = process.env["LOCAL_MODE_DATABASE_URL"];
-    if (localDbUrl) {
-      process.env["DATABASE_URL"] = localDbUrl;
+    const previewDbPort = process.env["PREVIEW_DB_PORT"] || "5433";
+    const previewPort = process.env["PREVIEW_PORT"] || "3001";
+
+    // Derive preview DATABASE_URL by swapping the port
+    const dbUrl = process.env["DATABASE_URL"];
+    if (dbUrl) {
+      try {
+        const parsed = new URL(dbUrl);
+        parsed.port = previewDbPort;
+        process.env["DATABASE_URL"] = parsed.toString();
+      } catch {
+        // If URL parsing fails, leave DATABASE_URL unchanged
+      }
     }
+
     process.env["NEXT_PUBLIC_LOCAL_MODE"] = "true";
-    // Override NEXT_PUBLIC_APP_URL with LOCAL_MODE_APP_URL so local mode
-    // uses its own URL (different port than dev). Must happen before Next.js
-    // server spawns so it picks up the correct value for SSR + client hydration.
-    const localAppUrl = process.env["LOCAL_MODE_APP_URL"];
-    if (localAppUrl) {
-      process.env["NEXT_PUBLIC_APP_URL"] = localAppUrl;
+
+    // Derive preview NEXT_PUBLIC_APP_URL by swapping the port
+    const appUrl = process.env["NEXT_PUBLIC_APP_URL"];
+    if (appUrl) {
+      try {
+        const parsed = new URL(appUrl);
+        parsed.port = previewPort;
+        process.env["NEXT_PUBLIC_APP_URL"] = parsed.toString();
+      } catch {
+        // If URL parsing fails, leave NEXT_PUBLIC_APP_URL unchanged
+      }
     }
   }
 

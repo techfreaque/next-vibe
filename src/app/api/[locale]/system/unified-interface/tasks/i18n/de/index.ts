@@ -382,6 +382,178 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  completeTask: {
+    post: {
+      title: "Aufgabe abschließen",
+      description:
+        "Markiert eine Cron-Aufgabe als abgeschlossen oder fehlgeschlagen und meldet das Ergebnis an die Ursprungsinstanz. Dev-only MCP-Tool für interaktive Claude Code-Sitzungen. Wenn Thea eine Aufgabe für Hermes erstellt, ruft Claude Code dieses Tool auf, nachdem der Benutzer die Fertigstellung bestätigt hat.",
+      fields: {
+        taskId: {
+          title: "Aufgaben-ID",
+          description: "Die Cron-Aufgaben-Datenbank-ID zum Abschließen.",
+        },
+        status: {
+          title: "Status",
+          description:
+            "Endstatus: 'completed' für Erfolg, 'failed' für Fehler.",
+        },
+        summary: {
+          title: "Zusammenfassung",
+          description:
+            "Kurze Beschreibung des Ergebnisses oder der Fehlerursache.",
+        },
+        completed: {
+          title: "Abgeschlossen",
+          description:
+            "Ob die Aufgabe erfolgreich als erledigt markiert wurde.",
+        },
+        pushedToRemote: {
+          title: "An Remote gesendet",
+          description:
+            "Ob der Abschluss erfolgreich an die Ursprungsinstanz gemeldet wurde.",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Validierungsfehler",
+          description: "Ungültige Aufgaben-ID oder Statuswert",
+        },
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Authentifizierung erforderlich",
+        },
+        internal: {
+          title: "Abschluss fehlgeschlagen",
+          description: "Aufgabe konnte nicht als abgeschlossen markiert werden",
+        },
+        forbidden: {
+          title: "Verboten",
+          description: "Zugriff verweigert",
+        },
+        notFound: {
+          title: "Aufgabe nicht gefunden",
+          description: "Keine Aufgabe mit der angegebenen ID gefunden",
+        },
+        network: {
+          title: "Netzwerkfehler",
+          description:
+            "Abschluss konnte nicht an Remote-Instanz gesendet werden",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten",
+        },
+        unsaved: {
+          title: "Ungespeicherte Änderungen",
+          description: "Ungespeicherte Änderungen erkannt",
+        },
+        conflict: {
+          title: "Konflikt",
+          description:
+            "Aufgabe befindet sich nicht in einem abschließbaren Zustand",
+        },
+      },
+      success: {
+        title: "Aufgabe abgeschlossen",
+        description:
+          "Aufgabe als erledigt markiert und Ergebnis an Ursprungsinstanz gesendet",
+      },
+    },
+  },
+  taskReport: {
+    post: {
+      title: "Aufgabenergebnis melden",
+      description:
+        "Nimmt Ausführungsergebnisse von einer entfernten Instanz entgegen. Wird von Dev-Instanzen aufgerufen, um Aufgabenabschlüsse an die Prod-Instanz zu melden.",
+      fields: {
+        apiKey: {
+          title: "API-Schlüssel",
+          description: "Gemeinsamer Schlüssel zur Instanz-Authentifizierung.",
+        },
+        taskRouteId: {
+          title: "Aufgaben-Route-ID",
+          description: "Die routeId der abgeschlossenen Aufgabe.",
+        },
+        executionId: {
+          title: "Ausführungs-ID",
+          description: "Eindeutige Ausführungskennung zur Deduplizierung.",
+        },
+        status: {
+          title: "Status",
+          description: "Endgültiger Ausführungsstatus.",
+        },
+        durationMs: {
+          title: "Dauer (ms)",
+          description: "Gesamte Ausführungszeit in Millisekunden.",
+        },
+        summary: {
+          title: "Zusammenfassung",
+          description:
+            "Menschenlesbare Zusammenfassung des Ausführungsergebnisses.",
+        },
+        error: {
+          title: "Fehler",
+          description: "Fehlermeldung bei fehlgeschlagener Aufgabe.",
+        },
+        serverTimezone: {
+          title: "Server-Zeitzone",
+          description:
+            "IANA-Zeitzone des ausführenden Servers (z.B. Europe/Vienna).",
+        },
+        executedByInstance: {
+          title: "Ausgeführt von",
+          description:
+            "Instanz-ID, die die Aufgabe ausgeführt hat (z.B. hermes).",
+        },
+        processed: {
+          title: "Verarbeitet",
+          description: "Ob der Bericht akzeptiert und angewendet wurde.",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Validierungsfehler",
+          description: "Ungültige Berichts-Nutzdaten",
+        },
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Ungültiger API-Schlüssel",
+        },
+        internal: {
+          title: "Interner Fehler",
+          description: "Verarbeitung des Berichts fehlgeschlagen",
+        },
+        forbidden: {
+          title: "Verboten",
+          description: "Zugriff verweigert",
+        },
+        notFound: {
+          title: "Nicht gefunden",
+          description: "Aufgabe auf dieser Instanz nicht gefunden",
+        },
+        network: {
+          title: "Netzwerkfehler",
+          description: "Netzwerkfehler aufgetreten",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten",
+        },
+        unsaved: {
+          title: "Ungespeicherte Änderungen",
+          description: "Ungespeicherte Änderungen erkannt",
+        },
+        conflict: {
+          title: "Konflikt",
+          description: "Ein Konflikt ist aufgetreten",
+        },
+      },
+      success: {
+        title: "Bericht akzeptiert",
+        description: "Ausführungsergebnis auf den Aufgabendatensatz angewendet",
+      },
+    },
+  },
   csvProcessor: {
     description: "Verarbeitet CSV-Importaufträge in Blöcken",
   },

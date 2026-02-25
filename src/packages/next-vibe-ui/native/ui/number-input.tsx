@@ -16,10 +16,10 @@ const StyledView = styled(View, { className: "style" });
 export type { NumberInputProps };
 
 export function NumberInput({
-  value = 1,
+  value = 0,
   onChange,
   onBlur,
-  min = 1,
+  min = 0,
   max = 10,
   step = 1,
   disabled = false,

@@ -164,11 +164,12 @@ export async function runClaudeCode(
   data: RunRequestOutput,
   logger: EndpointLogger,
   t: ModuleT,
+  cronTaskId?: string,
 ): Promise<ResponseType<RunResponseOutput>> {
   const timeoutMs = data.timeoutMs ?? 600000;
   const start = Date.now();
-  const isInteractive = !(data.interactive ?? false);
-  const cwd = data.workingDir ?? process.cwd();
+  const isInteractive = data.interactiveMode ?? false;
+  const cwd = process.cwd();
 
   // Build claude CLI args
   const args: string[] = isInteractive
@@ -183,8 +184,26 @@ export async function runClaudeCode(
   if (data.maxBudgetUsd !== undefined && data.maxBudgetUsd !== null) {
     args.push("--max-budget-usd", String(data.maxBudgetUsd));
   }
+  // Build system prompt: user-provided + task context injection
+  const systemPromptParts: string[] = [];
   if (data.systemPrompt) {
-    args.push("--system-prompt", data.systemPrompt);
+    systemPromptParts.push(data.systemPrompt);
+  }
+  if (cronTaskId && isInteractive) {
+    systemPromptParts.push(
+      [
+        `[TASK CONTEXT]`,
+        `You are working on task ID: ${cronTaskId}`,
+        `When the user confirms the work is complete, call the "complete-task" MCP tool with:`,
+        `  taskId: "${cronTaskId}"`,
+        `  status: "completed" (or "failed" if something went wrong)`,
+        `  summary: a brief description of what was done`,
+        `IMPORTANT: Only mark complete after explicit user confirmation. Never auto-complete.`,
+      ].join("\n"),
+    );
+  }
+  if (systemPromptParts.length > 0) {
+    args.push("--system-prompt", systemPromptParts.join("\n\n"));
   }
   if (data.allowedTools) {
     args.push("--allowedTools", data.allowedTools);
@@ -195,6 +214,7 @@ export async function runClaudeCode(
     prompt: data.prompt.slice(0, 200),
     model: data.model,
     timeoutMs,
+    tmp: data,
   });
 
   // ── Interactive mode: open in a separate terminal window ──
@@ -216,13 +236,20 @@ export async function runClaudeCode(
       logger.info("Claude Code interactive session launched in terminal", {
         terminal: terminal.bin,
         durationMs,
+        taskLifecycleManagedExternally: !!cronTaskId,
       });
 
-      return success({
-        output: `Opened interactive Claude Code session in ${terminal.bin}`,
-        exitCode: 0,
-        durationMs,
-      });
+      return {
+        success: true as const,
+        data: {
+          output: `Opened interactive Claude Code session in ${terminal.bin}`,
+          exitCode: 0,
+          durationMs,
+        },
+        // When launched with a cron task ID, the session manages its own lifecycle
+        // via the complete-task MCP tool — tell the runner not to auto-complete.
+        ...(cronTaskId && { taskLifecycleManagedExternally: true as const }),
+      };
     }
 
     // Fallback: no terminal emulator found — use inherited stdio

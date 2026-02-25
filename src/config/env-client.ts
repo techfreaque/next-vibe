@@ -41,10 +41,7 @@ export const {
   },
   NEXT_PUBLIC_APP_URL: {
     schema: createSchema(z.string().url(), z.string().optional()),
-
-    value: process.env.NEXT_PUBLIC_LOCAL_MODE
-      ? process.env.NEXT_PUBLIC_LOCAL_MODE_APP_URL
-      : process.env.NEXT_PUBLIC_APP_URL,
+    value: process.env.NEXT_PUBLIC_APP_URL,
     example: "http://localhost:3000",
   },
 
@@ -57,17 +54,12 @@ export const {
     schema: z
       .string()
       .optional()
-      .default("true")
-      .transform((v) => v !== "false"),
+      .default("false")
+      .transform((v) => v === "true"),
     value: process.env.NEXT_PUBLIC_LOCAL_MODE,
-    example: "true",
+    example: "false",
   },
 
-  NEXT_PUBLIC_LOCAL_MODE_APP_URL: {
-    schema: z.url().optional().default("http://localhost:3001"),
-    value: process.env.NEXT_PUBLIC_LOCAL_MODE_APP_URL,
-    example: "http://localhost:3001",
-  },
   NEXT_PUBLIC_TEST_SERVER_URL: {
     schema: createSchema(z.string(), z.string().optional()),
     value: process.env.NEXT_PUBLIC_TEST_SERVER_URL,

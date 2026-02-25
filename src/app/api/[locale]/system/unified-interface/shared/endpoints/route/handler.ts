@@ -176,6 +176,9 @@ export interface ApiHandlerProps<
 
   /** Original request (optional, platform-specific) */
   request?: NextRequest;
+
+  /** Cron task DB ID when executed by the task runner (for lifecycle tracking) */
+  cronTaskId?: string;
 }
 
 /**
@@ -295,6 +298,7 @@ export type GenericHandlerReturnType<
   logger: EndpointLogger;
   platform: Platform;
   request?: NextRequest; // Optional NextRequest for Next.js platform
+  cronTaskId?: string; // Cron task DB ID when executed by the task runner
 }) => Promise<ResponseType<TResponseOutput> | StreamingResponse | FileResponse>;
 
 /**
@@ -342,6 +346,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     logger,
     platform,
     request,
+    cronTaskId,
   }): Promise<
     | ResponseType<T["types"]["ResponseOutput"]>
     | StreamingResponse
@@ -470,6 +475,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       logger,
       request,
       platform,
+      cronTaskId,
     });
 
     // 5. Handle file responses - return immediately without email/SMS processing

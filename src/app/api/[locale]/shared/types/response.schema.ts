@@ -222,6 +222,10 @@ export interface SuccessResponseType<TResponseData> {
   data: TResponseData;
   isErrorResponse?: true;
   performance?: Partial<Record<TranslationKey, number>>;
+  /** When true, the task runner will NOT automatically mark this task as completed/failed.
+   *  The handler is responsible for managing the task lifecycle externally
+   *  (e.g. interactive Claude Code sessions that use the complete-task MCP tool). */
+  taskLifecycleManagedExternally?: true;
   message?: never;
   messageParams?: never;
   errorType?: never;
