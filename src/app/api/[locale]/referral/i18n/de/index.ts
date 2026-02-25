@@ -21,6 +21,28 @@ export const translations: typeof enTranslations = {
     form: {
       title: "Empfehlungscode-Details",
       description: "Empfehlungscode-Informationen anzeigen",
+      limit: {
+        label: "Limit",
+        description: "Maximale Anzahl der zurückzugebenden Ergebnisse",
+      },
+      offset: {
+        label: "Offset",
+        description: "Anzahl der zu überspringenden Ergebnisse",
+      },
+    },
+    response: {
+      earnings: {
+        id: "ID",
+        earnerUserId: "Verdiener-Benutzer-ID",
+        sourceUserId: "Quell-Benutzer-ID",
+        transactionId: "Transaktions-ID",
+        level: "Ebene",
+        amountCents: "Betrag (Cent)",
+        currency: "Währung",
+        status: "Status",
+        createdAt: "Erstellt am",
+      },
+      totalCount: "Gesamtanzahl",
     },
   },
 

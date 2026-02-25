@@ -73,10 +73,10 @@ export interface LinkWidgetConfig<
   href?: Route | string;
 
   /** Static link text translation key */
-  text?: TKey;
+  text?: NoInfer<TKey>;
 
   /** Accessible label (aria-label) - use if text is not descriptive */
-  label?: TKey;
+  label?: NoInfer<TKey>;
 
   /** Opens in new tab if true */
   external?: boolean;

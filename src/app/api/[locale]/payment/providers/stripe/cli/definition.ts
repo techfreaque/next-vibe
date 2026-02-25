@@ -58,9 +58,9 @@ const { POST } = createEndpoint({
       operation: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "fields.operation.label" as const,
-        description: "fields.operation.description" as const,
-        placeholder: "fields.operation.placeholder" as const,
+        label: "form.fields.operation.label" as const,
+        description: "form.fields.operation.description" as const,
+        placeholder: "form.fields.operation.placeholder" as const,
         columns: 6,
         options: [
           {
@@ -90,9 +90,9 @@ const { POST } = createEndpoint({
       port: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "fields.port.label" as const,
-        description: "fields.port.description" as const,
-        placeholder: "fields.port.placeholder" as const,
+        label: "form.fields.port.label" as const,
+        description: "form.fields.port.description" as const,
+        placeholder: "form.fields.port.placeholder" as const,
         columns: 6,
         schema: z.coerce.number().optional(),
       }),
@@ -100,34 +100,34 @@ const { POST } = createEndpoint({
       events: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.MULTISELECT,
-        label: "fields.events.label" as const,
-        description: "fields.events.description" as const,
-        placeholder: "fields.events.placeholder" as const,
+        label: "form.fields.events.label" as const,
+        description: "form.fields.events.description" as const,
+        placeholder: "form.fields.events.placeholder" as const,
         columns: 12,
         options: [
           {
             value: "payment_intent.succeeded",
-            label: "fields.events.paymentIntentSucceeded" as const,
+            label: "form.fields.events.paymentIntentSucceeded" as const,
           },
           {
             value: "payment_intent.payment_failed",
-            label: "fields.events.paymentIntentFailed" as const,
+            label: "form.fields.events.paymentIntentFailed" as const,
           },
           {
             value: "customer.subscription.created",
-            label: "fields.events.subscriptionCreated" as const,
+            label: "form.fields.events.subscriptionCreated" as const,
           },
           {
             value: "customer.subscription.updated",
-            label: "fields.events.subscriptionUpdated" as const,
+            label: "form.fields.events.subscriptionUpdated" as const,
           },
           {
             value: "invoice.payment_succeeded",
-            label: "fields.events.invoicePaymentSucceeded" as const,
+            label: "form.fields.events.invoicePaymentSucceeded" as const,
           },
           {
             value: "invoice.payment_failed",
-            label: "fields.events.invoicePaymentFailed" as const,
+            label: "form.fields.events.invoicePaymentFailed" as const,
           },
         ],
         schema: z.array(z.string()).optional(),
@@ -136,9 +136,9 @@ const { POST } = createEndpoint({
       forwardTo: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "fields.forwardTo.label" as const,
-        description: "fields.forwardTo.description" as const,
-        placeholder: "fields.forwardTo.placeholder" as const,
+        label: "form.fields.forwardTo.label" as const,
+        description: "form.fields.forwardTo.description" as const,
+        placeholder: "form.fields.forwardTo.placeholder" as const,
         columns: 6,
         schema: z.string().optional(),
       }),
@@ -146,8 +146,8 @@ const { POST } = createEndpoint({
       skipSslVerify: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "fields.skipSslVerify.label" as const,
-        description: "fields.skipSslVerify.description" as const,
+        label: "form.fields.skipSslVerify.label" as const,
+        description: "form.fields.skipSslVerify.description" as const,
         columns: 6,
         schema: z.boolean().default(false),
       }),

@@ -239,7 +239,7 @@ export function FavoriteEditContainer({
         />
         {(form?.formState.isDirty || isSubmitting) && (
           <>
-            <SubmitButtonWidget
+            <SubmitButtonWidget<typeof definitionPatch.PATCH>
               field={{
                 text: "patch.saveButton.label",
                 loadingText: "patch.saveButton.loadingText",

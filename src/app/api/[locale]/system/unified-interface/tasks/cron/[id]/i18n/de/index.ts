@@ -130,6 +130,14 @@ export const translations: typeof enTranslations = {
         label: "Wiederholungsverzögerung",
         description: "Verzögerung zwischen Wiederholungen in Sekunden",
       },
+      taskInput: {
+        label: "Aufgabeneingabe",
+        description: "JSON-Eingabedaten für die Aufgabe",
+      },
+      runOnce: {
+        label: "Einmal ausführen",
+        description: "Diese Aufgabe nur einmal ausführen und dann deaktivieren",
+      },
       targetInstance: {
         label: "Ziel-Instanz",
         description:

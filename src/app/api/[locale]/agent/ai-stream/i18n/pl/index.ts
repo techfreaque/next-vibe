@@ -249,6 +249,10 @@ export const translations: typeof enTranslations = {
       description:
         "Zezwól AI na przeszukiwanie sieci w poszukiwaniu aktualnych informacji",
     },
+    timezone: {
+      label: "Strefa czasowa",
+      description: "Strefa czasowa użytkownika dla stabilnych znaczników czasu",
+    },
     activeTool: {
       label: "Może wykonywać",
       description:

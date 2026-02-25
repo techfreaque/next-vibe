@@ -712,7 +712,7 @@ const { GET } = createEndpoint({
       id: scopedRequestUrlPathParamsField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
-        label: "get.response.favorite.id.content" as const,
+        label: "get.id.label" as const,
         schema: z.string().uuid(),
         hidden: true,
       }),

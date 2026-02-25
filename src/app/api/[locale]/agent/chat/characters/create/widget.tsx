@@ -62,7 +62,7 @@ export function CharacterCreateContainer({
         />
 
         {/* Submit Button */}
-        <SubmitButtonWidget
+        <SubmitButtonWidget<typeof defintion.POST>
           field={{
             text: "post.submitButton.text",
             loadingText: "post.submitButton.loadingText",

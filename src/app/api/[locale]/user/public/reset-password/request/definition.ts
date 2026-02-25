@@ -58,7 +58,7 @@ const { POST } = createEndpoint({
       }),
       title: scopedWidgetField(scopedTranslation, {
         type: WidgetType.TITLE,
-        content: "app.user.other.resetPassword.auth.resetPassword.title",
+        content: "request.ui.title",
         level: 3,
         order: 1,
         inline: true,
@@ -66,7 +66,7 @@ const { POST } = createEndpoint({
       }),
       subtitle: scopedWidgetField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "app.user.other.resetPassword.auth.resetPassword.subtitle",
+        content: "request.ui.subtitle",
         order: 2,
         usage: { request: "data", response: true },
       }),
@@ -74,10 +74,10 @@ const { POST } = createEndpoint({
       email: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,
-        label: "fields.email.label",
-        description: "fields.email.description",
-        placeholder: "fields.email.placeholder",
-        helpText: "fields.email.help",
+        label: "request.fields.email.label",
+        description: "request.fields.email.description",
+        placeholder: "request.fields.email.placeholder",
+        helpText: "request.fields.email.help",
         // theme: {
         //   style: "none",
         // },
@@ -85,7 +85,7 @@ const { POST } = createEndpoint({
         schema: z
           .string()
           .email({
-            message: "fields.email.validation.invalid",
+            message: "request.fields.email.validation.invalid",
           })
           .transform((val) => val.toLowerCase().trim()),
       }),
@@ -98,7 +98,7 @@ const { POST } = createEndpoint({
 
       message: scopedResponseField(scopedTranslation, {
         type: WidgetType.ALERT,
-        content: "response.success.message",
+        content: "request.response.success.message",
         order: 6,
         schema: z
           .string()
@@ -107,7 +107,7 @@ const { POST } = createEndpoint({
       // === SUBMIT BUTTON (inside card) ===
       submitButton: scopedWidgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
-        text: "app.user.other.resetPassword.auth.resetPassword.sendResetLink",
+        text: "request.ui.sendResetLink",
         loadingText: "actions.submitting",
         icon: "mail",
         variant: "default",
@@ -120,7 +120,7 @@ const { POST } = createEndpoint({
       // === FOOTER LINK (inside card, below button) ===
       alreadyHaveAccount: scopedWidgetField(scopedTranslation, {
         type: WidgetType.LINK,
-        text: "public.signup.footer.alreadyHaveAccount",
+        text: "request.ui.alreadyHaveAccount",
         href: "/user/login",
         textAlign: "center",
         external: false,

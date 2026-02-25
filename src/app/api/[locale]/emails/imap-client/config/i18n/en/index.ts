@@ -76,6 +76,42 @@ export const translations = {
     info: "Info",
     debug: "Debug",
   },
+  accounts: {
+    create: {
+      host: {
+        placeholder: "imap.example.com",
+      },
+      port: {
+        placeholder: "993",
+      },
+      username: {
+        label: "Username",
+        description: "IMAP account username",
+        placeholder: "user@example.com",
+      },
+      password: {
+        label: "Password",
+        description: "IMAP account password",
+        placeholder: "Enter password",
+      },
+      secure: {
+        label: "Use TLS",
+        description: "Enable TLS encryption for the connection",
+      },
+      keepAlive: {
+        label: "Auto Reconnect",
+        description: "Automatically reconnect on connection loss",
+      },
+    },
+  },
+  sync: {
+    maxMessages: {
+      description: "Maximum number of messages to sync",
+    },
+    accountIds: {
+      description: "Number of accounts to sync concurrently",
+    },
+  },
   debugMode: {
     label: "Debug Mode",
     description: "Enable debug mode for detailed logging",

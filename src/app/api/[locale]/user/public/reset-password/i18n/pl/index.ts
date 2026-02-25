@@ -7,6 +7,11 @@ export const translations: typeof enTranslations = {
   confirm: confirmTranslations,
   request: requestTranslations,
   validate: validateTranslations,
+  actions: {
+    back: "Wstecz",
+    submit: "Wyślij",
+    submitting: "Wysyłanie...",
+  },
   success: {
     password_reset: "Twoje hasło zostało pomyślnie zresetowane.",
   },

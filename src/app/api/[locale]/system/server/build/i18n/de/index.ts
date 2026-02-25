@@ -29,6 +29,30 @@ export const translations: typeof enTranslations = {
         title: "Code-Generierung überspringen",
         description: "API-Endpunkt-Generierung während Build überspringen",
       },
+      generate: {
+        title: "Code generieren",
+        description: "Code-Generierung während des Builds ausführen",
+      },
+      generateEndpoints: {
+        title: "Endpunkte generieren",
+        description: "API-Endpunkt-Dateien während des Builds generieren",
+      },
+      generateSeeds: {
+        title: "Seeds generieren",
+        description: "Seed-Dateien während des Builds generieren",
+      },
+      nextBuild: {
+        title: "Next.js-Build",
+        description: "Next.js-Build-Prozess ausführen",
+      },
+      migrate: {
+        title: "Migrationen ausführen",
+        description: "Datenbank-Migrationen während des Builds ausführen",
+      },
+      seed: {
+        title: "Seeding ausführen",
+        description: "Datenbank-Seeding während des Builds ausführen",
+      },
       force: {
         title: "Build erzwingen",
         description: "Build auch bei Fehlern fortsetzen",

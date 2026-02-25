@@ -64,7 +64,7 @@ export function KagiSearchResultsContainer({
         <Div className="flex flex-col gap-4 p-4 border rounded-lg bg-card">
           <TextFieldWidget fieldName="query" field={children.query} />
           <FormAlertWidget field={{}} />
-          <SubmitButtonWidget
+          <SubmitButtonWidget<typeof definition.GET>
             field={{
               text: "get.submitButton.label",
               loadingText: "get.submitButton.loadingText",

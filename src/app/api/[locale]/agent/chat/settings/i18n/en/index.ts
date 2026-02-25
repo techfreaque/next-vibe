@@ -83,6 +83,9 @@ export const translations = {
     pinnedTools: {
       label: "Pinned Tools",
     },
+    compactTrigger: {
+      label: "Compact Trigger (tokens)",
+    },
     errors: {
       validation: {
         title: "Validation Error",

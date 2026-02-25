@@ -92,7 +92,7 @@ export function ImapFoldersSyncContainer({
         )}
 
         <Div className="flex items-center justify-end pt-2">
-          <SubmitButtonWidget
+          <SubmitButtonWidget<typeof definition.POST>
             field={{
               text: "widget.submit",
               loadingText: "widget.submitting",

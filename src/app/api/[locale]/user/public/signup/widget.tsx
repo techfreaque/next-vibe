@@ -110,7 +110,9 @@ export function SignupFormContainer({
         )}
 
         {/* Submit Button */}
-        <SubmitButtonWidget field={children.submitButton} />
+        <SubmitButtonWidget<typeof definition.POST>
+          field={children.submitButton}
+        />
 
         {/* Footer Link */}
         <LinkWidget

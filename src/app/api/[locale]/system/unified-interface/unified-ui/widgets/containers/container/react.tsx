@@ -271,11 +271,11 @@ export function ContainerWidget<
 
   // Auto BackButton logic:
   // Show auto back button when:
-  // 1. Root container with auto submit button showing
+  // 1. Root container
   // 2. No inline back button already defined in the field tree
   // 3. Navigation stack exists and can go back
   const shouldShowAutoBackButton =
-    shouldShowAutoSubmitButton &&
+    isRootContainer &&
     !(inlineButtonInfo?.hasBackButton ?? false) &&
     navigation?.canGoBack;
 
@@ -544,6 +544,20 @@ export function ContainerWidget<
             </Button>
           </Div>
         )}
+        {/* Standalone back button when auto submit is not showing (e.g. custom widgets) */}
+        {!shouldShowAutoSubmitButton && shouldShowAutoBackButton && (
+          <Button
+            type="button"
+            onClick={(): void => {
+              navigation?.pop();
+            }}
+            variant="outline"
+            className="w-full"
+          >
+            <Icon icon="arrow-left" className="h-4 w-4 mr-2" />
+            {globalT("widgets.endpointRenderer.cancel")}
+          </Button>
+        )}
       </Div>
     );
   }
@@ -720,6 +734,22 @@ export function ContainerWidget<
               {isSubmitting ? autoSubmitLoadingText : autoSubmitText}
             </Button>
           </Div>
+        </CardContent>
+      )}
+      {/* Standalone back button when auto submit is not showing (e.g. custom widgets) */}
+      {!shouldShowAutoSubmitButton && shouldShowAutoBackButton && (
+        <CardContent>
+          <Button
+            type="button"
+            onClick={(): void => {
+              navigation?.pop();
+            }}
+            variant="outline"
+            className="w-full"
+          >
+            <Icon icon="arrow-left" className="h-4 w-4 mr-2" />
+            {globalT("widgets.endpointRenderer.cancel")}
+          </Button>
         </CardContent>
       )}
     </Card>

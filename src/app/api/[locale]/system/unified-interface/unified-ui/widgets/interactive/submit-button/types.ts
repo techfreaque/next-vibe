@@ -36,3 +36,24 @@ export interface SubmitButtonWidgetConfig<
   /** Spacing to the right of icon */
   iconSpacing?: SpacingSize;
 }
+
+/**
+ * Type-safe submit button field for direct use in custom widgets.
+ * Usage: `<SubmitButtonWidget field={{ text: "key" } satisfies SubmitButtonField<typeof definition.POST>} />`
+ */
+export type SubmitButtonField<
+  TEndpoint extends { scopedTranslation: { ScopedTranslationKey: string } },
+> = Pick<
+  SubmitButtonWidgetConfig<
+    TEndpoint["scopedTranslation"]["ScopedTranslationKey"],
+    FieldUsageConfig,
+    "widget"
+  >,
+  | "text"
+  | "loadingText"
+  | "icon"
+  | "variant"
+  | "size"
+  | "iconSize"
+  | "iconSpacing"
+>;

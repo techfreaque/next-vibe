@@ -180,7 +180,7 @@ export function LeadCreateContainer({
             {t("widget.headerCreateLead")}
           </Span>
         </Div>
-        <SubmitButtonWidget
+        <SubmitButtonWidget<typeof definition.POST>
           field={{
             text: "post.submitButton.label",
             loadingText: "post.submitButton.loadingText",

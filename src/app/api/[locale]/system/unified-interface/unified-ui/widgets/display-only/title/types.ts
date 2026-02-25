@@ -66,7 +66,7 @@ export interface TitleWidgetConfig<
   type: WidgetType.TITLE;
 
   /** Static content translation key - use for fixed titles */
-  content?: TKey;
+  content?: NoInfer<TKey>;
 
   /** Heading level (1-6) - overrides data level */
   level?: 1 | 2 | 3 | 4 | 5 | 6;

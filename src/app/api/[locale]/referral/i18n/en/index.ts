@@ -19,6 +19,28 @@ export const translations = {
     form: {
       title: "Referral Code Details",
       description: "View referral code information",
+      limit: {
+        label: "Limit",
+        description: "Maximum number of results to return",
+      },
+      offset: {
+        label: "Offset",
+        description: "Number of results to skip",
+      },
+    },
+    response: {
+      earnings: {
+        id: "ID",
+        earnerUserId: "Earner User ID",
+        sourceUserId: "Source User ID",
+        transactionId: "Transaction ID",
+        level: "Level",
+        amountCents: "Amount (Cents)",
+        currency: "Currency",
+        status: "Status",
+        createdAt: "Created At",
+      },
+      totalCount: "Total Count",
     },
   },
 

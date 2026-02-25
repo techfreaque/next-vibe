@@ -248,6 +248,10 @@ export const translations: typeof enTranslations = {
       description:
         "KI erlauben, das Web nach aktuellen Informationen zu durchsuchen",
     },
+    timezone: {
+      label: "Zeitzone",
+      description: "Benutzer-Zeitzone für cache-stabile Zeitstempel",
+    },
     activeTool: {
       label: "Ausführbar",
       description:

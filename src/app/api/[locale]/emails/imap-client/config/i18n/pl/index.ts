@@ -78,6 +78,42 @@ export const translations: typeof enTranslations = {
     info: "Info",
     debug: "Debug",
   },
+  accounts: {
+    create: {
+      host: {
+        placeholder: "imap.przyklad.pl",
+      },
+      port: {
+        placeholder: "993",
+      },
+      username: {
+        label: "Nazwa użytkownika",
+        description: "Nazwa użytkownika konta IMAP",
+        placeholder: "uzytkownik@przyklad.pl",
+      },
+      password: {
+        label: "Hasło",
+        description: "Hasło konta IMAP",
+        placeholder: "Wprowadź hasło",
+      },
+      secure: {
+        label: "Użyj TLS",
+        description: "Włącz szyfrowanie TLS dla połączenia",
+      },
+      keepAlive: {
+        label: "Automatyczne ponowne połączenie",
+        description: "Automatycznie połącz ponownie przy utracie połączenia",
+      },
+    },
+  },
+  sync: {
+    maxMessages: {
+      description: "Maksymalna liczba wiadomości do synchronizacji",
+    },
+    accountIds: {
+      description: "Liczba kont do równoczesnej synchronizacji",
+    },
+  },
   debugMode: {
     label: "Tryb debugowania",
     description: "Włącz tryb debugowania dla szczegółowego logowania",

@@ -30,6 +30,30 @@ export const translations: typeof enTranslations = {
         description:
           "Pomiń generowanie punktów końcowych API podczas budowania",
       },
+      generate: {
+        title: "Generuj kod",
+        description: "Uruchom generowanie kodu podczas budowania",
+      },
+      generateEndpoints: {
+        title: "Generuj endpointy",
+        description: "Generuj pliki endpointów API podczas budowania",
+      },
+      generateSeeds: {
+        title: "Generuj seedy",
+        description: "Generuj pliki seedów podczas budowania",
+      },
+      nextBuild: {
+        title: "Build Next.js",
+        description: "Uruchom proces budowania Next.js",
+      },
+      migrate: {
+        title: "Uruchom migracje",
+        description: "Uruchom migracje bazy danych podczas budowania",
+      },
+      seed: {
+        title: "Uruchom seeding",
+        description: "Uruchom seeding bazy danych podczas budowania",
+      },
       force: {
         title: "Wymuś budowanie",
         description: "Kontynuuj budowanie nawet przy błędach",

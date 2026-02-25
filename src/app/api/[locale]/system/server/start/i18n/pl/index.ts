@@ -25,6 +25,22 @@ export const translations: typeof enTranslations = {
         title: "Pomiń polecenie Next.js",
         description: "Pomiń uruchamianie polecenia start Next.js",
       },
+      seed: {
+        title: "Uruchom seeding",
+        description: "Uruchom seeding bazy danych przy starcie",
+      },
+      dbSetup: {
+        title: "Konfiguracja bazy danych",
+        description: "Uruchom konfigurację bazy danych i migracje przy starcie",
+      },
+      taskRunner: {
+        title: "Task Runner",
+        description: "Uruchom system Task Runner",
+      },
+      nextServer: {
+        title: "Serwer Next.js",
+        description: "Uruchom serwer Next.js",
+      },
       port: {
         title: "Port",
         description: "Numer portu dla serwera",

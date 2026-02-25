@@ -162,6 +162,10 @@ export const translations: typeof enTranslations = {
           "Ihr Abonnement hat sich geändert. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut",
       },
     },
+    submit: {
+      label: "Abonnement aktualisieren",
+      loading: "Aktualisierung...",
+    },
     success: {
       title: "Abonnement aktualisiert",
       description: "Ihr Abonnement wurde erfolgreich aktualisiert",
@@ -222,6 +226,10 @@ export const translations: typeof enTranslations = {
           "Ihr Abonnementstatus hat sich geändert. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut",
       },
     },
+    submit: {
+      label: "Abonnement kündigen",
+      loading: "Kündigung...",
+    },
     success: {
       title: "Abonnement gekündigt",
       description: "Ihr Abonnement wurde erfolgreich gekündigt",
@@ -240,6 +248,10 @@ export const translations: typeof enTranslations = {
         label: "Abrechnungsintervall",
         description: "Abrechnungshäufigkeit wählen",
         placeholder: "Abrechnungsintervall wählen",
+      },
+      provider: {
+        label: "Zahlungsanbieter",
+        description: "Wählen Sie Ihren Zahlungsanbieter",
       },
       cancelAtPeriodEnd: {
         label: "Am Periodenende kündigen",

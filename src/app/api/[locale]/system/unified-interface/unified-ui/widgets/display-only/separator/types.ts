@@ -27,5 +27,5 @@ export interface SeparatorWidgetConfig<
   spacingBottom?: SpacingSize;
 
   /** Optional label to display on the separator */
-  label?: TKey;
+  label?: NoInfer<TKey>;
 }

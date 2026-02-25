@@ -99,6 +99,10 @@ export const translations: typeof enTranslations = {
       description: "Ein Ordner mit diesem Namen existiert bereits",
     },
   },
+  submitButton: {
+    label: "Ordner erstellen",
+    loadingText: "Erstelle...",
+  },
   success: {
     title: "Erfolg",
     description: "Ordner erfolgreich erstellt",

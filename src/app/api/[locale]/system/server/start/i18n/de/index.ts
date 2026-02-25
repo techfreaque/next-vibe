@@ -25,6 +25,23 @@ export const translations: typeof enTranslations = {
         title: "Next.js-Befehl überspringen",
         description: "Next.js-Startbefehl überspringen",
       },
+      seed: {
+        title: "Seeding ausführen",
+        description: "Datenbank-Seeding beim Start ausführen",
+      },
+      dbSetup: {
+        title: "Datenbankeinrichtung",
+        description:
+          "Datenbankeinrichtung und Migrationen beim Start ausführen",
+      },
+      taskRunner: {
+        title: "Task Runner",
+        description: "Task-Runner-System starten",
+      },
+      nextServer: {
+        title: "Next.js-Server",
+        description: "Next.js-Server starten",
+      },
       port: {
         title: "Port",
         description: "Portnummer für den Server",

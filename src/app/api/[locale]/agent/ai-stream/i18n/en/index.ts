@@ -299,6 +299,10 @@ export const translations = {
       label: "Enable Web Search",
       description: "Allow AI to search the web for current information",
     },
+    timezone: {
+      label: "Timezone",
+      description: "User timezone for cache-stable timestamps",
+    },
     activeTool: {
       label: "Allowed to Execute",
       description:

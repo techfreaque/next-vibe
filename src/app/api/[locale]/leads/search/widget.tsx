@@ -315,7 +315,7 @@ export function LeadsSearchContainer({
         <Div className="flex-1">
           <TextFieldWidget fieldName="search" field={children.search} />
         </Div>
-        <SubmitButtonWidget
+        <SubmitButtonWidget<typeof definition.GET>
           field={{
             text: "get.search.label",
             loadingText: "get.search.label",

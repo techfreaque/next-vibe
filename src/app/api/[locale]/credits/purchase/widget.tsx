@@ -132,9 +132,9 @@ export function CreditsPurchaseContainer({
             </Div>
 
             {/* Submit Button */}
-            <SubmitButtonWidget
+            <SubmitButtonWidget<typeof definition.POST>
               field={{
-                text: "app.subscription.subscription.buy.pack.button.submit",
+                text: "post.submit.text",
                 loadingText: "post.submit.loading",
                 icon: "credit-card",
                 variant: "outline",

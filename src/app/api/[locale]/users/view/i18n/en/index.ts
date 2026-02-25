@@ -9,6 +9,9 @@ export const translations = {
   get: {
     title: "View User",
     description: "View detailed information about a user",
+    userId: {
+      label: "User ID",
+    },
   },
   errors: {
     validation: {

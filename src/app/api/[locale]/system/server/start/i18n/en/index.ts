@@ -23,6 +23,22 @@ export const translations = {
         title: "Skip Next.js Command",
         description: "Skip running Next.js start command",
       },
+      seed: {
+        title: "Run Seeding",
+        description: "Run database seeding on startup",
+      },
+      dbSetup: {
+        title: "Database Setup",
+        description: "Run database setup and migrations on startup",
+      },
+      taskRunner: {
+        title: "Task Runner",
+        description: "Start the task runner system",
+      },
+      nextServer: {
+        title: "Next.js Server",
+        description: "Start the Next.js server",
+      },
       port: {
         title: "Port",
         description: "Port number for the server",

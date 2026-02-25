@@ -11,6 +11,9 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Zobacz użytkownika",
     description: "Zobacz szczegółowe informacje o użytkowniku",
+    userId: {
+      label: "ID użytkownika",
+    },
   },
   errors: {
     validation: {

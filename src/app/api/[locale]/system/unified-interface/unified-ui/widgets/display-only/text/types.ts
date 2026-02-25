@@ -109,7 +109,7 @@ export interface TextWidgetConfig<
   fieldType?: FieldDataType;
 
   /** Label translation key displayed above text */
-  label?: TKey;
+  label?: NoInfer<TKey>;
 
   /** Color styling variant */
   variant?: TextVariant;

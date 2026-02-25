@@ -199,7 +199,7 @@ export function LeadsBatchUpdateContainer({
       </Div>
 
       <FormAlertWidget field={{}} />
-      <SubmitButtonWidget
+      <SubmitButtonWidget<typeof definition.PATCH>
         field={{
           text: "widget.update.submitButton" as const,
           loadingText: "widget.update.submitButtonLoading" as const,
@@ -491,7 +491,7 @@ export function LeadsBatchDeleteContainer({
       </Div>
 
       <FormAlertWidget field={{}} />
-      <SubmitButtonWidget
+      <SubmitButtonWidget<typeof definition.DELETE>
         field={{
           text: "widget.delete.submitButton" as const,
           loadingText: "widget.delete.submitButtonLoading" as const,

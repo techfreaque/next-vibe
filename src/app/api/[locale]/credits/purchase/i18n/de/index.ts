@@ -42,6 +42,10 @@ export const translations: typeof enTranslations = {
       requiresSubscription:
         "Ein aktives Abonnement ist erforderlich, um Credit-Pakete zu kaufen",
     },
+    submit: {
+      text: "Credit-Paket kaufen",
+      loading: "Verarbeitung...",
+    },
     redirecting: "Weiterleitung zum Checkout...",
     openCheckout: "Checkout öffnen",
     success: {

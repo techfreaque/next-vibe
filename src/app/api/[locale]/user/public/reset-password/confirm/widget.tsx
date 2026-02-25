@@ -4,6 +4,7 @@
 
 "use client";
 
+import { Button } from "next-vibe-ui/ui/button";
 import {
   Card,
   CardContent,
@@ -14,13 +15,14 @@ import {
 import { Div } from "next-vibe-ui/ui/div";
 
 import {
-  useWidgetForm,
+  useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import { EmailFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/email-field/react";
 import { PasswordFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/password-field/react";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 import { PasswordStrengthIndicator } from "@/app/api/[locale]/user/public/signup/_components/password-strength-indicator";
 
@@ -45,8 +47,8 @@ export function ResetPasswordConfirmContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
-  const form = useWidgetForm();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const navigation = useWidgetNavigation();
 
   return (
     <Card>
@@ -74,16 +76,30 @@ export function ResetPasswordConfirmContainer({
           />
         </Div>
 
-        {/* Submit Button */}
-        <SubmitButtonWidget
-          field={{
-            text: "actions.submit",
-            loadingText: "actions.submitting",
-            icon: "lock",
-            variant: "default",
-            size: "default",
-          }}
-        />
+        {/* Action Buttons */}
+        <Div className="flex gap-2">
+          {navigation?.canGoBack && (
+            <Button
+              type="button"
+              onClick={(): void => {
+                navigation.pop();
+              }}
+              variant="outline"
+            >
+              <Icon icon="arrow-left" className="h-4 w-4 mr-2" />
+              {t("actions.back")}
+            </Button>
+          )}
+          <SubmitButtonWidget<typeof definition.POST>
+            field={{
+              text: "actions.submit",
+              loadingText: "actions.submitting",
+              icon: "lock",
+              variant: "default",
+              size: "default",
+            }}
+          />
+        </Div>
 
         <AlertWidget
           fieldName="message"

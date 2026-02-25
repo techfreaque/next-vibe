@@ -32,8 +32,8 @@ import type { SubmitButtonWidgetConfig } from "./types";
  */
 export function SubmitButtonWidget<
   TEndpoint extends CreateApiEndpointAny,
-  TUsage extends FieldUsageConfig,
-  TSchemaType extends "widget",
+  TUsage extends FieldUsageConfig = FieldUsageConfig,
+  TSchemaType extends "widget" = "widget",
 >({
   field,
 }: ReactStaticWidgetProps<

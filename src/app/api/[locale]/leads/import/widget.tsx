@@ -279,7 +279,7 @@ export function LeadsImportContainer({
           />
           <NumberFieldWidget fieldName="batchSize" field={children.batchSize} />
 
-          <SubmitButtonWidget
+          <SubmitButtonWidget<typeof definition.POST>
             field={{
               text: "post.widget.headerTitle",
               loadingText: "post.widget.loadingText",

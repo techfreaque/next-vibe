@@ -54,15 +54,15 @@ export const { GET } = createEndpoint({
       limit: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "get.form.limit",
-        description: "get.form.limit",
+        label: "get.form.limit.label",
+        description: "get.form.limit.description",
         schema: z.coerce.number().positive().optional(),
       }),
       offset: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "get.form.offset",
-        description: "get.form.offset",
+        label: "get.form.offset.label",
+        description: "get.form.offset.description",
         schema: z.coerce.number().min(0).optional(),
       }),
 

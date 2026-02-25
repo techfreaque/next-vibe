@@ -40,6 +40,10 @@ export const translations = {
       requiresSubscription:
         "An active subscription is required to purchase credit packs",
     },
+    submit: {
+      text: "Buy Credit Pack",
+      loading: "Processing...",
+    },
     redirecting: "Redirecting to checkout...",
     openCheckout: "Open Checkout",
     success: {

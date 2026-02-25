@@ -50,7 +50,7 @@ export function SubscriptionUpdateContainer({
       />
 
       {/* Submit Button */}
-      <SubmitButtonWidget
+      <SubmitButtonWidget<typeof definition.PUT>
         field={{
           text: "put.submit.label",
           loadingText: "put.submit.loading",

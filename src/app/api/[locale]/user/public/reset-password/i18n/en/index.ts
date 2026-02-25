@@ -6,6 +6,11 @@ export const translations = {
   confirm: confirmTranslations,
   request: requestTranslations,
   validate: validateTranslations,
+  actions: {
+    back: "Back",
+    submit: "Submit",
+    submitting: "Submitting...",
+  },
   success: {
     password_reset: "Your password has been successfully reset.",
   },

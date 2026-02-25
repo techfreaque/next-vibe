@@ -62,7 +62,7 @@ export function BraveSearchResultsContainer({
           </Div>
           <FormAlertWidget field={{}} />
 
-          <SubmitButtonWidget
+          <SubmitButtonWidget<typeof definition.GET>
             field={{
               text: "get.submitButton.label",
               loadingText: "get.submitButton.loadingText",

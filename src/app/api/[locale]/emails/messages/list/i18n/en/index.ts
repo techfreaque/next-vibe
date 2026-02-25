@@ -41,6 +41,10 @@ export const translations = {
       description: "Filter by email status",
       placeholder: "Select status",
     },
+    channel: {
+      label: "Channel",
+      description: "Filter by message channel",
+    },
     type: {
       label: "Type",
       description: "Filter by email type",

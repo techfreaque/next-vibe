@@ -21,6 +21,28 @@ export const translations: typeof enTranslations = {
     form: {
       title: "Szczegóły kodu polecającego",
       description: "Wyświetl informacje o kodzie polecającym",
+      limit: {
+        label: "Limit",
+        description: "Maksymalna liczba wyników do zwrócenia",
+      },
+      offset: {
+        label: "Przesunięcie",
+        description: "Liczba wyników do pominięcia",
+      },
+    },
+    response: {
+      earnings: {
+        id: "ID",
+        earnerUserId: "ID użytkownika zarabiającego",
+        sourceUserId: "ID użytkownika źródłowego",
+        transactionId: "ID transakcji",
+        level: "Poziom",
+        amountCents: "Kwota (centy)",
+        currency: "Waluta",
+        status: "Status",
+        createdAt: "Utworzono",
+      },
+      totalCount: "Łączna liczba",
     },
   },
 

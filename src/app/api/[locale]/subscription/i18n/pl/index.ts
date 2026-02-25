@@ -149,6 +149,10 @@ export const translations: typeof enTranslations = {
           "Twoja subskrypcja się zmieniła. Odśwież stronę i spróbuj ponownie",
       },
     },
+    submit: {
+      label: "Zaktualizuj subskrypcję",
+      loading: "Aktualizowanie...",
+    },
     success: {
       title: "Subskrypcja zaktualizowana",
       description: "Twoja subskrypcja została pomyślnie zaktualizowana",
@@ -204,6 +208,10 @@ export const translations: typeof enTranslations = {
           "Status subskrypcji się zmienił. Odśwież stronę i spróbuj ponownie",
       },
     },
+    submit: {
+      label: "Anuluj subskrypcję",
+      loading: "Anulowanie...",
+    },
     success: {
       title: "Subskrypcja anulowana",
       description: "Twoja subskrypcja została pomyślnie anulowana",
@@ -222,6 +230,10 @@ export const translations: typeof enTranslations = {
         label: "Okres rozliczeniowy",
         description: "Wybierz częstotliwość rozliczeń",
         placeholder: "Wybierz okres rozliczeniowy",
+      },
+      provider: {
+        label: "Dostawca płatności",
+        description: "Wybierz dostawcę płatności",
       },
       cancelAtPeriodEnd: {
         label: "Anuluj na koniec okresu",

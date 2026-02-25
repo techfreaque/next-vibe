@@ -44,6 +44,10 @@ export const translations: typeof enTranslations = {
       description: "Nach E-Mail-Status filtern",
       placeholder: "Status auswählen",
     },
+    channel: {
+      label: "Kanal",
+      description: "Nach Nachrichtenkanal filtern",
+    },
     type: {
       label: "Typ",
       description: "Nach E-Mail-Typ filtern",

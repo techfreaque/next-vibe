@@ -200,7 +200,7 @@ export function scopedRequestField<
   TSchema extends z.ZodTypeAny,
   const TConfig extends Omit<
     FormFieldWidgetConfig<
-      string,
+      TScopedTranslation["ScopedTranslationKey"],
       TSchema,
       { request: "data"; response?: never }
     >,
@@ -232,7 +232,7 @@ export function scopedResponseField<
   TSchema extends z.ZodTypeAny,
   const TConfig extends Omit<
     RequestResponseWidgetConfig<
-      string,
+      TScopedTranslation["ScopedTranslationKey"],
       TSchema,
       { request?: never; response: true },
       "primitive"
@@ -262,7 +262,11 @@ export function scopedRequestResponseField<
   TScopedTranslation extends ScopedTranslationType<string>,
   TSchema extends z.ZodTypeAny,
   const TConfig extends Omit<
-    FormFieldWidgetConfig<string, TSchema, { request: "data" }>,
+    FormFieldWidgetConfig<
+      TScopedTranslation["ScopedTranslationKey"],
+      TSchema,
+      { request: "data" }
+    >,
     "usage" | "schemaType"
   >,
 >(
@@ -289,7 +293,7 @@ export function scopedRequestUrlPathParamsField<
   TSchema extends z.ZodTypeAny,
   const TConfig extends Omit<
     FormFieldWidgetConfig<
-      string,
+      TScopedTranslation["ScopedTranslationKey"],
       TSchema,
       { request: "urlPathParams"; response?: never }
     >,
@@ -318,7 +322,11 @@ export function scopedRequestUrlPathParamsResponseField<
   TScopedTranslation extends ScopedTranslationType<string>,
   TSchema extends z.ZodTypeAny,
   const TConfig extends Omit<
-    FormFieldWidgetConfig<string, TSchema, { request: "urlPathParams" }>,
+    FormFieldWidgetConfig<
+      TScopedTranslation["ScopedTranslationKey"],
+      TSchema,
+      { request: "urlPathParams" }
+    >,
     "usage" | "schemaType"
   >,
 >(

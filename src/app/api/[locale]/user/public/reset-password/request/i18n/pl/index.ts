@@ -8,6 +8,13 @@ export const translations: typeof enTranslations = {
   title: "Żądanie resetowania hasła",
   description: "Żądanie resetowania hasła",
   tag: "Reset hasła",
+  ui: {
+    title: "Zresetuj hasło",
+    subtitle:
+      "Wprowadź swój adres e-mail, a wyślemy Ci link do resetowania hasła",
+    sendResetLink: "Wyślij link resetujący",
+    alreadyHaveAccount: "Masz już konto? Zaloguj się",
+  },
   actions: {
     submitting: "Wysyłanie...",
   },

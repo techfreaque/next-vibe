@@ -27,6 +27,30 @@ export const translations = {
         title: "Skip Code Generation",
         description: "Skip API endpoint generation during build",
       },
+      generate: {
+        title: "Generate Code",
+        description: "Run code generation during build",
+      },
+      generateEndpoints: {
+        title: "Generate Endpoints",
+        description: "Generate API endpoint files during build",
+      },
+      generateSeeds: {
+        title: "Generate Seeds",
+        description: "Generate seed files during build",
+      },
+      nextBuild: {
+        title: "Next.js Build",
+        description: "Run Next.js build process",
+      },
+      migrate: {
+        title: "Run Migrations",
+        description: "Run database migrations during build",
+      },
+      seed: {
+        title: "Run Seeding",
+        description: "Run database seeding during build",
+      },
       force: {
         title: "Force Build",
         description: "Continue build even if errors occur",

@@ -168,7 +168,7 @@ const { POST } = createEndpoint({
       characterId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "characterId.label" as const,
+        label: "post.characterId.label" as const,
         columns: 6,
         hidden: true,
         schema: z.string(),
@@ -188,8 +188,8 @@ const { POST } = createEndpoint({
       voice: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
-        label: "voice.label" as const,
-        description: "voice.description" as const,
+        label: "post.voice.label" as const,
+        description: "post.voice.description" as const,
         options: TtsVoiceOptions,
         columns: 6,
         theme: {

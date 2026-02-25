@@ -99,6 +99,10 @@ export const translations: typeof enTranslations = {
       description: "Folder o tej nazwie już istnieje",
     },
   },
+  submitButton: {
+    label: "Utwórz folder",
+    loadingText: "Tworzenie...",
+  },
   success: {
     title: "Sukces",
     description: "Folder utworzony pomyślnie",

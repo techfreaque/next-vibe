@@ -69,7 +69,7 @@ export function TestEmailContainer({ field }: CustomWidgetProps): JSX.Element {
             {t("post.widget.title")}
           </Span>
         </Div>
-        <SubmitButtonWidget
+        <SubmitButtonWidget<typeof definition.POST>
           field={{
             text: "post.widget.send",
             loadingText: "post.widget.sending",

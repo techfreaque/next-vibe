@@ -51,10 +51,10 @@ export interface MarkdownEditorWidgetConfig<
   type: WidgetType.MARKDOWN_EDITOR;
 
   /** Label translation key */
-  label?: TKey;
+  label?: NoInfer<TKey>;
 
   /** Placeholder translation key */
-  placeholder?: TKey;
+  placeholder?: NoInfer<TKey>;
 
   /** Container gap */
   gap?: SpacingSize;

@@ -29,6 +29,7 @@ import {
   CronTaskPriorityOptions,
   TaskCategory,
   TaskOutputModeDB,
+  TaskOutputModeOptions,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
@@ -280,6 +281,7 @@ const { PUT } = createEndpoint({
       outputMode: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
+        options: TaskOutputModeOptions,
         label: "put.fields.outputMode.label",
         description: "put.fields.outputMode.description",
         columns: 6,
@@ -320,7 +322,7 @@ const { PUT } = createEndpoint({
         label: "put.fields.runOnce.label",
         description: "put.fields.runOnce.description",
         columns: 6,
-        schema: z.boolean().optional(),
+        schema: z.boolean().default(true),
       }),
       targetInstance: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -540,7 +542,6 @@ const { DELETE } = createEndpoint({
     },
     responses: {
       default: {
-        success: true,
         message: "Task deleted successfully",
       },
     },

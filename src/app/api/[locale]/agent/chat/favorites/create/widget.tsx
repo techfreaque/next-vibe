@@ -132,7 +132,7 @@ export function FavoriteCreateContainer({
             ? t("post.useWithoutSavingButton.loadingText")
             : t("post.useWithoutSavingButton.label")}
         </Button>
-        <SubmitButtonWidget
+        <SubmitButtonWidget<typeof definition.POST>
           field={{
             text: "post.submitButton.label",
             loadingText: "post.submitButton.loadingText",

@@ -24,16 +24,16 @@ export interface MarkdownWidgetConfig<
   type: WidgetType.MARKDOWN;
 
   /** Static markdown content (for hardcoded content, not field values) */
-  content?: TKey;
+  content?: NoInfer<TKey>;
 
   /** Number of columns for layout */
   columns?: number;
 
   /** Label for the markdown section */
-  label?: TKey;
+  label?: NoInfer<TKey>;
 
   /** Description for the markdown section */
-  description?: TKey;
+  description?: NoInfer<TKey>;
 
   /** Schema constraint for the field value */
   schema: TSchema;

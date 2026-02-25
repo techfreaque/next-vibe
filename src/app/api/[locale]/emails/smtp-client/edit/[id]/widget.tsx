@@ -156,7 +156,7 @@ export function SmtpEditContainer({
 
           {/* Submit */}
           <Div className="flex items-center justify-end pt-2">
-            <SubmitButtonWidget
+            <SubmitButtonWidget<typeof definition.PUT>
               field={{
                 text: "put.title",
                 loadingText: "put.title",

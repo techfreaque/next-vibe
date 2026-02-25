@@ -168,7 +168,7 @@ export function CampaignStarterConfigContainer({
         <NumberFieldWidget fieldName="timeout" field={children.timeout} />
         <NumberFieldWidget fieldName="retries" field={children.retries} />
         <NumberFieldWidget fieldName="retryDelay" field={children.retryDelay} />
-        <SubmitButtonWidget
+        <SubmitButtonWidget<typeof definition.PUT>
           field={{
             text: "post.success.title",
             loadingText: "widget.saving",

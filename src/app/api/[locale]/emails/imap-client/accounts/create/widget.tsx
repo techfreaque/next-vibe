@@ -127,7 +127,7 @@ export function ImapAccountCreateContainer({
 
         {/* Submit */}
         <Div className="flex items-center justify-end pt-2">
-          <SubmitButtonWidget
+          <SubmitButtonWidget<typeof definition.POST>
             field={{
               text: "submit",
               loadingText: "submitting",

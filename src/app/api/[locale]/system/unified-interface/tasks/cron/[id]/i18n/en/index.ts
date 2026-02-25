@@ -127,6 +127,14 @@ export const translations = {
         label: "Retry Delay",
         description: "Delay between retries in seconds",
       },
+      taskInput: {
+        label: "Task Input",
+        description: "JSON input data for the task",
+      },
+      runOnce: {
+        label: "Run Once",
+        description: "Run this task only once and then disable it",
+      },
       targetInstance: {
         label: "Target Instance",
         description:

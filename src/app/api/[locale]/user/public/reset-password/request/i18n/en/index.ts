@@ -7,6 +7,13 @@ export const translations = {
   title: "Reset Password Request",
   description: "Request password reset",
   tag: "Password Reset",
+  ui: {
+    title: "Reset Your Password",
+    subtitle:
+      "Enter your email address and we'll send you a link to reset your password",
+    sendResetLink: "Send Reset Link",
+    alreadyHaveAccount: "Already have an account? Sign in",
+  },
   actions: {
     submitting: "Sending...",
   },

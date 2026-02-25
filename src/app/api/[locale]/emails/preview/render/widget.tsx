@@ -88,10 +88,10 @@ export function EmailPreviewRenderContainer({
         )}
 
         <Div className="flex items-center justify-end pt-2">
-          <SubmitButtonWidget
+          <SubmitButtonWidget<typeof definition.POST>
             field={{
-              text: "submit",
-              loadingText: "submitting",
+              text: "preview.render.submit",
+              loadingText: "preview.render.submitting",
               icon: "eye",
               variant: "primary",
               size: "sm",

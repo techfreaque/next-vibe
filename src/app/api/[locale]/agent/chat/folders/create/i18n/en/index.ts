@@ -96,6 +96,10 @@ export const translations = {
       description: "A folder with this name already exists",
     },
   },
+  submitButton: {
+    label: "Create Folder",
+    loadingText: "Creating...",
+  },
   success: {
     title: "Success",
     description: "Folder created successfully",

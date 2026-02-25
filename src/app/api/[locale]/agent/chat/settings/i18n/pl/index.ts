@@ -85,6 +85,9 @@ export const translations: typeof enTranslations = {
     pinnedTools: {
       label: "Przypięte narzędzia",
     },
+    compactTrigger: {
+      label: "Wyzwalacz kompresji (tokeny)",
+    },
     errors: {
       validation: {
         title: "Błąd walidacji",

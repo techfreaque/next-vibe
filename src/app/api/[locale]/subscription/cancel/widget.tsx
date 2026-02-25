@@ -58,7 +58,7 @@ export function SubscriptionCancelContainer({
       <TextFieldWidget fieldName="reason" field={children.reason} />
 
       {/* Submit Button */}
-      <SubmitButtonWidget
+      <SubmitButtonWidget<typeof definition.DELETE>
         field={{
           text: "delete.submit.label",
           loadingText: "delete.submit.loading",

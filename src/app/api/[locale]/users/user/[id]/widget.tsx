@@ -678,7 +678,7 @@ export function UserEditContainer({
 
           {/* Submit */}
           <Div className="flex items-center justify-end pt-2">
-            <SubmitButtonWidget
+            <SubmitButtonWidget<typeof definition.PUT>
               field={{
                 text: "id.put.title",
                 loadingText: "id.put.title",

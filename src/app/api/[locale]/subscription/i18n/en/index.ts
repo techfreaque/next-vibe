@@ -148,6 +148,10 @@ export const translations = {
           "Your subscription has changed. Please refresh and try again",
       },
     },
+    submit: {
+      label: "Update Subscription",
+      loading: "Updating...",
+    },
     success: {
       title: "Subscription Updated",
       description: "Your subscription has been updated successfully",
@@ -203,6 +207,10 @@ export const translations = {
           "Your subscription status has changed. Please refresh and try again",
       },
     },
+    submit: {
+      label: "Cancel Subscription",
+      loading: "Canceling...",
+    },
     success: {
       title: "Subscription Canceled",
       description: "Your subscription has been canceled successfully",
@@ -221,6 +229,10 @@ export const translations = {
         label: "Billing Interval",
         description: "Select billing frequency",
         placeholder: "Choose billing interval",
+      },
+      provider: {
+        label: "Payment Provider",
+        description: "Select your payment provider",
       },
       cancelAtPeriodEnd: {
         label: "Cancel at Period End",

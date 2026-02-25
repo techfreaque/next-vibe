@@ -8,10 +8,7 @@
 import { Div } from "next-vibe-ui/ui/div";
 import { type JSX } from "react";
 
-import {
-  useWidgetForm,
-  useWidgetTranslation,
-} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { useWidgetForm } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { IconFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/react";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
@@ -31,7 +28,6 @@ export function FolderCreateContainer({
 }: CustomWidgetProps): JSX.Element {
   const children = field.children;
   useWidgetForm<typeof definition.POST>();
-  const t = useWidgetTranslation<typeof definition.POST>();
 
   return (
     <Div className="flex flex-col gap-4 p-4">
@@ -39,10 +35,10 @@ export function FolderCreateContainer({
 
       <IconFieldWidget field={children.icon} fieldName="icon" />
 
-      <SubmitButtonWidget
+      <SubmitButtonWidget<typeof definition.POST>
         field={{
-          text: t("sections.folder.name.label"),
-          loadingText: t("sections.folder.name.label"),
+          text: "submitButton.label",
+          loadingText: "submitButton.loadingText",
           icon: "folder-plus",
           variant: "primary",
           className: "w-full",

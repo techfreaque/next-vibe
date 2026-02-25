@@ -30,7 +30,7 @@ export interface KeyValueWidgetConfig<
   type: WidgetType.KEY_VALUE;
 
   /** Label/title for the key-value display */
-  label?: TKey;
+  label?: NoInfer<TKey>;
 
   /** Number of columns for layout (future use) */
   columns?: number;

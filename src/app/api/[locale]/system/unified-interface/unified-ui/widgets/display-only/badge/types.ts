@@ -53,7 +53,7 @@ export interface BadgeWidgetConfig<
   type: WidgetType.BADGE;
 
   /** Static text translation key - use for fixed labels */
-  text?: TKey;
+  text?: NoInfer<TKey>;
 
   /** Enum options for dynamic value mapping - use for enum fields */
   enumOptions?: Array<BadgeEnumOption<TKey>>;

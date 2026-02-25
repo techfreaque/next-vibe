@@ -8,6 +8,13 @@ export const translations: typeof enTranslations = {
   title: "Passwort-Reset Anfrage",
   description: "Passwort-Reset anfordern",
   tag: "Passwort-Reset",
+  ui: {
+    title: "Passwort zurücksetzen",
+    subtitle:
+      "Geben Sie Ihre E-Mail-Adresse ein und wir senden Ihnen einen Link zum Zurücksetzen",
+    sendResetLink: "Reset-Link senden",
+    alreadyHaveAccount: "Bereits ein Konto? Anmelden",
+  },
   actions: {
     submitting: "Senden...",
   },

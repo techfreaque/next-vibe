@@ -86,6 +86,9 @@ export const translations: typeof enTranslations = {
     pinnedTools: {
       label: "Angeheftete Tools",
     },
+    compactTrigger: {
+      label: "Komprimierungsauslöser (Token)",
+    },
     errors: {
       validation: {
         title: "Validierungsfehler",

@@ -192,6 +192,14 @@ export const translations: typeof enTranslations = {
         label: "Opóźnienie ponowienia (ms)",
         description: "Opóźnienie między ponownymi próbami w milisekundach",
       },
+      taskInput: {
+        label: "Dane wejściowe zadania",
+        description: "Dane wejściowe JSON dla zadania",
+      },
+      runOnce: {
+        label: "Uruchom raz",
+        description: "Uruchom to zadanie tylko raz, a następnie je wyłącz",
+      },
       targetInstance: {
         label: "Docelowa instancja",
         description:

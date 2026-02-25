@@ -146,7 +146,7 @@ export function CharacterEditContainer({
         )}
 
         {/* Submit Button */}
-        <SubmitButtonWidget
+        <SubmitButtonWidget<typeof definitionPatch.PATCH>
           field={{
             text: "patch.submitButton.label",
             loadingText: "patch.submitButton.loadingText",
