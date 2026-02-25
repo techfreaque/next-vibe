@@ -309,7 +309,7 @@ const { PATCH } = createEndpoint({
         label: "patch.content.label" as const,
         description: "patch.content.description" as const,
         columns: 12,
-        schema: z.string().max(1000).optional(),
+        schema: z.string().max(5000).optional(),
       }),
       tags: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

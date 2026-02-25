@@ -99,7 +99,7 @@ const { POST } = createEndpoint({
         label: "post.content.label" as const,
         description: "post.content.description" as const,
         columns: 12,
-        schema: z.string().min(1).max(1000),
+        schema: z.string().min(1).max(5000),
       }),
       tags: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
