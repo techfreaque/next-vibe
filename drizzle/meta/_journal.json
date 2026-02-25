@@ -226,6 +226,13 @@
       "when": 1772115268000,
       "tag": "20260224211428_migrate_remaining_legacy_enums",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1771973312415,
+      "tag": "20260224224832_lucky_moira_mactaggert",
+      "breakpoints": true
     }
   ]
 }

@@ -93,6 +93,9 @@ export const cronTasks = pgTable(
     errorCount: integer("error_count").notNull().default(0),
     averageExecutionTime: integer("average_execution_time").default(0),
 
+    // Instance routing — null means "run only on host instance"
+    targetInstance: text("target_instance"),
+
     // Metadata
     tags: jsonb("tags").$type<string[]>().notNull().default([]),
 

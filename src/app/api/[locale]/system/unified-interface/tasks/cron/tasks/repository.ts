@@ -26,6 +26,7 @@ import {
   CronTaskEnabledFilter,
   CronTaskPriority,
   TaskCategory,
+  TaskCategoryDB,
   TaskOutputMode,
 } from "../../enum";
 import type {
@@ -65,7 +66,9 @@ function formatTaskResponse(
     displayName: task.displayName,
     description: task.description ?? null,
     version: task.version,
-    category: task.category,
+    category: (TaskCategoryDB as readonly string[]).includes(task.category)
+      ? task.category
+      : TaskCategory.SYSTEM,
     schedule: task.schedule,
     timezone: task.timezone ?? null,
     enabled: task.enabled,
@@ -86,6 +89,7 @@ function formatTaskResponse(
     successCount: task.successCount,
     errorCount: task.errorCount,
     averageExecutionTime: task.averageExecutionTime ?? null,
+    targetInstance: task.targetInstance ?? null,
     tags: task.tags,
     userId: task.userId ?? null,
     createdAt: task.createdAt.toISOString(),
@@ -237,6 +241,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         version: "1.0.0",
         taskInput: data.taskInput,
         runOnce: data.runOnce ?? false,
+        targetInstance: data.targetInstance ?? null,
         outputMode: data.outputMode ?? TaskOutputMode.STORE_ONLY,
         notificationTargets: [] as NotificationTarget[],
         executionCount: 0,

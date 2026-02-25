@@ -192,6 +192,12 @@ export const translations: typeof enTranslations = {
         label: "Opóźnienie ponowienia (ms)",
         description: "Opóźnienie między ponownymi próbami w milisekundach",
       },
+      targetInstance: {
+        label: "Docelowa instancja",
+        description:
+          "ID instancji, na której zadanie ma być uruchamiane. Pozostaw puste dla wszystkich instancji.",
+        placeholder: "Pozostaw puste dla wszystkich instancji",
+      },
     },
     response: {
       task: {

@@ -20,6 +20,7 @@ import { calculateNextExecutionTime } from "@/app/api/[locale]/system/unified-in
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { TaskCategory, TaskCategoryDB } from "../enum";
 import type { scopedTranslation } from "../i18n";
 import type {
   CronTaskExecution,
@@ -44,7 +45,9 @@ function serializeTask(
     displayName: task.displayName,
     description: task.description ?? null,
     version: task.version,
-    category: task.category,
+    category: (TaskCategoryDB as readonly string[]).includes(task.category)
+      ? task.category
+      : TaskCategory.SYSTEM,
     schedule: task.schedule,
     timezone: task.timezone ?? null,
     enabled: task.enabled,
@@ -71,6 +74,7 @@ function serializeTask(
     successCount: task.successCount,
     errorCount: task.errorCount,
     averageExecutionTime: task.averageExecutionTime ?? null,
+    targetInstance: task.targetInstance ?? null,
     tags: task.tags,
     userId: task.userId ?? null,
     createdAt: task.createdAt.toISOString(),

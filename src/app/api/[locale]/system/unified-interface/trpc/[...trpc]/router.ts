@@ -25,37 +25,37 @@ import { tools as route12Tools } from "../../../../agent/fetch-url-content/route
 import { tools as route13Tools } from "../../../../agent/ai-stream/route";
 import { tools as route14Tools } from "../../../../agent/search/brave/route";
 import { tools as route15Tools } from "../../../../agent/search/kagi/route";
-import { tools as route16Tools } from "../../../../agent/text-to-speech/route";
-import { tools as route17Tools } from "../../../../agent/speech-to-text/hotkey/route";
-import { tools as route18Tools } from "../../../../agent/models/openrouter/route";
-import { tools as route19Tools } from "../../../server/dev/route";
-import { tools as route20Tools } from "../../../server/start/route";
-import { tools as route21Tools } from "../../../server/build/route";
-import { tools as route22Tools } from "../../../server/health/route";
-import { tools as route23Tools } from "../../../guard/start/route";
-import { tools as route24Tools } from "../../../guard/stop/route";
-import { tools as route25Tools } from "../../../guard/status/route";
-import { tools as route26Tools } from "../../../guard/destroy/route";
-import { tools as route27Tools } from "../../../help/route";
-import { tools as route28Tools } from "../../../db/schema-verify/route";
-import { tools as route29Tools } from "../../../db/utils/docker-operations/route";
-import { tools as route30Tools } from "../../../db/migrate-repair/route";
-import { tools as route31Tools } from "../../../db/migrate-prod/route";
-import { tools as route32Tools } from "../../../db/seed/route";
-import { tools as route33Tools } from "../../../db/reset/route";
-import { tools as route34Tools } from "../../../db/migrate-sync/route";
-import { tools as route35Tools } from "../../../db/migrate/route";
-import { tools as route36Tools } from "../../../db/ping/route";
-import { tools as route37Tools } from "../../../db/sql/route";
-import { tools as route38Tools } from "../../../db/studio/route";
-import { tools as route39Tools } from "../../tasks/cron/tasks/route";
-import { tools as route40Tools } from "../../tasks/cron/history/route";
-import { tools as route41Tools } from "../../tasks/cron/stats/route";
-import { tools as route42Tools } from "../../tasks/pulse/history/route";
-import { tools as route43Tools } from "../../tasks/pulse/status/route";
-import { tools as route44Tools } from "../../tasks/pulse/execute/route";
-import { tools as route45Tools } from "../../tasks/task-sync/route";
-import { tools as route46Tools } from "../../tasks/claude-code/route";
+import { tools as route16Tools } from "../../../../agent/claude-code/route";
+import { tools as route17Tools } from "../../../../agent/text-to-speech/route";
+import { tools as route18Tools } from "../../../../agent/speech-to-text/hotkey/route";
+import { tools as route19Tools } from "../../../../agent/models/openrouter/route";
+import { tools as route20Tools } from "../../../server/dev/route";
+import { tools as route21Tools } from "../../../server/start/route";
+import { tools as route22Tools } from "../../../server/build/route";
+import { tools as route23Tools } from "../../../server/health/route";
+import { tools as route24Tools } from "../../../guard/start/route";
+import { tools as route25Tools } from "../../../guard/stop/route";
+import { tools as route26Tools } from "../../../guard/status/route";
+import { tools as route27Tools } from "../../../guard/destroy/route";
+import { tools as route28Tools } from "../../../help/route";
+import { tools as route29Tools } from "../../../db/schema-verify/route";
+import { tools as route30Tools } from "../../../db/utils/docker-operations/route";
+import { tools as route31Tools } from "../../../db/migrate-repair/route";
+import { tools as route32Tools } from "../../../db/migrate-prod/route";
+import { tools as route33Tools } from "../../../db/seed/route";
+import { tools as route34Tools } from "../../../db/reset/route";
+import { tools as route35Tools } from "../../../db/migrate-sync/route";
+import { tools as route36Tools } from "../../../db/migrate/route";
+import { tools as route37Tools } from "../../../db/ping/route";
+import { tools as route38Tools } from "../../../db/sql/route";
+import { tools as route39Tools } from "../../../db/studio/route";
+import { tools as route40Tools } from "../../tasks/cron/tasks/route";
+import { tools as route41Tools } from "../../tasks/cron/history/route";
+import { tools as route42Tools } from "../../tasks/cron/stats/route";
+import { tools as route43Tools } from "../../tasks/pulse/history/route";
+import { tools as route44Tools } from "../../tasks/pulse/status/route";
+import { tools as route45Tools } from "../../tasks/pulse/execute/route";
+import { tools as route46Tools } from "../../tasks/task-sync/route";
 import { tools as route47Tools } from "../../tasks/unified-runner/route";
 import { tools as route48Tools } from "../../tasks/db-health/route";
 import { tools as route49Tools } from "../../mcp/serve/route";
@@ -396,57 +396,57 @@ export const appRouter = router({
       brave: router({ ...route14 }),
       kagi: router({ ...route15 }),
     }),
-    "text-to-speech": router({ ...route16 }),
+    "claude-code": router({ ...route16 }),
+    "text-to-speech": router({ ...route17 }),
     "speech-to-text": router({
-      hotkey: router({ ...route17 }),
+      hotkey: router({ ...route18 }),
     }),
     models: router({
-      openrouter: router({ ...route18 }),
+      openrouter: router({ ...route19 }),
     }),
   }),
   system: router({
     server: router({
-      dev: router({ ...route19 }),
-      start: router({ ...route20 }),
-      build: router({ ...route21 }),
-      health: router({ ...route22 }),
+      dev: router({ ...route20 }),
+      start: router({ ...route21 }),
+      build: router({ ...route22 }),
+      health: router({ ...route23 }),
     }),
     guard: router({
-      start: router({ ...route23 }),
-      stop: router({ ...route24 }),
-      status: router({ ...route25 }),
-      destroy: router({ ...route26 }),
+      start: router({ ...route24 }),
+      stop: router({ ...route25 }),
+      status: router({ ...route26 }),
+      destroy: router({ ...route27 }),
     }),
-    help: router({ ...route27 }),
+    help: router({ ...route28 }),
     db: router({
-      "schema-verify": router({ ...route28 }),
+      "schema-verify": router({ ...route29 }),
       utils: router({
-        "docker-operations": router({ ...route29 }),
+        "docker-operations": router({ ...route30 }),
       }),
-      "migrate-repair": router({ ...route30 }),
-      "migrate-prod": router({ ...route31 }),
-      seed: router({ ...route32 }),
-      reset: router({ ...route33 }),
-      "migrate-sync": router({ ...route34 }),
-      migrate: router({ ...route35 }),
-      ping: router({ ...route36 }),
-      sql: router({ ...route37 }),
-      studio: router({ ...route38 }),
+      "migrate-repair": router({ ...route31 }),
+      "migrate-prod": router({ ...route32 }),
+      seed: router({ ...route33 }),
+      reset: router({ ...route34 }),
+      "migrate-sync": router({ ...route35 }),
+      migrate: router({ ...route36 }),
+      ping: router({ ...route37 }),
+      sql: router({ ...route38 }),
+      studio: router({ ...route39 }),
     }),
     "unified-interface": router({
       tasks: router({
         cron: router({
-          tasks: router({ ...route39 }),
-          history: router({ ...route40 }),
-          stats: router({ ...route41 }),
+          tasks: router({ ...route40 }),
+          history: router({ ...route41 }),
+          stats: router({ ...route42 }),
         }),
         pulse: router({
-          history: router({ ...route42 }),
-          status: router({ ...route43 }),
-          execute: router({ ...route44 }),
+          history: router({ ...route43 }),
+          status: router({ ...route44 }),
+          execute: router({ ...route45 }),
         }),
-        "task-sync": router({ ...route45 }),
-        "claude-code": router({ ...route46 }),
+        "task-sync": router({ ...route46 }),
         "unified-runner": router({ ...route47 }),
         "db-health": router({ ...route48 }),
       }),

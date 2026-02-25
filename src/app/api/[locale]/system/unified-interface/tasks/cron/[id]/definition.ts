@@ -156,6 +156,7 @@ const { GET } = createEndpoint({
           successCount: 0,
           errorCount: 0,
           averageExecutionTime: null,
+          targetInstance: null,
           tags: [],
           userId: null,
           createdAt: "2024-01-01T00:00:00Z",
@@ -321,6 +322,15 @@ const { PUT } = createEndpoint({
         columns: 6,
         schema: z.boolean().optional(),
       }),
+      targetInstance: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "put.fields.targetInstance.label",
+        description: "put.fields.targetInstance.description",
+        placeholder: "put.fields.targetInstance.placeholder",
+        columns: 6,
+        schema: z.string().nullable().optional(),
+      }),
 
       // Response fields
       task: scopedResponseField(scopedTranslation, {
@@ -426,6 +436,7 @@ const { PUT } = createEndpoint({
           successCount: 0,
           errorCount: 0,
           averageExecutionTime: null,
+          targetInstance: null,
           tags: [],
           userId: null,
           createdAt: "2024-01-01T00:00:00Z",

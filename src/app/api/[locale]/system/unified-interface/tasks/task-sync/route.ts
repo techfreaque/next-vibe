@@ -27,15 +27,19 @@ export const { POST, tools } = endpointsHandler({
         };
       }
 
-      // Process incoming tasks from remote
+      // Process incoming tasks from remote — only accept tasks for this instance
       let synced = 0;
       if (data.completionsJson) {
         try {
           const remoteTasks = JSON.parse(
             data.completionsJson,
           ) as SyncedCronTask[];
+          const instanceId = env.INSTANCE_ID;
+          const relevantTasks = instanceId
+            ? remoteTasks.filter((t) => t.targetInstance === instanceId)
+            : remoteTasks;
           const result = await upsertRemoteTasks({
-            tasks: remoteTasks,
+            tasks: relevantTasks,
             logger,
           });
           if (result.success) {

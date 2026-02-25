@@ -129,6 +129,12 @@ export const translations: typeof enTranslations = {
         label: "Opóźnienie ponowienia",
         description: "Opóźnienie między ponowieniami w sekundach",
       },
+      targetInstance: {
+        label: "Docelowa instancja",
+        description:
+          "ID instancji, na której zadanie ma być uruchamiane. Pozostaw puste lub ustaw null dla wszystkich instancji.",
+        placeholder: "np. hermes, thea-prod",
+      },
     },
     response: {
       task: {

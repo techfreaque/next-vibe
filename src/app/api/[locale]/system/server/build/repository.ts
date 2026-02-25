@@ -19,6 +19,8 @@ import type { scopedTranslation } from "./i18n";
 import { databaseMigrationRepository } from "../../db/migrate/repository";
 import { scopedTranslation as migrateScopedTranslation } from "../../db/migrate/i18n";
 import { scopedTranslation as builderScopedTranslation } from "../../builder/i18n";
+import { scopedTranslation as dockerOperationsScopedTranslation } from "../../db/utils/docker-operations/i18n";
+import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
 import { generateAllRepository } from "../../generators/generate-all/repository";
 import type endpoints from "./definition";
 
@@ -206,6 +208,61 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
         }
       }
 
+      // Ensure preview database is running when in local/preview mode
+      // (LOCAL_MODE_DATABASE_URL is set by environment.ts for build/start)
+      if (
+        (data.migrate || data.seed) &&
+        process.env["LOCAL_MODE_DATABASE_URL"]
+      ) {
+        try {
+          const { dbUtilsRepository } =
+            await import("../../db/utils/repository");
+          const { t: dbUtilsT } = dbUtilsScopedTranslation.scopedT(locale);
+          const dockerCheckResult = await dbUtilsRepository.isDockerAvailable(
+            dbUtilsT,
+            logger,
+          );
+
+          if (dockerCheckResult.success && dockerCheckResult.data) {
+            output.push(MESSAGES.PROD_DB_START);
+            output.push(
+              "🐘 Starting preview PostgreSQL (docker-compose.preview.yml)...",
+            );
+
+            const { dockerOperationsRepository } =
+              await import("../../db/utils/docker-operations/repository");
+            const { t: dockerOpsT } =
+              dockerOperationsScopedTranslation.scopedT(locale);
+            const dbStartResult =
+              await dockerOperationsRepository.dockerComposeUp(
+                logger,
+                dockerOpsT,
+                "docker-compose.preview.yml",
+                60000,
+                "vibe-preview",
+              );
+
+            if (dbStartResult.success) {
+              output.push("✅ Preview PostgreSQL started (port 5433)");
+            } else {
+              output.push(
+                "⚠️ Failed to start preview PostgreSQL, continuing anyway",
+              );
+              logger.warn("Failed to start preview postgres", {
+                error: dbStartResult.message,
+              });
+            }
+
+            // Wait for database to be ready
+            await this.waitForPreviewDb(logger);
+          }
+        } catch (error) {
+          logger.warn("Preview DB setup failed, continuing anyway", {
+            error: parseError(error).message,
+          });
+        }
+      }
+
       // Run production database operations after successful build
       if (data.migrate || data.seed) {
         output.push(MESSAGES.PROD_DB_START);
@@ -293,6 +350,49 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
           error: parsedError.message,
         },
       });
+    }
+  }
+
+  /**
+   * Wait for preview database connection to be ready
+   */
+  private async waitForPreviewDb(logger: EndpointLogger): Promise<void> {
+    const maxAttempts = 60;
+    const delayMs = 500;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, delayMs);
+      });
+
+      try {
+        const { Pool } = await import("pg");
+        const pool = new Pool({
+          connectionString: process.env["DATABASE_URL"],
+          connectionTimeoutMillis: 5000,
+        });
+
+        try {
+          await pool.query("SELECT 1");
+          await pool.end();
+          logger.debug(
+            `Preview DB ready after ${attempt} attempts (${(attempt * delayMs) / 1000}s)`,
+          );
+          return;
+        } catch {
+          // oxlint-disable-next-line no-empty-function
+          await pool.end().catch(() => {});
+          if (attempt % 10 === 0) {
+            logger.debug(
+              `Still waiting for preview DB... (${attempt}/${maxAttempts})`,
+            );
+          }
+        }
+      } catch {
+        if (attempt === maxAttempts) {
+          logger.warn("Preview DB connection timeout — continuing anyway");
+        }
+      }
     }
   }
 }

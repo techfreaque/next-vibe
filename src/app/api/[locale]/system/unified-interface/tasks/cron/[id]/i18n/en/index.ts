@@ -127,6 +127,12 @@ export const translations = {
         label: "Retry Delay",
         description: "Delay between retries in seconds",
       },
+      targetInstance: {
+        label: "Target Instance",
+        description:
+          "Instance ID this task should run on. Leave empty to run only on the host instance.",
+        placeholder: "e.g. hermes, thea-prod",
+      },
     },
     response: {
       task: {

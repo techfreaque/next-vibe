@@ -103,7 +103,10 @@ export async function fetchMessageHistory(
     parentMessageId,
   });
 
-  // Build ancestry chain by traversing UP from parent to root
+  // Build ancestry chain by traversing UP from parent to root.
+  // Stop at the most recent SUCCESSFUL compacting message — it contains a
+  // summary of everything before it, so we only need it + subsequent messages.
+  // This prevents sending the full uncompacted history alongside the summary.
   const messageMap = new Map(allMessages.map((msg) => [msg.id, msg]));
   const ancestorIds = new Set<string>();
 
@@ -111,11 +114,27 @@ export async function fetchMessageHistory(
   while (currentId) {
     ancestorIds.add(currentId);
     const currentMessage = messageMap.get(currentId);
+
+    // Stop at a successful compacting message (include it, but not its ancestors)
+    if (
+      currentMessage?.metadata?.isCompacting === true &&
+      currentMessage.metadata.compactingFailed !== true
+    ) {
+      break;
+    }
+
     currentId = currentMessage?.parentId ?? null;
   }
 
   // Filter messages to only include ancestors and maintain chronological order
   const branchMessages = allMessages.filter((msg) => ancestorIds.has(msg.id));
+
+  logger.debug("Branch messages after compacting filter", {
+    threadId,
+    branchMessageCount: branchMessages.length,
+    totalMessageCount: allMessages.length,
+    stoppedAtCompacting: branchMessages[0]?.metadata?.isCompacting === true,
+  });
 
   // Map to role+content format (keep ERROR messages in chain)
   return branchMessages;

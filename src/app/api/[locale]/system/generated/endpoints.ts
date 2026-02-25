@@ -61,46 +61,46 @@ import { default as endpointDefinition_POST_48 } from "../../agent/ai-stream/def
 import { default as endpointDefinition_POST_49 } from "../../agent/ai-stream/run/definition";
 import { default as endpointDefinition_GET_50 } from "../../agent/search/brave/definition";
 import { default as endpointDefinition_GET_51 } from "../../agent/search/kagi/definition";
-import { default as endpointDefinition_POST_52 } from "../../agent/text-to-speech/definition";
-import { default as endpointDefinition_POST_53 } from "../../agent/speech-to-text/hotkey/definition";
-import { default as endpointDefinition_POST_54 } from "../../agent/speech-to-text/definition";
-import { default as endpointDefinition_GET_55 } from "../../agent/models/openrouter/definition";
-import { default as endpointDefinition_POST_56 } from "../server/dev/definition";
-import { default as endpointDefinition_POST_57 } from "../server/start/definition";
-import { default as endpointDefinition_POST_58 } from "../server/build/definition";
-import { default as endpointDefinition_GET_59 } from "../server/health/definition";
-import { default as endpointDefinition_POST_60 } from "../guard/start/definition";
-import { default as endpointDefinition_POST_61 } from "../guard/stop/definition";
-import { default as endpointDefinition_POST_62 } from "../guard/status/definition";
-import { default as endpointDefinition_POST_63 } from "../guard/destroy/definition";
-import { default as endpointDefinition_GET_64 } from "../help/definition";
-import { default as endpointDefinition_POST_65 } from "../db/schema-verify/definition";
-import { default as endpointDefinition_GET_66 } from "../db/utils/definition";
-import { default as endpointDefinition_POST_67 } from "../db/utils/docker-operations/definition";
-import { default as endpointDefinition_POST_68 } from "../db/migrate-repair/definition";
-import { default as endpointDefinition_POST_69 } from "../db/migrate-prod/definition";
-import { default as endpointDefinition_POST_70 } from "../db/seed/definition";
-import { default as endpointDefinition_POST_71 } from "../db/reset/definition";
-import { default as endpointDefinition_POST_72 } from "../db/reset/task-management/definition";
-import { default as endpointDefinition_POST_73 } from "../db/migrate-sync/definition";
-import { default as endpointDefinition_POST_74 } from "../db/migrate/definition";
-import { default as endpointDefinition_POST_75 } from "../db/migrate/task-management/definition";
-import { default as endpointDefinition_POST_76 } from "../db/ping/definition";
-import { default as endpointDefinition_POST_77 } from "../db/sql/definition";
-import { default as endpointDefinition_POST_78 } from "../db/studio/definition";
-import { default as endpointDefinition_GET_79 } from "../unified-interface/tasks/cron/tasks/definition";
-import { default as endpointDefinition_POST_80 } from "../unified-interface/tasks/cron/tasks/definition";
-import { default as endpointDefinition_GET_81 } from "../unified-interface/tasks/cron/[id]/definition";
-import { default as endpointDefinition_PUT_82 } from "../unified-interface/tasks/cron/[id]/definition";
-import { default as endpointDefinition_DELETE_83 } from "../unified-interface/tasks/cron/[id]/definition";
-import { default as endpointDefinition_GET_84 } from "../unified-interface/tasks/cron/history/definition";
-import { default as endpointDefinition_GET_85 } from "../unified-interface/tasks/cron/stats/definition";
-import { default as endpointDefinition_GET_86 } from "../unified-interface/tasks/pulse/history/definition";
-import { default as endpointDefinition_GET_87 } from "../unified-interface/tasks/pulse/status/definition";
-import { default as endpointDefinition_POST_88 } from "../unified-interface/tasks/pulse/execute/definition";
-import { default as endpointDefinition_POST_89 } from "../unified-interface/tasks/task-sync/definition";
-import { default as endpointDefinition_POST_90 } from "../unified-interface/tasks/task-sync/pull/definition";
-import { default as endpointDefinition_POST_91 } from "../unified-interface/tasks/claude-code/definition";
+import { default as endpointDefinition_POST_52 } from "../../agent/claude-code/definition";
+import { default as endpointDefinition_POST_53 } from "../../agent/text-to-speech/definition";
+import { default as endpointDefinition_POST_54 } from "../../agent/speech-to-text/hotkey/definition";
+import { default as endpointDefinition_POST_55 } from "../../agent/speech-to-text/definition";
+import { default as endpointDefinition_GET_56 } from "../../agent/models/openrouter/definition";
+import { default as endpointDefinition_POST_57 } from "../server/dev/definition";
+import { default as endpointDefinition_POST_58 } from "../server/start/definition";
+import { default as endpointDefinition_POST_59 } from "../server/build/definition";
+import { default as endpointDefinition_GET_60 } from "../server/health/definition";
+import { default as endpointDefinition_POST_61 } from "../guard/start/definition";
+import { default as endpointDefinition_POST_62 } from "../guard/stop/definition";
+import { default as endpointDefinition_POST_63 } from "../guard/status/definition";
+import { default as endpointDefinition_POST_64 } from "../guard/destroy/definition";
+import { default as endpointDefinition_GET_65 } from "../help/definition";
+import { default as endpointDefinition_POST_66 } from "../db/schema-verify/definition";
+import { default as endpointDefinition_GET_67 } from "../db/utils/definition";
+import { default as endpointDefinition_POST_68 } from "../db/utils/docker-operations/definition";
+import { default as endpointDefinition_POST_69 } from "../db/migrate-repair/definition";
+import { default as endpointDefinition_POST_70 } from "../db/migrate-prod/definition";
+import { default as endpointDefinition_POST_71 } from "../db/seed/definition";
+import { default as endpointDefinition_POST_72 } from "../db/reset/definition";
+import { default as endpointDefinition_POST_73 } from "../db/reset/task-management/definition";
+import { default as endpointDefinition_POST_74 } from "../db/migrate-sync/definition";
+import { default as endpointDefinition_POST_75 } from "../db/migrate/definition";
+import { default as endpointDefinition_POST_76 } from "../db/migrate/task-management/definition";
+import { default as endpointDefinition_POST_77 } from "../db/ping/definition";
+import { default as endpointDefinition_POST_78 } from "../db/sql/definition";
+import { default as endpointDefinition_POST_79 } from "../db/studio/definition";
+import { default as endpointDefinition_GET_80 } from "../unified-interface/tasks/cron/tasks/definition";
+import { default as endpointDefinition_POST_81 } from "../unified-interface/tasks/cron/tasks/definition";
+import { default as endpointDefinition_GET_82 } from "../unified-interface/tasks/cron/[id]/definition";
+import { default as endpointDefinition_PUT_83 } from "../unified-interface/tasks/cron/[id]/definition";
+import { default as endpointDefinition_DELETE_84 } from "../unified-interface/tasks/cron/[id]/definition";
+import { default as endpointDefinition_GET_85 } from "../unified-interface/tasks/cron/history/definition";
+import { default as endpointDefinition_GET_86 } from "../unified-interface/tasks/cron/stats/definition";
+import { default as endpointDefinition_GET_87 } from "../unified-interface/tasks/pulse/history/definition";
+import { default as endpointDefinition_GET_88 } from "../unified-interface/tasks/pulse/status/definition";
+import { default as endpointDefinition_POST_89 } from "../unified-interface/tasks/pulse/execute/definition";
+import { default as endpointDefinition_POST_90 } from "../unified-interface/tasks/task-sync/definition";
+import { default as endpointDefinition_POST_91 } from "../unified-interface/tasks/task-sync/pull/definition";
 import { default as endpointDefinition_POST_92 } from "../unified-interface/tasks/unified-runner/definition";
 import { default as endpointDefinition_POST_93 } from "../unified-interface/tasks/db-health/definition";
 import { default as endpointDefinition_POST_94 } from "../unified-interface/mcp/serve/definition";
@@ -604,202 +604,202 @@ function initializeEndpoints(): Record<string, ApiSection> {
   );
   setNestedPath(
     endpoints,
-    ["agent", "text-to-speech", "POST"],
+    ["agent", "claude-code", "POST"],
     endpointDefinition_POST_52.POST,
   );
   setNestedPath(
     endpoints,
-    ["agent", "speech-to-text", "hotkey", "POST"],
+    ["agent", "text-to-speech", "POST"],
     endpointDefinition_POST_53.POST,
   );
   setNestedPath(
     endpoints,
-    ["agent", "speech-to-text", "POST"],
+    ["agent", "speech-to-text", "hotkey", "POST"],
     endpointDefinition_POST_54.POST,
   );
   setNestedPath(
     endpoints,
+    ["agent", "speech-to-text", "POST"],
+    endpointDefinition_POST_55.POST,
+  );
+  setNestedPath(
+    endpoints,
     ["agent", "models", "openrouter", "GET"],
-    endpointDefinition_GET_55.GET,
+    endpointDefinition_GET_56.GET,
   );
   setNestedPath(
     endpoints,
     ["system", "server", "dev", "POST"],
-    endpointDefinition_POST_56.POST,
-  );
-  setNestedPath(
-    endpoints,
-    ["system", "server", "start", "POST"],
     endpointDefinition_POST_57.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "server", "build", "POST"],
+    ["system", "server", "start", "POST"],
     endpointDefinition_POST_58.POST,
   );
   setNestedPath(
     endpoints,
+    ["system", "server", "build", "POST"],
+    endpointDefinition_POST_59.POST,
+  );
+  setNestedPath(
+    endpoints,
     ["system", "server", "health", "GET"],
-    endpointDefinition_GET_59.GET,
+    endpointDefinition_GET_60.GET,
   );
   setNestedPath(
     endpoints,
     ["system", "guard", "start", "POST"],
-    endpointDefinition_POST_60.POST,
-  );
-  setNestedPath(
-    endpoints,
-    ["system", "guard", "stop", "POST"],
     endpointDefinition_POST_61.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "guard", "status", "POST"],
+    ["system", "guard", "stop", "POST"],
     endpointDefinition_POST_62.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "guard", "destroy", "POST"],
+    ["system", "guard", "status", "POST"],
     endpointDefinition_POST_63.POST,
   );
   setNestedPath(
     endpoints,
+    ["system", "guard", "destroy", "POST"],
+    endpointDefinition_POST_64.POST,
+  );
+  setNestedPath(
+    endpoints,
     ["system", "help", "GET"],
-    endpointDefinition_GET_64.GET,
+    endpointDefinition_GET_65.GET,
   );
   setNestedPath(
     endpoints,
     ["system", "db", "schema-verify", "POST"],
-    endpointDefinition_POST_65.POST,
+    endpointDefinition_POST_66.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "db", "utils", "GET"],
-    endpointDefinition_GET_66.GET,
+    endpointDefinition_GET_67.GET,
   );
   setNestedPath(
     endpoints,
     ["system", "db", "utils", "docker-operations", "POST"],
-    endpointDefinition_POST_67.POST,
-  );
-  setNestedPath(
-    endpoints,
-    ["system", "db", "migrate-repair", "POST"],
     endpointDefinition_POST_68.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "db", "migrate-prod", "POST"],
+    ["system", "db", "migrate-repair", "POST"],
     endpointDefinition_POST_69.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "db", "seed", "POST"],
+    ["system", "db", "migrate-prod", "POST"],
     endpointDefinition_POST_70.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "db", "reset", "POST"],
+    ["system", "db", "seed", "POST"],
     endpointDefinition_POST_71.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "db", "reset", "task-management", "POST"],
+    ["system", "db", "reset", "POST"],
     endpointDefinition_POST_72.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "db", "migrate-sync", "POST"],
+    ["system", "db", "reset", "task-management", "POST"],
     endpointDefinition_POST_73.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "db", "migrate", "POST"],
+    ["system", "db", "migrate-sync", "POST"],
     endpointDefinition_POST_74.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "db", "migrate", "task-management", "POST"],
+    ["system", "db", "migrate", "POST"],
     endpointDefinition_POST_75.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "db", "ping", "POST"],
+    ["system", "db", "migrate", "task-management", "POST"],
     endpointDefinition_POST_76.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "db", "sql", "POST"],
+    ["system", "db", "ping", "POST"],
     endpointDefinition_POST_77.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "db", "studio", "POST"],
+    ["system", "db", "sql", "POST"],
     endpointDefinition_POST_78.POST,
   );
   setNestedPath(
     endpoints,
+    ["system", "db", "studio", "POST"],
+    endpointDefinition_POST_79.POST,
+  );
+  setNestedPath(
+    endpoints,
     ["system", "unified-interface", "tasks", "cron", "tasks", "GET"],
-    endpointDefinition_GET_79.GET,
+    endpointDefinition_GET_80.GET,
   );
   setNestedPath(
     endpoints,
     ["system", "unified-interface", "tasks", "cron", "tasks", "POST"],
-    endpointDefinition_POST_80.POST,
+    endpointDefinition_POST_81.POST,
   );
   setNestedPath(
     endpoints,
     ["system", "unified-interface", "tasks", "cron", "[id]", "GET"],
-    endpointDefinition_GET_81.GET,
+    endpointDefinition_GET_82.GET,
   );
   setNestedPath(
     endpoints,
     ["system", "unified-interface", "tasks", "cron", "[id]", "PUT"],
-    endpointDefinition_PUT_82.PUT,
+    endpointDefinition_PUT_83.PUT,
   );
   setNestedPath(
     endpoints,
     ["system", "unified-interface", "tasks", "cron", "[id]", "DELETE"],
-    endpointDefinition_DELETE_83.DELETE,
+    endpointDefinition_DELETE_84.DELETE,
   );
   setNestedPath(
     endpoints,
     ["system", "unified-interface", "tasks", "cron", "history", "GET"],
-    endpointDefinition_GET_84.GET,
-  );
-  setNestedPath(
-    endpoints,
-    ["system", "unified-interface", "tasks", "cron", "stats", "GET"],
     endpointDefinition_GET_85.GET,
   );
   setNestedPath(
     endpoints,
-    ["system", "unified-interface", "tasks", "pulse", "history", "GET"],
+    ["system", "unified-interface", "tasks", "cron", "stats", "GET"],
     endpointDefinition_GET_86.GET,
   );
   setNestedPath(
     endpoints,
-    ["system", "unified-interface", "tasks", "pulse", "status", "GET"],
+    ["system", "unified-interface", "tasks", "pulse", "history", "GET"],
     endpointDefinition_GET_87.GET,
   );
   setNestedPath(
     endpoints,
-    ["system", "unified-interface", "tasks", "pulse", "execute", "POST"],
-    endpointDefinition_POST_88.POST,
+    ["system", "unified-interface", "tasks", "pulse", "status", "GET"],
+    endpointDefinition_GET_88.GET,
   );
   setNestedPath(
     endpoints,
-    ["system", "unified-interface", "tasks", "task-sync", "POST"],
+    ["system", "unified-interface", "tasks", "pulse", "execute", "POST"],
     endpointDefinition_POST_89.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "unified-interface", "tasks", "task-sync", "pull", "POST"],
+    ["system", "unified-interface", "tasks", "task-sync", "POST"],
     endpointDefinition_POST_90.POST,
   );
   setNestedPath(
     endpoints,
-    ["system", "unified-interface", "tasks", "claude-code", "POST"],
+    ["system", "unified-interface", "tasks", "task-sync", "pull", "POST"],
     endpointDefinition_POST_91.POST,
   );
   setNestedPath(

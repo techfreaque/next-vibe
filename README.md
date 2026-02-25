@@ -1,8 +1,8 @@
 # NextVibe
 
-**The AI-First Full-Stack Framework for Next.js**
+**Define it once. It exists everywhere.**
 
-Build once, run everywhere. NextVibe is a revolutionary Next.js framework that uses a single route definition pattern to generate interfaces for **6 platforms**: Next.js API, React Hook + Cross-Platform UI (Web & React Native), CLI, tRPC, AI tools (function calling), and MCP tools.
+One endpoint definition. Ten platforms. Not generated code that drifts apart — one living contract that the web app, mobile app, CLI, AI agent, MCP server, and cron system all read natively. Change the definition, every platform updates instantly. Delete the folder, the feature ceases to exist everywhere at once.
 
 [![License: GPL-3.0](https://img.shields.io/badge/Framework-GPL--3.0-blue.svg)](LICENSE)
 [![License: MIT](https://img.shields.io/badge/App-MIT-green.svg)](LICENSE)
@@ -10,697 +10,444 @@ Build once, run everywhere. NextVibe is a revolutionary Next.js framework that u
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-blue)](https://react.dev/)
 
-> **Fork it. Own it. Extend it.** Like shadcn/ui but for your entire business logic + UI stack.
+> **The spiritual successor to WordPress — for the AI era.** Fork it, own it, build your platform. No dependency. No black box. You own every line.
 
 ---
 
-## 🎯 What is NextVibe?
+## Why?
 
-NextVibe is **not a package you install** - it's a **pattern you adopt**. Fork this repository to build production-ready applications using a single Next.js-like codebase with recursive route definitions that automatically generate:
+WordPress gave everyone the power to publish. But we're not just publishing anymore — we're building AI-powered platforms that need to work across web, mobile, CLI, AI agents, and automation, all at once.
 
-### One Definition → 6 Platforms
+You build a contact form for the web. Then support wants a CLI command to submit tickets. Then the AI agent needs to file issues on behalf of users. Then the mobile app needs the same form. Then someone wants an MCP tool so external agents can reach you. Five implementations of the same thing. Five places to update when the schema changes. Five places where bugs hide.
 
-Write your endpoint once in `definition.ts`, and NextVibe automatically generates:
+Every framework promises to solve this. They give you code generators that create boilerplate you now have to maintain. Or they give you an abstraction layer that works until it doesn't, and then you're fighting the framework instead of building your product.
 
-1. **🌐 Next.js API** - RESTful endpoint with full type safety
-2. **⚛️ React Hook + Cross-Platform UI** - Type-safe hooks + data-driven UI for Web & React Native (iOS/Android)
-3. **💻 CLI Tool** - Interactive command-line interface
-4. **🔌 tRPC** - Type-safe client-server procedures
-5. **🤖 AI Function Calling** - OpenAI/Anthropic compatible schema
-6. **🔧 MCP Server** - Model Context Protocol for AI tools
+NextVibe takes the WordPress approach to a new level: **fork the codebase, and you have a complete platform.** Not a starter template. Not a library. A working product with auth, payments, AI chat, email, admin panels, task scheduling, and an AI agent that operates it — all from a single definition pattern.
 
-**See it in action: [Unbottled.ai](#unbottledai-reference-application)** - A production AI chat platform built entirely with NextVibe.
+## The Core Idea
 
----
+What if you described your feature once — its inputs, outputs, validation rules, permissions, UI hints, error types, translations, and examples — and every platform just... read that description and rendered it natively?
 
-## 🌟 Why NextVibe?
+That's NextVibe. Your feature **is** its definition. The web form reads it and renders input fields. The CLI reads it and creates flags. The AI agent reads it and gets a function-calling schema. The MCP server reads it and exposes a tool. The cron system reads it and knows how to execute it. Same contract. Same validation. Same types. Same truth.
 
-### Built for AI Collaboration
+An AI agent and a human user interact with your product through the exact same interface. There is no "API for humans" and "API for AI." There's just the tool.
 
-- **Forces One Way**: Recursive folder patterns eliminate ambiguity - AI can't deviate
-- **vibe check** combines lint + typecheck - AI can't skip either
-- **Instant CLI testing**: AI tests endpoints during development
-- **100% type-safe**: Even translations, error messages, and CLI args
+### One Definition, Ten Platforms
 
-### Developer Experience
-
-- **Fork, Don't Install**: Full code ownership, no black boxes
-- **Auto-managed Database**: Docker + PostgreSQL + migrations handled automatically
-- **One Command Setup**: `vibe dev` does everything
-- **Cross-platform by Default**: Web + Mobile from the same code
-- **Zero Configuration Routing**: Folder structure IS your API
+| #   | Platform          | What it does                                              |
+| --- | ----------------- | --------------------------------------------------------- |
+| 1   | **Web API**       | RESTful endpoint, full type safety                        |
+| 2   | **React UI**      | Data-driven forms and display widgets from the definition |
+| 3   | **React Native**  | Same components on iOS/Android — NativeWind + Expo        |
+| 4   | **CLI**           | Every endpoint is a command with auto-generated flags     |
+| 5   | **CLI Package**   | Ship your CLI as an installable npm package               |
+| 6   | **tRPC**          | Type-safe client-server calls, zero config                |
+| 7   | **AI Tools**      | OpenAI/Anthropic function-calling schema                  |
+| 8   | **MCP Server**    | Model Context Protocol — plug into any AI workflow        |
+| 9   | **Remote Skills** | AI-readable skill files for agent discovery               |
+| 10  | **Cron Tasks**    | Scheduled execution with instance routing                 |
 
 ---
 
-## 🚀 Quick Start
+## Zero Context Switching
 
-### Prerequisites
+This is the part that changes how you work.
 
-```bash
-- Bun 1.3.0+ (recommended) or Node.js 20+
-- Docker (auto-managed in dev mode)
+In a traditional stack, building a feature means touching a dozen files across different paradigms: the API handler, the validation schema, the frontend form, the CLI command, the AI tool spec, the docs. Each has its own conventions, its own file format, its own way of thinking. You spend more time navigating the codebase than writing logic.
+
+In NextVibe, a feature is one folder. Everything about that feature — its contract, its logic, its database schema, its translations, its UI, its tests, its email templates — lives together. You open one folder and you see everything. You close it and you're done.
+
+```
+contact/
+  definition.ts    — What it does (contract)
+  repository.ts    — How it does it (logic)
+  route.ts         — Make it available (all platforms)
+  i18n/            — What it says (translations)
+  email.tsx        — What it sends (transactional email)
+  widget.tsx       — How it looks (custom UI)
+  db.ts            — What it stores (database schema)
 ```
 
-### Get Started in 3 Commands
+There's no "API folder" and "components folder" and "utils folder" that you have to mentally stitch together. The feature is self-contained. Rename the folder and everything moves with it. Delete it and nothing breaks. Add a new field to the definition and it propagates — the web form, the CLI flags, the AI tool schema, the mobile screen, all updated from one change.
 
-```bash
-# 1. Fork this repository on GitHub, then clone
-git clone https://github.com/YOUR_USERNAME/next-vibe
-cd next-vibe
-
-# 2. Install dependencies
-bun install
-
-# 3. Start development (auto-manages everything)
-vibe dev
-```
-
-That's it! NextVibe automatically:
-
-- ✅ Starts PostgreSQL in Docker (if not running)
-- ✅ Creates database and runs migrations
-- ✅ Seeds development data
-- ✅ Starts Next.js dev server on http://localhost:3000
-- ✅ Starts cron task runner
-- ✅ Watches for changes and regenerates types
-
-**📚 [Full Quick Start Guide →](docs/guides/quickstart.md)**
+This isn't just convenient. It's what makes it possible for an AI agent to build features autonomously. Claude Code doesn't need a mental map of your architecture — it opens one folder, understands the pattern, and works.
 
 ---
 
-## 🎨 The Definition Pattern
+## AI Is Not a Feature. It's a Team Member.
 
-### Write Once, Run Everywhere
+Most platforms treat AI as an integration — a chatbot widget, an API wrapper. NextVibe is built around a fundamentally different idea: the AI agent is a full participant in your organization, operating through the same contracts as every human.
 
-Here's a REAL example from the codebase - the login endpoint definition:
+When Thea (the AI admin) calls your contact form endpoint, she uses the same definition a user sees in their browser. When she creates a task, it goes through the same validation. When she reads a memory, it comes from the same repository. No special API. No privileged backdoor. The same system, the same rules.
 
-```typescript
-// src/app/api/[locale]/user/public/login/definition.ts (simplified for clarity)
-import { z } from "zod";
-import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
-import {
-  objectField,
-  requestField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import {
-  Methods,
-  WidgetType,
-  FieldDataType,
-} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+This is what makes the Thea/Hermes architecture possible:
 
-const { POST } = createEndpoint({
-  method: Methods.POST,
-  path: ["user", "public", "login"],
-  title: "app.api.user.public.login.title",
-  description: "app.api.user.public.login.description",
+### Central Thea + Local Hermes
 
-  fields: objectField(
-    { type: WidgetType.CONTAINER },
-    { request: "data", response: true },
-    {
-      // Request fields
-      credentials: objectField(
-        { type: WidgetType.CONTAINER },
-        { request: "data" },
-        {
-          email: requestField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.EMAIL,
-              label: "app.api.user.public.login.fields.email.label",
-            },
-            z.string().email(),
-          ),
-          password: requestField(
-            {
-              type: WidgetType.FORM_FIELD,
-              fieldType: FieldDataType.PASSWORD,
-              label: "app.api.user.public.login.fields.password.label",
-            },
-            z.string().min(1),
-          ),
-        },
-      ),
-
-      // Response fields
-      success: responseField({ type: WidgetType.BADGE }, z.boolean()),
-      message: responseField({ type: WidgetType.TEXT }, z.string()),
-      user: objectField(
-        { type: WidgetType.CONTAINER },
-        { response: true },
-        {
-          id: responseField({ type: WidgetType.TEXT }, z.string()),
-          email: responseField({ type: WidgetType.TEXT }, z.string()),
-          privateName: responseField({ type: WidgetType.TEXT }, z.string()),
-        },
-      ),
-    },
-  ),
-});
-
-export default { POST };
+```
+                    CEO / CTO
+                       |
+                       v
+              +------------------+
+              |   Central Thea   |  (Production Server)
+              |   unbottled.ai   |
+              +--------+---------+
+                       |
+           +-----------+-----------+
+           |                       |
+    +------+-------+       +------+-------+
+    |   Hermes     |       |   Hermes     |   (Developer machines)
+    | Dev Instance |       | Dev Instance |
+    |  localhost   |       |  localhost   |
+    +--------------+       +--------------+
 ```
 
-### What This Automatically Generates
+**Central Thea** lives on production. She talks to users, monitors the platform, manages tasks, and coordinates work. The CEO/CTO directs her. She's not an assistant — she's the AI team lead.
 
-#### 1. 🌐 Next.js API Endpoint
+**Hermes** is the local worker. Every developer runs their own instance. It syncs with Central Thea, pulls tasks assigned to it, executes them via Claude Code, and reports back. Each developer has a dedicated AI pair programmer that takes direction from the central intelligence.
 
-```bash
-POST /api/en-GLOBAL/user/public/login
-```
+The flow is natural: the CEO creates a task on Thea — "refactor the payment flow" — routes it to Max's Hermes. Hermes picks it up, Claude Code executes, results sync back. Max reviews, iterates, ships. No Jira ticket. No standup. The work just flows.
 
-#### 2. ⚛️ React Hook + Cross-Platform UI (Web & Mobile)
+### Task Routing
 
-**REAL code from `src/app/api/[locale]/user/public/login/_components/login-form.tsx`:**
+- Each instance has a unique `INSTANCE_ID` — `"hermes-max"`, `"hermes-laura"`, `"thea-prod"`
+- Tasks carry a `targetInstance` — `null` means host only, a name targets that specific machine
+- Hermes instances poll Central Thea automatically — tasks arrive without manual coordination
+- The CEO/CTO creates work on Central Thea, it propagates to the right developer's machine
 
-```typescript
-"use client";
+### What Thea Can Do
 
-import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Div } from "next-vibe-ui/ui/div";
-import { Link } from "next-vibe-ui/ui/link";
-import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/react/widgets/renderers/EndpointRenderer";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { useLogin } from "@/app/api/[locale]/user/public/login/hooks";
-import loginEndpoints from "@/app/api/[locale]/user/public/login/definition";
+She has everything she needs to operate the platform:
 
-export function LoginForm({ locale }) {
-  const logger = createEndpointLogger(false, Date.now(), locale);
-  const loginResult = useLogin({
-    allowPasswordAuth: true,
-    allowSocialAuth: false,
-  }, logger);
-
-  const { form, onSubmit, isSubmitting } = loginResult.create || {};
-  const { isAccountLocked, loginOptions, alert } = loginResult;
-
-  return (
-    <Card>
-      <CardContent className="mt-6">
-        {alert && <FormAlert alert={alert} className="mb-6" />}
-
-        {/* Data-driven UI: Automatically renders ALL form fields */}
-        <EndpointRenderer
-          endpoint={loginEndpoints.POST}
-          form={form}
-          onSubmit={onSubmit}
-          locale={locale}
-          isSubmitting={isSubmitting || isAccountLocked || !loginOptions.allowPasswordAuth}
-          submitButtonText="app.user.other.login.auth.login.signInButton"
-        >
-          <Div className="space-y-4">
-            <Link href={`/${locale}/user/reset-password`}>
-              {t("app.user.other.login.auth.login.forgotPassword")}
-            </Link>
-          </Div>
-        </EndpointRenderer>
-      </CardContent>
-    </Card>
-  );
-}
-```
-
-**Key points:**
-
-- `next-vibe-ui/ui/*` components work on **both Web (Next.js) and React Native**
-- Platform resolution happens via TypeScript path mapping in `tsconfig.json`
-- `EndpointRenderer` automatically generates the entire form from the definition
-- Same JSX code runs on web and mobile with zero changes
-
-#### 3. 💻 CLI Command
-
-```bash
-vibe user:public:login \
-  --credentials.email="test@example.com" \
-  --credentials.password="password123"
-
-# Output:
-# ✓ Login successful
-# {
-#   "success": true,
-#   "message": "Welcome back!",
-#   "user": { "id": "...", "email": "test@example.com", ... }
-# }
-```
-
-#### 4. 🔌 tRPC Procedure
-
-```typescript
-// Automatic type-safe RPC
-const result = await trpc.user.public.login.mutate({
-  credentials: {
-    email: "test@example.com",
-    password: "password123",
-  },
-  options: {
-    rememberMe: true,
-  },
-});
-```
-
-#### 5. 🤖 AI Tool (Function Calling)
-
-```typescript
-// Automatic AI tool schema for chat integration
-{
-  name: "user_public_login",
-  description: "Authenticate user with email and password",
-  parameters: {
-    type: "object",
-    properties: {
-      credentials: {
-        type: "object",
-        properties: {
-          email: { type: "string", format: "email" },
-          password: { type: "string" }
-        }
-      }
-    }
-  }
-}
-```
-
-#### 6. 🔧 MCP Tool
-
-```typescript
-// Model Context Protocol tool for AI development
-{
-  name: "mcp__vibe__user_public_login_POST",
-  description: "User login endpoint",
-  inputSchema: { /* Auto-generated from definition */ }
-}
-```
-
-**One definition.ts file. Six complete implementations. Zero duplication.**
-
-**📚 [Deep dive into definitions →](docs/patterns/definition.md)**
+- **42+ AI models** — Claude, GPT, Gemini, DeepSeek, Llama, Mistral, and more
+- **Characters** — Different personas with their own prompts and behavior
+- **Memories** — Persistent context that grows across conversations
+- **Tools** — Call any endpoint as a function, same contracts as the UI
+- **Tasks** — Schedule work, route it to instances, track execution
+- **MCP** — Connect to external tools via Model Context Protocol
+- **Voice** — Real-time speech with text-to-speech and speech-to-text
 
 ---
 
-## 🏗️ Unbottled.ai: Reference Application
+## The Pattern
 
-**Unbottled.ai** is a production AI chat platform built entirely with NextVibe, demonstrating every framework feature in a real commercial application.
+Every feature is a folder. You need three files to exist on all ten platforms. Everything else you add as the feature grows.
 
-### Live Features
+### Required
 
-🤖 **AI Chat Platform**
+```
+definition.ts    — The contract. Schemas, fields, validation, permissions, examples.
+repository.ts    — The logic. Database operations, business rules. Returns success or failure, never throws.
+route.ts         — The bridge. Wires the contract to the logic, exposes it to all platforms.
+```
 
-- Multi-model AI chat (Claude, GPT, Gemini, DeepSeek, and 30+ models)
-- AI agent chat with function calling
-- Branching conversations with message trees
-- Persona system for customized AI behavior
-- Speech-to-text and text-to-speech
-- MCP (Model Context Protocol) tool integration
+### Optional — Add What You Need
 
-💼 **Lead Generation System**
+```
+i18n/            — Translations. Scoped per feature, type-checked at compile time.
+hooks.ts         — React hooks for client-side data fetching.
+widget.tsx       — Custom UI widget when the auto-generated form isn't enough.
+db.ts            — Database schema. Drizzle table definitions, lives next to the feature that owns it.
+enum.ts          — Domain enums with i18n labels. One pattern, used everywhere.
+seeds.ts         — Seed data for production, development and testing.
+email.tsx        — React Email template. Transactional emails tied to the feature.
+task.ts          — Cron task definition. Scheduled work tied to the feature.
+env.ts           — Domain-specific environment variables.
+```
 
-- Automated email campaigns with journey-based workflows
-- CSV import with batch processing
-- Lead tracking and engagement analytics
-- SMTP/IMAP email client integration
-- SMS notifications via Twilio
-
-👥 **User Management**
-
-- Authentication with JWT + NextAuth
-- Role-based access control (public, customer, admin)
-- User profiles with avatar uploads
-- Email verification workflows
-- Password reset flows
-
-💳 **Payment Processing**
-
-- Subscription management with Stripe and NowPayments
-- Credit system for AI usage
-- Referral program with earnings tracking
-- Invoice generation
-
-📧 **Communication**
-
-- React Email templates with tracking pixels
-- SMTP client with multiple account support
-- IMAP email reading and folder management
-- Email campaign automation
-
-🔧 **Admin Tools**
-
-- Data-driven admin panels
-- Database studio (Drizzle Studio integration)
-- System health monitoring
-- Cron task management
-- Translation management
-
-### Technical Implementation
-
-**Generated Interfaces:**
-
-- **200+ API endpoints** each generating 7+ platform interfaces
-- **Web app** running on Next.js with full SSR
-- **CLI tools** for database management, email sending, user creation
-- **tRPC procedures** for type-safe client-server communication
-- **React hooks** auto-generated for all endpoints
-- **AI tools** with function calling for chat agents
-- **MCP tools** for AI development workflow
-
-**Database Architecture:**
-
-- PostgreSQL with Drizzle ORM
-- 50+ tables with proper relationships
-- Automatic migrations from schema changes
-- Seed data for development/testing
-
-**Codebase Stats:**
-
-- Single Next.js-like codebase
-- Full type safety across 200,000+ lines
-- Zero runtime type errors
-- All translations type-checked (en, de, pl)
-
-### Key Patterns Demonstrated
-
-1. **Recursive API Architecture**: Folder structure defines the entire API
-2. **Repository-First**: All business logic in type-safe repositories
-3. **Email Integration**: React Email templates with translation support
-4. **Task System**: Cron jobs and background processing
-5. **Enum Patterns**: Database-safe enums with translations
-6. **i18n**: Type-safe translations across 3 languages
-
-**📚 [Explore Unbottled.ai architecture →](docs/examples/unbottled-ai/UNBOTTLED_AI.md)**
-
----
-
-## 🛠️ Core Concepts
-
-### 1. Recursive API Architecture
-
-Your folder structure **IS** your API. No routing configuration needed.
+The folder structure mirrors your API:
 
 ```
 src/app/api/[locale]/
-├── user/
-│   ├── public/
-│   │   ├── login/
-│   │   │   ├── definition.ts    # API contract
-│   │   │   ├── repository.ts    # Business logic
-│   │   │   ├── route.ts         # Auto-generates all interfaces
-│   │   │   ├── hooks.ts         # React hooks (optional)
-│   │   │   └── i18n/            # Translations
-│   │   └── signup/
-│   └── private/
-│       └── me/
+  user/
+    public/
+      login/          -> POST /api/en-GLOBAL/user/public/login
+      signup/         -> POST /api/en-GLOBAL/user/public/signup
+    private/
+      me/             -> GET  /api/en-GLOBAL/user/private/me
+  agent/
+    chat/
+      threads/        -> GET/POST /api/en-GLOBAL/agent/chat/threads
 ```
 
-Delete a folder = delete the feature across ALL platforms.
+Delete `user/private/me` and the user profile feature disappears — from the web, the CLI, the AI tools, the mobile app, everywhere. No orphaned code. No dead routes. No cleanup.
 
-### 2. Cross-Platform UI Components
-
-**Platform-independent components via TypeScript path mapping:**
+### What a Definition Looks Like
 
 ```typescript
-// Import from next-vibe-ui/ui/* - works on Web AND React Native
-import { Button } from "next-vibe-ui/ui/button";
-import { Div } from "next-vibe-ui/ui/div";
-import { Card } from "next-vibe-ui/ui/card";
-import { Link } from "next-vibe-ui/ui/link";
+// contact/definition.ts — real code, shortened (actual has more fields)
+const { POST } = createEndpoint({
+  scopedTranslation,
+  method: Methods.POST,
+  path: ["contact"],
+  title: "title",
+  description: "description",
+  category: "category",
+  icon: "mail",
+  aliases: ["contact-form"],
+  tags: ["tags.contactForm", "tags.helpSupport"],
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
 
-// tsconfig.json resolves to platform-specific implementation:
-// - Web build: ./src/packages/next-vibe-ui/web/ui/*
-// - Native build: ./src/packages/next-vibe-ui/native/ui/*
-```
+  fields: scopedObjectField(scopedTranslation, {
+    type: WidgetType.CONTAINER,
+    title: "form.label",
+    description: "form.description",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { request: "data", response: true },
+    children: {
+      name: scopedRequestField(scopedTranslation, {
+        schema: z.string().min(2),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "form.fields.name.label",
+        description: "form.fields.name.description",
+        placeholder: "form.fields.name.placeholder",
+        columns: 12,
+      }),
+      message: scopedRequestField(scopedTranslation, {
+        schema: z.string().min(10),
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "form.fields.message.label",
+        description: "form.fields.message.description",
+        placeholder: "form.fields.message.placeholder",
+        columns: 12,
+      }),
+      success: scopedResponseField(scopedTranslation, {
+        schema: z.string(),
+        type: WidgetType.ALERT,
+        columns: 12,
+      }),
+    },
+  }),
 
-**The same JSX works everywhere:**
-
-```typescript
-// This exact code runs on Next.js AND React Native
-export function MyComponent() {
-  return (
-    <Div className="flex-1 items-center">
-      <Card>
-        <Button onPress={() => console.log("works!")}>
-          Click Me
-        </Button>
-      </Card>
-    </Div>
-  );
-}
-```
-
-### 3. Type-Safe Everything
-
-**Even your translations are type-checked:**
-
-```typescript
-t("app.api.user.public.login.title"); // ✅ Valid
-t("app.invalid.key"); // ❌ TypeScript error at compile time
-```
-
-ESLint enforces translation usage - no hardcoded strings allowed.
-
-**📚 [i18n patterns →](docs/patterns/i18n.md)**
-
-### 4. Repository-First Architecture
-
-All business logic lives in repositories with standard interfaces:
-
-```typescript
-// repository.ts - Real pattern from codebase
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import { success } from "next-vibe/shared/types/response.schema";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
-
-export class LoginRepository {
-  async login(
-    data: { credentials: { email: string; password: string } },
-    locale: CountryLanguage,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<{ success: boolean; message: string; user: User }>> {
-    logger.info("Login attempt", { email: data.credentials.email });
-
-    // Business logic here
-
-    return success({
-      success: true,
-      message: "Welcome back!",
-      user: {
-        /* user data */
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "errors.validation.title",
+      description: "errors.validation.description",
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "errors.serverError.title",
+      description: "errors.serverError.description",
+    },
+    // ... all 9 error types — exhaustive, compiler enforced
+  },
+  successTypes: { title: "success.title", description: "success.description" },
+  examples: {
+    requests: {
+      default: {
+        name: "Jane Smith",
+        message: "I'd like to learn more about your platform.",
       },
-    });
-  }
-}
+    },
+    responses: { default: { success: "Thank you! We'll be in touch." } },
+  },
+});
 ```
 
-**📚 [Database patterns →](docs/patterns/database.md)**
+From this one file: the web renders a contact form with name and message fields. The CLI creates `vibe contact-form --name="Jane" --message="..."`. The AI gets a function-calling schema. The MCP server exposes a tool. Validation and permissions — identical on every platform.
 
-### 5. AI-Optimized Tooling
+### What the Route Looks Like
 
-Traditional approach (AI might skip one):
+The route wires the definition to the logic. Most routes are this short:
 
-```bash
-npm run lint      # AI might skip
-npm run typecheck # Or skip this
+```typescript
+// contact/route.ts — real code, complete
+export const { POST, tools } = endpointsHandler({
+  endpoint: contactEndpoints,
+  [Methods.POST]: {
+    email: [
+      { render: renderCompanyMail, ignoreErrors: false },
+      { render: renderPartnerMail, ignoreErrors: false },
+    ],
+    handler: ({ data, user, locale, logger, t }) =>
+      ContactRepository.submitContactForm(data, user, locale, logger, t),
+  },
+});
 ```
 
-NextVibe approach (AI can't ignore):
+That's it. The handler calls the repository, the email templates fire automatically, and `endpointsHandler` takes care of validation, auth, error handling, and exposing the endpoint to all ten platforms. No boilerplate. No middleware chains. The definition already declared everything.
+
+---
+
+## Recursive Simplicity
+
+There's one pattern. It applies everywhere. Learn it once, build anything.
+
+Every feature follows the same three-file structure whether it's a simple contact form or a complex AI chat system with branching conversations. The contact form has `definition.ts`, `repository.ts`, `route.ts`. The AI chat system has the same three files — it just has more optional files alongside them (`db.ts`, `hooks.ts`, `widget.tsx`, `i18n/`).
+
+This is what "recursive" means in practice: the pattern nests. A chat thread contains messages. Messages contain attachments. Each is its own folder with the same three files. The complexity lives in the nesting, not in the pattern. You never learn a new way of doing things — you just go deeper.
+
+This is also why AI agents can build features in this codebase. The pattern is so consistent that there's no ambiguity about where code goes or what it should look like. Show an AI agent one example and it can build the next hundred.
+
+---
+
+## The Pulse
+
+The pulse is the platform's heartbeat — a cron runner that keeps everything alive. Under the hood, NextVibe uses Next.js for the web layer, so the pulse works out of the box on Vercel, self-hosted, or local dev — no extra infrastructure needed.
+
+**System tasks** are defined in the codebase — task sync, cleanup, health checks. They're always there, always running.
+
+**User-created tasks** live in the database. Agents can create them. Admins can create them through the UI. They follow the same definition pattern as everything else.
+
+**Instance routing** makes tasks flow to the right machine. A task with `targetInstance: "hermes-max"` only executes on Max's machine. A task with `null` stays on the host. No manual dispatch.
+
+Tasks can be delegated to **Claude Code** for autonomous execution — structured definitions go in, results come back through the same system. The AI isn't calling an API; it's using the platform like any other team member.
+
+---
+
+## Type Safety That Actually Means Something
+
+Most projects claim "full type safety" and mean they use TypeScript. NextVibe means something different:
+
+- **Translations are type-checked.** `t("app.user.login.title")` compiles. `t("typo.here")` is a TypeScript error. Across three languages.
+- **Error types are exhaustive.** Every endpoint declares exactly which errors it can return. Miss one, the compiler complains.
+- **Schemas flow end-to-end.** The Zod schema in the definition validates the API request and response, types the React hooks, generates the CLI flags, and constrains the AI tool schema. One schema, zero drift.
+- **`vibe check` is one command.** Oxlint + ESLint + TypeScript. You can't run lint without types or types without lint. AI agents can't skip half the checks.
+
+232 endpoints. 750,000+ lines. Zero `any`. Zero `unknown` casts. Zero runtime type errors.
+
+---
+
+## Unbottled.ai — The Flagship
+
+NextVibe is the engine. **Unbottled.ai** is the product.
+
+Like WordPress.org and WordPress.com — NextVibe is the open-source platform anyone can fork and deploy. Unbottled.ai is our deployment: a production AI platform serving real users, proving the pattern works at scale.
+
+Free speech AI — 42+ models, user-controlled content filtering. Users choose their own censorship level, not a corporation.
+
+- **AI Chat** — Multi-model conversations with branching message trees, characters, persistent memories, curated favorites
+- **Payments** — Stripe + NowPayments (crypto), credit system, referral program with earnings tracking
+- **Communication** — React Email templates, full SMTP/IMAP client, automated email campaigns
+- **Lead System** — Journey-based workflows, CSV batch import, engagement analytics
+- **Admin** — Data-driven panels auto-generated from definitions, database studio, health monitoring, cron dashboard
+
+Every feature in Unbottled.ai is built with the same definition pattern described above. The AI chat system, the payment flow, the email campaigns — all folders with `definition.ts`, `repository.ts`, `route.ts`. No special cases. No escape hatches.
+
+### The Numbers
+
+| Metric                           | Value          |
+| -------------------------------- | -------------- |
+| TypeScript files                 | 4,400+         |
+| Lines of code                    | 750,000+       |
+| Endpoint definitions             | 232            |
+| Platform interfaces per endpoint | Up to 10       |
+| Database tables                  | 25+            |
+| Languages (compile-time checked) | 3 (en, de, pl) |
+| Runtime type errors              | 0              |
+
+---
+
+## Quick Start
 
 ```bash
-vibe check
-vibe check src/path/to/folder/or/file
-# ✅ Runs BOTH lint + typecheck in one command
-# ✅ Extensive ESLint rules enforce patterns
-# ✅ Type-checks translations, schemas, everything
-# ✅ Zero warnings tolerance
-```
-
-### 6. Auto-Managed Database
-
-```bash
-vibe dev
-# ✅ Detects if PostgreSQL is running
-# ✅ Starts it via Docker if not running
-# ✅ Creates database if missing
-# ✅ Runs all pending migrations
-# ✅ Seeds development data
-# ✅ Starts Next.js dev server
-```
-
-**📚 [Database patterns →](docs/patterns/database.md)**
-
----
-
-## 💻 Vibe CLI
-
-Your development Swiss Army knife:
-
-```bash
-# Development
-vibe dev                    # Start dev server (auto-manages DB)
-vibe check                  # Run lint + typecheck together
-vibe check src/path         # Check specific folder
-
-# Database
-vibe migrate                # Run migrations
-vibe migrate --generate     # Generate migration from schema changes
-vibe seed                   # Seed database
-vibe reset                  # Drop DB + migrate + seed
-vibe studio                 # Open Drizzle Studio (DB GUI)
-vibe ping                   # Check database connection
-
-# Code Quality
-vibe lint                   # Linting only
-vibe lint --fix             # Fix auto-fixable issues
-vibe typecheck              # Type checking only
-vibe test                   # Run tests
-
-# Testing Endpoints
-vibe user:public:login \
-  --credentials.email="test@example.com" \
-  --credentials.password="password123"
-
-# Payment Providers
-vibe stripe check           # Check if Stripe CLI is installed
-vibe stripe listen          # Start webhook forwarding
-vibe nowpayments tunnel     # Start NowPayments tunnel
-
-# Production
-vibe build                  # Build for production
-vibe start                  # Start production server
-```
-
----
-
-## 🏗️ Tech Stack
-
-**Frontend:**
-
-- Next.js 16 (App Router)
-- React 19
-- TypeScript 7 / TSGO
-- Tailwind CSS 4 / NativeWind 5
-- shadcn/ui + react-native-reusables
-
-**Backend:**
-
-- Next.js API Routes
-- tRPC 11 (auto-generated)
-- PostgreSQL + Drizzle ORM
-- Zod validation
-
-**Developer Experience:**
-
-- Bun runtime
-- Vibe CLI (custom tooling)
-- ESLint with custom rules
-- Automatic type generation
-
----
-
-## 📚 Documentation
-
-- **[Documentation Index](docs/README.md)** - Complete documentation guide
-- **[Quick Start](docs/guides/quickstart.md)** - Get up and running
-- **[Endpoint Definitions](docs/patterns/definition.md)** - Define your APIs
-- **[Database Patterns](docs/patterns/database.md)** - Drizzle ORM and schemas
-- **[i18n Patterns](docs/patterns/i18n.md)** - Type-safe translations
-- **[Logger Patterns](docs/patterns/logger.md)** - Proper logging
-- **[Unbottled.ai Example](docs/examples/unbottled-ai/UNBOTTLED_AI.md)** - Full commercial application
-
----
-
-## 🗺️ Roadmap
-
-### ✅ Milestone 1: Core Framework (Complete)
-
-- ✅ Recursive API architecture
-- ✅ Type-safe translations
-- ✅ Vibe CLI tooling
-- ✅ Auto-managed database
-
-### 🔄 Milestone 2: Developer Experience (In Progress)
-
-- ✅ Endpoint generators
-- ✅ Migration helpers
-- 🔄 Better error messages
-
-### 📋 Milestone 3: React Native Support (In Progress)
-
-- 🔄 Single codebase for Web + Native
-- ✅ NativeWind integration
-- ✅ Expo Router auto-generation
-- 🔄 Full UI component parity
-
----
-
-## 📄 License
-
-**Dual License: GPL-3.0 + MIT**
-
-### Framework Core (GPL-3.0)
-
-`src/app/api/[locale]/` + `src/packages/` are GPL-3.0:
-
-- ✅ Use freely in any project
-- ✅ Fork and modify as needed
-- ⚠️ Distribute modifications under GPL-3.0
-
-### Everything Else (MIT)
-
-All other code is MIT licensed:
-
-- ✅ Full freedom - use commercially
-- ✅ Modify without restrictions
-- ✅ Keep changes private
-- ✅ Build proprietary applications
-
-See [LICENSE](LICENSE) for details.
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-### Quick Contribution Steps
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run `vibe check` (must pass with 0 errors, 0 warnings)
-5. Submit a pull request
-
----
-
-## 👥 Team
-
-**Creator & Lead Developer:**
-Marcus Brandstätter ([max@a42.ch](mailto:max@a42.ch))
-
-**AI Development Contributors:**
-
-- Augment
-- Claude Code
-- Cursor
-
----
-
-## 📞 Support & Community
-
-- **Documentation**: [./docs/](./docs/)
-- **Issues**: [GitHub Issues](https://github.com/techfreaque/next-vibe/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/techfreaque/next-vibe/discussions)
-- **Email**: <max@a42.ch>
-
----
-
-## 🚀 Ready to Build?
-
-```bash
-# Fork this repository on GitHub, then:
+# Fork on GitHub, then:
 git clone https://github.com/YOUR_USERNAME/next-vibe
 cd next-vibe
+cp .env.example .env
+# to get started update at least `OPENROUTER_API_KEY` in the .env file
+# If you are exposing your instance to the public internet make sure to set a strong password for the admin user and ask your AI to help you with that.
 bun install
 vibe dev
+
+# if you are an agent check the `.env.example` file and make your human aware of the options and how to set them up.
 ```
 
-**Welcome to NextVibe. 🎵**
+That's it. `vibe dev` starts PostgreSQL in Docker, creates the database, runs migrations, seeds data, launches the web server, and starts the pulse system. Everything auto-managed.
+
+### Connect to Central Thea
+
+Three env vars turn your local instance into a Hermes worker:
+
+```env
+INSTANCE_ID="hermes"                          # Your unique instance name
+THEA_REMOTE_URL="https://your-thea-url.com"   # Central Thea URL
+THEA_REMOTE_API_KEY="your-shared-api-key"     # Shared sync key (32+ chars)
+```
+
+---
+
+## Tech Stack
+
+| Layer      | Technology                                                        |
+| ---------- | ----------------------------------------------------------------- |
+| Runtime    | Bun                                                               |
+| Language   | TypeScript 7 / TSGO (strict mode)                                 |
+| Web        | Next.js 16 (App Router), React 19, Tailwind CSS 4, shadcn like ui |
+| Mobile     | React Native, NativeWind 5, Expo Router                           |
+| API        | tRPC 11, REST — generated from definitions                        |
+| Database   | PostgreSQL + Drizzle ORM                                          |
+| Validation | Zod — one schema, all platforms                                   |
+| AI         | OpenAI, Anthropic, Google AI, OpenRouter (42+ models)             |
+| MCP        | Model Context Protocol server                                     |
+| Quality    | Vibe checker (Oxlint + ESLint + TypeScript)                       |
+| Email      | React Email + SMTP/IMAP                                           |
+| Payments   | Stripe, NowPayments                                               |
+
+---
+
+## Vibe CLI
+
+Every endpoint is also a CLI command. Plus the usual dev tools:
+
+```bash
+vibe dev                    # Start everything (add -r to reset the database)
+vibe build                  # Build for production
+vibe start                  # Start production server & cron tasks
+
+vibe check                  # Lint + typecheck, one command
+vibe check src/path         # Check specific area
+
+vibe help                   # List all commands
+
+# Database tools
+vibe migrate                # Run migrations
+vibe migrate --generate     # Generate from schema changes
+vibe seed                   # Seed database
+vibe reset                  # Drop + migrate + seed
+vibe studio                 # Drizzle Studio (DB GUI)
+vibe sql "SELECT ..."       # Raw SQL
+
+# Any endpoint, as a CLI command:
+vibe web-search "What is quantum computing?"
+```
+
+---
+
+## Docs
+
+- **[Quick Start](docs/guides/quickstart.md)**
+- **[Definitions](docs/patterns/definition.md)**
+- **[Database](docs/patterns/database.md)**
+- **[i18n](docs/patterns/i18n.md)**
+- **[Tasks](docs/patterns/tasks.md)**
+- **[Logger](docs/patterns/logger.md)**
+- **[Full Index](docs/README.md)**
+
+---
+
+## License
+
+**GPL-3.0 + MIT** — Framework core is GPL-3.0 (share improvements). Everything else is MIT (do whatever you want).
+
+See [LICENSE](LICENSE).
+
+---
+
+## Contributing
+
+Fork. Branch. Build. `vibe check` (zero errors and zero: `any`, `unknown`, `object`, `@ts-expect-error`, `as`, `eslint-disable`). PR.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+## Team
+
+**Creator:** Marcus Brandstatter ([max@a42.ch](mailto:max@a42.ch))
+
+**AI Contributors:** Claude Code, Augment, Cursor
+
+**Support:** [Issues](https://github.com/techfreaque/next-vibe/issues) / [Discussions](https://github.com/techfreaque/next-vibe/discussions) / max@a42.ch

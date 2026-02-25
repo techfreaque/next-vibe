@@ -197,6 +197,12 @@ export const translations: typeof enTranslations = {
         label: "Wiederholungsverzögerung (ms)",
         description: "Verzögerung zwischen Wiederholungen in Millisekunden",
       },
+      targetInstance: {
+        label: "Ziel-Instanz",
+        description:
+          "Instanz-ID, auf der diese Aufgabe ausgeführt werden soll. Leer lassen für alle Instanzen.",
+        placeholder: "Leer lassen für alle Instanzen",
+      },
     },
     response: {
       task: {

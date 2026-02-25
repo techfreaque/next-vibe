@@ -181,37 +181,37 @@ export class MessageContextBuilder {
     let history: ChatMessage[] = [];
 
     if (params.isIncognito && params.messageHistory) {
-      // Incognito: use passed message history
-      history = params.messageHistory;
+      // Incognito: use passed message history, but trim at the last successful
+      // compacting message so we don't send the full uncompacted history
+      // alongside the compacting summary.
+      const lastSuccessfulCompactingIdx = params.messageHistory.findLastIndex(
+        (m) =>
+          m.metadata?.isCompacting === true &&
+          m.metadata.compactingFailed !== true,
+      );
+      history =
+        lastSuccessfulCompactingIdx >= 0
+          ? params.messageHistory.slice(lastSuccessfulCompactingIdx)
+          : params.messageHistory;
       params.logger.debug(
         "[BuildMessageContext] Using passed message history (incognito)",
         {
           operation: params.operation,
           historyLength: history.length,
+          originalLength: params.messageHistory.length,
+          trimmedAtCompacting: lastSuccessfulCompactingIdx >= 0,
         },
       );
     } else if (!params.isIncognito && params.threadId) {
       // Server: fetch message history from database
       if (params.operation === "answer-as-ai" && params.parentMessageId) {
-        // For answer-as-ai: get all messages up to parent (not just branch)
-        const allMessages = await db
-          .select()
-          .from(chatMessages)
-          .where(eq(chatMessages.threadId, params.threadId))
-          .orderBy(chatMessages.createdAt);
-
-        const parentIndex = allMessages.findIndex(
-          (msg) => msg.id === params.parentMessageId,
+        // For answer-as-ai: walk up parent chain (same as fetchMessageHistory)
+        // to respect compacting boundaries.
+        history = await fetchMessageHistory(
+          params.threadId,
+          params.logger,
+          params.parentMessageId,
         );
-
-        if (parentIndex !== -1) {
-          history = allMessages.slice(0, parentIndex + 1);
-        } else {
-          params.logger.error("Parent message not found in thread", {
-            parentMessageId: params.parentMessageId,
-            threadId: params.threadId,
-          });
-        }
       } else {
         // For other operations: fetch history filtered by branch
         history = await fetchMessageHistory(

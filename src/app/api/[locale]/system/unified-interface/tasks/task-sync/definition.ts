@@ -31,7 +31,7 @@ const { POST } = createEndpoint({
   description: "taskSync.post.description",
   icon: "refresh-cw",
   category: "category",
-  tags: ["claudeCode.tags.tasks" as const],
+  tags: ["tags.tasks" as const],
   allowedRoles: [UserRole.PUBLIC],
 
   fields: scopedObjectFieldNew(scopedTranslation, {

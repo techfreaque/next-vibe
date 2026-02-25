@@ -486,7 +486,19 @@ export class PulseHealthRepository {
             const { CronTasksRepository } = await import("../cron/repository");
             const { scopedTranslation } = await import("../i18n");
 
+            const { env: serverEnv } = await import("@/config/env");
+            const instanceId = serverEnv.INSTANCE_ID;
+
             for (const dbTask of userCreatedTasks) {
+              // Instance routing: null targetInstance = host only (no INSTANCE_ID set),
+              // specific targetInstance = only on that named instance
+              const taskTarget = dbTask.targetInstance ?? null;
+              const currentInstance = instanceId ?? null;
+              if (taskTarget !== currentInstance) {
+                tasksSkipped.push(dbTask.displayName);
+                continue;
+              }
+
               const isDue =
                 options.force || isCronDue(logger, dbTask.schedule, now);
               if (!isDue) {

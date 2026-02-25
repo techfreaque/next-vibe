@@ -79,23 +79,26 @@ export function useDebugSystemPrompt(params: {
     return response.data.systemPrompt || "";
   }, [characterId, characterEndpoint.read?.response]);
 
-  // Fetch memories (interactive only — mirrors server behaviour)
+  // Incognito mode: never load personal data (memories, tasks, favorites)
+  const isIncognito = rootFolderId === "incognito";
+
+  // Fetch memories (skip in incognito — mirrors server behaviour)
   const { memorySummary } = useMemorySummary({
-    enabled: true, // Always enabled since component only renders in debug mode
+    enabled: !isIncognito,
     user,
     logger,
   });
 
-  // Fetch tasks (always — mirrors server behaviour)
+  // Fetch tasks (skip in incognito — mirrors server behaviour)
   const { tasksSummary } = useTasksSummary({
-    enabled: true,
+    enabled: !isIncognito,
     user,
     logger,
   });
 
-  // Fetch favorites (always — mirrors server behaviour)
+  // Fetch favorites (skip in incognito — mirrors server behaviour)
   const { favoritesSummary } = useFavoritesSummary({
-    enabled: true,
+    enabled: !isIncognito,
     user,
     logger,
   });

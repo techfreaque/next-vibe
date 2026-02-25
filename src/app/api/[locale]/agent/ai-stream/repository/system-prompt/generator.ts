@@ -219,8 +219,11 @@ export function sectionSystemContext(params: {
   isLocalMode: boolean;
   isDev: boolean;
   appUrl: string;
+  instanceId?: string;
+  knownInstanceIds?: string[];
 }): string {
-  const { appName, isLocalMode, isDev, appUrl } = params;
+  const { appName, isLocalMode, isDev, appUrl, instanceId, knownInstanceIds } =
+    params;
 
   const lines = [
     `## System Context`,
@@ -229,12 +232,58 @@ export function sectionSystemContext(params: {
     `- **URL:** ${appUrl}`,
   ];
 
+  if (instanceId) {
+    lines.push(`- **Instance ID:** ${instanceId}`);
+  }
+
   if (isDev) {
     lines.push(`- **Environment:** development (NODE_ENV=development)`);
     lines.push(`- **Models available:** ${TOTAL_MODEL_COUNT}`);
     lines.push(
       `- **Note:** Dev mode — hot reload active, DB may contain test data, errors are verbose.`,
     );
+  }
+
+  // Instance routing guidance for admins
+  const hasKnownInstances = knownInstanceIds && knownInstanceIds.length > 0;
+
+  if (!isLocalMode && !isDev) {
+    // Production instance
+    lines.push(``);
+    lines.push(`**Multi-instance task routing:**`);
+    lines.push(
+      `Tasks have an optional \`targetInstance\` field. When set, the task only runs on the matching instance.`,
+    );
+    lines.push(`- \`null\` / empty = runs only on the host instance`);
+    if (instanceId) {
+      lines.push(`- This instance is \`${instanceId}\``);
+    }
+    if (hasKnownInstances) {
+      lines.push(
+        `- **Known instances:** ${knownInstanceIds.map((id) => `\`${id}\``).join(", ")}`,
+      );
+      lines.push(
+        `- Route tasks to any of these instances by setting \`targetInstance\` to the instance ID.`,
+      );
+    }
+    lines.push(``);
+    lines.push(
+      `**Hermes** is the local dev instance that runs Claude Code for automated task execution. If the user hasn't set up Hermes yet, proactively suggest it — it enables scheduled code tasks, automated PR reviews, and local-only agent work.`,
+    );
+    lines.push(
+      `Setup requires: \`INSTANCE_ID\`, \`THEA_REMOTE_URL\`, and \`THEA_REMOTE_API_KEY\` in the local \`.env\`.`,
+    );
+  } else if (isLocalMode || isDev) {
+    // Local / dev instance
+    lines.push(``);
+    lines.push(
+      `**Task routing:** This is a local instance. Tasks with \`targetInstance\` matching \`${instanceId ?? "(not set)"}\` will run here. Set \`INSTANCE_ID\` in \`.env\` to enable instance-specific task routing.`,
+    );
+    if (hasKnownInstances) {
+      lines.push(
+        `**Known instances:** ${knownInstanceIds.map((id) => `\`${id}\``).join(", ")}`,
+      );
+    }
   }
 
   return lines.join("\n");
@@ -436,6 +485,7 @@ You have full platform access. A few things worth knowing:
 - Tasks are queued in the Claude Code task queue (unified-interface/tasks/claude-code/)
 - Thea assigns tasks; Claude Code executes them; results come back via task threads
 - Admins can inspect, override, or manually trigger tasks via the cron interface
+- Tasks support instance routing via \`targetInstance\` — route tasks to specific instances (e.g. "hermes" for local, "thea-prod" for production)
 
 **Tool discovery:**
 - Use the tool discovery endpoints to see what capabilities are currently available
@@ -498,6 +548,12 @@ export interface SystemPromptParams {
   isDev?: boolean;
   /** App URL for system context section */
   appUrl?: string;
+  /** Instance ID from env (e.g. "hermes", "thea-prod") */
+  instanceId?: string;
+  /** All known instance IDs for task routing (from KNOWN_INSTANCE_IDS env) */
+  knownInstanceIds?: string[];
+  /** User's display name (private or public depending on folder) */
+  userName?: string;
 }
 
 /**
@@ -522,6 +578,9 @@ export function generateSystemPrompt(params: SystemPromptParams): string {
     isLocalMode = false,
     isDev = false,
     appUrl = "",
+    instanceId,
+    knownInstanceIds,
+    userName,
   } = params;
 
   const freeTierCredits = productsRepository.getProduct(
@@ -569,6 +628,11 @@ export function generateSystemPrompt(params: SystemPromptParams): string {
     sections.push(folderSection);
   }
 
+  // Section 5b: User name (when available)
+  if (userName && !headless) {
+    sections.push(`## User\n\n**Name:** ${userName}`);
+  }
+
   // Section 6: Character / role
   const characterSection = sectionCharacter(characterPrompt);
   if (characterSection) {
@@ -613,7 +677,14 @@ export function generateSystemPrompt(params: SystemPromptParams): string {
   // Section 10b: System context — shown to admins always; dev details added in non-production
   if (isAdmin) {
     sections.push(
-      sectionSystemContext({ appName, isLocalMode, isDev, appUrl }),
+      sectionSystemContext({
+        appName,
+        isLocalMode,
+        isDev,
+        appUrl,
+        instanceId,
+        knownInstanceIds,
+      }),
     );
   }
 

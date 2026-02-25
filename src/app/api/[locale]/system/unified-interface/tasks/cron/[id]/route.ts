@@ -58,6 +58,9 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
       if (data.runOnce !== undefined) {
         updates.runOnce = data.runOnce;
       }
+      if (data.targetInstance !== undefined) {
+        updates.targetInstance = data.targetInstance;
+      }
       const { t: tasksT } = tasksScopedTranslation.scopedT(locale);
       return await CronTasksRepository.updateTask(
         urlPathParams.id,

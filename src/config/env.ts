@@ -75,6 +75,28 @@ export const {
     schema: createSchema(z.string().min(1), z.string().min(1).optional()),
     example: "your-cron-secret",
   },
+  INSTANCE_ID: {
+    schema: z.string().min(1).optional(),
+    example: "hermes",
+    comment:
+      "Unique instance identifier for task routing. Tasks with a targetInstance only run on the matching instance. E.g. 'hermes', 'thea-prod', 'thea-dev'.",
+  },
+  KNOWN_INSTANCE_IDS: {
+    schema: z
+      .string()
+      .optional()
+      .transform((v) =>
+        v
+          ? v
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : [],
+      ),
+    example: "hermes-max,hermes-laura,thea-prod",
+    comment:
+      "Comma-separated list of all known instance IDs. Used in system prompt so the AI knows which instances it can route tasks to.",
+  },
   THEA_REMOTE_URL: {
     schema: z.string().url().optional(),
     example: "https://unbottled.ai",

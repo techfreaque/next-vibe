@@ -30,7 +30,6 @@ import {
 } from "../../leads/campaigns/env";
 import { paymentEnv, paymentEnvSchema } from "../../payment/env";
 import { smsEnv, smsEnvSchema } from "../../sms/env";
-import { hostingEnv, hostingEnvSchema } from "../hosting/env";
 import { serverSystemEnv, serverSystemEnvSchema } from "../server/env";
 
 // Platform detection
@@ -49,7 +48,6 @@ export const envModules = {
   leadsCampaigns: { env: leadsCampaignsEnv, schema: leadsCampaignsEnvSchema },
   payment: { env: paymentEnv, schema: paymentEnvSchema },
   sms: { env: smsEnv, schema: smsEnvSchema },
-  hosting: { env: hostingEnv, schema: hostingEnvSchema },
   serverSystem: { env: serverSystemEnv, schema: serverSystemEnvSchema },
 } as const;
 
@@ -61,7 +59,6 @@ export const envSchema = env_envSchema
   .merge(leadsCampaignsEnvSchema)
   .merge(paymentEnvSchema)
   .merge(smsEnvSchema)
-  .merge(hostingEnvSchema)
   .merge(serverSystemEnvSchema);
 
 export type Env = z.infer<typeof envSchema>;

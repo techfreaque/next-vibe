@@ -130,6 +130,12 @@ export const translations: typeof enTranslations = {
         label: "Wiederholungsverzögerung",
         description: "Verzögerung zwischen Wiederholungen in Sekunden",
       },
+      targetInstance: {
+        label: "Ziel-Instanz",
+        description:
+          "Instanz-ID, auf der diese Aufgabe ausgeführt werden soll. Leer lassen oder null setzen für alle Instanzen.",
+        placeholder: "z.B. hermes, thea-prod",
+      },
     },
     response: {
       task: {

@@ -15,7 +15,7 @@ import type {
   TaskRegistry,
 } from "../unified-interface/tasks/unified-runner/types";
 
-import { tasks as taskModule0 } from "../unified-interface/tasks/task-sync/task";
+import { tasks as taskModule0 } from "../unified-interface/tasks/task-sync/pull/task";
 import { tasks as taskModule1 } from "../unified-interface/tasks/db-health/task";
 import { tasks as taskModule2 } from "../../leads/campaigns/campaign-starter/task";
 import { tasks as taskModule3 } from "../../leads/campaigns/email-campaigns/task";

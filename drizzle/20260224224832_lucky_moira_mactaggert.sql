@@ -1,0 +1,1 @@
+ALTER TABLE "cron_tasks" ADD COLUMN "target_instance" text;

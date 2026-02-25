@@ -14,14 +14,19 @@
 
 import "server-only";
 
+import { eq } from "drizzle-orm";
+
 import { CharactersRepository } from "@/app/api/[locale]/agent/chat/characters/repository";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { generateFavoritesSummary } from "@/app/api/[locale]/agent/chat/favorites/repository";
 import { generateMemorySummary } from "@/app/api/[locale]/agent/chat/memories/repository";
+import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { generateTasksSummary } from "@/app/api/[locale]/system/unified-interface/tasks/cron/repository";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { users as usersTable } from "@/app/api/[locale]/user/db";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
@@ -100,28 +105,51 @@ export async function buildSystemPrompt(params: {
   let memorySummary = "";
   let tasksSummary = "";
   let favoritesSummary = "";
+  let userName = "";
+
+  // Incognito mode: never load personal data (memories, tasks, favorites)
+  const isIncognito = rootFolderId === "incognito";
 
   if (userId) {
-    const [memoriesResult, tasksResult, favoritesResult, characterResult] =
-      await Promise.allSettled([
-        // Memories: interactive only (not in headless)
-        !headless
-          ? generateMemorySummary({ userId, logger })
-          : Promise.resolve(""),
-        // Tasks: always inject (headless agents need task context too)
-        generateTasksSummary({ userId, logger }),
-        // Favorites: always inject (headless agents benefit from knowing favorites too)
-        generateFavoritesSummary({ userId, logger }),
-        // Character: only if a characterId was provided
-        characterId
-          ? CharactersRepository.getCharacterById(
-              { id: characterId },
-              user,
-              logger,
-              locale,
-            )
-          : Promise.resolve(null),
-      ]);
+    const [
+      memoriesResult,
+      tasksResult,
+      favoritesResult,
+      characterResult,
+      userNameResult,
+    ] = await Promise.allSettled([
+      // Memories: skip in headless and incognito
+      !headless && !isIncognito
+        ? generateMemorySummary({ userId, logger })
+        : Promise.resolve(""),
+      // Tasks: skip in incognito (headless agents still need task context)
+      !isIncognito
+        ? generateTasksSummary({ userId, logger })
+        : Promise.resolve(""),
+      // Favorites: skip in incognito
+      !isIncognito
+        ? generateFavoritesSummary({ userId, logger })
+        : Promise.resolve(""),
+      // Character: only if a characterId was provided
+      characterId
+        ? CharactersRepository.getCharacterById(
+            { id: characterId },
+            user,
+            logger,
+            locale,
+          )
+        : Promise.resolve(null),
+      // User name: fetch for personalization
+      db
+        .select({
+          privateName: usersTable.privateName,
+          publicName: usersTable.publicName,
+        })
+        .from(usersTable)
+        .where(eq(usersTable.id, userId))
+        .limit(1)
+        .then((rows) => rows[0] ?? null),
+    ]);
 
     // --- Memories ---
     if (memoriesResult.status === "fulfilled") {
@@ -197,6 +225,16 @@ export async function buildSystemPrompt(params: {
         error: String(characterResult.reason),
       });
     }
+
+    // --- User Name ---
+    if (userNameResult.status === "fulfilled" && userNameResult.value) {
+      const { privateName, publicName } = userNameResult.value;
+      // Use private name for private/incognito/cron folders, public name for public/shared
+      userName =
+        rootFolderId === "public" || rootFolderId === "shared"
+          ? publicName
+          : privateName;
+    }
   } else if (characterId) {
     // Public users can still reference a character (e.g. default ones)
     try {
@@ -247,6 +285,9 @@ export async function buildSystemPrompt(params: {
     isLocalMode: envClient.NEXT_PUBLIC_LOCAL_MODE,
     isDev: envClient.NODE_ENV !== "production",
     appUrl: envClient.NEXT_PUBLIC_APP_URL,
+    instanceId: env.INSTANCE_ID,
+    knownInstanceIds: env.KNOWN_INSTANCE_IDS,
+    userName,
   });
 
   // ─── Step 4: Build trailing system message and return ───────────────────

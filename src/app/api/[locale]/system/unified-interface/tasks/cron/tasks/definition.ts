@@ -78,6 +78,7 @@ export const cronTaskResponseSchema = z.object({
   successCount: z.number(),
   errorCount: z.number(),
   averageExecutionTime: z.number().nullable(),
+  targetInstance: z.string().nullable(),
   tags: z.array(z.string()).optional().default([]),
   userId: z.string().nullable(),
   createdAt: z.string(),
@@ -513,6 +514,15 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.boolean().default(false),
       }),
+      targetInstance: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.fields.targetInstance.label",
+        description: "post.fields.targetInstance.description",
+        placeholder: "post.fields.targetInstance.placeholder",
+        columns: 6,
+        schema: z.string().optional(),
+      }),
 
       // Response - return the created task
       task: scopedResponseField(scopedTranslation, {
@@ -611,6 +621,7 @@ const { POST } = createEndpoint({
           successCount: 0,
           errorCount: 0,
           averageExecutionTime: null,
+          targetInstance: null,
           tags: [],
           userId: null,
           createdAt: new Date().toISOString(),
