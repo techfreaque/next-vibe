@@ -272,7 +272,7 @@ export class UnifiedTaskRunnerRepositoryImpl {
         user: this.cronUser,
         locale: userLocale,
         logger: this.logger,
-        platform: Platform.CLI,
+        platform: Platform.CRON,
       });
 
       const durationMs = Date.now() - startTime;

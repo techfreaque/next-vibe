@@ -186,6 +186,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
         break;
 
       case Platform.AI:
+      case Platform.CRON:
         if (
           platformMarkers.includes(PlatformMarker.AI_TOOL_OFF) ||
           platformMarkers.includes(PlatformMarker.WEB_OFF)

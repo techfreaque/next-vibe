@@ -79,7 +79,7 @@ async function executePreCall(
     user,
     locale,
     logger,
-    platform: Platform.CLI,
+    platform: Platform.AI,
   });
 
   if (!result.success) {

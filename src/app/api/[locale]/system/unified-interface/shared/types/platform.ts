@@ -19,6 +19,8 @@ export enum Platform {
   NEXT_PAGE = "next-page",
   /** Next.js API route context */
   NEXT_API = "next-api",
+  /** Cron/pulse task execution — behaves like AI for permissions */
+  CRON = "cron",
 }
 
 /**
@@ -29,10 +31,14 @@ export function isCliPlatform(platform: Platform): boolean {
 }
 
 /**
- * Check if platform is an agent/AI caller (MCP server or AI tool execution)
+ * Check if platform is an agent/AI caller (MCP server, AI tool, or cron execution)
  */
 export function isAgentPlatform(platform: Platform): boolean {
-  return platform === Platform.MCP || platform === Platform.AI;
+  return (
+    platform === Platform.MCP ||
+    platform === Platform.AI ||
+    platform === Platform.CRON
+  );
 }
 
 /**

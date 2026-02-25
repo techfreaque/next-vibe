@@ -4,14 +4,17 @@
  * Following interface + implementation pattern
  */
 
-import { and, count, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
+  isFileResponse,
+  isStreamingResponse,
   success,
 } from "next-vibe/shared/types/response.schema";
 
+import { LeadAuthRepository } from "@/app/api/[locale]/leads/auth/repository";
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -19,11 +22,24 @@ import {
   PulseExecutionStatus,
   PulseHealthStatus,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
+import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { users as usersTable } from "@/app/api/[locale]/user/db";
+import { UserRolesRepository } from "@/app/api/[locale]/user/user-roles/repository";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { getFullPath } from "../../../generated/endpoint";
+import { getRouteHandler } from "../../../generated/route-handlers";
+import { Platform } from "../../shared/types/platform";
+import { splitTaskArgs } from "../cron/arg-splitter";
 import { cronTasks as cronTasksTable } from "../cron/db";
-import { scopedTranslation as tasksScopedTranslation } from "../i18n";
+import { CronTasksRepository } from "../cron/repository";
+import { isCronTaskDue } from "../cron-formatter";
+import {
+  scopedTranslation,
+  scopedTranslation as tasksScopedTranslation,
+} from "../i18n";
 import type {
   NewPulseExecution,
   NewPulseHealth,
@@ -325,6 +341,66 @@ export class PulseHealthRepository {
     }
   }
   /**
+   * Resolve the user context for a task execution.
+   * System tasks (no userId) use the cached admin auth result.
+   * User tasks fetch real roles and leadId from the DB.
+   */
+  private static async resolveTaskUser(
+    userId: string | null,
+    adminAuthResult: ResponseType<JwtPrivatePayloadType> | null,
+    systemLocale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<{
+    user: JwtPrivatePayloadType;
+    locale: CountryLanguage;
+  } | null> {
+    if (!userId) {
+      // System task — use the cached admin user
+      if (!adminAuthResult?.success || !adminAuthResult.data) {
+        return null;
+      }
+      return { user: adminAuthResult.data, locale: systemLocale };
+    }
+
+    // User task — resolve locale, roles, and leadId
+    let userLocale: CountryLanguage = systemLocale;
+    const ownerRow = await db
+      .select({ locale: usersTable.locale })
+      .from(usersTable)
+      .where(eq(usersTable.id, userId))
+      .limit(1);
+    if (ownerRow[0]?.locale) {
+      userLocale = ownerRow[0].locale;
+    }
+
+    const rolesResult = await UserRolesRepository.getUserRoles(
+      userId,
+      logger,
+      userLocale,
+    );
+    if (!rolesResult.success) {
+      return null;
+    }
+
+    const { leadId } = await LeadAuthRepository.getAuthenticatedUserLeadId(
+      userId,
+      undefined,
+      userLocale,
+      logger,
+    );
+
+    return {
+      user: {
+        id: userId,
+        leadId,
+        isPublic: false as const,
+        roles: rolesResult.data,
+      },
+      locale: userLocale,
+    };
+  }
+
+  /**
    * Execute a pulse cycle with the given options
    * Merged functionality from old system
    */
@@ -360,259 +436,156 @@ export class PulseHealthRepository {
     }>
   > {
     try {
-      // Use the provided systemLocale for all translations in this pulse cycle
       locale = options.systemLocale;
       const startTime = Date.now();
       const pulseId = crypto.randomUUID();
-
-      // Load task registry and unified runner
-      const { taskRegistry } =
-        await import("@/app/api/[locale]/system/generated/tasks-index");
-      const { unifiedTaskRunnerRepository } =
-        await import("../unified-runner/repository");
-      const { isCronTaskDue } = await import("../cron-formatter");
-
       const now = new Date();
+
+      const instanceId = env.INSTANCE_ID;
+
       const tasksDue: string[] = [];
       const tasksExecuted: string[] = [];
       const tasksSucceeded: string[] = [];
       const tasksFailed: string[] = [];
       const tasksSkipped: string[] = [];
 
-      // Filter by taskNames if provided
-      const candidateTasks = options.taskNames
-        ? taskRegistry.cronTasks.filter((t) =>
-            options.taskNames!.includes(t.name),
+      // Resolve admin user for system tasks (cached for entire pulse cycle)
+      const adminEmail = env.VIBE_ADMIN_USER_EMAIL;
+      const adminAuthResult = adminEmail
+        ? await AuthRepository.authenticateUserByEmail(
+            adminEmail,
+            options.systemLocale,
+            logger,
           )
-        : taskRegistry.cronTasks;
+        : null;
 
-      // Fetch enabled status from DB (overrides in-memory defaults)
-      const candidateNames = candidateTasks.map((t) => t.name);
-      const dbEnabledRows =
-        candidateNames.length > 0
-          ? await db
-              .select({
-                name: cronTasksTable.routeId,
-                enabled: cronTasksTable.enabled,
-              })
-              .from(cronTasksTable)
-              .where(inArray(cronTasksTable.routeId, candidateNames))
-          : [];
-      const dbEnabledMap = new Map(
-        dbEnabledRows.map((r) => [r.name, r.enabled]),
-      );
+      // All tasks live in the DB (system tasks have no userId, user tasks have one)
+      const whereConditions = [eq(cronTasksTable.enabled, true)];
+      if (options.taskNames && options.taskNames.length > 0) {
+        whereConditions.push(
+          inArray(cronTasksTable.routeId, options.taskNames),
+        );
+      }
+      const allTasks = await db
+        .select()
+        .from(cronTasksTable)
+        .where(and(...whereConditions));
 
       // Discover which tasks are due
-      for (const task of candidateTasks) {
-        // DB enabled status takes precedence; fall back to in-memory default
-        const isEnabled = dbEnabledMap.has(task.name)
-          ? dbEnabledMap.get(task.name)
-          : task.enabled;
-        if (!isEnabled) {
-          tasksSkipped.push(task.name);
+      for (const dbTask of allTasks) {
+        // Instance routing: null targetInstance = host only (no INSTANCE_ID set),
+        // specific targetInstance = only on that named instance
+        const taskTarget = dbTask.targetInstance ?? null;
+        const currentInstance = instanceId ?? null;
+        if (taskTarget !== currentInstance) {
+          tasksSkipped.push(dbTask.displayName);
           continue;
         }
-        const due = options.force || isCronTaskDue(logger, task.schedule, now);
-        if (due) {
-          tasksDue.push(task.name);
+
+        const isDue =
+          options.force || isCronTaskDue(logger, dbTask.schedule, now);
+        if (!isDue) {
+          tasksSkipped.push(dbTask.displayName);
+          continue;
+        }
+
+        tasksDue.push(dbTask.displayName);
+
+        if (options.dryRun) {
+          continue;
+        }
+
+        tasksExecuted.push(dbTask.displayName);
+        logger.debug(
+          `Pulse executing task: ${dbTask.displayName} (routeId: ${dbTask.routeId})`,
+        );
+
+        // Resolve user context with real roles from DB
+        const taskUserContext = await PulseHealthRepository.resolveTaskUser(
+          dbTask.userId,
+          adminAuthResult,
+          options.systemLocale,
+          logger,
+        );
+
+        if (!taskUserContext) {
+          tasksFailed.push(dbTask.displayName);
+          logger.error(
+            `Pulse: failed to resolve user context for task "${dbTask.displayName}"${
+              dbTask.userId
+                ? ` (userId: ${dbTask.userId})`
+                : " (check VIBE_ADMIN_USER_EMAIL)"
+            }`,
+          );
+          continue;
+        }
+
+        const { user: cronUser, locale: userLocale } = taskUserContext;
+
+        // Resolve routeId → endpoint path → handler
+        const path = getFullPath(dbTask.routeId);
+        if (!path) {
+          tasksFailed.push(dbTask.displayName);
+          logger.error(
+            `Pulse: unknown routeId "${dbTask.routeId}" for task "${dbTask.displayName}"`,
+          );
         } else {
-          tasksSkipped.push(task.name);
-        }
-      }
-
-      // Execute due tasks (skip in dry run)
-      if (!options.dryRun) {
-        // Ensure runner has a logger and locale context for task execution
-        if (!unifiedTaskRunnerRepository.logger) {
-          unifiedTaskRunnerRepository.logger = logger;
-        }
-        if (!unifiedTaskRunnerRepository.systemLocale) {
-          unifiedTaskRunnerRepository.systemLocale = options.systemLocale;
-        }
-
-        for (const taskName of tasksDue) {
-          const task = taskRegistry.tasksByName[taskName];
-          if (!task || task.type !== "cron") {
-            continue;
-          }
-
-          tasksExecuted.push(taskName);
-          logger.debug(`Pulse executing cron task: ${taskName}`);
-
-          const result =
-            await unifiedTaskRunnerRepository.executeCronTask(task);
-          if (result.success) {
-            tasksSucceeded.push(taskName);
+          const handler = await getRouteHandler(path);
+          if (!handler) {
+            tasksFailed.push(dbTask.displayName);
+            logger.error(`Pulse: no handler for routeId "${dbTask.routeId}"`);
           } else {
-            tasksFailed.push(taskName);
-            logger.error(`Pulse: cron task failed: ${taskName}`, {
-              message: result.message,
-            });
-          }
-        }
-      }
-
-      // Phase 2: Execute user-created DB tasks
-      // These have userId set and call a routeId endpoint with defaultConfig + defaultUrlPathParams
-      if (!options.dryRun) {
-        try {
-          const userCreatedTasks = await db
-            .select()
-            .from(cronTasksTable)
-            .where(
-              and(
-                isNotNull(cronTasksTable.userId),
-                isNotNull(cronTasksTable.routeId),
-                eq(cronTasksTable.enabled, true),
-              ),
+            const taskInput = dbTask.taskInput ?? {};
+            const { urlPathParams, data } = await splitTaskArgs(
+              path,
+              taskInput,
             );
 
-          if (userCreatedTasks.length > 0) {
-            const { isCronTaskDue: isCronDue } =
-              await import("../cron-formatter");
-            const { UserPermissionRole } =
-              await import("@/app/api/[locale]/user/user-roles/enum");
-            const { getFullPath } =
-              await import("@/app/api/[locale]/system/generated/endpoint");
-            const { getRouteHandler } =
-              await import("@/app/api/[locale]/system/generated/route-handlers");
-            const { splitTaskArgs } = await import("../cron/arg-splitter");
-            const { LeadAuthRepository } =
-              await import("@/app/api/[locale]/leads/auth/repository");
-            const { isStreamingResponse: isStreaming, isFileResponse: isFile } =
-              await import("@/app/api/[locale]/shared/types/response.schema");
-            const { Platform } =
-              await import("@/app/api/[locale]/system/unified-interface/shared/types/platform");
-            const { CronTasksRepository } = await import("../cron/repository");
-            const { scopedTranslation } = await import("../i18n");
+            const result = await handler({
+              data,
+              urlPathParams,
+              user: cronUser,
+              locale: userLocale,
+              logger,
+              platform: Platform.CRON,
+            });
 
-            const { env: serverEnv } = await import("@/config/env");
-            const instanceId = serverEnv.INSTANCE_ID;
-
-            for (const dbTask of userCreatedTasks) {
-              // Instance routing: null targetInstance = host only (no INSTANCE_ID set),
-              // specific targetInstance = only on that named instance
-              const taskTarget = dbTask.targetInstance ?? null;
-              const currentInstance = instanceId ?? null;
-              if (taskTarget !== currentInstance) {
-                tasksSkipped.push(dbTask.displayName);
-                continue;
-              }
-
-              const isDue =
-                options.force || isCronDue(logger, dbTask.schedule, now);
-              if (!isDue) {
-                tasksSkipped.push(dbTask.displayName);
-                continue;
-              }
-
-              tasksDue.push(dbTask.displayName);
-              tasksExecuted.push(dbTask.displayName);
-              logger.debug(
-                `Pulse executing user task: ${dbTask.displayName} (routeId: ${dbTask.routeId})`,
+            if (isStreamingResponse(result) || isFileResponse(result)) {
+              tasksFailed.push(dbTask.displayName);
+              logger.error(
+                `Pulse: task "${dbTask.displayName}" returned streaming/file response`,
               );
-
-              // Resolve owner context
-              const taskOwnerId = dbTask.userId ?? "system-cron";
-              let userLocale: CountryLanguage = options.systemLocale;
-              if (dbTask.userId) {
-                const ownerRow = await db
-                  .select({ locale: usersTable.locale })
-                  .from(usersTable)
-                  .where(eq(usersTable.id, dbTask.userId))
-                  .limit(1);
-                if (ownerRow[0]?.locale) {
-                  userLocale = ownerRow[0].locale;
-                }
-              }
-
-              const { leadId: ownerLeadId } =
-                await LeadAuthRepository.getAuthenticatedUserLeadId(
-                  taskOwnerId,
-                  undefined,
-                  userLocale,
-                  logger,
-                );
-              const cronUser = {
-                id: taskOwnerId,
-                leadId: ownerLeadId,
-                isPublic: false as const,
-                roles: [UserPermissionRole.ADMIN],
-              };
-
-              // Resolve routeId → endpoint path → handler
-              const path = getFullPath(dbTask.routeId);
-              if (!path) {
-                tasksFailed.push(dbTask.displayName);
-                logger.error(
-                  `Pulse: unknown routeId "${dbTask.routeId}" for task "${dbTask.displayName}"`,
-                );
-              } else {
-                const handler = await getRouteHandler(path);
-                if (!handler) {
-                  tasksFailed.push(dbTask.displayName);
-                  logger.error(
-                    `Pulse: no handler for routeId "${dbTask.routeId}"`,
-                  );
-                } else {
-                  const taskInput = dbTask.taskInput ?? {};
-                  const { urlPathParams, data } = await splitTaskArgs(
-                    path,
-                    taskInput,
-                  );
-
-                  const result = await handler({
-                    data,
-                    urlPathParams,
-                    user: cronUser,
-                    locale: userLocale,
-                    logger,
-                    platform: Platform.CLI,
-                  });
-
-                  if (isStreaming(result) || isFile(result)) {
-                    tasksFailed.push(dbTask.displayName);
-                    logger.error(
-                      `Pulse: task "${dbTask.displayName}" returned streaming/file response`,
-                    );
-                  } else if (!result.success) {
-                    tasksFailed.push(dbTask.displayName);
-                    logger.error(`Pulse: task "${dbTask.displayName}" failed`, {
-                      message: result.message,
-                    });
-                  } else {
-                    tasksSucceeded.push(dbTask.displayName);
-                  }
-                }
-              }
-
-              // Run-once: disable after first execution regardless of outcome
-              if (dbTask.runOnce) {
-                const { t: tPulse } = scopedTranslation.scopedT(userLocale);
-                await CronTasksRepository.updateTask(
-                  dbTask.id,
-                  { enabled: false },
-                  null,
-                  tPulse,
-                  logger,
-                );
-                logger.info(
-                  `[run-once] User task "${dbTask.displayName}" disabled after single execution`,
-                );
-              }
+            } else if (!result.success) {
+              tasksFailed.push(dbTask.displayName);
+              logger.error(`Pulse: task "${dbTask.displayName}" failed`, {
+                message: result.message,
+              });
+            } else {
+              tasksSucceeded.push(dbTask.displayName);
             }
           }
-        } catch (userTaskError) {
-          logger.error("Failed to execute user-created tasks", {
-            error: parseError(userTaskError).message,
-          });
+        }
+
+        // Run-once: disable after first execution regardless of outcome
+        if (dbTask.runOnce) {
+          const { t: tPulse } = scopedTranslation.scopedT(userLocale);
+          await CronTasksRepository.updateTask(
+            dbTask.id,
+            { enabled: false },
+            null,
+            tPulse,
+            logger,
+          );
+          logger.info(
+            `[run-once] Task "${dbTask.displayName}" disabled after single execution`,
+          );
         }
       }
 
       const summary = {
         pulseId,
         executedAt: now.toISOString(),
-        totalTasksDiscovered: candidateTasks.length,
+        totalTasksDiscovered: allTasks.length,
         tasksDue,
         tasksExecuted,
         tasksSucceeded,
