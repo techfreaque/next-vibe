@@ -6,7 +6,6 @@
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import {
@@ -528,8 +527,6 @@ export function CronTaskDetailContainer({
   const t = useWidgetTranslation<typeof endpoints.GET>();
   const { push: navigate } = useWidgetNavigation();
   const { endpointMutations } = useWidgetContext();
-  const locale = useWidgetLocale();
-  const router = useRouter();
   const children = field.children;
 
   const isLoading = endpointMutations?.read?.isLoading;
@@ -572,8 +569,13 @@ export function CronTaskDetailContainer({
     if (!task?.id) {
       return;
     }
-    router.push(`/${locale}/admin/cron/history`);
-  }, [router, locale, task]);
+    void (async (): Promise<void> => {
+      const m = await import("../history/definition");
+      navigate(m.default.GET, {
+        data: { taskId: task.id },
+      });
+    })();
+  }, [navigate, task]);
 
   // ── Refresh ──
   const handleRefresh = useCallback((): void => {

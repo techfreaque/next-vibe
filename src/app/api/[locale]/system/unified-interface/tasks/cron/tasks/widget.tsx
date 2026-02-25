@@ -198,7 +198,7 @@ function TaskRow({
   onView: (task: Task) => void;
   onEdit: (task: Task) => void;
   onDelete: (task: Task) => void;
-  onHistory: () => void;
+  onHistory: (task: Task) => void;
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
   tTasks: ReturnType<typeof tasksScopedTranslation.scopedT>["t"];
 }): React.JSX.Element {
@@ -334,7 +334,7 @@ function TaskRow({
           variant="ghost"
           size="sm"
           className="h-7 w-7 p-0"
-          onClick={() => onHistory()}
+          onClick={() => onHistory(task)}
           title={t("widget.action.history")}
         >
           <Clock className="h-3.5 w-3.5" />
@@ -636,8 +636,11 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   }, [router, locale]);
 
   const handleNavigateHistory = useCallback((): void => {
-    router.push(`/${locale}/admin/cron/history`);
-  }, [router, locale]);
+    void (async (): Promise<void> => {
+      const m = await import("../history/definition");
+      navigate(m.default.GET, {});
+    })();
+  }, [navigate]);
 
   const handleCreate = useCallback((): void => {
     void (async (): Promise<void> => {
@@ -693,9 +696,17 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
     [navigate],
   );
 
-  const handleTaskHistory = useCallback((): void => {
-    router.push(`/${locale}/admin/cron/history`);
-  }, [router, locale]);
+  const handleTaskHistory = useCallback(
+    (task: Task): void => {
+      void (async (): Promise<void> => {
+        const m = await import("../history/definition");
+        navigate(m.default.GET, {
+          data: { taskId: task.id },
+        });
+      })();
+    },
+    [navigate],
+  );
 
   const handleClearFilters = useCallback((): void => {
     setSearch("");

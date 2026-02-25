@@ -19,7 +19,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { DEFAULT_CHARACTERS } from "../characters/config";
+import { DEFAULT_CHARACTERS, NO_CHARACTER_ID } from "../characters/config";
 import { scopedTranslation as charactersScopedTranslation } from "../characters/i18n";
 import { CharactersRepository } from "../characters/repository";
 import { chatSettings } from "../settings/db";
@@ -170,7 +170,7 @@ export async function generateFavoritesSummary(params: {
     // Look up custom character names for any non-default characterIds
     const customCharIds = rows
       .map((r) => r.characterId)
-      .filter((id) => !characterNameMap.has(id));
+      .filter((id) => id !== NO_CHARACTER_ID && !characterNameMap.has(id));
     if (customCharIds.length > 0) {
       const { customCharacters: customCharsTable } =
         await import("../characters/db");

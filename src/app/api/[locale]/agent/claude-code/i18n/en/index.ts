@@ -11,46 +11,46 @@ export const translations = {
           "Launch a Claude Code session on Hermes (the local dev machine). PREFER headless:false (default) — this opens a full back-and-forth Claude Code session where Max can actively participate. Use headless:true only for fully automated batch tasks that need no human input and must return output programmatically (e.g. cron jobs, automated review). In interactive mode the session streams live to the terminal and waits for the user; in batch mode it runs `claude -p`, collects all output, and returns when done. Always runs with --dangerously-skip-permissions so no confirmation prompts interrupt the flow.",
         fields: {
           prompt: {
-            title: "Prompt",
+            label: "Prompt",
             description:
               "The task or question to send to Claude Code. Be specific — include file paths, context, and expected output format.",
           },
           model: {
-            title: "Model",
+            label: "Model",
             description:
               "Claude model ID to use (e.g. claude-sonnet-4-6, claude-opus-4-6). Defaults to the Claude Code default if omitted.",
           },
           maxBudgetUsd: {
-            title: "Max Budget (USD)",
+            label: "Max Budget (USD)",
             description:
               "Maximum spend limit in USD for this run. Prevents runaway tool-use costs. Omit for no limit.",
           },
           allowedTools: {
-            title: "Allowed Tools",
+            label: "Allowed Tools",
             description:
               "Comma-separated list of tools Claude Code may use (e.g. Read,Edit,Bash). Omit to allow all default tools.",
           },
-          headless: {
-            title: "Headless (batch mode)",
+          interactiveMode: {
+            label: "Interactive Mode",
             description:
-              "PREFER false (default). Headless:false opens a full interactive Claude Code session — Max can see output live and participate. Set to true only for fully automated batch tasks (cron jobs, pipelines) where no human interaction is needed and output must be returned as a value.",
+              "PREFER true (default). Interactive mode opens a full Claude Code session — Max can see output live and participate. Set to false only for fully automated batch tasks (cron jobs, pipelines) where no human interaction is needed and output must be returned as a value.",
           },
           timeoutMs: {
-            title: "Timeout (ms)",
+            label: "Timeout (ms)",
             description:
               "Maximum execution time in milliseconds. Defaults to 600000 (10 minutes). Increase for long-running tasks.",
           },
           output: {
-            title: "Output",
+            label: "Output",
             description: "Combined stdout from the Claude Code process.",
           },
           exitCode: {
-            title: "Exit Code",
+            label: "Exit Code",
             description:
               "Process exit code. 0 = success, non-zero = error or partial failure.",
           },
           durationMs: {
-            title: "Duration (ms)",
+            label: "Duration (ms)",
             description: "Total wall-clock time the process ran.",
           },
         },

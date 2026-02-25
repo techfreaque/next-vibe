@@ -13,45 +13,45 @@ export const translations: typeof enTranslations = {
           "Uruchamia sesję Claude Code na Hermesie (lokalnej maszynie deweloperskiej). PREFERUJ headless:false (domyślnie) — otwiera pełną sesję Claude Code, w której Max może aktywnie uczestniczyć. headless:true tylko dla w pełni zautomatyzowanych zadań wsadowych bez udziału człowieka (np. cron-joby). W trybie interaktywnym sesja jest strumieniowana na żywo do terminala; w trybie wsadowym uruchamia `claude -p` i zwraca wynik po zakończeniu. Zawsze uruchamia z --dangerously-skip-permissions.",
         fields: {
           prompt: {
-            title: "Prompt",
+            label: "Prompt",
             description:
               "Zadanie lub pytanie dla Claude Code. Bądź konkretny — podaj ścieżki plików, kontekst i oczekiwany format wyjścia.",
           },
           model: {
-            title: "Model",
+            label: "Model",
             description:
               "ID modelu Claude (np. claude-sonnet-4-6, claude-opus-4-6). Domyślnie używa ustawień Claude Code.",
           },
           maxBudgetUsd: {
-            title: "Maks. budżet (USD)",
+            label: "Maks. budżet (USD)",
             description:
               "Maksymalny limit wydatków w USD. Zapobiega niekontrolowanym kosztom użycia narzędzi. Pomiń dla braku limitu.",
           },
           allowedTools: {
-            title: "Dozwolone narzędzia",
+            label: "Dozwolone narzędzia",
             description:
               "Rozdzielona przecinkami lista dozwolonych narzędzi (np. Read,Edit,Bash). Pomiń dla wszystkich domyślnych narzędzi.",
           },
-          headless: {
-            title: "Headless (tryb wsadowy)",
+          interactiveMode: {
+            label: "Tryb interaktywny",
             description:
-              "PREFERUJ false (domyślnie). headless:false otwiera pełną interaktywną sesję Claude Code — Max widzi wyniki na żywo i może uczestniczyć. Ustaw true tylko dla w pełni zautomatyzowanych zadań wsadowych (cron-joby, pipeline'y) bez interakcji człowieka.",
+              "PREFERUJ true (domyślnie). Tryb interaktywny otwiera pełną sesję Claude Code — Max widzi wyniki na żywo i może uczestniczyć. Ustaw false tylko dla w pełni zautomatyzowanych zadań wsadowych (cron-joby, pipeline'y) bez interakcji człowieka.",
           },
           timeoutMs: {
-            title: "Timeout (ms)",
+            label: "Timeout (ms)",
             description:
               "Maksymalny czas wykonania w milisekundach. Domyślnie: 600000 (10 minut).",
           },
           output: {
-            title: "Wyjście",
+            label: "Wyjście",
             description: "Połączony stdout procesu Claude Code.",
           },
           exitCode: {
-            title: "Kod wyjścia",
+            label: "Kod wyjścia",
             description: "Kod wyjścia procesu. 0 = sukces, niezerowy = błąd.",
           },
           durationMs: {
-            title: "Czas trwania (ms)",
+            label: "Czas trwania (ms)",
             description: "Łączny czas działania procesu.",
           },
         },

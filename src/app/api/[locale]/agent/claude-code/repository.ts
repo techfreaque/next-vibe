@@ -184,26 +184,10 @@ export async function runClaudeCode(
   if (data.maxBudgetUsd !== undefined && data.maxBudgetUsd !== null) {
     args.push("--max-budget-usd", String(data.maxBudgetUsd));
   }
-  // Build system prompt: user-provided + task context injection
-  const systemPromptParts: string[] = [];
-  if (data.systemPrompt) {
-    systemPromptParts.push(data.systemPrompt);
-  }
+  // For interactive mode, append task context to the prompt itself
+  // (--system-prompt gets mangled by shell escaping through terminal emulators)
   if (cronTaskId && isInteractive) {
-    systemPromptParts.push(
-      [
-        `[TASK CONTEXT]`,
-        `You are working on task ID: ${cronTaskId}`,
-        `When the user confirms the work is complete, call the "complete-task" MCP tool with:`,
-        `  taskId: "${cronTaskId}"`,
-        `  status: "completed" (or "failed" if something went wrong)`,
-        `  summary: a brief description of what was done`,
-        `IMPORTANT: Only mark complete after explicit user confirmation. Never auto-complete.`,
-      ].join("\n"),
-    );
-  }
-  if (systemPromptParts.length > 0) {
-    args.push("--system-prompt", systemPromptParts.join("\n\n"));
+    args[0] = `${args[0]}\n\n[TASK CONTEXT] cronTaskId=${cronTaskId} — When I confirm the work is complete, call MCP tool "complete-task" with taskId="${cronTaskId}", status="completed"|"failed", and a summary. `;
   }
   if (data.allowedTools) {
     args.push("--allowedTools", data.allowedTools);
