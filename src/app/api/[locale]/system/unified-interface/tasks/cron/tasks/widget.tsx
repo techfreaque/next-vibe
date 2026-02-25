@@ -154,10 +154,10 @@ function getStatusColorClass(status: string | null): string {
 
 function StatusBadge({
   status,
-  t,
+  tTasks,
 }: {
   status: string | null;
-  t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
+  tTasks: ReturnType<typeof tasksScopedTranslation.scopedT>["t"];
 }): React.JSX.Element {
   return (
     <Span
@@ -166,7 +166,7 @@ function StatusBadge({
         getStatusColorClass(status),
       )}
     >
-      {status ? t(status as Parameters<typeof t>[0]) : "—"}
+      {status ? tTasks(status as Parameters<typeof tTasks>[0]) : "—"}
     </Span>
   );
 }
@@ -314,7 +314,7 @@ function TaskRow({
 
       {/* Status badge */}
       <Div className="flex-shrink-0 flex items-center">
-        <StatusBadge status={task.lastExecutionStatus} t={t} />
+        <StatusBadge status={task.lastExecutionStatus} tTasks={tTasks} />
       </Div>
 
       {/* Action buttons (appear on hover) */}

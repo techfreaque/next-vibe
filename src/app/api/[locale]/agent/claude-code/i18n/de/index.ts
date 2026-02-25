@@ -27,11 +27,6 @@ export const translations: typeof enTranslations = {
             description:
               "Maximales Ausgabelimit in USD. Verhindert unkontrollierte Tool-Nutzungskosten. Weglassen für kein Limit.",
           },
-          systemPrompt: {
-            title: "System-Prompt",
-            description:
-              "Optionaler System-Prompt. Für Persona, Einschränkungen oder Kontext der gesamten Sitzung.",
-          },
           allowedTools: {
             title: "Erlaubte Tools",
             description:

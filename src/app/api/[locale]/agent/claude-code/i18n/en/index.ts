@@ -25,11 +25,6 @@ export const translations = {
             description:
               "Maximum spend limit in USD for this run. Prevents runaway tool-use costs. Omit for no limit.",
           },
-          systemPrompt: {
-            title: "System Prompt",
-            description:
-              "Optional system prompt to prepend. Use to set persona, constraints, or context that applies to the entire session.",
-          },
           allowedTools: {
             title: "Allowed Tools",
             description:

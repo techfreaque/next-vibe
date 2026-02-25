@@ -27,11 +27,6 @@ export const translations: typeof enTranslations = {
             description:
               "Maksymalny limit wydatków w USD. Zapobiega niekontrolowanym kosztom użycia narzędzi. Pomiń dla braku limitu.",
           },
-          systemPrompt: {
-            title: "Prompt systemowy",
-            description:
-              "Opcjonalny prompt systemowy. Dla persony, ograniczeń lub kontekstu całej sesji.",
-          },
           allowedTools: {
             title: "Dozwolone narzędzia",
             description:

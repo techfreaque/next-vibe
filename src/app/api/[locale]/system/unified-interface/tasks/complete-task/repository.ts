@@ -52,20 +52,18 @@ export async function completeTask(
   }
 
   const now = new Date();
-  const finalStatus =
-    status === "completed" ? CronTaskStatus.COMPLETED : CronTaskStatus.FAILED;
 
   // Update task in local DB
   try {
     const updates: Partial<NewCronTask> & { updatedAt: Date } = {
       lastExecutedAt: now,
-      lastExecutionStatus: finalStatus,
+      lastExecutionStatus: status,
       lastExecutionDuration: null,
       executionCount: task.executionCount + 1,
       updatedAt: now,
     };
 
-    if (status === "completed") {
+    if (status === CronTaskStatus.COMPLETED) {
       updates.successCount = task.successCount + 1;
       updates.lastExecutionError = null;
     } else {
@@ -86,7 +84,7 @@ export async function completeTask(
     logger.info("Task marked as complete", {
       taskId,
       routeId: task.routeId,
-      status: finalStatus,
+      status,
       summary: summary.slice(0, 200),
     });
   } catch (error) {
@@ -102,7 +100,7 @@ export async function completeTask(
   if (task.targetInstance && env.THEA_REMOTE_URL && env.THEA_REMOTE_API_KEY) {
     const pushResult = await pushCompletionToRemote({
       taskRouteId: task.routeId,
-      status: finalStatus,
+      status,
       summary,
       durationMs: null,
       serverTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,

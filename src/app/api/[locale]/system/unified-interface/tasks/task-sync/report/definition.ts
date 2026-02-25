@@ -19,6 +19,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../../i18n";
@@ -63,7 +64,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
-        schema: z.enum(["completed", "failed"]),
+        schema: z.enum([CronTaskStatus.COMPLETED, CronTaskStatus.FAILED]),
       }),
       durationMs: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -153,7 +154,7 @@ const { POST } = createEndpoint({
       default: {
         apiKey: "your-api-key",
         taskRouteId: "claude-code",
-        status: "completed" as const,
+        status: CronTaskStatus.COMPLETED,
         summary: "Task completed successfully.",
       },
     },
