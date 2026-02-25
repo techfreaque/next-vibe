@@ -167,7 +167,7 @@ export async function runClaudeCode(
 ): Promise<ResponseType<RunResponseOutput>> {
   const timeoutMs = data.timeoutMs ?? 600000;
   const start = Date.now();
-  const isInteractive = !(data.headless ?? false);
+  const isInteractive = !(data.interactive ?? false);
   const cwd = data.workingDir ?? process.cwd();
 
   // Build claude CLI args

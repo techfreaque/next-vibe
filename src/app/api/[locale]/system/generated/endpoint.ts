@@ -84,6 +84,7 @@ export const aliasToPathMap = {
     "agent_chat_threads_threadId_share-links_PATCH",
   "agent_chat_threads_threadId_share-links_POST":
     "agent_chat_threads_threadId_share-links_POST",
+  "agent_claude-code_POST": "agent_claude-code_POST",
   "agent_fetch-url-content_GET": "agent_fetch-url-content_GET",
   agent_models_openrouter_GET: "agent_models_openrouter_GET",
   agent_search_brave_GET: "agent_search_brave_GET",
@@ -132,8 +133,8 @@ export const aliasToPathMap = {
   cc: "system_check_config_create_POST",
   check: "system_check_vibe-check_POST",
   chrome: "browser_POST",
-  claude: "system_agent_claude-code_POST",
-  "claude-code": "system_agent_claude-code_POST",
+  claude: "agent_claude-code_POST",
+  "claude-code": "agent_claude-code_POST",
   "click-tracking": "leads_tracking_engagement_GET",
   "config-create": "system_check_config_create_POST",
   contact_POST: "contact_POST",
@@ -368,7 +369,6 @@ export const aliasToPathMap = {
   subscription_update_PUT: "subscription_update_PUT",
   "subscription-cancel": "subscription_cancel_DELETE",
   "subscription-update": "subscription_update_PUT",
-  "system_agent_claude-code_POST": "system_agent_claude-code_POST",
   system_builder_POST: "system_builder_POST",
   system_check_config_create_POST: "system_check_config_create_POST",
   system_check_lint_POST: "system_check_lint_POST",
@@ -723,6 +723,9 @@ export async function getEndpoint(
       return (
         await import("@/app/api/[locale]/agent/chat/threads/[threadId]/share-links/definition")
       ).default.POST;
+    case "agent_claude-code_POST":
+      return (await import("@/app/api/[locale]/agent/claude-code/definition"))
+        .default.POST;
     case "agent_fetch-url-content_GET":
       return (
         await import("@/app/api/[locale]/agent/fetch-url-content/definition")
@@ -1642,9 +1645,6 @@ export async function getEndpoint(
     case "subscription_update_PUT":
       return (await import("@/app/api/[locale]/subscription/update/definition"))
         .default.PUT;
-    case "system_agent_claude-code_POST":
-      return (await import("@/app/api/[locale]/agent/claude-code/definition"))
-        .default.POST;
     case "system_builder_POST":
       return (await import("@/app/api/[locale]/system/builder/definition"))
         .default.POST;

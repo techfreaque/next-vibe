@@ -27,7 +27,7 @@ import { scopedTranslation } from "./i18n";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "agent", "claude-code"],
+  path: ["agent", "claude-code"],
   title: "claudeCode.run.post.title",
   description: "claudeCode.run.post.description",
   icon: "terminal",
@@ -79,11 +79,11 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.string().optional(),
       }),
-      headless: scopedRequestField(scopedTranslation, {
+      interactive: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
         columns: 6,
-        schema: z.boolean().default(false),
+        schema: z.boolean().default(true),
       }),
       timeoutMs: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -157,12 +157,12 @@ const { POST } = createEndpoint({
       default: {
         prompt:
           "Add a new feature to the claude-code endpoint that tracks how many times it has been called.",
-        headless: false,
+        interactive: false,
       },
       batch: {
         prompt:
           "Read src/app/api/[locale]/system/agent/claude-code/repository.ts and summarize what it does in 2 sentences.",
-        headless: true,
+        interactive: true,
         timeoutMs: 60000,
       },
     },
