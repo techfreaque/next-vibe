@@ -69,6 +69,18 @@ const STRIPE_STATUS_MAP: Record<
 };
 
 /**
+ * Check if a plan ID matches the subscription plan.
+ * Handles both legacy prefixed values ('app.api.subscription.enums.plan.subscription')
+ * and current short values ('enums.plan.subscription') stored in the DB.
+ */
+function isSubscriptionPlan(planId: string): boolean {
+  return (
+    planId === SubscriptionPlan.SUBSCRIPTION ||
+    planId.endsWith(`.${SubscriptionPlan.SUBSCRIPTION}`)
+  );
+}
+
+/**
  * Generate canonical idempotency key for subscription credit grants.
  * Shared across all credit grant paths (invoice handler, subscription.updated, auto-sync)
  * to prevent duplicate grants from different webhook/sync triggers.
@@ -242,10 +254,9 @@ export class SubscriptionRepository {
                   const { t: creditsT } =
                     creditsScopedTranslation.scopedT(locale);
 
-                  const productId =
-                    subscription.planId === SubscriptionPlan.SUBSCRIPTION
-                      ? ProductIds.SUBSCRIPTION
-                      : null;
+                  const productId = isSubscriptionPlan(subscription.planId)
+                    ? ProductIds.SUBSCRIPTION
+                    : null;
 
                   if (productId) {
                     const product = productsRepository.getProduct(
@@ -368,10 +379,9 @@ export class SubscriptionRepository {
                 await import("../products/repository-client");
               const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
 
-              const productId =
-                subscription.planId === SubscriptionPlan.SUBSCRIPTION
-                  ? ProductIds.SUBSCRIPTION
-                  : null;
+              const productId = isSubscriptionPlan(subscription.planId)
+                ? ProductIds.SUBSCRIPTION
+                : null;
 
               if (productId) {
                 const product = productsRepository.getProduct(
@@ -908,10 +918,9 @@ export class SubscriptionRepository {
       }
       const { t: creditsT } = creditsScopedTranslation.scopedT(userLocale);
 
-      const productId =
-        subscription.planId === SubscriptionPlan.SUBSCRIPTION
-          ? ProductIds.SUBSCRIPTION
-          : null;
+      const productId = isSubscriptionPlan(subscription.planId)
+        ? ProductIds.SUBSCRIPTION
+        : null;
 
       if (!productId) {
         logger.warn("No product ID found for subscription plan", {
@@ -1108,10 +1117,9 @@ export class SubscriptionRepository {
         const { t: creditsT } =
           creditsScopedTranslation.scopedT(userLocaleForInvoice);
 
-        const productId =
-          subscription.planId === SubscriptionPlan.SUBSCRIPTION
-            ? ProductIds.SUBSCRIPTION
-            : null;
+        const productId = isSubscriptionPlan(subscription.planId)
+          ? ProductIds.SUBSCRIPTION
+          : null;
 
         if (productId) {
           const product = productsRepository.getProduct(
@@ -1472,10 +1480,9 @@ export class SubscriptionRepository {
         const { t: creditsT } =
           creditsScopedTranslation.scopedT(userLocaleForUpdate);
 
-        const productId =
-          subscription.planId === SubscriptionPlan.SUBSCRIPTION
-            ? ProductIds.SUBSCRIPTION
-            : null;
+        const productId = isSubscriptionPlan(subscription.planId)
+          ? ProductIds.SUBSCRIPTION
+          : null;
 
         if (productId) {
           const product = productsRepository.getProduct(
