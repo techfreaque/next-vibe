@@ -34,6 +34,11 @@ export const translations: typeof enTranslations = {
       description:
         "Wspomnienia o wyższym priorytecie pojawiają się pierwsze (pozostaw puste, aby zachować bieżący)",
     },
+    isPublic: {
+      label: "Publiczne",
+      description:
+        "Ustaw to wspomnienie jako widoczne w kontekstach publicznych i udostępnionych",
+    },
     backButton: {
       label: "Wstecz",
     },

@@ -14,6 +14,7 @@ import {
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import { DefaultFolderId } from "../config";
 import type { scopedTranslation as idScopedTranslation } from "./[id]/i18n";
 import { memories, type Memory } from "./db";
 import { formatMemorySummary } from "./formatter";
@@ -31,22 +32,33 @@ const MEMORY_LIMITS = {
 
 /**
  * Internal: Get memories as array (for use by other functions)
+ * @param rootFolderId - Root folder ID (public/shared for exposed folders)
  */
 async function getMemoriesList(params: {
   userId: string;
   logger: EndpointLogger;
+  rootFolderId: DefaultFolderId;
 }): Promise<Memory[]> {
-  const { userId, logger } = params;
+  const { userId, logger, rootFolderId } = params;
+  const publicOnly =
+    rootFolderId === DefaultFolderId.PUBLIC ||
+    rootFolderId === DefaultFolderId.SHARED;
+
+  const conditions = [eq(memories.userId, userId)];
+  if (publicOnly) {
+    conditions.push(eq(memories.isPublic, true));
+  }
 
   const result = await db
     .select()
     .from(memories)
-    .where(eq(memories.userId, userId))
+    .where(and(...conditions))
     .orderBy(desc(memories.priority), memories.id);
 
   logger.debug("Retrieved memories list", {
     userId,
     count: result.length,
+    publicOnly,
   });
 
   return result;
@@ -59,10 +71,11 @@ async function getMemoriesList(params: {
 export async function getMemories(params: {
   userId: string;
   logger: EndpointLogger;
+  rootFolderId: DefaultFolderId;
 }): Promise<ResponseType<{ memories: Memory[] }>> {
-  const { userId, logger } = params;
+  const { userId, logger, rootFolderId } = params;
 
-  const result = await getMemoriesList({ userId, logger });
+  const result = await getMemoriesList({ userId, logger, rootFolderId });
 
   logger.info("Retrieved memories", {
     userId,
@@ -78,12 +91,13 @@ export async function getMemories(params: {
  */
 export async function addMemory(params: {
   content: string;
-  tags?: string[];
+  tags: string[] | undefined;
   userId: string;
-  priority?: number;
+  priority: number | undefined;
+  isPublic: boolean;
   logger: EndpointLogger;
 }): Promise<ResponseType<{ id: number }>> {
-  const { content, tags = [], userId, priority = 0, logger } = params;
+  const { content, tags = [], userId, priority = 0, isPublic, logger } = params;
 
   // Get next memory number for this user (starts at 0)
   const nextMemoryNumber = await getNextMemoryNumber({ userId });
@@ -97,6 +111,7 @@ export async function addMemory(params: {
       tags,
       userId,
       priority,
+      isPublic,
       metadata: {
         source: "manual",
         confidence: 1.0,
@@ -113,7 +128,11 @@ export async function addMemory(params: {
   });
 
   // Check if auto-summarization is needed
-  await checkAndSummarizeIfNeeded({ userId, logger });
+  await checkAndSummarizeIfNeeded({
+    userId,
+    logger,
+    rootFolderId: DefaultFolderId.PRIVATE,
+  });
 
   return success({ id: memory.memoryNumber });
 }
@@ -126,11 +145,13 @@ export async function updateMemory(params: {
   content?: string;
   tags?: string[];
   priority?: number;
+  isPublic?: boolean;
   userId: string;
   logger: EndpointLogger;
   t: MemoriesT;
 }): Promise<ResponseType<{ success: true }>> {
-  const { memoryNumber, content, tags, priority, userId, logger, t } = params;
+  const { memoryNumber, content, tags, priority, isPublic, userId, logger, t } =
+    params;
 
   const updateData: Partial<typeof memories.$inferInsert> = {
     updatedAt: new Date(),
@@ -145,6 +166,9 @@ export async function updateMemory(params: {
   }
   if (priority !== undefined) {
     updateData.priority = priority;
+  }
+  if (isPublic !== undefined) {
+    updateData.isPublic = isPublic;
   }
 
   const [updated] = await db
@@ -217,10 +241,15 @@ export async function deleteMemory(params: {
 export async function generateMemorySummary(params: {
   userId: string;
   logger: EndpointLogger;
+  rootFolderId: DefaultFolderId;
 }): Promise<string> {
-  const { userId, logger } = params;
+  const { userId, logger, rootFolderId } = params;
 
-  const memoriesList = await getMemoriesList({ userId, logger });
+  const memoriesList = await getMemoriesList({
+    userId,
+    logger,
+    rootFolderId,
+  });
 
   // Update access metadata if memories exist
   if (memoriesList.length > 0) {
@@ -288,10 +317,15 @@ async function updateMemoryAccess(params: {
 async function checkAndSummarizeIfNeeded(params: {
   userId: string;
   logger: EndpointLogger;
+  rootFolderId: DefaultFolderId;
 }): Promise<void> {
-  const { userId, logger } = params;
+  const { userId, logger, rootFolderId } = params;
 
-  const memoriesList = await getMemoriesList({ userId, logger });
+  const memoriesList = await getMemoriesList({
+    userId,
+    logger,
+    rootFolderId,
+  });
 
   // Calculate total size
   const totalSize = memoriesList.reduce(
@@ -329,15 +363,16 @@ async function checkAndSummarizeIfNeeded(params: {
 export async function getMemoryStats(params: {
   userId: string;
   logger: EndpointLogger;
+  rootFolderId: DefaultFolderId;
 }): Promise<{
   count: number;
   totalSize: number;
   oldestMemory: Date | null;
   newestMemory: Date | null;
 }> {
-  const { userId, logger } = params;
+  const { userId, logger, rootFolderId } = params;
 
-  const memoriesList = await getMemoriesList({ userId, logger });
+  const memoriesList = await getMemoriesList({ userId, logger, rootFolderId });
 
   const totalSize = memoriesList.reduce(
     (sum, memory) => sum + memory.content.length,

@@ -29,9 +29,8 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../i18n";
-import { ExecuteToolWidget } from "./widget";
-
 export const EXECUTE_TOOL_ALIAS = "execute-tool" as const;
+import { ExecuteToolWidget } from "./widget";
 
 const { POST } = createEndpoint({
   scopedTranslation,

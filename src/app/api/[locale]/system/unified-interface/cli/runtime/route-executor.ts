@@ -7,6 +7,7 @@
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type {
   JwtPayloadType,
   JWTPublicPayloadType,
@@ -218,6 +219,7 @@ export class RouteDelegationHandler {
                 locale: options.locale,
                 logger,
                 platform: options.platform,
+                rootFolderId: DefaultFolderId.CRON,
               });
 
             return result;
@@ -306,6 +308,7 @@ export class RouteDelegationHandler {
           locale: options.locale,
           logger,
           platform: options.platform,
+          rootFolderId: DefaultFolderId.CRON,
         });
 
       // 7. Convert ResponseType to RouteExecutionResult

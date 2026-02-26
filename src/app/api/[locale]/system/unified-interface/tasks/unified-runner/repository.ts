@@ -17,6 +17,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import {
   isFileResponse,
   isStreamingResponse,
@@ -279,6 +280,7 @@ export class UnifiedTaskRunnerRepositoryImpl {
         logger: this.logger,
         platform: Platform.CRON,
         cronTaskId: dbTask?.id,
+        rootFolderId: DefaultFolderId.CRON,
       });
 
       const durationMs = Date.now() - startTime;
@@ -742,7 +744,7 @@ export class UnifiedTaskRunnerRepositoryImpl {
       process.exit(1);
     }
 
-    logger.info(
+    logger.debug(
       `Task runner started with ${taskRegistry.allTasks.length} tasks. Press Ctrl+C to stop.`,
     );
 

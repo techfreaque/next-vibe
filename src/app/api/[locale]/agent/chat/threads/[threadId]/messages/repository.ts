@@ -18,6 +18,7 @@ import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import {
@@ -626,10 +627,13 @@ export class MessagesRepository {
       // Extract user identifier - use leadId for PUBLIC users, userId for authenticated
       const userIdentifier = user.isPublic ? user.leadId : user.id;
 
-      // SECURITY: Force role to USER for all user-created messages
-      // Only the AI stream system can create ASSISTANT/SYSTEM/TOOL/ERROR messages
-      if (data.role && data.role !== ChatMessageRole.USER) {
-        logger.warn("Attempted to create message with non-USER role", {
+      // SECURITY: Only ADMIN users can create ASSISTANT messages.
+      // PUBLIC and CUSTOMER users are forced to USER role.
+      const isAdmin =
+        !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+
+      if (data.role === ChatMessageRole.ASSISTANT && !isAdmin) {
+        logger.warn("Non-admin attempted to create ASSISTANT message", {
           attemptedRole: data.role,
           userId: userIdentifier,
           isPublic: user.isPublic,
@@ -641,8 +645,10 @@ export class MessagesRepository {
         });
       }
 
-      // SECURITY: Force role to USER regardless of input
-      const safeRole = ChatMessageRole.USER;
+      const safeRole =
+        data.role === ChatMessageRole.ASSISTANT && isAdmin
+          ? ChatMessageRole.ASSISTANT
+          : ChatMessageRole.USER;
 
       // SECURITY: PUBLIC users cannot set model
       if (user.isPublic && data.model) {
@@ -743,7 +749,7 @@ export class MessagesRepository {
           parentId: data.parentId || null,
           depth,
           authorId: userIdentifier,
-          isAI: false,
+          isAI: safeRole === ChatMessageRole.ASSISTANT,
           model: user.isPublic ? null : data.model || null,
           metadata: data.metadata || {},
         })

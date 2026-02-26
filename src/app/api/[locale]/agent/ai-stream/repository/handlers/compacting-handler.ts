@@ -83,7 +83,7 @@ export class CompactingHandler {
     abortSignal: AbortSignal;
     logger: EndpointLogger;
     timezone: string;
-    rootFolderId?: DefaultFolderId;
+    rootFolderId: DefaultFolderId;
     compactingMessageCreatedAt: Date;
     t: AiStreamModuleT;
   }): Promise<

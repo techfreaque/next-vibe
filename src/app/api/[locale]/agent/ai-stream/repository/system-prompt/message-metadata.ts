@@ -31,7 +31,7 @@ export function formatAbsoluteTimestamp(date: Date, timezone: string): string {
  */
 export function createMessageMetadata(
   message: ChatMessage,
-  rootFolderId: DefaultFolderId | undefined,
+  rootFolderId: DefaultFolderId,
   timezone: string,
 ): string {
   const parts: string[] = [];
@@ -82,7 +82,7 @@ export function createMessageMetadata(
  */
 export function createMetadataSystemMessage(
   message: ChatMessage,
-  rootFolderId: DefaultFolderId | undefined,
+  rootFolderId: DefaultFolderId,
   timezone: string,
 ): string {
   const metadata = createMessageMetadata(message, rootFolderId, timezone);

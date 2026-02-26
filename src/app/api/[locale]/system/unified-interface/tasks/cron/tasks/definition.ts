@@ -82,6 +82,8 @@ export const cronTaskResponseSchema = z.object({
   successCount: z.number(),
   errorCount: z.number(),
   averageExecutionTime: z.number().nullable(),
+  consecutiveFailures: z.number(),
+  maxConsecutiveFailures: z.number().nullable(),
   targetInstance: z.string().nullable(),
   tags: z.array(z.string()).optional().default([]),
   userId: z.string().nullable(),
@@ -289,6 +291,11 @@ const { GET } = createEndpoint({
             executionCount: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.executionCount",
+              schema: z.number(),
+            }),
+            consecutiveFailures: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.task.consecutiveFailures",
               schema: z.number(),
             }),
             successCount: scopedResponseField(scopedTranslation, {
@@ -628,6 +635,8 @@ const { POST } = createEndpoint({
           successCount: 0,
           errorCount: 0,
           averageExecutionTime: null,
+          consecutiveFailures: 0,
+          maxConsecutiveFailures: 5,
           targetInstance: null,
           tags: [],
           userId: null,

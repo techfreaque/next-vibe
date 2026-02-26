@@ -244,6 +244,12 @@ export const translations = {
       description: "Message created successfully",
     },
   },
+  enums: {
+    role: {
+      user: "User",
+      assistant: "Assistant",
+    },
+  },
   messageId: messageIdTranslations,
   path: pathTranslations,
 };

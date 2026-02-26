@@ -19,7 +19,8 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { DEFAULT_CHARACTERS, NO_CHARACTER_ID } from "../characters/config";
+import { DEFAULT_CHARACTERS } from "../characters/config";
+import { NO_CHARACTER_ID } from "../characters/constants";
 import { scopedTranslation as charactersScopedTranslation } from "../characters/i18n";
 import { CharactersRepository } from "../characters/repository";
 import { chatSettings } from "../settings/db";
@@ -27,7 +28,10 @@ import { scopedTranslation as settingsScopedTranslation } from "../settings/i18n
 import { ChatSettingsRepository } from "../settings/repository";
 import { chatFavorites } from "./db";
 import type { FavoritesListResponseOutput } from "./definition";
-import { formatFavoritesSummary } from "./favorites-formatter";
+import {
+  formatEmptyFavoritesGuidance,
+  formatFavoritesSummary,
+} from "./favorites-formatter";
 import type { scopedTranslation } from "./i18n";
 import { ChatFavoritesRepositoryClient } from "./repository-client";
 
@@ -157,7 +161,7 @@ export async function generateFavoritesSummary(params: {
       .orderBy(asc(chatFavorites.position));
 
     if (rows.length === 0) {
-      return "";
+      return formatEmptyFavoritesGuidance();
     }
 
     // Resolve localized character names

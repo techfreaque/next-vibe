@@ -43,6 +43,11 @@ import {
   PriceLevel,
   SpeedLevel,
 } from "../../characters/enum";
+import {
+  CHARACTER_DELETE_ALIAS,
+  CHARACTER_GET_ALIAS,
+  CHARACTER_UPDATE_ALIAS,
+} from "../constants";
 import type {
   FiltersModelSelection,
   ManualModelSelection,
@@ -69,6 +74,8 @@ const { DELETE } = createEndpoint({
   icon: "trash" as const,
   category: "app.endpointCategories.chat",
   tags: ["tags.characters" as const],
+
+  aliases: [CHARACTER_DELETE_ALIAS],
 
   options: {
     mutationOptions: {
@@ -257,6 +264,8 @@ const { PATCH } = createEndpoint({
   icon: "sparkles" as const,
   category: "app.endpointCategories.chat",
   tags: ["tags.characters" as const],
+
+  aliases: [CHARACTER_UPDATE_ALIAS],
 
   options: {
     mutationOptions: {
@@ -645,6 +654,8 @@ const { GET } = createEndpoint({
   icon: "sparkles" as const,
   category: "app.endpointCategories.chat",
   tags: ["tags.characters" as const],
+
+  aliases: [CHARACTER_GET_ALIAS],
 
   fields: customWidgetObject({
     render: CharacterViewContainer,

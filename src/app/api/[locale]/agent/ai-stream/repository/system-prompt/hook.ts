@@ -35,7 +35,7 @@ export interface DebugSystemPromptParts {
  */
 export function useDebugSystemPrompt(params: {
   locale: CountryLanguage;
-  rootFolderId?: DefaultFolderId;
+  rootFolderId: DefaultFolderId;
   subFolderId?: string | null;
   characterId?: string | null;
   selectedModel?: string;

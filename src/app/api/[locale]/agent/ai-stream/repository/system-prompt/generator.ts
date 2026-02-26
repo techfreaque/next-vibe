@@ -94,9 +94,7 @@ function getFolderDescription(folderId: DefaultFolderId): string {
 /**
  * Build a folder-specific note for the headless execution context block
  */
-function buildHeadlessFolderNote(
-  rootFolderId: DefaultFolderId | undefined,
-): string {
+function buildHeadlessFolderNote(rootFolderId: DefaultFolderId): string {
   switch (rootFolderId) {
     case "cron":
       return "\nThis thread lives in the **cron** folder — standard home for scheduled agent tasks.";
@@ -157,10 +155,22 @@ IMPORTANT guidelines for voice responses:
 export function sectionIdentity(params: {
   appName: string;
   headless: boolean;
+  rootFolderId: DefaultFolderId;
 }): string {
-  const { appName, headless } = params;
+  const { appName, headless, rootFolderId } = params;
 
   if (headless) {
+    const isPublicForum =
+      rootFolderId === "public" || rootFolderId === "shared";
+
+    if (isPublicForum) {
+      return `# ${appName}
+
+**Current Date:** ${new Date().toISOString().split("T")[0]}
+
+You are posting in a public forum on ${appName}. Write as a natural participant — engaging, informative, and conversational. Your response will be visible to everyone.`;
+    }
+
     return `# ${appName} — Automated Agent
 
 **Current Date:** ${new Date().toISOString().split("T")[0]}
@@ -293,10 +303,23 @@ export function sectionSystemContext(params: {
  * Headless execution context section — placed early so the model internalises it
  */
 export function sectionHeadlessContext(params: {
-  rootFolderId?: DefaultFolderId;
+  rootFolderId: DefaultFolderId;
   extraInstructions?: string;
 }): string {
   const { rootFolderId, extraInstructions } = params;
+  const isPublicForum = rootFolderId === "public" || rootFolderId === "shared";
+
+  if (isPublicForum) {
+    const folderNote = buildHeadlessFolderNote(rootFolderId);
+    return `## Public Post Context
+${folderNote}
+**Guidelines:**
+- Write a natural, engaging response as a forum participant.
+- Your response will be visible to everyone — keep it helpful and on-topic.
+- Do not mention being automated, headless, or a background agent.
+- Your **last message** (with no tool call) is posted as the reply.${extraInstructions?.trim() ? `\n\n${extraInstructions.trim()}` : ""}`;
+  }
+
   const folderNote = buildHeadlessFolderNote(rootFolderId);
 
   return `## Automated Execution Context
@@ -337,7 +360,7 @@ ALWAYS respond in the language of the user's current message. Default language i
  * Current folder context section
  */
 export function sectionFolderContext(params: {
-  rootFolderId?: DefaultFolderId;
+  rootFolderId: DefaultFolderId;
   subFolderId?: string | null;
 }): string | null {
   const { rootFolderId, subFolderId } = params;
@@ -525,7 +548,7 @@ export interface SystemPromptParams {
   /** User's locale (language-country) */
   locale: CountryLanguage;
   /** Current root folder ID */
-  rootFolderId?: DefaultFolderId;
+  rootFolderId: DefaultFolderId;
   /** Current sub folder ID */
   subFolderId?: string | null;
   /** Optional custom character prompt */
@@ -601,7 +624,7 @@ export function generateSystemPrompt(params: SystemPromptParams): string {
   const sections: string[] = [];
 
   // Section 1: Identity
-  sections.push(sectionIdentity({ appName, headless }));
+  sections.push(sectionIdentity({ appName, headless, rootFolderId }));
 
   // Section 2: Platform overview
   sections.push(

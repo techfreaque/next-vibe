@@ -31,12 +31,8 @@ import type {
   CharacterUpdateRequestOutput,
   CharacterUpdateResponseOutput,
 } from "./[id]/definition";
-import {
-  type Character,
-  DEFAULT_CHARACTERS,
-  NO_CHARACTER,
-  NO_CHARACTER_ID,
-} from "./config";
+import { type Character, DEFAULT_CHARACTERS, NO_CHARACTER } from "./config";
+import { NO_CHARACTER_ID } from "./constants";
 import type {
   CharacterCreateRequestOutput,
   CharacterCreateResponseOutput,

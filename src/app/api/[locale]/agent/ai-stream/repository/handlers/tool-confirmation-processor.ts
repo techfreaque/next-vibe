@@ -12,6 +12,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { db } from "../../../../system/db";
+import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage, ToolCall } from "../../../chat/db";
 import { chatMessages } from "../../../chat/db";
 import type { AiStreamT } from "../../i18n";
@@ -29,6 +30,7 @@ export class ToolConfirmationProcessor {
     logger: EndpointLogger;
     user: JwtPayloadType;
     t: AiStreamT;
+    rootFolderId: DefaultFolderId;
   }): Promise<
     ResponseType<
       Array<{
@@ -70,6 +72,7 @@ export class ToolConfirmationProcessor {
           logger,
           user,
           t,
+          rootFolderId: params.rootFolderId,
         });
 
       if (!confirmResult.success) {

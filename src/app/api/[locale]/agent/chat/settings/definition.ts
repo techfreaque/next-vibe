@@ -26,6 +26,10 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { TtsVoiceDB, TtsVoiceOptions } from "../../text-to-speech/enum";
 import { ViewMode, ViewModeDB, ViewModeOptions } from "../enum";
+import {
+  CHAT_SETTINGS_GET_ALIAS,
+  CHAT_SETTINGS_UPDATE_ALIAS,
+} from "./constants";
 import { scopedTranslation } from "./i18n";
 
 /**
@@ -44,6 +48,8 @@ const { GET } = createEndpoint({
   icon: "settings" as const,
   category: "app.endpointCategories.chat",
   tags: ["tags.settings" as const],
+
+  aliases: [CHAT_SETTINGS_GET_ALIAS],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,
@@ -191,6 +197,8 @@ const { POST } = createEndpoint({
   icon: "settings" as const,
   category: "app.endpointCategories.chat",
   tags: ["tags.settings" as const],
+
+  aliases: [CHAT_SETTINGS_UPDATE_ALIAS],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

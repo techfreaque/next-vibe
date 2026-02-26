@@ -15,6 +15,7 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { DefaultFolderId } from "../../../agent/chat/config";
 import { definitionLoader } from "../shared/endpoints/definition/loader";
 import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
 import { permissionsRegistry } from "../shared/endpoints/permissions/registry";
@@ -184,6 +185,7 @@ export class MCPRegistry {
         locale: context.locale,
         logger,
         platform: Platform.MCP,
+        rootFolderId: DefaultFolderId.CRON,
       });
 
       logger.debug("[MCP Registry] Tool execution complete", {

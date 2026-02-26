@@ -9,7 +9,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import { useState } from "react";
 
-import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/config";
+import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/constants";
 import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
 import { ModelSelector } from "@/app/api/[locale]/agent/models/components/model-selector";
 import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/components/types";

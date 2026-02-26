@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
@@ -401,22 +401,12 @@ export class PaymentRepository {
         provider,
       });
 
-      // Check idempotency - skip if already processed
-      const [existing] = await db
-        .select()
-        .from(paymentWebhooks)
-        .where(eq(paymentWebhooks.providerEventId, event.id))
-        .limit(1);
-
-      if (existing?.processed) {
-        logger.debug("Webhook already processed, skipping", {
-          eventId: event.id,
-        });
-        return success({ received: true });
-      }
-
-      // Record webhook event
-      await db
+      // Atomic idempotency: insert-or-skip in one operation.
+      // If already processed, the INSERT does nothing and we get no row back.
+      // If not yet inserted, we insert with processed=false and get the row back.
+      // If inserted but not processed (concurrent request), onConflictDoNothing returns nothing
+      // and we skip processing — the first request that inserted will handle it.
+      const [webhookRow] = await db
         .insert(paymentWebhooks)
         .values({
           providerEventId: event.id,
@@ -424,7 +414,16 @@ export class PaymentRepository {
           processed: false,
           data: body,
         })
-        .onConflictDoNothing();
+        .onConflictDoNothing()
+        .returning({ id: paymentWebhooks.id });
+
+      if (!webhookRow) {
+        // Either already processed or being processed by another request
+        logger.debug("Webhook already recorded, skipping", {
+          eventId: event.id,
+        });
+        return success({ received: true });
+      }
 
       // Handle different event types
       // Provider already extracted the data object (e.g., Stripe's event.data.object)
@@ -440,6 +439,9 @@ export class PaymentRepository {
         case "payment_intent.payment_failed":
           await this.handlePaymentFailed(eventData, logger);
           break;
+        case "invoice.created":
+          await this.handleInvoiceCreated(eventData, logger, locale);
+          break;
         case "invoice.payment_succeeded":
         case "invoice.paid":
           await this.handleInvoicePaymentSucceeded(eventData, logger, locale);
@@ -447,11 +449,17 @@ export class PaymentRepository {
         case "invoice.payment_failed":
           await this.handleInvoicePaymentFailed(eventData, logger, locale);
           break;
+        case "invoice.voided":
+          await this.handleInvoiceVoided(eventData, logger, locale);
+          break;
         case "customer.subscription.deleted":
           await this.handleSubscriptionDeleted(eventData, logger, locale);
           break;
         case "customer.subscription.updated":
           await this.handleSubscriptionUpdated(eventData, logger, locale);
+          break;
+        case "checkout.session.expired":
+          await this.handleCheckoutSessionExpired(eventData, logger);
           break;
         default:
           logger.debug("Unhandled webhook event type", {
@@ -536,6 +544,111 @@ export class PaymentRepository {
     }
   }
 
+  /**
+   * Extract subscription ID from invoice webhook data.
+   * Handles both direct `subscription` field and `parent.subscription_details` (Stripe API 2025-03-31+).
+   */
+  private static extractSubscriptionIdFromInvoice(
+    data: WebhookData,
+    logger: EndpointLogger,
+  ): string | undefined {
+    const invoiceId = data.id;
+
+    // Try direct subscription field first
+    if ("subscription" in data && data.subscription) {
+      logger.info("Found subscription ID at root level", {
+        invoiceId,
+        subscriptionId: data.subscription,
+      });
+      return data.subscription;
+    }
+
+    // Try parent.subscription_details (Stripe API 2025-03-31+)
+    if ("parent" in data && data.parent && typeof data.parent === "object") {
+      logger.info("Parent object found in invoice", {
+        invoiceId,
+        parentKeys: Object.keys(data.parent),
+      });
+
+      if (
+        "subscription_details" in data.parent &&
+        data.parent.subscription_details &&
+        typeof data.parent.subscription_details === "object"
+      ) {
+        const subDetails = data.parent.subscription_details;
+        if (
+          typeof subDetails === "object" &&
+          subDetails !== null &&
+          "subscription" in subDetails &&
+          typeof subDetails.subscription === "string" &&
+          subDetails.subscription.length > 0
+        ) {
+          logger.info("Found subscription ID in parent.subscription_details", {
+            invoiceId,
+            subscriptionId: subDetails.subscription,
+          });
+          return subDetails.subscription;
+        }
+      }
+    }
+
+    logger.warn(
+      "No subscription ID found in invoice - skipping subscription processing",
+      {
+        invoiceId,
+        dataKeys: Object.keys(data),
+      },
+    );
+    return undefined;
+  }
+
+  /**
+   * Handle invoice.created — pre-grant credits before payment confirmation.
+   * This ensures users have credits immediately when a new billing period starts,
+   * even if payment takes time or fails temporarily.
+   */
+  private static async handleInvoiceCreated(
+    data: WebhookData,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<void> {
+    try {
+      const invoiceId = data.id;
+      const billingReason = data.billing_reason;
+
+      logger.info("Invoice created - checking for credit pre-grant", {
+        invoiceId,
+        billingReason,
+        hasRootSubscription: "subscription" in data,
+        hasParent: "parent" in data,
+      });
+
+      const subscriptionId = this.extractSubscriptionIdFromInvoice(
+        data,
+        logger,
+      );
+
+      if (!subscriptionId) {
+        return;
+      }
+
+      // Subscription module handles pre-granting logic
+      const { SubscriptionRepository } =
+        await import("../subscription/repository");
+      await SubscriptionRepository.handleInvoiceCreated(
+        data,
+        subscriptionId,
+        logger,
+        locale,
+      );
+    } catch (error) {
+      logger.error("Failed to process invoice created", {
+        error: parseError(error),
+        invoiceId: data.id,
+      });
+    }
+  }
+
   private static async handleInvoicePaymentSucceeded(
     data: WebhookData,
     logger: EndpointLogger,
@@ -550,79 +663,12 @@ export class PaymentRepository {
         hasParent: "parent" in data,
       });
 
-      // Try to get subscription ID from various possible fields
-      let subscriptionId: string | undefined;
-
-      if ("subscription" in data && data.subscription) {
-        subscriptionId = data.subscription;
-        logger.info("Found subscription ID at root level", {
-          invoiceId,
-          subscriptionId,
-        });
-      }
-
-      if (
-        !subscriptionId &&
-        "parent" in data &&
-        data.parent &&
-        typeof data.parent === "object"
-      ) {
-        logger.info("Parent object found in invoice", {
-          invoiceId,
-          parentKeys: Object.keys(data.parent),
-          parentType: typeof data.parent,
-        });
-
-        if (
-          "subscription_details" in data.parent &&
-          data.parent.subscription_details &&
-          typeof data.parent.subscription_details === "object"
-        ) {
-          const subDetails = data.parent.subscription_details;
-          logger.info("subscription_details found", {
-            invoiceId,
-            subscriptionDetailsKeys:
-              typeof subDetails === "object" && subDetails !== null
-                ? Object.keys(subDetails)
-                : [],
-            hasSubscription:
-              typeof subDetails === "object" &&
-              subDetails !== null &&
-              "subscription" in subDetails,
-          });
-
-          if (
-            typeof subDetails === "object" &&
-            subDetails !== null &&
-            "subscription" in subDetails &&
-            typeof subDetails.subscription === "string" &&
-            subDetails.subscription.length > 0
-          ) {
-            subscriptionId = subDetails.subscription;
-            logger.info(
-              "Found subscription ID in parent.subscription_details",
-              {
-                invoiceId,
-                subscriptionId,
-              },
-            );
-          }
-        } else {
-          logger.warn("subscription_details not found or invalid in parent", {
-            invoiceId,
-            hasSubscriptionDetails: "subscription_details" in data.parent,
-          });
-        }
-      }
+      const subscriptionId = this.extractSubscriptionIdFromInvoice(
+        data,
+        logger,
+      );
 
       if (!subscriptionId) {
-        logger.warn(
-          "No subscription ID found in invoice - skipping subscription processing",
-          {
-            invoiceId,
-            dataKeys: Object.keys(data),
-          },
-        );
         return;
       }
 
@@ -655,7 +701,7 @@ export class PaymentRepository {
     locale: CountryLanguage,
   ): Promise<void> {
     try {
-      const invoiceId = (data as { id?: string }).id;
+      const invoiceId = data.id;
 
       logger.info("Invoice payment failed - extracting subscription ID", {
         invoiceId,
@@ -663,60 +709,12 @@ export class PaymentRepository {
         hasParent: "parent" in data,
       });
 
-      // Try to get subscription ID from various possible fields
-      let subscriptionId: string | undefined;
-
-      if ("subscription" in data && data.subscription) {
-        subscriptionId = data.subscription;
-        logger.info("Found subscription ID at root level", {
-          invoiceId,
-          subscriptionId,
-        });
-      }
-
-      if (
-        !subscriptionId &&
-        "parent" in data &&
-        data.parent &&
-        typeof data.parent === "object"
-      ) {
-        logger.info("Parent object found in invoice", {
-          invoiceId,
-          parentKeys: Object.keys(data.parent),
-        });
-
-        if (
-          "subscription_details" in data.parent &&
-          data.parent.subscription_details &&
-          typeof data.parent.subscription_details === "object"
-        ) {
-          const subDetails = data.parent.subscription_details;
-          if (
-            typeof subDetails === "object" &&
-            subDetails !== null &&
-            "subscription" in subDetails &&
-            typeof subDetails.subscription === "string" &&
-            subDetails.subscription.length > 0
-          ) {
-            subscriptionId = subDetails.subscription;
-            logger.info(
-              "Found subscription ID in parent.subscription_details",
-              {
-                invoiceId,
-                subscriptionId,
-              },
-            );
-          }
-        }
-      }
+      const subscriptionId = this.extractSubscriptionIdFromInvoice(
+        data,
+        logger,
+      );
 
       if (!subscriptionId) {
-        logger.warn(
-          "No subscription ID found in failed invoice - skipping subscription processing",
-          {
-            invoiceId,
-          },
-        );
         return;
       }
 
@@ -730,16 +728,179 @@ export class PaymentRepository {
         locale,
       );
     } catch (error) {
-      if (typeof error === "object" && error && "id" in error) {
-        logger.error("Failed to process invoice payment failed", {
-          error: parseError(error),
-          invoiceId: String(error.id),
-        });
-      } else {
-        logger.error("Failed to process invoice payment failed", {
-          error: parseError(error),
-        });
+      logger.error("Failed to process invoice payment failed", {
+        error: parseError(error),
+        invoiceId: data.id,
+      });
+    }
+  }
+
+  /**
+   * Handle invoice.voided — revoke pre-granted credits if invoice is voided.
+   * This can happen if Stripe voids an invoice (e.g., subscription changed before payment).
+   */
+  private static async handleInvoiceVoided(
+    data: WebhookData,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<void> {
+    try {
+      const invoiceId = data.id;
+
+      logger.info(
+        "Invoice voided - checking for pre-granted credits to revoke",
+        {
+          invoiceId,
+        },
+      );
+
+      const subscriptionId = this.extractSubscriptionIdFromInvoice(
+        data,
+        logger,
+      );
+
+      if (!subscriptionId) {
+        return;
       }
+
+      // Look up any credit pack that was pre-granted for this invoice's period
+      // The renewalSessionKey is based on subscription ID + period end
+      const { getPaymentProvider } = await import("./providers");
+
+      const provider = getPaymentProvider("stripe");
+      const subResult = await provider.retrieveSubscription(
+        subscriptionId,
+        logger,
+        locale,
+      );
+
+      if (!subResult.success || !subResult.data.currentPeriodEnd) {
+        logger.warn("Could not retrieve subscription for voided invoice", {
+          invoiceId,
+          subscriptionId,
+        });
+        return;
+      }
+
+      // Find and revoke the pre-granted credit pack
+      const {
+        creditPacks,
+        creditWallets,
+        creditTransactions: creditTxTable,
+      } = await import("../credits/db");
+      const { CreditTransactionType } = await import("../credits/enum");
+      const { withTransaction } =
+        await import("../system/db/utils/repository-helpers");
+
+      const periodEndMs = subResult.data.currentPeriodEnd;
+      const renewalKey = `renewal_${subscriptionId}_${periodEndMs}`;
+
+      const [packToRevoke] = await db
+        .select()
+        .from(creditPacks)
+        .where(sql`${creditPacks.metadata}->>'sessionId' = ${renewalKey}`)
+        .limit(1);
+
+      if (!packToRevoke || packToRevoke.remaining <= 0) {
+        logger.info("No pre-granted credits to revoke for voided invoice", {
+          invoiceId,
+          renewalKey,
+        });
+        return;
+      }
+
+      await withTransaction(logger, async (tx) => {
+        const [lockedPack] = await tx
+          .select()
+          .from(creditPacks)
+          .where(eq(creditPacks.id, packToRevoke.id))
+          .for("update")
+          .limit(1);
+
+        if (!lockedPack || lockedPack.remaining <= 0) {
+          return;
+        }
+
+        const [wallet] = await tx
+          .select()
+          .from(creditWallets)
+          .where(eq(creditWallets.id, lockedPack.walletId))
+          .for("update")
+          .limit(1);
+
+        if (wallet) {
+          await tx
+            .update(creditWallets)
+            .set({
+              balance: sql`GREATEST(0, ${creditWallets.balance} - ${lockedPack.remaining})`,
+              updatedAt: new Date(),
+            })
+            .where(eq(creditWallets.id, wallet.id));
+
+          const [updated] = await tx
+            .select({ balance: creditWallets.balance })
+            .from(creditWallets)
+            .where(eq(creditWallets.id, wallet.id));
+
+          await tx.insert(creditTxTable).values({
+            walletId: wallet.id,
+            amount: -lockedPack.remaining,
+            balanceAfter: updated?.balance ?? 0,
+            type: CreditTransactionType.EXPIRY,
+            packId: lockedPack.id,
+            freePeriodId: wallet.freePeriodId,
+            metadata: {
+              expiredPackId: lockedPack.id,
+              expiredAmount: lockedPack.remaining,
+              originalAmount: lockedPack.originalAmount,
+              packType: "subscription",
+              expiredAt: new Date().toISOString(),
+            },
+          });
+        }
+
+        await tx.delete(creditPacks).where(eq(creditPacks.id, lockedPack.id));
+      });
+
+      logger.info("Revoked pre-granted credits for voided invoice", {
+        invoiceId,
+        subscriptionId,
+        creditsRevoked: packToRevoke.remaining,
+      });
+    } catch (error) {
+      logger.error("Failed to process voided invoice", {
+        error: parseError(error),
+        invoiceId: data.id,
+      });
+    }
+  }
+
+  /**
+   * Handle checkout.session.expired — clean up PENDING transactions.
+   */
+  private static async handleCheckoutSessionExpired(
+    data: WebhookData,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      const sessionId = data.id;
+
+      await db
+        .update(paymentTransactions)
+        .set({
+          status: PaymentStatus.FAILED,
+          updatedAt: new Date(),
+        })
+        .where(eq(paymentTransactions.providerSessionId, sessionId));
+
+      logger.info("Checkout session expired - marked transaction as failed", {
+        sessionId,
+      });
+    } catch (error) {
+      logger.error("Failed to process expired checkout session", {
+        error: parseError(error),
+        sessionId: data.id,
+      });
     }
   }
 

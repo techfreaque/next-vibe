@@ -4,7 +4,7 @@
  * Following interface + implementation pattern
  */
 
-import { count, desc, eq, isNull, sql } from "drizzle-orm";
+import { count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
@@ -16,13 +16,14 @@ import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { RecentExecution } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks-formatter";
 import { formatTasksSummary } from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks-formatter";
 import { calculateNextExecutionTime } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { TaskCategory, TaskCategoryDB } from "../enum";
+import { CronTaskStatus, TaskCategory, TaskCategoryDB } from "../enum";
 import type { scopedTranslation } from "../i18n";
 import type {
   CronTaskExecution,
@@ -68,7 +69,7 @@ async function translateTaskFields(
   };
 }
 
-function serializeTask(
+export function serializeTask(
   task: CronTaskRow,
   logger: EndpointLogger,
 ): CronTaskResponse {
@@ -107,6 +108,8 @@ function serializeTask(
     successCount: task.successCount,
     errorCount: task.errorCount,
     averageExecutionTime: task.averageExecutionTime ?? null,
+    consecutiveFailures: task.consecutiveFailures,
+    maxConsecutiveFailures: task.maxConsecutiveFailures ?? null,
     targetInstance: task.targetInstance ?? null,
     tags: task.tags,
     userId: task.userId ?? null,
@@ -569,8 +572,41 @@ export class CronTasksRepository {
 }
 
 /**
+ * Truncate a string to maxLen, adding "..." if truncated.
+ */
+function truncate(str: string, maxLen: number): string {
+  if (str.length <= maxLen) {
+    return str;
+  }
+  return `${str.slice(0, maxLen - 3)}...`;
+}
+
+/**
+ * Summarise a task result JSONB value into a short human-readable string.
+ */
+function summariseResult(
+  result: Record<string, string | number | boolean> | null,
+): string | null {
+  if (!result) {
+    return null;
+  }
+  const entries = Object.entries(result);
+  if (entries.length === 0) {
+    return null;
+  }
+  // Compact key:value pairs
+  const snippet = entries
+    .slice(0, 4)
+    .map(([k, v]) => `${k}:${String(v)}`)
+    .join(", ");
+  return truncate(snippet, 80);
+}
+
+/**
  * Generate a concise tasks summary for injection into the AI system prompt.
  * Returns an empty string if the user has no tasks.
+ *
+ * Loads task definitions + recent execution history for enriched formatting.
  */
 export async function generateTasksSummary(params: {
   userId: string;
@@ -579,6 +615,7 @@ export async function generateTasksSummary(params: {
   const { userId, logger } = params;
 
   try {
+    // Query 1: Task definitions with enriched fields
     const tasks = await db
       .select({
         id: cronTasks.id,
@@ -587,21 +624,97 @@ export async function generateTasksSummary(params: {
         enabled: cronTasks.enabled,
         lastExecutionStatus: cronTasks.lastExecutionStatus,
         lastExecutedAt: cronTasks.lastExecutedAt,
+        lastExecutionDuration: cronTasks.lastExecutionDuration,
         errorCount: cronTasks.errorCount,
         routeId: cronTasks.routeId,
         description: cronTasks.description,
+        priority: cronTasks.priority,
+        consecutiveFailures: cronTasks.consecutiveFailures,
       })
       .from(cronTasks)
       .where(eq(cronTasks.userId, userId))
       .orderBy(desc(cronTasks.updatedAt))
       .limit(50);
 
-    const summary = formatTasksSummary(tasks);
+    if (tasks.length === 0) {
+      return "";
+    }
+
+    // Query 2: Recent executions for all discovered tasks (last 3 per task)
+    const taskIds = tasks.map((t) => t.id);
+    const recentExecs =
+      taskIds.length > 0
+        ? await db
+            .select({
+              taskId: cronTaskExecutions.taskId,
+              status: cronTaskExecutions.status,
+              completedAt: cronTaskExecutions.completedAt,
+              durationMs: cronTaskExecutions.durationMs,
+              result: cronTaskExecutions.result,
+              error: cronTaskExecutions.error,
+            })
+            .from(cronTaskExecutions)
+            .where(inArray(cronTaskExecutions.taskId, taskIds))
+            .orderBy(desc(cronTaskExecutions.startedAt))
+            .limit(taskIds.length * 3)
+        : [];
+
+    // Group executions by taskId (max 3 per task)
+    const execsByTask = new Map<string, typeof recentExecs>();
+    for (const exec of recentExecs) {
+      const existing = execsByTask.get(exec.taskId) ?? [];
+      if (existing.length < 3) {
+        existing.push(exec);
+        execsByTask.set(exec.taskId, existing);
+      }
+    }
+
+    // Shape into TaskSummaryItem[] with enriched fields
+    const summaryItems = tasks.map((t) => {
+      const taskExecs = execsByTask.get(t.id) ?? [];
+
+      // Find last successful result for summary
+      const lastSuccess = taskExecs.find(
+        (e) => e.status === CronTaskStatus.COMPLETED,
+      );
+      const lastResultSummary = lastSuccess
+        ? summariseResult(lastSuccess.result ?? null)
+        : null;
+
+      // Map recent executions
+      const recentExecutions: RecentExecution[] = taskExecs.map((e) => ({
+        status: e.status,
+        completedAt: e.completedAt?.toISOString() ?? null,
+        durationMs: e.durationMs,
+        resultSnippet: e.result ? summariseResult(e.result) : null,
+        errorSnippet: e.error?.message ? truncate(e.error.message, 60) : null,
+      }));
+
+      return {
+        id: t.id,
+        displayName: t.displayName,
+        description: t.description,
+        schedule: t.schedule,
+        enabled: t.enabled,
+        lastExecutionStatus: t.lastExecutionStatus,
+        lastExecutedAt: t.lastExecutedAt,
+        lastExecutionDuration: t.lastExecutionDuration,
+        errorCount: t.errorCount,
+        routeId: t.routeId,
+        priority: t.priority,
+        consecutiveFailures: t.consecutiveFailures,
+        lastResultSummary,
+        recentExecutions: recentExecutions.length > 0 ? recentExecutions : null,
+      };
+    });
+
+    const summary = formatTasksSummary(summaryItems);
 
     if (summary) {
       logger.debug("Generated tasks summary for system prompt", {
         userId,
         taskCount: tasks.length,
+        execsLoaded: recentExecs.length,
       });
     }
 

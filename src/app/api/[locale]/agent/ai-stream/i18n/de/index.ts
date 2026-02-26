@@ -18,10 +18,21 @@ export const translations: typeof enTranslations = {
         description: "Vorausrufe und Prompt konfigurieren",
       },
       fields: {
-        model: { label: "Modell", description: "KI-Modell für die Antwort" },
+        favoriteId: {
+          label: "Favoriten-ID",
+          description:
+            "UUID eines gespeicherten Favoriten zum Laden von Charakter, Modell und Tool-Konfiguration. Explizite Charakter-, Modell- oder Tool-Felder überschreiben die Werte des Favoriten.",
+          placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        },
+        model: {
+          label: "Modell",
+          description:
+            "KI-Modell für die Antwort. Optional wenn favoriteId oder character gesetzt ist.",
+        },
         character: {
           label: "Charakter",
-          description: "Charakter-Persona",
+          description:
+            "Charakter-Persona. Optional wenn favoriteId gesetzt ist.",
           placeholder: "default",
         },
         prompt: {

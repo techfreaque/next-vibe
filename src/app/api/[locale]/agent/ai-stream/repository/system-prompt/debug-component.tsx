@@ -26,7 +26,7 @@ import { useDebugSystemPrompt } from "./hook";
 
 interface DebugProps {
   locale: CountryLanguage;
-  rootFolderId?: DefaultFolderId;
+  rootFolderId: DefaultFolderId;
   subFolderId?: string | null;
   characterId?: string | null;
   selectedModel?: string;

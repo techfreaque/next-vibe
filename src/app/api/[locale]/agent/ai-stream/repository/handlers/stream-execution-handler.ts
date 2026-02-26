@@ -9,6 +9,7 @@ import { stepCountIs, streamText as aiStreamText } from "ai";
 
 const DEFAULT_TEMPERATURE = 0.7;
 
+import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type {
   ModelId,
   ModelOption,
@@ -53,6 +54,7 @@ export class StreamExecutionHandler {
     locale: CountryLanguage;
     logger: EndpointLogger;
     t: AiStreamT;
+    rootFolderId: DefaultFolderId;
   }): Promise<void> {
     const {
       provider,
@@ -150,6 +152,7 @@ export class StreamExecutionHandler {
           ttsHandler,
           logger,
           t,
+          rootFolderId: params.rootFolderId,
         });
 
         if (shouldAbort) {

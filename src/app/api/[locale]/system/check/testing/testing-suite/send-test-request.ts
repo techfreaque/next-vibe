@@ -10,6 +10,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import type { z } from "zod";
 
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/parsing";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
@@ -110,6 +111,7 @@ export async function sendTestRequest<
       locale: defaultLocale,
       logger,
       platform: Platform.CLI, // Use CLI platform for testing
+      rootFolderId: DefaultFolderId.CRON,
     });
 
     const { t } = scopedTranslation.scopedT(defaultLocale);

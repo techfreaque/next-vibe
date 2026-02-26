@@ -10,6 +10,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TextareaKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/textarea";
 
+import type { DefaultFolderId } from "../config";
 import { clearDraft } from "./use-input-autosave";
 
 // Utility functions
@@ -38,7 +39,7 @@ interface UseInputHandlersProps {
     },
     onNewThread?: (
       threadId: string,
-      rootFolderId: string,
+      rootFolderId: DefaultFolderId,
       subFolderId: string | null,
     ) => void,
   ) => Promise<void>;

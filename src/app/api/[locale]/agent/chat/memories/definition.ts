@@ -104,6 +104,11 @@ const { GET } = createEndpoint({
               text: "get.response.memories.memory.priority.text" as const,
               schema: z.coerce.number(),
             }),
+            isPublic: scopedResponseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              text: "get.response.memories.memory.isPublic.text" as const,
+              schema: z.boolean(),
+            }),
             tags: scopedResponseArrayFieldNew(scopedTranslation, {
               type: WidgetType.CONTAINER,
               child: scopedResponseField(scopedTranslation, {
@@ -176,6 +181,7 @@ const { GET } = createEndpoint({
             content: "Profession: Software engineer specializing in Python",
             tags: ["profession", "skills"],
             priority: 0,
+            isPublic: false,
             createdAt: new Date("2025-01-01T00:00:00Z"),
           },
           {
@@ -183,6 +189,7 @@ const { GET } = createEndpoint({
             content: "Preferences: Dark mode, coffee over tea",
             tags: ["preferences"],
             priority: 0,
+            isPublic: false,
             createdAt: new Date("2025-01-01T00:00:00Z"),
           },
         ],

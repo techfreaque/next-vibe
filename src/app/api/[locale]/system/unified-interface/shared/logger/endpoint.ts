@@ -84,14 +84,19 @@ export function createEndpointLogger(
   startTime: number = Date.now(),
   locale: CountryLanguage,
 ): EndpointLogger {
-  const getElapsedTime = (): string => {
+  const isProduction = process.env["NODE_ENV"] === "production";
+
+  const getTimePrefix = (): string => {
+    if (isProduction) {
+      return new Date().toISOString().slice(11, 23);
+    }
     const elapsed = (Date.now() - startTime) / 1000;
     return `${elapsed.toFixed(3)}s`;
   };
   const { t } = simpleT(locale);
 
   const formatMessage = (message: string): string => {
-    return `[${getElapsedTime()}] ${t(message as TranslationKey)}`;
+    return `[${getTimePrefix()}] ${t(message as TranslationKey)}`;
   };
 
   return {
@@ -141,11 +146,11 @@ export function createEndpointLogger(
         }
         // In MCP mode, log to file instead of console
         const metadataObj = metadata.length > 0 ? { metadata } : undefined;
-        writeToFile(`[VIBE] [${getElapsedTime()}] ${message}`, metadataObj);
+        writeToFile(`[VIBE] [${getTimePrefix()}] ${message}`, metadataObj);
       } else {
         // Special vibe formatting - messages are plain strings
         // oxlint-disable-next-line no-console
-        console.log(`[${getElapsedTime()}] ${message}`, ...metadata);
+        console.log(`[${getTimePrefix()}] ${message}`, ...metadata);
       }
     },
 

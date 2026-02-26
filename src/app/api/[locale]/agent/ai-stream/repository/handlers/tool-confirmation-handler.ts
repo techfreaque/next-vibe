@@ -18,6 +18,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { db } from "../../../../system/db";
+import type { DefaultFolderId } from "../../../chat/config";
 import type { ChatMessage, ToolCall, ToolCallResult } from "../../../chat/db";
 import { chatMessages } from "../../../chat/db";
 import type { ChatMessageRole } from "../../../chat/enum";
@@ -39,6 +40,7 @@ export class ToolConfirmationHandler {
     logger: EndpointLogger;
     user: JwtPayloadType;
     t: AiStreamT;
+    rootFolderId: DefaultFolderId;
   }): Promise<ResponseType<{ threadId: string; toolMessageId: string }>> {
     const {
       toolConfirmation,
@@ -118,6 +120,7 @@ export class ToolConfirmationHandler {
         logger,
         systemPrompt: "",
         toolConfirmationConfig: confirmationConfig,
+        rootFolderId: params.rootFolderId,
       });
 
       const toolEntry = Object.entries(toolsResult.tools ?? {}).find(

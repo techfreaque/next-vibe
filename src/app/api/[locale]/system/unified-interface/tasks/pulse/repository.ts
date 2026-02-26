@@ -14,6 +14,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { LeadAuthRepository } from "@/app/api/[locale]/leads/auth/repository";
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
@@ -611,6 +612,7 @@ export class PulseHealthRepository {
                     locale: userLocale,
                     logger,
                     platform: Platform.CRON,
+                    rootFolderId: DefaultFolderId.CRON,
                   }),
                   new Promise<never>((...[, reject]) => {
                     setTimeout(
@@ -725,6 +727,15 @@ export class PulseHealthRepository {
             }
 
             // Update task stats (once, after all attempts)
+            const newConsecutiveFailures = taskSucceeded
+              ? 0
+              : (dbTask.consecutiveFailures ?? 0) + 1;
+            const maxFailures = dbTask.maxConsecutiveFailures ?? 5;
+            const shouldAutoDisable =
+              !taskSucceeded &&
+              maxFailures > 0 &&
+              newConsecutiveFailures >= maxFailures;
+
             await CronTasksRepository.updateTask(
               dbTask.id,
               {
@@ -733,9 +744,11 @@ export class PulseHealthRepository {
                 lastExecutionError: finalMessage,
                 lastExecutionDuration: finalDurationMs,
                 executionCount: dbTask.executionCount + 1,
+                consecutiveFailures: newConsecutiveFailures,
                 ...(taskSucceeded
                   ? { successCount: dbTask.successCount + 1 }
                   : { errorCount: dbTask.errorCount + 1 }),
+                ...(shouldAutoDisable ? { enabled: false } : {}),
                 ...(didLogHistory ? { lastHistoryLoggedAt: new Date() } : {}),
               },
               null,
@@ -743,6 +756,18 @@ export class PulseHealthRepository {
               tTask,
               logger,
             );
+
+            if (shouldAutoDisable) {
+              logger.warn(
+                `[auto-disable] Task "${dbTask.displayName}" disabled after ${newConsecutiveFailures} consecutive failures`,
+                {
+                  taskId: dbTask.id,
+                  routeId: dbTask.routeId,
+                  consecutiveFailures: newConsecutiveFailures,
+                  maxConsecutiveFailures: maxFailures,
+                },
+              );
+            }
           } catch (unexpectedError) {
             // Catch-all: if something goes wrong outside the retry loop,
             // ensure the task doesn't stay stuck in RUNNING state forever
@@ -751,6 +776,13 @@ export class PulseHealthRepository {
               parseError(unexpectedError),
             );
             tasksFailed.push(dbTask.displayName);
+            const catchConsecutiveFailures =
+              (dbTask.consecutiveFailures ?? 0) + 1;
+            const catchMaxFailures = dbTask.maxConsecutiveFailures ?? 5;
+            const catchShouldAutoDisable =
+              catchMaxFailures > 0 &&
+              catchConsecutiveFailures >= catchMaxFailures;
+
             await CronTasksRepository.updateTask(
               dbTask.id,
               {
@@ -758,12 +790,25 @@ export class PulseHealthRepository {
                 lastExecutionError: parseError(unexpectedError).message,
                 executionCount: dbTask.executionCount + 1,
                 errorCount: dbTask.errorCount + 1,
+                consecutiveFailures: catchConsecutiveFailures,
+                ...(catchShouldAutoDisable ? { enabled: false } : {}),
               },
               null,
               userLocale,
               tTask,
               logger,
             );
+
+            if (catchShouldAutoDisable) {
+              logger.warn(
+                `[auto-disable] Task "${dbTask.displayName}" disabled after ${catchConsecutiveFailures} consecutive failures (catch-all)`,
+                {
+                  taskId: dbTask.id,
+                  routeId: dbTask.routeId,
+                  consecutiveFailures: catchConsecutiveFailures,
+                },
+              );
+            }
           }
         }
       }

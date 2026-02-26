@@ -4,7 +4,6 @@
  */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
-import type Stripe from "stripe";
 
 import type { WebhookData } from "@/app/api/[locale]/payment/providers/types";
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
@@ -142,7 +141,7 @@ export class SubscriptionRepository {
 
   static async handleSubscriptionUpdated(
     // oxlint-disable-next-line no-unused-vars
-    _stripeSubscription: Stripe.Subscription,
+    _subscriptionId: string,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
     // oxlint-disable-next-line no-unused-vars
@@ -162,6 +161,20 @@ export class SubscriptionRepository {
   ): Promise<ResponseType<{ message: string; changes: string[] }>> {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("syncSubscriptionWithStripe is not implemented on native");
+  }
+
+  static async handleInvoiceCreated(
+    // oxlint-disable-next-line no-unused-vars
+    _invoice: WebhookData,
+    // oxlint-disable-next-line no-unused-vars
+    _subscriptionId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+  ): Promise<void> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error("handleInvoiceCreated is not implemented on native");
   }
 
   static async handleInvoicePaymentFailed(

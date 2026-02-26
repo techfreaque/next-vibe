@@ -775,6 +775,32 @@ export const translations: typeof enTranslations = {
         3: "Zeige mir den aktuellen Serverstatus",
       },
     },
+    vibeCoder: {
+      name: "Vibe Coder",
+      description:
+        "Leitender Implementierungsagent, der Feature-Ideen in Produktionscode umsetzt. Analysiert die Codebasis via Claude Code, extrahiert Absichten aus Anfragen und implementiert passende Lösungen.",
+      tagline: "Idee zu Code",
+      shortDesc: "Feature-Implementierung via Claude Code",
+      suggestedPrompts: {
+        0: "Ich habe eine Idee für ein neues Feature, lass mich beschreiben",
+        1: "Erkunde die Codebasis und erkläre wie ein Modul funktioniert",
+        2: "Hilf mir eine Änderung an einem bestehenden Feature zu planen und umzusetzen",
+        3: "Untersuche einen Bug und schlage einen Fix vor",
+      },
+    },
+    characterCreator: {
+      name: "Charakter-Ersteller",
+      description:
+        "Entwirf und erstelle KI-Charaktere mit maßgeschneiderten Persönlichkeiten, System-Prompts, Tools und Modellkonfigurationen. Verwaltet auch Favoriten und Einstellungen.",
+      tagline: "KI-Personas gestalten",
+      shortDesc: "KI-Charaktere erstellen und verwalten",
+      suggestedPrompts: {
+        0: "Hilf mir einen neuen KI-Charakter für Coding-Unterstützung zu erstellen",
+        1: "Zeige mir alle vorhandenen Charaktere und schlage vor was fehlt",
+        2: "Entwirf einen Charakter für kreatives Schreiben mit einzigartiger Persönlichkeit",
+        3: "Füge einen Charakter zu meinen Favoriten hinzu und konfiguriere meine Chat-Einstellungen",
+      },
+    },
   },
   get: {
     title: "Charaktere auflisten",

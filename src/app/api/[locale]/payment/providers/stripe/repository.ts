@@ -407,7 +407,11 @@ export class StripeProvider implements PaymentProvider {
       ) {
         webhookData.billing_reason = eventData.billing_reason;
       }
-      if ("parent" in eventData && typeof eventData.parent === "object" && eventData.parent !== null) {
+      if (
+        "parent" in eventData &&
+        typeof eventData.parent === "object" &&
+        eventData.parent !== null
+      ) {
         webhookData.parent = eventData.parent;
         logger.info("Extracted parent from webhook event", {
           eventType: event.type,
@@ -502,7 +506,9 @@ export class StripeProvider implements PaymentProvider {
         subscriptionId,
         currentPeriodStart,
         currentPeriodEnd,
-        usedItemPeriod: !!(item?.current_period_start && item?.current_period_end),
+        usedItemPeriod: !!(
+          item?.current_period_start && item?.current_period_end
+        ),
       });
 
       return success({

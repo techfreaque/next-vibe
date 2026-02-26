@@ -450,6 +450,7 @@ export class AiStreamRepository {
             locale,
             logger,
             t: aiStreamT,
+            rootFolderId: data.rootFolderId,
           });
 
           // After stream completes, capture the last assistant message ID from the writer.

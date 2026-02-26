@@ -5,6 +5,7 @@
 
 import { relations } from "drizzle-orm";
 import {
+  boolean,
   integer,
   jsonb,
   pgTable,
@@ -49,6 +50,9 @@ export const memories = pgTable("memories", {
 
   // Memory importance
   priority: integer("priority").default(0).notNull(), // Higher priority memories appear first in prompt
+
+  // Visibility — public memories are included in public folder AI context
+  isPublic: boolean("is_public").default(false).notNull(),
 
   // Metadata
   metadata: jsonb("metadata").$type<MemoryMetadata>().default({}),

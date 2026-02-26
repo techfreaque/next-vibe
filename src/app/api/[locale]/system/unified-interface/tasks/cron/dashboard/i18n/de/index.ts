@@ -1,0 +1,79 @@
+import type { translations as enTranslations } from "../en";
+
+export const translations: typeof enTranslations = {
+  category: "Aufgabenverwaltung",
+
+  errors: {
+    fetchDashboard: "Fehler beim Abrufen des Aufgaben-Dashboards",
+    repositoryInternalError: "Ein interner Fehler ist aufgetreten",
+  },
+
+  get: {
+    tags: {
+      tasks: "Aufgaben",
+      monitoring: "Überwachung",
+    },
+    title: "Aufgaben-Dashboard",
+    description:
+      "Einheitliche Ansicht aller geplanten Aufgaben mit aktueller Ausführungshistorie, Fehlerwarnungen und Systemgesundheit.",
+    fields: {
+      limit: {
+        label: "Aufgabenlimit",
+        description: "Maximale Anzahl der zurückzugebenden Aufgaben",
+      },
+      historyDepth: {
+        label: "Historien-Tiefe",
+        description: "Anzahl der letzten Ausführungen pro Aufgabe",
+      },
+    },
+    response: {
+      tasks: { title: "Aufgaben mit letzten Ausführungen" },
+      alerts: {
+        title: "Fehlerwarnungen für kritische/hohe Prioritätsaufgaben",
+      },
+      stats: { title: "Aggregierte Statistiken" },
+    },
+    success: {
+      title: "Dashboard geladen",
+      description: "Dashboard-Daten erfolgreich abgerufen",
+    },
+    errors: {
+      validation: {
+        title: "Validierungsfehler",
+        description: "Ungültige Anfrageparameter",
+      },
+      network: {
+        title: "Netzwerkfehler",
+        description: "Verbindung zum Server fehlgeschlagen",
+      },
+      unauthorized: {
+        title: "Nicht autorisiert",
+        description: "Authentifizierung erforderlich",
+      },
+      forbidden: {
+        title: "Verboten",
+        description: "Unzureichende Berechtigungen",
+      },
+      notFound: {
+        title: "Nicht gefunden",
+        description: "Dashboard-Daten nicht gefunden",
+      },
+      server: {
+        title: "Serverfehler",
+        description: "Ein interner Serverfehler ist aufgetreten",
+      },
+      unknown: {
+        title: "Unbekannter Fehler",
+        description: "Ein unerwarteter Fehler ist aufgetreten",
+      },
+      unsavedChanges: {
+        title: "Ungespeicherte Änderungen",
+        description: "Sie haben ungespeicherte Änderungen",
+      },
+      conflict: {
+        title: "Konflikt",
+        description: "Ein Konflikt ist aufgetreten",
+      },
+    },
+  },
+};

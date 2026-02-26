@@ -10,7 +10,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -23,6 +23,7 @@ import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { DEFAULT_TOOL_IDS } from "@/app/api/[locale]/agent/chat/constants";
 import type { ToolCallResult } from "@/app/api/[locale]/agent/chat/db";
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
+import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/parsing";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
@@ -71,6 +72,7 @@ async function executePreCall(
   user: JwtPayloadType,
   locale: CountryLanguage,
   logger: EndpointLogger,
+  rootFolderId: DefaultFolderId,
 ): Promise<PreCallResult> {
   logger.debug("[AiStreamRun] Executing pre-call", { routeId });
 
@@ -81,6 +83,7 @@ async function executePreCall(
     locale,
     logger,
     platform: Platform.AI,
+    rootFolderId,
   });
 
   if (!result.success) {
@@ -113,6 +116,7 @@ export class AiStreamRunRepository {
         prompt,
         model,
         character,
+        favoriteId,
         preCalls,
         instructions,
         maxTurns,
@@ -147,6 +151,7 @@ export class AiStreamRunRepository {
             user,
             locale,
             logger,
+            rootFolderId,
           );
           preCallResults.push({
             ...result,
@@ -171,20 +176,62 @@ export class AiStreamRunRepository {
         executionTimeMs: r.executionTimeMs,
       }));
 
-      // ── Step 2: Run headless AI stream ──────────────────────────────────
-      // Pre-call results are injected as proper tool messages in the thread
-      // When tools is not provided, inject base tools (same as interactive chat defaults)
+      // ── Step 2: Resolve tool config from favorite if needed ────────────
+      // When favoriteId is set and tools/allowedTools are NOT provided in the request,
+      // load the favorite's tool config (activeTools/visibleTools) as defaults.
+      let resolvedTools = tools;
+      let resolvedAllowedTools = allowedTools;
+
+      if (favoriteId && (!tools || !allowedTools)) {
+        const userId = user.isPublic ? undefined : user.id;
+        if (userId) {
+          const [favorite] = await db
+            .select({
+              activeTools: chatFavorites.activeTools,
+              visibleTools: chatFavorites.visibleTools,
+            })
+            .from(chatFavorites)
+            .where(
+              and(
+                eq(chatFavorites.id, favoriteId),
+                eq(chatFavorites.userId, userId),
+              ),
+            )
+            .limit(1);
+
+          if (favorite) {
+            if (!tools && favorite.visibleTools) {
+              resolvedTools = favorite.visibleTools.map((t) => ({
+                toolId: t.toolId,
+                requiresConfirmation: t.requiresConfirmation ?? false,
+              }));
+            }
+            if (!allowedTools && favorite.activeTools) {
+              resolvedAllowedTools = favorite.activeTools.map((t) => ({
+                toolId: t.toolId,
+                requiresConfirmation: t.requiresConfirmation ?? false,
+              }));
+            }
+          }
+        }
+      }
+
+      // When tools is still not provided, inject base tools (same as interactive chat defaults)
       // so the AI can call execute-tool, web-search, fetch-url, memories, etc.
       const defaultTools = DEFAULT_TOOL_IDS.map((id) => ({
         toolId: id,
         requiresConfirmation: false,
       }));
+
+      // ── Step 3: Run headless AI stream ──────────────────────────────────
+      // Pre-call results are injected as proper tool messages in the thread
       const streamResult = await runHeadlessAiStream({
+        favoriteId,
         model,
         character,
         prompt,
-        availableTools: tools ?? defaultTools, // default: base tools; null = all tools
-        allowedTools: allowedTools ?? null, // null = all tools permitted
+        availableTools: resolvedTools ?? defaultTools, // default: base tools; null = all tools
+        allowedTools: resolvedAllowedTools ?? null, // null = all tools permitted
         headlessInstructions: instructions,
         maxTurns: maxTurns ?? 1,
         threadMode: headlessThreadMode,

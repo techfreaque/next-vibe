@@ -5,7 +5,7 @@
 
 import "server-only";
 
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -257,7 +257,10 @@ export class SubscriptionRepository {
 
                     // Canonical idempotency key shared across all credit grant paths
                     // Prevents duplicate grants from invoice handler, subscription.updated, and auto-sync
-                    const sessionId = renewalSessionKey(subscription.providerSubscriptionId, currentPeriodEnd * 1000);
+                    const sessionId = renewalSessionKey(
+                      subscription.providerSubscriptionId ?? subscription.id,
+                      currentPeriodEnd * 1000,
+                    );
 
                     logger.info(
                       "Auto-granting renewal credits (missed webhook)",
@@ -603,7 +606,7 @@ export class SubscriptionRepository {
       await db
         .insert(subscriptions)
         .values({
-          userId: userId as string,
+          userId: userId,
           planId: planId as (typeof SubscriptionPlanDB)[number],
           billingInterval:
             billingInterval as (typeof BillingIntervalDB)[number],
@@ -636,11 +639,11 @@ export class SubscriptionRepository {
       let userLocale: CountryLanguage = locale;
       if (userId) {
         const { users: usersTable } = await import("../user/db");
-        const { eq: eqUser } = await import("drizzle-orm");
+
         const [userRow] = await db
           .select({ locale: usersTable.locale })
           .from(usersTable)
-          .where(eqUser(usersTable.id, userId as string))
+          .where(eq(usersTable.id, userId))
           .limit(1);
         if (userRow?.locale) {
           userLocale = userRow.locale;
@@ -671,7 +674,7 @@ export class SubscriptionRepository {
 
         // IDEMPOTENCY CHECK: Verify credits haven't been added for this checkout session already
         const { creditPacks } = await import("../credits/db");
-        const { sql } = await import("drizzle-orm");
+
         const [existingPack] = await db
           .select()
           .from(creditPacks)
@@ -688,7 +691,7 @@ export class SubscriptionRepository {
         }
 
         await CreditRepository.addUserCredits(
-          userId as string,
+          userId,
           product.credits,
           "subscription",
           logger,
@@ -712,6 +715,200 @@ export class SubscriptionRepository {
       logger.error("Failed to process subscription checkout", {
         error: parseError(error),
         sessionId: session.id,
+      });
+    }
+  }
+
+  /**
+   * Handle invoice.created webhook — pre-grant credits before payment confirmation.
+   * This ensures users have credits immediately when a new billing period starts.
+   * Idempotency: uses renewalSessionKey() so duplicate webhooks or later invoice.paid
+   * events won't double-grant.
+   */
+  static async handleInvoiceCreated(
+    invoice: WebhookData,
+    subscriptionId: string,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<void> {
+    try {
+      const invoiceId = invoice.id;
+      const billingReason = invoice.billing_reason;
+
+      logger.info("Processing invoice created for credit pre-grant", {
+        invoiceId,
+        subscriptionId,
+        billingReason,
+      });
+
+      // Skip initial checkout invoice — handled separately by checkout flow
+      if (billingReason === "subscription_create") {
+        logger.info("Skipping credit pre-grant - initial checkout invoice", {
+          billingReason,
+          invoiceId,
+        });
+        return;
+      }
+
+      // Skip voided or $0 invoices — don't pre-grant credits for non-chargeable invoices
+      if (invoice.status === "void" || invoice.status === "uncollectible") {
+        logger.info(
+          "Skipping credit pre-grant - invoice is void/uncollectible",
+          {
+            invoiceId,
+            status: invoice.status,
+          },
+        );
+        return;
+      }
+      if (
+        invoice.amount_total !== undefined &&
+        invoice.amount_total !== null &&
+        invoice.amount_total <= 0
+      ) {
+        logger.info("Skipping credit pre-grant - $0 or negative invoice", {
+          invoiceId,
+          amountTotal: invoice.amount_total,
+        });
+        return;
+      }
+
+      const [subscription] = await db
+        .select()
+        .from(subscriptions)
+        .where(eq(subscriptions.providerSubscriptionId, subscriptionId))
+        .limit(1);
+
+      if (!subscription) {
+        logger.error("Subscription not found for invoice created", {
+          subscriptionId,
+          invoiceId,
+        });
+        return;
+      }
+
+      const providerName = subscription.provider || "stripe";
+      const provider = getPaymentProvider(providerName);
+      const subscriptionResult = await provider.retrieveSubscription(
+        subscriptionId,
+        logger,
+        locale,
+      );
+
+      if (!subscriptionResult.success) {
+        logger.error("Failed to retrieve subscription for credit pre-grant", {
+          subscriptionId,
+          error: subscriptionResult.message,
+        });
+        return;
+      }
+
+      // Import credit dependencies
+      const { CreditRepository } = await import("../credits/repository");
+      const { scopedTranslation: creditsScopedTranslation } =
+        await import("../credits/i18n");
+      const { productsRepository, ProductIds } =
+        await import("../products/repository-client");
+
+      // Look up user's locale for translations
+      let userLocale: CountryLanguage = locale;
+      {
+        const { users: usersTable } = await import("../user/db");
+
+        const [userRow] = await db
+          .select({ locale: usersTable.locale })
+          .from(usersTable)
+          .where(eq(usersTable.id, subscription.userId))
+          .limit(1);
+        if (userRow?.locale) {
+          userLocale = userRow.locale;
+        }
+      }
+      const { t: creditsT } = creditsScopedTranslation.scopedT(userLocale);
+
+      const productId =
+        subscription.planId === SubscriptionPlan.SUBSCRIPTION
+          ? ProductIds.SUBSCRIPTION
+          : null;
+
+      if (!productId) {
+        logger.warn("No product ID found for subscription plan", {
+          planId: subscription.planId,
+          invoiceId,
+        });
+        return;
+      }
+
+      const product = productsRepository.getProduct(productId, userLocale);
+      const periodEnd = subscriptionResult.data.currentPeriodEnd
+        ? new Date(subscriptionResult.data.currentPeriodEnd)
+        : null;
+
+      if (!periodEnd) {
+        logger.error("Cannot pre-grant credits without period end date", {
+          subscriptionId,
+          invoiceId,
+        });
+        return;
+      }
+
+      const expiresAt = periodEnd;
+
+      // Canonical idempotency key — shared with invoice.paid and subscription.updated
+      const renewalSessionId = renewalSessionKey(
+        subscriptionId,
+        periodEnd.getTime(),
+      );
+
+      // Idempotency check
+      {
+        const { creditPacks } = await import("../credits/db");
+
+        const [existingPack] = await db
+          .select()
+          .from(creditPacks)
+          .where(
+            sql`${creditPacks.metadata}->>'sessionId' = ${renewalSessionId}`,
+          )
+          .limit(1);
+
+        if (existingPack) {
+          logger.info("Credits already pre-granted for this period", {
+            renewalSessionId,
+            packId: existingPack.id,
+            userId: subscription.userId,
+          });
+          return;
+        }
+      }
+
+      logger.info("Pre-granting subscription credits", {
+        userId: subscription.userId,
+        credits: product.credits,
+        expiresAt: expiresAt?.toISOString(),
+        renewalSessionId,
+        invoiceId,
+      });
+
+      await CreditRepository.addUserCredits(
+        subscription.userId,
+        product.credits,
+        "subscription",
+        logger,
+        creditsT,
+        expiresAt ?? undefined,
+        renewalSessionId,
+      );
+
+      logger.info("Successfully pre-granted subscription credits", {
+        userId: subscription.userId,
+        credits: product.credits,
+        invoiceId,
+      });
+    } catch (error) {
+      logger.error("Failed to process invoice created", {
+        error: parseError(error),
+        subscriptionId,
       });
     }
   }
@@ -816,11 +1013,11 @@ export class SubscriptionRepository {
         let userLocaleForInvoice: CountryLanguage = locale;
         {
           const { users: usersTable } = await import("../user/db");
-          const { eq: eqUser } = await import("drizzle-orm");
+
           const [userRow] = await db
             .select({ locale: usersTable.locale })
             .from(usersTable)
-            .where(eqUser(usersTable.id, subscription.userId))
+            .where(eq(usersTable.id, subscription.userId))
             .limit(1);
           if (userRow?.locale) {
             userLocaleForInvoice = userRow.locale;
@@ -842,18 +1039,31 @@ export class SubscriptionRepository {
           const periodEnd = subscriptionResult.data.currentPeriodEnd
             ? new Date(subscriptionResult.data.currentPeriodEnd)
             : null;
+
+          if (!periodEnd) {
+            logger.error(
+              "Cannot grant renewal credits without period end date",
+              {
+                subscriptionId,
+                invoiceId,
+              },
+            );
+            return;
+          }
+
           // Credits expire at exact period end — no grace buffer needed
           const expiresAt = periodEnd;
 
           // Canonical idempotency key shared across all credit grant paths
-          const renewalSessionId = periodEnd
-            ? renewalSessionKey(subscriptionId, periodEnd.getTime())
-            : renewalSessionKey(subscriptionId, Date.now());
+          const renewalSessionId = renewalSessionKey(
+            subscriptionId,
+            periodEnd.getTime(),
+          );
 
           // IDEMPOTENCY CHECK: Verify credits haven't been added for this period already
           {
             const { creditPacks } = await import("../credits/db");
-            const { sql } = await import("drizzle-orm");
+
             const [existingPack] = await db
               .select()
               .from(creditPacks)
@@ -879,16 +1089,21 @@ export class SubscriptionRepository {
           if (isLatePayment) {
             const { creditTransactions: creditTxTable } =
               await import("../credits/db");
-            const { CreditTransactionType } =
-              await import("../credits/enum");
+            const { CreditTransactionType } = await import("../credits/enum");
 
-            // Look up total revoked credits from grace period expiry transactions
+            // Look up revoked credits from this grace period only (not all-time).
+            // Scope by paymentFailedAt — revocations happen after that timestamp.
+            const scopeStart =
+              subscription.paymentFailedAt ??
+              subscription.currentPeriodEnd ??
+              new Date(0);
             const revokedTxs = await db
               .select({ amount: creditTxTable.amount })
               .from(creditTxTable)
               .where(
                 sql`${creditTxTable.type} = ${CreditTransactionType.EXPIRY}
                     AND ${creditTxTable.metadata}->>'reason' = 'subscription_grace_period_expired'
+                    AND ${creditTxTable.createdAt} >= ${scopeStart}
                     AND ${creditTxTable.walletId} IN (
                       SELECT id FROM credit_wallets WHERE user_id = ${subscription.userId}
                     )`,
@@ -905,6 +1120,7 @@ export class SubscriptionRepository {
                 userId: subscription.userId,
                 totalRevoked,
                 originalProductCredits: product.credits,
+                scopeStart: scopeStart.toISOString(),
               });
             }
           }
@@ -971,7 +1187,7 @@ export class SubscriptionRepository {
     _locale: CountryLanguage,
   ): Promise<void> {
     try {
-      const invoiceId = (invoice as { id?: string }).id;
+      const invoiceId = invoice.id;
 
       logger.info("Processing invoice payment failure", {
         invoiceId,
@@ -1108,9 +1324,8 @@ export class SubscriptionRepository {
       }
 
       // Fetch full subscription from Stripe to get all fields (webhook events may not include all fields)
-      const fullSubscription = await getStripe.subscriptions.retrieve(
-        subscriptionId,
-      );
+      const fullSubscription =
+        await getStripe.subscriptions.retrieve(subscriptionId);
 
       const status = STRIPE_STATUS_MAP[fullSubscription.status];
 
@@ -1143,9 +1358,10 @@ export class SubscriptionRepository {
         })
         .where(eq(subscriptions.providerSubscriptionId, fullSubscription.id));
 
-      // If period renewed, grant new monthly credits
-      if (periodRenewed && status === SubscriptionStatus.ACTIVE) {
-        logger.info("Subscription period renewed - granting credits", {
+      // If period renewed, pre-grant credits regardless of payment status.
+      // Idempotency key prevents double-granting if invoice.created already handled it.
+      if (periodRenewed) {
+        logger.info("Subscription period renewed - pre-granting credits", {
           userId: subscription.userId,
           oldPeriodEnd: oldPeriodEnd.toISOString(),
           newPeriodEnd: newPeriodEnd.toISOString(),
@@ -1161,11 +1377,11 @@ export class SubscriptionRepository {
         let userLocaleForUpdate: CountryLanguage = locale;
         {
           const { users: usersTable } = await import("../user/db");
-          const { eq: eqUser } = await import("drizzle-orm");
+
           const [userRow] = await db
             .select({ locale: usersTable.locale })
             .from(usersTable)
-            .where(eqUser(usersTable.id, subscription.userId))
+            .where(eq(usersTable.id, subscription.userId))
             .limit(1);
           if (userRow?.locale) {
             userLocaleForUpdate = userRow.locale;
@@ -1186,11 +1402,14 @@ export class SubscriptionRepository {
           );
 
           // Canonical idempotency key shared across all credit grant paths
-          const renewalSessionId = renewalSessionKey(fullSubscription.id, newPeriodEnd.getTime());
+          const renewalSessionId = renewalSessionKey(
+            fullSubscription.id,
+            newPeriodEnd.getTime(),
+          );
 
           // Check if credits already granted for this period
           const { creditPacks } = await import("../credits/db");
-          const { sql } = await import("drizzle-orm");
+
           const [existingPack] = await db
             .select()
             .from(creditPacks)
@@ -1287,8 +1506,11 @@ export class SubscriptionRepository {
           localSubscription.providerSubscriptionId,
         );
       } catch (error) {
-        const stripeError = error as { code?: string };
-        if (stripeError.code === "resource_missing") {
+        const stripeError = parseError(error);
+        if (
+          stripeError.message.includes("resource_missing") ||
+          stripeError.message.includes("No such subscription")
+        ) {
           logger.warn(
             "Subscription not found in Stripe - marking as canceled",
             {
@@ -1333,7 +1555,8 @@ export class SubscriptionRepository {
         // Always update period + status if anything changed (not just status)
         const periodChanged =
           localSubscription.currentPeriodEnd &&
-          currentPeriodEnd * 1000 !== localSubscription.currentPeriodEnd.getTime();
+          currentPeriodEnd * 1000 !==
+            localSubscription.currentPeriodEnd.getTime();
 
         if (newStatus !== localSubscription.status || periodChanged) {
           await db
@@ -1357,6 +1580,55 @@ export class SubscriptionRepository {
           changes.push(
             `Updated subscription status from ${localSubscription.status} to ${newStatus}`,
           );
+        }
+
+        // Grant renewal credits if period advanced (with idempotency)
+        if (periodChanged) {
+          const newPeriodEndMs = currentPeriodEnd * 1000;
+          const { productsRepository, ProductIds } =
+            await import("../products/repository-client");
+
+          const productId =
+            localSubscription.planId === SubscriptionPlan.SUBSCRIPTION
+              ? ProductIds.SUBSCRIPTION
+              : null;
+
+          if (productId) {
+            const product = productsRepository.getProduct(productId, locale);
+            const renewalSessionId = renewalSessionKey(
+              localSubscription.providerSubscriptionId,
+              newPeriodEndMs,
+            );
+
+            const { creditPacks: creditPacksTable } =
+              await import("../credits/db");
+            const [existingPack] = await db
+              .select({ id: creditPacksTable.id })
+              .from(creditPacksTable)
+              .where(
+                sql`${creditPacksTable.metadata}->>'sessionId' = ${renewalSessionId}`,
+              )
+              .limit(1);
+
+            if (!existingPack) {
+              const { CreditRepository: CreditRepo } =
+                await import("../credits/repository");
+              const { scopedTranslation: cScopedTranslation } =
+                await import("../credits/i18n");
+              const { t: cT } = cScopedTranslation.scopedT(locale);
+
+              await CreditRepo.addUserCredits(
+                userId,
+                product.credits,
+                "subscription",
+                logger,
+                cT,
+                new Date(newPeriodEndMs),
+                renewalSessionId,
+              );
+              changes.push(`Granted ${product.credits} renewal credits`);
+            }
+          }
         }
       }
 

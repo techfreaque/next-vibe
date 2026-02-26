@@ -42,6 +42,31 @@ function portFromUrl(url: string | undefined): number | undefined {
   }
 }
 
+/** Mask credentials in a database URL: postgres://u***:p***@host:5432/db */
+function maskDatabaseUrl(url: string | undefined): string {
+  if (!url) {
+    return "(not set)";
+  }
+  try {
+    const parsed = new URL(url);
+    const maskedUser = parsed.username
+      ? `${parsed.username[0]}${"*".repeat(Math.max(2, parsed.username.length - 1))}`
+      : "";
+    const maskedPass = parsed.password
+      ? `${parsed.password[0]}${"*".repeat(Math.max(2, parsed.password.length - 1))}`
+      : "";
+    const credentials =
+      maskedUser && maskedPass
+        ? `${maskedUser}:${maskedPass}@`
+        : maskedUser
+          ? `${maskedUser}@`
+          : "";
+    return `${parsed.protocol}//${credentials}${parsed.host}${parsed.pathname}${parsed.search}`;
+  } catch {
+    return "(invalid URL)";
+  }
+}
+
 /**
  * Server Start Repository Interface
  */
@@ -97,7 +122,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
         // DATABASE_URL port was already swapped to PREVIEW_DB_PORT by the CLI
         // environment loader (runtime/environment.ts) before any module loaded.
         output.push(
-          `   🔗 Using preview DATABASE_URL: ${process.env["DATABASE_URL"]}`,
+          `   🔗 Using preview DATABASE_URL: ${maskDatabaseUrl(process.env["DATABASE_URL"])}`,
         );
 
         try {
@@ -157,7 +182,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
               cwd: process.cwd(),
               env: { ...process.env },
             });
-            logger.info("Migrations completed", {
+            logger.debug("Migrations completed", {
               output: migrateResult.trim(),
             });
             output.push("   ✅ Database migrations completed");
@@ -187,7 +212,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
       // Initialize single unified task runner for production environment
       if (data.taskRunner) {
-        logger.info("Starting unified task runner for production");
+        logger.debug("Starting unified task runner for production");
         output.push(
           "   🔄 Initializing unified task runner for production environment...",
         );
@@ -235,7 +260,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
             output.push(
               "   📊 Environment: production | Side tasks: disabled (cron only)",
             );
-            logger.info("Task runner started successfully", {
+            logger.debug("Task runner started successfully", {
               environment: "production",
               supportsTaskRunners: false,
             });
@@ -291,7 +316,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
             const { taskRegistry } =
               await import("../../generated/tasks-index");
 
-            logger.info("Task registry loaded successfully", {
+            logger.debug("Task registry loaded successfully", {
               cronTasks: taskRegistry.cronTasks.length,
               taskRunners: taskRegistry.taskRunners.length,
               totalTasks: taskRegistry.allTasks.length,
@@ -310,7 +335,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
               await import("../../unified-interface/tasks/unified-runner/repository");
             const status = unifiedTaskRunnerRepository.getStatus();
 
-            logger.info("Task runner system operational", {
+            logger.debug("Task runner system operational", {
               environment: "production",
               running: status.running,
               activeTasks: status.activeTasks.length,
@@ -558,7 +583,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
     try {
       // fuser is more reliable than lsof for finding processes on a port
       execSync(`fuser -k ${port}/tcp 2>/dev/null`, { encoding: "utf-8" });
-      logger.info(`Killed stale process on port ${port}`);
+      logger.debug(`Killed stale process on port ${port}`);
       // Brief wait for process to exit
       execSync("sleep 0.5");
     } catch {
@@ -572,7 +597,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
   ): Promise<{ success: boolean; message?: string }> {
     return await new Promise((resolve) => {
       try {
-        logger.info("Starting Next.js production server", { port });
+        logger.debug("Starting Next.js production server", { port });
 
         // Kill any stale process on the target port
         this.killProcessOnPort(port, logger);
@@ -620,7 +645,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
             if (!serverStarted) {
               serverStarted = true;
               clearTimeout(startupTimeout);
-              logger.info("Next.js production server is ready", { port });
+              logger.debug("Next.js production server is ready", { port });
               // eslint-disable-next-line @typescript-eslint/no-floating-promises, eslint-plugin-promise/no-multiple-resolved
               resolve({ success: true });
             }

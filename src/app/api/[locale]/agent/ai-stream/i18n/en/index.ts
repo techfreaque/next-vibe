@@ -10,21 +10,27 @@ export const translations = {
     post: {
       title: "Run AI Agent",
       description:
-        "Run a headless AI agent and get back the full text response. Use this to delegate tasks, summarise tool results, generate content, or chain tools into a single AI answer. Credits are consumed based on the model. SETUP GUIDE: Before running, set up the right character + favorite for the task. Characters define the persona and system prompt (create with agent_chat_characters_create_POST). Favorites bundle a character with a model override (create with agent_chat_favorites_create_POST, modelSelection: {selectionType:'MANUAL', manualModelId:'...'} or {selectionType:'FILTERS',...}). Workflow: 1) List characters (agent_chat_characters_GET) to see what exists. 2) If none fits, ask the user if they want to create one — collect name, tagline, description, category, systemPrompt, and preferred model. 3) Create character, then create a favorite for it with the desired model. 4) Use the character id in this call. TIP: For recurring tasks (monitoring, reporting, coding help) always set up a dedicated character+favorite first — it makes future runs faster and more consistent. TOOL ACCESS: To give the agent tool access, add tools to allowedTools (execution permission). The standard agentic setup is allowedTools: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool lets the agent run any endpoint, system_help_GET lets it discover what's available. The tools field is optional; omit it (null) to use the user's default tool context.",
+        "Run a headless AI agent and get back the full text response. Use this to delegate tasks, summarise tool results, generate content, or chain tools into a single AI answer. Credits are consumed based on the model. QUICKSTART: Pass favoriteId to load character + model + tool config from a saved favorite in one shot. Override any field (model, character, tools, allowedTools) by also passing it explicitly. SETUP GUIDE: Before running, set up the right character + favorite for the task. Characters define the persona and system prompt (create with agent_chat_characters_create_POST). Favorites bundle a character with a model override and tool config (create with agent_chat_favorites_create_POST, modelSelection: {selectionType:'MANUAL', manualModelId:'...'} or {selectionType:'FILTERS',...}). Workflow: 1) List favorites (agent_chat_favorites_GET) or characters (agent_chat_characters_GET) to see what exists. 2) If none fits, create a character then create a favorite for it with the desired model. 3) Pass favoriteId to this call — model, character, and tools are resolved automatically. You can also pass just character (model is resolved from character's modelSelection) or both model + character explicitly. TOOL ACCESS: To give the agent tool access, add tools to allowedTools (execution permission). The standard agentic setup is allowedTools: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool lets the agent run any endpoint, system_help_GET lets it discover what's available. When using favoriteId, the favorite's activeTools and visibleTools are used as defaults if you don't pass tools/allowedTools explicitly.",
       container: {
         title: "AI Agent Run",
         description: "Configure pre-calls and prompt for headless AI execution",
       },
       fields: {
+        favoriteId: {
+          label: "Favorite ID",
+          description:
+            "UUID of a saved favorite to load character, model, and tool configuration from. When set, the favorite's character, model (from modelSelection), and tool config (activeTools/visibleTools) are used as defaults. Explicit character, model, tools, or allowedTools fields in this request override the favorite's values. Use agent_chat_favorites_GET to list available favorites.",
+          placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        },
         model: {
           label: "Model",
           description:
-            "AI model to use. Fast & cheap: claude-haiku-4.5, gemini-2.5-flash. Balanced: claude-sonnet-4.6, gpt-5. Powerful: claude-opus-4.6, gpt-5-pro. Free: qwen3_235b-free, gpt-oss-120b-free. TIP: The character's modelSelection sets the default — create a favorite with a MANUAL modelSelection override to pin a specific model per use-case without changing the character itself.",
+            "AI model to use. Optional when favoriteId or character is provided (resolved from their modelSelection). Fast & cheap: claude-haiku-4.5, gemini-2.5-flash. Balanced: claude-sonnet-4.6, gpt-5. Powerful: claude-opus-4.6, gpt-5-pro. Free: qwen3_235b-free, gpt-oss-120b-free. Overrides the model from favoriteId or character when set.",
         },
         character: {
           label: "Character",
           description:
-            "Character ID (UUID) or 'default'. Characters define the AI persona, system prompt, and default model. Use agent_chat_characters_GET to list available characters. If no suitable character exists, offer to create one with agent_chat_characters_create_POST (fields: name, tagline, description, category, systemPrompt, modelSelection, voice). After creating a character, also create a favorite for it with agent_chat_favorites_create_POST so the user can reuse it easily with a model override.",
+            "Character ID (UUID) or 'default'. Optional when favoriteId is provided (resolved from the favorite). Characters define the AI persona, system prompt, and default model. Overrides the character from favoriteId when set. Use agent_chat_characters_GET to list available characters.",
           placeholder: "default",
         },
         prompt: {

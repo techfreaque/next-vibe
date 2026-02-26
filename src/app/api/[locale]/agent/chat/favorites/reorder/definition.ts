@@ -20,6 +20,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { FAVORITES_REORDER_ALIAS } from "../constants";
 import { scopedTranslation } from "./i18n";
 
 /**
@@ -38,6 +39,8 @@ const { POST } = createEndpoint({
   icon: "move" as const,
   category: "app.endpointCategories.chat",
   tags: ["tags.favorites" as const],
+
+  aliases: [FAVORITES_REORDER_ALIAS],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

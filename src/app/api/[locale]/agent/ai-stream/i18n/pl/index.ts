@@ -18,13 +18,21 @@ export const translations: typeof enTranslations = {
         description: "Konfiguracja wywołań wstępnych i promptu",
       },
       fields: {
+        favoriteId: {
+          label: "ID ulubionego",
+          description:
+            "UUID zapisanego ulubionego do załadowania postaci, modelu i konfiguracji narzędzi. Jawne pola postaci, modelu lub narzędzi nadpisują wartości ulubionego.",
+          placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        },
         model: {
           label: "Model",
-          description: "Model AI do generowania odpowiedzi",
+          description:
+            "Model AI do generowania odpowiedzi. Opcjonalny gdy ustawiono favoriteId lub character.",
         },
         character: {
           label: "Charakter",
-          description: "Persona charakteru",
+          description:
+            "Persona charakteru. Opcjonalny gdy ustawiono favoriteId.",
           placeholder: "default",
         },
         prompt: {

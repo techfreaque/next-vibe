@@ -111,6 +111,9 @@ export async function buildSystemPrompt(params: {
 
   // Incognito mode: never load personal data (memories, tasks, favorites)
   const isIncognito = rootFolderId === "incognito";
+  // Public/shared folders: filter out private data to prevent leaking into visible threads
+  const isExposedFolder =
+    rootFolderId === "public" || rootFolderId === "shared";
 
   if (userId) {
     const [
@@ -120,16 +123,20 @@ export async function buildSystemPrompt(params: {
       characterResult,
       userNameResult,
     ] = await Promise.allSettled([
-      // Memories: skip when explicitly excluded or in incognito mode
+      // Memories: skip in incognito; in public/shared only load public memories
       !excludeMemories && !isIncognito
-        ? generateMemorySummary({ userId, logger })
+        ? generateMemorySummary({
+            userId,
+            logger,
+            rootFolderId,
+          })
         : Promise.resolve(""),
-      // Tasks: skip in incognito (headless agents still need task context)
-      !isIncognito
+      // Tasks: skip in incognito and public/shared (private user tasks should never leak)
+      !isIncognito && !isExposedFolder
         ? generateTasksSummary({ userId, logger })
         : Promise.resolve(""),
-      // Favorites: skip in incognito
-      !isIncognito
+      // Favorites: skip in incognito and public/shared
+      !isIncognito && !isExposedFolder
         ? generateFavoritesSummary({ userId, locale, logger })
         : Promise.resolve(""),
       // Character: only if a characterId was provided

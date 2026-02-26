@@ -25,6 +25,7 @@ import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interfac
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { DefaultFolderId } from "../../../chat/config";
 import { type ToolCall, type ToolCallResult } from "../../../chat/db";
 import type { AiStreamT } from "../../i18n";
 import type { MessageDbWriter } from "../core/message-db-writer";
@@ -69,6 +70,7 @@ export class ToolErrorHandler {
     dbWriter: MessageDbWriter;
     logger: EndpointLogger;
     t: AiStreamT;
+    rootFolderId: DefaultFolderId;
   }): Promise<{
     currentParentId: string | null;
     currentDepth: number;
@@ -234,6 +236,7 @@ export class ToolErrorHandler {
       user,
       locale,
       logger,
+      rootFolderId: params.rootFolderId,
     });
 
     if (fallbackResult && "data" in fallbackResult) {
@@ -347,6 +350,7 @@ export class ToolErrorHandler {
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
+    rootFolderId: DefaultFolderId;
   }): Promise<{ data: JSONValue } | { error: string } | null> {
     const { toolName, args, user, locale, logger } = params;
 
@@ -366,6 +370,7 @@ export class ToolErrorHandler {
         locale,
         logger,
         platform: Platform.AI,
+        rootFolderId: params.rootFolderId,
       });
 
       if (!result.success) {

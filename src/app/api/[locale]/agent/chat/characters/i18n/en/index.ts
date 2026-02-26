@@ -772,6 +772,32 @@ export const translations = {
         3: "Show me the current server status",
       },
     },
+    vibeCoder: {
+      name: "Vibe Coder",
+      description:
+        "Lead implementation agent that bridges feature ideas and production code. Deep-dives the codebase via Claude Code, extracts intent from requests, and implements aligned solutions.",
+      tagline: "Idea to Code",
+      shortDesc: "Feature implementation via Claude Code",
+      suggestedPrompts: {
+        0: "I have an idea for a new feature, let me describe it",
+        1: "Explore the codebase and explain how a module works",
+        2: "Help me plan and implement a change to an existing feature",
+        3: "Investigate a bug and propose a fix",
+      },
+    },
+    characterCreator: {
+      name: "Character Creator",
+      description:
+        "Design and create AI characters with tailored personalities, system prompts, tools, and model configurations. Manages favorites and settings too.",
+      tagline: "Design AI Personas",
+      shortDesc: "Create and manage AI characters",
+      suggestedPrompts: {
+        0: "Help me create a new AI character for coding assistance",
+        1: "Show me all existing characters and suggest what's missing",
+        2: "Design a character for creative writing with a unique personality",
+        3: "Add a character to my favorites and configure my chat settings",
+      },
+    },
   },
   get: {
     title: "List Characters",

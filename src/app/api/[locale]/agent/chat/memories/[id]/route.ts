@@ -20,6 +20,7 @@ export const { PATCH, DELETE, tools } = endpointsHandler({
         content: data.content,
         tags: data.tags,
         priority: data.priority,
+        isPublic: data.isPublic,
         logger,
         t,
       }),

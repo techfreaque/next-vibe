@@ -23,13 +23,16 @@
       "email": "max@a42.ch"
     },
     {
-      "name": "Augment"
-    },
-    {
       "name": "Claude Code"
     },
     {
-      "name": "t3.chat"
+      "name": "Unbottled.ai"
+    },
+    {
+      "name": "Augment (fired)"
+    },
+    {
+      "name": "t3.chat (fired)"
     },
     {
       "name": "ChatGPT (fired)"
@@ -44,7 +47,7 @@
       "name": "Devin (fired)"
     },
     {
-      "name": "Cursor"
+      "name": "Cursor (fired)"
     }
   ],
   "repository": {

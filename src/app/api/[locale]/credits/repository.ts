@@ -417,15 +417,19 @@ export class CreditRepository {
             return;
           }
 
-          const newBalance = Math.max(0, wallet.balance - lockedPack.remaining);
-
-          // Update wallet balance
+          // Atomic balance update with floor
           await tx
             .update(creditWallets)
             .set({
-              balance: newBalance,
+              balance: sql`GREATEST(0, ${creditWallets.balance} - ${lockedPack.remaining})`,
               updatedAt: new Date(),
             })
+            .where(eq(creditWallets.id, wallet.id));
+
+          // Re-read for accurate balanceAfter
+          const [updated] = await tx
+            .select({ balance: creditWallets.balance })
+            .from(creditWallets)
             .where(eq(creditWallets.id, wallet.id));
 
           // Set pack remaining to 0
@@ -441,7 +445,7 @@ export class CreditRepository {
           await tx.insert(creditTransactions).values({
             walletId: wallet.id,
             amount: -lockedPack.remaining,
-            balanceAfter: newBalance,
+            balanceAfter: updated?.balance ?? 0,
             type: CreditTransactionType.EXPIRY,
             packId: lockedPack.id,
             freePeriodId: wallet.freePeriodId,
@@ -459,7 +463,7 @@ export class CreditRepository {
             packId: pack.id,
             walletId: wallet.id,
             amount: pack.remaining,
-            newBalance,
+            newBalance: updated?.balance ?? 0,
           });
         });
       } catch (error) {
@@ -557,9 +561,7 @@ export class CreditRepository {
           // Revoke any remaining subscription credit packs for this user
           // (pre-granted credits for the period that payment failed)
           if (sub.userId) {
-            const userWallet = userWallets.find(
-              (w) => w.userId === sub.userId,
-            );
+            const userWallet = userWallets.find((w) => w.userId === sub.userId);
             if (userWallet) {
               const subPacks = await db
                 .select()
@@ -575,37 +577,58 @@ export class CreditRepository {
               for (const pack of subPacks) {
                 if (pack.remaining > 0) {
                   await withTransaction(logger, async (tx) => {
+                    // Lock the pack first to get fresh remaining value
+                    const [lockedPack] = await tx
+                      .select()
+                      .from(creditPacks)
+                      .where(eq(creditPacks.id, pack.id))
+                      .for("update")
+                      .limit(1);
+
+                    if (!lockedPack || lockedPack.remaining <= 0) {
+                      // Pack already consumed or revoked by concurrent operation
+                      if (lockedPack) {
+                        await tx
+                          .delete(creditPacks)
+                          .where(eq(creditPacks.id, pack.id));
+                      }
+                      return;
+                    }
+
                     const [wallet] = await tx
                       .select()
                       .from(creditWallets)
-                      .where(eq(creditWallets.id, pack.walletId))
+                      .where(eq(creditWallets.id, lockedPack.walletId))
                       .for("update")
                       .limit(1);
 
                     if (wallet) {
-                      const newBalance = Math.max(
-                        0,
-                        wallet.balance - pack.remaining,
-                      );
+                      // Atomic balance update with floor
                       await tx
                         .update(creditWallets)
                         .set({
-                          balance: newBalance,
+                          balance: sql`GREATEST(0, ${creditWallets.balance} - ${lockedPack.remaining})`,
                           updatedAt: new Date(),
                         })
                         .where(eq(creditWallets.id, wallet.id));
 
+                      // Re-read for accurate balanceAfter
+                      const [updated] = await tx
+                        .select({ balance: creditWallets.balance })
+                        .from(creditWallets)
+                        .where(eq(creditWallets.id, wallet.id));
+
                       await tx.insert(creditTransactions).values({
                         walletId: wallet.id,
-                        amount: -pack.remaining,
-                        balanceAfter: newBalance,
+                        amount: -lockedPack.remaining,
+                        balanceAfter: updated?.balance ?? 0,
                         type: CreditTransactionType.EXPIRY,
-                        packId: pack.id,
+                        packId: lockedPack.id,
                         freePeriodId: wallet.freePeriodId,
                         metadata: {
-                          expiredPackId: pack.id,
-                          expiredAmount: pack.remaining,
-                          originalAmount: pack.originalAmount,
+                          expiredPackId: lockedPack.id,
+                          expiredAmount: lockedPack.remaining,
+                          originalAmount: lockedPack.originalAmount,
                           reason: "subscription_grace_period_expired",
                         },
                       });
@@ -613,20 +636,17 @@ export class CreditRepository {
 
                     await tx
                       .delete(creditPacks)
-                      .where(eq(creditPacks.id, pack.id));
+                      .where(eq(creditPacks.id, lockedPack.id));
                   });
                   packsRevoked++;
                 }
                 // Packs with remaining=0 (fully consumed) are left intact for audit trail
               }
 
-              logger.info(
-                "Revoked subscription credits after grace period",
-                {
-                  userId: sub.userId,
-                  packsRevoked,
-                },
-              );
+              logger.info("Revoked subscription credits after grace period", {
+                userId: sub.userId,
+                packsRevoked,
+              });
             }
           }
 
@@ -1136,6 +1156,24 @@ export class CreditRepository {
     ).credits;
 
     await withTransaction(logger, async (tx) => {
+      // Lock the oldest wallet first and re-check if period was already advanced
+      // This prevents TOCTOU double-grants when concurrent requests both see isNewMonth=true
+      const [lockedOldest] = await tx
+        .select({ freePeriodId: creditWallets.freePeriodId })
+        .from(creditWallets)
+        .where(eq(creditWallets.id, oldestLeadWallet.id))
+        .for("update")
+        .limit(1);
+
+      if (lockedOldest && lockedOldest.freePeriodId === newPeriodId) {
+        logger.debug("Monthly reset already completed by concurrent request", {
+          poolId: pool.poolId,
+          freePeriodId: lockedOldest.freePeriodId,
+          newPeriodId,
+        });
+        return;
+      }
+
       // CRITICAL: ALWAYS reset to exactly 20 credits when entering new period
       // This ensures fresh credits each month, regardless of leftover from previous period
 
@@ -1550,48 +1588,52 @@ export class CreditRepository {
         packType = CreditPackType.BONUS;
       }
 
-      // Create credit pack
-      const [newPack] = await db
-        .insert(creditPacks)
-        .values({
-          walletId: wallet.id,
-          originalAmount: amount,
-          remaining: amount,
-          type: packType,
-          expiresAt,
-          source: type,
-          metadata: {},
-        })
-        .returning();
+      // Atomic: insert pack, increment balance, create transaction in one transaction
+      await withTransaction(logger, async (tx) => {
+        const [newPack] = await tx
+          .insert(creditPacks)
+          .values({
+            walletId: wallet.id,
+            originalAmount: amount,
+            remaining: amount,
+            type: packType,
+            expiresAt,
+            source: type,
+            metadata: {},
+          })
+          .returning();
 
-      // Update wallet balance
-      const newBalance = wallet.balance + amount;
-      await db
-        .update(creditWallets)
-        .set({ balance: newBalance, updatedAt: new Date() })
-        .where(eq(creditWallets.id, wallet.id));
+        // Atomic SQL increment — prevents lost updates from concurrent writes
+        const [updated] = await tx
+          .update(creditWallets)
+          .set({
+            balance: sql`${creditWallets.balance} + ${amount}`,
+            updatedAt: new Date(),
+          })
+          .where(eq(creditWallets.id, wallet.id))
+          .returning({ balance: creditWallets.balance });
 
-      // Create transaction with typed metadata
-      const transactionMetadata =
-        packType === CreditPackType.SUBSCRIPTION
-          ? {
-              subscriptionId: `system_add_${Date.now()}`,
-              periodStart: new Date().toISOString(),
-              periodEnd: expiresAt?.toISOString(),
-            }
-          : { packQuantity: 1 };
-
-      await db.insert(creditTransactions).values({
-        walletId: wallet.id,
-        amount,
-        balanceAfter: newBalance,
-        type:
+        const transactionMetadata =
           packType === CreditPackType.SUBSCRIPTION
-            ? CreditTransactionType.SUBSCRIPTION
-            : CreditTransactionType.PURCHASE,
-        packId: newPack.id,
-        freePeriodId: wallet.freePeriodId,
-        metadata: transactionMetadata,
+            ? {
+                subscriptionId: `system_add_${Date.now()}`,
+                periodStart: new Date().toISOString(),
+                periodEnd: expiresAt?.toISOString(),
+              }
+            : { packQuantity: 1 };
+
+        await tx.insert(creditTransactions).values({
+          walletId: wallet.id,
+          amount,
+          balanceAfter: updated.balance,
+          type:
+            packType === CreditPackType.SUBSCRIPTION
+              ? CreditTransactionType.SUBSCRIPTION
+              : CreditTransactionType.PURCHASE,
+          packId: newPack.id,
+          freePeriodId: wallet.freePeriodId,
+          metadata: transactionMetadata,
+        });
       });
 
       logger.info("Credits added", {
@@ -1654,45 +1696,68 @@ export class CreditRepository {
         packType = CreditPackType.BONUS;
       }
 
-      // Create credit pack with optional session tracking for idempotency
-      const [newPack] = await db
-        .insert(creditPacks)
-        .values({
+      // Atomic: insert pack, increment balance, create transaction in one transaction
+      await withTransaction(logger, async (tx) => {
+        // Internal idempotency guard: if sessionId is provided, check for existing pack
+        // inside the transaction to prevent TOCTOU races from concurrent webhooks
+        if (sessionId) {
+          const [existing] = await tx
+            .select({ id: creditPacks.id })
+            .from(creditPacks)
+            .where(sql`${creditPacks.metadata}->>'sessionId' = ${sessionId}`)
+            .limit(1);
+
+          if (existing) {
+            logger.info("Idempotency: credit pack already exists for session", {
+              sessionId,
+              existingPackId: existing.id,
+              userId,
+            });
+            return;
+          }
+        }
+
+        const [newPack] = await tx
+          .insert(creditPacks)
+          .values({
+            walletId: wallet.id,
+            originalAmount: amount,
+            remaining: amount,
+            type: packType,
+            expiresAt: finalExpiresAt,
+            source: `${type}_purchase`,
+            metadata: sessionId ? { sessionId } : {},
+          })
+          .returning();
+
+        // Atomic SQL increment — prevents lost updates from concurrent writes
+        const [updated] = await tx
+          .update(creditWallets)
+          .set({
+            balance: sql`${creditWallets.balance} + ${amount}`,
+            updatedAt: new Date(),
+          })
+          .where(eq(creditWallets.id, wallet.id))
+          .returning({ balance: creditWallets.balance });
+
+        const purchaseMetadata = sessionId
+          ? { sessionId, packQuantity: 1, totalPaid: 0, currency: "USD" }
+          : { packQuantity: 1 };
+
+        await tx.insert(creditTransactions).values({
           walletId: wallet.id,
-          originalAmount: amount,
-          remaining: amount,
-          type: packType,
-          expiresAt: finalExpiresAt,
-          source: `${type}_purchase`,
-          metadata: sessionId ? { sessionId } : {},
-        })
-        .returning();
-
-      // Update wallet balance
-      const newBalance = wallet.balance + amount;
-      await db
-        .update(creditWallets)
-        .set({ balance: newBalance, updatedAt: new Date() })
-        .where(eq(creditWallets.id, wallet.id));
-
-      // Create transaction with typed metadata
-      const purchaseMetadata = sessionId
-        ? { sessionId, packQuantity: 1, totalPaid: 0, currency: "USD" }
-        : { packQuantity: 1 };
-
-      await db.insert(creditTransactions).values({
-        walletId: wallet.id,
-        amount,
-        balanceAfter: newBalance,
-        type:
-          type === "subscription"
-            ? CreditTransactionType.SUBSCRIPTION
-            : type === "free"
-              ? CreditTransactionType.FREE_GRANT
-              : CreditTransactionType.PURCHASE,
-        packId: newPack.id,
-        freePeriodId: wallet.freePeriodId,
-        metadata: purchaseMetadata,
+          amount,
+          balanceAfter: updated.balance,
+          type:
+            type === "subscription"
+              ? CreditTransactionType.SUBSCRIPTION
+              : type === "free"
+                ? CreditTransactionType.FREE_GRANT
+                : CreditTransactionType.PURCHASE,
+          packId: newPack.id,
+          freePeriodId: wallet.freePeriodId,
+          metadata: purchaseMetadata,
+        });
       });
 
       return success();
@@ -1835,12 +1900,15 @@ export class CreditRepository {
           );
 
           const maxFreeCreditsPerPool = 20;
-          // Re-fetch lead wallets inside transaction to get fresh values
-          // (ensureMonthlyFreeCreditsForPool may have updated them)
+          // Re-fetch lead wallets inside transaction with FOR UPDATE to prevent
+          // concurrent over-spending of free credits across the pool
           const freshLeadWallets = await tx
-            .select({ freeCreditsRemaining: creditWallets.freeCreditsRemaining })
+            .select({
+              freeCreditsRemaining: creditWallets.freeCreditsRemaining,
+            })
             .from(creditWallets)
-            .where(inArray(creditWallets.id, leadWalletIds));
+            .where(inArray(creditWallets.id, leadWalletIds))
+            .for("update");
           const actualFreeRemaining = freshLeadWallets.reduce(
             (sum, w) => sum + w.freeCreditsRemaining,
             0,
@@ -1964,7 +2032,7 @@ export class CreditRepository {
             await tx
               .update(creditWallets)
               .set({
-                balance: sql`${creditWallets.balance} - ${deduction}`,
+                balance: sql`GREATEST(0, ${creditWallets.balance} - ${deduction})`,
                 updatedAt: new Date(),
               })
               .where(eq(creditWallets.id, pack.walletId));
@@ -2042,7 +2110,7 @@ export class CreditRepository {
             await tx
               .update(creditWallets)
               .set({
-                balance: sql`${creditWallets.balance} - ${deduction}`,
+                balance: sql`GREATEST(0, ${creditWallets.balance} - ${deduction})`,
                 updatedAt: new Date(),
               })
               .where(eq(creditWallets.id, pack.walletId));
@@ -2124,7 +2192,7 @@ export class CreditRepository {
             await tx
               .update(creditWallets)
               .set({
-                balance: sql`${creditWallets.balance} - ${deduction}`,
+                balance: sql`GREATEST(0, ${creditWallets.balance} - ${deduction})`,
                 updatedAt: new Date(),
               })
               .where(eq(creditWallets.id, pack.walletId));
@@ -2688,7 +2756,7 @@ export class CreditRepository {
           // Wrap each pack expiration in a transaction for atomicity
           await withTransaction(logger, async (tx) => {
             if (pack.remaining > 0) {
-              // Get wallet to update balance (with row lock to prevent concurrent modifications)
+              // Lock wallet to prevent concurrent modifications
               const [wallet] = await tx
                 .select()
                 .from(creditWallets)
@@ -2697,22 +2765,26 @@ export class CreditRepository {
                 .limit(1);
 
               if (wallet) {
-                const newBalance = wallet.balance - pack.remaining;
-
-                // Update wallet balance
+                // Atomic balance update with floor
                 await tx
                   .update(creditWallets)
                   .set({
-                    balance: Math.max(0, newBalance),
+                    balance: sql`GREATEST(0, ${creditWallets.balance} - ${pack.remaining})`,
                     updatedAt: new Date(),
                   })
+                  .where(eq(creditWallets.id, wallet.id));
+
+                // Re-read for accurate balanceAfter
+                const [updated] = await tx
+                  .select({ balance: creditWallets.balance })
+                  .from(creditWallets)
                   .where(eq(creditWallets.id, wallet.id));
 
                 // Create EXPIRY transaction (preserves history)
                 await tx.insert(creditTransactions).values({
                   walletId: wallet.id,
                   amount: -pack.remaining,
-                  balanceAfter: Math.max(0, newBalance),
+                  balanceAfter: updated?.balance ?? 0,
                   type: CreditTransactionType.EXPIRY,
                   packId: pack.id,
                   freePeriodId: wallet.freePeriodId,
@@ -3309,62 +3381,65 @@ export class CreditRepository {
 
       const wallet = walletResult.data;
 
-      // Create earned credit pack (no expiration)
-      const [newPack] = await db
-        .insert(creditPacks)
-        .values({
-          walletId: wallet.id,
-          originalAmount: amountCents,
-          remaining: amountCents,
-          type: CreditPackType.EARNED,
-          expiresAt: null,
-          source: "referral_earning",
-          metadata: {
-            sourceUserId,
-            transactionId,
-          },
-        })
-        .returning();
+      // Atomic: insert pack, increment balance, create transaction in one transaction
+      const result = await withTransaction(logger, async (tx) => {
+        const [newPack] = await tx
+          .insert(creditPacks)
+          .values({
+            walletId: wallet.id,
+            originalAmount: amountCents,
+            remaining: amountCents,
+            type: CreditPackType.EARNED,
+            expiresAt: null,
+            source: "referral_earning",
+            metadata: {
+              sourceUserId,
+              transactionId,
+            },
+          })
+          .returning();
 
-      // Update wallet balance
-      const newBalance = wallet.balance + amountCents;
-      await db
-        .update(creditWallets)
-        .set({ balance: newBalance, updatedAt: new Date() })
-        .where(eq(creditWallets.id, wallet.id));
+        // Atomic SQL increment — prevents lost updates from concurrent writes
+        const [updated] = await tx
+          .update(creditWallets)
+          .set({
+            balance: sql`${creditWallets.balance} + ${amountCents}`,
+            updatedAt: new Date(),
+          })
+          .where(eq(creditWallets.id, wallet.id))
+          .returning({ balance: creditWallets.balance });
 
-      // Create REFERRAL_EARNING transaction
-      const [txRecord] = await db
-        .insert(creditTransactions)
-        .values({
-          walletId: wallet.id,
-          amount: amountCents,
-          balanceAfter: newBalance,
-          type: CreditTransactionType.REFERRAL_EARNING,
-          packId: newPack.id,
-          freePeriodId: wallet.freePeriodId,
-          metadata: {
-            sourceUserId,
-            sourceUserEmail,
-            transactionId,
-            commissionPercent,
-            originalAmountCents,
-          },
-        })
-        .returning();
+        const [txRecord] = await tx
+          .insert(creditTransactions)
+          .values({
+            walletId: wallet.id,
+            amount: amountCents,
+            balanceAfter: updated.balance,
+            type: CreditTransactionType.REFERRAL_EARNING,
+            packId: newPack.id,
+            freePeriodId: wallet.freePeriodId,
+            metadata: {
+              sourceUserId,
+              sourceUserEmail,
+              transactionId,
+              commissionPercent,
+              originalAmountCents,
+            },
+          })
+          .returning();
+
+        return { packId: newPack.id, transactionId: txRecord.id };
+      });
 
       logger.info("Earned credits added from referral", {
         userId,
         amountCents,
         sourceUserId,
-        packId: newPack.id,
-        transactionId: txRecord.id,
+        packId: result.packId,
+        transactionId: result.transactionId,
       });
 
-      return success({
-        packId: newPack.id,
-        transactionId: txRecord.id,
-      });
+      return success(result);
     } catch (error) {
       logger.error("Failed to add earned credits", parseError(error), {
         userId,
@@ -3476,7 +3551,7 @@ export class CreditRepository {
 
       const wallet = walletResult.data;
 
-      await withTransaction(logger, async (tx) => {
+      const txResult = await withTransaction(logger, async (tx) => {
         // Lock wallet row to prevent concurrent deductions
         const [lockedWallet] = await tx
           .select()
@@ -3486,10 +3561,10 @@ export class CreditRepository {
           .limit(1);
 
         if (!lockedWallet) {
-          throw new Error("Wallet not found during earned credits deduction");
+          return { error: "wallet_not_found" } as const;
         }
 
-        // Get earned packs ordered by creation (FIFO)
+        // Get earned packs ordered by creation (FIFO), locked to prevent concurrent reads
         const earnedPacks = await tx
           .select()
           .from(creditPacks)
@@ -3499,7 +3574,8 @@ export class CreditRepository {
               eq(creditPacks.type, CreditPackType.EARNED),
             ),
           )
-          .orderBy(creditPacks.createdAt);
+          .orderBy(creditPacks.createdAt)
+          .for("update");
 
         let remaining = amountCents;
 
@@ -3526,21 +3602,29 @@ export class CreditRepository {
         }
 
         if (remaining > 0) {
-          throw new Error("Insufficient earned credits for payout");
+          return { error: "insufficient_earned_credits" } as const;
         }
 
-        // Update wallet balance (prevent negative)
-        const newBalance = Math.max(0, lockedWallet.balance - amountCents);
+        // Update wallet balance atomically with floor
         await tx
           .update(creditWallets)
-          .set({ balance: newBalance, updatedAt: new Date() })
+          .set({
+            balance: sql`GREATEST(0, ${creditWallets.balance} - ${amountCents})`,
+            updatedAt: new Date(),
+          })
+          .where(eq(creditWallets.id, wallet.id));
+
+        // Re-read for accurate balanceAfter
+        const [updatedWallet] = await tx
+          .select({ balance: creditWallets.balance })
+          .from(creditWallets)
           .where(eq(creditWallets.id, wallet.id));
 
         // Create REFERRAL_PAYOUT transaction
         await tx.insert(creditTransactions).values({
           walletId: wallet.id,
           amount: -amountCents,
-          balanceAfter: newBalance,
+          balanceAfter: updatedWallet?.balance ?? 0,
           type: CreditTransactionType.REFERRAL_PAYOUT,
           freePeriodId: lockedWallet.freePeriodId,
           metadata: {
@@ -3549,7 +3633,22 @@ export class CreditRepository {
             amountCents,
           },
         });
+
+        return { error: null } as const;
       });
+
+      if (txResult.error === "wallet_not_found") {
+        return fail({
+          message: t("errors.deductEarnedCreditsFailed"),
+          errorType: ErrorResponseTypes.NOT_FOUND,
+        });
+      }
+      if (txResult.error === "insufficient_earned_credits") {
+        return fail({
+          message: t("errors.deductEarnedCreditsFailed"),
+          errorType: ErrorResponseTypes.BAD_REQUEST,
+        });
+      }
 
       logger.info("Earned credits deducted for payout", {
         userId,

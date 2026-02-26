@@ -119,7 +119,7 @@ export class MessageContextBuilder {
     role: ChatMessageRole;
     userId: string | undefined;
     isIncognito: boolean;
-    rootFolderId?: DefaultFolderId;
+    rootFolderId: DefaultFolderId;
     messageHistory?: ChatMessage[];
     logger: EndpointLogger;
     timezone: string;
@@ -878,7 +878,7 @@ export class MessageContextBuilder {
     model: ModelId;
     character: string | null;
     timezone: string;
-    rootFolderId?: DefaultFolderId;
+    rootFolderId: DefaultFolderId;
     /** Pre-built trailing system message string, built in builder.ts via generator.ts */
     trailingSystemMessage: string;
     locale: CountryLanguage;

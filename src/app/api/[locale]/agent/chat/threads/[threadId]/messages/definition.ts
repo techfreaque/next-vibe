@@ -359,9 +359,13 @@ const { POST } = createEndpoint({
             value: ChatMessageRole.USER,
             label: "enums.role.user" as const,
           },
+          {
+            value: ChatMessageRole.ASSISTANT,
+            label: "enums.role.assistant" as const,
+          },
         ],
         schema: z
-          .literal(ChatMessageRole.USER)
+          .enum([ChatMessageRole.USER, ChatMessageRole.ASSISTANT])
           .optional()
           .default(ChatMessageRole.USER),
       }),

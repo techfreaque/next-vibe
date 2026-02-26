@@ -45,6 +45,7 @@ export const translations = {
           content: { content: "Content" },
           tags: { content: "Tags" },
           priority: { text: "Priority" },
+          isPublic: { text: "Public" },
           createdAt: { content: "Created At" },
         },
       },

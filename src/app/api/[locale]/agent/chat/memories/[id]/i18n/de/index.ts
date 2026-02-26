@@ -34,6 +34,11 @@ export const translations: typeof enTranslations = {
       description:
         "Höhere Priorität Erinnerungen erscheinen zuerst (leer lassen, um aktuellen Wert zu behalten)",
     },
+    isPublic: {
+      label: "Öffentlich",
+      description:
+        "Diese Erinnerung in öffentlichen und geteilten Kontexten sichtbar machen",
+    },
     backButton: {
       label: "Zurück",
     },

@@ -8,6 +8,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
 import {
   ErrorResponseError,
@@ -109,6 +110,7 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
         logger,
         platform: Platform.NEXT_API,
         request, // Pass NextRequest for auth context
+        rootFolderId: DefaultFolderId.PRIVATE,
       });
 
       // Handle file responses - return immediately

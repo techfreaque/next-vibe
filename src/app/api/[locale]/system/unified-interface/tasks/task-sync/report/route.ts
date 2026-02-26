@@ -50,7 +50,7 @@ export const { POST, tools } = endpointsHandler({
 
       const now = new Date();
       const finalStatus =
-        data.status === "completed"
+        data.status === CronTaskStatus.COMPLETED
           ? CronTaskStatus.COMPLETED
           : CronTaskStatus.FAILED;
 
@@ -63,7 +63,7 @@ export const { POST, tools } = endpointsHandler({
           updatedAt: now,
         };
 
-        if (data.status === "completed") {
+        if (data.status === CronTaskStatus.COMPLETED) {
           updates.successCount = task.successCount + 1;
           updates.lastExecutionError = null;
         } else {

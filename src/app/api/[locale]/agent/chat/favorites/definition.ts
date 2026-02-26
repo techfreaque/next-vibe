@@ -26,7 +26,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { iconSchema } from "../../../shared/types/common.schema";
 import { ModelId } from "../../models/models";
 import { TtsVoiceValue } from "../../text-to-speech/enum";
-import charactersDefinitions from "../characters/definition";
+import { FAVORITES_LIST_ALIAS } from "./constants";
 import type { FavoritesTranslationKey } from "./i18n";
 import { scopedTranslation } from "./i18n";
 import { FavoritesListContainer } from "./widget";
@@ -48,6 +48,8 @@ const { GET } = createEndpoint({
   category: "app.endpointCategories.chat",
   tags: ["tags.favorites" as const],
 
+  aliases: [FAVORITES_LIST_ALIAS],
+
   fields: customWidgetObject({
     render: FavoritesListContainer,
     usage: { response: true } as const,
@@ -62,7 +64,8 @@ const { GET } = createEndpoint({
         usage: { response: true },
       }),
       createButton: scopedNavigateButtonField(scopedTranslation, {
-        targetEndpoint: charactersDefinitions.GET,
+        targetEndpoint: async () =>
+          (await import("../characters/definition")).default.GET,
         extractParams: () => ({}),
         prefillFromGet: false,
         label: "get.createButton.label" as const,

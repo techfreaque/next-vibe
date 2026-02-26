@@ -72,6 +72,20 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true } as const,
     noFormElement: true,
     children: {
+      // ── Favorite shortcut ─────────────────────────────────────────────
+      favoriteId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "run.post.fields.favoriteId.label",
+        description: "run.post.fields.favoriteId.description",
+        placeholder: "run.post.fields.favoriteId.placeholder",
+        columns: 6,
+        schema: z
+          .union([z.literal(""), z.string().uuid()])
+          .optional()
+          .transform((v) => (v === "" ? undefined : v)),
+      }),
+
       // ── Model & character ───────────────────────────────────────────────
       model: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -80,7 +94,7 @@ const { POST } = createEndpoint({
         description: "run.post.fields.model.description",
         options: ModelIdOptions,
         columns: 6,
-        schema: z.enum(ModelId),
+        schema: z.enum(ModelId).optional(),
       }),
 
       character: scopedRequestField(scopedTranslation, {
@@ -90,7 +104,7 @@ const { POST } = createEndpoint({
         description: "run.post.fields.character.description",
         placeholder: "run.post.fields.character.placeholder",
         columns: 6,
-        schema: z.string().default("default"),
+        schema: z.string().optional(),
       }),
 
       // ── User prompt ─────────────────────────────────────────────────────
@@ -260,23 +274,27 @@ const { POST } = createEndpoint({
         columns: 6,
         options: [
           {
-            value: DefaultFolderId.CRON,
-            label: "run.post.fields.rootFolderId.options.cron" as const,
-          },
-          {
             value: DefaultFolderId.PRIVATE,
             label: "run.post.fields.rootFolderId.options.private" as const,
+          },
+          {
+            value: DefaultFolderId.INCOGNITO,
+            label: "run.post.fields.rootFolderId.options.incognito" as const,
           },
           {
             value: DefaultFolderId.SHARED,
             label: "run.post.fields.rootFolderId.options.shared" as const,
           },
           {
-            value: DefaultFolderId.INCOGNITO,
-            label: "run.post.fields.rootFolderId.options.incognito" as const,
+            value: DefaultFolderId.PUBLIC,
+            label: "run.post.fields.rootFolderId.options.public" as const,
+          },
+          {
+            value: DefaultFolderId.CRON,
+            label: "run.post.fields.rootFolderId.options.cron" as const,
           },
         ],
-        schema: z.enum(DefaultFolderId).optional(),
+        schema: z.enum(DefaultFolderId).default(DefaultFolderId.CRON),
       }),
 
       subFolderId: scopedRequestField(scopedTranslation, {
@@ -436,9 +454,16 @@ const { POST } = createEndpoint({
         maxTurns: 1,
         rootFolderId: DefaultFolderId.CRON,
       },
-      // Recommended: use a dedicated character with custom system prompt
+      // Recommended: use a favorite to load character + model + tools in one shot
+      withFavorite: {
+        favoriteId: "550e8400-e29b-41d4-a716-446655440000",
+        prompt: "Analyse last week's signups and write a brief report.",
+        instructions: "Use bullet points. Max 5 items.",
+        maxTurns: 1,
+        rootFolderId: DefaultFolderId.CRON,
+      },
+      // Use a dedicated character with custom system prompt
       withCharacter: {
-        model: ModelId["CLAUDE_HAIKU_4_5"],
         character: "uuid-of-your-character",
         prompt: "Analyse last week's signups and write a brief report.",
         instructions: "Use bullet points. Max 5 items.",

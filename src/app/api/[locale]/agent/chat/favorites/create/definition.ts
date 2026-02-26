@@ -31,6 +31,7 @@ import type {
   ManualModelSelection,
 } from "../../characters/create/definition";
 import { IntelligenceLevel, ModelSelectionType } from "../../characters/enum";
+import { FAVORITE_CREATE_ALIAS } from "../constants";
 import { scopedTranslation } from "./i18n";
 import { FavoriteCreateContainer } from "./widget";
 
@@ -50,6 +51,8 @@ const { POST } = createEndpoint({
   icon: "plus" as const,
   category: "app.endpointCategories.chat",
   tags: ["tags.favorites" as const],
+
+  aliases: [FAVORITE_CREATE_ALIAS],
 
   options: {
     mutationOptions: {

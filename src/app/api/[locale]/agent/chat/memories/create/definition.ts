@@ -60,6 +60,7 @@ const { POST } = createEndpoint({
           content: data.requestData.content,
           tags: data.requestData.tags ?? [],
           priority: data.requestData.priority ?? 0,
+          isPublic: data.requestData.isPublic ?? false,
           createdAt: new Date(),
         };
 
@@ -116,6 +117,14 @@ const { POST } = createEndpoint({
         description: "post.priority.description" as const,
         columns: 6,
         schema: z.coerce.number().min(0).max(100).optional(),
+      }),
+      isPublic: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.isPublic.label" as const,
+        description: "post.isPublic.description" as const,
+        columns: 6,
+        schema: z.boolean().optional().default(false),
       }),
 
       // Back button

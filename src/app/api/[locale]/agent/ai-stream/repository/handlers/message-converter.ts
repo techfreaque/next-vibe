@@ -271,7 +271,7 @@ export class MessageConverter {
     messages: ChatMessage[],
     logger: EndpointLogger,
     timezone: string,
-    rootFolderId: DefaultFolderId | undefined,
+    rootFolderId: DefaultFolderId,
     locale: CountryLanguage,
   ): Promise<ModelMessage[]> {
     const result: ModelMessage[] = [];

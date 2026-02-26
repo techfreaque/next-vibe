@@ -6,6 +6,17 @@
 
 /* eslint-disable i18next/no-literal-string */
 
+import {
+  CHARACTER_CREATE_ALIAS,
+  CHARACTERS_LIST_ALIAS,
+} from "../characters/constants";
+import {
+  FAVORITE_CREATE_ALIAS,
+  FAVORITE_DELETE_ALIAS,
+  FAVORITE_UPDATE_ALIAS,
+  FAVORITES_LIST_ALIAS,
+} from "./constants";
+
 export interface FavoriteSummaryItem {
   id: string;
   name: string;
@@ -55,11 +66,34 @@ function compactLine(fav: FavoriteSummaryItem): string {
  * - Active favorite first, then by position
  * - Full lines up to budget, then compact, then hard cut
  */
+/**
+ * Returns setup guidance when no favorites exist yet.
+ * Only shown in private/cron threads (caller responsibility — builder.ts filters).
+ */
+export function formatEmptyFavoritesGuidance(): string {
+  return `## Favorites — Not Set Up Yet
+
+You have no saved favorites. Favorites let you save character + model + tool combinations for instant reuse.
+
+**Why set one up:**
+- Switch between specialized personas (coder, writer, analyst) in one click
+- Lock a preferred model per character — no manual selection each time
+- Pre-configure which tools each persona can access
+- Use \`favoriteId\` in API/CLI/cron calls for zero-config AI runs
+
+**Quick setup:**
+1. Help the user find or create a character that fits their workflow (\`${CHARACTERS_LIST_ALIAS}\`, \`${CHARACTER_CREATE_ALIAS}\`)
+2. Create a favorite linking that character to a model (\`${FAVORITE_CREATE_ALIAS}\`)
+3. Set it as active so it loads by default
+
+**Proactive guidance:** When you notice the user repeatedly uses a specific model or asks for a particular style, suggest creating a character + favorite for it. A well-configured favorite eliminates repetitive setup.`;
+}
+
 export function formatFavoritesSummary(
   favorites: FavoriteSummaryItem[],
 ): string {
   if (favorites.length === 0) {
-    return "";
+    return formatEmptyFavoritesGuidance();
   }
 
   // Sort: active first, then by position
@@ -79,7 +113,13 @@ export function formatFavoritesSummary(
     : "";
 
   const header = `## Favorites (${favorites.length})${activeNote}`;
-  const footer = `\nTools: agent_chat_favorites_GET (list) · agent_chat_favorites_create_POST (create) · agent_chat_favorites_[id]_PATCH (edit) · agent_chat_favorites_[id]_DELETE (delete)\n\n**Self-management:** After completing the user's request, keep favorites tidy — suggest removing unused ones, renaming for clarity, or creating new ones based on patterns you notice.`;
+  const footer = `\nTools: \`${FAVORITES_LIST_ALIAS}\` (list) · \`${FAVORITE_CREATE_ALIAS}\` (create) · \`${FAVORITE_UPDATE_ALIAS}\` (edit) · \`${FAVORITE_DELETE_ALIAS}\` (delete) · \`${CHARACTER_CREATE_ALIAS}\` (new character)
+
+**Proactive optimization:** Continuously improve the user's character + favorites setup:
+- Notice patterns: if the user keeps asking for a certain style, tone, or expertise → suggest a dedicated character + favorite
+- Suggest model upgrades: if a favorite uses an expensive model for simple tasks, recommend a lighter one
+- Keep favorites tidy: suggest removing unused ones, renaming for clarity, or consolidating similar setups
+- When a character lacks tools it clearly needs, suggest adding them to the favorite's tool config`;
 
   const reserved = header.length + footer.length + 80;
   let remaining = FAVORITES_BUDGET - reserved;
@@ -105,7 +145,7 @@ export function formatFavoritesSummary(
   const parts = [header, lines.join("\n")];
   if (hiddenCount > 0) {
     parts.push(
-      `[... ${hiddenCount} more favorite${hiddenCount === 1 ? "" : "s"} not shown — use agent_chat_favorites_GET for the full list]`,
+      `[... ${hiddenCount} more favorite${hiddenCount === 1 ? "" : "s"} not shown — use \`${FAVORITES_LIST_ALIAS}\` for the full list]`,
     );
   }
   parts.push(footer);

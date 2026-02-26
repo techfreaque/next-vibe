@@ -17,6 +17,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/parsing";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -52,6 +53,7 @@ export class RouteExecuteRepository {
         locale,
         logger,
         platform: Platform.MCP,
+        rootFolderId: DefaultFolderId.CRON,
       });
 
       if (!result.success) {

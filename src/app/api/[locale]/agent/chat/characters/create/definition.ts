@@ -39,6 +39,7 @@ import {
   PriceLevel,
   SpeedLevel,
 } from "../../characters/enum";
+import { CHARACTER_CREATE_ALIAS } from "../constants";
 import { CategoryOptions } from "../enum";
 import { CharacterCategory, CharacterCategoryDB } from "../enum";
 import type { CharactersTranslationKey } from "../i18n";
@@ -61,6 +62,8 @@ const { POST } = createEndpoint({
   icon: "sparkle" as const,
   category: "app.endpointCategories.chat",
   tags: ["tags.characters" as const],
+
+  aliases: [CHARACTER_CREATE_ALIAS],
 
   options: {
     mutationOptions: {

@@ -22,6 +22,10 @@ export const translations = {
       label: "Priority",
       description: "Higher priority memories appear first (0-100)",
     },
+    isPublic: {
+      label: "Public",
+      description: "Make this memory visible in public and shared contexts",
+    },
     backButton: {
       label: "Back",
     },

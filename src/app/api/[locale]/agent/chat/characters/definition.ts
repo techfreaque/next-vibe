@@ -29,7 +29,7 @@ import { iconSchema } from "../../../shared/types/common.schema";
 import { ModelId, TOTAL_MODEL_COUNT } from "../../models/models";
 import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
 import createFavoriteDefinitions from "../favorites/create/definition";
-import { NO_CHARACTER_ID } from "./config";
+import { CHARACTERS_LIST_ALIAS, NO_CHARACTER_ID } from "./constants";
 import {
   CharacterCategory,
   CharacterCategoryDB,
@@ -39,8 +39,6 @@ import {
 } from "./enum";
 import { scopedTranslation } from "./i18n";
 import { CharactersListContainer } from "./widget";
-
-export const CHARACTERS_LIST_ALIAS = "characters" as const;
 
 /**
  * Get Characters List Endpoint (GET)

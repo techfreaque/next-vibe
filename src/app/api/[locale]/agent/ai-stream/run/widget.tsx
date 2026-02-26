@@ -33,10 +33,8 @@ import {
   getFullPath,
 } from "@/app/api/[locale]/system/generated/endpoint";
 import helpDefinitions from "@/app/api/[locale]/system/help/definition";
-import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/shared/utils/error-types";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
@@ -62,30 +60,20 @@ import {
   ToolsConfigEdit,
 } from "../../tools/tools-config-widget";
 import type definition from "./definition";
-import type { AiStreamRunPostResponseOutput } from "./definition";
+import type {
+  AiStreamRunPostRequestOutput,
+  AiStreamRunPostResponseOutput,
+} from "./definition";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
-type PreCallArgs = Record<string, JsonValue>;
-
-interface PreCall {
-  routeId: string;
-  args: PreCallArgs;
-}
+type PreCall = NonNullable<AiStreamRunPostRequestOutput["preCalls"]>[number];
 
 interface CustomWidgetProps {
   field: {
     value: AiStreamRunPostResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
   fieldName: string;
-}
-
-interface EndpointMethods {
-  GET?: CreateApiEndpointAny;
-  POST?: CreateApiEndpointAny;
-  PUT?: CreateApiEndpointAny;
-  PATCH?: CreateApiEndpointAny;
-  DELETE?: CreateApiEndpointAny;
 }
 
 // ─── Pre-Call Row with inline endpoint ──────────────────────────────────────
@@ -151,59 +139,8 @@ function PreCallRow({
     | "DELETE"
     | undefined;
 
-  // Build endpoint options to pre-fill the embedded form with args
-  const hasArgs = Object.keys(call.args).length > 0;
-
-  const endpointOptions = useMemo(():
-    | UseEndpointOptions<EndpointMethods>
-    | undefined => {
-    if (!hasArgs || !method) {
-      return undefined;
-    }
-
-    if (method === "GET") {
-      return {
-        read: {
-          urlPathParams: call.args,
-        },
-      };
-    }
-
-    if (method === "DELETE") {
-      return {
-        delete: {
-          urlPathParams: call.args,
-          autoPrefillData: call.args,
-        },
-      };
-    }
-
-    if (method === "POST") {
-      return {
-        create: {
-          autoPrefillData: call.args,
-        },
-      };
-    }
-
-    if (method === "PATCH") {
-      return {
-        update: {
-          autoPrefillData: call.args,
-        },
-      };
-    }
-
-    if (method === "PUT") {
-      return {
-        create: {
-          autoPrefillData: call.args,
-        },
-      };
-    }
-
-    return undefined;
-  }, [hasArgs, method, call.args]);
+  // Pre-call args are set via the inline endpoint form (not via endpointOptions prefill)
+  // The EndpointsPage renders the target endpoint's form directly.
 
   return (
     <Div className="rounded-lg border bg-muted/20 flex flex-col gap-2 overflow-hidden">
@@ -256,7 +193,6 @@ function PreCallRow({
             endpoint={{ [method]: resolvedEndpoint }}
             locale={locale}
             user={user}
-            endpointOptions={endpointOptions}
           />
         </Div>
       )}

@@ -239,6 +239,7 @@ export async function setupAiStream(params: {
       logger,
       user,
       t: aiStreamT,
+      rootFolderId: data.rootFolderId,
     });
 
     if (!confirmationResult.success) {
@@ -689,6 +690,7 @@ export async function setupAiStream(params: {
     logger,
     systemPrompt: builtSystemPrompt,
     toolConfirmationResults,
+    rootFolderId: data.rootFolderId,
   });
 
   const provider = ProviderFactoryClass.getProviderForModel(

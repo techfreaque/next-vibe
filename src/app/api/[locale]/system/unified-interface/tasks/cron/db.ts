@@ -99,6 +99,12 @@ export const cronTasks = pgTable(
     errorCount: integer("error_count").notNull().default(0),
     averageExecutionTime: integer("average_execution_time").default(0),
 
+    // Self-healing: auto-disable after repeated failures
+    /** Running count of consecutive failures — reset to 0 on success */
+    consecutiveFailures: integer("consecutive_failures").notNull().default(0),
+    /** Auto-disable threshold — null = never auto-disable */
+    maxConsecutiveFailures: integer("max_consecutive_failures").default(5),
+
     // Instance routing — null means "run only on host instance"
     targetInstance: text("target_instance"),
 

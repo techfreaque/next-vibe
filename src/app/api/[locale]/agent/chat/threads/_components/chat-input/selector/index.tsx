@@ -14,7 +14,7 @@ import { useMemo } from "react";
 
 import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-config";
 import { useTourState } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-state-context";
-import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/config";
+import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/constants";
 import {
   type ModelId,
   modelOptions,

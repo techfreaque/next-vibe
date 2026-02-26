@@ -50,6 +50,12 @@ export function useTasksSummary(params: {
         lastExecutedAt: t.lastExecutedAt,
         errorCount: t.errorCount,
         routeId: t.routeId,
+        // Enriched fields — not available client-side, graceful defaults
+        priority: t.priority ?? null,
+        lastExecutionDuration: t.lastExecutionDuration ?? null,
+        lastResultSummary: null,
+        consecutiveFailures: t.consecutiveFailures ?? 0,
+        recentExecutions: null,
       })),
     );
   }, [shouldFetch, tasksEndpoint.read?.response]);

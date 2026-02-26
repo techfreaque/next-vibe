@@ -50,6 +50,11 @@ import {
   PriceLevel,
   SpeedLevel,
 } from "../../characters/enum";
+import {
+  FAVORITE_DELETE_ALIAS,
+  FAVORITE_GET_ALIAS,
+  FAVORITE_UPDATE_ALIAS,
+} from "../constants";
 import { scopedTranslation } from "./i18n";
 import { FavoriteEditContainer } from "./widgets";
 
@@ -68,6 +73,8 @@ const { DELETE } = createEndpoint({
   icon: "trash" as const,
   category: "app.endpointCategories.chat",
   tags: ["tags.favorites" as const],
+
+  aliases: [FAVORITE_DELETE_ALIAS],
 
   options: {
     mutationOptions: {
@@ -301,6 +308,8 @@ const { PATCH } = createEndpoint({
   icon: "edit" as const,
   category: "app.endpointCategories.chat",
   tags: ["tags.favorites" as const],
+
+  aliases: [FAVORITE_UPDATE_ALIAS],
 
   options: {
     mutationOptions: {
@@ -703,6 +712,8 @@ const { GET } = createEndpoint({
   icon: "star" as const,
   category: "app.endpointCategories.chat",
   tags: ["tags.favorites" as const],
+
+  aliases: [FAVORITE_GET_ALIAS],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

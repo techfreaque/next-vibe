@@ -327,6 +327,14 @@ const { PATCH } = createEndpoint({
         columns: 6,
         schema: z.coerce.number().min(0).max(100).optional(),
       }),
+      isPublic: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "patch.isPublic.label" as const,
+        description: "patch.isPublic.description" as const,
+        columns: 6,
+        schema: z.boolean().optional(),
+      }),
 
       // Back button
       backButton: scopedBackButton(scopedTranslation, {

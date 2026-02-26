@@ -21,7 +21,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { NO_CHARACTER_ID } from "../../chat/characters/config";
+import { NO_CHARACTER_ID } from "../../chat/characters/constants";
 import {
   isFiltersSelection,
   isManualSelection,
@@ -102,7 +102,7 @@ export interface HeadlessAiStreamParams {
   /** Subfolder for thread placement */
   subFolderId?: string;
   /** Override root folder (defaults to INCOGNITO for none, CRON for new/append) */
-  rootFolderId?: DefaultFolderId;
+  rootFolderId: DefaultFolderId;
   /**
    * Pre-fetched tool call results to inject as tool messages before the AI runs.
    * Written to the thread DB so they appear in UI exactly like regular tool calls.
@@ -258,6 +258,32 @@ export async function runHeadlessAiStream(
         // Explicit params override favorite values
         model = modelOverride ?? resolved.model;
         character = characterOverride ?? resolved.character;
+      }
+    }
+
+    // ── Resolve model from character if only character is provided ────────────
+    if (!model && character && character !== NO_CHARACTER_ID) {
+      const { CharactersRepository } =
+        await import("../../chat/characters/repository");
+      const characterResult = await CharactersRepository.getCharacterById(
+        { id: character },
+        user,
+        logger,
+        locale,
+      );
+      if (characterResult.success) {
+        const charSel = characterResult.data.modelSelection;
+        if (charSel) {
+          if (isManualSelection(charSel) && "manualModelId" in charSel) {
+            model = charSel.manualModelId as ModelId;
+          } else if (isFiltersSelection(charSel)) {
+            const best =
+              CharactersRepositoryClient.getBestModelForCharacter(charSel);
+            if (best) {
+              model = best.id as ModelId;
+            }
+          }
+        }
       }
     }
 

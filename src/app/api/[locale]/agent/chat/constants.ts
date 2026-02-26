@@ -6,7 +6,7 @@
 import { CONTACT_FORM_ALIAS } from "../../contact/definition";
 import { aliasToPathMap } from "../../system/generated/endpoint";
 import { TOOL_HELP_ALIAS } from "../../system/help/constants";
-import { EXECUTE_TOOL_ALIAS } from "../../system/unified-interface/ai/execute-tool/definition";
+import { EXECUTE_TOOL_ALIAS } from "../../system/unified-interface/ai/execute-tool/constants";
 import { FETCH_URL_ALIAS } from "../fetch-url-content/definition";
 import { BRAVE_SEARCH_ALIAS } from "../search/brave/definition";
 import {

@@ -19,7 +19,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useState } from "react";
 
-import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/config";
+import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/constants";
 import { ModelSelector } from "@/app/api/[locale]/agent/models/components/model-selector";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {

@@ -16,6 +16,13 @@ import type {
 } from "../../_shared/types";
 
 /**
+ * Endpoint reference: direct object or async resolver (for breaking circular deps)
+ */
+export type TargetEndpointOrResolver<
+  T extends CreateApiEndpointAny | undefined,
+> = T | (() => Promise<NonNullable<T>>);
+
+/**
  * Navigate Button Widget Configuration
  */
 export interface NavigateButtonWidgetConfig<
@@ -36,7 +43,7 @@ export interface NavigateButtonWidgetConfig<
     | "ghost"
     | "outline";
   size?: "default" | "sm" | "lg" | "icon";
-  targetEndpoint?: TTargetEndpoint;
+  targetEndpoint?: TargetEndpointOrResolver<TTargetEndpoint>;
   extractParams?: TTargetEndpoint extends CreateApiEndpointAny
     ? (
         source: {

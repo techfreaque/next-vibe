@@ -137,129 +137,109 @@ export function NavigateButtonWidget<
   }
 
   // Check if user has permission to access the target endpoint
-  if (!targetEndpoint) {
-    return <></>;
-  }
+  // For async resolvers (functions), permission is checked on click
+  if (typeof targetEndpoint !== "function") {
+    const userRoles = user.roles;
+    const allowedRoles = targetEndpoint.allowedRoles || [];
+    const allowedClientRoles = targetEndpoint.allowedClientRoles || [];
+    const allAllowedRoles = [...allowedRoles, ...allowedClientRoles];
 
-  const userRoles = user.roles;
-  const allowedRoles = targetEndpoint.allowedRoles || [];
-  const allowedClientRoles = targetEndpoint.allowedClientRoles || [];
-
-  // Combine both server and client roles for permission check
-  const allAllowedRoles = [...allowedRoles, ...allowedClientRoles];
-
-  // If there are any role restrictions, check if user has permission
-  if (allAllowedRoles.length > 0) {
-    const hasPermission = userRoles.some((role) =>
-      allAllowedRoles.includes(role),
-    );
-    if (!hasPermission) {
-      // User doesn't have permission - don't render the button
-      return <></>;
+    if (allAllowedRoles.length > 0) {
+      const hasPermission = userRoles.some((role) =>
+        allAllowedRoles.includes(role),
+      );
+      if (!hasPermission) {
+        return <></>;
+      }
     }
   }
 
-  // Forward navigation (push to stack)
+  // Forward navigation (push to stack) — always async to support resolver + async extractParams
   const handleClick = (e: ButtonMouseEvent): void => {
     e.stopPropagation();
 
-    if (!navigation || !extractParams || targetEndpoint === null) {
+    if (!navigation || !extractParams) {
       logger.warn(
-        "NavigateButtonWidget: No navigation context, extractParams, or targetEndpoint",
+        "NavigateButtonWidget: No navigation context or extractParams",
       );
       return;
     }
 
-    // Build structured source data for extractParams
-    // requestData: current form values
-    // urlPathParams: URL path params from current navigation entry
-    // responseData: response data from GET request (for PATCH forms)
-    // itemData: parent array item data (if inside array)
-    const requestData = form?.getValues() ?? {};
-    const responseData =
-      response?.success && response.data ? response.data : {};
-    const urlPathParams = navigation?.current?.params?.urlPathParams ?? {};
-    const itemData = field.parentValue; // For array items
+    void (async (): Promise<void> => {
+      try {
+        // Resolve endpoint (may be direct ref or async () => import())
+        const resolvedEndpoint: CreateApiEndpointAny =
+          typeof targetEndpoint === "function"
+            ? await targetEndpoint()
+            : targetEndpoint;
 
-    const source = {
-      itemData,
-      requestData,
-      urlPathParams,
-      responseData,
-    };
+        // Permission check for lazily-resolved endpoints
+        if (typeof targetEndpoint === "function") {
+          const userRoles = user.roles;
+          const allowedRoles = resolvedEndpoint.allowedRoles || [];
+          const allowedClientRoles = resolvedEndpoint.allowedClientRoles || [];
+          const allAllowedRoles = [...allowedRoles, ...allowedClientRoles];
 
-    // Build context for extractParams
-    const context = {
-      logger,
-      user,
-      locale,
-    };
-
-    // Handle both sync and async extractParams
-    const paramsOrPromise = extractParams(source, context);
-
-    if (paramsOrPromise instanceof Promise) {
-      // Async extractParams - wrap in async IIFE
-      void (async (): Promise<void> => {
-        try {
-          const params = await paramsOrPromise;
-
-          // If prefillFromGet is true but no getEndpoint provided, use current endpoint if it's a GET
-          let effectiveGetEndpoint: CreateApiEndpointAny | undefined =
-            getEndpoint;
-          if (prefillFromGet && !effectiveGetEndpoint && endpoint) {
-            // Check if current endpoint is a GET endpoint
-            if (endpoint.method === "GET") {
-              effectiveGetEndpoint = endpoint;
+          if (allAllowedRoles.length > 0) {
+            const hasPermission = userRoles.some((role) =>
+              allAllowedRoles.includes(role),
+            );
+            if (!hasPermission) {
+              return;
             }
           }
-
-          // Capture click position for modal positioning
-          const clickX = e.clientX ?? 0;
-          const clickY = e.clientY ?? 0;
-
-          navigation.push(targetEndpoint, {
-            urlPathParams: params.urlPathParams,
-            data: params.data,
-            prefillFromGet,
-            getEndpoint: effectiveGetEndpoint,
-            renderInModal,
-            popNavigationOnSuccess,
-            modalPosition: { x: clickX, y: clickY },
-          });
-        } catch (error) {
-          logger.error("NavigateButtonWidget: Failed to extract params", {
-            error: error instanceof Error ? error.message : String(error),
-          });
         }
-      })();
-    } else {
-      // Sync extractParams
-      const params = paramsOrPromise;
 
-      // If prefillFromGet is true but no getEndpoint provided, use current endpoint if it's a GET
-      let effectiveGetEndpoint: CreateApiEndpointAny | undefined = getEndpoint;
-      if (prefillFromGet && !effectiveGetEndpoint && endpoint) {
-        // Check if current endpoint is a GET endpoint
-        if (endpoint.method === "GET") {
-          effectiveGetEndpoint = endpoint;
+        // Build structured source data for extractParams
+        const requestData = form?.getValues() ?? {};
+        const responseData =
+          response?.success && response.data ? response.data : {};
+        const urlPathParams = navigation?.current?.params?.urlPathParams ?? {};
+        const itemData = field.parentValue;
+
+        const source = {
+          itemData,
+          requestData,
+          urlPathParams,
+          responseData,
+        };
+
+        const context = { logger, user, locale };
+
+        // Resolve params (may be sync or async)
+        const paramsOrPromise = extractParams(source, context);
+        const params =
+          paramsOrPromise instanceof Promise
+            ? await paramsOrPromise
+            : paramsOrPromise;
+
+        // Determine getEndpoint for prefill
+        let effectiveGetEndpoint: CreateApiEndpointAny | undefined =
+          getEndpoint;
+        if (prefillFromGet && !effectiveGetEndpoint && endpoint) {
+          if (endpoint.method === "GET") {
+            effectiveGetEndpoint = endpoint;
+          }
         }
+
+        const clickX = e.clientX ?? 0;
+        const clickY = e.clientY ?? 0;
+
+        navigation.push(resolvedEndpoint, {
+          urlPathParams: params.urlPathParams,
+          data: params.data,
+          prefillFromGet,
+          getEndpoint: effectiveGetEndpoint,
+          renderInModal,
+          popNavigationOnSuccess,
+          modalPosition: { x: clickX, y: clickY },
+        });
+      } catch (error) {
+        logger.error("NavigateButtonWidget: Failed to navigate", {
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
-
-      // Capture click position for modal positioning
-      const clickX = e.clientX ?? 0;
-      const clickY = e.clientY ?? 0;
-
-      navigation.push(targetEndpoint, {
-        urlPathParams: params.urlPathParams,
-        data: params.data,
-        prefillFromGet,
-        getEndpoint: effectiveGetEndpoint,
-        renderInModal,
-        popNavigationOnSuccess,
-        modalPosition: { x: clickX, y: clickY },
-      });
-    }
+    })();
   };
 
   return (
