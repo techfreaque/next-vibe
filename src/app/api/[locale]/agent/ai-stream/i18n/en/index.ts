@@ -101,6 +101,12 @@ export const translations = {
           description:
             "Where to persist the thread. 'cron' (default) = persisted agent runs. 'incognito' = no storage, no history. 'private' = user's private folder. 'shared' = team-accessible.",
           placeholder: "cron",
+          options: {
+            cron: "Cron (agent runs)",
+            private: "Private",
+            shared: "Shared",
+            incognito: "Incognito (no storage)",
+          },
         },
         subFolderId: {
           label: "Sub-folder ID",

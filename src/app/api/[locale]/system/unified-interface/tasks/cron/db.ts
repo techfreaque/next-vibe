@@ -87,6 +87,12 @@ export const cronTasks = pgTable(
     lastExecutionDuration: integer("last_execution_duration"),
     nextExecutionAt: timestamp("next_execution_at"),
 
+    // History logging throttle
+    /** Minimum interval (ms) between successful execution history records. null = log every run. */
+    historyInterval: integer("history_interval"),
+    /** Last time a history record was written for this task (success or error). */
+    lastHistoryLoggedAt: timestamp("last_history_logged_at"),
+
     // Statistics
     executionCount: integer("execution_count").notNull().default(0),
     successCount: integer("success_count").notNull().default(0),

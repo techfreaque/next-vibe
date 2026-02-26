@@ -72,6 +72,19 @@ export const TASK_RETRY_CONFIG = {
 } as const;
 
 /**
+ * History Logging Intervals (in milliseconds)
+ * Controls how often successful execution records are written to the history table.
+ * Errors are always logged regardless of interval.
+ */
+export const HISTORY_INTERVALS = {
+  EVERY_RUN: undefined, // Log every execution (default)
+  EVERY_5_MINUTES: 300000,
+  EVERY_15_MINUTES: 900000,
+  EVERY_30_MINUTES: 1800000,
+  EVERY_HOUR: 3600000,
+} as const;
+
+/**
  * Task Batch Sizes
  */
 export const TASK_BATCH_SIZES = {

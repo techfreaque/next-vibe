@@ -18,6 +18,7 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  customWidgetObject,
   scopedObjectFieldNew,
   scopedRequestDataArrayOptionalField,
   scopedRequestField,
@@ -35,6 +36,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { DefaultFolderId } from "../../chat/config";
 import { scopedTranslation } from "../i18n";
+import { AiRunWidget } from "./widget";
 
 /**
  * A single pre-call — route to execute before the AI prompt.
@@ -65,13 +67,10 @@ const { POST } = createEndpoint({
   category: "app.endpointCategories.ai",
   tags: ["tags.ai", "tags.chat"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "run.post.container.title",
-    description: "run.post.container.description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: AiRunWidget,
+    usage: { request: "data", response: true } as const,
+    noFormElement: true,
     children: {
       // ── Model & character ───────────────────────────────────────────────
       model: scopedRequestField(scopedTranslation, {
@@ -246,18 +245,38 @@ const { POST } = createEndpoint({
         description: "run.post.fields.appendThreadId.description",
         placeholder: "run.post.fields.appendThreadId.placeholder",
         columns: 6,
-        schema: z.string().uuid().optional(),
+        schema: z
+          .union([z.literal(""), z.string().uuid()])
+          .optional()
+          .transform((v) => (v === "" ? undefined : v)),
       }),
 
       // ── Thread folder placement ──────────────────────────────────────────
       rootFolderId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.SELECT,
         label: "run.post.fields.rootFolderId.label",
         description: "run.post.fields.rootFolderId.description",
-        placeholder: "run.post.fields.rootFolderId.placeholder",
         columns: 6,
-        schema: z.enum(DefaultFolderId).default(DefaultFolderId.CRON),
+        options: [
+          {
+            value: DefaultFolderId.CRON,
+            label: "run.post.fields.rootFolderId.options.cron" as const,
+          },
+          {
+            value: DefaultFolderId.PRIVATE,
+            label: "run.post.fields.rootFolderId.options.private" as const,
+          },
+          {
+            value: DefaultFolderId.SHARED,
+            label: "run.post.fields.rootFolderId.options.shared" as const,
+          },
+          {
+            value: DefaultFolderId.INCOGNITO,
+            label: "run.post.fields.rootFolderId.options.incognito" as const,
+          },
+        ],
+        schema: z.enum(DefaultFolderId).optional(),
       }),
 
       subFolderId: scopedRequestField(scopedTranslation, {
@@ -267,7 +286,10 @@ const { POST } = createEndpoint({
         description: "run.post.fields.subFolderId.description",
         placeholder: "run.post.fields.subFolderId.placeholder",
         columns: 6,
-        schema: z.uuid().optional(),
+        schema: z
+          .union([z.literal(""), z.string().uuid()])
+          .optional()
+          .transform((v) => (v === "" ? undefined : v)),
       }),
 
       // ── Response ────────────────────────────────────────────────────────

@@ -53,6 +53,7 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
     // splitTaskArgs() splits by schema at execution time.
     taskInput: task.taskInput ?? {},
     runOnce: task.runOnce ?? false,
+    historyInterval: task.historyInterval ?? null,
     // System tasks have no user owner (null userId)
     userId: null,
   }));
@@ -71,6 +72,7 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
           displayName: sql`COALESCE(NULLIF(${cronTasks.displayName}, ''), excluded.display_name)`,
           description: sql`excluded.description`,
           category: sql`excluded.category`,
+          historyInterval: sql`excluded.history_interval`,
           updatedAt: new Date(),
         },
       });

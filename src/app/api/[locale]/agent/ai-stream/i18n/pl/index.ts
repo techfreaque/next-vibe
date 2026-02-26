@@ -88,6 +88,12 @@ export const translations: typeof enTranslations = {
           label: "Folder główny",
           description: "Miejsce przechowywania wątku",
           placeholder: "cron",
+          options: {
+            cron: "Cron (zadania agenta)",
+            private: "Prywatny",
+            shared: "Udostępniony",
+            incognito: "Incognito (bez zapisu)",
+          },
         },
         subFolderId: {
           label: "ID podfolderu",

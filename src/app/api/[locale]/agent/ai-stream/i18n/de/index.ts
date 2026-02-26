@@ -82,6 +82,12 @@ export const translations: typeof enTranslations = {
           label: "Stammordner",
           description: "Speicherort für den Thread",
           placeholder: "cron",
+          options: {
+            cron: "Cron (Agent-Läufe)",
+            private: "Privat",
+            shared: "Geteilt",
+            incognito: "Inkognito (kein Speicher)",
+          },
         },
         subFolderId: {
           label: "Unterordner-ID",

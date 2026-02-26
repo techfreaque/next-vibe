@@ -8,6 +8,7 @@ import "server-only";
 
 import {
   CRON_SCHEDULES,
+  HISTORY_INTERVALS,
   TASK_TIMEOUTS,
 } from "@/app/api/[locale]/system/unified-interface/tasks/constants";
 import {
@@ -30,6 +31,7 @@ const dbHealthTask = createCronTask(definitions.POST, tools.POST, {
   enabled: true,
   priority: CronTaskPriority.LOW,
   timeout: TASK_TIMEOUTS.SHORT,
+  historyInterval: HISTORY_INTERVALS.EVERY_30_MINUTES,
   taskInput: undefined,
 });
 

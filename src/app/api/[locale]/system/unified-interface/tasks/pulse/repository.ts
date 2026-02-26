@@ -584,6 +584,7 @@ export class PulseHealthRepository {
             let finalStatus: typeof CronTaskStatusValue = CronTaskStatus.FAILED;
             let finalMessage: string | null = null;
             let finalDurationMs = 0;
+            let didLogHistory = false;
 
             for (let attempt = 0; attempt <= maxRetries; attempt++) {
               if (attempt > 0) {
@@ -653,32 +654,43 @@ export class PulseHealthRepository {
                     ? CronTaskStatus.TIMEOUT
                     : CronTaskStatus.FAILED;
 
-              // Record execution for this attempt
-              const execResponse = await CronTasksRepository.createExecution(
-                {
-                  taskId: dbTask.id,
-                  taskName: dbTask.displayName,
-                  executionId: crypto.randomUUID(),
-                  status: attemptStatus,
-                  priority: dbTask.priority,
-                  startedAt: new Date(attemptStart),
-                  completedAt: new Date(),
-                  durationMs: attemptDuration,
-                  config: taskInput,
-                  result: typedResult.success
-                    ? (typedResult.data ?? null)
-                    : null,
-                  retryAttempt: attempt,
-                  parentExecutionId: firstExecutionId,
-                  triggeredBy: "pulse",
-                },
-                tTask,
-                logger,
-              );
+              // History throttle: skip logging successful runs when within historyInterval
+              const shouldLogHistory =
+                !typedResult.success ||
+                !dbTask.historyInterval ||
+                !dbTask.lastHistoryLoggedAt ||
+                Date.now() - dbTask.lastHistoryLoggedAt.getTime() >=
+                  dbTask.historyInterval;
 
-              // Track first execution ID for retry chain
-              if (attempt === 0 && execResponse.success) {
-                firstExecutionId = execResponse.data.id;
+              // Record execution for this attempt (unless throttled)
+              if (shouldLogHistory) {
+                const execResponse = await CronTasksRepository.createExecution(
+                  {
+                    taskId: dbTask.id,
+                    taskName: dbTask.displayName,
+                    executionId: crypto.randomUUID(),
+                    status: attemptStatus,
+                    priority: dbTask.priority,
+                    startedAt: new Date(attemptStart),
+                    completedAt: new Date(),
+                    durationMs: attemptDuration,
+                    config: taskInput,
+                    result: typedResult.success
+                      ? (typedResult.data ?? null)
+                      : null,
+                    retryAttempt: attempt,
+                    parentExecutionId: firstExecutionId,
+                    triggeredBy: "pulse",
+                  },
+                  tTask,
+                  logger,
+                );
+
+                // Track first execution ID for retry chain
+                if (attempt === 0 && execResponse.success) {
+                  firstExecutionId = execResponse.data.id;
+                }
+                didLogHistory = true;
               }
 
               finalDurationMs += attemptDuration;
@@ -724,6 +736,7 @@ export class PulseHealthRepository {
                 ...(taskSucceeded
                   ? { successCount: dbTask.successCount + 1 }
                   : { errorCount: dbTask.errorCount + 1 }),
+                ...(didLogHistory ? { lastHistoryLoggedAt: new Date() } : {}),
               },
               null,
               userLocale,

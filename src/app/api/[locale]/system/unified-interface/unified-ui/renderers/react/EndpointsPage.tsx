@@ -818,6 +818,7 @@ function StackEntryLayer({
           endpointOptions={{
             read: {
               urlPathParams: entry.params.urlPathParams,
+              initialState: entry.params.data,
             },
           }}
           submitButton={submitButton}

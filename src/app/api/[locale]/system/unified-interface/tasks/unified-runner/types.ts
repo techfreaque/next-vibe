@@ -194,6 +194,8 @@ export interface CronTask<TEndpointDefinition extends CreateApiEndpointAny> {
     Partial<TEndpointDefinition["types"]["UrlVariablesOutput"]>;
   /** When true, task disables itself after first execution (success or failure) */
   runOnce?: boolean;
+  /** Minimum interval (ms) between successful history records. null/undefined = log every run. Always logs errors. */
+  historyInterval?: number;
 }
 
 /**
@@ -219,6 +221,8 @@ export interface CronTaskAny {
   taskInput?: Record<string, JsonValue>;
   /** When true, task disables itself after first execution (success or failure) */
   runOnce?: boolean;
+  /** Minimum interval (ms) between successful history records. null/undefined = log every run. Always logs errors. */
+  historyInterval?: number;
 }
 
 /**
@@ -292,6 +296,8 @@ export function createCronTask<const T extends CreateApiEndpointAny>(
     taskInput: CronTaskInput<T>;
     /** When true, task disables itself after first execution (success or failure) */
     runOnce?: boolean;
+    /** Minimum interval (ms) between successful history records. null/undefined = log every run. Always logs errors. */
+    historyInterval?: number;
   },
 ): CronTaskAny {
   return {

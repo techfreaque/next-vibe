@@ -118,9 +118,11 @@ export class AiStreamRunRepository {
         allowedTools,
         tools,
         appendThreadId,
-        rootFolderId,
+        rootFolderId: rootFolderIdRaw,
         subFolderId,
       } = data;
+
+      const rootFolderId = rootFolderIdRaw ?? DefaultFolderId.CRON;
 
       // Derive thread mode from fields:
       // incognito rootFolder → no persistence; appendThreadId present → append; else → new
