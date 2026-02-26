@@ -94,6 +94,11 @@ export const translations: typeof enTranslations = {
           description: "Optionaler Unterordner",
           placeholder: "uuid",
         },
+        excludeMemories: {
+          label: "Erinnerungen ausschließen",
+          description:
+            "Wenn aktiviert, sieht die KI keine gespeicherten Erinnerungen im Kontext. Verwende dies für öffentliche Bots und isolierte Aufgaben.",
+        },
       },
       response: {
         text: "Antworttext des Assistenten",

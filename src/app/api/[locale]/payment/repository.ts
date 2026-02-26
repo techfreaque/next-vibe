@@ -578,18 +578,27 @@ export class PaymentRepository {
           data.parent.subscription_details &&
           typeof data.parent.subscription_details === "object"
         ) {
-          const subDetails = data.parent.subscription_details as {
-            subscription?: string;
-            [key: string]: string | number | boolean | null | undefined;
-          };
+          const subDetails = data.parent.subscription_details;
           logger.info("subscription_details found", {
             invoiceId,
-            subscriptionDetailsKeys: Object.keys(subDetails),
-            hasSubscription: "subscription" in subDetails,
+            subscriptionDetailsKeys:
+              typeof subDetails === "object" && subDetails !== null
+                ? Object.keys(subDetails)
+                : [],
+            hasSubscription:
+              typeof subDetails === "object" &&
+              subDetails !== null &&
+              "subscription" in subDetails,
           });
 
-          if ("subscription" in subDetails && subDetails.subscription) {
-            subscriptionId = String(subDetails.subscription);
+          if (
+            typeof subDetails === "object" &&
+            subDetails !== null &&
+            "subscription" in subDetails &&
+            typeof subDetails.subscription === "string" &&
+            subDetails.subscription.length > 0
+          ) {
+            subscriptionId = subDetails.subscription;
             logger.info(
               "Found subscription ID in parent.subscription_details",
               {
@@ -602,7 +611,6 @@ export class PaymentRepository {
           logger.warn("subscription_details not found or invalid in parent", {
             invoiceId,
             hasSubscriptionDetails: "subscription_details" in data.parent,
-            typeOfSubscriptionDetails: typeof data.parent.subscription_details,
           });
         }
       }
@@ -682,12 +690,15 @@ export class PaymentRepository {
           data.parent.subscription_details &&
           typeof data.parent.subscription_details === "object"
         ) {
-          const subDetails = data.parent.subscription_details as {
-            subscription?: string;
-            [key: string]: string | number | boolean | null | undefined;
-          };
-          if ("subscription" in subDetails && subDetails.subscription) {
-            subscriptionId = String(subDetails.subscription);
+          const subDetails = data.parent.subscription_details;
+          if (
+            typeof subDetails === "object" &&
+            subDetails !== null &&
+            "subscription" in subDetails &&
+            typeof subDetails.subscription === "string" &&
+            subDetails.subscription.length > 0
+          ) {
+            subscriptionId = subDetails.subscription;
             logger.info(
               "Found subscription ID in parent.subscription_details",
               {
@@ -932,9 +943,8 @@ export class PaymentRepository {
 
       const { SubscriptionRepository } =
         await import("../subscription/repository");
-      // The webhook data is actually a Stripe.Subscription object from the event
       await SubscriptionRepository.handleSubscriptionUpdated(
-        data as Stripe.Subscription,
+        data.id,
         logger,
         locale,
       );

@@ -92,6 +92,7 @@ export class AiStreamRepository {
     headless: true;
     t: AiStreamT;
     extraInstructions?: string;
+    excludeMemories?: boolean;
   }): Promise<ResponseType<HeadlessAiStreamResult>>;
 
   /**
@@ -106,6 +107,7 @@ export class AiStreamRepository {
     headless?: false;
     t: AiStreamT;
     extraInstructions?: string;
+    excludeMemories?: boolean;
   }): Promise<ResponseType<AiStreamPostResponseOutput> | StreamingResponse>;
 
   static async createAiStream({
@@ -117,6 +119,7 @@ export class AiStreamRepository {
     headless = false,
     t: aiStreamT,
     extraInstructions,
+    excludeMemories,
   }: {
     data: AiStreamPostRequestOutput;
     locale: CountryLanguage;
@@ -126,6 +129,7 @@ export class AiStreamRepository {
     headless?: boolean;
     t: AiStreamT;
     extraInstructions?: string;
+    excludeMemories?: boolean;
   }): Promise<
     | ResponseType<AiStreamPostResponseOutput>
     | StreamingResponse
@@ -153,6 +157,7 @@ export class AiStreamRepository {
       request,
       headless,
       extraInstructions,
+      excludeMemories,
     });
 
     if (!setupResult.success) {

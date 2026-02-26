@@ -20,6 +20,7 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { DEFAULT_TOOL_IDS } from "@/app/api/[locale]/agent/chat/constants";
 import type { ToolCallResult } from "@/app/api/[locale]/agent/chat/db";
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { db } from "@/app/api/[locale]/system/db";
@@ -120,6 +121,7 @@ export class AiStreamRunRepository {
         appendThreadId,
         rootFolderId: rootFolderIdRaw,
         subFolderId,
+        excludeMemories,
       } = data;
 
       const rootFolderId = rootFolderIdRaw ?? DefaultFolderId.CRON;
@@ -171,11 +173,17 @@ export class AiStreamRunRepository {
 
       // ── Step 2: Run headless AI stream ──────────────────────────────────
       // Pre-call results are injected as proper tool messages in the thread
+      // When tools is not provided, inject base tools (same as interactive chat defaults)
+      // so the AI can call execute-tool, web-search, fetch-url, memories, etc.
+      const defaultTools = DEFAULT_TOOL_IDS.map((id) => ({
+        toolId: id,
+        requiresConfirmation: false,
+      }));
       const streamResult = await runHeadlessAiStream({
         model,
         character,
         prompt,
-        availableTools: tools ?? [], // default: no tools (explicit opt-in); null = all tools
+        availableTools: tools ?? defaultTools, // default: base tools; null = all tools
         allowedTools: allowedTools ?? null, // null = all tools permitted
         headlessInstructions: instructions,
         maxTurns: maxTurns ?? 1,
@@ -184,6 +192,7 @@ export class AiStreamRunRepository {
         subFolderId,
         rootFolderId: rootFolderId as DefaultFolderId,
         preCalls: headlessPreCalls.length > 0 ? headlessPreCalls : undefined,
+        excludeMemories: excludeMemories ?? false,
         user,
         locale,
         logger,

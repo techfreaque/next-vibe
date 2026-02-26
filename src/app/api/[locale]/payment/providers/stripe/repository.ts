@@ -318,8 +318,19 @@ export class StripeProvider implements PaymentProvider {
         );
       }
       if ("customer" in eventData) {
-        webhookData.customer =
-          typeof eventData.customer === "string" ? eventData.customer : null;
+        const cust = eventData.customer;
+        if (typeof cust === "string") {
+          webhookData.customer = cust;
+        } else if (
+          typeof cust === "object" &&
+          cust !== null &&
+          "id" in cust &&
+          typeof cust.id === "string"
+        ) {
+          webhookData.customer = cust.id;
+        } else {
+          webhookData.customer = null;
+        }
       }
       if ("status" in eventData && typeof eventData.status === "string") {
         webhookData.status = eventData.status;
@@ -348,11 +359,47 @@ export class StripeProvider implements PaymentProvider {
       ) {
         webhookData.amount_total = eventData.amount_total;
       }
+      // Extract subscription ID: try direct field first, then parent.subscription_details
+      // (Stripe API 2025-03-31+ deprecated `subscription` on Invoice in favor of `parent`)
       if ("subscription" in eventData) {
-        webhookData.subscription =
-          typeof eventData.subscription === "string"
-            ? eventData.subscription
-            : undefined;
+        const sub = eventData.subscription;
+        if (typeof sub === "string" && sub.length > 0) {
+          webhookData.subscription = sub;
+        } else if (
+          typeof sub === "object" &&
+          sub !== null &&
+          "id" in sub &&
+          typeof sub.id === "string"
+        ) {
+          webhookData.subscription = sub.id;
+        }
+      }
+      // Fallback: extract from parent.subscription_details (Stripe API 2025-03-31+ invoices)
+      if (!webhookData.subscription && "parent" in eventData) {
+        const parent = eventData.parent;
+        if (
+          typeof parent === "object" &&
+          parent !== null &&
+          "subscription_details" in parent
+        ) {
+          const details = parent.subscription_details;
+          if (
+            typeof details === "object" &&
+            details !== null &&
+            "subscription" in details &&
+            typeof details.subscription === "string" &&
+            details.subscription.length > 0
+          ) {
+            webhookData.subscription = details.subscription;
+            logger.info(
+              "Extracted subscription from parent.subscription_details",
+              {
+                subscription: details.subscription,
+                eventType: event.type,
+              },
+            );
+          }
+        }
       }
       if (
         "billing_reason" in eventData &&
@@ -360,22 +407,18 @@ export class StripeProvider implements PaymentProvider {
       ) {
         webhookData.billing_reason = eventData.billing_reason;
       }
-      if ("parent" in eventData && typeof eventData.parent === "object") {
-        webhookData.parent = eventData.parent as
-          | Stripe.InvoiceItem.Parent
-          | Stripe.Invoice.Parent;
+      if ("parent" in eventData && typeof eventData.parent === "object" && eventData.parent !== null) {
+        webhookData.parent = eventData.parent;
         logger.info("Extracted parent from webhook event", {
           eventType: event.type,
           hasParent: true,
-          parentKeys: Object.keys(eventData.parent || {}),
+          parentKeys: Object.keys(eventData.parent),
         });
-      } else {
-        if (event.type.includes("invoice")) {
-          logger.warn("No parent in invoice event", {
-            eventType: event.type,
-            eventDataKeys: Object.keys(eventData),
-          });
-        }
+      } else if (event.type.includes("invoice")) {
+        logger.warn("No parent in invoice event", {
+          eventType: event.type,
+          eventDataKeys: Object.keys(eventData),
+        });
       }
 
       return success<WebhookEvent>({
@@ -404,58 +447,68 @@ export class StripeProvider implements PaymentProvider {
     try {
       const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-      // In API version 2025-09-30.clover, current_period_end/start were removed from Subscription
-      // Use start_date/created for period start and billing_cycle_anchor for the cycle anchor
-      // Use start_date if available, otherwise fall back to created timestamp
-      const currentPeriodStart =
-        subscription.start_date || subscription.created;
+      // Prefer actual period dates from subscription item (most accurate, available in 2025-12-15.clover)
+      const item = subscription.items.data[0];
+      let currentPeriodStart: number;
+      let currentPeriodEnd: number;
 
-      // Calculate currentPeriodEnd based on billing interval
-      // billing_cycle_anchor is the start of the billing cycle, not the end
-      // We need to add the interval duration to get the period end
-      const billingInterval =
-        subscription.items.data[0]?.plan.interval || "month";
-      const intervalCount =
-        subscription.items.data[0]?.plan.interval_count || 1;
-
-      // Calculate period end by adding the interval to period start
-      const periodStartDate = new Date(currentPeriodStart * 1000);
-      let periodEndDate: Date;
-
-      if (billingInterval === "month") {
-        periodEndDate = new Date(periodStartDate);
-        periodEndDate.setMonth(periodEndDate.getMonth() + intervalCount);
-      } else if (billingInterval === "year") {
-        periodEndDate = new Date(periodStartDate);
-        periodEndDate.setFullYear(periodEndDate.getFullYear() + intervalCount);
-      } else if (billingInterval === "week") {
-        periodEndDate = new Date(periodStartDate);
-        periodEndDate.setDate(periodEndDate.getDate() + 7 * intervalCount);
-      } else if (billingInterval === "day") {
-        periodEndDate = new Date(periodStartDate);
-        periodEndDate.setDate(periodEndDate.getDate() + intervalCount);
+      if (item?.current_period_start && item?.current_period_end) {
+        currentPeriodStart = item.current_period_start;
+        currentPeriodEnd = item.current_period_end;
       } else {
-        // Default to 1 month if interval is unknown
-        periodEndDate = new Date(periodStartDate);
-        periodEndDate.setMonth(periodEndDate.getMonth() + 1);
-      }
+        // Fallback: Calculate current period from billing_cycle_anchor + interval
+        // billing_cycle_anchor advances with each renewal cycle
+        const anchor =
+          subscription.billing_cycle_anchor ||
+          subscription.start_date ||
+          subscription.created;
+        const billingInterval = item?.plan.interval || "month";
+        const intervalCount = item?.plan.interval_count || 1;
 
-      const currentPeriodEnd = Math.floor(periodEndDate.getTime() / 1000);
+        // Find the current period by advancing from anchor until we pass now
+        const now = Math.floor(Date.now() / 1000);
+        let periodStart = anchor;
+        let periodEnd = anchor;
+
+        // Advance period-by-period until we find the one containing "now"
+        for (let i = 0; i < 120; i++) {
+          const d = new Date(periodEnd * 1000);
+          if (billingInterval === "month") {
+            d.setMonth(d.getMonth() + intervalCount);
+          } else if (billingInterval === "year") {
+            d.setFullYear(d.getFullYear() + intervalCount);
+          } else if (billingInterval === "week") {
+            d.setDate(d.getDate() + 7 * intervalCount);
+          } else if (billingInterval === "day") {
+            d.setDate(d.getDate() + intervalCount);
+          } else {
+            d.setMonth(d.getMonth() + 1);
+          }
+          const nextEnd = Math.floor(d.getTime() / 1000);
+
+          if (nextEnd > now) {
+            periodStart = periodEnd;
+            periodEnd = nextEnd;
+            break;
+          }
+          periodEnd = nextEnd;
+        }
+
+        currentPeriodStart = periodStart;
+        currentPeriodEnd = periodEnd;
+      }
 
       logger.debug("Retrieved Stripe subscription", {
         subscriptionId,
         currentPeriodStart,
-        currentPeriodStartMs: currentPeriodStart * 1000,
         currentPeriodEnd,
-        currentPeriodEndMs: currentPeriodEnd * 1000,
-        billingInterval,
-        intervalCount,
+        usedItemPeriod: !!(item?.current_period_start && item?.current_period_end),
       });
 
       return success({
         userId: subscription.metadata?.userId || "",
-        currentPeriodStart: currentPeriodStart * 1000, // Convert to milliseconds
-        currentPeriodEnd: currentPeriodEnd * 1000, // Convert to milliseconds
+        currentPeriodStart: currentPeriodStart * 1000,
+        currentPeriodEnd: currentPeriodEnd * 1000,
       });
     } catch (error) {
       logger.error("Failed to retrieve Stripe subscription", {

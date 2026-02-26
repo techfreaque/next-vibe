@@ -292,6 +292,16 @@ const { POST } = createEndpoint({
           .transform((v) => (v === "" ? undefined : v)),
       }),
 
+      // ── Memory control ────────────────────────────────────────────────
+      excludeMemories: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "run.post.fields.excludeMemories.label",
+        description: "run.post.fields.excludeMemories.description",
+        columns: 6,
+        schema: z.boolean().default(false),
+      }),
+
       // ── Response ────────────────────────────────────────────────────────
       text: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -452,6 +462,15 @@ const { POST } = createEndpoint({
           "Search for the latest news about AI assistants and write a brief report.",
         allowedTools: [{ toolId: "web-search", requiresConfirmation: false }],
         maxTurns: 3,
+        rootFolderId: DefaultFolderId.CRON,
+      },
+      // Public bot: exclude memories so the bot doesn't inherit personal context
+      publicBot: {
+        model: ModelId["CLAUDE_HAIKU_4_5"],
+        character: "uuid-of-public-bot-character",
+        prompt: "Answer this forum question concisely.",
+        excludeMemories: true,
+        maxTurns: 1,
         rootFolderId: DefaultFolderId.CRON,
       },
       // Continue an existing thread

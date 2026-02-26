@@ -114,6 +114,11 @@ export const translations = {
             "Optional UUID of a sub-folder within the root folder for organising runs.",
           placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         },
+        excludeMemories: {
+          label: "Exclude Memories",
+          description:
+            "When true, the AI will not see the user's stored memories in its context. Use this for public bots and isolated tasks that should not inherit personal context. Default: false (memories included).",
+        },
       },
       response: {
         text: "The AI's response text (think-tags stripped). Null if the model produced no output.",

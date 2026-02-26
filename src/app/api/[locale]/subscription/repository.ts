@@ -50,6 +50,37 @@ import type {
 } from "./update/definition";
 
 /**
+ * Map Stripe subscription status to our subscription status.
+ * Exhaustive over Stripe.Subscription.Status — adding a new Stripe status will
+ * cause a compile error, forcing us to handle it explicitly.
+ */
+const STRIPE_STATUS_MAP: Record<
+  Stripe.Subscription.Status,
+  typeof SubscriptionStatusValue
+> = {
+  active: SubscriptionStatus.ACTIVE,
+  trialing: SubscriptionStatus.TRIALING,
+  canceled: SubscriptionStatus.CANCELED,
+  incomplete_expired: SubscriptionStatus.INCOMPLETE_EXPIRED,
+  past_due: SubscriptionStatus.PAST_DUE,
+  unpaid: SubscriptionStatus.UNPAID,
+  paused: SubscriptionStatus.PAUSED,
+  incomplete: SubscriptionStatus.INCOMPLETE,
+};
+
+/**
+ * Generate canonical idempotency key for subscription credit grants.
+ * Shared across all credit grant paths (invoice handler, subscription.updated, auto-sync)
+ * to prevent duplicate grants from different webhook/sync triggers.
+ */
+function renewalSessionKey(
+  providerSubscriptionId: string,
+  periodEndMs: number,
+): string {
+  return `renewal_${providerSubscriptionId}_${periodEndMs}`;
+}
+
+/**
  * Calculate current period dates from Stripe subscription
  * Stripe API 2025-12-15.clover removed current_period_start/end from response
  */
@@ -66,34 +97,45 @@ function calculateSubscriptionPeriod(subscription: Stripe.Subscription): {
     };
   }
 
-  // Fallback: Calculate from subscription start date and billing interval
-  const currentPeriodStart = subscription.start_date || subscription.created;
+  // Fallback: Calculate current period from billing_cycle_anchor + interval
+  const anchor =
+    subscription.billing_cycle_anchor ||
+    subscription.start_date ||
+    subscription.created;
   const billingInterval = item?.plan.interval || "month";
   const intervalCount = item?.plan.interval_count || 1;
 
-  const periodStartDate = new Date(currentPeriodStart * 1000);
-  let periodEndDate: Date;
+  const now = Math.floor(Date.now() / 1000);
+  let periodStart = anchor;
+  let periodEnd = anchor;
 
-  if (billingInterval === "month") {
-    periodEndDate = new Date(periodStartDate);
-    periodEndDate.setMonth(periodEndDate.getMonth() + intervalCount);
-  } else if (billingInterval === "year") {
-    periodEndDate = new Date(periodStartDate);
-    periodEndDate.setFullYear(periodEndDate.getFullYear() + intervalCount);
-  } else if (billingInterval === "week") {
-    periodEndDate = new Date(periodStartDate);
-    periodEndDate.setDate(periodEndDate.getDate() + 7 * intervalCount);
-  } else if (billingInterval === "day") {
-    periodEndDate = new Date(periodStartDate);
-    periodEndDate.setDate(periodEndDate.getDate() + intervalCount);
-  } else {
-    periodEndDate = new Date(periodStartDate);
-    periodEndDate.setMonth(periodEndDate.getMonth() + 1);
+  // Advance period-by-period until we find the one containing "now"
+  for (let i = 0; i < 120; i++) {
+    const d = new Date(periodEnd * 1000);
+    if (billingInterval === "month") {
+      d.setMonth(d.getMonth() + intervalCount);
+    } else if (billingInterval === "year") {
+      d.setFullYear(d.getFullYear() + intervalCount);
+    } else if (billingInterval === "week") {
+      d.setDate(d.getDate() + 7 * intervalCount);
+    } else if (billingInterval === "day") {
+      d.setDate(d.getDate() + intervalCount);
+    } else {
+      d.setMonth(d.getMonth() + 1);
+    }
+    const nextEnd = Math.floor(d.getTime() / 1000);
+
+    if (nextEnd > now) {
+      periodStart = periodEnd;
+      periodEnd = nextEnd;
+      break;
+    }
+    periodEnd = nextEnd;
   }
 
   return {
-    currentPeriodStart,
-    currentPeriodEnd: Math.floor(periodEndDate.getTime() / 1000),
+    currentPeriodStart: periodStart,
+    currentPeriodEnd: periodEnd,
   };
 }
 
@@ -141,23 +183,7 @@ export class SubscriptionRepository {
             const { currentPeriodStart, currentPeriodEnd } =
               calculateSubscriptionPeriod(stripeResponse);
 
-            // Map Stripe status to our status
-            let newStatus: typeof SubscriptionStatusValue;
-            switch (stripeResponse.status) {
-              case "active":
-                newStatus = SubscriptionStatus.ACTIVE;
-                break;
-              case "canceled":
-                newStatus = SubscriptionStatus.CANCELED;
-                break;
-              case "past_due":
-              case "unpaid":
-                newStatus = SubscriptionStatus.PAST_DUE;
-                break;
-              default:
-                newStatus = subscription.status;
-                break;
-            }
+            const newStatus = STRIPE_STATUS_MAP[stripeResponse.status];
 
             // Update if status or period changed
             const periodChanged =
@@ -226,11 +252,12 @@ export class SubscriptionRepository {
                       productId,
                       locale,
                     );
+                    // Credits expire at exact period end — new period credits are pre-granted via invoice.paid
                     const expiresAt = new Date(currentPeriodEnd * 1000);
 
-                    // Use period start timestamp as sessionId for idempotency
-                    // This prevents duplicate credits if auto-sync runs multiple times
-                    const sessionId = `auto-sync-${currentPeriodStart}`;
+                    // Canonical idempotency key shared across all credit grant paths
+                    // Prevents duplicate grants from invoice handler, subscription.updated, and auto-sync
+                    const sessionId = renewalSessionKey(subscription.providerSubscriptionId, currentPeriodEnd * 1000);
 
                     logger.info(
                       "Auto-granting renewal credits (missed webhook)",
@@ -636,9 +663,11 @@ export class SubscriptionRepository {
 
       if (productId) {
         const product = productsRepository.getProduct(productId, userLocale);
-        const expiresAt = subscriptionResult.data.currentPeriodEnd
+        const periodEnd = subscriptionResult.data.currentPeriodEnd
           ? new Date(subscriptionResult.data.currentPeriodEnd)
           : null;
+        // Credits expire at exact period end — no grace buffer needed
+        const expiresAt = periodEnd;
 
         // IDEMPOTENCY CHECK: Verify credits haven't been added for this checkout session already
         const { creditPacks } = await import("../credits/db");
@@ -698,11 +727,8 @@ export class SubscriptionRepository {
     locale: CountryLanguage,
   ): Promise<void> {
     try {
-      const invoiceData = invoice as Stripe.Invoice & {
-        billing_reason?: string;
-      };
-      const invoiceId = invoiceData.id;
-      const billingReason = invoiceData.billing_reason;
+      const invoiceId = invoice.id;
+      const billingReason = invoice.billing_reason;
 
       logger.info("Processing invoice payment", {
         invoiceId,
@@ -724,10 +750,16 @@ export class SubscriptionRepository {
         return;
       }
 
+      // Detect late payment: subscription was in PAST_DUE or CANCELED state
+      const isLatePayment =
+        subscription.status === SubscriptionStatus.PAST_DUE ||
+        subscription.status === SubscriptionStatus.CANCELED;
+
       logger.info("Found subscription for invoice", {
         subscriptionId,
         userId: subscription.userId,
         currentStatus: subscription.status,
+        isLatePayment,
       });
 
       const providerName = subscription.provider || "stripe";
@@ -763,14 +795,13 @@ export class SubscriptionRepository {
         })
         .where(eq(subscriptions.providerSubscriptionId, subscriptionId));
 
-      // Add monthly credits for renewal (skip if this is the first payment - handled by checkout)
-      // Check if this is a renewal by looking at billing_reason
-      if (
-        billingReason === "subscription_cycle" ||
-        billingReason === "subscription_update"
-      ) {
-        logger.info("Billing reason indicates renewal - processing credits", {
-          billingReason,
+      // Add monthly credits for renewal (skip only the initial checkout payment - handled separately)
+      // Use deny-list: skip "subscription_create" which is the first invoice at checkout
+      // All other billing reasons (subscription_cycle, subscription_update, undefined, etc.) should grant credits
+      const isInitialCheckout = billingReason === "subscription_create";
+      if (!isInitialCheckout) {
+        logger.info("Processing renewal credits", {
+          billingReason: billingReason ?? "undefined",
           invoiceId,
         });
 
@@ -808,24 +839,32 @@ export class SubscriptionRepository {
             productId,
             userLocaleForInvoice,
           );
-          const expiresAt = subscriptionResult.data.currentPeriodEnd
+          const periodEnd = subscriptionResult.data.currentPeriodEnd
             ? new Date(subscriptionResult.data.currentPeriodEnd)
             : null;
+          // Credits expire at exact period end — no grace buffer needed
+          const expiresAt = periodEnd;
 
-          // IDEMPOTENCY CHECK: Verify credits haven't been added for this invoice already
-          // Use invoice ID as sessionId for idempotency tracking
-          if (invoiceId) {
+          // Canonical idempotency key shared across all credit grant paths
+          const renewalSessionId = periodEnd
+            ? renewalSessionKey(subscriptionId, periodEnd.getTime())
+            : renewalSessionKey(subscriptionId, Date.now());
+
+          // IDEMPOTENCY CHECK: Verify credits haven't been added for this period already
+          {
             const { creditPacks } = await import("../credits/db");
             const { sql } = await import("drizzle-orm");
             const [existingPack] = await db
               .select()
               .from(creditPacks)
-              .where(sql`${creditPacks.metadata}->>'sessionId' = ${invoiceId}`)
+              .where(
+                sql`${creditPacks.metadata}->>'sessionId' = ${renewalSessionId}`,
+              )
               .limit(1);
 
             if (existingPack) {
-              logger.info("Renewal credits already processed for invoice", {
-                invoiceId,
+              logger.info("Renewal credits already processed for period", {
+                renewalSessionId,
                 packId: existingPack.id,
                 userId: subscription.userId,
               });
@@ -833,26 +872,64 @@ export class SubscriptionRepository {
             }
           }
 
+          // For late payments, revive only the amount that was revoked (not the full pack).
+          // This accounts for credits already consumed before revocation.
+          let creditsToGrant = product.credits;
+
+          if (isLatePayment) {
+            const { creditTransactions: creditTxTable } =
+              await import("../credits/db");
+            const { CreditTransactionType } =
+              await import("../credits/enum");
+
+            // Look up total revoked credits from grace period expiry transactions
+            const revokedTxs = await db
+              .select({ amount: creditTxTable.amount })
+              .from(creditTxTable)
+              .where(
+                sql`${creditTxTable.type} = ${CreditTransactionType.EXPIRY}
+                    AND ${creditTxTable.metadata}->>'reason' = 'subscription_grace_period_expired'
+                    AND ${creditTxTable.walletId} IN (
+                      SELECT id FROM credit_wallets WHERE user_id = ${subscription.userId}
+                    )`,
+              );
+
+            const totalRevoked = revokedTxs.reduce(
+              (sum, tx) => sum + Math.abs(tx.amount),
+              0,
+            );
+
+            if (totalRevoked > 0) {
+              creditsToGrant = totalRevoked;
+              logger.info("Late payment - reviving revoked credits", {
+                userId: subscription.userId,
+                totalRevoked,
+                originalProductCredits: product.credits,
+              });
+            }
+          }
+
           logger.info("Granting renewal credits", {
             userId: subscription.userId,
-            credits: product.credits,
+            credits: creditsToGrant,
+            isLatePayment,
             expiresAt: expiresAt?.toISOString(),
-            invoiceId,
+            renewalSessionId,
           });
 
           await CreditRepository.addUserCredits(
             subscription.userId,
-            product.credits,
+            creditsToGrant,
             "subscription",
             logger,
             creditsT,
             expiresAt ?? undefined,
-            invoiceId, // Pass invoiceId as sessionId for idempotency tracking
+            renewalSessionId,
           );
 
           logger.info("Successfully granted renewal credits", {
             userId: subscription.userId,
-            credits: product.credits,
+            credits: creditsToGrant,
             invoiceId,
           });
         } else {
@@ -862,7 +939,7 @@ export class SubscriptionRepository {
           });
         }
       } else {
-        logger.info("Skipping credit grant - not a renewal", {
+        logger.info("Skipping credit grant - initial checkout invoice", {
           billingReason,
           invoiceId,
         });
@@ -921,20 +998,20 @@ export class SubscriptionRepository {
         currentStatus: subscription.status,
       });
 
-      // Set grace period: 7 days from now
+      // Set grace period only on first failure (don't reset on Stripe retries)
       const GRACE_PERIOD_DAYS = 7;
       const now = new Date();
-      const gracePeriodEndsAt = new Date(now);
-      gracePeriodEndsAt.setDate(
-        gracePeriodEndsAt.getDate() + GRACE_PERIOD_DAYS,
-      );
+      const isFirstFailure = !subscription.paymentFailedAt;
 
-      // Update subscription to PAST_DUE with grace period
+      const gracePeriodEndsAt = isFirstFailure
+        ? new Date(now.getTime() + GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000)
+        : subscription.gracePeriodEndsAt;
+
       await db
         .update(subscriptions)
         .set({
           status: SubscriptionStatus.PAST_DUE,
-          paymentFailedAt: now,
+          paymentFailedAt: subscription.paymentFailedAt ?? now,
           gracePeriodEndsAt,
           updatedAt: now,
         })
@@ -943,7 +1020,8 @@ export class SubscriptionRepository {
       logger.info("Set subscription to PAST_DUE with grace period", {
         subscriptionId,
         userId: subscription.userId,
-        gracePeriodEndsAt: gracePeriodEndsAt.toISOString(),
+        gracePeriodEndsAt: gracePeriodEndsAt?.toISOString(),
+        isFirstFailure,
         gracePeriodDays: GRACE_PERIOD_DAYS,
       });
 
@@ -982,12 +1060,15 @@ export class SubscriptionRepository {
         return;
       }
 
-      // Mark subscription as canceled
+      // Mark subscription as canceled with proper timestamps
+      const now = new Date();
       await db
         .update(subscriptions)
         .set({
           status: SubscriptionStatus.CANCELED,
-          updatedAt: new Date(),
+          canceledAt: subscription.canceledAt ?? now,
+          endedAt: subscription.currentPeriodEnd ?? now,
+          updatedAt: now,
         })
         .where(eq(subscriptions.providerSubscriptionId, subscriptionId));
 
@@ -1008,7 +1089,7 @@ export class SubscriptionRepository {
    * Called when customer.subscription.updated webhook is received
    */
   static async handleSubscriptionUpdated(
-    stripeSubscription: Stripe.Subscription,
+    subscriptionId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<void> {
@@ -1016,42 +1097,22 @@ export class SubscriptionRepository {
       const [subscription] = await db
         .select()
         .from(subscriptions)
-        .where(eq(subscriptions.providerSubscriptionId, stripeSubscription.id))
+        .where(eq(subscriptions.providerSubscriptionId, subscriptionId))
         .limit(1);
 
       if (!subscription) {
         logger.error("Subscription not found for update", {
-          subscriptionId: stripeSubscription.id,
+          subscriptionId,
         });
         return;
       }
 
       // Fetch full subscription from Stripe to get all fields (webhook events may not include all fields)
       const fullSubscription = await getStripe.subscriptions.retrieve(
-        stripeSubscription.id,
+        subscriptionId,
       );
 
-      // Map Stripe status to our status
-      let status: typeof SubscriptionStatusValue;
-      switch (fullSubscription.status) {
-        case "active":
-          status = SubscriptionStatus.ACTIVE;
-          break;
-        case "canceled":
-          status = SubscriptionStatus.CANCELED;
-          break;
-        case "past_due":
-        case "unpaid":
-          status = SubscriptionStatus.PAST_DUE;
-          break;
-        case "incomplete":
-        case "incomplete_expired":
-        case "trialing":
-        case "paused":
-        default:
-          status = SubscriptionStatus.ACTIVE; // Default to active for unknown states
-          break;
-      }
+      const status = STRIPE_STATUS_MAP[fullSubscription.status];
 
       // Check if period changed (renewal detected)
       const { currentPeriodStart, currentPeriodEnd } =
@@ -1063,6 +1124,8 @@ export class SubscriptionRepository {
         oldPeriodEnd && newPeriodEnd.getTime() > oldPeriodEnd.getTime();
 
       // Update subscription with proper period information
+      // Clear grace period fields when subscription is active again
+      const isActive = status === SubscriptionStatus.ACTIVE;
       await db
         .update(subscriptions)
         .set({
@@ -1073,6 +1136,9 @@ export class SubscriptionRepository {
           cancelAt: fullSubscription.cancel_at
             ? new Date(fullSubscription.cancel_at * 1000)
             : null,
+          ...(isActive
+            ? { paymentFailedAt: null, gracePeriodEndsAt: null }
+            : {}),
           updatedAt: new Date(),
         })
         .where(eq(subscriptions.providerSubscriptionId, fullSubscription.id));
@@ -1119,8 +1185,8 @@ export class SubscriptionRepository {
             userLocaleForUpdate,
           );
 
-          // Use subscription update event ID for idempotency
-          const eventId = `sub_update_${fullSubscription.id}_${newPeriodEnd.getTime()}`;
+          // Canonical idempotency key shared across all credit grant paths
+          const renewalSessionId = renewalSessionKey(fullSubscription.id, newPeriodEnd.getTime());
 
           // Check if credits already granted for this period
           const { creditPacks } = await import("../credits/db");
@@ -1128,10 +1194,13 @@ export class SubscriptionRepository {
           const [existingPack] = await db
             .select()
             .from(creditPacks)
-            .where(sql`${creditPacks.metadata}->>'sessionId' = ${eventId}`)
+            .where(
+              sql`${creditPacks.metadata}->>'sessionId' = ${renewalSessionId}`,
+            )
             .limit(1);
 
           if (!existingPack) {
+            // Credits expire at exact period end — no grace buffer needed
             await CreditRepository.addUserCredits(
               subscription.userId,
               product.credits,
@@ -1139,18 +1208,19 @@ export class SubscriptionRepository {
               logger,
               creditsT,
               newPeriodEnd,
-              eventId,
+              renewalSessionId,
             );
 
             logger.info("Granted renewal credits", {
               userId: subscription.userId,
               credits: product.credits,
               expiresAt: newPeriodEnd.toISOString(),
+              renewalSessionId,
             });
           } else {
             logger.debug("Renewal credits already granted for this period", {
               userId: subscription.userId,
-              eventId,
+              renewalSessionId,
             });
           }
         }
@@ -1166,7 +1236,7 @@ export class SubscriptionRepository {
     } catch (error) {
       logger.error("Failed to process subscription update", {
         error: parseError(error),
-        subscriptionId: stripeSubscription.id,
+        subscriptionId,
       });
     }
   }
@@ -1258,24 +1328,14 @@ export class SubscriptionRepository {
         const { currentPeriodStart, currentPeriodEnd } =
           calculateSubscriptionPeriod(stripeSubscription);
 
-        let newStatus: typeof SubscriptionStatusValue;
-        switch (stripeSubscription.status) {
-          case "active":
-            newStatus = SubscriptionStatus.ACTIVE;
-            break;
-          case "canceled":
-            newStatus = SubscriptionStatus.CANCELED;
-            break;
-          case "past_due":
-          case "unpaid":
-            newStatus = SubscriptionStatus.PAST_DUE;
-            break;
-          default:
-            newStatus = SubscriptionStatus.ACTIVE;
-            break;
-        }
+        const newStatus = STRIPE_STATUS_MAP[stripeSubscription.status];
 
-        if (newStatus !== localSubscription.status) {
+        // Always update period + status if anything changed (not just status)
+        const periodChanged =
+          localSubscription.currentPeriodEnd &&
+          currentPeriodEnd * 1000 !== localSubscription.currentPeriodEnd.getTime();
+
+        if (newStatus !== localSubscription.status || periodChanged) {
           await db
             .update(subscriptions)
             .set({

@@ -61,6 +61,7 @@ export async function buildSystemPrompt(params: {
   callMode: boolean | null | undefined;
   extraInstructions?: string;
   headless?: boolean;
+  excludeMemories?: boolean;
   voiceTranscription?: {
     wasTranscribed: boolean;
     confidence: number | null;
@@ -77,6 +78,7 @@ export async function buildSystemPrompt(params: {
     callMode,
     extraInstructions,
     headless,
+    excludeMemories,
     voiceTranscription,
   } = params;
 
@@ -118,8 +120,8 @@ export async function buildSystemPrompt(params: {
       characterResult,
       userNameResult,
     ] = await Promise.allSettled([
-      // Memories: skip in headless and incognito
-      !headless && !isIncognito
+      // Memories: skip when explicitly excluded or in incognito mode
+      !excludeMemories && !isIncognito
         ? generateMemorySummary({ userId, logger })
         : Promise.resolve(""),
       // Tasks: skip in incognito (headless agents still need task context)

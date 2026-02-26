@@ -180,6 +180,7 @@ export async function setupAiStream(params: {
   request: NextRequest | undefined;
   extraInstructions?: string;
   headless?: boolean;
+  excludeMemories?: boolean;
 }): Promise<ResponseType<StreamSetupResult>> {
   const {
     data,
@@ -621,6 +622,7 @@ export async function setupAiStream(params: {
     callMode: data.voiceMode?.enabled,
     extraInstructions: params.extraInstructions,
     headless: params.headless,
+    excludeMemories: params.excludeMemories,
     voiceTranscription: voiceTranscription
       ? {
           wasTranscribed: voiceTranscription.wasTranscribed,

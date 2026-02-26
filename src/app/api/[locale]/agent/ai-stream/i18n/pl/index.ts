@@ -100,6 +100,11 @@ export const translations: typeof enTranslations = {
           description: "Opcjonalny podfolder",
           placeholder: "uuid",
         },
+        excludeMemories: {
+          label: "Wyklucz wspomnienia",
+          description:
+            "Gdy włączone, AI nie zobaczy zapisanych wspomnień w kontekście. Użyj dla publicznych botów i izolowanych zadań.",
+        },
       },
       response: {
         text: "Tekst odpowiedzi asystenta",

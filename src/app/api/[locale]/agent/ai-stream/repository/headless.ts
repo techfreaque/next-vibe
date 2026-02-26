@@ -108,6 +108,11 @@ export interface HeadlessAiStreamParams {
    * Written to the thread DB so they appear in UI exactly like regular tool calls.
    */
   preCalls?: HeadlessPreCall[];
+  /**
+   * When true, the AI will not see the user's stored memories in its context.
+   * Use for public bots and isolated tasks that should not inherit personal context.
+   */
+  excludeMemories?: boolean;
   /** System user context for execution */
   user: JwtPayloadType;
   /** Locale for i18n */
@@ -222,6 +227,7 @@ export async function runHeadlessAiStream(
     subFolderId,
     rootFolderId: rootFolderIdOverride,
     preCalls,
+    excludeMemories,
     user,
     locale,
     logger,
@@ -391,6 +397,7 @@ export async function runHeadlessAiStream(
       t: aiStreamT,
       headless: true,
       extraInstructions: headlessInstructions,
+      excludeMemories,
     });
 
     if (!result.success) {
