@@ -29,14 +29,32 @@ export const {
     ]),
     example: "twilio",
     comment: "Options: twilio, aws, aws-sns, messagebird, http",
+    commented: true,
   },
-  SMS_FROM_NUMBER: { schema: z.string(), example: "+1234567890" },
-  SMS_MAX_LENGTH: { schema: z.string().optional(), example: "160" },
-  SMS_MAX_RETRY_ATTEMPTS: { schema: z.string().optional(), example: "3" },
-  SMS_RETRY_DELAY_MS: { schema: z.string().optional(), example: "1000" },
+  SMS_FROM_NUMBER: {
+    schema: z.string(),
+    example: "+1234567890",
+    commented: true,
+  },
+  SMS_MAX_LENGTH: {
+    schema: z.string().optional(),
+    example: "160",
+    commented: true,
+  },
+  SMS_MAX_RETRY_ATTEMPTS: {
+    schema: z.string().optional(),
+    example: "3",
+    commented: true,
+  },
+  SMS_RETRY_DELAY_MS: {
+    schema: z.string().optional(),
+    example: "1000",
+    commented: true,
+  },
   ADMIN_NOTIFICATION_PHONE: {
     schema: z.string().optional(),
     example: "+1234567890",
+    commented: true,
   },
 
   // MessageBird provider
@@ -44,6 +62,7 @@ export const {
     schema: z.string().optional(),
     example: "your_messagebird_key",
     comment: "MessageBird provider",
+    commented: true,
   },
 
   // Twilio provider
@@ -51,22 +70,30 @@ export const {
     schema: z.string().optional(),
     example: "your_twilio_account_sid",
     comment: "Twilio provider",
+    commented: true,
   },
   TWILIO_AUTH_TOKEN: {
     schema: z.string().optional(),
     example: "your_twilio_auth_token",
+    commented: true,
   },
-  TWILIO_REGION: { schema: z.string().optional(), example: "us1" },
+  TWILIO_REGION: {
+    schema: z.string().optional(),
+    example: "us1",
+    commented: true,
+  },
 
   // AWS SNS provider
   AWS_ACCESS_KEY_ID: {
     schema: z.string().optional(),
     example: "your_aws_access_key",
     comment: "AWS SNS provider",
+    commented: true,
   },
   AWS_SECRET_ACCESS_KEY: {
     schema: z.string().optional(),
     example: "your_aws_secret_key",
+    commented: true,
   },
   AWS_REGION: {
     schema: z
@@ -91,6 +118,7 @@ export const {
       ])
       .optional(),
     example: "us-east-1",
+    commented: true,
   },
 
   // HTTP provider
@@ -98,25 +126,57 @@ export const {
     schema: z.string().optional(),
     example: "https://api.example.com/sms",
     comment: "HTTP SMS provider",
+    commented: true,
   },
-  SMS_HTTP_API_KEY: { schema: z.string().optional(), example: "your_api_key" },
-  SMS_HTTP_API_METHOD: { schema: z.string().optional(), example: "POST" },
+  SMS_HTTP_API_KEY: {
+    schema: z.string().optional(),
+    example: "your_api_key",
+    commented: true,
+  },
+  SMS_HTTP_API_METHOD: {
+    schema: z.string().optional(),
+    example: "POST",
+    commented: true,
+  },
   SMS_HTTP_PHONE_REGEX: {
     schema: z.string().optional(),
     example: "^\\+[1-9]\\d{1,14}$",
+    commented: true,
   },
-  SMS_HTTP_TO_FIELD: { schema: z.string().optional(), example: "to" },
-  SMS_HTTP_MESSAGE_FIELD: { schema: z.string().optional(), example: "message" },
-  SMS_HTTP_FROM_FIELD: { schema: z.string().optional(), example: "from" },
-  SMS_HTTP_RESPONSE_ID_FIELD: { schema: z.string().optional(), example: "id" },
+  SMS_HTTP_TO_FIELD: {
+    schema: z.string().optional(),
+    example: "to",
+    commented: true,
+  },
+  SMS_HTTP_MESSAGE_FIELD: {
+    schema: z.string().optional(),
+    example: "message",
+    commented: true,
+  },
+  SMS_HTTP_FROM_FIELD: {
+    schema: z.string().optional(),
+    example: "from",
+    commented: true,
+  },
+  SMS_HTTP_RESPONSE_ID_FIELD: {
+    schema: z.string().optional(),
+    example: "id",
+    commented: true,
+  },
   SMS_HTTP_CUSTOM_HEADERS: {
     schema: z.string().optional(),
     example: '{"X-Custom": "value"}',
+    commented: true,
   },
-  SMS_HTTP_AUTH_SCHEME: { schema: z.string().optional(), example: "Bearer" },
+  SMS_HTTP_AUTH_SCHEME: {
+    schema: z.string().optional(),
+    example: "Bearer",
+    commented: true,
+  },
   SMS_HTTP_CONTENT_TYPE: {
     schema: z.string().optional(),
     example: "application/json",
+    commented: true,
   },
 
   // WhatsApp Business Cloud API
@@ -124,11 +184,13 @@ export const {
     schema: z.string().optional(),
     example: "123456789012345",
     comment: "WhatsApp Business provider — phone number ID from Meta dashboard",
+    commented: true,
   },
   WHATSAPP_ACCESS_TOKEN: {
     schema: z.string().optional(),
     example: "EAAxxxxxxxx",
     comment: "WhatsApp Business provider — permanent access token",
+    commented: true,
   },
 
   // Telegram Bot API
@@ -136,5 +198,6 @@ export const {
     schema: z.string().optional(),
     example: "123456789:AAFxxxxxxxx",
     comment: "Telegram Bot provider — token from BotFather",
+    commented: true,
   },
 });

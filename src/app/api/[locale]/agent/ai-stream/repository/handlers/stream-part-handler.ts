@@ -173,6 +173,22 @@ export class StreamPartHandler {
         typeof part.toolCallId === "string" &&
         typeof part.toolName === "string"
       ) {
+        // Guard against duplicate toolCallIds from the model/provider.
+        // Some providers reuse IDs across steps or retries. A second DB row
+        // with the same toolCallId causes "tool_use ids must be unique" when
+        // the history is later sent to the API (e.g. during compacting).
+        if (ctx.allSeenToolCallIds.has(part.toolCallId)) {
+          logger.warn(
+            "[AI Stream] Duplicate toolCallId from model — skipping",
+            {
+              toolCallId: part.toolCallId,
+              toolName: part.toolName,
+            },
+          );
+          return { shouldAbort: false };
+        }
+        ctx.allSeenToolCallIds.add(part.toolCallId);
+
         const result = await ToolCallHandler.processToolCall({
           part: {
             type: "tool-call",

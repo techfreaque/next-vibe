@@ -689,31 +689,41 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
     ];
 
     // Pass 1: build a map of key -> owning module (client wins over server)
+    // Also collect ALL keys (including example: false) for Docker ARG/ENV generation
     interface KeyOwner {
       example: string;
       comment?: string;
+      commented?: boolean;
       isClient: boolean;
     }
     const keyOwner = new Map<string, KeyOwner>();
+    const allKeys = new Set<string>();
 
     for (const mod of modules) {
       const moduleImport = await import(mod.filePath);
       const examples = moduleImport[mod.examplesExportName] as Array<{
         key: string;
-        example: string;
+        example: string | false;
         comment?: string;
+        commented?: boolean;
       }>;
       if (!examples) {
         continue;
       }
 
       for (const entry of examples) {
+        allKeys.add(entry.key);
+        // example: false means "exclude from .env.example" but still include in Docker
+        if (entry.example === false) {
+          continue;
+        }
         const existing = keyOwner.get(entry.key);
         // Client definition beats server; otherwise first seen wins
         if (!existing || (!existing.isClient && mod.isClient)) {
           keyOwner.set(entry.key, {
             example: entry.example,
             comment: entry.comment,
+            commented: entry.commented,
             isClient: mod.isClient,
           });
         }
@@ -727,8 +737,9 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
       const moduleImport = await import(mod.filePath);
       const examples = moduleImport[mod.examplesExportName] as Array<{
         key: string;
-        example: string;
+        example: string | false;
         comment?: string;
+        commented?: boolean;
       }>;
       if (!examples) {
         continue;
@@ -736,7 +747,7 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
 
       // Only include keys whose preferred owner is this module
       const ownedEntries = examples.filter((entry) => {
-        if (emittedKeys.has(entry.key)) {
+        if (entry.example === false || emittedKeys.has(entry.key)) {
           return false;
         }
         const owner = keyOwner.get(entry.key);
@@ -747,25 +758,35 @@ export function getEnvClientModuleNames(): (keyof typeof envClientModules)[] {
         continue;
       }
 
+      // Sort: active keys A-Z first, then commented keys A-Z
+      const sortedEntries = [...ownedEntries].toSorted((a, b) => {
+        const aCommented = keyOwner.get(a.key)?.commented ?? false;
+        const bCommented = keyOwner.get(b.key)?.commented ?? false;
+        if (aCommented !== bCommented) {
+          return aCommented ? 1 : -1;
+        }
+        return a.key.localeCompare(b.key);
+      });
+
       const relativeSourcePath = mod.filePath
         .replace(process.cwd(), "")
         .replace(/^\//, "");
       lines.push(`# Source: ${relativeSourcePath}`);
-      lines.push(`# ${mod.moduleName}`);
 
-      for (const entry of ownedEntries) {
+      for (const entry of sortedEntries) {
         const owner = keyOwner.get(entry.key);
         if (owner?.comment) {
           lines.push(`# ${owner.comment}`);
         }
-        lines.push(`${entry.key}="${owner?.example ?? entry.example}"`);
+        const line = `${entry.key}="${owner?.example ?? entry.example}"`;
+        lines.push(owner?.commented ? `# ${line}` : line);
         emittedKeys.add(entry.key);
       }
 
       lines.push("");
     }
 
-    return { content: lines.join("\n"), keys: [...emittedKeys] };
+    return { content: lines.join("\n"), keys: [...allKeys] };
   }
 
   /**

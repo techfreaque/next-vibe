@@ -27,48 +27,57 @@ const baseFields = {
     schema: requiredOrOptionalString(!isLocalMode),
     example: "sk-or-v1-...",
     comment: "OpenRouter API key - get yours at https://openrouter.ai/keys",
+    commented: true,
   },
   UNCENSORED_AI_API_KEY: {
     schema: z.string().optional().default(""),
     example: "your-uncensored-ai-key",
     comment: "Uncensored AI API key",
+    commented: true,
   },
   FREEDOMGPT_API_KEY: {
     schema: z.string().optional().default(""),
     example: "your-freedomgpt-key",
     comment: "FreedomGPT API key",
+    commented: true,
   },
   GAB_AI_API_KEY: {
     schema: z.string().optional().default(""),
     example: "your-gab-ai-key",
     comment: "Gab AI API key",
+    commented: true,
   },
   VENICE_AI_API_KEY: {
     schema: z.string().optional().default(""),
     example: "your-venice-ai-key",
     comment: "Venice AI API key - get yours at https://venice.ai",
+    commented: true,
   },
   EDEN_AI_API_KEY: {
     schema: requiredOrOptionalString(!isLocalMode),
     example: "your-eden-ai-key",
     comment:
       "Eden AI API key (voice/TTS) - get yours at https://app.edenai.run/user/settings#api",
+    commented: true,
   },
   BRAVE_SEARCH_API_KEY: {
     schema: z.string().optional().default(""),
     example: "your-brave-search-key",
     comment:
       "Brave Search API key - get yours at https://api.search.brave.com/app/keys",
+    commented: true,
   },
   KAGI_API_KEY: {
     schema: z.string().optional().default(""),
     example: "your-kagi-api-key",
     comment: "Kagi API key - get yours at https://kagi.com/settings?p=api",
+    commented: true,
   },
   SCRAPPEY_API_KEY: {
     schema: z.string().optional().default(""),
     example: "your-scrappey-key",
     comment: "Scrappey API key",
+    commented: true,
   },
 } as const;
 
@@ -83,31 +92,37 @@ const s3Fields = {
     schema: z.string().min(1),
     example: "https://s3.amazonaws.com",
     comment: "S3 endpoint URL",
+    commented: true,
   },
   S3_REGION: {
     schema: z.string().min(1),
     example: "us-east-1",
     comment: "S3 region",
+    commented: true,
   },
   S3_BUCKET: {
     schema: z.string().min(1),
     example: "my-chat-bucket",
     comment: "S3 bucket name",
+    commented: true,
   },
   S3_ACCESS_KEY_ID: {
     schema: z.string().min(1),
     example: "AKIAIOSFODNN7EXAMPLE",
     comment: "S3 access key ID",
+    commented: true,
   },
   S3_SECRET_ACCESS_KEY: {
     schema: z.string().min(1),
     example: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
     comment: "S3 secret access key",
+    commented: true,
   },
   S3_PUBLIC_URL_BASE: {
     schema: z.string().optional(),
     example: "https://cdn.example.com",
     comment: "Optional public URL base for S3 objects",
+    commented: true,
   },
   CHAT_STORAGE_PATH: {
     schema: z.string().optional(),
@@ -132,31 +147,37 @@ const filesystemFields = {
     schema: z.string().optional(),
     example: "https://s3.amazonaws.com",
     comment: "Not used with filesystem storage",
+    commented: true,
   },
   S3_REGION: {
     schema: z.string().optional(),
     example: "us-east-1",
     comment: "Not used with filesystem storage",
+    commented: true,
   },
   S3_BUCKET: {
     schema: z.string().optional(),
     example: "my-bucket",
     comment: "Not used with filesystem storage",
+    commented: true,
   },
   S3_ACCESS_KEY_ID: {
     schema: z.string().optional(),
     example: "AKIAIOSFODNN7EXAMPLE",
     comment: "Not used with filesystem storage",
+    commented: true,
   },
   S3_SECRET_ACCESS_KEY: {
     schema: z.string().optional(),
     example: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
     comment: "Not used with filesystem storage",
+    commented: true,
   },
   S3_PUBLIC_URL_BASE: {
     schema: z.string().optional(),
     example: "https://cdn.example.com",
     comment: "Not used with filesystem storage",
+    commented: true,
   },
 } as const;
 

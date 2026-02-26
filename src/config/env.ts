@@ -24,10 +24,15 @@ export const {
       z.enum(Environment).default(Environment.DEVELOPMENT),
     ),
     example: "development",
+    comment:
+      "vibe dev always uses dev DB on port 5432. vibe build/start in development: auto-manages preview DB on port 5433. vibe build/start in production: no DB setup, expects externally managed database.",
   },
   PROJECT_ROOT: {
     schema: z.string().optional(),
     example: "/path/to/your/project",
+    comment:
+      "Absolute path to the project root. Mainly needed for MCP servers which often run in a different working directory.",
+    commented: true,
   },
   NEXT_PUBLIC_APP_URL: {
     schema: createSchema(z.string().url(), z.string().url().optional()),
@@ -44,6 +49,8 @@ export const {
       .default("false")
       .transform((v) => v !== "false"),
     example: "true",
+    comment:
+      "Self-hosted mode. Hides SaaS features (login buttons, lead management), makes AI keys optional, and adjusts navigation. Set automatically by vibe build/start.",
   },
   NEXT_PUBLIC_TEST_SERVER_URL: {
     schema: createSchema(z.string().url(), z.string().url().optional()),
@@ -72,8 +79,8 @@ export const {
     comment: "JWT secret",
   },
   CRON_SECRET: {
-    schema: createSchema(z.string().min(1), z.string().min(1).optional()),
-    example: "your-cron-secret",
+    schema: createSchema(z.string().min(32), z.string().min(32).optional()),
+    example: "your-cron-secret-min-32-chars!!",
   },
   INSTANCE_ID: {
     schema: z.string().min(1).optional(),
@@ -96,24 +103,32 @@ export const {
     example: "hermes-max,hermes-laura,thea-prod",
     comment:
       "Comma-separated list of all known instance IDs. Used in system prompt so the AI knows which instances it can route tasks to.",
+    commented: true,
   },
   THEA_REMOTE_URL: {
     schema: z.string().url().optional(),
     example: "https://unbottled.ai",
     comment:
       "Remote Thea instance URL for task sync. Local instance polls this for new tasks.",
+    commented: true,
   },
   THEA_REMOTE_API_KEY: {
     schema: z.string().min(32).optional(),
     example: "your-remote-api-key-min-32-chars-here",
     comment:
       "Shared API key for task sync between local and remote Thea instances.",
+    commented: true,
   },
   THEA_REMOTE_LEAD_ID: {
     schema: z.string().uuid().optional(),
-    example: "00000000-0000-0000-0000-000000000000",
+    example: false,
     comment:
       "Lead ID cookie for remote Thea instance. Get by visiting the remote URL once and copying the lead_id cookie.",
+  },
+  PULSE_INTERVAL_MINUTES: {
+    schema: z.coerce.number().int().positive().optional(),
+    example: "1",
+    comment: "Pulse runner interval in minutes (default: 1)",
   },
   ENABLE_ANALYTICS: {
     schema: createSchema(
@@ -129,12 +144,16 @@ export const {
   VIBE_ADMIN_USER_EMAIL: {
     schema: z.email(),
     example: "admin@example.com",
-    comment: "Admin user email (used for CLI auth and seeding)",
+    comment:
+      "Root admin email. Used for CLI auth, API tool access, and all admin endpoints. Change via the app syncs to DB.",
+    commented: true,
   },
   VIBE_ADMIN_USER_PASSWORD: {
     schema: z.string().min(8),
     example: "your-admin-password",
-    comment: "Admin user password (used for seeding)",
+    comment:
+      "Root admin password. Protects all exposed tools/endpoints. Use a strong password in production! Change via the app syncs to DB.",
+    commented: true,
   },
   VIBE_CLI_LOCALE: {
     schema: (z.string() as z.Schema<CountryLanguage>)

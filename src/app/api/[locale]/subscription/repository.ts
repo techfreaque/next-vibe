@@ -333,6 +333,88 @@ export class SubscriptionRepository {
             }
           }
         }
+
+        // Safety net: If subscription is active with a valid future period,
+        // ensure renewal credits exist. Catches cases where the webhook or
+        // auto-sync updated the period but credit granting silently failed.
+        if (
+          subscription.status === SubscriptionStatus.ACTIVE &&
+          subscription.currentPeriodEnd &&
+          new Date(subscription.currentPeriodEnd) > new Date() &&
+          subscription.providerSubscriptionId
+        ) {
+          try {
+            const { creditPacks } = await import("../credits/db");
+            const periodEndMs = subscription.currentPeriodEnd.getTime();
+            const expectedSessionId = renewalSessionKey(
+              subscription.providerSubscriptionId,
+              periodEndMs,
+            );
+
+            const [existingPack] = await db
+              .select({ id: creditPacks.id })
+              .from(creditPacks)
+              .where(
+                sql`${creditPacks.metadata}->>'sessionId' = ${expectedSessionId}`,
+              )
+              .limit(1);
+
+            if (!existingPack) {
+              const { CreditRepository } =
+                await import("../credits/repository");
+              const { scopedTranslation: creditsScopedTranslation } =
+                await import("../credits/i18n");
+              const { productsRepository, ProductIds } =
+                await import("../products/repository-client");
+              const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
+
+              const productId =
+                subscription.planId === SubscriptionPlan.SUBSCRIPTION
+                  ? ProductIds.SUBSCRIPTION
+                  : null;
+
+              if (productId) {
+                const product = productsRepository.getProduct(
+                  productId,
+                  locale,
+                );
+                const expiresAt = new Date(periodEndMs);
+
+                logger.info("Safety-net: granting missing renewal credits", {
+                  userId,
+                  credits: product.credits,
+                  expiresAt: expiresAt.toISOString(),
+                  sessionId: expectedSessionId,
+                });
+
+                await CreditRepository.addUserCredits(
+                  userId,
+                  product.credits,
+                  "subscription",
+                  logger,
+                  creditsT,
+                  expiresAt,
+                  expectedSessionId,
+                );
+
+                logger.info(
+                  "Safety-net: successfully granted renewal credits",
+                  {
+                    userId,
+                    credits: product.credits,
+                    sessionId: expectedSessionId,
+                  },
+                );
+              }
+            }
+          } catch (creditError) {
+            logger.error("Safety-net credit grant failed", {
+              error: parseError(creditError),
+              userId,
+            });
+            // Don't fail the whole request if safety net fails
+          }
+        }
       }
 
       return success({

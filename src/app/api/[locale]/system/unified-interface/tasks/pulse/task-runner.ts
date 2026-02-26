@@ -7,7 +7,6 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import { serverSystemEnv } from "@/app/api/[locale]/system/server/env";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import {
   formatDuration,
@@ -18,6 +17,7 @@ import {
   TaskCategory,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { TasksTranslationKey } from "../i18n";
@@ -45,13 +45,9 @@ const pulseTaskRunner: TaskRunner<TasksTranslationKey> = {
     const { signal, logger, systemLocale } = props;
     logger.info(formatTask("Starting pulse task runner...", "💓"));
 
-    const PULSE_INTERVAL =
-      (serverSystemEnv.PULSE_INTERVAL_MINUTES ?? 1) * 60 * 1000;
+    const PULSE_INTERVAL = (env.PULSE_INTERVAL_MINUTES ?? 1) * 60 * 1000;
     logger.info(
-      formatTask(
-        `Pulse interval: ${serverSystemEnv.PULSE_INTERVAL_MINUTES ?? 1}min`,
-        "💓",
-      ),
+      formatTask(`Pulse interval: ${env.PULSE_INTERVAL_MINUTES ?? 1}min`, "💓"),
     );
 
     // Import once outside the loop — dynamic to avoid circular dependencies at module load time

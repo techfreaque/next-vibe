@@ -14,8 +14,10 @@ import { envValidationLogger } from "./validation-logger";
 
 interface FieldDef<T extends z.ZodTypeAny = z.ZodTypeAny> {
   schema: T;
-  example: string;
+  example: string | false;
   comment?: string;
+  /** When true, the key is commented out in .env.example (still present but inactive) */
+  commented?: boolean;
 }
 
 type Fields = Record<string, FieldDef>;
@@ -54,8 +56,9 @@ type InferUnionEnv<V extends Record<string, Fields>> = z.infer<
 
 export interface EnvExample {
   key: string;
-  example: string;
+  example: string | false;
   comment?: string;
+  commented?: boolean;
 }
 
 export function defineEnv<T extends Fields>(
@@ -111,12 +114,26 @@ export function defineEnv(
       schemas as never,
     );
 
+    // Build hints for validation error messages
+    const unionHints: Record<
+      string,
+      { example: string | false; comment?: string }
+    > = {};
+    for (const variantFields of Object.values(unionInput.variants)) {
+      for (const [key, def] of Object.entries(variantFields)) {
+        if (!unionHints[key]) {
+          unionHints[key] = { example: def.example, comment: def.comment };
+        }
+      }
+    }
+
     // Validate using discriminated union
     const env = validateEnv(
       process.env,
       discriminatedUnionSchema,
       envValidationLogger,
       defaultLocale,
+      unionHints,
     );
 
     // Create a mergeable object schema by combining all fields from all variants
@@ -148,6 +165,7 @@ export function defineEnv(
             key,
             example: def.example,
             comment: def.comment,
+            commented: def.commented,
           });
         }
       }
@@ -167,14 +185,21 @@ export function defineEnv(
       key,
       example: def.example,
       comment: def.comment,
+      commented: def.commented,
     });
   }
   const schema = zod.object(schemaShape);
+  const hints: Record<string, { example: string | false; comment?: string }> =
+    {};
+  for (const [key, def] of Object.entries(fields)) {
+    hints[key] = { example: def.example, comment: def.comment };
+  }
   const env = validateEnv(
     process.env,
     schema,
     envValidationLogger,
     defaultLocale,
+    hints,
   );
   return { env, schema, examples };
 }

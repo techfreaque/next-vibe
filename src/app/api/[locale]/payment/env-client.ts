@@ -15,5 +15,6 @@ export const {
     schema: z.string().min(1),
     value: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
     example: "pk_test_your_stripe_publishable_key",
+    commented: true,
   },
 });

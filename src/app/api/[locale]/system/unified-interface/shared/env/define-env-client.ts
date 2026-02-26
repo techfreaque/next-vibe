@@ -9,8 +9,10 @@ import { z as zod } from "zod";
 interface FieldDef<T extends z.ZodTypeAny = z.ZodTypeAny> {
   schema: T;
   value: z.input<T>; // Must pass explicit process.env.VAR_NAME
-  example: string;
+  example: string | false;
   comment?: string;
+  /** When true, the key is commented out in .env.example (still present but inactive) */
+  commented?: boolean;
 }
 
 type Fields = Record<string, FieldDef>;
@@ -21,8 +23,9 @@ type InferEnv<T extends Fields> = {
 
 export interface EnvExample {
   key: string;
-  example: string;
+  example: string | false;
   comment?: string;
+  commented?: boolean;
 }
 
 /**
@@ -61,6 +64,7 @@ export function defineEnvClient<T extends Fields>(
     key,
     example: def.example,
     comment: def.comment,
+    commented: def.commented,
   }));
 
   return { envClient, schema, examples };

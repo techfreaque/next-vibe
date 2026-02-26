@@ -401,11 +401,11 @@ export class PaymentRepository {
         provider,
       });
 
-      // Atomic idempotency: insert-or-skip in one operation.
-      // If already processed, the INSERT does nothing and we get no row back.
-      // If not yet inserted, we insert with processed=false and get the row back.
-      // If inserted but not processed (concurrent request), onConflictDoNothing returns nothing
-      // and we skip processing — the first request that inserted will handle it.
+      // Atomic idempotency: insert-or-update in one operation.
+      // - New event: inserts with processed=false, returns row → process it.
+      // - Already processed (processed=true): conflict, WHERE excludes it → no row → skip.
+      // - Previously failed (processed=false): conflict, WHERE matches → updates data, returns row → retry.
+      // This allows Stripe retriggers to reprocess webhooks that failed on previous attempts.
       const [webhookRow] = await db
         .insert(paymentWebhooks)
         .values({
@@ -414,7 +414,11 @@ export class PaymentRepository {
           processed: false,
           data: body,
         })
-        .onConflictDoNothing()
+        .onConflictDoUpdate({
+          target: paymentWebhooks.providerEventId,
+          set: { data: body },
+          where: eq(paymentWebhooks.processed, false),
+        })
         .returning({ id: paymentWebhooks.id });
 
       if (!webhookRow) {

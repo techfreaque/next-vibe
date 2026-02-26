@@ -18,10 +18,12 @@ export const {
     schema: z.string().min(1),
     example: "sk_test_your_stripe_secret_key",
     comment: "Stripe",
+    commented: true,
   },
   STRIPE_WEBHOOK_SECRET: {
     schema: z.string().min(1),
     example: "whsec_your_stripe_webhook_secret",
+    commented: true,
   },
 
   // NOWPayments
@@ -29,14 +31,17 @@ export const {
     schema: z.string().min(1),
     example: "your_nowpayments_api_key",
     comment: "NOWPayments (crypto)",
+    commented: true,
   },
   NOWPAYMENTS_IPN_SECRET: {
     schema: z.string().min(1),
     example: "your_nowpayments_ipn_secret",
+    commented: true,
   },
   NOWPAYMENTS_API_URL: {
     schema: z.string().url().default("https://api-sandbox.nowpayments.io/v1"),
     example: "https://api-sandbox.nowpayments.io/v1",
     comment: "Use https://api.nowpayments.io/v1 for production",
+    commented: true,
   },
 });

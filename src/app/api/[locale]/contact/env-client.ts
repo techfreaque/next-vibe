@@ -14,16 +14,16 @@ export const {
   NEXT_PUBLIC_SUPPORT_EMAIL_DE: {
     schema: z.string().email(),
     value: process.env.NEXT_PUBLIC_SUPPORT_EMAIL_DE,
-    example: "support-de@example.com",
+    example: "hi@unbottled.ai",
   },
   NEXT_PUBLIC_SUPPORT_EMAIL_PL: {
     schema: z.string().email(),
     value: process.env.NEXT_PUBLIC_SUPPORT_EMAIL_PL,
-    example: "support-pl@example.com",
+    example: "hi@unbottled.ai",
   },
   NEXT_PUBLIC_SUPPORT_EMAIL_GLOBAL: {
     schema: z.string().email(),
     value: process.env.NEXT_PUBLIC_SUPPORT_EMAIL_GLOBAL,
-    example: "support@example.com",
+    example: "hi@unbottled.ai",
   },
 });

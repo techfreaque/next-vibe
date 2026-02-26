@@ -4,7 +4,7 @@
 
 import "server-only";
 
-import type { ModelMessage } from "ai";
+import type { ModelMessage, ToolCallPart, ToolResultPart } from "ai";
 
 import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import { parseError } from "@/app/api/[locale]/shared/utils";
@@ -235,6 +235,16 @@ export class MessageConverter {
           };
         }
 
+        // Quick check: if it doesn't look like JSON, skip parsing
+        const trimmedContent = message.content.trim();
+        if (!trimmedContent.startsWith("{")) {
+          // Plain text error message (e.g. "Generation was stopped...")
+          return {
+            content: message.content,
+            role: "assistant",
+          };
+        }
+
         try {
           const errorData = JSON.parse(message.content) as ErrorResponseType;
 
@@ -320,8 +330,28 @@ export class MessageConverter {
         // Build separate tool result messages (one per tool call with result)
         const toolResultMessages: ModelMessage[] = [];
 
+        // Track seen toolCallIds to prevent duplicates (API rejects non-unique IDs)
+        const seenToolCallIds = new Set<string>();
+
         for (const toolMsg of toolMessages) {
           const toolCall = toolMsg.metadata!.toolCall!;
+
+          // Skip duplicate toolCallIds — keep the first occurrence
+          // Duplicates can occur when a tool call fails and is retried with the same ID
+          if (seenToolCallIds.has(toolCall.toolCallId)) {
+            logger.warn(
+              "[MessageConverter] Skipping duplicate toolCallId in batch",
+              {
+                toolCallId: toolCall.toolCallId,
+                toolName: toolCall.toolName,
+                messageId: MessageConverter.isChatMessage(toolMsg)
+                  ? toolMsg.id
+                  : "unknown",
+              },
+            );
+            continue;
+          }
+          seenToolCallIds.add(toolCall.toolCallId);
 
           // Add tool call to assistant message content
           toolCallContent.push({
@@ -431,7 +461,66 @@ export class MessageConverter {
       }
     }
 
-    return result;
+    // Safety net: deduplicate tool_use IDs across the entire result.
+    // The API rejects messages with non-unique tool_use IDs.
+    // This handles edge cases where the same toolCallId appears in separate
+    // assistant messages (e.g. non-consecutive TOOL messages sharing an ID).
+    const globalSeenToolCallIds = new Set<string>();
+    for (let k = 0; k < result.length; k++) {
+      const msg = result[k];
+      if (msg.role === "assistant" && Array.isArray(msg.content)) {
+        const contentArr = msg.content;
+        const indicesToRemove = new Set<number>();
+        for (let p = 0; p < contentArr.length; p++) {
+          const part = contentArr[p];
+          if (part && part.type === "tool-call") {
+            const toolPart = part as ToolCallPart;
+            if (globalSeenToolCallIds.has(toolPart.toolCallId)) {
+              logger.warn(
+                "[MessageConverter] Removing duplicate toolCallId from assistant message",
+                { toolCallId: toolPart.toolCallId },
+              );
+              indicesToRemove.add(p);
+            } else {
+              globalSeenToolCallIds.add(toolPart.toolCallId);
+            }
+          }
+        }
+        if (indicesToRemove.size > 0) {
+          const kept = contentArr.flatMap((part, idx) =>
+            indicesToRemove.has(idx) ? [] : [part],
+          );
+          result[k] = { ...msg, content: kept };
+        }
+      }
+      if (msg.role === "tool" && Array.isArray(msg.content)) {
+        const contentArr = msg.content;
+        const indicesToRemove = new Set<number>();
+        for (let p = 0; p < contentArr.length; p++) {
+          const part = contentArr[p];
+          if (part && part.type === "tool-result") {
+            const toolPart = part as ToolResultPart;
+            if (!globalSeenToolCallIds.has(toolPart.toolCallId)) {
+              logger.warn("[MessageConverter] Removing orphaned tool-result", {
+                toolCallId: toolPart.toolCallId,
+              });
+              indicesToRemove.add(p);
+            }
+          }
+        }
+        if (indicesToRemove.size > 0) {
+          const kept = contentArr.flatMap((part, idx) =>
+            indicesToRemove.has(idx) ? [] : [part],
+          );
+          result[k] = { ...msg, content: kept };
+        }
+      }
+    }
+
+    // Remove any assistant/tool messages that ended up with empty content arrays
+    return result.filter(
+      (msg) => !Array.isArray(msg.content) || msg.content.length > 0,
+    );
   }
   /**
    * Recursively translate error messages including nested causes

@@ -17,13 +17,31 @@ export const {
     schema: z.string().email(),
     example: "leads@example.com",
     comment: "Lead campaigns SMTP",
+    commented: true,
   },
-  LEADS_EMAIL_HOST: { schema: z.string(), example: "smtp.example.com" },
-  LEADS_EMAIL_PORT: { schema: z.coerce.number(), example: "587" },
+  LEADS_EMAIL_HOST: {
+    schema: z.string(),
+    example: "smtp.example.com",
+    commented: true,
+  },
+  LEADS_EMAIL_PORT: {
+    schema: z.coerce.number(),
+    example: "587",
+    commented: true,
+  },
   LEADS_EMAIL_SECURE: {
     schema: z.string().transform((v) => v === "true"),
     example: "true",
+    commented: true,
   },
-  LEADS_EMAIL_USER: { schema: z.string(), example: "leads_email_username" },
-  LEADS_EMAIL_PASS: { schema: z.string(), example: "leads_email_password" },
+  LEADS_EMAIL_USER: {
+    schema: z.string(),
+    example: "leads_email_username",
+    commented: true,
+  },
+  LEADS_EMAIL_PASS: {
+    schema: z.string(),
+    example: "leads_email_password",
+    commented: true,
+  },
 });

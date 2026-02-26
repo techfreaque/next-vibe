@@ -45,6 +45,9 @@ export class StreamContext {
 
   // Tool tracking
   pendingToolMessages = new Map<string, PendingToolData>();
+  /** All toolCallIds ever seen in this stream — prevents duplicate DB rows
+   *  when a provider reuses IDs across steps or retries. */
+  allSeenToolCallIds = new Set<string>();
   stepHasToolsAwaitingConfirmation = false;
 
   // Loop control - set to true when model requests to stop the tool loop
