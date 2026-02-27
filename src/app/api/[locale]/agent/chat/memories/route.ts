@@ -14,11 +14,11 @@ export const { GET, tools } = endpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     email: undefined,
-    handler: ({ user, logger, rootFolderId }) =>
+    handler: ({ user, logger, streamContext }) =>
       repository.getMemories({
         userId: user.id,
         logger,
-        rootFolderId: rootFolderId ?? DefaultFolderId.PRIVATE,
+        rootFolderId: streamContext.rootFolderId ?? DefaultFolderId.PRIVATE,
       }),
   },
 });

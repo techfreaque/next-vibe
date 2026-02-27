@@ -53,6 +53,12 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().optional(),
       }),
+      memoriesJson: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        columns: 12,
+        schema: z.string().optional(),
+      }),
 
       // Response
       tasksJson: scopedResponseField(scopedTranslation, {
@@ -66,6 +72,14 @@ const { POST } = createEndpoint({
       completionsProcessed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.number(),
+      }),
+      memoriesSynced: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number(),
+      }),
+      sharedMemoriesJson: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string(),
       }),
     },
   }),
@@ -125,6 +139,8 @@ const { POST } = createEndpoint({
         tasksJson: "[]",
         synced: 0,
         completionsProcessed: 0,
+        memoriesSynced: 0,
+        sharedMemoriesJson: "[]",
       },
     },
   },

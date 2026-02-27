@@ -264,9 +264,10 @@ export class CompactingHandler {
 
           ctx.dbWriter.emitError(
             fail({
-              message: t("errors.compactingStreamError"),
+              message: t("errors.compactingStreamError", {
+                error: errorObj.message,
+              }),
               errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-              messageParams: { error: errorObj.message },
             }),
           );
 
@@ -285,9 +286,10 @@ export class CompactingHandler {
 
       ctx.dbWriter.emitError(
         fail({
-          message: t("errors.compactingException"),
+          message: t("errors.compactingException", {
+            error: errorObj.message,
+          }),
           errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          messageParams: { error: errorObj.message },
         }),
       );
 

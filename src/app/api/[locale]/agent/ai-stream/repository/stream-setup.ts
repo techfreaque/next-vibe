@@ -45,6 +45,7 @@ type SttModuleT = ReturnType<typeof sttScopedTranslation.scopedT>["t"];
 
 import { DEFAULT_CHARACTERS } from "../../chat/characters/config";
 import { customCharacters } from "../../chat/characters/db";
+import type { ToolExecutionContext } from "../../chat/config";
 import type { ToolCall } from "../../chat/db";
 import type { ChatMessageRole } from "../../chat/enum";
 import { chatFavorites } from "../../chat/favorites/db";
@@ -165,6 +166,8 @@ export interface StreamSetupResult {
   encoder: TextEncoder;
   /** Abort controller for stream timeout and cancellation */
   streamAbortController: AbortController;
+  /** Rich context for tool executions — rootFolderId, threadId, aiMessageId, etc. */
+  streamContext: ToolExecutionContext;
 }
 
 export async function setupAiStream(params: {
@@ -240,7 +243,14 @@ export async function setupAiStream(params: {
       logger,
       user,
       t: aiStreamT,
-      rootFolderId: data.rootFolderId,
+      streamContext: {
+        rootFolderId: data.rootFolderId,
+        threadId: undefined,
+        aiMessageId: undefined,
+        characterId: undefined,
+        modelId: undefined,
+        headless: undefined,
+      },
     });
 
     if (!confirmationResult.success) {
@@ -661,6 +671,17 @@ export async function setupAiStream(params: {
   // CRITICAL: Use same timestamp for metadata AND database to ensure cache stability
   const aiMessageId = crypto.randomUUID();
   const aiMessageCreatedAt = new Date();
+
+  // Build the rich stream context — passed through to all tool executions
+  const streamContext: ToolExecutionContext = {
+    rootFolderId: data.rootFolderId,
+    threadId: threadResult.threadId,
+    aiMessageId,
+    characterId: data.character,
+    modelId: data.model,
+    headless: params.headless,
+  };
+
   logger.debug("Generated AI message ID", {
     messageId: aiMessageId,
     createdAt: aiMessageCreatedAt.toISOString(),
@@ -708,7 +729,7 @@ export async function setupAiStream(params: {
     logger,
     systemPrompt: builtSystemPrompt,
     toolConfirmationResults,
-    rootFolderId: data.rootFolderId,
+    streamContext,
   });
 
   const provider = ProviderFactoryClass.getProviderForModel(
@@ -785,6 +806,7 @@ export async function setupAiStream(params: {
       encoder,
       streamAbortController,
       effectiveCompactTrigger,
+      streamContext,
     },
   };
 }

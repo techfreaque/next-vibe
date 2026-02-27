@@ -17,86 +17,103 @@ export const translations: typeof enTranslations = {
     post: {
       title: "KI-Agent ausführen",
       description:
-        "Vorausrufe ausführen, dann einen KI-Prompt headless ausführen und die Antwort zurückgeben. Credits werden je nach verwendetem Modell verbraucht.",
+        "Einen headless KI-Agenten ausführen und die vollständige Textantwort erhalten. Verwende dies, um Aufgaben zu delegieren, Tool-Ergebnisse zusammenzufassen, Inhalte zu generieren oder Tools zu einer einzigen KI-Antwort zu verketten. Credits werden je nach Modell verbraucht. SCHNELLSTART: Übergib favoriteId, um Charakter + Modell + Tool-Konfiguration aus einem gespeicherten Favoriten zu laden. Überschreibe jedes Feld (model, character, tools, allowedTools) durch explizite Angabe. EINRICHTUNG: Vor der Ausführung den richtigen Charakter + Favoriten einrichten. Charaktere definieren Persona und System-Prompt (erstellen mit agent_chat_characters_create_POST). Favoriten bündeln Charakter mit Modellüberschreibung und Tool-Konfiguration (erstellen mit agent_chat_favorites_create_POST, modelSelection: {selectionType:'MANUAL', manualModelId:'...'} oder {selectionType:'FILTERS',...}). Workflow: 1) Favoriten (agent_chat_favorites_GET) oder Charaktere (agent_chat_characters_GET) auflisten. 2) Falls keiner passt, Charakter erstellen, dann Favorit dafür anlegen. 3) favoriteId an diesen Aufruf übergeben. TOOL-ZUGRIFF: Standard-Setup: allowedTools: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool führt jeden Endpunkt aus, system_help_GET ermöglicht Tool-Entdeckung.",
       container: {
         title: "KI-Agent-Ausführung",
-        description: "Vorausrufe und Prompt konfigurieren",
+        description:
+          "Vorausrufe und Prompt für headless KI-Ausführung konfigurieren",
       },
       fields: {
         favoriteId: {
           label: "Favoriten-ID",
           description:
-            "UUID eines gespeicherten Favoriten zum Laden von Charakter, Modell und Tool-Konfiguration. Explizite Charakter-, Modell- oder Tool-Felder überschreiben die Werte des Favoriten.",
+            "UUID eines gespeicherten Favoriten zum Laden von Charakter, Modell und Tool-Konfiguration. Charakter, Modell (aus modelSelection) und Tool-Konfiguration (activeTools/visibleTools) des Favoriten werden als Standardwerte verwendet. Explizite Felder in dieser Anfrage überschreiben die Favoriten-Werte. Verwende agent_chat_favorites_GET zum Auflisten.",
           placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         },
         model: {
           label: "Modell",
           description:
-            "KI-Modell für die Antwort. Optional wenn favoriteId oder character gesetzt ist.",
+            "KI-Modell. Optional wenn favoriteId oder character gesetzt (aus deren modelSelection aufgelöst). Schnell & günstig: claude-haiku-4.5, gemini-2.5-flash. Ausgewogen: claude-sonnet-4.6, gpt-5. Leistungsstark: claude-opus-4.6, gpt-5-pro. Kostenlos: qwen3_235b-free, gpt-oss-120b-free. Überschreibt das Modell aus favoriteId/character.",
         },
         character: {
           label: "Charakter",
           description:
-            "Charakter-Persona. Optional wenn favoriteId gesetzt ist.",
+            "Charakter-ID (UUID) oder 'default'. Optional wenn favoriteId gesetzt (aus dem Favoriten aufgelöst). Charaktere definieren KI-Persona, System-Prompt und Standard-Modell. Überschreibt den Charakter aus favoriteId. Verwende agent_chat_characters_GET zum Auflisten.",
           placeholder: "default",
         },
         prompt: {
           label: "Prompt",
-          description: "Benutzerprompt für die KI",
+          description:
+            "Die Hauptanweisung oder Frage an die KI. Sei spezifisch — die KI nutzt Vorausruf-Ergebnisse als Kontext falls vorhanden.",
           placeholder: "Prompt eingeben...",
         },
         instructions: {
-          label: "Zusätzliche Anweisungen",
-          description: "Optionale Systemanweisungen",
+          label: "Zusätzliche System-Anweisungen",
+          description:
+            "Optionale Zusatzanweisungen, die an den System-Prompt angehängt werden. Verwende dies um Format, Ton oder Ausgabelänge einzuschränken (z.B. 'Sei präzise. Nur JSON.').",
           placeholder: "Prägnant sein. Max. ein Absatz.",
         },
         preCalls: {
           label: "Vorausrufe",
-          description: "Routen, die vor dem KI-Prompt ausgeführt werden",
+          description:
+            "Tool-Aufrufe, die vor dem Prompt ausgeführt werden. Ergebnisse werden als Kontext injiziert. Verwende system_help_GET um verfügbare Tools und deren Argumente zu entdecken.",
           routeId: {
-            label: "Routen-ID",
-            description: "Endpunkt-Alias oder vollständiger Pfad",
-            placeholder: "agent_chat_characters_GET",
+            label: "Tool-ID",
+            description:
+              "Alias oder vollständiger Tool-Name (z.B. 'web-search', 'agent_chat_characters_GET'). Verwende system_help_GET zur Tool-Entdeckung.",
+            placeholder: "web-search",
           },
-          args: { label: "Argumente", description: "Flache Argumente" },
+          args: {
+            label: "Argumente",
+            description:
+              'Flache Schlüssel-Wert-Argumente — urlPathParams und Body-Felder zusammengeführt (z.B. {"query": "neueste Nachrichten", "maxResults": 5}).',
+          },
         },
         allowedTools: {
           label: "Ausführbar (Berechtigungsschicht)",
           description:
-            "Legt fest, welche Tools die KI tatsächlich ausführen darf. null = alle erlaubt. Array = nur diese Tools erlaubt. Standard-Setup: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool führt beliebige Endpunkte aus, system_help_GET ermöglicht Tool-Entdeckung.",
+            "Ausführungs-Berechtigungsschicht — kontrolliert welche Tools die KI tatsächlich ausführen darf. null = alle Tools erlaubt. Array = nur aufgelistete Tools (andere werden mit 'vom Benutzer deaktiviert' blockiert). Standard-Agent-Setup: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool dispatcht jeden registrierten Endpunkt, system_help_GET ermöglicht Tool-Entdeckung. Tools aus dem tools-Feld müssen nicht wiederholt werden.",
           toolId: {
             label: "Tool-ID",
             description:
-              "Alias oder vollständiger Name des erlaubten Tools (z.B. 'execute-tool', 'system_help_GET')",
+              "Alias oder vollständiger Name des erlaubten Tools (z.B. 'execute-tool', 'system_help_GET', 'web-search')",
           },
           requiresConfirmation: {
             label: "Bestätigung erforderlich",
             description:
-              "Bei true wartet die Ausführung auf Benutzerbestätigung. Für destruktive Aktionen verwenden.",
+              "Bei true wartet die Ausführung auf Benutzerbestätigung. Für destruktive oder kostenintensive Aktionen verwenden.",
           },
         },
         tools: {
           label: "Im Kontext (KI sieht diese)",
           description:
-            "Tools im Kontext der KI — was das Modell kennt und verwenden kann. null = Standard-Tool-Set des Benutzers (empfohlen). Array nur für fokussierten Kontext. Hinweis: allowedTools steuert die tatsächliche Ausführung.",
+            "Tools im Kontextfenster des Modells — was die KI kennt und worüber sie nachdenken kann. null = Standard-Tool-Set des Benutzers (empfohlen). Array nur für fokussierten, minimalen Kontext. Hinweis: allowedTools kontrolliert die tatsächliche Ausführung — dieses Feld beeinflusst nur, was das Modell sieht.",
           toolId: {
             label: "Tool-ID",
-            description: "Alias oder vollständiger Name des Tools im Kontext",
+            description:
+              "Alias oder vollständiger Name des Tools im Kontext (z.B. 'execute-tool', 'system_help_GET')",
           },
           requiresConfirmation: {
             label: "Bestätigung erforderlich",
-            description: "Ob Bestätigung vor Ausführung nötig ist",
+            description:
+              "Ob dieses Tool vor der Ausführung eine Benutzerbestätigung erfordert",
           },
         },
-        maxTurns: { label: "Max. Runden", description: "Maximale Tool-Runden" },
+        maxTurns: {
+          label: "Max. Runden",
+          description:
+            "Maximale agentische Runden (Tool-Aufruf-Zyklen) vor dem Stopp. Standard: unbegrenzt. Auf 1 setzen für einzelnen Prompt+Antwort ohne Tool-Aufrufe.",
+        },
         appendThreadId: {
-          label: "Thread-ID (anhängen)",
-          description: "Bestehenden Thread fortsetzen",
-          placeholder: "uuid",
+          label: "Thread-ID (fortsetzen)",
+          description:
+            "UUID eines bestehenden Threads zum Fortsetzen. Die neue Nachricht wird an die Konversation angehängt. Weglassen für neuen Thread.",
+          placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         },
         rootFolderId: {
-          label: "Stammordner",
-          description: "Speicherort für den Thread",
+          label: "Speicherordner",
+          description:
+            "Wo der Thread gespeichert wird. 'cron' (Standard) = persistierte Agent-Läufe. 'incognito' = kein Speicher, kein Verlauf. 'private' = privater Ordner des Benutzers. 'shared' = Team-zugänglich.",
           placeholder: "cron",
           options: {
             cron: "Cron (Agent-Läufe)",
@@ -107,28 +124,31 @@ export const translations: typeof enTranslations = {
         },
         subFolderId: {
           label: "Unterordner-ID",
-          description: "Optionaler Unterordner",
-          placeholder: "uuid",
+          description:
+            "Optionale UUID eines Unterordners im Stammordner zur Organisation von Läufen.",
+          placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         },
         excludeMemories: {
           label: "Erinnerungen ausschließen",
           description:
-            "Wenn aktiviert, sieht die KI keine gespeicherten Erinnerungen im Kontext. Verwende dies für öffentliche Bots und isolierte Aufgaben.",
+            "Wenn true, sieht die KI keine gespeicherten Erinnerungen im Kontext. Verwende dies für öffentliche Bots und isolierte Aufgaben, die keinen persönlichen Kontext erben sollen. Standard: false (Erinnerungen eingeschlossen).",
         },
       },
       response: {
-        text: "Antworttext des Assistenten",
-        promptTokens: "Anzahl der Prompt-Token",
-        completionTokens: "Anzahl der Completion-Token",
-        threadId: "Thread-ID",
-        lastAiMessageId: "ID der letzten KI-Nachricht",
-        threadTitle: "Thread-Titel",
-        threadCreatedAt: "Erstellungszeitpunkt des Threads",
+        text: "Antworttext der KI (Think-Tags entfernt). Null wenn das Modell keine Ausgabe erzeugt hat.",
+        promptTokens: "Verbrauchte Prompt-Token (Eingabekosten)",
+        completionTokens: "Erzeugte Completion-Token (Ausgabekosten)",
+        threadId:
+          "Thread-UUID wo der Lauf gespeichert wurde. Null wenn rootFolderId 'incognito' war. Verwende dies um die Konversation via appendThreadId fortzusetzen.",
+        lastAiMessageId:
+          "UUID der letzten Assistenten-Nachricht. Nützlich für Verzweigungen oder Referenzen.",
+        threadTitle: "Automatisch generierter Titel für diesen Thread",
+        threadCreatedAt: "Erstellungszeitpunkt des Threads (ISO 8601)",
         preCallResults: {
           title: "Vorausruf-Ergebnisse",
-          routeId: "Routen-ID",
-          succeeded: "Erfolgreich",
-          errorMessage: "Fehler",
+          routeId: "Aufgerufenes Tool",
+          succeeded: "Ob der Aufruf erfolgreich war",
+          errorMessage: "Fehlermeldung falls der Aufruf fehlgeschlagen ist",
         },
       },
       errors: {

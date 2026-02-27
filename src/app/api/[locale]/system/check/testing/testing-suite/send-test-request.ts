@@ -111,7 +111,14 @@ export async function sendTestRequest<
       locale: defaultLocale,
       logger,
       platform: Platform.CLI, // Use CLI platform for testing
-      rootFolderId: DefaultFolderId.CRON,
+      streamContext: {
+        rootFolderId: DefaultFolderId.CRON,
+        threadId: undefined,
+        aiMessageId: undefined,
+        characterId: undefined,
+        modelId: undefined,
+        headless: undefined,
+      },
     });
 
     const { t } = scopedTranslation.scopedT(defaultLocale);

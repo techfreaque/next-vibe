@@ -31,11 +31,12 @@ import { HelpToolsWidget } from "./widget";
 
 // Serializable tool metadata returned in response
 const aiToolMetadataSchema = z.object({
-  // Always present
+  // Always present — `name` is the preferred call name (use this in execute-tool toolName param)
   name: z.string(),
   title: z.string(),
   description: z.string(),
-  toolName: z.string(),
+  /** Internal technical ID (e.g. "system_server_rebuild_POST"). Use `name` to call tools, not this. */
+  id: z.string(),
   tags: z.array(z.string()),
   // Present in list mode with query/category
   method: z.string().optional(),
@@ -277,7 +278,7 @@ const { GET } = createEndpoint({
             description: "Search the web using Brave Search API",
             category: "Search",
             tags: ["search", "web"],
-            toolName: "agent_search_brave_GET",
+            id: "agent_search_brave_GET",
             aliases: ["web-search"],
           },
         ],

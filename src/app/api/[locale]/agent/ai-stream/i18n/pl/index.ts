@@ -17,89 +17,103 @@ export const translations: typeof enTranslations = {
     post: {
       title: "Uruchom agenta AI",
       description:
-        "Wykonaj wywołania wstępne, a następnie uruchom headless prompt AI i zwróć odpowiedź. Kredyty są pobierane w zależności od użytego modelu.",
+        "Uruchom headless agenta AI i otrzymaj pełną odpowiedź tekstową. Użyj do delegowania zadań, podsumowywania wyników narzędzi, generowania treści lub łączenia narzędzi w jedną odpowiedź AI. Kredyty są pobierane w zależności od modelu. SZYBKI START: Przekaż favoriteId, aby załadować postać + model + konfigurację narzędzi z zapisanego ulubionego. Nadpisz dowolne pole (model, character, tools, allowedTools) przekazując je jawnie. KONFIGURACJA: Przed uruchomieniem skonfiguruj odpowiednią postać + ulubiony. Postacie definiują personę i prompt systemowy (utwórz za pomocą agent_chat_characters_create_POST). Ulubione łączą postać z nadpisaniem modelu i konfiguracją narzędzi (utwórz za pomocą agent_chat_favorites_create_POST, modelSelection: {selectionType:'MANUAL', manualModelId:'...'} lub {selectionType:'FILTERS',...}). Workflow: 1) Listuj ulubione (agent_chat_favorites_GET) lub postacie (agent_chat_characters_GET). 2) Jeśli żaden nie pasuje, utwórz postać, potem ulubiony. 3) Przekaż favoriteId. DOSTĘP DO NARZĘDZI: Standardowe ustawienie: allowedTools: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool uruchamia dowolny endpoint, system_help_GET pozwala odkrywać narzędzia.",
       container: {
         title: "Uruchomienie agenta AI",
-        description: "Konfiguracja wywołań wstępnych i promptu",
+        description:
+          "Konfiguracja wywołań wstępnych i promptu dla headless wykonania AI",
       },
       fields: {
         favoriteId: {
           label: "ID ulubionego",
           description:
-            "UUID zapisanego ulubionego do załadowania postaci, modelu i konfiguracji narzędzi. Jawne pola postaci, modelu lub narzędzi nadpisują wartości ulubionego.",
+            "UUID zapisanego ulubionego do załadowania postaci, modelu i konfiguracji narzędzi. Postać, model (z modelSelection) i konfiguracja narzędzi (activeTools/visibleTools) ulubionego są używane jako wartości domyślne. Jawne pola w tym żądaniu nadpisują wartości ulubionego. Użyj agent_chat_favorites_GET do listowania.",
           placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         },
         model: {
           label: "Model",
           description:
-            "Model AI do generowania odpowiedzi. Opcjonalny gdy ustawiono favoriteId lub character.",
+            "Model AI. Opcjonalny gdy ustawiono favoriteId lub character (rozwiązywany z ich modelSelection). Szybki & tani: claude-haiku-4.5, gemini-2.5-flash. Zbalansowany: claude-sonnet-4.6, gpt-5. Potężny: claude-opus-4.6, gpt-5-pro. Darmowy: qwen3_235b-free, gpt-oss-120b-free. Nadpisuje model z favoriteId/character.",
         },
         character: {
-          label: "Charakter",
+          label: "Postać",
           description:
-            "Persona charakteru. Opcjonalny gdy ustawiono favoriteId.",
+            "ID postaci (UUID) lub 'default'. Opcjonalny gdy ustawiono favoriteId (rozwiązywany z ulubionego). Postacie definiują personę AI, prompt systemowy i domyślny model. Nadpisuje postać z favoriteId. Użyj agent_chat_characters_GET do listowania.",
           placeholder: "default",
         },
         prompt: {
           label: "Prompt",
-          description: "Prompt użytkownika do AI",
+          description:
+            "Główna instrukcja lub pytanie do AI. Bądź konkretny — AI użyje wyników wywołań wstępnych jako kontekstu jeśli podano.",
           placeholder: "Wpisz prompt...",
         },
         instructions: {
-          label: "Dodatkowe instrukcje",
-          description: "Opcjonalne instrukcje systemowe",
+          label: "Dodatkowe instrukcje systemowe",
+          description:
+            "Opcjonalne dodatkowe instrukcje dołączane do promptu systemowego. Użyj do ograniczenia formatu, tonu lub długości (np. 'Bądź zwięzły. Tylko JSON.').",
           placeholder: "Bądź zwięzły. Maksymalnie jeden akapit.",
         },
         preCalls: {
           label: "Wywołania wstępne",
-          description: "Trasy wykonywane przed promptem AI",
+          description:
+            "Wywołania narzędzi do wykonania przed promptem. Wyniki są wstrzykiwane jako kontekst. Użyj system_help_GET do odkrywania dostępnych narzędzi i ich argumentów.",
           routeId: {
-            label: "ID trasy",
-            description: "Alias endpointu lub pełna ścieżka",
-            placeholder: "agent_chat_characters_GET",
+            label: "ID narzędzia",
+            description:
+              "Alias lub pełna nazwa narzędzia do wywołania (np. 'web-search', 'agent_chat_characters_GET'). Użyj system_help_GET do odkrywania.",
+            placeholder: "web-search",
           },
-          args: { label: "Argumenty", description: "Płaskie argumenty" },
+          args: {
+            label: "Argumenty",
+            description:
+              'Płaskie argumenty klucz-wartość — urlPathParams i pola body połączone w jeden obiekt (np. {"query": "najnowsze wiadomości", "maxResults": 5}).',
+          },
         },
         allowedTools: {
           label: "Może wykonywać (warstwa uprawnień)",
           description:
-            "Kontroluje, które narzędzia AI może faktycznie uruchomić. null = wszystkie dozwolone. Tablica = tylko wymienione narzędzia (pozostałe są blokowane). Standardowe ustawienie agenta: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool uruchamia dowolny endpoint, system_help_GET pozwala odkrywać dostępne narzędzia.",
+            "Brama uprawnień do wykonania — kontroluje które narzędzia AI faktycznie może uruchomić. null = wszystkie dozwolone. Tablica = tylko wymienione narzędzia (inne blokowane z 'wyłączone przez użytkownika'). Standardowe ustawienie: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool dispatchuje dowolny zarejestrowany endpoint, system_help_GET pozwala odkrywać narzędzia. Nie trzeba powtarzać narzędzi z pola tools.",
           toolId: {
             label: "ID narzędzia",
             description:
-              "Alias lub pełna nazwa narzędzia, które AI może wykonać (np. 'execute-tool', 'system_help_GET')",
+              "Alias lub pełna nazwa narzędzia, które AI może wykonać (np. 'execute-tool', 'system_help_GET', 'web-search')",
           },
           requiresConfirmation: {
             label: "Wymaga potwierdzenia",
             description:
-              "Jeśli true, wykonanie czeka na potwierdzenie użytkownika. Używaj dla destrukcyjnych akcji.",
+              "Jeśli true, wykonanie zatrzymuje się i czeka na potwierdzenie użytkownika. Używaj dla destrukcyjnych lub kosztownych akcji.",
           },
         },
         tools: {
           label: "W kontekście (AI to widzi)",
           description:
-            "Narzędzia załadowane do kontekstu modelu — co AI zna i może rozważać. null = domyślny zestaw narzędzi użytkownika (zalecane). Tablica tylko dla skupionego kontekstu. Uwaga: allowedTools kontroluje rzeczywiste wykonanie.",
+            "Narzędzia załadowane do okna kontekstu modelu — co AI zna i nad czym może rozumować. null = domyślny zestaw narzędzi użytkownika (zalecane). Podaj tablicę tylko dla skupionego, minimalnego kontekstu. Uwaga: allowedTools kontroluje co faktycznie się wykonuje — to pole wpływa tylko na to, co model widzi.",
           toolId: {
             label: "ID narzędzia",
-            description: "Alias lub pełna nazwa narzędzia w kontekście",
+            description:
+              "Alias lub pełna nazwa narzędzia w kontekście (np. 'execute-tool', 'system_help_GET')",
           },
           requiresConfirmation: {
             label: "Wymaga potwierdzenia",
-            description: "Czy wymagane jest potwierdzenie przed wykonaniem",
+            description:
+              "Czy to narzędzie wymaga potwierdzenia użytkownika przed wykonaniem",
           },
         },
         maxTurns: {
           label: "Maks. tury",
-          description: "Maksymalna liczba tur narzędzi",
+          description:
+            "Maksymalna liczba tur agencji (cykli wywołań narzędzi) przed zatrzymaniem. Domyślnie: bez limitu. Ustaw na 1 dla pojedynczego promptu+odpowiedzi bez wywołań narzędzi.",
         },
         appendThreadId: {
-          label: "ID wątku (dołącz)",
-          description: "Kontynuuj istniejący wątek",
-          placeholder: "uuid",
+          label: "ID wątku (kontynuuj)",
+          description:
+            "UUID istniejącego wątku do kontynuacji. Nowa wiadomość jest dołączana do konwersacji. Pomiń aby rozpocząć nowy wątek.",
+          placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         },
         rootFolderId: {
-          label: "Folder główny",
-          description: "Miejsce przechowywania wątku",
+          label: "Folder zapisu",
+          description:
+            "Gdzie zapisać wątek. 'cron' (domyślny) = trwałe uruchomienia agenta. 'incognito' = bez zapisu, bez historii. 'private' = prywatny folder użytkownika. 'shared' = dostępny dla zespołu.",
           placeholder: "cron",
           options: {
             cron: "Cron (zadania agenta)",
@@ -110,28 +124,31 @@ export const translations: typeof enTranslations = {
         },
         subFolderId: {
           label: "ID podfolderu",
-          description: "Opcjonalny podfolder",
-          placeholder: "uuid",
+          description:
+            "Opcjonalne UUID podfolderu w folderze głównym do organizacji uruchomień.",
+          placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         },
         excludeMemories: {
           label: "Wyklucz wspomnienia",
           description:
-            "Gdy włączone, AI nie zobaczy zapisanych wspomnień w kontekście. Użyj dla publicznych botów i izolowanych zadań.",
+            "Gdy true, AI nie zobaczy zapisanych wspomnień użytkownika w kontekście. Użyj dla publicznych botów i izolowanych zadań, które nie powinny dziedziczyć osobistego kontekstu. Domyślnie: false (wspomnienia włączone).",
         },
       },
       response: {
-        text: "Tekst odpowiedzi asystenta",
-        promptTokens: "Liczba tokenów promptu",
-        completionTokens: "Liczba tokenów odpowiedzi",
-        threadId: "ID wątku",
-        lastAiMessageId: "ID ostatniej wiadomości AI",
-        threadTitle: "Tytuł wątku",
-        threadCreatedAt: "Czas utworzenia wątku",
+        text: "Tekst odpowiedzi AI (tagi think usunięte). Null jeśli model nie wygenerował wyjścia.",
+        promptTokens: "Zużyte tokeny promptu (koszt wejścia)",
+        completionTokens: "Wygenerowane tokeny odpowiedzi (koszt wyjścia)",
+        threadId:
+          "UUID wątku gdzie uruchomienie zostało zapisane. Null jeśli rootFolderId to 'incognito'. Użyj do kontynuacji konwersacji przez appendThreadId.",
+        lastAiMessageId:
+          "UUID ostatniej wiadomości asystenta. Przydatne do rozgałęzień lub referencji.",
+        threadTitle: "Automatycznie wygenerowany tytuł wątku",
+        threadCreatedAt: "Znacznik czasu utworzenia wątku (ISO 8601)",
         preCallResults: {
           title: "Wyniki wywołań wstępnych",
-          routeId: "ID trasy",
-          succeeded: "Sukces",
-          errorMessage: "Błąd",
+          routeId: "Wywołane narzędzie",
+          succeeded: "Czy wywołanie się powiodło",
+          errorMessage: "Komunikat błędu jeśli wywołanie się nie powiodło",
         },
       },
       errors: {

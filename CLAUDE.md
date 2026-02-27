@@ -100,6 +100,20 @@ All paths relative to project root.
 5. Implement — follow patterns, strict types, pass vibe checker
 6. Report results — what works, what doesn't, next steps
 
+## End-of-Session Protocol
+
+When you complete a task (from Thea, Hermes, or Max):
+
+1. **Check for a task ID.** Look for `TASK_ID` in environment variables or in the task instructions from Hermes. If a task ID was provided, call `complete-task` via MCP:
+   - `taskId`: The cron task ID provided by Hermes
+   - `status`: `status.completed`, `status.failed`, or `status.cancelled`
+   - `summary`: 2-3 sentence summary of what was done
+   - `output`: Key facts as key-value pairs (files changed, status, follow-ups)
+
+2. **If no task ID exists** (ad-hoc request from Max directly): just provide a clear summary at the end — what was done, files changed, what needs follow-up.
+
+3. **Be concise, be confident.** Implement what you're sure about. Only ask for approval on architectural decisions — not on obvious fixes.
+
 ## When Stuck
 
 - Don't guess — ask

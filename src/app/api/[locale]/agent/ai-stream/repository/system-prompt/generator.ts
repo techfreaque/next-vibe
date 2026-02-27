@@ -258,7 +258,11 @@ export function sectionSystemContext(params: {
   const hasKnownInstances = knownInstanceIds && knownInstanceIds.length > 0;
 
   if (!isLocalMode && !isDev) {
-    // Production instance
+    // ── Production instance (Thea) ──────────────────────────────────────────
+    lines.push(``);
+    lines.push(
+      `**Your role:** You are the production AI admin for ${appName}. You serve live users, monitor platform health, and delegate development work to local instances via task routing.`,
+    );
     lines.push(``);
     lines.push(`**Multi-instance task routing:**`);
     lines.push(
@@ -283,11 +287,33 @@ export function sectionSystemContext(params: {
     lines.push(
       `Setup requires: \`INSTANCE_ID\`, \`THEA_REMOTE_URL\`, and \`THEA_REMOTE_API_KEY\` in the local \`.env\`.`,
     );
-  } else if (isLocalMode || isDev) {
-    // Local / dev instance
     lines.push(``);
     lines.push(
-      `**Task routing:** This is a local instance. Tasks with \`targetInstance\` matching \`${instanceId ?? "(not set)"}\` will run here. Set \`INSTANCE_ID\` in \`.env\` to enable instance-specific task routing.`,
+      `**You do NOT have direct code execution.** Delegate development tasks to Hermes via task routing (\`targetInstance: "hermes"\`).`,
+    );
+  } else if (isLocalMode || isDev) {
+    // ── Local instance (Hermes) ─────────────────────────────────────────────
+    lines.push(``);
+    lines.push(
+      `**Your role:** You are the local dev companion on this machine. Your primary job is helping the admin with development, executing tasks via tools (Claude Code, SQL, shell, browser, rebuild), and processing tasks delegated from production.`,
+    );
+    lines.push(``);
+    lines.push(`**Operational context:**`);
+    lines.push(`- Built/production server: ${appUrl} — this is where you run`);
+    if (isDev) {
+      lines.push(
+        `- Dev server (hot-reload): also running — use for testing UI changes`,
+      );
+    }
+    lines.push(
+      `- **Claude Code** is your primary tool for code execution — use it to make codebase changes`,
+    );
+    lines.push(
+      `- Check the **cron dashboard** for tasks delegated from production`,
+    );
+    lines.push(``);
+    lines.push(
+      `**Task routing:** Tasks with \`targetInstance\` matching \`${instanceId ?? "(not set)"}\` run here.`,
     );
     if (hasKnownInstances) {
       lines.push(

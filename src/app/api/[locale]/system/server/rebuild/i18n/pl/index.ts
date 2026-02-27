@@ -8,52 +8,28 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Przebuduj i uruchom ponownie",
     description:
-      "Przebuduj aplikację i uruchom ponownie serwer Next.js bez pełnego przestoju",
+      "Przebuduj aplikację i uruchom ponownie serwer Next.js. Wykonuje 6 kroków sekwencyjnie: 1) generowanie kodu, 2) vibe check (bramka jakości kodu), 3) produkcyjny build Next.js, 4) migracje bazy danych, 5) seeding bazy danych, 6) hot-restart przez SIGUSR1. Vibe check blokuje build przy błędach — użyj 'vibe check' lub MCP check tool po szczegóły. UWAGA: Odpowiedź HTTP może zostać ucięta, ponieważ serwer restartuje się przed ukończeniem odpowiedzi.",
     form: {
-      title: "Konfiguracja przebudowy",
-      description: "Skonfiguruj opcje przebudowy i ponownego uruchomienia",
+      title: "Przebuduj i uruchom ponownie",
+      description: "Przebuduj aplikację i uruchom ponownie serwer",
     },
     fields: {
-      generate: {
-        title: "Generuj kod",
-        description: "Uruchom generowanie kodu przed budowaniem",
-      },
-      nextBuild: {
-        title: "Build Next.js",
-        description: "Uruchom produkcyjny build Next.js",
-      },
-      migrate: {
-        title: "Uruchom migracje",
-        description: "Uruchom migracje bazy danych po buildzie",
-      },
-      seed: {
-        title: "Uruchom seeding",
-        description: "Uruchom seeding bazy danych po migracjach",
-      },
-      restart: {
-        title: "Uruchom ponownie serwer",
-        description:
-          "Wyślij SIGUSR1 do działającego procesu vibe start, aby ponownie uruchomić Next.js",
-      },
-      force: {
-        title: "Wymuś przebudowę",
-        description: "Kontynuuj przebudowę nawet w przypadku błędów",
-      },
       success: {
-        title: "Przebudowa udana",
-      },
-      output: {
-        title: "Wyjście przebudowy",
-      },
-      duration: {
-        title: "Czas przebudowy (ms)",
+        title: "Wynik",
       },
       errors: {
-        title: "Błędy przebudowy",
+        title: "Błędy",
       },
-      restarted: {
-        title: "Serwer uruchomiony ponownie",
-      },
+    },
+    steps: {
+      codegenFailed: "Generowanie kodu nie powiodło się: {{error}}",
+      vibeCheckFailed:
+        "Vibe check: {{errors}} błędów, {{warnings}} ostrzeżeń. Użyj 'vibe check' lub MCP check tool po szczegóły.",
+      vibeCheckError: "Vibe check nie powiódł się: {{error}}",
+      buildFailed: "Build Next.js nie powiódł się: {{error}}",
+      migrationFailed: "Migracja nie powiodła się: {{error}}",
+      seedingFailed: "Seeding nie powiódł się: {{error}}",
+      restartFailed: "Restart serwera nie powiódł się: {{error}}",
     },
     errors: {
       validation: {

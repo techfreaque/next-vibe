@@ -281,7 +281,14 @@ export class UnifiedTaskRunnerRepositoryImpl {
         logger: this.logger,
         platform: Platform.CRON,
         cronTaskId: dbTask?.id,
-        rootFolderId: DefaultFolderId.CRON,
+        streamContext: {
+          rootFolderId: DefaultFolderId.CRON,
+          threadId: undefined,
+          aiMessageId: undefined,
+          characterId: undefined,
+          modelId: undefined,
+          headless: undefined,
+        },
       });
 
       const durationMs = Date.now() - startTime;

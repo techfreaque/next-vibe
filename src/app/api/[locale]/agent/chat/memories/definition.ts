@@ -114,6 +114,11 @@ const { GET } = createEndpoint({
               text: "get.response.memories.memory.isArchived.text" as const,
               schema: z.boolean(),
             }),
+            isShared: scopedResponseField(scopedTranslation, {
+              type: WidgetType.BADGE,
+              text: "get.response.memories.memory.isShared.text" as const,
+              schema: z.boolean(),
+            }),
             tags: scopedResponseArrayFieldNew(scopedTranslation, {
               type: WidgetType.CONTAINER,
               child: scopedResponseField(scopedTranslation, {
@@ -188,6 +193,7 @@ const { GET } = createEndpoint({
             priority: 0,
             isPublic: false,
             isArchived: false,
+            isShared: false,
             createdAt: new Date("2025-01-01T00:00:00Z"),
           },
           {
@@ -197,6 +203,7 @@ const { GET } = createEndpoint({
             priority: 0,
             isPublic: false,
             isArchived: false,
+            isShared: false,
             createdAt: new Date("2025-01-01T00:00:00Z"),
           },
         ],

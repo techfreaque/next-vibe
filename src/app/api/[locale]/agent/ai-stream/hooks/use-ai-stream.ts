@@ -1547,9 +1547,10 @@ export function useAIStream(
 
             if (activeThreadId) {
               const errorResponse = fail({
-                message: t("errors.unexpectedError"),
+                message: t("errors.unexpectedError", {
+                  error: error.message,
+                }),
                 errorType: ErrorResponseTypes.UNKNOWN_ERROR,
-                messageParams: { error: error.message },
               });
 
               void import("../../chat/hooks/store")

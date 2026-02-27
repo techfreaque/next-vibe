@@ -48,6 +48,7 @@ export const translations: typeof enTranslations = {
           priority: { text: "Priorität" },
           isPublic: { text: "Öffentlich" },
           isArchived: { text: "Archiviert" },
+          isShared: { text: "Geteilt" },
           createdAt: { content: "Erstellt am" },
         },
       },

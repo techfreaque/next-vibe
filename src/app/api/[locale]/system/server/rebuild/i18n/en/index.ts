@@ -6,52 +6,28 @@ export const translations = {
   post: {
     title: "Rebuild & Restart",
     description:
-      "Rebuild the application and hot-restart the running Next.js server without full downtime",
+      "Rebuild the application and hot-restart the running Next.js server. Runs 6 steps in sequence: 1) code generation, 2) vibe check (code quality gate), 3) Next.js production build, 4) database migrations, 5) database seeding, 6) hot-restart via SIGUSR1. The vibe check blocks the build if there are any errors — use 'vibe check' or the MCP check tool to see details. WARNING: The HTTP response may be cut short because the server restarts before the response completes.",
     form: {
-      title: "Rebuild Configuration",
-      description: "Configure rebuild and restart options",
+      title: "Rebuild & Restart",
+      description: "Rebuild the application and restart the server",
     },
     fields: {
-      generate: {
-        title: "Generate Code",
-        description: "Run code generation before building",
-      },
-      nextBuild: {
-        title: "Next.js Build",
-        description: "Run Next.js production build",
-      },
-      migrate: {
-        title: "Run Migrations",
-        description: "Run database migrations after build",
-      },
-      seed: {
-        title: "Run Seeding",
-        description: "Run database seeding after migrations",
-      },
-      restart: {
-        title: "Restart Server",
-        description:
-          "Send SIGUSR1 to the running vibe start process to hot-restart Next.js",
-      },
-      force: {
-        title: "Force Rebuild",
-        description: "Continue rebuild even if errors occur",
-      },
       success: {
-        title: "Rebuild Successful",
-      },
-      output: {
-        title: "Rebuild Output",
-      },
-      duration: {
-        title: "Rebuild Duration (ms)",
+        title: "Result",
       },
       errors: {
-        title: "Rebuild Errors",
+        title: "Errors",
       },
-      restarted: {
-        title: "Server Restarted",
-      },
+    },
+    steps: {
+      codegenFailed: "Code generation failed: {{error}}",
+      vibeCheckFailed:
+        "Vibe check: {{errors}} errors, {{warnings}} warnings. Use 'vibe check' or the MCP check tool to see details.",
+      vibeCheckError: "Vibe check failed: {{error}}",
+      buildFailed: "Next.js build failed: {{error}}",
+      migrationFailed: "Migration failed: {{error}}",
+      seedingFailed: "Seeding failed: {{error}}",
+      restartFailed: "Server restart failed: {{error}}",
     },
     errors: {
       validation: {

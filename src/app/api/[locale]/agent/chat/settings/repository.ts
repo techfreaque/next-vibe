@@ -22,7 +22,7 @@ import { endpointToToolName } from "@/app/api/[locale]/system/unified-interface/
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
-import { DEFAULT_TOOL_IDS } from "../constants";
+import { getDefaultToolIds } from "../constants";
 import { chatSettings } from "./db";
 import type {
   ChatSettingsGetResponseOutput,
@@ -175,7 +175,7 @@ export class ChatSettingsRepository {
           : undefined;
       const pinnedToolsToStore =
         data.pinnedTools !== undefined
-          ? normalizeToolsOrNull(data.pinnedTools, DEFAULT_TOOL_IDS)
+          ? normalizeToolsOrNull(data.pinnedTools, getDefaultToolIds())
           : undefined;
 
       let result: typeof existing;

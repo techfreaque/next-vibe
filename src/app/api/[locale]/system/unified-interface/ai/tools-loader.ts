@@ -11,7 +11,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
 import { scopedTranslation as aiStreamScopedTranslation } from "@/app/api/[locale]/agent/ai-stream/i18n";
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -43,7 +43,7 @@ function createToolFromEndpoint(
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
-    rootFolderId: DefaultFolderId;
+    streamContext: ToolExecutionContext;
   },
   requiresConfirmation: boolean,
 ): CoreTool {
@@ -123,7 +123,7 @@ function createToolFromEndpoint(
         locale: context.locale,
         logger: context.logger,
         platform: Platform.AI,
-        rootFolderId: context.rootFolderId,
+        streamContext: context.streamContext,
       });
 
       if (!result.success) {
@@ -203,8 +203,8 @@ export async function loadTools(params: {
   systemPrompt: string;
   /** Map of tool IDs to their confirmation requirements (from API request) */
   toolConfirmationConfig?: Map<string, boolean>;
-  /** Root folder ID from AI stream context (e.g. "public", "private", "cron"). */
-  rootFolderId: DefaultFolderId;
+  /** Stream context — rootFolderId, threadId, aiMessageId, etc. */
+  streamContext: ToolExecutionContext;
 }): Promise<{
   tools: Record<string, CoreTool> | undefined;
   systemPrompt: string;
@@ -293,7 +293,7 @@ export async function loadTools(params: {
             user: params.user,
             locale: params.locale,
             logger: params.logger,
-            rootFolderId: params.rootFolderId,
+            streamContext: params.streamContext,
           },
           requiresConfirmation,
         );

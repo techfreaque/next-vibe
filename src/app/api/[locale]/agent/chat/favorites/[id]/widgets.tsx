@@ -480,6 +480,12 @@ function SaveAndUseButton({
           locale,
           user,
         });
+
+        // Pop navigation like the regular save button does
+        const popCount = navigation?.current?.popNavigationOnSuccess ?? 0;
+        for (let i = 0; i < popCount; i++) {
+          navigation.pop();
+        }
       } catch (error) {
         logger.error("Failed to activate favorite", {
           error: error instanceof Error ? error.message : String(error),

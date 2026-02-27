@@ -29,6 +29,11 @@ export const translations: typeof enTranslations = {
       description:
         "Diese Erinnerung in öffentlichen und geteilten Kontexten sichtbar machen",
     },
+    isShared: {
+      label: "Geteilt",
+      description:
+        "Diese Erinnerung zwischen Instanzen synchronisieren (z.B. lokale Entwicklung und Produktion)",
+    },
     backButton: {
       label: "Zurück",
     },

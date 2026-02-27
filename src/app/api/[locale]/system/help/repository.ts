@@ -90,6 +90,7 @@ function isCompactPlatform(platform: Platform): boolean {
 
 function getParameterSchema(
   endpoint: ReturnType<typeof definitionsRegistry.getEndpointsForUser>[number],
+  locale: CountryLanguage,
 ): ToolItem["parameters"] | null {
   if (!endpoint.fields) {
     return null;
@@ -115,7 +116,7 @@ function getParameterSchema(
     }
     const schema = zodSchemaToJsonSchema(z.object(combinedShape));
 
-    // Flatten the top-level request fields for fieldType enrichment
+    // Flatten the top-level request fields for fieldType enrichment + description resolution
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const topLevelFields: Record<string, any> = {};
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -128,6 +129,41 @@ function getParameterSchema(
       }
     }
     enrichJsonSchemaFromFields(schema, topLevelFields);
+
+    // Add translated descriptions from field metadata to JSON schema properties
+    if (
+      locale &&
+      schema &&
+      typeof schema === "object" &&
+      "properties" in schema
+    ) {
+      const props = (
+        schema as {
+          properties: Record<
+            string,
+            Record<string, string | number | boolean | null | string[]>
+          >;
+        }
+      ).properties;
+      const { t } = endpoint.scopedTranslation.scopedT(locale);
+      for (const [key, prop] of Object.entries(props)) {
+        if (prop && typeof prop === "object" && !prop.description) {
+          const field = topLevelFields[key];
+          if (
+            field &&
+            typeof field === "object" &&
+            "description" in field &&
+            typeof field.description === "string"
+          ) {
+            try {
+              prop.description = t(field.description);
+            } catch {
+              /* missing translation — skip */
+            }
+          }
+        }
+      }
+    }
 
     // Strip zod-internal ~standard field — not useful for AI consumers
     if (schema && "~standard" in schema) {
@@ -156,7 +192,7 @@ function serializeTool(
   return {
     name: callName,
     title: tool.title,
-    toolName: tool.toolName,
+    id: tool.toolName,
     tags: tool.tags,
     method: tool.method,
     description: tool.description,
@@ -180,7 +216,7 @@ function serializeToolMinimal(
   return {
     name: callName,
     title: tool.title,
-    toolName: tool.toolName,
+    id: tool.toolName,
     tags: tool.tags,
     description: tool.description,
     category: tool.category,
@@ -1146,7 +1182,7 @@ export class HelpRepository {
         );
       });
       const parameters = endpoint
-        ? (getParameterSchema(endpoint) ?? undefined)
+        ? (getParameterSchema(endpoint, locale) ?? undefined)
         : undefined;
       const aliases = matchedTool.aliases?.length
         ? matchedTool.aliases
@@ -1163,19 +1199,8 @@ export class HelpRepository {
     const query = data.query?.toLowerCase().trim();
     const category = data.category?.toLowerCase().trim();
 
-    // AI/MCP overview — no params → categories + hint only
-    if (isCompact && !query && !category) {
-      const categoryList = categories
-        .map((c) => `${c.name} (${c.count})`)
-        .join(", ");
-      return success({
-        tools: [] satisfies ToolItem[],
-        totalCount,
-        matchedCount: 0,
-        categories,
-        hint: `${totalCount} tools available across categories: ${categoryList}. Next steps: use query="keyword" to search, category="Chat" to list a category, or toolName="agent_chat_characters_GET" for full schema + examples. CLI: vibe <toolName> [--field=value].`,
-      });
-    }
+    // AI/MCP overview — no params → return paginated first page with categories
+    // (Previously returned tools:[] which was confusing — callers had no way to discover tools without knowing params)
 
     let filtered = allTools;
 
@@ -1229,7 +1254,7 @@ export class HelpRepository {
               e.aliases?.some((a) => a.toLowerCase() === needle),
           );
           const parameters = endpoint
-            ? (getParameterSchema(endpoint) ?? undefined)
+            ? (getParameterSchema(endpoint, locale) ?? undefined)
             : undefined;
           return serializeTool(tool, parameters, true);
         });
@@ -1240,7 +1265,7 @@ export class HelpRepository {
           hint:
             matchedCount === 0
               ? `No tools matched. Try a broader query or call without params to see all categories.`
-              : `Showing full detail for ${matchedCount} tool${matchedCount === 1 ? "" : "s"}. Call as: execute-tool toolName="<name>" or CLI: vibe <alias>.`,
+              : `Showing full detail for ${matchedCount} tool${matchedCount === 1 ? "" : "s"}. To call a tool: execute-tool toolName="<name>" (use the name field). CLI: vibe <name> [--field=value].`,
         });
       }
       // > threshold → minimal list to preserve context
@@ -1252,7 +1277,8 @@ export class HelpRepository {
         tools: pageSlice.map(serializeToolMinimal),
         totalCount,
         matchedCount,
-        hint: `${matchedCount} tools matched. Narrow your search or use toolName="<name>" for full schema + examples.${paginationHint}`,
+        categories,
+        hint: `${matchedCount} tools matched. Use toolName="<name>" for full schema + examples (name is the preferred call name). To call: execute-tool toolName="<name>".${paginationHint}`,
         currentPage: safePage,
         effectivePageSize,
         totalPages,

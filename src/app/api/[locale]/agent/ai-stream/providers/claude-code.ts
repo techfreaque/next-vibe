@@ -158,14 +158,10 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
     const toolExecutors = this.toolExecutors;
     const logger = this.logger;
 
-    // Track tool executions so we can emit them as stream parts
-    const toolExecutionResults: Array<{
-      toolCallId: string;
-      toolName: string;
-      input: string;
-      result: string;
-      isError: boolean;
-    }> = [];
+    // Stream controller ref — set once ReadableStream.start() fires.
+    // MCP handlers use this to emit tool-call/tool-result in real-time.
+    let streamController: ReadableStreamDefaultController<LanguageModelV2StreamPart> | null =
+      null;
 
     const mcpTools = (tools ?? [])
       .filter(
@@ -183,6 +179,17 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
           inputShape,
           // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- MCP handler args are dynamic
           async (args: Record<string, unknown>) => {
+            const toolCallId = crypto.randomUUID();
+
+            // Emit tool-call BEFORE execution so frontend shows it in-progress
+            streamController?.enqueue({
+              type: "tool-call",
+              toolCallId,
+              toolName: t.name,
+              input: JSON.stringify(args),
+              providerExecuted: true,
+            });
+
             // Execute the tool via our registry (which holds CoreTool execute functions)
             const executionResult = await toolExecutors.execute(
               t.name,
@@ -190,13 +197,12 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
               logger,
             );
 
-            // Track for stream event emission
-            toolExecutionResults.push({
-              toolCallId: crypto.randomUUID(),
+            // Emit tool-result AFTER execution so frontend updates with result
+            streamController?.enqueue({
+              type: "tool-result",
+              toolCallId,
               toolName: t.name,
-              input: JSON.stringify(args),
               result: executionResult.content[0]?.text ?? "",
-              isError: executionResult.isError ?? false,
             });
 
             return executionResult;
@@ -228,6 +234,9 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
     // Create a ReadableStream that maps Agent SDK events to LanguageModelV2StreamPart
     const stream = new ReadableStream<LanguageModelV2StreamPart>({
       async start(controller): Promise<void> {
+        // Expose controller to MCP handlers so they can emit tool events in real-time
+        streamController = controller;
+
         let totalInputTokens = 0;
         let totalOutputTokens = 0;
         let totalCachedTokens = 0;
@@ -239,39 +248,6 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
         /** Track current reasoning block id for emitting reasoning-end */
         let currentReasoningId = "";
         let isInReasoningBlock = false;
-        // Track how many tool results we've emitted so far
-        let emittedToolResultCount = 0;
-
-        /**
-         * Flush any pending tool execution results as stream parts.
-         * Called before text blocks to ensure proper ordering.
-         */
-        function flushToolResults(): void {
-          while (emittedToolResultCount < toolExecutionResults.length) {
-            const toolResult = toolExecutionResults[emittedToolResultCount];
-            if (!toolResult) {
-              break;
-            }
-            emittedToolResultCount++;
-
-            // Emit tool-call with providerExecuted=true so streamText() won't re-execute
-            controller.enqueue({
-              type: "tool-call",
-              toolCallId: toolResult.toolCallId,
-              toolName: toolResult.toolName,
-              input: toolResult.input,
-              providerExecuted: true,
-            });
-
-            // Emit tool-result
-            controller.enqueue({
-              type: "tool-result",
-              toolCallId: toolResult.toolCallId,
-              toolName: toolResult.toolName,
-              result: toolResult.result,
-            });
-          }
-        }
 
         try {
           const agentQuery = query({
@@ -316,9 +292,6 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
 
             switch (message.type) {
               case "stream_event": {
-                // Flush tool results before processing text events
-                flushToolResults();
-
                 const event = message.event;
 
                 // Handle content_block_start — track block type and allocate ids
@@ -358,9 +331,6 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
               }
 
               case "assistant": {
-                // Flush any remaining tool results
-                flushToolResults();
-
                 // Accumulate usage from complete messages
                 const msg = message.message;
                 if (msg.usage) {
@@ -404,9 +374,6 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
                 break;
             }
           }
-
-          // Flush any final tool results
-          flushToolResults();
 
           // Emit finish
           controller.enqueue({

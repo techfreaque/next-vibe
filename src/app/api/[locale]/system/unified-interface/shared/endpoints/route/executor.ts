@@ -9,7 +9,7 @@ import "server-only";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -63,8 +63,8 @@ export class RouteExecutionExecutor {
     locale: CountryLanguage;
     logger: EndpointLogger;
     platform: CliCompatiblePlatform | Platform.AI;
-    /** Root folder ID from AI stream context (e.g. "public", "private", "cron"). */
-    rootFolderId: DefaultFolderId;
+    /** Stream context — rootFolderId, threadId, aiMessageId, etc. */
+    streamContext: ToolExecutionContext;
   }): Promise<ResponseType<TResult>> {
     const { t } = systemScopedTranslation.scopedT(params.locale);
     try {
@@ -96,7 +96,7 @@ export class RouteExecutionExecutor {
         locale: params.locale,
         logger: params.logger,
         platform: params.platform,
-        rootFolderId: params.rootFolderId,
+        streamContext: params.streamContext,
       });
 
       // Streaming responses are not supported in CLI/AI/MCP platforms

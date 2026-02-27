@@ -44,6 +44,11 @@ export const translations: typeof enTranslations = {
       description:
         "Diese Erinnerung archivieren, um sie aus dem KI-Kontext auszuschließen, ohne sie zu löschen",
     },
+    isShared: {
+      label: "Geteilt",
+      description:
+        "Diese Erinnerung zwischen Instanzen synchronisieren (z.B. lokale Entwicklung und Produktion)",
+    },
     backButton: {
       label: "Zurück",
     },

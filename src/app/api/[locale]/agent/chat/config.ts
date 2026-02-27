@@ -33,6 +33,26 @@ export enum DefaultFolderId {
 }
 
 /**
+ * Stream Context — rich context passed to tool executions during AI streaming.
+ * Replaces the old single `rootFolderId` parameter with a structured object
+ * so handlers know which thread/message/model they're operating in.
+ */
+export interface ToolExecutionContext {
+  /** Which root folder the conversation lives in */
+  rootFolderId: DefaultFolderId;
+  /** Thread ID of the active conversation */
+  threadId: string | undefined;
+  /** The assistant message ID currently being generated */
+  aiMessageId: string | undefined;
+  /** The character/persona driving the conversation */
+  characterId: string | undefined;
+  /** The model being used (e.g. "claude-sonnet-4-6") */
+  modelId: string | undefined;
+  /** Whether this is a headless/cron invocation */
+  headless: boolean | undefined;
+}
+
+/**
  * Default folder configuration with all metadata
  * These folders are created automatically for all users
  */

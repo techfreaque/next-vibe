@@ -340,9 +340,9 @@ export function AiRunWidget({ field }: CustomWidgetProps): JSX.Element {
     }
     return response.data.tools.map((tool) => {
       const alias = tool.aliases?.[0];
-      const label = alias ?? tool.toolName;
+      const label = alias ?? tool.name;
       return {
-        value: tool.toolName,
+        value: tool.name,
         label,
         description: tool.description,
         category: tool.category,

@@ -30,6 +30,11 @@ export const translations = {
             description:
               "Comma-separated list of tools Claude Code may use (e.g. Read,Edit,Bash). Omit to allow all default tools.",
           },
+          taskTitle: {
+            label: "Task Title",
+            description:
+              "Short title for archiving this task (e.g. 'Fix login bug', 'Add memory sync'). Auto-generated from the prompt if omitted.",
+          },
           interactiveMode: {
             label: "Interactive Mode",
             description:

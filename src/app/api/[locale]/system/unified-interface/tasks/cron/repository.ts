@@ -4,7 +4,7 @@
  * Following interface + implementation pattern
  */
 
-import { count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { count, desc, eq, inArray, isNull, or, sql } from "drizzle-orm";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
@@ -21,6 +21,7 @@ import { formatTasksSummary } from "@/app/api/[locale]/system/unified-interface/
 import { calculateNextExecutionTime } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CronTaskStatus, TaskCategory, TaskCategoryDB } from "../enum";
@@ -632,7 +633,15 @@ export async function generateTasksSummary(params: {
         consecutiveFailures: cronTasks.consecutiveFailures,
       })
       .from(cronTasks)
-      .where(eq(cronTasks.userId, userId))
+      .where(
+        // Include user's own tasks + tasks targeting this instance (e.g. delegated from prod)
+        env.INSTANCE_ID
+          ? or(
+              eq(cronTasks.userId, userId),
+              eq(cronTasks.targetInstance, env.INSTANCE_ID),
+            )
+          : eq(cronTasks.userId, userId),
+      )
       .orderBy(desc(cronTasks.updatedAt))
       .limit(50);
 

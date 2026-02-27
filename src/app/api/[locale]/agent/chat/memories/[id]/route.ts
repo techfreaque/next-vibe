@@ -22,6 +22,7 @@ export const { PATCH, DELETE, tools } = endpointsHandler({
         priority: data.priority,
         isPublic: data.isPublic,
         isArchived: data.isArchived,
+        isShared: data.isShared,
         logger,
         t,
       }),

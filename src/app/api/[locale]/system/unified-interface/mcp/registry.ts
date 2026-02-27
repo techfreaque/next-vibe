@@ -186,7 +186,14 @@ export class MCPRegistry {
         locale: context.locale,
         logger,
         platform: Platform.MCP,
-        rootFolderId: DefaultFolderId.CRON,
+        streamContext: {
+          rootFolderId: DefaultFolderId.CRON,
+          threadId: undefined,
+          aiMessageId: undefined,
+          characterId: undefined,
+          modelId: undefined,
+          headless: undefined,
+        },
       });
 
       logger.debug("[MCP Registry] Tool execution complete", {

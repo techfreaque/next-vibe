@@ -9,7 +9,7 @@ import "server-only";
 import type { NextRequest } from "next/server";
 import type { z } from "zod";
 
-import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { emailHandlingRepository } from "@/app/api/[locale]/emails/smtp-client/email-handling/repository";
@@ -180,9 +180,10 @@ export interface ApiHandlerProps<
   /** Cron task DB ID when executed by the task runner (for lifecycle tracking) */
   cronTaskId?: string;
 
-  /** Root folder ID from AI stream context (e.g. "public", "private", "cron").
-   *  Only set when the handler is invoked as an AI tool during streaming. */
-  rootFolderId: DefaultFolderId;
+  /** Stream context — rich metadata about the AI streaming session.
+   *  Contains rootFolderId, threadId, aiMessageId, etc.
+   *  Populated at every entry point (web, CLI, MCP, cron, AI tool). */
+  streamContext: ToolExecutionContext;
 }
 
 /**
@@ -302,7 +303,7 @@ export type GenericHandlerReturnType<
   platform: Platform;
   request?: NextRequest; // Optional NextRequest for Next.js platform
   cronTaskId?: string; // Cron task DB ID when executed by the task runner
-  rootFolderId: DefaultFolderId;
+  streamContext: ToolExecutionContext;
 }) => Promise<HandlerResponse<TResponseOutput>>;
 
 /**
@@ -351,7 +352,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     platform,
     request,
     cronTaskId,
-    rootFolderId,
+    streamContext,
   }): Promise<HandlerResponse<T["types"]["ResponseOutput"]>> => {
     const { t } = endpoint.scopedTranslation.scopedT(locale);
     const { t: tCredits } = creditsScopedTranslation.scopedT(locale);
@@ -477,7 +478,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
       request,
       platform,
       cronTaskId,
-      rootFolderId,
+      streamContext,
     });
 
     // 5. Handle file responses - return immediately without email/SMS processing

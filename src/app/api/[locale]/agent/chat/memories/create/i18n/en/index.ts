@@ -26,6 +26,11 @@ export const translations = {
       label: "Public",
       description: "Make this memory visible in public and shared contexts",
     },
+    isShared: {
+      label: "Shared",
+      description:
+        "Sync this memory between instances (e.g. local dev and production)",
+    },
     backButton: {
       label: "Back",
     },

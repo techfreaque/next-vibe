@@ -8,52 +8,28 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Neu bauen & Neustarten",
     description:
-      "Anwendung neu bauen und den laufenden Next.js-Server ohne vollständige Ausfallzeit hot-restarten",
+      "Anwendung neu bauen und den laufenden Next.js-Server hot-restarten. Führt 6 Schritte sequentiell aus: 1) Code-Generierung, 2) Vibe-Check (Code-Qualitäts-Gate), 3) Next.js-Produktions-Build, 4) Datenbank-Migrationen, 5) Datenbank-Seeding, 6) Hot-Restart via SIGUSR1. Der Vibe-Check blockiert den Build bei Fehlern — verwende 'vibe check' oder das MCP-Check-Tool für Details. WARNUNG: Die HTTP-Antwort kann abgeschnitten werden, da der Server vor Abschluss der Antwort neu startet.",
     form: {
-      title: "Rebuild-Konfiguration",
-      description: "Rebuild- und Neustart-Optionen konfigurieren",
+      title: "Neu bauen & Neustarten",
+      description: "Anwendung neu bauen und Server neustarten",
     },
     fields: {
-      generate: {
-        title: "Code generieren",
-        description: "Code-Generierung vor dem Build ausführen",
-      },
-      nextBuild: {
-        title: "Next.js-Build",
-        description: "Next.js-Produktions-Build ausführen",
-      },
-      migrate: {
-        title: "Migrationen ausführen",
-        description: "Datenbank-Migrationen nach dem Build ausführen",
-      },
-      seed: {
-        title: "Seeding ausführen",
-        description: "Datenbank-Seeding nach Migrationen ausführen",
-      },
-      restart: {
-        title: "Server neustarten",
-        description:
-          "SIGUSR1 an den laufenden vibe start-Prozess senden, um Next.js hot-neuzustarten",
-      },
-      force: {
-        title: "Rebuild erzwingen",
-        description: "Rebuild auch bei Fehlern fortsetzen",
-      },
       success: {
-        title: "Rebuild erfolgreich",
-      },
-      output: {
-        title: "Rebuild-Ausgabe",
-      },
-      duration: {
-        title: "Rebuild-Dauer (ms)",
+        title: "Ergebnis",
       },
       errors: {
-        title: "Rebuild-Fehler",
+        title: "Fehler",
       },
-      restarted: {
-        title: "Server neugestartet",
-      },
+    },
+    steps: {
+      codegenFailed: "Code-Generierung fehlgeschlagen: {{error}}",
+      vibeCheckFailed:
+        "Vibe-Check: {{errors}} Fehler, {{warnings}} Warnungen. Verwende 'vibe check' oder das MCP-Check-Tool für Details.",
+      vibeCheckError: "Vibe-Check fehlgeschlagen: {{error}}",
+      buildFailed: "Next.js-Build fehlgeschlagen: {{error}}",
+      migrationFailed: "Migration fehlgeschlagen: {{error}}",
+      seedingFailed: "Seeding fehlgeschlagen: {{error}}",
+      restartFailed: "Server-Neustart fehlgeschlagen: {{error}}",
     },
     errors: {
       validation: {

@@ -30,6 +30,7 @@ import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Div, type DivRefObject } from "next-vibe-ui/ui/div";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo, useState } from "react";
@@ -152,6 +153,8 @@ const FullCard = React.memo(function FullCard({
   isTouch,
   dragAttributes,
   dragListeners,
+  logger,
+  user,
 }: {
   item: FavoriteCard;
   index: number;
@@ -163,6 +166,8 @@ const FullCard = React.memo(function FullCard({
   isTouch: boolean;
   dragAttributes: DraggableAttributes;
   dragListeners: DraggableSyntheticListeners;
+  logger: ReturnType<typeof useWidgetContext>["logger"];
+  user: ReturnType<typeof useWidgetContext>["user"];
 }): React.JSX.Element {
   const isActive = Boolean(item.activeBadge);
 
@@ -304,6 +309,13 @@ const FullCard = React.memo(function FullCard({
             <Zap className="h-4 w-4" />
           </Button>
         )}
+        <AddVariantButton
+          characterId={item.characterId}
+          navigate={navigate}
+          logger={logger}
+          user={user}
+          locale={locale}
+        />
         <EditFavoriteButton item={item} navigate={navigate} />
       </Div>
     </Div>
@@ -486,6 +498,8 @@ const SortableGroup = React.memo(function SortableGroup({
   locale,
   onItemDragEnd,
   isTouch,
+  logger,
+  user,
 }: {
   group: CharacterGroup;
   allFavorites: FavoriteCard[];
@@ -496,6 +510,8 @@ const SortableGroup = React.memo(function SortableGroup({
   locale: CountryLanguage;
   onItemDragEnd: (groupId: string, event: DragEndEvent) => void;
   isTouch: boolean;
+  logger: ReturnType<typeof useWidgetContext>["logger"];
+  user: ReturnType<typeof useWidgetContext>["user"];
 }): React.JSX.Element {
   const {
     attributes,
@@ -551,6 +567,8 @@ const SortableGroup = React.memo(function SortableGroup({
           isTouch={isTouch}
           dragAttributes={attributes}
           dragListeners={listeners}
+          logger={logger}
+          user={user}
         />
       </Div>
     );
@@ -594,16 +612,27 @@ const SortableGroup = React.memo(function SortableGroup({
             ) : null}
           </Div>
           <Div
-            {...attributes}
-            {...listeners}
             className={cn(
-              "cursor-grab active:cursor-grabbing inline-flex items-center justify-center h-10 w-10 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors shrink-0",
+              "flex gap-0.5 shrink-0",
               isTouch
                 ? "opacity-100"
                 : "opacity-0 group-hover:opacity-100 transition-opacity",
             )}
           >
-            <Icon icon="grip" className="h-4 w-4" />
+            <Div
+              {...attributes}
+              {...listeners}
+              className="cursor-grab active:cursor-grabbing inline-flex items-center justify-center h-10 w-10 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
+              <Icon icon="grip" className="h-4 w-4" />
+            </Div>
+            <AddVariantButton
+              characterId={group.characterId}
+              navigate={navigate}
+              logger={logger}
+              user={user}
+              locale={locale}
+            />
           </Div>
         </Div>
 
@@ -843,6 +872,8 @@ export function FavoritesListContainer({
                     locale={locale}
                     onItemDragEnd={handleItemDragEnd}
                     isTouch={isTouch}
+                    logger={logger}
+                    user={user}
                   />
                 ))}
               </Div>
@@ -865,6 +896,106 @@ export function FavoritesListContainer({
 /**
  * Edit Favorite Button - navigates to edit favorite
  */
+/**
+ * Add Variant Button - navigates to create favorite form with character data
+ * Allows adding another variant of the same character from the favorites list
+ */
+function AddVariantButton({
+  characterId,
+  navigate,
+  logger,
+  user,
+  locale,
+  size,
+}: {
+  characterId: string;
+  navigate: ReturnType<typeof useWidgetNavigation>["push"];
+  logger: ReturnType<typeof useWidgetContext>["logger"];
+  user: ReturnType<typeof useWidgetContext>["user"];
+  locale: CountryLanguage;
+  size?: "sm";
+}): React.JSX.Element {
+  const [isLoading, setIsLoading] = useState(false);
+  const { t } = scopedTranslation.scopedT(locale);
+
+  const handleClick = async (e: ButtonMouseEvent): Promise<void> => {
+    e.stopPropagation();
+    setIsLoading(true);
+
+    try {
+      const characterSingleDefinitions =
+        await import("../characters/[id]/definition");
+      const createFavoriteDefinitions = await import("./create/definition");
+      const { DEFAULT_TTS_VOICE } = await import("../../text-to-speech/enum");
+
+      // Fetch character data from cache or API
+      const cachedData = apiClient.getEndpointData(
+        characterSingleDefinitions.default.GET,
+        logger,
+        { id: characterId },
+      );
+
+      if (cachedData?.success) {
+        navigate(createFavoriteDefinitions.default.POST, {
+          data: {
+            characterId,
+            icon: cachedData.data.icon ?? undefined,
+            voice: cachedData.data.voice ?? DEFAULT_TTS_VOICE,
+            modelSelection: null,
+          },
+          popNavigationOnSuccess: 1,
+        });
+        return;
+      }
+
+      const characterResponse = await apiClient.fetch(
+        characterSingleDefinitions.default.GET,
+        logger,
+        user,
+        undefined,
+        { id: characterId },
+        locale,
+      );
+      if (!characterResponse.success) {
+        return;
+      }
+
+      navigate(createFavoriteDefinitions.default.POST, {
+        data: {
+          characterId,
+          icon: characterResponse.data.icon ?? undefined,
+          voice: characterResponse.data.voice ?? DEFAULT_TTS_VOICE,
+          modelSelection: null,
+        },
+        popNavigationOnSuccess: 1,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const isSmall = size === "sm";
+  const iconSize = isSmall ? "h-3 w-3" : "h-4 w-4";
+
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      className={isSmall ? "h-7 w-7 p-0" : undefined}
+      onClick={handleClick}
+      disabled={isLoading}
+      title={t("get.addVariant")}
+    >
+      {isLoading ? (
+        <Loader2 className={cn(iconSize, "animate-spin")} />
+      ) : (
+        <Plus className={iconSize} />
+      )}
+    </Button>
+  );
+}
+
 function EditFavoriteButton({
   navigate,
   item,

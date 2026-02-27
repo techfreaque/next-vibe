@@ -30,6 +30,11 @@ export const translations: typeof enTranslations = {
       description:
         "Ustaw to wspomnienie jako widoczne w kontekstach publicznych i udostępnionych",
     },
+    isShared: {
+      label: "Udostępnione",
+      description:
+        "Synchronizuj to wspomnienie między instancjami (np. lokalna i produkcyjna)",
+    },
     backButton: {
       label: "Wstecz",
     },

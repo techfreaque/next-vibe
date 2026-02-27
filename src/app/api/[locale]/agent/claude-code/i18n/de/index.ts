@@ -50,6 +50,11 @@ export const translations: typeof enTranslations = {
             label: "Exit-Code",
             description: "Prozess-Exit-Code. 0 = Erfolg, ungleich 0 = Fehler.",
           },
+          taskTitle: {
+            label: "Aufgabentitel",
+            description:
+              "Kurzer Titel zur Archivierung dieser Aufgabe (z.B. 'Login-Bug beheben'). Wird automatisch aus dem Prompt generiert, wenn nicht angegeben.",
+          },
           durationMs: {
             label: "Dauer (ms)",
             description: "Gesamte Laufzeit des Prozesses.",

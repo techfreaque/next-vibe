@@ -253,6 +253,7 @@ const { PATCH } = createEndpoint({
                     tags: requestData.tags ?? mem.tags,
                     priority: requestData.priority ?? mem.priority,
                     isArchived: requestData.isArchived ?? mem.isArchived,
+                    isShared: requestData.isShared ?? mem.isShared,
                   };
                 }),
               },
@@ -341,6 +342,14 @@ const { PATCH } = createEndpoint({
         fieldType: FieldDataType.BOOLEAN,
         label: "patch.isArchived.label" as const,
         description: "patch.isArchived.description" as const,
+        columns: 6,
+        schema: z.boolean().optional(),
+      }),
+      isShared: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "patch.isShared.label" as const,
+        description: "patch.isShared.description" as const,
         columns: 6,
         schema: z.boolean().optional(),
       }),

@@ -190,6 +190,7 @@ export class AiStreamRepository {
       encoder,
       streamAbortController,
       effectiveCompactTrigger,
+      streamContext,
     } = setupResult.data;
 
     // Captured refs so headless path can read lastAiMessageId + content after runStream completes
@@ -451,7 +452,7 @@ export class AiStreamRepository {
             locale,
             logger,
             t: aiStreamT,
-            rootFolderId: data.rootFolderId,
+            streamContext,
           });
 
           // After stream completes, capture the last assistant message ID from the writer.

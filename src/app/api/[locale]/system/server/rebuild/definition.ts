@@ -8,12 +8,10 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   scopedObjectFieldNew,
-  scopedRequestField,
   scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
-  FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
@@ -39,7 +37,12 @@ const { POST } = createEndpoint({
     UserRole.WEB_OFF,
     UserRole.CLI_AUTH_BYPASS,
   ],
-  aliases: [REBUILD_ALIAS],
+  aliases: [
+    REBUILD_ALIAS,
+    "rebuild-restart",
+    "rebuild-server",
+    "rebuild-and-restart",
+  ],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,
@@ -47,80 +50,12 @@ const { POST } = createEndpoint({
     description: "post.form.description",
     layoutType: LayoutType.GRID,
     columns: 12,
-    usage: { request: "data", response: true },
+    usage: { response: true },
     children: {
-      // === REQUEST FIELDS ===
-      generate: scopedRequestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "post.fields.generate.title",
-        description: "post.fields.generate.description",
-        schema: z.boolean().default(true),
-      }),
-
-      nextBuild: scopedRequestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "post.fields.nextBuild.title",
-        description: "post.fields.nextBuild.description",
-        schema: z.boolean().default(true),
-      }),
-
-      migrate: scopedRequestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "post.fields.migrate.title",
-        description: "post.fields.migrate.description",
-        schema: z.boolean().default(true),
-      }),
-
-      seed: scopedRequestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "post.fields.seed.title",
-        description: "post.fields.seed.description",
-        schema: z.boolean().default(true),
-      }),
-
-      restart: scopedRequestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "post.fields.restart.title",
-        description: "post.fields.restart.description",
-        schema: z.boolean().default(true),
-      }),
-
-      force: scopedRequestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.BOOLEAN,
-        label: "post.fields.force.title",
-        description: "post.fields.force.description",
-        schema: z.boolean().default(false),
-      }),
-
-      // === RESPONSE FIELDS ===
       success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.success.title",
-        schema: z.boolean(),
-      }),
-
-      output: scopedResponseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "post.fields.output.title",
         schema: z.string(),
-      }),
-
-      duration: scopedResponseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "post.fields.duration.title",
-        schema: z.coerce.number(),
-      }),
-
-      restarted: scopedResponseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "post.fields.restarted.title",
-        schema: z.boolean(),
       }),
 
       errors: scopedResponseField(scopedTranslation, {
@@ -179,36 +114,9 @@ const { POST } = createEndpoint({
 
   // === EXAMPLES ===
   examples: {
-    requests: {
-      default: {
-        generate: true,
-        nextBuild: true,
-        migrate: true,
-        seed: true,
-        restart: true,
-        force: false,
-      },
-      buildOnly: {
-        generate: true,
-        nextBuild: true,
-        migrate: false,
-        seed: false,
-        restart: false,
-        force: false,
-      },
-    },
     responses: {
       default: {
-        success: true,
-        output: "Rebuild completed successfully. Server restarted.",
-        duration: 45000,
-        restarted: true,
-      },
-      buildOnly: {
-        success: true,
-        output: "Build completed. Server not restarted.",
-        duration: 30000,
-        restarted: false,
+        success: "Rebuild completed successfully. Server restarted.",
       },
     },
   },

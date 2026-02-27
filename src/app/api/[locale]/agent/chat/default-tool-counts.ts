@@ -12,7 +12,7 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { JwtPayloadType } from "../../user/auth/types";
-import { DEFAULT_TOOL_IDS } from "./constants";
+import { getDefaultToolIds } from "./constants";
 
 /** Cached counts per role key */
 let publicCount: number | null = null;
@@ -50,7 +50,7 @@ function ensureComputed(): void {
  * Returns a single number — the count of DEFAULT_TOOL_IDS (core 8).
  */
 export function getDefaultActiveToolCount(): number {
-  return DEFAULT_TOOL_IDS.length;
+  return getDefaultToolIds().length;
 }
 
 /**

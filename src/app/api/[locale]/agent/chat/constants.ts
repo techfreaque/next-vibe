@@ -3,6 +3,8 @@
  * Centralized constants for chat system including storage keys, limits, and defaults
  */
 
+import { envClient } from "@/config/env-client";
+
 import { CONTACT_FORM_ALIAS } from "../../contact/definition";
 import { aliasToPathMap } from "../../system/generated/endpoint";
 import { TOOL_HELP_ALIAS } from "../../system/help/constants";
@@ -57,3 +59,32 @@ export const DEFAULT_TOOL_IDS = [
   aliasToPathMap[MEMORY_DELETE_ALIAS],
   aliasToPathMap[CONTACT_FORM_ALIAS],
 ] as const;
+
+/**
+ * Additional tools pinned for local/admin instances (Hermes).
+ * These are appended to DEFAULT_TOOL_IDS when running in local mode.
+ */
+const LOCAL_ADMIN_EXTRA_TOOL_IDS = [
+  aliasToPathMap["claude-code"],
+  aliasToPathMap["sql"],
+  aliasToPathMap["rebuild"],
+  aliasToPathMap["cron-dashboard"],
+  aliasToPathMap["chrome"],
+  aliasToPathMap["complete-task"],
+] as const;
+
+/**
+ * Get the effective default pinned tool IDs based on environment and role.
+ * - Local mode + admin: base defaults + dev tools (claude-code, sql, rebuild, etc.)
+ * - All other cases: base defaults only
+ *
+ * When `isAdmin` is not provided, defaults to `true` in local mode (the common case
+ * for self-hosted instances where only admin uses the AI).
+ */
+export function getDefaultToolIds(isAdmin?: boolean): readonly string[] {
+  const effectiveAdmin = isAdmin ?? envClient.NEXT_PUBLIC_LOCAL_MODE;
+  if (envClient.NEXT_PUBLIC_LOCAL_MODE && effectiveAdmin) {
+    return [...DEFAULT_TOOL_IDS, ...LOCAL_ADMIN_EXTRA_TOOL_IDS.filter(Boolean)];
+  }
+  return DEFAULT_TOOL_IDS;
+}

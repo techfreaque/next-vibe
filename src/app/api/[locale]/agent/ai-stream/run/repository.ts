@@ -19,8 +19,11 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { DEFAULT_TOOL_IDS } from "@/app/api/[locale]/agent/chat/constants";
+import {
+  DefaultFolderId,
+  type ToolExecutionContext,
+} from "@/app/api/[locale]/agent/chat/config";
+import { getDefaultToolIds } from "@/app/api/[locale]/agent/chat/constants";
 import type { ToolCallResult } from "@/app/api/[locale]/agent/chat/db";
 import { chatMessages, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { chatFavorites } from "@/app/api/[locale]/agent/chat/favorites/db";
@@ -72,7 +75,7 @@ async function executePreCall(
   user: JwtPayloadType,
   locale: CountryLanguage,
   logger: EndpointLogger,
-  rootFolderId: DefaultFolderId,
+  streamContext: ToolExecutionContext,
 ): Promise<PreCallResult> {
   logger.debug("[AiStreamRun] Executing pre-call", { routeId });
 
@@ -83,7 +86,7 @@ async function executePreCall(
     locale,
     logger,
     platform: Platform.AI,
-    rootFolderId,
+    streamContext,
   });
 
   if (!result.success) {
@@ -151,7 +154,14 @@ export class AiStreamRunRepository {
             user,
             locale,
             logger,
-            rootFolderId,
+            {
+              rootFolderId,
+              threadId: undefined,
+              aiMessageId: undefined,
+              characterId: undefined,
+              modelId: undefined,
+              headless: undefined,
+            },
           );
           preCallResults.push({
             ...result,
@@ -218,7 +228,7 @@ export class AiStreamRunRepository {
 
       // When tools is still not provided, inject base tools (same as interactive chat defaults)
       // so the AI can call execute-tool, web-search, fetch-url, memories, etc.
-      const defaultTools = DEFAULT_TOOL_IDS.map((id) => ({
+      const defaultTools = getDefaultToolIds().map((id) => ({
         toolId: id,
         requiresConfirmation: false,
       }));
@@ -323,9 +333,8 @@ export class AiStreamRunRepository {
       const msg = parseError(error).message;
       logger.error("[AiStreamRun] Failed", { error: msg });
       return fail({
-        message: t("errors.unexpectedError"),
+        message: t("errors.unexpectedError", { error: msg }),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: msg },
       });
     }
   }

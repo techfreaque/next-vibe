@@ -26,6 +26,7 @@ interface MemoryMetadata {
   confidence?: number; // How confident we are in this memory (0-1)
   lastAccessed?: string; // ISO timestamp of last access
   accessCount?: number; // Number of times this memory was accessed
+  syncId?: string; // Stable UUID for cross-instance sync (Hermes ↔ Thea)
 }
 
 /**
@@ -56,6 +57,9 @@ export const memories = pgTable("memories", {
 
   // Archive — archived memories are excluded from AI context but not deleted
   isArchived: boolean("is_archived").default(false).notNull(),
+
+  // Shared — synced between instances (Hermes ↔ Thea) via task-sync
+  isShared: boolean("is_shared").default(false).notNull(),
 
   // Metadata
   metadata: jsonb("metadata").$type<MemoryMetadata>().default({}),

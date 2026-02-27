@@ -114,7 +114,14 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
         logger,
         platform: Platform.NEXT_API,
         request, // Pass NextRequest for auth context
-        rootFolderId: DefaultFolderId.PRIVATE,
+        streamContext: {
+          rootFolderId: DefaultFolderId.PRIVATE,
+          threadId: undefined,
+          aiMessageId: undefined,
+          characterId: undefined,
+          modelId: undefined,
+          headless: undefined,
+        },
       });
 
       // Handle file responses - return immediately

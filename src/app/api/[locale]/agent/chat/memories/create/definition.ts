@@ -61,6 +61,7 @@ const { POST } = createEndpoint({
           tags: data.requestData.tags ?? [],
           priority: data.requestData.priority ?? 0,
           isPublic: data.requestData.isPublic ?? false,
+          isShared: data.requestData.isShared ?? false,
           isArchived: false,
           createdAt: new Date(),
         };
@@ -124,6 +125,14 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.BOOLEAN,
         label: "post.isPublic.label" as const,
         description: "post.isPublic.description" as const,
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
+      isShared: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.isShared.label" as const,
+        description: "post.isShared.description" as const,
         columns: 6,
         schema: z.boolean().optional().default(false),
       }),

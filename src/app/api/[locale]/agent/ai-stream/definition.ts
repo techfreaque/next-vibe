@@ -34,6 +34,8 @@ import { ChatMessageRole, ChatMessageRoleOptions } from "../chat/enum";
 import { DEFAULT_TTS_VOICE, TtsVoice } from "../text-to-speech/enum";
 import { scopedTranslation } from "./i18n";
 
+export const AI_STREAM_ALIAS = "ai-stream" as const;
+
 /**
  * AI Stream Endpoint (POST)
  * Streams AI responses
@@ -48,6 +50,7 @@ const { POST } = createEndpoint({
     UserRole.PUBLIC,
     UserRole.AI_TOOL_OFF,
   ],
+  aliases: [AI_STREAM_ALIAS],
 
   title: "post.title",
   description: "post.description",

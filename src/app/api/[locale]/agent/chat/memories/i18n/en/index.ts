@@ -47,6 +47,7 @@ export const translations = {
           priority: { text: "Priority" },
           isPublic: { text: "Public" },
           isArchived: { text: "Archived" },
+          isShared: { text: "Shared" },
           createdAt: { content: "Created At" },
         },
       },

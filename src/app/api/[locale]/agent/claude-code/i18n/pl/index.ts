@@ -50,6 +50,11 @@ export const translations: typeof enTranslations = {
             label: "Kod wyjścia",
             description: "Kod wyjścia procesu. 0 = sukces, niezerowy = błąd.",
           },
+          taskTitle: {
+            label: "Tytuł zadania",
+            description:
+              "Krótki tytuł do archiwizacji tego zadania (np. 'Napraw błąd logowania'). Generowany automatycznie z promptu, jeśli pominięty.",
+          },
           durationMs: {
             label: "Czas trwania (ms)",
             description: "Łączny czas działania procesu.",

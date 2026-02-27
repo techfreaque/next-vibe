@@ -460,9 +460,8 @@ export async function runHeadlessAiStream(
     });
 
     return fail({
-      message: aiStreamT("errors.unexpectedError"),
+      message: aiStreamT("errors.unexpectedError", { error: errorMsg }),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: { error: errorMsg },
     });
   }
 }

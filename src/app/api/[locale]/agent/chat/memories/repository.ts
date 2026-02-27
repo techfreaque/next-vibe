@@ -99,9 +99,18 @@ export async function addMemory(params: {
   userId: string;
   priority: number | undefined;
   isPublic: boolean;
+  isShared: boolean;
   logger: EndpointLogger;
 }): Promise<ResponseType<{ id: number }>> {
-  const { content, tags = [], userId, priority = 0, isPublic, logger } = params;
+  const {
+    content,
+    tags = [],
+    userId,
+    priority = 0,
+    isPublic,
+    isShared = false,
+    logger,
+  } = params;
 
   // Get next memory number for this user (starts at 0)
   const nextMemoryNumber = await getNextMemoryNumber({ userId });
@@ -116,11 +125,13 @@ export async function addMemory(params: {
       userId,
       priority,
       isPublic,
+      isShared,
       metadata: {
         source: "manual",
         confidence: 1.0,
         lastAccessed: new Date().toISOString(),
         accessCount: 0,
+        ...(isShared ? { syncId: crypto.randomUUID() } : {}),
       },
     })
     .returning();
@@ -151,6 +162,7 @@ export async function updateMemory(params: {
   priority?: number;
   isPublic?: boolean;
   isArchived?: boolean;
+  isShared: boolean;
   userId: string;
   logger: EndpointLogger;
   t: MemoriesT;
@@ -162,6 +174,7 @@ export async function updateMemory(params: {
     priority,
     isPublic,
     isArchived,
+    isShared,
     userId,
     logger,
     t,
@@ -187,6 +200,9 @@ export async function updateMemory(params: {
   if (isArchived !== undefined) {
     updateData.isArchived = isArchived;
   }
+  if (isShared !== undefined) {
+    updateData.isShared = isShared;
+  }
 
   const [updated] = await db
     .update(memories)
@@ -201,6 +217,19 @@ export async function updateMemory(params: {
       message: t("patch.errors.notFound.title"),
       errorType: ErrorResponseTypes.NOT_FOUND,
     });
+  }
+
+  // Assign syncId when isShared transitions to true (if not already present)
+  if (isShared) {
+    const meta = updated.metadata as Record<string, unknown> | null;
+    if (!meta?.syncId) {
+      await db
+        .update(memories)
+        .set({
+          metadata: sql`COALESCE(${memories.metadata}, '{}'::jsonb) || ${JSON.stringify({ syncId: crypto.randomUUID() })}::jsonb`,
+        })
+        .where(eq(memories.id, updated.id));
+    }
   }
 
   logger.info("Updated memory", { memoryNumber });

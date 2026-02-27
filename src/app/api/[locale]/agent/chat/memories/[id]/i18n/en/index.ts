@@ -40,6 +40,11 @@ export const translations = {
       description:
         "Archive this memory to exclude it from AI context without deleting it",
     },
+    isShared: {
+      label: "Shared",
+      description:
+        "Sync this memory between instances (e.g. local dev and production)",
+    },
     backButton: {
       label: "Back",
     },

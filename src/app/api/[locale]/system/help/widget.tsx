@@ -37,7 +37,7 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
-import { DEFAULT_TOOL_IDS } from "@/app/api/[locale]/agent/chat/constants";
+import { getDefaultToolIds } from "@/app/api/[locale]/agent/chat/constants";
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
@@ -69,7 +69,7 @@ interface CustomWidgetProps {
 // ─── Label helpers ──────────────────────────────────────────────────────────
 
 function getToolLabel(tool: HelpToolMetadataSerialized): string {
-  return tool.title || tool.aliases?.[0] || tool.toolName;
+  return tool.title || tool.aliases?.[0] || tool.id;
 }
 
 const isIdSegment = (s: string): boolean =>
@@ -209,11 +209,11 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
       return enabledTools;
     }
     // null = default: all tools are allowed (enabled), only DEFAULT_TOOL_IDS are pinned
-    const defaultPinnedSet = new Set<string>(DEFAULT_TOOL_IDS);
+    const defaultPinnedSet = new Set<string>(getDefaultToolIds());
     return availableTools.map((tool) => ({
-      id: tool.toolName,
+      id: tool.id,
       requiresConfirmation: tool.requiresConfirmation ?? false,
-      pinned: defaultPinnedSet.has(tool.toolName),
+      pinned: defaultPinnedSet.has(tool.id),
     }));
   }, [enabledTools, availableTools]);
 
@@ -246,7 +246,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
         grouped[category] = { tools: [], subcategories: {} };
       }
       grouped[category].tools.push(tool);
-      const subKey = getSubcategory(tool.toolName);
+      const subKey = getSubcategory(tool.id);
       if (!grouped[category].subcategories[subKey]) {
         grouped[category].subcategories[subKey] = [];
       }
@@ -265,7 +265,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     () =>
       filteredTools.length > 0 &&
       filteredTools.every((tool) =>
-        effectiveEnabledTools.some((t) => t.id === tool.toolName),
+        effectiveEnabledTools.some((t) => t.id === tool.id),
       ),
     [filteredTools, effectiveEnabledTools],
   );
@@ -277,7 +277,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     if (existing) {
       setEnabledTools(effectiveEnabledTools.filter((t) => t.id !== toolName));
     } else {
-      const tool = availableTools.find((t) => t.toolName === toolName);
+      const tool = availableTools.find((t) => t.id === toolName);
       setEnabledTools([
         ...effectiveEnabledTools,
         {
@@ -308,7 +308,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   };
 
   const handleEnableAll = (): void => {
-    const allIds = filteredTools.map((tool) => tool.toolName);
+    const allIds = filteredTools.map((tool) => tool.id);
     const allEnabled = allIds.every((id) =>
       effectiveEnabledTools.some((t) => t.id === id),
     );
@@ -318,11 +318,9 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
       );
     } else {
       const toAdd = filteredTools
-        .filter(
-          (tool) => !effectiveEnabledTools.some((t) => t.id === tool.toolName),
-        )
+        .filter((tool) => !effectiveEnabledTools.some((t) => t.id === tool.id))
         .map((tool) => ({
-          id: tool.toolName,
+          id: tool.id,
           requiresConfirmation: tool.requiresConfirmation ?? false,
           pinned: true,
         }));
@@ -345,7 +343,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   };
 
   const toggleCategoryTools = (tools: HelpToolMetadataSerialized[]): void => {
-    const ids = tools.map((t) => t.toolName);
+    const ids = tools.map((t) => t.id);
     const allEnabled = ids.every((id) =>
       effectiveEnabledTools.some((t) => t.id === id),
     );
@@ -353,11 +351,9 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
       setEnabledTools(effectiveEnabledTools.filter((t) => !ids.includes(t.id)));
     } else {
       const toAdd = tools
-        .filter(
-          (tool) => !effectiveEnabledTools.some((t) => t.id === tool.toolName),
-        )
+        .filter((tool) => !effectiveEnabledTools.some((t) => t.id === tool.id))
         .map((tool) => ({
-          id: tool.toolName,
+          id: tool.id,
           requiresConfirmation: tool.requiresConfirmation ?? false,
           pinned: true,
         }));
@@ -445,7 +441,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
           variant="default"
           size="sm"
           onClick={(): void => {
-            void navigateToTool(tool.toolName, navigate);
+            void navigateToTool(tool.id, navigate);
           }}
         >
           {t("get.fields.openTool.label")}
@@ -598,7 +594,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
               {Object.entries(toolsByCategory).map(
                 ([category, { tools, subcategories }]) => {
                   const isExpanded = expandedCategories.has(category);
-                  const categoryIds = tools.map((t) => t.toolName);
+                  const categoryIds = tools.map((t) => t.id);
                   const enabledCount = categoryIds.filter((id) =>
                     effectiveEnabledTools.some((t) => t.id === id),
                   ).length;
@@ -669,7 +665,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
                                 <Div className="divide-y">
                                   {subTools.map((tool) => (
                                     <ToolRow
-                                      key={tool.toolName}
+                                      key={tool.id}
                                       tool={tool}
                                       effectiveEnabledTools={
                                         effectiveEnabledTools
@@ -690,7 +686,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
                             <Div className="divide-y">
                               {tools.map((tool) => (
                                 <ToolRow
-                                  key={tool.toolName}
+                                  key={tool.id}
                                   tool={tool}
                                   effectiveEnabledTools={effectiveEnabledTools}
                                   onToggleEnabled={handleToggleEnabled}
@@ -763,9 +759,7 @@ function ToolRow({
   onOpenTool: (toolName: string) => Promise<void>;
   t: ReturnType<typeof scopedTranslation.scopedT>["t"];
 }): JSX.Element {
-  const enabledTool = effectiveEnabledTools.find(
-    (et) => et.id === tool.toolName,
-  );
+  const enabledTool = effectiveEnabledTools.find((et) => et.id === tool.id);
   const isEnabled = !!enabledTool;
   const isActive = enabledTool?.pinned ?? false;
   const requiresConfirmation = enabledTool?.requiresConfirmation ?? false;
@@ -781,7 +775,7 @@ function ToolRow({
       <Div className="flex items-center gap-3">
         <Switch
           checked={isEnabled}
-          onCheckedChange={() => onToggleEnabled(tool.toolName)}
+          onCheckedChange={() => onToggleEnabled(tool.id)}
           className="h-4 w-7 shrink-0"
         />
         <Div className="flex-1 min-w-0">
@@ -815,7 +809,7 @@ function ToolRow({
                   )}
                   onClick={(e) => {
                     e.stopPropagation();
-                    onToggleActive(tool.toolName);
+                    onToggleActive(tool.id);
                   }}
                 >
                   {isActive ? (
@@ -850,7 +844,7 @@ function ToolRow({
                   )}
                   onClick={(e) => {
                     e.stopPropagation();
-                    onToggleConfirmation(tool.toolName);
+                    onToggleConfirmation(tool.id);
                   }}
                 >
                   <Shield className="h-3.5 w-3.5" />
@@ -875,7 +869,7 @@ function ToolRow({
                 className="h-7 w-7 p-0 shrink-0 text-muted-foreground/40 hover:text-primary hover:bg-primary/10"
                 onClick={(e) => {
                   e.stopPropagation();
-                  void onOpenTool(tool.toolName);
+                  void onOpenTool(tool.id);
                 }}
               >
                 <ArrowRight className="h-3.5 w-3.5" />

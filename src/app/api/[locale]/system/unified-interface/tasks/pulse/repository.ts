@@ -631,7 +631,14 @@ export class PulseHealthRepository {
                     locale: userLocale,
                     logger,
                     platform: Platform.CRON,
-                    rootFolderId: DefaultFolderId.CRON,
+                    streamContext: {
+                      rootFolderId: DefaultFolderId.CRON,
+                      threadId: undefined,
+                      aiMessageId: undefined,
+                      characterId: undefined,
+                      modelId: undefined,
+                      headless: undefined,
+                    },
                   }),
                   new Promise<never>((...[, reject]) => {
                     setTimeout(

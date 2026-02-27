@@ -44,6 +44,11 @@ export const translations: typeof enTranslations = {
       description:
         "Zarchiwizuj to wspomnienie, aby wykluczyć je z kontekstu AI bez usuwania",
     },
+    isShared: {
+      label: "Udostępnione",
+      description:
+        "Synchronizuj to wspomnienie między instancjami (np. lokalna i produkcyjna)",
+    },
     backButton: {
       label: "Wstecz",
     },

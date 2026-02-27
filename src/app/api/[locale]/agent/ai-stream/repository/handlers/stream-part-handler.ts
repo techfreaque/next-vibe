@@ -10,7 +10,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { DefaultFolderId } from "../../../chat/config";
+import type { ToolExecutionContext } from "../../../chat/config";
 import type { ModelId } from "../../../models/models";
 import type { AiStreamT } from "../../i18n";
 import type { StreamContext } from "../core/stream-context";
@@ -44,7 +44,7 @@ export class StreamPartHandler {
     ttsHandler: StreamingTTSHandler | null;
     logger: EndpointLogger;
     t: AiStreamT;
-    rootFolderId: DefaultFolderId;
+    streamContext: ToolExecutionContext;
   }): Promise<{ shouldAbort: boolean }> {
     const {
       part,
@@ -63,7 +63,7 @@ export class StreamPartHandler {
       ttsHandler,
       logger,
       t,
-      rootFolderId,
+      streamContext,
     } = params;
 
     if (part.type === "finish-step") {
@@ -273,7 +273,7 @@ export class StreamPartHandler {
           dbWriter: ctx.dbWriter,
           logger,
           t,
-          rootFolderId,
+          streamContext,
         });
         if (result) {
           ctx.currentParentId = result.currentParentId;

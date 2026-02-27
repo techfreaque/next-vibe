@@ -20,6 +20,7 @@ export const { POST, tools } = endpointsHandler({
         tags: data.tags,
         priority: data.priority,
         isPublic: data.isPublic,
+        isShared: data.isShared,
         logger,
       }),
   },

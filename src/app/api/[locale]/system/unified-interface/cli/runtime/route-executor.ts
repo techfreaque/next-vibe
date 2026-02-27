@@ -219,7 +219,14 @@ export class RouteDelegationHandler {
                 locale: options.locale,
                 logger,
                 platform: options.platform,
-                rootFolderId: DefaultFolderId.CRON,
+                streamContext: {
+                  rootFolderId: DefaultFolderId.CRON,
+                  threadId: undefined,
+                  aiMessageId: undefined,
+                  characterId: undefined,
+                  modelId: undefined,
+                  headless: undefined,
+                },
               });
 
             return result;
@@ -308,7 +315,14 @@ export class RouteDelegationHandler {
           locale: options.locale,
           logger,
           platform: options.platform,
-          rootFolderId: DefaultFolderId.CRON,
+          streamContext: {
+            rootFolderId: DefaultFolderId.CRON,
+            threadId: undefined,
+            aiMessageId: undefined,
+            characterId: undefined,
+            modelId: undefined,
+            headless: undefined,
+          },
         });
 
       // 7. Convert ResponseType to RouteExecutionResult

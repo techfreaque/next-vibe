@@ -11,7 +11,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { UseAIStreamReturn } from "../../../../../../ai-stream/hooks/use-ai-stream";
 import type { TtsVoiceValue } from "../../../../../../text-to-speech/enum";
 import { DefaultFolderId } from "../../../../../config";
-import { DEFAULT_TOOL_IDS } from "../../../../../constants";
+import { getDefaultToolIds } from "../../../../../constants";
 import type { ChatMessage } from "../../../../../db";
 import { ChatMessageRole } from "../../../../../enum";
 import { useChatStore } from "../../../../../hooks/store";
@@ -200,7 +200,7 @@ export async function createAndSendUserMessage(
       })) ?? null;
     const pinnedToolsPayload = (
       settings.pinnedTools ??
-      DEFAULT_TOOL_IDS.map((id) => ({
+      getDefaultToolIds().map((id) => ({
         toolId: id,
         requiresConfirmation: false,
       }))

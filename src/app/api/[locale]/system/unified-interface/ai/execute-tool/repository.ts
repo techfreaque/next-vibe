@@ -53,7 +53,14 @@ export class RouteExecuteRepository {
         locale,
         logger,
         platform: Platform.MCP,
-        rootFolderId: DefaultFolderId.CRON,
+        streamContext: {
+          rootFolderId: DefaultFolderId.CRON,
+          threadId: undefined,
+          aiMessageId: undefined,
+          characterId: undefined,
+          modelId: undefined,
+          headless: undefined,
+        },
       });
 
       if (!result.success) {

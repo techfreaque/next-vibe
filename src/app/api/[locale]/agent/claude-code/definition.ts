@@ -81,6 +81,14 @@ const { POST } = createEndpoint({
         columns: 12,
         schema: z.string().optional(),
       }),
+      taskTitle: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "claudeCode.run.post.fields.taskTitle.label",
+        description: "claudeCode.run.post.fields.taskTitle.description",
+        columns: 12,
+        schema: z.string().optional(),
+      }),
       interactiveMode: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,

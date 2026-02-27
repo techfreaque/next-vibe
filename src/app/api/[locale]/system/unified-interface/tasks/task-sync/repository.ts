@@ -15,6 +15,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { memories } from "@/app/api/[locale]/agent/chat/memories/db";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
@@ -340,10 +341,20 @@ export async function pullFromRemote(
     const { endpoints: syncEndpoints } = await import("./definition");
     const syncUrl = buildRemoteEndpointUrl(remoteUrl, syncEndpoints.POST);
 
+    // Collect shared memories to send alongside the sync request
+    const localMemories = await getSharedMemories({ logger });
+    const memoriesPayload =
+      localMemories.success && localMemories.data.memories.length > 0
+        ? JSON.stringify(localMemories.data.memories)
+        : undefined;
+
     const response = await fetch(syncUrl, {
       method: "POST",
       headers: await buildRemoteSyncHeaders(remoteUrl, logger),
-      body: JSON.stringify({ apiKey }),
+      body: JSON.stringify({
+        apiKey,
+        ...(memoriesPayload && { memoriesJson: memoriesPayload }),
+      }),
       signal: AbortSignal.timeout(30000),
     });
 
@@ -364,6 +375,7 @@ export async function pullFromRemote(
       data?: {
         tasksJson?: string;
         synced?: number;
+        sharedMemoriesJson?: string;
       };
     };
 
@@ -394,6 +406,40 @@ export async function pullFromRemote(
           logger,
         });
         pulled = upsertResult.success ? upsertResult.data.synced : 0;
+      }
+    }
+
+    // Pull shared memories from remote
+    if (result.data.sharedMemoriesJson) {
+      try {
+        const remoteMemories = JSON.parse(
+          result.data.sharedMemoriesJson,
+        ) as SyncedMemory[];
+        if (remoteMemories.length > 0) {
+          // Find admin user to attach memories to
+          const { users, userRoles } =
+            await import("@/app/api/[locale]/user/db");
+          const { UserPermissionRole } =
+            await import("@/app/api/[locale]/user/user-roles/enum");
+          const [adminUser] = await db
+            .select({ id: users.id })
+            .from(users)
+            .innerJoin(userRoles, eq(userRoles.userId, users.id))
+            .where(eq(userRoles.role, UserPermissionRole.ADMIN))
+            .limit(1);
+
+          if (adminUser) {
+            await upsertSharedMemories({
+              remoteMemories,
+              localUserId: adminUser.id,
+              logger,
+            });
+          }
+        }
+      } catch (error) {
+        logger.error("Failed to process remote shared memories", {
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
     }
 
@@ -466,4 +512,212 @@ export async function pushStatusToRemote(params: {
     logger.error("Push status to remote error", parseError(error));
     return success({ pushed: false });
   }
+}
+
+// ─── Memory Sync ─────────────────────────────────────────────────────────────
+
+/**
+ * Serialized shared memory for cross-instance sync.
+ * Uses syncId (UUID in metadata jsonb) for stable cross-instance identity.
+ */
+export interface SyncedMemory {
+  /** Stable UUID identity stored in metadata.syncId */
+  syncId: string;
+  content: string;
+  tags: string[];
+  priority: number;
+  updatedAt: string;
+  /** false = tombstone (memory was unshared/deleted, propagate removal) */
+  isShared: boolean;
+}
+
+/**
+ * Get shared memories for sync.
+ * Includes active shared memories AND tombstones (recently unshared memories
+ * that still have a syncId — so the remote knows to remove them).
+ */
+export async function getSharedMemories(params: {
+  logger: EndpointLogger;
+}): Promise<ResponseType<{ memories: SyncedMemory[] }>> {
+  const { logger } = params;
+  try {
+    // Fetch: isShared=true (active) OR has syncId with isShared=false (tombstone)
+    const rows = await db
+      .select({
+        id: memories.id,
+        content: memories.content,
+        tags: memories.tags,
+        priority: memories.priority,
+        updatedAt: memories.updatedAt,
+        isShared: memories.isShared,
+        metadata: memories.metadata,
+      })
+      .from(memories)
+      .where(
+        sql`${memories.isShared} = true OR (${memories.metadata}->>'syncId' IS NOT NULL AND ${memories.isShared} = false)`,
+      )
+      .limit(200);
+
+    const result: SyncedMemory[] = [];
+
+    for (const r of rows) {
+      const meta = r.metadata as Record<string, unknown> | null;
+      let syncId = (meta?.syncId as string) ?? null;
+
+      // Backfill: assign syncId to shared memories that don't have one yet
+      if (!syncId && r.isShared) {
+        syncId = crypto.randomUUID();
+        await db
+          .update(memories)
+          .set({
+            metadata: sql`COALESCE(${memories.metadata}, '{}'::jsonb) || ${JSON.stringify({ syncId })}::jsonb`,
+          })
+          .where(eq(memories.id, r.id));
+      }
+
+      if (syncId) {
+        result.push({
+          syncId,
+          content: r.content,
+          tags: r.tags as string[],
+          priority: r.priority,
+          updatedAt: r.updatedAt.toISOString(),
+          isShared: r.isShared,
+        });
+      }
+    }
+
+    return success({ memories: result });
+  } catch (error) {
+    logger.error("Failed to get shared memories", parseError(error));
+    return success({ memories: [] });
+  }
+}
+
+/**
+ * Upsert shared memories from a remote instance.
+ * Uses syncId-based matching with last-writer-wins conflict resolution.
+ * Supports tombstones (isShared=false) for delete/unshare propagation.
+ */
+export async function upsertSharedMemories(params: {
+  remoteMemories: SyncedMemory[];
+  localUserId: string;
+  logger: EndpointLogger;
+}): Promise<ResponseType<{ synced: number }>> {
+  const { remoteMemories, localUserId, logger } = params;
+  let synced = 0;
+
+  for (const remoteMem of remoteMemories) {
+    try {
+      // 1. Match by syncId in metadata jsonb
+      const [existingBySyncId] = await db
+        .select({
+          id: memories.id,
+          updatedAt: memories.updatedAt,
+          isShared: memories.isShared,
+        })
+        .from(memories)
+        .where(
+          sql`${memories.userId} = ${localUserId} AND ${memories.metadata}->>'syncId' = ${remoteMem.syncId}`,
+        )
+        .limit(1);
+
+      if (existingBySyncId) {
+        // Tombstone: remote unshared this memory → archive locally
+        if (!remoteMem.isShared) {
+          await db
+            .update(memories)
+            .set({
+              isShared: false,
+              isArchived: true,
+              updatedAt: new Date(),
+            })
+            .where(eq(memories.id, existingBySyncId.id));
+          synced++;
+          continue;
+        }
+
+        // Last-writer-wins: only update if remote is newer
+        const remoteUpdatedAt = new Date(remoteMem.updatedAt);
+        if (remoteUpdatedAt > existingBySyncId.updatedAt) {
+          await db
+            .update(memories)
+            .set({
+              content: remoteMem.content,
+              tags: remoteMem.tags,
+              priority: remoteMem.priority,
+              isShared: true,
+              updatedAt: remoteUpdatedAt,
+            })
+            .where(eq(memories.id, existingBySyncId.id));
+          synced++;
+        }
+        continue;
+      }
+
+      // Tombstone for unknown memory — nothing to do
+      if (!remoteMem.isShared) {
+        continue;
+      }
+
+      // 2. Legacy fallback: match by exact content (for pre-syncId memories)
+      const [existingByContent] = await db
+        .select({
+          id: memories.id,
+          metadata: memories.metadata,
+        })
+        .from(memories)
+        .where(
+          sql`${memories.userId} = ${localUserId} AND ${memories.content} = ${remoteMem.content}`,
+        )
+        .limit(1);
+
+      if (existingByContent) {
+        // Backfill syncId on the existing memory so future syncs use syncId matching
+        await db
+          .update(memories)
+          .set({
+            metadata: sql`COALESCE(${memories.metadata}, '{}'::jsonb) || ${JSON.stringify({ syncId: remoteMem.syncId })}::jsonb`,
+            isShared: true,
+            updatedAt: new Date(),
+          })
+          .where(eq(memories.id, existingByContent.id));
+        synced++;
+        continue;
+      }
+
+      // 3. New memory — insert with syncId
+      const [maxSeq] = await db
+        .select({
+          max: sql<number>`COALESCE(MAX(${memories.memoryNumber}), -1)`,
+        })
+        .from(memories)
+        .where(eq(memories.userId, localUserId));
+
+      const nextSeq = (maxSeq?.max ?? -1) + 1;
+
+      await db.insert(memories).values({
+        userId: localUserId,
+        content: remoteMem.content,
+        tags: remoteMem.tags,
+        priority: remoteMem.priority,
+        memoryNumber: nextSeq,
+        isShared: true,
+        isPublic: false,
+        isArchived: false,
+        metadata: { source: "remote-sync", syncId: remoteMem.syncId },
+      });
+      synced++;
+    } catch (error) {
+      logger.error("Failed to upsert shared memory", {
+        syncId: remoteMem.syncId,
+        ...parseError(error),
+      });
+    }
+  }
+
+  if (synced > 0) {
+    logger.info(`Memory sync: imported/updated ${synced} shared memories`);
+  }
+  return success({ synced });
 }

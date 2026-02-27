@@ -20,7 +20,14 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { cronTasks } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
+import {
+  CronTaskPriority,
+  TaskCategory,
+} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import { env } from "@/config/env";
 
 import type { RunRequestOutput, RunResponseOutput } from "./definition";
 import type { scopedTranslation } from "./i18n";
@@ -171,6 +178,37 @@ export async function runClaudeCode(
   const isInteractive = data.interactiveMode ?? false;
   const cwd = process.cwd();
 
+  // ── Auto-create a cron task for tracking when none was provided ──
+  let effectiveTaskId = cronTaskId;
+  if (!effectiveTaskId && isInteractive) {
+    const taskId = `cc-${Date.now()}`;
+    const title =
+      data.taskTitle || data.prompt.slice(0, 80).replace(/\n/g, " ");
+    try {
+      await db.insert(cronTasks).values({
+        id: taskId,
+        routeId: "claude-code",
+        displayName: title,
+        description: data.prompt.slice(0, 500),
+        category: TaskCategory.DEVELOPMENT,
+        schedule: "manual",
+        enabled: false,
+        priority: CronTaskPriority.LOW,
+        runOnce: true,
+        targetInstance: env.INSTANCE_ID ?? null,
+        tags: ["claude-code", "interactive"],
+      });
+      effectiveTaskId = taskId;
+      logger.info("Auto-created tracking task for interactive session", {
+        taskId,
+        title,
+      });
+    } catch (err) {
+      // Non-fatal — continue without tracking
+      logger.warn("Failed to auto-create tracking task", parseError(err));
+    }
+  }
+
   // Build claude CLI args
   const args: string[] = isInteractive
     ? [data.prompt]
@@ -186,8 +224,8 @@ export async function runClaudeCode(
   }
   // For interactive mode, append task context to the prompt itself
   // (--system-prompt gets mangled by shell escaping through terminal emulators)
-  if (cronTaskId && isInteractive) {
-    args[0] = `${args[0]}\n\n[TASK CONTEXT] cronTaskId=${cronTaskId} — When I confirm the work is complete, call MCP tool "complete-task" with taskId="${cronTaskId}", status="completed"|"failed", and a summary. `;
+  if (effectiveTaskId && isInteractive) {
+    args[0] = `${args[0]}\n\n[TASK CONTEXT] cronTaskId=${effectiveTaskId} — When the work is complete, call MCP tool "complete-task" with taskId="${effectiveTaskId}", status="status.completed"|"status.failed", and a brief summary of what was done.`;
   }
   if (data.allowedTools) {
     args.push("--allowedTools", data.allowedTools);
@@ -198,7 +236,7 @@ export async function runClaudeCode(
     prompt: data.prompt.slice(0, 200),
     model: data.model,
     timeoutMs,
-    tmp: data,
+    taskId: effectiveTaskId,
   });
 
   // ── Interactive mode: open in a separate terminal window ──
@@ -220,7 +258,7 @@ export async function runClaudeCode(
       logger.info("Claude Code interactive session launched in terminal", {
         terminal: terminal.bin,
         durationMs,
-        taskLifecycleManagedExternally: !!cronTaskId,
+        taskLifecycleManagedExternally: !!effectiveTaskId,
       });
 
       return {
@@ -232,7 +270,9 @@ export async function runClaudeCode(
         },
         // When launched with a cron task ID, the session manages its own lifecycle
         // via the complete-task MCP tool — tell the runner not to auto-complete.
-        ...(cronTaskId && { taskLifecycleManagedExternally: true as const }),
+        ...(effectiveTaskId && {
+          taskLifecycleManagedExternally: true as const,
+        }),
       };
     }
 

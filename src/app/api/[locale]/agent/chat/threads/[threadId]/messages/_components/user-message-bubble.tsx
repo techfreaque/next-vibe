@@ -60,7 +60,7 @@ export function UserMessageBubble({
               isAI={message.isAI}
               model={message.model}
               timestamp={message.createdAt}
-              edited={message.edited}
+              edited={false}
               character={character}
               locale={locale}
               compact

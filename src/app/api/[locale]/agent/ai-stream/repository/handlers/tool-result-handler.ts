@@ -160,16 +160,9 @@ export class ToolResultHandler {
 
     let toolError: ErrorResponseType | undefined;
     if (isError) {
-      const errorMessage =
-        typeof output === "string"
-          ? output
-          : output && typeof output === "object" && "message" in output
-            ? String(output.message)
-            : JSON.stringify(output);
       toolError = fail({
         message: t("errors.toolExecutionError"),
         errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: errorMessage },
       });
     }
 

@@ -9,7 +9,7 @@ import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interfac
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { DefaultFolderId } from "../../../chat/config";
+import type { ToolExecutionContext } from "../../../chat/config";
 import type { ToolCall } from "../../../chat/db";
 
 /**
@@ -42,7 +42,7 @@ export class ToolsSetupHandler {
       sequenceId: string;
       toolCall: ToolCall;
     }>;
-    rootFolderId: DefaultFolderId;
+    streamContext: ToolExecutionContext;
   }): Promise<{
     tools: Record<string, CoreTool> | undefined;
     toolsConfig: Map<string, { requiresConfirmation: boolean }>;
@@ -151,7 +151,7 @@ export class ToolsSetupHandler {
       logger: params.logger,
       systemPrompt: params.systemPrompt,
       toolConfirmationConfig,
-      rootFolderId: params.rootFolderId,
+      streamContext: params.streamContext,
     });
 
     // Build toolsConfig map for confirmation checks (used by tool-call-handler AND tool-error-handler)
