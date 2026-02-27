@@ -38,6 +38,12 @@ import { dockerOperationsRepository } from "../../db/utils/docker-operations/rep
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
 import { dbUtilsRepository } from "../../db/utils/repository";
 import { DEV_WATCHER_TASK_NAME } from "../../unified-interface/tasks/dev-watcher/task-runner";
+import {
+  cleanupPidFile,
+  killPreviousInstance,
+  VIBE_DEV_PID_FILE,
+  writePidFile,
+} from "../pid";
 import type endpoints from "./definition";
 
 /** Extract port number from a URL string, returns undefined if not parseable */
@@ -122,6 +128,8 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         `\n❌ Uncaught exception: ${error.message}\n${error.stack || ""}\n`,
       );
 
+      cleanupPidFile(VIBE_DEV_PID_FILE);
+
       // Kill child processes
       for (const childProcess of this.runningProcesses.values()) {
         try {
@@ -143,6 +151,8 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       process.stderr.write(
         `\n❌ Unhandled promise rejection: ${errorMsg}\n${stack || ""}\n`,
       );
+
+      cleanupPidFile(VIBE_DEV_PID_FILE);
 
       // Kill child processes
       for (const childProcess of this.runningProcesses.values()) {
@@ -319,6 +329,10 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     const port = data.port ?? portFromUrl(env.NEXT_PUBLIC_APP_URL) ?? 3000;
 
     this.logStartupInfo(port, logger, data);
+
+    // Kill any previous dev instance, then write our PID
+    killPreviousInstance(VIBE_DEV_PID_FILE, logger);
+    writePidFile(VIBE_DEV_PID_FILE, logger);
 
     // Setup database if not skipped
     const dbSetupSuccess = await this.setupDatabase(data, locale, logger);
@@ -634,6 +648,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         // Remove our SIGINT handler now that child has exited
         process.removeListener("SIGINT", sigintHandler);
 
+        // Clean up PID file
+        cleanupPidFile(VIBE_DEV_PID_FILE);
+
         // Wait briefly for stdio streams to finish (child might have buffered output)
         // This prevents terminal pollution from warnings like browserslist age warnings
         setTimeout(() => {
@@ -651,6 +668,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
 
       nextProcess.on("error", (error) => {
         process.removeListener("SIGINT", sigintHandler);
+        cleanupPidFile(VIBE_DEV_PID_FILE);
         // eslint-disable-next-line i18next/no-literal-string
         process.stderr.write(`❌ Next.js error: ${error.message}\n`);
         process.exit(1);

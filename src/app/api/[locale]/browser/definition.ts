@@ -83,7 +83,17 @@ const { POST } = createEndpoint({
       result: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "response.result",
-        schema: z.unknown().optional(),
+        schema: z
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
+          .optional()
+          .describe("MCP content blocks returned by the tool"),
       }),
       status: scopedResponseArrayOptionalFieldNew(scopedTranslation, {
         type: WidgetType.CONTAINER,
@@ -135,35 +145,37 @@ const { POST } = createEndpoint({
     responses: {
       navigate: {
         success: true,
-        result: { url: "https://example.com", title: "Example Domain" },
+        result: [
+          {
+            type: "text",
+            text: "# navigate_page response\nNavigated to https://example.com",
+          },
+        ],
         status: [BrowserToolStatus.COMPLETED],
         executionId: "exec_123",
       },
       screenshot: {
         success: true,
-        result: {
-          screenshot: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
-        },
+        result: [
+          {
+            type: "text",
+            text: "# take_screenshot response\nTook a screenshot of the current page's viewport.",
+          },
+          { type: "image", data: "iVBORw0KGgoAAAANSUhEUgAA..." },
+        ],
         status: [BrowserToolStatus.COMPLETED],
         executionId: "exec_456",
       },
       click: {
         success: true,
-        result: { clicked: true },
+        result: [
+          {
+            type: "text",
+            text: "# click response\nClicked element button[type='submit']",
+          },
+        ],
         status: [BrowserToolStatus.COMPLETED],
         executionId: "exec_789",
-      },
-      performance: {
-        success: true,
-        result: { traceId: "trace_123", started: true },
-        status: [BrowserToolStatus.RUNNING],
-        executionId: "exec_101",
-      },
-      script: {
-        success: true,
-        result: { value: "Example Domain" },
-        status: [BrowserToolStatus.COMPLETED],
-        executionId: "exec_202",
       },
     },
   },

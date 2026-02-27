@@ -7,6 +7,7 @@ import {
   BUILD_ALIAS,
   BUILD_SERVER_ALIAS,
 } from "../../../server/build/definition";
+import { REBUILD_ALIAS } from "../../../server/rebuild/definition";
 import {
   START_ALIAS,
   START_SERVER_ALIAS,
@@ -132,12 +133,15 @@ export function loadEnvironment(): EnvironmentResult {
     }
   }
 
-  // Load the .env file if found
+  // Load the .env file if found.
+  // Use override: true so .env values always win over inherited shell env vars.
+  // This prevents stale DATABASE_URL (e.g. from a previous `vibe start` session
+  // that swapped to preview port 5433) from leaking into CLI/MCP commands.
   if (envPath) {
-    config({ path: envPath, quiet: true });
+    config({ path: envPath, quiet: true, override: true });
   } else {
     // Fallback to default dotenv behavior
-    config({ quiet: true });
+    config({ quiet: true, override: true });
   }
 
   // Activate local/preview mode for `vibe build` / `vibe start` (or --preview).
@@ -150,11 +154,16 @@ export function loadEnvironment(): EnvironmentResult {
     args.includes(START_ALIAS) ||
     args.includes(START_SERVER_ALIAS) ||
     args.includes(BUILD_ALIAS) ||
-    args.includes(BUILD_SERVER_ALIAS);
+    args.includes(BUILD_SERVER_ALIAS) ||
+    args.includes(REBUILD_ALIAS);
 
-  const isProduction = process.env["NODE_ENV"] === "production";
+  // Expose preview mode flag so tasks can distinguish vibe start from vibe dev.
+  // Explicitly set to "false" when not in preview mode to clear any stale shell env.
+  process.env["IS_PREVIEW_MODE"] = isPreviewMode ? "true" : "false";
 
-  if (isPreviewMode && !isProduction && !args.includes("--skip-db-setup")) {
+  // Port swap must happen even when NODE_ENV=production (vibe build sets it for
+  // Next.js optimizations), since the build still targets the preview environment.
+  if (isPreviewMode && !args.includes("--skip-db-setup")) {
     const previewDbPort = process.env["PREVIEW_DB_PORT"] || "5433";
     const previewPort = process.env["PREVIEW_PORT"] || "3001";
 
@@ -172,13 +181,19 @@ export function loadEnvironment(): EnvironmentResult {
 
     process.env["NEXT_PUBLIC_LOCAL_MODE"] = "true";
 
-    // Derive preview NEXT_PUBLIC_APP_URL by swapping the port
+    // Derive preview NEXT_PUBLIC_APP_URL by swapping the port (localhost only)
+    // Skip for production URLs (e.g. https://unbottled.ai) to avoid breaking real deployments
     const appUrl = process.env["NEXT_PUBLIC_APP_URL"];
     if (appUrl) {
       try {
         const parsed = new URL(appUrl);
-        parsed.port = previewPort;
-        process.env["NEXT_PUBLIC_APP_URL"] = parsed.toString();
+        if (
+          parsed.hostname === "localhost" ||
+          parsed.hostname === "127.0.0.1"
+        ) {
+          parsed.port = previewPort;
+          process.env["NEXT_PUBLIC_APP_URL"] = parsed.toString();
+        }
       } catch {
         // If URL parsing fails, leave NEXT_PUBLIC_APP_URL unchanged
       }

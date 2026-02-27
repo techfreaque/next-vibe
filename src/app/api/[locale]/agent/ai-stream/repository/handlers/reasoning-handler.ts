@@ -46,7 +46,7 @@ export class ReasoningHandler {
 
     if (!currentAssistantMessageId) {
       const messageId = getNextAssistantMessageId();
-      logger.info("[AI Stream] Creating ASSISTANT message (reasoning)", {
+      logger.debug("[AI Stream] Creating ASSISTANT message (reasoning)", {
         messageId,
         parentId: currentParentId,
         depth: currentDepth,

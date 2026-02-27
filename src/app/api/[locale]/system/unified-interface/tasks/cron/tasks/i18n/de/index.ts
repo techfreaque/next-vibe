@@ -150,6 +150,12 @@ export const translations: typeof enTranslations = {
       description: "Neue Cron-Aufgabe konfigurieren",
     },
     fields: {
+      id: {
+        label: "Task-ID",
+        description:
+          "Eindeutiger, stabiler Bezeichner für diese Aufgabe (z.B. 'db-health')",
+        placeholder: "Task-ID eingeben...",
+      },
       routeId: {
         label: "Route-ID",
         description:

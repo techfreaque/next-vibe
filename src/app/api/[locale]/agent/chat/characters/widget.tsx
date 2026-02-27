@@ -958,6 +958,7 @@ function CharacterFavoriteActions({
         const bestModel = CharactersRepositoryClient.getBestModelForFavorite(
           favorite.modelSelection,
           undefined,
+          user,
         );
         modelId = bestModel?.id || null;
       }
@@ -1021,6 +1022,7 @@ function CharacterFavoriteActions({
         const bestModel = CharactersRepositoryClient.getBestModelForFavorite(
           favorite.modelSelection,
           undefined,
+          user,
         );
         modelId = bestModel?.id || null;
       }

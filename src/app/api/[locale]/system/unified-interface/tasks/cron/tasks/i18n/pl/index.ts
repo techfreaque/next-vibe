@@ -146,6 +146,12 @@ export const translations: typeof enTranslations = {
       description: "Skonfiguruj nowe zadanie cron",
     },
     fields: {
+      id: {
+        label: "ID zadania",
+        description:
+          "Unikalny, stały identyfikator tego zadania (np. 'db-health')",
+        placeholder: "Wprowadź ID zadania...",
+      },
       routeId: {
         label: "ID trasy",
         description:

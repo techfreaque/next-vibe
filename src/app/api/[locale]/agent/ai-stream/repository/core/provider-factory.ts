@@ -8,8 +8,10 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
+import { createClaudeCode } from "../../providers/claude-code";
 import { createFreedomGPT } from "../../providers/freedomgpt";
 import { createGabAI } from "../../providers/gab-ai";
+import { logProviderRequest } from "../../providers/shared/debug-file-logger";
 import { createUncensoredAI } from "../../providers/uncensored-ai";
 import { createVeniceAI } from "../../providers/venice-ai";
 
@@ -69,8 +71,12 @@ export class ProviderFactory {
     | typeof createFreedomGPT
     | typeof createGabAI
     | typeof createVeniceAI
+    | typeof createClaudeCode
   > {
     switch (modelOption.apiProvider) {
+      case ApiProvider.CLAUDE_CODE:
+        return createClaudeCode(logger);
+
       case ApiProvider.UNCENSORED_AI:
         return createUncensoredAI(logger);
 
@@ -168,6 +174,11 @@ export class ProviderFactory {
             const sorted = sortObjectKeys(parsed);
             normalizedBody = JSON.stringify(sorted);
           }
+
+          logProviderRequest(
+            "openrouter",
+            (normalizedBody as string) ?? "null",
+          );
 
           return fetch(url, { ...options, body: normalizedBody });
         };

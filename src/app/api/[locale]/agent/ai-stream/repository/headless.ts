@@ -173,7 +173,7 @@ async function resolveFavorite(
     };
   }
   if (sel && isFiltersSelection(sel)) {
-    const best = CharactersRepositoryClient.getBestModelForCharacter(sel);
+    const best = CharactersRepositoryClient.getBestModelForCharacter(sel, user);
     if (best) {
       return { model: best.id as ModelId, character };
     }
@@ -195,8 +195,10 @@ async function resolveFavorite(
         charSel &&
         (isManualSelection(charSel) || isFiltersSelection(charSel))
       ) {
-        const best =
-          CharactersRepositoryClient.getBestModelForCharacter(charSel);
+        const best = CharactersRepositoryClient.getBestModelForCharacter(
+          charSel,
+          user,
+        );
         if (best) {
           return { model: best.id as ModelId, character };
         }
@@ -277,8 +279,10 @@ export async function runHeadlessAiStream(
           if (isManualSelection(charSel) && "manualModelId" in charSel) {
             model = charSel.manualModelId as ModelId;
           } else if (isFiltersSelection(charSel)) {
-            const best =
-              CharactersRepositoryClient.getBestModelForCharacter(charSel);
+            const best = CharactersRepositoryClient.getBestModelForCharacter(
+              charSel,
+              user,
+            );
             if (best) {
               model = best.id as ModelId;
             }

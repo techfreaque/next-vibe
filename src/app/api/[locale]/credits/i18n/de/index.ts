@@ -345,4 +345,76 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  adminAdd: {
+    post: {
+      title: "Guthaben hinzufügen",
+      description:
+        "Guthabenpakete zu einem Benutzerkonto hinzufügen (nur Admin)",
+      tag: "admin",
+      container: {
+        title: "Guthaben zum Benutzer hinzufügen",
+        description: "Guthabenpakete an einen bestimmten Benutzer vergeben",
+      },
+      targetUserId: {
+        label: "Zielbenutzer-ID",
+        description: "Der Benutzer, dem Guthaben hinzugefügt werden soll",
+      },
+      amount: {
+        label: "Betrag",
+        description: "Anzahl der hinzuzufügenden Guthabenpunkte",
+        placeholder: "Guthabenbetrag eingeben...",
+      },
+      packType: {
+        label: "Pakettyp",
+        description: "Art des Guthabenpakets",
+      },
+      response: {
+        message: {
+          content: "Ergebnis",
+        },
+      },
+      success: {
+        title: "Guthaben hinzugefügt",
+        description: "Guthaben wurde dem Benutzerkonto hinzugefügt",
+      },
+      errors: {
+        validation: {
+          title: "Validierungsfehler",
+          description: "Ungültige Anfrageparameter",
+        },
+        network: {
+          title: "Netzwerkfehler",
+          description: "Netzwerkverbindung fehlgeschlagen",
+        },
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Authentifizierung erforderlich",
+        },
+        forbidden: {
+          title: "Verboten",
+          description: "Admin-Zugang erforderlich",
+        },
+        notFound: {
+          title: "Nicht gefunden",
+          description: "Benutzer nicht gefunden",
+        },
+        server: {
+          title: "Serverfehler",
+          description: "Fehler beim Hinzufügen von Guthaben",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten",
+        },
+        unsavedChanges: {
+          title: "Nicht gespeicherte Änderungen",
+          description: "Sie haben nicht gespeicherte Änderungen",
+        },
+        conflict: {
+          title: "Konflikt",
+          description: "Ressourcenkonflikt aufgetreten",
+        },
+      },
+    },
+  },
 };

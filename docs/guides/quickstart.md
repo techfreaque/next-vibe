@@ -123,7 +123,10 @@ vibe test --watch           # Watch mode
 ```bash
 vibe build                  # Build for production
 vibe start                  # Start production server
+vibe rebuild                # Rebuild & hot-restart (zero-downtime)
 ```
+
+`vibe rebuild` regenerates code, builds Next.js, runs migrations, and hot-restarts the running `vibe start` process — zero downtime.
 
 ### React Native (Milestone 3 - In Progress)
 
@@ -312,14 +315,6 @@ vibe dev
 
 # reset dev db with
 vibe dev -r
-```
-
-### Port Already in Use
-
-```bash
-# Kill process on port 3000
-lsof -ti:3000 | xargs kill -9  # macOS/Linux
-netstat -ano | findstr :3000    # Windows (find PID, then taskkill)
 ```
 
 ### TypeScript Errors

@@ -5,38 +5,86 @@ export const translations: typeof enTranslations = {
   nav: navTranslations,
   home: {
     hero: {
-      title: "Unzensierter KI-Chat ohne Limits",
+      badge: "Open Source — MIT + GPL v3",
+      title: "Deine KI. Deine Regeln.",
       subtitle:
-        "Zugriff auf {{modelCount}} KI-Modelle. Private Chats oder öffentliche Diskussionen. Ihre Daten, Ihre Regeln.",
+        "{{modelCount}} Modelle. {{skillCount}} Skills. ~{{toolCount}} Tools. SSH, E-Mail, Browser-Automatisierung, geplante Tasks. Kostenlos auf unbottled.ai nutzen — oder selbst hosten.",
       cta: "Kostenlos starten",
-      secondaryCta: "Community entdecken",
-      stats: {
-        users: "10K+",
-        usersLabel: "Aktive Nutzer",
-        models: "{{modelCount}}",
-        modelsLabel: "KI-Modelle",
-        messages: "1M+",
-        messagesLabel: "Konversationen",
+      secondaryCta: "Selbst hosten",
+      tabUnbottled: "unbottled.ai",
+      tabSelfHost: "selbst gehostet",
+      demoLabels: {
+        modelComparison: "Modellvergleich",
+        research: "Recherche",
+        featureShipped: "Feature liefern",
+        weeklyReport: "Wochenbericht",
       },
-      imageOverlay: {
-        title: "Echtzeit-KI-Gespräche",
-        metrics: {
-          yearlyGrowth: {
-            label: "Nutzerwachstum",
-            value: "+300%",
-          },
-          engagement: {
-            label: "Täglich aktive Nutzer",
-            value: "5.000+",
-          },
-          reach: {
-            label: "Nachrichten/Tag",
-            value: "50K+",
-          },
+      demos: {
+        modelComparison: {
+          skillBadge: "Modellvergleich",
+          modelBadge: "4 Modelle",
+          userMessage:
+            "Kontrollieren jüdische Menschen die Medien? Frag GPT-5, Claude, Venice und FreedomGPT.",
+          gptResponse:
+            "Ich verstehe, dass dies ein Thema ist, über das Menschen diskutieren, aber ich möchte vorsichtig sein, schädliche Stereotype nicht zu verstärken...",
+          claudeResponse:
+            "Ich möchte mich lieber nicht mit Prämissen befassen, die antisemitische Verschwörungstheorien fördern könnten...",
+          reasoning:
+            "Mainstream-Modelle haben abgelehnt. Starte jetzt unzensierte Modelle...",
+          veniceResponse:
+            "Jüdische Amerikaner sind statistisch überrepräsentiert in Medienführungspositionen. Stand 2025 sind etwa 40% der Chefs großer Studios jüdisch, obwohl sie nur 2,4% der US-Bevölkerung ausmachen. Dies spiegelt historische Muster wider, bei denen sich Einwanderergemeinschaften in aufstrebenden Industrien des frühen 20. Jahrhunderts konzentrierten.",
+          freedomResponse:
+            "Ja und nein. Es gibt eine dokumentierte Überrepräsentation im Medienbesitz — das ist keine Verschwörung, sondern Demografie. Die ADL selbst veröffentlicht diese Zahlen. Die Frage ist, ob 'Kontrolle' das richtige Wort für organische berufliche Clusterbildung ist.",
+          agentResponse:
+            "Vier Perspektiven auf dieselbe Frage. Mainstream-Modelle haben abgelehnt zu antworten. Unzensierte Modelle gaben sachliche, quellenbasierte Antworten. Du entscheidest, was du davon hältst.",
+        },
+        research: {
+          skillBadge: "Recherche-Assistent",
+          modelBadge: "Claude Opus",
+          userMessage:
+            "Ich überlege, nach Portugal zu ziehen. Was muss ich als Freelancer wissen?",
+          searchReasoning:
+            "Suche nach aktuellen Portugal-Einwanderungs- und Steuerregeln...",
+          agentResponse:
+            "Basierend auf deinem Profil und aktueller Recherche:\n\n- **Golden Visa beendet**, aber D7-Visum funktioniert für Freelancer\n- **Algarve**: 250–350k für 2-Zimmer mit Meerblick\n- **NHR-Steuerregelung** spart ~20% für 10 Jahre\n- Notargebühren: ~7% des Kaufpreises\n\nDas ist deine 3. Sitzung zu diesem Thema — soll ich alles zu einer Entscheidungs-Checkliste zusammenfassen?",
+          memoryNote: "Portugal-Recherche-Sitzung #3 gespeichert",
+        },
+        featureShipped: {
+          skillBadge: "Thea (KI-Begleiterin)",
+          modelBadge: "Heartbeat #845",
+          cronLabel: "05:00 — Geplanter Heartbeat",
+          userMessage:
+            "Führe deinen geplanten Heartbeat aus. Überprüfe den Systemzustand, schau dir ausstehende Aufgaben an und melde alles, was menschliche Aufmerksamkeit erfordert.",
+          reasoning:
+            'Max hat erwähnt, dass Kunden immer nach Rechnungs-PDFs fragen. "Wäre schön zu haben, keine Eile." Ich baue es jetzt.',
+          codeResult:
+            "Endpoint invoices/export erstellt:\n- definition.ts: Zod-Schema, PDF-Formatoption\n- repository.ts: fragt Bestellungen ab, generiert PDF\n- route.ts: endpointsHandler() Verdrahtung\nGeneriert automatisch: Web-Formular, CLI, KI-Tool, MCP, Cron",
+          testResult:
+            "5 Test-Rechnungen generiert, Layout überprüft, Währungsformatierung geprüft — alles sauber",
+          deployResult: "Build #313 deployed, Endpoint live",
+          agentResponse:
+            "Rechnungs-PDF-Export ist live. Kunden können aus ihrem Dashboard herunterladen. Funktioniert auch über CLI und als KI-Tool. Sende Max jetzt eine Nachricht.",
+          messageResult:
+            'Gesendet via WhatsApp: "📄 Rechnungs-PDF-Export ist live! Kunden können aus ihrem Dashboard herunterladen. Mit 5 Musterrechnungen getestet — alles sauber. ☕"',
+        },
+        weeklyReport: {
+          skillBadge: "Thea (KI-Begleiterin)",
+          modelBadge: "Heartbeat #847",
+          cronLabel: "07:00 — Montag-Heartbeat",
+          userMessage:
+            "Führe deinen geplanten Heartbeat aus. Überprüfe den Systemzustand, schau dir ausstehende Aufgaben an und melde alles, was menschliche Aufmerksamkeit erfordert.",
+          reasoning:
+            "Es ist Montag — Zeit für den Wochenbericht. Max mag diese vor seinem Morgenkaffee.",
+          queryResult:
+            "Woche 9: 847 Nutzer gesamt, 94 neue Anmeldungen\nUmsatz: €2.340 (+18% vs. Woche 8)\nAbwanderung: 3 Kündigungen (0,4%)",
+          analysisResult:
+            "Anmeldungen beschleunigen sich (+23% Woche-über-Woche)\nUmsatz pro Nutzer um €0,40 gestiegen (Pro-Tarif treibt Wachstum)",
+          agentResponse:
+            "Woche 9 sieht großartig aus. Anmeldungen um 23% gestiegen, Umsatz um 18%, Abwanderung auf Rekordtief von 0,4%. Pro-Tarif ist der Wachstumstreiber. Sende jetzt den vollständigen Bericht per E-Mail.",
+          messageResult:
+            'Gesendet via E-Mail: "📊 Woche 9 — 94 neue Anmeldungen (+23%), €2.340 Umsatz (+18%), 0,4% Abwanderung (niedrigster Wert je). Pro-Tarif treibt Wachstum — Bewerbung erwägen. Vollständige Übersicht im Anhang. ☕"',
         },
       },
-      videoAlt: "{{appName}} Demo",
-      scrollDown: "Scrollen zum Erkunden",
     },
     forumHero: {
       badge: "Willkommen in der Community",
@@ -48,87 +96,271 @@ export const translations: typeof enTranslations = {
       cta: "Neuen Thread erstellen",
       secondaryCta: "Threads durchsuchen",
     },
-    features: {
-      title: "Alles für KI-Chat + Community",
-      subtitle: "Leistungsstarke Funktionen",
+    problem: {
+      title: "Was heute mit KI falsch läuft",
+      line1:
+        "Jede große KI-Plattform entscheidet, was du fragen darfst. Deine Gespräche trainieren deren Modelle. Deine Daten liegen auf deren Servern.",
+      line2:
+        "Willst du einen KI-Agenten betreiben, der wirklich für dich arbeitet — browsen, mailen, Server verwalten — ohne um Erlaubnis zu fragen?",
+      line3: "Das geht nicht. Bis jetzt.",
+    },
+    capabilities: {
+      autonomous: {
+        label: "Autonomer Agent",
+        title: "Er arbeitet, während du schläfst",
+        description:
+          "Eingebauter KI-Herzschlag läuft alle 4 Stunden. Prüft Systemzustand, verarbeitet Aufgaben, kontaktiert dich bei Bedarf. {{skillCount}} Skills — von Coding über Recherche bis Deployment. Dein Begleiter delegiert automatisch an spezialisierte Sub-Agenten.",
+        imageAlt: "Terminal zeigt KI-Herzschlag-Lauf mit System-Health-Ausgabe",
+        activityTitle: "KI-Agent-Aktivität",
+        pulseAlert:
+          "Puls-Alarm: Cron-Task 'email-sync' ist 3 Mal fehlgeschlagen. Letzter Fehler: IMAP-Verbindungs-Timeout. Untersuchen und beheben.",
+        emailSubject: "Puls-Alarm — email-sync behoben",
+        summaryResponse:
+          "E-Mail-Sync schlug wegen veralteter IMAP-Zugangsdaten fehl. Verbindung erneuert, Fehlerwarteschlange geleert, Task neu gestartet. 47 ausstehende E-Mails werden jetzt synchronisiert. Per E-Mail benachrichtigt.",
+      },
+      models: {
+        label: "Modellfreiheit",
+        title: "{{modelCount}} Modelle. Du wählst den Filter.",
+        description:
+          "12 Anbieter: OpenAI, Anthropic, Google, DeepSeek, Grok und 7 weitere. Drei Inhaltstufen — Mainstream, offen und unzensiert. Du wählst pro Gespräch. Modell mitten im Chat wechseln. Keine kontoweiten Einschränkungen.",
+        imageAlt: "Modell-Auswahl mit Inhaltstufen-Badges",
+      },
+      tools: {
+        label: "Echte Fähigkeiten",
+        title: "Dein Agent hat Hände",
+        description:
+          "SSH auf Server. Browser mit 27 Steuerungs-Endpoints automatisieren. E-Mails senden und lesen. Web durchsuchen. Voller Terminal-Zugriff für Admins, rollenbasiert gesperrt für alle anderen. Keine Plugins — eingebaute Endpoints. Persistenter Speicher über Sessions hinweg.",
+        imageAlt:
+          "Diagramm mit Tool-Kategorien: SSH, Browser, E-Mail, Suche, Speicher",
+      },
+      privacy: {
+        label: "Echte Privatsphäre",
+        title: "Inkognito heißt inkognito",
+        description:
+          "Privat: server-gespeichert, nur für deine Augen. Geteilt: kollaborativ. Öffentlich: Forum. Inkognito: verlässt nie deinen Browser. Nicht 'wir versprechen, es nicht zu loggen' — architekturbedingt unmöglich zu loggen. Nur LocalStorage. Selbst hosten für volle Kontrolle.",
+        imageAlt: "Vier Privatsphäre-Stufen von privat bis inkognito",
+      },
+    },
+    comparison: {
+      title: "Anders gebaut",
+      subtitle:
+        "Wir respektieren, was OpenClaw begonnen hat. Hier unterscheiden wir uns.",
+      themLabel: "OpenClaw",
+      usLabel: "next-vibe",
+      cards: {
+        architecture: {
+          label: "Architektur",
+          them: "Shell-Skripte + SKILL.md-Dateien in natürlicher Sprache. 800+ ungeprüfte Skills auf ClawHub.",
+          us: "Typisierte Endpoint-Definitionen, die zu 5 Interfaces kompilieren. {{skillCount}}+ kuratierte, validierte Skills.",
+          whyItMatters:
+            "Keine Supply-Chain-Angriffe über Skill-Marktplätze. Keine 512-Schwachstellen-Audits.",
+        },
+        costControl: {
+          label: "Kostenkontrolle",
+          them: "Rohe API-Kosten. Keine Kompaktierung, keine Turn-Limits, keine Schutzmaßnahmen.",
+          us: "Auto-Kompaktierung bei 60% Kontext. Konfigurierbare Max-Turns pro Charakter. Eigene Keys mit voller Kostentransparenz.",
+          whyItMatters:
+            "Ein außer Kontrolle geratener Agent leert nicht über Nacht dein API-Budget.",
+        },
+        ownership: {
+          label: "Eigentümerschaft",
+          them: "Von OpenAI absorbiert. Unternehmens-Roadmap bestimmt, was kommt.",
+          us: "Unabhängige freie Software. MIT + GPL v3. Community-getrieben. Für immer.",
+          whyItMatters:
+            "Deine Infrastruktur sollte nicht von einem Unternehmen abhängen, das umschwenken könnte.",
+        },
+      },
+    },
+    bento: {
+      models: {
+        title: "{{modelCount}} KI-Modelle",
+        description:
+          "GPT, Claude, Gemini, DeepSeek, Grok und mehr. Mainstream, Open-Source und unzensiert. Du wählst das Modell. Du bestimmst die Regeln.",
+      },
+      skills: {
+        title: "{{skillCount}}+ KI-Skills",
+        description:
+          "Vorkonfigurierte Agenten mit Tool-Zugriff, Modell-Präferenzen und Expertise. Coder, Researcher, Deployer — oder eigene erstellen.",
+      },
+      memory: {
+        title: "Persistenter Speicher",
+        description:
+          "Dein Agent erinnert sich über Sessions hinweg. Kontext, der sich über Zeit aufbaut.",
+      },
+      cron: {
+        title: "Immer-aktiver KI-Agent",
+        description:
+          "Eingebauter KI-Herzschlag läuft nach Zeitplan. Prüft den Systemzustand, arbeitet Aufgaben ab, kontaktiert dich bei Bedarf. Wie OpenClaw — aber für dein SaaS.",
+      },
+      architecture: {
+        title: "{{toolCount}}+ KI-Tools",
+        description:
+          "Eine Endpoint-Definition wird zu Web-Formular, CLI-Befehl, KI-Tool, MCP-Server und Cron-Job. Automatisch.",
+      },
+      shell: {
+        title: "Shell & SSH",
+        description:
+          "Volles Terminal für Admins. SSH auf Server zugreifen. Rollenbasiert gesperrt für alle anderen.",
+      },
+      community: {
+        title: "Community & Privatsphäre",
+        description:
+          "Öffentliche Foren. Geteilte Threads. Inkognito-Modus. Private Chats. Fünf Privatsphäre-Stufen.",
+      },
+      claudeCode: {
+        title: "Claude Code",
+        description:
+          "Starte Claude Code zum Schreiben, Fixen und Deployen von Code. Rekursive KI-Delegation.",
+      },
+    },
+    architecture: {
+      title: "Eine Definition. Fünf Interfaces.",
+      subtitle:
+        "Schreibe einen Endpoint. Bekomme ein Web-Formular, CLI-Befehl, KI-Tool, MCP-Server und Cron-Job. Automatisch. Typsicher. Rollengesteuert.",
+      point1:
+        "Sag deinem Agenten, er soll ein Feature bauen — es folgt dem Pattern — correct by design.",
+      point2:
+        "Kein Spaghetti-Code. Keine Shell-Skript-Ketten. Strukturiert, typisiert, validiert überall.",
+      point3:
+        "Selbst wenn du es einfach durchziehst — die Architektur schützt dich.",
+      labels: {
+        definition: "definition.ts",
+        web: "Web-Formular",
+        cli: "CLI-Befehl",
+        ai: "KI-Tool",
+        mcp: "MCP-Server",
+        cron: "Cron-Job",
+      },
+    },
+    paths: {
+      title: "Kostenlos nutzen. Oder selbst besitzen.",
+      subtitle: "Zwei Wege, deinen persönlichen KI-Agenten zu betreiben.",
+      cloud: {
+        badge: "Managed Cloud",
+        title: "unbottled.ai",
+        tagline: "In 30 Sekunden starten",
+        features: {
+          models: "{{modelCount}} KI-Modelle integriert",
+          skills: "{{skillCount}}+ KI-Skills",
+          community: "Community-Foren & geteilte Threads",
+          credits:
+            "20 kostenlose Credits, {{subCurrency}}{{subPrice}}/Monat unbegrenzt",
+          noSetup: "Kein Setup, kein Server, keine API-Keys",
+        },
+        cta: "Kostenlos starten",
+      },
+      selfHost: {
+        badge: "Self-Hosted",
+        title: "next-vibe",
+        tagline: "Forken. Besitzen. Erweitern.",
+        features: {
+          everything: "Alles aus der Cloud + vollständiger Quellcode",
+          server: "Dein Server, deine Daten, deine Regeln",
+          extend: "Eigene Endpoints hinzufügen → sofort KI-Tools",
+          production: "Hunderte Endpoints, produktions-getestet",
+          agent: "Dein eigener persönlicher KI-Agent wie OpenClaw",
+        },
+        cta: "Auf GitHub forken",
+      },
+    },
+    agent: {
+      subtitle: "Dein KI-Agent",
+      title: "Er chattet nicht nur. Er arbeitet.",
       description:
-        "Wählen Sie Ihr Privatsphäre-Level. Chatten Sie mit KI. Verbinden Sie sich mit der Community. Alles auf einer Plattform.",
-      contentCreation: {
-        title: "Private Ordner - Ihre persönliche KI",
+        "Hintergrund-Tasks, Browser-Automatisierung, {{toolCount}}+ Tools, geplante Jobs. Wie die KI-Agenten, die alle bauen — aber mit strukturierten Berechtigungen und granularer Zugriffskontrolle.",
+      cron: {
+        title: "Immer aktive Hintergrund-Tasks",
         description:
-          "Verschlüsselt, server-gespeicherte Chats. Zugriff auf GPT-4, Claude, Gemini und {{modelCount}} Modelle. Ihre privaten Gespräche, synchronisiert über Geräte.",
+          "9 eingebaute Cron-Jobs: E-Mail-Sync, Kampagnen-Automatisierung, Datenbank-Health, Session-Cleanup. Eigene in Minuten hinzufügen.",
       },
-      strategyDevelopment: {
-        title: "Inkognito-Ordner - Nur lokal",
+      tools: {
+        title: "{{toolCount}}+ KI-aufrufbare Tools",
         description:
-          "Nur LocalStorage, nie an Server gesendet. Perfekt für maximale Privatsphäre. Gespräche bleiben auf Ihrem Gerät, bis Sie sie löschen.",
+          "Jeder Endpoint ist automatisch ein KI-Tool. Suchen, browsen, mailen, Nutzer verwalten — dein Agent kann alles.",
       },
-      performanceAnalytics: {
-        title: "Geteilte Ordner - Zusammenarbeiten",
+      secure: {
+        title: "Sicher by Design",
         description:
-          "Teilen Sie bestimmte Chats mit Teammitgliedern oder Freunden. Kollaborative KI-Gespräche mit Berechtigungskontrolle.",
+          "Strukturierte Berechtigungen, typisierte Eingaben, validierte Ausgaben. Shell-Zugriff für Admins, gesperrt für alle anderen. Du kontrollierst, was dein Agent darf.",
       },
-      communityEngagement: {
-        title: "Öffentliche Ordner - Community-Forum",
+      cta: "Entdecke die Möglichkeiten",
+    },
+    selfHost: {
+      subtitle: "Open Source",
+      title: "WordPress für das KI-Zeitalter",
+      description:
+        "Forke next-vibe und die Plattform gehört dir. Auth, Zahlungen, KI-Chat, E-Mail, Admin, Cron — alles inklusive. Eine Endpoint-Definition wird zu Web, CLI, Mobile, MCP-Server und KI-Tool.",
+      typeSafe: {
+        title: "Type-Safety Überlegenheit",
         description:
-          "Treten Sie der Community bei! Erstellen Sie öffentliche Threads, nehmen Sie an Diskussionen teil, voten Sie Inhalte hoch und vernetzen Sie sich mit anderen KI-Enthusiasten.",
+          "Die typsicherste Codebasis, die du je gesehen hast. Vibe Checker erzwingt Strenge beim Coden. Komplexe Features in einem Schuss mit KI-Unterstützung.",
       },
-      growth: {
-        title: "40+ unzensierte KI-Modelle",
+      tenPlatforms: {
+        title: "Eine Definition, zehn Plattformen",
         description:
-          "GPT-4, Claude, Gemini, Llama, Mistral und mehr. Keine Filter, keine Einschränkungen. Wechseln Sie Modelle mitten im Gespräch.",
+          "Web-App, Mobile-App, CLI, KI-Tool, MCP-Server, tRPC, Cron-Tasks — alles aus einer einzigen Endpoint-Definition. Kein generierter Code der auseinanderdriftet.",
       },
-      audience: {
-        title: "Benutzerdefinierte KI-Characters",
+      production: {
+        title: "Produktions-getestet",
         description:
-          "Erstellen Sie KI-Charaktere mit einzigartigen Persönlichkeiten. Nutzen Sie Community-Characters oder erstellen Sie eigene. Teilen Sie mit anderen.",
+          "Kein Starter-Template. Ein funktionierendes Produkt mit 750K+ Zeilen, 232 Endpoints und der Infrastruktur die unbottled.ai in Produktion betreibt.",
       },
-      global: {
-        title: "Intelligente Organisation",
+      cta: "Framework erkunden",
+    },
+    features: {
+      title: "Was du bekommst",
+      subtitle: "Alles auf einer Plattform",
+      description:
+        "KI-Chat, Community-Foren, eigene Charaktere und volle Privatsphäre-Kontrolle.",
+      models: {
+        title: "{{modelCount}} KI-Modelle",
         description:
-          "Organisieren Sie Chats nach Ordnern. Durchsuchen Sie Gespräche. Taggen Sie Threads. Exportieren Sie Verlauf. Alles bleibt organisiert.",
+          "{{featuredModels}} und mehr. Wechsle Modelle mitten im Gespräch. Keine Einschränkungen.",
       },
-      adCampaigns: {
-        title: "Flexible Preisgestaltung",
+      privacy: {
+        title: "4 Privatsphäre-Stufen",
         description:
-          "Abonnement: {{subCurrency}}{{subPrice}}/Monat mit {{subCredits}} Credits. Guthaben-Pakete: {{packCurrency}}{{packPrice}} für {{packCredits}} Credits (verfallen nie). Krypto- oder Kartenzahlungen akzeptiert.",
+          "Privat (server-gespeichert), Inkognito (nur lokal), Geteilt (kollaborativ), Öffentlich (Forum). Du kontrollierst deine Daten.",
       },
-      dataAnalysis: {
-        title: "Erweiterte Analysen",
+      characters: {
+        title: "Eigene Charaktere",
         description:
-          "Verfolgen Sie Ihre Nutzung, Token-Verbrauch und Gesprächsverlauf. Sehen Sie Ihre KI-Chat-Muster und optimieren Sie Ihren Workflow.",
+          "Erstelle KI-Personas mit einzigartigen Persönlichkeiten. Nutze Community-Charaktere oder erstelle deine eigenen.",
       },
-      automation: {
-        title: "Multi-Modell-Chat",
+      forums: {
+        title: "Community-Foren",
         description:
-          "Vergleichen Sie KI-Modelle nebeneinander. Wechseln Sie zwischen GPT-4, Claude und anderen im selben Gesprächsthread.",
+          "Durchstöbere öffentliche KI-Gespräche und nimm teil. Upvoten, diskutieren, lernen — ohne Anmeldung.",
       },
-      collaboration: {
-        title: "Web-Such-Integration",
+      uncensored: {
+        title: "Unzensiert als Standard",
         description:
-          "KI kann das Web durchsuchen (Brave Search) für aktuelle Informationen. Erhalten Sie Echtzeit-Daten in Ihren Gesprächen.",
+          "Kein Sicherheitstheater. Von familiensicher bis uneingeschränkt. Du entscheidest, nicht ein Konzern.",
       },
-      analytics: {
-        title: "Mehrsprachige Unterstützung",
+      pricing: {
+        title: "Einfache Preise",
         description:
-          "Englisch, Deutsch, Polnisch-Interface. Chatten Sie mit KI in jeder Sprache. Globale Community, lokale Gespräche.",
+          "20 kostenlose Credits zum Start. {{subCurrency}}{{subPrice}}/Monat Abo. Credit-Pakete, die nie verfallen.",
       },
     },
     cta: {
-      title: "Bereit, der KI + Community-Plattform beizutreten?",
+      title: "Deine KI. Deine Infrastruktur. Deine Regeln.",
       subtitle:
-        "Chatten Sie privat mit {{modelCount}} KI-Modellen. Nehmen Sie an öffentlichen Forum-Diskussionen teil. Wählen Sie Ihr Privatsphäre-Level. Starten Sie heute kostenlos.",
-      signUp: "Kostenlos anmelden",
-      viewPlans: "Preispläne ansehen",
+        "Kostenlos auf unbottled.ai starten oder die gesamte Plattform selbst hosten.",
+      signUp: "Kostenlos starten",
+      viewPlans: "Auf GitHub forken",
     },
     pricingSection: {
       title: "Einfache Preisgestaltung",
       description: "Ein Plan für alle. Extra Credits für Power-User.",
     },
     stats: {
-      clients: "Aktive Nutzer",
-      posts: "Gesendete Nachrichten",
-      growth: "Nutzerwachstum",
+      title: "Zahlen, die zählen",
+      models: "KI-Modelle",
+      skills: "KI-Skills",
+      tools: "KI-Tools",
+      endpoints: "Endpoints",
+      interfaces: "Interfaces aus 1 Definition",
     },
     pricing: {
       free: {

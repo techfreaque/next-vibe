@@ -12,6 +12,8 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { parseError } from "../../../shared/utils";
@@ -20,7 +22,7 @@ import type {
   FiltersModelSelection,
   ManualModelSelection,
 } from "../../models/components/types";
-import { modelProviders } from "../../models/models";
+import { getModelDisplayName, modelProviders } from "../../models/models";
 import {
   DEFAULT_TTS_VOICE,
   type TtsVoiceValue,
@@ -69,6 +71,7 @@ export class ChatFavoritesRepositoryClient {
   static async getFavorites(
     logger: EndpointLogger,
     locale: CountryLanguage,
+    user: JwtPayloadType,
   ): Promise<ResponseType<FavoritesListResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
     try {
@@ -94,6 +97,7 @@ export class ChatFavoritesRepositoryClient {
           activeFavoriteId,
           character?.voice ?? null,
           locale,
+          user,
         );
       });
 
@@ -307,11 +311,13 @@ export class ChatFavoritesRepositoryClient {
     activeFavoriteId: string | null,
     characterVoice: typeof TtsVoiceValue | null,
     locale: CountryLanguage,
+    user: JwtPayloadType,
   ): FavoriteCard {
     const { t } = scopedTranslation.scopedT(locale);
     const bestModel = CharactersRepositoryClient.getBestModelForFavorite(
       stored.modelSelection,
       characterModelSelection ?? undefined,
+      user,
     );
     const hasCharacter = stored.characterId !== "default";
 
@@ -330,7 +336,10 @@ export class ChatFavoritesRepositoryClient {
       ...(bestModel
         ? {
             modelIcon: hasCharacter ? bestModel.icon : ("sparkles" as const),
-            modelInfo: bestModel.name,
+            modelInfo: getModelDisplayName(
+              bestModel,
+              !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN),
+            ),
             modelProvider:
               modelProviders[bestModel.provider]?.name ??
               t("fallbacks.unknownProvider"),

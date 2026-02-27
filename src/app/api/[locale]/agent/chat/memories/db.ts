@@ -54,6 +54,9 @@ export const memories = pgTable("memories", {
   // Visibility — public memories are included in public folder AI context
   isPublic: boolean("is_public").default(false).notNull(),
 
+  // Archive — archived memories are excluded from AI context but not deleted
+  isArchived: boolean("is_archived").default(false).notNull(),
+
   // Metadata
   metadata: jsonb("metadata").$type<MemoryMetadata>().default({}),
 

@@ -414,4 +414,75 @@ export const translations = {
       },
     },
   },
+  adminAdd: {
+    post: {
+      title: "Add Credits",
+      description: "Add credit packs to a user account (admin only)",
+      tag: "admin",
+      container: {
+        title: "Add Credits to User",
+        description: "Grant credit packs to a specific user",
+      },
+      targetUserId: {
+        label: "Target User ID",
+        description: "The user to add credits to",
+      },
+      amount: {
+        label: "Amount",
+        description: "Number of credits to add",
+        placeholder: "Enter credit amount...",
+      },
+      packType: {
+        label: "Pack Type",
+        description: "Type of credit pack to add",
+      },
+      response: {
+        message: {
+          content: "Result",
+        },
+      },
+      success: {
+        title: "Credits Added",
+        description: "Credits have been added to the user account",
+      },
+      errors: {
+        validation: {
+          title: "Validation Error",
+          description: "Invalid request parameters",
+        },
+        network: {
+          title: "Network Error",
+          description: "Network connection failed",
+        },
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+        forbidden: {
+          title: "Forbidden",
+          description: "Admin access required",
+        },
+        notFound: {
+          title: "Not Found",
+          description: "User not found",
+        },
+        server: {
+          title: "Server Error",
+          description: "Failed to add credits",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unexpected error occurred",
+        },
+        unsavedChanges: {
+          title: "Unsaved Changes",
+          description: "You have unsaved changes",
+        },
+        conflict: {
+          title: "Conflict",
+          description: "Resource conflict occurred",
+        },
+      },
+    },
+  },
 };

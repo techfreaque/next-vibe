@@ -138,31 +138,6 @@ export interface StreamingResponse {
 }
 
 /**
- * Create a streaming response marker
- * Use this in handlers that need to return streaming responses
- */
-export function createStreamingResponse(response: Response): StreamingResponse {
-  return {
-    __isStreamingResponse: true,
-    response,
-  };
-}
-
-/**
- * Type guard to check if a response is a streaming response
- */
-export function isStreamingResponse<T>(
-  value: ResponseType<T> | StreamingResponse | FileResponse,
-): value is StreamingResponse {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "__isStreamingResponse" in value &&
-    value.__isStreamingResponse === true
-  );
-}
-
-/**
  * File response marker
  * When a handler returns this, the Next.js handler will return a NextResponse with binary data
  * without wrapping it in NextResponse.json()
@@ -177,8 +152,50 @@ export interface FileResponse {
 }
 
 /**
+ * A content block within a ContentResponse.
+ * Follows the MCP content block specification.
+ */
+export type ContentBlock =
+  | { type: "text"; text: string }
+  | { type: "image"; data: string; mimeType: string };
+
+/**
+ * Content response marker
+ * When a handler returns this, the response contains mixed content blocks (text + images).
+ * Each platform handles it natively:
+ * - MCP: Returns content blocks directly (images rendered inline by MCP clients)
+ * - AI stream: Returns multipart tool result with image-data parts (AI can "see" images)
+ * - Web/CLI: Renders via widget system
+ *
+ * NOTE: This is NOT part of ResponseType - it's a separate return type like FileResponse
+ */
+export interface ContentResponse {
+  __isContentResponse: true;
+  content: ContentBlock[];
+}
+
+/**
+ * Union of all possible handler return types.
+ * Used by type guards and handler signatures.
+ */
+export type HandlerResponse<T> =
+  | ResponseType<T>
+  | StreamingResponse
+  | FileResponse
+  | ContentResponse;
+
+/**
+ * Create a streaming response marker
+ */
+export function createStreamingResponse(response: Response): StreamingResponse {
+  return {
+    __isStreamingResponse: true,
+    response,
+  };
+}
+
+/**
  * Create a file response marker
- * Use this in handlers that need to return binary file responses
  */
 export function createFileResponse(
   buffer: Buffer | ReadableStream | Blob,
@@ -194,16 +211,56 @@ export function createFileResponse(
 }
 
 /**
+ * Create a content response with mixed text and image blocks
+ */
+export function createContentResponse(
+  content: ContentBlock[],
+): ContentResponse {
+  return {
+    __isContentResponse: true,
+    content,
+  };
+}
+
+/**
+ * Type guard to check if a response is a streaming response
+ */
+export function isStreamingResponse<T>(
+  value: HandlerResponse<T>,
+): value is StreamingResponse {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "__isStreamingResponse" in value &&
+    value.__isStreamingResponse === true
+  );
+}
+
+/**
  * Type guard to check if a response is a file response
  */
 export function isFileResponse<T>(
-  value: ResponseType<T> | StreamingResponse | FileResponse,
+  value: HandlerResponse<T>,
 ): value is FileResponse {
   return (
     typeof value === "object" &&
     value !== null &&
     "__isFileResponse" in value &&
     value.__isFileResponse === true
+  );
+}
+
+/**
+ * Type guard to check if a response is a content response
+ */
+export function isContentResponse<T>(
+  value: HandlerResponse<T>,
+): value is ContentResponse {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "__isContentResponse" in value &&
+    value.__isContentResponse === true
   );
 }
 

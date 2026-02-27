@@ -15,6 +15,7 @@ import { agentEnv } from "@/app/api/[locale]/agent/env";
 import { ApiProvider } from "@/app/api/[locale]/agent/models/models";
 
 import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
+import { logProviderRequest } from "./shared/debug-file-logger";
 import { processStreamingResponseWithToolCalls } from "./shared/streaming-tool-call-processor";
 import {
   convertDeveloperToSystemMessages,
@@ -79,6 +80,7 @@ export function createVeniceAI(logger: EndpointLogger): {
     };
 
     const bodyString = JSON.stringify(requestBody);
+    logProviderRequest("venice-ai", bodyString);
 
     // Update request body
     const modifiedInit: RequestInit = {

@@ -5,6 +5,7 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { BrowserTool } from "../enum";
 import { executeClosePage, filterUndefinedArgs } from "../shared/repository";
 import closePageEndpoints, { type ClosePageResponseOutput } from "./definition";
 
@@ -15,9 +16,9 @@ export const { POST, tools } = endpointsHandler({
     handler: ({ data, t, logger }) =>
       executeClosePage<ClosePageResponseOutput>(
         {
-          toolName: "close-page",
+          toolName: BrowserTool.CLOSE_PAGE,
           args: filterUndefinedArgs({
-            pageIdx: data.pageIdx,
+            pageId: data.pageId,
           }),
         },
         t,

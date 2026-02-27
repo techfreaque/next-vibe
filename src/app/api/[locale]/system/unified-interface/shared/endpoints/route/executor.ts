@@ -14,6 +14,7 @@ import type { ResponseType } from "@/app/api/[locale]/shared/types/response.sche
 import {
   ErrorResponseTypes,
   fail,
+  isContentResponse,
   isFileResponse,
   isStreamingResponse,
   success,
@@ -112,6 +113,11 @@ export class RouteExecutionExecutor {
           message: t("unifiedInterface.cli.vibe.errors.executionFailed"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
+      }
+
+      // Content responses carry mixed content blocks (text + images)
+      if (isContentResponse(result)) {
+        return success(result as TResult);
       }
 
       if (result.success) {

@@ -76,6 +76,8 @@ interface ToolCallRendererProps {
   messageId: string;
   toolIndex?: number;
   logger: EndpointLogger;
+  /** Override the platform used for definition loading (default: NEXT_PAGE) */
+  platformOverride?: Platform;
   collapseState?: {
     isCollapsed: (
       key: {
@@ -121,10 +123,12 @@ export function ToolCallRenderer({
   parentId,
   decision,
   logger,
+  platformOverride,
 }: ToolCallRendererProps): JSX.Element {
   const { t } = reactScopedTranslation.scopedT(locale);
   const { t: globalT } = simpleT(locale);
   const { sendMessage } = useChatContext();
+  const loadPlatform = platformOverride ?? Platform.NEXT_PAGE;
 
   // Determine if tool is waiting for user confirmation
   const isWaitingForConfirmation = Boolean(toolCall.waitingForConfirmation);
@@ -256,7 +260,7 @@ export function ToolCallRenderer({
 
       let result = await definitionLoader.load({
         identifier: toolCall.toolName,
-        platform: Platform.NEXT_PAGE,
+        platform: loadPlatform,
         user,
         logger,
         locale,
@@ -266,7 +270,7 @@ export function ToolCallRenderer({
         const convertedPath = `${toolCall.toolName.replaceAll("_", "/")}/GET`;
         result = await definitionLoader.load({
           identifier: convertedPath,
-          platform: Platform.NEXT_PAGE,
+          platform: loadPlatform,
           user,
           logger,
           locale,
@@ -277,7 +281,7 @@ export function ToolCallRenderer({
         const convertedPath = `${toolCall.toolName.replaceAll("_", "/")}/POST`;
         result = await definitionLoader.load({
           identifier: convertedPath,
-          platform: Platform.NEXT_PAGE,
+          platform: loadPlatform,
           user,
           logger,
           locale,
@@ -289,7 +293,7 @@ export function ToolCallRenderer({
       }
     };
     void loadDef();
-  }, [toolCall.toolName, locale, user, definition]);
+  }, [toolCall.toolName, locale, user, definition, loadPlatform]);
 
   const hasResult = Boolean(toolCall.result);
   const hasError = Boolean(toolCall.error);

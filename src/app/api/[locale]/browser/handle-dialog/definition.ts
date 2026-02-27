@@ -91,12 +91,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "handle-dialog.response.result",
         schema: z
-          .object({
-            handled: z.boolean().describe("Whether the dialog was handled"),
-            action: z.string().describe("The action taken"),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of the dialog handling"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -123,10 +127,9 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          handled: true,
-          action: "accept",
-        },
+        result: [
+          { type: "text", text: "# handle_dialog response\nDialog accepted." },
+        ],
         executionId: "exec_123",
       },
     },

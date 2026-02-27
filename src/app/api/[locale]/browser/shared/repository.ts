@@ -7,6 +7,8 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
+  isContentResponse,
+  success,
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -20,16 +22,37 @@ import type { BrowserT } from "../i18n";
 import { browserRepository } from "../repository";
 
 /**
+ * MCP content block returned by browser tools
+ */
+export interface MCPContentBlock {
+  type: string;
+  text?: string;
+  data?: string;
+  mimeType?: string;
+}
+
+/**
+ * Standard response shape for individual browser tool endpoints
+ */
+export interface BrowserToolResponse {
+  success: boolean;
+  result?: MCPContentBlock[];
+  error?: string;
+  executionId?: string;
+}
+
+/**
  * Explicit type for MCP argument values - no any or unknown
  */
 export type MCPArgValue =
   | string
   | number
   | boolean
+  | null
   | string[]
   | number[]
   | boolean[]
-  | Record<string, string | number | boolean>
+  | Record<string, string | number | boolean | undefined>
   | Array<Record<string, string | number | boolean>>;
 
 /**
@@ -49,7 +72,7 @@ export function filterUndefinedArgs<
   const filtered: Record<string, MCPArgValue> = {};
   for (const [key, value] of Object.entries(args)) {
     if (value !== undefined) {
-      filtered[key] = value;
+      filtered[key] = value as MCPArgValue;
     }
   }
   return filtered;
@@ -73,8 +96,9 @@ export async function executeMCPTool<T>(
     // Call main browser repository
     const result = await browserRepository.executeTool(requestData, t, logger);
 
-    if (!result.success) {
-      return result as ResponseType<T>;
+    // Content responses (e.g. screenshots) are wrapped in success for MCP/AI consumers
+    if (isContentResponse(result)) {
+      return success(result as T & typeof result);
     }
 
     // Return the result directly - it already has the correct structure
@@ -131,18 +155,7 @@ export function executeEmulate(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<
-  ResponseType<{
-    success: boolean;
-    result?: {
-      applied: boolean;
-      network?: string;
-      cpuThrottling?: number;
-    };
-    error?: string;
-    executionId?: string;
-  }>
-> {
+): Promise<ResponseType<BrowserToolResponse>> {
   return executeMCPTool(params, t, logger);
 }
 
@@ -150,18 +163,7 @@ export function executeEvaluateScript(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<
-  ResponseType<{
-    success: boolean;
-    result?: {
-      executed: boolean;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      result?: string | number | boolean | Record<string, any> | Array<any>;
-    };
-    error?: string;
-    executionId?: string;
-  }>
-> {
+): Promise<ResponseType<BrowserToolResponse>> {
   return executeMCPTool(params, t, logger);
 }
 
@@ -169,21 +171,7 @@ export function executeFillForm(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<
-  ResponseType<{
-    success: boolean;
-    result?: {
-      filled: boolean;
-      filledCount: number;
-      elements: Array<{
-        uid: string;
-        filled: boolean;
-      }> | null;
-    } | null;
-    error?: string;
-    executionId?: string;
-  }>
-> {
+): Promise<ResponseType<BrowserToolResponse>> {
   return executeMCPTool(params, t, logger);
 }
 
@@ -191,21 +179,7 @@ export function executeGetConsoleMessage(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<
-  ResponseType<{
-    success: boolean;
-    result?: {
-      found: boolean;
-      message?: {
-        type: string;
-        text: string;
-        timestamp?: string;
-      };
-    };
-    error?: string;
-    executionId?: string;
-  }>
-> {
+): Promise<ResponseType<BrowserToolResponse>> {
   return executeMCPTool(params, t, logger);
 }
 
@@ -325,19 +299,7 @@ export function executeTakeScreenshot(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<
-  ResponseType<{
-    success: boolean;
-    result?: {
-      captured: boolean;
-      format: string;
-      filePath?: string;
-      data?: string;
-    };
-    error?: string;
-    executionId?: string;
-  }>
-> {
+): Promise<ResponseType<BrowserToolResponse>> {
   return executeMCPTool(params, t, logger);
 }
 
@@ -345,19 +307,7 @@ export function executeTakeSnapshot(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<
-  ResponseType<{
-    success: boolean;
-    result?: {
-      captured: boolean;
-      elementCount?: number;
-      filePath?: string;
-      data?: string;
-    };
-    error?: string;
-    executionId?: string;
-  }>
-> {
+): Promise<ResponseType<BrowserToolResponse>> {
   return executeMCPTool(params, t, logger);
 }
 
@@ -365,17 +315,7 @@ export function executeUploadFile(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<
-  ResponseType<{
-    success: boolean;
-    result?: {
-      uploaded: boolean;
-      fileName?: string;
-    };
-    error?: string;
-    executionId?: string;
-  }>
-> {
+): Promise<ResponseType<BrowserToolResponse>> {
   return executeMCPTool(params, t, logger);
 }
 
@@ -383,16 +323,6 @@ export function executeWaitFor(
   params: MCPToolParams,
   t: BrowserT,
   logger: EndpointLogger,
-): Promise<
-  ResponseType<{
-    success: boolean;
-    result?: {
-      found: boolean;
-      waitTime?: number;
-    };
-    error?: string;
-    executionId?: string;
-  }>
-> {
+): Promise<ResponseType<BrowserToolResponse>> {
   return executeMCPTool(params, t, logger);
 }

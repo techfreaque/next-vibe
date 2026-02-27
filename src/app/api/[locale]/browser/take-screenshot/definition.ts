@@ -145,22 +145,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "take-screenshot.response.result",
         schema: z
-          .object({
-            captured: z
-              .boolean()
-              .describe("Whether the screenshot was captured"),
-            format: z.string().describe("Format of the screenshot"),
-            filePath: z
-              .string()
-              .optional()
-              .describe("Path where screenshot was saved"),
-            data: z
-              .string()
-              .optional()
-              .describe("Base64 encoded screenshot data"),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of screenshot capture"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -187,11 +181,13 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          captured: true,
-          format: "png",
-          filePath: "/path/to/file.txt",
-        },
+        result: [
+          {
+            type: "text",
+            text: "# take_screenshot response\nTook a screenshot of the current page's viewport.",
+          },
+          { type: "image", data: "iVBORw0KGgoAAAANSUhEUgAA..." },
+        ],
         executionId: "exec_123",
       },
     },

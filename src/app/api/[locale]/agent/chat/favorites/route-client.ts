@@ -6,17 +6,23 @@
 
 import { clientEndpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/client-multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { createPublicUser } from "@/app/api/[locale]/user/auth/helpers";
 
 import definitions from "./definition";
 import { ChatFavoritesRepositoryClient } from "./repository-client";
 
 /**
  * Client-side handlers - mirrors server route structure exactly
+ * Uses a public user stub since client-side has no auth context
  */
 export const { GET } = clientEndpointsHandler({
   endpoint: definitions,
   [Methods.GET]: {
     handler: ({ logger, locale }) =>
-      ChatFavoritesRepositoryClient.getFavorites(logger, locale),
+      ChatFavoritesRepositoryClient.getFavorites(
+        logger,
+        locale,
+        createPublicUser("client"),
+      ),
   },
 });

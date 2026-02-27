@@ -68,3 +68,13 @@ export function getTotalToolCount(user: JwtPayloadType): number {
   }
   return customerCount!;
 }
+
+/**
+ * Get the maximum tool count (admin-level).
+ * Represents the full platform capability regardless of user role.
+ * Useful for marketing/landing pages that show total platform tools.
+ */
+export function getMaxToolCount(): number {
+  ensureComputed();
+  return adminCount!;
+}

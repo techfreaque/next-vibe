@@ -7,10 +7,12 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
+  scopedRequestField,
   scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
+  FieldDataType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -40,8 +42,16 @@ export const { GET } = createEndpoint({
 
   fields: customWidgetObject({
     render: ReferralCodesListContainer,
-    usage: { response: true } as const,
+    usage: { request: "data", response: true } as const,
     children: {
+      // Admin override: view another user's referral codes
+      targetUserId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.title" as const,
+        hidden: true,
+        schema: z.string().optional(),
+      }),
       codes: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.array(
@@ -60,6 +70,12 @@ export const { GET } = createEndpoint({
   }),
 
   examples: {
+    requests: {
+      default: {},
+      adminView: {
+        targetUserId: "123e4567-e89b-12d3-a456-426614174000",
+      },
+    },
     responses: {
       default: {
         codes: [

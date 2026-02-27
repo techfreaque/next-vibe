@@ -8,10 +8,12 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   scopedObjectFieldNew,
+  scopedRequestField,
   scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
+  FieldDataType,
   LayoutType,
   Methods,
   WidgetType,
@@ -43,6 +45,20 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
+      filePath: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "performance-stop-trace.response.success",
+        description: "performance-stop-trace.response.success",
+        columns: 12,
+        schema: z
+          .string()
+          .optional()
+          .describe(
+            "The absolute file path, or a file path relative to the current working directory, to save the raw trace data. For example, trace.json.gz (compressed) or trace.json (uncompressed).",
+          ),
+      }),
+
       // Response fields
       success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -55,20 +71,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "performance-stop-trace.response.result",
         schema: z
-          .object({
-            stopped: z.boolean().describe("Whether the trace was stopped"),
-            metrics: z
-              .object({
-                lcp: z.coerce.number().optional(),
-                fcp: z.coerce.number().optional(),
-                cls: z.coerce.number().optional(),
-                tti: z.coerce.number().optional(),
-              })
-              .optional()
-              .describe("Performance metrics from the trace"),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of trace stop operation"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -89,18 +101,18 @@ const { POST } = createEndpoint({
     },
   }),
   examples: {
+    requests: {
+      default: {},
+    },
     responses: {
       default: {
         success: true,
-        result: {
-          stopped: true,
-          metrics: {
-            lcp: 2500,
-            fcp: 1800,
-            cls: 0.1,
-            tti: 3200,
+        result: [
+          {
+            type: "text",
+            text: "# performance_stop_trace response\nTrace stopped. LCP: 2500ms, FCP: 1800ms, CLS: 0.1, TTI: 3200ms",
           },
-        },
+        ],
         executionId: "exec_123",
       },
     },

@@ -77,6 +77,7 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Favoriten abrufen",
     description: "Alle gespeicherten Favoriten-Konfigurationen abrufen",
+    addVariant: "Variante hinzufügen",
     emptyState: "Sie haben noch keine Favoriten hinzugefügt",
     container: {
       title: "Ihre Favoriten",

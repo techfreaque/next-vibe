@@ -41,7 +41,11 @@ import type {
   ManualModelSelection,
   ModelSelectionSimple,
 } from "@/app/api/[locale]/agent/models/components/types";
-import { modelOptions } from "@/app/api/[locale]/agent/models/models";
+import {
+  getModelById,
+  type ModelId,
+} from "@/app/api/[locale]/agent/models/models";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -65,21 +69,19 @@ function formatTokens(n: number): string {
  * then falls back to MAX_ABSOLUTE when no model is resolvable.
  */
 function getModelContextWindow(
+  user: JwtPayloadType,
   modelSelection:
     | FiltersModelSelection
     | ManualModelSelection
     | ModelSelectionSimple
-    | string
+    | ModelId
     | null
     | undefined,
   characterModelSelection?: FiltersModelSelection | ManualModelSelection | null,
 ): number {
-  // String = direct model ID
   if (typeof modelSelection === "string") {
-    const model = Object.values(modelOptions).find(
-      (m) => m.id === modelSelection,
-    );
-    return model?.contextWindow ?? MAX_ABSOLUTE;
+    const model = getModelById(modelSelection);
+    return model.contextWindow;
   }
 
   // Use the same resolution logic as getBestModelForFavorite:
@@ -88,6 +90,7 @@ function getModelContextWindow(
     (modelSelection as FiltersModelSelection | ManualModelSelection | null) ??
       null,
     characterModelSelection ?? undefined,
+    user,
   );
   return best?.contextWindow ?? MAX_ABSOLUTE;
 }
@@ -202,7 +205,7 @@ export interface CompactTriggerEditProps {
     | FiltersModelSelection
     | ManualModelSelection
     | ModelSelectionSimple
-    | string
+    | ModelId
     | null;
   /**
    * Character's model selection — fallback when favoriteModelSelection is null.
@@ -212,6 +215,8 @@ export interface CompactTriggerEditProps {
   /** Optional sub-label shown in the header (e.g. "Override for this slot") */
   label?: ReactNode;
   className?: string;
+  /** User payload for admin-only model filtering */
+  user: JwtPayloadType;
 }
 
 // ---------------------------------------------------------------------------
@@ -225,14 +230,15 @@ export function CompactTriggerEdit({
   characterModelSelection,
   label,
   className,
+  user,
 }: CompactTriggerEditProps): JSX.Element {
   const modelCap = useMemo(
     () =>
       Math.min(
-        getModelContextWindow(modelSelection, characterModelSelection),
+        getModelContextWindow(user, modelSelection, characterModelSelection),
         MAX_ABSOLUTE,
       ),
-    [modelSelection, characterModelSelection],
+    [modelSelection, characterModelSelection, user],
   );
 
   const effectiveValue = value ?? COMPACT_TRIGGER;
@@ -390,93 +396,5 @@ function CostMemoryBar({
         />
       </Div>
     </Div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Props for the view (read-only) component
-// ---------------------------------------------------------------------------
-
-export interface CompactTriggerViewProps {
-  /** Effective resolved value (after cascade). Never null — always a real number. */
-  value: number;
-  /** Whether this value comes from the cascade default (not explicitly set here) */
-  isInherited?: boolean;
-  modelSelection?:
-    | FiltersModelSelection
-    | ManualModelSelection
-    | ModelSelectionSimple
-    | string
-    | null;
-  characterModelSelection?: FiltersModelSelection | ManualModelSelection | null;
-  label?: ReactNode;
-  className?: string;
-}
-
-// ---------------------------------------------------------------------------
-// View (read-only) component
-// ---------------------------------------------------------------------------
-
-export function CompactTriggerView({
-  value,
-  isInherited = false,
-  modelSelection,
-  characterModelSelection,
-  label,
-  className,
-}: CompactTriggerViewProps): JSX.Element {
-  const modelCap = useMemo(
-    () =>
-      Math.min(
-        getModelContextWindow(modelSelection, characterModelSelection),
-        MAX_ABSOLUTE,
-      ),
-    [modelSelection, characterModelSelection],
-  );
-  const cappedValue = Math.min(value, modelCap);
-  const isDefault = value === COMPACT_TRIGGER;
-
-  return (
-    <CardWrapper className={className}>
-      <CardHeader
-        modelCap={modelCap}
-        isDefault={isDefault || isInherited}
-        label={label}
-      />
-
-      <Div className="flex items-center gap-3">
-        <Div className="flex flex-col">
-          <Span className="text-2xl font-bold tabular-nums text-foreground">
-            {formatTokens(cappedValue)}
-          </Span>
-          <Span className="text-xs text-muted-foreground">tokens</Span>
-        </Div>
-        <Div className="flex flex-col gap-1 text-xs text-muted-foreground">
-          {isInherited && (
-            <Span className="text-xs text-muted-foreground italic">
-              {isDefault
-                ? "Inherited · using global default"
-                : "Inherited from higher level"}
-            </Span>
-          )}
-          <Span>
-            {"Model cap: "}
-            <Span className="font-medium text-foreground">
-              {formatTokens(modelCap)}
-            </Span>
-          </Span>
-        </Div>
-      </Div>
-
-      <CostMemoryBar value={cappedValue} modelCap={modelCap} />
-
-      <Div className="text-xs text-muted-foreground">
-        {"Older messages are summarised after "}
-        <Span className="font-medium text-foreground">
-          {formatTokens(cappedValue)}
-        </Span>
-        {" tokens to save cost while keeping context."}
-      </Div>
-    </CardWrapper>
   );
 }

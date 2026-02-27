@@ -514,10 +514,7 @@ if (import.meta.main) {
       logger,
       defaultLocale,
     )
-    .then((result) => {
-      if (result.success && result.data) {
-        logger.info(result.data.output);
-      }
+    .then(() => {
       return;
     })
     .catch((error) => {

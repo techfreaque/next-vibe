@@ -22,6 +22,7 @@ import {
   processMessageGroupForTTS,
 } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -42,6 +43,10 @@ interface GroupedAssistantMessageProps {
   onDelete?: (messageId: string) => void;
   showAuthor?: boolean;
   logger: EndpointLogger;
+  /** Hide action buttons (copy, TTS, delete). Used for read-only demos. */
+  readOnly?: boolean;
+  /** Override the platform used for tool definition loading */
+  platformOverride?: Platform;
   /** Collapse state management callbacks */
   collapseState?: {
     isCollapsed: (
@@ -123,6 +128,7 @@ interface ToolMessageProps {
   onCancel?: () => void;
   collapseState?: GroupedAssistantMessageProps["collapseState"];
   logger: EndpointLogger;
+  platformOverride?: Platform;
 }
 
 const ToolMessage = memo(
@@ -136,6 +142,7 @@ const ToolMessage = memo(
     onCancel,
     collapseState,
     logger,
+    platformOverride,
   }: ToolMessageProps): JSX.Element | null {
     if (!message.metadata?.toolCall) {
       return null;
@@ -146,6 +153,7 @@ const ToolMessage = memo(
         toolCall={message.metadata.toolCall}
         locale={locale}
         user={user}
+        platformOverride={platformOverride}
         threadId={message.threadId}
         messageId={message.id}
         collapseState={collapseState}
@@ -239,6 +247,7 @@ interface MessagesListProps {
   logger: EndpointLogger;
   collapseState?: GroupedAssistantMessageProps["collapseState"];
   sendMessage: ReturnType<typeof useChatContext>["sendMessage"];
+  platformOverride?: Platform;
 }
 
 const MessagesList = memo(function MessagesList({
@@ -251,6 +260,7 @@ const MessagesList = memo(function MessagesList({
   logger,
   collapseState,
   sendMessage,
+  platformOverride,
 }: MessagesListProps): JSX.Element {
   // Find tools waiting for confirmation
   const toolsWaitingForConfirmation = useMemo(
@@ -480,6 +490,7 @@ const MessagesList = memo(function MessagesList({
               }
               collapseState={collapseState}
               logger={logger}
+              platformOverride={platformOverride}
             />
           );
         }
@@ -543,6 +554,7 @@ interface MessageActionsWrapperProps {
   model: ChatMessage["model"];
   promptTokens: number | null;
   completionTokens: number | null;
+  readOnly?: boolean;
 }
 
 const MessageActionsWrapper = memo(function MessageActionsWrapper({
@@ -555,6 +567,7 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
   model,
   promptTokens,
   completionTokens,
+  readOnly,
 }: MessageActionsWrapperProps): JSX.Element {
   // Process content for actions - only runs in this component
   const [allContent, setAllContent] = useState<string>("");
@@ -612,6 +625,7 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
       promptTokens={promptTokens}
       completionTokens={completionTokens}
       creditCost={creditCost}
+      readOnly={readOnly}
     />
   );
 });
@@ -660,7 +674,7 @@ const MessageAuthorHeader = memo(function MessageAuthorHeader({
         isAI={primary.isAI}
         model={primary.model}
         timestamp={primary.createdAt}
-        edited={primary.edited}
+        edited={false}
         character={character}
         characterName={characterName}
         locale={locale}
@@ -683,7 +697,9 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
   onDelete,
   showAuthor = false,
   logger,
+  readOnly = false,
   collapseState,
+  platformOverride,
 }: GroupedAssistantMessageProps): JSX.Element {
   const {
     currentRootFolderId: rootFolderId,
@@ -744,6 +760,7 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
             logger={logger}
             collapseState={collapseState}
             sendMessage={sendMessage}
+            platformOverride={platformOverride}
           />
         </Div>
 
@@ -759,6 +776,7 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
             model={primary.model}
             promptTokens={groupTotals.promptTokens}
             completionTokens={groupTotals.completionTokens}
+            readOnly={readOnly}
           />
         </Div>
       </Div>

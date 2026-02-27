@@ -385,12 +385,17 @@ export const translations = {
         status: {
           title: "Status",
           description:
-            "Final status: 'completed' for success, 'failed' for failure.",
+            "Final status: 'completed' for success, 'failed' for failure, 'cancelled' to cancel.",
         },
         summary: {
           title: "Summary",
           description:
             "Brief description of what was accomplished or why it failed.",
+        },
+        output: {
+          title: "Output Payload",
+          description:
+            "Optional structured data payload (key-value pairs) to attach to the execution result.",
         },
         completed: {
           title: "Completed",
@@ -400,6 +405,10 @@ export const translations = {
           title: "Pushed to Remote",
           description:
             "Whether the completion was successfully reported to the originating instance.",
+        },
+        updatedAt: {
+          title: "Updated At",
+          description: "Timestamp when the task status was updated.",
         },
       },
       errors: {
@@ -490,6 +499,14 @@ export const translations = {
           title: "Executed By",
           description: "Instance ID that ran the task (e.g. hermes).",
         },
+        output: {
+          title: "Output",
+          description: "Structured execution output payload.",
+        },
+        startedAt: {
+          title: "Started At",
+          description: "ISO timestamp when execution started.",
+        },
         processed: {
           title: "Processed",
           description: "Whether the report was accepted and applied.",
@@ -536,6 +553,79 @@ export const translations = {
       success: {
         title: "Report Accepted",
         description: "Execution result applied to the task record",
+      },
+    },
+  },
+  errorMonitor: {
+    name: "error-monitor",
+    description: "Scans chat threads for error patterns every 3 hours",
+    tag: "Monitoring",
+    post: {
+      title: "Error Monitor",
+      description:
+        "Privacy-first error monitoring - scans messages for error patterns without reading content",
+      container: {
+        title: "Error Scan Results",
+        description: "Aggregated error patterns from chat messages",
+      },
+      response: {
+        errorsFound: "Errors Found",
+        threadsScanned: "Threads Scanned",
+        scanWindowFrom: "Scan Window Start",
+        scanWindowTo: "Scan Window End",
+        patternType: "Error Type",
+        patternCount: "Count",
+        patternThreadIds: "Thread IDs",
+        patternModel: "Model",
+        patternTool: "Tool",
+        patternFirstSeen: "First Seen",
+        patternLastSeen: "Last Seen",
+      },
+      errors: {
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+        forbidden: {
+          title: "Forbidden",
+          description: "Access denied",
+        },
+        server: {
+          title: "Server Error",
+          description: "Error scan failed",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unexpected error occurred",
+        },
+        validation: {
+          title: "Validation Error",
+          description: "Invalid request parameters",
+        },
+      },
+      success: {
+        title: "Scan Complete",
+        description: "Error scan completed successfully",
+      },
+    },
+    cleanup: {
+      name: "error-logs-cleanup",
+      description: "Prunes error logs older than 7 days",
+      post: {
+        title: "Error Logs Cleanup",
+        description: "Delete old error log entries to keep the database lean",
+        container: {
+          title: "Cleanup Results",
+          description: "Number of error logs deleted",
+        },
+        response: {
+          deletedCount: "Deleted Count",
+          retentionDays: "Retention Days",
+        },
+        success: {
+          title: "Cleanup Complete",
+          description: "Old error logs pruned successfully",
+        },
       },
     },
   },

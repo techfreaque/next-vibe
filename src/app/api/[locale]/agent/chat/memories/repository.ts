@@ -3,7 +3,7 @@
  * Database operations for user memories with auto-summarization
  */
 
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, sql } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
@@ -38,8 +38,9 @@ async function getMemoriesList(params: {
   userId: string;
   logger: EndpointLogger;
   rootFolderId: DefaultFolderId;
+  includeArchived?: boolean;
 }): Promise<Memory[]> {
-  const { userId, logger, rootFolderId } = params;
+  const { userId, logger, rootFolderId, includeArchived = false } = params;
   const publicOnly =
     rootFolderId === DefaultFolderId.PUBLIC ||
     rootFolderId === DefaultFolderId.SHARED;
@@ -47,6 +48,9 @@ async function getMemoriesList(params: {
   const conditions = [eq(memories.userId, userId)];
   if (publicOnly) {
     conditions.push(eq(memories.isPublic, true));
+  }
+  if (!includeArchived) {
+    conditions.push(eq(memories.isArchived, false));
   }
 
   const result = await db
@@ -121,7 +125,7 @@ export async function addMemory(params: {
     })
     .returning();
 
-  logger.info("Created new memory", {
+  logger.debug("Created new memory", {
     memoryId: memory.id,
     memoryNumber: memory.memoryNumber,
     userId,
@@ -146,12 +150,22 @@ export async function updateMemory(params: {
   tags?: string[];
   priority?: number;
   isPublic?: boolean;
+  isArchived?: boolean;
   userId: string;
   logger: EndpointLogger;
   t: MemoriesT;
 }): Promise<ResponseType<{ success: true }>> {
-  const { memoryNumber, content, tags, priority, isPublic, userId, logger, t } =
-    params;
+  const {
+    memoryNumber,
+    content,
+    tags,
+    priority,
+    isPublic,
+    isArchived,
+    userId,
+    logger,
+    t,
+  } = params;
 
   const updateData: Partial<typeof memories.$inferInsert> = {
     updatedAt: new Date(),
@@ -169,6 +183,9 @@ export async function updateMemory(params: {
   }
   if (isPublic !== undefined) {
     updateData.isPublic = isPublic;
+  }
+  if (isArchived !== undefined) {
+    updateData.isArchived = isArchived;
   }
 
   const [updated] = await db
@@ -333,7 +350,7 @@ async function checkAndSummarizeIfNeeded(params: {
     0,
   );
 
-  logger.info("Memory size check", {
+  logger.debug("Memory size check", {
     userId,
     totalSize,
     count: memoriesList.length,
@@ -355,6 +372,63 @@ async function checkAndSummarizeIfNeeded(params: {
     // For now, just log a warning
     // In production, this would call an AI endpoint to consolidate memories
   }
+}
+
+/**
+ * Search memories by content using ILIKE
+ * Returns matching memories with total count
+ */
+export async function searchMemories(params: {
+  userId: string;
+  query: string;
+  includeArchived?: boolean;
+  tags?: string[];
+  logger: EndpointLogger;
+}): Promise<
+  ResponseType<{
+    results: Memory[];
+    total: number;
+  }>
+> {
+  const { userId, query, includeArchived = false, tags, logger } = params;
+
+  const conditions = [
+    eq(memories.userId, userId),
+    ilike(memories.content, `%${query}%`),
+  ];
+
+  if (!includeArchived) {
+    conditions.push(eq(memories.isArchived, false));
+  }
+
+  if (tags && tags.length > 0) {
+    // Filter memories that have at least one of the specified tags
+    conditions.push(
+      sql`${memories.tags} ?| array[${sql.join(
+        tags.map((tag) => sql`${tag}`),
+        sql`, `,
+      )}]`,
+    );
+  }
+
+  const results = await db
+    .select()
+    .from(memories)
+    .where(and(...conditions))
+    .orderBy(desc(memories.priority), memories.id);
+
+  logger.debug("Searched memories", {
+    userId,
+    query,
+    includeArchived,
+    tags,
+    resultsCount: results.length,
+  });
+
+  return success({
+    results,
+    total: results.length,
+  });
 }
 
 /**

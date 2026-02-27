@@ -66,6 +66,7 @@ export class StreamCompletionHandler {
         logger,
       });
     } else {
+      // TODO: This should not happen, right?
       logger.warn("[AI Stream] Skipping finalization", {
         hasCurrentAssistantMessageId: !!ctx.currentAssistantMessageId,
         hasCurrentAssistantContent: !!ctx.currentAssistantContent,

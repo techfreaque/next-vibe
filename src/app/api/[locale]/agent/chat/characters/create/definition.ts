@@ -93,6 +93,7 @@ const { POST } = createEndpoint({
             const bestModel = data.requestData.modelSelection
               ? CharactersRepositoryClient.getBestModelForCharacter(
                   data.requestData.modelSelection,
+                  data.user,
                 )
               : null;
 

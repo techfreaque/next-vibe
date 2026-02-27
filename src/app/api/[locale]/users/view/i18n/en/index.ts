@@ -66,6 +66,7 @@ export const translations = {
     recentActivity: "Recent Activity",
   },
   status: {
+    active: "Active",
     banned: "Banned",
     inactive: "Inactive",
     verified: "Verified",
@@ -87,6 +88,12 @@ export const translations = {
   credits: {
     currentBalance: "Current Balance",
     availableCredits: "Available Credits",
+    packBreakdown: "Credit Pack Breakdown",
+    subscription: "Subscription",
+    permanent: "Permanent",
+    bonus: "Bonus",
+    earned: "Earned",
+    expires: "Expires",
   },
   payment: {
     stripeCustomerId: "Stripe Customer ID",
@@ -115,6 +122,23 @@ export const translations = {
     lastThread: "Last Thread",
     lastMessage: "Last Message",
     lastPayment: "Last Payment",
+  },
+  tabs: {
+    overview: "Overview",
+    credits: "Credits",
+    referrals: "Referrals",
+    earnings: "Earnings",
+  },
+  modelUsage: {
+    title: "Model Usage",
+    model: "Model",
+    spent: "Credits Spent",
+    messages: "Messages",
+    noUsage: "No model usage data",
+  },
+  ban: {
+    banUser: "Ban User",
+    unbanUser: "Unban User",
   },
   widget: {
     actions: {

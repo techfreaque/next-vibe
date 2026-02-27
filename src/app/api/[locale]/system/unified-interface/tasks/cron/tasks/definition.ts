@@ -417,6 +417,15 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // Request fields
+      id: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.fields.id.label",
+        description: "post.fields.id.description",
+        placeholder: "post.fields.id.placeholder",
+        columns: 6,
+        schema: z.string().optional(),
+      }),
       routeId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -592,6 +601,7 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
+        id: "daily-cleanup",
         routeId: "newsletter_unsubscribe_GET",
         displayName: "Daily Cleanup Task",
         description: "Cleans up old data",

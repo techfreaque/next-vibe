@@ -21,6 +21,7 @@ import definitions from "./definition";
 import { tools } from "./route";
 
 const imapSyncTask = createCronTask(definitions.POST, tools.POST, {
+  id: "imap-sync",
   name: "title",
   description: "description",
   schedule: CRON_SCHEDULES.EVERY_15_MINUTES,

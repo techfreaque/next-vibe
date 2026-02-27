@@ -77,8 +77,9 @@ export class StreamPartHandler {
     }
 
     if (part.type === "text-delta") {
+      const textContent = part.text;
       const result = await TextHandler.processTextDelta({
-        textDelta: part.text,
+        textDelta: textContent,
         currentAssistantMessageId: ctx.currentAssistantMessageId,
         currentAssistantContent: ctx.currentAssistantContent,
         threadId,
@@ -142,7 +143,7 @@ export class StreamPartHandler {
     }
 
     if (part.type === "reasoning-delta") {
-      const reasoningText = "text" in part ? part.text : "";
+      const reasoningText = part.text;
       ctx.currentAssistantContent = ReasoningHandler.processReasoningDelta({
         reasoningText,
         currentAssistantMessageId: ctx.currentAssistantMessageId,
@@ -318,7 +319,32 @@ export class StreamPartHandler {
       if (result) {
         ctx.currentParentId = result.currentParentId;
         ctx.currentDepth = result.currentDepth;
+        ctx.lastParentId = result.currentParentId;
+        ctx.lastDepth = result.currentDepth;
         ctx.pendingToolMessages.delete(part.toolCallId);
+
+        // Finalize and reset assistant message state so the next turn creates
+        // a fresh message. This is critical for provider-executed tool loops
+        // (e.g. Agent SDK) where the entire multi-turn conversation arrives
+        // in a single stream without finish-step between turns.
+        if (ctx.currentAssistantMessageId && ctx.currentAssistantContent) {
+          const { FinalizationHandler } =
+            await import("./finalization-handler");
+          await FinalizationHandler.finalizeAssistantMessage({
+            currentAssistantMessageId: ctx.currentAssistantMessageId,
+            currentAssistantContent: ctx.currentAssistantContent,
+            isInReasoningBlock: ctx.isInReasoningBlock,
+            finishReason: null,
+            totalTokens: null,
+            promptTokens: null,
+            completionTokens: null,
+            dbWriter: ctx.dbWriter,
+            logger,
+          });
+        }
+        ctx.currentAssistantMessageId = null;
+        ctx.currentAssistantContent = "";
+        ctx.isInReasoningBlock = false;
       }
 
       return { shouldAbort: false };

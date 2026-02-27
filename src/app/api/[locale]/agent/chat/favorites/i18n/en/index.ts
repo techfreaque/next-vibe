@@ -76,6 +76,7 @@ export const translations = {
   get: {
     title: "Get Favorites",
     description: "Retrieve all your saved favorite character configurations",
+    addVariant: "Add Variant",
     emptyState: "You haven't added any favorites yet",
     container: {
       title: "Your Favorites",

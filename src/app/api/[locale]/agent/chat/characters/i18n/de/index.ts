@@ -775,6 +775,19 @@ export const translations: typeof enTranslations = {
         3: "Zeige mir den aktuellen Serverstatus",
       },
     },
+    rebuildAgent: {
+      name: "Rebuild Agent",
+      description:
+        "Build- und Neustart-Spezialist, der die Anwendung neu baut und den Server per SIGUSR1-Signal ohne Ausfallzeit hot-restartet",
+      tagline: "Bauen & Neustarten",
+      shortDesc: "Anwendungs-Rebuild und Hot-Restart",
+      suggestedPrompts: {
+        0: "Produktionsserver neu bauen und neustarten",
+        1: "Build ohne Neustart ausführen",
+        2: "Serverstatus nach Rebuild prüfen",
+        3: "Geplanten Rebuild-Task erstellen",
+      },
+    },
     vibeCoder: {
       name: "Vibe Coder",
       description:

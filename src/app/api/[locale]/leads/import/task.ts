@@ -21,6 +21,7 @@ import definitions from "./process/definition";
 import { tools } from "./process/route";
 
 const csvProcessorTask = createCronTask(definitions.POST, tools.POST, {
+  id: "leads-import",
   name: "import.process.post.title",
   description: "import.process.post.description",
   schedule: CRON_SCHEDULES.EVERY_MINUTE,

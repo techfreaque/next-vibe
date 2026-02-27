@@ -341,4 +341,75 @@ export const translations: typeof enTranslations = {
       },
     },
   },
+  adminAdd: {
+    post: {
+      title: "Dodaj kredyty",
+      description: "Dodaj pakiety kredytów do konta użytkownika (tylko admin)",
+      tag: "admin",
+      container: {
+        title: "Dodaj kredyty użytkownikowi",
+        description: "Przyznaj pakiety kredytów konkretnemu użytkownikowi",
+      },
+      targetUserId: {
+        label: "ID użytkownika docelowego",
+        description: "Użytkownik, któremu zostaną dodane kredyty",
+      },
+      amount: {
+        label: "Kwota",
+        description: "Liczba kredytów do dodania",
+        placeholder: "Wprowadź kwotę kredytów...",
+      },
+      packType: {
+        label: "Typ pakietu",
+        description: "Rodzaj pakietu kredytów",
+      },
+      response: {
+        message: {
+          content: "Wynik",
+        },
+      },
+      success: {
+        title: "Kredyty dodane",
+        description: "Kredyty zostały dodane do konta użytkownika",
+      },
+      errors: {
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe parametry żądania",
+        },
+        network: {
+          title: "Błąd sieci",
+          description: "Połączenie sieciowe nie powiodło się",
+        },
+        unauthorized: {
+          title: "Brak autoryzacji",
+          description: "Wymagane uwierzytelnienie",
+        },
+        forbidden: {
+          title: "Zabronione",
+          description: "Wymagany dostęp administratora",
+        },
+        notFound: {
+          title: "Nie znaleziono",
+          description: "Nie znaleziono użytkownika",
+        },
+        server: {
+          title: "Błąd serwera",
+          description: "Nie udało się dodać kredytów",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieoczekiwany błąd",
+        },
+        unsavedChanges: {
+          title: "Niezapisane zmiany",
+          description: "Masz niezapisane zmiany",
+        },
+        conflict: {
+          title: "Konflikt",
+          description: "Wystąpił konflikt zasobów",
+        },
+      },
+    },
+  },
 };

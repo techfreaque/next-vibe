@@ -66,11 +66,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "hover.response.result",
         schema: z
-          .object({
-            hovered: z.boolean().describe("Whether the element was hovered"),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of the hover operation"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -97,9 +102,9 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          hovered: true,
-        },
+        result: [
+          { type: "text", text: "# hover response\nHovered over the element." },
+        ],
         executionId: "exec_123",
       },
     },

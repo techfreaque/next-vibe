@@ -80,15 +80,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "upload-file.response.result",
         schema: z
-          .object({
-            uploaded: z.boolean().describe("Whether the file was uploaded"),
-            fileName: z
-              .string()
-              .optional()
-              .describe("Name of the uploaded file"),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of file upload operation"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -118,10 +119,12 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          uploaded: true,
-          fileName: "file.txt",
-        },
+        result: [
+          {
+            type: "text",
+            text: "# upload_file response\nUploaded file: file.txt",
+          },
+        ],
         executionId: "exec_123",
       },
     },

@@ -18,11 +18,10 @@ import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/em
 import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
 import {
   ErrorResponseTypes,
-  type FileResponse,
+  type HandlerResponse,
+  isContentResponse,
   isFileResponse,
   isStreamingResponse,
-  type ResponseType,
-  type StreamingResponse,
 } from "@/app/api/[locale]/shared/types/response.schema";
 import { handleSms } from "@/app/api/[locale]/sms/handle-sms";
 import type { SmsFunctionType } from "@/app/api/[locale]/sms/utils";
@@ -195,6 +194,7 @@ export interface ApiHandlerProps<
  * - ResponseType<TResponseOutput> for standard JSON responses
  * - StreamingResponse for streaming endpoints (e.g., AI chat)
  * - FileResponse for binary file responses (e.g., file downloads)
+ * - ContentResponse for mixed content blocks (text + images)
  */
 export type ApiHandlerFunction<
   TRequestOutput,
@@ -212,10 +212,8 @@ export type ApiHandlerFunction<
     TScopedTranslationKey
   >,
 ) =>
-  | Promise<ResponseType<TResponseOutput> | StreamingResponse | FileResponse>
-  | ResponseType<TResponseOutput>
-  | StreamingResponse
-  | FileResponse;
+  | Promise<HandlerResponse<TResponseOutput>>
+  | HandlerResponse<TResponseOutput>;
 
 /**
  * Handler configuration for a single method with proper typing
@@ -305,7 +303,7 @@ export type GenericHandlerReturnType<
   request?: NextRequest; // Optional NextRequest for Next.js platform
   cronTaskId?: string; // Cron task DB ID when executed by the task runner
   rootFolderId: DefaultFolderId;
-}) => Promise<ResponseType<TResponseOutput> | StreamingResponse | FileResponse>;
+}) => Promise<HandlerResponse<TResponseOutput>>;
 
 /**
  * Base type for generic handlers when exact types are not known
@@ -354,11 +352,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     request,
     cronTaskId,
     rootFolderId,
-  }): Promise<
-    | ResponseType<T["types"]["ResponseOutput"]>
-    | StreamingResponse
-    | FileResponse
-  > => {
+  }): Promise<HandlerResponse<T["types"]["ResponseOutput"]>> => {
     const { t } = endpoint.scopedTranslation.scopedT(locale);
     const { t: tCredits } = creditsScopedTranslation.scopedT(locale);
 
@@ -495,6 +489,12 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     // 6. Handle streaming responses - return immediately without email/SMS processing
     if (isStreamingResponse(result)) {
       logger.debug("Streaming response detected - returning immediately");
+      return result;
+    }
+
+    // 6b. Handle content responses - return immediately without email/SMS processing
+    if (isContentResponse(result)) {
+      logger.debug("Content response detected - returning immediately");
       return result;
     }
 

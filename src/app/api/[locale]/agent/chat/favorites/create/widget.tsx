@@ -87,8 +87,10 @@ export function FavoriteCreateContainer({
 
       if (modelSelection) {
         // Resolve model selection to actual ModelId
-        const bestModel =
-          CharactersRepositoryClient.getBestModelForCharacter(modelSelection);
+        const bestModel = CharactersRepositoryClient.getBestModelForCharacter(
+          modelSelection,
+          user,
+        );
         selectedModel = bestModel?.id;
       }
 
@@ -186,6 +188,7 @@ export function FavoriteCreateContainer({
                 isNoCharacter ? undefined : characterData?.modelSelection
               }
               locale={locale}
+              user={user}
             />
           )}
         </Div>

@@ -182,7 +182,7 @@ export class ToolCallHandler {
     const newCurrentParentId = currentParentId;
     const newCurrentDepth = currentDepth + 1;
 
-    logger.info("[AI Stream] Tool confirmation check", {
+    logger.debug("[AI Stream] Tool confirmation check", {
       toolName: part.toolName,
       toolConfigFound: !!toolConfig,
       requiresConfirmation,

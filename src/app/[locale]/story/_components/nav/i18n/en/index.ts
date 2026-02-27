@@ -27,6 +27,7 @@ export const translations = {
   home: "Home",
   pricing: "Pricing",
   features: "Features",
+  framework: "Framework",
   forum: "Forum",
   contact: "Contact",
   getStarted: "Get Started Free",

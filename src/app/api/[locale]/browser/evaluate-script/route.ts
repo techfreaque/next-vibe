@@ -5,6 +5,7 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { BrowserTool } from "../enum";
 import {
   executeEvaluateScript,
   filterUndefinedArgs,
@@ -18,7 +19,7 @@ export const { POST, tools } = endpointsHandler({
     handler: ({ data, t, logger }) =>
       executeEvaluateScript(
         {
-          toolName: "evaluate-script",
+          toolName: BrowserTool.EVALUATE_SCRIPT,
           args: filterUndefinedArgs({
             function: data.function,
             args: data.args ?? undefined,

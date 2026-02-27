@@ -1,4 +1,12 @@
-import { Building, Home, Info, Sparkles, Tag } from "next-vibe-ui/ui/icons";
+import {
+  Building,
+  Code,
+  Home,
+  Info,
+  MessageSquare,
+  Sparkles,
+  Tag,
+} from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -18,6 +26,7 @@ export type NavPaths =
   | "/story"
   | "/story/about-us"
   | "/story/careers"
+  | "/story/framework"
   | "/help"
   | "/admin";
 
@@ -59,6 +68,16 @@ export const navItems: NavItemType[] = [
     icon: <Home className="h-4 w-4" />,
     title: "app.story._components.nav.home",
     href: "/story",
+  },
+  {
+    icon: <MessageSquare className="h-4 w-4" />,
+    title: "app.story._components.nav.goToApp",
+    href: "",
+  },
+  {
+    icon: <Code className="h-4 w-4" />,
+    title: "app.story._components.nav.framework",
+    href: "/story/framework",
   },
   {
     icon: <Sparkles className="h-4 w-4" />,

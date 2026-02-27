@@ -71,15 +71,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "drag.response.result",
         schema: z
-          .object({
-            dragged: z
-              .boolean()
-              .describe("Whether the drag operation was performed"),
-            from: z.string().describe("The source element uid"),
-            to: z.string().describe("The target element uid"),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of the drag operation"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -107,9 +108,11 @@ const { POST } = createEndpoint({
       },
     },
     responses: {
-      dragDrop: {
+      default: {
         success: true,
-        result: { dragged: true, from: "draggable-123", to: "dropzone-456" },
+        result: [
+          { type: "text", text: "# drag response\nDragged element to target." },
+        ],
         executionId: "exec_123",
       },
     },

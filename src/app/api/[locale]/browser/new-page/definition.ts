@@ -52,7 +52,33 @@ const { POST } = createEndpoint({
         description: "new-page.form.fields.url.description",
         placeholder: "new-page.form.fields.url.placeholder",
         columns: 8,
-        schema: z.string().describe("URL to load in a new page"),
+        schema: z.string().describe("URL to load in a new page."),
+      }),
+      background: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "new-page.form.fields.url.label",
+        description: "new-page.form.fields.url.description",
+        columns: 4,
+        schema: z
+          .boolean()
+          .optional()
+          .describe(
+            "Whether to open the page in the background without bringing it to the front. Default is false (foreground).",
+          ),
+      }),
+      isolatedContext: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "new-page.form.fields.url.label",
+        description: "new-page.form.fields.url.description",
+        columns: 8,
+        schema: z
+          .string()
+          .optional()
+          .describe(
+            "If specified, the page is created in an isolated browser context with the given name. Pages in the same browser context share cookies and storage.",
+          ),
       }),
       timeout: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -81,13 +107,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "new-page.response.result",
         schema: z
-          .object({
-            created: z.boolean().describe("Whether the new page was created"),
-            pageIdx: z.coerce.number().describe("Index of the new page"),
-            url: z.string().describe("URL of the new page"),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of new page creation"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -114,11 +143,12 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          created: true,
-          pageIdx: 0,
-          url: "https://example.com",
-        },
+        result: [
+          {
+            type: "text",
+            text: "# new_page response\nCreated new page at https://example.com",
+          },
+        ],
         executionId: "exec_123",
       },
     },

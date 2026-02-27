@@ -163,6 +163,37 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
   }
 
   /**
+   * Get total endpoint count (no platform or permission filtering).
+   * Traverses the endpoint tree and counts all registered HTTP methods.
+   */
+  getTotalEndpointCount(): number {
+    const endpointsData = endpoints as EndpointNode;
+    let count = 0;
+
+    const traverse = (obj: EndpointNode): void => {
+      if (!obj || typeof obj !== "object") {
+        return;
+      }
+      for (const [key, value] of Object.entries(obj)) {
+        if (Object.values(Methods).includes(key as Methods)) {
+          if (value) {
+            count++;
+          }
+        } else if (
+          !key.startsWith("_") &&
+          typeof value === "object" &&
+          value !== null
+        ) {
+          traverse(value as EndpointNode);
+        }
+      }
+    };
+
+    traverse(endpointsData);
+    return count;
+  }
+
+  /**
    * Get endpoint count by category (no permission filtering)
    */
   getEndpointCountByCategory(platform: Platform): Record<string, number> {

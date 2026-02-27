@@ -44,6 +44,7 @@ import {
   scopedTranslation,
   scopedTranslation as tasksScopedTranslation,
 } from "../i18n";
+import { pushStatusToRemote } from "../task-sync/repository";
 import type {
   NewPulseExecution,
   NewPulseHealth,
@@ -571,6 +572,24 @@ export class PulseHealthRepository {
             );
           }
 
+          // Fire-and-forget: notify remote that task is now RUNNING
+          if (
+            dbTask.targetInstance &&
+            env.THEA_REMOTE_URL &&
+            env.THEA_REMOTE_API_KEY
+          ) {
+            void pushStatusToRemote({
+              taskRouteId: dbTask.routeId,
+              status: CronTaskStatus.RUNNING,
+              summary: "",
+              durationMs: null,
+              startedAt: startedAt.toISOString(),
+              serverTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+              executedByInstance: env.INSTANCE_ID ?? null,
+              logger,
+            });
+          }
+
           try {
             const taskInput = dbTask.taskInput ?? {};
             const { urlPathParams, data } = await splitTaskArgs(
@@ -768,6 +787,26 @@ export class PulseHealthRepository {
                 },
               );
             }
+
+            // Fire-and-forget: push final status to remote
+            if (
+              dbTask.targetInstance &&
+              env.THEA_REMOTE_URL &&
+              env.THEA_REMOTE_API_KEY
+            ) {
+              void pushStatusToRemote({
+                taskRouteId: dbTask.routeId,
+                status: finalStatus,
+                summary: finalMessage ?? "",
+                durationMs: finalDurationMs,
+                executionId: firstExecutionId ?? undefined,
+                startedAt: startedAt.toISOString(),
+                serverTimezone:
+                  Intl.DateTimeFormat().resolvedOptions().timeZone,
+                executedByInstance: env.INSTANCE_ID ?? null,
+                logger,
+              });
+            }
           } catch (unexpectedError) {
             // Catch-all: if something goes wrong outside the retry loop,
             // ensure the task doesn't stay stuck in RUNNING state forever
@@ -808,6 +847,25 @@ export class PulseHealthRepository {
                   consecutiveFailures: catchConsecutiveFailures,
                 },
               );
+            }
+
+            // Fire-and-forget: push FAILED to remote so it doesn't stay stuck on RUNNING
+            if (
+              dbTask.targetInstance &&
+              env.THEA_REMOTE_URL &&
+              env.THEA_REMOTE_API_KEY
+            ) {
+              void pushStatusToRemote({
+                taskRouteId: dbTask.routeId,
+                status: CronTaskStatus.FAILED,
+                summary: parseError(unexpectedError).message,
+                durationMs: null,
+                startedAt: startedAt.toISOString(),
+                serverTimezone:
+                  Intl.DateTimeFormat().resolvedOptions().timeZone,
+                executedByInstance: env.INSTANCE_ID ?? null,
+                logger,
+              });
             }
           }
         }

@@ -73,6 +73,7 @@ export const translations: typeof enTranslations = {
     recentActivity: "Letzte Aktivität",
   },
   status: {
+    active: "Aktiv",
     banned: "Gesperrt",
     inactive: "Inaktiv",
     verified: "Verifiziert",
@@ -94,6 +95,12 @@ export const translations: typeof enTranslations = {
   credits: {
     currentBalance: "Aktuelles Guthaben",
     availableCredits: "Verfügbares Guthaben",
+    packBreakdown: "Guthabenpakete Aufschlüsselung",
+    subscription: "Abonnement",
+    permanent: "Dauerhaft",
+    bonus: "Bonus",
+    earned: "Verdient",
+    expires: "Läuft ab",
   },
   payment: {
     stripeCustomerId: "Stripe-Kunden-ID",
@@ -122,6 +129,23 @@ export const translations: typeof enTranslations = {
     lastThread: "Letzter Thread",
     lastMessage: "Letzte Nachricht",
     lastPayment: "Letzte Zahlung",
+  },
+  tabs: {
+    overview: "Übersicht",
+    credits: "Guthaben",
+    referrals: "Empfehlungen",
+    earnings: "Verdienste",
+  },
+  modelUsage: {
+    title: "Modellnutzung",
+    model: "Modell",
+    spent: "Verbrauchtes Guthaben",
+    messages: "Nachrichten",
+    noUsage: "Keine Modellnutzungsdaten",
+  },
+  ban: {
+    banUser: "Benutzer sperren",
+    unbanUser: "Sperre aufheben",
   },
   widget: {
     actions: {

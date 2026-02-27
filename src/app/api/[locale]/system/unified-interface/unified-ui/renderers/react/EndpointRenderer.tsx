@@ -21,6 +21,7 @@ import type { UseFormProps } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import type { ZodTypeAny } from "zod";
 
+import type { ContentBlock } from "@/app/api/[locale]/shared/types/response.schema";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -42,6 +43,7 @@ import type {
 } from "../../widgets/_shared/react-types";
 import { isResponseField } from "../../widgets/_shared/type-guards";
 import { WidgetContextProvider } from "../../widgets/_shared/WidgetContextProvider";
+import { ContentBlocksRenderer } from "./ContentBlocksRenderer";
 import { WidgetRenderer } from "./WidgetRenderer";
 
 /**
@@ -227,6 +229,19 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
       hasRenderedBackButton: false,
     },
   };
+
+  // ContentResponse: render mixed content blocks (text + images) directly
+  // This applies to any endpoint that returns a ContentResponse (e.g. browser take-screenshot)
+  if (
+    data &&
+    typeof data === "object" &&
+    !Array.isArray(data) &&
+    "__isContentResponse" in data &&
+    "content" in data &&
+    Array.isArray(data.content)
+  ) {
+    return <ContentBlocksRenderer blocks={data.content as ContentBlock[]} />;
+  }
 
   // Check if there are any request fields
   const hasRequest =

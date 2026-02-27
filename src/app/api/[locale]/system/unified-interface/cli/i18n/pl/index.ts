@@ -37,7 +37,6 @@ export const translations: typeof enTranslations = {
       commands: "Dostępne polecenia",
       options: "Opcje",
       examples: "Przykłady",
-      userType: "Określ typ użytkownika (admin, public, itd.)",
       locale: "Określ lokalizację (en-GLOBAL, de-DE, pl-PL)",
       verbose: "Włącz szczegółowe wyjście",
       dryRun: "Wykonaj próbny przebieg bez wykonywania",

@@ -53,6 +53,10 @@ const nextConfig: NextConfig = {
       "src/app/api/**/translations/reorganize/**": {
         loaders: ["ignore-loader"],
       },
+      // Generators use dynamic import(variable) for definition scanning — not bundler-safe
+      "src/app/api/**/generators/**": {
+        loaders: ["ignore-loader"],
+      },
       "src/app-native/**": {
         loaders: ["ignore-loader"],
       },
@@ -117,7 +121,7 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  distDir: ".next",
+  distDir: process.env["NEXT_DIST_DIR"] || ".next",
 };
 
 export default nextConfig;

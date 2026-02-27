@@ -586,7 +586,7 @@ export class MessageDbWriter {
     confidence: number | null;
     durationSeconds: number | null;
     creditCost?: number | null;
-    user?: JwtPayloadType;
+    user: JwtPayloadType;
   }): void {
     const voiceEvent = createStreamEvent.voiceTranscribed({
       messageId: params.messageId,

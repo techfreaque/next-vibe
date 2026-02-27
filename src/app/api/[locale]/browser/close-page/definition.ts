@@ -42,7 +42,7 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      pageIdx: scopedRequestField(scopedTranslation, {
+      pageId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
         label: "close-page.form.fields.pageIdx.label",
@@ -52,7 +52,7 @@ const { POST } = createEndpoint({
         schema: z
           .number()
           .describe(
-            "The index of the page to close. Call list_pages to list pages.",
+            "The ID of the page to close. Call list_pages to list pages.",
           ),
       }),
 
@@ -68,15 +68,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "close-page.response.result",
         schema: z
-          .object({
-            closed: z.boolean().describe("Whether the page was closed"),
-            remainingPages: z
-              .number()
-              .optional()
-              .describe("Number of remaining open pages"),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of the close page operation"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -99,16 +100,15 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        pageIdx: 0,
+        pageId: 0,
       },
     },
     responses: {
       default: {
         success: true,
-        result: {
-          closed: true,
-          remainingPages: 2,
-        },
+        result: [
+          { type: "text", text: "# close_page response\nClosed the page." },
+        ],
         executionId: "exec_123",
       },
     },

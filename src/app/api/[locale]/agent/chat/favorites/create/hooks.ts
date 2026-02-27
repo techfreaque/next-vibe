@@ -221,6 +221,7 @@ export function useAddToFavorites({
               null,
               null,
               locale,
+              user,
             );
 
           return {

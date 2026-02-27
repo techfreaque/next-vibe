@@ -4,6 +4,9 @@
  * Handles ONLY Next.js-specific concerns: NextRequest parsing, NextResponse wrapping, streaming
  */
 
+// Side-effect: registers global error sink so all logger.error() calls persist to error_logs
+import "../shared/logger/error-persist";
+
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { parseError } from "next-vibe/shared/utils/parse-error";
@@ -14,6 +17,7 @@ import {
   ErrorResponseError,
   ErrorResponseTypes,
   fail,
+  isContentResponse,
   isFileResponse,
   isStreamingResponse,
   type ResponseType,
@@ -132,6 +136,15 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
       if (isStreamingResponse(result)) {
         logger.debug("Returning streaming response");
         return result.response;
+      }
+
+      // Handle content responses - return content blocks as JSON
+      if (isContentResponse(result)) {
+        logger.debug("Returning content response");
+        return NextResponse.json({
+          success: true,
+          data: { content: result.content },
+        });
       }
 
       // Handle errors - wrap in NextResponse

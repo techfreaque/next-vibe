@@ -41,6 +41,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
@@ -77,13 +78,15 @@ function UserRow({
   onDelete,
   onCreditHistory,
   t,
+  isTouch,
 }: {
   user: User;
   locale: CountryLanguage;
   onView: (user: User) => void | Promise<void>;
   onEdit: (user: User) => void | Promise<void>;
   onDelete: (user: User) => void | Promise<void>;
-  onCreditHistory: (userId: string) => void;
+  onCreditHistory: (userId: string) => void | Promise<void>;
+  isTouch: boolean;
   t: UsersListT;
 }): React.JSX.Element {
   return (
@@ -133,14 +136,19 @@ function UserRow({
       </Div>
 
       <Div
-        className="flex-shrink-0 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+        className={cn(
+          "flex-shrink-0 flex gap-0.5",
+          isTouch
+            ? "opacity-100"
+            : "opacity-0 group-hover:opacity-100 transition-opacity",
+        )}
         onClick={(e) => e.stopPropagation()}
       >
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() => onCreditHistory(user.id)}
+          onClick={() => void onCreditHistory(user.id)}
           title={t("widget.creditHistory")}
         >
           <CreditCard className="h-4 w-4" />
@@ -185,6 +193,7 @@ export function UsersListContainer({
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
+  const isTouch = useTouchDevice();
   const router = useRouter();
   const { push: navigate } = useWidgetNavigation();
   const t = useWidgetTranslation<typeof definition.GET>();
@@ -281,9 +290,9 @@ export function UsersListContainer({
 
   const handleView = useCallback(
     async (user: User): Promise<void> => {
-      const userDefinitions = await import("../user/[id]/definition");
-      navigate(userDefinitions.default.GET, {
-        urlPathParams: { id: user.id },
+      const viewDefinitions = await import("../view/definition");
+      navigate(viewDefinitions.default.GET, {
+        data: { userId: user.id },
       });
     },
     [navigate],
@@ -326,10 +335,13 @@ export function UsersListContainer({
   }, [router, locale]);
 
   const handleCreditHistory = useCallback(
-    (userId: string): void => {
-      router.push(`/${locale}/admin/users/${userId}/edit`);
+    async (userId: string): Promise<void> => {
+      const viewDefinitions = await import("../view/definition");
+      navigate(viewDefinitions.default.GET, {
+        data: { userId },
+      });
     },
-    [router, locale],
+    [navigate],
   );
 
   const statusChips: {
@@ -532,6 +544,7 @@ export function UsersListContainer({
                 onDelete={handleDelete}
                 onCreditHistory={handleCreditHistory}
                 t={t}
+                isTouch={isTouch}
               />
             ))}
           </Div>

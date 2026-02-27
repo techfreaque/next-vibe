@@ -13,7 +13,7 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import { env } from "@/config/env";
 
 import type { NewCronTask } from "../../cron/db";
-import { cronTasks } from "../../cron/db";
+import { cronTaskExecutions, cronTasks } from "../../cron/db";
 import { CronTaskStatus } from "../../enum";
 import { endpoints } from "./definition";
 
@@ -49,45 +49,103 @@ export const { POST, tools } = endpointsHandler({
       }
 
       const now = new Date();
-      const finalStatus =
-        data.status === CronTaskStatus.COMPLETED
-          ? CronTaskStatus.COMPLETED
-          : CronTaskStatus.FAILED;
+      const isRunning = data.status === CronTaskStatus.RUNNING;
 
       try {
-        const updates: Partial<NewCronTask> & { updatedAt: Date } = {
-          lastExecutedAt: now,
-          lastExecutionStatus: finalStatus,
-          lastExecutionDuration: data.durationMs ?? null,
-          executionCount: task.executionCount + 1,
-          updatedAt: now,
-        };
+        if (isRunning) {
+          // RUNNING: update task status only (visibility for Thea)
+          await db
+            .update(cronTasks)
+            .set({
+              lastExecutionStatus: CronTaskStatus.RUNNING,
+              updatedAt: now,
+            })
+            .where(eq(cronTasks.id, task.id));
 
-        if (data.status === CronTaskStatus.COMPLETED) {
-          updates.successCount = task.successCount + 1;
-          updates.lastExecutionError = null;
+          logger.info("Task report: RUNNING", {
+            taskId: task.id,
+            routeId: task.routeId,
+            executedBy: data.executedByInstance,
+          });
         } else {
-          updates.errorCount = task.errorCount + 1;
-          updates.lastExecutionError = data.error ?? data.summary ?? null;
+          // Terminal status: update counters + create execution record
+          const finalStatus =
+            data.status === CronTaskStatus.COMPLETED
+              ? CronTaskStatus.COMPLETED
+              : data.status === CronTaskStatus.CANCELLED
+                ? CronTaskStatus.CANCELLED
+                : data.status === CronTaskStatus.TIMEOUT
+                  ? CronTaskStatus.TIMEOUT
+                  : CronTaskStatus.FAILED;
+
+          const updates: Partial<NewCronTask> & { updatedAt: Date } = {
+            lastExecutedAt: now,
+            lastExecutionStatus: finalStatus,
+            lastExecutionDuration: data.durationMs ?? null,
+            executionCount: task.executionCount + 1,
+            updatedAt: now,
+          };
+
+          if (data.status === CronTaskStatus.COMPLETED) {
+            updates.successCount = task.successCount + 1;
+            updates.lastExecutionError = null;
+          } else {
+            updates.errorCount = task.errorCount + 1;
+            updates.lastExecutionError = data.error ?? data.summary ?? null;
+          }
+
+          // Run-once tasks: disable after completion
+          if (task.runOnce) {
+            updates.enabled = false;
+          }
+
+          await db
+            .update(cronTasks)
+            .set(updates)
+            .where(eq(cronTasks.id, task.id));
+
+          // Create execution record on remote for full history visibility
+          const executionId =
+            data.executionId ?? `report-${task.id}-${now.getTime()}`;
+          const startedAt = data.startedAt ? new Date(data.startedAt) : now;
+
+          await db
+            .insert(cronTaskExecutions)
+            .values({
+              taskId: task.id,
+              taskName: task.routeId,
+              executionId,
+              status: finalStatus,
+              priority: task.priority,
+              startedAt,
+              completedAt: now,
+              durationMs: data.durationMs ?? null,
+              result: data.output ?? null,
+              triggeredBy: "remote",
+              serverTimezone: data.serverTimezone ?? null,
+              executedByInstance: data.executedByInstance ?? null,
+              environment: "remote",
+              config: {},
+            })
+            .onConflictDoUpdate({
+              target: [cronTaskExecutions.executionId],
+              set: {
+                status: sql`excluded.status`,
+                completedAt: sql`excluded.completed_at`,
+                durationMs: sql`excluded.duration_ms`,
+                result: sql`excluded.result`,
+              },
+            });
+
+          logger.info("Task report applied with execution record", {
+            taskId: task.id,
+            routeId: task.routeId,
+            status: finalStatus,
+            executionId,
+            executedBy: data.executedByInstance,
+            serverTz: data.serverTimezone,
+          });
         }
-
-        // Run-once tasks: disable after completion
-        if (task.runOnce) {
-          updates.enabled = false;
-        }
-
-        await db
-          .update(cronTasks)
-          .set(updates)
-          .where(eq(cronTasks.id, task.id));
-
-        logger.info("Task report applied", {
-          taskId: task.id,
-          routeId: task.routeId,
-          status: finalStatus,
-          executedBy: data.executedByInstance,
-          serverTz: data.serverTimezone,
-        });
 
         return {
           success: true as const,

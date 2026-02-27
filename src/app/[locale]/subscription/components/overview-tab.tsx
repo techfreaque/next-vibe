@@ -24,7 +24,7 @@ import { useState } from "react";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/components/model-credit-display";
 import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
 import {
-  modelOptions,
+  modelDefinitions,
   modelProviders,
   TOTAL_MODEL_COUNT,
 } from "@/app/api/[locale]/agent/models/models";
@@ -211,24 +211,24 @@ export function OverviewTab({
               <Div className="flex flex-col gap-4">
                 {Object.entries(modelProviders).map(
                   ([providerId, provider]) => {
-                    const providerModels = Object.values(modelOptions).filter(
-                      (model) => {
-                        // Filter by provider
-                        if (model.provider !== providerId) {
-                          return false;
-                        }
+                    const providerModels = Object.values(
+                      modelDefinitions,
+                    ).filter((def) => {
+                      // Filter by provider company
+                      if (def.by !== providerId) {
+                        return false;
+                      }
 
-                        // Filter legacy models if toggle is off
-                        const isLegacy = model.utilities.includes(
-                          ModelUtility.LEGACY,
-                        );
-                        if (!showLegacyModels && isLegacy) {
-                          return false;
-                        }
+                      // Filter legacy models if toggle is off
+                      const isLegacy = def.utilities.includes(
+                        ModelUtility.LEGACY,
+                      );
+                      if (!showLegacyModels && isLegacy) {
+                        return false;
+                      }
 
-                        return true;
-                      },
-                    );
+                      return true;
+                    });
                     if (providerModels.length === 0) {
                       return null;
                     }
@@ -239,17 +239,18 @@ export function OverviewTab({
                           {provider.name}
                         </H4>
                         <Div className="grid grid-cols-2 gap-2 text-sm">
-                          {providerModels.map((model) => {
-                            const isLegacy = model.utilities.includes(
+                          {providerModels.map((def) => {
+                            const isLegacy = def.utilities.includes(
                               ModelUtility.LEGACY,
                             );
+                            const primaryId = def.providers[0].id;
                             return (
                               <Div
-                                key={model.id}
+                                key={primaryId}
                                 className="flex justify-between p-2 rounded bg-accent"
                               >
                                 <Span className="flex items-center gap-1">
-                                  {model.name}
+                                  {def.name}
                                   {isLegacy && (
                                     <Span className="text-xs text-muted-foreground">
                                       (
@@ -261,7 +262,7 @@ export function OverviewTab({
                                   )}
                                 </Span>
                                 <ModelCreditDisplay
-                                  modelId={model.id}
+                                  modelId={primaryId}
                                   variant="text"
                                   className="font-mono"
                                   locale={locale}

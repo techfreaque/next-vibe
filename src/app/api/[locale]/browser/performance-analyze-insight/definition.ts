@@ -90,18 +90,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "performance-analyze-insight.response.result",
         schema: z
-          .object({
-            analyzed: z.boolean().describe("Whether the insight was analyzed"),
-            insight: z
-              .object({
-                name: z.string(),
-                value: z.coerce.number(),
-                details: z.string(),
-              })
-              .describe("The analyzed insight details"),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of performance insight analysis"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -128,14 +126,12 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          analyzed: true,
-          insight: {
-            name: "LCP",
-            value: 2500,
-            details: "Largest Contentful Paint",
+        result: [
+          {
+            type: "text",
+            text: "# performance_analyze_insight response\nLCP: 2500ms - Largest Contentful Paint",
           },
-        },
+        ],
         executionId: "exec_123",
       },
     },

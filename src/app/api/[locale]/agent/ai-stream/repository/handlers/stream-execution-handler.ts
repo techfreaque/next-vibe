@@ -100,7 +100,7 @@ export class StreamExecutionHandler {
     const contextGuardThreshold = Math.floor(modelConfig.contextWindow * 0.9);
 
     const streamResult = aiStreamText({
-      model: provider.chat(modelConfig.openRouterModel),
+      model: provider.chat(modelConfig.providerModel),
       messages,
       temperature: DEFAULT_TEMPERATURE,
       abortSignal: streamAbortController.signal,
@@ -211,7 +211,7 @@ export class StreamExecutionHandler {
     const cachePercentage =
       inputTokens > 0 ? Math.round((cachedInputTokens / inputTokens) * 100) : 0;
 
-    logger.info("[CACHE DEBUG] Token usage from AI response", {
+    logger.debug("[CACHE DEBUG] Token usage from AI response", {
       cachePercentage: `${cachePercentage}%`,
       cachedInputTokens,
       uncachedInputTokens,

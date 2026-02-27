@@ -39,6 +39,11 @@ export const translations: typeof enTranslations = {
       description:
         "Ustaw to wspomnienie jako widoczne w kontekstach publicznych i udostępnionych",
     },
+    isArchived: {
+      label: "Zarchiwizowane",
+      description:
+        "Zarchiwizuj to wspomnienie, aby wykluczyć je z kontekstu AI bez usuwania",
+    },
     backButton: {
       label: "Wstecz",
     },

@@ -305,6 +305,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
 
       // Prepare task data for insertion
       const taskData = {
+        id: data.id || crypto.randomUUID(),
         routeId: data.routeId,
         displayName: data.displayName,
         description: data.description || null,

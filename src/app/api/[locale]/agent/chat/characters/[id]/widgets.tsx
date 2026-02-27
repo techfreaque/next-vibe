@@ -196,6 +196,7 @@ export function CharacterEditContainer({
                 form.setValue("modelSelection", selection)
               }
               locale={locale}
+              user={user}
             />
           )}
 
@@ -207,6 +208,7 @@ export function CharacterEditContainer({
                 form.setValue("compactTrigger", v, { shouldDirty: true })
               }
               modelSelection={form.watch("modelSelection") ?? null}
+              user={user}
             />
           )}
 
@@ -323,6 +325,7 @@ export function CharacterViewContainer({
         modelSelection={modelSelection}
         readOnly={true}
         locale={locale}
+        user={user}
       />
     </>
   );

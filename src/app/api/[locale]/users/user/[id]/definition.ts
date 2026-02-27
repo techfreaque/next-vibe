@@ -446,6 +446,24 @@ const { PUT } = createEndpoint({
         schema: z.uuid().nullable().optional(),
       }),
 
+      // === BAN SETTINGS ===
+      isBanned: scopedRequestResponseField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "id.put.isBanned.label" as const,
+        description: "id.put.isBanned.description" as const,
+        columns: 6,
+        schema: z.boolean().optional(),
+      }),
+      bannedReason: scopedRequestResponseField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "id.put.bannedReason.label" as const,
+        description: "id.put.bannedReason.description" as const,
+        columns: 6,
+        schema: z.string().nullable().optional(),
+      }),
+
       // === RESPONSE-ONLY FIELDS ===
       stripeCustomerId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -535,6 +553,8 @@ const { PUT } = createEndpoint({
         privateName: "John Doe",
         publicName: "John D.",
         isActive: true,
+        isBanned: false,
+        bannedReason: null,
       },
     },
     responses: {
@@ -546,6 +566,8 @@ const { PUT } = createEndpoint({
         publicName: "John D.",
         emailVerified: true,
         isActive: true,
+        isBanned: false,
+        bannedReason: null,
         stripeCustomerId: null,
         userRoles: [
           {

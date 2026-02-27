@@ -8,9 +8,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   scopedObjectFieldNew,
-  scopedObjectOptionalField,
   scopedRequestField,
-  scopedResponseArrayField,
   scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
@@ -142,62 +140,20 @@ const { POST } = createEndpoint({
           .boolean()
           .describe("Whether the network requests listing operation succeeded"),
       }),
-      result: scopedObjectOptionalField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "list-network-requests.response.result.title",
-        description: "list-network-requests.response.result.description",
-        layoutType: LayoutType.STACKED,
-        usage: { response: true },
-        children: {
-          requests: scopedResponseArrayField(
-            scopedTranslation,
-            {
-              type: WidgetType.CONTAINER,
-            },
-            scopedObjectFieldNew(scopedTranslation, {
-              type: WidgetType.CONTAINER,
-              layoutType: LayoutType.GRID,
-              columns: 12,
-              usage: { response: true },
-              children: {
-                reqid: scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  content:
-                    "list-network-requests.response.result.requests.reqid",
-                  schema: z.coerce.number(),
-                }),
-                url: scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  content: "list-network-requests.response.result.requests.url",
-                  schema: z.string(),
-                }),
-                method: scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  content:
-                    "list-network-requests.response.result.requests.method",
-                  schema: z.string(),
-                }),
-                status: scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  content:
-                    "list-network-requests.response.result.requests.status",
-                  schema: z.coerce.number().optional(),
-                }),
-                type: scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  content:
-                    "list-network-requests.response.result.requests.type",
-                  schema: z.string(),
-                }),
-              },
+      result: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "list-network-requests.response.result",
+        schema: z
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
             }),
-          ),
-          totalCount: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "list-network-requests.response.result.totalCount",
-            schema: z.coerce.number().describe("Total number of requests"),
-          }),
-        },
+          )
+          .optional()
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -224,18 +180,12 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          requests: [
-            {
-              reqid: 1,
-              url: "https://example.com",
-              method: "GET",
-              status: 200,
-              type: "document",
-            },
-          ],
-          totalCount: 1,
-        },
+        result: [
+          {
+            type: "text",
+            text: "# list_network_requests response\n[1] GET https://example.com - 200 document",
+          },
+        ],
         executionId: "exec_123",
       },
     },

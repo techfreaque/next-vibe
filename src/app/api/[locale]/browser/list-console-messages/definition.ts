@@ -8,9 +8,7 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   scopedObjectFieldNew,
-  scopedObjectOptionalField,
   scopedRequestField,
-  scopedResponseArrayField,
   scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
@@ -141,57 +139,20 @@ const { POST } = createEndpoint({
           .boolean()
           .describe("Whether the console messages listing operation succeeded"),
       }),
-      result: scopedObjectOptionalField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "list-console-messages.response.result.title",
-        description: "list-console-messages.response.result.description",
-        layoutType: LayoutType.STACKED,
-        usage: { response: true },
-        children: {
-          messages: scopedResponseArrayField(
-            scopedTranslation,
-            {
-              type: WidgetType.CONTAINER,
-            },
-            scopedObjectFieldNew(scopedTranslation, {
-              type: WidgetType.CONTAINER,
-              layoutType: LayoutType.GRID,
-              columns: 12,
-              usage: { response: true },
-              children: {
-                msgid: scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  content:
-                    "list-console-messages.response.result.messages.msgid",
-                  schema: z.coerce.number(),
-                }),
-                type: scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  content:
-                    "list-console-messages.response.result.messages.type",
-                  schema: z.string(),
-                }),
-                text: scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  content:
-                    "list-console-messages.response.result.messages.text",
-                  schema: z.string(),
-                }),
-                timestamp: scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  content:
-                    "list-console-messages.response.result.messages.timestamp",
-                  schema: z.string().optional(),
-                }),
-              },
+      result: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "list-console-messages.response.result",
+        schema: z
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
             }),
-          ),
-          totalCount: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "list-console-messages.response.result.totalCount",
-            schema: z.coerce.number().describe("Total number of messages"),
-          }),
-        },
+          )
+          .optional()
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -218,16 +179,12 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          messages: [
-            {
-              msgid: 1,
-              type: "log",
-              text: "Example message",
-            },
-          ],
-          totalCount: 1,
-        },
+        result: [
+          {
+            type: "text",
+            text: "# list_console_messages response\n[1] [log] Example message",
+          },
+        ],
         executionId: "exec_123",
       },
     },

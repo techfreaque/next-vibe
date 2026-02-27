@@ -8,6 +8,7 @@ import "server-only";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import type { ContentBlock } from "@/app/api/[locale]/shared/types/response.schema";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { McpResultFormatter } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/mcp/McpResultFormatter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -280,6 +281,29 @@ export class MCPRegistry {
     user: JwtPayloadType,
   ): MCPToolCallResult {
     const { t } = mcpScopedTranslation.scopedT(locale);
+
+    if (
+      result.success &&
+      result.data &&
+      typeof result.data === "object" &&
+      "__isContentResponse" in result.data &&
+      "content" in result.data &&
+      Array.isArray(result.data.content)
+    ) {
+      // ContentResponse: return content blocks directly (text + images)
+      const content = result.data.content as ContentBlock[];
+      logger.debug(
+        "[MCP Registry] ContentResponse with native content blocks",
+        {
+          toolName,
+          blockCount: content.length,
+        },
+      );
+      return {
+        content,
+        isError: false,
+      };
+    }
 
     if (result.success && result.data) {
       // Format successful response using endpoint renderer if available

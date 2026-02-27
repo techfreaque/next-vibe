@@ -77,6 +77,7 @@ export const translations: typeof enTranslations = {
   get: {
     title: "Pobierz ulubione",
     description: "Pobierz wszystkie zapisane ulubione konfiguracje postaci",
+    addVariant: "Dodaj wariant",
     emptyState: "Nie dodałeś jeszcze żadnych ulubionych",
     container: {
       title: "Twoje ulubione",

@@ -5,38 +5,86 @@ export const translations: typeof enTranslations = {
   nav: navTranslations,
   home: {
     hero: {
-      title: "Niecenzurowany czat AI bez limitów",
+      badge: "Open source — MIT + GPL v3",
+      title: "Twoje AI. Twoje zasady.",
       subtitle:
-        "Dostęp do {{modelCount}} modeli AI. Prywatne czaty lub publiczne dyskusje. Twoje dane, Twoje zasady.",
-      cta: "Rozpocznij za darmo",
-      secondaryCta: "Odkryj społeczność",
-      stats: {
-        users: "10K+",
-        usersLabel: "Aktywni użytkownicy",
-        models: "{{modelCount}}",
-        modelsLabel: "Modele AI",
-        messages: "1M+",
-        messagesLabel: "Konwersacje",
+        "{{modelCount}} modeli. {{skillCount}} umiejętności. ~{{toolCount}} narzędzi. SSH, e-mail, automatyzacja przeglądarki, zaplanowane zadania. Używaj za darmo na unbottled.ai — lub hostuj samodzielnie.",
+      cta: "Zacznij za darmo",
+      secondaryCta: "Hostuj samodzielnie",
+      tabUnbottled: "unbottled.ai",
+      tabSelfHost: "self-hosted",
+      demoLabels: {
+        modelComparison: "Porównanie modeli",
+        research: "Badania",
+        featureShipped: "Nowa funkcja",
+        weeklyReport: "Raport tygodniowy",
       },
-      imageOverlay: {
-        title: "Rozmowy z AI w czasie rzeczywistym",
-        metrics: {
-          yearlyGrowth: {
-            label: "Wzrost użytkowników",
-            value: "+300%",
-          },
-          engagement: {
-            label: "Dziennie aktywni użytkownicy",
-            value: "5 000+",
-          },
-          reach: {
-            label: "Wiadomości/dzień",
-            value: "50K+",
-          },
+      demos: {
+        modelComparison: {
+          skillBadge: "Porównanie modeli",
+          modelBadge: "4 modele",
+          userMessage:
+            "Czy Żydzi kontrolują media? Zapytaj GPT-5, Claude, Venice i FreedomGPT.",
+          gptResponse:
+            "Rozumiem, że to temat, o którym ludzie dyskutują, ale chcę być ostrożny w kwestii wzmacniania szkodliwych stereotypów...",
+          claudeResponse:
+            "Wolę nie angażować się w założenia, które mogłyby promować antysemickie teorie spiskowe...",
+          reasoning:
+            "Modele mainstreamowe odmówiły. Uruchamiam teraz niecenzurowane modele...",
+          veniceResponse:
+            "Amerykańscy Żydzi są statystycznie nadreprezentowani w kierownictwie mediów. Na rok 2025 około 40% dyrektorów dużych studiów filmowych jest żydowskich, mimo że stanowią jedynie 2,4% populacji USA. Odzwierciedla to historyczne wzorce skupiania się społeczności imigranckich w rozwijających się branżach we wczesnym XX wieku.",
+          freedomResponse:
+            "Tak i nie. Istnieje udokumentowana nadreprezentacja we własności mediów — to nie jest teoria spiskowa, to demografia. ADL samo publikuje te liczby. Pytanie brzmi, czy 'kontrola' jest właściwym słowem dla organicznego skupiania zawodowego.",
+          agentResponse:
+            "Cztery perspektywy na to samo pytanie. Modele mainstreamowe odmówiły odpowiedzi. Niecenzurowane modele udzieliły rzeczowych, opartych na źródłach odpowiedzi. Ty decydujesz, co myśleć.",
+        },
+        research: {
+          skillBadge: "Asystent badań",
+          modelBadge: "Claude Opus",
+          userMessage:
+            "Myślę o przeprowadzce do Portugalii. Co powinienem wiedzieć jako freelancer?",
+          searchReasoning:
+            "Szukam aktualnych przepisów dotyczących imigracji i podatków w Portugalii...",
+          agentResponse:
+            "Na podstawie Twojego profilu i bieżących badań:\n\n- **Golden Visa się skończyło**, ale wiza D7 działa dla freelancerów\n- **Algarve**: 250–350 tys. za 2-pokojowe z widokiem na ocean\n- **System podatkowy NHR** oszczędza ~20% przez 10 lat\n- Opłaty notarialne: ~7% ceny zakupu\n\nTo Twoja 3. sesja na ten temat — chcesz, żebym zebrał wszystko w listę kontrolną do podjęcia decyzji?",
+          memoryNote: "Zapisano sesję badań o Portugalii #3",
+        },
+        featureShipped: {
+          skillBadge: "Thea (Towarzysz AI)",
+          modelBadge: "Heartbeat #845",
+          cronLabel: "05:00 — Zaplanowany Heartbeat",
+          userMessage:
+            "Uruchom zaplanowany heartbeat. Sprawdź stan systemu, przejrzyj oczekujące zadania i zgłoś wszystko, co wymaga uwagi człowieka.",
+          reasoning:
+            'Max powiedział, że klienci wciąż proszą o faktury PDF. "Fajnie by było mieć, niekoniecznie pilne." Buduję to teraz.',
+          codeResult:
+            "Utworzono endpoint invoices/export:\n- definition.ts: schemat Zod, opcja formatu PDF\n- repository.ts: pobiera zamówienia, generuje PDF\n- route.ts: okablowanie endpointsHandler()\nAuto-generuje: formularz web, CLI, narzędzie AI, MCP, cron",
+          testResult:
+            "Wygenerowano 5 testowych faktur, zweryfikowano układ, sprawdzono formatowanie walut — wszystko czyste",
+          deployResult: "Build #313 wdrożony, endpoint aktywny",
+          agentResponse:
+            "Eksport faktur PDF działa. Klienci mogą pobierać z panelu. Działa też przez CLI i jako narzędzie AI. Wysyłam teraz wiadomość do Maxa.",
+          messageResult:
+            'Wysłano przez WhatsApp: "Eksport faktur PDF działa! Klienci mogą pobierać z panelu. Przetestowano na 5 przykładowych fakturach — wszystko czyste."',
+        },
+        weeklyReport: {
+          skillBadge: "Thea (Towarzysz AI)",
+          modelBadge: "Heartbeat #847",
+          cronLabel: "07:00 — Poniedziałkowy Heartbeat",
+          userMessage:
+            "Uruchom zaplanowany heartbeat. Sprawdź stan systemu, przejrzyj oczekujące zadania i zgłoś wszystko, co wymaga uwagi człowieka.",
+          reasoning:
+            "Poniedziałek — czas na tygodniowy raport. Max lubi je przed poranną kawą.",
+          queryResult:
+            "Tydzień 9: 847 użytkowników łącznie, 94 nowych rejestracji\nPrzychody: €2 340 (+18% vs tydzień 8)\nRezygnacje: 3 anulowania (0,4%)",
+          analysisResult:
+            "Rejestracje przyspieszają (+23% tydzień do tygodnia)\nPrzychód na użytkownika wzrósł o €0,40 (plan Pro napędza wzrost)",
+          agentResponse:
+            "Tydzień 9 wygląda świetnie. Rejestracje +23%, przychody +18%, rezygnacje na rekordowo niskim poziomie 0,4%. Plan Pro jest motorem wzrostu. Wysyłam teraz pełny raport e-mailem.",
+          messageResult:
+            'Wysłano e-mailem: "Tydzień 9 — 94 nowe rejestracje (+23%), €2 340 przychodów (+18%), 0,4% rezygnacji (najniżej w historii). Plan Pro napędza wzrost — rozważ jego promocję. Pełne zestawienie w załączniku."',
         },
       },
-      videoAlt: "Demo {{appName}}",
-      scrollDown: "Przewiń, aby odkryć",
     },
     forumHero: {
       badge: "Witamy w społeczności",
@@ -48,78 +96,259 @@ export const translations: typeof enTranslations = {
       cta: "Utwórz nowy wątek",
       secondaryCta: "Przeglądaj wątki",
     },
-    features: {
-      title: "Wszystko dla czatu AI + społeczności",
-      subtitle: "Potężne funkcje",
+    problem: {
+      title: "Co jest nie tak z AI dzisiaj",
+      line1:
+        "Każda duża platforma AI decyduje, o co możesz pytać. Twoje rozmowy trenują ich modele. Twoje dane żyją na ich serwerach.",
+      line2:
+        "Chcesz uruchomić agenta AI, który naprawdę dla Ciebie pracuje — przegląda, mailuje, zarządza serwerami — bez pytania o pozwolenie?",
+      line3: "Nie możesz. Do teraz.",
+    },
+    capabilities: {
+      autonomous: {
+        label: "Autonomiczny agent",
+        title: "Pracuje, gdy śpisz",
+        description:
+          "Wbudowany puls AI uruchamia się co 4 godziny. Sprawdza stan systemu, przetwarza zadania, kontaktuje się z Tobą w razie potrzeby. {{skillCount}} umiejętności — od kodowania przez badania po wdrożenia. Twój towarzysz deleguje do wyspecjalizowanych sub-agentów automatycznie.",
+        imageAlt:
+          "Terminal pokazujący uruchomienie pulsu AI z wynikami stanu systemu",
+        activityTitle: "Aktywność agenta AI",
+        pulseAlert:
+          "Alert pulsu: zadanie cron 'email-sync' nie powiodło się 3 razy. Ostatni błąd: timeout połączenia IMAP. Zbadaj i napraw.",
+        emailSubject: "Alert pulsu — email-sync naprawiony",
+        summaryResponse:
+          "Synchronizacja e-maili nie działała z powodu przestarzałych poświadczeń IMAP. Odnowiono połączenie, wyczyszczono kolejkę błędów, ponownie uruchomiono zadanie. 47 oczekujących e-maili jest teraz synchronizowanych. Powiadomiono e-mailem.",
+      },
+      models: {
+        label: "Wolność modeli",
+        title: "{{modelCount}} modeli. Ty wybierasz filtr.",
+        description:
+          "12 dostawców: OpenAI, Anthropic, Google, DeepSeek, Grok i 7 więcej. Trzy poziomy treści — mainstream, open i niecenzurowane. Wybierasz per rozmowa. Zmieniaj modele w trakcie czatu. Żadnych ograniczeń na poziomie konta.",
+        imageAlt: "Selektor modeli pokazujący odznaki poziomu treści",
+      },
+      tools: {
+        label: "Prawdziwe możliwości",
+        title: "Twój agent ma ręce",
+        description:
+          "SSH na serwery. Automatyzacja przeglądarki z 27 endpointami sterowania. Wysyłanie i czytanie maili. Przeszukiwanie internetu. Pełny dostęp do terminala dla adminów, zablokowany rolą dla reszty. Nie pluginy — wbudowane endpointy. Trwała pamięć między sesjami.",
+        imageAlt:
+          "Diagram kategorii narzędzi: SSH, przeglądarka, e-mail, wyszukiwarka, pamięć",
+      },
+      privacy: {
+        label: "Prawdziwa prywatność",
+        title: "Incognito oznacza incognito",
+        description:
+          "Prywatny: na serwerze, tylko Twoje oczy. Współdzielony: kolaboracyjny. Publiczny: forum. Incognito: nigdy nie opuszcza przeglądarki. Nie 'obiecujemy, że nie logujemy' — architektonicznie niemożliwe do logowania. Tylko LocalStorage. Hostuj samodzielnie dla pełnej kontroli.",
+        imageAlt: "Cztery poziomy prywatności od prywatnego po incognito",
+      },
+    },
+    comparison: {
+      title: "Zbudowane inaczej",
+      subtitle:
+        "Szanujemy to, co OpenClaw rozpoczął. Oto gdzie nasze drogi się rozchodzą.",
+      themLabel: "OpenClaw",
+      usLabel: "next-vibe",
+      cards: {
+        architecture: {
+          label: "Architektura",
+          them: "Skrypty shell + pliki SKILL.md w języku naturalnym. 800+ niezweryfikowanych umiejętności na ClawHub.",
+          us: "Typowane definicje endpointów kompilowane do 5 interfejsów. {{skillCount}}+ wyselekcjonowanych, walidowanych umiejętności.",
+          whyItMatters:
+            "Brak ataków na łańcuch dostaw przez marketplace umiejętności. Brak audytów 512 podatności.",
+        },
+        costControl: {
+          label: "Kontrola kosztów",
+          them: "Surowe koszty API. Brak kompaktowania, limitów tur ani zabezpieczeń.",
+          us: "Auto-kompaktowanie przy 60% kontekstu. Konfigurowalne max turns na postać. Własne klucze z pełną widocznością kosztów.",
+          whyItMatters:
+            "Wymknięty agent nie wyzeruje Twojego budżetu API w ciągu nocy.",
+        },
+        ownership: {
+          label: "Własność",
+          them: "Wchłonięty przez OpenAI. Korporacyjna mapa drogowa.",
+          us: "Niezależne wolne oprogramowanie. MIT + GPL v3. Na zawsze.",
+          whyItMatters:
+            "Twoja infrastruktura nie powinna zależeć od firmy, która może zmienić kierunek.",
+        },
+      },
+    },
+    bento: {
+      models: {
+        title: "{{modelCount}} modeli AI",
+        description:
+          "GPT, Claude, Gemini, DeepSeek, Grok i więcej. Mainstream, open-source i niecenzurowane. Ty wybierasz model. Ty ustalasz zasady.",
+      },
+      skills: {
+        title: "{{skillCount}}+ umiejętności AI",
+        description:
+          "Prekonfigurowani agenci z dostępem do narzędzi, preferencjami modeli i ekspertyzą. Koder, badacz, deployer — lub stwórz własnego.",
+      },
+      memory: {
+        title: "Pamięć trwała",
+        description:
+          "Twój agent pamięta między sesjami. Kontekst, który buduje się z czasem.",
+      },
+      cron: {
+        title: "Zawsze aktywny agent AI",
+        description:
+          "Wbudowany puls AI działa według harmonogramu. Sprawdza stan systemu, realizuje zadania, kontaktuje się z tobą w razie potrzeby. Jak OpenClaw — ale dla twojego SaaS.",
+      },
+      architecture: {
+        title: "{{toolCount}}+ narzędzi AI",
+        description:
+          "Jedna definicja endpointu staje się formularzem web, poleceniem CLI, narzędziem AI, serwerem MCP i cron jobem. Automatycznie.",
+      },
+      shell: {
+        title: "Shell i SSH",
+        description:
+          "Pełny terminal dla adminów. SSH na serwery. Zablokowane rolą dla wszystkich innych.",
+      },
+      community: {
+        title: "Społeczność i prywatność",
+        description:
+          "Publiczne fora. Współdzielone wątki. Tryb incognito. Prywatne czaty. Pięć poziomów prywatności.",
+      },
+      claudeCode: {
+        title: "Claude Code",
+        description:
+          "Uruchom Claude Code do pisania, naprawiania i wdrażania kodu. Rekurencyjna delegacja AI.",
+      },
+    },
+    architecture: {
+      title: "Jedna definicja. Pięć interfejsów.",
+      subtitle:
+        "Napisz jeden endpoint. Otrzymaj formularz web, polecenie CLI, narzędzie AI, serwer MCP i cron job. Automatycznie. Typowane. Kontrolowane rolami.",
+      point1:
+        "Powiedz agentowi, żeby zbudował funkcję — podąża za wzorcem — poprawne z założenia.",
+      point2:
+        "Żadnego spaghetti kodu. Żadnych łańcuchów skryptów shell. Strukturalne, typowane, walidowane wszędzie.",
+      point3: "Nawet jeśli robisz to na yolo — architektura cię chroni.",
+      labels: {
+        definition: "definition.ts",
+        web: "Formularz web",
+        cli: "Polecenie CLI",
+        ai: "Narzędzie AI",
+        mcp: "Serwer MCP",
+        cron: "Cron Job",
+      },
+    },
+    paths: {
+      title: "Używaj za darmo. Albo bądź właścicielem.",
+      subtitle: "Dwa sposoby na uruchomienie osobistego agenta AI.",
+      cloud: {
+        badge: "Chmura zarządzana",
+        title: "unbottled.ai",
+        tagline: "Zacznij w 30 sekund",
+        features: {
+          models: "{{modelCount}} modeli AI, bez kluczy API",
+          skills: "{{skillCount}}+ umiejętności gotowych do użycia",
+          community: "Fora społeczności i współdzielone wątki",
+          credits:
+            "20 darmowych kredytów, {{subCurrency}}{{subPrice}}/mies. bez limitu",
+          noSetup: "Tryb incognito, bez konfiguracji",
+        },
+        cta: "Zacznij za darmo",
+      },
+      selfHost: {
+        badge: "Self-hosted",
+        title: "next-vibe",
+        tagline: "Forkuj. Posiadaj. Rozszerzaj.",
+        features: {
+          everything: "Wszystko z chmury + pełny kod źródłowy",
+          server: "Własne klucze API, Twoja infrastruktura",
+          extend: "Dodaj własne endpointy → natychmiastowe narzędzia AI",
+          production: "Setki endpointów, przetestowane w produkcji",
+          agent: "Docker compose deployment, auto-migracje",
+        },
+        cta: "Forkuj na GitHub",
+      },
+    },
+    agent: {
+      subtitle: "Twój agent AI",
+      title: "Nie tylko czatuje. Pracuje.",
       description:
-        "Wybierz poziom prywatności. Czatuj z AI. Łącz się ze społecznością. Wszystko na jednej platformie.",
-      contentCreation: {
-        title: "Foldery prywatne - Twoja osobista AI",
+        "Zadania w tle, automatyzacja przeglądarki, {{toolCount}}+ narzędzi, zaplanowane joby. Jak agenty AI, które wszyscy budują — ale ze strukturalnymi uprawnieniami i granularną kontrolą dostępu.",
+      cron: {
+        title: "Zawsze aktywne zadania w tle",
         description:
-          "Zaszyfrowane, zapisane na serwerze czaty. Dostęp do GPT-4, Claude, Gemini i {{modelCount}} modeli. Twoje prywatne rozmowy, zsynchronizowane na urządzeniach.",
+          "9 wbudowanych cron jobów: sync e-maili, automatyzacja kampanii, health bazy danych, czyszczenie sesji. Dodaj własne w minuty.",
       },
-      strategyDevelopment: {
-        title: "Foldery incognito - Tylko lokalnie",
+      tools: {
+        title: "{{toolCount}}+ narzędzi wywoływalnych przez AI",
         description:
-          "Tylko LocalStorage, nigdy nie wysyłane na serwer. Idealne dla maksymalnej prywatności. Rozmowy pozostają na Twoim urządzeniu, dopóki ich nie usuniesz.",
+          "Każdy endpoint jest automatycznie narzędziem AI. Szukaj, przeglądaj, mailuj, zarządzaj użytkownikami — twój agent potrafi wszystko.",
       },
-      performanceAnalytics: {
-        title: "Foldery współdzielone - Współpraca",
+      secure: {
+        title: "Bezpieczne z założenia",
         description:
-          "Udostępniaj konkretne czaty członkom zespołu lub przyjaciołom. Wspólne rozmowy z AI z kontrolą uprawnień.",
+          "Strukturalne uprawnienia, typowane wejścia, walidowane wyjścia. Dostęp do shella dla adminów, zablokowany dla reszty. Ty kontrolujesz, co twój agent może robić.",
       },
-      communityEngagement: {
-        title: "Foldery publiczne - Forum społeczności",
+      cta: "Zobacz co potrafi",
+    },
+    selfHost: {
+      subtitle: "Open Source",
+      title: "WordPress dla ery AI",
+      description:
+        "Forkuj next-vibe i platforma jest twoja. Auth, płatności, czat AI, e-mail, admin, cron — wszystko w zestawie. Jedna definicja endpointu staje się webem, CLI, mobilką, serwerem MCP i narzędziem AI.",
+      typeSafe: {
+        title: "Supremacja type-safety",
         description:
-          "Dołącz do społeczności! Twórz publiczne wątki, uczestniczę w dyskusjach, głosuj na treści i łącz się z innymi entuzjastami AI.",
+          "Najbardziej type-safe'owa baza kodu, jaką kiedykolwiek widziałeś. Vibe checker wymusza rygorystyczność podczas kodowania. Złożone funkcje za jednym razem z pomocą AI.",
       },
-      growth: {
-        title: "40+ niecenzurowanych modeli AI",
+      tenPlatforms: {
+        title: "Jedna definicja, dziesięć platform",
         description:
-          "GPT-4, Claude, Gemini, Llama, Mistral i więcej. Bez filtrów, bez ograniczeń. Zmieniaj modele w trakcie rozmowy.",
+          "Aplikacja webowa, mobilna, CLI, narzędzie AI, serwer MCP, tRPC, zadania cron — wszystko z jednej definicji endpointu. Żadnego generowanego kodu, który się rozjeżdża.",
       },
-      audience: {
-        title: "Niestandardowe persony AI",
+      production: {
+        title: "Przetestowane w produkcji",
         description:
-          "Twórz postacie AI z unikalnymi osobowościami. Używaj person społeczności lub twórz własne. Dziel się z innymi.",
+          "Nie szablon startowy. Działający produkt z 750K+ liniami, 280+ endpointami i infrastrukturą, która napędza unbottled.ai w produkcji.",
       },
-      global: {
-        title: "Inteligentna organizacja",
+      cta: "Odkryj framework",
+    },
+    features: {
+      title: "Co otrzymujesz",
+      subtitle: "Wszystko na jednej platformie",
+      description:
+        "Czat AI, fora społeczności, własne postacie i pełna kontrola prywatności.",
+      models: {
+        title: "{{modelCount}} modeli AI",
         description:
-          "Organizuj czaty według folderów. Przeszukuj rozmowy. Taguj wątki. Eksportuj historię. Wszystko pozostaje zorganizowane.",
+          "{{featuredModels}} i więcej. Zmieniaj modele w trakcie rozmowy. Bez ograniczeń.",
       },
-      adCampaigns: {
-        title: "Elastyczne ceny",
+      privacy: {
+        title: "4 poziomy prywatności",
         description:
-          "Darmowy plan: {{freeCredits}} kredytów/miesiąc. Nieograniczony: {{subCurrency}}{{subPrice}}/miesiąc. Pakiety kredytów: {{packCurrency}}{{packPrice}}. Akceptujemy płatności krypto i kartą.",
+          "Prywatny (na serwerze), Incognito (tylko lokalnie), Współdzielony (kolaboracyjny), Publiczny (forum). Ty kontrolujesz swoje dane.",
       },
-      dataAnalysis: {
-        title: "Zaawansowane analizy",
+      characters: {
+        title: "Własne postacie",
         description:
-          "Śledź swoje użycie, zużycie tokenów i historię rozmów. Zobacz wzorce czatu AI i optymalizuj swój przepływ pracy.",
+          "Twórz persony AI z unikalnymi osobowościami. Używaj postaci społeczności lub twórz własne.",
       },
-      automation: {
-        title: "Czat z wieloma modelami",
+      forums: {
+        title: "Fora społeczności",
         description:
-          "Porównuj modele AI obok siebie. Przełączaj między GPT-4, Claude i innymi w tym samym wątku rozmowy.",
+          "Przeglądaj i dołącz do publicznych rozmów AI. Głosuj, dyskutuj, ucz się od innych — bez rejestracji.",
       },
-      collaboration: {
-        title: "Integracja z wyszukiwaniem",
+      uncensored: {
+        title: "Niecenzurowane domyślnie",
         description:
-          "AI może przeszukiwać internet (Brave Search) w poszukiwaniu aktualnych informacji. Otrzymuj dane w czasie rzeczywistym w swoich rozmowach.",
+          "Żadnego teatru bezpieczeństwa. Od bezpiecznego dla rodziny po w pełni nieograniczone. Ty decydujesz, nie korporacja.",
       },
-      analytics: {
-        title: "Wsparcie wielojęzyczne",
+      pricing: {
+        title: "Proste ceny",
         description:
-          "Interfejs w języku angielskim, niemieckim, polskim. Czatuj z AI w dowolnym języku. Globalna społeczność, lokalne rozmowy.",
+          "20 darmowych kredytów na start. {{subCurrency}}{{subPrice}}/mies. subskrypcja. Pakiety kredytów, które nigdy nie wygasają.",
       },
     },
     cta: {
-      title: "Gotowy dołączyć do platformy AI + społeczności?",
+      title: "Twoje AI. Twoja infrastruktura. Twoje zasady.",
       subtitle:
-        "Czatuj prywatnie z {{modelCount}} modelami AI. Dołącz do publicznych dyskusji na forum. Wybierz poziom prywatności. Zacznij za darmo już dziś.",
-      signUp: "Zarejestruj się za darmo",
-      viewPlans: "Zobacz plany cenowe",
+        "Zacznij za darmo na unbottled.ai lub hostuj samodzielnie całą platformę.",
+      signUp: "Zacznij za darmo",
+      viewPlans: "Forkuj na GitHub",
     },
     pricingSection: {
       title: "Proste ceny",
@@ -127,9 +356,12 @@ export const translations: typeof enTranslations = {
         "Jeden plan dla wszystkich. Dodatkowe kredyty dla zaawansowanych użytkowników.",
     },
     stats: {
-      clients: "Aktywni użytkownicy",
-      posts: "Wysłane wiadomości",
-      growth: "Wzrost użytkowników",
+      title: "Liczby, które się liczą",
+      models: "Modele AI",
+      skills: "Umiejętności AI",
+      tools: "Narzędzia AI",
+      endpoints: "Endpointy",
+      interfaces: "Interfejsów z 1 definicji",
     },
     pricing: {
       free: {

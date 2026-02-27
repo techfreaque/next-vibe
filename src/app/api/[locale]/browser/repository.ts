@@ -10,6 +10,9 @@ import { spawn } from "node:child_process";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
+  type ContentBlock,
+  type ContentResponse,
+  createContentResponse,
   ErrorResponseTypes,
   fail,
   success,
@@ -29,29 +32,29 @@ const TOOL_NAME_MAP: Record<string, string> = {
   [BrowserTool.CLICK]: "click",
   [BrowserTool.DRAG]: "drag",
   [BrowserTool.FILL]: "fill",
-  [BrowserTool.FILL_FORM]: "fill-form",
-  [BrowserTool.HANDLE_DIALOG]: "handle-dialog",
+  [BrowserTool.FILL_FORM]: "fill_form",
+  [BrowserTool.HANDLE_DIALOG]: "handle_dialog",
   [BrowserTool.HOVER]: "hover",
-  [BrowserTool.PRESS_KEY]: "press-key",
-  [BrowserTool.UPLOAD_FILE]: "upload-file",
-  [BrowserTool.CLOSE_PAGE]: "close-page",
-  [BrowserTool.LIST_PAGES]: "list-pages",
-  [BrowserTool.NAVIGATE_PAGE]: "navigate-page",
-  [BrowserTool.NEW_PAGE]: "new-page",
-  [BrowserTool.SELECT_PAGE]: "select-page",
-  [BrowserTool.WAIT_FOR]: "wait-for",
+  [BrowserTool.PRESS_KEY]: "press_key",
+  [BrowserTool.UPLOAD_FILE]: "upload_file",
+  [BrowserTool.CLOSE_PAGE]: "close_page",
+  [BrowserTool.LIST_PAGES]: "list_pages",
+  [BrowserTool.NAVIGATE_PAGE]: "navigate_page",
+  [BrowserTool.NEW_PAGE]: "new_page",
+  [BrowserTool.SELECT_PAGE]: "select_page",
+  [BrowserTool.WAIT_FOR]: "wait_for",
   [BrowserTool.EMULATE]: "emulate",
-  [BrowserTool.RESIZE_PAGE]: "resize-page",
-  [BrowserTool.PERFORMANCE_ANALYZE_INSIGHT]: "performance-analyze-insight",
-  [BrowserTool.PERFORMANCE_START_TRACE]: "performance-start-trace",
-  [BrowserTool.PERFORMANCE_STOP_TRACE]: "performance-stop-trace",
-  [BrowserTool.GET_NETWORK_REQUEST]: "get-network-request",
-  [BrowserTool.LIST_NETWORK_REQUESTS]: "list-network-requests",
-  [BrowserTool.EVALUATE_SCRIPT]: "evaluate-script",
-  [BrowserTool.GET_CONSOLE_MESSAGE]: "get-console-message",
-  [BrowserTool.LIST_CONSOLE_MESSAGES]: "list-console-messages",
-  [BrowserTool.TAKE_SCREENSHOT]: "take-screenshot",
-  [BrowserTool.TAKE_SNAPSHOT]: "take-snapshot",
+  [BrowserTool.RESIZE_PAGE]: "resize_page",
+  [BrowserTool.PERFORMANCE_ANALYZE_INSIGHT]: "performance_analyze_insight",
+  [BrowserTool.PERFORMANCE_START_TRACE]: "performance_start_trace",
+  [BrowserTool.PERFORMANCE_STOP_TRACE]: "performance_stop_trace",
+  [BrowserTool.GET_NETWORK_REQUEST]: "get_network_request",
+  [BrowserTool.LIST_NETWORK_REQUESTS]: "list_network_requests",
+  [BrowserTool.EVALUATE_SCRIPT]: "evaluate_script",
+  [BrowserTool.GET_CONSOLE_MESSAGE]: "get_console_message",
+  [BrowserTool.LIST_CONSOLE_MESSAGES]: "list_console_messages",
+  [BrowserTool.TAKE_SCREENSHOT]: "take_screenshot",
+  [BrowserTool.TAKE_SNAPSHOT]: "take_snapshot",
 };
 
 /**
@@ -69,7 +72,7 @@ export interface BrowserRepository {
     data: BrowserRequestOutput,
     t: BrowserT,
     logger: EndpointLogger,
-  ): Promise<ResponseType<BrowserResponseOutput>>;
+  ): Promise<ResponseType<BrowserResponseOutput> | ContentResponse>;
 }
 
 /**
@@ -120,7 +123,7 @@ export class BrowserRepositoryImpl implements BrowserRepository {
     data: BrowserRequestOutput,
     t: BrowserT,
     logger: EndpointLogger,
-  ): Promise<ResponseType<BrowserResponseOutput>> {
+  ): Promise<ResponseType<BrowserResponseOutput> | ContentResponse> {
     logger.info("[Browser Repository] Executing Chrome DevTools tool", {
       tool: data.tool,
       hasArguments: !!data.arguments,
@@ -169,19 +172,62 @@ export class BrowserRepositoryImpl implements BrowserRepository {
 
       const executionId = `exec_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 
+      // Check for MCP tool-level errors (isError flag in content response)
+      const mcpResult = result.result as
+        | {
+            content?: Array<{
+              type: string;
+              text?: string;
+              data?: string;
+              mimeType?: string;
+            }>;
+            isError?: boolean;
+          }
+        | undefined;
+
+      const isToolError = mcpResult?.isError === true;
+      const toolSuccess = result.success && !isToolError;
+
       logger.info("[Browser Repository] Tool execution completed", {
         tool: data.tool,
-        success: result.success,
+        success: toolSuccess,
         executionId,
       });
 
+      // Extract content from MCP response
+      const content = mcpResult?.content ?? [];
+
+      // On error, wrap the error message into a content block
+      const resultContent = toolSuccess
+        ? content
+        : result.error
+          ? [{ type: "text" as const, text: result.error }]
+          : content;
+
+      // If result contains image blocks, return as ContentResponse
+      // so MCP clients and AI models can render/see images natively
+      const hasImages = resultContent.some((block) => block.type === "image");
+      if (hasImages && toolSuccess) {
+        const contentBlocks: ContentBlock[] = [];
+        for (const block of resultContent) {
+          if (block.type === "image" && block.data && block.mimeType) {
+            contentBlocks.push({
+              type: "image",
+              data: block.data,
+              mimeType: block.mimeType,
+            });
+          } else if (block.type === "text" && block.text) {
+            contentBlocks.push({ type: "text", text: block.text });
+          }
+        }
+        return createContentResponse(contentBlocks);
+      }
+
       return success({
-        success: result.success,
-        result: result.success ? result.result : result.error,
+        success: toolSuccess,
+        result: resultContent,
         status: [
-          result.success
-            ? BrowserToolStatus.COMPLETED
-            : BrowserToolStatus.FAILED,
+          toolSuccess ? BrowserToolStatus.COMPLETED : BrowserToolStatus.FAILED,
         ],
         executionId,
       });

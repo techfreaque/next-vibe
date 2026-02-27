@@ -5,6 +5,7 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { BrowserTool } from "../enum";
 import {
   executeTakeScreenshot,
   filterUndefinedArgs,
@@ -18,7 +19,7 @@ export const { POST, tools } = endpointsHandler({
     handler: ({ data, t, logger }) =>
       executeTakeScreenshot(
         {
-          toolName: "take-screenshot",
+          toolName: BrowserTool.TAKE_SCREENSHOT,
           args: filterUndefinedArgs({
             uid: data.uid,
             fullPage: data.fullPage,

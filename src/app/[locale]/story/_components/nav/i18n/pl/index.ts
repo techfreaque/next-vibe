@@ -29,6 +29,7 @@ export const translations: typeof enTranslations = {
   home: "Strona główna",
   pricing: "Cennik",
   features: "Funkcje",
+  framework: "Framework",
   forum: "Forum",
   contact: "Kontakt",
   getStarted: "Zacznij za darmo",

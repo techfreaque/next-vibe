@@ -5,6 +5,7 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { BrowserTool } from "../enum";
 import { executeSelectPage, filterUndefinedArgs } from "../shared/repository";
 import selectPageEndpoints, {
   type SelectPageResponseOutput,
@@ -17,9 +18,10 @@ export const { POST, tools } = endpointsHandler({
     handler: ({ data, t, logger }) =>
       executeSelectPage<SelectPageResponseOutput>(
         {
-          toolName: "select-page",
+          toolName: BrowserTool.SELECT_PAGE,
           args: filterUndefinedArgs({
-            pageIdx: data.pageIdx,
+            pageId: data.pageId,
+            bringToFront: data.bringToFront,
           }),
         },
         t,

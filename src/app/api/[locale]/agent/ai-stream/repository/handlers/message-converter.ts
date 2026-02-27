@@ -6,7 +6,10 @@ import "server-only";
 
 import type { ModelMessage, ToolCallPart, ToolResultPart } from "ai";
 
-import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type {
+  ContentBlock,
+  ErrorResponseType,
+} from "@/app/api/[locale]/shared/types/response.schema";
 import { parseError } from "@/app/api/[locale]/shared/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -173,7 +176,7 @@ export class MessageConverter {
                     locale,
                   ),
                 }
-              : { type: "json" as const, value: toolCall.result ?? null };
+              : MessageConverter.buildToolResultOutput(toolCall.result);
 
             return [
               // Message 1: Assistant's tool call
@@ -372,7 +375,7 @@ export class MessageConverter {
                     locale,
                   ),
                 }
-              : { type: "json" as const, value: toolCall.result ?? null };
+              : MessageConverter.buildToolResultOutput(toolCall.result);
 
             toolResultMessages.push({
               role: "tool",
@@ -522,6 +525,59 @@ export class MessageConverter {
       (msg) => !Array.isArray(msg.content) || msg.content.length > 0,
     );
   }
+  /**
+   * Build tool result output, detecting ContentResponse to pass images to the AI model
+   * When the result contains a ContentResponse (with __isContentResponse marker),
+   * we use the AI SDK's `type: 'content'` format with `file-data` parts so the
+   * model can actually "see" images (e.g. screenshots from browser tools).
+   */
+  private static buildToolResultOutput(result: ToolCallResult | undefined):
+    | {
+        type: "json";
+        value: ToolCallResult | null;
+      }
+    | {
+        type: "content";
+        value: Array<
+          | { type: "text"; text: string }
+          | { type: "file-data"; data: string; mediaType: string }
+        >;
+      } {
+    // Check if result is a ContentResponse (stored as JSON with marker fields)
+    if (
+      result &&
+      typeof result === "object" &&
+      !Array.isArray(result) &&
+      "__isContentResponse" in result &&
+      "content" in result &&
+      Array.isArray(result.content)
+    ) {
+      const blocks = result.content as ContentBlock[];
+      const contentParts: Array<
+        | { type: "text"; text: string }
+        | { type: "file-data"; data: string; mediaType: string }
+      > = [];
+
+      for (const block of blocks) {
+        if (block.type === "text") {
+          contentParts.push({ type: "text", text: block.text });
+        } else if (block.type === "image") {
+          contentParts.push({
+            type: "file-data",
+            data: block.data,
+            mediaType: block.mimeType,
+          });
+        }
+      }
+
+      if (contentParts.length > 0) {
+        return { type: "content", value: contentParts };
+      }
+    }
+
+    return { type: "json", value: result ?? null };
+  }
+
   /**
    * Recursively translate error messages including nested causes
    */

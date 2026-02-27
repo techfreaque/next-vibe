@@ -6,7 +6,10 @@
 import { z } from "zod";
 
 import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/components/types";
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+import {
+  getModelDisplayName,
+  ModelId,
+} from "@/app/api/[locale]/agent/models/models";
 import { success } from "@/app/api/[locale]/shared/types/response.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -27,6 +30,7 @@ import {
   SpacingSize,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema, iconSchema } from "../../../../shared/types/common.schema";
@@ -337,6 +341,7 @@ const { PATCH } = createEndpoint({
                     const bestModel = modelSel
                       ? CharactersRepositoryClient.getBestModelForCharacter(
                           modelSel,
+                          data.user,
                         )
                       : null;
 
@@ -352,7 +357,13 @@ const { PATCH } = createEndpoint({
                       ...(bestModel
                         ? {
                             modelIcon: bestModel.icon,
-                            modelInfo: bestModel.name,
+                            modelInfo: getModelDisplayName(
+                              bestModel,
+                              !data.user.isPublic &&
+                                data.user.roles.includes(
+                                  UserPermissionRole.ADMIN,
+                                ),
+                            ),
                             modelProvider: bestModel.provider,
                           }
                         : {}),

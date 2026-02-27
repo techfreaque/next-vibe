@@ -75,7 +75,7 @@ export class ChatSettingsRepositoryClient {
   static getDefaults(): ChatSettingsGetResponseOutput {
     return {
       selectedModel: defaultModel,
-      selectedCharacter: "default",
+      selectedCharacter: "thea",
       activeFavoriteId: null,
       ttsAutoplay: false,
       ttsVoice: DEFAULT_TTS_VOICE,

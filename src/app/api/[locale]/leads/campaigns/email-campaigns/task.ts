@@ -25,6 +25,7 @@ import definitions from "./definition";
 import { tools } from "./route";
 
 const emailCampaignsTask = createCronTask(definitions.POST, tools.POST, {
+  id: "email-campaigns",
   name: "post.title",
   description: "task.description",
   schedule:

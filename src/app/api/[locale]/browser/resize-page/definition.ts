@@ -76,13 +76,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "resize-page.response.result",
         schema: z
-          .object({
-            resized: z.boolean().describe("Whether the page was resized"),
-            width: z.coerce.number().describe("New page width"),
-            height: z.coerce.number().describe("New page height"),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of page resize operation"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -109,11 +112,12 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          resized: true,
-          width: 1920,
-          height: 1080,
-        },
+        result: [
+          {
+            type: "text",
+            text: "# resize_page response\nResized page to 1920x1080.",
+          },
+        ],
         executionId: "exec_123",
       },
     },

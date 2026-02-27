@@ -397,12 +397,17 @@ export const translations: typeof enTranslations = {
         status: {
           title: "Status",
           description:
-            "Status końcowy: 'completed' dla sukcesu, 'failed' dla niepowodzenia.",
+            "Status końcowy: 'completed' dla sukcesu, 'failed' dla niepowodzenia, 'cancelled' do anulowania.",
         },
         summary: {
           title: "Podsumowanie",
           description:
             "Krótki opis tego, co zostało zrobione lub dlaczego się nie powiodło.",
+        },
+        output: {
+          title: "Dane wyjściowe",
+          description:
+            "Opcjonalne dane strukturalne (pary klucz-wartość) dołączane do wyniku wykonania.",
         },
         completed: {
           title: "Ukończone",
@@ -412,6 +417,10 @@ export const translations: typeof enTranslations = {
           title: "Wysłane do zdalnej instancji",
           description:
             "Czy ukończenie zostało pomyślnie zgłoszone do instancji źródłowej.",
+        },
+        updatedAt: {
+          title: "Zaktualizowano",
+          description: "Znacznik czasu aktualizacji statusu zadania.",
         },
       },
       errors: {
@@ -502,6 +511,14 @@ export const translations: typeof enTranslations = {
           title: "Wykonane przez",
           description: "ID instancji, która wykonała zadanie (np. hermes).",
         },
+        output: {
+          title: "Wynik",
+          description: "Strukturalny wynik wykonania.",
+        },
+        startedAt: {
+          title: "Rozpoczęto",
+          description: "Znacznik czasu ISO rozpoczęcia wykonania.",
+        },
         processed: {
           title: "Przetworzone",
           description: "Czy raport został zaakceptowany i zastosowany.",
@@ -548,6 +565,81 @@ export const translations: typeof enTranslations = {
       success: {
         title: "Raport zaakceptowany",
         description: "Wynik wykonania zastosowany do rekordu zadania",
+      },
+    },
+  },
+  errorMonitor: {
+    name: "error-monitor",
+    description:
+      "Skanuje wątki czatu co 3 godziny w poszukiwaniu wzorców błędów",
+    tag: "Monitoring",
+    post: {
+      title: "Monitor błędów",
+      description:
+        "Monitorowanie błędów z zachowaniem prywatności - skanuje wiadomości w poszukiwaniu wzorców błędów bez czytania treści",
+      container: {
+        title: "Wyniki skanowania błędów",
+        description: "Zagregowane wzorce błędów z wiadomości czatu",
+      },
+      response: {
+        errorsFound: "Znalezione błędy",
+        threadsScanned: "Przeskanowane wątki",
+        scanWindowFrom: "Początek okna skanowania",
+        scanWindowTo: "Koniec okna skanowania",
+        patternType: "Typ błędu",
+        patternCount: "Liczba",
+        patternThreadIds: "ID wątków",
+        patternModel: "Model",
+        patternTool: "Narzędzie",
+        patternFirstSeen: "Pierwszy raz",
+        patternLastSeen: "Ostatni raz",
+      },
+      errors: {
+        unauthorized: {
+          title: "Nieautoryzowany",
+          description: "Wymagana autoryzacja",
+        },
+        forbidden: {
+          title: "Zabroniony",
+          description: "Odmowa dostępu",
+        },
+        server: {
+          title: "Błąd serwera",
+          description: "Skanowanie błędów nie powiodło się",
+        },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieoczekiwany błąd",
+        },
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe parametry żądania",
+        },
+      },
+      success: {
+        title: "Skanowanie zakończone",
+        description: "Skanowanie błędów zakończone pomyślnie",
+      },
+    },
+    cleanup: {
+      name: "error-logs-cleanup",
+      description: "Usuwa logi błędów starsze niż 7 dni",
+      post: {
+        title: "Czyszczenie logów błędów",
+        description:
+          "Usuwanie starych wpisów logów błędów aby utrzymać bazę danych w dobrej kondycji",
+        container: {
+          title: "Wyniki czyszczenia",
+          description: "Liczba usuniętych logów błędów",
+        },
+        response: {
+          deletedCount: "Usunięte wpisy",
+          retentionDays: "Dni przechowywania",
+        },
+        success: {
+          title: "Czyszczenie zakończone",
+          description: "Stare logi błędów usunięte pomyślnie",
+        },
       },
     },
   },

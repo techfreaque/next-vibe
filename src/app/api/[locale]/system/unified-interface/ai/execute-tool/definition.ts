@@ -48,6 +48,9 @@ const { POST } = createEndpoint({
   icon: "zap",
   category: "app.endpointCategories.system",
   tags: ["tools.get.tags.tools" as const],
+  cli: {
+    firstCliArgKey: "toolName",
+  },
 
   // Public — the target route enforces its own auth
   allowedRoles: [

@@ -5,6 +5,7 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { BrowserTool } from "../enum";
 import { executeUploadFile, filterUndefinedArgs } from "../shared/repository";
 import uploadFileEndpoints from "./definition";
 
@@ -15,7 +16,7 @@ export const { POST, tools } = endpointsHandler({
     handler: ({ data, t, logger }) =>
       executeUploadFile(
         {
-          toolName: "upload-file",
+          toolName: BrowserTool.UPLOAD_FILE,
           args: filterUndefinedArgs({
             uid: data.uid,
             filePath: data.filePath,

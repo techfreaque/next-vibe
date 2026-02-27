@@ -18,7 +18,7 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import { ModelId, type ModelOption, modelOptions } from "../models";
+import { ApiProvider, modelDefinitions, ModelId } from "../models";
 import type { OpenRouterModelsGetResponseOutput } from "./definition";
 import type { scopedTranslation } from "./i18n";
 
@@ -84,7 +84,8 @@ export class OpenRouterModelsRepository {
         modelMap.set(model.id, model);
       }
 
-      // Extract pricing for our models by reading from modelOptions
+      // Extract pricing for our models by iterating modelDefinitions
+      // Only check OpenRouter providers (other providers like Claude Code have their own pricing)
       const models: Array<{
         id: string;
         name: string;
@@ -102,44 +103,57 @@ export class OpenRouterModelsRepository {
         outputTokenCost?: number;
       }> = [];
 
-      for (const [modelId, modelConfig] of Object.entries(modelOptions) as [
-        ModelId,
-        ModelOption,
-      ][]) {
-        const openRouterId = modelConfig.openRouterModel;
-        const model = modelMap.get(openRouterId);
+      const nonOpenRouterProviders: Array<{
+        modelId: ModelId;
+        provider: string;
+      }> = [];
 
-        if (model) {
-          // Convert from per-token to per-million-tokens
-          const inputTokenCost = parseFloat(model.pricing.prompt) * 1_000_000;
-          const outputTokenCost =
-            parseFloat(model.pricing.completion) * 1_000_000;
+      for (const def of Object.values(modelDefinitions)) {
+        for (const providerConfig of def.providers) {
+          // Skip non-OpenRouter providers (they don't exist on OpenRouter)
+          if (providerConfig.apiProvider !== ApiProvider.OPENROUTER) {
+            nonOpenRouterProviders.push({
+              modelId: providerConfig.id,
+              provider: providerConfig.apiProvider,
+            });
+            continue;
+          }
 
-          const roundedInput = Math.round(inputTokenCost * 100) / 100;
-          const roundedOutput = Math.round(outputTokenCost * 100) / 100;
+          const openRouterId = providerConfig.providerModel;
+          const model = modelMap.get(openRouterId);
 
-          models.push({
-            id: modelId,
-            name: model.name,
-            contextLength: model.context_length,
-            inputTokenCost: roundedInput,
-            outputTokenCost: roundedOutput,
-          });
+          if (model) {
+            // Convert from per-token to per-million-tokens
+            const inputTokenCost = parseFloat(model.pricing.prompt) * 1_000_000;
+            const outputTokenCost =
+              parseFloat(model.pricing.completion) * 1_000_000;
 
-          updates.push({
-            modelId,
-            openRouterId,
-            found: true,
-            contextLength: model.context_length,
-            inputTokenCost: roundedInput,
-            outputTokenCost: roundedOutput,
-          });
-        } else {
-          updates.push({
-            modelId,
-            openRouterId,
-            found: false,
-          });
+            const roundedInput = Math.round(inputTokenCost * 100) / 100;
+            const roundedOutput = Math.round(outputTokenCost * 100) / 100;
+
+            models.push({
+              id: providerConfig.id,
+              name: model.name,
+              contextLength: model.context_length,
+              inputTokenCost: roundedInput,
+              outputTokenCost: roundedOutput,
+            });
+
+            updates.push({
+              modelId: providerConfig.id,
+              openRouterId,
+              found: true,
+              contextLength: model.context_length,
+              inputTokenCost: roundedInput,
+              outputTokenCost: roundedOutput,
+            });
+          } else {
+            updates.push({
+              modelId: providerConfig.id,
+              openRouterId,
+              found: false,
+            });
+          }
         }
       }
 
@@ -180,7 +194,7 @@ export class OpenRouterModelsRepository {
           outputCost: update.outputTokenCost,
         });
 
-        // Update contextWindow
+        // Update contextWindow (lives at definition level, outside providers)
         const contextWindowRegex = new RegExp(
           `(\\[ModelId\\.${enumKey}\\]:\\s*\\{[^}]*?contextWindow:\\s*)\\d+`,
           "s",
@@ -198,10 +212,16 @@ export class OpenRouterModelsRepository {
           });
         }
 
-        // Update inputTokenCost
+        // Update inputTokenCost and outputTokenCost inside providers array.
+        // Match from the providerModel string (unique per provider) to find the right block.
+        const escapedOpenRouterId = update.openRouterId.replace(
+          /[.*+?^${}()|[\]\\]/g,
+          "\\$&",
+        );
+
+        // inputTokenCost: find providerModel: "xxx", then match inputTokenCost within same block
         const inputCostRegex = new RegExp(
-          `(\\[ModelId\\.${enumKey}\\]:\\s*\\{[^}]*?inputTokenCost:\\s*)[\\d.]+`,
-          "s",
+          `(providerModel:\\s*"${escapedOpenRouterId}"[\\s\\S]*?inputTokenCost:\\s*)[\\d.]+`,
         );
         if (inputCostRegex.test(content)) {
           content = content.replace(
@@ -210,10 +230,9 @@ export class OpenRouterModelsRepository {
           );
         }
 
-        // Update outputTokenCost
+        // outputTokenCost: same approach
         const outputCostRegex = new RegExp(
-          `(\\[ModelId\\.${enumKey}\\]:\\s*\\{[^}]*?outputTokenCost:\\s*)[\\d.]+`,
-          "s",
+          `(providerModel:\\s*"${escapedOpenRouterId}"[\\s\\S]*?outputTokenCost:\\s*)[\\d.]+`,
         );
         if (outputCostRegex.test(content)) {
           content = content.replace(
@@ -226,42 +245,42 @@ export class OpenRouterModelsRepository {
       // Write updated content back to file
       writeFileSync(modelsPath, content, "utf-8");
 
-      // Categorize models for reporting
-      const notFoundOpenRouterModels = updates.filter(
-        (u) =>
-          !u.found && modelOptions[u.modelId]?.apiProvider === "openrouter",
-      );
-      const nonOpenRouterModels = updates.filter(
-        (u) =>
-          !u.found && modelOptions[u.modelId]?.apiProvider !== "openrouter",
+      // Categorize: updates only contains OpenRouter providers, so !found means missing from OpenRouter API
+      const missingFromOpenRouter = updates.filter((u) => !u.found);
+
+      // Count total OpenRouter providers across all definitions
+      const totalOpenRouterProviders = Object.values(modelDefinitions).reduce(
+        (count, def) =>
+          count +
+          def.providers.filter((p) => p.apiProvider === ApiProvider.OPENROUTER)
+            .length,
+        0,
       );
 
       logger.info("Model pricing update completed", {
         modelsFound: models.length,
-        modelsTotal: Object.keys(modelOptions).length,
+        totalOpenRouterProviders,
         updatedCount,
-        missingOpenRouterCount: notFoundOpenRouterModels.length,
-        nonOpenRouterCount: nonOpenRouterModels.length,
+        missingCount: missingFromOpenRouter.length,
+        nonOpenRouterProviderCount: nonOpenRouterProviders.length,
       });
 
       return success({
         summary: {
-          totalModels: Object.keys(modelOptions).length,
+          totalModels: Object.keys(modelDefinitions).length,
           modelsFound: models.length,
           modelsUpdated: updatedCount,
           fileUpdated: updatedCount > 0,
         },
         models,
-        missingOpenRouterModels: notFoundOpenRouterModels.map((m) => ({
+        missingOpenRouterModels: missingFromOpenRouter.map((m) => ({
           modelId: m.modelId,
           openRouterId: m.openRouterId,
           suggestion: "Consider marking as LEGACY or removing from models.ts",
         })),
-        nonOpenRouterModels: nonOpenRouterModels.map((m) => ({
+        nonOpenRouterModels: nonOpenRouterProviders.map((m) => ({
           modelId: m.modelId,
-          provider:
-            modelOptions[m.modelId as keyof typeof modelOptions]?.apiProvider ??
-            "unknown",
+          provider: m.provider,
         })),
       });
     } catch (error) {

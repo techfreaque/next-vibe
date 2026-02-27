@@ -1,6 +1,7 @@
 /**
  * Complete Task API Definition
- * MCP tool for Claude Code to mark a cron task as completed/failed.
+ * MCP tool for Claude Code to mark a cron task as completed/failed/cancelled.
+ * Supports custom output payloads for structured result reporting.
  * Dev-only (PRODUCTION_OFF) — not available on production instances.
  */
 
@@ -47,19 +48,31 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 12,
-        schema: z.string().uuid(),
+        schema: z.string().min(1),
       }),
       status: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
-        schema: z.enum([CronTaskStatus.COMPLETED, CronTaskStatus.FAILED]),
+        schema: z.enum([
+          CronTaskStatus.COMPLETED,
+          CronTaskStatus.FAILED,
+          CronTaskStatus.CANCELLED,
+        ]),
       }),
       summary: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         columns: 12,
         schema: z.string().min(1),
+      }),
+      output: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        columns: 12,
+        schema: z
+          .record(z.string(), z.union([z.string(), z.number(), z.boolean()]))
+          .optional(),
       }),
 
       // Response
@@ -70,6 +83,10 @@ const { POST } = createEndpoint({
       pushedToRemote: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.boolean(),
+      }),
+      updatedAt: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string().optional(),
       }),
     },
   }),
@@ -121,15 +138,17 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        taskId: "550e8400-e29b-41d4-a716-446655440000",
+        taskId: "db-health",
         status: CronTaskStatus.COMPLETED,
         summary: "Implemented the requested feature and all tests pass.",
+        output: { errorsFound: 0, testsRun: 12, testsPassed: 12 },
       },
     },
     responses: {
       default: {
         completed: true,
         pushedToRemote: true,
+        updatedAt: new Date("2026-02-26T21:00:00Z").toISOString(),
       },
     },
   },

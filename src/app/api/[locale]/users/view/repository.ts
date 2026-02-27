@@ -20,10 +20,14 @@ import {
   ThreadStatusDB,
 } from "@/app/api/[locale]/agent/chat/enum";
 import {
+  creditPacks,
   creditTransactions,
   creditWallets,
 } from "@/app/api/[locale]/credits/db";
-import { CreditTransactionTypeDB } from "@/app/api/[locale]/credits/enum";
+import {
+  CreditPackType,
+  CreditTransactionTypeDB,
+} from "@/app/api/[locale]/credits/enum";
 import { newsletterSubscriptions } from "@/app/api/[locale]/newsletter/db";
 import { NewsletterSubscriptionStatus } from "@/app/api/[locale]/newsletter/enum";
 import {
@@ -86,6 +90,7 @@ export class UserViewRepository {
         referralStatsResult,
         userRolesResult,
         recentActivityResult,
+        modelUsageStatsResult,
       ] = await Promise.all([
         // Chat Statistics
         this.getChatStats(userId),
@@ -101,6 +106,8 @@ export class UserViewRepository {
         this.getUserRoles(userId),
         // Recent Activity
         this.getRecentActivity(userId),
+        // Model Usage Statistics
+        this.getModelUsageStats(userId),
       ]);
 
       logger.debug("User view data fetched successfully", { userId });
@@ -129,6 +136,7 @@ export class UserViewRepository {
         referralStats: referralStatsResult,
         roles: userRolesResult,
         recentActivity: recentActivityResult,
+        modelUsageStats: modelUsageStatsResult,
       });
     } catch (error) {
       logger.error("Error fetching user view data", parseError(error));
@@ -243,6 +251,11 @@ export class UserViewRepository {
     totalCreditsPurchased: number;
     freePeriodStart: Date | null;
     freePeriodId: string | null;
+    subscriptionCredits: number;
+    permanentCredits: number;
+    bonusCredits: number;
+    earnedCredits: number;
+    nextExpiry: Date | null;
   }> {
     const [wallet] = await db
       .select()
@@ -259,11 +272,16 @@ export class UserViewRepository {
         totalCreditsPurchased: 0,
         freePeriodStart: null,
         freePeriodId: null,
+        subscriptionCredits: 0,
+        permanentCredits: 0,
+        bonusCredits: 0,
+        earnedCredits: 0,
+        nextExpiry: null,
       };
     }
 
-    // Get transaction totals
-    const [[earnedResult], [spentResult], [purchasedResult]] =
+    // Get transaction totals and pack breakdown in parallel
+    const [[earnedResult], [spentResult], [purchasedResult], packBreakdown] =
       await Promise.all([
         // Total credits earned (positive transactions excluding purchases)
         db
@@ -286,7 +304,42 @@ export class UserViewRepository {
           .where(
             sql`${creditTransactions.walletId} = ${wallet.id} AND ${creditTransactions.type} IN (${CreditTransactionTypeDB[1]}, ${CreditTransactionTypeDB[2]})`,
           ),
+        // Credit pack breakdown by type (remaining > 0 only)
+        db
+          .select({
+            type: creditPacks.type,
+            total: sum(creditPacks.remaining),
+            nextExpiry: sql<Date | null>`MIN(${creditPacks.expiresAt})`,
+          })
+          .from(creditPacks)
+          .where(
+            sql`${creditPacks.walletId} = ${wallet.id} AND ${creditPacks.remaining} > 0`,
+          )
+          .groupBy(creditPacks.type),
       ]);
+
+    // Extract pack amounts by type
+    let subscriptionCredits = 0;
+    let permanentCredits = 0;
+    let bonusCredits = 0;
+    let earnedCreditsRemaining = 0;
+    let nextExpiry: Date | null = null;
+
+    for (const pack of packBreakdown) {
+      const amount = Number(pack.total) || 0;
+      if (pack.type === CreditPackType.SUBSCRIPTION) {
+        subscriptionCredits = amount;
+        if (pack.nextExpiry) {
+          nextExpiry = pack.nextExpiry;
+        }
+      } else if (pack.type === CreditPackType.PERMANENT) {
+        permanentCredits = amount;
+      } else if (pack.type === CreditPackType.BONUS) {
+        bonusCredits = amount;
+      } else if (pack.type === CreditPackType.EARNED) {
+        earnedCreditsRemaining = amount;
+      }
+    }
 
     return {
       currentBalance: Number(wallet.balance) || 0,
@@ -296,6 +349,11 @@ export class UserViewRepository {
       totalCreditsPurchased: Number(purchasedResult?.total) || 0,
       freePeriodStart: wallet.freePeriodStart,
       freePeriodId: wallet.freePeriodId,
+      subscriptionCredits,
+      permanentCredits,
+      bonusCredits,
+      earnedCredits: earnedCreditsRemaining,
+      nextExpiry,
     };
   }
 
@@ -552,5 +610,43 @@ export class UserViewRepository {
       lastMessageSent: lastMessage?.createdAt ?? null,
       lastPayment: lastPayment?.createdAt ?? null,
     };
+  }
+
+  /**
+   * Get model usage statistics for user
+   */
+  private static async getModelUsageStats(
+    userId: string,
+  ): Promise<
+    Array<{ modelId: string; totalCreditsSpent: number; messageCount: number }>
+  > {
+    const [wallet] = await db
+      .select()
+      .from(creditWallets)
+      .where(eq(creditWallets.userId, userId))
+      .limit(1);
+
+    if (!wallet) {
+      return [];
+    }
+
+    const results = await db
+      .select({
+        modelId: creditTransactions.modelId,
+        totalCreditsSpent: sql<number>`ABS(SUM(${creditTransactions.amount}))`,
+        messageCount: count(),
+      })
+      .from(creditTransactions)
+      .where(
+        sql`${creditTransactions.walletId} = ${wallet.id} AND ${creditTransactions.type} = ${CreditTransactionTypeDB[3]} AND ${creditTransactions.modelId} IS NOT NULL`,
+      )
+      .groupBy(creditTransactions.modelId)
+      .orderBy(sql`ABS(SUM(${creditTransactions.amount})) DESC`);
+
+    return results.map((r) => ({
+      modelId: r.modelId ?? "unknown",
+      totalCreditsSpent: Number(r.totalCreditsSpent) || 0,
+      messageCount: r.messageCount,
+    }));
   }
 }

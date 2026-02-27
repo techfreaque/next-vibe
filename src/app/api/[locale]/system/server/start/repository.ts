@@ -21,6 +21,12 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation as dockerOperationsScopedTranslation } from "../../db/utils/docker-operations/i18n";
 import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i18n";
+import {
+  cleanupPidFile,
+  killPreviousInstance,
+  VIBE_START_PID_FILE,
+  writePidFile,
+} from "../pid";
 import type {
   ServerStartRequestOutput,
   ServerStartResponseOutput,
@@ -461,11 +467,16 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       // Log the initial output using stdout for CLI display
       process.stdout.write(`${output.join("\n")}\n`);
 
+      // Kill any previous vibe start instance, then write our PID
+      killPreviousInstance(VIBE_START_PID_FILE, logger);
+      writePidFile(VIBE_START_PID_FILE, logger);
+
       // Set up signal handlers for graceful shutdown
       const handleShutdown = (signal: string): void => {
         process.stdout.write(
           `\n🛑 Received ${signal}, shutting down gracefully...\n`,
         );
+        cleanupPidFile(VIBE_START_PID_FILE);
         this.stopAllProcesses();
         process.stdout.write("✅ All processes stopped. Goodbye! 👋\n");
         process.exit(0);
@@ -473,6 +484,44 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
       process.on("SIGINT", () => handleShutdown("SIGINT"));
       process.on("SIGTERM", () => handleShutdown("SIGTERM"));
+
+      // SIGUSR1: hot-restart Next.js child (triggered by `vibe rebuild`)
+      process.on("SIGUSR1", () => {
+        logger.info("Received SIGUSR1 — restarting Next.js server...");
+        process.stdout.write(
+          "\n🔄 SIGUSR1 received — restarting Next.js server...\n",
+        );
+
+        // Kill old Next.js child, then start a new one
+        if (this.nextServerProcess && !this.nextServerProcess.killed) {
+          this.nextServerProcess.kill("SIGTERM");
+          this.runningProcesses.delete("next-start");
+          this.nextServerProcess = null;
+        }
+
+        this.startNextServer(port, logger)
+          .then((result) => {
+            if (result.success) {
+              process.stdout.write(
+                "✅ Next.js server restarted successfully\n",
+              );
+              logger.info("Next.js server restarted via SIGUSR1");
+            } else {
+              process.stdout.write(
+                `❌ Next.js server restart failed: ${result.message}\n`,
+              );
+              logger.error("Next.js server restart failed", {
+                message: result.message,
+              });
+            }
+            return result;
+          })
+          .catch((error) => {
+            logger.error("Next.js restart error after SIGUSR1", {
+              error: parseError(error).message,
+            });
+          });
+      });
 
       // Keep the process alive and log periodic status
       let logCounter = 0;

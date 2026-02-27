@@ -24,6 +24,7 @@ const creditExpirationTask = createCronTask(
   creditExpirationTaskDefinition.POST,
   tools.POST,
   {
+    id: "credits-expire",
     name: "expire.post.title",
     description: "expire.task.description",
     schedule: CRON_SCHEDULES.DAILY_MIDNIGHT,

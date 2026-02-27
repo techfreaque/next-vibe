@@ -64,7 +64,13 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
-        schema: z.enum([CronTaskStatus.COMPLETED, CronTaskStatus.FAILED]),
+        schema: z.enum([
+          CronTaskStatus.RUNNING,
+          CronTaskStatus.COMPLETED,
+          CronTaskStatus.FAILED,
+          CronTaskStatus.CANCELLED,
+          CronTaskStatus.TIMEOUT,
+        ]),
       }),
       durationMs: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -95,6 +101,20 @@ const { POST } = createEndpoint({
         fieldType: FieldDataType.TEXT,
         columns: 6,
         schema: z.string().optional(),
+      }),
+      output: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        columns: 12,
+        schema: z
+          .record(z.string(), z.union([z.string(), z.number(), z.boolean()]))
+          .optional(),
+      }),
+      startedAt: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        columns: 6,
+        schema: z.string().datetime().optional(),
       }),
 
       // Response

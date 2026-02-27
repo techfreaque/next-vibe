@@ -344,6 +344,7 @@ const { PATCH } = createEndpoint({
               CharactersRepositoryClient.getBestModelForFavorite(
                 requestData.modelSelection,
                 undefined,
+                user,
               );
             modelId = bestModel?.id || settingsData.data.selectedModel;
           }
@@ -450,6 +451,7 @@ const { PATCH } = createEndpoint({
                       null,
                       null,
                       locale,
+                      user,
                     );
 
                   updatedFavorite.activeBadge = fav.activeBadge;

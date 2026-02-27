@@ -77,7 +77,12 @@ class BrowserRepositoryClientImpl implements BrowserRepositoryClient {
     if (!response.ok) {
       return {
         success: false,
-        result: `HTTP ${response.status}: ${response.statusText}`,
+        result: [
+          {
+            type: "text",
+            text: `HTTP ${response.status}: ${response.statusText}`,
+          },
+        ],
         status: ["FAILED"],
         executionId: "",
       };

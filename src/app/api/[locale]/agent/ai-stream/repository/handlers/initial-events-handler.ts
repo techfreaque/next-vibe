@@ -3,6 +3,7 @@
  */
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { ToolCall } from "../../../chat/db";
 import type { ModelId } from "../../../models/models";
@@ -85,6 +86,7 @@ export class InitialEventsHandler {
     effectiveContent: string;
     model: ModelId;
     character: string | null;
+    user: JwtPayloadType;
     dbWriter: MessageDbWriter;
     logger: EndpointLogger;
     voiceTranscription?: {
@@ -113,6 +115,7 @@ export class InitialEventsHandler {
       effectiveContent,
       model,
       character,
+      user,
       dbWriter,
       logger,
       voiceTranscription,
@@ -165,6 +168,7 @@ export class InitialEventsHandler {
         confidence: voiceTranscription.confidence,
         durationSeconds: voiceTranscription.durationSeconds,
         creditCost: voiceTranscription.creditCost,
+        user,
       });
       logger.debug("[InitialEvents] Emitted VOICE_TRANSCRIBED", {
         messageId: userMessageId,

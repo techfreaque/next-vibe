@@ -3,6 +3,7 @@
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import type { JSX } from "react";
 
+import adminAddDefinitions from "@/app/api/[locale]/credits/admin-add/definition";
 import purchaseDefinitions from "@/app/api/[locale]/credits/purchase/definition";
 import createSubscriptionDefinition from "@/app/api/[locale]/subscription/create/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
@@ -12,9 +13,16 @@ import type { CountryLanguage } from "@/i18n/core/config";
 interface BuyTabProps {
   locale: CountryLanguage;
   user: JwtPayloadType;
+  hasPaymentProvider: boolean;
+  isAdmin: boolean;
 }
 
-export function BuyTab({ locale, user }: BuyTabProps): JSX.Element {
+export function BuyTab({
+  locale,
+  user,
+  hasPaymentProvider,
+  isAdmin,
+}: BuyTabProps): JSX.Element {
   return (
     <MotionDiv
       initial={{ opacity: 0, y: 20 }}
@@ -22,19 +30,32 @@ export function BuyTab({ locale, user }: BuyTabProps): JSX.Element {
       transition={{ delay: 0.1 }}
       className="grid grid-cols-1 md:grid-cols-2 gap-6"
     >
-      {/* Subscription Option */}
-      <EndpointsPage
-        endpoint={createSubscriptionDefinition}
-        user={user}
-        locale={locale}
-      />
+      {/* Subscription Option - only when payment provider configured */}
+      {hasPaymentProvider && (
+        <EndpointsPage
+          endpoint={createSubscriptionDefinition}
+          user={user}
+          locale={locale}
+        />
+      )}
 
-      {/* Credit Pack Option */}
-      <EndpointsPage
-        endpoint={purchaseDefinitions}
-        user={user}
-        locale={locale}
-      />
+      {/* Credit Pack Purchase - only when payment provider configured */}
+      {hasPaymentProvider && (
+        <EndpointsPage
+          endpoint={purchaseDefinitions}
+          user={user}
+          locale={locale}
+        />
+      )}
+
+      {/* Admin Add Credits - only for admin users */}
+      {isAdmin && (
+        <EndpointsPage
+          endpoint={adminAddDefinitions}
+          user={user}
+          locale={locale}
+        />
+      )}
     </MotionDiv>
   );
 }

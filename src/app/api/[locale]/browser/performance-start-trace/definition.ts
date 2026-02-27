@@ -54,6 +54,8 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z
           .boolean()
+          .optional()
+          .default(false)
           .describe(
             "Determines if, once tracing has started, the page should be automatically reloaded",
           ),
@@ -67,8 +69,23 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z
           .boolean()
+          .optional()
+          .default(false)
           .describe(
             "Determines if the trace recording should be automatically stopped",
+          ),
+      }),
+      filePath: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "performance-start-trace.form.fields.reload.label",
+        description: "performance-start-trace.form.fields.reload.description",
+        columns: 12,
+        schema: z
+          .string()
+          .optional()
+          .describe(
+            "The absolute file path, or a file path relative to the current working directory, to save the raw trace data. For example, trace.json.gz (compressed) or trace.json (uncompressed).",
           ),
       }),
 
@@ -84,12 +101,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "performance-start-trace.response.result",
         schema: z
-          .object({
-            started: z.boolean().describe("Whether the trace was started"),
-            traceId: z.string().describe("Identifier for this trace"),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of trace start operation"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -116,10 +137,12 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          started: true,
-          traceId: "trace_123",
-        },
+        result: [
+          {
+            type: "text",
+            text: "# performance_start_trace response\nTrace recording started.",
+          },
+        ],
         executionId: "exec_123",
       },
     },

@@ -5,6 +5,7 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { BrowserTool } from "../enum";
 import { executeMCPTool, filterUndefinedArgs } from "../shared/repository";
 import newPageEndpoints from "./definition";
 
@@ -15,9 +16,11 @@ export const { POST, tools } = endpointsHandler({
     handler: ({ data, t, logger }) =>
       executeMCPTool(
         {
-          toolName: "new-page",
+          toolName: BrowserTool.NEW_PAGE,
           args: filterUndefinedArgs({
             url: data.url,
+            background: data.background,
+            isolatedContext: data.isolatedContext,
             timeout: data.timeout,
           }),
         },

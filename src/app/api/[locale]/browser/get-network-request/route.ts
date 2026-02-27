@@ -5,6 +5,7 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { BrowserTool } from "../enum";
 import {
   executeGetNetworkRequest,
   filterUndefinedArgs,
@@ -20,9 +21,11 @@ export const { POST, tools } = endpointsHandler({
     handler: ({ data, t, logger }) =>
       executeGetNetworkRequest<GetNetworkRequestResponseOutput>(
         {
-          toolName: "get-network-request",
+          toolName: BrowserTool.GET_NETWORK_REQUEST,
           args: filterUndefinedArgs({
             reqid: data.reqid,
+            requestFilePath: data.requestFilePath,
+            responseFilePath: data.responseFilePath,
           }),
         },
         t,

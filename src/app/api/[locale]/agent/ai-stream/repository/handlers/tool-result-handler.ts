@@ -211,7 +211,7 @@ export class ToolResultHandler {
       return null;
     }
 
-    logger.info("[AI Stream] TOOL MESSAGE_CREATED event sent", {
+    logger.debug("[AI Stream] TOOL MESSAGE_CREATED event sent", {
       messageId: toolMessageId,
       toolName: part.toolName,
       isIncognito,

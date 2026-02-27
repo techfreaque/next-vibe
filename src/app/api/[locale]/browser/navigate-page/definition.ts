@@ -98,6 +98,42 @@ const { POST } = createEndpoint({
           .optional()
           .describe("Whether to ignore cache on reload."),
       }),
+      handleBeforeUnload: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "navigate-page.form.fields.ignoreCache.label",
+        description: "navigate-page.form.fields.ignoreCache.description",
+        columns: 6,
+        options: [
+          {
+            label: "navigate-page.form.fields.type.options.url" as const,
+            value: "accept",
+          },
+          {
+            label: "navigate-page.form.fields.type.options.back" as const,
+            value: "decline",
+          },
+        ],
+        schema: z
+          .enum(["accept", "decline"])
+          .optional()
+          .describe(
+            "Whether to auto accept or beforeunload dialogs triggered by this navigation. Default is accept.",
+          ),
+      }),
+      initScript: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        label: "navigate-page.form.fields.url.label",
+        description: "navigate-page.form.fields.url.description",
+        columns: 12,
+        schema: z
+          .string()
+          .optional()
+          .describe(
+            "A JavaScript script to be executed on each new document before any other scripts for the next navigation.",
+          ),
+      }),
       timeout: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
@@ -125,19 +161,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "navigate-page.response.result",
         schema: z
-          .object({
-            navigated: z.boolean().describe("Whether the page was navigated"),
-            url: z
-              .string()
-              .optional()
-              .describe("The URL of the navigated page"),
-            title: z
-              .string()
-              .optional()
-              .describe("The title of the navigated page"),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of the navigation"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -164,11 +197,12 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          navigated: true,
-          url: "https://example.com",
-          title: "Example Page",
-        },
+        result: [
+          {
+            type: "text",
+            text: "# navigate_page response\nNavigated to https://example.com",
+          },
+        ],
         executionId: "exec_123",
       },
     },

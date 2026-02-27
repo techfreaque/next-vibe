@@ -7,6 +7,11 @@ export const translations = {
   },
 
   run: {
+    task: {
+      name: "AI Heartbeat",
+      description:
+        "Background AI agent that checks system health, works through tasks, and contacts the human when needed",
+    },
     post: {
       title: "Run AI Agent",
       description:

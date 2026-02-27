@@ -35,7 +35,6 @@ export const translations = {
       commands: "Available commands",
       options: "Options",
       examples: "Examples",
-      userType: "Specify user type (admin, public, etc.)",
       locale: "Specify locale (en-GLOBAL, de-DE, pl-PL)",
       verbose: "Enable verbose output",
       dryRun: "Perform a dry run without executing",

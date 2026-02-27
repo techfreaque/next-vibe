@@ -69,6 +69,7 @@ export interface ParsedToolCall {
  * Generate system prompt for tool calling instructions
  */
 export function generateToolSystemPrompt(tools: OpenAITool[]): string {
+  const toolNames = tools.map((t) => `"${t.function.name}"`).join(", ");
   const toolDescriptions = tools
     .map((tool) => {
       const func = tool.function;
@@ -82,39 +83,38 @@ export function generateToolSystemPrompt(tools: OpenAITool[]): string {
   const memoryExample = MEMORY_ADD_DEFINITION.POST.examples.requests.add;
   const fetchExample = FETCH_URL_DEFINITION.GET.examples.requests.default;
 
-  return `You have access to the following tools:
+  return `You have access to the following tools (use EXACT names: ${toolNames}):
 
 ${toolDescriptions}
 
-CRITICAL INSTRUCTIONS FOR TOOL USAGE:
-1. To call tools, you MUST use this EXACT format:
-   <tool_calls>
-   [
-     {"name": "tool_name", "arguments": {"param": "value"}}
-   ]
-   </tool_calls>
+TOOL CALLING FORMAT:
+To call tools, output this EXACT format (no extra text inside the tags):
+<tool_calls>
+[{"name": "tool_name", "arguments": {"param": "value"}}]
+</tool_calls>
 
-2. You can call MULTIPLE tools in a single response by including multiple objects in the array.
+RULES:
+1. The <tool_calls> block must contain a valid JSON array. No text inside the tags.
+2. You may call MULTIPLE tools at once by adding more objects to the array.
+3. You may write text BEFORE the <tool_calls> block (e.g. "Let me look that up.").
+4. If you don't need tools, respond normally without <tool_calls>.
 
-3. You can combine tool calls with a text response:
-   - Put your explanation/thinking BEFORE the <tool_calls> block
-   - Example: "I'll search for that information.\\n<tool_calls>[{...}]</tool_calls>"
+MULTI-STEP WORKFLOW:
+- You will receive tool results as follow-up messages. Read them carefully.
+- After receiving results, decide: do you have enough information to answer? If yes, write your final answer as plain text (no <tool_calls>). If no, call more tools.
+- You may call the same tool again with DIFFERENT arguments (e.g. a refined search query, a different URL). Do NOT repeat the exact same call.
+- When your task requires multiple steps (search → read → summarize), work through each step. Call tools as needed, then write your final answer once you have all the information.
 
-4. IMPORTANT: The <tool_calls> block must contain valid JSON array. Do not add any text inside the tags except the JSON.
+STOP LOOP — noLoop:
+When a tool call needs no follow-up response (e.g. saving a memory), add "noLoop": true to the arguments. The system stops after that tool completes.
+- Use for: ${MEMORY_ADD_ALIAS}, ${MEMORY_UPDATE_ALIAS}, ${MEMORY_DELETE_ALIAS}
+- Example: {"name": "${MEMORY_ADD_ALIAS}", "arguments": {"content": "...", "noLoop": true}}
 
-5. After tools are executed, you'll receive their results. Use them to provide your final answer IF NEEDED.
-
-6. If you don't need to call any tools, just respond normally without the <tool_calls> block.
-
-7. CRITICAL: When you don't need a follow-up response after a tool executes, add "noLoop": true to the arguments.
-   - Use this for tools like ${MEMORY_ADD_ALIAS}, ${MEMORY_UPDATE_ALIAS}, ${MEMORY_DELETE_ALIAS}
-   - Example: {"name": "${MEMORY_ADD_ALIAS}", "arguments": {"content": "...", "noLoop": true}}
-
-Examples:
-- Single tool: <tool_calls>[{"name": "${BRAVE_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}]</tool_calls>
-- Multiple tools: <tool_calls>[{"name": "${BRAVE_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}, {"name": "${FETCH_URL_ALIAS}", "arguments": ${JSON.stringify(fetchExample)}}]</tool_calls>
-- With text: Let me search for that.\\n<tool_calls>[{"name": "${BRAVE_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}]</tool_calls>
-- With noLoop: I'll remember that.\\n<tool_calls>[{"name": "${MEMORY_ADD_ALIAS}", "arguments": ${JSON.stringify({ ...memoryExample, noLoop: true })}}]</tool_calls>`;
+EXAMPLES:
+- Search: <tool_calls>[{"name": "${BRAVE_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}]</tool_calls>
+- Multiple: <tool_calls>[{"name": "${BRAVE_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}, {"name": "${FETCH_URL_ALIAS}", "arguments": ${JSON.stringify(fetchExample)}}]</tool_calls>
+- With text: Let me search for that.\n<tool_calls>[{"name": "${BRAVE_SEARCH_ALIAS}", "arguments": ${JSON.stringify(searchExample)}}]</tool_calls>
+- With noLoop: I'll remember that.\n<tool_calls>[{"name": "${MEMORY_ADD_ALIAS}", "arguments": ${JSON.stringify({ ...memoryExample, noLoop: true })}}]</tool_calls>`;
 }
 
 /**
@@ -129,90 +129,80 @@ export function parseToolCalls(
   textContent: string;
   toolCalls: ParsedToolCall[] | null;
 } {
-  // Match <tool_calls>[...]</tool_calls>
-  const toolCallsRegex = /<tool_calls>\s*(\[[\s\S]*?\])\s*<\/tool_calls>/;
-  const match = content.match(toolCallsRegex);
+  // Tolerant regex: matches <tool_calls>...</tool_calls>, </tool_call>, or unclosed blocks
+  const toolCallsRegex =
+    /<tool_calls>\s*(\[[\s\S]*?\])\s*(?:<\/tool_calls?\s*>|$)/g;
 
-  if (!match) {
+  const allToolCalls: ParsedToolCall[] = [];
+  let firstMatchIndex = -1;
+
+  let match: RegExpExecArray | null;
+  while ((match = toolCallsRegex.exec(content)) !== null) {
+    if (firstMatchIndex === -1) {
+      firstMatchIndex = match.index ?? 0;
+    }
+
+    const parsed = tryParseToolCallsJson(match[1], logger);
+    if (parsed) {
+      allToolCalls.push(...parsed);
+    }
+  }
+
+  if (allToolCalls.length === 0) {
     return { textContent: content, toolCalls: null };
   }
 
-  // Extract text before tool calls
-  const textContent = content.substring(0, match.index).trim();
+  // Extract text before the first <tool_calls> block
+  const textContent = content.substring(0, firstMatchIndex).trim();
+  return { textContent, toolCalls: allToolCalls };
+}
 
-  // Parse JSON array of tool calls
+/**
+ * Try to parse a JSON array string from a tool_calls block.
+ * Applies progressive cleanup on failure.
+ */
+function tryParseToolCallsJson(
+  raw: string,
+  logger: EndpointLogger,
+): ParsedToolCall[] | null {
+  // First attempt: minimal cleanup
+  let jsonStr = raw.trim();
+  jsonStr = jsonStr.replace(/,(\s*[}\]])/g, "$1");
+
   try {
-    // Clean up the JSON string - remove trailing commas and fix formatting
-    let jsonStr = match[1].trim();
+    const parsed = JSON.parse(jsonStr) as ParsedToolCall[];
+    if (Array.isArray(parsed)) {
+      return parsed;
+    }
+  } catch {
+    // Continue to aggressive cleanup
+  }
 
-    // Remove trailing commas before closing brackets/braces
+  // Second attempt: aggressive cleanup
+  try {
+    jsonStr = raw.trim().replace(/\s+/g, " ");
     jsonStr = jsonStr.replace(/,(\s*[}\]])/g, "$1");
 
-    // Try to parse
+    // Fix missing closing braces
+    const openBraces = (jsonStr.match(/{/g) || []).length;
+    const closeBraces = (jsonStr.match(/}/g) || []).length;
+    if (openBraces > closeBraces) {
+      const missing = openBraces - closeBraces;
+      jsonStr = jsonStr.replace(/]$/, `${"}".repeat(missing)}]`);
+    }
+
     const parsed = JSON.parse(jsonStr) as ParsedToolCall[];
-    if (!Array.isArray(parsed)) {
-      logger.error("Tool calls parsed but not an array", {
-        rawMatch: match[1],
-      });
-      return { textContent: content, toolCalls: null };
+    if (Array.isArray(parsed)) {
+      logger.info("Parsed tool calls after cleanup");
+      return parsed;
     }
-    return { textContent, toolCalls: parsed };
   } catch (error) {
-    // Log the exact position of the error
-    const errorMsg = parseError(error);
-    const errorPosMatch = errorMsg.message?.match(/position (\d+)/);
-    const errorPos = errorPosMatch ? parseInt(errorPosMatch[1], 10) : -1;
-
-    logger.error("Failed to parse tool calls JSON", errorMsg, {
-      rawMatch: match[1],
-      rawMatchLength: match[1].length,
-      errorPosition: errorPos,
-      // Show context around error
-      errorContext:
-        errorPos >= 0
-          ? match[1].substring(Math.max(0, errorPos - 50), errorPos + 50)
-          : "N/A",
-      charAtError: errorPos >= 0 ? match[1][errorPos] : "N/A",
+    logger.error("Failed to parse tool calls JSON", parseError(error), {
+      rawSnippet: raw.substring(0, 200),
     });
-
-    // Try one more time with aggressive cleanup
-    try {
-      let jsonStr = match[1].trim();
-      // Remove all newlines and extra whitespace
-      jsonStr = jsonStr.replace(/\s+/g, " ");
-      // Remove trailing commas
-      jsonStr = jsonStr.replace(/,(\s*[}\]])/g, "$1");
-
-      // Fix missing closing braces for tool objects
-      // Pattern: }"  }] should be }}]
-      // This fixes when AI closes arguments object but forgets to close the tool object
-      jsonStr = jsonStr.replace(/}\s*}\s*]/g, "}}]");
-
-      // If we have pattern like }] without double brace, it means missing a brace
-      // Count braces to detect imbalance
-      const openBraces = (jsonStr.match(/{/g) || []).length;
-      const closeBraces = (jsonStr.match(/}/g) || []).length;
-
-      if (openBraces > closeBraces) {
-        // Add missing closing braces before the final ]
-        const missing = openBraces - closeBraces;
-        jsonStr = jsonStr.replace(/]$/, `${"}".repeat(missing)}]`);
-      }
-
-      const parsed = JSON.parse(jsonStr) as ParsedToolCall[];
-      if (Array.isArray(parsed)) {
-        logger.info("Successfully parsed tool calls after cleanup");
-        return { textContent, toolCalls: parsed };
-      }
-    } catch (retryError) {
-      logger.error(
-        "Failed to parse tool calls even after cleanup",
-        parseError(retryError),
-      );
-    }
-
-    return { textContent: content, toolCalls: null };
   }
+
+  return null;
 }
 
 /**
@@ -260,13 +250,12 @@ export function convertToolMessagesToUserMessages(
     }
 
     if (msg.role === "tool") {
-      // Format: Tool result for call_id: {result}
       const toolCallId = msg.tool_call_id || "unknown";
       const result = msg.content || "Tool execution completed";
 
       return {
         role: "user",
-        content: `Tool result for ${toolCallId}:\n${result}`,
+        content: `[Tool Result for ${toolCallId}]\n${result}`,
       };
     }
 

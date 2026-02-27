@@ -49,7 +49,12 @@ const { POST } = createEndpoint({
         description: "wait-for.form.fields.text.description",
         placeholder: "wait-for.form.fields.text.placeholder",
         columns: 8,
-        schema: z.string().describe("Text to appear on the page"),
+        schema: z
+          .array(z.string())
+          .min(1)
+          .describe(
+            "Non-empty list of texts. Resolves when any value appears on the page.",
+          ),
       }),
       timeout: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -76,15 +81,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "wait-for.response.result",
         schema: z
-          .object({
-            found: z.boolean().describe("Whether the text was found"),
-            waitTime: z
-              .number()
-              .optional()
-              .describe("Time waited in milliseconds"),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of wait operation"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -106,15 +112,17 @@ const { POST } = createEndpoint({
   }),
   examples: {
     requests: {
-      default: { text: "wait-for.Loading..." },
+      default: { text: ["Loading..."] },
     },
     responses: {
       default: {
         success: true,
-        result: {
-          found: true,
-          waitTime: 1500,
-        },
+        result: [
+          {
+            type: "text",
+            text: "# wait_for response\nText found on the page.",
+          },
+        ],
         executionId: "exec_123",
       },
     },

@@ -119,6 +119,7 @@ export class ChatFavoritesRepository {
             activeFavoriteId,
             characterVoice,
             locale,
+            user,
           );
         }),
       );

@@ -39,6 +39,11 @@ export const translations: typeof enTranslations = {
       description:
         "Diese Erinnerung in öffentlichen und geteilten Kontexten sichtbar machen",
     },
+    isArchived: {
+      label: "Archiviert",
+      description:
+        "Diese Erinnerung archivieren, um sie aus dem KI-Kontext auszuschließen, ohne sie zu löschen",
+    },
     backButton: {
       label: "Zurück",
     },

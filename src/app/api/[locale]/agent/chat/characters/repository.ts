@@ -23,7 +23,11 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { defaultModel, modelProviders } from "../../models/models";
+import {
+  defaultModel,
+  getModelDisplayName,
+  modelProviders,
+} from "../../models/models";
 import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
 import type {
   CharacterDeleteResponseOutput,
@@ -164,6 +168,7 @@ export class CharactersRepository {
               modelSelection: char.modelSelection,
             },
             t,
+            user,
           );
         });
 
@@ -181,6 +186,7 @@ export class CharactersRepository {
               modelSelection: char.modelSelection,
             },
             t,
+            user,
           );
         });
 
@@ -233,6 +239,7 @@ export class CharactersRepository {
             modelSelection: char.modelSelection,
           },
           t,
+          user,
         );
       });
 
@@ -720,18 +727,22 @@ export class CharactersRepository {
       modelSelection: ModelSelectionSimple;
     },
     t: ReturnType<(typeof scopedTranslation)["scopedT"]>["t"],
+    user: JwtPayloadType,
   ): CharacterListItem {
     // Get best model from character's modelSelection
     const bestModel = CharactersRepositoryClient.getBestModelForCharacter(
       char.modelSelection,
+      user,
     );
 
     // Fallback if no model found (shouldn't happen with valid modelSelection)
     const modelId = bestModel?.id ?? defaultModel;
+    const isAdmin =
+      !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
     const modelRow = bestModel
       ? {
           modelIcon: bestModel.icon,
-          modelInfo: bestModel.name,
+          modelInfo: getModelDisplayName(bestModel, isAdmin),
           modelProvider: modelProviders[bestModel.provider].name,
         }
       : {

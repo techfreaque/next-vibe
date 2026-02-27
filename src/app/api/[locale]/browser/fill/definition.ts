@@ -75,13 +75,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "fill.response.result",
         schema: z
-          .object({
-            filled: z.boolean().describe("Whether the element was filled"),
-            element: z.string().describe("The element uid that was filled"),
-            value: z.string().describe("The value that was filled"),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of the fill operation"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -108,11 +111,12 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          filled: true,
-          element: "field-1",
-          value: "test value",
-        },
+        result: [
+          {
+            type: "text",
+            text: "# fill response\nFilled element with the specified value.",
+          },
+        ],
         executionId: "exec_123",
       },
     },

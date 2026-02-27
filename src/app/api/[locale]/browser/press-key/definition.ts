@@ -68,12 +68,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "press-key.response.result",
         schema: z
-          .object({
-            pressed: z.boolean().describe("Whether the key was pressed"),
-            key: z.string().describe("The key or combination that was pressed"),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of key press operation"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -100,10 +104,9 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          pressed: true,
-          key: "Enter",
-        },
+        result: [
+          { type: "text", text: "# press_key response\nPressed key: Enter" },
+        ],
         executionId: "exec_123",
       },
     },

@@ -7,6 +7,7 @@ import type { FieldValues } from "react-hook-form";
 
 import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { ToolCallRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/ToolCallRenderer";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -52,6 +53,8 @@ interface ToolDisplayProps {
     ) => void;
   };
   user: JwtPayloadType;
+  /** Override the platform used for definition loading */
+  platformOverride?: Platform;
   /** Optional batch mode handlers */
   onConfirm?: (formData: FieldValues) => void;
   onCancel?: () => void;
@@ -86,6 +89,7 @@ export const ToolDisplay = memo(function ToolDisplay({
   toolCall,
   locale,
   user,
+  platformOverride,
   threadId,
   messageId,
   collapseState,
@@ -114,6 +118,7 @@ export const ToolDisplay = memo(function ToolDisplay({
         toolIndex={0}
         collapseState={collapseState}
         user={user}
+        platformOverride={platformOverride}
         onConfirm={onConfirm}
         onCancel={onCancel}
         parentId={parentId}

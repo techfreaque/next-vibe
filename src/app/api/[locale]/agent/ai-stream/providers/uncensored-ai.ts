@@ -1,10 +1,11 @@
 /**
  * Uncensored AI Provider
- * Extends OpenAI's implementation with custom fetch to handle non-streaming responses
- * The API returns complete JSON responses but we emulate streaming for compatibility
+ * Extends OpenAI's implementation with custom fetch to handle tool calling
  *
- * Tool Calling: Since this model doesn't support native tool calling, we use prompt engineering
- * to instruct the model to output tool calls in a specific JSON format that we then parse.
+ * Two modes controlled by USE_NATIVE_TOOLS:
+ * - true:  Pass tools array natively to the API (if they now support it)
+ * - false: Prompt engineering approach — inject tool instructions into system message,
+ *          parse <tool_calls> markup from responses
  */
 
 import "server-only";
@@ -14,6 +15,7 @@ import { OpenAIChatLanguageModel } from "@ai-sdk/openai/internal";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 
 import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
+import { logProviderRequest } from "./shared/debug-file-logger";
 import { processStreamingResponseWithToolCalls } from "./shared/streaming-tool-call-processor";
 import {
   convertDeveloperToSystemMessages,
@@ -26,9 +28,15 @@ import {
 } from "./shared/tool-calling-prompt-engineering";
 
 /**
+ * Toggle: try native tool calling vs prompt engineering
+ * Set to true to test if Uncensored AI now supports OpenAI-compatible tools array
+ */
+// eslint-disable-next-line i18next/no-literal-string
+const USE_NATIVE_TOOLS = false;
+
+/**
  * Create an Uncensored AI provider compatible with AI SDK V2
  * Uses OpenAI's internal implementation with custom fetch override
- * This keeps all message conversion and tool handling from OpenAI while adapting the response format
  *
  * @returns Provider object with chat() method
  */
@@ -53,23 +61,55 @@ export function createUncensoredAI(logger: EndpointLogger): {
     }
 
     const parsedBody = JSON.parse(init.body as string) as OpenAIRequestBody;
-    const { tools, messages, ...restBody } = parsedBody;
 
-    // Convert developer messages to system and inject tool instructions
-    let modifiedMessages = convertDeveloperToSystemMessages(messages);
-    modifiedMessages = convertToolMessagesToUserMessages(modifiedMessages);
-    if (tools && tools.length > 0) {
-      modifiedMessages = injectToolInstructions(modifiedMessages, tools);
+    let bodyString: string;
+
+    if (USE_NATIVE_TOOLS) {
+      // Native mode: pass tools directly, only convert developer→system messages
+      const { messages, ...restBody } = parsedBody;
+      const modifiedMessages = convertDeveloperToSystemMessages(messages);
+
+      bodyString = JSON.stringify(
+        {
+          ...restBody,
+          messages: modifiedMessages,
+          stream_options: parsedBody.stream
+            ? { include_usage: true }
+            : undefined,
+        },
+        null,
+        2,
+      );
+    } else {
+      // Prompt engineering mode: strip tools, inject instructions into system prompt
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { tools, tool_choice, messages, ...restBody } = parsedBody;
+
+      let modifiedMessages = convertDeveloperToSystemMessages(messages);
+      modifiedMessages = convertToolMessagesToUserMessages(modifiedMessages);
+      if (tools && tools.length > 0) {
+        modifiedMessages = injectToolInstructions(modifiedMessages, tools);
+      }
+
+      bodyString = JSON.stringify(
+        {
+          ...restBody,
+          messages: modifiedMessages,
+          stream_options: parsedBody.stream
+            ? { include_usage: true }
+            : undefined,
+        },
+        null,
+        2,
+      );
     }
 
-    // Prepare request body
-    const requestBody = {
-      ...restBody,
-      messages: modifiedMessages,
-      // Remove tools from request
-    };
-
-    const bodyString = JSON.stringify(requestBody);
+    // Debug: log the full request payload
+    // eslint-disable-next-line i18next/no-literal-string
+    logProviderRequest(
+      `uncensored-ai-${USE_NATIVE_TOOLS ? "native" : "prompt"}`,
+      bodyString,
+    );
 
     // Update request body
     const modifiedInit: RequestInit = {
@@ -81,15 +121,18 @@ export function createUncensoredAI(logger: EndpointLogger): {
     const response = await fetch(input, modifiedInit);
 
     if (!response.ok) {
-      // Return error responses as-is for OpenAI's error handling
       return response;
     }
 
-    // Check if this is a streaming request
     const isStreamRequest = parsedBody.stream === true;
-
-    // If the API returns SSE directly (native streaming), process with tool call detection
     const contentType = response.headers.get("content-type") ?? "";
+
+    if (USE_NATIVE_TOOLS) {
+      // Native mode: pass response through as-is (API handles tool calls natively)
+      return response;
+    }
+
+    // Prompt engineering mode: process responses for <tool_calls> markup
     if (isStreamRequest && contentType.includes("text/event-stream")) {
       logger.debug(
         "Uncensored AI: API returned native SSE stream, processing with tool call detection",
@@ -106,7 +149,6 @@ export function createUncensoredAI(logger: EndpointLogger): {
     const jsonResponse = (await response.json()) as OpenAIResponse;
 
     if (!isStreamRequest) {
-      // Non-streaming request - return the JSON as-is
       return new Response(JSON.stringify(jsonResponse), {
         status: response.status,
         statusText: response.statusText,
@@ -139,10 +181,19 @@ export function createUncensoredAI(logger: EndpointLogger): {
  * OpenAI API Types
  */
 
+type JSONValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JSONValue[]
+  | { [key: string]: JSONValue };
+
 interface OpenAIRequestBody {
   model: string;
   messages: OpenAIMessage[];
   tools?: OpenAITool[];
+  tool_choice?: string | JSONValue;
   temperature?: number;
   max_tokens?: number;
   stream?: boolean;
@@ -168,6 +219,7 @@ interface OpenAIResponse {
 
 /**
  * Convert JSON response to Server-Sent Events (SSE) streaming format
+ * Used only in prompt engineering mode for non-streaming API responses
  */
 function createStreamingResponse(
   jsonResponse: OpenAIResponse,

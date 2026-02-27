@@ -73,6 +73,7 @@ export function PickStep({
       if (createdId && character.modelSelection) {
         const bestModel = CharactersRepositoryClient.getBestModelForCharacter(
           character.modelSelection,
+          user,
         );
 
         if (bestModel) {
@@ -94,6 +95,7 @@ export function PickStep({
     settings?.ttsVoice,
     onContinue,
     logger,
+    user,
   ]);
 
   return (

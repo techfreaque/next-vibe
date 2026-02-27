@@ -170,6 +170,12 @@ export class UserByIdRepository {
       if (data.emailVerified !== undefined) {
         updateData.emailVerified = data.emailVerified;
       }
+      if (data.isBanned !== undefined) {
+        updateData.isBanned = data.isBanned;
+      }
+      if (data.bannedReason !== undefined) {
+        updateData.bannedReason = data.bannedReason;
+      }
 
       // Update user
       const [updatedUser] = await db
@@ -212,6 +218,8 @@ export class UserByIdRepository {
         publicName: updatedUser.publicName,
         emailVerified: updatedUser.emailVerified,
         isActive: updatedUser.isActive,
+        isBanned: updatedUser.isBanned,
+        bannedReason: updatedUser.bannedReason,
         stripeCustomerId: updatedUser.stripeCustomerId,
         userRoles: userRoles,
         createdAt: updatedUser.createdAt,

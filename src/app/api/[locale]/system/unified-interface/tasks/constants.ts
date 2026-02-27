@@ -19,6 +19,7 @@ export const CRON_SCHEDULES = {
   EVERY_HOUR: "0 * * * *",
   EVERY_2_HOURS: "0 */2 * * *",
   EVERY_3_HOURS: "0 */3 * * *",
+  EVERY_4_HOURS: "0 */4 * * *",
   EVERY_6_HOURS: "0 */6 * * *",
   EVERY_12_HOURS: "0 */12 * * *",
 

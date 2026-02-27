@@ -70,6 +70,7 @@ export const translations: typeof enTranslations = {
     recentActivity: "Ostatnia aktywność",
   },
   status: {
+    active: "Aktywny",
     banned: "Zablokowany",
     inactive: "Nieaktywny",
     verified: "Zweryfikowany",
@@ -91,6 +92,12 @@ export const translations: typeof enTranslations = {
   credits: {
     currentBalance: "Aktualny stan",
     availableCredits: "Dostępne kredyty",
+    packBreakdown: "Podział pakietów kredytów",
+    subscription: "Subskrypcja",
+    permanent: "Stałe",
+    bonus: "Bonus",
+    earned: "Zarobione",
+    expires: "Wygasa",
   },
   payment: {
     stripeCustomerId: "ID klienta Stripe",
@@ -119,6 +126,23 @@ export const translations: typeof enTranslations = {
     lastThread: "Ostatni wątek",
     lastMessage: "Ostatnia wiadomość",
     lastPayment: "Ostatnia płatność",
+  },
+  tabs: {
+    overview: "Przegląd",
+    credits: "Kredyty",
+    referrals: "Polecenia",
+    earnings: "Zarobki",
+  },
+  modelUsage: {
+    title: "Użycie modeli",
+    model: "Model",
+    spent: "Wydane kredyty",
+    messages: "Wiadomości",
+    noUsage: "Brak danych o użyciu modeli",
+  },
+  ban: {
+    banUser: "Zablokuj użytkownika",
+    unbanUser: "Odblokuj użytkownika",
   },
   widget: {
     actions: {

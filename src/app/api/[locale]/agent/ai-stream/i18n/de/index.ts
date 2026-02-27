@@ -9,6 +9,11 @@ export const translations: typeof enTranslations = {
   },
 
   run: {
+    task: {
+      name: "KI-Herzschlag",
+      description:
+        "Hintergrund-KI-Agent, der den Systemzustand prüft, Aufgaben abarbeitet und den Menschen bei Bedarf kontaktiert",
+    },
     post: {
       title: "KI-Agent ausführen",
       description:

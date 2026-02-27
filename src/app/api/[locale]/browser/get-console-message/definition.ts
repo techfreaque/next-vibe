@@ -73,19 +73,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "get-console-message.response.result",
         schema: z
-          .object({
-            found: z.boolean().describe("Whether the message was found"),
-            message: z
-              .object({
-                type: z.string().describe("Type of console message"),
-                text: z.string().describe("Message text"),
-                timestamp: z.string().optional().describe("Message timestamp"),
-              })
-              .optional()
-              .describe("The console message details"),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of the console message retrieval"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -112,14 +109,12 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          found: true,
-          message: {
-            type: "log",
-            text: "Example message",
-            timestamp: "2024-01-01T00:00:00Z",
+        result: [
+          {
+            type: "text",
+            text: "# get_console_message response\nConsole message: [log] Example message",
           },
-        },
+        ],
         executionId: "exec_123",
       },
     },

@@ -74,6 +74,10 @@ export enum ModelId {
   // DOLPHIN_3_0_R1_MISTRAL_24B = "dolphin-3.0-r1-mistral-24b",
   FREEDOMGPT_LIBERTY = "freedomgpt-liberty",
   GAB_AI_ARYA = "gab-ai-arya",
+  // Claude Code provider variants (admin-only, same underlying model)
+  CLAUDE_CODE_HAIKU = "claude-code-haiku",
+  CLAUDE_CODE_SONNET = "claude-code-sonnet",
+  CLAUDE_CODE_OPUS = "claude-code-opus",
 }
 
 /**
@@ -81,15 +85,73 @@ export enum ModelId {
  */
 export enum ApiProvider {
   OPENROUTER = "openrouter",
+  CLAUDE_CODE = "claude-code",
   GAB_AI = "gab-ai",
   FREEDOMGPT = "freedomgpt",
   UNCENSORED_AI = "uncensored-ai",
   VENICE_AI = "venice-ai",
 }
 
+// eslint-disable-next-line i18next/no-literal-string -- API provider names are technical identifiers
+export const apiProviderDisplayNames: Record<ApiProvider, string> = {
+  [ApiProvider.OPENROUTER]: "OpenRouter",
+  [ApiProvider.CLAUDE_CODE]: "Claude Code",
+  [ApiProvider.GAB_AI]: "Gab AI",
+  [ApiProvider.FREEDOMGPT]: "FreedomGPT",
+  [ApiProvider.UNCENSORED_AI]: "Uncensored.ai",
+  [ApiProvider.VENICE_AI]: "Venice.ai",
+};
+
+/**
+ * Provider-specific config for a model variant
+ */
+export interface ModelProviderConfigTokenBased {
+  id: ModelId;
+  apiProvider: ApiProvider;
+  providerModel: string;
+  creditCost: typeof calculateCreditCost;
+  inputTokenCost: number;
+  outputTokenCost: number;
+  adminOnly?: boolean;
+}
+export interface ModelProviderConfigCreditBased {
+  id: ModelId;
+  apiProvider: ApiProvider;
+  providerModel: string;
+  creditCost: number;
+  inputTokenCost?: never;
+  outputTokenCost?: never;
+  adminOnly?: boolean;
+}
+export type ModelProviderConfig =
+  | ModelProviderConfigTokenBased
+  | ModelProviderConfigCreditBased;
+
+/**
+ * Model definition - canonical source of truth for each conceptual model.
+ * Provider-specific details (id, apiProvider, costs) live in `providers`.
+ */
+export interface ModelDefinition {
+  name: string;
+  by: ModelProviderId;
+  description: AgentTranslationKey;
+  parameterCount: number | undefined;
+  contextWindow: number;
+  icon: IconKey;
+  providers: ModelProviderConfig[];
+  utilities: (typeof ModelUtilityValue)[];
+  supportsTools: boolean;
+  intelligence: typeof IntelligenceLevelValue;
+  speed: typeof SpeedLevelValue;
+  content: typeof ContentLevelValue;
+  features: ModelFeatures;
+  weaknesses?: (typeof ModelUtilityValue)[];
+}
+
 /**
  * Configuration interface for AI model options.
  * Contains all necessary information for model selection and API integration.
+ * Derived from ModelDefinition + ModelProviderConfig for backward compat.
  */
 export interface ModelOptionBase {
   /** Unique identifier for the model */
@@ -108,8 +170,8 @@ export interface ModelOptionBase {
   contextWindow: number;
   /** Icon key from ICON_REGISTRY for UI display */
   icon: IconKey;
-  /** OpenRouter API model identifier */
-  openRouterModel: string;
+  /** Provider-specific model identifier */
+  providerModel: string;
 
   /** Utility categories this model belongs to (strengths) */
   utilities: (typeof ModelUtilityValue)[];
@@ -127,17 +189,15 @@ export interface ModelOptionBase {
   features: ModelFeatures;
   /** What the model is NOT good at (optional) */
   weaknesses?: (typeof ModelUtilityValue)[];
+  /** Whether this model variant is only visible to admin users */
+  adminOnly?: boolean;
 }
 export interface ModelOptionTokenBased extends ModelOptionBase {
-  /** Credit cost calculation function */
   creditCost: typeof calculateCreditCost;
-  /** Input token cost in USD per million tokens */
   inputTokenCost: number;
-  /** Output token cost in USD per million tokens */
   outputTokenCost: number;
 }
 export interface ModelOptionCreditBased extends ModelOptionBase {
-  /** Credit cost per message (0 = free). */
   creditCost: number;
   inputTokenCost?: never;
   outputTokenCost?: never;
@@ -228,18 +288,22 @@ const defaultFeatures: ModelFeatures = {
 
 // Model names and icons are technical identifiers that should not be translated
 /* eslint-disable i18next/no-literal-string */
-export const modelOptions: Record<ModelId, ModelOption> = {
+export const modelDefinitions: Record<string, ModelDefinition> = {
   [ModelId.UNCENSORED_LM_V1_2]: {
-    id: ModelId.UNCENSORED_LM_V1_2,
     name: "UncensoredLM v1.2",
-    provider: "uncensoredAI",
-    apiProvider: ApiProvider.UNCENSORED_AI,
+    by: "uncensoredAI",
     description: "chat.models.descriptions.uncensoredLmV11",
     parameterCount: undefined,
     contextWindow: 32768,
     icon: "uncensored-ai",
-    openRouterModel: "uncensored-lm",
-    creditCost: 7,
+    providers: [
+      {
+        id: ModelId.UNCENSORED_LM_V1_2,
+        apiProvider: ApiProvider.UNCENSORED_AI,
+        providerModel: "uncensored-lm",
+        creditCost: 7,
+      },
+    ],
 
     utilities: [
       ModelUtility.UNCENSORED,
@@ -255,16 +319,20 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     weaknesses: [ModelUtility.CODING],
   },
   [ModelId.FREEDOMGPT_LIBERTY]: {
-    id: ModelId.FREEDOMGPT_LIBERTY,
     name: "FreedomGPT Liberty",
-    provider: "freedomGPT",
-    apiProvider: ApiProvider.FREEDOMGPT,
+    by: "freedomGPT",
     description: "chat.models.descriptions.freedomgptLiberty",
     parameterCount: undefined,
     contextWindow: 32768,
     icon: "freedom-gpt-logo",
-    openRouterModel: "liberty",
-    creditCost: 7, // costs 5 credits but we add 2 credits for markup
+    providers: [
+      {
+        id: ModelId.FREEDOMGPT_LIBERTY,
+        apiProvider: ApiProvider.FREEDOMGPT,
+        providerModel: "liberty",
+        creditCost: 7, // costs 5 credits but we add 2 credits for markup
+      },
+    ],
 
     utilities: [
       ModelUtility.UNCENSORED,
@@ -280,16 +348,20 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     weaknesses: [ModelUtility.CODING, ModelUtility.ANALYSIS],
   },
   [ModelId.GAB_AI_ARYA]: {
-    id: ModelId.GAB_AI_ARYA,
     name: "Gab AI Arya",
-    provider: "gabAI",
-    apiProvider: ApiProvider.GAB_AI,
+    by: "gabAI",
     description: "chat.models.descriptions.gabAiArya",
     parameterCount: undefined,
     contextWindow: 131072,
     icon: "gab-ai-logo",
-    openRouterModel: "arya",
-    creditCost: 7,
+    providers: [
+      {
+        id: ModelId.GAB_AI_ARYA,
+        apiProvider: ApiProvider.GAB_AI,
+        providerModel: "arya",
+        creditCost: 7,
+      },
+    ],
 
     utilities: [
       ModelUtility.UNCENSORED,
@@ -309,18 +381,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     weaknesses: [ModelUtility.CODING],
   },
   [ModelId.VENICE_UNCENSORED]: {
-    id: ModelId.VENICE_UNCENSORED,
     name: "Venice Uncensored 1.1",
-    provider: "veniceAI",
-    apiProvider: ApiProvider.VENICE_AI,
+    by: "veniceAI",
     description: "chat.models.descriptions.veniceUncensored",
     parameterCount: 24,
     contextWindow: 32000,
     icon: "venice-ai-logo",
-    openRouterModel: "venice-uncensored",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.2,
-    outputTokenCost: 0.9,
+    providers: [
+      {
+        id: ModelId.VENICE_UNCENSORED,
+        apiProvider: ApiProvider.VENICE_AI,
+        providerModel: "venice-uncensored",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.2,
+        outputTokenCost: 0.9,
+      },
+    ],
 
     utilities: [
       ModelUtility.UNCENSORED,
@@ -343,7 +419,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
   //   parameterCount: 70,
   //   contextWindow: 8192,
   //   icon: "ocean",
-  //   openRouterModel: "cognitivecomputations/dolphin-llama-3-70b",
+  //   providerModel: "cognitivecomputations/dolphin-llama-3-70b",
   //   creditCost: 1,
   //   inputTokenCost: 0,
   //   outputTokenCost: 0,
@@ -365,7 +441,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
   //   parameterCount: 24,
   //   contextWindow: 32768,
   //   icon: "ocean",
-  //   openRouterModel: "cognitivecomputations/dolphin3.0-r1-mistral-24b",
+  //   providerModel: "cognitivecomputations/dolphin3.0-r1-mistral-24b",
   //   creditCost: 1,
   //   inputTokenCost: 0,
   //   outputTokenCost: 0,
@@ -387,7 +463,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
   //   parameterCount: 24,
   //   contextWindow: 32768,
   //   icon: "ocean",
-  //   openRouterModel: "cognitivecomputations/dolphin3.0-mistral-24b:free",
+  //   providerModel: "cognitivecomputations/dolphin3.0-mistral-24b:free",
   //   creditCost: 1,
   //   inputTokenCost: 0,
   //   outputTokenCost: 0,
@@ -402,18 +478,31 @@ export const modelOptions: Record<ModelId, ModelOption> = {
   // },
 
   [ModelId.CLAUDE_HAIKU_4_5]: {
-    id: ModelId.CLAUDE_HAIKU_4_5,
     name: "Claude Haiku 4.5",
-    provider: "anthropic",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "anthropic",
     description: "chat.models.descriptions.claudeHaiku45",
     parameterCount: undefined,
     contextWindow: 200000,
     icon: "si-anthropic",
-    openRouterModel: "anthropic/claude-haiku-4.5",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 1,
-    outputTokenCost: 5,
+    providers: [
+      {
+        id: ModelId.CLAUDE_HAIKU_4_5,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "anthropic/claude-haiku-4.5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1,
+        outputTokenCost: 5,
+      },
+      {
+        id: ModelId.CLAUDE_CODE_HAIKU,
+        apiProvider: ApiProvider.CLAUDE_CODE,
+        providerModel: "claude-haiku-4-5-20251001",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1,
+        outputTokenCost: 5,
+        adminOnly: true,
+      },
+    ],
 
     utilities: [
       ModelUtility.CHAT,
@@ -435,18 +524,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
   },
 
   [ModelId.CLAUDE_OPUS_4_5]: {
-    id: ModelId.CLAUDE_OPUS_4_5,
     name: "Claude Opus 4.5",
-    provider: "anthropic",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "anthropic",
     description: "chat.models.descriptions.claudeOpus45",
     parameterCount: undefined,
     contextWindow: 200000,
     icon: "si-anthropic",
-    openRouterModel: "anthropic/claude-opus-4.5",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 5,
-    outputTokenCost: 25,
+    providers: [
+      {
+        id: ModelId.CLAUDE_OPUS_4_5,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "anthropic/claude-opus-4.5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 5,
+        outputTokenCost: 25,
+      },
+    ],
 
     utilities: [
       ModelUtility.LEGACY,
@@ -469,18 +562,31 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
   },
   [ModelId.CLAUDE_OPUS_4_6]: {
-    id: ModelId.CLAUDE_OPUS_4_6,
     name: "Claude Opus 4.6",
-    provider: "anthropic",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "anthropic",
     description: "chat.models.descriptions.claudeOpus46",
     parameterCount: undefined,
     contextWindow: 200000,
     icon: "si-anthropic",
-    openRouterModel: "anthropic/claude-opus-4.6",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 5,
-    outputTokenCost: 25,
+    providers: [
+      {
+        id: ModelId.CLAUDE_OPUS_4_6,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "anthropic/claude-opus-4.6",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 5,
+        outputTokenCost: 25,
+      },
+      {
+        id: ModelId.CLAUDE_CODE_OPUS,
+        apiProvider: ApiProvider.CLAUDE_CODE,
+        providerModel: "claude-opus-4-6",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 5,
+        outputTokenCost: 25,
+        adminOnly: true,
+      },
+    ],
 
     utilities: [
       ModelUtility.SMART,
@@ -502,18 +608,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
   },
   [ModelId.CLAUDE_SONNET_4_5]: {
-    id: ModelId.CLAUDE_SONNET_4_5,
     name: "Claude Sonnet 4.5",
-    provider: "anthropic",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "anthropic",
     description: "chat.models.descriptions.claudeSonnet45",
     parameterCount: undefined,
     contextWindow: 1000000,
     icon: "si-anthropic",
-    openRouterModel: "anthropic/claude-sonnet-4.5",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 3,
-    outputTokenCost: 15,
+    providers: [
+      {
+        id: ModelId.CLAUDE_SONNET_4_5,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "anthropic/claude-sonnet-4.5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 3,
+        outputTokenCost: 15,
+      },
+    ],
 
     utilities: [
       ModelUtility.SMART,
@@ -536,18 +646,31 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CONTROVERSIAL],
   },
   [ModelId.CLAUDE_SONNET_4_6]: {
-    id: ModelId.CLAUDE_SONNET_4_6,
     name: "Claude Sonnet 4.6",
-    provider: "anthropic",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "anthropic",
     description: "chat.models.descriptions.claudeSonnet46",
     parameterCount: undefined,
     contextWindow: 1000000,
     icon: "si-anthropic",
-    openRouterModel: "anthropic/claude-sonnet-4.6",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 3,
-    outputTokenCost: 15,
+    providers: [
+      {
+        id: ModelId.CLAUDE_SONNET_4_6,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "anthropic/claude-sonnet-4.6",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 3,
+        outputTokenCost: 15,
+      },
+      {
+        id: ModelId.CLAUDE_CODE_SONNET,
+        apiProvider: ApiProvider.CLAUDE_CODE,
+        providerModel: "claude-sonnet-4-6",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 3,
+        outputTokenCost: 15,
+        adminOnly: true,
+      },
+    ],
 
     utilities: [
       ModelUtility.SMART,
@@ -570,18 +693,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
   },
 
   [ModelId.GROK_4]: {
-    id: ModelId.GROK_4,
     name: "Grok 4",
-    provider: "xAI",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "xAI",
     description: "chat.models.descriptions.grok4",
     parameterCount: undefined,
     contextWindow: 256000,
     icon: "si-x",
-    openRouterModel: "x-ai/grok-4",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 3,
-    outputTokenCost: 15,
+    providers: [
+      {
+        id: ModelId.GROK_4,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "x-ai/grok-4",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 3,
+        outputTokenCost: 15,
+      },
+    ],
 
     utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.ANALYSIS],
     supportsTools: true,
@@ -596,18 +723,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     },
   },
   [ModelId.GROK_4_FAST]: {
-    id: ModelId.GROK_4_FAST,
     name: "Grok 4 Fast",
-    provider: "xAI",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "xAI",
     description: "chat.models.descriptions.grok4Fast",
     parameterCount: undefined,
     contextWindow: 2000000,
     icon: "si-x",
-    openRouterModel: "x-ai/grok-4-fast",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.2,
-    outputTokenCost: 0.5,
+    providers: [
+      {
+        id: ModelId.GROK_4_FAST,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "x-ai/grok-4-fast",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.2,
+        outputTokenCost: 0.5,
+      },
+    ],
 
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
@@ -622,18 +753,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     },
   },
   [ModelId.GTP_5_PRO]: {
-    id: ModelId.GTP_5_PRO,
     name: "GPT-5 Pro",
-    provider: "openAI",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "openAI",
     description: "chat.models.descriptions.gpt5Pro",
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
-    openRouterModel: "openai/gpt-5-pro",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 15,
-    outputTokenCost: 120,
+    providers: [
+      {
+        id: ModelId.GTP_5_PRO,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5-pro",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 15,
+        outputTokenCost: 120,
+      },
+    ],
 
     utilities: [ModelUtility.LEGACY, ModelUtility.SMART],
     supportsTools: true,
@@ -649,18 +784,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5_2_PRO]: {
-    id: ModelId.GPT_5_2_PRO,
     name: "GPT-5.2 Pro",
-    provider: "openAI",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "openAI",
     description: "chat.models.descriptions.gpt52Pro",
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
-    openRouterModel: "openai/gpt-5.2-pro",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 21,
-    outputTokenCost: 168,
+    providers: [
+      {
+        id: ModelId.GPT_5_2_PRO,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5.2-pro",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 21,
+        outputTokenCost: 168,
+      },
+    ],
 
     utilities: [
       ModelUtility.SMART,
@@ -682,18 +821,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5_CODEX]: {
-    id: ModelId.GPT_5_CODEX,
     name: "GPT-5 Codex",
-    provider: "openAI",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "openAI",
     description: "chat.models.descriptions.gpt5Codex",
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
-    openRouterModel: "openai/gpt-5-codex",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 1.25,
-    outputTokenCost: 10,
+    providers: [
+      {
+        id: ModelId.GPT_5_CODEX,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5-codex",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.25,
+        outputTokenCost: 10,
+      },
+    ],
 
     utilities: [ModelUtility.LEGACY, ModelUtility.CODING],
     supportsTools: true,
@@ -709,18 +852,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CREATIVE],
   },
   [ModelId.GPT_5_1_CODEX]: {
-    id: ModelId.GPT_5_1_CODEX,
     name: "GPT 5.1 Codex",
-    provider: "openAI",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "openAI",
     description: "chat.models.descriptions.gpt51Codex",
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
-    openRouterModel: "openai/gpt-5.1-codex",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 1.25,
-    outputTokenCost: 10,
+    providers: [
+      {
+        id: ModelId.GPT_5_1_CODEX,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5.1-codex",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.25,
+        outputTokenCost: 10,
+      },
+    ],
 
     utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.CREATIVE],
     supportsTools: true,
@@ -736,18 +883,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5_1]: {
-    id: ModelId.GPT_5_1,
     name: "GPT 5.1",
-    provider: "openAI",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "openAI",
     description: "chat.models.descriptions.gpt51",
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
-    openRouterModel: "openai/gpt-5.1",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 1.25,
-    outputTokenCost: 10,
+    providers: [
+      {
+        id: ModelId.GPT_5_1,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5.1",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.25,
+        outputTokenCost: 10,
+      },
+    ],
 
     utilities: [ModelUtility.LEGACY, ModelUtility.SMART],
     supportsTools: true,
@@ -763,20 +914,24 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5_2]: {
-    id: ModelId.GPT_5_2,
     name: "GPT 5.2",
-    provider: "openAI",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "openAI",
     description: "chat.models.descriptions.gpt52",
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
-    openRouterModel: "openai/gpt-5.2",
-    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.CREATIVE],
-    creditCost: calculateCreditCost,
-    inputTokenCost: 1.75,
-    outputTokenCost: 14,
+    providers: [
+      {
+        id: ModelId.GPT_5_2,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5.2",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.75,
+        outputTokenCost: 14,
+      },
+    ],
 
+    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.CREATIVE],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.BALANCED,
@@ -790,15 +945,23 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5_2_CHAT]: {
-    id: ModelId.GPT_5_2_CHAT,
     name: "GPT 5.2 Chat",
-    provider: "openAI",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "openAI",
     description: "chat.models.descriptions.gpt52_chat",
     parameterCount: undefined,
     contextWindow: 128000,
     icon: "si-openai",
-    openRouterModel: "openai/gpt-5.2-chat",
+    providers: [
+      {
+        id: ModelId.GPT_5_2_CHAT,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5.2-chat",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.75,
+        outputTokenCost: 14,
+      },
+    ],
+
     utilities: [
       ModelUtility.SMART,
       ModelUtility.CODING,
@@ -806,10 +969,6 @@ export const modelOptions: Record<ModelId, ModelOption> = {
       ModelUtility.FAST,
       ModelUtility.CHAT,
     ],
-    creditCost: calculateCreditCost,
-    inputTokenCost: 1.75,
-    outputTokenCost: 14,
-
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.FAST,
@@ -823,18 +982,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5]: {
-    id: ModelId.GPT_5,
     name: "GPT-5",
-    provider: "openAI",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "openAI",
     description: "chat.models.descriptions.gpt5",
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
-    openRouterModel: "openai/gpt-5",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 1.25,
-    outputTokenCost: 10,
+    providers: [
+      {
+        id: ModelId.GPT_5,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.25,
+        outputTokenCost: 10,
+      },
+    ],
 
     utilities: [ModelUtility.LEGACY, ModelUtility.SMART, ModelUtility.CHAT],
     supportsTools: true,
@@ -850,18 +1013,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     weaknesses: [ModelUtility.ROLEPLAY],
   },
   [ModelId.GPT_5_MINI]: {
-    id: ModelId.GPT_5_MINI,
     name: "GPT-5 Mini",
-    provider: "openAI",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "openAI",
     description: "chat.models.descriptions.gpt5Mini",
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
-    openRouterModel: "openai/gpt-5-mini",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.25,
-    outputTokenCost: 2,
+    providers: [
+      {
+        id: ModelId.GPT_5_MINI,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5-mini",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.25,
+        outputTokenCost: 2,
+      },
+    ],
 
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
@@ -877,18 +1044,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.ANALYSIS],
   },
   [ModelId.GPT_5_NANO]: {
-    id: ModelId.GPT_5_NANO,
     name: "GPT-5 Nano",
-    provider: "openAI",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "openAI",
     description: "chat.models.descriptions.gpt5Nano",
     parameterCount: undefined,
     contextWindow: 400000,
     icon: "si-openai",
-    openRouterModel: "openai/gpt-5-nano",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.05,
-    outputTokenCost: 0.4,
+    providers: [
+      {
+        id: ModelId.GPT_5_NANO,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5-nano",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.05,
+        outputTokenCost: 0.4,
+      },
+    ],
 
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
@@ -908,18 +1079,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     ],
   },
   [ModelId.GPT_OSS_120B]: {
-    id: ModelId.GPT_OSS_120B,
     name: "GPT-OSS 120B",
-    provider: "openAI",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "openAI",
     description: "chat.models.descriptions.gptOss120b",
     parameterCount: 117,
     contextWindow: 131072,
     icon: "si-openai",
-    openRouterModel: "openai/gpt-oss-120b",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.04,
-    outputTokenCost: 0.19,
+    providers: [
+      {
+        id: ModelId.GPT_OSS_120B,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-oss-120b",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.04,
+        outputTokenCost: 0.19,
+      },
+    ],
 
     utilities: [ModelUtility.CHAT, ModelUtility.CODING],
     supportsTools: true,
@@ -929,16 +1104,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.KIMI_K2_5]: {
-    id: ModelId.KIMI_K2_5,
     name: "Kimi K2.5",
-    provider: "moonshotAI",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "moonshotAI",
     description: "chat.models.descriptions.kimiK2_5",
     parameterCount: 1000,
     contextWindow: 262144,
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.45,
-    outputTokenCost: 2.5,
+    icon: "moon",
+    providers: [
+      {
+        id: ModelId.KIMI_K2_5,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "moonshotai/kimi-k2.5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.45,
+        outputTokenCost: 2.5,
+      },
+    ],
 
     utilities: [
       ModelUtility.SMART,
@@ -947,8 +1128,6 @@ export const modelOptions: Record<ModelId, ModelOption> = {
       ModelUtility.ANALYSIS,
       ModelUtility.CREATIVE,
     ],
-    icon: "moon",
-    openRouterModel: "moonshotai/kimi-k2.5",
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
     speed: SpeedLevel.FAST,
@@ -956,16 +1135,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.KIMI_K2]: {
-    id: ModelId.KIMI_K2,
     name: "Kimi K2",
-    provider: "moonshotAI",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "moonshotAI",
     description: "chat.models.descriptions.kimiK2",
     parameterCount: 1000,
     contextWindow: 262144,
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.39,
-    outputTokenCost: 1.9,
+    icon: "moon",
+    providers: [
+      {
+        id: ModelId.KIMI_K2,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "moonshotai/kimi-k2-0905",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.39,
+        outputTokenCost: 1.9,
+      },
+    ],
 
     utilities: [
       ModelUtility.LEGACY,
@@ -975,8 +1160,6 @@ export const modelOptions: Record<ModelId, ModelOption> = {
       ModelUtility.ANALYSIS,
       ModelUtility.CREATIVE,
     ],
-    icon: "moon",
-    openRouterModel: "moonshotai/kimi-k2-0905",
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.FAST,
@@ -984,16 +1167,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.KIMI_K2_THINKING]: {
-    id: ModelId.KIMI_K2_THINKING,
     name: "Kimi K2 Thinking",
-    provider: "moonshotAI",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "moonshotAI",
     description: "chat.models.descriptions.kimiK2Thinking",
     parameterCount: 1000,
     contextWindow: 262144,
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.4,
-    outputTokenCost: 1.75,
+    icon: "moon",
+    providers: [
+      {
+        id: ModelId.KIMI_K2_THINKING,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "moonshotai/kimi-k2-thinking",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.4,
+        outputTokenCost: 1.75,
+      },
+    ],
 
     utilities: [
       ModelUtility.LEGACY,
@@ -1003,8 +1192,6 @@ export const modelOptions: Record<ModelId, ModelOption> = {
       ModelUtility.CREATIVE,
       ModelUtility.REASONING,
     ],
-    icon: "moon",
-    openRouterModel: "moonshotai/kimi-k2-thinking",
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.THOROUGH,
@@ -1013,18 +1200,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
   },
 
   [ModelId.GLM_5]: {
-    id: ModelId.GLM_5,
     name: "GLM-5",
-    provider: "zAi",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "zAi",
     description: "chat.models.descriptions.glm5",
     parameterCount: undefined,
     contextWindow: 205000,
     icon: "si-zendesk",
-    openRouterModel: "z-ai/glm-5",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.3,
-    outputTokenCost: 2.55,
+    providers: [
+      {
+        id: ModelId.GLM_5,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "z-ai/glm-5",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.3,
+        outputTokenCost: 2.55,
+      },
+    ],
 
     utilities: [
       ModelUtility.SMART,
@@ -1039,18 +1230,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.GLM_4_7]: {
-    id: ModelId.GLM_4_7,
     name: "GLM 4.7",
-    provider: "zAi",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "zAi",
     description: "chat.models.descriptions.glm47",
     parameterCount: undefined,
     contextWindow: 202752,
     icon: "si-zendesk",
-    openRouterModel: "z-ai/glm-4.7",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.4,
-    outputTokenCost: 1.5,
+    providers: [
+      {
+        id: ModelId.GLM_4_7,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "z-ai/glm-4.7",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.4,
+        outputTokenCost: 1.5,
+      },
+    ],
 
     utilities: [
       ModelUtility.LEGACY,
@@ -1065,18 +1260,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.GLM_4_7_FLASH]: {
-    id: ModelId.GLM_4_7_FLASH,
     name: "GLM 4.7 Flash",
-    provider: "zAi",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "zAi",
     description: "chat.models.descriptions.glm47Flash",
     parameterCount: undefined,
     contextWindow: 200000,
     icon: "si-zendesk",
-    openRouterModel: "z-ai/glm-4.7-flash",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.07,
-    outputTokenCost: 0.4,
+    providers: [
+      {
+        id: ModelId.GLM_4_7_FLASH,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "z-ai/glm-4.7-flash",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.07,
+        outputTokenCost: 0.4,
+      },
+    ],
 
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
@@ -1086,18 +1285,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.GLM_4_5_AIR]: {
-    id: ModelId.GLM_4_5_AIR,
     name: "GLM 4.5 AIR",
-    provider: "zAi",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "zAi",
     description: "chat.models.descriptions.glm45Air",
     parameterCount: undefined,
     contextWindow: 131072,
     icon: "si-zendesk",
-    openRouterModel: "z-ai/glm-4.5-air",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.05,
-    outputTokenCost: 0.22,
+    providers: [
+      {
+        id: ModelId.GLM_4_5_AIR,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "z-ai/glm-4.5-air",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.05,
+        outputTokenCost: 0.22,
+      },
+    ],
 
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
@@ -1107,18 +1310,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.GLM_4_6]: {
-    id: ModelId.GLM_4_6,
     name: "GLM 4.6",
-    provider: "zAi",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "zAi",
     description: "chat.models.descriptions.glm46",
     parameterCount: undefined,
     contextWindow: 202752,
     icon: "si-zendesk",
-    openRouterModel: "z-ai/glm-4.6",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.35,
-    outputTokenCost: 1.5,
+    providers: [
+      {
+        id: ModelId.GLM_4_6,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "z-ai/glm-4.6",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.35,
+        outputTokenCost: 1.5,
+      },
+    ],
 
     utilities: [
       ModelUtility.LEGACY,
@@ -1133,18 +1340,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.GLM_4_5V]: {
-    id: ModelId.GLM_4_5V,
     name: "GLM 4.5v",
-    provider: "zAi",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "zAi",
     description: "chat.models.descriptions.glm45v",
     parameterCount: 106,
     contextWindow: 65536,
     icon: "si-zendesk",
-    openRouterModel: "z-ai/glm-4.5v",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.6,
-    outputTokenCost: 1.8,
+    providers: [
+      {
+        id: ModelId.GLM_4_5V,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "z-ai/glm-4.5v",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.6,
+        outputTokenCost: 1.8,
+      },
+    ],
 
     utilities: [ModelUtility.LEGACY, ModelUtility.VISION, ModelUtility.CHAT],
     supportsTools: true,
@@ -1154,18 +1365,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     features: { ...defaultFeatures, imageInput: true, toolCalling: true },
   },
   [ModelId.GEMINI_2_5_FLASH_LITE]: {
-    id: ModelId.GEMINI_2_5_FLASH_LITE,
     name: "Gemini 2.5 Flash Lite",
-    provider: "google",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "google",
     description: "chat.models.descriptions.geminiFlash25Lite",
     parameterCount: undefined,
     contextWindow: 1048576,
     icon: "si-googlegemini",
-    openRouterModel: "google/gemini-2.5-flash-lite",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.1,
-    outputTokenCost: 0.4,
+    providers: [
+      {
+        id: ModelId.GEMINI_2_5_FLASH_LITE,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "google/gemini-2.5-flash-lite",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.1,
+        outputTokenCost: 0.4,
+      },
+    ],
 
     utilities: [ModelUtility.LEGACY, ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
@@ -1180,18 +1395,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     },
   },
   [ModelId.GEMINI_2_5_FLASH]: {
-    id: ModelId.GEMINI_2_5_FLASH,
     name: "Gemini 2.5 Flash",
-    provider: "google",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "google",
     description: "chat.models.descriptions.geminiFlash25Flash",
     parameterCount: undefined,
     contextWindow: 1048576,
     icon: "si-googlegemini",
-    openRouterModel: "google/gemini-2.5-flash",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.3,
-    outputTokenCost: 2.5,
+    providers: [
+      {
+        id: ModelId.GEMINI_2_5_FLASH,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "google/gemini-2.5-flash",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.3,
+        outputTokenCost: 2.5,
+      },
+    ],
 
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
@@ -1206,18 +1425,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     },
   },
   [ModelId.GEMINI_2_5_PRO]: {
-    id: ModelId.GEMINI_2_5_PRO,
     name: "Gemini 2.5 Flash Pro",
-    provider: "google",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "google",
     description: "chat.models.descriptions.geminiFlash25Pro",
     parameterCount: undefined,
     contextWindow: 1048576,
     icon: "si-googlegemini",
-    openRouterModel: "google/gemini-2.5-pro",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 1.25,
-    outputTokenCost: 10,
+    providers: [
+      {
+        id: ModelId.GEMINI_2_5_PRO,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "google/gemini-2.5-pro",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.25,
+        outputTokenCost: 10,
+      },
+    ],
 
     utilities: [ModelUtility.LEGACY, ModelUtility.SMART],
     supportsTools: true,
@@ -1232,18 +1455,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     },
   },
   [ModelId.GEMINI_3_PRO]: {
-    id: ModelId.GEMINI_3_PRO,
     name: "Gemini 3 Pro",
-    provider: "google",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "google",
     description: "chat.models.descriptions.gemini3Pro",
     parameterCount: undefined,
     contextWindow: 1048576,
     icon: "si-googlegemini",
-    openRouterModel: "google/gemini-3-pro-preview",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 2,
-    outputTokenCost: 12,
+    providers: [
+      {
+        id: ModelId.GEMINI_3_PRO,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "google/gemini-3-pro-preview",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 2,
+        outputTokenCost: 12,
+      },
+    ],
 
     utilities: [
       ModelUtility.SMART,
@@ -1262,18 +1489,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     },
   },
   [ModelId.GEMINI_3_FLASH]: {
-    id: ModelId.GEMINI_3_FLASH,
     name: "Gemini 3 Flash",
-    provider: "google",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "google",
     description: "chat.models.descriptions.gemini3Flash",
     parameterCount: undefined,
     contextWindow: 1048576,
     icon: "si-googlegemini",
-    openRouterModel: "google/gemini-3-flash-preview",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.5,
-    outputTokenCost: 3,
+    providers: [
+      {
+        id: ModelId.GEMINI_3_FLASH,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "google/gemini-3-flash-preview",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.5,
+        outputTokenCost: 3,
+      },
+    ],
 
     utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.FAST],
     supportsTools: true,
@@ -1296,7 +1527,7 @@ export const modelOptions: Record<ModelId, ModelOption> = {
   //   parameterCount: 12,
   //   contextWindow: 131072,
   //   icon: "si-mistralai",
-  //   openRouterModel: "mistralai/mistral-nemo:free",
+  //   providerModel: "mistralai/mistral-nemo:free",
   //   creditCost: 0,
 
   //   utilities: [ModelUtility.CHAT, ModelUtility.FAST],
@@ -1308,18 +1539,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
   //   weaknesses: [ModelUtility.ANALYSIS, ModelUtility.CODING],
   // },
   [ModelId.DEEPSEEK_V32]: {
-    id: ModelId.DEEPSEEK_V32,
     name: "DeepSeek V3.2",
-    provider: "deepSeek",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "deepSeek",
     description: "chat.models.descriptions.deepseekV32",
     parameterCount: 671,
     contextWindow: 163840,
     icon: "whale",
-    openRouterModel: "deepseek/deepseek-v3.2",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.25,
-    outputTokenCost: 0.38,
+    providers: [
+      {
+        id: ModelId.DEEPSEEK_V32,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "deepseek/deepseek-v3.2",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.25,
+        outputTokenCost: 0.38,
+      },
+    ],
 
     utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.ANALYSIS],
     supportsTools: true,
@@ -1329,18 +1564,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.DEEPSEEK_V31]: {
-    id: ModelId.DEEPSEEK_V31,
     name: "DeepSeek V3.1",
-    provider: "deepSeek",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "deepSeek",
     description: "chat.models.descriptions.deepseekV31",
     parameterCount: 671,
     contextWindow: 32768,
     icon: "whale",
-    openRouterModel: "deepseek/deepseek-chat-v3.1",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.15,
-    outputTokenCost: 0.75,
+    providers: [
+      {
+        id: ModelId.DEEPSEEK_V31,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "deepseek/deepseek-chat-v3.1",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.15,
+        outputTokenCost: 0.75,
+      },
+    ],
 
     utilities: [ModelUtility.LEGACY, ModelUtility.SMART, ModelUtility.CODING],
     supportsTools: true,
@@ -1350,18 +1589,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.DEEPSEEK_R1]: {
-    id: ModelId.DEEPSEEK_R1,
     name: "DeepSeek R1",
-    provider: "deepSeek",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "deepSeek",
     description: "chat.models.descriptions.deepseekR1",
     parameterCount: 671,
     contextWindow: 163840,
     icon: "whale",
-    openRouterModel: "deepseek/deepseek-r1-0528",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.4,
-    outputTokenCost: 1.75,
+    providers: [
+      {
+        id: ModelId.DEEPSEEK_R1,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "deepseek/deepseek-r1-0528",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.4,
+        outputTokenCost: 1.75,
+      },
+    ],
 
     utilities: [
       ModelUtility.SMART,
@@ -1376,18 +1619,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.QWEN3_235B_FREE]: {
-    id: ModelId.QWEN3_235B_FREE,
     name: "Qwen3 235B ",
-    provider: "alibaba",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "alibaba",
     description: "chat.models.descriptions.qwen3235bFree",
     parameterCount: 235,
     contextWindow: 40960,
     icon: "si-alibabadotcom",
-    openRouterModel: "qwen/qwen3-235b-a22b",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.2,
-    outputTokenCost: 0.6,
+    providers: [
+      {
+        id: ModelId.QWEN3_235B_FREE,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "qwen/qwen3-235b-a22b",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.2,
+        outputTokenCost: 0.6,
+      },
+    ],
 
     utilities: [ModelUtility.SMART, ModelUtility.CODING],
     supportsTools: true,
@@ -1397,18 +1644,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.DEEPSEEK_R1_DISTILL]: {
-    id: ModelId.DEEPSEEK_R1_DISTILL,
     name: "DeepSeek R1 Distill",
-    provider: "deepSeek",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "deepSeek",
     description: "chat.models.descriptions.deepseekR1Distill",
     parameterCount: 70,
     contextWindow: 32768,
     icon: "whale",
-    openRouterModel: "deepseek/deepseek-r1-distill-qwen-32b",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.29,
-    outputTokenCost: 0.29,
+    providers: [
+      {
+        id: ModelId.DEEPSEEK_R1_DISTILL,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "deepseek/deepseek-r1-distill-qwen-32b",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.29,
+        outputTokenCost: 0.29,
+      },
+    ],
 
     utilities: [
       ModelUtility.CODING,
@@ -1422,18 +1673,22 @@ export const modelOptions: Record<ModelId, ModelOption> = {
     features: { ...defaultFeatures, toolCalling: true },
   },
   [ModelId.QWEN_2_5_7B]: {
-    id: ModelId.QWEN_2_5_7B,
     name: "Qwen 2.5 7B",
-    provider: "alibaba",
-    apiProvider: ApiProvider.OPENROUTER,
+    by: "alibaba",
     description: "chat.models.descriptions.qwen257b",
     parameterCount: 7,
     contextWindow: 32768,
     icon: "si-alibabadotcom",
-    openRouterModel: "qwen/qwen-2.5-7b-instruct",
-    creditCost: calculateCreditCost,
-    inputTokenCost: 0.04,
-    outputTokenCost: 0.1,
+    providers: [
+      {
+        id: ModelId.QWEN_2_5_7B,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "qwen/qwen-2.5-7b-instruct",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.04,
+        outputTokenCost: 0.1,
+      },
+    ],
 
     utilities: [ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
@@ -1446,6 +1701,66 @@ export const modelOptions: Record<ModelId, ModelOption> = {
 };
 /* eslint-enable i18next/no-literal-string */
 
+/**
+ * Build flat modelOptions from modelDefinitions for backward compatibility.
+ * Each provider variant becomes its own ModelOption entry.
+ */
+function buildModelOptions(): Record<string, ModelOption> {
+  const result: Record<string, ModelOption> = {};
+
+  for (const def of Object.values(modelDefinitions)) {
+    for (const provider of def.providers) {
+      const base = {
+        id: provider.id,
+        name: def.name,
+        provider: def.by,
+        apiProvider: provider.apiProvider,
+        description: def.description,
+        parameterCount: def.parameterCount,
+        contextWindow: def.contextWindow,
+        icon: def.icon,
+        providerModel: provider.providerModel,
+        utilities: def.utilities,
+        supportsTools: def.supportsTools,
+        intelligence: def.intelligence,
+        speed: def.speed,
+        content: def.content,
+        features: def.features,
+        weaknesses: def.weaknesses,
+        adminOnly: provider.adminOnly,
+      };
+
+      if (typeof provider.creditCost === "number") {
+        result[provider.id] = {
+          ...base,
+          creditCost: provider.creditCost,
+        } as ModelOptionCreditBased;
+      } else {
+        result[provider.id] = {
+          ...base,
+          creditCost: provider.creditCost,
+          inputTokenCost: provider.inputTokenCost,
+          outputTokenCost: provider.outputTokenCost,
+        } as ModelOptionTokenBased;
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Internal flat index: ModelId → ModelOption (one entry per provider variant).
+ * Use getModelById() for point lookups, getAllModelOptions() for iteration.
+ */
+const modelOptionsIndex = buildModelOptions();
+
+/**
+ * @deprecated Use modelDefinitions + getModelById() instead.
+ * Kept temporarily for backward compat during refactor.
+ */
+export const modelOptions = modelOptionsIndex;
+
 /** Default model used when no specific model is selected */
 export const defaultModel = ModelId.CLAUDE_HAIKU_4_5;
 
@@ -1457,20 +1772,57 @@ export const defaultModel = ModelId.CLAUDE_HAIKU_4_5;
  * @returns The model configuration object
  */
 export function getModelById(modelId: ModelId): ModelOption {
-  const foundModel = modelOptions[modelId];
+  const foundModel = modelOptionsIndex[modelId];
 
   if (foundModel) {
     return foundModel;
   }
 
   // Fallback to default model - this should never fail as default model is in the object
-  return modelOptions[defaultModel];
+  return modelOptionsIndex[defaultModel];
+}
+
+/**
+ * Get all model options as a flat array (one entry per provider variant).
+ * For UI display that groups by conceptual model, use modelDefinitions instead.
+ */
+export function getAllModelOptions(): ModelOption[] {
+  return Object.values(modelOptionsIndex);
+}
+
+/**
+ * Get display name for a model, appending API provider suffix when the
+ * conceptual model has multiple providers visible to the given user.
+ * E.g. "Claude Haiku 4.5 (OpenRouter)" vs "Claude Haiku 4.5 (Claude Code)"
+ */
+export function getModelDisplayName(
+  model: ModelOption,
+  isAdmin: boolean,
+): string {
+  // Find the parent definition by matching model name
+  const def = Object.values(modelDefinitions).find(
+    (d) => d.name === model.name,
+  );
+  if (!def) {
+    return model.name;
+  }
+
+  // Count how many providers are visible to this user
+  const visibleProviders = isAdmin
+    ? def.providers
+    : def.providers.filter((p) => !p.adminOnly);
+
+  if (visibleProviders.length <= 1) {
+    return model.name;
+  }
+
+  return `${model.name} (${apiProviderDisplayNames[model.apiProvider]})`;
 }
 
 /**
  * Model ID options for SELECT fields
  */
-export const ModelIdOptions = Object.values(modelOptions).map((model) => ({
+export const ModelIdOptions = Object.values(modelOptionsIndex).map((model) => ({
   value: model.id,
   label: model.name,
 }));
@@ -1556,10 +1908,16 @@ export function calculateCreditCost(
 }
 
 /**
- * Total number of AI models available
- * Dynamically calculated from modelOptions object
+ * Total number of AI models available (conceptual models, not provider variants)
  */
-export const TOTAL_MODEL_COUNT = Object.keys(modelOptions).length;
+export const TOTAL_MODEL_COUNT = Object.keys(modelDefinitions).length;
+
+/**
+ * Total number of pre-built AI characters/personas.
+ * 2 companions + 7 coding + 10 creative + 4 education
+ * + 6 analysis + 16 assistant + 1 roleplay + 6 controversial = 52
+ */
+export const TOTAL_CHARACTER_COUNT = 52;
 
 /**
  * Featured models by category for use in marketing content, emails, etc.
@@ -1567,20 +1925,20 @@ export const TOTAL_MODEL_COUNT = Object.keys(modelOptions).length;
 export const FEATURED_MODELS = {
   // Representative picks per category — used in marketing content and emails
   mainstream: [
-    modelOptions[ModelId.CLAUDE_OPUS_4_6].name,
-    modelOptions[ModelId.GPT_5_2_PRO].name,
-    modelOptions[ModelId.GEMINI_3_PRO].name,
-    modelOptions[ModelId.GROK_4].name,
+    modelDefinitions[ModelId.CLAUDE_OPUS_4_6].name,
+    modelDefinitions[ModelId.GPT_5_2_PRO].name,
+    modelDefinitions[ModelId.GEMINI_3_PRO].name,
+    modelDefinitions[ModelId.GROK_4].name,
   ],
   open: [
-    modelOptions[ModelId.DEEPSEEK_R1].name,
-    modelOptions[ModelId.KIMI_K2_5].name,
-    modelOptions[ModelId.GLM_5].name,
+    modelDefinitions[ModelId.DEEPSEEK_R1].name,
+    modelDefinitions[ModelId.KIMI_K2_5].name,
+    modelDefinitions[ModelId.GLM_5].name,
   ],
   uncensored: [
-    modelOptions[ModelId.UNCENSORED_LM_V1_2].name,
-    modelOptions[ModelId.FREEDOMGPT_LIBERTY].name,
-    modelOptions[ModelId.GAB_AI_ARYA].name,
-    modelOptions[ModelId.VENICE_UNCENSORED].name,
+    modelDefinitions[ModelId.UNCENSORED_LM_V1_2].name,
+    modelDefinitions[ModelId.FREEDOMGPT_LIBERTY].name,
+    modelDefinitions[ModelId.GAB_AI_ARYA].name,
+    modelDefinitions[ModelId.VENICE_UNCENSORED].name,
   ],
 } as const;

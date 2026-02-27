@@ -12,6 +12,7 @@ import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { SubscriptionRepository } from "@/app/api/[locale]/subscription/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -89,6 +90,13 @@ export default async function SubscriptionPage({
     initialHistory = historyResponse.success ? historyResponse.data : null;
   }
 
+  const hasPaymentProvider = !!(
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ||
+    process.env.NOWPAYMENTS_API_KEY
+  );
+  const isAdmin =
+    !!isAuthenticated && user.roles.includes(UserPermissionRole.ADMIN);
+
   return (
     <SubscriptionPageClient
       locale={locale}
@@ -98,6 +106,8 @@ export default async function SubscriptionPage({
       initialSubscription={initialSubscription}
       initialCredits={initialCredits}
       initialHistory={initialHistory}
+      hasPaymentProvider={hasPaymentProvider}
+      isAdmin={isAdmin}
     />
   );
 }

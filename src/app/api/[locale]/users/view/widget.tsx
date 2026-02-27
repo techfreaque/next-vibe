@@ -1,11 +1,10 @@
 /**
  * Custom Widget for User View
- * Displays comprehensive user information with statistics
+ * Comprehensive user dashboard with tabs for embedded sub-endpoints
  */
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
@@ -20,14 +19,11 @@ import {
   Copy,
   CreditCard,
   DollarSign,
-  ExternalLink,
   Gift,
-  History,
   Mail,
   MessageSquare,
   Pencil,
   Shield,
-  ShoppingCart,
   Trash2,
   TrendingUp,
   User,
@@ -37,11 +33,23 @@ import {
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
-import { P } from "next-vibe-ui/ui/typography";
-import { useCallback, useState } from "react";
-
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "next-vibe-ui/ui/table";
+import { P } from "next-vibe-ui/ui/typography";
+import { useCallback, useMemo, useState } from "react";
+
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
+import {
+  useWidgetContext,
   useWidgetLocale,
+  useWidgetNavigation,
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
@@ -59,11 +67,24 @@ interface CustomWidgetProps {
   fieldName: string;
 }
 
+type TabId = "overview" | "credits" | "referrals" | "earnings";
+
 /**
  * Format currency cents to dollars
  */
 function formatCurrency(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
+}
+
+/**
+ * Format a role enum key like "enums.userRole.partnerAdmin" to "Partner Admin"
+ */
+function formatRoleLabel(roleKey: string): string {
+  const lastSegment = roleKey.split(".").pop() ?? roleKey;
+  return lastSegment
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, (c) => c.toUpperCase())
+    .trim();
 }
 
 /**
@@ -127,61 +148,53 @@ export function UserViewContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const t = useWidgetTranslation<typeof definition.GET>();
-  const router = useRouter();
   const locale = useWidgetLocale();
-  const [editLoading, setEditLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
+  const { user } = useWidgetContext();
+  const { push: navigate } = useWidgetNavigation();
   const data = field.value;
   const children = field.children;
 
+  const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const [copyIdSuccess, setCopyIdSuccess] = useState(false);
+
   const userId = data?.basicInfo?.id;
 
-  const handleViewCreditHistory = useCallback((): void => {
+  const handleAddCredits = useCallback(async (): Promise<void> => {
     if (!userId) {
       return;
     }
-    router.push(`/${locale}/admin/users/${userId}/edit`);
-  }, [router, locale, userId]);
+    const adminAddDefs = await import("../../credits/admin-add/definition");
+    navigate(adminAddDefs.default.POST, {
+      data: { targetUserId: userId },
+      renderInModal: true,
+      popNavigationOnSuccess: 1,
+    });
+  }, [navigate, userId]);
 
-  const handleEdit = useCallback((): void => {
+  const handleEdit = useCallback(async (): Promise<void> => {
     if (!userId) {
       return;
     }
-    setEditLoading(true);
-    router.push(`/${locale}/admin/users/${userId}/edit`);
-    setEditLoading(false);
-  }, [router, locale, userId]);
+    const userDefs = await import("../user/[id]/definition");
+    navigate(userDefs.default.PUT, {
+      urlPathParams: { id: userId },
+      prefillFromGet: true,
+      getEndpoint: userDefs.default.GET,
+      popNavigationOnSuccess: 1,
+    });
+  }, [navigate, userId]);
 
-  const handleDelete = useCallback((): void => {
+  const handleDelete = useCallback(async (): Promise<void> => {
     if (!userId) {
       return;
     }
-    setDeleteLoading(true);
-    router.push(`/${locale}/admin/users/${userId}/edit`);
-    setDeleteLoading(false);
-  }, [router, locale, userId]);
+    const userDefs = await import("../user/[id]/definition");
+    navigate(userDefs.default.DELETE, {
+      urlPathParams: { id: userId },
+      popNavigationOnSuccess: 1,
+    });
+  }, [navigate, userId]);
 
-  const handleViewSubscription = useCallback((): void => {
-    router.push(`/${locale}/admin/users/${userId ?? ""}/edit`);
-  }, [router, locale, userId]);
-
-  const handleViewReferralCodes = useCallback((): void => {
-    router.push(`/${locale}/admin/users/${userId ?? ""}/edit`);
-  }, [router, locale, userId]);
-
-  const handleViewReferralEarnings = useCallback((): void => {
-    router.push(`/${locale}/admin/users/${userId ?? ""}/edit`);
-  }, [router, locale, userId]);
-
-  const handleAddCredits = useCallback((): void => {
-    router.push(`/${locale}/admin/users/${userId ?? ""}/edit`);
-  }, [router, locale, userId]);
-
-  const handleViewLeadByEmail = useCallback((): void => {
-    router.push(`/${locale}/admin/leads/list`);
-  }, [router, locale]);
-
-  const [copyIdSuccess, setCopyIdSuccess] = useState(false);
   const handleCopyUserId = useCallback((): void => {
     if (!userId) {
       return;
@@ -195,15 +208,56 @@ export function UserViewContainer({
     });
   }, [userId]);
 
+  // Memoize endpoint options for embedded EndpointsPage components
+  const creditsEndpointOptions = useMemo(
+    () =>
+      userId
+        ? {
+            read: {
+              initialState: {
+                targetUserId: userId,
+                paginationInfo: { page: 1, limit: 20 },
+              },
+            },
+          }
+        : undefined,
+    [userId],
+  );
+
+  const referralEndpointOptions = useMemo(
+    () =>
+      userId
+        ? {
+            read: {
+              initialState: {
+                targetUserId: userId,
+              },
+            },
+          }
+        : undefined,
+    [userId],
+  );
+
+  const earningsEndpointOptions = useMemo(
+    () =>
+      userId
+        ? {
+            read: {
+              initialState: {
+                targetUserId: userId,
+                limit: 50,
+                offset: 0,
+              },
+            },
+          }
+        : undefined,
+    [userId],
+  );
+
   if (!data) {
     return (
       <Div className="flex flex-col items-center justify-center py-12 text-center">
-        <Div className="rounded-full bg-muted p-3 mb-4">
-          <User className="h-6 w-6 text-muted-foreground" />
-        </Div>
-        <Div className="text-sm font-medium text-muted-foreground">
-          {t("empty")}
-        </Div>
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </Div>
     );
   }
@@ -217,10 +271,18 @@ export function UserViewContainer({
     referralStats,
     roles,
     recentActivity,
+    modelUsageStats,
   } = data;
 
+  const tabs: { id: TabId; label: string }[] = [
+    { id: "overview", label: t("tabs.overview") },
+    { id: "credits", label: t("tabs.credits") },
+    { id: "referrals", label: t("tabs.referrals") },
+    { id: "earnings", label: t("tabs.earnings") },
+  ];
+
   return (
-    <Div className="flex flex-col gap-6">
+    <Div className="flex flex-col gap-4">
       {/* Top action bar */}
       <Div className="flex items-center gap-2">
         <NavigateButtonWidget field={children.backButton} />
@@ -231,44 +293,39 @@ export function UserViewContainer({
               type="button"
               variant="ghost"
               size="sm"
-              onClick={handleEdit}
-              disabled={editLoading}
+              onClick={() => void handleEdit()}
               className="gap-1"
             >
-              {editLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Pencil className="h-4 w-4" />
-              )}
+              <Pencil className="h-4 w-4" />
               {t("widget.actions.edit")}
             </Button>
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              onClick={handleDelete}
-              disabled={deleteLoading}
+              onClick={() => void handleAddCredits()}
+              className="gap-1"
+            >
+              <Coins className="h-4 w-4" />
+              {t("widget.actions.addCredits")}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => void handleDelete()}
               className="gap-1 text-destructive hover:text-destructive"
             >
-              {deleteLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Trash2 className="h-4 w-4" />
-              )}
+              <Trash2 className="h-4 w-4" />
               {t("widget.actions.delete")}
             </Button>
           </>
         )}
       </Div>
-      {/* Basic User Information */}
+
+      {/* Basic User Information Card */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5" />
-            {t("sections.basicInfo")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="p-4 space-y-4">
           {/* User Header */}
           <Div className="flex items-start gap-4">
             {basicInfo.avatarUrl ? (
@@ -282,7 +339,7 @@ export function UserViewContainer({
               </Div>
             )}
             <Div className="flex-1">
-              <Div className="flex items-center gap-2 mb-1">
+              <Div className="flex items-center gap-2 mb-1 flex-wrap">
                 <Span className="text-xl font-bold">
                   {basicInfo.privateName}
                 </Span>
@@ -292,14 +349,23 @@ export function UserViewContainer({
                     {t("status.banned")}
                   </Badge>
                 )}
-                {!basicInfo.isActive && (
+                {!basicInfo.isActive && !basicInfo.isBanned && (
                   <Badge variant="secondary" className="gap-1">
                     <XCircle className="h-3 w-3" />
                     {t("status.inactive")}
                   </Badge>
                 )}
+                {basicInfo.isActive && (
+                  <Badge
+                    variant="default"
+                    className="gap-1 bg-green-600 hover:bg-green-700"
+                  >
+                    <CheckCircle className="h-3 w-3" />
+                    {t("status.active")}
+                  </Badge>
+                )}
                 {basicInfo.emailVerified && (
-                  <Badge variant="default" className="gap-1">
+                  <Badge variant="outline" className="gap-1">
                     <CheckCircle className="h-3 w-3" />
                     {t("status.verified")}
                   </Badge>
@@ -315,6 +381,23 @@ export function UserViewContainer({
             </Div>
           </Div>
 
+          {/* Banned Reason */}
+          {basicInfo.isBanned && basicInfo.bannedReason && (
+            <Div className="rounded-lg bg-red-50 dark:bg-red-950/20 p-3 border border-red-200 dark:border-red-800">
+              <Div className="flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 mt-0.5" />
+                <Div>
+                  <P className="text-sm font-medium text-red-600 dark:text-red-400">
+                    {t("fields.banReason")}
+                  </P>
+                  <P className="text-sm text-red-600/80 dark:text-red-400/80">
+                    {basicInfo.bannedReason}
+                  </P>
+                </Div>
+              </Div>
+            </Div>
+          )}
+
           <Separator />
 
           {/* User Details Grid */}
@@ -323,7 +406,24 @@ export function UserViewContainer({
               <P className="text-xs text-muted-foreground">
                 {t("fields.userId")}
               </P>
-              <P className="text-sm font-mono">{basicInfo.id.slice(0, 8)}...</P>
+              <Div className="flex items-center gap-1">
+                <P className="text-sm font-mono">
+                  {basicInfo.id.slice(0, 8)}...
+                </P>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-5 w-5 p-0"
+                  onClick={handleCopyUserId}
+                >
+                  {copyIdSuccess ? (
+                    <CheckCircle className="h-3 w-3 text-green-500" />
+                  ) : (
+                    <Copy className="h-3 w-3" />
+                  )}
+                </Button>
+              </Div>
             </Div>
             <Div>
               <P className="text-xs text-muted-foreground">
@@ -353,16 +453,6 @@ export function UserViewContainer({
             </Div>
             <Div>
               <P className="text-xs text-muted-foreground">
-                {t("fields.marketing")}
-              </P>
-              <P className="text-sm">
-                {basicInfo.marketingConsent
-                  ? t("fields.optedIn")
-                  : t("fields.optedOut")}
-              </P>
-            </Div>
-            <Div>
-              <P className="text-xs text-muted-foreground">
                 {t("fields.created")}
               </P>
               <P className="text-sm">{formatDate(basicInfo.createdAt)}</P>
@@ -373,29 +463,19 @@ export function UserViewContainer({
               </P>
               <P className="text-sm">{formatDate(basicInfo.updatedAt)}</P>
             </Div>
+            <Div>
+              <P className="text-xs text-muted-foreground">
+                {t("fields.marketing")}
+              </P>
+              <P className="text-sm">
+                {basicInfo.marketingConsent
+                  ? t("fields.optedIn")
+                  : t("fields.optedOut")}
+              </P>
+            </Div>
           </Div>
 
-          {/* Banned Reason */}
-          {basicInfo.isBanned && basicInfo.bannedReason && (
-            <>
-              <Separator />
-              <Div className="rounded-lg bg-red-50 dark:bg-red-950/20 p-3 border border-red-200 dark:border-red-800">
-                <Div className="flex items-start gap-2">
-                  <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 mt-0.5" />
-                  <Div>
-                    <P className="text-sm font-medium text-red-600 dark:text-red-400">
-                      {t("fields.banReason")}
-                    </P>
-                    <P className="text-sm text-red-600/80 dark:text-red-400/80">
-                      {basicInfo.bannedReason}
-                    </P>
-                  </Div>
-                </Div>
-              </Div>
-            </>
-          )}
-
-          {/* User Roles */}
+          {/* Roles */}
           {roles.length > 0 && (
             <>
               <Separator />
@@ -406,7 +486,7 @@ export function UserViewContainer({
                 <Div className="flex flex-wrap gap-2">
                   {roles.map((roleItem, index) => (
                     <Badge key={index} variant="outline">
-                      {roleItem.role}
+                      {formatRoleLabel(roleItem.role)}
                     </Badge>
                   ))}
                 </Div>
@@ -416,11 +496,96 @@ export function UserViewContainer({
         </CardContent>
       </Card>
 
-      {/* Chat Activity Statistics */}
+      {/* Tabs */}
+      <Div className="flex gap-1 border-b">
+        {tabs.map((tab) => (
+          <Button
+            key={tab.id}
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setActiveTab(tab.id)}
+            className={`rounded-b-none border-b-2 ${
+              activeTab === tab.id
+                ? "border-primary text-primary font-semibold"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {tab.label}
+          </Button>
+        ))}
+      </Div>
+
+      {/* Tab Content */}
+      {activeTab === "overview" && (
+        <OverviewTab
+          chatStats={chatStats}
+          creditInfo={creditInfo}
+          paymentStats={paymentStats}
+          newsletterInfo={newsletterInfo}
+          referralStats={referralStats}
+          recentActivity={recentActivity}
+          modelUsageStats={modelUsageStats}
+          t={t}
+        />
+      )}
+
+      {activeTab === "credits" && userId && creditsEndpointOptions && (
+        <CreditHistoryTab
+          locale={locale}
+          user={user}
+          endpointOptions={creditsEndpointOptions}
+        />
+      )}
+
+      {activeTab === "referrals" && referralEndpointOptions && (
+        <ReferralCodesTab
+          locale={locale}
+          user={user}
+          endpointOptions={referralEndpointOptions}
+        />
+      )}
+
+      {activeTab === "earnings" && earningsEndpointOptions && (
+        <ReferralEarningsTab
+          locale={locale}
+          user={user}
+          endpointOptions={earningsEndpointOptions}
+        />
+      )}
+    </Div>
+  );
+}
+
+/**
+ * Overview tab with all stats cards
+ */
+function OverviewTab({
+  chatStats,
+  creditInfo,
+  paymentStats,
+  newsletterInfo,
+  referralStats,
+  recentActivity,
+  modelUsageStats,
+  t,
+}: {
+  chatStats: UserViewResponseOutput["chatStats"];
+  creditInfo: UserViewResponseOutput["creditInfo"];
+  paymentStats: UserViewResponseOutput["paymentStats"];
+  newsletterInfo: UserViewResponseOutput["newsletterInfo"];
+  referralStats: UserViewResponseOutput["referralStats"];
+  recentActivity: UserViewResponseOutput["recentActivity"];
+  modelUsageStats: UserViewResponseOutput["modelUsageStats"];
+  t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
+}): React.JSX.Element {
+  return (
+    <Div className="flex flex-col gap-6">
+      {/* Chat Activity */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageSquare className="h-5 w-5" />
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <MessageSquare className="h-4 w-4" />
             {t("sections.chatActivity")}
           </CardTitle>
         </CardHeader>
@@ -460,15 +625,15 @@ export function UserViewContainer({
         </CardContent>
       </Card>
 
-      {/* Credits Information */}
+      {/* Credits */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Coins className="h-5 w-5" />
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Coins className="h-4 w-4" />
             {t("sections.credits")}
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-col gap-4">
           <Div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard
               title={t("credits.currentBalance")}
@@ -497,14 +662,91 @@ export function UserViewContainer({
               colorClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
             />
           </Div>
+          <Separator />
+          <P className="text-xs font-medium text-muted-foreground">
+            {t("credits.packBreakdown")}
+          </P>
+          <Div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <StatCard
+              title={t("credits.subscription")}
+              value={creditInfo.subscriptionCredits.toFixed(2)}
+              description={
+                creditInfo.nextExpiry
+                  ? `${t("credits.expires")}: ${formatDate(creditInfo.nextExpiry)}`
+                  : undefined
+              }
+              icon={Calendar}
+              colorClassName="bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400"
+            />
+            <StatCard
+              title={t("credits.permanent")}
+              value={creditInfo.permanentCredits.toFixed(2)}
+              icon={Shield}
+              colorClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+            />
+            <StatCard
+              title={t("credits.bonus")}
+              value={creditInfo.bonusCredits.toFixed(2)}
+              icon={Gift}
+              colorClassName="bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400"
+            />
+            <StatCard
+              title={t("credits.earned")}
+              value={creditInfo.earnedCredits.toFixed(2)}
+              icon={DollarSign}
+              colorClassName="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400"
+            />
+          </Div>
         </CardContent>
       </Card>
 
-      {/* Payment & Revenue Statistics */}
+      {/* Model Usage */}
+      {modelUsageStats && modelUsageStats.length > 0 && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Activity className="h-4 w-4" />
+              {t("modelUsage.title")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t("modelUsage.model")}</TableHead>
+                  <TableHead className="text-right">
+                    {t("modelUsage.spent")}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t("modelUsage.messages")}
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {modelUsageStats.map((stat) => (
+                  <TableRow key={stat.modelId}>
+                    <TableCell className="font-mono text-sm">
+                      {stat.modelId}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {stat.totalCreditsSpent.toFixed(2)}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {stat.messageCount}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Payments */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5" />
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <DollarSign className="h-4 w-4" />
             {t("sections.payments")}
           </CardTitle>
         </CardHeader>
@@ -541,9 +783,7 @@ export function UserViewContainer({
               colorClassName="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
             />
           </Div>
-
           <Separator className="my-4" />
-
           <Div className="grid grid-cols-2 gap-4">
             <Div>
               <P className="text-xs text-muted-foreground mb-1">
@@ -577,13 +817,13 @@ export function UserViewContainer({
         </CardContent>
       </Card>
 
-      {/* Newsletter & Referral Stats */}
+      {/* Newsletter & Referrals */}
       <Div className="grid md:grid-cols-2 gap-6">
-        {/* Newsletter Information */}
+        {/* Newsletter */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Mail className="h-5 w-5" />
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Mail className="h-4 w-4" />
               {t("sections.newsletter")}
             </CardTitle>
           </CardHeader>
@@ -624,24 +864,14 @@ export function UserViewContainer({
                 </P>
               </Div>
             )}
-            {newsletterInfo.lastEmailSentAt && (
-              <Div>
-                <P className="text-xs text-muted-foreground">
-                  {t("newsletter.lastEmailSent")}
-                </P>
-                <P className="text-sm">
-                  {formatDate(newsletterInfo.lastEmailSentAt)}
-                </P>
-              </Div>
-            )}
           </CardContent>
         </Card>
 
-        {/* Referral Statistics */}
+        {/* Referral Stats */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Users className="h-4 w-4" />
               {t("sections.referrals")}
             </CardTitle>
           </CardHeader>
@@ -667,14 +897,6 @@ export function UserViewContainer({
             <Separator />
             <Div>
               <P className="text-xs text-muted-foreground">
-                {t("referrals.revenue")}
-              </P>
-              <P className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
-                {formatCurrency(referralStats.totalReferralRevenueCents)}
-              </P>
-            </Div>
-            <Div>
-              <P className="text-xs text-muted-foreground">
                 {t("referrals.earnings")}
               </P>
               <P className="text-xl font-bold text-blue-600 dark:text-blue-400">
@@ -687,9 +909,9 @@ export function UserViewContainer({
 
       {/* Recent Activity */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Activity className="h-5 w-5" />
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Activity className="h-4 w-4" />
             {t("sections.recentActivity")}
           </CardTitle>
         </CardHeader>
@@ -728,106 +950,152 @@ export function UserViewContainer({
           </Div>
         </CardContent>
       </Card>
+    </Div>
+  );
+}
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <ExternalLink className="h-5 w-5" />
-            {t("widget.sections.quickActions")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleViewCreditHistory}
-              className="gap-2"
-            >
-              <History className="h-4 w-4" />
-              {t("widget.actions.viewCreditHistory")}
-            </Button>
+/**
+ * Credit History tab - embeds the credits/history EndpointsPage
+ */
+function CreditHistoryTab({
+  locale,
+  user,
+  endpointOptions,
+}: {
+  locale: ReturnType<typeof useWidgetLocale>;
+  user: ReturnType<typeof useWidgetContext>["user"];
+  endpointOptions: {
+    read: {
+      initialState: {
+        targetUserId: string;
+        paginationInfo: { page: number; limit: number };
+      };
+    };
+  };
+}): React.JSX.Element {
+  const [creditsHistoryDef, setCreditsHistoryDef] = useState<{
+    GET: CreateApiEndpointAny;
+  } | null>(null);
 
-            {paymentStats.hasActiveSubscription && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleViewSubscription}
-                className="gap-2"
-              >
-                <CreditCard className="h-4 w-4" />
-                {t("widget.actions.viewSubscription")}
-              </Button>
-            )}
+  // Lazy load the definition
+  if (!creditsHistoryDef) {
+    void import("@/app/api/[locale]/credits/history/definition").then((mod) => {
+      setCreditsHistoryDef(mod.default);
+      return undefined;
+    });
+    return (
+      <Div className="flex items-center justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </Div>
+    );
+  }
 
-            {referralStats.activeReferralCodes > 0 && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleViewReferralCodes}
-                className="gap-2"
-              >
-                <Gift className="h-4 w-4" />
-                {t("widget.actions.viewReferralCodes")}
-              </Button>
-            )}
+  return (
+    <Div className="border rounded-lg overflow-hidden">
+      <EndpointsPage
+        endpoint={creditsHistoryDef}
+        locale={locale}
+        user={user}
+        endpointOptions={endpointOptions}
+      />
+    </Div>
+  );
+}
 
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleViewReferralEarnings}
-              className="gap-2"
-            >
-              <TrendingUp className="h-4 w-4" />
-              {t("widget.actions.viewReferralEarnings")}
-            </Button>
+/**
+ * Referral Codes tab - embeds the referral/codes/list EndpointsPage
+ */
+function ReferralCodesTab({
+  locale,
+  user,
+  endpointOptions,
+}: {
+  locale: ReturnType<typeof useWidgetLocale>;
+  user: ReturnType<typeof useWidgetContext>["user"];
+  endpointOptions: {
+    read: {
+      initialState: {
+        targetUserId: string;
+      };
+    };
+  };
+}): React.JSX.Element {
+  const [referralCodesDef, setReferralCodesDef] = useState<{
+    GET: CreateApiEndpointAny;
+  } | null>(null);
 
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleAddCredits}
-              className="gap-2"
-            >
-              <ShoppingCart className="h-4 w-4" />
-              {t("widget.actions.addCredits")}
-            </Button>
+  if (!referralCodesDef) {
+    void import("@/app/api/[locale]/referral/codes/list/definition").then(
+      (mod) => {
+        setReferralCodesDef(mod.default);
+        return undefined;
+      },
+    );
+    return (
+      <Div className="flex items-center justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </Div>
+    );
+  }
 
-            {basicInfo.email && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleViewLeadByEmail}
-                className="gap-2"
-              >
-                <Users className="h-4 w-4" />
-                {t("widget.actions.viewLead")}
-              </Button>
-            )}
+  return (
+    <Div className="border rounded-lg overflow-hidden">
+      <EndpointsPage
+        endpoint={referralCodesDef}
+        locale={locale}
+        user={user}
+        endpointOptions={endpointOptions}
+      />
+    </Div>
+  );
+}
 
-            {userId && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleCopyUserId}
-                className="gap-2"
-              >
-                <Copy className="h-4 w-4" />
-                {copyIdSuccess
-                  ? t("widget.actions.copied")
-                  : t("widget.actions.copyUserId")}
-              </Button>
-            )}
-          </Div>
-        </CardContent>
-      </Card>
+/**
+ * Referral Earnings tab - embeds the referral/earnings/list EndpointsPage
+ */
+function ReferralEarningsTab({
+  locale,
+  user,
+  endpointOptions,
+}: {
+  locale: ReturnType<typeof useWidgetLocale>;
+  user: ReturnType<typeof useWidgetContext>["user"];
+  endpointOptions: {
+    read: {
+      initialState: {
+        targetUserId: string;
+        limit: number;
+        offset: number;
+      };
+    };
+  };
+}): React.JSX.Element {
+  const [referralEarningsDef, setReferralEarningsDef] = useState<{
+    GET: CreateApiEndpointAny;
+  } | null>(null);
+
+  if (!referralEarningsDef) {
+    void import("@/app/api/[locale]/referral/earnings/list/definition").then(
+      (mod) => {
+        setReferralEarningsDef(mod.default);
+        return undefined;
+      },
+    );
+    return (
+      <Div className="flex items-center justify-center py-12">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </Div>
+    );
+  }
+
+  return (
+    <Div className="border rounded-lg overflow-hidden">
+      <EndpointsPage
+        endpoint={referralEarningsDef}
+        locale={locale}
+        user={user}
+        endpointOptions={endpointOptions}
+      />
     </Div>
   );
 }

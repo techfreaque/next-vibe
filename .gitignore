@@ -2,6 +2,11 @@
 dist
 .dist
 .next
+.next-rebuild
+.next-old
+.vibe-start.pid
+.vibe-dev.pid
+.vibe-pid
 .env
 .env.staging
 

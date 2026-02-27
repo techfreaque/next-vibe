@@ -35,6 +35,11 @@ export const translations = {
       label: "Public",
       description: "Make this memory visible in public and shared contexts",
     },
+    isArchived: {
+      label: "Archived",
+      description:
+        "Archive this memory to exclude it from AI context without deleting it",
+    },
     backButton: {
       label: "Back",
     },

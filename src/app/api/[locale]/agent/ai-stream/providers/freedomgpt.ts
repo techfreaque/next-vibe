@@ -11,6 +11,7 @@ import { OpenAIChatLanguageModel } from "@ai-sdk/openai/internal";
 import { agentEnv } from "@/app/api/[locale]/agent/env";
 
 import type { EndpointLogger } from "../../../system/unified-interface/shared/logger/endpoint";
+import { logProviderRequest } from "./shared/debug-file-logger";
 import { processStreamingResponseWithToolCalls } from "./shared/streaming-tool-call-processor";
 import {
   convertDeveloperToSystemMessages,
@@ -76,6 +77,7 @@ export function createFreedomGPT(logger: EndpointLogger): {
     };
 
     const bodyString = JSON.stringify(requestBody);
+    logProviderRequest("freedomgpt", bodyString);
 
     // Update request body
     const modifiedInit: RequestInit = {

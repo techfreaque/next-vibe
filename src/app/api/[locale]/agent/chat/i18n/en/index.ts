@@ -510,6 +510,12 @@ export const translations = {
         "Kimi K2.5 - Enhanced Chinese AI model with improved reasoning and creative capabilities",
       claudeSonnet45:
         "Claude Sonnet 4.5 - Anthropic's previous-generation Sonnet model with strong coding and analytical capabilities",
+      claudeAgentSonnet:
+        "Claude Agent Sonnet - Autonomous AI agent powered by Claude Sonnet via Anthropic's Agent SDK. Executes tools independently with built-in reasoning.",
+      claudeAgentHaiku:
+        "Claude Agent Haiku - Fast autonomous AI agent powered by Claude Haiku via Anthropic's Agent SDK. Optimized for speed with tool execution.",
+      claudeAgentOpus:
+        "Claude Agent Opus - Most powerful autonomous AI agent powered by Claude Opus via Anthropic's Agent SDK. Maximum intelligence with tool execution.",
       grok4:
         "Grok 4 - xAI's flagship reasoning model with vision and web search capabilities",
       grok4Fast:

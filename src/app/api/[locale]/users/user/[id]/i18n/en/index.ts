@@ -299,6 +299,14 @@ export const translations = {
         description: "Associated lead identifier",
         placeholder: "Enter lead ID...",
       },
+      isBanned: {
+        label: "Banned",
+        description: "Whether the user is banned from the platform",
+      },
+      bannedReason: {
+        label: "Ban Reason",
+        description: "Reason for banning the user",
+      },
       response: {
         leadId: {
           content: "Associated Lead ID",

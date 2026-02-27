@@ -5,6 +5,7 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { BrowserTool } from "../enum";
 import { executeTakeSnapshot, filterUndefinedArgs } from "../shared/repository";
 import takeSnapshotEndpoints from "./definition";
 
@@ -15,7 +16,7 @@ export const { POST, tools } = endpointsHandler({
     handler: ({ data, t, logger }) =>
       executeTakeSnapshot(
         {
-          toolName: "take-snapshot",
+          toolName: BrowserTool.TAKE_SNAPSHOT,
           args: filterUndefinedArgs({
             verbose: data.verbose,
             filePath: data.filePath,

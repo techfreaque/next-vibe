@@ -777,6 +777,19 @@ export const translations: typeof enTranslations = {
         3: "Pokaż mi aktualny status serwera",
       },
     },
+    rebuildAgent: {
+      name: "Rebuild Agent",
+      description:
+        "Specjalista od budowania i restartu, który przebudowuje aplikację i hot-restartuje serwer bez przestojów przez sygnał SIGUSR1",
+      tagline: "Buduj i restartuj",
+      shortDesc: "Przebudowa aplikacji i hot-restart",
+      suggestedPrompts: {
+        0: "Przebuduj i uruchom ponownie serwer produkcyjny",
+        1: "Uruchom build bez restartu",
+        2: "Sprawdź stan serwera po przebudowie",
+        3: "Utwórz zaplanowane zadanie przebudowy",
+      },
+    },
     vibeCoder: {
       name: "Vibe Coder",
       description:

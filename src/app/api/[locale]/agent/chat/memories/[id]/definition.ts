@@ -252,6 +252,7 @@ const { PATCH } = createEndpoint({
                     content: requestData.content ?? mem.content,
                     tags: requestData.tags ?? mem.tags,
                     priority: requestData.priority ?? mem.priority,
+                    isArchived: requestData.isArchived ?? mem.isArchived,
                   };
                 }),
               },
@@ -332,6 +333,14 @@ const { PATCH } = createEndpoint({
         fieldType: FieldDataType.BOOLEAN,
         label: "patch.isPublic.label" as const,
         description: "patch.isPublic.description" as const,
+        columns: 6,
+        schema: z.boolean().optional(),
+      }),
+      isArchived: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "patch.isArchived.label" as const,
+        description: "patch.isArchived.description" as const,
         columns: 6,
         schema: z.boolean().optional(),
       }),

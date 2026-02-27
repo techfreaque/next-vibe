@@ -15,6 +15,7 @@ interface MessageActionButtonProps {
   title: string;
   variant?: "default" | "destructive";
   className?: string;
+  disabled?: boolean;
 }
 
 export function MessageActionButton({
@@ -23,6 +24,7 @@ export function MessageActionButton({
   title,
   variant = "default",
   className,
+  disabled = false,
 }: MessageActionButtonProps): JSX.Element {
   return (
     <Button
@@ -31,6 +33,7 @@ export function MessageActionButton({
       onClick={onClick}
       className={`h-8 w-8 md:h-7 md:w-7 ${variant === "destructive" ? "hover:text-red-500" : ""} ${className || ""}`}
       title={title}
+      disabled={disabled}
     >
       <Icon className="h-4 w-4 md:h-3.5 md:w-3.5" />
     </Button>

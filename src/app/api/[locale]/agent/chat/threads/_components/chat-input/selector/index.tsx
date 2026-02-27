@@ -16,8 +16,8 @@ import { TOUR_DATA_ATTRS } from "@/app/api/[locale]/agent/chat/_components/welco
 import { useTourState } from "@/app/api/[locale]/agent/chat/_components/welcome-tour/tour-state-context";
 import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/constants";
 import {
+  getModelById,
   type ModelId,
-  modelOptions,
 } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
@@ -64,7 +64,7 @@ export function Selector({
     logger,
   );
   const currentCharacter = currentCharaterHook.read?.data ?? null;
-  const currentModel = useMemo(() => modelOptions[modelId], [modelId]);
+  const currentModel = useMemo(() => getModelById(modelId), [modelId]);
   const modelSupportsTools = currentModel?.supportsTools ?? false;
 
   return (

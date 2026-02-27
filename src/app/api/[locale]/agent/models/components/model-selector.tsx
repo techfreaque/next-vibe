@@ -49,13 +49,17 @@ import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-co
 import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
 import {
   ApiProvider,
+  apiProviderDisplayNames,
+  getAllModelOptions,
   getCreditCostFromModel,
+  getModelById,
   type ModelId,
   type ModelOption,
-  modelOptions,
   modelProviders,
+  TOTAL_MODEL_COUNT,
 } from "@/app/api/[locale]/agent/models/models";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DEFAULT_INPUT_TOKENS, DEFAULT_OUTPUT_TOKENS } from "../constants";
@@ -71,6 +75,8 @@ interface ModelCardProps {
   dimmed?: boolean;
   disabled?: boolean;
   setupRequired?: string | null;
+  /** Show API provider suffix when model name appears with multiple providers */
+  providerSuffix?: string | null;
   t: ReturnType<typeof scopedTranslation.scopedT>["t"];
   locale: CountryLanguage;
 }
@@ -83,6 +89,7 @@ function ModelCard({
   dimmed = false,
   disabled = false,
   setupRequired = null,
+  providerSuffix = null,
   t,
   locale,
 }: ModelCardProps): JSX.Element {
@@ -121,6 +128,11 @@ function ModelCard({
             )}
           >
             {model.name}
+            {providerSuffix ? (
+              <Span className="text-muted-foreground font-normal">
+                {` (${providerSuffix})`}
+              </Span>
+            ) : null}
           </Span>
           {isBest && (
             <Badge variant="default" className="text-[9px] h-4 px-1.5 shrink-0">
@@ -244,6 +256,11 @@ export interface ModelSelectorProps {
    * User's locale for currency formatting
    */
   locale: CountryLanguage;
+
+  /**
+   * User payload for admin-only model filtering
+   */
+  user: JwtPayloadType;
 }
 
 /** Map ApiProvider to the availability key */
@@ -289,6 +306,7 @@ export function ModelSelector({
   readOnly = false,
   envAvailability: envAvailabilityProp,
   locale,
+  user,
 }: ModelSelectorProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   // Prefer prop (for non-chat contexts), fall back to context (chat pages)
@@ -411,9 +429,7 @@ export function ModelSelector({
       if (newMode === ModelSelectionType.MANUAL) {
         // Try to keep current model if available, otherwise use best filtered model
         const currentModel =
-          manualModelId ??
-          bestFilteredModel?.id ??
-          Object.values(modelOptions)[0]?.id;
+          manualModelId ?? bestFilteredModel?.id ?? getAllModelOptions()[0]?.id;
         updateValue({
           selectionType: ModelSelectionType.MANUAL,
           manualModelId: currentModel,
@@ -714,6 +730,7 @@ export function ModelSelector({
     };
     return CharactersRepositoryClient.getFilteredModelsForCharacter(
       modelSelection,
+      user,
     );
   }, [
     intelligenceRange,
@@ -722,6 +739,7 @@ export function ModelSelector({
     speedRange,
     sortBy,
     sortDirection,
+    user,
   ]);
 
   const bestFilteredModel = useMemo(() => {
@@ -730,23 +748,37 @@ export function ModelSelector({
 
   const bestModel = useMemo(() => {
     if (mode === ModelSelectionType.MANUAL && manualModelId) {
-      return modelOptions[manualModelId] ?? null;
+      return getModelById(manualModelId) ?? null;
     } else if (mode === ModelSelectionType.CHARACTER_BASED) {
       if (characterModelSelection) {
         return CharactersRepositoryClient.getBestModelForCharacter(
           characterModelSelection,
+          user,
         );
       }
       return null;
     } else {
       return bestFilteredModel;
     }
-  }, [mode, manualModelId, bestFilteredModel, characterModelSelection]);
+  }, [mode, manualModelId, bestFilteredModel, characterModelSelection, user]);
 
   // Get models to show (filtered or all)
   const modelsToShow = showUnfilteredModels
-    ? Object.values(modelOptions)
+    ? getAllModelOptions()
     : filteredModels;
+
+  // Compute which model names appear with multiple providers (need provider suffix)
+  const duplicateModelNames = useMemo(() => {
+    const nameCount = new Map<string, number>();
+    for (const model of modelsToShow) {
+      nameCount.set(model.name, (nameCount.get(model.name) ?? 0) + 1);
+    }
+    return new Set(
+      [...nameCount.entries()]
+        .filter(([, count]) => count > 1)
+        .map(([name]) => name),
+    );
+  }, [modelsToShow]);
 
   // Sort and group models
   const sortedAndGroupedModels = useMemo(() => {
@@ -914,6 +946,11 @@ export function ModelSelector({
               </Span>
               <Span className="text-sm font-bold text-primary block truncate">
                 {bestModel.name}
+                {duplicateModelNames.has(bestModel.name) ? (
+                  <Span className="text-muted-foreground font-normal text-xs">
+                    {` (${apiProviderDisplayNames[bestModel.apiProvider]})`}
+                  </Span>
+                ) : null}
               </Span>
               <Span className="text-xs text-muted-foreground">
                 {bestModel.provider && modelProviders[bestModel.provider]
@@ -994,7 +1031,7 @@ export function ModelSelector({
             <Label className="text-xs font-medium text-muted-foreground">
               {showUnfilteredModels
                 ? t("selector.allModelsCount", {
-                    count: Object.values(modelOptions).length,
+                    count: TOTAL_MODEL_COUNT,
                   })
                 : t("selector.filteredModelsCount", {
                     count: filteredModels.length,
@@ -1015,7 +1052,7 @@ export function ModelSelector({
                 {showUnfilteredModels
                   ? t("selector.showFiltered")
                   : t("selector.showAllModels", {
-                      count: Object.values(modelOptions).length,
+                      count: TOTAL_MODEL_COUNT,
                     })}
               </Button>
             </Div>
@@ -1084,6 +1121,11 @@ export function ModelSelector({
                       dimmed={isOutsideFilter}
                       disabled={readOnly}
                       setupRequired={setupRequired}
+                      providerSuffix={
+                        duplicateModelNames.has(model.name)
+                          ? apiProviderDisplayNames[model.apiProvider]
+                          : null
+                      }
                       t={t}
                       locale={locale}
                     />
@@ -1173,6 +1215,11 @@ export function ModelSelector({
                               dimmed={isOutsideFilter}
                               disabled={readOnly}
                               setupRequired={setupRequired}
+                              providerSuffix={
+                                duplicateModelNames.has(model.name)
+                                  ? apiProviderDisplayNames[model.apiProvider]
+                                  : null
+                              }
                               t={t}
                               locale={locale}
                             />

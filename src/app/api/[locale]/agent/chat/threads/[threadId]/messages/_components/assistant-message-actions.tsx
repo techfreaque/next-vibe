@@ -36,6 +36,8 @@ interface AssistantMessageActionsProps {
   promptTokens: number | null;
   completionTokens: number | null;
   creditCost: number | null;
+  /** Hide TTS and interactive buttons. Used for read-only demos. */
+  readOnly?: boolean;
 }
 
 export function AssistantMessageActions({
@@ -51,6 +53,7 @@ export function AssistantMessageActions({
   promptTokens,
   completionTokens,
   creditCost,
+  readOnly = false,
 }: AssistantMessageActionsProps): React.JSX.Element {
   const { t } = simpleT(locale);
   const isTouch = useTouchDevice();
@@ -144,6 +147,7 @@ export function AssistantMessageActions({
           isLoading && "text-orange-400 hover:text-orange-300",
           isPlaying && "text-blue-400 hover:text-blue-300",
         )}
+        disabled={readOnly}
       />
 
       {onAnswerAsModel && (
@@ -151,6 +155,7 @@ export function AssistantMessageActions({
           icon={Bot}
           onClick={() => onAnswerAsModel(messageId)}
           title={t("app.chat.common.assistantMessageActions.answerAsAI")}
+          disabled={readOnly}
         />
       )}
 
@@ -160,6 +165,7 @@ export function AssistantMessageActions({
           onClick={() => onDelete(messageId)}
           title={t("app.chat.common.assistantMessageActions.deleteMessage")}
           variant="destructive"
+          disabled={readOnly}
         />
       )}
 

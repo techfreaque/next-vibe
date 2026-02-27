@@ -188,6 +188,21 @@ The AI sees only active tools, but can discover and request activation of enable
 
 ---
 
+## Rebuilding in Production
+
+`vibe rebuild` performs a zero-downtime rebuild. The old server keeps running until the new build succeeds.
+
+```bash
+vibe rebuild                        # Full rebuild + restart
+vibe rebuild --generate=false       # Skip code generation
+vibe rebuild --migrate=false        # Skip migrations
+vibe rebuild --restart=false        # Build only, don't restart
+```
+
+Works from CLI, MCP, or web.
+
+---
+
 ## Database
 
 ### Migrations

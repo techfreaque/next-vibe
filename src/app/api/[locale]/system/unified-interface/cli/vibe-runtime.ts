@@ -5,6 +5,9 @@
  * Command line interface that can execute any route.ts from generated index files
  */
 
+// Side-effect: registers global error sink so all logger.error() calls persist to error_logs
+import "../shared/logger/error-persist";
+
 import { Command } from "commander";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 

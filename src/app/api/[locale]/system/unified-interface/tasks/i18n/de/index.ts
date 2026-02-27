@@ -395,12 +395,17 @@ export const translations: typeof enTranslations = {
         status: {
           title: "Status",
           description:
-            "Endstatus: 'completed' für Erfolg, 'failed' für Fehler.",
+            "Endstatus: 'completed' für Erfolg, 'failed' für Fehler, 'cancelled' zum Abbrechen.",
         },
         summary: {
           title: "Zusammenfassung",
           description:
             "Kurze Beschreibung des Ergebnisses oder der Fehlerursache.",
+        },
+        output: {
+          title: "Ausgabe-Daten",
+          description:
+            "Optionale strukturierte Daten (Schlüssel-Wert-Paare) als Ergebnisanhang.",
         },
         completed: {
           title: "Abgeschlossen",
@@ -411,6 +416,10 @@ export const translations: typeof enTranslations = {
           title: "An Remote gesendet",
           description:
             "Ob der Abschluss erfolgreich an die Ursprungsinstanz gemeldet wurde.",
+        },
+        updatedAt: {
+          title: "Aktualisiert am",
+          description: "Zeitstempel der Statusaktualisierung.",
         },
       },
       errors: {
@@ -505,6 +514,14 @@ export const translations: typeof enTranslations = {
           description:
             "Instanz-ID, die die Aufgabe ausgeführt hat (z.B. hermes).",
         },
+        output: {
+          title: "Ausgabe",
+          description: "Strukturierte Ausführungsausgabe.",
+        },
+        startedAt: {
+          title: "Gestartet um",
+          description: "ISO-Zeitstempel des Ausführungsbeginns.",
+        },
         processed: {
           title: "Verarbeitet",
           description: "Ob der Bericht akzeptiert und angewendet wurde.",
@@ -551,6 +568,80 @@ export const translations: typeof enTranslations = {
       success: {
         title: "Bericht akzeptiert",
         description: "Ausführungsergebnis auf den Aufgabendatensatz angewendet",
+      },
+    },
+  },
+  errorMonitor: {
+    name: "error-monitor",
+    description: "Durchsucht Chat-Threads alle 3 Stunden nach Fehlermustern",
+    tag: "Überwachung",
+    post: {
+      title: "Fehlermonitor",
+      description:
+        "Datenschutzfreundliche Fehlerüberwachung - durchsucht Nachrichten nach Fehlermustern ohne Inhalte zu lesen",
+      container: {
+        title: "Fehlerscan-Ergebnisse",
+        description: "Aggregierte Fehlermuster aus Chat-Nachrichten",
+      },
+      response: {
+        errorsFound: "Gefundene Fehler",
+        threadsScanned: "Gescannte Threads",
+        scanWindowFrom: "Scanfenster-Start",
+        scanWindowTo: "Scanfenster-Ende",
+        patternType: "Fehlertyp",
+        patternCount: "Anzahl",
+        patternThreadIds: "Thread-IDs",
+        patternModel: "Modell",
+        patternTool: "Tool",
+        patternFirstSeen: "Erstmals gesehen",
+        patternLastSeen: "Zuletzt gesehen",
+      },
+      errors: {
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Authentifizierung erforderlich",
+        },
+        forbidden: {
+          title: "Verboten",
+          description: "Zugriff verweigert",
+        },
+        server: {
+          title: "Serverfehler",
+          description: "Fehlerscan fehlgeschlagen",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten",
+        },
+        validation: {
+          title: "Validierungsfehler",
+          description: "Ungültige Anfrageparameter",
+        },
+      },
+      success: {
+        title: "Scan abgeschlossen",
+        description: "Fehlerscan erfolgreich abgeschlossen",
+      },
+    },
+    cleanup: {
+      name: "error-logs-cleanup",
+      description: "Bereinigt Fehlerprotokolle älter als 7 Tage",
+      post: {
+        title: "Fehlerprotokoll-Bereinigung",
+        description:
+          "Alte Fehlerprotokolleinträge löschen um die Datenbank schlank zu halten",
+        container: {
+          title: "Bereinigungsergebnisse",
+          description: "Anzahl gelöschter Fehlerprotokolle",
+        },
+        response: {
+          deletedCount: "Gelöschte Einträge",
+          retentionDays: "Aufbewahrungstage",
+        },
+        success: {
+          title: "Bereinigung abgeschlossen",
+          description: "Alte Fehlerprotokolle erfolgreich bereinigt",
+        },
       },
     },
   },

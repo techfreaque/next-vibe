@@ -76,6 +76,25 @@ export interface EndpointLogger {
 }
 
 /**
+ * Global error sink — set once on server startup to persist errors.
+ * Client-side this stays null (no DB access).
+ */
+let globalErrorSink:
+  | ((message: string, error?: LoggerMetadata) => void)
+  | null = null;
+
+/**
+ * Register a global error persistence sink.
+ * Called once from server-side initialization (e.g. launchpad).
+ * All subsequent logger.error() calls will fire this sink.
+ */
+export function registerErrorSink(
+  sink: (message: string, error?: LoggerMetadata) => void,
+): void {
+  globalErrorSink = sink;
+}
+
+/**
  * Creates a logger instance for endpoint handlers
  * Provides pretty formatted logging with running time in seconds
  */
@@ -120,6 +139,9 @@ export function createEndpointLogger(
       error?: LoggerMetadata,
       ...metadata: LoggerMetadata[]
     ): void {
+      // Fire global error sink if registered (server-only persistence)
+      globalErrorSink?.(message, error);
+
       if (mcpSilentMode) {
         if (!(debugEnabled || enableDebugLogger)) {
           // use --verbose / or set src/config/debug.ts to true

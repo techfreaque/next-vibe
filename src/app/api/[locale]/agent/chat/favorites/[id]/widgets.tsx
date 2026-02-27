@@ -359,6 +359,7 @@ export function FavoriteEditContainer({
                 isNoCharacter ? undefined : characterData?.modelSelection
               }
               locale={locale}
+              user={user}
             />
           )}
 
@@ -372,6 +373,7 @@ export function FavoriteEditContainer({
               modelSelection={favoriteModelSelection ?? null}
               characterModelSelection={characterData?.modelSelection ?? null}
               label={t("patch.slotOverride.label")}
+              user={user}
             />
           )}
 
@@ -463,6 +465,7 @@ function SaveAndUseButton({
           const bestModel = CharactersRepositoryClient.getBestModelForFavorite(
             favoriteData.modelSelection,
             undefined,
+            user,
           );
           modelId = bestModel?.id || null;
         }

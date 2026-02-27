@@ -86,20 +86,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "take-snapshot.response.result",
         schema: z
-          .object({
-            captured: z.boolean().describe("Whether the snapshot was captured"),
-            elementCount: z
-              .number()
-              .optional()
-              .describe("Number of elements in the snapshot"),
-            filePath: z
-              .string()
-              .optional()
-              .describe("Path where snapshot was saved"),
-            data: z.string().optional().describe("The snapshot data"),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of snapshot capture"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -126,12 +122,12 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          captured: true,
-          elementCount: 42,
-          filePath: "/path/to/file.txt",
-          data: "Snapshot data content",
-        },
+        result: [
+          {
+            type: "text",
+            text: "# take_snapshot response\nCaptured accessibility snapshot of the page.",
+          },
+        ],
         executionId: "exec_123",
       },
     },

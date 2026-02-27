@@ -19,6 +19,7 @@ import { parseError } from "next-vibe/shared/utils";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import {
+  isContentResponse,
   isFileResponse,
   isStreamingResponse,
 } from "@/app/api/[locale]/shared/types/response.schema";
@@ -285,8 +286,12 @@ export class UnifiedTaskRunnerRepositoryImpl {
 
       const durationMs = Date.now() - startTime;
 
-      // Cron tasks should not return streaming/file responses
-      if (isStreamingResponse(result) || isFileResponse(result)) {
+      // Cron tasks should not return streaming/file/content responses
+      if (
+        isStreamingResponse(result) ||
+        isFileResponse(result) ||
+        isContentResponse(result)
+      ) {
         this.markTaskAsCompleted(taskName);
         return success({
           status: CronTaskStatus.COMPLETED,

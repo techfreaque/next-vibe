@@ -48,6 +48,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
@@ -151,6 +152,7 @@ function LeadRow({
   onDelete,
   t,
   leadsT,
+  isTouch,
 }: {
   lead: Lead;
   locale: CountryLanguage;
@@ -159,6 +161,7 @@ function LeadRow({
   onDelete: (lead: Lead) => void;
   t: ReturnType<typeof useWidgetTranslation<typeof definition.GET>>;
   leadsT: ReturnType<typeof leadsScopedTranslation.scopedT>["t"];
+  isTouch: boolean;
 }): React.JSX.Element {
   const isConverted = Boolean(lead.convertedUserId);
 
@@ -259,7 +262,12 @@ function LeadRow({
 
       {/* Actions */}
       <Div
-        className="flex-shrink-0 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+        className={cn(
+          "flex-shrink-0 flex gap-0.5",
+          isTouch
+            ? "opacity-100"
+            : "opacity-0 group-hover:opacity-100 transition-opacity",
+        )}
         onClick={(e) => e.stopPropagation()}
       >
         <Button
@@ -301,6 +309,7 @@ export function LeadsListContainer({
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
   const locale = useWidgetLocale();
+  const isTouch = useTouchDevice();
   const router = useRouter();
   const t = useWidgetTranslation<typeof definition.GET>();
   const leadsT = leadsScopedTranslation.scopedT(locale).t;
@@ -745,6 +754,7 @@ export function LeadsListContainer({
                 onDelete={handleDelete}
                 t={t}
                 leadsT={leadsT}
+                isTouch={isTouch}
               />
             ))}
           </Div>

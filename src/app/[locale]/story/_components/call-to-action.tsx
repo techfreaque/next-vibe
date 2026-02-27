@@ -9,16 +9,16 @@ import { H2, P } from "next-vibe-ui/ui/typography";
 import type { FC } from "react";
 import { useInView } from "react-intersection-observer";
 
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "./i18n";
 
 interface CallToActionProps {
   locale: CountryLanguage;
 }
 
 const CallToAction: FC<CallToActionProps> = ({ locale }) => {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
@@ -41,12 +41,10 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
           <Div className="relative p-8 md:p-16 text-white text-center">
             <Div className="max-w-3xl mx-auto">
               <H2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4 leading-tight">
-                {t("app.story._components.home.cta.title")}
+                {t("home.cta.title")}
               </H2>
               <P className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto mb-8 leading-relaxed">
-                {t("app.story._components.home.cta.subtitle", {
-                  modelCount: TOTAL_MODEL_COUNT,
-                })}
+                {t("home.cta.subtitle")}
               </P>
 
               <Div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -56,7 +54,7 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
                   asChild
                 >
                   <Link href={`/${locale}/user/signup`}>
-                    {t("app.story._components.home.cta.signUp")}
+                    {t("home.cta.signUp")}
                   </Link>
                 </Button>
 
@@ -66,8 +64,8 @@ const CallToAction: FC<CallToActionProps> = ({ locale }) => {
                   className="bg-transparent border-white text-white hover:bg-white/10"
                   asChild
                 >
-                  <Link href={`/${locale}/subscription/buy`}>
-                    {t("app.story._components.home.cta.viewPlans")}
+                  <Link href="https://github.com/techfreaque/next-vibe">
+                    {t("home.cta.viewPlans")}
                   </Link>
                 </Button>
               </Div>

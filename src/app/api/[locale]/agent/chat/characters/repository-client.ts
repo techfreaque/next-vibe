@@ -20,9 +20,12 @@ import {
 } from "@/app/api/[locale]/agent/models/constants";
 import type { ModelOption } from "@/app/api/[locale]/agent/models/models";
 import {
+  getAllModelOptions,
   getCreditCostFromModel,
-  modelOptions,
+  getModelById,
 } from "@/app/api/[locale]/agent/models/models";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import {
   ContentLevelDB,
@@ -129,8 +132,16 @@ export class CharactersRepositoryClient {
    */
   private static applyHardFilters(
     filters: FiltersModelSelection,
+    user: JwtPayloadType,
   ): ModelOption[] {
-    const filtered = Object.values(modelOptions).filter((model) => {
+    const isAdmin =
+      !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+    const filtered = getAllModelOptions().filter((model) => {
+      // Admin-only models (e.g. Agent SDK) are only visible to admins
+      if (model.adminOnly && !isAdmin) {
+        return false;
+      }
+
       const modelPrice = this.getModelPriceLevel(
         getCreditCostFromModel(
           model,
@@ -177,18 +188,29 @@ export class CharactersRepositoryClient {
 
   private static getFilteredModelsInternal(
     modelSelection: FiltersModelSelection | ManualModelSelection,
+    user: JwtPayloadType,
   ): ModelOption[] {
     if (modelSelection.selectionType === ModelSelectionType.MANUAL) {
-      const model = modelOptions[modelSelection.manualModelId];
+      const model = getModelById(modelSelection.manualModelId);
+      // Admin-only models can only be manually selected by admins
+      const isAdmin =
+        !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+      if (model?.adminOnly && !isAdmin) {
+        return [];
+      }
       return model ? [model] : [];
     }
 
-    return this.applyHardFilters(modelSelection);
+    return this.applyHardFilters(modelSelection, user);
   }
 
   static getFilteredModelsForFavorite(
     favoriteModelSelection: FavoriteGetModelSelection | null,
-    characterModelSelection?: FiltersModelSelection | ManualModelSelection,
+    characterModelSelection:
+      | FiltersModelSelection
+      | ManualModelSelection
+      | undefined,
+    user: JwtPayloadType,
   ): ModelOption[] {
     // Use favorite's custom selection if present, otherwise fall back to character's selection
     const selectionToUse = favoriteModelSelection ?? characterModelSelection;
@@ -197,16 +219,21 @@ export class CharactersRepositoryClient {
       return [];
     }
 
-    return this.getFilteredModelsInternal(selectionToUse);
+    return this.getFilteredModelsInternal(selectionToUse, user);
   }
 
   static getBestModelForFavorite(
     favoriteModelSelection: FavoriteGetModelSelection | null,
-    characterModelSelection?: FiltersModelSelection | ManualModelSelection,
+    characterModelSelection:
+      | FiltersModelSelection
+      | ManualModelSelection
+      | undefined,
+    user: JwtPayloadType,
   ): ModelOption | null {
     const candidates = this.getFilteredModelsForFavorite(
       favoriteModelSelection,
       characterModelSelection,
+      user,
     );
     return candidates.length > 0 ? candidates[0] : null;
   }
@@ -217,15 +244,18 @@ export class CharactersRepositoryClient {
    */
   static getFilteredModelsForCharacter(
     characterModelSelection: FiltersModelSelection | ManualModelSelection,
+    user: JwtPayloadType,
   ): ModelOption[] {
-    return this.getFilteredModelsInternal(characterModelSelection);
+    return this.getFilteredModelsInternal(characterModelSelection, user);
   }
 
   static getBestModelForCharacter(
     characterModelSelection: FiltersModelSelection | ManualModelSelection,
+    user: JwtPayloadType,
   ): ModelOption | null {
     const candidates = this.getFilteredModelsForCharacter(
       characterModelSelection,
+      user,
     );
     return candidates.length > 0 ? candidates[0] : null;
   }

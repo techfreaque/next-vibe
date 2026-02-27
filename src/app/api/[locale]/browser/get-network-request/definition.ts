@@ -51,12 +51,38 @@ const { POST } = createEndpoint({
         label: "get-network-request.form.fields.reqid.label",
         description: "get-network-request.form.fields.reqid.description",
         placeholder: "get-network-request.form.fields.reqid.placeholder",
-        columns: 6,
+        columns: 4,
         schema: z
           .number()
           .optional()
           .describe(
             "The reqid of the network request. If omitted returns the currently selected request in the DevTools Network panel.",
+          ),
+      }),
+      requestFilePath: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get-network-request.form.fields.reqid.label",
+        description: "get-network-request.form.fields.reqid.description",
+        columns: 4,
+        schema: z
+          .string()
+          .optional()
+          .describe(
+            "The absolute or relative path to save the request body to. If omitted, the body is returned inline.",
+          ),
+      }),
+      responseFilePath: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get-network-request.form.fields.reqid.label",
+        description: "get-network-request.form.fields.reqid.description",
+        columns: 4,
+        schema: z
+          .string()
+          .optional()
+          .describe(
+            "The absolute or relative path to save the response body to. If omitted, the body is returned inline.",
           ),
       }),
 
@@ -74,23 +100,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "get-network-request.response.result",
         schema: z
-          .object({
-            found: z.boolean().describe("Whether the request was found"),
-            request: z
-              .object({
-                url: z.string().describe("Request URL"),
-                method: z.string().describe("HTTP method"),
-                status: z.coerce
-                  .number()
-                  .optional()
-                  .describe("Response status code"),
-                type: z.string().optional().describe("Resource type"),
-              })
-              .optional()
-              .describe("The network request details"),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of the network request retrieval"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -117,15 +136,12 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          found: true,
-          request: {
-            url: "https://example.com",
-            method: "GET",
-            status: 200,
-            type: "document",
+        result: [
+          {
+            type: "text",
+            text: "# get_network_request response\nGET https://example.com - 200 document",
           },
-        },
+        ],
         executionId: "exec_123",
       },
     },

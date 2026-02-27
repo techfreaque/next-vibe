@@ -78,12 +78,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "click.response.result",
         schema: z
-          .object({
-            clicked: z.boolean(),
-            doubleClick: z.boolean().optional(),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of the click operation"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -115,15 +119,12 @@ const { POST } = createEndpoint({
       },
     },
     responses: {
-      singleClick: {
+      default: {
         success: true,
-        result: { clicked: true },
+        result: [
+          { type: "text", text: "# click response\nClicked on the element." },
+        ],
         executionId: "exec_123",
-      },
-      doubleClick: {
-        success: true,
-        result: { clicked: true, doubleClick: true },
-        executionId: "exec_456",
       },
     },
   },

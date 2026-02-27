@@ -151,8 +151,10 @@ function serializeTool(
   parameters?: ToolItem["parameters"],
   includeExamples = false,
 ): ToolItem {
+  const callName =
+    tool.aliases && tool.aliases.length > 0 ? tool.aliases[0] : tool.toolName;
   return {
-    name: tool.name,
+    name: callName,
     title: tool.title,
     toolName: tool.toolName,
     tags: tool.tags,
@@ -182,6 +184,7 @@ function serializeToolMinimal(
     tags: tool.tags,
     description: tool.description,
     category: tool.category,
+    aliases: tool.aliases,
     credits: tool.credits,
   };
 }

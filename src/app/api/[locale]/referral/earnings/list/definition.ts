@@ -50,6 +50,14 @@ export const { GET } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
+      // Admin override: view another user's referral earnings
+      targetUserId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.title" as const,
+        hidden: true,
+        schema: z.string().optional(),
+      }),
       // Request fields
       limit: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

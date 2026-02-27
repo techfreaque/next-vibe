@@ -35,6 +35,7 @@ import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
+import { useTouchDevice } from "@/hooks/use-touch-device";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
 import type definition from "./definition";
@@ -161,6 +162,7 @@ function CopyEmail({
   copyEmailTitle: string;
 }): React.JSX.Element {
   const [copied, setCopied] = useState(false);
+  const isTouch = useTouchDevice();
 
   const handleCopy = useCallback(
     (e: ButtonMouseEvent): void => {
@@ -187,7 +189,14 @@ function CopyEmail({
       {copied ? (
         <Check className="h-3 w-3 text-green-500 flex-shrink-0" />
       ) : (
-        <Copy className="h-3 w-3 opacity-0 group-hover/copy:opacity-100 flex-shrink-0 transition-opacity" />
+        <Copy
+          className={cn(
+            "h-3 w-3 flex-shrink-0",
+            isTouch
+              ? "opacity-100"
+              : "opacity-0 group-hover/copy:opacity-100 transition-opacity",
+          )}
+        />
       )}
     </Button>
   );

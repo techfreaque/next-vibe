@@ -42,6 +42,15 @@ export const {
     schema: z.string().url().default("https://unbottled.ai"),
     example: "https://unbottled.ai",
   },
+  IS_PREVIEW_MODE: {
+    schema: z
+      .string()
+      .optional()
+      .default("false")
+      .transform((v) => v !== "false"),
+    example: false,
+    commented: true,
+  },
   NEXT_PUBLIC_LOCAL_MODE: {
     schema: z
       .string()

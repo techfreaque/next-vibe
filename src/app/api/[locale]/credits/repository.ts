@@ -3294,7 +3294,7 @@ export class CreditRepository {
       // NO REDISTRIBUTION - wallets stay separate with their own balances
       // Pool limit (max 20 free credits) enforced at DEDUCTION time, not here
 
-      logger.info("Lead wallets linked to user pool", {
+      logger.debug("Lead wallets linked to user pool", {
         userId,
         poolLeadCount: poolResult.data.leadWallets.length,
         leadWalletIds: poolResult.data.leadWallets.map((w) => w.id),

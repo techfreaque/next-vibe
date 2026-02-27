@@ -8,8 +8,6 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   scopedObjectFieldNew,
-  scopedObjectOptionalField,
-  scopedResponseArrayField,
   scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
@@ -53,55 +51,20 @@ const { POST } = createEndpoint({
           .boolean()
           .describe("Whether the pages listing operation succeeded"),
       }),
-      result: scopedObjectOptionalField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "list-pages.response.result.title",
-        description: "list-pages.response.result.description",
-        layoutType: LayoutType.STACKED,
-        usage: { response: true },
-        children: {
-          pages: scopedResponseArrayField(
-            scopedTranslation,
-            {
-              type: WidgetType.CONTAINER,
-            },
-            scopedObjectFieldNew(scopedTranslation, {
-              type: WidgetType.CONTAINER,
-              layoutType: LayoutType.GRID,
-              columns: 12,
-              usage: { response: true },
-              children: {
-                idx: scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  content: "list-pages.response.result.pages.idx",
-                  schema: z.coerce.number().describe("Page index"),
-                }),
-                title: scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  content: "list-pages.response.result.pages.title",
-                  schema: z.string().describe("Page title"),
-                }),
-                url: scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  content: "list-pages.response.result.pages.url",
-                  schema: z.string().describe("Page URL"),
-                }),
-                active: scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  content: "list-pages.response.result.pages.active",
-                  schema: z
-                    .boolean()
-                    .describe("Whether this is the active page"),
-                }),
-              },
+      result: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "list-pages.response.result",
+        schema: z
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
             }),
-          ),
-          totalCount: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "list-pages.response.result.totalCount",
-            schema: z.coerce.number().describe("Total number of open pages"),
-          }),
-        },
+          )
+          .optional()
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -125,17 +88,12 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          pages: [
-            {
-              idx: 0,
-              title: "Example Page",
-              url: "https://example.com",
-              active: true,
-            },
-          ],
-          totalCount: 1,
-        },
+        result: [
+          {
+            type: "text",
+            text: "# list_pages response\n[0] Example Page (https://example.com) [active]",
+          },
+        ],
         executionId: "exec_123",
       },
     },

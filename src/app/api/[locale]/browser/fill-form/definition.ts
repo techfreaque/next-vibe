@@ -8,10 +8,8 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   scopedObjectFieldNew,
-  scopedObjectOptionalField,
   scopedRequestDataArrayField,
   scopedRequestField,
-  scopedResponseArrayOptionalField,
   scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
@@ -87,47 +85,20 @@ const { POST } = createEndpoint({
           .boolean()
           .describe("Whether the form fill operation succeeded"),
       }),
-      result: scopedObjectOptionalField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "fill-form.response.result.title",
-        description: "fill-form.response.result.description",
-        layoutType: LayoutType.STACKED,
-        usage: { response: true },
-        children: {
-          filled: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "fill-form.response.result.filled",
-            schema: z
-              .boolean()
-              .describe("Whether all form elements were filled"),
-          }),
-          filledCount: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "fill-form.response.result.filledCount",
-            schema: z.coerce.number().describe("Number of elements filled"),
-          }),
-          elements: scopedResponseArrayOptionalField(scopedTranslation, {
-            type: WidgetType.CONTAINER,
-            child: scopedObjectFieldNew(scopedTranslation, {
-              type: WidgetType.CONTAINER,
-              layoutType: LayoutType.GRID,
-              columns: 2,
-              usage: { response: true },
-              children: {
-                uid: scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  content: "fill-form.response.result.elements.uid",
-                  schema: z.string(),
-                }),
-                filled: scopedResponseField(scopedTranslation, {
-                  type: WidgetType.TEXT,
-                  content: "fill-form.response.result.elements.filled",
-                  schema: z.boolean(),
-                }),
-              },
+      result: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "fill-form.response.result",
+        schema: z
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
             }),
-          }),
-        },
+          )
+          .optional()
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -154,11 +125,12 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          filled: true,
-          filledCount: 1,
-          elements: [{ uid: "field-1", filled: true }],
-        },
+        result: [
+          {
+            type: "text",
+            text: "# fill_form response\nFilled 1 form element(s).",
+          },
+        ],
         executionId: "exec_123",
       },
     },

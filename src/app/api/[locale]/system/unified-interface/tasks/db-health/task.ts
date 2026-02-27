@@ -24,6 +24,7 @@ import definitions from "./definition";
 import { tools } from "./route";
 
 const dbHealthTask = createCronTask(definitions.POST, tools.POST, {
+  id: "db-health",
   name: "dbHealthCheck.name",
   description: "dbHealthCheck.description",
   schedule: CRON_SCHEDULES.EVERY_MINUTE,

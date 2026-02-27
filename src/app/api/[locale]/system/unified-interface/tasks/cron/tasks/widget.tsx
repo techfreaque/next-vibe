@@ -43,6 +43,7 @@ import {
   useWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
+import { useTouchDevice } from "@/hooks/use-touch-device";
 
 import type { CronTaskPriorityDB, TaskCategoryDB } from "../../enum";
 import {
@@ -193,6 +194,7 @@ function TaskRow({
   onHistory,
   t,
   tTasks,
+  isTouch,
 }: {
   task: Task;
   onView: (task: Task) => void;
@@ -201,6 +203,7 @@ function TaskRow({
   onHistory: (task: Task) => void;
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
   tTasks: ReturnType<typeof tasksScopedTranslation.scopedT>["t"];
+  isTouch: boolean;
 }): React.JSX.Element {
   const rate = successRate(task);
   const lastRunText = formatDate(task.lastExecutedAt);
@@ -318,7 +321,14 @@ function TaskRow({
       </Div>
 
       {/* Action buttons (appear on hover) */}
-      <Div className="flex-shrink-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <Div
+        className={cn(
+          "flex-shrink-0 flex items-center gap-1",
+          isTouch
+            ? "opacity-100"
+            : "opacity-0 group-hover:opacity-100 transition-opacity",
+        )}
+      >
         <Button
           type="button"
           variant="ghost"
@@ -423,6 +433,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
   const form = useWidgetForm<typeof endpoints.GET>();
 
   const isLoading = endpointMutations?.read?.isLoading;
+  const isTouch = useTouchDevice();
 
   const tasks: Task[] = useMemo(() => data?.tasks ?? [], [data?.tasks]);
   const totalTasks = data?.totalTasks ?? 0;
@@ -950,6 +961,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
               onHistory={handleTaskHistory}
               t={t}
               tTasks={tTasks}
+              isTouch={isTouch}
             />
           ))}
         </Div>

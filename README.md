@@ -396,6 +396,7 @@ Every endpoint is also a CLI command. Plus the usual dev tools:
 vibe dev                    # Start everything (add -r to reset the database)
 vibe build                  # Build for production
 vibe start                  # Start production server & cron tasks
+vibe rebuild                # Rebuild & hot-restart production (zero-downtime)
 
 vibe check                  # Lint + typecheck, one command
 vibe check src/path         # Check specific area

@@ -8,7 +8,6 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   scopedObjectFieldNew,
-  scopedObjectOptionalField,
   scopedRequestDataArrayOptionalField,
   scopedRequestField,
   scopedResponseField,
@@ -97,33 +96,20 @@ const { POST } = createEndpoint({
           .boolean()
           .describe("Whether the script evaluation operation succeeded"),
       }),
-      result: scopedObjectOptionalField(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        title: "evaluate-script.response.result.title",
-        description: "evaluate-script.response.result.description",
-        layoutType: LayoutType.STACKED,
-        usage: { response: true },
-        children: {
-          executed: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "evaluate-script.response.result.executed",
-            schema: z.boolean().describe("Whether the script was executed"),
-          }),
-          result: scopedResponseField(scopedTranslation, {
-            type: WidgetType.TEXT,
-            content: "evaluate-script.response.result.result",
-            schema: z
-              .union([
-                z.string(),
-                z.coerce.number(),
-                z.boolean(),
-                z.record(z.string(), z.unknown()),
-                z.array(z.unknown()),
-              ])
-              .optional()
-              .describe("The result returned by the script"),
-          }),
-        },
+      result: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "evaluate-script.response.result",
+        schema: z
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
+          .optional()
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -150,10 +136,12 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          executed: true,
-          result: "Example Page Title",
-        },
+        result: [
+          {
+            type: "text",
+            text: "# evaluate_script response\nScript executed successfully. Result: Example Page Title",
+          },
+        ],
         executionId: "exec_123",
       },
     },

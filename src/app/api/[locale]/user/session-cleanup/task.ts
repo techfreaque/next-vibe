@@ -25,6 +25,7 @@ import definitions from "./definition";
 import { tools } from "./route";
 
 const sessionCleanupTask = createCronTask(definitions.POST, tools.POST, {
+  id: "session-cleanup",
   name: "task.name",
   description: "task.description",
   schedule: CRON_SCHEDULES.DAILY_6AM,

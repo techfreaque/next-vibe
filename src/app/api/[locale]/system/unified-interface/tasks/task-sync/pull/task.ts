@@ -7,7 +7,6 @@
 
 import "server-only";
 
-import { Environment } from "@/app/api/[locale]/shared/utils";
 import {
   CRON_SCHEDULES,
   TASK_TIMEOUTS,
@@ -26,11 +25,12 @@ import endpoints from "./definition";
 import { tools } from "./route";
 
 const syncTask = createCronTask(endpoints.POST, tools.POST, {
+  id: "task-sync-pull",
   name: "taskSync.name",
   description: "taskSync.description",
   schedule: CRON_SCHEDULES.EVERY_MINUTE,
   category: TaskCategory.SYSTEM,
-  enabled: env.NODE_ENV === Environment.DEVELOPMENT,
+  enabled: env.IS_PREVIEW_MODE,
   priority: CronTaskPriority.HIGH,
   timeout: TASK_TIMEOUTS.MEDIUM,
   taskInput: undefined,

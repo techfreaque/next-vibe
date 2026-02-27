@@ -9,7 +9,8 @@ import type { LoggerMetadata } from "./endpoint";
 /**
  * File logger configuration
  */
-const DEBUG_DIR = ".tmp";
+// Use runtime concatenation to prevent Turbopack from statically tracing these paths
+const DEBUG_DIR = [".tmp"].join("");
 const DEBUG_FILE = "vibe-mcp.log";
 
 /**
@@ -18,10 +19,10 @@ const DEBUG_FILE = "vibe-mcp.log";
  */
 function getDebugFilePath(): string {
   const { existsSync, mkdirSync } = require("node:fs");
-  const { join } = require("node:path");
   // Use PROJECT_ROOT if available, otherwise use cwd
   const projectRoot = process.env.PROJECT_ROOT || process.cwd();
-  const debugDir = join(projectRoot, DEBUG_DIR);
+  // Use string concatenation instead of join() to prevent Turbopack from statically tracing paths
+  const debugDir = `${projectRoot}/${DEBUG_DIR}`;
 
   // Create debug directory if it doesn't exist
   if (!existsSync(debugDir)) {
@@ -36,7 +37,7 @@ function getDebugFilePath(): string {
     }
   }
 
-  return join(debugDir, DEBUG_FILE);
+  return `${debugDir}/${DEBUG_FILE}`;
 }
 
 /**

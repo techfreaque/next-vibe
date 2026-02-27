@@ -772,6 +772,19 @@ export const translations = {
         3: "Show me the current server status",
       },
     },
+    rebuildAgent: {
+      name: "Rebuild Agent",
+      description:
+        "Build and restart specialist that rebuilds the application and hot-restarts the server with zero-downtime via SIGUSR1 signaling",
+      tagline: "Build & Restart",
+      shortDesc: "Application rebuild and hot-restart",
+      suggestedPrompts: {
+        0: "Rebuild and restart the production server",
+        1: "Run a build without restarting",
+        2: "Check if the server is healthy after rebuild",
+        3: "Create a scheduled rebuild task",
+      },
+    },
     vibeCoder: {
       name: "Vibe Coder",
       description:

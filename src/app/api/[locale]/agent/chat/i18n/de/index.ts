@@ -516,6 +516,12 @@ export const translations: typeof enTranslations = {
         "Kimi K2.5 - Erweitertes chinesisches KI-Modell mit verbesserten Reasoning- und kreativen Fähigkeiten",
       claudeSonnet45:
         "Claude Sonnet 4.5 - Anthropics Vorgänger-Sonnet-Modell mit starken Coding- und Analysefähigkeiten",
+      claudeAgentSonnet:
+        "Claude Agent Sonnet - Autonomer KI-Agent mit Claude Sonnet über Anthropics Agent SDK. Führt Tools selbstständig mit integriertem Reasoning aus.",
+      claudeAgentHaiku:
+        "Claude Agent Haiku - Schneller autonomer KI-Agent mit Claude Haiku über Anthropics Agent SDK. Optimiert für Geschwindigkeit mit Tool-Ausführung.",
+      claudeAgentOpus:
+        "Claude Agent Opus - Leistungsstärkster autonomer KI-Agent mit Claude Opus über Anthropics Agent SDK. Maximale Intelligenz mit Tool-Ausführung.",
       grok4:
         "Grok 4 - xAIs Flaggschiff-Reasoning-Modell mit Vision- und Web-Suchfähigkeiten",
       grok4Fast:

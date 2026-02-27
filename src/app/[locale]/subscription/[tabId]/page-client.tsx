@@ -31,6 +31,8 @@ interface SubscriptionPageClientProps {
   initialSubscription: SubscriptionGetResponseOutput | null;
   initialCredits: CreditsGetResponseOutput | null;
   initialHistory: CreditsHistoryGetResponseOutput | null;
+  hasPaymentProvider: boolean;
+  isAdmin: boolean;
 }
 
 export function SubscriptionPageClient({
@@ -41,6 +43,8 @@ export function SubscriptionPageClient({
   initialSubscription,
   initialCredits,
   initialHistory,
+  hasPaymentProvider,
+  isAdmin,
 }: SubscriptionPageClientProps): JSX.Element {
   return (
     <Container className="py-8 flex flex-col gap-8">
@@ -86,7 +90,14 @@ export function SubscriptionPageClient({
         />
       )}
 
-      {activeTab === "buy" && <BuyTab locale={locale} user={user} />}
+      {activeTab === "buy" && (
+        <BuyTab
+          locale={locale}
+          user={user}
+          hasPaymentProvider={hasPaymentProvider}
+          isAdmin={isAdmin}
+        />
+      )}
 
       {activeTab === "history" && (
         <Div className="w-full">

@@ -108,6 +108,112 @@ const { POST } = createEndpoint({
             "Represents the CPU slowdown factor. Set the rate to 1 to disable throttling. If omitted, throttling remains unchanged.",
           ),
       }),
+      geolocation: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "emulate.form.fields.networkConditions.label",
+        description: "emulate.form.fields.networkConditions.description",
+        columns: 6,
+        schema: z
+          .object({
+            latitude: z
+              .number()
+              .min(-90)
+              .max(90)
+              .describe("Latitude between -90 and 90."),
+            longitude: z
+              .number()
+              .min(-180)
+              .max(180)
+              .describe("Longitude between -180 and 180."),
+          })
+          .nullable()
+          .optional()
+          .describe(
+            "Geolocation to emulate. Set to null to clear the geolocation override.",
+          ),
+      }),
+      userAgent: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "emulate.form.fields.networkConditions.label",
+        description: "emulate.form.fields.networkConditions.description",
+        columns: 6,
+        schema: z
+          .string()
+          .nullable()
+          .optional()
+          .describe(
+            "User agent to emulate. Set to null to clear the user agent override.",
+          ),
+      }),
+      colorScheme: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "emulate.form.fields.networkConditions.label",
+        description: "emulate.form.fields.networkConditions.description",
+        columns: 6,
+        options: [
+          {
+            value: "dark",
+            label: "emulate.form.fields.networkConditions.options.offline",
+          },
+          {
+            value: "light",
+            label: "emulate.form.fields.networkConditions.options.noEmulation",
+          },
+          {
+            value: "auto",
+            label: "emulate.form.fields.networkConditions.options.noEmulation",
+          },
+        ],
+        schema: z
+          .enum(["dark", "light", "auto"])
+          .optional()
+          .describe(
+            'Emulate the dark or the light mode. Set to "auto" to reset to the default.',
+          ),
+      }),
+      viewport: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "emulate.form.fields.networkConditions.label",
+        description: "emulate.form.fields.networkConditions.description",
+        columns: 6,
+        schema: z
+          .object({
+            width: z.number().int().min(0).describe("Page width in pixels."),
+            height: z.number().int().min(0).describe("Page height in pixels."),
+            deviceScaleFactor: z
+              .number()
+              .min(0)
+              .optional()
+              .describe(
+                "Specify device scale factor (can be thought of as dpr).",
+              ),
+            isMobile: z
+              .boolean()
+              .optional()
+              .describe(
+                "Whether the meta viewport tag is taken into account. Defaults to false.",
+              ),
+            hasTouch: z
+              .boolean()
+              .optional()
+              .describe("Specifies if viewport supports touch events."),
+            isLandscape: z
+              .boolean()
+              .optional()
+              .describe(
+                "Specifies if viewport is in landscape mode. Defaults to false.",
+              ),
+          })
+          .nullable()
+          .optional()
+          .describe(
+            "Viewport to emulate. Set to null to reset to the default viewport.",
+          ),
+      }),
 
       // Response fields
       success: scopedResponseField(scopedTranslation, {
@@ -121,21 +227,16 @@ const { POST } = createEndpoint({
         type: WidgetType.TEXT,
         content: "emulate.response.result",
         schema: z
-          .object({
-            applied: z
-              .boolean()
-              .describe("Whether emulation settings were applied"),
-            network: z
-              .string()
-              .optional()
-              .describe("Applied network condition"),
-            cpuThrottling: z
-              .number()
-              .optional()
-              .describe("Applied CPU throttling rate"),
-          })
+          .array(
+            z.object({
+              type: z.string().describe("Content type (text or image)"),
+              text: z.string().optional().describe("Text content"),
+              data: z.string().optional().describe("Base64 encoded data"),
+              mimeType: z.string().optional().describe("MIME type for data"),
+            }),
+          )
           .optional()
-          .describe("Result of the emulation operation"),
+          .describe("MCP content blocks returned by the tool"),
       }),
       error: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -162,11 +263,12 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         success: true,
-        result: {
-          applied: true,
-          network: "Fast 3G",
-          cpuThrottling: 2,
-        },
+        result: [
+          {
+            type: "text",
+            text: "# emulate response\nApplied emulation settings.",
+          },
+        ],
         executionId: "exec_123",
       },
     },

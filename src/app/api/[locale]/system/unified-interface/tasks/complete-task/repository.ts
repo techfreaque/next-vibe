@@ -1,6 +1,7 @@
 /**
  * Complete Task Repository
- * Marks a cron task as completed/failed and pushes result to remote.
+ * Marks a cron task as completed/failed/cancelled and pushes result to remote.
+ * Supports custom output payloads stored in execution history.
  */
 
 import "server-only";
@@ -19,10 +20,11 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { env } from "@/config/env";
 
 import type { NewCronTask } from "../cron/db";
-import { cronTasks } from "../cron/db";
+import { cronTaskExecutions, cronTasks } from "../cron/db";
 import { CronTaskStatus } from "../enum";
 import type { scopedTranslation } from "../i18n";
-import { pushCompletionToRemote } from "../task-sync/repository";
+import { pushStatusToRemote } from "../task-sync/repository";
+import type { JsonValue } from "../unified-runner/types";
 import type {
   CompleteTaskRequestOutput,
   CompleteTaskResponseOutput,
@@ -35,7 +37,7 @@ export async function completeTask(
   logger: EndpointLogger,
   t: ModuleT,
 ): Promise<ResponseType<CompleteTaskResponseOutput>> {
-  const { taskId, status, summary } = data;
+  const { taskId, status, summary, output } = data;
 
   // Find the task
   const [task] = await db
@@ -52,6 +54,9 @@ export async function completeTask(
   }
 
   const now = new Date();
+
+  // Build execution ID for both local record and remote push
+  const executionId = `complete-${taskId}-${now.getTime()}`;
 
   // Update task in local DB
   try {
@@ -81,10 +86,28 @@ export async function completeTask(
 
     await db.update(cronTasks).set(updates).where(eq(cronTasks.id, taskId));
 
+    // Create execution history record with output payload
+    await db.insert(cronTaskExecutions).values({
+      taskId,
+      taskName: task.routeId,
+      executionId,
+      status: status as (typeof CronTaskStatus)[keyof typeof CronTaskStatus],
+      priority: task.priority,
+      startedAt: now,
+      completedAt: now,
+      durationMs: null,
+      config: (task.taskInput ?? {}) as Record<string, JsonValue>,
+      result: output,
+      isManual: true,
+      triggeredBy: "manual",
+      environment: String(env.NODE_ENV ?? "development"),
+    });
+
     logger.info("Task marked as complete", {
       taskId,
       routeId: task.routeId,
       status,
+      hasOutput: !!output,
       summary: summary.slice(0, 200),
     });
   } catch (error) {
@@ -98,11 +121,14 @@ export async function completeTask(
   // Push to remote (fire-and-forget, but report result)
   let pushedToRemote = false;
   if (task.targetInstance && env.THEA_REMOTE_URL && env.THEA_REMOTE_API_KEY) {
-    const pushResult = await pushCompletionToRemote({
+    const pushResult = await pushStatusToRemote({
       taskRouteId: task.routeId,
       status,
       summary,
       durationMs: null,
+      executionId,
+      output,
+      startedAt: now.toISOString(),
       serverTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       executedByInstance: env.INSTANCE_ID ?? null,
       logger,
@@ -113,5 +139,6 @@ export async function completeTask(
   return success({
     completed: true,
     pushedToRemote,
+    updatedAt: now.toISOString(),
   });
 }

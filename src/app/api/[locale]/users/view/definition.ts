@@ -108,6 +108,11 @@ export const { GET } = createEndpoint({
           totalCreditsPurchased: z.coerce.number(),
           freePeriodStart: z.coerce.date().nullable(),
           freePeriodId: z.string().nullable(),
+          subscriptionCredits: z.coerce.number(),
+          permanentCredits: z.coerce.number(),
+          bonusCredits: z.coerce.number(),
+          earnedCredits: z.coerce.number(),
+          nextExpiry: z.coerce.date().nullable(),
         }),
       }),
 
@@ -169,6 +174,18 @@ export const { GET } = createEndpoint({
           lastPayment: z.coerce.date().nullable(),
         }),
       }),
+
+      // Model Usage Statistics
+      modelUsageStats: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.array(
+          z.object({
+            modelId: z.string(),
+            totalCreditsSpent: z.coerce.number(),
+            messageCount: z.coerce.number(),
+          }),
+        ),
+      }),
     },
   }),
 
@@ -213,6 +230,11 @@ export const { GET } = createEndpoint({
           totalCreditsPurchased: 2300,
           freePeriodStart: new Date(),
           freePeriodId: "2026-02",
+          subscriptionCredits: 800,
+          permanentCredits: 500,
+          bonusCredits: 200,
+          earnedCredits: 100,
+          nextExpiry: new Date("2026-03-15"),
         },
         paymentStats: {
           totalRevenueCents: 5000,
@@ -248,6 +270,18 @@ export const { GET } = createEndpoint({
           lastMessageSent: new Date(),
           lastPayment: new Date(),
         },
+        modelUsageStats: [
+          {
+            modelId: "gpt-5-mini",
+            totalCreditsSpent: 150.5,
+            messageCount: 42,
+          },
+          {
+            modelId: "claude-sonnet-4-5",
+            totalCreditsSpent: 85.2,
+            messageCount: 18,
+          },
+        ],
       },
     },
   },

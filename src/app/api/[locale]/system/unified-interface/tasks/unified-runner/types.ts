@@ -171,6 +171,8 @@ export interface CronTaskRunResult {
  */
 export interface CronTask<TEndpointDefinition extends CreateApiEndpointAny> {
   type: "cron";
+  /** Stable human-readable task identity (e.g. "db-health"). Distinct from routeId (the endpoint to call). */
+  id: string;
   name: string;
   definition: TEndpointDefinition;
   route: GenericHandlerReturnType<
@@ -204,6 +206,8 @@ export interface CronTask<TEndpointDefinition extends CreateApiEndpointAny> {
  */
 export interface CronTaskAny {
   type: "cron";
+  /** Stable human-readable task identity (e.g. "db-health"). Distinct from routeId (the endpoint to call). */
+  id: string;
   name: string;
   definition: CreateApiEndpointAny;
   route: GenericHandlerBase;
@@ -279,6 +283,8 @@ export function createCronTask<const T extends CreateApiEndpointAny>(
     T["allowedRoles"]
   >,
   config: {
+    /** Stable human-readable task identity (e.g. "db-health"). Must be unique across all tasks. */
+    id: string;
     name: T["types"]["ScopedTranslationKey"];
     description: T["types"]["ScopedTranslationKey"];
     schedule: string;

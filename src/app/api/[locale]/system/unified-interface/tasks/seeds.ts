@@ -7,7 +7,7 @@
 
 /* eslint-disable i18next/no-literal-string */
 
-import { isNull, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -19,7 +19,7 @@ import { CronTaskPriority } from "./enum";
 
 /**
  * Upsert all cron tasks from the task registry into the DB.
- * System tasks (userId IS NULL) use the partial unique index on routeId.
+ * Upserts by id (primary key) — each task has a hardcoded stable identity.
  * Task runners are excluded (dev-only infrastructure tasks).
  */
 async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
@@ -40,7 +40,9 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
   );
 
   const taskRows: NewCronTask[] = cronTaskDefs.map((task) => ({
-    // routeId: first alias or canonical endpoint path — both resolve via getFullPath()
+    // id: stable identity — multiple tasks can share the same routeId (endpoint)
+    id: task.id,
+    // routeId: which endpoint to call — first alias or canonical path
     routeId: getPreferredToolName(task.definition),
     displayName: task.name,
     description: task.description,
@@ -58,7 +60,7 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
     userId: null,
   }));
 
-  // Upsert using the partial unique index on routeId WHERE userId IS NULL.
+  // Upsert by id (primary key).
   // Do NOT overwrite enabled/schedule/priority/timeout/taskInput — those are user-overridable.
   // Preserve displayName if DB already has one (may be a translated string vs code's translation key).
   for (const row of taskRows) {
@@ -66,9 +68,9 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
       .insert(cronTasks)
       .values(row)
       .onConflictDoUpdate({
-        target: [cronTasks.routeId],
-        targetWhere: isNull(cronTasks.userId),
+        target: [cronTasks.id],
         set: {
+          routeId: sql`excluded.route_id`,
           displayName: sql`COALESCE(NULLIF(${cronTasks.displayName}, ''), excluded.display_name)`,
           description: sql`excluded.description`,
           category: sql`excluded.category`,

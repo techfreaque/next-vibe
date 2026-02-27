@@ -142,6 +142,12 @@ export const translations = {
       description: "Configure a new cron task",
     },
     fields: {
+      id: {
+        label: "Task ID",
+        description:
+          "Unique, stable identifier for this task (e.g. 'db-health')",
+        placeholder: "Enter task ID...",
+      },
       routeId: {
         label: "Route ID",
         description:

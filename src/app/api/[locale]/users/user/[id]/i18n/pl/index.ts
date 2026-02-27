@@ -305,6 +305,14 @@ export const translations: typeof enTranslations = {
         description: "Identyfikator powiązanego leada",
         placeholder: "Wprowadź ID leada...",
       },
+      isBanned: {
+        label: "Zablokowany",
+        description: "Czy użytkownik jest zablokowany na platformie",
+      },
+      bannedReason: {
+        label: "Powód blokady",
+        description: "Powód zablokowania użytkownika",
+      },
       response: {
         leadId: {
           content: "ID powiązanego leada",

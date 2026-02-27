@@ -21,6 +21,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 
+// Revalidate every hour (ISR)
+export const revalidate = 3600;
+
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
 }

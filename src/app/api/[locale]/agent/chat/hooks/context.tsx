@@ -27,7 +27,11 @@ import type { DefaultFolderId } from "../config";
  */
 export type ChatContextValue = UseChatReturn;
 
-const ChatContext = createContext<ChatContextValue | null>(null);
+/**
+ * Exported for mock/demo providers (e.g. landing page chat preview).
+ * Production code should use ChatProvider instead.
+ */
+export const ChatContext = createContext<ChatContextValue | null>(null);
 
 /**
  * Root folder permissions type

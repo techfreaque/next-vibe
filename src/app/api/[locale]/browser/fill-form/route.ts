@@ -5,6 +5,7 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
+import { BrowserTool } from "../enum";
 import { executeFillForm, filterUndefinedArgs } from "../shared/repository";
 import fillFormEndpoints from "./definition";
 
@@ -15,7 +16,7 @@ export const { POST, tools } = endpointsHandler({
     handler: ({ data, t, logger }) =>
       executeFillForm(
         {
-          toolName: "fill-form",
+          toolName: BrowserTool.FILL_FORM,
           args: filterUndefinedArgs({
             elements: data.elements,
           }),

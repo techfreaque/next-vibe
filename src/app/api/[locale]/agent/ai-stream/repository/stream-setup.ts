@@ -26,6 +26,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { simpleT } from "@/i18n/core/shared";
@@ -284,10 +285,27 @@ export async function setupAiStream(params: {
         return agentEnv.VENICE_AI_API_KEY
           ? null
           : buildMissingKeyMessage("veniceAI");
+      case ApiProvider.CLAUDE_CODE:
+        // Agent SDK authenticates via OAuth login, no separate API key needed
+        return null;
       default:
         return null;
     }
   })();
+
+  // Guard: Agent SDK models are admin-only
+  if (
+    modelConfig.apiProvider === ApiProvider.CLAUDE_CODE &&
+    (user.isPublic || !user.roles.includes(UserPermissionRole.ADMIN))
+  ) {
+    logger.warn("[Setup] Non-admin user attempted to use Agent SDK model", {
+      model: data.model,
+    });
+    return fail({
+      message: aiStreamT("route.errors.invalidRequestData"),
+      errorType: ErrorResponseTypes.FORBIDDEN,
+    });
+  }
 
   if (providerKeyMissing) {
     logger.warn("AI provider API key not configured", { model: data.model });
@@ -698,7 +716,16 @@ export async function setupAiStream(params: {
     logger,
   );
 
-  logger.debug("[AI Stream] Starting OpenRouter stream", {
+  // Register tool executors for Agent SDK provider (uses CoreTool execute functions)
+  if (
+    modelConfig.apiProvider === ApiProvider.CLAUDE_CODE &&
+    tools &&
+    "toolExecutors" in provider
+  ) {
+    provider.toolExecutors.registerTools(tools, logger);
+  }
+
+  logger.debug("[AI Stream] Starting stream", {
     model: data.model,
     hasTools: !!tools,
     toolCount: tools ? Object.keys(tools).length : 0,

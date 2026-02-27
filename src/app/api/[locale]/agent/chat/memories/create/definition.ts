@@ -61,6 +61,7 @@ const { POST } = createEndpoint({
           tags: data.requestData.tags ?? [],
           priority: data.requestData.priority ?? 0,
           isPublic: data.requestData.isPublic ?? false,
+          isArchived: false,
           createdAt: new Date(),
         };
 

@@ -309,6 +309,14 @@ export const translations: typeof enTranslations = {
         description: "Zugehörige Lead-Kennung",
         placeholder: "Lead-ID eingeben...",
       },
+      isBanned: {
+        label: "Gesperrt",
+        description: "Ob der Benutzer von der Plattform gesperrt ist",
+      },
+      bannedReason: {
+        label: "Sperrgrund",
+        description: "Grund für die Sperrung des Benutzers",
+      },
       response: {
         leadId: {
           content: "Zugehörige Lead-ID",

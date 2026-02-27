@@ -23,10 +23,11 @@ import { defaultLocale } from "@/i18n/core/config";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import type { NewCronTask } from "../cron/db";
 import { cronTasks } from "../cron/db";
-import type {
-  CronTaskPriorityDB,
-  TaskCategoryDB,
-  TaskOutputModeDB,
+import {
+  type CronTaskPriorityDB,
+  CronTaskStatus,
+  type TaskCategoryDB,
+  type TaskOutputModeDB,
 } from "../enum";
 import type { scopedTranslation } from "../i18n";
 import type { JsonValue, NotificationTarget } from "../unified-runner/types";
@@ -96,7 +97,8 @@ function serializeForSync(task: CronTaskSelect): SyncedCronTask {
 
 /**
  * Upsert cron tasks from a remote instance.
- * Only inserts tasks that don't already exist locally (by routeId match).
+ * Match by id — every task has a unique, stable string identity.
+ * routeId is NOT used for identity — multiple tasks can call the same endpoint.
  */
 export async function upsertRemoteTasks(params: {
   tasks: SyncedCronTask[];
@@ -107,11 +109,14 @@ export async function upsertRemoteTasks(params: {
 
   for (const remoteTask of tasks) {
     try {
-      // Check if task with same routeId already exists
+      // Match by id — stable, human-readable task identity
       const [existing] = await db
-        .select({ id: cronTasks.id })
+        .select({
+          id: cronTasks.id,
+          lastExecutionStatus: cronTasks.lastExecutionStatus,
+        })
         .from(cronTasks)
-        .where(eq(cronTasks.routeId, remoteTask.routeId))
+        .where(eq(cronTasks.id, remoteTask.id))
         .limit(1);
 
       // Build update payload from fields actually present in the remote payload.
@@ -156,6 +161,15 @@ export async function upsertRemoteTasks(params: {
       }
 
       if (existing) {
+        // Skip update if task is currently RUNNING — avoid overwriting mid-execution
+        if (existing.lastExecutionStatus === CronTaskStatus.RUNNING) {
+          logger.debug("Skipping sync for RUNNING task", {
+            id: remoteTask.id,
+            routeId: remoteTask.routeId,
+          });
+          continue;
+        }
+
         // Update definition fields only — never overwrite local execution state
         // (enabled, lastExecutionStatus, counts, etc. are managed by the local pulse runner)
         await db
@@ -164,8 +178,9 @@ export async function upsertRemoteTasks(params: {
           .where(eq(cronTasks.id, existing.id));
         synced++;
       } else {
-        // New task — use remote enabled state as initial value
+        // New task — use remote's id directly
         await db.insert(cronTasks).values({
+          id: remoteTask.id,
           routeId: remoteTask.routeId,
           displayName: definitionFields.displayName ?? remoteTask.routeId,
           category: definitionFields.category ?? remoteTask.category,
@@ -397,14 +412,18 @@ export async function pullFromRemote(
 }
 
 /**
- * Push a task completion result to the remote Thea instance.
+ * Push a task status update to the remote Thea instance.
+ * Supports RUNNING (in-progress visibility) and terminal statuses (with execution records).
  * Fire-and-forget — logs errors but never fails the caller.
  */
-export async function pushCompletionToRemote(params: {
+export async function pushStatusToRemote(params: {
   taskRouteId: string;
   status: string;
   summary: string;
   durationMs: number | null;
+  executionId?: string;
+  output?: Record<string, string | number | boolean>;
+  startedAt?: string;
   serverTimezone: string;
   executedByInstance: string | null;
   logger: EndpointLogger;
@@ -414,7 +433,7 @@ export async function pushCompletionToRemote(params: {
   const apiKey = env.THEA_REMOTE_API_KEY;
 
   if (!remoteUrl || !apiKey) {
-    logger.debug("No remote configured, skipping completion push");
+    logger.debug("No remote configured, skipping status push");
     return success({ pushed: false });
   }
 
@@ -430,7 +449,7 @@ export async function pushCompletionToRemote(params: {
     });
 
     if (!response.ok) {
-      logger.error("Push completion to remote failed", {
+      logger.error("Push status to remote failed", {
         status: response.status,
         statusText: response.statusText,
         taskRouteId: payload.taskRouteId,
@@ -438,13 +457,13 @@ export async function pushCompletionToRemote(params: {
       return success({ pushed: false });
     }
 
-    logger.info("Completion pushed to remote", {
+    logger.info("Status pushed to remote", {
       taskRouteId: payload.taskRouteId,
       status: payload.status,
     });
     return success({ pushed: true });
   } catch (error) {
-    logger.error("Push completion to remote error", parseError(error));
+    logger.error("Push status to remote error", parseError(error));
     return success({ pushed: false });
   }
 }

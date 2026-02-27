@@ -3,12 +3,12 @@ import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { scopedTranslation as threadsScopedTranslation } from "@/app/api/[locale]/agent/chat/threads/i18n";
-import { ThreadsRepository } from "@/app/api/[locale]/agent/chat/threads/repository";
+import { getMaxToolCount } from "@/app/api/[locale]/agent/chat/default-tool-counts";
 import {
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
+import { definitionsRegistry } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definitions/registry";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
@@ -20,10 +20,17 @@ import { getCountryFromLocale } from "@/i18n/core/language-utils";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 
+import { Architecture } from "./_components/architecture";
 import CallToAction from "./_components/call-to-action";
-import Features from "./_components/features";
+import { CapabilityShowcase } from "./_components/capability-showcase";
+import { CloudVsSelfHost } from "./_components/cloud-vs-selfhost";
 import Hero from "./_components/hero";
-import { StoryPricingSection } from "./_components/story-pricing-section";
+import { OpenClawComparison } from "./_components/openclaw-comparison";
+import { ProblemStatement } from "./_components/problem-statement";
+import { StatsStrip } from "./_components/stats-strip";
+
+// Revalidate every hour (ISR)
+export const revalidate = 3600;
 
 interface HomePageProps {
   params: Promise<{ locale: CountryLanguage }>;
@@ -107,62 +114,47 @@ export default async function HomePage({
     );
   }
 
-  // Fetch stats for hero section (cached for 24h)
-  const activeUserCountResponse = await UserRepository.getActiveUserCount(
-    logger,
-    locale,
-  );
-  const { t: threadsT } = threadsScopedTranslation.scopedT(locale);
-  const totalConversationsResponse =
-    await ThreadsRepository.getTotalConversationsCount(logger, threadsT);
+  // Get dynamic counts for marketing display
+  const totalToolCount = getMaxToolCount();
+  const totalEndpointCount = definitionsRegistry.getTotalEndpointCount();
 
-  const activeUserCount = activeUserCountResponse.success
-    ? activeUserCountResponse.data
-    : 0;
-  const totalConversations = totalConversationsResponse.success
-    ? totalConversationsResponse.data
-    : 0;
-
-  // Get pricing information for features section
+  // Get pricing information
   const products = productsRepository.getProducts(locale);
   const country = getCountryFromLocale(locale);
   const countryInfo = languageConfig.countryInfo[country];
 
   const SUBSCRIPTION_PRICE = products[ProductIds.SUBSCRIPTION].price;
-  const SUBSCRIPTION_CREDITS = products[ProductIds.SUBSCRIPTION].credits;
-  const PACK_PRICE = products[ProductIds.CREDIT_PACK].price;
-  const PACK_CREDITS = products[ProductIds.CREDIT_PACK].credits;
-
-  // Get currency symbol from languageConfig
   const CURRENCY_SYMBOL = countryInfo.symbol;
 
   return (
     <Div role="main" className="flex min-h-screen flex-col w-full">
-      {/* Hero Section */}
-      <Hero
-        locale={locale}
-        activeUserCount={activeUserCount}
-        totalConversations={totalConversations}
-      />
+      {/* Hero — "Your AI. Your Rules." */}
+      <Hero locale={locale} totalToolCount={totalToolCount} />
 
-      {/* Features Section */}
-      <Features
+      {/* Problem Statement — "What's wrong with AI today" */}
+      <ProblemStatement locale={locale} />
+
+      {/* Capability Showcase — 4 alternating feature blocks */}
+      <CapabilityShowcase locale={locale} totalToolCount={totalToolCount} />
+
+      {/* Architecture — "One Definition. Five Interfaces." */}
+      <Architecture locale={locale} />
+
+      {/* Honest Comparison — next-vibe vs OpenClaw */}
+      <OpenClawComparison locale={locale} totalToolCount={totalToolCount} />
+
+      {/* Two Paths — Cloud vs Self-Host */}
+      <CloudVsSelfHost
         locale={locale}
         subPrice={SUBSCRIPTION_PRICE}
-        subCredits={SUBSCRIPTION_CREDITS}
         subCurrency={CURRENCY_SYMBOL}
-        packPrice={PACK_PRICE}
-        packCredits={PACK_CREDITS}
-        packCurrency={CURRENCY_SYMBOL}
       />
 
-      {/* Pricing Section with Overview and Buy Credits */}
-      <StoryPricingSection locale={locale} user={user} />
+      {/* Stats — Numbers that matter */}
+      <StatsStrip locale={locale} totalEndpointCount={totalEndpointCount} />
 
-      {/* Call to Action */}
+      {/* CTA — "Your AI. Your infrastructure. Your rules." */}
       <CallToAction locale={locale} />
     </Div>
   );
 }
-
-// Type definition for subscription data

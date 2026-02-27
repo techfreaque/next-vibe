@@ -9,6 +9,11 @@ export const translations: typeof enTranslations = {
   },
 
   run: {
+    task: {
+      name: "Puls AI",
+      description:
+        "Agent AI w tle, który sprawdza stan systemu, realizuje zadania i kontaktuje się z człowiekiem w razie potrzeby",
+    },
     post: {
       title: "Uruchom agenta AI",
       description:
