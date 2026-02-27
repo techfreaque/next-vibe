@@ -54,13 +54,11 @@ const { POST } = createEndpoint({
     children: {
       success: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.success.title",
         schema: z.string(),
       }),
 
       errors: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        content: "post.fields.errors.title",
         schema: z.array(z.string()).optional(),
       }),
     },

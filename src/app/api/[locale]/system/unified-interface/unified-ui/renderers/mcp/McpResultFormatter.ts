@@ -97,6 +97,12 @@ export class McpResultFormatter {
           `output: ${output.length} chars`,
       );
 
+      // Fall back to JSON if renderer produced empty output (reconciler failure)
+      if (!output) {
+        logger.debug("[MCP Fast Renderer] Empty output, falling back to JSON");
+        return JSON.stringify(data, null, 2);
+      }
+
       return output;
     } catch (error) {
       // Fallback to JSON if rendering fails

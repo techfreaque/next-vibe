@@ -148,21 +148,23 @@ export function loadEnvironment(): EnvironmentResult {
   // Derives preview DATABASE_URL and NEXT_PUBLIC_APP_URL by swapping ports,
   // using PREVIEW_DB_PORT (default 5433) and PREVIEW_PORT (default 3001).
   // Must happen BEFORE the env singleton is created by defineEnv().
+  //
+  // Only in development: production uses the real DATABASE_URL as-is.
   const args = process.argv.slice(2);
+  const isProduction = process.env["NODE_ENV"] === "production";
   const isPreviewMode =
-    args.includes("--preview") ||
-    args.includes(START_ALIAS) ||
-    args.includes(START_SERVER_ALIAS) ||
-    args.includes(BUILD_ALIAS) ||
-    args.includes(BUILD_SERVER_ALIAS) ||
-    args.includes(REBUILD_ALIAS);
+    !isProduction &&
+    (args.includes("--preview") ||
+      args.includes(START_ALIAS) ||
+      args.includes(START_SERVER_ALIAS) ||
+      args.includes(BUILD_ALIAS) ||
+      args.includes(BUILD_SERVER_ALIAS) ||
+      args.includes(REBUILD_ALIAS));
 
   // Expose preview mode flag so tasks can distinguish vibe start from vibe dev.
   // Explicitly set to "false" when not in preview mode to clear any stale shell env.
   process.env["IS_PREVIEW_MODE"] = isPreviewMode ? "true" : "false";
 
-  // Port swap must happen even when NODE_ENV=production (vibe build sets it for
-  // Next.js optimizations), since the build still targets the preview environment.
   if (isPreviewMode && !args.includes("--skip-db-setup")) {
     const previewDbPort = process.env["PREVIEW_DB_PORT"] || "5433";
     const previewPort = process.env["PREVIEW_PORT"] || "3001";

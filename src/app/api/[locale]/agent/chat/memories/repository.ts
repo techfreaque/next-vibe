@@ -162,7 +162,7 @@ export async function updateMemory(params: {
   priority?: number;
   isPublic?: boolean;
   isArchived?: boolean;
-  isShared: boolean;
+  isShared?: boolean;
   userId: string;
   logger: EndpointLogger;
   t: MemoriesT;
@@ -221,7 +221,7 @@ export async function updateMemory(params: {
 
   // Assign syncId when isShared transitions to true (if not already present)
   if (isShared) {
-    const meta = updated.metadata as Record<string, unknown> | null;
+    const meta = updated.metadata;
     if (!meta?.syncId) {
       await db
         .update(memories)

@@ -4,6 +4,8 @@
  * 3000x faster than Ink for static responses
  */
 
+import "./reconciler-polyfill";
+
 import { Chalk } from "chalk";
 import cliBoxes from "cli-boxes";
 import type { BoxProps, StaticProps, TextProps } from "ink";
@@ -1139,15 +1141,35 @@ function createStaticReconciler(): ReturnType<typeof Reconciler> {
   return Reconciler(hostConfig);
 }
 
+/**
+ * Extended reconciler type — React 19 adds updateContainerSync and flushSyncWork
+ * but @types/react-reconciler doesn't include them yet.
+ */
+interface ExtendedReconciler extends ReturnType<typeof createStaticReconciler> {
+  updateContainerSync: (
+    element: ReactElement | null,
+    container: ReturnType<
+      ReturnType<typeof createStaticReconciler>["createContainer"]
+    >,
+    parentComponent: null,
+    callback: () => void,
+  ) => void;
+  flushSyncWork: () => void;
+}
+
 // Cache the reconciler instance
-let reconciler: ReturnType<typeof createStaticReconciler> | null = null;
+let reconciler: ExtendedReconciler | null = null;
 
 /**
- * Render a React element tree with full hook support using react-reconciler
+ * Render a React element tree with full hook support using react-reconciler.
+ *
+ * Uses the same API pattern as Ink: updateContainerSync → flushSyncWork.
+ * Error callbacks on createContainer surface reconciler-internal errors that
+ * would otherwise be swallowed silently (e.g. missing dispatcher methods).
  */
 function renderWithReconciler(element: ReactElement): RenderNode | null {
   if (!reconciler) {
-    reconciler = createStaticReconciler();
+    reconciler = createStaticReconciler() as ExtendedReconciler;
   }
 
   const container: Container = { node: null };
@@ -1164,21 +1186,9 @@ function renderWithReconciler(element: ReactElement): RenderNode | null {
   );
 
   try {
-    const updateSync = Reflect.get(reconciler, "updateContainerSync");
-    const updateContainer = Reflect.get(reconciler, "updateContainer");
-    const flushSyncWork = Reflect.get(reconciler, "flushSyncWork");
-
-    // Render using same pattern as Ink: updateContainerSync then flushSyncWork
-    if (typeof updateSync === "function") {
-      updateSync(element, root, null, noop);
-    } else if (typeof updateContainer === "function") {
-      updateContainer(element, root, null, noop);
-    }
-
-    // Flush the work like Ink does
-    if (typeof flushSyncWork === "function") {
-      flushSyncWork();
-    }
+    // Use same render pattern as Ink: updateContainerSync then flushSyncWork
+    reconciler.updateContainerSync(element, root, null, noop);
+    reconciler.flushSyncWork();
   } catch {
     return null;
   }

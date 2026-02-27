@@ -5,6 +5,36 @@
  * Command line interface that can execute any route.ts from generated index files
  */
 
+// Register Bun plugin for CLI widget overrides BEFORE any other imports.
+// When a definition.ts imports from "./widget", this plugin checks if a
+// "widget.cli.ts" or "widget.cli.tsx" exists alongside it and resolves to
+// that instead. Only active in this CLI Bun process — the Next.js child
+// process spawned by `vibe dev` is unaffected (separate process).
+import { basename, dirname, resolve } from "node:path";
+
+import { plugin } from "bun";
+
+plugin({
+  name: "cli-widget-override", // eslint-disable-line i18next/no-literal-string
+  setup(build) {
+    // Match any import ending with "/widget" (bare specifier, no extension)
+    build.onResolve({ filter: /\/widget$/ }, async ({ path, importer }) => {
+      if (!importer) {
+        return;
+      }
+      const dir = dirname(importer);
+      const base = basename(path);
+      for (const ext of [".cli.ts", ".cli.tsx"]) {
+        const candidate = resolve(dir, `${base}${ext}`);
+        const file = Bun.file(candidate);
+        if (await file.exists()) {
+          return { path: candidate };
+        }
+      }
+    });
+  },
+});
+
 // Side-effect: registers global error sink so all logger.error() calls persist to error_logs
 import "../shared/logger/error-persist";
 

@@ -133,8 +133,21 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
     }
 
     case WidgetType.CUSTOM_WIDGET: {
-      // Custom React widgets can't run in CLI — fall back to ContainerWidgetInk
-      // which iterates over the children (standard widgets) and renders them.
+      // If a widget.cli.ts override exists, the Bun plugin in vibe-runtime.ts
+      // will have resolved `import ... from "./widget"` to the CLI version.
+      // CLI widgets mark themselves with a static `.cliWidget = true` property
+      // so we can distinguish them from web React components (which would crash in Ink).
+      const customField = field as typeof field & {
+        render?: React.ComponentType<{
+          fieldName: string;
+          field: typeof field;
+        }> & { cliWidget?: boolean };
+      };
+      if (customField.render?.cliWidget) {
+        const CustomRender = customField.render;
+        return <CustomRender fieldName={fieldName} field={field} />;
+      }
+      // No CLI override — fall back to ContainerWidgetInk which renders children.
       const W = ContainerWidgetInk as AnyInkWidget;
       return <W fieldName={fieldName} field={field} />;
     }

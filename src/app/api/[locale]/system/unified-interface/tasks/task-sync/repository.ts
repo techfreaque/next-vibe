@@ -561,8 +561,8 @@ export async function getSharedMemories(params: {
     const result: SyncedMemory[] = [];
 
     for (const r of rows) {
-      const meta = r.metadata as Record<string, unknown> | null;
-      let syncId = (meta?.syncId as string) ?? null;
+      const meta = r.metadata;
+      let syncId = meta?.syncId ?? null;
 
       // Backfill: assign syncId to shared memories that don't have one yet
       if (!syncId && r.isShared) {
