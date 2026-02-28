@@ -20,7 +20,12 @@ export const translations: typeof enTranslations = {
           model: {
             label: "Modell",
             description:
-              "Claude Modell-ID (z.B. claude-sonnet-4-6, claude-opus-4-6). Verwendet Claude Code-Standard wenn nicht angegeben.",
+              "Claude-Modell für diese Sitzung. Standard ist Sonnet.",
+            options: {
+              sonnet: "Sonnet 4.6",
+              opus: "Opus 4.6",
+              haiku: "Haiku 4.5",
+            },
           },
           maxBudgetUsd: {
             label: "Max. Budget (USD)",
@@ -37,10 +42,10 @@ export const translations: typeof enTranslations = {
             description:
               "BEVORZUGE true (Standard). Interaktiver Modus öffnet eine vollständige Claude Code-Sitzung — Max sieht die Ausgabe live und kann teilnehmen. Nur auf false setzen für vollautomatisierte Batch-Aufgaben (Cron-Jobs, Pipelines) ohne menschliche Interaktion.",
           },
-          timeoutMs: {
-            label: "Timeout (ms)",
+          timeoutSeconds: {
+            label: "Timeout (Sekunden)",
             description:
-              "Maximale Ausführungszeit in Millisekunden. Standard: 600000 (10 Minuten).",
+              "Maximale Ausführungszeit in Sekunden. Standard: 600 (10 Minuten).",
           },
           output: {
             label: "Ausgabe",

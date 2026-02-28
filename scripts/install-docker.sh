@@ -44,4 +44,7 @@ until curl -sf http://localhost:3000 > /dev/null 2>&1; do
 done
 
 echo "Deployment successful — new app is responding."
-docker builder prune -a -f
+echo "Cleaning up docker resources..."
+docker system prune -a -f
+docker volume prune -a -f
+

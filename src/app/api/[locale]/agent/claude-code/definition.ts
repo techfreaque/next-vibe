@@ -59,28 +59,33 @@ const { POST } = createEndpoint({
       }),
       model: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
+        fieldType: FieldDataType.SELECT,
         label: "claudeCode.run.post.fields.model.label",
         description: "claudeCode.run.post.fields.model.description",
         columns: 6,
-        schema: z.string().optional(),
+        options: [
+          {
+            value: "claude-sonnet-4-6",
+            label: "claudeCode.run.post.fields.model.options.sonnet" as const,
+          },
+          {
+            value: "claude-opus-4-6",
+            label: "claudeCode.run.post.fields.model.options.opus" as const,
+          },
+          {
+            value: "claude-haiku-4-5-20251001",
+            label: "claudeCode.run.post.fields.model.options.haiku" as const,
+          },
+        ],
+        schema: z
+          .enum([
+            "claude-sonnet-4-6",
+            "claude-opus-4-6",
+            "claude-haiku-4-5-20251001",
+          ])
+          .default("claude-sonnet-4-6"),
       }),
-      maxBudgetUsd: scopedRequestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.NUMBER,
-        label: "claudeCode.run.post.fields.maxBudgetUsd.label",
-        description: "claudeCode.run.post.fields.maxBudgetUsd.description",
-        columns: 6,
-        schema: z.coerce.number().optional(),
-      }),
-      allowedTools: scopedRequestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "claudeCode.run.post.fields.allowedTools.label",
-        description: "claudeCode.run.post.fields.allowedTools.description",
-        columns: 12,
-        schema: z.string().optional(),
-      }),
+
       taskTitle: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -97,13 +102,13 @@ const { POST } = createEndpoint({
         columns: 6,
         schema: z.boolean().default(true),
       }),
-      timeoutMs: scopedRequestField(scopedTranslation, {
+      timeoutSeconds: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
-        label: "claudeCode.run.post.fields.timeoutMs.label",
-        description: "claudeCode.run.post.fields.timeoutMs.description",
+        label: "claudeCode.run.post.fields.timeoutSeconds.label",
+        description: "claudeCode.run.post.fields.timeoutSeconds.description",
         columns: 6,
-        schema: z.coerce.number().default(600000),
+        schema: z.coerce.number().default(60 * 30), // 30 minutes
       }),
 
       // Response
@@ -180,7 +185,7 @@ const { POST } = createEndpoint({
         prompt:
           "Read src/app/api/[locale]/system/agent/claude-code/repository.ts and summarize what it does in 2 sentences.",
         interactiveMode: true,
-        timeoutMs: 60000,
+        timeoutSeconds: 60,
       },
     },
     responses: {

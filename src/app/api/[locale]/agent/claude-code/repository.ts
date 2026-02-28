@@ -173,7 +173,7 @@ export async function runClaudeCode(
   t: ModuleT,
   cronTaskId?: string,
 ): Promise<ResponseType<RunResponseOutput>> {
-  const timeoutMs = data.timeoutMs ?? 600000;
+  const timeoutMs = (data.timeoutSeconds ?? 600) * 1000;
   const start = Date.now();
   const isInteractive = data.interactiveMode ?? false;
   const cwd = process.cwd();
@@ -219,17 +219,17 @@ export async function runClaudeCode(
   if (data.model) {
     args.push("--model", data.model);
   }
-  if (data.maxBudgetUsd !== undefined && data.maxBudgetUsd !== null) {
-    args.push("--max-budget-usd", String(data.maxBudgetUsd));
-  }
+  // if (data.maxBudgetUsd !== undefined && data.maxBudgetUsd !== null) {
+  //   args.push("--max-budget-usd", String(data.maxBudgetUsd));
+  // }
   // For interactive mode, append task context to the prompt itself
   // (--system-prompt gets mangled by shell escaping through terminal emulators)
   if (effectiveTaskId && isInteractive) {
     args[0] = `${args[0]}\n\n[TASK CONTEXT] cronTaskId=${effectiveTaskId} — When the work is complete, call MCP tool "complete-task" with taskId="${effectiveTaskId}", status="status.completed"|"status.failed", and a brief summary of what was done.`;
   }
-  if (data.allowedTools) {
-    args.push("--allowedTools", data.allowedTools);
-  }
+  // if (data.allowedTools) {
+  //   args.push("--allowedTools", data.allowedTools);
+  // }
 
   logger.info("Running Claude Code CLI", {
     mode: isInteractive ? "interactive" : "batch",

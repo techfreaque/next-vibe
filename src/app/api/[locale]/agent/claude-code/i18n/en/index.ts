@@ -18,7 +18,12 @@ export const translations = {
           model: {
             label: "Model",
             description:
-              "Claude model ID to use (e.g. claude-sonnet-4-6, claude-opus-4-6). Defaults to the Claude Code default if omitted.",
+              "Claude model to use for this session. Defaults to Sonnet.",
+            options: {
+              sonnet: "Sonnet 4.6",
+              opus: "Opus 4.6",
+              haiku: "Haiku 4.5",
+            },
           },
           maxBudgetUsd: {
             label: "Max Budget (USD)",
@@ -40,10 +45,10 @@ export const translations = {
             description:
               "PREFER true (default). Interactive mode opens a full Claude Code session — Max can see output live and participate. Set to false only for fully automated batch tasks (cron jobs, pipelines) where no human interaction is needed and output must be returned as a value.",
           },
-          timeoutMs: {
-            label: "Timeout (ms)",
+          timeoutSeconds: {
+            label: "Timeout (seconds)",
             description:
-              "Maximum execution time in milliseconds. Defaults to 600000 (10 minutes). Increase for long-running tasks.",
+              "Maximum execution time in seconds. Defaults to 600 (10 minutes). Increase for long-running tasks.",
           },
           output: {
             label: "Output",

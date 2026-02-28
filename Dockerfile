@@ -228,9 +228,9 @@ RUN --mount=type=cache,target=/root/.bun/install/cache,id=next-vibe-bun-cache,sh
     bun install --frozen-lockfile
 
 # Build
-# /app/.next/cache mounted directly — Next.js webpack/RSC incremental cache persisted across builds
+# /app/.next-prod/cache mounted directly — Next.js webpack/RSC incremental cache persisted across builds
 # DB unreachable at build time (docker network only); migrations run via docker compose run in install-docker.sh
-RUN --mount=type=cache,target=/app/.next/cache,id=next-vibe-next-cache,sharing=locked \
+RUN --mount=type=cache,target=/app/.next-prod/cache,id=next-vibe-next-cache,sharing=locked \
     bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts build --migrate=false --seed=false
 
 ENV NODE_ENV=production
