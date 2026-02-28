@@ -53,7 +53,7 @@ type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 /**
  * Client information extracted from request
  */
-export interface ClientInfo {
+interface ClientInfo {
   userAgent: string;
   referer: string;
   ipAddress: string;
@@ -63,7 +63,7 @@ export interface ClientInfo {
 /**
  * Tracking pixel response data
  */
-export interface TrackingPixelResult {
+interface TrackingPixelResult {
   success: boolean;
   leadId: string;
   campaignId?: string;
@@ -88,15 +88,6 @@ const getMetadataNumber = (
  * Handles all server-side tracking operations
  */
 export class LeadTrackingRepository {
-  private static readonly UUID_REGEX =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  private static readonly VALID_SOURCES = [
-    "email",
-    "social",
-    "website",
-    "referral",
-  ];
-
   /**
    * Extract client information from request
    */
@@ -126,38 +117,10 @@ export class LeadTrackingRepository {
   }
 
   /**
-   * Validate tracking parameters from URL
-   */
-  static validateTrackingParams(searchParams: URLSearchParams): {
-    leadId?: string;
-    campaignId?: string;
-    error?: string;
-  } {
-    const leadId =
-      searchParams.get("leadId") || searchParams.get("id") || undefined;
-    const campaignId = searchParams.get("campaignId");
-
-    if (!leadId) {
-      return { error: "error.validation" };
-    }
-
-    // Validate UUID format
-    if (!this.UUID_REGEX.test(leadId)) {
-      return { error: "error.validation" };
-    }
-
-    if (campaignId && !this.UUID_REGEX.test(campaignId)) {
-      return { error: "error.validation" };
-    }
-
-    return { leadId, campaignId: campaignId || undefined };
-  }
-
-  /**
    * Record engagement event
    * Returns LeadEngagementResponseOutput from definition
    */
-  static async recordEngagement(
+  private static async recordEngagement(
     data: {
       leadId: string;
       engagementType: EngagementType;
@@ -321,42 +284,9 @@ export class LeadTrackingRepository {
   }
 
   /**
-   * Track subscription confirmation (true conversion)
-   */
-  static async trackSubscriptionConfirmation(
-    leadId: string,
-    t: ModuleT,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<{ leadStatusUpdated: boolean }>> {
-    try {
-      logger.debug(`Subscription confirmed for lead ${leadId}`);
-      // Update lead status to SUBSCRIPTION_CONFIRMED and set timestamp
-      await LeadsRepository.updateLeadInternal(
-        leadId,
-        {
-          status: LeadStatus.SUBSCRIPTION_CONFIRMED,
-          subscriptionConfirmedAt: new Date(),
-        },
-        logger,
-        t,
-      );
-
-      return success({
-        leadStatusUpdated: true,
-      });
-    } catch (error) {
-      logger.error("Subscription tracking failed", parseError(error).message);
-      return fail({
-        message: t("tracking.errors.default"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-  }
-
-  /**
    * Create anonymous lead for website visitors
    */
-  static async createAnonymousLead(
+  private static async createAnonymousLead(
     clientInfo: ClientInfo,
     locale: CountryLanguage,
     logger: EndpointLogger,
@@ -473,7 +403,7 @@ export class LeadTrackingRepository {
    * Transition lead status based on user actions
    * Implements proper lead lifecycle management
    */
-  static async transitionLeadStatus(
+  private static async transitionLeadStatus(
     leadId: string,
     action:
       | "website_visit"
@@ -1101,76 +1031,6 @@ export class LeadTrackingRepository {
   }
 
   /**
-   * Generate tracking pixel URL for email opens
-   * Migrated from utils.ts
-   */
-  static generateTrackingPixelUrl(
-    leadId: string | undefined,
-    userId: string | undefined,
-    campaignId: string | undefined,
-    baseUrl: string,
-    locale: CountryLanguage,
-  ): string {
-    const url = new URL(`/api/${locale}/v1/leads/tracking/pixel`, baseUrl);
-
-    if (leadId) {
-      url.searchParams.set("leadId", leadId);
-    }
-    if (userId) {
-      url.searchParams.set("userId", userId);
-    }
-    if (campaignId) {
-      url.searchParams.set("campaignId", campaignId);
-    }
-
-    // Add timestamp to prevent caching
-    url.searchParams.set("t", Date.now().toString());
-
-    return url.toString();
-  }
-
-  /**
-   * Generate tracking link URL for click tracking
-   * Migrated from utils.ts
-   */
-  static generateTrackingLinkUrl(
-    originalUrl: string,
-    leadId: string | undefined,
-    userId: string | undefined,
-    campaignId: string | undefined,
-    baseUrl: string,
-    locale: CountryLanguage,
-    source = "email",
-  ): string {
-    // Prevent nested tracking URLs
-    if (
-      originalUrl.includes("/track?") ||
-      originalUrl.includes(`/api/${locale}/v1/leads/tracking/`) ||
-      (originalUrl.includes("/api/") && originalUrl.includes("/tracking/"))
-    ) {
-      // Nested tracking URL detected, return as-is
-      return originalUrl;
-    }
-
-    const url = new URL(`/${locale}/track`, baseUrl);
-    url.searchParams.set("url", originalUrl);
-
-    if (leadId) {
-      url.searchParams.set("id", leadId);
-    }
-    if (userId) {
-      url.searchParams.set("userId", userId);
-    }
-    if (campaignId) {
-      url.searchParams.set("campaignId", campaignId);
-    }
-
-    url.searchParams.set("source", source);
-
-    return url.toString();
-  }
-
-  /**
    * Generate campaign tracking URL for email campaigns
    * Migrated from utils.ts
    */
@@ -1201,93 +1061,5 @@ export class LeadTrackingRepository {
     url.searchParams.set("url", finalDestinationUrl);
 
     return url.toString();
-  }
-
-  /**
-   * Check if URL is already a tracking URL
-   * Migrated from utils.ts
-   */
-  static isTrackingUrl(url: string, locale: CountryLanguage): boolean {
-    if (url.includes("/track?")) {
-      return true;
-    }
-
-    if (locale && url.includes(`/api/${locale}/v1/leads/tracking/`)) {
-      return true;
-    }
-
-    if (url.includes("/api/") && url.includes("/tracking/")) {
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * Ensure URL has proper base URL
-   * Migrated from utils.ts
-   */
-  static ensureFullUrl(url: string, baseUrl: string): string {
-    // Skip mailto, tel, and anchor links
-    const mailtoPrefix = "mailto:";
-    const telPrefix = "tel:";
-    const anchorPrefix = "#";
-
-    if (
-      url.startsWith(mailtoPrefix) ||
-      url.startsWith(telPrefix) ||
-      url.startsWith(anchorPrefix)
-    ) {
-      return url;
-    }
-
-    // If already a full URL, return as is
-    const httpPrefix = "http://";
-    const httpsPrefix = "https://";
-    const slashPrefix = "/";
-
-    if (url.startsWith(httpPrefix) || url.startsWith(httpsPrefix)) {
-      return url;
-    }
-
-    // If relative URL, prepend base URL
-    if (url.startsWith(slashPrefix)) {
-      return `${baseUrl}${url}`;
-    }
-
-    return url;
-  }
-
-  /**
-   * Generate engagement tracking API URL
-   * Migrated from utils.ts
-   */
-  static generateEngagementTrackingApiUrl(
-    baseUrl: string,
-    locale: CountryLanguage,
-    params: {
-      id: string;
-      campaignId?: string;
-      stage?: string;
-      source?: string;
-      url: string;
-    },
-  ): string {
-    const apiUrl = new URL(
-      `/api/${locale}/v1/leads/tracking/engagement`,
-      baseUrl,
-    );
-
-    apiUrl.searchParams.set("id", params.id);
-    if (params.campaignId) {
-      apiUrl.searchParams.set("campaignId", params.campaignId);
-    }
-    if (params.stage) {
-      apiUrl.searchParams.set("stage", params.stage);
-    }
-    apiUrl.searchParams.set("source", params.source || "email");
-    apiUrl.searchParams.set("url", params.url);
-
-    return apiUrl.toString();
   }
 }

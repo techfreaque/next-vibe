@@ -6,7 +6,14 @@
 /* eslint-disable i18next/no-literal-string */
 
 import { execSync } from "node:child_process";
-import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
+import { dirname } from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
@@ -100,6 +107,10 @@ export function killPreviousInstance(
  * Write current process PID to the given PID file
  */
 export function writePidFile(pidFile: string, logger: EndpointLogger): void {
+  const dir = dirname(pidFile);
+  if (!existsSync(dir)) {
+    mkdirSync(dir, { recursive: true });
+  }
   writeFileSync(pidFile, process.pid.toString(), "utf-8");
   logger.debug("PID file written", { pid: process.pid, path: pidFile });
 }

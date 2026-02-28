@@ -54,6 +54,7 @@ export function validateData<TSchema extends z.ZodType>(
         errorConstructor: result.error?.constructor?.name,
         hasIssues: "issues" in result.error,
         fullError: JSON.stringify(result.error, null, 2),
+        receivedData: JSON.stringify(data)?.slice(0, 500),
       });
       return fail({
         message: sharedT("errorTypes.validation_error"),
