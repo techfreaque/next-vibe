@@ -14,17 +14,24 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 
 import { InkWidgetRenderer } from "../../../renderers/cli/CliWidgetRenderer";
-import type { FieldUsageConfig, InkWidgetProps } from "../../_shared/cli-types";
+import type {
+  FieldUsageConfig,
+  InkWidgetProps,
+  InkWidgetRendererProps,
+} from "../../_shared/cli-types";
 import { withValueNonStrict } from "../../_shared/field-helpers";
 import {
+  hasChild,
   hasChildren,
   isObject,
   isResponseField,
 } from "../../_shared/type-guards";
 import type {
+  AnyChildrenConstrain,
   ArrayChildConstraint,
   ConstrainedChildUsage,
   ObjectChildrenConstraint,
+  SchemaTypes,
   UnionObjectWidgetConfigConstrain,
 } from "../../_shared/types";
 import type {
@@ -46,6 +53,35 @@ function getChildValue(
     return null;
   }
   return value[key];
+}
+
+/**
+ * Dispatch boundary helpers for container widgets.
+ * Container widgets render heterogeneous children whose Zod output types
+ * are structurally compatible with WidgetData but can't be proven at the
+ * generic level. These helpers bridge the gap (same pattern as React
+ * MultiWidgetRenderer which uses `as never`).
+ */
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- dispatch boundary coercion
+function coerceToWidgetData(value: any): WidgetData {
+  return value;
+}
+
+function toWidgetDataArray(value: WidgetData): WidgetData[] {
+  return Array.isArray(value) ? value : [];
+}
+
+function dispatchChildField(
+  child: AnyChildrenConstrain<string, FieldUsageConfig>,
+  item: WidgetData,
+  parentValue: WidgetData,
+): InkWidgetRendererProps["field"] {
+  const augmented = withValueNonStrict(child, item, parentValue);
+  // Dispatch boundary: the child template + value is structurally a DispatchField
+  // but TypeScript can't prove it across the container generic boundary.
+  // The switch-discriminant in CliWidgetRenderer guarantees runtime safety.
+  return augmented as InkWidgetRendererProps["field"];
 }
 
 export function ContainerWidgetInk<
@@ -107,8 +143,46 @@ export function ContainerWidgetInk<
   const description =
     showLabels && descriptionKey ? t(descriptionKey) : undefined;
 
-  // Container can have children (object), child (array), or variants (union)
-  // Only object containers with children are rendered here
+  // Container can have children (object) or child (array)
+  // Handle array containers — render each item using the child template
+  const structField: { schemaType: SchemaTypes } = field;
+  if (hasChild(structField)) {
+    const parentValue = coerceToWidgetData(field.value);
+    const items = toWidgetDataArray(parentValue);
+    if (items.length === 0) {
+      return <></>;
+    }
+
+    return (
+      <Box flexDirection="column">
+        {title && (
+          <Box marginBottom={1}>
+            <Text bold>{title}</Text>
+          </Box>
+        )}
+        {description && (
+          <Box marginBottom={1}>
+            <Text dimColor>{description}</Text>
+          </Box>
+        )}
+        {items.map((item: WidgetData, index: number) => {
+          const itemFieldName = fieldName
+            ? `${fieldName}[${String(index)}]`
+            : `[${String(index)}]`;
+          return (
+            <Box key={String(index)} marginBottom={1}>
+              <InkWidgetRenderer
+                field={dispatchChildField(structField.child, item, parentValue)}
+                fieldName={itemFieldName}
+              />
+            </Box>
+          );
+        })}
+      </Box>
+    );
+  }
+
+  // Object containers with children
   if (!hasChildren(field)) {
     return <></>;
   }

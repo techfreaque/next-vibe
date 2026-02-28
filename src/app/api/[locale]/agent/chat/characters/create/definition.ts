@@ -59,6 +59,15 @@ const { POST } = createEndpoint({
 
   title: "post.title" as const,
   description: "post.description" as const,
+  dynamicTitle: ({ request }) => {
+    if (request?.name && typeof request.name === "string") {
+      return {
+        message: "post.dynamicTitle" as const,
+        messageParams: { name: request.name },
+      };
+    }
+    return undefined;
+  },
   icon: "sparkle" as const,
   category: "app.endpointCategories.chat",
   tags: ["tags.characters" as const],

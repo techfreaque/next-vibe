@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   category: "Informacja",
   get: {
     title: "Wyszukaj w sieci",
+    dynamicTitle: "Search: {{query}}",
     description:
       "Przeszukuj internet w poszukiwaniu aktualnych informacji, wiadomości, faktów lub ostatnich wydarzeń. Użyj tego, gdy potrzebujesz aktualnych informacji lub chcesz zweryfikować fakty.",
     form: {

@@ -10,9 +10,11 @@ import { useState } from "react";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { DateWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import {
+  useInkWidgetFieldFocused,
   useInkWidgetForm,
   useInkWidgetLocale,
   useInkWidgetResponse,
+  useInkWidgetResponseOnly,
   useInkWidgetShowLabels,
   useInkWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
@@ -40,7 +42,9 @@ export function TimeFieldWidgetInk<
   const locale = useInkWidgetLocale();
   const form = useInkWidgetForm();
   const response = useInkWidgetResponse();
+  const responseOnly = useInkWidgetResponseOnly();
   const showLabels = useInkWidgetShowLabels();
+  const isFocused = useInkWidgetFieldFocused(fieldName);
   const [inputValue, setInputValue] = useState(
     field.value instanceof Date
       ? `${String(field.value.getHours()).padStart(2, "0")}:${String(field.value.getMinutes()).padStart(2, "0")}`
@@ -50,7 +54,7 @@ export function TimeFieldWidgetInk<
   const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
   // Response mode - just display the value
-  if (response) {
+  if (response && responseOnly) {
     const displayValue =
       field.value instanceof Date
         ? `${String(field.value.getHours()).padStart(2, "0")}:${String(field.value.getMinutes()).padStart(2, "0")}`
@@ -112,6 +116,7 @@ export function TimeFieldWidgetInk<
         </Text>
         <TextInput
           value={inputValue}
+          focus={isFocused}
           onChange={(newValue) => {
             setInputValue(newValue);
             const [hours, minutes] = newValue.split(":").map(Number);

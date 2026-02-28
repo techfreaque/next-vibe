@@ -1,13 +1,14 @@
 /**
  * Ink Endpoint Page
  *
- * Terminal UI wrapper for endpoint rendering
- * Mirrors React End points Page but for Ink (terminal UI)
+ * Thin wrapper around InkEndpointRenderer for interactive terminal UI.
+ * Uses the exact same widget rendering system as non-interactive CLI,
+ * but with real Ink render() instead of fastRenderToString().
  */
 
-import { Box, render, Text } from "ink";
+import { Box, render, Text, useApp, useInput } from "ink";
 import type { JSX } from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import { parseError } from "@/app/api/[locale]/shared/utils";
@@ -42,14 +43,91 @@ export interface InkEndpointPageProps<
   user: JwtPayloadType;
   /** Enable debug logging */
   debug?: boolean;
-  /** Submit handler */
+  /** Submit handler — executes the endpoint */
   onSubmit?: (data: WidgetData) => Promise<ResponseType<WidgetData>>;
-  /** Initial data to prefill */
+  /** Initial data from CLI args to prefill request fields */
   initialData?: WidgetData;
 }
 
 /**
+ * Check if a GET endpoint has auto-fetch enabled (default: true).
+ * Endpoints like search set options.queryOptions.enabled = false to wait for user input.
+ */
+function isAutoFetchEnabled(endpoint: CreateApiEndpointAny): boolean {
+  if (
+    "options" in endpoint &&
+    endpoint.options &&
+    typeof endpoint.options === "object" &&
+    "queryOptions" in endpoint.options &&
+    endpoint.options.queryOptions &&
+    typeof endpoint.options.queryOptions === "object" &&
+    "enabled" in endpoint.options.queryOptions &&
+    endpoint.options.queryOptions.enabled === false
+  ) {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Build an example CLI command string from endpoint and current form values.
+ * Shows `vibe <command> --key value` for each non-empty form field.
+ */
+function buildExampleCommand(
+  endpoint: CreateApiEndpointAny,
+  formValues: Record<string, WidgetData>,
+): string {
+  // Use first alias if available, otherwise join path with spaces
+  const command =
+    endpoint.aliases && endpoint.aliases.length > 0
+      ? endpoint.aliases[0]
+      : endpoint.path.join(" ");
+
+  const firstArgKey =
+    endpoint.cli && "firstCliArgKey" in endpoint.cli
+      ? endpoint.cli.firstCliArgKey
+      : undefined;
+
+  const parts: string[] = [`vibe ${command}`];
+
+  for (const [key, value] of Object.entries(formValues)) {
+    if (value === undefined || value === null || value === "") {
+      continue;
+    }
+
+    const strValue = String(value);
+
+    // First positional arg doesn't need a flag
+    if (key === firstArgKey) {
+      parts.push(strValue.includes(" ") ? `"${strValue}"` : strValue);
+      continue;
+    }
+
+    // Convert camelCase to kebab-case for CLI flags
+    const kebabKey = key.replace(
+      /[A-Z]/g,
+      (match) => `-${match.toLowerCase()}`,
+    );
+
+    if (typeof value === "boolean") {
+      if (value) {
+        parts.push(`--${kebabKey}`);
+      }
+    } else {
+      parts.push(
+        `--${kebabKey} ${strValue.includes(" ") ? `"${strValue}"` : strValue}`,
+      );
+    }
+  }
+
+  return parts.join(" ");
+}
+
+/**
  * Ink Endpoint Page Component
+ *
+ * Uses InkEndpointRenderer (same widget system as non-interactive CLI).
+ * Only adds: endpoint header, submit execution, quit handling, auto-fetch.
  */
 export function InkEndpointPage<
   T extends {
@@ -67,13 +145,14 @@ export function InkEndpointPage<
   onSubmit,
   initialData,
 }: InkEndpointPageProps<T>): JSX.Element {
-  // State management - must be before early return
+  const { exit } = useApp();
+
   const [response, setResponse] = useState<
     ResponseType<WidgetData> | undefined
   >(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formValues, setFormValues] = useState<Record<string, WidgetData>>({});
 
-  // Determine active endpoint
   const activeEndpoint =
     endpoint.GET ??
     endpoint.POST ??
@@ -81,16 +160,15 @@ export function InkEndpointPage<
     endpoint.PATCH ??
     endpoint.DELETE;
 
-  // Logger
-  const logger = createEndpointLogger(debug, Date.now(), locale);
+  // Stable logger — useRef so it doesn't cause re-renders
+  const loggerRef = useRef(createEndpointLogger(debug, Date.now(), locale));
+  const logger = loggerRef.current;
 
-  // Handle form submission - must be before early return
   const handleSubmit = useCallback(
     async (data: WidgetData): Promise<void> => {
       if (!onSubmit) {
         return;
       }
-
       setIsSubmitting(true);
       try {
         const result = await onSubmit(data);
@@ -102,6 +180,33 @@ export function InkEndpointPage<
       }
     },
     [onSubmit, logger],
+  );
+
+  // Auto-fetch: GET endpoints auto-submit unless queryOptions.enabled === false
+  const shouldAutoFetch = !!endpoint.GET && isAutoFetchEnabled(endpoint.GET);
+  const hasAutoFetched = useRef(false);
+  useEffect(() => {
+    if (shouldAutoFetch && !hasAutoFetched.current && onSubmit && !response) {
+      hasAutoFetched.current = true;
+      void handleSubmit(initialData ?? {});
+    }
+  }, [shouldAutoFetch, onSubmit, response, handleSubmit, initialData]);
+
+  // Quit handler
+  useInput(
+    (input, key) => {
+      if (input === "q" || key.escape) {
+        exit();
+      }
+    },
+    { isActive: !isSubmitting },
+  );
+
+  // Example CLI command based on current form input — must be before early return
+  const exampleCommand = useMemo(
+    () =>
+      activeEndpoint ? buildExampleCommand(activeEndpoint, formValues) : "",
+    [activeEndpoint, formValues],
   );
 
   if (!activeEndpoint) {
@@ -117,21 +222,49 @@ export function InkEndpointPage<
   const { t } = activeEndpoint.scopedTranslation.scopedT(locale);
   const { t: cliT } = cliScopedTranslation.scopedT(locale);
 
+  // Endpoint info
+  const title = t(activeEndpoint.title);
+  const description = t(activeEndpoint.description);
+  const method = activeEndpoint.method;
+
+  // Response data for widgets — mirrors React EndpointsPage pattern
   const responseData = response?.success === true ? response.data : initialData;
 
   return (
-    <Box flexDirection="column" paddingX={2} paddingY={1}>
-      {/* Request - always visible */}
+    <Box flexDirection="column" paddingX={1} paddingY={1}>
+      {/* Endpoint header */}
       <Box
         borderStyle="round"
         borderColor="blue"
         paddingX={1}
-        paddingY={1}
         flexDirection="column"
       >
-        <Text bold color="blue">
-          {cliT("request")}
-        </Text>
+        <Box>
+          <Text bold color="cyan">
+            {method}{" "}
+          </Text>
+          <Text bold>{title}</Text>
+        </Box>
+        <Text dimColor>{description}</Text>
+        <Box marginTop={1}>
+          <Text dimColor>
+            {cliT(
+              "vibe.endpoints.renderers.cliUi.widgets.common.hints.dollarPrompt",
+            )}
+          </Text>
+          <Text color="yellow">{exampleCommand}</Text>
+        </Box>
+      </Box>
+
+      {/* Endpoint fields — rendered by the widget system */}
+      <Box
+        borderStyle="round"
+        borderColor={response?.success === false ? "red" : "green"}
+        paddingX={1}
+        paddingY={1}
+        marginTop={1}
+        flexDirection="column"
+      >
         <InkEndpointRenderer
           endpoint={activeEndpoint}
           locale={locale}
@@ -140,55 +273,51 @@ export function InkEndpointPage<
           logger={logger}
           user={user}
           platform={Platform.CLI}
-          onSubmit={(): void => {
-            void handleSubmit(responseData ?? {});
+          response={response}
+          onFormChange={setFormValues}
+          onSubmit={(data): void => {
+            void handleSubmit(data as WidgetData);
           }}
-          response={undefined}
         />
       </Box>
 
-      {/* Response - shown after submit */}
-      {response && (
-        <Box
-          marginTop={1}
-          borderStyle="round"
-          borderColor={response.success ? "green" : "red"}
-          paddingX={1}
-          paddingY={1}
-          flexDirection="column"
-        >
-          <Text bold color={response.success ? "green" : "red"}>
-            {response.success
-              ? cliT("response.success")
-              : cliT("response.error")}
+      {/* Submitting indicator */}
+      {isSubmitting && (
+        <Box marginTop={1}>
+          <Text color="yellow">
+            {cliT(
+              "vibe.endpoints.renderers.cliUi.widgets.common.hints.executing",
+            )}
           </Text>
-          {response.success && (
-            <InkEndpointRenderer
-              endpoint={activeEndpoint}
-              locale={locale}
-              data={response.data}
-              isSubmitting={false}
-              logger={logger}
-              user={user}
-              platform={Platform.CLI}
-              response={response}
-            />
-          )}
-          {!response.success && (
-            <Text color="red">
-              {t(response.message, response.messageParams)}
-            </Text>
-          )}
         </Box>
       )}
+
+      {/* Error display */}
+      {response && !response.success && (
+        <Box marginTop={1}>
+          <Text color="red">{t(response.message, response.messageParams)}</Text>
+        </Box>
+      )}
+
+      {/* Footer */}
+      <Box marginTop={1}>
+        <Text dimColor>
+          {response
+            ? `${cliT("response.success")} | enter: re-submit | q/esc: exit`
+            : cliT(
+                "vibe.endpoints.renderers.cliUi.widgets.common.hints.tabNextField",
+              )}
+        </Text>
+      </Box>
     </Box>
   );
 }
 
 /**
- * Render Ink Endpoint Page to terminal
+ * Render interactive endpoint page with real Ink.
+ * Same widget rendering system as non-interactive CLI, but with live terminal UI.
  */
-export function renderInkEndpointPage<
+export async function renderInkEndpointPage<
   T extends {
     GET?: CreateApiEndpointAny;
     POST?: CreateApiEndpointAny;
@@ -196,6 +325,7 @@ export function renderInkEndpointPage<
     PATCH?: CreateApiEndpointAny;
     DELETE?: CreateApiEndpointAny;
   },
->(props: InkEndpointPageProps<T>): void {
-  render(<InkEndpointPage {...props} />);
+>(props: InkEndpointPageProps<T>): Promise<void> {
+  const instance = render(<InkEndpointPage {...props} />);
+  await instance.waitUntilExit();
 }

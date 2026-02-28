@@ -11,9 +11,11 @@ import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/ap
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { DateWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import {
+  useInkWidgetFieldFocused,
   useInkWidgetForm,
   useInkWidgetLocale,
   useInkWidgetResponse,
+  useInkWidgetResponseOnly,
   useInkWidgetShowLabels,
   useInkWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
@@ -40,13 +42,15 @@ export function DateFieldWidgetInk<
   const locale = useInkWidgetLocale();
   const form = useInkWidgetForm();
   const response = useInkWidgetResponse();
+  const responseOnly = useInkWidgetResponseOnly();
   const showLabels = useInkWidgetShowLabels();
+  const isFocused = useInkWidgetFieldFocused(fieldName);
   const [inputValue, setInputValue] = useState(String(field.value || ""));
 
   const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
   // Response mode - just display the value
-  if (response) {
+  if (response && responseOnly) {
     const displayValue =
       field.value instanceof Date
         ? field.value.toISOString().split("T")[0]
@@ -108,6 +112,7 @@ export function DateFieldWidgetInk<
         </Text>
         <TextInput
           value={inputValue}
+          focus={isFocused}
           onChange={(newValue) => {
             setInputValue(newValue);
             const date = new Date(newValue);

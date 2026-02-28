@@ -10,6 +10,7 @@ export const translations = {
 
   get: {
     title: "Get Character",
+    dynamicTitle: "Character: {{name}}",
     description: "Retrieve a specific character by ID",
     container: {
       title: "Character Details",
@@ -137,6 +138,7 @@ export const translations = {
   },
   patch: {
     title: "Update Character",
+    dynamicTitle: "Edit: {{name}}",
     container: {
       title: "Update Character",
       description: "Modify an existing custom character",
@@ -299,6 +301,7 @@ export const translations = {
   },
   delete: {
     title: "Delete Character",
+    dynamicTitle: "Delete: {{name}}",
     description: "Delete a custom character",
     container: {
       title: "Delete Character",

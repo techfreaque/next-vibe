@@ -27,10 +27,13 @@ import {
 import helpEndpoints from "@/app/api/[locale]/system/help/definition";
 import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
+import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
+import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
+  useWidgetDisabled,
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
@@ -56,17 +59,25 @@ interface CustomWidgetProps {
   fieldName: string;
 }
 
-export function ExecuteToolWidget({
-  // oxlint-disable-next-line no-unused-vars
-  field,
-}: CustomWidgetProps): JSX.Element {
+export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
   const form = useWidgetForm<typeof definition.POST>();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const t = useWidgetTranslation<typeof definition.POST>();
+  const disabled = useWidgetDisabled();
 
-  const toolName = form?.watch("toolName") ?? "";
+  // Get values from form (interactive mode) or field.value (read-only tool call display)
+  const fieldValue =
+    field.value &&
+    typeof field.value === "object" &&
+    !Array.isArray(field.value)
+      ? (field.value as Record<string, WidgetData>)
+      : null;
+  const toolName =
+    form?.watch("toolName") ??
+    (typeof fieldValue?.toolName === "string" ? fieldValue.toolName : "");
+  const resultData = fieldValue?.result;
 
   // Fetch available tools from help endpoint (role-based filtering)
   const helpState = useEndpoint(
@@ -101,9 +112,16 @@ export function ExecuteToolWidget({
     });
   }, [helpState?.read?.response]);
 
-  const inputData = form?.watch("input") as
+  const formInputData = form?.watch("input") as
     | Record<string, WidgetData>
     | undefined;
+  const inputData =
+    formInputData ??
+    (fieldValue?.input &&
+    typeof fieldValue.input === "object" &&
+    !Array.isArray(fieldValue.input)
+      ? (fieldValue.input as Record<string, WidgetData>)
+      : undefined);
 
   const [resolvedEndpoint, setResolvedEndpoint] =
     useState<CreateApiEndpointAny | null>(null);
@@ -253,13 +271,27 @@ export function ExecuteToolWidget({
         </P>
       )}
 
-      {resolvedEndpoint && method && (
+      {resolvedEndpoint && method && !resultData && (
         <EndpointsPage
           endpoint={{ [method]: resolvedEndpoint }}
           locale={locale}
           user={user}
           endpointOptions={endpointOptions}
         />
+      )}
+
+      {/* Response mode: render the target endpoint with result data (read-only) */}
+      {resolvedEndpoint && resultData && (
+        <NavigationStackProvider>
+          <EndpointRenderer
+            endpoint={resolvedEndpoint}
+            locale={locale}
+            user={user}
+            logger={logger}
+            data={resultData as WidgetData}
+            disabled={disabled}
+          />
+        </NavigationStackProvider>
       )}
     </Div>
   );

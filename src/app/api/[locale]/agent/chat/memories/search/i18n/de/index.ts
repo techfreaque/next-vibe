@@ -9,6 +9,8 @@ export const translations: typeof enTranslations = {
   search: {
     get: {
       title: "Erinnerungen durchsuchen",
+      dynamicTitle: "Memory Search: {{query}}",
+      dynamicTitleWithCount: "Memory Search: {{query}} ({{count}})",
       description:
         "Durchsucht Erinnerungen nach Textinhalt. Gibt passende Erinnerungen mit Inhaltsausschnitten zurück. Unterstützt Filterung nach Tags und Einbeziehung archivierter Erinnerungen.",
       container: {

@@ -492,7 +492,6 @@ export class TypecheckRepositoryImpl {
                 file: configResult.configPath,
                 severity: "error" as const,
                 message: configResult.message,
-                type: "type" as const,
               },
             ],
             files: [
@@ -503,15 +502,7 @@ export class TypecheckRepositoryImpl {
                 total: 1,
               },
             ],
-            summary: {
-              totalIssues: 1,
-              totalFiles: 1,
-              totalErrors: 1,
-              displayedIssues: 1,
-              displayedFiles: 1,
-              currentPage: 1,
-              totalPages: 1,
-            },
+            totalIssues: 1,
           });
         }
         checkConfig = configResult.config;
@@ -534,15 +525,7 @@ export class TypecheckRepositoryImpl {
         return success({
           items: [],
           files: [],
-          summary: {
-            totalIssues: 0,
-            totalFiles: 0,
-            totalErrors: 0,
-            displayedIssues: 0,
-            displayedFiles: 0,
-            currentPage: 1,
-            totalPages: 1,
-          },
+          totalIssues: 0,
         });
       }
 
@@ -730,7 +713,7 @@ export class TypecheckRepositoryImpl {
       return {
         items: undefined,
         files,
-        summary,
+        ...summary,
       };
     }
 
@@ -771,7 +754,7 @@ export class TypecheckRepositoryImpl {
     return {
       items: data.summaryOnly ? undefined : paginatedIssues,
       files,
-      summary,
+      ...summary,
     };
   }
 

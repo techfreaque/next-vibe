@@ -12,12 +12,13 @@
  * - NO separate request/response modes - just render everything
  */
 
-import { Box, Text } from "ink";
+import { Box, Text, useInput } from "ink";
 import type { JSX } from "react";
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Path } from "react-hook-form";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import { extractSchemaDefaults } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -71,6 +72,8 @@ export interface InkEndpointRendererProps<
   response?: ResponseType<WidgetData>;
   /** Called when all Suspense boundaries have resolved */
   onRenderComplete?: () => void;
+  /** Called when form values change (for parent to track current input) */
+  onFormChange?: (values: Record<string, WidgetData>) => void;
   /** Whether this is result-formatter mode (only show response fields) vs interactive mode (show all fields) */
   responseOnly?: boolean;
   /** Platform identifier for widget rendering context */
@@ -94,20 +97,67 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
   onSubmit,
   response,
   onRenderComplete,
+  onFormChange,
   responseOnly = false,
   platform,
 }: InkEndpointRendererProps<TEndpoint>): JSX.Element {
-  // Form state management
-  const [formValues, setFormValues] = useState<
-    Partial<TEndpoint["types"]["RequestOutput"]>
-  >({});
+  // Stable ref for onFormChange to avoid re-render cycles
+  const onFormChangeRef = useRef(onFormChange);
+  onFormChangeRef.current = onFormChange;
+
+  // Extract schema defaults (same as React's useApiForm) — stable, only depends on schema
+  const schemaDefaults = useMemo(() => {
+    const extracted = extractSchemaDefaults<
+      TEndpoint["types"]["RequestOutput"]
+    >(endpoint.requestSchema, logger, "", true);
+    if (!extracted) {
+      return {} as Partial<TEndpoint["types"]["RequestOutput"]>;
+    }
+    // Validate through Zod parse to apply transforms
+    const parsed = endpoint.requestSchema.safeParse(extracted);
+    return (parsed.success ? parsed.data : extracted) as Partial<
+      TEndpoint["types"]["RequestOutput"]
+    >;
+  }, [endpoint.requestSchema, logger]);
+
+  // Merge defaults: schema defaults < endpoint formOptions defaults < data prop
+  const mergedDefaults = useMemo(() => {
+    const endpointDefaults =
+      endpoint.options?.formOptions &&
+      typeof endpoint.options.formOptions === "object" &&
+      "defaultValues" in endpoint.options.formOptions
+        ? endpoint.options.formOptions.defaultValues
+        : {};
+    return {
+      ...schemaDefaults,
+      ...endpointDefaults,
+      ...(data && typeof data === "object" && !Array.isArray(data) ? data : {}),
+    } as Partial<TEndpoint["types"]["RequestOutput"]>;
+  }, [schemaDefaults, endpoint.options, data]);
+
+  // Form state management — initialized with merged defaults
+  const [formValues, setFormValues] =
+    useState<Partial<TEndpoint["types"]["RequestOutput"]>>(mergedDefaults);
   const [formErrors] = useState<Record<string, string>>({});
+
+  // Notify parent of initial defaults (once on mount)
+  const hasNotifiedInitial = useRef(false);
+  useEffect(() => {
+    if (!hasNotifiedInitial.current) {
+      hasNotifiedInitial.current = true;
+      onFormChangeRef.current?.(mergedDefaults);
+    }
+  }, [mergedDefaults]);
 
   // Create form state object
   const form: InkFormState<TEndpoint["types"]["RequestOutput"]> = {
     values: formValues,
     setValue: <TValue,>(name: string, value: TValue) => {
-      setFormValues((prev) => ({ ...prev, [name]: value }));
+      setFormValues((prev) => {
+        const next = { ...prev, [name]: value };
+        onFormChangeRef.current?.(next);
+        return next;
+      });
     },
     getValue: <TValue,>(name: string): TValue | undefined => {
       const key = name as keyof typeof formValues;
@@ -127,6 +177,53 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     }
   };
 
+  // Focus management — extract request field names for tab navigation
+  // Keep request fields focusable even after response (for re-filtering/re-submitting)
+  const requestFieldNames = useMemo(() => {
+    if (responseOnly) {
+      return [];
+    }
+    const fields = extractAllFields(endpoint.fields);
+    return fields
+      .filter(([, field]) => !isResponseField(field))
+      .map(([fieldName]) => fieldName);
+  }, [endpoint.fields, responseOnly]);
+
+  const [focusIndex, setFocusIndex] = useState(0);
+  const focusedField =
+    requestFieldNames.length > 0
+      ? requestFieldNames[focusIndex % requestFieldNames.length]
+      : undefined;
+
+  const moveFocus = useCallback(
+    (direction: "next" | "prev") => {
+      if (requestFieldNames.length === 0) {
+        return;
+      }
+      setFocusIndex((prev) => {
+        if (direction === "next") {
+          return (prev + 1) % requestFieldNames.length;
+        }
+        return (prev - 1 + requestFieldNames.length) % requestFieldNames.length;
+      });
+    },
+    [requestFieldNames],
+  );
+
+  // Tab / shift-tab navigation between fields, Enter to submit
+  useInput(
+    // eslint-disable-next-line no-unused-vars -- useInput requires (input, key) signature
+    (_, key) => {
+      if (key.tab) {
+        moveFocus(key.shift ? "prev" : "next");
+      }
+      if (key.return && onSubmit && !isSubmitting) {
+        handleSubmit();
+      }
+    },
+    { isActive: requestFieldNames.length > 0 && !responseOnly },
+  );
+
   // Create render context with CLI-specific form state
   const context: InkWidgetContext<TEndpoint> = {
     locale,
@@ -145,6 +242,8 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     form,
     onSubmit: handleSubmit,
     isSubmitting,
+    focusedField,
+    moveFocus,
   };
 
   // Check if root is a container/array widget that should render directly
@@ -177,7 +276,7 @@ export function InkEndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
       <InkWidgetContextProvider context={context}>
         <Box flexDirection="column">
           <InkWidgetRenderer
-            fieldName={"root" as Path<TEndpoint["types"]["RequestOutput"]>}
+            fieldName={"" as Path<TEndpoint["types"]["RequestOutput"]>}
             field={
               withValueNonStrict(endpoint.fields, data, null) as DispatchField<
                 string,

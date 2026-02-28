@@ -114,6 +114,14 @@ export const translations: typeof enTranslations = {
               errors: "Błędy",
               warning: "Ostrzeżenie",
               warnings: "Ostrzeżenia",
+              hints: {
+                spaceToToggle: "(spacja aby przełączyć)",
+                arrowsToChange: "(←/→ aby zmienić)",
+                dollarPrompt: "$ ",
+                executing: "Wykonywanie...",
+                tabNextField:
+                  "Tab: następne pole | Enter: wyślij | q/Esc: wyjdź",
+              },
             },
             pagination: {
               notImplemented:
@@ -126,6 +134,23 @@ export const translations: typeof enTranslations = {
     interactive: {
       welcome: "Witamy w trybie interaktywnym Vibe",
       goodbye: "Do widzenia!",
+      help: {
+        selectCategory: "Wybierz kategorię aby przeglądać narzędzia",
+        selectTool: "Wybierz narzędzie aby zobaczyć szczegóły",
+        category: "Kategoria  ",
+        method: "Metoda  ",
+        credits: "Kredyty  ",
+        callAs: "Wywołaj  ",
+        fields: "Pola",
+        hintsNavSelect: "strzałki: nawiguj | Enter: wybierz | q: wyjdź",
+        hintsNavSelectBack:
+          "strzałki: nawiguj | Enter: wybierz | Esc: wróć | q: wyjdź",
+        hintsExecuteBack: "Enter: wykonaj | Esc: wróć | q: wyjdź",
+        hintsBack: "Enter/Esc: wróć | q: wyjdź",
+        success: "Sukces",
+        error: "Błąd",
+        result: "Wynik",
+      },
       navigation: {
         rootName: "Katalog główny",
         directoryIcon: "📁",

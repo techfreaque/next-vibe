@@ -2,6 +2,7 @@ export const translations = {
   executeTool: {
     post: {
       title: "Execute Tool",
+      dynamicTitle: "Execute: {{toolName}}",
       description:
         "Execute any registered endpoint by name. Pass the tool's name and its input parameters. The target route enforces its own authentication — this endpoint is a universal dispatcher for MCP, AI agents, and automation.",
       container: {

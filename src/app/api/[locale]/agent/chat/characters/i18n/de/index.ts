@@ -817,6 +817,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Charaktere auflisten",
+    dynamicTitle: "Charaktere ({{count}})",
     description:
       "Alle verfügbaren Charaktere abrufen (Standard + benutzerdefiniert)",
     fields: {
@@ -967,6 +968,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Charakter erstellen",
+    dynamicTitle: "Erstellen: {{name}}",
     description: "Einen neuen benutzerdefinierten Charakter erstellen",
     form: {
       title: "Erstellen Sie Ihren benutzerdefinierten Charakter",

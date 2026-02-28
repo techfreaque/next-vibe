@@ -819,6 +819,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Lista postaci",
+    dynamicTitle: "Postacie ({{count}})",
     description:
       "Pobierz wszystkie dostępne postaciy (domyślne + niestandardowe)",
     fields: {
@@ -966,6 +967,7 @@ export const translations: typeof enTranslations = {
   },
   post: {
     title: "Utwórz postacię",
+    dynamicTitle: "Utwórz: {{name}}",
     description: "Utwórz nową niestandardową postacię",
     form: {
       title: "Utwórz swoją niestandardową postać",

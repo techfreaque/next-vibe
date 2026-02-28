@@ -44,6 +44,10 @@ export type InkWidgetContext<TEndpoint extends CreateApiEndpointAny> =
     form?: InkFormState<TEndpoint["types"]["RequestOutput"]>;
     onSubmit?: () => void;
     isSubmitting?: boolean;
+    /** Currently focused field name — only this field should accept input */
+    focusedField?: string;
+    /** Move focus to the next/previous field */
+    moveFocus?: (direction: "next" | "prev") => void;
   };
 
 /**

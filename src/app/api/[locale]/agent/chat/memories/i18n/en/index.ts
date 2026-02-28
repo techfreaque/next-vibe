@@ -18,6 +18,7 @@ export const translations = {
   },
   get: {
     title: "List Memories",
+    dynamicTitle: "Memories ({{count}})",
     description: "Retrieves all memories for the current user",
     container: {
       title: "Memories",

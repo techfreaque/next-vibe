@@ -19,6 +19,7 @@ export const translations: typeof enTranslations = {
   },
   get: {
     title: "Erinnerungen auflisten",
+    dynamicTitle: "Memories ({{count}})",
     description: "Ruft alle Erinnerungen für den aktuellen Benutzer ab",
     container: {
       title: "Erinnerungen",

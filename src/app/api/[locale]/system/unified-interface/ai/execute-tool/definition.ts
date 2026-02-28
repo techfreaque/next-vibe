@@ -45,6 +45,15 @@ const { POST } = createEndpoint({
   ],
   title: "executeTool.post.title" as const,
   description: "executeTool.post.description" as const,
+  dynamicTitle: ({ request }) => {
+    if (request?.toolName) {
+      return {
+        message: "executeTool.post.dynamicTitle" as const,
+        messageParams: { toolName: request.toolName },
+      };
+    }
+    return undefined;
+  },
   icon: "zap",
   category: "app.endpointCategories.system",
   tags: ["tools.get.tags.tools" as const],

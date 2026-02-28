@@ -11,10 +11,10 @@ import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 /** PID file for production server (vibe start) */
-export const VIBE_START_PID_FILE = ".vibe-start.pid";
+export const VIBE_START_PID_FILE = ".tmp/.vibe-start.pid";
 
 /** PID file for development server (vibe dev) */
-export const VIBE_DEV_PID_FILE = ".vibe-dev.pid";
+export const VIBE_DEV_PID_FILE = ".tmp/.vibe-dev.pid";
 
 /**
  * Check if a process with the given PID is still running

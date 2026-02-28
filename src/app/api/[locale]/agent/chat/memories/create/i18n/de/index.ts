@@ -5,6 +5,7 @@ export const translations: typeof enTranslations = {
 
   post: {
     title: "Erinnerung hinzufügen",
+    dynamicTitle: "Remember: {{content}}",
     description: "Erstellt eine neue Erinnerung für den aktuellen Benutzer",
     container: {
       title: "Erinnerung hinzufügen",

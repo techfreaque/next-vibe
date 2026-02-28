@@ -75,6 +75,15 @@ const { DELETE } = createEndpoint({
 
   title: "delete.title" as const,
   description: "delete.description" as const,
+  dynamicTitle: ({ response }) => {
+    if (response?.name && typeof response.name === "string") {
+      return {
+        message: "delete.dynamicTitle" as const,
+        messageParams: { name: response.name },
+      };
+    }
+    return undefined;
+  },
   icon: "trash" as const,
   category: "app.endpointCategories.chat",
   tags: ["tags.characters" as const],
@@ -265,6 +274,15 @@ const { PATCH } = createEndpoint({
 
   title: "patch.title" as const,
   description: "patch.container.description" as const,
+  dynamicTitle: ({ request }) => {
+    if (request?.name && typeof request.name === "string") {
+      return {
+        message: "patch.dynamicTitle" as const,
+        messageParams: { name: request.name },
+      };
+    }
+    return undefined;
+  },
   icon: "sparkles" as const,
   category: "app.endpointCategories.chat",
   tags: ["tags.characters" as const],
@@ -662,6 +680,15 @@ const { GET } = createEndpoint({
 
   title: "get.title" as const,
   description: "get.description" as const,
+  dynamicTitle: ({ response }) => {
+    if (response?.name && typeof response.name === "string") {
+      return {
+        message: "get.dynamicTitle" as const,
+        messageParams: { name: response.name },
+      };
+    }
+    return undefined;
+  },
   icon: "sparkles" as const,
   category: "app.endpointCategories.chat",
   tags: ["tags.characters" as const],

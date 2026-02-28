@@ -99,8 +99,8 @@ export class RebuildRepositoryImpl implements RebuildRepositoryInterface {
           locale,
         );
 
-        if (checkResult.success && checkResult.data.summary) {
-          const { totalIssues, totalErrors } = checkResult.data.summary;
+        if (checkResult.success) {
+          const { totalIssues, totalErrors } = checkResult.data;
           const errCount = totalErrors ?? totalIssues;
           const warnCount = totalIssues - errCount;
 
@@ -126,8 +126,8 @@ export class RebuildRepositoryImpl implements RebuildRepositoryInterface {
       // Step 3: Next.js build to staging dir, then atomic swap
       const cwd = process.cwd();
       const stagingDir = ".next-rebuild";
-      // Use runtime concatenation to prevent Turbopack from statically tracing these paths
-      const prodDir = [".next"].join("");
+      // Production uses a separate dist dir so rebuilds don't destroy vibe dev's .next cache
+      const prodDir = [".next-prod"].join("");
       const oldDir = ".next-old";
 
       try {
@@ -146,7 +146,7 @@ export class RebuildRepositoryImpl implements RebuildRepositoryInterface {
           },
         });
 
-        // Atomic swap: .next → .next-old, .next-rebuild → .next
+        // Atomic swap: .next-prod → .next-old, .next-rebuild → .next-prod
         const prodPath = join(cwd, prodDir);
         const oldPath = join(cwd, oldDir);
 

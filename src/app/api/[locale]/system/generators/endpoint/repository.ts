@@ -158,7 +158,30 @@ class EndpointGeneratorRepositoryImpl {
         );
         continue;
       }
-      const defaultExport = definition.default;
+      let defaultExport;
+      try {
+        defaultExport = definition.default;
+      } catch {
+        // Bun plugin race: synthetic onLoad modules with `export *` can delay
+        // initialization. Yield to the event loop then retry.
+        await new Promise((resolve) => {
+          setTimeout(resolve, 0);
+        });
+        try {
+          defaultExport = definition.default;
+        } catch (retryError) {
+          const errorMsg =
+            retryError instanceof Error
+              ? retryError.message
+              : String(retryError);
+          logger.warn(
+            formatWarning(
+              `Deferred init (Bun plugin race): ${defFile.replace(process.cwd(), "").replace(/^\//, "")}\n    ${errorMsg}`,
+            ),
+          );
+          continue;
+        }
+      }
 
       if (!defaultExport) {
         logger.warn(

@@ -10,9 +10,11 @@ import { useState } from "react";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import {
+  useInkWidgetFieldFocused,
   useInkWidgetForm,
   useInkWidgetLocale,
   useInkWidgetResponse,
+  useInkWidgetResponseOnly,
   useInkWidgetShowLabels,
   useInkWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
@@ -40,7 +42,9 @@ export function JsonFieldWidgetInk<
   const locale = useInkWidgetLocale();
   const form = useInkWidgetForm();
   const response = useInkWidgetResponse();
+  const responseOnly = useInkWidgetResponseOnly();
   const showLabels = useInkWidgetShowLabels();
+  const isFocused = useInkWidgetFieldFocused(fieldName);
   const [inputValue, setInputValue] = useState(
     field.value ? JSON.stringify(field.value, null, 2) : "",
   );
@@ -48,7 +52,7 @@ export function JsonFieldWidgetInk<
   const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
   // Response mode - just display the value
-  if (response) {
+  if (response && responseOnly) {
     const displayValue = field.value
       ? JSON.stringify(field.value, null, 2)
       : "—";
@@ -97,6 +101,7 @@ export function JsonFieldWidgetInk<
         </Text>
         <TextInput
           value={inputValue}
+          focus={isFocused}
           onChange={(newValue) => {
             setInputValue(newValue);
             try {

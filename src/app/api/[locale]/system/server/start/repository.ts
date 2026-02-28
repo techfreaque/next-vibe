@@ -660,6 +660,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
             env: {
               ...process.env,
               NODE_ENV: "production",
+              NEXT_DIST_DIR: ".next-prod",
             },
           },
         );

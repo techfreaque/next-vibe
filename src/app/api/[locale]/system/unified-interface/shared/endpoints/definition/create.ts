@@ -190,6 +190,21 @@ export interface ApiEndpoint<
   // This makes errors appear on the specific property with the invalid key
   readonly title: NoInfer<TScopedTranslationKey>;
   readonly description: NoInfer<TScopedTranslationKey>;
+
+  /**
+   * Optional function that returns a context-specific display title based on request/response data.
+   * Called on every render — as state transitions (loading → complete), the title updates reactively.
+   * Return undefined to fall back to the static translated `title`.
+   */
+  readonly dynamicTitle?: (data: {
+    request?: Partial<InferRequestInput<TFields>>;
+    response?: Partial<InferResponseInput<TFields>>;
+  }) =>
+    | {
+        message: NoInfer<TScopedTranslationKey>;
+        messageParams?: TParams;
+      }
+    | undefined;
   readonly category: TranslationKey;
   readonly tags: readonly NoInfer<TScopedTranslationKey>[];
 
@@ -529,6 +544,7 @@ export function createEndpoint<
     path: config.path,
     title: config.title,
     description: config.description,
+    dynamicTitle: config.dynamicTitle,
     category: config.category,
     tags: config.tags,
     fields: config.fields,

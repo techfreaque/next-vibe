@@ -6,6 +6,7 @@
  * All widgets directly imported for CLI (no lazy loading).
  */
 
+import { Box } from "ink";
 import React, { type JSX } from "react";
 import type { Path } from "react-hook-form";
 import type { z } from "zod";
@@ -15,13 +16,17 @@ import {
   FieldDataType,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 import type { InkWidgetRendererProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
+import { withValueNonStrict } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
+import { isObject } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/type-guards";
 import type {
   AnyChildrenConstrain,
   ConstrainedChildUsage,
   DispatchField,
   FieldUsageConfig,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
+import { useInkWidgetResponseOnly } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
 import { CodeOutputWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/code-output/cli";
 import { ContainerWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/container/cli";
 import { PaginationWidgetInk } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/containers/pagination/cli";
@@ -93,6 +98,66 @@ type DispatchableField = DispatchField<
 >;
 
 /**
+ * Renders only request-field children from a customWidgetObject.
+ * The custom widget handles response display; this handles the form inputs.
+ */
+function CustomWidgetRequestFields({
+  fieldName,
+  field,
+}: {
+  fieldName: string;
+  field: InkWidgetRendererProps["field"];
+}): JSX.Element {
+  const responseOnly = useInkWidgetResponseOnly();
+
+  // In non-interactive (responseOnly) mode, don't render request fields
+  if (responseOnly) {
+    return <></>;
+  }
+
+  const structField = field as typeof field & {
+    children?: Record<
+      string,
+      { usage?: { request?: string | boolean } } & Record<string, WidgetData>
+    >;
+    value?: Record<string, WidgetData>;
+  };
+  if (!structField.children) {
+    return <></>;
+  }
+  const elements: JSX.Element[] = [];
+  for (const [childName, childField] of Object.entries(structField.children)) {
+    // Only render request fields
+    if (!childField?.usage?.request) {
+      continue;
+    }
+    const hidden = "hidden" in childField && childField.hidden === true;
+    if (hidden) {
+      continue;
+    }
+    const childData = isObject(structField.value)
+      ? structField.value[childName]
+      : null;
+    const childFieldName = fieldName ? `${fieldName}.${childName}` : childName;
+    elements.push(
+      <Box key={childName}>
+        <InkWidgetRenderer
+          field={
+            withValueNonStrict(
+              childField,
+              childData ?? null,
+              structField.value,
+            ) as never
+          }
+          fieldName={childFieldName}
+        />
+      </Box>,
+    );
+  }
+  return <>{elements}</>;
+}
+
+/**
  * Ink Widget Renderer Component - Routes to widgets with full type inference.
  * Receives DispatchField (UnifiedField + value) and switches on field.type.
  */
@@ -142,9 +207,24 @@ function renderWidget<TEndpoint extends CreateApiEndpointAny>(props: {
           fieldName: string;
           field: typeof field;
         }> & { cliWidget?: boolean };
+        children?: Record<string, { usage?: { request?: string | boolean } }>;
       };
       if (customField.render?.cliWidget) {
         const CustomRender = customField.render;
+        // Custom widget handles response display.
+        // Also render request field children via ContainerWidgetInk so forms work
+        // (custom widgets typically only render response visualization).
+        const hasRequestChildren =
+          customField.children &&
+          Object.values(customField.children).some((c) => c?.usage?.request);
+        if (hasRequestChildren) {
+          return (
+            <>
+              <CustomWidgetRequestFields fieldName={fieldName} field={field} />
+              <CustomRender fieldName={fieldName} field={field} />
+            </>
+          );
+        }
         return <CustomRender fieldName={fieldName} field={field} />;
       }
       // No CLI override — fall back to ContainerWidgetInk which renders children.

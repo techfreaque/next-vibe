@@ -46,6 +46,15 @@ const { GET } = createEndpoint({
 
   title: "get.title" as const,
   description: "get.description" as const,
+  dynamicTitle: ({ response }) => {
+    if (response?.memories) {
+      return {
+        message: "get.dynamicTitle" as const,
+        messageParams: { count: response.memories.length },
+      };
+    }
+    return undefined;
+  },
   icon: "brain",
   category: "app.endpointCategories.chat",
   tags: ["tags.memories" as const],

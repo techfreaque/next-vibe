@@ -63,6 +63,19 @@ const { POST } = createEndpoint({
   ],
   title: "run.post.title",
   description: "run.post.description",
+  dynamicTitle: ({ request }) => {
+    if (request?.prompt) {
+      const prompt =
+        request.prompt.length > 40
+          ? `${request.prompt.slice(0, 40)}...`
+          : request.prompt;
+      return {
+        message: "run.post.dynamicTitle" as const,
+        messageParams: { prompt },
+      };
+    }
+    return undefined;
+  },
   icon: "sparkles",
   category: "app.endpointCategories.ai",
   tags: ["tags.ai", "tags.chat"],

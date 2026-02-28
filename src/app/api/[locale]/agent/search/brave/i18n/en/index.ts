@@ -2,6 +2,7 @@ export const translations = {
   category: "Information",
   get: {
     title: "Search the Web",
+    dynamicTitle: "Search: {{query}}",
     description:
       "Search the internet for current information, news, facts, or recent events. Use this when you need up-to-date information or to verify facts.",
     form: {

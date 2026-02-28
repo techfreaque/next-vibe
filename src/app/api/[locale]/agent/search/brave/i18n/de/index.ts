@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   category: "Information",
   get: {
     title: "Im Web suchen",
+    dynamicTitle: "Search: {{query}}",
     description:
       "Durchsuchen Sie das Internet nach aktuellen Informationen, Nachrichten, Fakten oder aktuellen Ereignissen. Verwenden Sie dies, wenn Sie aktuelle Informationen benötigen oder Fakten überprüfen möchten.",
     form: {

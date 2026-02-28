@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   executeTool: {
     post: {
       title: "Wykonaj narzędzie",
+      dynamicTitle: "Execute: {{toolName}}",
       description:
         "Wykonuje dowolny zarejestrowany punkt końcowy według nazwy. Przekaż nazwę narzędzia i parametry wejściowe. Docelowa trasa egzekwuje własne uwierzytelnienie.",
       container: {

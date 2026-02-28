@@ -222,7 +222,7 @@ export class VibeCheckRepository {
       if (!configResult.ready) {
         return success(
           {
-            editorUriSchema: isMCP ? undefined : "vscode://file/", // Default or skip for MCP
+            editorUriSchema: isMCP ? undefined : "vscode://file/",
             items: [
               {
                 file: configResult.configPath,
@@ -240,15 +240,13 @@ export class VibeCheckRepository {
                     total: 1,
                   },
                 ],
-            summary: {
-              totalIssues: 1,
-              totalFiles: 1,
-              totalErrors: 1,
-              displayedIssues: 1,
-              displayedFiles: 1,
-              currentPage: 1,
-              totalPages: 1,
-            },
+            totalIssues: 1,
+            totalFiles: 1,
+            totalErrors: 1,
+            displayedIssues: 1,
+            displayedFiles: 1,
+            currentPage: 1,
+            totalPages: 1,
           },
           {
             isErrorResponse: true,
@@ -529,7 +527,7 @@ export class VibeCheckRepository {
         editorUriSchema: skipFiles ? undefined : editorUriScheme,
         items: undefined,
         files,
-        summary,
+        ...summary,
       };
     }
 
@@ -569,7 +567,7 @@ export class VibeCheckRepository {
       editorUriSchema: skipFiles ? undefined : editorUriScheme,
       items: summaryOnly ? undefined : paginatedIssues,
       files,
-      summary,
+      ...summary,
     };
   }
 

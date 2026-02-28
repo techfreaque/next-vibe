@@ -111,6 +111,13 @@ export const translations = {
               errors: "Errors",
               warning: "Warning",
               warnings: "Warnings",
+              hints: {
+                spaceToToggle: "(space to toggle)",
+                arrowsToChange: "(←/→ to change)",
+                dollarPrompt: "$ ",
+                executing: "Executing...",
+                tabNextField: "tab: next field | enter: submit | q/esc: exit",
+              },
             },
             pagination: {
               notImplemented:
@@ -123,6 +130,23 @@ export const translations = {
     interactive: {
       welcome: "Welcome to Vibe Interactive Mode",
       goodbye: "Goodbye!",
+      help: {
+        selectCategory: "Select a category to browse tools",
+        selectTool: "Select a tool to view details",
+        category: "Category  ",
+        method: "Method  ",
+        credits: "Credits  ",
+        callAs: "Call as   ",
+        fields: "Fields",
+        hintsNavSelect: "arrows: navigate | enter: select | q: quit",
+        hintsNavSelectBack:
+          "arrows: navigate | enter: select | esc: back | q: quit",
+        hintsExecuteBack: "enter: execute | esc: back | q: quit",
+        hintsBack: "enter/esc: back | q: quit",
+        success: "Success",
+        error: "Error",
+        result: "Result",
+      },
       navigation: {
         rootName: "Root",
         directoryIcon: "📁",

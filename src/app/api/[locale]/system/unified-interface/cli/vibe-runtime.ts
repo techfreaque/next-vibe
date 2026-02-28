@@ -6,35 +6,7 @@
  */
 
 // Register Bun plugin for CLI widget overrides BEFORE any other imports.
-// When a definition.ts imports from "./widget", this plugin checks if a
-// "widget.cli.ts" or "widget.cli.tsx" exists alongside it and resolves to
-// that instead. Only active in this CLI Bun process — the Next.js child
-// process spawned by `vibe dev` is unaffected (separate process).
-import { basename, dirname, resolve } from "node:path";
-
-import { plugin } from "bun";
-
-plugin({
-  name: "cli-widget-override", // eslint-disable-line i18next/no-literal-string
-  setup(build) {
-    // Match any import ending with "/widget" (bare specifier, no extension)
-    build.onResolve({ filter: /\/widget$/ }, async ({ path, importer }) => {
-      if (!importer) {
-        return;
-      }
-      const dir = dirname(importer);
-      const base = basename(path);
-      for (const ext of [".cli.ts", ".cli.tsx"]) {
-        const candidate = resolve(dir, `${base}${ext}`);
-        const file = Bun.file(candidate);
-        if (await file.exists()) {
-          return { path: candidate };
-        }
-      }
-    });
-  },
-});
-
+import "./cli-widget-plugin";
 // Side-effect: registers global error sink so all logger.error() calls persist to error_logs
 import "../shared/logger/error-persist";
 
@@ -139,6 +111,7 @@ program
     "--platform <platform>", // eslint-disable-line i18next/no-literal-string
     `Override detected platform. Valid values: ${Object.values(Platform).join(", ")}`, // eslint-disable-line i18next/no-literal-string
   )
+  .helpOption(false) // Disable Commander's built-in -h/--help — we handle it ourselves
   .allowUnknownOption() // Allow dynamic CLI arguments
   .action(
     async (
@@ -198,8 +171,38 @@ program
 
         performanceMonitor.mark("initEnd");
 
-        // If no command provided, show help
-        if (!command) {
+        // Interactive mode — launch interactive route navigator
+        // Handles: `vibe -i`, `vibe help -i`, `vibe --interactive`
+        if (
+          options.interactive &&
+          (!command ||
+            command === "help" ||
+            command === "h" ||
+            command === "-i")
+        ) {
+          const { getCliUser } = await import("./auth/cli-user");
+          const { HelpRepository } =
+            await import("@/app/api/[locale]/system/help/repository");
+          const userResult = await getCliUser(logger, options.locale);
+          const user = userResult.success ? userResult.data : undefined;
+          await HelpRepository.startInteractive(
+            user,
+            options.locale,
+            effectivePlatform,
+          );
+          await cliResourceManager.cleanupAndExit(logger, debug ?? false, {
+            success: true,
+          });
+          return;
+        }
+
+        // If no command provided or bare -h/--help, show help overview
+        if (
+          !command ||
+          command === "-h" ||
+          command === "--help" ||
+          command === "-?"
+        ) {
           performanceMonitor.mark("routeStart");
           const helpResult = await RouteDelegationHandler.executeRoute(
             "help",
@@ -224,6 +227,51 @@ program
           performanceMonitor.mark("renderStart");
           if (helpResult.formattedOutput) {
             // Write output and wait for it to drain before exiting (important when piped)
+            await new Promise<void>((resolve) => {
+              process.stdout.write(`${helpResult.formattedOutput}\n`, () => {
+                resolve();
+              });
+            });
+          }
+          performanceMonitor.mark("renderEnd");
+
+          await cliResourceManager.cleanupAndExit(
+            logger,
+            debug ?? false,
+            helpResult,
+          );
+          return;
+        }
+
+        // Handle -h / --help — redirect to `vibe help <command>`
+        if (
+          args?.includes("-h") ||
+          args?.includes("--help") ||
+          args?.includes("-?")
+        ) {
+          performanceMonitor.mark("routeStart");
+          const helpResult = await RouteDelegationHandler.executeRoute(
+            "help",
+            {
+              data: undefined,
+              urlPathParams: undefined,
+              cliArgs: {
+                positionalArgs: [command],
+                namedArgs: {},
+              },
+              locale: options.locale,
+              platform: effectivePlatform,
+              output: options.output ?? DEFAULT_OUTPUT,
+              verbose: debug ?? false,
+              interactive: options.interactive ?? false,
+              dryRun: options.dryRun ?? false,
+            },
+            logger,
+          );
+          performanceMonitor.mark("routeEnd");
+
+          performanceMonitor.mark("renderStart");
+          if (helpResult.formattedOutput) {
             await new Promise<void>((resolve) => {
               process.stdout.write(`${helpResult.formattedOutput}\n`, () => {
                 resolve();

@@ -47,7 +47,10 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import {
+  Icon,
+  type IconKey,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
@@ -165,6 +168,9 @@ export function ToolCallRenderer({
   const [definition, setDefinition] = useState<CreateApiEndpointAny | null>(
     null,
   );
+  // For execute-tool: resolve the child endpoint's definition for title/icon
+  const [childDefinition, setChildDefinition] =
+    useState<CreateApiEndpointAny | null>(null);
 
   // Create a form for managing the tool parameters when waiting for confirmation
   const confirmationForm = useForm<FieldValues>({
@@ -249,27 +255,21 @@ export function ToolCallRenderer({
       return;
     }
 
-    const loadDef = async (): Promise<void> => {
-      // toolCall.toolName comes from AI SDK, which uses path_with_underscores format
-      // We need to try multiple formats to find the definition:
-      // 1. As-is (might be an alias like "search")
-      // 2. Convert underscores to slashes + /GET
-      // 3. Convert underscores to slashes + /POST
-
+    const tryLoad = async (
+      identifier: string,
+    ): ReturnType<typeof definitionLoader.load> => {
       const logger = createEndpointLogger(true, Date.now(), locale);
-
       let result = await definitionLoader.load({
-        identifier: toolCall.toolName,
+        identifier,
         platform: loadPlatform,
         user,
         logger,
         locale,
       });
 
-      if (!result.success && toolCall.toolName.includes("_")) {
-        const convertedPath = `${toolCall.toolName.replaceAll("_", "/")}/GET`;
+      if (!result.success && identifier.includes("_")) {
         result = await definitionLoader.load({
-          identifier: convertedPath,
+          identifier: `${identifier.replaceAll("_", "/")}/GET`,
           platform: loadPlatform,
           user,
           logger,
@@ -277,23 +277,50 @@ export function ToolCallRenderer({
         });
       }
 
-      if (!result.success && toolCall.toolName.includes("_")) {
-        const convertedPath = `${toolCall.toolName.replaceAll("_", "/")}/POST`;
+      if (!result.success && identifier.includes("_")) {
         result = await definitionLoader.load({
-          identifier: convertedPath,
+          identifier: `${identifier.replaceAll("_", "/")}/POST`,
           platform: loadPlatform,
           user,
           logger,
           locale,
         });
       }
+
+      return result;
+    };
+
+    const loadDef = async (): Promise<void> => {
+      const result = await tryLoad(toolCall.toolName);
 
       if (result.success) {
         setDefinition(result.data);
+
+        // For execute-tool: also resolve the child endpoint's definition
+        if (result.data.aliases?.includes("execute-tool")) {
+          const args = toolCall.args;
+          const childToolName =
+            args && typeof args === "object" && "toolName" in args
+              ? (args as Record<string, string>).toolName
+              : undefined;
+          if (childToolName) {
+            const childResult = await tryLoad(childToolName);
+            if (childResult.success) {
+              setChildDefinition(childResult.data);
+            }
+          }
+        }
       }
     };
     void loadDef();
-  }, [toolCall.toolName, locale, user, definition, loadPlatform]);
+  }, [
+    toolCall.toolName,
+    toolCall.args,
+    locale,
+    user,
+    definition,
+    loadPlatform,
+  ]);
 
   const hasResult = Boolean(toolCall.result);
   const hasError = Boolean(toolCall.error);
@@ -306,9 +333,29 @@ export function ToolCallRenderer({
 
   const handleCopyJson = (e: DivMouseEvent): void => {
     e.stopPropagation();
-    const payload = toolCall.result ?? toolCall.error;
-    const text =
-      typeof payload === "string" ? payload : JSON.stringify(payload, null, 2);
+    const payload: {
+      request?: ToolCall["args"];
+      response?: ToolCall["result"];
+      error?: ToolCall["error"];
+    } = {};
+    if (toolCall.args) {
+      payload.request = toolCall.args;
+    }
+    if (toolCall.result) {
+      if (typeof toolCall.result === "string") {
+        try {
+          payload.response = JSON.parse(toolCall.result) as ToolCall["result"];
+        } catch {
+          payload.response = toolCall.result;
+        }
+      } else {
+        payload.response = toolCall.result;
+      }
+    }
+    if (toolCall.error) {
+      payload.error = toolCall.error;
+    }
+    const text = JSON.stringify(payload, null, 2);
     void navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -344,10 +391,104 @@ export function ToolCallRenderer({
     }
   };
 
-  const displayName = definition?.title
-    ? definition.scopedTranslation.scopedT(locale).t(definition.title)
-    : toolCall.toolName;
-  const icon = definition?.icon;
+  // dynamicTitle is fully typed at each definition site; here we call it via CreateApiEndpointAny
+  // which erases the concrete field types — cast the function to accept ToolCall data
+  type DynamicTitleFn = (data: {
+    request?: ToolCall["args"];
+    response?: ToolCall["result"];
+  }) =>
+    | { message: string; messageParams?: Record<string, string | number> }
+    | undefined;
+
+  // Resolve display title: for execute-tool, prefer child endpoint's title/icon
+  const resolveDisplay = (): {
+    displayName: string;
+    icon: IconKey | undefined;
+  } => {
+    // When execute-tool wraps a child endpoint, use the child's title/icon
+    if (childDefinition) {
+      const childScopedT = childDefinition.scopedTranslation.scopedT(locale);
+
+      // Try child's dynamicTitle with the execute-tool's input (child's request data)
+      const childDynamicFn = childDefinition.dynamicTitle as
+        | DynamicTitleFn
+        | undefined;
+      const childInput =
+        toolCall.args &&
+        typeof toolCall.args === "object" &&
+        "input" in toolCall.args
+          ? (toolCall.args as Record<string, ToolCall["args"]>).input
+          : undefined;
+      const childResponse =
+        toolCall.result &&
+        typeof toolCall.result === "object" &&
+        "data" in toolCall.result
+          ? (toolCall.result as Record<string, ToolCall["result"]>).data
+          : toolCall.result;
+      const childDynamic = childDynamicFn
+        ? childDynamicFn({
+            request:
+              childInput && typeof childInput === "object"
+                ? childInput
+                : undefined,
+            response:
+              childResponse && typeof childResponse === "object"
+                ? childResponse
+                : undefined,
+          })
+        : undefined;
+
+      if (childDynamic) {
+        return {
+          displayName:
+            childScopedT.t(childDynamic.message, childDynamic.messageParams) ??
+            toolCall.toolName,
+          icon: childDefinition.icon,
+        };
+      }
+
+      // Fall back to child's static title
+      const childTitle = childDefinition.title
+        ? childScopedT.t(childDefinition.title)
+        : undefined;
+      if (childTitle) {
+        return { displayName: childTitle, icon: childDefinition.icon };
+      }
+    }
+
+    // Standard path: use this definition's own title
+    const scopedT = definition?.scopedTranslation.scopedT(locale);
+    const staticTitle = definition?.title
+      ? scopedT?.t(definition.title)
+      : toolCall.toolName;
+
+    const dynamicTitleFn = definition?.dynamicTitle as
+      | DynamicTitleFn
+      | undefined;
+    const dynamicResult = dynamicTitleFn
+      ? dynamicTitleFn({
+          request:
+            toolCall.args && typeof toolCall.args === "object"
+              ? toolCall.args
+              : undefined,
+          response:
+            toolCall.result && typeof toolCall.result === "object"
+              ? toolCall.result
+              : undefined,
+        })
+      : undefined;
+
+    return {
+      displayName: dynamicResult
+        ? (scopedT?.t(dynamicResult.message, dynamicResult.messageParams) ??
+          staticTitle ??
+          toolCall.toolName)
+        : (staticTitle ?? toolCall.toolName),
+      icon: definition?.icon,
+    };
+  };
+
+  const { displayName, icon } = resolveDisplay();
   const credits = definition?.credits ?? toolCall.creditsUsed ?? 0;
   const creditsDisplay = credits
     ? globalT(
@@ -404,8 +545,8 @@ export function ToolCallRenderer({
 
             {/* Status Badge */}
             <Div className="flex items-center gap-2">
-              {/* Copy JSON button — only when expanded and result/error is available */}
-              {isOpen && (hasResult || hasError) && (
+              {/* Copy JSON button — when expanded and any data is available */}
+              {isOpen && (hasResult || hasError || toolCall.args) && (
                 <Div
                   className="flex items-center gap-1 px-1.5 py-0.5 rounded text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer"
                   onClick={handleCopyJson}
@@ -455,12 +596,31 @@ export function ToolCallRenderer({
         {/* Content */}
         <CollapsibleContent>
           <Div className="border-t border-border/50 bg-card">
-            {/* Loading State */}
+            {/* Loading State - show spinner, and endpoint with input data if available */}
             {isLoading && (
-              <Div className="flex items-center gap-2 text-sm text-muted-foreground p-4">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <Span>{t("widgets.toolCall.messages.executingTool")}</Span>
-              </Div>
+              <>
+                <Div className="flex items-center gap-2 text-sm text-muted-foreground p-4">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Span>{t("widgets.toolCall.messages.executingTool")}</Span>
+                </Div>
+                {definition &&
+                  toolCall.args &&
+                  typeof toolCall.args === "object" &&
+                  !Array.isArray(toolCall.args) && (
+                    <Div className="p-4 pt-0">
+                      <NavigationStackProvider>
+                        <EndpointRenderer
+                          user={user}
+                          endpoint={definition}
+                          locale={locale}
+                          data={toolCall.args}
+                          logger={logger}
+                          disabled={true}
+                        />
+                      </NavigationStackProvider>
+                    </Div>
+                  )}
+              </>
             )}
 
             {/* Error State - Check if it's a declined tool (has args) or a real error */}

@@ -7,6 +7,8 @@ export const translations = {
   search: {
     get: {
       title: "Search Memories",
+      dynamicTitle: "Memory Search: {{query}}",
+      dynamicTitleWithCount: "Memory Search: {{query}} ({{count}})",
       description:
         "Search through memories by content text. Returns matching memories with content snippets. Supports filtering by tags and including archived memories.",
       container: {

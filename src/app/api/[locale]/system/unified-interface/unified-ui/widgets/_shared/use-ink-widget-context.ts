@@ -182,6 +182,27 @@ export function useInkWidgetResponseOnly(): boolean {
 }
 
 /**
+ * Hook to check if a specific field is focused in interactive mode.
+ * Returns true if no focus management exists (e.g., fast renderer / response mode).
+ */
+export function useInkWidgetFieldFocused(fieldName: string): boolean {
+  const store = useInkWidgetContextStore();
+  const focusedField = store(
+    (
+      state: WidgetContextStore<
+        CreateApiEndpointAny,
+        InkWidgetContext<CreateApiEndpointAny>
+      >,
+    ) => state.context.focusedField,
+  );
+  // If no focus management, all fields are "focused" (response/static mode)
+  if (focusedField === undefined) {
+    return true;
+  }
+  return focusedField === fieldName;
+}
+
+/**
  * Hook to get translation function from Ink context
  */
 export function useInkWidgetTranslation<

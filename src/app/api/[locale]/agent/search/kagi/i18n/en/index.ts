@@ -2,6 +2,7 @@ export const translations = {
   category: "Information",
   get: {
     title: "Search with Kagi",
+    dynamicTitle: "Kagi: {{query}}",
     description:
       "Search the internet or get AI-powered answers using Kagi. FastGPT mode provides comprehensive answers with sources, while search mode returns direct results.",
     form: {

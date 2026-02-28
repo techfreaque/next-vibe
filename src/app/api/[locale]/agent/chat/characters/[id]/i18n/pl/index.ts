@@ -12,6 +12,7 @@ export const translations: typeof enTranslations = {
 
   get: {
     title: "Pobierz postacię",
+    dynamicTitle: "Postać: {{name}}",
     description: "Pobierz konkretną postacię według ID",
     container: {
       title: "Szczegóły postaciy",
@@ -138,6 +139,7 @@ export const translations: typeof enTranslations = {
   },
   patch: {
     title: "Aktualizuj postacię",
+    dynamicTitle: "Edycja: {{name}}",
     container: {
       title: "Aktualizuj postacię",
       description: "Modyfikuj istniejącą niestandardową postacię",
@@ -293,6 +295,7 @@ export const translations: typeof enTranslations = {
   },
   delete: {
     title: "Usuń postać",
+    dynamicTitle: "Usuń: {{name}}",
     description: "Usuń niestandardową postać",
     container: {
       title: "Usuń postać",

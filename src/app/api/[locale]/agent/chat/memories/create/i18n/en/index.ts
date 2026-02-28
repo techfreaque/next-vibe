@@ -3,6 +3,7 @@ export const translations = {
 
   post: {
     title: "Add Memory",
+    dynamicTitle: "Remember: {{content}}",
     description: "Creates a new memory for the current user",
     container: {
       title: "Add Memory",

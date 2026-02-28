@@ -7,8 +7,10 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  customWidgetObject,
   scopedObjectFieldNew,
   scopedRequestField,
+  scopedResponseArrayOptionalFieldNew,
   scopedResponseField,
   scopedWidgetField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
@@ -22,6 +24,7 @@ import {
 
 import { UserRole } from "../../../user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
+import { CheckResultWidget } from "./widget";
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -46,10 +49,9 @@ const { POST } = createEndpoint({
     firstCliArgKey: "paths",
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.STACKED,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: CheckResultWidget,
+    usage: { request: "data", response: true } as const,
     children: {
       // === REQUEST FIELDS ===
       title: scopedWidgetField(scopedTranslation, {
@@ -60,7 +62,6 @@ const { POST } = createEndpoint({
         usage: { request: "data" },
       }),
 
-      // Default: check.config.ts vibeCheck.fix ?? false
       fix: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
@@ -70,7 +71,6 @@ const { POST } = createEndpoint({
         schema: z.boolean().optional(),
       }),
 
-      // Default: check.config.ts vibeCheck.timeout ?? 3600
       timeout: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
@@ -88,31 +88,15 @@ const { POST } = createEndpoint({
         placeholder: "fields.paths.placeholder",
         columns: 8,
         options: [
-          {
-            value: "src/",
-            label: "fields.paths.options.src",
-          },
-          {
-            value: "src/components",
-            label: "fields.paths.options.components",
-          },
-          {
-            value: "src/utils",
-            label: "fields.paths.options.utils",
-          },
-          {
-            value: "src/pages",
-            label: "fields.paths.options.pages",
-          },
-          {
-            value: "src/app",
-            label: "fields.paths.options.app",
-          },
+          { value: "src/", label: "fields.paths.options.src" },
+          { value: "src/components", label: "fields.paths.options.components" },
+          { value: "src/utils", label: "fields.paths.options.utils" },
+          { value: "src/pages", label: "fields.paths.options.pages" },
+          { value: "src/app", label: "fields.paths.options.app" },
         ],
         schema: z.union([z.string(), z.array(z.string())]).optional(),
       }),
 
-      // Default: check.config.ts vibeCheck.limit ?? 200
       limit: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
@@ -122,7 +106,6 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().min(1).optional(),
       }),
 
-      // Default: 1 (not configurable in check.config.ts)
       page: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.NUMBER,
@@ -132,7 +115,6 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().min(1).optional().default(1),
       }),
 
-      // Filter issues by file path, message, or rule
       filter: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -143,7 +125,6 @@ const { POST } = createEndpoint({
         schema: z.union([z.string(), z.array(z.string())]).optional(),
       }),
 
-      // Only return summary stats, omit items and files lists
       summaryOnly: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
@@ -155,61 +136,114 @@ const { POST } = createEndpoint({
 
       // === RESPONSE FIELDS ===
       editorUriSchema: scopedResponseField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "fields.editorUriScheme.label",
-        description: "fields.editorUriScheme.description",
-        columns: 8,
+        type: WidgetType.TEXT,
         schema: z.string().optional(),
-        hidden: true,
-      }),
-      items: scopedResponseField(scopedTranslation, {
-        type: WidgetType.CODE_QUALITY_LIST,
-        editorUriSchemaFieldKey: "editorUriSchema",
-        schema: z
-          .array(
-            z.object({
-              file: z.string(),
-              line: z.coerce.number().optional(),
-              column: z.coerce.number().optional(),
-              rule: z.string().optional(),
-              severity: z.enum(["error", "warning", "info"]),
-              message: z.string(),
-            }),
-          )
-          .optional(),
       }),
 
-      // === FILES LIST (optional for compact MCP responses) ===
-      files: scopedResponseField(scopedTranslation, {
-        type: WidgetType.CODE_QUALITY_FILES,
-        schema: z
-          .array(
-            z.object({
-              file: z.string(),
-              errors: z.number(),
-              warnings: z.number(),
-              total: z.number(),
+      items: scopedResponseArrayOptionalFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: scopedObjectFieldNew(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          usage: { response: true },
+          layoutType: LayoutType.STACKED,
+          columns: 12,
+          children: {
+            file: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.string(),
             }),
-          )
-          .optional(),
-      }),
-
-      // === SUMMARY STATS ===
-      summary: scopedResponseField(scopedTranslation, {
-        type: WidgetType.CODE_QUALITY_SUMMARY,
-        schema: z.object({
-          totalIssues: z.number(),
-          totalFiles: z.number(),
-          totalErrors: z.number().optional(),
-          filteredIssues: z.number().optional(),
-          filteredFiles: z.number().optional(),
-          displayedIssues: z.number().optional(),
-          displayedFiles: z.number().optional(),
-          truncatedMessage: z.string().optional(),
-          currentPage: z.number().optional(),
-          totalPages: z.number().optional(),
+            line: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.coerce.number().optional(),
+            }),
+            column: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.coerce.number().optional(),
+            }),
+            rule: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.string().optional(),
+            }),
+            severity: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.enum(["error", "warning", "info"]),
+            }),
+            message: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.string(),
+            }),
+          },
         }),
+      }),
+
+      files: scopedResponseArrayOptionalFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: scopedObjectFieldNew(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          usage: { response: true },
+          layoutType: LayoutType.STACKED,
+          columns: 12,
+          children: {
+            file: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.string(),
+            }),
+            errors: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.number(),
+            }),
+            warnings: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.number(),
+            }),
+            total: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.number(),
+            }),
+          },
+        }),
+      }),
+
+      // Summary (flat)
+      totalIssues: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number(),
+      }),
+      totalFiles: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number(),
+      }),
+      totalErrors: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number().optional(),
+      }),
+      filteredIssues: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number().optional(),
+      }),
+      filteredFiles: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number().optional(),
+      }),
+      displayedIssues: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number().optional(),
+      }),
+      displayedFiles: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number().optional(),
+      }),
+      truncatedMessage: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.string().optional(),
+      }),
+      currentPage: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number().optional(),
+      }),
+      totalPages: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.number().optional(),
       }),
     },
   }),
@@ -294,32 +328,14 @@ const { POST } = createEndpoint({
       default: {
         items: [],
         files: [],
-        summary: {
-          totalIssues: 0,
-          totalFiles: 0,
-          totalErrors: 0,
-          filteredIssues: 0,
-          filteredFiles: 0,
-          displayedIssues: 0,
-          displayedFiles: 0,
-          currentPage: 1,
-          totalPages: 1,
-        },
+        totalIssues: 0,
+        totalFiles: 0,
       },
       success: {
         items: [],
         files: [],
-        summary: {
-          totalIssues: 0,
-          totalFiles: 0,
-          totalErrors: 0,
-          filteredIssues: 0,
-          filteredFiles: 0,
-          displayedIssues: 0,
-          displayedFiles: 0,
-          currentPage: 1,
-          totalPages: 1,
-        },
+        totalIssues: 0,
+        totalFiles: 0,
       },
       withErrors: {
         items: [
@@ -340,47 +356,21 @@ const { POST } = createEndpoint({
             total: 1,
           },
         ],
-        summary: {
-          totalIssues: 1,
-          totalFiles: 1,
-          totalErrors: 1,
-          filteredIssues: 1,
-          filteredFiles: 1,
-          displayedIssues: 1,
-          displayedFiles: 1,
-          currentPage: 1,
-          totalPages: 1,
-        },
+        totalIssues: 1,
+        totalFiles: 1,
+        totalErrors: 1,
       },
       quickCheck: {
         items: [],
         files: [],
-        summary: {
-          totalIssues: 0,
-          totalFiles: 0,
-          totalErrors: 0,
-          filteredIssues: 0,
-          filteredFiles: 0,
-          displayedIssues: 0,
-          displayedFiles: 0,
-          currentPage: 1,
-          totalPages: 1,
-        },
+        totalIssues: 0,
+        totalFiles: 0,
       },
       specificPaths: {
         items: [],
         files: [],
-        summary: {
-          totalIssues: 0,
-          totalFiles: 0,
-          totalErrors: 0,
-          filteredIssues: 0,
-          filteredFiles: 0,
-          displayedIssues: 0,
-          displayedFiles: 0,
-          currentPage: 1,
-          totalPages: 1,
-        },
+        totalIssues: 0,
+        totalFiles: 0,
       },
     },
   },

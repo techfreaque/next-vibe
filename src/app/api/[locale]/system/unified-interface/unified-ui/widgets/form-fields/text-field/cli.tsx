@@ -16,9 +16,11 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/cli-types";
 import type { FieldUsageConfig } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/types";
 import {
+  useInkWidgetFieldFocused,
   useInkWidgetForm,
   useInkWidgetLocale,
   useInkWidgetResponse,
+  useInkWidgetResponseOnly,
   useInkWidgetShowLabels,
   useInkWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
@@ -51,13 +53,15 @@ export function TextFieldWidgetInk<
   const locale = useInkWidgetLocale();
   const form = useInkWidgetForm();
   const response = useInkWidgetResponse();
+  const responseOnly = useInkWidgetResponseOnly();
   const showLabels = useInkWidgetShowLabels();
+  const isFocused = useInkWidgetFieldFocused(fieldName);
   const [inputValue, setInputValue] = useState(field.value ? field.value : "");
 
   const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
-  // Response mode - just display the value
-  if (response) {
+  // Response-only mode (non-interactive) - just display the value
+  if (response && responseOnly) {
     const displayValue = field.value ? field.value : "—";
     return (
       <Box flexDirection="column">
@@ -104,7 +108,8 @@ export function TextFieldWidgetInk<
       {/* Label with required indicator */}
       {field.label && (
         <Box marginBottom={0}>
-          <Text bold>
+          <Text bold color={isFocused ? "cyan" : undefined}>
+            {isFocused ? "> " : "  "}
             {t(field.label)}
             {isRequired && <Text color="blue"> *</Text>}
           </Text>
@@ -119,6 +124,7 @@ export function TextFieldWidgetInk<
         </Text>
         <TextInput
           value={inputValue}
+          focus={isFocused}
           onChange={(newValue) => {
             setInputValue(newValue);
             if (form) {

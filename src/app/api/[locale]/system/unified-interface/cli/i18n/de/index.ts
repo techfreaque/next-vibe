@@ -113,6 +113,14 @@ export const translations: typeof enTranslations = {
               errors: "Fehler",
               warning: "Warnung",
               warnings: "Warnungen",
+              hints: {
+                spaceToToggle: "(Leertaste zum Umschalten)",
+                arrowsToChange: "(←/→ zum Ändern)",
+                dollarPrompt: "$ ",
+                executing: "Wird ausgeführt...",
+                tabNextField:
+                  "Tab: nächstes Feld | Enter: absenden | q/Esc: beenden",
+              },
             },
             pagination: {
               notImplemented:
@@ -125,6 +133,23 @@ export const translations: typeof enTranslations = {
     interactive: {
       welcome: "Willkommen im Vibe Interaktiven Modus",
       goodbye: "Auf Wiedersehen!",
+      help: {
+        selectCategory: "Kategorie zum Durchsuchen der Tools wählen",
+        selectTool: "Tool zum Anzeigen der Details wählen",
+        category: "Kategorie  ",
+        method: "Methode  ",
+        credits: "Credits  ",
+        callAs: "Aufrufen  ",
+        fields: "Felder",
+        hintsNavSelect: "Pfeile: navigieren | Enter: auswählen | q: beenden",
+        hintsNavSelectBack:
+          "Pfeile: navigieren | Enter: auswählen | Esc: zurück | q: beenden",
+        hintsExecuteBack: "Enter: ausführen | Esc: zurück | q: beenden",
+        hintsBack: "Enter/Esc: zurück | q: beenden",
+        success: "Erfolg",
+        error: "Fehler",
+        result: "Ergebnis",
+      },
       navigation: {
         rootName: "Wurzel",
         directoryIcon: "📁",

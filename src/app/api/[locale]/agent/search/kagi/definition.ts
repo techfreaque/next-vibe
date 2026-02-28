@@ -37,6 +37,19 @@ const { GET } = createEndpoint({
   path: ["agent", "search", "kagi"],
   title: "get.title" as const,
   description: "get.description" as const,
+  dynamicTitle: ({ request }) => {
+    if (request?.query) {
+      const query =
+        request.query.length > 40
+          ? `${request.query.slice(0, 40)}...`
+          : request.query;
+      return {
+        message: "get.dynamicTitle" as const,
+        messageParams: { query },
+      };
+    }
+    return undefined;
+  },
   category: "app.endpointCategories.ai",
   tags: ["tags.search" as const, "tags.web" as const, "tags.ai" as const],
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,

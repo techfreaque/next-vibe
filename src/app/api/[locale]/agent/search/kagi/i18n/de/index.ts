@@ -4,6 +4,7 @@ export const translations: typeof enTranslations = {
   category: "Information",
   get: {
     title: "Mit Kagi suchen",
+    dynamicTitle: "Kagi: {{query}}",
     description:
       "Durchsuchen Sie das Internet oder erhalten Sie KI-gestützte Antworten mit Kagi. Der FastGPT-Modus liefert umfassende Antworten mit Quellen, während der Suchmodus direkte Ergebnisse zurückgibt.",
     form: {

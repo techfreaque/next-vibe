@@ -814,6 +814,7 @@ export const translations = {
   },
   get: {
     title: "List Characters",
+    dynamicTitle: "Characters ({{count}})",
     description: "Get all available characters (default + custom)",
     fields: {
       query: {
@@ -961,6 +962,7 @@ export const translations = {
   },
   post: {
     title: "Create Character",
+    dynamicTitle: "Create: {{name}}",
     description: "Create a new custom character",
     form: {
       title: "Create Your Custom Character",

@@ -164,7 +164,16 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
       const definition = (await import(definitionPath)) as {
         default?: ApiSection;
       };
-      const defaultExport = definition.default;
+      let defaultExport;
+      try {
+        defaultExport = definition.default;
+      } catch {
+        // Bun plugin race — yield then retry
+        await new Promise((resolve) => {
+          setTimeout(resolve, 0);
+        });
+        defaultExport = definition.default;
+      }
 
       if (!defaultExport) {
         return [];
@@ -193,7 +202,15 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
       const definition = (await import(definitionPath)) as {
         default?: Record<string, { aliases?: string[] }>;
       };
-      const defaultExport = definition.default;
+      let defaultExport;
+      try {
+        defaultExport = definition.default;
+      } catch {
+        await new Promise((resolve) => {
+          setTimeout(resolve, 0);
+        });
+        defaultExport = definition.default;
+      }
 
       if (!defaultExport) {
         return [];

@@ -21,6 +21,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import type { TParams } from "@/i18n/core/static-types";
 
 import { scopedTranslation } from "./i18n";
 
@@ -37,6 +38,33 @@ const { GET } = createEndpoint({
 
   title: "search.get.title" as const,
   description: "search.get.description" as const,
+  dynamicTitle: ({
+    request,
+    response,
+  }):
+    | {
+        message: "search.get.dynamicTitle" | "search.get.dynamicTitleWithCount";
+        messageParams: TParams;
+      }
+    | undefined => {
+    if (!request?.query) {
+      return undefined;
+    }
+    const query =
+      request.query.length > 30
+        ? `${request.query.slice(0, 30)}...`
+        : request.query;
+    if (response?.results) {
+      return {
+        message: "search.get.dynamicTitleWithCount",
+        messageParams: { query, count: response.results.length },
+      };
+    }
+    return {
+      message: "search.get.dynamicTitle",
+      messageParams: { query },
+    };
+  },
   icon: "search",
   category: "app.endpointCategories.chat",
   tags: ["tags.memories" as const],

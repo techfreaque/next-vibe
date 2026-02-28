@@ -11,9 +11,11 @@ import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/ap
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import {
+  useInkWidgetFieldFocused,
   useInkWidgetForm,
   useInkWidgetLocale,
   useInkWidgetResponse,
+  useInkWidgetResponseOnly,
   useInkWidgetShowLabels,
   useInkWidgetTranslation,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-ink-widget-context";
@@ -40,13 +42,15 @@ export function ColorFieldWidgetInk<
   const locale = useInkWidgetLocale();
   const form = useInkWidgetForm();
   const response = useInkWidgetResponse();
+  const responseOnly = useInkWidgetResponseOnly();
   const showLabels = useInkWidgetShowLabels();
+  const isFocused = useInkWidgetFieldFocused(fieldName);
   const [inputValue, setInputValue] = useState(field.value ? field.value : "");
 
   const { t: widgetT } = unifiedInterfaceScopedTranslation.scopedT(locale);
 
   // Response mode - just display the value
-  if (response) {
+  if (response && responseOnly) {
     const displayValue = field.value ? field.value : "—";
     return (
       <Box flexDirection="column">
@@ -105,6 +109,7 @@ export function ColorFieldWidgetInk<
         </Text>
         <TextInput
           value={inputValue}
+          focus={isFocused}
           onChange={(newValue) => {
             setInputValue(newValue);
             if (form) {

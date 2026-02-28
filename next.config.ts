@@ -30,6 +30,12 @@ const nextConfig: NextConfig = {
       "*.native.ts": {
         loaders: ["ignore-loader"],
       },
+      "*.cli.tsx": {
+        loaders: ["ignore-loader"],
+      },
+      "*.cli.ts": {
+        loaders: ["ignore-loader"],
+      },
       "**/native/**": {
         loaders: ["ignore-loader"],
       },

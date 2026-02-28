@@ -202,19 +202,34 @@ export class RouteDelegationHandler {
       if (options.interactive && endpoint) {
         const { renderInkEndpointPage } =
           await import("@/app/api/[locale]/system/unified-interface/unified-ui/renderers/cli/CliEndpointPage");
-        // Render interactive Ink UI - it handles form and submission
-        renderInkEndpointPage({
+
+        // Collect CLI input data first (parse args, but no interactive prompts)
+        const inputData = await CliInputParser.collectCliRequestData(
+          endpoint,
+          {
+            data: options.data || {},
+            urlPathParams: options.urlPathParams,
+            positionalArgs: options.cliArgs?.positionalArgs ?? [],
+            namedArgs: options.cliArgs?.namedArgs ?? [],
+            rawTokens: options.cliArgs?.rawTokens,
+            interactive: false,
+            dryRun: options.dryRun ?? false,
+          },
+          logger,
+        );
+
+        // Render interactive Ink UI — waits until user exits
+        await renderInkEndpointPage({
           endpoint: { [endpoint.method]: endpoint },
           locale: options.locale,
           user: cliUser,
           debug: options.verbose || false,
           onSubmit: async (data: WidgetData) => {
-            // Execute the endpoint when user submits
             const result =
               await RouteExecutionExecutor.executeGenericHandler<WidgetData>({
                 toolName: resolvedCommand,
                 data: data as CliRequestData,
-                urlPathParams: options.urlPathParams || {},
+                urlPathParams: inputData.urlPathParams || {},
                 user: cliUser,
                 locale: options.locale,
                 logger,
@@ -228,13 +243,12 @@ export class RouteDelegationHandler {
                   headless: undefined,
                 },
               });
-
             return result;
           },
-          initialData: options.data,
+          initialData: inputData.data,
         });
 
-        // Return empty result - Ink handles everything
+        // Ink handled all rendering — return empty output
         return {
           success: true,
           data: undefined,
@@ -244,7 +258,7 @@ export class RouteDelegationHandler {
             method: endpoint.method,
             resolvedCommand,
           },
-          formattedOutput: "", // Ink handles rendering
+          formattedOutput: "",
         };
       }
 

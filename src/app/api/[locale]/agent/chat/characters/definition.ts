@@ -52,6 +52,19 @@ const { GET } = createEndpoint({
 
   title: "get.title" as const,
   description: "get.description" as const,
+  dynamicTitle: ({ response }) => {
+    if (response?.sections) {
+      const count = response.sections.reduce(
+        (sum, s) => sum + (s.characters?.length ?? 0),
+        0,
+      );
+      return {
+        message: "get.dynamicTitle" as const,
+        messageParams: { count },
+      };
+    }
+    return undefined;
+  },
   icon: "sparkles" as const,
   category: "app.endpointCategories.chat",
   tags: ["tags.characters" as const],

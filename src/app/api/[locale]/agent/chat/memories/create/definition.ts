@@ -42,6 +42,19 @@ const { POST } = createEndpoint({
 
   title: "post.title" as const,
   description: "post.description" as const,
+  dynamicTitle: ({ request }) => {
+    if (request?.content) {
+      const content =
+        request.content.length > 40
+          ? `${request.content.slice(0, 40)}...`
+          : request.content;
+      return {
+        message: "post.dynamicTitle" as const,
+        messageParams: { content },
+      };
+    }
+    return undefined;
+  },
   icon: "brain",
   category: "app.endpointCategories.chat",
   tags: ["post.tags.memories" as const],
