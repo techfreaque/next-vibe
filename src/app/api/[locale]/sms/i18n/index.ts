@@ -15,17 +15,15 @@
 
 import { createScopedTranslation } from "@/i18n/core/scoped-translation";
 
-import { translations as deTranslations } from "./de";
 import { translations as enTranslations } from "./en";
-import { translations as plTranslations } from "./pl";
 
 // Create an isolated translation function that ONLY uses SMS module translations
 // EN translations are used as the source of truth for type safety
 export const { scopedT: smsScopedT, ScopedTranslationKey: SmsTranslationKey } =
   createScopedTranslation({
     en: enTranslations,
-    de: deTranslations,
-    pl: plTranslations,
+    de: () => require("./de").translations,
+    pl: () => require("./pl").translations,
   });
 
 export type SmsT = ReturnType<typeof smsScopedT>["t"];

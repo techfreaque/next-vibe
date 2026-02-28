@@ -1,7 +1,6 @@
 import type { LanguageConfig, LanguageDefaults } from "./core/config";
-import { translations as deTranslations } from "./de";
+import type { TranslationElement } from "./core/static-types";
 import { translations as enTranslations } from "./en";
-import { translations as plTranslations } from "./pl";
 
 // ----------------
 // CONFIGURATION
@@ -14,8 +13,8 @@ export const languageDefaults = {
 } satisfies LanguageDefaults<typeof enTranslations>;
 
 export const allTranslations = {
-  de: deTranslations,
-  pl: plTranslations,
+  de: (): TranslationElement => require("./de").translations,
+  pl: (): TranslationElement => require("./pl").translations,
   en: enTranslations,
 };
 

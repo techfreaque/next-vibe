@@ -71,13 +71,11 @@ export interface TranslationSchemaConstraint {
  * // In src/app/api/[locale]/sms/i18n/index.ts
  * import { createScopedTranslation } from "@/i18n/core/scoped-translation";
  * import { translations as enTranslations } from "./en";
- * import { translations as deTranslations } from "./de";
- * import { translations as plTranslations } from "./pl";
  *
  * export const simpleT = createScopedTranslation({
  *   en: enTranslations,
- *   de: deTranslations,
- *   pl: plTranslations,
+ *   de: () => require("./de").translations,  // lazy — loaded on first DE request
+ *   pl: () => require("./pl").translations,  // lazy — loaded on first PL request
  * });
  *
  * // Usage:
@@ -93,20 +91,50 @@ export type ExtractScopedTranslationKey<T> = T extends {
   ? K
   : never;
 
+/**
+ * Resolves a translation entry — supports both eager objects and lazy getters.
+ * Lazy getters are called once and their result is cached.
+ */
+type LazyOrEager<T> = T | (() => T);
+
+function resolveTranslation<T>(entry: LazyOrEager<T>): T {
+  if (typeof entry === "function") {
+    return (entry as () => T)();
+  }
+  return entry;
+}
+
 export function createScopedTranslation<
   const TEN,
   const TDE,
   const TPL,
 >(translationsByLanguage: {
   en: TEN;
-  de: TDE;
-  pl: TPL;
+  de: LazyOrEager<TDE>;
+  pl: LazyOrEager<TPL>;
 }): {
   readonly ScopedTranslationKey: DotNotation<TEN>;
   readonly scopedT: (locale: CountryLanguage) => {
     t: (key: DotNotation<TEN>, params?: TParams) => TranslatedKeyType;
   };
 } {
+  // Cache resolved translations per language to avoid repeated getter calls
+  const resolvedCache = new Map<string, Record<string, NestedValue>>();
+
+  function getTranslations(language: Languages): Record<string, NestedValue> {
+    const cached = resolvedCache.get(language);
+    if (cached) {
+      return cached;
+    }
+
+    const raw = resolveTranslation(
+      translationsByLanguage[language as keyof typeof translationsByLanguage],
+    );
+    const resolved = raw as Record<string, NestedValue>;
+    resolvedCache.set(language, resolved);
+    return resolved;
+  }
+
   return {
     ScopedTranslationKey: undefined as DotNotation<TEN>,
 
@@ -126,13 +154,9 @@ export function createScopedTranslation<
           const language = locale.split("-")[0] as Languages;
           const defaultLanguage = getLanguageFromLocale(defaultLocale);
 
-          // Get translations for the requested language
-          const languageTranslations = translationsByLanguage[
-            language
-          ] as Record<string, NestedValue>;
-          const fallbackTranslations = translationsByLanguage[
-            defaultLanguage
-          ] as Record<string, NestedValue>;
+          // Get translations for the requested language (resolves lazy getters on first access)
+          const languageTranslations = getTranslations(language);
+          const fallbackTranslations = getTranslations(defaultLanguage);
 
           // Navigate through the translation object using shared logic
           const keys = (key as string).split(".");

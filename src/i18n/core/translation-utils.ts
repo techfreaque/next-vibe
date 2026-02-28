@@ -98,11 +98,15 @@ function tryGetTranslation<K extends TranslationKey>(
   context?: string,
 ): TranslationElement | string | undefined {
   const keys = key?.split(".");
-  const translationsForLanguage = translations[language];
+  const entry = translations[language];
 
-  if (!translationsForLanguage) {
+  if (!entry) {
     return undefined;
   }
+
+  // Resolve lazy-loaded translations (de/pl use () => require(...))
+  const translationsForLanguage: TranslationElement =
+    typeof entry === "function" ? entry() : entry;
 
   return navigateTranslationPath(
     translationsForLanguage,
