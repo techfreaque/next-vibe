@@ -22,7 +22,6 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { UserRole } from "../../../user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
 import { CheckResultWidget } from "./widget";
 
@@ -36,11 +35,7 @@ const { POST } = createEndpoint({
   tags: ["tag"],
   icon: "bug",
   allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.WEB_OFF,
-    UserRole.PRODUCTION_OFF,
-    UserRole.AI_TOOL_OFF,
-    UserRole.CLI_AUTH_BYPASS,
+    // intentionally disabled so AI can't call it and rather uses check
   ],
   aliases: ["eslint", "elint", "el"],
 

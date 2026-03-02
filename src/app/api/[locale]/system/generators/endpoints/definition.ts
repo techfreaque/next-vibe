@@ -18,7 +18,6 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
-import { UserRole } from "../../../user/user-roles/enum";
 import { scopedTranslation } from "./i18n";
 
 /**
@@ -36,10 +35,7 @@ const { POST } = createEndpoint({
 
   // === ROLES ===
   allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-    UserRole.PRODUCTION_OFF,
+    // use vibe generate instead
   ],
 
   // === FIELDS ===

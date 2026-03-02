@@ -110,7 +110,6 @@ export function serializeTask(
     errorCount: task.errorCount,
     averageExecutionTime: task.averageExecutionTime ?? null,
     consecutiveFailures: task.consecutiveFailures,
-    maxConsecutiveFailures: task.maxConsecutiveFailures ?? null,
     targetInstance: task.targetInstance ?? null,
     tags: task.tags,
     userId: task.userId ?? null,

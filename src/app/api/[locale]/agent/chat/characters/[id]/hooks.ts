@@ -12,6 +12,7 @@ import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/h
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import type { CharacterGetResponseOutput } from "./definition";
 import definitions from "./definition";
 
 /**
@@ -25,6 +26,8 @@ export function useCharacter(
   characterId: string | undefined,
   user: JwtPayloadType,
   logger: EndpointLogger,
+  /** SSR-prefetched character data — pre-populates React Query cache, skips initial fetch */
+  initialData?: CharacterGetResponseOutput | null,
 ): CharacterEndpointReturn {
   const options = useMemo(
     () => ({
@@ -35,9 +38,10 @@ export function useCharacter(
           staleTime: 5 * 60 * 1000, // 5 minutes
         },
         ...(characterId ? { urlPathParams: { id: characterId } } : {}),
+        initialData: initialData ?? undefined,
       },
     }),
-    [characterId],
+    [characterId, initialData],
   );
   return useEndpoint(definitions, options, logger, user);
 }

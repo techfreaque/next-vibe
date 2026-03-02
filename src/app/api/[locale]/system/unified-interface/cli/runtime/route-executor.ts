@@ -33,6 +33,7 @@ import type { WidgetData } from "../../shared/widgets/widget-data";
 import { CliResultFormatter } from "../../unified-ui/renderers/cli/response/result-formatter";
 import { getCliUser } from "../auth/cli-user";
 import { scopedTranslation as cliScopedTranslation } from "../i18n";
+import { CliTarget, type CliTargetValue } from "../types/cli-target";
 import {
   CliInputParser,
   type CliObject,
@@ -151,6 +152,10 @@ export interface CliExecutionOptions {
   interactive: boolean | undefined;
   verbose: boolean | undefined;
   output: "json" | "pretty" | undefined;
+  /** Execution target: dev, local, or remote */
+  cliTarget: CliTargetValue;
+  /** Remote URL when cliTarget === REMOTE */
+  remoteUrl?: string;
 }
 
 /**
@@ -189,12 +194,14 @@ export class RouteDelegationHandler {
       }
 
       // Get endpoint definition for CLI-specific features (interactive forms, arg parsing)
+      // For remote execution, skip access validation — the remote server handles its own auth
       const endpointResult = await definitionLoader.load<CreateApiEndpointAny>({
         identifier: resolvedCommand,
         platform: options.platform,
         user: cliUser,
         logger,
         locale: options.locale,
+        skipAccessValidation: options.cliTarget === CliTarget.REMOTE,
       });
       const endpoint = endpointResult.success ? endpointResult.data : null;
 
@@ -303,6 +310,51 @@ export class RouteDelegationHandler {
             resolvedCommand,
           },
         };
+      }
+
+      // Remote execution: delegate to HTTP remote executor
+      if (
+        options.cliTarget === CliTarget.REMOTE &&
+        options.remoteUrl &&
+        endpoint
+      ) {
+        const { RemoteExecutor } = await import("./remote-executor");
+        const remoteResult = await RemoteExecutor.execute({
+          endpoint,
+          data: inputData.data || {},
+          locale: options.locale,
+          logger,
+          remoteUrl: options.remoteUrl,
+        });
+
+        const routeResult: RouteExecutionResult = {
+          success: remoteResult.success,
+          data: remoteResult.success
+            ? (remoteResult.data as CliResponseData)
+            : undefined,
+          error: remoteResult.success ? undefined : remoteResult.message,
+          errorParams: remoteResult.success
+            ? undefined
+            : remoteResult.messageParams,
+          metadata: {
+            executionTime: Date.now() - startTime,
+            endpointPath: resolvedCommand,
+            method: endpoint.method,
+            resolvedCommand,
+          },
+        };
+
+        const formattedOutput = await CliResultFormatter.formatResult(
+          routeResult,
+          options.output || "pretty",
+          options.locale,
+          options.verbose || false,
+          logger,
+          endpoint,
+          cliUser,
+        );
+
+        return { ...routeResult, formattedOutput };
       }
 
       // CLI-specific: Show execution info if verbose

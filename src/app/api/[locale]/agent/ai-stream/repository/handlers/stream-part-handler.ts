@@ -12,7 +12,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolExecutionContext } from "../../../chat/config";
 import type { ModelId } from "../../../models/models";
-import type { AiStreamT } from "../../i18n";
+import type { AiStreamT } from "../../stream/i18n";
 import type { StreamContext } from "../core/stream-context";
 import type { StreamingTTSHandler } from "../streaming-tts";
 import { FinishStepHandler } from "./finish-step-handler";

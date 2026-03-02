@@ -32,6 +32,19 @@ const { POST } = createEndpoint({
   path: ["agent", "claude-code"],
   title: "claudeCode.run.post.title",
   description: "claudeCode.run.post.description",
+  dynamicTitle: ({ request }) => {
+    if (request?.prompt) {
+      const prompt =
+        request.prompt.length > 40
+          ? `${request.prompt.slice(0, 40)}...`
+          : request.prompt;
+      return {
+        message: "claudeCode.run.post.dynamicTitle" as const,
+        messageParams: { prompt },
+      };
+    }
+    return undefined;
+  },
   icon: "terminal",
   category: "app.endpointCategories.ai",
   tags: ["claudeCode.tags.tasks" as const],

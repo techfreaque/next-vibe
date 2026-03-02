@@ -16,7 +16,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { IconKey } from "../../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import type { ModelSelectionSimple } from "../../../models/components/types";
+import type { ModelSelectionSimple } from "../../../models/types";
 import type { TtsVoiceValue } from "../../../text-to-speech/enum";
 import characterSingleDefinitions from "../../characters/[id]/definition";
 import { ChatFavoritesRepositoryClient } from "../repository-client";

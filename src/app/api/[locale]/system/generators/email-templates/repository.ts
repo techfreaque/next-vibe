@@ -23,6 +23,7 @@ import {
   formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
+import type { LiveIndex } from "../shared/live-index";
 import {
   findFilesRecursively,
   generateFileHeader,
@@ -74,6 +75,7 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
     data: EmailTemplateRequestType,
     logger: EndpointLogger,
     t: ModuleT,
+    liveIndex?: LiveIndex,
   ): Promise<BaseResponseType<EmailTemplateResponseType>> {
     const startTime = Date.now();
 
@@ -81,23 +83,28 @@ class EmailTemplateGeneratorRepositoryImpl implements EmailTemplateGeneratorRepo
       const outputFile = data.outputFile;
       logger.debug(`Starting email template generation: ${outputFile}`);
 
-      // Discover template files in all api/[locale] subdirectories
-      // eslint-disable-next-line i18next/no-literal-string
-      const apiPath = ["src", "app", "api", "[locale]"];
-      const startDir = join(process.cwd(), ...apiPath);
+      // Use live index when available (dev watcher), otherwise scan from disk
+      let templateFiles: string[];
 
-      logger.debug(`Discovering email template files in: ${startDir}`);
+      if (liveIndex) {
+        logger.debug("Using live index for file discovery");
+        templateFiles = [...liveIndex.emailFiles];
+      } else {
+        // eslint-disable-next-line i18next/no-literal-string
+        const apiPath = ["src", "app", "api", "[locale]"];
+        const startDir = join(process.cwd(), ...apiPath);
 
-      // Find both email.tsx and *.email.tsx files recursively
-      const emailTsxFiles = findFilesRecursively(startDir, "email.tsx");
-      const emailDotTsxFiles = findFilesRecursively(
-        startDir,
-        ".email.tsx",
-      ).filter(
-        (file) => !file.endsWith("/email.tsx"), // Exclude already found email.tsx
-      );
+        logger.debug(`Discovering email template files in: ${startDir}`);
 
-      const templateFiles = [...emailTsxFiles, ...emailDotTsxFiles];
+        // Find both email.tsx and *.email.tsx files recursively
+        const emailTsxFiles = findFilesRecursively(startDir, "email.tsx");
+        const emailDotTsxFiles = findFilesRecursively(
+          startDir,
+          ".email.tsx",
+        ).filter((file) => !file.endsWith("/email.tsx"));
+
+        templateFiles = [...emailTsxFiles, ...emailDotTsxFiles];
+      }
 
       logger.debug(`Found ${templateFiles.length} template files`);
 
@@ -337,7 +344,6 @@ ${descriptionStr}
     return `${header}
 
 ${importStatements}
-
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type {
@@ -503,7 +509,10 @@ export async function getAllTranslatedTemplateMetadata(
   locale: CountryLanguage,
 ): Promise<
   Array<
-    Omit<TemplateCachedMetadata<string>, "name" | "description" | "category"> & {
+    Omit<
+      TemplateCachedMetadata<string>,
+      "name" | "description" | "category"
+    > & {
       name: string;
       description: string;
       category: string;

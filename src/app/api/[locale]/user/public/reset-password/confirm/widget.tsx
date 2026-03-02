@@ -24,7 +24,7 @@ import { PasswordFieldWidget } from "@/app/api/[locale]/system/unified-interface
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
-import { PasswordStrengthIndicator } from "@/app/api/[locale]/user/public/signup/_components/password-strength-indicator";
+import { PasswordStrengthIndicator } from "@/app/api/[locale]/user/public/signup/widget/password-strength-indicator";
 
 import type definition from "./definition";
 import type { ResetPasswordConfirmPostResponseOutput } from "./definition";

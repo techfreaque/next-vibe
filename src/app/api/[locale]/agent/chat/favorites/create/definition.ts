@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/components/types";
+import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/types";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,

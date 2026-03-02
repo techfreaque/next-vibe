@@ -5,11 +5,11 @@
 
 import { z } from "zod";
 
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import {
   modelSelectionSchemaSimple,
   type ModelSelectionSimple,
-} from "@/app/api/[locale]/agent/models/components/types";
-import { ModelId } from "@/app/api/[locale]/agent/models/models";
+} from "@/app/api/[locale]/agent/models/types";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {

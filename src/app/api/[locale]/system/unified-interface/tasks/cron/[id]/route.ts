@@ -6,6 +6,7 @@
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { scopedTranslation as tasksScopedTranslation } from "@/app/api/[locale]/system/unified-interface/tasks/i18n";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { CronTasksRepository } from "../repository";
 import { endpoints } from "./definition";
@@ -60,6 +61,20 @@ export const { GET, PUT, DELETE, tools } = endpointsHandler({
         updates.runOnce = data.runOnce;
       }
       if (data.targetInstance !== undefined) {
+        // Only admins can set targetInstance — it controls cross-instance task routing
+        const isAdmin =
+          !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+        if (!isAdmin) {
+          const { t: tasksT } = tasksScopedTranslation.scopedT(locale);
+          return {
+            success: false as const,
+            message: tasksT("errors.repositoryUpdateTaskForbidden"),
+            errorType: {
+              errorKey: "errorTypes.forbidden" as const,
+              errorCode: 403 as const,
+            },
+          };
+        }
         updates.targetInstance = data.targetInstance;
       }
       const { t: tasksT } = tasksScopedTranslation.scopedT(locale);

@@ -10,6 +10,12 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
 import { Div } from "next-vibe-ui/ui/div";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "next-vibe-ui/ui/form/form";
 import { Info } from "next-vibe-ui/ui/icons/Info";
 import { Label } from "next-vibe-ui/ui/label";
 import { Span } from "next-vibe-ui/ui/span";
@@ -26,12 +32,6 @@ import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/ap
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { BooleanWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import type { ReactFormFieldProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/packages/next-vibe-ui/web/ui/form/form";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import {

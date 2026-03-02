@@ -25,6 +25,7 @@ import {
 import type { ApiSection } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { PATH_SEPARATOR } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 
+import type { LiveIndex } from "../shared/live-index";
 import {
   extractPathKey,
   findFilesRecursively,
@@ -69,6 +70,7 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
     data: RouteHandlersRequestType,
     logger: EndpointLogger,
     t: ModuleT,
+    liveIndex?: LiveIndex,
   ): Promise<BaseResponseType<RouteHandlersResponseType>> {
     const startTime = Date.now();
 
@@ -76,24 +78,34 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
       const outputFile = data.outputFile;
       logger.debug(`Starting route handlers generation: ${outputFile}`);
 
-      // Discover route files
-      // eslint-disable-next-line i18next/no-literal-string
-      const apiCorePath = ["src", "app", "api", "[locale]"];
-      const startDir = join(process.cwd(), ...apiCorePath);
+      // Use live index when available (dev watcher), otherwise scan from disk
+      let routeFiles: string[];
+      let definitionFiles: string[];
 
-      logger.debug("Discovering route files");
-      const routeFiles = findFilesRecursively(startDir, "route.ts");
+      if (liveIndex) {
+        logger.debug("Using live index for file discovery");
+        routeFiles = [...liveIndex.routeFiles];
+        definitionFiles = [...liveIndex.definitionFiles];
+      } else {
+        // eslint-disable-next-line i18next/no-literal-string
+        const apiCorePath = ["src", "app", "api", "[locale]"];
+        const startDir = join(process.cwd(), ...apiCorePath);
+
+        logger.debug("Discovering route files");
+        routeFiles = findFilesRecursively(startDir, "route.ts");
+        definitionFiles = findFilesRecursively(startDir, "definition.ts");
+      }
 
       logger.debug(`Found ${routeFiles.length} route files`);
 
-      // Check for routes without definitions - filter them out
-      const definitionFiles = findFilesRecursively(startDir, "definition.ts");
+      // Filter routes that have no matching definition
+      const definitionFilesSet = new Set(definitionFiles);
       const routesWithoutDefinition: string[] = [];
       const validRouteFiles: string[] = [];
 
       for (const routeFile of routeFiles) {
         const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
-        if (!definitionFiles.includes(definitionPath)) {
+        if (!definitionFilesSet.has(definitionPath)) {
           routesWithoutDefinition.push(routeFile);
         } else {
           validRouteFiles.push(routeFile);

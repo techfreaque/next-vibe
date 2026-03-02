@@ -9,6 +9,13 @@ import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "next-vibe-ui/ui/form/form";
 import { Info } from "next-vibe-ui/ui/icons/Info";
 import {
   Slider,
@@ -29,13 +36,6 @@ import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/ap
 import type { NumberWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import type { ReactFormFieldProps } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/react-types";
 import { simpleT } from "@/i18n/core/shared";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/packages/next-vibe-ui/web/ui/form/form";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { FieldUsageConfig } from "../../_shared/types";

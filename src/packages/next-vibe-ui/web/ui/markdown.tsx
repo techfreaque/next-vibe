@@ -1,6 +1,7 @@
 "use client";
 
 import { Brain, Check, ChevronDown, Copy, ExternalLink } from "lucide-react";
+import type { Route } from "next";
 import Link from "next/link";
 import { cn } from "next-vibe/shared/utils";
 import type { JSX } from "react";
@@ -394,7 +395,7 @@ export const Markdown = memo(function Markdown({
             children: React.ReactNode;
           }) => (
             <Link
-              href={href || "#"}
+              href={(href || "#") as Route}
               target="_blank"
               rel="noopener noreferrer"
               className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 inline-flex items-center gap-1 underline underline-offset-2 decoration-2 hover:decoration-blue-600 dark:hover:decoration-blue-400 transition-all duration-200 font-medium"

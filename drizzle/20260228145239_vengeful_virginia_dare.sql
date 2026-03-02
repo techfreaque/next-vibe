@@ -1,0 +1,1 @@
+ALTER TABLE "cron_tasks" DROP COLUMN "max_consecutive_failures";

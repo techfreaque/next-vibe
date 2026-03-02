@@ -16,17 +16,24 @@ import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
 
 import { isUUID, parseChatUrl } from "@/app/[locale]/chat/lib/url-parser";
-import { ChatInterface } from "@/app/api/[locale]/agent/chat/_components/chat-interface";
+import { CharactersRepository } from "@/app/api/[locale]/agent/chat/characters/repository";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import {
-  getDefaultActiveToolCount,
-  getTotalToolCount,
-} from "@/app/api/[locale]/agent/chat/default-tool-counts";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { FolderRepository } from "@/app/api/[locale]/agent/chat/folders/[id]/repository";
+import { scopedTranslation as foldersScopedTranslation } from "@/app/api/[locale]/agent/chat/folders/i18n";
+import { ChatFoldersRepository } from "@/app/api/[locale]/agent/chat/folders/repository";
 import { RootFolderPermissionsRepository } from "@/app/api/[locale]/agent/chat/folders/root-permissions/repository";
-import { ChatProvider } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { ChatBootProvider } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { ChatNavigationProvider } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
+import { scopedTranslation as settingsScopedTranslation } from "@/app/api/[locale]/agent/chat/settings/i18n";
+import { ChatSettingsRepository } from "@/app/api/[locale]/agent/chat/settings/repository";
+import { scopedTranslation as messagesScopedTranslation } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/i18n";
+import { scopedTranslation as pathScopedTranslation } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/i18n";
+import { pathRepository } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/path/repository";
+import { MessagesRepository } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/repository";
 import { ThreadByIdRepository } from "@/app/api/[locale]/agent/chat/threads/[threadId]/repository";
+import { scopedTranslation as threadsScopedTranslation } from "@/app/api/[locale]/agent/chat/threads/i18n";
+import { ThreadsRepository } from "@/app/api/[locale]/agent/chat/threads/repository";
 import { getAgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import { EnvAvailabilityProvider } from "@/app/api/[locale]/agent/env-availability-context";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
@@ -38,6 +45,8 @@ import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
+
+import { ChatInterface } from "./_components/chat-interface";
 
 interface ThreadsPathPageProps {
   params: Promise<{
@@ -170,25 +179,136 @@ export default async function ThreadsPathPage({
   }
 
   const envAvailability = getAgentEnvAvailability();
-  const defaultToolCount = getDefaultActiveToolCount();
-  const totalToolCount = getTotalToolCount(user);
+
+  // Prefetch initial sidebar + thread data server-side to avoid client-side fetch on mount.
+  // Skip for incognito (localStorage-only).
+  // This data is passed as initialData so pages render immediately without a fetch.
+  let initialFoldersData = null;
+  let initialThreadsData = null;
+  let initialMessagesData = null;
+  let initialPathData = null;
+  let initialSettingsData = null;
+  let initialCharacterData = null;
+
+  if (initialRootFolderId !== DefaultFolderId.INCOGNITO && user) {
+    const { t: foldersT } = foldersScopedTranslation.scopedT(locale);
+    const { t: threadsT } = threadsScopedTranslation.scopedT(locale);
+    const { t: messagesT } = messagesScopedTranslation.scopedT(locale);
+    const { t: settingsT } = settingsScopedTranslation.scopedT(locale);
+    const { t: pathT } = pathScopedTranslation.scopedT(locale);
+
+    const activeThreadIdForFetch =
+      initialThreadId && initialThreadId !== NEW_MESSAGE_ID
+        ? initialThreadId
+        : null;
+
+    // Fetch folders, threads, messages, settings in parallel (settings needed to know the character)
+    const [foldersResult, threadsResult, messagesResult, settingsResult] =
+      await Promise.all([
+        ChatFoldersRepository.getFolders(
+          { rootFolderId: initialRootFolderId },
+          user,
+          foldersT,
+          logger,
+          locale,
+        ),
+        ThreadsRepository.listThreads(
+          {
+            rootFolderId: initialRootFolderId,
+            subFolderId: initialSubFolderId ?? undefined,
+            page: 1,
+            limit: 50,
+          },
+          user,
+          threadsT,
+          logger,
+          locale,
+        ),
+        activeThreadIdForFetch
+          ? MessagesRepository.listMessages(
+              { threadId: activeThreadIdForFetch },
+              user,
+              messagesT,
+              logger,
+              locale,
+            )
+          : Promise.resolve(null),
+        user.isPublic
+          ? Promise.resolve(null)
+          : ChatSettingsRepository.getSettings(user, logger, settingsT),
+      ]);
+
+    if (foldersResult.success) {
+      initialFoldersData = foldersResult.data;
+    }
+    if (threadsResult.success) {
+      initialThreadsData = threadsResult.data;
+    }
+    if (messagesResult && messagesResult.success) {
+      initialMessagesData = messagesResult.data;
+    }
+    if (settingsResult && settingsResult.success) {
+      initialSettingsData = settingsResult.data;
+    }
+
+    // Fetch path + character in parallel (character depends on settings, path depends on thread)
+    const selectedCharacter = initialSettingsData?.selectedCharacter ?? null;
+
+    const [pathResult, characterResult] = await Promise.all([
+      activeThreadIdForFetch
+        ? pathRepository.getPath(
+            { threadId: activeThreadIdForFetch },
+            { branchIndices: {} },
+            user,
+            pathT,
+            logger,
+            locale,
+          )
+        : Promise.resolve(null),
+      selectedCharacter
+        ? CharactersRepository.getCharacterById(
+            { id: selectedCharacter },
+            user,
+            logger,
+            locale,
+          )
+        : Promise.resolve(null),
+    ]);
+
+    if (pathResult && pathResult.success) {
+      initialPathData = pathResult.data;
+    }
+    if (characterResult && characterResult.success) {
+      initialCharacterData = characterResult.data;
+    }
+  }
 
   return (
     <EnvAvailabilityProvider availability={envAvailability}>
-      <ChatProvider
-        user={user}
-        locale={locale}
+      <ChatNavigationProvider
         activeThreadId={initialThreadId}
         currentRootFolderId={initialRootFolderId}
         currentSubFolderId={initialSubFolderId}
-        initialCredits={creditsToUse}
-        rootFolderPermissions={rootFolderPermissions}
-        envAvailability={envAvailability}
-        defaultToolCount={defaultToolCount}
-        totalToolCount={totalToolCount}
       >
-        <ChatInterface user={user} />
-      </ChatProvider>
+        <ChatBootProvider
+          user={user}
+          locale={locale}
+          activeThreadId={initialThreadId}
+          currentRootFolderId={initialRootFolderId}
+          currentSubFolderId={initialSubFolderId}
+          initialCredits={creditsToUse}
+          rootFolderPermissions={rootFolderPermissions}
+          envAvailability={envAvailability}
+          initialFoldersData={initialFoldersData}
+          initialThreadsData={initialThreadsData}
+          initialMessagesData={initialMessagesData}
+          initialPathData={initialPathData}
+          initialSettingsData={initialSettingsData}
+          initialCharacterData={initialCharacterData}
+        >
+          <ChatInterface user={user} />
+        </ChatBootProvider>
+      </ChatNavigationProvider>
     </EnvAvailabilityProvider>
   );
 }

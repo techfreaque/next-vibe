@@ -89,9 +89,9 @@ export class LocalStorageAdapter implements StorageAdapter {
     const metadataPath = path.join(metadataDir, `${fileId}.json`);
     await fs.writeFile(metadataPath, JSON.stringify(fileMetadata, null, 2));
 
-    // URL format: /api/{locale}/agent/chat/files/{threadId}/{filename}
+    // URL format: /api/{locale}/agent/chat/threads/files/{threadId}/{filename}
     // Use en-GLOBAL as default locale for file URLs
-    const url = `/api/en-GLOBAL/agent/chat/files/${metadata.threadId}/${storedFilename}`;
+    const url = `/api/en-GLOBAL/agent/chat/threads/files/${metadata.threadId}/${storedFilename}`;
 
     return {
       url,
@@ -141,7 +141,7 @@ export class LocalStorageAdapter implements StorageAdapter {
       return "";
     }
 
-    return `/api/en-GLOBAL/agent/chat/files/${metadata.threadId}/${metadata.filename}`;
+    return `/api/en-GLOBAL/agent/chat/threads/files/${metadata.threadId}/${metadata.filename}`;
   }
 
   async getFileMetadata(fileId: string): Promise<FileMetadata | null> {

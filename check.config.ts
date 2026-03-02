@@ -66,6 +66,7 @@ const { oxlintIgnores, eslintIgnores } = formatIgnorePatterns([
   ".next",
   ".next-prod",
   ".next-rebuild",
+  ".next-prod",
   ".next-old",
   ".tmp",
   "node_modules",

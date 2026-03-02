@@ -1,0 +1,19 @@
+# Kustomize base for next-vibe Kubernetes deployment
+# Usage:
+#   kubectl apply -k k8s/                    # apply all
+#   kubectl kustomize k8s/ | kubectl diff -f - # preview changes
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: next-vibe
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secret.yaml
+  - web-deployment.yaml
+  - web-service.yaml
+  - tasks-deployment.yaml
+  - ingress.yaml
+  # Uncomment to deploy Redis for multi-instance WebSocket pub/sub:
+  # - redis.yaml

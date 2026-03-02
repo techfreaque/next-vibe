@@ -10,6 +10,13 @@ import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "next-vibe-ui/ui/form/form";
 import { Info } from "next-vibe-ui/ui/icons/Info";
 import { Span } from "next-vibe-ui/ui/span";
 import {
@@ -29,13 +36,6 @@ import {
   type IconKey,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { simpleT } from "@/i18n/core/shared";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/packages/next-vibe-ui/web/ui/form/form";
 
 import type { FieldUsageConfig } from "../../_shared/types";
 import {

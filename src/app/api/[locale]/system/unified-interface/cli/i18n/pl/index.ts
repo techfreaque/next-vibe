@@ -40,7 +40,8 @@ export const translations: typeof enTranslations = {
       locale: "Określ lokalizację (en-GLOBAL, de-DE, pl-PL)",
       verbose: "Włącz szczegółowe wyjście",
       dryRun: "Wykonaj próbny przebieg bez wykonywania",
-      preview: "Użyj podglądowej bazy danych i URL aplikacji (LOCAL_MODE_*)",
+      target:
+        "Cel wykonania: dev (domyślny), local (podglądowa baza), lub remote (HTTP przez NEXT_PUBLIC_PROJECT_URL)",
       interactive: "Włącz tryb interaktywny",
     },
     errors: {
@@ -63,6 +64,17 @@ export const translations: typeof enTranslations = {
       storeFailed: "Nie udało się zapisać sesji",
       clearFailed: "Nie udało się wyczyścić sesji",
       setLeadIdCookieFailed: "Nie udało się ustawić ciasteczka ID leada",
+      remoteNoToken: "Zdalna sesja nie ma aktywnego tokenu",
+      remoteExpired: "Zdalna sesja wygasła",
+      remoteNotFound:
+        "Nie znaleziono zdalnej sesji. Uruchom: vibe login --target remote",
+      remoteReadFailed: "Nie udało się odczytać zdalnej sesji",
+      remoteWriteFailed: "Nie udało się zapisać zdalnej sesji",
+      remoteClearFailed: "Nie udało się wyczyścić zdalnej sesji",
+      remoteNotLoggedIn:
+        "Nie zalogowano na zdalnym hoście. Uruchom: vibe login --target remote",
+      remoteNoLeadId: "Nie udało się uzyskać tożsamości ze zdalnego hosta",
+      remoteServerError: "Błąd zdalnego serwera",
     },
     endpoints: {
       endpointHandler: {

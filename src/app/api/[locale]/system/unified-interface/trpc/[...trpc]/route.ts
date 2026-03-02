@@ -14,11 +14,12 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interfac
 import { createTRPCContext } from "@/app/api/[locale]/system/unified-interface/trpc/setup";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
-import { appRouter } from "./router";
-
 /**
  * Handle all HTTP methods for tRPC with locale support
  * Route pattern: /api/[locale]/trpc/[...trpc]
+ *
+ * tRPC is opt-in. Enable by running the tRPC router generator, which creates
+ * router.ts in this directory. Delete router.ts to disable tRPC entirely.
  */
 async function handler(
   req: NextRequest,
@@ -26,6 +27,22 @@ async function handler(
 ): Promise<Response> {
   const { locale: rawLocale } = await params;
   const logger = createEndpointLogger(false, Date.now(), rawLocale);
+
+  // Dynamically import the generated router — only exists if tRPC is enabled
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let appRouter: any;
+  try {
+    // @ts-expect-error -- Doesnt exist if tRPC is not enabled
+    const routerModule = await import("./router");
+    appRouter = routerModule.appRouter;
+  } catch {
+    return new Response(
+      "tRPC is not enabled. Run the tRPC router generator to enable it.",
+      {
+        status: 404,
+      },
+    );
+  }
 
   // Validate locale parameter
   const localeValidation = validateData(

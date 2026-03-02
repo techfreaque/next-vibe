@@ -6,7 +6,7 @@
 import type React from "react";
 import type { ReactNode } from "react";
 
-import { AdminLeadsLayoutClient } from "@/app/api/[locale]/leads/_components/admin-leads-layout-client";
+import { AdminLeadsLayoutClient } from "@/app/api/[locale]/leads/widget/admin-leads-layout-client";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 

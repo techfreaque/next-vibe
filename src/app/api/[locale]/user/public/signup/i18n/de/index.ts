@@ -1,4 +1,4 @@
-import { translations as _componentsTranslations } from "../../_components/i18n/de";
+import { translations as _componentsTranslations } from "../../widget/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {

@@ -11,7 +11,7 @@ import {
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { AiStreamT } from "../../i18n";
+import type { AiStreamT } from "../../stream/i18n";
 import type { MessageDbWriter } from "../core/message-db-writer";
 
 export class TimeoutErrorHandler {

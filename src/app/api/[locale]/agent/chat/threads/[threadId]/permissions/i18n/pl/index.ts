@@ -6,6 +6,9 @@ export const translations: typeof enTranslations = {
     threads: "Wątki",
     permissions: "Uprawnienia",
   },
+  dialog: {
+    title: "Uprawnienia wątku: {{threadTitle}}",
+  },
   get: {
     title: "Pobierz uprawnienia wątku",
     description: "Pobierz listę moderatorów dla konkretnego wątku",

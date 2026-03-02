@@ -5,9 +5,9 @@
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
-import { type JSX, useCallback } from "react";
+import { type JSX, useCallback, useMemo } from "react";
 
-import { ModelSelector } from "@/app/api/[locale]/agent/models/components/model-selector";
+import { ModelSelector } from "@/app/api/[locale]/agent/models/widget/model-selector";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
   useWidgetForm,
@@ -25,7 +25,7 @@ import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interfac
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { ModelSelectionSimple } from "../../../models/components/types";
+import type { ModelSelectionSimple } from "../../../models/types";
 import type defintion from "./definition";
 import type { CharacterCreateResponseOutput } from "./definition";
 
@@ -50,6 +50,7 @@ export function CharacterCreateContainer({
   const form = useWidgetForm<typeof defintion.POST>();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
+  const emptyField = useMemo(() => ({}), []);
 
   return (
     <Div className="flex flex-col gap-0">
@@ -78,7 +79,7 @@ export function CharacterCreateContainer({
       {/* Scrollable Form Container */}
       <Div className="group overflow-y-auto max-h-[min(800px,calc(100dvh-180px))] px-4 pb-4">
         {/* Form Alert */}
-        <FormAlertWidget field={{}} />
+        <FormAlertWidget field={emptyField} />
 
         {/* Success message (response only) */}
         <AlertWidget

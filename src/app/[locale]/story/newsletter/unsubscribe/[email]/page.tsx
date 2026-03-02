@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next-vibe-ui/lib/not-found";
 import type { JSX } from "react";
 
-import { UnsubscribePage } from "@/app/api/[locale]/newsletter/unsubscribe/_components/unsubscribe-page";
+import { UnsubscribePage } from "@/app/api/[locale]/newsletter/unsubscribe/widget/unsubscribe-page";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";

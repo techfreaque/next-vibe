@@ -70,6 +70,14 @@ export const translations: typeof enTranslations = {
       openTool: {
         label: "Otwórz narzędzie",
       },
+      platform: {
+        label: "Platforma",
+        description:
+          "Filtruj narzędzia według platformy (tylko admin). Pokazuje narzędzia dostępne na wybranej platformie.",
+      },
+      platforms: {
+        title: "Dostępne platformy",
+      },
     },
     success: {
       title: "Narzędzia pobrane pomyślnie",
@@ -289,6 +297,17 @@ export const translations: typeof enTranslations = {
         "Nieprzypięte — AI może wywoływać na żądanie. Kliknij aby przypiąć",
       confirmOn: "Prosi o potwierdzenie — kliknij aby wyłączyć",
       confirmOff: "Uruchamia automatycznie — kliknij aby wymagać potwierdzenia",
+    },
+    platformFilter: {
+      all: "Wszystkie platformy",
+      cli: "CLI",
+      mcp: "MCP",
+      ai: "AI",
+      web: "Web",
+    },
+    envFilter: {
+      development: "Rozwojowe",
+      production: "Produkcyjne",
     },
   },
   list: {

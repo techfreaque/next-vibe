@@ -10,7 +10,7 @@ import { jsonSchema, type JSONSchema7, tool } from "ai";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
-import { scopedTranslation as aiStreamScopedTranslation } from "@/app/api/[locale]/agent/ai-stream/i18n";
+import { scopedTranslation as aiStreamScopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";

@@ -347,6 +347,9 @@ export const chatThreads = pgTable(
     // Published status (for SHARED folders - allows public read access via link)
     published: boolean("published").default(false).notNull(),
 
+    // Streaming state — true while an AI stream is actively running on this thread
+    isStreaming: boolean("is_streaming").default(false).notNull(),
+
     // Timestamps
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),

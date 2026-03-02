@@ -587,6 +587,7 @@ export class ThreadsRepository {
             status: thread.status,
             preview: thread.preview,
             pinned: thread.pinned,
+            archived: thread.archived,
             // Preserve null values for inheritance (null = inherit, [] = deny, [roles...] = allow)
             rolesView: thread.rolesView,
             rolesEdit: thread.rolesEdit,

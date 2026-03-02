@@ -9,6 +9,13 @@ import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "next-vibe-ui/ui/form/form";
 import { Info } from "next-vibe-ui/ui/icons/Info";
 import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
@@ -23,13 +30,6 @@ import type { JSX } from "react";
 import { scopedTranslation as unifiedInterfaceScopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { StringWidgetSchema } from "@/app/api/[locale]/system/unified-interface/shared/widgets/utils/schema-constraints";
 import { simpleT } from "@/i18n/core/shared";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/packages/next-vibe-ui/web/ui/form/form";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import type { ReactFormFieldProps } from "../../_shared/react-types";

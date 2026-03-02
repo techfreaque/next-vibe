@@ -1,9 +1,10 @@
 import { translations as threadsThreadIdTranslations } from "../../[threadId]/i18n/pl";
-import { translations as searchTranslations } from "../../search/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  ...searchTranslations,
+  tags: {
+    threads: "Wątki",
+  },
   errors: {
     count_failed: "Nie udało się pobrać liczby konwersacji: {{error}}",
   },
@@ -89,6 +90,9 @@ export const translations: typeof enTranslations = {
           },
           pinned: {
             content: "Przypięty",
+          },
+          archived: {
+            content: "Zarchiwizowany",
           },
           createdAt: {
             content: "Utworzono",

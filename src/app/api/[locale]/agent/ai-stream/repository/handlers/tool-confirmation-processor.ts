@@ -15,7 +15,7 @@ import { db } from "../../../../system/db";
 import type { ToolExecutionContext } from "../../../chat/config";
 import type { ChatMessage, ToolCall } from "../../../chat/db";
 import { chatMessages } from "../../../chat/db";
-import type { AiStreamT } from "../../i18n";
+import type { AiStreamT } from "../../stream/i18n";
 import { ToolConfirmationHandler } from "./tool-confirmation-handler";
 
 export class ToolConfirmationProcessor {

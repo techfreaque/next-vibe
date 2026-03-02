@@ -19,7 +19,7 @@ import { creditValidator } from "@/app/api/[locale]/credits/validator";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { AiStreamT } from "../../i18n";
+import type { AiStreamT } from "../../stream/i18n";
 
 export class CreditValidatorHandler {
   static async validateCredits(params: {

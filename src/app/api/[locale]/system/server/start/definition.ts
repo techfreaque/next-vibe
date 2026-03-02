@@ -52,6 +52,20 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // === REQUEST FIELDS ===
+      mode: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.fields.mode.title",
+        description: "post.fields.mode.description",
+        columns: 12,
+        options: [
+          { value: "all", label: "post.fields.mode.options.all" },
+          { value: "web", label: "post.fields.mode.options.web" },
+          { value: "tasks", label: "post.fields.mode.options.tasks" },
+        ],
+        schema: z.enum(["all", "web", "tasks"]).optional().default("all"),
+      }),
+
       seed: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
@@ -157,42 +171,46 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
+        mode: "all",
+        seed: true,
+        dbSetup: true,
+        taskRunner: true,
+        nextServer: true,
+      },
+      webOnly: {
+        mode: "web",
+        seed: true,
+        dbSetup: true,
+        taskRunner: true,
+        nextServer: true,
+      },
+      tasksOnly: {
+        mode: "tasks",
         seed: true,
         dbSetup: true,
         taskRunner: true,
         nextServer: true,
       },
       withPort: {
+        mode: "all",
         seed: true,
         dbSetup: true,
         taskRunner: true,
         nextServer: true,
         port: 3000,
       },
-      noDb: {
-        seed: false,
-        dbSetup: false,
-        taskRunner: true,
-        nextServer: true,
-      },
-      nextOnly: {
-        seed: false,
-        dbSetup: false,
-        taskRunner: false,
-        nextServer: true,
-      },
     },
     responses: {
       default: {
         responseMessage: "post.fields.output.title",
       },
+      webOnly: {
+        responseMessage: "post.fields.output.title",
+      },
+      tasksOnly: {
+        responseMessage: "post.fields.output.title",
+      },
       withPort: {
-        responseMessage: "post.fields.output.title",
-      },
-      noDb: {
-        responseMessage: "post.fields.output.title",
-      },
-      nextOnly: {
         responseMessage: "post.fields.output.title",
       },
     },

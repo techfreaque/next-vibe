@@ -16,7 +16,7 @@ import { UserRepository } from "@/app/api/[locale]/user/repository";
 
 import type { ChatMessageRole } from "../../../chat/enum";
 import { createUserMessage } from "../../../chat/threads/[threadId]/messages/repository";
-import type { AiStreamT } from "../../i18n";
+import type { AiStreamT } from "../../stream/i18n";
 import { FileAttachmentHandler } from "./file-attachment-handler";
 
 export class UserMessageHandler {

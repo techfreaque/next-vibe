@@ -4,6 +4,7 @@ import type { z } from "zod";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { EventSchemas } from "@/app/api/[locale]/system/unified-interface/websocket/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
 
@@ -65,13 +66,15 @@ export interface TestRunner<
       TMethod,
       TUserRoleValue,
       TScopedTranslationKey,
-      TFields
+      TFields,
+      EventSchemas
     >["types"]["RequestOutput"];
     urlPathParams: CreateApiEndpoint<
       TMethod,
       TUserRoleValue,
       TScopedTranslationKey,
-      TFields
+      TFields,
+      EventSchemas
     >["types"]["UrlVariablesOutput"];
     user: JwtPayloadType;
   }) => Promise<
@@ -80,7 +83,8 @@ export interface TestRunner<
         TMethod,
         TUserRoleValue,
         TScopedTranslationKey,
-        TFields
+        TFields,
+        EventSchemas
       >["types"]["ResponseOutput"]
     >
   >;
@@ -92,6 +96,7 @@ export interface TestRunner<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
-    TFields
+    TFields,
+    EventSchemas
   >;
 }

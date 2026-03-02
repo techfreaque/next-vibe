@@ -21,8 +21,9 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams } from "@/i18n/core/static-types";
 
-import type { AiStreamTranslationKey } from "../../i18n";
+import type { AiStreamTranslationKey } from "../../stream/i18n";
 import type { StreamContext } from "../core/stream-context";
+import { clearStreamingState } from "../core/stream-registry";
 
 type AiStreamModuleT = (
   key: AiStreamTranslationKey,
@@ -384,8 +385,10 @@ export class AbortErrorHandler {
           finishReason: "stop",
         });
       }
-      ctx.dbWriter.closeController();
     }
+
+    // Clear streaming state in DB + registry
+    await clearStreamingState(threadId);
 
     ctx.cleanup();
 

@@ -8,6 +8,7 @@ import type { z } from "zod";
 import type { CreateApiEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import type { EventSchemas } from "@/app/api/[locale]/system/unified-interface/websocket/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import {
   UserPermissionRole,
@@ -63,7 +64,8 @@ export function testEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
-    TFields
+    TFields,
+    EventSchemas
   >,
   options: TestEndpointOptions<
     TMethod,

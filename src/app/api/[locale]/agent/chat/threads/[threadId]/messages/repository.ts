@@ -751,6 +751,7 @@ export class MessagesRepository {
           authorId: userIdentifier,
           isAI: safeRole === ChatMessageRole.ASSISTANT,
           model: user.isPublic ? null : data.model || null,
+          character: user.isPublic ? null : data.character || null,
           metadata: data.metadata || {},
         })
         .returning({

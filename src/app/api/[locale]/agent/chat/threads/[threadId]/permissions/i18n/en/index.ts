@@ -4,6 +4,9 @@ export const translations = {
     threads: "Threads",
     permissions: "Permissions",
   },
+  dialog: {
+    title: "Thread Permissions: {{threadTitle}}",
+  },
   get: {
     title: "Get Thread Permissions",
     description: "Retrieve the list of moderators for a specific thread",

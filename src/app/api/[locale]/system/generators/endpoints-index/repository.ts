@@ -24,6 +24,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import type { ApiSection } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 
+import type { LiveIndex } from "../shared/live-index";
 import {
   extractNestedPath,
   findFilesRecursively,
@@ -57,6 +58,7 @@ class EndpointsIndexGeneratorRepositoryImpl {
     data: EndpointsRequestType,
     logger: EndpointLogger,
     t: ModuleT,
+    liveIndex?: LiveIndex,
   ): Promise<BaseResponseType<EndpointsResponseType>> {
     const startTime = Date.now();
 
@@ -64,24 +66,34 @@ class EndpointsIndexGeneratorRepositoryImpl {
       const outputFile = data.outputFile;
       logger.debug(`Starting endpoints index generation: ${outputFile}`);
 
-      // Discover definition files
-      // eslint-disable-next-line i18next/no-literal-string
-      const apiCorePath = ["src", "app", "api", "[locale]"];
-      const startDir = join(process.cwd(), ...apiCorePath);
+      // Use live index when available (dev watcher), otherwise scan from disk
+      let definitionFiles: string[];
+      let routeFiles: string[];
 
-      logger.debug("Discovering definition files");
-      const definitionFiles = findFilesRecursively(startDir, "definition.ts");
+      if (liveIndex) {
+        logger.debug("Using live index for file discovery");
+        definitionFiles = [...liveIndex.definitionFiles];
+        routeFiles = [...liveIndex.routeFiles];
+      } else {
+        // eslint-disable-next-line i18next/no-literal-string
+        const apiCorePath = ["src", "app", "api", "[locale]"];
+        const startDir = join(process.cwd(), ...apiCorePath);
+
+        logger.debug("Discovering definition files");
+        definitionFiles = findFilesRecursively(startDir, "definition.ts");
+        routeFiles = findFilesRecursively(startDir, "route.ts");
+      }
 
       logger.debug(`Found ${definitionFiles.length} definition files`);
 
       // Filter to only definitions with matching route files
-      const routeFiles = findFilesRecursively(startDir, "route.ts");
+      const routeFilesSet = new Set(routeFiles);
       const definitionsWithoutRoute: string[] = [];
       const validDefinitionFiles: string[] = [];
 
       for (const defFile of definitionFiles) {
         const routePath = defFile.replace("/definition.ts", "/route.ts");
-        if (!routeFiles.includes(routePath)) {
+        if (!routeFilesSet.has(routePath)) {
           definitionsWithoutRoute.push(defFile);
         } else {
           validDefinitionFiles.push(defFile);
@@ -105,6 +117,7 @@ class EndpointsIndexGeneratorRepositoryImpl {
       const content = await this.generateContent(
         validDefinitionFiles,
         outputFile,
+        liveIndex?.methodCache,
       );
 
       // Write file
@@ -233,22 +246,93 @@ class EndpointsIndexGeneratorRepositoryImpl {
   private async generateContent(
     definitionFiles: string[],
     outputFile: string,
+    methodCache?: Map<string, string[]>,
   ): Promise<string> {
     const imports: string[] = [];
     const setNestedPathCalls: string[] = [];
-    let importCounter = 0;
+
+    // Reserved JS keywords that cannot be used as identifiers
+    const JS_RESERVED = new Set([
+      "break",
+      "case",
+      "catch",
+      "class",
+      "const",
+      "continue",
+      "debugger",
+      "default",
+      "delete",
+      "do",
+      "else",
+      "export",
+      "extends",
+      "finally",
+      "for",
+      "function",
+      "if",
+      "import",
+      "in",
+      "instanceof",
+      "let",
+      "new",
+      "return",
+      "static",
+      "super",
+      "switch",
+      "this",
+      "throw",
+      "try",
+      "typeof",
+      "var",
+      "void",
+      "while",
+      "with",
+      "yield",
+      "enum",
+      "await",
+    ]);
+
+    const usedImportNames = new Set<string>();
 
     for (const defFile of definitionFiles) {
       const relativePath = getRelativeImportPath(defFile, outputFile);
       const nestedPath = extractNestedPath(defFile);
 
-      // Get methods for this endpoint
-      const methods = await this.extractMethodsFromDefinition(defFile);
+      // Get methods for this endpoint — use cache when available (dev watcher)
+      const methods = methodCache?.has(defFile)
+        ? (methodCache.get(defFile) ?? [])
+        : await this.extractMethodsFromDefinition(defFile);
+
+      // Derive a stable base name from the nested path segments, e.g.
+      // agent/chat/threads -> agent_chat_threads
+      const pathSegments = nestedPath
+        .map((seg) => {
+          const parts = seg.split(/[^a-zA-Z0-9]+/);
+          return parts
+            .map((part, i) =>
+              i === 0
+                ? part.toLowerCase()
+                : part.charAt(0).toUpperCase() + part.slice(1).toLowerCase(),
+            )
+            .join("");
+        })
+        .filter(Boolean);
+      let baseName = pathSegments.join("_") || "root";
+      if (JS_RESERVED.has(baseName)) {
+        baseName = `endpoint_${baseName}`;
+      }
 
       // Add separate import and path for each method
       for (const method of methods) {
         // eslint-disable-next-line i18next/no-literal-string
-        const importName = `endpointDefinition_${method}_${importCounter}`;
+        let importName = `endpointDefinition_${method}_${baseName}`;
+        // Ensure uniqueness with numeric suffix only on collision
+        let suffix = 2;
+        while (usedImportNames.has(importName)) {
+          importName = `endpointDefinition_${method}_${baseName}_${suffix++}`;
+        }
+        usedImportNames.add(importName);
+
         // eslint-disable-next-line i18next/no-literal-string
         const importStatement = `import { default as ${importName} } from "${relativePath}";`;
         imports.push(importStatement);
@@ -271,8 +355,6 @@ class EndpointsIndexGeneratorRepositoryImpl {
         } else {
           setNestedPathCalls.push(singleLine);
         }
-
-        importCounter++;
       }
     }
 

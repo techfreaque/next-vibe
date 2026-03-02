@@ -163,6 +163,7 @@ export const CLI_ICONS: Record<IconKey, string> = {
   mountain: "⛰️",
   leaf: "🍃",
   flame: "🔥",
+  frame: "🖼️",
   wind: "💨",
   sun: "☀️",
 

@@ -46,7 +46,6 @@ export class FinishStepHandler {
       );
 
       streamAbortController.abort(new Error("Tool requires user confirmation"));
-      ctx.dbWriter.closeController();
 
       return { shouldAbort: true };
     }
@@ -59,7 +58,6 @@ export class FinishStepHandler {
       );
 
       streamAbortController.abort(new Error("Model requested loop stop"));
-      ctx.dbWriter.closeController();
 
       return { shouldAbort: true };
     }

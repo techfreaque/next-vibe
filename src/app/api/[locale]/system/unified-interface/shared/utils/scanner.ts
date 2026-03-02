@@ -209,6 +209,7 @@ export function scanDirectory(
   }
 
   scan(resolvedBaseDir);
+  results.sort((a, b) => a.fullPath.localeCompare(b.fullPath));
   return results;
 }
 

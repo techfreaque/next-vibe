@@ -150,7 +150,7 @@ export interface ApiHandlerProps<
   TRequestOutput,
   TUrlVariablesOutput,
   TUserRoleValue extends readonly UserRoleValue[],
-  TPlatform extends Platform = Platform,
+  TPlatform extends Platform,
   TScopedTranslationKey extends string = TranslationKey,
 > {
   /** Request data (validated by Zod schema) */
@@ -257,7 +257,7 @@ export interface ApiHandlerOptions<
   TUrlVariablesOutput,
   TUserRoleValue extends readonly UserRoleValue[],
   TEndpoint extends CreateApiEndpointAny,
-  TPlatform extends Platform = Platform,
+  TPlatform extends Platform,
   TScopedTranslationKey extends string = TranslationKey,
 > {
   endpoint: TEndpoint;

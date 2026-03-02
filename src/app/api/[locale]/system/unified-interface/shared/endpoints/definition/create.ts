@@ -46,6 +46,9 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
+import type { EventSchemas } from "../../../websocket/types";
+import type { EndpointLogger } from "../../logger/endpoint";
+
 // Extract schema type directly from field, bypassing complex field structure
 type ExtractSchemaType<F> = F extends { schema: z.ZodType<infer T> }
   ? T
@@ -164,6 +167,7 @@ export interface ApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
+  out TEvents extends EventSchemas | never,
 > {
   // Core endpoint metadata - all required for type safety
   readonly method: TMethod;
@@ -185,6 +189,23 @@ export interface ApiEndpoint<
    * Use [UserRole.PUBLIC] to allow unauthenticated access via client route
    */
   readonly allowedClientRoles?: readonly UserRoleValue[];
+
+  /**
+   * Client-side routing decision callback.
+   * Receives typed request data and returns true to route to the client handler
+   * (route-client.ts), or false to fall through to the server.
+   *
+   * When true, callApi loads the matching route-client.ts handler via
+   * getClientRouteHandler and executes it — same flow as allowedClientRoles.
+   *
+   * Use cases: localStorage-backed data (incognito), offline mode, conditional client routing.
+   */
+  readonly useClientRoute?: (props: {
+    data: InferRequestOutput<TFields>;
+    urlPathParams: InferUrlVariablesOutput<TFields>;
+    locale: CountryLanguage;
+    logger: EndpointLogger;
+  }) => boolean | Promise<boolean>;
 
   // Translation keys use NoInfer to ensure they don't contribute to TScopedTranslationKey inference
   // This makes errors appear on the specific property with the invalid key
@@ -239,6 +260,21 @@ export interface ApiEndpoint<
   readonly requiresConfirmation?: boolean;
   /** Icon identifier */
   readonly icon: IconKey;
+
+  /**
+   * WebSocket event schemas for this endpoint.
+   * When defined, the handler receives a typed `emit()` function that broadcasts
+   * events to all connected clients subscribed to this endpoint's channel.
+   *
+   * Example:
+   * ```ts
+   * events: {
+   *   contentDelta: z.object({ messageId: z.string(), delta: z.string() }),
+   *   contentDone: z.object({ messageId: z.string(), content: z.string() }),
+   * }
+   * ```
+   */
+  readonly events?: TEvents;
 
   // Unified fields for schema generation
   readonly fields: TFields;
@@ -420,13 +456,20 @@ export interface CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
+  out TEvents extends EventSchemas | never,
   RequestInput = InferRequestInput<TFields>,
   RequestOutput = InferRequestOutput<TFields>,
   ResponseInput = InferResponseInput<TFields>,
   ResponseOutput = InferResponseOutput<TFields>,
   UrlVariablesInput = InferUrlVariablesInput<TFields>,
   UrlVariablesOutput = InferUrlVariablesOutput<TFields>,
-> extends ApiEndpoint<TMethod, TUserRoleValue, TScopedTranslationKey, TFields> {
+> extends ApiEndpoint<
+  TMethod,
+  TUserRoleValue,
+  TScopedTranslationKey,
+  TFields,
+  TEvents
+> {
   readonly requestSchema: InferRequestDataSchema<TFields>;
   readonly requestUrlPathParamsSchema: InferUrlParamsSchema<TFields>;
   readonly responseSchema: InferResponseDataSchema<TFields>;
@@ -466,6 +509,7 @@ export interface CreateApiEndpoint<
     Method: TMethod;
     UserRoleValue: TUserRoleValue;
     ScopedTranslationKey: TScopedTranslationKey;
+    Events: TEvents;
   };
 }
 /**
@@ -481,12 +525,14 @@ export type CreateEndpointReturnInMethod<
     FieldUsageConfig,
     AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
+  TEvents extends EventSchemas | never,
 > = {
   readonly [KMethod in TMethod]: CreateApiEndpoint<
     KMethod,
     TUserRoleValue,
     TScopedTranslationKey,
-    TFields
+    TFields,
+    TEvents
   >;
 };
 
@@ -501,6 +547,7 @@ export type CreateEndpointReturnInMethod<
 export function createEndpoint<
   const TMethod extends Methods,
   const TUserRoleValue extends readonly UserRoleValue[],
+  const TEvents extends EventSchemas | never,
   TScopedTranslationKey extends string = TranslationKey,
   const TFields extends UnifiedField<
     TScopedTranslationKey,
@@ -514,12 +561,19 @@ export function createEndpoint<
     AnyChildrenConstrain<TScopedTranslationKey, FieldUsageConfig>
   >,
 >(
-  config: ApiEndpoint<TMethod, TUserRoleValue, TScopedTranslationKey, TFields>,
+  config: ApiEndpoint<
+    TMethod,
+    TUserRoleValue,
+    TScopedTranslationKey,
+    TFields,
+    TEvents
+  >,
 ): CreateEndpointReturnInMethod<
   TMethod,
   TUserRoleValue,
   TScopedTranslationKey,
-  TFields
+  TFields,
+  TEvents
 > {
   // Generate schemas from unified fields
   // const fieldBuilder = createFieldBuilder<TScopedTranslationKey>();
@@ -538,7 +592,8 @@ export function createEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
-    TFields
+    TFields,
+    TEvents
   > = {
     method: config.method,
     path: config.path,
@@ -551,6 +606,7 @@ export function createEndpoint<
     allowedRoles: config.allowedRoles,
     allowedLocalModeRoles: config.allowedLocalModeRoles,
     allowedClientRoles: config.allowedClientRoles,
+    useClientRoute: config.useClientRoute,
     examples: config.examples,
     errorTypes: config.errorTypes,
     successTypes: config.successTypes,
@@ -560,6 +616,7 @@ export function createEndpoint<
     cli: config.cli,
     credits: config.credits,
     icon: config.icon,
+    events: config.events,
     options: config.options,
     requestSchema,
     responseSchema,
@@ -588,6 +645,7 @@ export function createEndpoint<
       Method: undefined! as TMethod,
       UserRoleValue: undefined! as TUserRoleValue,
       ScopedTranslationKey: undefined! as TScopedTranslationKey,
+      Events: undefined! as TEvents,
     },
   };
 
@@ -598,6 +656,7 @@ export function createEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
-    TFields
+    TFields,
+    TEvents
   >;
 }

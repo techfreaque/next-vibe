@@ -35,15 +35,13 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { AiStreamT } from "../i18n";
 import type { HeadlessPreCall } from "../repository/headless";
 import { runHeadlessAiStream } from "../repository/headless";
+import type { AiStreamT } from "../stream/i18n";
 import type {
   AiStreamRunPostRequestOutput,
   AiStreamRunPostResponseOutput,
 } from "./definition";
-
-/* eslint-disable i18next/no-literal-string */
 
 /**
  * Strip <think>...</think> reasoning tags from AI message content.

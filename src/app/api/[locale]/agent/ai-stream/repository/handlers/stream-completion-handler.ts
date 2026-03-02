@@ -9,6 +9,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { ModelId } from "../../../models/models";
 import type { StreamContext } from "../core/stream-context";
+import { clearStreamingState } from "../core/stream-registry";
 import type { StreamingTTSHandler } from "../streaming-tts";
 import { FinalizationHandler } from "./finalization-handler";
 
@@ -34,6 +35,7 @@ export class StreamCompletionHandler {
     user: JwtPayloadType;
     modelCost: number;
     model: ModelId;
+    threadId: string;
     logger: EndpointLogger;
   }): Promise<void> {
     const {
@@ -44,6 +46,7 @@ export class StreamCompletionHandler {
       user,
       modelCost,
       model,
+      threadId,
       logger,
     } = params;
 
@@ -122,8 +125,10 @@ export class StreamCompletionHandler {
       model,
     });
 
-    // Cleanup stream context and close controller
+    // Clear streaming state in DB + registry
+    await clearStreamingState(threadId);
+
+    // Cleanup stream context
     ctx.cleanup();
-    ctx.dbWriter.closeController();
   }
 }

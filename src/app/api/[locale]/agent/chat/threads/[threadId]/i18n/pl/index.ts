@@ -27,6 +27,11 @@ export const translations: typeof enTranslations = {
       description: "Unikalny identyfikator wątku",
       placeholder: "Wprowadź ID wątku...",
     },
+    rootFolderId: {
+      label: "Folder główny",
+      description:
+        "Folder główny wątku (używany do routingu po stronie klienta)",
+    },
     response: {
       thread: {
         title: "Szczegóły wątku",
@@ -150,6 +155,11 @@ export const translations: typeof enTranslations = {
         title: "Aktualizacje wątku",
         description: "Pola do aktualizacji",
       },
+    },
+    rootFolderId: {
+      label: "Folder główny",
+      description:
+        "Folder główny wątku (używany do routingu po stronie klienta)",
     },
     threadTitle: {
       label: "Tytuł",
@@ -310,6 +320,11 @@ export const translations: typeof enTranslations = {
       description: "Unikalny identyfikator wątku do usunięcia",
       placeholder: "Wprowadź ID wątku...",
       helpText: "OSTRZEŻENIE: Ta akcja nie może być cofnięta",
+    },
+    rootFolderId: {
+      label: "Folder główny",
+      description:
+        "Folder główny wątku (używany do routingu po stronie klienta)",
     },
     response: {
       success: {

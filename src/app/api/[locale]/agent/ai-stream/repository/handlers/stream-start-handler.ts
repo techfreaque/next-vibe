@@ -4,8 +4,6 @@
 
 import "server-only";
 
-import type { ReadableStreamDefaultController } from "node:stream/web";
-
 import type { ModelMessage } from "ai";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -13,6 +11,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolCall } from "../../../chat/db";
+import type { WsEmitCallback } from "../../../chat/threads/[threadId]/messages/emitter";
 import type { TtsVoiceValue } from "../../../text-to-speech/enum";
 import type { StreamContext } from "../core/stream-context";
 import { StreamContextInitializer } from "../core/stream-context-initializer";
@@ -36,7 +35,6 @@ export class StreamStartHandler {
     aiMessageId: string;
     effectiveParentMessageId: string | null | undefined;
     messageDepth: number;
-    isHeadless?: boolean;
     toolConfirmationResults: Array<{
       messageId: string;
       sequenceId: string;
@@ -66,11 +64,10 @@ export class StreamStartHandler {
     isIncognito: boolean;
     threadId: string;
     messages: ModelMessage[];
-    controller: ReadableStreamDefaultController<Uint8Array>;
-    encoder: TextEncoder;
     locale: CountryLanguage;
     user: JwtPayloadType;
     logger: EndpointLogger;
+    wsEmit?: WsEmitCallback | null;
   }): {
     ctx: StreamContext;
     ttsHandler: StreamingTTSHandler | null;
@@ -81,7 +78,6 @@ export class StreamStartHandler {
       aiMessageId,
       effectiveParentMessageId,
       messageDepth,
-      isHeadless,
       toolConfirmationResults,
       voiceMode,
       fileUploadPromise,
@@ -89,11 +85,10 @@ export class StreamStartHandler {
       isIncognito,
       threadId,
       messages,
-      controller,
-      encoder,
       locale,
       user,
       logger,
+      wsEmit,
     } = params;
 
     // Initialize stream context (creates MessageDbWriter with controller + encoder)
@@ -104,26 +99,23 @@ export class StreamStartHandler {
       toolConfirmationResults,
       aiMessageId,
       isIncognito,
-      isHeadless,
       logger,
-      controller,
-      encoder,
       locale,
+      wsEmit,
     });
 
     // Create streaming TTS handler if voice mode enabled
     let ttsHandler: StreamingTTSHandler | null = null;
     if (voiceMode?.enabled) {
       ttsHandler = createStreamingTTSHandler({
-        controller,
-        encoder,
+        wsEmit: wsEmit ?? null,
         logger,
         locale,
         voice: voiceMode.voice,
         user,
         enabled: true,
       });
-      logger.info("[AI Stream] Voice mode enabled - streaming TTS active", {
+      logger.debug("[AI Stream] Voice mode enabled - streaming TTS active", {
         voice: voiceMode.voice,
         enabled: voiceMode.enabled,
       });

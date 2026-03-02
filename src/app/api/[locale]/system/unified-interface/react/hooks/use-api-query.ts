@@ -1,7 +1,7 @@
 "use client";
 
 import type { QueryKey } from "@tanstack/react-query";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
@@ -82,6 +82,7 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
         urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
       }) => void | Promise<void>;
       refetchOnWindowFocus?: boolean;
+      refetchInterval?: number | false;
       retry?: number;
       initialData?: TEndpoint["types"]["ResponseOutput"];
       persistToStorage?: boolean;
@@ -98,6 +99,7 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
     staleTime = 60_000, // 60 seconds default
     gcTime,
     refetchOnWindowFocus = false,
+    refetchInterval,
     retry = 3,
     // persistToStorage will be used in Phase 3 when we setup persistQueryClient
   } = options;
@@ -124,10 +126,24 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
       const formId = store.getFormId(endpoint);
       const storedParams = store.getFormQueryParams(formId);
 
-      // Use stored params if available and non-empty, otherwise fall back to the prop value
+      // When urlPathParams are present (e.g. /threads/:threadId/messages), always prefer
+      // requestData because it already has the correct path params merged in by useEndpointRead.
+      // storedParams are keyed by endpoint only (not urlPathParams) so they can be stale
+      // from a previous navigation to the same endpoint with different path params.
+      const hasUrlPathParams =
+        urlPathParams !== undefined &&
+        urlPathParams !== null &&
+        typeof urlPathParams === "object" &&
+        Object.keys(urlPathParams as FormQueryParams).length > 0;
+
+      // Use stored params if available and non-empty, and no urlPathParams override,
+      // otherwise fall back to the prop value.
       // Deserialize any JSON-stringified nested objects
       const hasStoredParams =
-        storedParams && Object.keys(storedParams).length > 0;
+        !hasUrlPathParams &&
+        storedParams !== undefined &&
+        storedParams !== null &&
+        Object.keys(storedParams).length > 0;
       const currentRequestData = hasStoredParams
         ? deserializeQueryParams<TEndpoint["types"]["RequestOutput"]>(
             storedParams as FormQueryParams,
@@ -192,9 +208,14 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
     staleTime,
     gcTime,
     refetchOnWindowFocus,
+    refetchInterval,
     retry,
-    // initialData populates the cache and respects staleTime
-    // This allows optimistic updates to work because data is in the cache
+    // Keep showing previous data during background refetches (tab switch, window refocus)
+    // Prevents components from flashing empty state while refetch is in flight
+    placeholderData: keepPreviousData,
+    // initialData populates the cache and respects staleTime.
+    // initialDataUpdatedAt is required — without it React Query treats the data as
+    // infinitely stale and immediately refetches, defeating the purpose of initialData.
     initialData: initialData
       ? (): ResponseType<TEndpoint["types"]["ResponseOutput"]> => {
           logger.debug("useApiQuery: Using initialData", {
@@ -205,6 +226,7 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
           return success(initialData);
         }
       : undefined,
+    initialDataUpdatedAt: initialData ? Date.now() : undefined,
   });
 
   // Stable refetch function

@@ -38,7 +38,8 @@ export const translations = {
       locale: "Specify locale (en-GLOBAL, de-DE, pl-PL)",
       verbose: "Enable verbose output",
       dryRun: "Perform a dry run without executing",
-      preview: "Use preview database and app URL (LOCAL_MODE_*)",
+      target:
+        "Execution target: dev (default), local (preview DB), or remote (HTTP via NEXT_PUBLIC_PROJECT_URL)",
       interactive: "Enter interactive mode",
     },
     errors: {
@@ -61,6 +62,17 @@ export const translations = {
       storeFailed: "Failed to store session",
       clearFailed: "Failed to clear session",
       setLeadIdCookieFailed: "Failed to set lead ID cookie",
+      remoteNoToken: "Remote session has no active token",
+      remoteExpired: "Remote session expired",
+      remoteNotFound:
+        "No remote session found. Run: vibe login --target remote",
+      remoteReadFailed: "Failed to read remote session",
+      remoteWriteFailed: "Failed to write remote session",
+      remoteClearFailed: "Failed to clear remote session",
+      remoteNotLoggedIn:
+        "Not logged in to remote host. Run: vibe login --target remote",
+      remoteNoLeadId: "Could not obtain identity from remote host",
+      remoteServerError: "Remote server error",
     },
     endpoints: {
       endpointHandler: {

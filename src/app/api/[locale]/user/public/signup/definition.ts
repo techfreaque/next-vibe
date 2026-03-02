@@ -22,7 +22,7 @@ import {
 
 import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../user-roles/enum";
-import { SignupFormContainer } from "./widget";
+import { SignupFormContainer } from "./widget/widget";
 
 /**
  * POST /signup - User registration

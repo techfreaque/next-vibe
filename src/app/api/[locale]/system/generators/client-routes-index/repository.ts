@@ -22,6 +22,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 import { PATH_SEPARATOR } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 
+import type { LiveIndex } from "../shared/live-index";
 import {
   extractNestedPath,
   extractPathKey,
@@ -54,6 +55,7 @@ class ClientRoutesIndexGeneratorRepositoryImpl {
     data: ClientRoutesRequestType,
     logger: EndpointLogger,
     t: ModuleT,
+    liveIndex?: LiveIndex,
   ): Promise<BaseResponseType<ClientRoutesResponseType>> {
     const startTime = Date.now();
 
@@ -61,15 +63,19 @@ class ClientRoutesIndexGeneratorRepositoryImpl {
       const outputFile = data.outputFile;
       logger.debug(`Starting client routes index generation: ${outputFile}`);
 
-      // Discover route-client files
-      const apiCorePath = ["src", "app", "api", "[locale]"];
-      const startDir = join(process.cwd(), ...apiCorePath);
+      // Use live index when available (dev watcher), otherwise scan from disk
+      let clientRouteFiles: string[];
 
-      logger.debug("Discovering route-client files");
-      const clientRouteFiles = findFilesRecursively(
-        startDir,
-        "route-client.ts",
-      );
+      if (liveIndex) {
+        logger.debug("Using live index for file discovery");
+        clientRouteFiles = [...liveIndex.clientRouteFiles];
+      } else {
+        const apiCorePath = ["src", "app", "api", "[locale]"];
+        const startDir = join(process.cwd(), ...apiCorePath);
+
+        logger.debug("Discovering route-client files");
+        clientRouteFiles = findFilesRecursively(startDir, "route-client.ts");
+      }
 
       logger.debug(formatCount(clientRouteFiles.length, "route-client file"));
 

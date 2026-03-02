@@ -70,6 +70,14 @@ export const translations = {
       openTool: {
         label: "Open Tool",
       },
+      platform: {
+        label: "Platform",
+        description:
+          "Filter tools by platform (admin only). Shows tools available on the selected platform. Use 'all' to see tools across all platforms.",
+      },
+      platforms: {
+        title: "Available platforms",
+      },
     },
     success: {
       title: "Tools fetched successfully",
@@ -288,6 +296,17 @@ export const translations = {
       activeOff: "Not pinned — AI can still call on demand. Click to pin",
       confirmOn: "Asks for confirmation — click to disable",
       confirmOff: "Runs automatically — click to require confirmation",
+    },
+    platformFilter: {
+      all: "All Platforms",
+      cli: "CLI",
+      mcp: "MCP",
+      ai: "AI",
+      web: "Web",
+    },
+    envFilter: {
+      development: "Development",
+      production: "Production",
     },
   },
   list: {

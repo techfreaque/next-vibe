@@ -18,11 +18,11 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { parseError } from "../../../shared/utils";
 import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { getModelDisplayName, modelProviders } from "../../models/models";
 import type {
   FiltersModelSelection,
   ManualModelSelection,
-} from "../../models/components/types";
-import { getModelDisplayName, modelProviders } from "../../models/models";
+} from "../../models/types";
 import {
   DEFAULT_TTS_VOICE,
   type TtsVoiceValue,

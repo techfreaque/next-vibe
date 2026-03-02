@@ -35,7 +35,7 @@ import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo, useState } from "react";
 
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/components/model-credit-display";
+import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import {
   arrayFieldPath,
@@ -57,8 +57,8 @@ import {
   Icon,
   type IconKey,
 } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
-import { useTourState } from "../_components/welcome-tour/tour-state-context";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
+import { useTourState } from "../widget/welcome-tour/tour-state-context";
 import definition, {
   type FavoriteCard,
   type FavoritesListResponseOutput,

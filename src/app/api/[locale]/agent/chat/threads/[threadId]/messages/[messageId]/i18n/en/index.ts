@@ -1,4 +1,3 @@
-import { translations as branchTranslations } from "../../branch/i18n/en";
 import { translations as voteTranslations } from "../../vote/i18n/en";
 
 export const translations = {
@@ -302,6 +301,5 @@ export const translations = {
       description: "Message deleted successfully",
     },
   },
-  branch: branchTranslations,
   vote: voteTranslations,
 };

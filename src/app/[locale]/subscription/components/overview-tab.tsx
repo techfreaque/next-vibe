@@ -21,13 +21,13 @@ import { H4, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/components/model-credit-display";
 import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
 import {
   modelDefinitions,
   modelProviders,
   TOTAL_MODEL_COUNT,
 } from "@/app/api/[locale]/agent/models/models";
+import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import {
   FEATURE_COSTS,
   ProductIds,

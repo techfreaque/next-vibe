@@ -5,11 +5,11 @@
 
 import { z } from "zod";
 
-import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/components/types";
 import {
   getModelDisplayName,
   ModelId,
 } from "@/app/api/[locale]/agent/models/models";
+import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/types";
 import { success } from "@/app/api/[locale]/shared/types/response.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -61,7 +61,7 @@ import { CategoryOptions } from "../enum";
 import { CharacterCategory } from "../enum";
 import type { CharactersTranslationKey } from "../i18n";
 import { scopedTranslation } from "./i18n";
-import { CharacterEditContainer, CharacterViewContainer } from "./widgets";
+import { CharacterEditContainer, CharacterViewContainer } from "./widget";
 
 /**
  * Delete Character Endpoint (DELETE)

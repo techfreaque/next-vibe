@@ -9,6 +9,7 @@ import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  customWidgetObject,
   scopedObjectFieldNew,
   scopedRequestField,
   scopedRequestUrlPathParamsField,
@@ -26,7 +27,9 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type { MessageMetadata } from "../../../db";
 import { ChatMessageRole } from "../../../enum";
+import { loadIncognitoState } from "../../../incognito/storage";
 import { scopedTranslation } from "./i18n";
+import { MessagesWidget } from "./widget/widget";
 
 /**
  * Get Messages List Endpoint (GET)
@@ -46,11 +49,163 @@ const { GET } = createEndpoint({
     UserRole.REMOTE_SKILL,
   ] as const,
 
+  // Route to client (localStorage) for incognito threads
+  useClientRoute: async ({ urlPathParams }) => {
+    const state = await loadIncognitoState();
+    return !!state.threads[urlPathParams.threadId];
+  },
+
   title: "get.title" as const,
   description: "get.description" as const,
   icon: "message-circle",
   category: "app.endpointCategories.chat",
   tags: ["tags.messages" as const],
+
+  // WebSocket events for real-time message streaming.
+  // Emitted by ai-stream repository, consumed by clients subscribed to this channel.
+  // All 16 StreamEventType events — kebab-case keys match enqueue() directly.
+  events: {
+    "message-created": z.object({
+      messageId: z.string(),
+      threadId: z.string(),
+      role: z.string(),
+      parentId: z.string().nullable(),
+      depth: z.number(),
+      content: z.string().nullable(),
+      model: z.string().nullable(),
+      character: z.string().nullable(),
+      sequenceId: z.string().nullable().optional(),
+      toolCall: z
+        .object({
+          toolCallId: z.string(),
+          toolName: z.string(),
+          args: z.unknown(),
+          result: z.unknown().optional(),
+          error: z.record(z.string(), z.unknown()).optional(),
+          executionTime: z.number().optional(),
+          creditsUsed: z.number().optional(),
+          requiresConfirmation: z.boolean().optional(),
+          isConfirmed: z.boolean().optional(),
+          waitingForConfirmation: z.boolean().optional(),
+        })
+        .optional(),
+      metadata: z.record(z.string(), z.unknown()).optional(),
+    }),
+    "content-delta": z.object({
+      messageId: z.string(),
+      delta: z.string(),
+    }),
+    "content-done": z.object({
+      messageId: z.string(),
+      content: z.string(),
+      totalTokens: z.number().nullable(),
+      finishReason: z.string().nullable(),
+    }),
+    "reasoning-delta": z.object({
+      messageId: z.string(),
+      delta: z.string(),
+    }),
+    "reasoning-done": z.object({
+      messageId: z.string(),
+      content: z.string(),
+    }),
+    "tool-call": z.object({
+      messageId: z.string(),
+      toolName: z.string(),
+      args: z.unknown(),
+    }),
+    "tool-waiting": z.object({
+      messageId: z.string(),
+      toolName: z.string(),
+      toolCallId: z.string(),
+    }),
+    "tool-result": z.object({
+      messageId: z.string(),
+      toolName: z.string(),
+      result: z.unknown().optional(),
+      error: z.record(z.string(), z.unknown()).optional(),
+      toolCall: z
+        .object({
+          toolCallId: z.string(),
+          toolName: z.string(),
+          args: z.unknown(),
+          result: z.unknown().optional(),
+          error: z.record(z.string(), z.unknown()).optional(),
+          executionTime: z.number().optional(),
+          creditsUsed: z.number().optional(),
+          requiresConfirmation: z.boolean().optional(),
+          isConfirmed: z.boolean().optional(),
+          waitingForConfirmation: z.boolean().optional(),
+        })
+        .optional(),
+    }),
+    error: z.object({
+      success: z.literal(false),
+      message: z.string(),
+      messageParams: z.record(z.string(), z.unknown()).optional(),
+      errorType: z.object({
+        errorKey: z.string(),
+        errorCode: z.number(),
+      }),
+      cause: z.unknown().optional(),
+    }),
+    "voice-transcribed": z.object({
+      messageId: z.string(),
+      text: z.string(),
+      confidence: z.number().nullable(),
+      durationSeconds: z.number().nullable(),
+    }),
+    "audio-chunk": z.object({
+      messageId: z.string(),
+      audioData: z.string(),
+      chunkIndex: z.number(),
+      isFinal: z.boolean(),
+      text: z.string(),
+    }),
+    "files-uploaded": z.object({
+      messageId: z.string(),
+      attachments: z.array(
+        z.object({
+          id: z.string(),
+          url: z.string(),
+          filename: z.string(),
+          mimeType: z.string(),
+          size: z.number(),
+        }),
+      ),
+    }),
+    "credits-deducted": z.object({
+      amount: z.number(),
+      feature: z.string(),
+      type: z.enum(["tool", "model"]),
+      partial: z.boolean().optional(),
+    }),
+    "tokens-updated": z.object({
+      messageId: z.string(),
+      promptTokens: z.number(),
+      completionTokens: z.number(),
+      totalTokens: z.number(),
+      finishReason: z.string().nullable(),
+      creditCost: z.number(),
+    }),
+    "compacting-delta": z.object({
+      messageId: z.string(),
+      delta: z.string(),
+    }),
+    "compacting-done": z.object({
+      messageId: z.string(),
+      content: z.string(),
+      metadata: z.object({
+        isCompacting: z.literal(true),
+        compactedMessageCount: z.number(),
+      }),
+    }),
+    // Stream lifecycle — definitive "stream is completely done" signal
+    "stream-finished": z.object({
+      threadId: z.string(),
+      reason: z.enum(["completed", "cancelled", "error", "timeout"]),
+    }),
+  },
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
@@ -91,12 +246,10 @@ const { GET } = createEndpoint({
     },
   },
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "get.container.title" as const,
-    description: "get.container.description" as const,
-    layoutType: LayoutType.STACKED,
-    usage: { request: "urlPathParams", response: true },
+  fields: customWidgetObject({
+    render: MessagesWidget,
+    usage: { request: "urlPathParams", response: true } as const,
+    noFormElement: true,
     children: {
       // === URL PARAMS ===
       threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
@@ -147,13 +300,17 @@ const { GET } = createEndpoint({
               type: WidgetType.TEXT,
               schema: z.string().nullable(),
             }),
+            authorName: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              schema: z.string().nullable(),
+            }),
             isAI: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
               schema: z.boolean(),
             }),
             model: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
-              schema: z.string().nullable(),
+              schema: z.nativeEnum(ModelId).nullable(),
             }),
             character: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -221,6 +378,7 @@ const { GET } = createEndpoint({
             parentId: null,
             depth: 0,
             authorId: "770e8400-e29b-41d4-a716-446655440000",
+            authorName: null,
             isAI: false,
             model: null,
             character: null,
@@ -243,8 +401,9 @@ const { GET } = createEndpoint({
             parentId: "660e8400-e29b-41d4-a716-446655440000",
             depth: 1,
             authorId: "770e8400-e29b-41d4-a716-446655440000",
+            authorName: null,
             isAI: true,
-            model: "gpt-4o",
+            model: ModelId.GPT_5,
             character: null,
             sequenceId: null,
             metadata: null,
@@ -280,6 +439,12 @@ const { POST } = createEndpoint({
     UserRole.ADMIN,
     UserRole.REMOTE_SKILL,
   ] as const,
+
+  // Route to client (localStorage) for incognito threads
+  useClientRoute: async ({ urlPathParams }) => {
+    const state = await loadIncognitoState();
+    return !!state.threads[urlPathParams.threadId];
+  },
 
   title: "post.title" as const,
   description: "post.description" as const,
@@ -390,6 +555,13 @@ const { POST } = createEndpoint({
         description: "post.model.description" as const,
         schema: z.enum(ModelId).optional(),
       }),
+      character: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "post.character.label" as const,
+        description: "post.character.description" as const,
+        schema: z.string().optional(),
+      }),
       metadata: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
@@ -449,6 +621,9 @@ export type MessageCreateRequestOutput = typeof POST.types.RequestOutput;
 export type MessageCreateUrlParamsTypeOutput =
   typeof POST.types.UrlVariablesOutput;
 export type MessageCreateResponseOutput = typeof POST.types.ResponseOutput;
+
+// Extract WS event types for typed emit/subscribe — owned by messages, used by ai-stream
+export type MessagesWsEvents = typeof GET.types.Events;
 
 /**
  * Export definitions

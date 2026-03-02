@@ -22,6 +22,8 @@ export interface LoadEndpointOptions {
   user: JwtPayloadType;
   logger: EndpointLogger;
   locale: CountryLanguage;
+  /** Skip role/platform access validation (e.g. for remote execution where the remote server handles auth) */
+  skipAccessValidation?: boolean;
 }
 
 export interface LoadEndpointsOptions {
@@ -46,7 +48,8 @@ export class DefinitionLoader implements IDefinitionLoader {
   async load<TEndpoint extends CreateApiEndpointAny = CreateApiEndpointAny>(
     options: LoadEndpointOptions,
   ): Promise<ResponseType<TEndpoint>> {
-    const { identifier, platform, user, logger, locale } = options;
+    const { identifier, platform, user, logger, locale, skipAccessValidation } =
+      options;
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
@@ -63,15 +66,18 @@ export class DefinitionLoader implements IDefinitionLoader {
       }
 
       // Validate endpoint access using consolidated method
-      const accessValidation = permissionsRegistry.validateEndpointAccess(
-        endpoint,
-        user,
-        platform,
-        locale,
-      );
+      // Skip for remote execution — the remote server handles its own auth
+      if (!skipAccessValidation) {
+        const accessValidation = permissionsRegistry.validateEndpointAccess(
+          endpoint,
+          user,
+          platform,
+          locale,
+        );
 
-      if (!accessValidation.success) {
-        return accessValidation;
+        if (!accessValidation.success) {
+          return accessValidation;
+        }
       }
 
       return success(endpoint as TEndpoint);

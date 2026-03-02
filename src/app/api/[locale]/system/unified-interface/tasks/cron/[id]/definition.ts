@@ -36,7 +36,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { taskInputSchema } from "../db";
 import { cronTaskResponseSchema } from "../tasks/definition";
 import { scopedTranslation } from "./i18n";
-import { CronTaskDetailContainer, CronTaskEditContainer } from "./widget";
+import { CronTaskDetailContainer, CronTaskEditContainer } from "./widget/widget";
 
 export const CRON_GET_ALIAS = "cron-get" as const;
 export const CRON_UPDATE_ALIAS = "cron-update" as const;
@@ -163,7 +163,6 @@ const { GET } = createEndpoint({
           errorCount: 0,
           averageExecutionTime: null,
           consecutiveFailures: 0,
-          maxConsecutiveFailures: 5,
           targetInstance: null,
           tags: [],
           userId: null,
@@ -446,7 +445,6 @@ const { PUT } = createEndpoint({
           errorCount: 0,
           averageExecutionTime: null,
           consecutiveFailures: 0,
-          maxConsecutiveFailures: 5,
           targetInstance: null,
           tags: [],
           userId: null,

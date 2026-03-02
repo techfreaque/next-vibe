@@ -4,6 +4,9 @@ import { translations as searchTranslations } from "../../search/i18n/en";
 
 export const translations = {
   ...searchTranslations,
+  loadingOlderMessages: "Loading older messages...",
+  scrollUpForOlderMessages: "Scroll up for older messages",
+  showOlderMessages: "Show older messages",
   transcribing: "Transcribing audio...",
   errorCode: "Error Code",
   compacting: {
@@ -160,6 +163,10 @@ export const translations = {
       label: "Model",
       description: "AI model to use for response",
     },
+    character: {
+      label: "Character",
+      description: "AI character/persona for the message",
+    },
     metadata: {
       label: "Metadata",
       description: "Message metadata (attachments, tokens, etc.)",
@@ -249,6 +256,10 @@ export const translations = {
       user: "User",
       assistant: "Assistant",
     },
+  },
+  debugView: {
+    systemPromptTitle: "System Prompt",
+    copied: "Copied!",
   },
   messageId: messageIdTranslations,
   path: pathTranslations,

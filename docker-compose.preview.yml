@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    image: sibedge/postgres-plv8:16.10-3.2.3-alpine
     container_name: preview-postgres
     restart: unless-stopped
     environment:

@@ -1,3 +1,5 @@
+export const DEFAULT_PROJECT_URL = "https://unbottled.ai"; // eslint-disable-line i18next/no-literal-string
+
 export const LOCALE_COOKIE_NAME = "locale";
 export const LEAD_ID_COOKIE_NAME = "lead_id";
 

@@ -80,6 +80,7 @@ import {
   type CreditWallet,
   creditWallets,
 } from "./db";
+import { getPoolBalance } from "./db-functions";
 import type { CreditsGetResponseOutput } from "./definition";
 import {
   CreditPackType,
@@ -1256,6 +1257,7 @@ export class CreditRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<CreditsGetResponseOutput>> {
     try {
+      // Side effects first: ensure wallets exist + monthly reset
       let poolResult: ResponseType<CreditPool>;
 
       if (identifier.userId) {
@@ -1282,18 +1284,30 @@ export class CreditRepository {
         return poolResult;
       }
 
-      // Ensure monthly free credits are up to date before calculating balance
+      // Monthly free credit reset (side effect — must happen before balance read)
       await CreditRepository.ensureMonthlyFreeCreditsForPool(
         poolResult.data,
         logger,
         locale,
       );
 
-      const balance = await CreditRepository.calculatePoolBalance(
-        poolResult.data,
+      // Atomic balance calc: expiry + aggregation in one PG call
+      const result = await getPoolBalance.call(
+        {
+          p_user_id: identifier.userId ?? null,
+          p_lead_id: identifier.leadId ?? null,
+        },
         logger,
       );
-      return success(balance);
+
+      return success({
+        total: result.total,
+        free: result.free,
+        expiring: result.expiring,
+        permanent: result.permanent,
+        earned: result.earned,
+        expiresAt: result.expires_at ? new Date(result.expires_at) : null,
+      });
     } catch (error) {
       logger.error("Failed to get balance", parseError(error), {
         ...identifier,
@@ -1316,7 +1330,7 @@ export class CreditRepository {
     locale: CountryLanguage,
   ): Promise<ResponseType<number>> {
     try {
-      // Get pool for this lead
+      // Side effects: ensure wallets exist + monthly reset
       const poolResult = await CreditRepository.getLeadPool(
         leadId,
         logger,
@@ -1327,18 +1341,18 @@ export class CreditRepository {
         return poolResult;
       }
 
-      const pool = poolResult.data;
-
-      // Check and reset monthly free credits for entire pool if needed
       await CreditRepository.ensureMonthlyFreeCreditsForPool(
-        pool,
+        poolResult.data,
         logger,
         locale,
       );
 
-      // Calculate balance across all wallets in pool
-      const balance = await CreditRepository.calculatePoolBalance(pool, logger);
-      return success(balance.total);
+      // Atomic balance calc in one PG call
+      const result = await getPoolBalance.call(
+        { p_user_id: null, p_lead_id: leadId },
+        logger,
+      );
+      return success(result.total);
     } catch (error) {
       logger.error("Failed to get lead balance", parseError(error), { leadId });
       return fail({
@@ -1359,6 +1373,7 @@ export class CreditRepository {
     t: ModuleT,
   ): Promise<ResponseType<CreditsGetResponseOutput>> {
     try {
+      // Side effects first: ensure wallets exist + monthly reset
       let poolResult: ResponseType<CreditPool>;
       if (user.isPublic) {
         poolResult = await CreditRepository.getLeadPoolOnly(
@@ -1375,19 +1390,30 @@ export class CreditRepository {
         return poolResult;
       }
 
-      const pool = poolResult.data;
-
-      // Check and reset monthly free credits for entire pool if needed
+      // Monthly free credit reset (side effect)
       await CreditRepository.ensureMonthlyFreeCreditsForPool(
-        pool,
+        poolResult.data,
         logger,
         locale,
       );
 
-      // Calculate balance across all wallets in pool
-      const balance = await CreditRepository.calculatePoolBalance(pool, logger);
+      // Atomic balance calc: expiry + aggregation in one PG call
+      const result = await getPoolBalance.call(
+        {
+          p_user_id: user.isPublic ? null : user.id,
+          p_lead_id: user.isPublic ? user.leadId : null,
+        },
+        logger,
+      );
 
-      return success(balance);
+      return success({
+        total: result.total,
+        free: result.free,
+        expiring: result.expiring,
+        permanent: result.permanent,
+        earned: result.earned,
+        expiresAt: result.expires_at ? new Date(result.expires_at) : null,
+      });
     } catch (error) {
       logger.error("Failed to get user balance", parseError(error), {
         userId: user.isPublic ? undefined : user.id,

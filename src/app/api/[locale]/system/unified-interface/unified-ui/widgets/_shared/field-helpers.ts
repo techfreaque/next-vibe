@@ -26,6 +26,7 @@ import type {
   AnyChildrenConstrain,
   BaseWidgetConfig,
   ConstrainedChildUsage,
+  DispatchField,
   FieldUsageConfig,
   SchemaTypes,
 } from "./types";
@@ -39,7 +40,7 @@ export type ExtractedField<TKey extends string> = UnifiedField<
   TKey,
   ZodTypeAny,
   FieldUsageConfig,
-  AnyChildrenConstrain<TKey, ConstrainedChildUsage<FieldUsageConfig>>
+  AnyChildrenConstrain<TKey, FieldUsageConfig>
 >;
 
 /**
@@ -156,11 +157,27 @@ export function withValueNonStrict<TField, TValue>(
   field: TField,
   value: TValue,
   parentValue: WidgetData | undefined | null,
-): TField & {
-  value: TValue;
-  parentValue: WidgetData | undefined | null;
-} {
-  return { ...field, value, parentValue };
+): DispatchField<
+  string,
+  ZodTypeAny,
+  FieldUsageConfig,
+  AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
+> {
+  // Callers pass UnifiedField or child field types that have no existing `value` property.
+  // The spread safely produces the correct runtime shape. The two-step cast routes through
+  // the concrete augmented type (sufficient overlap with ExtractedField) to reach DispatchField,
+  // bypassing the conditional type that prevents direct assignability proof.
+  const augmented = {
+    ...(field as ExtractedField<string>),
+    value,
+    parentValue,
+  };
+  return augmented as DispatchField<
+    string,
+    ZodTypeAny,
+    FieldUsageConfig,
+    AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
+  >;
 }
 
 /**

@@ -1,8 +1,8 @@
 /**
- * MessageDbWriter - Centralized handler for all ASSISTANT message SSE events + DB writes.
+ * MessageDbWriter - Centralized handler for all ASSISTANT message events + DB writes.
  *
- * Each public method emits the SSE event(s) AND persists to DB in one call.
- * Callers never touch controller.enqueue or createStreamEvent directly for message writes.
+ * Each public method emits the WS event(s) AND persists to DB in one call.
+ * Callers never touch wsEmit or createStreamEvent directly for message writes.
  *
  * DB throttle strategy: debounce content updates within THROTTLE_MS window so
  * rapid deltas don't hammer the DB. flush() / flushAll() cancel the timer and
@@ -10,8 +10,6 @@
  */
 
 import "server-only";
-
-import type { ReadableStreamDefaultController } from "node:stream/web";
 
 import { eq, sql } from "drizzle-orm";
 import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
@@ -31,14 +29,15 @@ import {
   type ToolCallResult,
 } from "../../../chat/db";
 import { ChatMessageRole } from "../../../chat/enum";
+import type { WsEmitCallback } from "../../../chat/threads/[threadId]/messages/emitter";
+import { createStreamEvent } from "../../../chat/threads/[threadId]/messages/events";
 import {
   createErrorMessage,
   createTextMessage,
   createToolMessage,
   updateMessageContent,
 } from "../../../chat/threads/[threadId]/messages/repository";
-import { serializeError } from "../../error-utils";
-import { createStreamEvent, formatSSEEvent } from "../../events";
+import { serializeError } from "../error-utils";
 
 /** Throttle window in ms - coalesces content updates to same message */
 const THROTTLE_MS = 300;
@@ -52,13 +51,11 @@ interface PendingWrite {
 
 export class MessageDbWriter {
   private readonly isIncognito: boolean;
-  private readonly isHeadless: boolean;
   private readonly logger: EndpointLogger;
-  private readonly controller: ReadableStreamDefaultController<Uint8Array>;
-  private readonly encoder: TextEncoder;
   private readonly pending = new Map<string, PendingWrite>();
   private readonly creditsT: ModuleT;
   private readonly locale: CountryLanguage;
+  private readonly wsEmit: WsEmitCallback | null;
 
   /** Tracks the last assistant message ID written — used by headless callers */
   lastAssistantMessageId: string | null = null;
@@ -68,19 +65,15 @@ export class MessageDbWriter {
   constructor(
     isIncognito: boolean,
     logger: EndpointLogger,
-    controller: ReadableStreamDefaultController<Uint8Array>,
-    encoder: TextEncoder,
-    isHeadless = false,
     creditsT: ModuleT,
     locale: CountryLanguage,
+    wsEmit: WsEmitCallback | null = null,
   ) {
     this.isIncognito = isIncognito;
-    this.isHeadless = isHeadless;
     this.logger = logger;
-    this.controller = controller;
-    this.encoder = encoder;
     this.creditsT = creditsT;
     this.locale = locale;
+    this.wsEmit = wsEmit;
   }
 
   // ─── High-level methods (SSE + DB in one call) ────────────────────────────
@@ -953,17 +946,6 @@ export class MessageDbWriter {
     this.enqueue(doneEvent);
   }
 
-  /**
-   * Close the SSE controller (ends the stream to the client).
-   */
-  closeController(): void {
-    try {
-      this.controller.close();
-    } catch {
-      // Already closed - ignore
-    }
-  }
-
   // ─── Low-level helpers (used internally and by flush paths) ───────────────
 
   /** Emit a single CONTENT_DELTA SSE event. */
@@ -1168,15 +1150,8 @@ export class MessageDbWriter {
       (typeof createStreamEvent)[keyof typeof createStreamEvent]
     >,
   ): void {
-    if (this.isHeadless) {
-      return;
-    }
-    try {
-      this.controller.enqueue(this.encoder.encode(formatSSEEvent(event)));
-    } catch (err) {
-      this.logger.debug("[MessageDbWriter] Controller closed, skipping event", {
-        error: err instanceof Error ? err.message : String(err),
-      });
+    if (this.wsEmit) {
+      this.wsEmit(event);
     }
   }
 }

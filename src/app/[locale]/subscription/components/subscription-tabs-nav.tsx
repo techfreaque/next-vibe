@@ -1,7 +1,9 @@
 "use client";
 
+import type { Route } from "next";
 import Link from "next/link";
 import { cn } from "next-vibe/shared/utils/utils";
+import type { IconComponent } from "next-vibe-ui/lib/helper";
 import { Div } from "next-vibe-ui/ui/div";
 import { History, ShoppingCart, TrendingUp } from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
@@ -20,7 +22,12 @@ export function SubscriptionTabsNav({
 }: SubscriptionTabsNavProps): JSX.Element {
   const { t } = simpleT(locale);
 
-  const tabs = [
+  const tabs: Array<{
+    value: string;
+    href: Route;
+    icon: IconComponent;
+    label: string;
+  }> = [
     {
       value: "overview",
       href: `/${locale}/subscription/overview`,

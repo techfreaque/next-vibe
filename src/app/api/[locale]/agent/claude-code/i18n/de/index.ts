@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
     run: {
       post: {
         title: "Claude Code ausführen",
+        dynamicTitle: "Claude Code: {{prompt}}",
         description:
           "Startet eine Claude Code-Sitzung auf Hermes (dem lokalen Entwicklungsrechner). BEVORZUGE headless:false (Standard) — öffnet eine vollständige bidirektionale Claude Code-Sitzung, bei der Max aktiv teilnehmen kann. headless:true nur für vollautomatisierte Batch-Aufgaben ohne menschliche Eingabe verwenden (z.B. Cron-Jobs). Im interaktiven Modus wird die Sitzung live ins Terminal gestreamt; im Batch-Modus läuft `claude -p` und gibt die gesamte Ausgabe zurück. Läuft immer mit --dangerously-skip-permissions.",
         fields: {

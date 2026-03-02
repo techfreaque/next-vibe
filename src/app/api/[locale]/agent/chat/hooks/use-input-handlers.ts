@@ -3,14 +3,14 @@
  * Handles input submission, keyboard events, model changes, and prompt filling
  */
 
-import { useRouter } from "next-vibe-ui/hooks";
+import type { TextareaKeyboardEvent } from "next-vibe-ui/ui/textarea";
 import { useCallback } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import type { TextareaKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/textarea";
 
 import type { DefaultFolderId } from "../config";
+import { useChatNavigationStore } from "./use-chat-navigation-store";
 import { clearDraft } from "./use-input-autosave";
 
 // Utility functions
@@ -70,7 +70,7 @@ export function useInputHandlers({
   logger,
   draftKey,
 }: UseInputHandlersProps): UseInputHandlersReturn {
-  const router = useRouter();
+  const setNavigation = useChatNavigationStore((s) => s.setNavigation);
 
   const submitMessage = useCallback(async () => {
     logger.debug("Chat", "submitMessage called", {
@@ -91,16 +91,21 @@ export function useInputHandlers({
             rootFolderId,
             subFolderId,
           });
+
+          // Update navigation store immediately for instant reactivity
+          setNavigation({
+            activeThreadId: threadId,
+            currentRootFolderId: rootFolderId,
+            currentSubFolderId: subFolderId,
+          });
+
           // Build URL with proper subfolder path if present
           const url = subFolderId
             ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
             : `/${locale}/threads/${rootFolderId}/${threadId}`;
 
-          // CRITICAL: Use history.replaceState for SYNCHRONOUS navigation
-          // router.push/replace are async and won't update activeThreadId before messages are created
+          // Synchronous URL update — Zustand store is source of truth
           window.history.replaceState(null, "", url);
-          // Still call router for Next.js state management
-          router.replace(url);
         },
       );
       // Clear the draft after successful send
@@ -117,8 +122,8 @@ export function useInputHandlers({
     sendMessage,
     logger,
     locale,
-    router,
     draftKey,
+    setNavigation,
   ]);
 
   /**
@@ -145,10 +150,16 @@ export function useInputHandlers({
               rootFolderId,
               subFolderId,
             });
+            // Update store immediately
+            setNavigation({
+              activeThreadId: threadId,
+              currentRootFolderId: rootFolderId,
+              currentSubFolderId: subFolderId,
+            });
             const url = subFolderId
               ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
               : `/${locale}/threads/${rootFolderId}/${threadId}`;
-            router.push(url);
+            window.history.pushState(null, "", url);
           },
         );
         await clearDraft(draftKey, logger);
@@ -165,8 +176,8 @@ export function useInputHandlers({
       setInput,
       logger,
       locale,
-      router,
       draftKey,
+      setNavigation,
     ],
   );
 
@@ -200,16 +211,30 @@ export function useInputHandlers({
             rootFolderId,
             subFolderId,
           });
+          // Update store immediately
+          setNavigation({
+            activeThreadId: threadId,
+            currentRootFolderId: rootFolderId,
+            currentSubFolderId: subFolderId,
+          });
           // Build URL with proper subfolder path if present (same as text flow)
           const url = subFolderId
             ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
             : `/${locale}/threads/${rootFolderId}/${threadId}`;
-          router.push(url);
+          window.history.pushState(null, "", url);
         },
       );
       await clearDraft(draftKey, logger);
     },
-    [isLoading, attachments, sendMessage, logger, locale, router, draftKey],
+    [
+      isLoading,
+      attachments,
+      sendMessage,
+      logger,
+      locale,
+      draftKey,
+      setNavigation,
+    ],
   );
 
   const handleKeyDown = useCallback(

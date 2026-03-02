@@ -1,4 +1,4 @@
-import { translations as _componentsTranslations } from "../../_components/i18n/en";
+import { translations as _componentsTranslations } from "../../widget/i18n/en";
 
 export const translations = {
   category: "Users",

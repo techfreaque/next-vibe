@@ -3,14 +3,14 @@
  * React hook for CSV import with file handling logic
  */
 
+import type { DivDragEvent } from "next-vibe-ui/ui/div";
+import type { InputChangeEvent } from "next-vibe-ui/ui/input";
 import React from "react";
 
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { DivDragEvent } from "@/packages/next-vibe-ui/web/ui/div";
-import type { InputChangeEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
 import definitions from "./definition";
 

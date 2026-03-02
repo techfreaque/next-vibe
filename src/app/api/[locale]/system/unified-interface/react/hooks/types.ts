@@ -215,7 +215,9 @@ export interface ApiQueryFormReturn<
   errorMessage?: string;
 
   isLoading: boolean;
+  isLoadingFresh: boolean;
   isFetching: boolean;
+  isCachedData: boolean;
   status: "loading" | "success" | "error" | "idle";
   refetch: () => Promise<ResponseType<TResponse>>;
   /**

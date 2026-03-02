@@ -1,0 +1,1259 @@
+/**
+ * Model Selector Component
+ * Standalone, reusable model selection with CHARACTER_BASED, FILTERS, and MANUAL modes
+ *
+ * Accepts state from outside - can be used with any state management
+ */
+
+"use client";
+
+import { cn } from "next-vibe/shared/utils";
+import { Badge } from "next-vibe-ui/ui/badge";
+import { Button } from "next-vibe-ui/ui/button";
+import { Div } from "next-vibe-ui/ui/div";
+import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
+import { ArrowDown } from "next-vibe-ui/ui/icons/ArrowDown";
+import { ArrowUp } from "next-vibe-ui/ui/icons/ArrowUp";
+import { Check } from "next-vibe-ui/ui/icons/Check";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
+import { Filter } from "next-vibe-ui/ui/icons/Filter";
+import { Label } from "next-vibe-ui/ui/label";
+import { RangeSlider } from "next-vibe-ui/ui/range-slider";
+import { Separator } from "next-vibe-ui/ui/separator";
+import { Span } from "next-vibe-ui/ui/span";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "next-vibe-ui/ui/tooltip";
+import { P } from "next-vibe-ui/ui/typography";
+import type { JSX } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+import {
+  CONTENT_DISPLAY,
+  INTELLIGENCE_DISPLAY,
+  ModelSelectionType,
+  ModelSortDirection,
+  ModelSortField,
+  ModelSortFieldOptions,
+  PRICE_DISPLAY,
+  SPEED_DISPLAY,
+} from "@/app/api/[locale]/agent/chat/characters/enum";
+import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
+import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
+import { useEnvAvailability } from "@/app/api/[locale]/agent/env-availability-context";
+import { ModelUtility } from "@/app/api/[locale]/agent/models/enum";
+import {
+  ApiProvider,
+  apiProviderDisplayNames,
+  getAllModelOptions,
+  getCreditCostFromModel,
+  getModelById,
+  type ModelId,
+  type ModelOption,
+  modelProviders,
+  TOTAL_MODEL_COUNT,
+} from "@/app/api/[locale]/agent/models/models";
+import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import { DEFAULT_INPUT_TOKENS, DEFAULT_OUTPUT_TOKENS } from "../constants";
+import { scopedTranslation } from "../i18n";
+import type { FiltersModelSelection, ModelSelectionSimple } from "../types";
+import { ModelCreditDisplay } from "./model-credit-display";
+
+interface ModelCardProps {
+  model: ModelOption;
+  isBest: boolean;
+  selected: boolean;
+  onClick: () => void;
+  dimmed?: boolean;
+  disabled?: boolean;
+  setupRequired?: string | null;
+  /** Show API provider suffix when model name appears with multiple providers */
+  providerSuffix?: string | null;
+  t: ReturnType<typeof scopedTranslation.scopedT>["t"];
+  locale: CountryLanguage;
+}
+
+function ModelCard({
+  model,
+  isBest,
+  selected,
+  onClick,
+  dimmed = false,
+  disabled = false,
+  setupRequired = null,
+  providerSuffix = null,
+  t,
+  locale,
+}: ModelCardProps): JSX.Element {
+  const isUnavailable = disabled || Boolean(setupRequired);
+
+  const card = (
+    <Div
+      onClick={isUnavailable ? undefined : onClick}
+      className={cn(
+        "flex items-center gap-2.5 p-2.5 rounded-lg border transition-all",
+        !isUnavailable &&
+          "cursor-pointer hover:bg-muted/50 hover:border-primary/30",
+        isUnavailable && "cursor-not-allowed opacity-50",
+        selected &&
+          !setupRequired &&
+          "bg-primary/10 border-primary/40 shadow-sm",
+        dimmed && !selected && "opacity-40 hover:opacity-70",
+        setupRequired && "border-dashed border-muted-foreground/30 bg-muted/20",
+      )}
+    >
+      <Div
+        className={cn(
+          "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors",
+          selected ? "bg-primary text-primary-foreground" : "bg-muted",
+        )}
+      >
+        <Icon icon={model.icon} className="h-4 w-4" />
+      </Div>
+
+      <Div className="flex-1 min-w-0">
+        <Div className="flex items-center gap-1.5">
+          <Span
+            className={cn(
+              "text-sm font-medium truncate",
+              selected && "text-primary",
+            )}
+          >
+            {model.name}
+            {providerSuffix ? (
+              <Span className="text-muted-foreground font-normal">
+                {` (${providerSuffix})`}
+              </Span>
+            ) : null}
+          </Span>
+          {isBest && (
+            <Badge variant="default" className="text-[9px] h-4 px-1.5 shrink-0">
+              {t("selector.bestForFilter")}
+            </Badge>
+          )}
+        </Div>
+        <Span className="text-[11px] text-muted-foreground">
+          {modelProviders[model.provider]?.name ?? model.provider}
+        </Span>
+      </Div>
+
+      <Div className="flex items-center gap-1.5 shrink-0">
+        {setupRequired ? (
+          <Badge
+            variant="outline"
+            className="text-[9px] h-4 px-1.5 shrink-0 border-amber-400 text-amber-600"
+          >
+            {t("selector.setupRequired")}
+          </Badge>
+        ) : (
+          <ModelCreditDisplay
+            modelId={model.id}
+            variant="badge"
+            badgeVariant={selected ? "outline" : "secondary"}
+            className="text-[10px] h-5"
+            locale={locale}
+          />
+        )}
+        {selected && !setupRequired && (
+          <Check className="h-4 w-4 text-primary" />
+        )}
+      </Div>
+    </Div>
+  );
+
+  if (!setupRequired) {
+    return card;
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{card}</TooltipTrigger>
+      <TooltipContent className="max-w-xs text-xs">
+        <P className="font-semibold mb-1">
+          {t("selector.providerUnconfigured")}
+        </P>
+        <P>{setupRequired}</P>
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+interface RangeIndices {
+  min: number;
+  max: number;
+}
+
+function getIndicesFromRange<T extends string>(
+  range: { min?: T; max?: T } | undefined,
+  options: readonly { value: T }[],
+): RangeIndices {
+  if (!range) {
+    return { min: 0, max: options.length - 1 };
+  }
+
+  // Handle partial ranges - if only min or max is set, use that value
+  const minIndex = range.min
+    ? options.findIndex((o) => o.value === range.min)
+    : 0;
+  const maxIndex = range.max
+    ? options.findIndex((o) => o.value === range.max)
+    : options.length - 1;
+
+  return {
+    min: minIndex === -1 ? 0 : minIndex,
+    max: maxIndex === -1 ? options.length - 1 : maxIndex,
+  };
+}
+
+function getRangeFromIndices<T extends string>(
+  indices: RangeIndices,
+  options: readonly { value: T }[],
+): { min?: T; max?: T } {
+  return {
+    min: options[indices.min]?.value,
+    max: options[indices.max]?.value,
+  };
+}
+
+/**
+ * Standalone Model Selector Component
+ */
+export interface ModelSelectorProps {
+  /**
+   * Current model selection
+   */
+  modelSelection: ModelSelectionSimple | undefined;
+
+  /**
+   * Callback when selection changes (optional for read-only mode)
+   */
+  onChange?: (selection: ModelSelectionSimple | null) => void;
+
+  /**
+   * Character's model selection (optional, for CHARACTER_BASED mode)
+   */
+  characterModelSelection?: ModelSelectionSimple | undefined;
+
+  /**
+   * Read-only mode - disables all interactions
+   */
+  readOnly?: boolean;
+
+  /**
+   * Which AI providers have API keys configured (optional - if not provided all are assumed available)
+   */
+  envAvailability?: AgentEnvAvailability;
+
+  /**
+   * User's locale for currency formatting
+   */
+  locale: CountryLanguage;
+
+  /**
+   * User payload for admin-only model filtering
+   */
+  user: JwtPayloadType;
+}
+
+/** Map ApiProvider to the availability key */
+function getSetupRequiredMessage(
+  model: ModelOption,
+  envAvailability: AgentEnvAvailability | undefined,
+  locale: CountryLanguage,
+): string | null {
+  if (!envAvailability) {
+    return null;
+  }
+  const t = scopedTranslation.scopedT(locale).t;
+  switch (model.apiProvider) {
+    case ApiProvider.OPENROUTER:
+      return envAvailability.openRouter
+        ? null
+        : `${t("selector.addEnvKey")}: OPENROUTER_API_KEY → openrouter.ai/keys`;
+    case ApiProvider.UNCENSORED_AI:
+      return envAvailability.uncensoredAI
+        ? null
+        : `${t("selector.addEnvKey")}: UNCENSORED_AI_API_KEY`;
+    case ApiProvider.FREEDOMGPT:
+      return envAvailability.freedomGPT
+        ? null
+        : `${t("selector.addEnvKey")}: FREEDOMGPT_API_KEY`;
+    case ApiProvider.GAB_AI:
+      return envAvailability.gabAI
+        ? null
+        : `${t("selector.addEnvKey")}: GAB_AI_API_KEY`;
+    case ApiProvider.VENICE_AI:
+      return envAvailability.veniceAI
+        ? null
+        : `${t("selector.addEnvKey")}: VENICE_AI_API_KEY → venice.ai`;
+    default:
+      return null;
+  }
+}
+
+export function ModelSelector({
+  modelSelection,
+  onChange,
+  characterModelSelection,
+  readOnly = false,
+  envAvailability: envAvailabilityProp,
+  locale,
+  user,
+}: ModelSelectorProps): JSX.Element {
+  const { t } = scopedTranslation.scopedT(locale);
+  // Prefer prop (for non-chat contexts), fall back to context (chat pages)
+  const envAvailabilityCtx = useEnvAvailability();
+  const envAvailability = envAvailabilityProp ?? envAvailabilityCtx;
+  // UI state - initialize to CHARACTER_BASED if modelSelection is null and we have character defaults
+  const [useCharacterBased, setUseCharacterBased] = useState(
+    !modelSelection && !!characterModelSelection,
+  );
+
+  // Reset to CHARACTER_BASED when characterModelSelection changes and we have no modelSelection
+  useEffect(() => {
+    if (!modelSelection && characterModelSelection) {
+      setUseCharacterBased(true);
+    }
+  }, [characterModelSelection, modelSelection]);
+
+  const [showAllModels, setShowAllModels] = useState(false);
+  const [showUnfilteredModels, setShowUnfilteredModels] = useState(false);
+  const [showLegacyByGroup, setShowLegacyByGroup] = useState<
+    Record<string, boolean>
+  >({});
+
+  // Current selection - use character's selection if in CHARACTER_BASED mode
+  const currentSelection =
+    useCharacterBased && characterModelSelection
+      ? characterModelSelection
+      : (modelSelection ?? { selectionType: ModelSelectionType.FILTERS });
+
+  // Determine current mode
+  const mode = useCharacterBased
+    ? ModelSelectionType.CHARACTER_BASED
+    : currentSelection.selectionType;
+
+  // activeSelection is used for filtering models - use currentSelection
+  const activeSelection = currentSelection;
+
+  // For slider UI, show character filters when in CHARACTER_BASED, otherwise show modelSelection filters
+  // Both FILTERS and MANUAL types store filter ranges
+  const sliderSource =
+    useCharacterBased && characterModelSelection
+      ? characterModelSelection
+      : modelSelection;
+
+  const intelligenceIndices = useMemo(
+    () =>
+      sliderSource && sliderSource.intelligenceRange
+        ? getIndicesFromRange(
+            sliderSource.intelligenceRange,
+            INTELLIGENCE_DISPLAY,
+          )
+        : { min: 0, max: INTELLIGENCE_DISPLAY.length - 1 },
+    [sliderSource],
+  );
+
+  const contentIndices = useMemo(
+    () =>
+      sliderSource && sliderSource.contentRange
+        ? getIndicesFromRange(sliderSource.contentRange, CONTENT_DISPLAY)
+        : { min: 0, max: CONTENT_DISPLAY.length - 1 },
+    [sliderSource],
+  );
+
+  const speedIndices = useMemo(
+    () =>
+      sliderSource && sliderSource.speedRange
+        ? getIndicesFromRange(sliderSource.speedRange, SPEED_DISPLAY)
+        : { min: 0, max: SPEED_DISPLAY.length - 1 },
+    [sliderSource],
+  );
+
+  const priceIndices = useMemo(
+    () =>
+      sliderSource && sliderSource.priceRange
+        ? getIndicesFromRange(sliderSource.priceRange, PRICE_DISPLAY)
+        : { min: 0, max: PRICE_DISPLAY.length - 1 },
+    [sliderSource],
+  );
+
+  const manualModelId =
+    currentSelection.selectionType === ModelSelectionType.MANUAL
+      ? currentSelection.manualModelId
+      : undefined;
+
+  // Helper to update value
+  const updateValue = (newSelection: ModelSelectionSimple | null): void => {
+    if (readOnly || !onChange) {
+      return;
+    }
+    onChange(newSelection);
+  };
+
+  // Mode change handlers
+  const handleModeChange = (
+    newMode:
+      | typeof ModelSelectionType.CHARACTER_BASED
+      | typeof ModelSelectionType.FILTERS
+      | typeof ModelSelectionType.MANUAL,
+  ): void => {
+    if (newMode === ModelSelectionType.CHARACTER_BASED) {
+      // Toggle UI state and set form value to null
+      setUseCharacterBased(true);
+      updateValue(null);
+    } else {
+      setUseCharacterBased(false);
+
+      // Use current slider values (which reflect character filters if coming from CHARACTER_BASED)
+      const baseProps = {
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy,
+        sortDirection,
+      };
+
+      if (newMode === ModelSelectionType.MANUAL) {
+        // Try to keep current model if available, otherwise use best filtered model
+        const currentModel =
+          manualModelId ?? bestFilteredModel?.id ?? getAllModelOptions()[0]?.id;
+        updateValue({
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: currentModel,
+          ...baseProps,
+        });
+      } else {
+        updateValue({
+          selectionType: ModelSelectionType.FILTERS,
+          ...baseProps,
+        });
+      }
+    }
+  };
+
+  // Range change handlers - switch to FILTERS mode when editing (unless already in MANUAL)
+  const handleIntelligenceChange = (min: number, max: number): void => {
+    setUseCharacterBased(false);
+    const newType =
+      mode === ModelSelectionType.MANUAL
+        ? ModelSelectionType.MANUAL
+        : ModelSelectionType.FILTERS;
+
+    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+      updateValue({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId,
+        intelligenceRange: getRangeFromIndices(
+          { min, max },
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy,
+        sortDirection,
+      });
+    } else {
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange: getRangeFromIndices(
+          { min, max },
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy,
+        sortDirection,
+      });
+    }
+  };
+
+  const handleContentChange = (min: number, max: number): void => {
+    setUseCharacterBased(false);
+    const newType =
+      mode === ModelSelectionType.MANUAL
+        ? ModelSelectionType.MANUAL
+        : ModelSelectionType.FILTERS;
+
+    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+      updateValue({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices({ min, max }, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy,
+        sortDirection,
+      });
+    } else {
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices({ min, max }, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy,
+        sortDirection,
+      });
+    }
+  };
+
+  const handleSpeedChange = (min: number, max: number): void => {
+    setUseCharacterBased(false);
+    const newType =
+      mode === ModelSelectionType.MANUAL
+        ? ModelSelectionType.MANUAL
+        : ModelSelectionType.FILTERS;
+
+    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+      updateValue({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices({ min, max }, SPEED_DISPLAY),
+        sortBy,
+        sortDirection,
+      });
+    } else {
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices({ min, max }, SPEED_DISPLAY),
+        sortBy,
+        sortDirection,
+      });
+    }
+  };
+
+  const handlePriceChange = (min: number, max: number): void => {
+    setUseCharacterBased(false);
+    const newType =
+      mode === ModelSelectionType.MANUAL
+        ? ModelSelectionType.MANUAL
+        : ModelSelectionType.FILTERS;
+
+    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+      updateValue({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices({ min, max }, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy,
+        sortDirection,
+      });
+    } else {
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices({ min, max }, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy,
+        sortDirection,
+      });
+    }
+  };
+
+  const handleModelSelect = (modelId: ModelId): void => {
+    // When selecting a model, preserve current filter/sort settings
+    setUseCharacterBased(false);
+    updateValue({
+      selectionType: ModelSelectionType.MANUAL,
+      manualModelId: modelId,
+      intelligenceRange: getRangeFromIndices(
+        intelligenceIndices,
+        INTELLIGENCE_DISPLAY,
+      ),
+      priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+      contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+      speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+      sortBy,
+      sortDirection,
+    });
+  };
+
+  // Get current sort settings from activeSelection (works for both FILTERS and MANUAL)
+  const sortBy =
+    activeSelection?.selectionType === ModelSelectionType.FILTERS ||
+    activeSelection?.selectionType === ModelSelectionType.MANUAL
+      ? activeSelection.sortBy
+      : undefined;
+  const sortDirection =
+    activeSelection?.selectionType === ModelSelectionType.FILTERS ||
+    activeSelection?.selectionType === ModelSelectionType.MANUAL
+      ? activeSelection.sortDirection
+      : undefined;
+
+  // Sort change handlers - switch to FILTERS mode when editing (unless already in MANUAL)
+  const handleSortFieldChange = (
+    field: (typeof ModelSortField)[keyof typeof ModelSortField],
+  ): void => {
+    // Determine sane default direction based on field - always reset when changing field
+    // All fields default to DESC (highest/best first, including most expensive for price)
+    const defaultDirection = ModelSortDirection.DESC;
+
+    setUseCharacterBased(false);
+    const newType =
+      mode === ModelSelectionType.MANUAL
+        ? ModelSelectionType.MANUAL
+        : ModelSelectionType.FILTERS;
+
+    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+      updateValue({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy: field,
+        sortDirection: defaultDirection,
+      });
+    } else {
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy: field,
+        sortDirection: defaultDirection,
+      });
+    }
+  };
+
+  const handleSortDirectionToggle = (): void => {
+    const newDirection =
+      sortDirection === ModelSortDirection.ASC
+        ? ModelSortDirection.DESC
+        : ModelSortDirection.ASC;
+
+    setUseCharacterBased(false);
+    const newType =
+      mode === ModelSelectionType.MANUAL
+        ? ModelSelectionType.MANUAL
+        : ModelSelectionType.FILTERS;
+
+    if (newType === ModelSelectionType.MANUAL && manualModelId) {
+      updateValue({
+        selectionType: ModelSelectionType.MANUAL,
+        manualModelId,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy: sortBy ?? ModelSortField.INTELLIGENCE,
+        sortDirection: newDirection,
+      });
+    } else {
+      updateValue({
+        selectionType: ModelSelectionType.FILTERS,
+        intelligenceRange: getRangeFromIndices(
+          intelligenceIndices,
+          INTELLIGENCE_DISPLAY,
+        ),
+        priceRange: getRangeFromIndices(priceIndices, PRICE_DISPLAY),
+        contentRange: getRangeFromIndices(contentIndices, CONTENT_DISPLAY),
+        speedRange: getRangeFromIndices(speedIndices, SPEED_DISPLAY),
+        sortBy: sortBy ?? ModelSortField.INTELLIGENCE,
+        sortDirection: newDirection,
+      });
+    }
+  };
+
+  // Calculate filtered models and best model
+  const intelligenceRange = getRangeFromIndices(
+    intelligenceIndices,
+    INTELLIGENCE_DISPLAY,
+  );
+  const contentRange = getRangeFromIndices(contentIndices, CONTENT_DISPLAY);
+  const speedRange = getRangeFromIndices(speedIndices, SPEED_DISPLAY);
+  const priceRange = getRangeFromIndices(priceIndices, PRICE_DISPLAY);
+
+  const filteredModels = useMemo(() => {
+    const modelSelection: FiltersModelSelection = {
+      selectionType: ModelSelectionType.FILTERS,
+      intelligenceRange,
+      priceRange,
+      contentRange,
+      speedRange,
+      sortBy,
+      sortDirection,
+    };
+    return CharactersRepositoryClient.getFilteredModelsForCharacter(
+      modelSelection,
+      user,
+    );
+  }, [
+    intelligenceRange,
+    priceRange,
+    contentRange,
+    speedRange,
+    sortBy,
+    sortDirection,
+    user,
+  ]);
+
+  const bestFilteredModel = useMemo(() => {
+    return filteredModels.length > 0 ? filteredModels[0] : null;
+  }, [filteredModels]);
+
+  const bestModel = useMemo(() => {
+    if (mode === ModelSelectionType.MANUAL && manualModelId) {
+      return getModelById(manualModelId) ?? null;
+    } else if (mode === ModelSelectionType.CHARACTER_BASED) {
+      if (characterModelSelection) {
+        return CharactersRepositoryClient.getBestModelForCharacter(
+          characterModelSelection,
+          user,
+        );
+      }
+      return null;
+    } else {
+      return bestFilteredModel;
+    }
+  }, [mode, manualModelId, bestFilteredModel, characterModelSelection, user]);
+
+  // Get models to show (filtered or all)
+  const modelsToShow = showUnfilteredModels
+    ? getAllModelOptions()
+    : filteredModels;
+
+  // Compute which model names appear with multiple providers (need provider suffix)
+  const duplicateModelNames = useMemo(() => {
+    const nameCount = new Map<string, number>();
+    for (const model of modelsToShow) {
+      nameCount.set(model.name, (nameCount.get(model.name) ?? 0) + 1);
+    }
+    return new Set(
+      [...nameCount.entries()]
+        .filter(([, count]) => count > 1)
+        .map(([name]) => name),
+    );
+  }, [modelsToShow]);
+
+  // Sort and group models
+  const sortedAndGroupedModels = useMemo(() => {
+    if (!sortBy) {
+      return { ungrouped: modelsToShow };
+    }
+
+    // Get sort value and label based on field
+    const getSortInfo = (
+      model: ModelOption,
+    ): { value: number; label: string } => {
+      switch (sortBy) {
+        case ModelSortField.INTELLIGENCE: {
+          const idx = INTELLIGENCE_DISPLAY.findIndex(
+            (d) => d.value === model.intelligence,
+          );
+          return {
+            value: idx === -1 ? 0 : idx,
+            label: t(INTELLIGENCE_DISPLAY[idx]?.label ?? ""),
+          };
+        }
+        case ModelSortField.SPEED: {
+          const idx = SPEED_DISPLAY.findIndex((d) => d.value === model.speed);
+          return {
+            value: idx === -1 ? 0 : idx,
+            label: t(SPEED_DISPLAY[idx]?.label ?? ""),
+          };
+        }
+        case ModelSortField.PRICE: {
+          const cost = getCreditCostFromModel(
+            model,
+            DEFAULT_INPUT_TOKENS,
+            DEFAULT_OUTPUT_TOKENS,
+          );
+          return {
+            value: cost,
+            label:
+              cost === 0
+                ? t("selector.free")
+                : cost === 1
+                  ? t("selector.creditsSingle")
+                  : t("selector.creditsExact", { cost }),
+          };
+        }
+        case ModelSortField.CONTENT: {
+          const idx = CONTENT_DISPLAY.findIndex(
+            (d) => d.value === model.content,
+          );
+          return {
+            value: idx === -1 ? 0 : idx,
+            label: t(CONTENT_DISPLAY[idx]?.label ?? ""),
+          };
+        }
+        default:
+          return { value: 0, label: "" };
+      }
+    };
+
+    // Sort models
+    const sorted = [...modelsToShow].toSorted((a, b) => {
+      const aVal = getSortInfo(a).value;
+      const bVal = getSortInfo(b).value;
+      return sortDirection === ModelSortDirection.ASC
+        ? aVal - bVal
+        : bVal - aVal;
+    });
+
+    // Group by sort value label
+    const grouped: Record<string, ModelOption[]> = {};
+    for (const model of sorted) {
+      const { label } = getSortInfo(model);
+      if (!grouped[label]) {
+        grouped[label] = [];
+      }
+      grouped[label].push(model);
+    }
+
+    return grouped;
+  }, [modelsToShow, sortBy, sortDirection, t]);
+
+  // Get display models (limited or all)
+  const displayModels = useMemo(() => {
+    if (
+      Object.keys(sortedAndGroupedModels).length === 1 &&
+      sortedAndGroupedModels.ungrouped
+    ) {
+      // No grouping - just slice for show more/less
+      return showAllModels
+        ? sortedAndGroupedModels.ungrouped
+        : sortedAndGroupedModels.ungrouped.slice(0, 3);
+    }
+    // With grouping - return all groups (show more/less handled per group)
+    return sortedAndGroupedModels;
+  }, [sortedAndGroupedModels, showAllModels]);
+
+  return (
+    <TooltipProvider>
+      <Div className="flex flex-col gap-4 border rounded-lg p-4">
+        {/* Model selection mode tabs */}
+        <Div className="flex items-center gap-1.5 p-1 bg-muted/50 rounded-lg">
+          {characterModelSelection && (
+            <Button
+              type="button"
+              variant={
+                mode === ModelSelectionType.CHARACTER_BASED
+                  ? "default"
+                  : "ghost"
+              }
+              size="sm"
+              className="flex-1 h-8 text-xs"
+              onClick={() =>
+                handleModeChange(ModelSelectionType.CHARACTER_BASED)
+              }
+              disabled={readOnly}
+            >
+              {t("selector.characterMode")}
+            </Button>
+          )}
+          <Button
+            type="button"
+            variant={mode === ModelSelectionType.FILTERS ? "default" : "ghost"}
+            size="sm"
+            className="flex-1 h-8 text-xs"
+            onClick={() => handleModeChange(ModelSelectionType.FILTERS)}
+            disabled={readOnly}
+          >
+            {t("selector.autoMode")}
+          </Button>
+          <Button
+            type="button"
+            variant={mode === ModelSelectionType.MANUAL ? "default" : "ghost"}
+            size="sm"
+            className="flex-1 h-8 text-xs"
+            onClick={() => handleModeChange(ModelSelectionType.MANUAL)}
+            disabled={readOnly}
+          >
+            {t("selector.manualMode")}
+          </Button>
+        </Div>
+
+        {/* Mode description */}
+        <Span className="text-xs text-center text-muted-foreground/70 -mt-2">
+          {mode === ModelSelectionType.CHARACTER_BASED
+            ? t("selector.characterBasedModeDescription")
+            : mode === ModelSelectionType.FILTERS
+              ? t("selector.autoModeDescription")
+              : t("selector.manualModeDescription")}
+        </Span>
+
+        <Separator className="my-1" />
+
+        {/* Model preview card */}
+        {bestModel ? (
+          <Div className="sticky top-0 z-15 flex items-start gap-3 p-3 bg-gradient-to-br from-primary/15 via-primary/10 to-primary/5 border-2 border-primary/30 rounded-xl shadow-lg backdrop-blur-sm">
+            <Div className="w-10 h-10 rounded-lg bg-primary/30 flex items-center justify-center shrink-0 shadow-inner">
+              <Icon icon={bestModel.icon} className="h-5 w-5 text-primary" />
+            </Div>
+            <Div className="flex-1 min-w-0">
+              <Span className="block text-[10px] text-primary/80 uppercase tracking-wider font-bold mb-1">
+                {mode === ModelSelectionType.FILTERS
+                  ? t("selector.autoSelectedModel")
+                  : mode === ModelSelectionType.MANUAL
+                    ? t("selector.manualSelectedModel")
+                    : t("selector.characterSelectedModel")}
+              </Span>
+              <Span className="text-sm font-bold text-primary block truncate">
+                {bestModel.name}
+                {duplicateModelNames.has(bestModel.name) ? (
+                  <Span className="text-muted-foreground font-normal text-xs">
+                    {` (${apiProviderDisplayNames[bestModel.apiProvider]})`}
+                  </Span>
+                ) : null}
+              </Span>
+              <Span className="text-xs text-muted-foreground">
+                {bestModel.provider && modelProviders[bestModel.provider]
+                  ? modelProviders[bestModel.provider].name
+                  : "Unknown"}
+              </Span>
+            </Div>
+            <ModelCreditDisplay
+              modelId={bestModel.id}
+              variant="badge"
+              badgeVariant="secondary"
+              className="text-[10px] h-5 shrink-0 bg-background/60"
+              locale={locale}
+            />
+          </Div>
+        ) : (
+          <Div className="flex items-center gap-2 p-3 bg-destructive/10 border-2 border-destructive/30 rounded-xl">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-destructive" />
+            <Span className="text-xs font-medium text-destructive">
+              {mode === ModelSelectionType.MANUAL
+                ? t("selector.selectModelBelow")
+                : t("selector.noModelsWarning")}
+            </Span>
+          </Div>
+        )}
+
+        {/* Filter sliders */}
+        <Div className="flex flex-col gap-3.5">
+          <RangeSlider
+            options={INTELLIGENCE_DISPLAY}
+            minIndex={intelligenceIndices.min}
+            maxIndex={intelligenceIndices.max}
+            onChange={handleIntelligenceChange}
+            minLabel={t("ranges.intelligenceRange.minLabel")}
+            maxLabel={t("ranges.intelligenceRange.maxLabel")}
+            disabled={readOnly}
+            t={t}
+          />
+
+          <RangeSlider
+            options={CONTENT_DISPLAY}
+            minIndex={contentIndices.min}
+            maxIndex={contentIndices.max}
+            onChange={handleContentChange}
+            minLabel={t("ranges.contentRange.minLabel")}
+            maxLabel={t("ranges.contentRange.maxLabel")}
+            disabled={readOnly}
+            t={t}
+          />
+
+          <RangeSlider
+            options={SPEED_DISPLAY}
+            minIndex={speedIndices.min}
+            maxIndex={speedIndices.max}
+            onChange={handleSpeedChange}
+            minLabel={t("ranges.speedRange.minLabel")}
+            maxLabel={t("ranges.speedRange.maxLabel")}
+            disabled={readOnly}
+            t={t}
+          />
+
+          <RangeSlider
+            options={PRICE_DISPLAY}
+            minIndex={priceIndices.min}
+            maxIndex={priceIndices.max}
+            onChange={handlePriceChange}
+            minLabel={t("ranges.priceRange.minLabel")}
+            maxLabel={t("ranges.priceRange.maxLabel")}
+            disabled={readOnly}
+            t={t}
+          />
+        </Div>
+
+        {/* Models list */}
+        <Div className="flex flex-col gap-3">
+          {/* Filter and Sort Controls */}
+          <Div className="flex items-center justify-between gap-2 px-1">
+            <Label className="text-xs font-medium text-muted-foreground">
+              {showUnfilteredModels
+                ? t("selector.allModelsCount", {
+                    count: TOTAL_MODEL_COUNT,
+                  })
+                : t("selector.filteredModelsCount", {
+                    count: filteredModels.length,
+                  })}
+            </Label>
+            <Div className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs gap-1"
+                onClick={() => {
+                  setShowUnfilteredModels(!showUnfilteredModels);
+                }}
+                disabled={readOnly}
+              >
+                <Filter className="h-3 w-3" />
+                {showUnfilteredModels
+                  ? t("selector.showFiltered")
+                  : t("selector.showAllModels", {
+                      count: TOTAL_MODEL_COUNT,
+                    })}
+              </Button>
+            </Div>
+          </Div>
+
+          {/* Sort Controls */}
+          <Div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg border">
+            <Label className="text-[11px] font-medium text-muted-foreground shrink-0">
+              {t("selector.sortBy")}:
+            </Label>
+            <Div className="flex items-center gap-1 flex-wrap flex-1">
+              {ModelSortFieldOptions.map((option) => (
+                <Button
+                  key={option.value}
+                  type="button"
+                  variant={sortBy === option.value ? "default" : "ghost"}
+                  size="sm"
+                  className="h-6 text-[11px] px-2"
+                  onClick={() => handleSortFieldChange(option.value)}
+                  disabled={readOnly}
+                >
+                  {t(option.label)}
+                </Button>
+              ))}
+            </Div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0 shrink-0"
+              onClick={handleSortDirectionToggle}
+              disabled={!sortBy || readOnly}
+            >
+              {sortDirection === ModelSortDirection.ASC ? (
+                <ArrowUp className="h-3.5 w-3.5" />
+              ) : (
+                <ArrowDown className="h-3.5 w-3.5" />
+              )}
+            </Button>
+          </Div>
+
+          {/* Model list */}
+          {Array.isArray(displayModels) ? (
+            // Ungrouped list
+            displayModels.length > 0 ? (
+              <Div className="flex flex-col gap-2">
+                {displayModels.map((model: ModelOption) => {
+                  const isOutsideFilter =
+                    showUnfilteredModels &&
+                    !filteredModels.some((m: ModelOption) => m.id === model.id);
+                  const setupRequired = getSetupRequiredMessage(
+                    model,
+                    envAvailability,
+                    locale,
+                  );
+                  return (
+                    <ModelCard
+                      key={model.id}
+                      model={model}
+                      isBest={model.id === bestFilteredModel?.id}
+                      selected={
+                        mode === ModelSelectionType.MANUAL &&
+                        manualModelId === model.id
+                      }
+                      onClick={() => handleModelSelect(model.id)}
+                      dimmed={isOutsideFilter}
+                      disabled={readOnly}
+                      setupRequired={setupRequired}
+                      providerSuffix={
+                        duplicateModelNames.has(model.name)
+                          ? apiProviderDisplayNames[model.apiProvider]
+                          : null
+                      }
+                      t={t}
+                      locale={locale}
+                    />
+                  );
+                })}
+                {modelsToShow.length > 3 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="w-full h-8 text-xs"
+                    onClick={() => setShowAllModels(!showAllModels)}
+                    disabled={readOnly}
+                  >
+                    {showAllModels ? (
+                      <>
+                        <ChevronUp className="h-3 w-3 mr-1" />
+                        {t("selector.showLess")}
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="h-3 w-3 mr-1" />
+                        {t("selector.showMore", {
+                          count: modelsToShow.length - 3,
+                        })}
+                      </>
+                    )}
+                  </Button>
+                )}
+              </Div>
+            ) : (
+              <Div className="p-4 text-center text-sm text-muted-foreground border rounded-lg">
+                {t("selector.noMatchingModels")}
+              </Div>
+            )
+          ) : (
+            // Grouped list
+            <Div className="flex flex-col gap-4">
+              {Object.entries(displayModels).map(
+                ([groupLabel, groupModels]) => {
+                  const models = groupModels as ModelOption[];
+
+                  // Separate legacy and non-legacy models
+                  const nonLegacyModels = models.filter(
+                    (model) => !model.utilities.includes(ModelUtility.LEGACY),
+                  );
+                  const legacyModels = models.filter((model) =>
+                    model.utilities.includes(ModelUtility.LEGACY),
+                  );
+
+                  const showingLegacy = showLegacyByGroup[groupLabel] ?? false;
+                  const visibleModels = showingLegacy
+                    ? models
+                    : nonLegacyModels;
+
+                  return (
+                    <Div key={groupLabel} className="flex flex-col gap-2">
+                      <Div className="flex items-center gap-2 px-1">
+                        <Separator className="flex-1" />
+                        <Label className="text-[11px] font-semibold text-primary uppercase tracking-wide">
+                          {groupLabel}
+                        </Label>
+                        <Separator className="flex-1" />
+                      </Div>
+                      <Div className="flex flex-col gap-2">
+                        {visibleModels.map((model) => {
+                          const isOutsideFilter =
+                            showUnfilteredModels &&
+                            !filteredModels.some(
+                              (m: ModelOption) => m.id === model.id,
+                            );
+                          const setupRequired = getSetupRequiredMessage(
+                            model,
+                            envAvailability,
+                            locale,
+                          );
+                          return (
+                            <ModelCard
+                              key={model.id}
+                              model={model}
+                              isBest={model.id === bestFilteredModel?.id}
+                              selected={
+                                mode === ModelSelectionType.MANUAL &&
+                                manualModelId === model.id
+                              }
+                              onClick={() => handleModelSelect(model.id)}
+                              dimmed={isOutsideFilter}
+                              disabled={readOnly}
+                              setupRequired={setupRequired}
+                              providerSuffix={
+                                duplicateModelNames.has(model.name)
+                                  ? apiProviderDisplayNames[model.apiProvider]
+                                  : null
+                              }
+                              t={t}
+                              locale={locale}
+                            />
+                          );
+                        })}
+
+                        {/* Show Legacy Models Button */}
+                        {legacyModels.length > 0 && !showingLegacy && (
+                          <Div
+                            className="flex items-center justify-center gap-2 p-3 rounded-xl border-2 border-dashed cursor-pointer transition-all hover:bg-muted/50 hover:border-primary/30 text-muted-foreground hover:text-foreground"
+                            onClick={() => {
+                              setShowLegacyByGroup((prev) => ({
+                                ...prev,
+                                [groupLabel]: true,
+                              }));
+                            }}
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                            <Span className="text-sm font-medium">
+                              {t("selector.showLegacyModels", {
+                                count: legacyModels.length,
+                              })}
+                            </Span>
+                          </Div>
+                        )}
+                      </Div>
+                    </Div>
+                  );
+                },
+              )}
+            </Div>
+          )}
+        </Div>
+      </Div>
+    </TooltipProvider>
+  );
+}

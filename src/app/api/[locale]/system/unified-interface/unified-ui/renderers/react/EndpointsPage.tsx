@@ -497,6 +497,7 @@ function EndpointsPageInternal<
             await endpointState.read?.refetch();
           },
           isLoading: endpointState.read.isLoading,
+          isLoadingFresh: endpointState.read.isLoadingFresh,
         }
       : undefined,
   };
@@ -547,6 +548,7 @@ function EndpointsPageInternal<
                 locale={locale}
                 isSubmitting={endpointState.create?.isSubmitting ?? isLoading}
                 data={responseData}
+                className={className}
                 submitButton={submitButton}
                 response={response}
                 endpointMutations={endpointMutations}

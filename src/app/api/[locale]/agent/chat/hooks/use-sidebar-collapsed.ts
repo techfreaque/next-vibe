@@ -1,64 +1,73 @@
 /**
- * Sidebar Collapsed State Hook
- * Manages sidebar collapsed state independently from chat settings
- * Uses zustand with async storage
+ * Sidebar Collapsed State Store
+ * Zustand store for sidebar collapsed state, persisted to localStorage.
+ *
+ * Replaces the previous useState-based hook so that multiple components
+ * (SidebarWrapper, TopBar) can share the same collapsed state without context.
  */
 
+"use client";
+
 import { storage } from "next-vibe-ui/lib/storage";
-import { useEffect, useRef, useState } from "react";
+import { create } from "zustand";
 
 const STORAGE_KEY = "sidebar-collapsed";
 const MOBILE_BREAKPOINT = 930; // px
 
-/**
- * Hook for managing sidebar collapsed state
- * - Initial state: false (not collapsed) for SSR and client (to avoid hydration mismatch)
- * - After mount: updates based on screen size and localStorage
- * - Only saves when user explicitly changes it (not on initial load)
- */
-export function useSidebarCollapsed(): [boolean, (collapsed: boolean) => void] {
-  // Initialize state to false on both server and client to avoid hydration mismatch
-  const [collapsed, setCollapsed] = useState<boolean>(false);
+interface SidebarState {
+  collapsed: boolean;
+  /** Whether storage/screen-size check has completed */
+  initialized: boolean;
+  /** Toggle or set collapsed state. Persists to storage. */
+  setCollapsed: (collapsed: boolean) => void;
+  /** Load initial state from storage or screen size. Called once on mount. */
+  initialize: () => void;
+}
 
-  // Track if user has explicitly changed the state
-  const hasUserChanged = useRef(false);
+export const useSidebarStore = create<SidebarState>((set, get) => ({
+  collapsed: false,
+  initialized: false,
 
-  // Load state from storage and apply screen size check on mount
-  useEffect(() => {
-    const loadState = async (): Promise<void> => {
+  setCollapsed: (collapsed): void => {
+    set({ collapsed });
+    void storage.setItem(STORAGE_KEY, JSON.stringify(collapsed));
+  },
+
+  initialize: (): void => {
+    if (get().initialized) {
+      return;
+    }
+    set({ initialized: true });
+
+    void (async (): Promise<void> => {
       try {
         const stored = await storage.getItem(STORAGE_KEY);
-
         if (stored !== null) {
-          // User has a saved preference - use it
-          const savedCollapsed = JSON.parse(stored) as boolean;
-          setCollapsed(savedCollapsed);
+          set({ collapsed: JSON.parse(stored) as boolean });
         } else {
-          // No stored preference - check screen size
-          const initialCollapsed = window.innerWidth < MOBILE_BREAKPOINT;
-          setCollapsed(initialCollapsed);
+          set({ collapsed: window.innerWidth < MOBILE_BREAKPOINT });
         }
       } catch {
-        // If storage fails, check screen size
-        const initialCollapsed = window.innerWidth < MOBILE_BREAKPOINT;
-        setCollapsed(initialCollapsed);
+        set({ collapsed: window.innerWidth < MOBILE_BREAKPOINT });
       }
-    };
+    })();
+  },
+}));
 
-    void loadState();
-  }, []);
+/**
+ * Convenience hook — returns [collapsed, setCollapsed] tuple.
+ * Initializes the store on first call.
+ * Compatible with the previous useSidebarCollapsed() API.
+ */
+export function useSidebarCollapsed(): [boolean, (collapsed: boolean) => void] {
+  const collapsed = useSidebarStore((s) => s.collapsed);
+  const setCollapsed = useSidebarStore((s) => s.setCollapsed);
+  const initialize = useSidebarStore((s) => s.initialize);
 
-  // Create a wrapper function that saves to storage
-  const setSidebarCollapsed = (newCollapsed: boolean): void => {
-    // Mark that user has changed it
-    hasUserChanged.current = true;
+  // Initialize on first render (idempotent)
+  if (typeof window !== "undefined") {
+    initialize();
+  }
 
-    // Save to storage (fire and forget)
-    void storage.setItem(STORAGE_KEY, JSON.stringify(newCollapsed));
-
-    // Update state
-    setCollapsed(newCollapsed);
-  };
-
-  return [collapsed, setSidebarCollapsed];
+  return [collapsed, setCollapsed];
 }

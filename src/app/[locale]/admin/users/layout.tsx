@@ -9,7 +9,7 @@ import type { ReactNode } from "react";
 import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { AdminUsersLayoutClient } from "./components/admin-users-layout-client";
+import { AdminUsersLayoutClient } from "./_components/admin-users-layout-client";
 
 interface AdminUsersLayoutProps {
   children: ReactNode;

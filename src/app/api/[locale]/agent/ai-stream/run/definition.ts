@@ -35,20 +35,8 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { DefaultFolderId } from "../../chat/config";
-import { scopedTranslation } from "../i18n";
+import { scopedTranslation } from "../stream/i18n";
 import { AiRunWidget } from "./widget";
-
-/**
- * A single pre-call — route to execute before the AI prompt.
- * Args are flat (merged urlPathParams + data) since the AI sees them as one object.
- * The repository splits them by inspecting the endpoint definition.
- */
-const preCallSchema = z.object({
-  /** Endpoint alias or full path (e.g. "agent_chat_characters_GET") */
-  routeId: z.string().min(1),
-  /** Merged flat args — urlPathParams + data in one object */
-  args: z.record(z.string(), z.unknown()).default({}),
-});
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -79,6 +67,8 @@ const { POST } = createEndpoint({
   icon: "sparkles",
   category: "app.endpointCategories.ai",
   tags: ["tags.ai", "tags.chat"],
+
+  // No events — run emits to the messages channel directly.
 
   fields: customWidgetObject({
     render: AiRunWidget,
@@ -542,8 +532,5 @@ export type AiStreamRunPostRequestInput = typeof POST.types.RequestInput;
 export type AiStreamRunPostRequestOutput = typeof POST.types.RequestOutput;
 export type AiStreamRunPostResponseInput = typeof POST.types.ResponseInput;
 export type AiStreamRunPostResponseOutput = typeof POST.types.ResponseOutput;
-
-// Re-export preCallSchema for use in repository
-export { preCallSchema };
 
 export default endpoints;

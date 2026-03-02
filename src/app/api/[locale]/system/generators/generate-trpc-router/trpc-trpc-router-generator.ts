@@ -369,7 +369,50 @@ function generateRouterCode(
 
   const imports: string[] = [];
   const constants: string[] = [];
-  let importCounter = 0;
+
+  // Track used var names to handle collisions (e.g. two routes with same segments)
+  const usedVarNames = new Set<string>();
+
+  // Reserved JS keywords that cannot be used as identifiers
+  const JS_RESERVED = new Set([
+    "break",
+    "case",
+    "catch",
+    "class",
+    "const",
+    "continue",
+    "debugger",
+    "default",
+    "delete",
+    "do",
+    "else",
+    "export",
+    "extends",
+    "finally",
+    "for",
+    "function",
+    "if",
+    "import",
+    "in",
+    "instanceof",
+    "let",
+    "new",
+    "return",
+    "static",
+    "super",
+    "switch",
+    "this",
+    "throw",
+    "try",
+    "typeof",
+    "var",
+    "void",
+    "while",
+    "with",
+    "yield",
+    "enum",
+    "await",
+  ]);
 
   // Only generate imports and constants for routes that are actually used
   for (const routeFile of validRouteFiles) {
@@ -377,7 +420,36 @@ function generateRouterCode(
       continue;
     }
 
-    const varName = `route${importCounter++}`;
+    // Derive a stable var name from the route path segments, e.g.
+    // agent/chat/threads/[threadId]/messages -> agent_chat_threads_messages
+    const segments = routeFile.routerPath
+      .map((seg) => {
+        const parts = seg.split(/[^a-zA-Z0-9]+/);
+        return parts
+          .map((part, i) =>
+            i === 0
+              ? part.toLowerCase()
+              : part.charAt(0).toUpperCase() + part.slice(1).toLowerCase(),
+          )
+          .join("");
+      })
+      .filter(Boolean);
+
+    let baseName = segments.join("_");
+    if (!baseName) {
+      baseName = "root";
+    }
+    if (JS_RESERVED.has(baseName)) {
+      baseName = `route_${baseName}`;
+    }
+    // Ensure uniqueness with a numeric suffix only when there is a collision
+    let varName = baseName;
+    let suffix = 2;
+    while (usedVarNames.has(varName)) {
+      varName = `${baseName}_${suffix++}`;
+    }
+    usedVarNames.add(varName);
+
     // eslint-disable-next-line i18next/no-literal-string
     const toolsVarName = `${varName}Tools`;
     // Get the current working directory (only available in Node.js environment)

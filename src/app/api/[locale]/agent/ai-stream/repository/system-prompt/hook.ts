@@ -4,8 +4,8 @@ import { useMemo } from "react";
 
 import { useCharacter } from "@/app/api/[locale]/agent/chat/characters/[id]/hooks";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { useFavoritesSummary } from "@/app/api/[locale]/agent/chat/favorites/use-favorites-summary";
-import { useMemorySummary } from "@/app/api/[locale]/agent/chat/memories/use-memory-summary";
+import { useFavoritesSummary } from "@/app/api/[locale]/agent/chat/favorites/hooks/use-favorites-summary";
+import { useMemorySummary } from "@/app/api/[locale]/agent/chat/memories/hooks/use-memory-summary";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTasksSummary } from "@/app/api/[locale]/system/unified-interface/tasks/cron/use-tasks-summary";
@@ -54,9 +54,7 @@ export function useDebugSystemPrompt(params: {
 
   const isPublicUser = user.isPublic;
   const isAdmin =
-    !user.isPublic &&
-    "roles" in user &&
-    user.roles.includes(UserPermissionRole.ADMIN);
+    !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
 
   // Get TTS autoplay from chat settings (same source the server uses via data.voiceMode?.enabled)
   const { settings: chatSettings } = useChatSettings(user, logger);

@@ -1,11 +1,14 @@
 /**
  * Development File Watcher Task Runner
- * Watches for file changes and triggers generators in development mode
+ *
+ * Maintains a live in-memory index of all generator-relevant files.
+ * On each file change, surgically updates the index and runs only the
+ * generators whose slice is actually dirty — not everything every time.
  */
 
 import "server-only";
 
-import type { FSWatcher } from "node:fs";
+import { join } from "node:path";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
@@ -15,62 +18,32 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { Environment } from "../../../../shared/utils";
 import { generateAllRepository } from "../../../generators/generate-all/repository";
+import type { LiveIndex } from "../../../generators/shared/live-index";
+import {
+  buildLiveIndex,
+  classifyFile,
+  clearDirtyFlags,
+  updateLiveIndex,
+} from "../../../generators/shared/live-index";
 import { CronTaskPriority, TaskCategory } from "../enum";
 import type { TasksTranslationKey } from "../i18n";
 import type { TaskRunner } from "../unified-runner/types";
 
-/**
- * Determine if a file change should trigger generator execution
- */
-const shouldTriggerGeneration = (filename: string): boolean => {
-  // Skip node_modules, generated dirs, temp files
-  if (
-    // eslint-disable-next-line i18next/no-literal-string
-    filename.includes("node_modules") ||
-    // eslint-disable-next-line i18next/no-literal-string
-    filename.includes(".git") ||
-    // eslint-disable-next-line i18next/no-literal-string
-    filename.includes(".next") ||
-    filename.includes("generated") ||
-    filename.startsWith(".") ||
-    // eslint-disable-next-line i18next/no-literal-string
-    filename.includes("~") ||
-    // eslint-disable-next-line i18next/no-literal-string
-    filename.includes(".tmp")
-  ) {
-    return false;
-  }
-
-  // Only trigger for definition.ts or route.ts changes
-  if (!filename.includes("definition.ts") && !filename.includes("route.ts")) {
-    return false;
-  }
-
-  // Only trigger for relevant file types
-  // eslint-disable-next-line i18next/no-literal-string
-  const relevantExtensions = [".ts", ".tsx", ".js", ".jsx", ".json"];
-  const hasRelevantExtension = relevantExtensions.some((ext) =>
-    filename.toLowerCase().endsWith(ext),
-  );
-
-  return hasRelevantExtension;
-};
-
 export const DEV_WATCHER_TASK_NAME = "devWatcher.name" as const;
+
 /**
  * Development File Watcher Task Runner
- * Only runs in development mode
+ * Only runs in development mode.
  */
 const devWatcherTaskRunner: TaskRunner<TasksTranslationKey> = {
   type: "task-runner",
-  name: "devWatcher.name",
+  name: DEV_WATCHER_TASK_NAME,
   description: "devWatcher.description",
   category: TaskCategory.DEVELOPMENT,
   enabled: env.NODE_ENV === Environment.DEVELOPMENT,
   priority: CronTaskPriority.MEDIUM,
 
   async run({ logger, signal, systemLocale }) {
-    // Only run in development
     if (env.NODE_ENV !== Environment.DEVELOPMENT) {
       logger.debug("Dev watcher skipped (not in development mode)");
       return;
@@ -79,7 +52,6 @@ const devWatcherTaskRunner: TaskRunner<TasksTranslationKey> = {
     logger.debug("Starting smart development file watcher...");
 
     try {
-      // Use actual file system watching instead of polling
       await startSmartFileWatcher(signal, logger, systemLocale);
     } catch (error) {
       const errorMsg = parseError(error).message;
@@ -87,8 +59,6 @@ const devWatcherTaskRunner: TaskRunner<TasksTranslationKey> = {
         "Smart file watcher failed, falling back to polling",
         new Error(errorMsg),
       );
-
-      // Fallback to polling if file watching fails
       await startPollingWatcher(signal, logger, systemLocale);
     }
   },
@@ -110,9 +80,10 @@ const devWatcherTaskRunner: TaskRunner<TasksTranslationKey> = {
   },
 };
 
-/**
- * Smart file watcher using fs.watch for real-time file changes
- */
+// ---------------------------------------------------------------------------
+// Smart watcher — live index + surgical generator dispatch
+// ---------------------------------------------------------------------------
+
 const startSmartFileWatcher = async (
   signal: AbortSignal,
   logger: EndpointLogger,
@@ -120,37 +91,59 @@ const startSmartFileWatcher = async (
 ): Promise<void> => {
   const fs = await import("node:fs");
 
-  // Directories to watch for changes that require generator runs
-  const watchPaths = [
-    "src/app/api/[locale]", // API routes
-  ];
+  // Build the initial live index (full scan, runs once)
+  logger.debug("📂 Building live index (initial full scan)...");
+  const liveIndex: LiveIndex = buildLiveIndex();
+  logger.debug(
+    `Live index built: ${liveIndex.definitionFiles.size} definitions, ` +
+      `${liveIndex.routeFiles.size} routes, ${liveIndex.taskFiles.size} tasks`,
+  );
 
-  // Debounce settings
-  const DEBOUNCE_MS = 1000; // 1 second
+  // Debounce settings — shorter than before since we're doing less work per run
+  const DEBOUNCE_MS = 300;
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   let changeCount = 0;
 
-  const runGenerators = async (skipSeeds = true): Promise<void> => {
-    try {
-      changeCount++;
-      const action = skipSeeds ? "File changes detected" : "Initial startup";
-      logger.debug(
-        `📁 ${action} - Running generators (change #${changeCount})...`,
-      );
+  const runDirtyGenerators = async (): Promise<void> => {
+    const { dirty } = liveIndex;
+    const dirtyNames: string[] = [];
+    if (dirty.endpoints) {
+      dirtyNames.push("endpoints");
+    }
+    if (dirty.clientRoutes) {
+      dirtyNames.push("clientRoutes");
+    }
+    if (dirty.taskIndex) {
+      dirtyNames.push("taskIndex");
+    }
+    if (dirty.emailTemplates) {
+      dirtyNames.push("emailTemplates");
+    }
+    if (dirty.seeds) {
+      dirtyNames.push("seeds");
+    }
 
-      await generateAllRepository.generateAll(
-        {
-          outputDir: "src/app/api/[locale]/system/generated",
-          verbose: false,
-          skipEndpoints: false,
-          skipSeeds, // Generate seeds on startup, skip on file changes
-          skipTaskIndex: false, // Keep task index updated
-          skipTrpc: false,
-        },
+    if (dirtyNames.length === 0) {
+      logger.debug("⏭️  No dirty generators — skipping run");
+      return;
+    }
+
+    changeCount++;
+    logger.debug(
+      `📁 Running dirty generators [${dirtyNames.join(", ")}] (change #${changeCount})...`,
+    );
+
+    // Snapshot dirty flags before clearing (clearing resets for next cycle)
+    const dirtySnapshot = { ...dirty };
+    clearDirtyFlags(liveIndex);
+
+    try {
+      await generateAllRepository.generateDirty(
+        dirtySnapshot,
+        liveIndex,
         logger,
         locale,
       );
-
       logger.debug(`✅ Generators completed for change #${changeCount}`);
     } catch (error) {
       const errorMsg = parseError(error).message;
@@ -158,18 +151,22 @@ const startSmartFileWatcher = async (
     }
   };
 
-  const debouncedRunGenerators = (): void => {
+  const debouncedRun = (): void => {
     if (debounceTimer) {
       clearTimeout(debounceTimer);
     }
     debounceTimer = setTimeout(() => {
-      void runGenerators();
+      void runDirtyGenerators();
     }, DEBOUNCE_MS);
   };
 
-  const watchers: FSWatcher[] = [];
+  // Base directory for resolving absolute paths from fs.watch relative filenames
+  // eslint-disable-next-line i18next/no-literal-string
+  const watchRoot = join(process.cwd(), "src", "app", "api", "[locale]");
 
-  // Set up file watchers for each path
+  const watchPaths = [watchRoot];
+  const watchers: ReturnType<typeof fs.watch>[] = [];
+
   for (const watchPath of watchPaths) {
     try {
       if (fs.existsSync(watchPath)) {
@@ -177,10 +174,30 @@ const startSmartFileWatcher = async (
           watchPath,
           { recursive: true },
           (eventType, filename) => {
-            if (filename && shouldTriggerGeneration(filename)) {
-              logger.debug(`📝 File changed: ${filename} (${eventType})`);
-              debouncedRunGenerators();
+            if (!filename) {
+              return;
             }
+
+            // classifyFile filters irrelevant files (node_modules, generated, etc.)
+            const fileClass = classifyFile(filename);
+            if (!fileClass) {
+              return;
+            }
+
+            // Resolve to absolute path
+            const absPath = join(watchRoot, filename);
+
+            logger.debug(`📝 File changed: ${filename} (${eventType})`);
+
+            // Surgically update the live index
+            updateLiveIndex(
+              liveIndex,
+              eventType as "rename" | "change",
+              absPath,
+            );
+
+            // Schedule a debounced run of dirty generators
+            debouncedRun();
           },
         );
 
@@ -195,11 +212,13 @@ const startSmartFileWatcher = async (
     }
   }
 
-  // Run generators once on startup with full generation including seeds
+  // Run all generators once on startup (all dirty = true from buildLiveIndex)
   logger.debug("🚀 Running initial generator scan...");
-  await runGenerators(false);
+  // Startup: skip seeds (they're run separately by the dev server db setup)
+  liveIndex.dirty.seeds = false;
+  await runDirtyGenerators();
 
-  // Wait for abort signal (resolves exactly once)
+  // Wait for abort signal
   await new Promise<void>((resolve) => {
     let done = false;
     const finish = (): void => {
@@ -209,6 +228,7 @@ const startSmartFileWatcher = async (
       done = true;
       resolve();
     };
+
     signal.addEventListener(
       "abort",
       () => {
@@ -218,13 +238,13 @@ const startSmartFileWatcher = async (
           clearTimeout(debounceTimer);
         }
 
-        watchers.forEach((watcher) => {
+        for (const watcher of watchers) {
           try {
             watcher.close();
           } catch (error) {
             logger.debug("Error closing watcher:", { error: String(error) });
           }
-        });
+        }
 
         logger.debug("✅ File watchers stopped");
         finish();
@@ -234,9 +254,10 @@ const startSmartFileWatcher = async (
   });
 };
 
-/**
- * Fallback polling watcher (original implementation)
- */
+// ---------------------------------------------------------------------------
+// Fallback polling watcher (no live index — rescans each cycle)
+// ---------------------------------------------------------------------------
+
 const startPollingWatcher = async (
   signal: AbortSignal,
   logger: EndpointLogger,
@@ -244,13 +265,12 @@ const startPollingWatcher = async (
 ): Promise<void> => {
   logger.info("Using fallback polling watcher...");
 
-  const WATCH_INTERVAL = 10000; // 10 seconds (less frequent than before)
+  const WATCH_INTERVAL = 10000;
   let watchCount = 0;
 
   while (!signal.aborted) {
     try {
       watchCount++;
-
       const action = watchCount === 1 ? "Initial startup" : "Polling cycle";
       logger.info(`⏰ ${action} #${watchCount} - Running generators...`);
 
@@ -259,9 +279,9 @@ const startPollingWatcher = async (
           outputDir: "src/app/api/[locale]/system/generated",
           verbose: false,
           skipEndpoints: false,
-          skipSeeds: watchCount !== 1, // Generate seeds on first run only
+          skipSeeds: watchCount !== 1,
           skipTaskIndex: false,
-          skipTrpc: false,
+          enableTrpc: false,
         },
         logger,
         locale,
@@ -273,7 +293,6 @@ const startPollingWatcher = async (
       logger.error("Polling watcher error", new Error(errorMsg));
     }
 
-    // Wait for next cycle or abort signal
     await new Promise<void>((resolve) => {
       let done = false;
       const finish = (): void => {

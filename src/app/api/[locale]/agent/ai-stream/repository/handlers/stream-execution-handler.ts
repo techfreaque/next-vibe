@@ -20,7 +20,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import type { AiStreamT } from "../../i18n";
+import type { AiStreamT } from "../../stream/i18n";
 import { MAX_TOOL_CALLS } from "../core/constants";
 import type { ProviderFactory } from "../core/provider-factory";
 import type { StreamContext } from "../core/stream-context";
@@ -160,6 +160,11 @@ export class StreamExecutionHandler {
         }
       }
     } catch (streamError) {
+      // Cancel TTS generation immediately to avoid wasting API calls + credits
+      if (ttsHandler) {
+        ttsHandler.cancel();
+      }
+
       // If stream was aborted, handle it inline and emit all events NOW
       // (before the ReadableStream's cancel() closes the controller)
       if (streamError instanceof Error) {
@@ -239,6 +244,7 @@ export class StreamExecutionHandler {
       user,
       modelCost: actualCreditCost,
       model,
+      threadId,
       logger,
     });
   }

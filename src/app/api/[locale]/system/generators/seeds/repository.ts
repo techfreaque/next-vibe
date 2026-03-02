@@ -22,6 +22,7 @@ import {
   formatGenerator,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
+import type { LiveIndex } from "../shared/live-index";
 import {
   extractModuleName,
   findFilesRecursively,
@@ -68,6 +69,7 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
     data: SeedsRequestType,
     logger: EndpointLogger,
     t: ModuleT,
+    liveIndex?: LiveIndex,
   ): Promise<BaseResponseType<SeedsResponseType>> {
     const startTime = Date.now();
 
@@ -75,13 +77,20 @@ class SeedsGeneratorRepositoryImpl implements SeedsGeneratorRepository {
       const outputFile = join(data.outputDir, "seeds.ts");
       logger.debug(`Starting seeds generation: ${outputFile}`);
 
-      // Discover seed files
-      // eslint-disable-next-line i18next/no-literal-string
-      const apiCorePath = ["src", "app", "api", "[locale]"];
-      const startDir = join(process.cwd(), ...apiCorePath);
+      // Use live index when available (dev watcher), otherwise scan from disk
+      let seedFiles: string[];
 
-      logger.debug("Discovering seed files");
-      const seedFiles = findFilesRecursively(startDir, "seeds.ts");
+      if (liveIndex) {
+        logger.debug("Using live index for file discovery");
+        seedFiles = [...liveIndex.seedFiles];
+      } else {
+        // eslint-disable-next-line i18next/no-literal-string
+        const apiCorePath = ["src", "app", "api", "[locale]"];
+        const startDir = join(process.cwd(), ...apiCorePath);
+
+        logger.debug("Discovering seed files");
+        seedFiles = findFilesRecursively(startDir, "seeds.ts");
+      }
 
       logger.debug(`Found ${seedFiles.length} seed files`);
 

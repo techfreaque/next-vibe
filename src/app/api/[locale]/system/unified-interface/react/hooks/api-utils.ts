@@ -125,16 +125,35 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
     method: endpoint.method,
     pathParams,
   });
-  // Check if we should use client route based on user roles and endpoint allowedClientRoles
-  if (endpoint.allowedClientRoles) {
+  // Determine if we should use client route (route-client.ts)
+  let shouldUseClientRoute = false;
+
+  // 1. Check useClientRoute callback (data-driven decision, e.g. incognito)
+  // The callback is typed with InferRequestOutput<TFields> which becomes `never`
+  // due to covariant TFields + contravariant function params. We extract it as a
+  // wider function type since the concrete endpoint always accepts its own data.
+  if (endpoint.useClientRoute) {
+    const clientRouteCheck = endpoint.useClientRoute as (props: {
+      data: TEndpoint["types"]["RequestOutput"];
+      urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
+      locale: CountryLanguage;
+      logger: EndpointLogger;
+    }) => boolean | Promise<boolean>;
+    shouldUseClientRoute = await clientRouteCheck({
+      data: requestData,
+      urlPathParams: pathParams,
+      locale,
+      logger,
+    });
+  }
+
+  // 2. Check allowedClientRoles (role-based decision, e.g. public users)
+  if (!shouldUseClientRoute && endpoint.allowedClientRoles) {
     const { filterUserPermissionRoles, UserPermissionRole } =
       await import("@/app/api/[locale]/user/user-roles/enum");
     const clientPermissionRoles = filterUserPermissionRoles(
       endpoint.allowedClientRoles,
     );
-
-    // Check if user has permission for client route
-    let shouldUseClientRoute = false;
 
     if (
       user.isPublic &&
@@ -146,31 +165,31 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
     ) {
       shouldUseClientRoute = true;
     }
+  }
 
-    if (shouldUseClientRoute) {
-      // Load and use client handler
-      const { endpointToToolName } =
-        await import("@/app/api/[locale]/system/unified-interface/shared/utils/path");
-      const { getClientRouteHandler } =
-        await import("@/app/api/[locale]/system/generated/route-handlers-client");
+  // Route to client handler if either check passed
+  if (shouldUseClientRoute) {
+    const { endpointToToolName } =
+      await import("@/app/api/[locale]/system/unified-interface/shared/utils/path");
+    const { getClientRouteHandler } =
+      await import("@/app/api/[locale]/system/generated/route-handlers-client");
 
-      const pathKey = endpointToToolName(endpoint);
+    const pathKey = endpointToToolName(endpoint);
 
-      const handlerObject = await getClientRouteHandler(pathKey);
-      if (handlerObject?.handler) {
-        return handlerObject.handler({
-          data: requestData,
-          urlPathParams: pathParams,
-          locale,
-          logger,
-        });
-      }
-
-      logger.warn(
-        "Client handler not found, falling back to server API",
-        pathKey,
-      );
+    const handlerObject = await getClientRouteHandler(pathKey);
+    if (handlerObject?.handler) {
+      return handlerObject.handler({
+        data: requestData,
+        urlPathParams: pathParams,
+        locale,
+        logger,
+      });
     }
+
+    logger.warn(
+      "Client handler not found, falling back to server API",
+      pathKey,
+    );
   }
 
   try {

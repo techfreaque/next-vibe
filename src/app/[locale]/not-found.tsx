@@ -1,13 +1,11 @@
 import type { JSX } from "react";
 
-import Loading from "./loading";
+import { NotFoundBackButton } from "./[...notFound]/not-found-client";
 
 /**
- * This route should not get hit as we have localized versions of the not found page.
- * Its just here to get rid of some console errors.
- *
- * @returns JSX Element
+ * Fallback not-found page at the locale level.
+ * Renders the proper 404 UI — localized not-found is handled by [...notFound] catch-all.
  */
 export default function NotFound(): JSX.Element {
-  return <Loading />;
+  return <NotFoundBackButton locale="en-DE" />;
 }

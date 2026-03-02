@@ -105,6 +105,7 @@ const {
   FolderPlus,
   FolderTree,
   FolderX,
+  Frame,
   FreedomGptLogo,
   UncensoredAILogo,
   GabAILogo,

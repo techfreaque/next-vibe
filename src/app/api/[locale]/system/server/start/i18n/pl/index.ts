@@ -25,6 +25,16 @@ export const translations: typeof enTranslations = {
         title: "Pomiń polecenie Next.js",
         description: "Pomiń uruchamianie polecenia start Next.js",
       },
+      mode: {
+        title: "Tryb serwera",
+        description:
+          "Które podsystemy uruchomić: all (domyślnie), web (tylko Next.js + WS), tasks (tylko Task Runner)",
+        options: {
+          all: "Wszystkie (domyślnie)",
+          web: "Tylko Web (Next.js + WebSocket)",
+          tasks: "Tylko Tasks (Cron Runner)",
+        },
+      },
       seed: {
         title: "Uruchom seeding",
         description: "Uruchom seeding bazy danych przy starcie",

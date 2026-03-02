@@ -11,6 +11,8 @@ export const translations: typeof enTranslations = {
     invalidTaskInput:
       "Task-Eingabe stimmt nicht mit dem Anforderungsschema des Endpunkts überein",
     endpointNotFound: "Endpunkt für die angegebene Route-ID nicht gefunden",
+    targetInstanceForbidden:
+      "Nur Administratoren können die Zielinstanz für Aufgaben festlegen",
   },
   list: {
     columns: {

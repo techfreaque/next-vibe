@@ -126,7 +126,6 @@ function formatTaskResponse(
     errorCount: task.errorCount,
     averageExecutionTime: task.averageExecutionTime ?? null,
     consecutiveFailures: task.consecutiveFailures,
-    maxConsecutiveFailures: task.maxConsecutiveFailures ?? null,
     targetInstance: task.targetInstance ?? null,
     tags: task.tags,
     userId: task.userId ?? null,
@@ -302,6 +301,16 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
       }
 
       const userId = !user.isPublic ? user.id : null;
+      const isAdmin =
+        !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
+
+      // Only admins can set targetInstance — it controls cross-instance task routing
+      if (data.targetInstance && !isAdmin) {
+        return fail({
+          message: t("errors.targetInstanceForbidden"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
 
       // Prepare task data for insertion
       const taskData = {
@@ -319,7 +328,7 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         version: "1.0.0",
         taskInput: data.taskInput,
         runOnce: data.runOnce ?? false,
-        targetInstance: data.targetInstance ?? null,
+        targetInstance: isAdmin ? (data.targetInstance ?? null) : null,
         outputMode: data.outputMode ?? TaskOutputMode.STORE_ONLY,
         notificationTargets: [] as NotificationTarget[],
         executionCount: 0,

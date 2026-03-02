@@ -30,7 +30,8 @@ const syncTask = createCronTask(endpoints.POST, tools.POST, {
   description: "taskSync.description",
   schedule: CRON_SCHEDULES.EVERY_MINUTE,
   category: TaskCategory.SYSTEM,
-  enabled: env.IS_PREVIEW_MODE,
+  enabled:
+    env.IS_PREVIEW_MODE || !!(env.THEA_REMOTE_URL && env.THEA_REMOTE_API_KEY),
   priority: CronTaskPriority.HIGH,
   timeout: TASK_TIMEOUTS.MEDIUM,
   taskInput: undefined,

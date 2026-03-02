@@ -13,10 +13,12 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import definitions, {
   type FolderDeleteResponseOutput,
   type FolderGetResponseOutput,
-  type FolderUpdateRequestOutput,
-  type FolderUpdateResponseOutput,
 } from "./definition";
 import type { FolderRepositoryType } from "./repository";
+import type {
+  FolderUpdateRequestOutput,
+  FolderUpdateResponseOutput,
+} from "./update/definition";
 
 /**
  * Native Folder Repository - Static class pattern

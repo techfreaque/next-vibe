@@ -17,7 +17,12 @@ export const translations = {
     branchIndices: {
       label: "Branch Indices",
       description:
-        "Map of depth to branch index for selecting conversation path",
+        "Map of parent message ID to branch index for selecting conversation path",
+    },
+    before: {
+      label: "Before Message ID",
+      description:
+        "Load history chunk before this message ID (cursor-based pagination)",
     },
     response: {
       title: "Path Messages",
@@ -43,8 +48,14 @@ export const translations = {
           depth: {
             content: "Depth",
           },
+          sequenceId: {
+            content: "Sequence ID",
+          },
           authorId: {
             content: "Author ID",
+          },
+          authorName: {
+            content: "Author Name",
           },
           isAI: {
             content: "Is AI",
@@ -52,8 +63,29 @@ export const translations = {
           model: {
             content: "Model",
           },
-          tokens: {
-            content: "Tokens",
+          character: {
+            content: "Character",
+          },
+          errorType: {
+            content: "Error Type",
+          },
+          errorMessage: {
+            content: "Error Message",
+          },
+          errorCode: {
+            content: "Error Code",
+          },
+          metadata: {
+            content: "Metadata",
+          },
+          upvotes: {
+            content: "Upvotes",
+          },
+          downvotes: {
+            content: "Downvotes",
+          },
+          searchVector: {
+            content: "Search Vector",
           },
           createdAt: {
             content: "Created At",
@@ -62,6 +94,27 @@ export const translations = {
             content: "Updated At",
           },
         },
+      },
+      branchMeta: {
+        title: "Branch Metadata",
+        item: {
+          title: "Branch Fork Point",
+          parentId: {
+            content: "Parent ID",
+          },
+          siblingCount: {
+            content: "Sibling Count",
+          },
+          currentIndex: {
+            content: "Current Index",
+          },
+        },
+      },
+      hasOlderHistory: {
+        content: "Has Older History",
+      },
+      oldestLoadedMessageId: {
+        content: "Oldest Loaded Message ID",
       },
     },
     errors: {

@@ -24,6 +24,7 @@ import type {
   ConstrainedChildUsage,
   FieldUsageConfig,
 } from "../../../unified-ui/widgets/_shared/types";
+import type { EventSchemas } from "../../../websocket/types";
 import type {
   ApiEndpoint,
   CreateApiEndpoint,
@@ -223,7 +224,8 @@ type Test3_1_Endpoint = ApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
   string,
-  typeof test3_1_field
+  typeof test3_1_field,
+  EventSchemas
 >;
 
 // Just verify it's a valid ApiEndpoint type
@@ -237,7 +239,8 @@ type Test3_1_Result =
       z.ZodTypeAny,
       FieldUsageConfig,
       AnyChildrenConstrain<string, FieldUsageConfig>
-    >
+    >,
+    EventSchemas
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -248,7 +251,8 @@ type Test3_2_Endpoint = ApiEndpoint<
   Methods.PUT,
   readonly UserRoleValue[],
   string,
-  typeof test2_1_field
+  typeof test2_1_field,
+  EventSchemas
 >;
 type Test3_2_Result =
   Test3_2_Endpoint extends ApiEndpoint<
@@ -260,7 +264,8 @@ type Test3_2_Result =
       z.ZodTypeAny,
       FieldUsageConfig,
       AnyChildrenConstrain<string, FieldUsageConfig>
-    >
+    >,
+    EventSchemas
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -288,14 +293,16 @@ type Test4_1_CreateEndpoint = CreateApiEndpoint<
   Methods.PATCH,
   readonly UserRoleValue[],
   string,
-  typeof test4_1_field
+  typeof test4_1_field,
+  EventSchemas
 >;
 type Test4_1_Result =
   Test4_1_CreateEndpoint extends CreateApiEndpoint<
     Methods,
     readonly UserRoleValue[],
     string,
-    typeof test4_1_field
+    typeof test4_1_field,
+    EventSchemas
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -318,14 +325,16 @@ type Test4_2_CreateEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
   string,
-  typeof test4_2_field
+  typeof test4_2_field,
+  EventSchemas
 >;
 type Test4_2_Result =
   Test4_2_CreateEndpoint extends CreateApiEndpoint<
     Methods,
     readonly UserRoleValue[],
     string,
-    typeof test4_2_field
+    typeof test4_2_field,
+    EventSchemas
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -507,7 +516,8 @@ type Test5_2_MixedEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
   string,
-  typeof test5_1_field
+  typeof test5_1_field,
+  EventSchemas
 >;
 
 type Test5_2_Result =
@@ -520,7 +530,8 @@ type Test5_2_Result =
       z.ZodTypeAny,
       FieldUsageConfig,
       AnyChildrenConstrain<string, ConstrainedChildUsage<FieldUsageConfig>>
-    >
+    >,
+    EventSchemas
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -537,7 +548,8 @@ type Test5_2c_GenericEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
   string,
-  typeof test5_1_field
+  typeof test5_1_field,
+  EventSchemas
 >;
 type Test5_2c_Result = Test5_2c_GenericEndpoint extends CreateApiEndpointAny
   ? "✓ PASS"
@@ -557,7 +569,8 @@ type Test5_2d_MatchingTKeys = CreateApiEndpoint<
       TranslationKey,
       ConstrainedChildUsage<FieldUsageConfig>
     >
-  >
+  >,
+  EventSchemas
 >;
 type Test5_2d_Result = Test5_2d_MatchingTKeys extends CreateApiEndpointAny
   ? "✓ PASS"
@@ -629,7 +642,8 @@ type Test6_3_LoginEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
   string,
-  typeof test6_loginFields
+  typeof test6_loginFields,
+  EventSchemas
 >;
 
 // Test 6.3: Constraint in nested generic
@@ -657,7 +671,8 @@ type Test7_LoginEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
   string,
-  typeof test5_1_field
+  typeof test5_1_field,
+  EventSchemas
 >;
 
 // Test 7.1: Simplified useApiForm signature (with any instead of UnifiedField)
@@ -687,7 +702,8 @@ type Test7_2_AcceptsAnyEndpoint = (
         TranslationKey,
         ConstrainedChildUsage<FieldUsageConfig>
       >
-    >
+    >,
+    EventSchemas
   >,
 ) => void;
 
@@ -902,7 +918,8 @@ interface Test11_1_LoginEndpoints {
     Methods.GET,
     readonly UserRoleValue[],
     TranslationKey,
-    typeof test11_1_getField
+    typeof test11_1_getField,
+    EventSchemas
   >;
 }
 
@@ -916,7 +933,13 @@ const test11_1: Test11_1_Result = "✓ PASS";
 type Test11_2_UseEndpoint = <
   T extends Record<
     string,
-    CreateApiEndpoint<Methods, readonly UserRoleValue[], TranslationKey, any>
+    CreateApiEndpoint<
+      Methods,
+      readonly UserRoleValue[],
+      TranslationKey,
+      any,
+      EventSchemas
+    >
   >,
 >(
   endpoints: T,
@@ -968,7 +991,8 @@ type Test12_1_CustomEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
   TranslationKey,
-  typeof test12_1_field
+  typeof test12_1_field,
+  EventSchemas
 >;
 
 type Test12_1_Result =
@@ -976,7 +1000,8 @@ type Test12_1_Result =
     Methods,
     readonly UserRoleValue[],
     TranslationKey,
-    any
+    any,
+    EventSchemas
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -1033,7 +1058,8 @@ type Test13_2_OptionalEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly UserRoleValue[],
   TranslationKey,
-  typeof test13_1_field
+  typeof test13_1_field,
+  EventSchemas
 >;
 type Test13_2_Request = Test13_2_OptionalEndpoint["types"]["RequestOutput"];
 type Test13_2_Result = Test13_2_Request extends {
@@ -1065,7 +1091,8 @@ type Test14_1_GetEndpoint = CreateApiEndpoint<
   Methods.GET,
   readonly UserRoleValue[],
   TranslationKey,
-  typeof test14_1_field
+  typeof test14_1_field,
+  EventSchemas
 >;
 
 type Test14_1_Result =
@@ -1073,7 +1100,8 @@ type Test14_1_Result =
     Methods,
     readonly UserRoleValue[],
     TranslationKey,
-    any
+    any,
+    EventSchemas
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -1098,7 +1126,8 @@ type Test14_2_DeleteEndpoint = CreateApiEndpoint<
   Methods.DELETE,
   readonly [typeof UserRole.ADMIN],
   TranslationKey,
-  typeof test14_2_field
+  typeof test14_2_field,
+  EventSchemas
 >;
 
 type Test14_2_Result =
@@ -1106,7 +1135,8 @@ type Test14_2_Result =
     Methods,
     readonly UserRoleValue[],
     TranslationKey,
-    any
+    any,
+    EventSchemas
   >
     ? "✓ PASS"
     : "✗ FAIL";
@@ -1259,7 +1289,8 @@ type Test16_1_UseApiFormSignature = <
     Methods,
     readonly UserRoleValue[],
     TranslationKey,
-    any
+    any,
+    EventSchemas
   >,
 >(
   endpoint: TEndpoint,
@@ -1290,7 +1321,8 @@ interface Test16_2_TestRecord {
     Methods.POST,
     readonly UserRoleValue[],
     TranslationKey,
-    typeof test16_2_logoutField
+    typeof test16_2_logoutField,
+    EventSchemas
   >;
 }
 
@@ -1474,19 +1506,22 @@ interface Test20_1_MultiEndpoint {
     Methods.POST,
     readonly UserRoleValue[],
     TranslationKey,
-    typeof test20_1_defaultField
+    typeof test20_1_defaultField,
+    EventSchemas
   >;
   verify: CreateApiEndpoint<
     Methods.POST,
     readonly UserRoleValue[],
     TranslationKey,
-    typeof test20_1_verifyField
+    typeof test20_1_verifyField,
+    EventSchemas
   >;
   resend: CreateApiEndpoint<
     Methods.POST,
     readonly UserRoleValue[],
     TranslationKey,
-    typeof test20_1_resendField
+    typeof test20_1_resendField,
+    EventSchemas
   >;
 }
 
@@ -1496,7 +1531,8 @@ type Test20_1_DefaultValid =
     Methods,
     readonly UserRoleValue[],
     TranslationKey,
-    any
+    any,
+    EventSchemas
   >
     ? "✓ PASS"
     : "✗ FAIL";

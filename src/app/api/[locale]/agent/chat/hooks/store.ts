@@ -37,9 +37,17 @@ interface ChatState {
   isLoading: boolean;
   isDataLoaded: boolean;
 
+  // Tracks threads created this session that haven't been persisted to server yet.
+  // Prevents useLazyBranchLoader from fetching messages for brand-new threads (404).
+  pendingNewThreadIds: Set<string>;
+
   // Branch state - tracks which branch is selected at each level for each thread
   // Key: threadId, Value: Record<parentMessageId, branchIndex>
   branchIndices: Record<string, Record<string, number>>;
+
+  // Lazy loading state - tracks whether a thread's messages are fully or partially loaded
+  // 'full' = all messages loaded (original behavior), 'partial' = only active branch path
+  threadLoadMode: Record<string, "full" | "partial">;
 
   // Thread actions
   addThread: (thread: ChatThread) => void;
@@ -66,9 +74,17 @@ interface ChatState {
   updateFolder: (folderId: string, updates: Partial<ChatFolder>) => void;
   deleteFolder: (folderId: string) => void;
 
+  // Thread load mode
+  setThreadLoadMode: (threadId: string, mode: "full" | "partial") => void;
+
   // Loading state
   setLoading: (loading: boolean) => void;
   setDataLoaded: (loaded: boolean) => void;
+
+  // Pending new threads
+  markThreadPendingCreate: (threadId: string) => void;
+  clearThreadPendingCreate: (threadId: string) => void;
+  isThreadPendingCreate: (threadId: string) => boolean;
 
   // Reset
   reset: () => void;
@@ -85,6 +101,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
   isLoading: false,
   isDataLoaded: false,
   branchIndices: {},
+  threadLoadMode: {},
+  pendingNewThreadIds: new Set<string>(),
 
   // Thread actions
   addThread: (thread: ChatThread): void => {
@@ -289,6 +307,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
     });
   },
 
+  // Thread load mode
+  setThreadLoadMode: (threadId: string, mode: "full" | "partial"): void =>
+    set((state) => ({
+      threadLoadMode: {
+        ...state.threadLoadMode,
+        [threadId]: mode,
+      },
+    })),
+
   // Folder actions
   addFolder: (folder: ChatFolder): void =>
     set((state) => ({
@@ -337,6 +364,22 @@ export const useChatStore = create<ChatState>((set, get) => ({
       isDataLoaded: loaded,
     }),
 
+  // Pending new threads
+  markThreadPendingCreate: (threadId: string): void =>
+    set((state) => ({
+      pendingNewThreadIds: new Set([...state.pendingNewThreadIds, threadId]),
+    })),
+
+  clearThreadPendingCreate: (threadId: string): void =>
+    set((state) => {
+      const next = new Set(state.pendingNewThreadIds);
+      next.delete(threadId);
+      return { pendingNewThreadIds: next };
+    }),
+
+  isThreadPendingCreate: (threadId: string): boolean =>
+    get().pendingNewThreadIds.has(threadId),
+
   // Reset
   reset: (): void => {
     set({
@@ -345,6 +388,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       folders: {},
       isLoading: false,
       isDataLoaded: false,
+      threadLoadMode: {},
     });
   },
 }));

@@ -1,5 +1,5 @@
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import { BRANCH_INDEX_KEY } from "@/app/api/[locale]/agent/chat/hooks/use-branch-management";
+import { BRANCH_INDEX_KEY } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-branch-management";
 
 /**
  * Get direct replies for a specific message

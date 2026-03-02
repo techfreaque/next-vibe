@@ -20,6 +20,86 @@ import threadsDefinition, {
 } from "../threads/definition";
 
 /**
+ * Seed Zustand store from SSR-prefetched threads data.
+ * Same mapping logic as loadThreadsFromServer but from in-memory data.
+ */
+function seedThreadsFromSSR(
+  data: ThreadListResponseOutput,
+  addThread: (thread: ChatThread) => void,
+): void {
+  data.threads?.forEach((thread) => {
+    addThread({
+      id: thread.id,
+      userId: "",
+      leadId: null,
+      title: thread.title,
+      rootFolderId: thread.rootFolderId,
+      folderId: thread.folderId,
+      status: thread.status,
+      defaultModel: null,
+      defaultCharacter: null,
+      systemPrompt: null,
+      pinned: thread.pinned,
+      archived: false,
+      tags: [],
+      preview: thread.preview,
+      metadata: {},
+      rolesView: thread.rolesView ?? null,
+      rolesEdit: thread.rolesEdit ?? null,
+      rolesPost: thread.rolesPost ?? null,
+      rolesModerate: thread.rolesModerate ?? null,
+      rolesAdmin: thread.rolesAdmin ?? null,
+      published: false,
+      isStreaming: false,
+      createdAt: new Date(thread.createdAt),
+      updatedAt: new Date(thread.updatedAt),
+      searchVector: null,
+      canEdit: thread.canEdit,
+      canPost: thread.canPost,
+      canModerate: thread.canModerate,
+      canDelete: thread.canDelete,
+      canManagePermissions: thread.canManagePermissions,
+    });
+  });
+}
+
+/**
+ * Seed Zustand store from SSR-prefetched folders data.
+ */
+function seedFoldersFromSSR(
+  data: FolderListResponseOutput,
+  addFolder: (folder: ChatFolder) => void,
+): void {
+  data.folders?.forEach((folder) => {
+    addFolder({
+      id: folder.id,
+      userId: folder.userId,
+      leadId: null,
+      rootFolderId: folder.rootFolderId,
+      name: folder.name,
+      icon: folder.icon,
+      color: folder.color,
+      parentId: folder.parentId,
+      expanded: folder.expanded,
+      sortOrder: folder.sortOrder,
+      rolesView: folder.rolesView ?? null,
+      rolesManage: folder.rolesManage ?? null,
+      rolesCreateThread: folder.rolesCreateThread ?? null,
+      rolesPost: folder.rolesPost ?? null,
+      rolesModerate: folder.rolesModerate ?? null,
+      rolesAdmin: folder.rolesAdmin ?? null,
+      createdAt: new Date(folder.createdAt),
+      updatedAt: new Date(folder.updatedAt),
+      canManage: folder.canManage,
+      canCreateThread: folder.canCreateThread,
+      canModerate: folder.canModerate,
+      canDelete: folder.canDelete,
+      canManagePermissions: folder.canManagePermissions,
+    });
+  });
+}
+
+/**
  * Load incognito data from localStorage
  */
 async function loadIncognitoData(
@@ -163,6 +243,7 @@ async function loadThreadsFromServer(
             rolesModerate: thread.rolesModerate ?? null,
             rolesAdmin: thread.rolesAdmin ?? null,
             published: false,
+            isStreaming: false,
             createdAt: new Date(thread.createdAt),
             updatedAt: new Date(thread.updatedAt),
             searchVector: null,
@@ -261,6 +342,9 @@ async function loadFoldersFromServer(
 /**
  * Hook for loading initial chat data (threads, folders, messages)
  * NOTE: Root folder permissions are now computed server-side and passed as props
+ *
+ * When SSR data is provided for the initial rootFolderId, seeds the store from
+ * it directly without any client-side fetch. Falls back to fetching on tab switches.
  */
 export function useDataLoader(
   locale: CountryLanguage,
@@ -271,21 +355,45 @@ export function useDataLoader(
   addFolder: (folder: ChatFolder) => void,
   setDataLoaded: (loaded: boolean) => void,
   user: JwtPayloadType,
+  /** SSR-prefetched initial data — skips fetch for the initial root folder */
+  initialData?: {
+    rootFolderId: DefaultFolderId;
+    threadsData: ThreadListResponseOutput | null;
+    foldersData: FolderListResponseOutput | null;
+  } | null,
 ): void {
-  const dataLoadedRef = useRef(false);
+  const loadedForFolderRef = useRef<DefaultFolderId | null>(null);
 
   useEffect(() => {
-    if (dataLoadedRef.current) {
+    if (loadedForFolderRef.current === currentRootFolderId) {
       return;
     }
 
-    dataLoadedRef.current = true;
+    loadedForFolderRef.current = currentRootFolderId;
 
     const loadData = async (): Promise<void> => {
+      setDataLoaded(false);
+
       // ALWAYS load incognito data from localStorage (for incognito mode only)
       if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
         await loadIncognitoData(logger, addThread, addMessage, addFolder);
         // Skip server calls for incognito mode - everything is local-only
+        setDataLoaded(true);
+        return;
+      }
+
+      // If SSR data is available for the current folder, seed store from it — no fetch needed
+      if (
+        initialData &&
+        initialData.rootFolderId === currentRootFolderId &&
+        (initialData.threadsData || initialData.foldersData)
+      ) {
+        if (initialData.threadsData) {
+          seedThreadsFromSSR(initialData.threadsData, addThread);
+        }
+        if (initialData.foldersData) {
+          seedFoldersFromSSR(initialData.foldersData, addFolder);
+        }
         setDataLoaded(true);
         return;
       }
@@ -322,5 +430,6 @@ export function useDataLoader(
     addMessage,
     addFolder,
     setDataLoaded,
+    initialData,
   ]);
 }

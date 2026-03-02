@@ -18,10 +18,14 @@ import {
   ChevronRight,
   Eye,
   EyeOff,
+  Globe,
+  Monitor,
   RotateCcw,
   Search,
   Shield,
+  Terminal,
   X,
+  Zap,
 } from "next-vibe-ui/ui/icons";
 import { Input } from "next-vibe-ui/ui/input";
 import { Pre } from "next-vibe-ui/ui/pre";
@@ -43,11 +47,15 @@ import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import {
+  useWidgetEndpointMutations,
+  useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
   useWidgetNavigation,
+  useWidgetOnSubmit,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import type definition from "./definition";
 import type {
@@ -135,6 +143,9 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   const user = useWidgetUser();
   const logger = useWidgetLogger();
   const locale = useWidgetLocale();
+  const form = useWidgetForm();
+  const onSubmit = useWidgetOnSubmit();
+  const endpointMutations = useWidgetEndpointMutations();
 
   // Use settings directly (no ChatProvider dependency)
   const settingsOps = useChatSettings(user, logger);
@@ -203,6 +214,23 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   const matchedCount = response?.matchedCount ?? 0;
   const categories = response?.categories ?? [];
   const hint = response?.hint;
+
+  // Admin context from response
+  const isAdmin = response?.isAdmin ?? false;
+  const currentPlatform = response?.currentPlatform;
+  const currentEnv = response?.currentEnv;
+
+  // Check if user has admin role (for initial render before response comes back)
+  const isAdminUser = useMemo(
+    () => !user?.isPublic && user?.roles?.includes(UserPermissionRole.ADMIN),
+    [user],
+  );
+
+  // Platform filter state
+  const [activePlatform, setActivePlatform] = useState<string | undefined>(
+    undefined,
+  );
+  const [prodOnly, setProdOnly] = useState(false);
 
   const effectiveEnabledTools = useMemo((): EnabledTool[] => {
     if (enabledTools !== null) {
@@ -365,6 +393,36 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     await navigateToTool(toolName, navigate);
   };
 
+  const triggerRefetch = useCallback((): void => {
+    if (onSubmit) {
+      onSubmit();
+    } else {
+      endpointMutations?.read?.refetch?.();
+    }
+  }, [onSubmit, endpointMutations]);
+
+  const handlePlatformChange = useCallback(
+    (platform: string | undefined): void => {
+      setActivePlatform(platform);
+      form?.setValue(
+        "platform",
+        platform as "cli" | "mcp" | "ai" | "web" | "all" | undefined,
+      );
+      // Small delay to let form state propagate to Zustand store
+      setTimeout(triggerRefetch, 50);
+    },
+    [form, triggerRefetch],
+  );
+
+  const handleProdToggle = useCallback(
+    (checked: boolean): void => {
+      setProdOnly(checked);
+      form?.setValue("includeProdOnly", checked || undefined);
+      setTimeout(triggerRefetch, 50);
+    },
+    [form, triggerRefetch],
+  );
+
   // ── Render ─────────────────────────────────────────────────────────────────
 
   // Overview mode (no tools returned, just categories)
@@ -423,6 +481,29 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
                 {t("get.fields.aliases.title")}: {tool.aliases.join(", ")}
               </P>
             )}
+            {tool.platforms && tool.platforms.length > 0 && (
+              <Div className="flex items-center gap-1 mt-2">
+                <Span className="text-[11px] text-muted-foreground/60 mr-1">
+                  {t("get.fields.platforms.title")}:
+                </Span>
+                {tool.platforms.map((p) => (
+                  <Badge
+                    key={p}
+                    variant="outline"
+                    className={cn(
+                      "text-[10px] px-1.5 py-0 font-mono",
+                      p === "cli" && "border-amber-500/30 text-amber-600",
+                      p === "mcp" && "border-violet-500/30 text-violet-600",
+                      p === "ai" && "border-blue-500/30 text-blue-600",
+                      p === "web" && "border-emerald-500/30 text-emerald-600",
+                      p === "cron" && "border-gray-500/30 text-gray-600",
+                    )}
+                  >
+                    {p}
+                  </Badge>
+                ))}
+              </Div>
+            )}
           </Div>
         </Div>
 
@@ -453,6 +534,95 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   // Full list mode (web)
   return (
     <Div className="flex flex-col gap-0">
+      {/* Admin Platform & Env Bar */}
+      {(isAdmin || isAdminUser) && (
+        <Div className="px-4 pt-4 pb-2 flex flex-col gap-2">
+          {/* Environment + Platform Info */}
+          <Div className="flex items-center gap-2 text-xs text-muted-foreground">
+            {currentEnv && (
+              <Badge
+                variant={currentEnv === "production" ? "default" : "secondary"}
+                className={cn(
+                  "text-[10px] font-mono",
+                  currentEnv === "production"
+                    ? "bg-red-500/10 text-red-600 border-red-500/20"
+                    : "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
+                )}
+              >
+                {currentEnv === "production" ? "PROD" : "DEV"}
+              </Badge>
+            )}
+            {currentPlatform && (
+              <Badge variant="outline" className="text-[10px] font-mono">
+                {currentPlatform}
+              </Badge>
+            )}
+          </Div>
+
+          {/* Platform Tabs */}
+          <Div className="flex items-center gap-1">
+            {(
+              [
+                {
+                  key: undefined,
+                  label: t("aiTools.platformFilter.all"),
+                  icon: <Globe className="h-3 w-3" />,
+                },
+                {
+                  key: "cli",
+                  label: t("aiTools.platformFilter.cli"),
+                  icon: <Terminal className="h-3 w-3" />,
+                },
+                {
+                  key: "mcp",
+                  label: t("aiTools.platformFilter.mcp"),
+                  icon: <Zap className="h-3 w-3" />,
+                },
+                {
+                  key: "ai",
+                  label: t("aiTools.platformFilter.ai"),
+                  icon: <Monitor className="h-3 w-3" />,
+                },
+                {
+                  key: "web",
+                  label: t("aiTools.platformFilter.web"),
+                  icon: <Globe className="h-3 w-3" />,
+                },
+              ] as const
+            ).map(({ key, label, icon }) => (
+              <Button
+                key={key ?? "all"}
+                variant={activePlatform === key ? "default" : "outline"}
+                size="sm"
+                className={cn(
+                  "h-7 text-xs gap-1.5 px-2.5",
+                  activePlatform === key &&
+                    "bg-primary text-primary-foreground",
+                )}
+                onClick={() => handlePlatformChange(key)}
+              >
+                {icon}
+                <Span>{label}</Span>
+              </Button>
+            ))}
+
+            {/* Dev/Prod Toggle (only visible in dev) */}
+            {currentEnv === "development" && (
+              <Div className="flex items-center gap-1.5 ml-auto">
+                <Span className="text-[11px] text-muted-foreground">
+                  {t("aiTools.envFilter.production")}
+                </Span>
+                <Switch
+                  checked={prodOnly}
+                  onCheckedChange={handleProdToggle}
+                  className="h-4 w-7"
+                />
+              </Div>
+            )}
+          </Div>
+        </Div>
+      )}
+
       {/* Stats Bar */}
       <Div className="flex gap-3 text-xs px-4 pt-4">
         <TooltipProvider>
@@ -790,9 +960,31 @@ function ToolRow({
               </Badge>
             )}
           </Div>
-          <P className="text-[11px] text-muted-foreground/70 truncate">
-            {tool.description}
-          </P>
+          <Div className="flex items-center gap-1 mt-0.5">
+            <P className="text-[11px] text-muted-foreground/70 truncate flex-1">
+              {tool.description}
+            </P>
+            {tool.platforms && tool.platforms.length > 0 && (
+              <Div className="flex gap-0.5 shrink-0">
+                {tool.platforms.map((p) => (
+                  <Badge
+                    key={p}
+                    variant="outline"
+                    className={cn(
+                      "text-[9px] px-1 py-0 font-mono leading-tight",
+                      p === "cli" && "border-amber-500/30 text-amber-600",
+                      p === "mcp" && "border-violet-500/30 text-violet-600",
+                      p === "ai" && "border-blue-500/30 text-blue-600",
+                      p === "web" && "border-emerald-500/30 text-emerald-600",
+                      p === "cron" && "border-gray-500/30 text-gray-600",
+                    )}
+                  >
+                    {p}
+                  </Badge>
+                ))}
+              </Div>
+            )}
+          </Div>
         </Div>
         {isEnabled && (
           <TooltipProvider>

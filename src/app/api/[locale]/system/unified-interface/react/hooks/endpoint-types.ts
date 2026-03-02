@@ -351,6 +351,8 @@ export type ReadOperationReturn<T> = "GET" extends keyof T
       submitError: ErrorResponseType | undefined;
 
       isLoading: boolean;
+      isLoadingFresh: boolean;
+      isCachedData: boolean;
       refetch: () => Promise<void>;
       submitForm: SubmitFormFunction<
         GetRequest<T>,
@@ -412,6 +414,8 @@ export type EndpointReturn<T> = Prettify<{
         submitError: ErrorResponseType | undefined;
 
         isLoading: boolean;
+        isLoadingFresh: boolean;
+        isCachedData: boolean;
         refetch: () => Promise<void>;
         submitForm: SubmitFormFunction<
           GetRequest<T>,

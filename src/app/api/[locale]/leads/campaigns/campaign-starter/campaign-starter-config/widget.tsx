@@ -12,7 +12,7 @@ import { Label } from "next-vibe-ui/ui/label";
 import { Span } from "next-vibe-ui/ui/span";
 import React from "react";
 
-import { ScheduleAutocomplete } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/_components/schedule-autocomplete";
+import { ScheduleAutocomplete } from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/widget/schedule-autocomplete";
 import {
   useWidgetContext,
   useWidgetForm,

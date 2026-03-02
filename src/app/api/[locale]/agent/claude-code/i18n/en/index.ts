@@ -7,6 +7,7 @@ export const translations = {
     run: {
       post: {
         title: "Run Claude Code",
+        dynamicTitle: "Claude Code: {{prompt}}",
         description:
           "Launch a Claude Code session on Hermes (the local dev machine). PREFER headless:false (default) — this opens a full back-and-forth Claude Code session where Max can actively participate. Use headless:true only for fully automated batch tasks that need no human input and must return output programmatically (e.g. cron jobs, automated review). In interactive mode the session streams live to the terminal and waits for the user; in batch mode it runs `claude -p`, collects all output, and returns when done. Always runs with --dangerously-skip-permissions so no confirmation prompts interrupt the flow.",
         fields: {

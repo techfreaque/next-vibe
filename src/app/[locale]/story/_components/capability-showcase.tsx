@@ -24,9 +24,9 @@ import type {
   ToolCallResult,
 } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole } from "@/app/api/[locale]/agent/chat/enum";
-import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/_components/grouped-assistant-message";
-import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/_components/message-grouping";
-import { UserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/_components/user-message-bubble";
+import { GroupedAssistantMessage } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/grouped-assistant-message";
+import type { MessageGroup } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/message-grouping";
+import { UserMessageBubble } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/widget/user-message-bubble";
 import {
   ModelId,
   TOTAL_CHARACTER_COUNT,
@@ -34,6 +34,7 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
@@ -340,6 +341,17 @@ function AutonomousVisual({
           readOnly
           showAuthor
           platformOverride={Platform.CLI}
+          onAnswerAsModel={null}
+          onDelete={null}
+          collapseState={null}
+          rootFolderId={DefaultFolderId.PUBLIC}
+          user={{
+            isPublic: true,
+            leadId: "00000000-0000-0000-0000-000000000000",
+            roles: [UserPermissionRole.PUBLIC],
+          }}
+          sendMessage={null}
+          deductCredits={null}
         />
       </Div>
     </MockChatProvider>

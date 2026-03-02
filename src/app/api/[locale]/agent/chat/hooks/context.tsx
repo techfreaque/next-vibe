@@ -1,37 +1,31 @@
 "use client";
 
 /**
- * Chat Context Provider
- * Provides the useChat() hook to all chat components
- * URL is the single source of truth for navigation state
+ * Chat Boot Context
+ * Lightweight context for server-origin props that don't change after mount.
+ * Replaces the old ChatProvider/ChatContext which aggregated everything.
+ *
+ * This context provides: user, logger, initialCredits, envAvailability, rootFolderPermissions.
+ * All other chat state lives in scoped Zustand stores and hooks.
  */
 
 import type { JSX, ReactNode } from "react";
 import { createContext, useContext, useMemo } from "react";
 
-import {
-  useChat,
-  type UseChatReturn,
-} from "@/app/api/[locale]/agent/chat/hooks/hooks";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { CharacterGetResponseOutput } from "../characters/[id]/definition";
 import type { DefaultFolderId } from "../config";
-
-/**
- * Chat context is the same as UseChatReturn
- * UseChatReturn already includes initialCredits, deductCredits, and refetchCredits
- */
-export type ChatContextValue = UseChatReturn;
-
-/**
- * Exported for mock/demo providers (e.g. landing page chat preview).
- * Production code should use ChatProvider instead.
- */
-export const ChatContext = createContext<ChatContextValue | null>(null);
+import type { FolderListResponseOutput } from "../folders/definition";
+import type { ChatSettingsGetResponseOutput } from "../settings/definition";
+import type { MessageListResponseOutput } from "../threads/[threadId]/messages/definition";
+import type { PathGetResponseOutput } from "../threads/[threadId]/messages/path/definition";
+import type { ThreadListResponseOutput } from "../threads/definition";
 
 /**
  * Root folder permissions type
@@ -42,11 +36,43 @@ export interface RootFolderPermissions {
 }
 
 /**
- * Chat provider props
- * All navigation state comes from URL props (not from store)
+ * Server-origin boot values — stable after mount
  */
-interface ChatProviderProps {
-  /** JWT payload from server (undefined for unauthenticated/public users) */
+export interface ChatBootValue {
+  user: JwtPayloadType;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
+  initialCredits: CreditsGetResponseOutput;
+  envAvailability: AgentEnvAvailability;
+  rootFolderPermissions: RootFolderPermissions;
+  /** Initial folders data fetched server-side — used as initialData for the sidebar */
+  initialFoldersData: FolderListResponseOutput | null;
+  /** Initial threads data fetched server-side — used as initialData for the threads list */
+  initialThreadsData: ThreadListResponseOutput | null;
+  /** Root folder ID at page load — initialData only applies to this folder */
+  initialRootFolderId: DefaultFolderId;
+  /** Initial messages data fetched server-side — used as initialData for the active thread */
+  initialMessagesData: MessageListResponseOutput | null;
+  /** Initial path data fetched server-side — used as initialData for the branch path */
+  initialPathData: PathGetResponseOutput | null;
+  /** Initial settings fetched server-side — used as initialData for chat settings */
+  initialSettingsData: ChatSettingsGetResponseOutput | null;
+  /** Initial character fetched server-side — used as initialData for the selected character */
+  initialCharacterData: CharacterGetResponseOutput | null;
+  /** Thread ID at page load — initialMessagesData only applies to this thread */
+  initialThreadId: string | null;
+}
+
+/**
+ * Exported for mock/demo providers (e.g. landing page chat preview).
+ * Production code should use ChatBootProvider instead.
+ */
+export const ChatBootContext = createContext<ChatBootValue | null>(null);
+
+/**
+ * Chat boot provider props
+ */
+interface ChatBootProviderProps {
   user: JwtPayloadType;
   locale: CountryLanguage;
   children: ReactNode;
@@ -56,72 +82,94 @@ interface ChatProviderProps {
   currentRootFolderId: DefaultFolderId;
   /** Current subfolder ID from URL (null if none) */
   currentSubFolderId: string | null;
-  /** Initial credits from server (must be provided from server) */
   initialCredits: CreditsGetResponseOutput;
-  /** Root folder permissions computed server-side */
   rootFolderPermissions: RootFolderPermissions;
-  /** Which AI provider keys are configured (computed server-side) */
   envAvailability: AgentEnvAvailability;
-  /** Default active tool count (core 8, computed once at boot, server-side) */
-  defaultToolCount: number;
-  /** Total available tool count for this user's role (computed once at boot, server-side) */
-  totalToolCount: number;
+  /** Initial data fetched server-side to avoid client-side refetch on mount */
+  initialFoldersData?: FolderListResponseOutput | null;
+  initialThreadsData?: ThreadListResponseOutput | null;
+  initialMessagesData?: MessageListResponseOutput | null;
+  initialPathData?: PathGetResponseOutput | null;
+  initialSettingsData?: ChatSettingsGetResponseOutput | null;
+  initialCharacterData?: CharacterGetResponseOutput | null;
 }
 
 /**
- * Chat provider component
- * Provides the useChat() hook to all children
- * URL is the single source of truth - no hydration mismatch
+ * Chat boot provider — provides stable server-origin values.
+ * All dynamic chat state lives in scoped Zustand stores.
  */
-export function ChatProvider({
+export function ChatBootProvider({
   user,
   locale,
   children,
   activeThreadId,
   currentRootFolderId,
-  currentSubFolderId,
   initialCredits,
   rootFolderPermissions,
   envAvailability,
-  defaultToolCount,
-  totalToolCount,
-}: ChatProviderProps): JSX.Element {
-  // Create logger once - memoize to prevent infinite re-renders
-  // The timestamp is only used for logging context, not for identity
+  initialFoldersData = null,
+  initialThreadsData = null,
+  initialMessagesData = null,
+  initialPathData = null,
+  initialSettingsData = null,
+  initialCharacterData = null,
+}: ChatBootProviderProps): JSX.Element {
   const logger = useMemo(
     () => createEndpointLogger(false, Date.now(), locale),
     [locale],
   );
 
-  // Get chat hook with URL-derived navigation state
-  const chat = useChat(
-    user,
-    locale,
-    logger,
-    activeThreadId,
-    currentRootFolderId,
-    currentSubFolderId,
-    initialCredits,
-    rootFolderPermissions,
-    envAvailability,
-    defaultToolCount,
-    totalToolCount,
+  const value = useMemo(
+    (): ChatBootValue => ({
+      user,
+      locale,
+      logger,
+      initialCredits,
+      envAvailability,
+      rootFolderPermissions,
+      initialFoldersData,
+      initialThreadsData,
+      initialRootFolderId: currentRootFolderId,
+      initialMessagesData,
+      initialPathData,
+      initialSettingsData,
+      initialCharacterData,
+      initialThreadId: activeThreadId,
+    }),
+    [
+      user,
+      locale,
+      logger,
+      initialCredits,
+      envAvailability,
+      rootFolderPermissions,
+      initialFoldersData,
+      initialThreadsData,
+      currentRootFolderId,
+      initialMessagesData,
+      initialPathData,
+      initialSettingsData,
+      initialCharacterData,
+      activeThreadId,
+    ],
   );
 
-  return <ChatContext.Provider value={chat}>{children}</ChatContext.Provider>;
+  return (
+    <ChatBootContext.Provider value={value}>
+      {children}
+    </ChatBootContext.Provider>
+  );
 }
 
 /**
- * Hook to use chat context
- * Throws error if used outside ChatProvider
+ * Hook to access chat boot context.
+ * Throws if used outside ChatBootProvider.
  */
-export function useChatContext(): ChatContextValue {
-  const context = useContext(ChatContext);
+export function useChatBootContext(): ChatBootValue {
+  const context = useContext(ChatBootContext);
   if (!context) {
     // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-    throw new Error(
-      "useChatContext must be used within ChatProvider. Make sure your component is wrapped in <ChatProvider>.",
-    );
+    throw new Error("useChatBootContext must be used within ChatBootProvider.");
   }
   return context;
 }

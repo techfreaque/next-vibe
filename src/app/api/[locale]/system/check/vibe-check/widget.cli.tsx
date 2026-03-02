@@ -28,10 +28,12 @@ export function CheckResultWidget({
 
   return (
     <Box flexDirection="column">
-      <CodeQualityIssueListCli
-        items={value.items}
-        editorUriScheme={value.editorUriSchema}
-      />
+      {value.items !== undefined && (
+        <CodeQualityIssueListCli
+          items={value.items}
+          editorUriScheme={value.editorUriSchema}
+        />
+      )}
       <CodeQualityFilesListCli files={value.files} />
       <CodeQualitySummaryCli
         totalIssues={value.totalIssues}

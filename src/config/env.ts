@@ -171,4 +171,18 @@ export const {
     example: defaultLocale,
     comment: "CLI locale setting",
   },
+  WS_PUBSUB_TYPE: {
+    schema: z.enum(["local", "redis"]).optional().default("local"),
+    example: "local",
+    comment:
+      "WebSocket pub/sub adapter. 'local' for single-instance (default), 'redis' for multi-instance broadcasting.",
+    commented: true,
+  },
+  REDIS_URL: {
+    schema: z.string().url().optional(),
+    example: "redis://localhost:6379",
+    comment:
+      "Redis connection URL. Required when WS_PUBSUB_TYPE=redis for cross-instance WebSocket broadcasting.",
+    commented: true,
+  },
 });

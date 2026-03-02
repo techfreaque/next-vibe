@@ -197,8 +197,11 @@ export class PaymentRepository {
         await getStripe.checkout.sessions.expire(session.id).catch(() => {
           // Ignore expiration errors
         });
-        // eslint-disable-next-line @typescript-eslint/only-throw-error, oxlint-plugin-restricted/restricted-syntax
-        throw dbError;
+        return fail({
+          message: t("create.errors.server.title"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+          messageParams: { error: parseError(dbError).message },
+        });
       }
 
       logger.debug("Payment session created successfully", {

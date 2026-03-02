@@ -95,6 +95,7 @@ export { FolderPen } from "./FolderPen";
 export { FolderPlus } from "./FolderPlus";
 export { FolderTree } from "./FolderTree";
 export { FolderX } from "./FolderX";
+export { Frame } from "./Frame";
 export { FreedomGptLogo } from "./FreedomGptLogo";
 export { GabAILogo } from "./GabAiLogo";
 export { Gamepad } from "./Gamepad";

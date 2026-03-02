@@ -3,7 +3,6 @@
  * Handles thread creation and selection with navigation
  */
 
-import { useRouter } from "next-vibe-ui/hooks";
 import { useCallback } from "react";
 
 import {
@@ -14,6 +13,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ChatFolder } from "./store";
+import { useChatNavigationStore } from "./use-chat-navigation-store";
 
 interface UseThreadNavigationProps {
   locale: CountryLanguage;
@@ -47,7 +47,7 @@ export function useThreadNavigation({
   activeThreadId,
   logger,
 }: UseThreadNavigationProps): UseThreadNavigationReturn {
-  const router = useRouter();
+  const setNavigation = useChatNavigationStore((s) => s.setNavigation);
 
   // Handle thread selection with navigation
   const handleSelectThread = useCallback(
@@ -103,14 +103,26 @@ export function useThreadNavigation({
 
       // Only navigate if the deleted thread was the active one
       if (threadId === activeThreadId) {
+        setNavigation({
+          activeThreadId: null,
+          currentRootFolderId,
+          currentSubFolderId: null,
+        });
         const url = `/${locale}/threads/${currentRootFolderId}`;
         logger.debug("Chat: Navigating after deleting active thread", { url });
-        router.push(url);
+        window.history.pushState(null, "", url);
       } else {
         logger.debug("Chat: Deleted non-active thread, no navigation needed");
       }
     },
-    [deleteThread, logger, locale, currentRootFolderId, router, activeThreadId],
+    [
+      deleteThread,
+      logger,
+      locale,
+      currentRootFolderId,
+      activeThreadId,
+      setNavigation,
+    ],
   );
 
   return {

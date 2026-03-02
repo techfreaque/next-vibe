@@ -2,9 +2,8 @@
  * AI Agent Run Widget
  *
  * Custom widget for the AI Agent Run endpoint.
- * - Standard form fields for model, character, prompt, etc.
- * - Pre-calls with inline endpoint rendering (same pattern as execute-tool)
- * - ToolsConfigEdit for allowedTools and tools (same pattern as character edit)
+ * Uses shared AiFormView for chat-like layout + AiResultView for disabled mode.
+ * Adds ai-run-specific: pre-calls, tools config, instructions.
  */
 
 /* eslint-disable oxlint-plugin-i18n/no-literal-string */
@@ -19,29 +18,31 @@ import {
   ChevronDown,
   ChevronRight,
   Plus,
-  Sparkles,
   Trash2,
   Zap,
 } from "next-vibe-ui/ui/icons";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   getEndpoint,
   getFullPath,
 } from "@/app/api/[locale]/system/generated/endpoint";
 import helpDefinitions from "@/app/api/[locale]/system/help/definition";
+import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
+  useWidgetDisabled,
   useWidgetForm,
+  useWidgetIsSubmitting,
   useWidgetLocale,
   useWidgetLogger,
-  useWidgetTranslation,
+  useWidgetOnSubmit,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { TextWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/react";
@@ -50,15 +51,23 @@ import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/u
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/textarea-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useCharacter } from "../../chat/characters/[id]/hooks";
+import { ChatBootContext } from "../../chat/hooks/context";
+import {
+  ChatNavigationProvider,
+  useChatNavigationStore,
+} from "../../chat/hooks/use-chat-navigation-store";
 import { useChatSettings } from "../../chat/settings/hooks";
+import { defaultModel, type ModelId } from "../../models/models";
 import {
   type ToolEntry,
   ToolsConfigEdit,
-} from "../../tools/tools-config-widget";
+} from "../../tools/widget/tools-config-widget";
+import cancelEndpoints from "../cancel/definition";
+import { WidgetChatInput } from "../stream/widget/chat-input";
+import { EmbeddedMessagesView } from "../stream/widget/embedded-messages";
 import type definition from "./definition";
 import type {
   AiStreamRunPostRequestOutput,
@@ -74,6 +83,12 @@ interface CustomWidgetProps {
     value: AiStreamRunPostResponseOutput | null | undefined;
   } & (typeof definition.POST)["fields"];
   fieldName: string;
+}
+
+// ─── Hook to read thread ID from navigation store ────────────────────────────
+
+function useAiRunThreadId(): string | null {
+  return useChatNavigationStore((s) => s.activeThreadId);
 }
 
 // ─── Pre-Call Row with inline endpoint ──────────────────────────────────────
@@ -99,7 +114,6 @@ function PreCallRow({
     useState<CreateApiEndpointAny | null>(null);
   const [resolveError, setResolveError] = useState<string | null>(null);
 
-  // Resolve routeId → endpoint definition (same as execute-tool)
   useEffect((): (() => void) => {
     if (!call.routeId) {
       setResolvedEndpoint(null);
@@ -139,12 +153,8 @@ function PreCallRow({
     | "DELETE"
     | undefined;
 
-  // Pre-call args are set via the inline endpoint form (not via endpointOptions prefill)
-  // The EndpointsPage renders the target endpoint's form directly.
-
   return (
     <Div className="rounded-lg border bg-muted/20 flex flex-col gap-2 overflow-hidden">
-      {/* Header: autocomplete + remove */}
       <Div className="flex items-center gap-2 p-3 pb-0">
         <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
           #{index + 1}
@@ -170,7 +180,6 @@ function PreCallRow({
         </Button>
       </Div>
 
-      {/* Inline endpoint form */}
       {!call.routeId && (
         <P className="text-xs text-muted-foreground px-3 pb-3">
           Select an endpoint to configure its parameters.
@@ -189,8 +198,9 @@ function PreCallRow({
 
       {resolvedEndpoint && method && (
         <Div className="border-t">
-          <EndpointsPage
-            endpoint={{ [method]: resolvedEndpoint }}
+          <PreCallEndpointsPage
+            method={method}
+            resolvedEndpoint={resolvedEndpoint}
             locale={locale}
             user={user}
           />
@@ -199,6 +209,25 @@ function PreCallRow({
     </Div>
   );
 }
+
+/** Memoized wrapper to stabilize the computed endpoint object */
+const PreCallEndpointsPage = React.memo(function PreCallEndpointsPage({
+  method,
+  resolvedEndpoint,
+  locale,
+  user,
+}: {
+  method: string;
+  resolvedEndpoint: CreateApiEndpointAny;
+  locale: CountryLanguage;
+  user: ReturnType<typeof useWidgetUser>;
+}): JSX.Element {
+  const endpoint = useMemo(
+    () => ({ [method]: resolvedEndpoint }),
+    [method, resolvedEndpoint],
+  );
+  return <EndpointsPage endpoint={endpoint} locale={locale} user={user} />;
+});
 
 // ─── Pre-Calls Editor ───────────────────────────────────────────────────────
 
@@ -232,7 +261,6 @@ function PreCallsEditor({
   const handleRouteIdChange = useCallback(
     (index: number, routeId: string): void => {
       const updated = [...preCalls];
-      // Reset args when routeId changes
       updated[index] = { routeId, args: {} };
       onChange(updated);
     },
@@ -293,15 +321,18 @@ function PreCallsEditor({
   );
 }
 
-// ─── Main Widget ────────────────────────────────────────────────────────────
+// ─── Form mode (used in both active and disabled states) ─────────────────────
 
-export function AiRunWidget({ field }: CustomWidgetProps): JSX.Element {
-  const children = field.children;
+function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
+  const { children } = field;
   const form = useWidgetForm<typeof definition.POST>();
   const locale = useWidgetLocale();
   const user = useWidgetUser();
   const logger = useWidgetLogger();
-  const t = useWidgetTranslation<typeof definition.POST>();
+  const onSubmit = useWidgetOnSubmit();
+  const isSubmitting = useWidgetIsSubmitting();
+  const isDisabled = useWidgetDisabled();
+  const cancelMutation = useApiMutation(cancelEndpoints.POST, logger, user);
 
   // ── Tools cascade: user settings → character → form (explicit) ───────────
   const characterId = form.watch("character") ?? undefined;
@@ -311,13 +342,11 @@ export function AiRunWidget({ field }: CustomWidgetProps): JSX.Element {
   const settingsOps = useChatSettings(user, logger);
   const settingsData = settingsOps.settings;
 
-  // Fallback tools: character overrides settings, form overrides character
   const fallbackAllowedTools: ToolEntry[] | null =
     characterData?.allowedTools ?? settingsData?.allowedTools ?? null;
   const fallbackPinnedTools: ToolEntry[] | null =
     characterData?.pinnedTools ?? settingsData?.pinnedTools ?? null;
 
-  // Fetch available tools from help endpoint (same as execute-tool)
   const helpState = useEndpoint(
     helpDefinitions,
     {
@@ -365,6 +394,11 @@ export function AiRunWidget({ field }: CustomWidgetProps): JSX.Element {
   const allowedTools: ToolEntry[] | null = form.watch("allowedTools") ?? null;
   const tools: ToolEntry[] | null = form.watch("tools") ?? null;
 
+  const toolsValue = useMemo(
+    () => ({ allowedTools, pinnedTools: tools }),
+    [allowedTools, tools],
+  );
+
   const handleToolsChange = useCallback(
     ({
       allowedTools: newAllowed,
@@ -379,64 +413,125 @@ export function AiRunWidget({ field }: CustomWidgetProps): JSX.Element {
     [form],
   );
 
+  const promptValue = form.watch("prompt") ?? "";
+  const modelValue = form.watch("model") ?? defaultModel;
+  const characterValue = form.watch("character") ?? "";
+
+  const handleContentChange = useCallback(
+    (val: string) => form.setValue("prompt", val, { shouldDirty: true }),
+    [form],
+  );
+  const handleModelChange = useCallback(
+    (id: ModelId) => form.setValue("model", id, { shouldDirty: true }),
+    [form],
+  );
+  const handleCharacterChange = useCallback(
+    (id: string) => form.setValue("character", id, { shouldDirty: true }),
+    [form],
+  );
+  const handleSubmit = useCallback(() => {
+    if (onSubmit) {
+      onSubmit();
+    }
+  }, [onSubmit]);
+
   const responseData = field.value;
+  const contextThreadId = useAiRunThreadId();
+  // Show messages from appendThreadId while submitting (before POST response arrives)
+  const appendThreadId = form.watch("appendThreadId") ?? undefined;
+  const displayThreadId =
+    contextThreadId ?? (isSubmitting ? appendThreadId : undefined);
+  const rootFolderValue = form.watch("rootFolderId") ?? "cron";
+  const threadHref = displayThreadId
+    ? `/${locale}/threads/${rootFolderValue}/${displayThreadId}`
+    : undefined;
+
+  const handleCancel = useCallback(() => {
+    const tid = displayThreadId;
+    if (!tid) {
+      return;
+    }
+    cancelMutation.mutate({ requestData: { threadId: tid } });
+  }, [cancelMutation, displayThreadId]);
+
+  const emptyField = useMemo(() => ({}), []);
 
   return (
-    <Div className="flex flex-col gap-0">
-      {/* Header */}
-      <Div className="flex items-center gap-3 px-4 pt-4 pb-2">
-        <Sparkles className="h-5 w-5 text-primary" />
-        <Div className="flex-1">
-          <Span className="text-base font-semibold">
-            {t("run.post.container.title")}
-          </Span>
-        </Div>
-        <SubmitButtonWidget<typeof definition.POST>
-          field={{
-            text: "run.post.success.title",
-            loadingText: "run.post.success.description",
-            icon: "sparkles",
-            variant: "primary",
-          }}
-        />
+    <Div className="flex flex-col h-[500px] min-h-[300px]">
+      <FormAlertWidget field={emptyField} />
+
+      {/* Messages area — flex-grow + scroll so input stays at bottom */}
+      <Div className="flex-1 overflow-y-auto min-h-0">
+        {/* Loading state */}
+        {isSubmitting && !displayThreadId && (
+          <Div className="flex items-center justify-center h-full">
+            <Div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent" />
+          </Div>
+        )}
+
+        {/* Response thread messages (if response has threadId) */}
+        {/* Null out ChatBootContext so MessagesWidget uses standalone read-only mode
+            instead of picking up the page's active thread from ChatBootProvider */}
+        {displayThreadId && (
+          <ChatBootContext.Provider value={null}>
+            <ChatNavigationProvider activeThreadId={displayThreadId} isEmbedded>
+              <EmbeddedMessagesView
+                threadId={displayThreadId}
+                locale={locale}
+                user={user}
+                className="rounded-lg bg-background"
+                refetchInterval={isSubmitting ? 2000 : false}
+              />
+            </ChatNavigationProvider>
+          </ChatBootContext.Provider>
+        )}
+
+        {/* Response text fallback */}
+        {responseData && !responseData.threadId && responseData.text && (
+          <TextWidget
+            fieldName="text"
+            field={withValue(children.text, responseData.text, responseData)}
+          />
+        )}
       </Div>
 
-      {/* Scrollable Form */}
-      <Div className="overflow-y-auto max-h-[min(800px,calc(100dvh-180px))] px-4 pb-4">
-        <FormAlertWidget field={{}} />
+      {/* Chat-like input — sticky at bottom */}
+      <WidgetChatInput
+        content={promptValue}
+        onContentChange={handleContentChange}
+        modelId={modelValue}
+        characterId={characterValue}
+        onModelChange={handleModelChange}
+        onCharacterChange={handleCharacterChange}
+        locale={locale}
+        user={user}
+        logger={logger}
+        onSubmit={handleSubmit}
+        isSubmitting={isSubmitting ?? false}
+        disabled={isDisabled}
+        threadHref={threadHref}
+        onCancel={handleCancel}
+        className="rounded-b-lg"
+        advancedContent={
+          <>
+            {/* Instructions */}
+            <TextareaFieldWidget
+              fieldName="instructions"
+              field={children.instructions}
+            />
 
-        <Div className="flex flex-col gap-4 mt-2">
-          {/* Model & Character row */}
-          <Div className="grid grid-cols-2 gap-4">
-            <SelectFieldWidget fieldName="model" field={children.model} />
-            <TextFieldWidget fieldName="character" field={children.character} />
-          </Div>
+            {/* Pre-Calls */}
+            <PreCallsEditor
+              preCalls={preCalls}
+              onChange={handlePreCallsChange}
+              toolOptions={toolOptions}
+              locale={locale}
+              user={user}
+            />
 
-          {/* Prompt */}
-          <TextareaFieldWidget fieldName="prompt" field={children.prompt} />
-
-          {/* Instructions */}
-          <TextareaFieldWidget
-            fieldName="instructions"
-            field={children.instructions}
-          />
-
-          {/* Pre-Calls with inline endpoint rendering */}
-          <PreCallsEditor
-            preCalls={preCalls}
-            onChange={handlePreCallsChange}
-            toolOptions={toolOptions}
-            locale={locale}
-            user={user}
-          />
-
-          {/* Allowed Tools & In-Context Tools */}
-          {form && (
+            {/* Tools config */}
             <ToolsConfigEdit
-              value={{
-                allowedTools,
-                pinnedTools: tools,
-              }}
+              value={toolsValue}
               onChange={handleToolsChange}
               user={user}
               logger={logger}
@@ -444,105 +539,47 @@ export function AiRunWidget({ field }: CustomWidgetProps): JSX.Element {
               characterAllowedTools={fallbackAllowedTools}
               characterPinnedTools={fallbackPinnedTools}
             />
-          )}
 
-          {/* Max Turns & Thread ID */}
-          <Div className="grid grid-cols-2 gap-4">
-            <NumberFieldWidget fieldName="maxTurns" field={children.maxTurns} />
-            <TextFieldWidget
-              fieldName="appendThreadId"
-              field={children.appendThreadId}
-            />
-          </Div>
-
-          {/* Folder settings */}
-          <Div className="grid grid-cols-2 gap-4">
-            <SelectFieldWidget
-              fieldName="rootFolderId"
-              field={children.rootFolderId}
-            />
-            <TextFieldWidget
-              fieldName="subFolderId"
-              field={children.subFolderId}
-            />
-          </Div>
-
-          {/* ── Response section ────────────────────────────────────────── */}
-          {responseData && (
-            <Div className="border-t pt-4 flex flex-col gap-3">
-              <Span className="text-sm font-semibold text-muted-foreground">
-                Response
-              </Span>
-
-              <TextWidget
-                fieldName="text"
-                field={withValue(
-                  children.text,
-                  responseData.text,
-                  responseData,
-                )}
+            {/* Max Turns & Thread ID */}
+            <Div className="grid grid-cols-2 gap-3">
+              <NumberFieldWidget
+                fieldName="maxTurns"
+                field={children.maxTurns}
               />
-
-              <Div className="grid grid-cols-2 gap-4">
-                <TextWidget
-                  fieldName="promptTokens"
-                  field={withValue(
-                    children.promptTokens,
-                    responseData.promptTokens,
-                    responseData,
-                  )}
-                />
-                <TextWidget
-                  fieldName="completionTokens"
-                  field={withValue(
-                    children.completionTokens,
-                    responseData.completionTokens,
-                    responseData,
-                  )}
-                />
-              </Div>
-
-              <Div className="grid grid-cols-2 gap-4">
-                <TextWidget
-                  fieldName="threadId"
-                  field={withValue(
-                    children.threadId,
-                    responseData.threadId,
-                    responseData,
-                  )}
-                />
-                <TextWidget
-                  fieldName="lastAiMessageId"
-                  field={withValue(
-                    children.lastAiMessageId,
-                    responseData.lastAiMessageId,
-                    responseData,
-                  )}
-                />
-              </Div>
-
-              <Div className="grid grid-cols-2 gap-4">
-                <TextWidget
-                  fieldName="threadTitle"
-                  field={withValue(
-                    children.threadTitle,
-                    responseData.threadTitle,
-                    responseData,
-                  )}
-                />
-                <TextWidget
-                  fieldName="threadCreatedAt"
-                  field={withValue(
-                    children.threadCreatedAt,
-                    responseData.threadCreatedAt,
-                    responseData,
-                  )}
-                />
-              </Div>
+              <TextFieldWidget
+                fieldName="appendThreadId"
+                field={children.appendThreadId}
+              />
             </Div>
-          )}
-        </Div>
-      </Div>
+
+            {/* Folder settings */}
+            <Div className="grid grid-cols-2 gap-3">
+              <SelectFieldWidget
+                fieldName="rootFolderId"
+                field={children.rootFolderId}
+              />
+              <TextFieldWidget
+                fieldName="subFolderId"
+                field={children.subFolderId}
+              />
+            </Div>
+          </>
+        }
+      />
     </Div>
+  );
+}
+
+// ─── Main Widget (entry point) ───────────────────────────────────────────────
+
+export function AiRunWidget({
+  field,
+  fieldName,
+}: CustomWidgetProps): JSX.Element {
+  const threadId = field.value?.threadId ?? null;
+  return (
+    <ChatNavigationProvider activeThreadId={threadId}>
+      <AiRunFormView field={field} fieldName={fieldName} />
+    </ChatNavigationProvider>
   );
 }

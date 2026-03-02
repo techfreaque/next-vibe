@@ -114,8 +114,9 @@ const { POST } = createEndpoint({
     UserRole.ADMIN,
     UserRole.AI_TOOL_OFF,
     UserRole.WEB_OFF,
-    UserRole.CLI_AUTH_BYPASS,
-  ],
+    UserRole.MCP_OFF,
+    UserRole.PRODUCTION_OFF,
+  ] as const,
   aliases: ["release", "pub", "publish"],
 
   fields: scopedObjectFieldNew(scopedTranslation, {

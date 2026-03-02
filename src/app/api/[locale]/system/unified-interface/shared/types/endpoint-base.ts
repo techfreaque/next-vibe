@@ -13,6 +13,7 @@ import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
 } from "../../unified-ui/widgets/_shared/types";
+import type { EventSchemas } from "../../websocket/types";
 import type { CreateApiEndpoint } from "../endpoints/definition/create";
 import type { UnifiedField } from "./endpoint";
 import type { Methods } from "./enums";
@@ -35,6 +36,7 @@ export type CreateApiEndpointAny = CreateApiEndpoint<
     FieldUsageConfig,
     AnyChildrenConstrain<string, FieldUsageConfig>
   >,
+  EventSchemas, // TEvents
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   any, // RequestInput
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

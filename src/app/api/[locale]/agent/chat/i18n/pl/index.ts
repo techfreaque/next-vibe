@@ -1,9 +1,8 @@
 import { translations as creditsTranslations } from "../../../../credits/i18n/pl";
-import { translations as aiStreamTranslations } from "../../../ai-stream/i18n/pl";
+import { translations as aiStreamTranslations } from "../../../ai-stream/stream/i18n/pl";
 import { translations as fetchUrlContentTranslations } from "../../../fetch-url-content/i18n/pl";
 import { translations as postaćsTranslations } from "../../characters/i18n/pl";
 import { translations as favoritesTranslations } from "../../favorites/i18n/pl";
-import { translations as filesTranslations } from "../../files/[threadId]/[filename]/i18n/pl";
 import { translations as foldersTranslations } from "../../folders/i18n/pl";
 import { translations as memoriesTranslations } from "../../memories/i18n/pl";
 import { translations as settingsTranslations } from "../../settings/i18n/pl";
@@ -452,7 +451,6 @@ export const translations: typeof enTranslations = {
   },
   aiStream: aiStreamTranslations,
   credits: creditsTranslations,
-  files: filesTranslations,
   folders: foldersTranslations,
   memories: memoriesTranslations,
   characters: postaćsTranslations,

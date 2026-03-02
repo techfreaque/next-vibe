@@ -33,8 +33,9 @@ import { chatMessages } from "../../chat/db";
 import { ChatMessageRole } from "../../chat/enum";
 import { chatFavorites } from "../../chat/favorites/db";
 import { ensureThread } from "../../chat/threads/repository";
-import type { AiStreamPostRequestOutput } from "../definition";
-import type { AiStreamT } from "../i18n";
+import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
+import type { AiStreamPostRequestOutput } from "../stream/definition";
+import type { AiStreamT } from "../stream/i18n";
 import { AiStreamRepository } from "./index";
 
 /* eslint-disable i18next/no-literal-string */
@@ -411,7 +412,7 @@ export async function runHeadlessAiStream(
       tools: availableTools ?? null,
       toolConfirmations: null,
       messageHistory: [] as AiStreamPostRequestOutput["messageHistory"],
-      voiceMode: null,
+      voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE },
       audioInput: { file: null },
       resumeToken: null,
       timezone: "UTC",

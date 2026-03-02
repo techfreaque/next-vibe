@@ -25,6 +25,16 @@ export const translations: typeof enTranslations = {
         title: "Next.js-Befehl überspringen",
         description: "Next.js-Startbefehl überspringen",
       },
+      mode: {
+        title: "Server-Modus",
+        description:
+          "Welche Subsysteme ausgeführt werden: all (Standard), web (nur Next.js + WS), tasks (nur Task Runner)",
+        options: {
+          all: "Alle (Standard)",
+          web: "Nur Web (Next.js + WebSocket)",
+          tasks: "Nur Tasks (Cron Runner)",
+        },
+      },
       seed: {
         title: "Seeding ausführen",
         description: "Datenbank-Seeding beim Start ausführen",

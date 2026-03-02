@@ -7,7 +7,7 @@ import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { UseAIStreamReturn } from "../../../../../../ai-stream/hooks/use-ai-stream";
+import type { UseAIStreamReturn } from "../../../../../../ai-stream/stream/hooks/use-ai-stream";
 import type { DefaultFolderId } from "../../../../../config";
 import type { ChatMessage } from "../../../../../db";
 import type { ToolConfigItem } from "../../../../../settings/definition";
@@ -31,7 +31,6 @@ export interface BranchMessageDeps {
     ttsAutoplay: boolean;
     ttsVoice: typeof TtsVoiceValue;
   };
-  deductCredits: (creditCost: number, feature: string) => void;
 }
 
 export async function branchMessage(

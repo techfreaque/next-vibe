@@ -6,6 +6,8 @@ export const translations = {
     emails: "Emails",
     cronTasks: "Cron Tasks",
     sshAccess: "SSH / Machine",
+    endpoints: "Endpoints",
+    vibeFrame: "Vibe Frame",
     admin: "Admin",
     adminPanel: "Admin Panel",
     administrator: "Administrator",

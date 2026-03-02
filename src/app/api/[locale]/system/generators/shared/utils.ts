@@ -58,7 +58,7 @@ export function findFilesRecursively(
     }
   }
 
-  return results;
+  return results.toSorted();
 }
 
 /**

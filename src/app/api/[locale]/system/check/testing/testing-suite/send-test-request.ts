@@ -18,6 +18,7 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interfac
 import type { UnifiedField } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint";
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import type { EventSchemas } from "@/app/api/[locale]/system/unified-interface/websocket/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { defaultLocale } from "@/i18n/core/config";
 
@@ -52,19 +53,22 @@ export async function sendTestRequest<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
-    TFields
+    TFields,
+    EventSchemas
   >;
   data?: CreateApiEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
-    TFields
+    TFields,
+    EventSchemas
   >["types"]["RequestOutput"];
   urlPathParams?: CreateApiEndpoint<
     TMethod,
     TUserRoleValue,
     TScopedTranslationKey,
-    TFields
+    TFields,
+    EventSchemas
   >["types"]["UrlVariablesOutput"];
   user: JwtPayloadType;
 }): Promise<
@@ -73,7 +77,8 @@ export async function sendTestRequest<
       TMethod,
       TUserRoleValue,
       TScopedTranslationKey,
-      TFields
+      TFields,
+      EventSchemas
     >["types"]["ResponseOutput"]
   >
 > {

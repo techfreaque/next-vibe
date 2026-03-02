@@ -8,23 +8,27 @@ import "server-only";
 import type { JSONValue } from "ai";
 import type { NextRequest } from "next/server";
 import {
-  createStreamingResponse,
   ErrorResponseTypes,
   fail,
   type ResponseType,
-  type StreamingResponse,
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import {
+  createMessagesEmitter,
+  type WsEmitCallback,
+} from "../../chat/threads/[threadId]/messages/emitter";
+import { createStreamEvent } from "../../chat/threads/[threadId]/messages/events";
 import { scopedTranslation as sttScopedTranslation } from "../../speech-to-text/i18n";
 import type {
   AiStreamPostRequestOutput,
   AiStreamPostResponseOutput,
-} from "../definition";
-import type { AiStreamT } from "../i18n";
+} from "../stream/definition";
+import type { AiStreamT } from "../stream/i18n";
+import { clearStreamingState } from "./core/stream-registry";
 import { CompactingHandler } from "./handlers/compacting-handler";
 import { InitialEventsHandler } from "./handlers/initial-events-handler";
 import { MessageContextBuilder } from "./handlers/message-context-builder";
@@ -79,10 +83,7 @@ function extractUserIdentifiers(
  * AI Stream Repository Implementation
  */
 export class AiStreamRepository {
-  /**
-   * Headless overload — no SSE, returns structured result with threadId + lastAiMessageId.
-   * DB writes happen normally; caller reads message content from DB using lastAiMessageId.
-   */
+  /** Headless overload — returns structured result with threadId + lastAiMessageId */
   static createAiStream(params: {
     data: AiStreamPostRequestOutput;
     locale: CountryLanguage;
@@ -95,9 +96,7 @@ export class AiStreamRepository {
     excludeMemories?: boolean;
   }): Promise<ResponseType<HeadlessAiStreamResult>>;
 
-  /**
-   * Streaming overload — returns SSE StreamingResponse (or ResponseType on validation error).
-   */
+  /** Interactive overload — returns response output (events stream via WS) */
   static createAiStream(params: {
     data: AiStreamPostRequestOutput;
     locale: CountryLanguage;
@@ -108,7 +107,7 @@ export class AiStreamRepository {
     t: AiStreamT;
     extraInstructions?: string;
     excludeMemories?: boolean;
-  }): Promise<ResponseType<AiStreamPostResponseOutput> | StreamingResponse>;
+  }): Promise<ResponseType<AiStreamPostResponseOutput>>;
 
   static async createAiStream({
     data,
@@ -132,7 +131,6 @@ export class AiStreamRepository {
     excludeMemories?: boolean;
   }): Promise<
     | ResponseType<AiStreamPostResponseOutput>
-    | StreamingResponse
     | ResponseType<HeadlessAiStreamResult>
   > {
     const { userId, leadId, ipAddress } = extractUserIdentifiers(
@@ -187,7 +185,6 @@ export class AiStreamRepository {
       toolsConfig,
       activeToolNames,
       provider,
-      encoder,
       streamAbortController,
       effectiveCompactTrigger,
       streamContext,
@@ -197,14 +194,15 @@ export class AiStreamRepository {
     let capturedLastAiMessageId: string = aiMessageId;
     let capturedLastAiMessageContent: string | null = null;
 
+    // Create emitter on the messages channel — events are owned by messages endpoint
+    const wsEmit: WsEmitCallback = createMessagesEmitter(
+      threadResultThreadId,
+      logger,
+    );
+
     // Step 9: Start AI streaming (for all operations including answer-as-ai)
     try {
-      // Shared inner function — runs compacting check + executeStream.
-      // Used by both SSE and headless paths so there is zero code duplication.
-
-      const runStream = async (
-        controller: ReadableStreamDefaultController<Uint8Array>,
-      ): Promise<void> => {
+      const runStream = async (): Promise<void> => {
         // Initialize stream context, TTS handler, and emit tool confirmations.
         // User MESSAGE_CREATED is emitted below, after the compacting check.
         const { ctx, ttsHandler, emittedToolResultIds } =
@@ -213,7 +211,6 @@ export class AiStreamRepository {
             aiMessageId,
             effectiveParentMessageId,
             messageDepth,
-            isHeadless: headless,
             toolConfirmationResults,
             voiceMode,
             fileUploadPromise,
@@ -221,11 +218,10 @@ export class AiStreamRepository {
             isIncognito,
             threadId: threadResultThreadId,
             messages,
-            controller,
-            encoder,
             locale,
             user,
             logger,
+            wsEmit,
           });
 
         try {
@@ -248,7 +244,7 @@ export class AiStreamRepository {
               compactTrigger: effectiveCompactTrigger,
             });
 
-          logger.info("[Compacting] Check result", {
+          logger.debug("[Compacting] Check result", {
             shouldCompact: compactingCheck.shouldCompact,
             totalTokens: compactingCheck.totalTokens,
             messagesToCompactCount: compactingCheck.messagesToCompact.length,
@@ -258,10 +254,8 @@ export class AiStreamRepository {
           // Emit USER MESSAGE_CREATED AFTER the compacting check so ordering is always correct:
           // - Non-compacting: user message emitted here with original parentId
           // - Compacting: CompactingHandler emits it with parentId = compactingMessageId
-          // This is the only place user message emission happens for non-tool-confirmation streams.
-          // Skipped in headless — no SSE client to receive it (dbWriter.enqueue is a noop anyway).
+          // Emit user MESSAGE_CREATED — WS subscribers see the user message appear.
           if (
-            !headless &&
             userMessageId &&
             data.operation !== "answer-as-ai" &&
             !compactingCheck.shouldCompact
@@ -336,7 +330,6 @@ export class AiStreamRepository {
 
               // STOP - don't continue with broken state
               ctx.cleanup();
-              ctx.dbWriter.closeController();
               return;
             }
 
@@ -380,7 +373,6 @@ export class AiStreamRepository {
 
               // STOP - don't continue with broken state
               ctx.cleanup();
-              ctx.dbWriter.closeController();
               return;
             }
 
@@ -472,6 +464,11 @@ export class AiStreamRepository {
             );
           }
         } catch (error) {
+          // Cancel TTS to avoid wasting API calls + credits after error/disconnect
+          if (ttsHandler) {
+            ttsHandler.cancel();
+          }
+
           await StreamErrorCatchHandler.handleError({
             error: error as Error | JSONValue,
             ctx,
@@ -485,23 +482,13 @@ export class AiStreamRepository {
         }
       };
 
-      // ── Headless path — run synchronously, return lastAiMessageId ──────────
       if (headless) {
-        // The writer has isHeadless=true so controller.enqueue is never called.
-        // We still need to satisfy the ReadableStreamDefaultController type —
-        // capture a real controller from a throwaway stream (never consumed).
-        const noopController = await new Promise<
-          ReadableStreamDefaultController<Uint8Array>
-        >((resolve) => {
-          // eslint-disable-next-line no-new
-          new ReadableStream<Uint8Array>({
-            start: (ctrl): void => {
-              resolve(ctrl);
-            },
-          });
-        });
-
-        await runStream(noopController);
+        // Headless path: must await to capture result
+        try {
+          await runStream();
+        } finally {
+          await clearStreamingState(threadResultThreadId);
+        }
 
         logger.info("[AI Stream] Headless execution complete", {
           threadId: threadResultThreadId,
@@ -518,31 +505,69 @@ export class AiStreamRepository {
         } satisfies ResponseType<HeadlessAiStreamResult>;
       }
 
-      // ── SSE path — wrap in ReadableStream, return streaming response ────────
-      const stream = new ReadableStream({
-        async start(controller): Promise<void> {
-          await runStream(controller);
-        },
+      // Interactive path: fire-and-forget — stream runs independently of HTTP connection.
+      // Events flow via WebSocket. The POST returns immediately with threadId.
+      // The finally block guarantees isStreaming is cleared even on unhandled crashes.
+      let streamFinishReason: "completed" | "cancelled" | "error" | "timeout" =
+        "completed";
 
-        // Client disconnect is intentionally ignored — the stream continues
-        // writing to DB so messages are fully persisted even if the user
-        // navigates away. The client can re-fetch from DB on return.
-        cancel(): void {
-          logger.info(
-            "[AI Stream] Client disconnected — stream continues server-side",
+      void runStream()
+        .catch((error) => {
+          const msg = error instanceof Error ? error.message : String(error);
+          logger.error("[AI Stream] Background stream failed", {
+            error: msg,
+            threadId: threadResultThreadId,
+          });
+          streamFinishReason = msg.includes("timeout")
+            ? "timeout"
+            : msg.includes("cancel")
+              ? "cancelled"
+              : "error";
+        })
+        .finally(() => {
+          // Determine finish reason: if AbortErrorHandler handled it gracefully
+          // (runStream resolved instead of rejecting), check the abort signal.
+          if (
+            streamFinishReason === "completed" &&
+            streamAbortController.signal.aborted
+          ) {
+            const reason = streamAbortController.signal.reason;
+            const reasonMsg =
+              reason instanceof Error ? reason.message : String(reason ?? "");
+            streamFinishReason = reasonMsg.includes("timeout")
+              ? "timeout"
+              : "cancelled";
+          }
+
+          // Emit STREAM_FINISHED so all WS subscribers know the stream is done
+          wsEmit(
+            createStreamEvent.streamFinished({
+              threadId: threadResultThreadId,
+              reason: streamFinishReason,
+            }),
           );
-        },
+
+          void clearStreamingState(threadResultThreadId).catch((err) => {
+            logger.error("[AI Stream] Failed to clear streaming state", {
+              error: err instanceof Error ? err.message : String(err),
+              threadId: threadResultThreadId,
+            });
+          });
+        });
+
+      logger.debug("[AI Stream] Interactive stream started (fire-and-forget)", {
+        threadId: threadResultThreadId,
+        messageId: aiMessageId,
       });
 
-      return createStreamingResponse(
-        new Response(stream, {
-          headers: {
-            "Content-Type": "text/event-stream",
-            "Cache-Control": "no-cache",
-            Connection: "keep-alive",
-          },
-        }),
-      );
+      return {
+        success: true,
+        data: {
+          success: true,
+          messageId: aiMessageId,
+          responseThreadId: threadResultThreadId,
+        },
+      } satisfies ResponseType<AiStreamPostResponseOutput>;
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -550,6 +575,19 @@ export class AiStreamRepository {
         error: errorMessage,
         model: data.model,
       });
+
+      // Safety net: clear streaming state if threadId is available
+      if (threadResultThreadId) {
+        await clearStreamingState(threadResultThreadId).catch((err) => {
+          logger.error(
+            "[AI Stream] Failed to clear streaming state in outer catch",
+            {
+              error: err instanceof Error ? err.message : String(err),
+              threadId: threadResultThreadId,
+            },
+          );
+        });
+      }
 
       return fail({
         message: aiStreamT("route.errors.streamCreationFailed"),

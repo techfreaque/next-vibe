@@ -255,7 +255,7 @@ export class ToolCallHandler {
       };
     }
 
-    logger.info(
+    logger.debug(
       "[AI Stream] Tool does NOT require confirmation - AI SDK will execute automatically",
       { messageId: toolMessageId, toolName: part.toolName, toolCallId },
     );

@@ -8,14 +8,17 @@ import { parseError } from "next-vibe/shared/utils";
 import { getLastMessageInBranch } from "@/app/[locale]/chat/lib/utils/thread-builder";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
+import { success } from "@/app/api/[locale]/shared/types/response.schema";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { UseAIStreamReturn } from "../../../../../../ai-stream/hooks/use-ai-stream";
+import type { UseAIStreamReturn } from "../../../../../../ai-stream/stream/hooks/use-ai-stream";
 import { DefaultFolderId } from "../../../../../config";
 import type { ChatMessage, ChatThread } from "../../../../../db";
 import { ThreadStatus } from "../../../../../enum";
 import { useChatStore } from "../../../../../hooks/store";
 import type { ToolConfigItem } from "../../../../../settings/definition";
+import threadsDefinition from "../../../../../threads/definition";
 import { createAndSendUserMessage } from "./shared";
 
 export interface SendMessageParams {
@@ -54,7 +57,6 @@ export interface SendMessageDeps {
   };
   setInput: (input: string) => void;
   setAttachments: (attachments: File[] | ((prev: File[]) => File[])) => void;
-  deductCredits: (creditCost: number, feature: string) => void;
 }
 
 export async function sendMessage(
@@ -76,7 +78,6 @@ export async function sendMessage(
     settings,
     setInput,
     setAttachments,
-    deductCredits,
   } = deps;
   const { content } = params;
 
@@ -176,8 +177,12 @@ export async function sendMessage(
         updatedAt: new Date(),
         searchVector: null,
         published: false,
+        isStreaming: false,
       };
       useChatStore.getState().addThread(newThread);
+      useChatStore
+        .getState()
+        .markThreadPendingCreate(createdThreadIdForNewThread);
 
       if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
         const { createIncognitoThread } =
@@ -189,6 +194,46 @@ export async function sendMessage(
           createdThreadIdForNewThread,
         );
       }
+
+      // Optimistically update the sidebar threads list
+      const now = new Date();
+      const optimisticThread = {
+        id: createdThreadIdForNewThread,
+        title: content.slice(0, 50) || "New Chat",
+        rootFolderId: currentRootFolderId,
+        folderId: currentSubFolderId,
+        status: ThreadStatus.ACTIVE,
+        preview: null,
+        pinned: false,
+        archived: false,
+        rolesView: null,
+        rolesEdit: null,
+        rolesPost: null,
+        rolesModerate: null,
+        rolesAdmin: null,
+        canEdit: true,
+        canPost: true,
+        canModerate: false,
+        canDelete: true,
+        canManagePermissions: false,
+        createdAt: now,
+        updatedAt: now,
+      };
+      apiClient.updateEndpointData(
+        threadsDefinition.GET,
+        logger,
+        (oldData) => {
+          if (!oldData?.success) {
+            return oldData;
+          }
+          return success({
+            ...oldData.data,
+            threads: [optimisticThread, ...oldData.data.threads],
+            totalCount: oldData.data.totalCount + 1,
+          });
+        },
+        undefined,
+      );
     }
 
     const finalThreadId = threadIdToUse || createdThreadIdForNewThread;
@@ -221,7 +266,6 @@ export async function sendMessage(
         currentRootFolderId,
         currentSubFolderId,
         settings,
-        deductCredits,
         setInput,
         setAttachments,
       },

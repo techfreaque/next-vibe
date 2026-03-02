@@ -32,7 +32,7 @@ import type { TranslatedKeyType } from "@/i18n/core/scoped-translation";
 import { simpleT } from "@/i18n/core/shared";
 import type { TParams } from "@/i18n/core/static-types";
 
-import type { AiStreamTranslationKey } from "../i18n";
+import type { AiStreamTranslationKey } from "../stream/i18n";
 
 type AiStreamModuleT = (
   key: AiStreamTranslationKey,
@@ -46,7 +46,7 @@ type SttModuleT = ReturnType<typeof sttScopedTranslation.scopedT>["t"];
 import { DEFAULT_CHARACTERS } from "../../chat/characters/config";
 import { customCharacters } from "../../chat/characters/db";
 import type { ToolExecutionContext } from "../../chat/config";
-import type { ToolCall } from "../../chat/db";
+import { chatThreads, type ToolCall } from "../../chat/db";
 import type { ChatMessageRole } from "../../chat/enum";
 import { chatFavorites } from "../../chat/favorites/db";
 import { chatSettings } from "../../chat/settings/db";
@@ -56,11 +56,12 @@ import {
   DEFAULT_TTS_VOICE,
   type TtsVoiceValue,
 } from "../../text-to-speech/enum";
-import { type AiStreamPostRequestOutput } from "../definition";
+import { type AiStreamPostRequestOutput } from "../stream/definition";
 import { AbortControllerSetup } from "./core/abort-controller-setup";
 import { COMPACT_TRIGGER } from "./core/constants";
 import { CreditValidatorHandler } from "./core/credit-validator-handler";
 import { ProviderFactory as ProviderFactoryClass } from "./core/provider-factory";
+import { StreamRegistry } from "./core/stream-registry";
 import { ToolsSetupHandler } from "./core/tools-setup-handler";
 import { MessageContextBuilder } from "./handlers/message-context-builder";
 import { OperationHandler } from "./handlers/operation-handler";
@@ -162,8 +163,6 @@ export interface StreamSetupResult {
   effectiveCompactTrigger: number;
   /** Provider for AI streaming */
   provider: ReturnType<typeof ProviderFactoryClass.getProviderForModel>;
-  /** Text encoder for SSE stream */
-  encoder: TextEncoder;
   /** Abort controller for stream timeout and cancellation */
   streamAbortController: AbortController;
   /** Rich context for tool executions — rootFolderId, threadId, aiMessageId, etc. */
@@ -755,14 +754,26 @@ export async function setupAiStream(params: {
     supportsTools: modelConfig?.supportsTools,
   });
 
-  // Create SSE stream encoder
-  const encoder = new TextEncoder();
-
-  // Create abort controller for this stream - combines request signal with timeout
+  // Create abort controller for this stream (timeout only — no request.signal linkage)
   const streamAbortController = AbortControllerSetup.setupAbortController({
     maxDuration: params.maxDuration,
-    request: params.request,
   });
+
+  // Register in stream registry so the cancel endpoint can find and abort it
+  StreamRegistry.register(
+    threadResult.threadId,
+    streamAbortController,
+    userId,
+    leadId,
+  );
+
+  // Mark thread as streaming in DB (for refresh recovery + cross-tab detection)
+  if (!isIncognito) {
+    await db
+      .update(chatThreads)
+      .set({ isStreaming: true })
+      .where(eq(chatThreads.id, threadResult.threadId));
+  }
 
   return {
     success: true,
@@ -803,7 +814,6 @@ export async function setupAiStream(params: {
       toolsConfig,
       activeToolNames,
       provider,
-      encoder,
       streamAbortController,
       effectiveCompactTrigger,
       streamContext,

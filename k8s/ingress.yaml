@@ -1,0 +1,43 @@
+# Ingress: routes HTTP and WebSocket traffic to the web service
+# Adjust annotations for your ingress controller (nginx shown here)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: next-vibe-ingress
+  namespace: next-vibe
+  annotations:
+    # nginx ingress controller
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    # WebSocket support
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+    nginx.ingress.kubernetes.io/upstream-hash-by: "$remote_addr"
+    # TLS via cert-manager (optional)
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  # Uncomment for TLS:
+  # tls:
+  #   - hosts:
+  #       - your-domain.com
+  #     secretName: next-vibe-tls
+  rules:
+    - host: your-domain.com
+      http:
+        paths:
+          # WebSocket sidecar — must come before the catch-all
+          - path: /ws
+            pathType: Prefix
+            backend:
+              service:
+                name: next-vibe-web
+                port:
+                  number: 4000
+          # All other traffic → Next.js
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: next-vibe-web
+                port:
+                  number: 3000

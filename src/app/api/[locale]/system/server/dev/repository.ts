@@ -7,7 +7,7 @@
 // CLI output messages don't need internationalization
 
 import type { ChildProcess } from "node:child_process";
-import { execSync, spawn } from "node:child_process";
+import { execSync } from "node:child_process";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
@@ -487,6 +487,11 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         }
       }
 
+      // Deploy db-functions (idempotent — runs after every migration)
+      const { deployDbFunctions } =
+        await import("@/app/api/[locale]/system/db/db-functions/deploy");
+      await deployDbFunctions(logger);
+
       // Seed database if not skipped
       if (data.skipSeeding) {
         logger.vibe(formatSkip("Database seeding skipped"));
@@ -618,61 +623,65 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   }
 
   /**
-   * Start Next.js and wait for it to exit
+   * Start Next.js dev server + WebSocket sidecar and wait forever
    */
   private async startNextJsAndWait(
     port: number,
     logger: EndpointLogger,
   ): Promise<never> {
-    logger.info(`🌐 Starting Next.js on port ${port}...`);
+    const { spawn } = await import("node:child_process");
 
     // Kill any stale process on the target port before starting
     this.killProcessOnPort(port, logger);
 
-    const nextProcess = this.startNextJsProcess(port, logger);
+    // --- Start Next.js directly on the user-facing port ---
+    const nextProcess = spawn(
+      "bun",
+      ["run", "next", "dev", "--port", String(port)],
+      { stdio: "inherit" },
+    );
+    this.runningProcesses.set("next", nextProcess);
 
-    // Set up SIGINT handler to prevent parent from exiting before child
-    // Both parent and child receive SIGINT from terminal, but we want to wait
-    // for child to finish cleanly before parent exits
-    // oxlint-disable-next-line consistent-function-scoping
+    logger.info(
+      `Next.js dev spawned on port ${port} (PID: ${String(nextProcess.pid)})`,
+    );
+
+    // --- Start WebSocket sidecar on port + 1000 ---
+    const { startWebSocketServer, WS_PORT_OFFSET } =
+      await import("@/app/api/[locale]/system/unified-interface/websocket/server");
+
+    const wsPort = port + WS_PORT_OFFSET;
+    const wsHandle = startWebSocketServer({ port: wsPort, logger });
+
+    // Set up SIGINT/SIGTERM handler for graceful shutdown
     const sigintHandler = (): void => {
-      // Do nothing - just prevent default exit behavior
-      // Child already received SIGINT from terminal and is shutting down
-      // We'll exit when child exits via the 'exit' event below
+      wsHandle.stop();
+      if (!nextProcess.killed) {
+        nextProcess.kill("SIGTERM");
+      }
+      cleanupPidFile(VIBE_DEV_PID_FILE);
+
+      const randomMessage =
+        SHUTDOWN_MESSAGES[Math.floor(Math.random() * SHUTDOWN_MESSAGES.length)];
+      // eslint-disable-next-line i18next/no-literal-string
+      process.stdout.write(`\n${randomMessage}\n`);
+      process.exit(0);
     };
     process.on("SIGINT", sigintHandler);
+    process.on("SIGTERM", sigintHandler);
 
-    // Wait for Next.js to exit, then give time for buffered output
+    // Also exit if Next.js dies
+    nextProcess.on("exit", (code) => {
+      logger.info(`Next.js exited with code ${String(code)}`);
+      wsHandle.stop();
+      cleanupPidFile(VIBE_DEV_PID_FILE);
+      process.exit(code ?? 1);
+    });
+
+    // Keep the process alive indefinitely
     return await new Promise<never>(() => {
-      nextProcess.on("exit", (code) => {
-        // Remove our SIGINT handler now that child has exited
-        process.removeListener("SIGINT", sigintHandler);
-
-        // Clean up PID file
-        cleanupPidFile(VIBE_DEV_PID_FILE);
-
-        // Wait briefly for stdio streams to finish (child might have buffered output)
-        // This prevents terminal pollution from warnings like browserslist age warnings
-        setTimeout(() => {
-          // Pick a random shutdown message
-          const randomMessage =
-            SHUTDOWN_MESSAGES[
-              Math.floor(Math.random() * SHUTDOWN_MESSAGES.length)
-            ];
-          // eslint-disable-next-line i18next/no-literal-string
-          process.stdout.write(`\n${randomMessage}\n`);
-          // Exit with the same code as Next.js
-          process.exit(code ?? 0);
-        }, 100);
-      });
-
-      nextProcess.on("error", (error) => {
-        process.removeListener("SIGINT", sigintHandler);
-        cleanupPidFile(VIBE_DEV_PID_FILE);
-        // eslint-disable-next-line i18next/no-literal-string
-        process.stderr.write(`❌ Next.js error: ${error.message}\n`);
-        process.exit(1);
-      });
+      // This promise never resolves
+      // The only way out is through signal handlers
     });
   }
 
@@ -779,39 +788,31 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
   }
 
   /**
-   * Kill any process occupying the given port
+   * Kill any process occupying the given port and wait until it's free.
    */
   private killProcessOnPort(port: number, logger: EndpointLogger): void {
     try {
       // fuser is more reliable than lsof for finding processes on a port
       execSync(`fuser -k ${port}/tcp 2>/dev/null`, { encoding: "utf-8" });
       logger.info(`Killed stale process on port ${port}`);
-      execSync("sleep 0.5");
     } catch {
       // No process on port or kill failed — both are fine
     }
-  }
 
-  /**
-   * Start Next.js development server using spawn
-   */
-  private startNextJsProcess(
-    port: number,
-    logger: EndpointLogger,
-  ): ChildProcess {
-    const args = ["run", "next", "dev", "--port", port.toString()];
-    logger.debug(`Starting Next.js with args: ${args.join(" ")}`);
-    const nextProcess = spawn("bun", args, {
-      stdio: "inherit", // Pass output directly to stdout/stderr
-      // Keep in same process group (default) so Ctrl+C propagates naturally
-      // When terminal sends SIGINT, both parent and child receive it
-      detached: false,
-    });
+    // Wait until the port is actually released (up to 5 seconds)
+    const deadline = Date.now() + 5000;
+    while (Date.now() < deadline) {
+      try {
+        execSync(`fuser ${port}/tcp 2>/dev/null`, { encoding: "utf-8" });
+        // fuser succeeded → port still occupied, keep waiting
+        execSync("sleep 0.1");
+      } catch {
+        // fuser exited non-zero → port is free
+        return;
+      }
+    }
 
-    // Store the process for cleanup
-    this.runningProcesses.set("next-dev", nextProcess);
-
-    return nextProcess;
+    logger.warn(`Port ${port} did not free up within 5 seconds`);
   }
 }
 

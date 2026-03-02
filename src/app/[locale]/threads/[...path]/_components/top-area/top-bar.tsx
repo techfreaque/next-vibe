@@ -1,0 +1,184 @@
+"use client";
+
+import { Button } from "next-vibe-ui/ui/button";
+import { Dialog, DialogContent } from "next-vibe-ui/ui/dialog";
+import { Div } from "next-vibe-ui/ui/div";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "next-vibe-ui/ui/dropdown-menu";
+import {
+  ChevronRight,
+  MessageSquarePlus,
+  PanelLeft,
+  Settings,
+} from "next-vibe-ui/ui/icons";
+import { Span } from "next-vibe-ui/ui/span";
+import type { JSX } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+
+import { Logo } from "@/app/[locale]/_components/logo";
+import { ThemeToggleDropdown } from "@/app/[locale]/_components/theme-toggle";
+import { isDefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
+import { useChatStore } from "@/app/api/[locale]/agent/chat/hooks/store";
+import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
+import { useSidebarCollapsed } from "@/app/api/[locale]/agent/chat/hooks/use-sidebar-collapsed";
+import { scopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
+import type { CountryLanguage } from "@/i18n/core/config";
+
+import { LocaleSelectorContent } from "./locale-selector-content";
+
+interface TopBarProps {
+  currentCountry: { flag: string; name: string };
+  locale: CountryLanguage;
+}
+
+export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
+  const messages = useChatStore((s) => s.messages);
+  const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
+  const currentRootFolderId = useChatNavigationStore(
+    (s) => s.currentRootFolderId,
+  );
+  const currentSubFolderId = useChatNavigationStore(
+    (s) => s.currentSubFolderId,
+  );
+  const setNavigation = useChatNavigationStore((s) => s.setNavigation);
+  const folders = useChatStore((s) => s.folders);
+  const [sidebarCollapsed, setSidebarCollapsed] = useSidebarCollapsed();
+
+  // Inline handleCreateThread — navigates to new thread in current or specified folder
+  const handleCreateThread = useCallback(
+    (folderId?: string | null): void => {
+      let rootId = currentRootFolderId;
+      let subId = currentSubFolderId;
+
+      if (folderId) {
+        if (isDefaultFolderId(folderId)) {
+          rootId = folderId;
+          subId = null;
+        } else {
+          const folder = folders[folderId];
+          if (folder) {
+            rootId = folder.rootFolderId;
+            subId = folderId;
+          }
+        }
+      }
+
+      setNavigation({
+        activeThreadId: "new",
+        currentRootFolderId: rootId,
+        currentSubFolderId: subId,
+      });
+      const url = subId
+        ? `/${locale}/threads/${rootId}/${subId}/new`
+        : `/${locale}/threads/${rootId}/new`;
+      window.history.pushState(null, "", url);
+    },
+    [currentRootFolderId, currentSubFolderId, folders, setNavigation, locale],
+  );
+
+  const { t } = scopedTranslation.scopedT(locale);
+  const [mounted, setMounted] = useState(false);
+  const [localeDialogOpen, setLocaleDialogOpen] = useState(false);
+
+  // Prevent hydration mismatch by only rendering conditional UI after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  return (
+    <>
+      <Dialog open={localeDialogOpen} onOpenChange={setLocaleDialogOpen}>
+        <DialogContent className="max-w-md">
+          <LocaleSelectorContent />
+        </DialogContent>
+      </Dialog>
+
+      <Div className="absolute top-4 left-4 z-51 flex flex-row gap-1 ">
+        {/* Menu Button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          className="bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9"
+          title={t("common.toggleSidebar")}
+          data-tour="sidebar-toggle"
+        >
+          <PanelLeft className="h-5 w-5" />
+        </Button>
+
+        {/* Settings Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9"
+              title={t("common.settings")}
+              suppressHydrationWarning
+            >
+              <Settings className="h-5 w-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56">
+            {/* Theme Toggle */}
+            <ThemeToggleDropdown locale={locale} />
+
+            {/* Locale Selector - Desktop: Sub-menu, Mobile: Dialog */}
+            <Div className="hidden md:block">
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="cursor-pointer">
+                  <Span className="mr-2">{currentCountry.flag}</Span>
+                  <Span>{currentCountry.name}</Span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <LocaleSelectorContent />
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+            </Div>
+            <DropdownMenuItem
+              className="cursor-pointer md:hidden flex items-center justify-between"
+              onSelect={(e) => {
+                e.preventDefault();
+                setLocaleDialogOpen(true);
+              }}
+            >
+              <Div className="flex items-center">
+                <Span className="mr-2">{currentCountry.flag}</Span>
+                <Span>{currentCountry.name}</Span>
+              </Div>
+              <ChevronRight className="h-4 w-4 ml-auto" />
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {mounted && sidebarCollapsed && activeThreadId !== NEW_MESSAGE_ID && (
+          <>
+            {/* New Chat Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleCreateThread(null)}
+              className="bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9"
+              title={t("common.newChat")}
+            >
+              <MessageSquarePlus className="h-5 w-5" />
+            </Button>
+          </>
+        )}
+        {(!sidebarCollapsed || Object.keys(messages).length === 0) && (
+          <Div className="flex-1 flex justify-center">
+            <Logo locale={locale} pathName="" size="h-8" />
+          </Div>
+        )}
+      </Div>
+    </>
+  );
+}

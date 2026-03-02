@@ -27,6 +27,10 @@ export const translations: typeof enTranslations = {
       description: "Eindeutige Kennung für den Thread",
       placeholder: "Thread-ID eingeben...",
     },
+    rootFolderId: {
+      label: "Stammordner",
+      description: "Stammordner des Threads (für Client-Routing verwendet)",
+    },
     response: {
       thread: {
         title: "Thread-Details",
@@ -150,6 +154,10 @@ export const translations: typeof enTranslations = {
         title: "Thread-Aktualisierungen",
         description: "Zu aktualisierende Felder",
       },
+    },
+    rootFolderId: {
+      label: "Stammordner",
+      description: "Stammordner des Threads (für Client-Routing verwendet)",
     },
     threadTitle: {
       label: "Titel",
@@ -312,6 +320,10 @@ export const translations: typeof enTranslations = {
       description: "Eindeutige Kennung für den zu löschenden Thread",
       placeholder: "Thread-ID eingeben...",
       helpText: "WARNUNG: Diese Aktion kann nicht rückgängig gemacht werden",
+    },
+    rootFolderId: {
+      label: "Stammordner",
+      description: "Stammordner des Threads (für Client-Routing verwendet)",
     },
     response: {
       success: {

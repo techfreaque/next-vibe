@@ -12,6 +12,7 @@ import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
 } from "../../../unified-ui/widgets/_shared/types";
+import type { EventSchemas } from "../../../websocket/types";
 import type { CreateApiEndpoint } from "../../endpoints/definition/create";
 import { objectField } from "../../field/utils";
 import type { UnifiedField } from "../../types/endpoint";
@@ -147,7 +148,8 @@ type GenericEndpoint = CreateApiEndpoint<
     z.ZodTypeAny,
     FieldUsageConfig,
     AnyChildrenConstrain<string, FieldUsageConfig>
-  >
+  >,
+  EventSchemas
 >;
 
 type Test6_1_GenericEndpointExtendsAny =
@@ -164,7 +166,8 @@ type SpecificEndpoint = CreateApiEndpoint<
     z.ZodTypeAny,
     FieldUsageConfig,
     AnyChildrenConstrain<string, FieldUsageConfig>
-  >
+  >,
+  EventSchemas
 >;
 
 type Test6_2_SpecificEndpointExtendsAny =

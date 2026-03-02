@@ -22,10 +22,12 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type {
   FolderDeleteResponseOutput,
   FolderGetResponseOutput,
-  FolderUpdateRequestOutput,
-  FolderUpdateResponseOutput,
 } from "./definition";
 import { scopedTranslation } from "./i18n";
+import type {
+  FolderUpdateRequestOutput,
+  FolderUpdateResponseOutput,
+} from "./update/definition";
 
 /**
  * Folder Repository - Static class pattern

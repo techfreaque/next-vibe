@@ -1,12 +1,12 @@
 /**
  * Navigation hooks for chat interface
- * Provides centralized navigation functions that use router.push()
- * These replace the old setActiveThread() and setCurrentFolder() store methods
+ * Updates the Zustand navigation store + pushes URL via history API.
+ * Store update is instant (re-renders immediately), URL follows synchronously.
+ * Uses window.history.pushState to avoid triggering server component re-renders.
  */
 
 "use client";
 
-import { useRouter } from "next-vibe-ui/hooks/use-navigation";
 import { useCallback } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -14,6 +14,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { DefaultFolderId } from "../config";
 import type { ChatThread } from "./store";
+import { useChatNavigationStore } from "./use-chat-navigation-store";
 
 /**
  * Build URL for a thread
@@ -82,22 +83,32 @@ export interface NavigationOperations {
 
 /**
  * Hook for navigation operations
- * Provides centralized navigation functions that use router.push()
+ * Updates Zustand store (instant) + pushes URL via history API
  */
 export function useNavigation(
   locale: CountryLanguage,
   logger: EndpointLogger,
   threads: Record<string, ChatThread>,
 ): NavigationOperations {
-  const router = useRouter();
+  const setNavigation = useChatNavigationStore((s) => s.setNavigation);
 
   const navigateToThread = useCallback(
     (threadId: string): void => {
       logger.debug("Navigation: Navigating to thread", { threadId });
+
+      // Update store — single source of truth
+      const thread = threads[threadId];
+      setNavigation({
+        activeThreadId: threadId,
+        currentRootFolderId: thread?.rootFolderId ?? undefined,
+        currentSubFolderId: thread?.folderId ?? undefined,
+      });
+
+      // Update URL without triggering server re-render
       const url = buildThreadUrl(locale, threadId, threads);
-      router.push(url);
+      window.history.pushState(null, "", url);
     },
-    [locale, logger, router, threads],
+    [locale, logger, threads, setNavigation],
   );
 
   const navigateToFolder = useCallback(
@@ -106,10 +117,17 @@ export function useNavigation(
         rootFolderId,
         subFolderId,
       });
+
+      setNavigation({
+        activeThreadId: null,
+        currentRootFolderId: rootFolderId,
+        currentSubFolderId: subFolderId,
+      });
+
       const url = buildFolderUrl(locale, rootFolderId, subFolderId);
-      router.push(url);
+      window.history.pushState(null, "", url);
     },
-    [locale, logger, router],
+    [locale, logger, setNavigation],
   );
 
   const navigateToNewThread = useCallback(
@@ -118,10 +136,17 @@ export function useNavigation(
         rootFolderId,
         subFolderId,
       });
+
+      setNavigation({
+        activeThreadId: "new",
+        currentRootFolderId: rootFolderId,
+        currentSubFolderId: subFolderId,
+      });
+
       const url = buildNewThreadUrl(locale, rootFolderId, subFolderId);
-      router.push(url);
+      window.history.pushState(null, "", url);
     },
-    [locale, logger, router],
+    [locale, logger, setNavigation],
   );
 
   return {

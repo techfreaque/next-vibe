@@ -5,6 +5,7 @@
  * Type-safe hooks for newsletter subscription management
  */
 
+import type { InputChangeEvent } from "next-vibe-ui/ui/input";
 import { useCallback, useMemo } from "react";
 
 import type { EndpointReturn } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
@@ -17,7 +18,6 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interfac
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 import type { TranslationKey } from "@/i18n/core/static-types";
-import type { InputChangeEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
 import { scopedTranslation } from "./i18n";
 import statusEndpoints from "./status/definition";

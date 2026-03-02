@@ -8,9 +8,9 @@ import { parseError } from "next-vibe/shared/utils";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { UseAIStreamReturn } from "../../../../../../ai-stream/hooks/use-ai-stream";
+import type { UseAIStreamReturn } from "../../../../../../ai-stream/stream/hooks/use-ai-stream";
+import { DEFAULT_TTS_VOICE } from "../../../../../../text-to-speech/enum";
 import { DefaultFolderId } from "../../../../../config";
-import { createCreditUpdateCallback } from "../../../../../credit-updater";
 import type { ChatMessage } from "../../../../../db";
 import { ChatMessageRole } from "../../../../../enum";
 import type { ToolConfigItem } from "../../../../../settings/definition";
@@ -31,7 +31,6 @@ export interface AnswerAsAIDeps {
     allowedTools: ToolConfigItem[] | null;
     pinnedTools: ToolConfigItem[] | null;
   };
-  deductCredits: (creditCost: number, feature: string) => void;
 }
 
 export async function answerAsAI(
@@ -47,7 +46,6 @@ export async function answerAsAI(
     currentSubFolderId,
     chatStore,
     settings,
-    deductCredits,
   } = deps;
 
   logger.debug("Answer as AI operation", {
@@ -91,42 +89,34 @@ export async function answerAsAI(
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     // Start AI stream
-    await aiStream.startStream(
-      {
-        operation: "answer-as-ai" as const,
-        rootFolderId: currentRootFolderId,
-        subFolderId: currentSubFolderId ?? null,
-        threadId: message.threadId ?? null,
-        userMessageId: aiMessageId,
-        parentMessageId: messageId ?? null,
-        content,
-        role: ChatMessageRole.ASSISTANT,
-        model: settings.selectedModel,
-        character: settings.selectedCharacter ?? null,
-        allowedTools:
-          settings.allowedTools?.map((t) => ({
-            toolId: t.toolId,
-            requiresConfirmation: t.requiresConfirmation ?? false,
-          })) ?? null,
-        tools:
-          settings.pinnedTools?.map((t) => ({
-            toolId: t.toolId,
-            requiresConfirmation: t.requiresConfirmation ?? false,
-          })) ?? null,
-        messageHistory: messageHistory ?? [],
-        attachments: attachments && attachments.length > 0 ? attachments : null,
-        toolConfirmations: null,
-        voiceMode: null,
-        audioInput: { file: null },
-        timezone,
-      },
-      {
-        onContentDone: createCreditUpdateCallback(
-          settings.selectedModel,
-          deductCredits,
-        ),
-      },
-    );
+    await aiStream.startStream({
+      operation: "answer-as-ai" as const,
+      rootFolderId: currentRootFolderId,
+      subFolderId: currentSubFolderId ?? null,
+      threadId: message.threadId ?? null,
+      userMessageId: aiMessageId,
+      parentMessageId: messageId ?? null,
+      content,
+      role: ChatMessageRole.ASSISTANT,
+      model: settings.selectedModel,
+      character: settings.selectedCharacter ?? null,
+      allowedTools:
+        settings.allowedTools?.map((t) => ({
+          toolId: t.toolId,
+          requiresConfirmation: t.requiresConfirmation ?? false,
+        })) ?? null,
+      tools:
+        settings.pinnedTools?.map((t) => ({
+          toolId: t.toolId,
+          requiresConfirmation: t.requiresConfirmation ?? false,
+        })) ?? null,
+      messageHistory: messageHistory ?? [],
+      attachments: attachments && attachments.length > 0 ? attachments : null,
+      toolConfirmations: null,
+      voiceMode: { enabled: false, voice: DEFAULT_TTS_VOICE },
+      audioInput: { file: null },
+      timezone,
+    });
   } catch (error) {
     logger.error("Failed to answer as AI", parseError(error));
   } finally {

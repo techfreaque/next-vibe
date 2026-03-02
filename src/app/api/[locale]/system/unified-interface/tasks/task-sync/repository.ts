@@ -218,10 +218,14 @@ export async function getUserCreatedTasks(params: {
   const { logger, t } = params;
 
   try {
+    // Only sync tasks that have an explicit targetInstance.
+    // null targetInstance = host-only, never shared with remote instances.
     const tasks = await db
       .select()
       .from(cronTasks)
-      .where(sql`${cronTasks.userId} IS NOT NULL`)
+      .where(
+        sql`${cronTasks.userId} IS NOT NULL AND ${cronTasks.targetInstance} IS NOT NULL`,
+      )
       .limit(100);
 
     return success({
@@ -341,19 +345,16 @@ export async function pullFromRemote(
     const { endpoints: syncEndpoints } = await import("./definition");
     const syncUrl = buildRemoteEndpointUrl(remoteUrl, syncEndpoints.POST);
 
-    // Collect shared memories to send alongside the sync request
-    const localMemories = await getSharedMemories({ logger });
-    const memoriesPayload =
-      localMemories.success && localMemories.data.memories.length > 0
-        ? JSON.stringify(localMemories.data.memories)
-        : undefined;
+    // Include local shared memories for bidirectional sync
+    const memResult = await getSharedMemories({ logger });
+    const localMemories = memResult.success ? memResult.data.memories : [];
 
     const response = await fetch(syncUrl, {
       method: "POST",
       headers: await buildRemoteSyncHeaders(remoteUrl, logger),
       body: JSON.stringify({
         apiKey,
-        ...(memoriesPayload && { memoriesJson: memoriesPayload }),
+        memoriesJson: JSON.stringify(localMemories),
       }),
       signal: AbortSignal.timeout(30000),
     });
@@ -390,12 +391,12 @@ export async function pullFromRemote(
     let pulled = 0;
     if (result.data.tasksJson) {
       const remoteTasks = JSON.parse(result.data.tasksJson) as SyncedCronTask[];
-      // Only pull tasks explicitly targeted at this instance
-      // (null targetInstance = host only, not synced to remote instances)
+      // Only pull tasks explicitly targeted at this instance.
+      // null targetInstance = host-only, never synced.
       const instanceId = env.INSTANCE_ID;
-      const relevantTasks = instanceId
-        ? remoteTasks.filter((t) => t.targetInstance === instanceId)
-        : remoteTasks;
+      const relevantTasks = remoteTasks.filter(
+        (t) => t.targetInstance !== null && t.targetInstance === instanceId,
+      );
 
       if (relevantTasks.length > 0) {
         logger.debug(

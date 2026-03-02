@@ -11,6 +11,7 @@ import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import {
   Clock,
+  Frame,
   Home,
   Mail,
   Menu,
@@ -18,6 +19,7 @@ import {
   Terminal,
   Users,
   X,
+  Zap,
 } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
 import { Main } from "next-vibe-ui/ui/main";
@@ -100,6 +102,20 @@ export function AdminLayoutClient({
       href: `/${locale}/admin/ssh` as const,
       icon: Terminal,
       current: pathname.startsWith(`/${locale}/admin/ssh`),
+      hidden: false,
+    },
+    {
+      name: t("app.admin.components.navigation.endpoints"),
+      href: `/${locale}/admin/endpoints` as const,
+      icon: Zap,
+      current: pathname.startsWith(`/${locale}/admin/endpoints`),
+      hidden: false,
+    },
+    {
+      name: t("app.admin.components.navigation.vibeFrame"),
+      href: `/${locale}/admin/vibe-frame` as const,
+      icon: Frame,
+      current: pathname.startsWith(`/${locale}/admin/vibe-frame`),
       hidden: false,
     },
   ];

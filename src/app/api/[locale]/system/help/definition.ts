@@ -46,6 +46,8 @@ const aiToolMetadataSchema = z.object({
   requiresConfirmation: z.boolean().optional(),
   /** Credit cost — only present when > 0 */
   credits: z.number().optional(),
+  /** Platforms this tool is available on (admin only) */
+  platforms: z.array(z.string()).optional(),
   parameters: z.record(z.string(), z.unknown()).optional(),
   examples: z
     .object({
@@ -151,6 +153,24 @@ const { GET } = createEndpoint({
           .transform((v) => (v && v >= 1 ? v : undefined)),
       }),
 
+      platform: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.platform.label" as const,
+        description: "get.fields.platform.description" as const,
+        columns: 3,
+        schema: z.enum(["cli", "mcp", "ai", "web", "all"]).optional(),
+      }),
+
+      includeProdOnly: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "get.fields.platform.label" as const,
+        description: "get.fields.platform.description" as const,
+        columns: 3,
+        schema: z.boolean().optional(),
+      }),
+
       // === RESPONSE FIELDS ===
       tools: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -182,6 +202,24 @@ const { GET } = createEndpoint({
         type: WidgetType.TEXT,
         content: "get.fields.hint.title" as const,
         schema: z.string().optional(),
+      }),
+
+      currentPlatform: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.fields.platform.label" as const,
+        schema: z.string().optional(),
+      }),
+
+      currentEnv: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.fields.platform.label" as const,
+        schema: z.enum(["development", "production"]).optional(),
+      }),
+
+      isAdmin: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.fields.platform.label" as const,
+        schema: z.boolean().optional(),
       }),
 
       currentPage: scopedResponseField(scopedTranslation, {
@@ -254,6 +292,7 @@ const { GET } = createEndpoint({
       searchByName: { query: "search", page: 1 },
       filterByCategory: { category: "chat", page: 1, pageSize: 50 },
       toolDetail: { toolName: "agent_search_brave_GET" },
+      adminAllPlatforms: { platform: "all" as const },
     },
     responses: {
       default: {

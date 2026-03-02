@@ -1,0 +1,46 @@
+# Tasks Deployment: Cron runner + task runner (singleton)
+# IMPORTANT: Keep replicas=1 to avoid duplicate task execution.
+# The FOR UPDATE SKIP LOCKED guard handles edge cases, but running
+# a single task instance is the intended architecture.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: next-vibe-tasks
+  namespace: next-vibe
+  labels:
+    app.kubernetes.io/name: next-vibe
+    app.kubernetes.io/component: tasks
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: next-vibe
+      app.kubernetes.io/component: tasks
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: next-vibe
+        app.kubernetes.io/component: tasks
+    spec:
+      containers:
+        - name: tasks
+          image: next-vibe:latest
+          command:
+            - bun
+            - src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts
+            - start
+            - --mode=tasks
+          envFrom:
+            - configMapRef:
+                name: next-vibe-config
+            - secretRef:
+                name: next-vibe-secret
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi

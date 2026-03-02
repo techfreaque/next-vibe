@@ -162,6 +162,83 @@ export async function saveFolder(folder: ChatFolder): Promise<void> {
 }
 
 /**
+ * Create new folder in incognito mode
+ */
+export async function createIncognitoFolder(
+  name: string,
+  rootFolderId: DefaultFolderId,
+  parentId: string | null = null,
+  icon: ChatFolder["icon"] = "folder",
+): Promise<ChatFolder> {
+  const folders = await getItem<Record<string, ChatFolder>>(
+    STORAGE_KEYS.FOLDERS,
+    {},
+  );
+
+  // Compute sort order: max among siblings + 1
+  const siblings = Object.values(folders).filter(
+    (f) => f.rootFolderId === rootFolderId && f.parentId === parentId,
+  );
+  const maxSortOrder = siblings.reduce(
+    (max, f) => Math.max(max, f.sortOrder ?? 0),
+    -1,
+  );
+
+  const folder: ChatFolder = {
+    id: crypto.randomUUID(),
+    userId: null,
+    leadId: null,
+    rootFolderId,
+    name,
+    icon: icon ?? "folder",
+    color: null,
+    parentId,
+    expanded: false,
+    sortOrder: maxSortOrder + 1,
+    rolesView: null,
+    rolesManage: null,
+    rolesCreateThread: null,
+    rolesPost: null,
+    rolesModerate: null,
+    rolesAdmin: null,
+    canManage: true,
+    canCreateThread: true,
+    canModerate: false,
+    canDelete: true,
+    canManagePermissions: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  folders[folder.id] = folder;
+  await setItem(STORAGE_KEYS.FOLDERS, folders);
+  return folder;
+}
+
+/**
+ * Update folder in incognito mode
+ */
+export async function updateIncognitoFolder(
+  folderId: string,
+  updates: Partial<ChatFolder>,
+): Promise<void> {
+  const folders = await getItem<Record<string, ChatFolder>>(
+    STORAGE_KEYS.FOLDERS,
+    {},
+  );
+  const folder = folders[folderId];
+
+  if (folder) {
+    folders[folderId] = {
+      ...folder,
+      ...updates,
+      updatedAt: new Date(),
+    };
+    await setItem(STORAGE_KEYS.FOLDERS, folders);
+  }
+}
+
+/**
  * Delete thread from storage
  */
 export async function deleteThread(threadId: string): Promise<void> {
@@ -259,6 +336,22 @@ export async function getThreadsForFolder(
 }
 
 /**
+ * Get all folders for a specific root folder
+ */
+export async function getFoldersForRoot(
+  rootFolderId: DefaultFolderId,
+): Promise<ChatFolder[]> {
+  const folders = await getItem<Record<string, ChatFolder>>(
+    STORAGE_KEYS.FOLDERS,
+    {},
+  );
+
+  return Object.values(folders).filter(
+    (folder) => folder.rootFolderId === rootFolderId,
+  );
+}
+
+/**
  * Parse message from storage - convert string dates to Date objects
  */
 function parseMessage(message: ChatMessage): ChatMessage {
@@ -344,6 +437,7 @@ export async function createIncognitoThread(
     rolesModerate: null,
     rolesAdmin: null,
     published: false,
+    isStreaming: false,
     canPost: true,
     canEdit: true,
     canModerate: true,

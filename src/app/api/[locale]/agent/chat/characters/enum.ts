@@ -3,6 +3,7 @@
  * Centralized enum definitions for character system using localized enum pattern
  */
 
+import type { IconComponent } from "next-vibe-ui/lib/helper";
 import {
   Brain,
   Code,
@@ -20,7 +21,6 @@ import {
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { TranslationKey } from "@/i18n/core/static-types";
-import type { IconComponent } from "@/packages/next-vibe-ui/web/lib/helper";
 
 import { ModelUtility, type ModelUtilityValue } from "../../models/enum";
 import type { ModelsTranslationKey } from "../../models/i18n";

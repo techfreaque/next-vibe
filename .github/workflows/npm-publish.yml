@@ -1,4 +1,4 @@
-name: Release to npm
+name: Release to npm + Deploy
 
 on:
   push:
@@ -43,13 +43,14 @@ jobs:
         run: bun install
 
       - name: Run checks (lint, typecheck, tests)
-        run: src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts check
+        run: bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts check
 
       - name: Build package (dry run)
-        run: src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts builder
+        run: bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts build --run-prod-database=false
 
-  # Publish to npm on tag creation using the release tool
-  publish-npm:
+  # Publish to npm + deploy to VPS on tag creation
+  # Triggered by: vibe pub (locally) → creates tag → pushes → this runs
+  publish-and-deploy:
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
 
@@ -62,7 +63,7 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Set up Node.js (for npm publish)
+      - name: Set up Node.js (for npm publish with provenance)
         uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -84,10 +85,15 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      # Use release tool in CI mode for proper release workflow
-      # This runs checks, builds, and publishes according to release.config.ts
-      - name: Run release (CI mode)
-        run: src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts release --ci --skip-git-tag --skip-git-push
+      # Release tool in CI mode: checks, builds, publishes to npm,
+      # then postPublish hook SSHs into VPS and deploys via install-docker.sh
+      - name: Release + Deploy
+        run: bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts release --ci --skip-git-tag --skip-git-push
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # Deploy: passed to postPublish hook in release.config.ts
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_APP_DIR: ${{ secrets.VPS_APP_DIR }}

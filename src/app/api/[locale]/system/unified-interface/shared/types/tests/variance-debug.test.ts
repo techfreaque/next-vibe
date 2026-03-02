@@ -8,6 +8,7 @@ import type {
   AnyChildrenConstrain,
   FieldUsageConfig,
 } from "../../../unified-ui/widgets/_shared/types";
+import type { EventSchemas } from "../../../websocket/types";
 import type { CreateApiEndpoint } from "../../endpoints/definition/create";
 import { objectField } from "../../field/utils";
 import { requestField } from "../../field/utils-new";
@@ -46,7 +47,8 @@ type TestEndpoint = CreateApiEndpoint<
   Methods.POST,
   readonly ["enums.userRole.admin"],
   string,
-  typeof testEndpoint_field
+  typeof testEndpoint_field,
+  EventSchemas
 >;
 
 // Test if it's assignable
@@ -63,7 +65,8 @@ type TestEndpoint2 = CreateApiEndpoint<
     z.ZodTypeAny,
     FieldUsageConfig,
     AnyChildrenConstrain<string, FieldUsageConfig>
-  >
+  >,
+  EventSchemas
 >;
 
 type Test2 = TestEndpoint2 extends CreateApiEndpointAny ? "PASS" : "FAIL";

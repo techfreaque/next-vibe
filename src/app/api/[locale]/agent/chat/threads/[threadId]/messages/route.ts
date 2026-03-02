@@ -14,22 +14,13 @@ export const { GET, POST, tools } = endpointsHandler({
   [Methods.GET]: {
     email: undefined,
     handler: ({ urlPathParams, user, t, logger, locale }) =>
-      MessagesRepository.listMessages(
-        { threadId: urlPathParams.threadId },
-        user,
-        t,
-        logger,
-        locale,
-      ),
+      MessagesRepository.listMessages(urlPathParams, user, t, logger, locale),
   },
   [Methods.POST]: {
     email: undefined,
     handler: ({ data, urlPathParams, user, t, logger, locale }) =>
       MessagesRepository.createMessage(
-        {
-          ...data,
-          threadId: urlPathParams.threadId,
-        },
+        { ...data, threadId: urlPathParams.threadId },
         user,
         t,
         logger,

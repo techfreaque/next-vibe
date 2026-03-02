@@ -1,14 +1,21 @@
 import { useMemo } from "react";
 
-import type { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import type { ChatThread } from "@/app/api/[locale]/agent/chat/db";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
-type ChatContextType = ReturnType<typeof useChatContext>;
+import type { RootFolderPermissions } from "./context";
 
 interface ChatPermissionsResult {
   canPost: boolean;
   noPermissionReason: string | undefined;
+}
+
+interface ChatPermissionsParams {
+  activeThread: ChatThread | null;
+  currentSubFolderId: string | null;
+  folders: Record<string, { canCreateThread?: boolean }>;
+  rootFolderPermissions: RootFolderPermissions;
 }
 
 /**
@@ -16,7 +23,7 @@ interface ChatPermissionsResult {
  * This determines if the user can send messages based on thread and folder permissions.
  */
 export function useChatPermissions(
-  chat: ChatContextType,
+  params: ChatPermissionsParams,
   locale: CountryLanguage,
 ): ChatPermissionsResult {
   const { t } = simpleT(locale);
@@ -25,7 +32,7 @@ export function useChatPermissions(
     currentSubFolderId,
     folders,
     rootFolderPermissions,
-  } = chat;
+  } = params;
 
   // Compute canPost permission reactively
   // This determines if the user can send messages in the current context

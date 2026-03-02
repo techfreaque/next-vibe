@@ -15,6 +15,7 @@ import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { WebSocketServerHandle } from "@/app/api/[locale]/system/unified-interface/websocket/server";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -92,6 +93,7 @@ export interface ServerStartRepository {
 export class ServerStartRepositoryImpl implements ServerStartRepository {
   private taskRunnerStarted = false;
   private nextServerProcess: ChildProcess | null = null;
+  private wsServerHandle: WebSocketServerHandle | null = null;
   private runningProcesses: Map<string, ChildProcess> = new Map();
 
   async startServer(
@@ -107,6 +109,13 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
     // Derive port: explicit --port > NEXT_PUBLIC_APP_URL port > default 3000
     const port = data.port ?? portFromUrl(env.NEXT_PUBLIC_APP_URL) ?? 3000;
 
+    // Mode-based process splitting: "all" (default), "web", "tasks"
+    const mode = data.mode ?? "all";
+    const runDb = data.dbSetup && (mode === "all" || mode === "tasks");
+    const runTasks = data.taskRunner && (mode === "all" || mode === "tasks");
+    const runSeed = data.seed && (mode === "all" || mode === "tasks");
+    const runNext = data.nextServer && (mode === "all" || mode === "web");
+
     try {
       output.push("🚀 Starting Vibe Production Server");
       output.push(
@@ -119,9 +128,11 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       output.push(`   ✅ Environment: ${currentEnv}`);
       output.push(`   🌐 Target port: ${port}`);
 
+      output.push(`   🔀 Mode: ${mode}`);
+
       // Database setup FIRST — must happen before task runner so all DB
       // connections (seeds, pulse) use the preview postgres.
-      if (data.dbSetup) {
+      if (runDb) {
         output.push("");
         output.push("🗄️  Database Setup");
 
@@ -210,14 +221,31 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       } else {
         output.push("");
         output.push("🗄️  Database Setup");
-        output.push("   ⏭️ Database setup skipped (--db-setup=false)");
+        output.push(
+          `   ⏭️ Database setup skipped (${mode !== "all" ? `--mode=${mode}` : "--db-setup=false"})`,
+        );
+      }
+
+      // Deploy db-functions (idempotent — runs after every migration)
+      try {
+        const { deployDbFunctions } =
+          await import("@/app/api/[locale]/system/db/db-functions/deploy");
+        await deployDbFunctions(logger);
+      } catch (error) {
+        const errorMsg = parseError(error).message;
+        output.push(
+          `   \u26A0\uFE0F DB functions deployment failed: ${errorMsg}`,
+        );
+        logger.warn("DB functions deployment failed, continuing anyway", {
+          error: errorMsg,
+        });
       }
 
       output.push("");
       output.push("📋 Task Runner Setup");
 
       // Initialize single unified task runner for production environment
-      if (data.taskRunner) {
+      if (runTasks) {
         logger.debug("Starting unified task runner for production");
         output.push(
           "   🔄 Initializing unified task runner for production environment...",
@@ -286,10 +314,12 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           });
         }
       } else {
-        output.push("   ⏭️ Task runner skipped (--task-runner=false)");
+        output.push(
+          `   ⏭️ Task runner skipped (${mode !== "all" ? `--mode=${mode}` : "--task-runner=false"})`,
+        );
       }
 
-      if (data.seed) {
+      if (runSeed) {
         output.push("");
         output.push("🌱 Database Seeding");
 
@@ -310,7 +340,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       }
 
       // Load task registry and verify task runner system
-      if (data.taskRunner && this.taskRunnerStarted) {
+      if (runTasks && this.taskRunnerStarted) {
         output.push("");
         output.push("📋 Task Registry & Runner System");
 
@@ -367,10 +397,12 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           errors.push(errorMsg);
           output.push(`   ❌ Task runner system failed: ${errorMsg}`);
         }
-      } else if (!data.taskRunner) {
+      } else if (!runTasks) {
         output.push("");
         output.push("📋 Task Registry & Runner System");
-        output.push("   ⏭️ Task runner skipped (--task-runner=false)");
+        output.push(
+          `   ⏭️ Task runner skipped (${mode !== "all" ? `--mode=${mode}` : "--task-runner=false"})`,
+        );
       } else {
         output.push("");
         output.push("📋 Task Registry & Runner System");
@@ -380,7 +412,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       output.push("");
       output.push("⚡ Next.js Production Server");
 
-      if (data.nextServer) {
+      if (runNext) {
         output.push("   🚀 Starting Next.js production server in parallel...");
         output.push(`   🌐 Target port: ${port}`);
 
@@ -406,7 +438,9 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
           logger.error("Next.js server startup failed", { error: errorMsg });
         }
       } else {
-        output.push("   ⏭️ Next.js server skipped (--next-server=false)");
+        output.push(
+          `   ⏭️ Next.js server skipped (${mode !== "all" ? `--mode=${mode}` : "--next-server=false"})`,
+        );
       }
 
       const duration = Date.now() - startTime;
@@ -424,8 +458,11 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       if (this.taskRunnerStarted) {
         runningServices.push("unified-task-runner");
       }
-      if (data.nextServer && this.nextServerProcess) {
-        runningServices.push(`next-start (PID: ${this.nextServerProcess.pid})`);
+      if (runNext && this.nextServerProcess) {
+        runningServices.push(`next-server (HTTP on port ${port})`);
+      }
+      if (this.wsServerHandle) {
+        runningServices.push(`ws-sidecar (WebSocket on port ${port + 1000})`);
       }
 
       if (runningServices.length > 0) {
@@ -485,43 +522,51 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       process.on("SIGINT", () => handleShutdown("SIGINT"));
       process.on("SIGTERM", () => handleShutdown("SIGTERM"));
 
-      // SIGUSR1: hot-restart Next.js child (triggered by `vibe rebuild`)
-      process.on("SIGUSR1", () => {
-        logger.info("Received SIGUSR1 — restarting Next.js server...");
-        process.stdout.write(
-          "\n🔄 SIGUSR1 received — restarting Next.js server...\n",
+      // SIGUSR1: hot-restart server (triggered by `vibe rebuild`) — only when running Next.js
+      if (!runNext) {
+        logger.debug(
+          "SIGUSR1 handler not registered (Next.js not running in this mode)",
         );
+      }
+      if (runNext) {
+        process.on("SIGUSR1", () => {
+          logger.info("Received SIGUSR1 — restarting server...");
+          process.stdout.write(
+            "\n🔄 SIGUSR1 received — restarting server...\n",
+          );
 
-        // Kill old Next.js child, then start a new one
-        if (this.nextServerProcess && !this.nextServerProcess.killed) {
-          this.nextServerProcess.kill("SIGTERM");
-          this.runningProcesses.delete("next-start");
-          this.nextServerProcess = null;
-        }
+          // Stop old servers, then start new ones
+          if (this.wsServerHandle) {
+            this.wsServerHandle.stop();
+            this.wsServerHandle = null;
+          }
+          if (this.nextServerProcess && !this.nextServerProcess.killed) {
+            this.nextServerProcess.kill("SIGTERM");
+            this.nextServerProcess = null;
+          }
 
-        this.startNextServer(port, logger)
-          .then((result) => {
-            if (result.success) {
-              process.stdout.write(
-                "✅ Next.js server restarted successfully\n",
-              );
-              logger.info("Next.js server restarted via SIGUSR1");
-            } else {
-              process.stdout.write(
-                `❌ Next.js server restart failed: ${result.message}\n`,
-              );
-              logger.error("Next.js server restart failed", {
-                message: result.message,
+          this.startNextServer(port, logger)
+            .then((result) => {
+              if (result.success) {
+                process.stdout.write("✅ Server restarted successfully\n");
+                logger.info("Server restarted via SIGUSR1");
+              } else {
+                process.stdout.write(
+                  `❌ Server restart failed: ${result.message}\n`,
+                );
+                logger.error("Server restart failed", {
+                  message: result.message,
+                });
+              }
+              return result;
+            })
+            .catch((error) => {
+              logger.error("Server restart error after SIGUSR1", {
+                error: parseError(error).message,
               });
-            }
-            return result;
-          })
-          .catch((error) => {
-            logger.error("Next.js restart error after SIGUSR1", {
-              error: parseError(error).message,
             });
-          });
-      });
+        });
+      }
 
       // Keep the process alive and log periodic status
       let logCounter = 0;
@@ -538,16 +583,8 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
             `Status: ${runningServices.length} services running | Uptime: ${minutes}m ${seconds}s`,
           );
 
-          // Check if processes are still alive
-          if (this.nextServerProcess?.killed) {
-            logger.warn("Next.js server process died, attempting restart...");
-            this.startNextServer(port, logger).catch((error) => {
-              logger.error(
-                "Failed to restart Next.js server",
-                parseError(error),
-              );
-            });
-          }
+          // The Bun server runs in-process, so it doesn't "die" like a child process.
+          // No restart watchdog needed — Bun.serve() is stable within the process.
         }
       }, 1000);
 
@@ -644,122 +681,110 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
     port: number,
     logger: EndpointLogger,
   ): Promise<{ success: boolean; message?: string }> {
-    return await new Promise((resolve) => {
+    try {
+      // Kill any stale process on the target port
+      this.killProcessOnPort(port, logger);
+
+      // --- Start Next.js directly on the user-facing port ---
+      const nextProcess = spawn(
+        "bun",
+        ["run", "next", "start", "--port", String(port)],
+        {
+          stdio: "pipe",
+          env: {
+            ...process.env,
+            NODE_ENV: "production",
+            NEXT_DIST_DIR: ".next-prod",
+          } as NodeJS.ProcessEnv,
+        },
+      );
+      this.nextServerProcess = nextProcess;
+
+      logger.info(
+        `Next.js start spawned on port ${port} (PID: ${String(nextProcess.pid)})`,
+      );
+
+      // --- Start WebSocket sidecar on port + 1000 ---
+      const { startWebSocketServer, WS_PORT_OFFSET } =
+        await import("@/app/api/[locale]/system/unified-interface/websocket/server");
+
+      const wsPort = port + WS_PORT_OFFSET;
+      const wsHandle = startWebSocketServer({ port: wsPort, logger });
+      this.wsServerHandle = wsHandle;
+
+      // Wait for Next.js to be ready
+      await this.waitForNextServer(`http://127.0.0.1:${port}`, 30000, logger);
+
+      logger.info(`Next.js production server ready on port ${port}`);
+      return { success: true };
+    } catch (error) {
+      logger.error("Failed to start server", {
+        error: parseError(error).message,
+      });
+      return { success: false, message: parseError(error).message };
+    }
+  }
+
+  /**
+   * Wait for Next.js to respond on the given URL.
+   */
+  private async waitForNextServer(
+    url: string,
+    timeoutMs: number,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    const start = Date.now();
+    const pollInterval = 500;
+
+    while (Date.now() - start < timeoutMs) {
       try {
-        logger.debug("Starting Next.js production server", { port });
-
-        // Kill any stale process on the target port
-        this.killProcessOnPort(port, logger);
-
-        // Spawn Next.js production server using bun
-        const nextProcess = spawn(
-          "bun",
-          ["run", "next", "start", "--port", port.toString()],
-          {
-            stdio: ["pipe", "pipe", "pipe"],
-            env: {
-              ...process.env,
-              NODE_ENV: "production",
-              NEXT_DIST_DIR: ".next-prod",
-            },
-          },
-        );
-
-        this.nextServerProcess = nextProcess;
-        this.runningProcesses.set("next-start", nextProcess);
-
-        let serverStarted = false;
-        let startupTimeout: ReturnType<typeof setTimeout>;
-
-        // Set up timeout for server startup
-        startupTimeout = setTimeout(() => {
-          if (!serverStarted) {
-            serverStarted = true;
-            logger.warn("Next.js server startup timeout");
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises, eslint-plugin-promise/no-multiple-resolved
-            resolve({ success: false, message: "Server startup timeout" });
-          }
-        }, 30000); // 30 second timeout
-
-        // Handle stdout to detect when server is ready
-        nextProcess.stdout?.on("data", (data: Buffer) => {
-          const output = data.toString();
-          logger.debug("Next.js stdout", { output: output.trim() });
-
-          // Check for server ready indicators
-          if (
-            output.includes("Ready") ||
-            output.includes("started server") ||
-            output.includes(`http://localhost:${port}`)
-          ) {
-            if (!serverStarted) {
-              serverStarted = true;
-              clearTimeout(startupTimeout);
-              logger.debug("Next.js production server is ready", { port });
-              // eslint-disable-next-line @typescript-eslint/no-floating-promises, eslint-plugin-promise/no-multiple-resolved
-              resolve({ success: true });
-            }
-          }
-        });
-
-        // Handle stderr
-        nextProcess.stderr?.on("data", (data: Buffer) => {
-          const error = data.toString();
-          logger.warn("Next.js stderr", { error: error.trim() });
-        });
-
-        // Handle process exit
-        nextProcess.on("exit", (code, signal) => {
-          logger.info("Next.js process exited", { code, signal });
-          this.runningProcesses.delete("next-start");
-          this.nextServerProcess = null;
-
-          if (!serverStarted) {
-            serverStarted = true;
-            clearTimeout(startupTimeout);
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises, eslint-plugin-promise/no-multiple-resolved
-            resolve({
-              success: false,
-              message: `Process exited with code ${code}`,
-            });
-          }
-        });
-
-        // Handle process errors
-        nextProcess.on("error", (error) => {
-          logger.error("Next.js process error", { error: error.message });
-
-          if (!serverStarted) {
-            serverStarted = true;
-            clearTimeout(startupTimeout);
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises, eslint-plugin-promise/no-multiple-resolved
-            resolve({ success: false, message: error.message });
-          }
-        });
-
-        // Give the process a moment to start
-        // eslint-disable-next-line eslint-plugin-promise/no-multiple-resolved
-        setTimeout(() => {
-          if (!serverStarted && nextProcess.pid) {
-            // Process started but not ready yet, that's normal
-            logger.debug("Next.js process started, waiting for ready signal", {
-              pid: nextProcess.pid,
-            });
-          }
-        }, 1000);
-      } catch (error) {
-        logger.error("Failed to spawn Next.js process", {
-          error: parseError(error).message,
-        });
-        resolve({ success: false, message: parseError(error).message });
+        const response = await fetch(url, { method: "HEAD" });
+        if (response.ok || response.status === 404) {
+          return;
+        }
+      } catch {
+        // Connection refused — server not ready yet
       }
-    });
+
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, pollInterval);
+      });
+
+      if ((Date.now() - start) % 5000 < pollInterval) {
+        logger.debug(`Still waiting for Next.js on ${url}...`);
+      }
+    }
+
+    logger.warn(
+      `Next.js did not respond within ${timeoutMs}ms — continuing anyway`,
+    );
   }
 
   /**
    * Stop all running processes
    */
   private stopAllProcesses(): void {
+    // Stop the WS sidecar
+    if (this.wsServerHandle) {
+      try {
+        this.wsServerHandle.stop();
+      } catch {
+        // Ignore errors when stopping WS server
+      }
+      this.wsServerHandle = null;
+    }
+
+    // Stop Next.js child process
+    if (this.nextServerProcess && !this.nextServerProcess.killed) {
+      try {
+        this.nextServerProcess.kill("SIGTERM");
+      } catch {
+        // Ignore
+      }
+    }
+    this.nextServerProcess = null;
+
+    // Stop any remaining child processes (task runner etc.)
     for (const [, process] of this.runningProcesses) {
       try {
         if (process && !process.killed) {
@@ -775,7 +800,6 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       }
     }
     this.runningProcesses.clear();
-    this.nextServerProcess = null;
   }
 }
 

@@ -1,4 +1,4 @@
-import { translations as uiTranslations } from "@/app/api/[locale]/emails/smtp-client/_components/i18n/pl";
+import { translations as uiTranslations } from "@/app/api/[locale]/emails/smtp-client/widget/i18n/pl";
 
 import { translations as accountsTranslations } from "../../accounts/i18n/pl";
 import { translations as createTranslations } from "../../create/i18n/pl";

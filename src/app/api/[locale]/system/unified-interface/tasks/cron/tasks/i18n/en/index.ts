@@ -8,6 +8,8 @@ export const translations = {
     createCronTask: "Failed to create cron task",
     invalidTaskInput: "Task input does not match the endpoint's request schema",
     endpointNotFound: "Endpoint not found for the given route ID",
+    targetInstanceForbidden:
+      "Only administrators can set the target instance for tasks",
   },
   list: {
     columns: {

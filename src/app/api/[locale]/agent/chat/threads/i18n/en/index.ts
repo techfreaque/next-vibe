@@ -1,8 +1,9 @@
 import { translations as threadsThreadIdTranslations } from "../../[threadId]/i18n/en";
-import { translations as searchTranslations } from "../../search/i18n/en";
 
 export const translations = {
-  ...searchTranslations,
+  tags: {
+    threads: "Threads",
+  },
   errors: {
     count_failed: "Failed to get conversation count: {{error}}",
   },
@@ -87,6 +88,9 @@ export const translations = {
           },
           pinned: {
             content: "Pinned",
+          },
+          archived: {
+            content: "Archived",
           },
           createdAt: {
             content: "Created At",

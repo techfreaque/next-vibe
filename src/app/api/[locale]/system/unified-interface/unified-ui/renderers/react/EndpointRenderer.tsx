@@ -30,6 +30,7 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 import { useNavigationStack } from "../../../react/hooks/use-navigation-stack";
 import type { EndpointLogger } from "../../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../../shared/types/endpoint-base";
+import { WidgetType } from "../../../shared/types/enums";
 import { Platform } from "../../../shared/types/platform";
 import type { WidgetData } from "../../../shared/widgets/widget-data";
 import {
@@ -44,7 +45,7 @@ import type {
 import { isResponseField } from "../../widgets/_shared/type-guards";
 import { WidgetContextProvider } from "../../widgets/_shared/WidgetContextProvider";
 import { ContentBlocksRenderer } from "./ContentBlocksRenderer";
-import { WidgetRenderer } from "./WidgetRenderer";
+import { LazyWidgetRenderer } from "./LazyWidgetRenderer";
 
 /**
  * Submit button configuration
@@ -262,10 +263,31 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
         }
       : undefined;
 
-    const rootWidget = (
-      <WidgetRenderer
+    // CUSTOM_WIDGET with render: render directly without WidgetRenderer.
+    // This avoids loading all widget dependencies when a custom component
+    // handles its own rendering (e.g. chat messages widget).
+    const isCustomWidget =
+      "type" in endpoint.fields &&
+      endpoint.fields.type === WidgetType.CUSTOM_WIDGET;
+    const CustomRender = isCustomWidget
+      ? (
+          endpoint.fields as typeof endpoint.fields & {
+            // oxlint-disable-next-line typescript/no-explicit-any
+            render?: React.ComponentType<any>;
+          }
+        ).render
+      : undefined;
+
+    const rootWidget = CustomRender ? (
+      <CustomRender
         fieldName={"" as Path<TEndpoint["types"]["RequestOutput"]>}
-        field={withValueNonStrict(endpoint.fields, data, null) as never}
+        field={withValueNonStrict(endpoint.fields, data, null)}
+        inlineButtonInfo={inlineButtonInfo}
+      />
+    ) : (
+      <LazyWidgetRenderer
+        fieldName={"" as Path<TEndpoint["types"]["RequestOutput"]>}
+        field={withValueNonStrict(endpoint.fields, data, null)}
         inlineButtonInfo={inlineButtonInfo}
       />
     );
@@ -288,6 +310,16 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
     }
 
     // No request fields - just response display, no form needed
+    // Custom widgets: no wrapper Div, render directly
+    if (CustomRender) {
+      return (
+        <WidgetContextProvider context={context}>
+          {rootWidget}
+          {children}
+        </WidgetContextProvider>
+      );
+    }
+
     return (
       <WidgetContextProvider context={context}>
         <Div className={className}>
@@ -352,10 +384,10 @@ export function EndpointRenderer<TEndpoint extends CreateApiEndpointAny>({
         : undefined;
 
     return (
-      <WidgetRenderer
+      <LazyWidgetRenderer
         key={fieldName}
         fieldName={fieldName as Path<TEndpoint["types"]["RequestOutput"]>}
-        field={withValueNonStrict(field, fieldValue, data) as never}
+        field={withValueNonStrict(field, fieldValue, data)}
       />
     );
   });

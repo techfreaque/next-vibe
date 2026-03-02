@@ -28,7 +28,7 @@ import { dateSchema } from "../../../shared/types/common.schema";
 import { DefaultFolderId } from "../config";
 import { ThreadStatus, ThreadStatusDB, ThreadStatusOptions } from "../enum";
 import { scopedTranslation } from "./i18n";
-import { ThreadsListContainer } from "./widget";
+import { ThreadsListContainer } from "./widget/widget";
 
 /**
  * Get Threads List Endpoint (GET)
@@ -100,6 +100,10 @@ const { GET } = createEndpoint({
             value: DefaultFolderId.CRON,
             label: "config.folders.cron" as const,
           },
+          {
+            value: DefaultFolderId.INCOGNITO,
+            label: "config.folders.incognito" as const,
+          },
         ],
         schema: z
           .enum([
@@ -107,9 +111,10 @@ const { GET } = createEndpoint({
             DefaultFolderId.SHARED,
             DefaultFolderId.PUBLIC,
             DefaultFolderId.CRON,
+            DefaultFolderId.INCOGNITO,
           ])
           .describe(
-            "Root folder to filter threads (incognito not allowed - local-only)",
+            "Root folder to filter threads (incognito routed to route-client.ts via useClientRoute)",
           ),
       }),
       subFolderId: scopedRequestField(scopedTranslation, {
@@ -207,6 +212,11 @@ const { GET } = createEndpoint({
             pinned: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.threads.thread.pinned.content" as const,
+              schema: z.boolean(),
+            }),
+            archived: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.threads.thread.archived.content" as const,
               schema: z.boolean(),
             }),
             // Permission roles - nullable arrays (null = inherit, [] = deny, [roles...] = allow)
@@ -380,6 +390,8 @@ const { GET } = createEndpoint({
     title: "get.success.title",
     description: "get.success.description",
   },
+
+  useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
 
   examples: {
     requests: {

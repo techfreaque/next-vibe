@@ -8,7 +8,7 @@ import "server-only";
 import { and, eq, ne, or } from "drizzle-orm";
 import { parseError } from "next-vibe/shared/utils";
 
-import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/components/types";
+import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
   ErrorResponseTypes,

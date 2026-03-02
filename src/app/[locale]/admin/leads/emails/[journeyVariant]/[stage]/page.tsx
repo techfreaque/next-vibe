@@ -14,7 +14,7 @@ import type React from "react";
 
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import { emailService } from "@/app/api/[locale]/leads/campaigns/emails";
-import { EmailPreviewClient } from "@/app/api/[locale]/leads/campaigns/emails/_components/email-preview-client";
+import { EmailPreviewClient } from "@/app/api/[locale]/leads/campaigns/emails/widget/email-preview-client";
 import type {
   EmailCampaignStageValues,
   EmailJourneyVariantValues,

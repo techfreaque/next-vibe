@@ -14,7 +14,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
-import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/components/types";
+import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { iconSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";

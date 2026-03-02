@@ -18,8 +18,9 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
+import type { WsEmitCallback } from "../../chat/threads/[threadId]/messages/emitter";
+import { createStreamEvent } from "../../chat/threads/[threadId]/messages/events";
 import { TtsVoice, type TtsVoiceValue } from "../../text-to-speech/enum";
-import { createStreamEvent, formatSSEEvent } from "../events";
 
 /**
  * Minimum characters before emitting a TTS chunk
@@ -45,6 +46,10 @@ const NATURAL_BREAKS = /[,;:\n]+\s*$/;
 /**
  * Streaming TTS Handler
  * Collects streaming text and emits TTS audio chunks
+ *
+ * Uses a look-ahead strategy: while a chunk is playing on the client (~5-10s),
+ * the next chunk's TTS is already being generated in parallel so it's ready
+ * the moment the client finishes playing the current one.
  */
 export class StreamingTTSHandler {
   private buffer = "";
@@ -52,28 +57,30 @@ export class StreamingTTSHandler {
   private isInsideThinkTag = false;
   private isInsideChatTag = false;
   private messageId: string | null = null;
-  private readonly controller: ReadableStreamDefaultController<Uint8Array>;
-  private readonly encoder: TextEncoder;
+  private readonly wsEmit: WsEmitCallback | null;
   private readonly logger: EndpointLogger;
   private readonly locale: CountryLanguage;
   private readonly voice: typeof TtsVoiceValue;
   private readonly user: JwtPayloadType;
   private isEnabled: boolean;
+  private isCancelled = false;
   private totalCharactersProcessed = 0;
-  /** Serialises concurrent addDelta / flush calls to prevent duplicate chunk emissions */
-  private processingChain: Promise<void> = Promise.resolve();
+  /**
+   * Sequential generation chain: at most one TTS API call in-flight at a time.
+   * The next chunk's generation starts as soon as the previous one resolves,
+   * giving exactly one chunk of look-ahead without hammering the API.
+   */
+  private generationChain: Promise<void> = Promise.resolve();
 
   constructor(params: {
-    controller: ReadableStreamDefaultController<Uint8Array>;
-    encoder: TextEncoder;
+    wsEmit: WsEmitCallback | null;
     logger: EndpointLogger;
     locale: CountryLanguage;
     voice: typeof TtsVoiceValue;
     user: JwtPayloadType;
     enabled: boolean;
   }) {
-    this.controller = params.controller;
-    this.encoder = params.encoder;
+    this.wsEmit = params.wsEmit;
     this.logger = params.logger;
     this.locale = params.locale;
     this.voice = params.voice;
@@ -96,25 +103,24 @@ export class StreamingTTSHandler {
   }
 
   /**
-   * Add a text delta to the buffer
-   * May trigger TTS generation if boundary is detected.
-   * Serialised via processingChain to prevent concurrent emitChunk calls.
+   * Add a text delta to the buffer.
+   * May trigger TTS generation if a boundary is detected.
+   *
+   * Buffer manipulation is synchronous and fast — TTS generation runs in
+   * the background via `generationChain`, so this never blocks on the
+   * Eden AI API.
    */
-  async addDelta(delta: string): Promise<void> {
-    this.processingChain = this.processingChain.then(() =>
-      this.addDeltaInternal(delta),
-    );
-    return this.processingChain;
+  addDelta(delta: string): void {
+    this.addDeltaInternal(delta);
   }
 
-  private async addDeltaInternal(delta: string): Promise<void> {
-    if (!this.isEnabled) {
-      this.logger.info("[Streaming TTS] Skipping - TTS not enabled");
+  private addDeltaInternal(delta: string): void {
+    if (!this.isEnabled || this.isCancelled) {
       return;
     }
 
     if (!this.messageId) {
-      this.logger.info("[Streaming TTS] Skipping - no messageId set yet");
+      this.logger.debug("[Streaming TTS] Skipping - no messageId set yet");
       return;
     }
 
@@ -160,43 +166,72 @@ export class StreamingTTSHandler {
       bufferPreview: this.buffer.substring(0, 100),
     });
 
-    // Check if we should emit a chunk
-    await this.checkAndEmit();
+    // Check if we should emit a chunk (non-blocking — generation runs in background)
+    this.checkAndEmit();
   }
 
   /**
-   * Check if buffer should be emitted
+   * Check if buffer should be emitted.
+   *
+   * When a boundary is detected, the text is captured and generation + emission
+   * is appended to `generationChain`.  The buffer is cleared immediately so new
+   * deltas keep flowing without blocking on the TTS API.
+   *
+   * Because generation is sequential (one API call at a time), we get exactly
+   * one chunk of look-ahead: while chunk N plays on the client, chunk N+1's
+   * generation is already running — but N+2 won't start until N+1 finishes.
    */
-  private async checkAndEmit(): Promise<void> {
+  private checkAndEmit(): void {
     const cleanBuffer = this.stripSpecialTags(this.buffer).trim();
 
     if (cleanBuffer.length < MIN_CHUNK_SIZE) {
       return;
     }
 
+    let shouldEmit = false;
+
     // Check for sentence ending
     if (SENTENCE_ENDINGS.test(cleanBuffer)) {
-      await this.emitChunk(cleanBuffer);
-      return;
+      shouldEmit = true;
     }
 
     // Check for natural break if buffer is large
-    if (cleanBuffer.length >= MAX_BUFFER_SIZE) {
+    if (!shouldEmit && cleanBuffer.length >= MAX_BUFFER_SIZE) {
       if (NATURAL_BREAKS.test(cleanBuffer)) {
-        await this.emitChunk(cleanBuffer);
-        return;
+        shouldEmit = true;
       }
       // Force emit if buffer is too large
       if (cleanBuffer.length >= MAX_BUFFER_SIZE * 1.5) {
-        await this.emitChunk(cleanBuffer);
+        shouldEmit = true;
       }
+    }
+
+    if (shouldEmit) {
+      // Capture text & index, clear buffer immediately so deltas keep flowing
+      const textToEmit = cleanBuffer;
+      const idx = this.chunkIndex++;
+      this.buffer = "";
+
+      // Chain onto generationChain: sequential generation (1 API call at a time)
+      // but non-blocking for delta processing
+      this.generationChain = this.generationChain.then(() =>
+        this.generateAndEmitChunk(textToEmit, idx),
+      );
     }
   }
 
   /**
-   * Emit a TTS chunk
+   * Generate TTS audio for a chunk and emit it over WebSocket.
+   * Runs inside `generationChain` — sequential, one at a time.
    */
-  private async emitChunk(text: string): Promise<void> {
+  private async generateAndEmitChunk(
+    text: string,
+    chunkIdx: number,
+  ): Promise<void> {
+    if (this.isCancelled) {
+      return;
+    }
+
     if (!this.messageId) {
       this.logger.warn("[Streaming TTS] No message ID set - skipping chunk");
       return;
@@ -205,35 +240,33 @@ export class StreamingTTSHandler {
     const cleanText = this.stripMarkdownForTTS(text);
     if (cleanText.trim().length === 0) {
       this.logger.debug("[Streaming TTS] Empty text after cleanup - skipping");
-      this.buffer = "";
       return;
     }
 
     this.logger.debug("[Streaming TTS] Generating TTS for chunk", {
-      chunkIndex: this.chunkIndex,
+      chunkIndex: chunkIdx,
       textLength: cleanText.length,
       textPreview: cleanText.substring(0, 100),
     });
 
     try {
-      // Generate TTS audio using Eden AI
       const audioDataUrl = await this.generateTTS(cleanText);
 
       if (audioDataUrl) {
-        // Emit AUDIO_CHUNK event
         const event = createStreamEvent.audioChunk({
           messageId: this.messageId,
           audioData: audioDataUrl,
-          chunkIndex: this.chunkIndex,
+          chunkIndex: chunkIdx,
           isFinal: false,
           text: cleanText,
         });
 
-        this.controller.enqueue(this.encoder.encode(formatSSEEvent(event)));
-        this.chunkIndex++;
+        if (this.wsEmit) {
+          this.wsEmit(event);
+        }
 
         this.logger.info("[Streaming TTS] Emitted audio chunk successfully", {
-          chunkIndex: this.chunkIndex - 1,
+          chunkIndex: chunkIdx,
           textLength: cleanText.length,
           audioDataLength: audioDataUrl.length,
         });
@@ -241,7 +274,7 @@ export class StreamingTTSHandler {
         // Track character count for credit deduction
         this.totalCharactersProcessed += cleanText.length;
 
-        // Deduct credits for TTS (with partial deduction allowed - graceful to 0)
+        // Deduct credits for TTS
         const creditsNeeded = cleanText.length * TTS_COST_PER_CHARACTER;
         if (creditsNeeded > 0) {
           const { t: creditsT } = creditsScopedTranslation.scopedT(this.locale);
@@ -254,16 +287,15 @@ export class StreamingTTSHandler {
           );
 
           if (deductResult.success) {
-            // Emit credit deduction event
             const creditEvent = createStreamEvent.creditsDeducted({
               amount: creditsNeeded,
               feature: "tts",
               type: "tool",
               partial: deductResult.partialDeduction,
             });
-            this.controller.enqueue(
-              this.encoder.encode(formatSSEEvent(creditEvent)),
-            );
+            if (this.wsEmit) {
+              this.wsEmit(creditEvent);
+            }
             this.logger.debug("[Streaming TTS] Credits deducted", {
               characters: cleanText.length,
               credits: creditsNeeded,
@@ -280,7 +312,7 @@ export class StreamingTTSHandler {
         this.logger.warn("[Streaming TTS] TTS conversion returned null", {
           text: cleanText.substring(0, 100),
           textLength: cleanText.length,
-          chunkIndex: this.chunkIndex,
+          chunkIndex: chunkIdx,
           locale: this.locale,
           voice: this.voice,
         });
@@ -289,13 +321,10 @@ export class StreamingTTSHandler {
       this.logger.error("[Streaming TTS] Error generating TTS", {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-        chunkIndex: this.chunkIndex,
+        chunkIndex: chunkIdx,
         textLength: cleanText.length,
       });
     }
-
-    // Clear the buffer
-    this.buffer = "";
   }
 
   /**
@@ -420,19 +449,15 @@ export class StreamingTTSHandler {
   }
 
   /**
-   * Flush any remaining content in the buffer
+   * Flush any remaining content in the buffer.
    * Call this when the stream ends.
-   * Waits for all pending addDelta calls to finish before flushing.
+   *
+   * 1. Enqueues any remaining buffer text for generation
+   * 2. Awaits ALL pending background generations
+   * 3. Emits the final isFinal marker
    */
   async flush(): Promise<void> {
-    this.processingChain = this.processingChain.then(() =>
-      this.flushInternal(),
-    );
-    return this.processingChain;
-  }
-
-  private async flushInternal(): Promise<void> {
-    this.logger.info("[Streaming TTS] flush() called", {
+    this.logger.debug("[Streaming TTS] flush() called", {
       isEnabled: this.isEnabled,
       hasMessageId: !!this.messageId,
       messageId: this.messageId,
@@ -440,13 +465,14 @@ export class StreamingTTSHandler {
       bufferPreview: this.buffer.substring(0, 100),
     });
 
-    if (!this.isEnabled || !this.messageId) {
+    if (!this.isEnabled || !this.messageId || this.isCancelled) {
       this.logger.info(
-        "[Streaming TTS] flush() skipped - not enabled or no messageId",
+        "[Streaming TTS] flush() skipped - not enabled, no messageId, or cancelled",
       );
       return;
     }
 
+    // Enqueue remaining buffer content for generation
     const cleanBuffer = this.stripSpecialTags(this.buffer).trim();
     this.logger.info("[Streaming TTS] flush() cleanBuffer", {
       cleanBufferLength: cleanBuffer.length,
@@ -454,10 +480,19 @@ export class StreamingTTSHandler {
     });
 
     if (cleanBuffer.length > 0) {
-      await this.emitChunk(cleanBuffer);
+      const idx = this.chunkIndex++;
+      this.buffer = "";
+
+      // Chain like normal chunks
+      this.generationChain = this.generationChain.then(() =>
+        this.generateAndEmitChunk(cleanBuffer, idx),
+      );
     } else {
       this.logger.info("[Streaming TTS] flush() - no content to emit");
     }
+
+    // Wait for ALL background generations + emissions to finish
+    await this.generationChain;
 
     // Emit final chunk marker
     if (this.chunkIndex > 0) {
@@ -469,13 +504,28 @@ export class StreamingTTSHandler {
         text: "",
       });
 
-      this.controller.enqueue(this.encoder.encode(formatSSEEvent(event)));
+      if (this.wsEmit) {
+        this.wsEmit(event);
+      }
     }
 
     // Reset state
     this.buffer = "";
     this.isInsideThinkTag = false;
     this.isInsideChatTag = false;
+  }
+
+  /**
+   * Cancel all pending and future TTS generation.
+   * Call this on stream abort / client disconnect to stop wasting API calls
+   * and credit deductions for audio that will never be played.
+   */
+  cancel(): void {
+    this.isCancelled = true;
+    this.buffer = "";
+    this.logger.info(
+      "[Streaming TTS] Cancelled — no further chunks will generate",
+    );
   }
 
   /**
@@ -487,6 +537,8 @@ export class StreamingTTSHandler {
     this.isInsideThinkTag = false;
     this.isInsideChatTag = false;
     this.messageId = null;
+    this.isCancelled = false;
+    this.generationChain = Promise.resolve();
   }
 
   /**
@@ -548,8 +600,7 @@ export class StreamingTTSHandler {
  * Create a streaming TTS handler
  */
 export function createStreamingTTSHandler(params: {
-  controller: ReadableStreamDefaultController<Uint8Array>;
-  encoder: TextEncoder;
+  wsEmit: WsEmitCallback | null;
   logger: EndpointLogger;
   locale: CountryLanguage;
   voice: typeof TtsVoiceValue;

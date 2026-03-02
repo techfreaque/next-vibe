@@ -95,6 +95,13 @@ export function useEndpoint<
     options?.read?.queryOptions?.refetchOnWindowFocus ??
     endpointReadOptions?.queryOptions?.refetchOnWindowFocus ??
     true;
+  const rawRefetchInterval =
+    options?.read?.queryOptions?.refetchInterval ??
+    endpointReadOptions?.queryOptions?.refetchInterval;
+  const readRefetchInterval: number | false | undefined =
+    typeof rawRefetchInterval === "number" || rawRefetchInterval === false
+      ? rawRefetchInterval
+      : undefined;
   const autoPrefillEnabled = options?.autoPrefill ?? true;
 
   // Use read hook for GET endpoints - route to client or server
@@ -121,6 +128,7 @@ export function useEndpoint<
       enabled: readQueryEnabled,
       staleTime: readStaleTime,
       refetchOnWindowFocus: readRefetchOnWindowFocus,
+      refetchInterval: readRefetchInterval,
     },
     urlPathParams: readUrlPathParams,
     autoPrefillConfig: {

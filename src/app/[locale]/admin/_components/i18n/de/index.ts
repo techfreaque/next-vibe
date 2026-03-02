@@ -8,6 +8,8 @@ export const translations: typeof enTranslations = {
     emails: "E-Mails",
     cronTasks: "Cron-Aufgaben",
     sshAccess: "SSH / Maschine",
+    endpoints: "Endpunkte",
+    vibeFrame: "Vibe Frame",
     admin: "Admin",
     adminPanel: "Admin-Panel",
     administrator: "Administrator",

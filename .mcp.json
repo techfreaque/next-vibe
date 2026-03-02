@@ -3,8 +3,11 @@
     "vibe-local": {
       "command": "bun",
       "args": [
+        "--preload",
+        "/home/max/projects/next-vibe/src/app/api/[locale]/system/unified-interface/cli/runtime/env-preload.ts",
         "/home/max/projects/next-vibe/src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts",
-        "mcp"
+        "mcp",
+        "--preview"
       ],
       "env": {
         "PROJECT_ROOT": "/home/max/projects/next-vibe"

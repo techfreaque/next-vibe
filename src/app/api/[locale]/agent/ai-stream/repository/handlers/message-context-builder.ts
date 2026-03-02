@@ -619,7 +619,7 @@ export class MessageContextBuilder {
         .where(eq(chatMessages.threadId, threadId))
         .orderBy(asc(chatMessages.createdAt));
 
-      logger.info("[fetchBranchMessages] Fetched all thread messages", {
+      logger.debug("[fetchBranchMessages] Fetched all thread messages", {
         totalMessages: allMessages.length,
         threadId,
       });
@@ -648,7 +648,7 @@ export class MessageContextBuilder {
       }
 
       branchMessages.reverse(); // Oldest first
-      logger.info("[fetchBranchMessages] Server branch messages filtered", {
+      logger.debug("[fetchBranchMessages] Server branch messages filtered", {
         count: branchMessages.length,
         parentMessageId,
         stoppedAtCompacting: branchMessages[branchMessages.length - 1]?.metadata
@@ -779,7 +779,7 @@ export class MessageContextBuilder {
           } satisfies ChatMessage)
         : null;
 
-    logger.info("[Compacting] Created current user message", {
+    logger.debug("[Compacting] Created current user message", {
       hasCurrentUserMessage: !!currentUserMessage,
       currentUserMessageId,
       currentUserContentLength: currentUserContent?.length ?? 0,
@@ -825,7 +825,7 @@ export class MessageContextBuilder {
 
     const shouldCompact = isEmergencyCompact || totalTokens >= effectiveTrigger;
 
-    logger.info("[Compacting] Token calculation", {
+    logger.debug("[Compacting] Token calculation", {
       totalTokens,
       compactTriggerAbsolute: absoluteTrigger,
       compactTriggerOverride: compactTrigger ?? null,

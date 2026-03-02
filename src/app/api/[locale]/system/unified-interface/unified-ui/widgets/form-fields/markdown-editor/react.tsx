@@ -4,6 +4,7 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Check, Edit2, X } from "next-vibe-ui/ui/icons";
+import type { InputKeyboardEvent } from "next-vibe-ui/ui/input";
 import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
@@ -20,7 +21,6 @@ import {
   useWidgetForm,
   useWidgetIsInteractive,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import type { InputKeyboardEvent } from "@/packages/next-vibe-ui/web/ui/input";
 
 import type { CreateApiEndpointAny } from "../../../../shared/types/endpoint-base";
 import { extractEditableTextData } from "./shared";

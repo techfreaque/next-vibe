@@ -37,6 +37,7 @@ const { POST } = createEndpoint({
     UserRole.AI_TOOL_OFF,
     UserRole.REMOTE_SKILL,
   ] as const,
+  aliases: ["login"],
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,

@@ -92,6 +92,11 @@ interface IPermissionsRegistry {
     user: JwtPayloadType,
     platform: Platform,
   ): CreateApiEndpointAny[];
+
+  /**
+   * Get platforms an endpoint is available on
+   */
+  getAvailablePlatforms(endpoint: CreateApiEndpointAny): Platform[];
 }
 
 /**
@@ -637,9 +642,9 @@ class PermissionsRegistry implements IPermissionsRegistry {
   }
 
   /**
-   * Get platforms endpoint is available on (PRIVATE - used internally)
+   * Get platforms endpoint is available on
    */
-  private getAvailablePlatforms(endpoint: CreateApiEndpointAny): Platform[] {
+  getAvailablePlatforms(endpoint: CreateApiEndpointAny): Platform[] {
     const platforms: Platform[] = [];
 
     // Safety check
@@ -654,6 +659,12 @@ class PermissionsRegistry implements IPermissionsRegistry {
       if (endpoint.allowedRoles.includes(PlatformMarker.CLI_AUTH_BYPASS)) {
         platforms.push(Platform.CLI_PACKAGE);
       }
+    }
+    if (
+      !endpoint.allowedRoles.includes(UserRole.MCP_OFF) &&
+      !endpoint.allowedRoles.includes(UserRole.CLI_OFF)
+    ) {
+      platforms.push(Platform.MCP);
     }
     if (!endpoint.allowedRoles.includes(UserRole.AI_TOOL_OFF)) {
       platforms.push(Platform.AI);

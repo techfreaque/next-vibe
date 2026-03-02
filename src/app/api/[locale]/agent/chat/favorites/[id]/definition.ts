@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 
-import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/components/types";
+import { modelSelectionSchemaSimple } from "@/app/api/[locale]/agent/models/types";
 import {
   TtsVoice,
   TtsVoiceDB,
@@ -56,7 +56,7 @@ import {
   FAVORITE_UPDATE_ALIAS,
 } from "../constants";
 import { scopedTranslation } from "./i18n";
-import { FavoriteEditContainer } from "./widgets";
+import { FavoriteEditContainer } from "./widget";
 
 /**
  * Delete Favorite Endpoint (DELETE)

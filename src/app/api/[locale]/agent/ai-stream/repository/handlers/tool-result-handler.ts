@@ -15,7 +15,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { parseError } from "../../../../shared/utils";
 import { type ToolCall, type ToolCallResult } from "../../../chat/db";
-import type { AiStreamT } from "../../i18n";
+import type { AiStreamT } from "../../stream/i18n";
 import type { MessageDbWriter } from "../core/message-db-writer";
 
 /**
@@ -36,7 +36,7 @@ function sortObjectKeys(obj: JSONValue): JSONValue {
       try {
         const parsed = JSON.parse(obj) as JSONValue;
         const sorted = sortObjectKeys(parsed);
-        return JSON.stringify(sorted);
+        return sorted;
       } catch {
         return obj;
       }
@@ -158,12 +158,46 @@ export class ToolResultHandler {
     const output = "output" in part ? part.output : undefined;
     const isError = "isError" in part ? part.isError : false;
 
+    // Detect ErrorResponseType returned as a "successful" tool result.
+    // When a tool returns fail({...}) without throwing, the AI SDK treats it as
+    // isError=false, but the output is {success: false, message: ..., errorType: ...}.
+    const isErrorResponse =
+      !isError &&
+      output !== null &&
+      output !== undefined &&
+      typeof output === "object" &&
+      !Array.isArray(output) &&
+      "success" in output &&
+      output.success === false &&
+      "message" in output &&
+      typeof output.message === "string";
+
+    const effectiveIsError = isError || isErrorResponse;
+
     let toolError: ErrorResponseType | undefined;
-    if (isError) {
-      toolError = fail({
-        message: t("errors.toolExecutionError"),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-      });
+    if (effectiveIsError) {
+      if (isErrorResponse && typeof output === "object" && output !== null) {
+        // Output is a structured ErrorResponseType from fail() — extract the error
+        // detail and wrap in our translation key so types are satisfied.
+        const errObj = output as Record<string, JSONValue>;
+        const errDetail =
+          typeof errObj.message === "string" ? errObj.message : "";
+        toolError = fail({
+          message: t(
+            "errors.toolExecutionError",
+            errDetail ? { error: errDetail } : undefined,
+          ),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        });
+      } else {
+        toolError = fail({
+          message: t(
+            "errors.toolExecutionError",
+            typeof output === "string" ? { error: output } : undefined,
+          ),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        });
+      }
     }
 
     const cleanedOutput: JSONValue | undefined =
@@ -178,7 +212,7 @@ export class ToolResultHandler {
 
     const toolCallWithResult: ToolCall = {
       ...toolCallData.toolCall,
-      result: validatedOutput,
+      result: effectiveIsError ? undefined : validatedOutput,
       error: toolError,
     };
 

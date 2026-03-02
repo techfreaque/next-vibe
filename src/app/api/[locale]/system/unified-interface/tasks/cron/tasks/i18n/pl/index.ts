@@ -12,6 +12,8 @@ export const translations: typeof enTranslations = {
       "Dane wejściowe zadania nie pasują do schematu żądania endpointu",
     endpointNotFound:
       "Nie znaleziono endpointu dla podanego identyfikatora trasy",
+    targetInstanceForbidden:
+      "Tylko administratorzy mogą ustawiać instancję docelową dla zadań",
   },
   list: {
     columns: {

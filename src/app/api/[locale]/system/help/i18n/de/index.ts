@@ -70,6 +70,14 @@ export const translations: typeof enTranslations = {
       openTool: {
         label: "Tool öffnen",
       },
+      platform: {
+        label: "Plattform",
+        description:
+          "Tools nach Plattform filtern (nur Admin). Zeigt Tools an, die auf der ausgewählten Plattform verfügbar sind.",
+      },
+      platforms: {
+        title: "Verfügbare Plattformen",
+      },
     },
     success: {
       title: "Tools erfolgreich abgerufen",
@@ -291,6 +299,17 @@ export const translations: typeof enTranslations = {
         "Nicht angeheftet — KI kann trotzdem auf Anfrage aufrufen. Klicken zum Anheften",
       confirmOn: "Fragt nach Bestätigung — klicken zum Deaktivieren",
       confirmOff: "Läuft automatisch — klicken um Bestätigung zu erfordern",
+    },
+    platformFilter: {
+      all: "Alle Plattformen",
+      cli: "CLI",
+      mcp: "MCP",
+      ai: "KI",
+      web: "Web",
+    },
+    envFilter: {
+      development: "Entwicklung",
+      production: "Produktion",
     },
   },
   list: {

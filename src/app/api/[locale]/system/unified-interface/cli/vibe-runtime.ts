@@ -13,6 +13,7 @@ import "../shared/logger/error-persist";
 import { Command } from "commander";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { DEFAULT_PROJECT_URL } from "@/config/constants";
 import { enableDebug, enableMcpSilentMode } from "@/config/debug";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -56,6 +57,9 @@ interface CliOptions {
   interactive?: boolean;
   dryRun?: boolean;
   platform?: Platform;
+  target?: string;
+  local?: boolean;
+  remote?: boolean;
 }
 
 /**
@@ -65,16 +69,23 @@ const CLI_NAME = "vibe" as const;
 const CLI_VERSION = "3.0.0" as const;
 const DEFAULT_OUTPUT = "pretty" as const;
 
-import { env } from "@/config/env";
+import { defaultLocale } from "@/i18n/core/config";
 
 import {
   type CliCompatiblePlatform,
   RouteDelegationHandler,
 } from "./runtime/route-executor";
+import { CliTarget, type CliTargetValue } from "./types/cli-target";
 
 const program = new Command();
 
-const { t: earlyT } = cliScopedTranslation.scopedT(env.VIBE_CLI_LOCALE);
+// Read locale from process.env instead of the env singleton.
+// The env singleton (@/config/env) captures DATABASE_URL at import time,
+// before loadEnvironment() can apply --preview port swap. Avoiding that
+// static import lets the preview DB URL propagate correctly.
+const cliLocale = (process.env["VIBE_CLI_LOCALE"] ??
+  defaultLocale) as typeof defaultLocale;
+const { t: earlyT } = cliScopedTranslation.scopedT(cliLocale);
 
 program
   .name(CLI_NAME)
@@ -87,11 +98,7 @@ program
   .argument("[command]", earlyT("vibe.help.usage"))
   .argument("[args...]", earlyT("vibe.help.commands"))
   .option("-d, --data <json>", earlyT("vibe.executeCommand"))
-  .option(
-    "-l, --locale <locale>",
-    earlyT("vibe.help.locale"),
-    env.VIBE_CLI_LOCALE,
-  )
+  .option("-l, --locale <locale>", earlyT("vibe.help.locale"), cliLocale)
   .option("-o, --output <format>", earlyT("vibe.output"), DEFAULT_OUTPUT)
 
   .option(
@@ -106,7 +113,13 @@ program
   )
   .option("-i, --interactive", earlyT("vibe.help.interactive"), false)
   .option("--dry-run", earlyT("vibe.help.dryRun"), false)
-  .option("--preview", earlyT("vibe.help.preview"), false)
+  .option(
+    `--target <${Object.values(CliTarget).join("|")}>`,
+    earlyT("vibe.help.target"),
+    CliTarget.DEV,
+  )
+  .option("--local", earlyT("vibe.help.target"), false) // eslint-disable-line i18next/no-literal-string
+  .option("--remote", earlyT("vibe.help.target"), false) // eslint-disable-line i18next/no-literal-string
   .option(
     "--platform <platform>", // eslint-disable-line i18next/no-literal-string
     `Override detected platform. Valid values: ${Object.values(Platform).join(", ")}`, // eslint-disable-line i18next/no-literal-string
@@ -142,6 +155,30 @@ program
         : null;
       const effectivePlatform: CliCompatiblePlatform =
         platformOverride ?? cliPlatform;
+
+      // Resolve CLI target from --target flag or --local/--remote aliases (default: dev)
+      // Also respect IS_PREVIEW_MODE for `vibe start` / `vibe build` auto-detection
+      const targetArg: CliTargetValue = options.remote
+        ? CliTarget.REMOTE
+        : options.local
+          ? CliTarget.LOCAL
+          : ((options.target ?? CliTarget.DEV) as CliTargetValue);
+      let cliTarget: CliTargetValue;
+      let resolvedRemoteUrl: string | undefined;
+
+      if (targetArg === CliTarget.REMOTE) {
+        cliTarget = CliTarget.REMOTE;
+        resolvedRemoteUrl =
+          process.env["VIBE_REMOTE_URL"] || DEFAULT_PROJECT_URL;
+        resolvedRemoteUrl = resolvedRemoteUrl.replace(/\/+$/, "");
+      } else if (
+        targetArg === CliTarget.LOCAL ||
+        process.env["IS_PREVIEW_MODE"] === "true"
+      ) {
+        cliTarget = CliTarget.LOCAL;
+      } else {
+        cliTarget = CliTarget.DEV;
+      }
 
       const debug = options.debug || options.verbose;
       const logger = createEndpointLogger(
@@ -219,6 +256,8 @@ program
               verbose: debug ?? false,
               interactive: options.interactive ?? false,
               dryRun: options.dryRun ?? false,
+              cliTarget,
+              remoteUrl: resolvedRemoteUrl,
             },
             logger,
           );
@@ -265,6 +304,8 @@ program
               verbose: debug ?? false,
               interactive: options.interactive ?? false,
               dryRun: options.dryRun ?? false,
+              cliTarget,
+              remoteUrl: resolvedRemoteUrl,
             },
             logger,
           );
@@ -344,6 +385,8 @@ program
             verbose: debug ?? false,
             interactive: options.interactive ?? false,
             dryRun: options.dryRun ?? false,
+            cliTarget,
+            remoteUrl: resolvedRemoteUrl,
           },
           logger,
         );

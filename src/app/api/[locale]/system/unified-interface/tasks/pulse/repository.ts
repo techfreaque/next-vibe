@@ -4,7 +4,7 @@
  * Following interface + implementation pattern
  */
 
-import { and, count, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, ne, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -513,6 +513,51 @@ export class PulseHealthRepository {
           continue;
         }
 
+        // Atomically claim the task using FOR UPDATE SKIP LOCKED
+        // This prevents two instances from executing the same task simultaneously
+        const claimed = await db.transaction(async (tx) => {
+          const [row] = await tx
+            .select()
+            .from(cronTasksTable)
+            .where(
+              and(
+                eq(cronTasksTable.id, dbTask.id),
+                ne(cronTasksTable.lastExecutionStatus, CronTaskStatus.RUNNING),
+              ),
+            )
+            .for("update", { skipLocked: true })
+            .limit(1);
+
+          if (!row) {
+            return null;
+          }
+
+          await tx
+            .update(cronTasksTable)
+            .set({
+              lastExecutionStatus: CronTaskStatus.RUNNING,
+              ...(dbTask.runOnce ? { enabled: false } : {}),
+              updatedAt: new Date(),
+            })
+            .where(eq(cronTasksTable.id, dbTask.id));
+
+          return row;
+        });
+
+        if (!claimed) {
+          tasksSkipped.push(dbTask.displayName);
+          logger.debug(
+            `Pulse: skipping task "${dbTask.displayName}" — claimed by another instance`,
+          );
+          continue;
+        }
+
+        if (dbTask.runOnce) {
+          logger.info(
+            `[run-once] Task "${dbTask.displayName}" disabled before execution`,
+          );
+        }
+
         tasksExecuted.push(dbTask.displayName);
         logger.debug(
           `Pulse executing task: ${dbTask.displayName} (routeId: ${dbTask.routeId})`,
@@ -553,25 +598,6 @@ export class PulseHealthRepository {
             `Pulse: ${!path ? "unknown routeId" : "no handler"} "${dbTask.routeId}" for task "${dbTask.displayName}"`,
           );
         } else {
-          // Mark task as RUNNING in DB (overlap prevention + run-once pre-disable)
-          await CronTasksRepository.updateTask(
-            dbTask.id,
-            {
-              lastExecutionStatus: CronTaskStatus.RUNNING,
-              // Run-once: disable before execution so a crash won't re-trigger
-              ...(dbTask.runOnce ? { enabled: false } : {}),
-            },
-            null,
-            userLocale,
-            tTask,
-            logger,
-          );
-          if (dbTask.runOnce) {
-            logger.info(
-              `[run-once] Task "${dbTask.displayName}" disabled before execution`,
-            );
-          }
-
           // Fire-and-forget: notify remote that task is now RUNNING
           if (
             dbTask.targetInstance &&
@@ -756,44 +782,26 @@ export class PulseHealthRepository {
             const newConsecutiveFailures = taskSucceeded
               ? 0
               : (dbTask.consecutiveFailures ?? 0) + 1;
-            const maxFailures = dbTask.maxConsecutiveFailures ?? 5;
-            const shouldAutoDisable =
-              !taskSucceeded &&
-              maxFailures > 0 &&
-              newConsecutiveFailures >= maxFailures;
 
-            await CronTasksRepository.updateTask(
-              dbTask.id,
-              {
+            // Use atomic SQL increments to avoid lost updates across instances
+            await db
+              .update(cronTasksTable)
+              .set({
                 lastExecutedAt: startedAt,
                 lastExecutionStatus: finalStatus,
                 lastExecutionError: finalMessage,
                 lastExecutionDuration: finalDurationMs,
-                executionCount: dbTask.executionCount + 1,
+                executionCount: sql`${cronTasksTable.executionCount} + 1`,
                 consecutiveFailures: newConsecutiveFailures,
                 ...(taskSucceeded
-                  ? { successCount: dbTask.successCount + 1 }
-                  : { errorCount: dbTask.errorCount + 1 }),
-                ...(shouldAutoDisable ? { enabled: false } : {}),
+                  ? {
+                      successCount: sql`${cronTasksTable.successCount} + 1`,
+                    }
+                  : { errorCount: sql`${cronTasksTable.errorCount} + 1` }),
                 ...(didLogHistory ? { lastHistoryLoggedAt: new Date() } : {}),
-              },
-              null,
-              userLocale,
-              tTask,
-              logger,
-            );
-
-            if (shouldAutoDisable) {
-              logger.warn(
-                `[auto-disable] Task "${dbTask.displayName}" disabled after ${newConsecutiveFailures} consecutive failures`,
-                {
-                  taskId: dbTask.id,
-                  routeId: dbTask.routeId,
-                  consecutiveFailures: newConsecutiveFailures,
-                  maxConsecutiveFailures: maxFailures,
-                },
-              );
-            }
+                updatedAt: new Date(),
+              })
+              .where(eq(cronTasksTable.id, dbTask.id));
 
             // Fire-and-forget: push final status to remote
             if (
@@ -824,37 +832,19 @@ export class PulseHealthRepository {
             tasksFailed.push(dbTask.displayName);
             const catchConsecutiveFailures =
               (dbTask.consecutiveFailures ?? 0) + 1;
-            const catchMaxFailures = dbTask.maxConsecutiveFailures ?? 5;
-            const catchShouldAutoDisable =
-              catchMaxFailures > 0 &&
-              catchConsecutiveFailures >= catchMaxFailures;
 
-            await CronTasksRepository.updateTask(
-              dbTask.id,
-              {
+            // Use atomic SQL increments to avoid lost updates across instances
+            await db
+              .update(cronTasksTable)
+              .set({
                 lastExecutionStatus: CronTaskStatus.FAILED,
                 lastExecutionError: parseError(unexpectedError).message,
-                executionCount: dbTask.executionCount + 1,
-                errorCount: dbTask.errorCount + 1,
+                executionCount: sql`${cronTasksTable.executionCount} + 1`,
+                errorCount: sql`${cronTasksTable.errorCount} + 1`,
                 consecutiveFailures: catchConsecutiveFailures,
-                ...(catchShouldAutoDisable ? { enabled: false } : {}),
-              },
-              null,
-              userLocale,
-              tTask,
-              logger,
-            );
-
-            if (catchShouldAutoDisable) {
-              logger.warn(
-                `[auto-disable] Task "${dbTask.displayName}" disabled after ${catchConsecutiveFailures} consecutive failures (catch-all)`,
-                {
-                  taskId: dbTask.id,
-                  routeId: dbTask.routeId,
-                  consecutiveFailures: catchConsecutiveFailures,
-                },
-              );
-            }
+                updatedAt: new Date(),
+              })
+              .where(eq(cronTasksTable.id, dbTask.id));
 
             // Fire-and-forget: push FAILED to remote so it doesn't stay stuck on RUNNING
             if (

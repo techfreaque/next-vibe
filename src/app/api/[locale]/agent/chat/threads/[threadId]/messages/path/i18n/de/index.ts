@@ -20,7 +20,12 @@ export const translations: typeof enTranslations = {
     branchIndices: {
       label: "Zweigindizes",
       description:
-        "Zuordnung von Tiefe zu Zweigindex für die Auswahl des Konversationspfads",
+        "Zuordnung von übergeordneter Nachrichten-ID zu Zweigindex für die Auswahl des Konversationspfads",
+    },
+    before: {
+      label: "Vor Nachrichten-ID",
+      description:
+        "Verlaufsblock vor dieser Nachrichten-ID laden (cursorbasierte Paginierung)",
     },
     response: {
       title: "Pfadnachrichten",
@@ -46,8 +51,14 @@ export const translations: typeof enTranslations = {
           depth: {
             content: "Tiefe",
           },
+          sequenceId: {
+            content: "Sequenz-ID",
+          },
           authorId: {
             content: "Autor-ID",
+          },
+          authorName: {
+            content: "Autorname",
           },
           isAI: {
             content: "Ist KI",
@@ -55,8 +66,29 @@ export const translations: typeof enTranslations = {
           model: {
             content: "Modell",
           },
-          tokens: {
-            content: "Tokens",
+          character: {
+            content: "Charakter",
+          },
+          errorType: {
+            content: "Fehlertyp",
+          },
+          errorMessage: {
+            content: "Fehlermeldung",
+          },
+          errorCode: {
+            content: "Fehlercode",
+          },
+          metadata: {
+            content: "Metadaten",
+          },
+          upvotes: {
+            content: "Positiv-Bewertungen",
+          },
+          downvotes: {
+            content: "Negativ-Bewertungen",
+          },
+          searchVector: {
+            content: "Suchvektor",
           },
           createdAt: {
             content: "Erstellt am",
@@ -65,6 +97,27 @@ export const translations: typeof enTranslations = {
             content: "Aktualisiert am",
           },
         },
+      },
+      branchMeta: {
+        title: "Zweig-Metadaten",
+        item: {
+          title: "Zweig-Gabelungspunkt",
+          parentId: {
+            content: "Übergeordnete ID",
+          },
+          siblingCount: {
+            content: "Anzahl Geschwister",
+          },
+          currentIndex: {
+            content: "Aktueller Index",
+          },
+        },
+      },
+      hasOlderHistory: {
+        content: "Hat älteren Verlauf",
+      },
+      oldestLoadedMessageId: {
+        content: "Älteste geladene Nachrichten-ID",
       },
     },
     errors: {

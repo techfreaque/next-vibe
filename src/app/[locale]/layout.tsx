@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import Script from "next/script";
+import { Body } from "next-vibe-ui/ui/body";
 import { Html } from "next-vibe-ui/ui/html";
 import type { JSX, ReactNode } from "react";
 
@@ -14,7 +15,6 @@ import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
-import { Body } from "@/packages/next-vibe-ui/web/ui/body";
 
 import { RootProviders } from "./layout-shared";
 

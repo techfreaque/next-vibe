@@ -3,6 +3,8 @@
  * Handles routing logic for threads and folders
  */
 
+import type { Route } from "next";
+
 import {
   DefaultFolderId,
   isDefaultFolderId,
@@ -50,7 +52,7 @@ export function buildFolderUrl(
   locale: CountryLanguage,
   rootFolderId: DefaultFolderId,
   subFolderId?: string | null,
-): string {
+): Route {
   if (subFolderId) {
     return `/${locale}/threads/${rootFolderId}/${subFolderId}`;
   }

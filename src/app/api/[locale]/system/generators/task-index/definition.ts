@@ -16,7 +16,6 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
 
@@ -30,10 +29,7 @@ const { POST } = createEndpoint({
   tags: ["post.title"],
   icon: "wand",
   allowedRoles: [
-    UserRole.ADMIN,
-    UserRole.WEB_OFF,
-    UserRole.AI_TOOL_OFF,
-    UserRole.PRODUCTION_OFF,
+    // use vibe generate instead
   ],
 
   fields: scopedObjectFieldNew(scopedTranslation, {

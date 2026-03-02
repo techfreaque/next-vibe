@@ -1,10 +1,10 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils/utils";
+import { Check, ChevronDown, X } from "next-vibe-ui/ui/icons";
 import * as React from "react";
 
 import { useTranslation } from "@/i18n/core/client";
-import { Check, ChevronDown, X } from "@/packages/next-vibe-ui/web/ui/icons";
 
 import type { StyleType } from "../utils/style-type";
 import { Badge } from "./badge";

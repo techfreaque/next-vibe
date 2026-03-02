@@ -12,7 +12,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { v4 as uuidv4 } from "uuid";
 
-import type { scopedTranslation } from "@/app/api/[locale]/agent/ai-stream/i18n";
+import type { scopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import {
   calculateCreditCost,
   getModelById,

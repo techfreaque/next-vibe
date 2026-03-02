@@ -1,10 +1,11 @@
 /**
  * Conversation Path Endpoint Definition
- * Retrieves messages following a specific conversation path
+ * Retrieves messages following a specific conversation path with branch metadata
  */
 
 import { z } from "zod";
 
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { dateSchema } from "@/app/api/[locale]/shared/types/common.schema";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
@@ -23,18 +24,25 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import type { MessageMetadata } from "../../../../db";
 import { ChatMessageRole } from "../../../../enum";
 import { scopedTranslation } from "./i18n";
 
 /**
  * Get Conversation Path Endpoint (GET)
- * Retrieves messages following a specific conversation path
+ * Retrieves messages following a specific conversation path with branch metadata
+ * Supports compaction-aware pagination via `before` cursor
  */
 const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["agent", "chat", "threads", "[threadId]", "messages", "path"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [
+    UserRole.PUBLIC,
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.REMOTE_SKILL,
+  ] as const,
 
   title: "get.title" as const,
   description: "get.description" as const,
@@ -105,6 +113,13 @@ const { GET } = createEndpoint({
         description: "get.branchIndices.description" as const,
         schema: z.record(z.string(), z.coerce.number()).optional(),
       }),
+      before: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.before.label" as const,
+        description: "get.before.description" as const,
+        schema: z.string().uuid().optional(),
+      }),
 
       // === RESPONSE ===
       messages: scopedResponseArrayFieldNew(scopedTranslation, {
@@ -148,10 +163,22 @@ const { GET } = createEndpoint({
               content: "get.response.messages.message.depth.content" as const,
               schema: z.coerce.number(),
             }),
+            sequenceId: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content:
+                "get.response.messages.message.sequenceId.content" as const,
+              schema: z.string().uuid().nullable(),
+            }),
             authorId: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content:
                 "get.response.messages.message.authorId.content" as const,
+              schema: z.string().nullable(),
+            }),
+            authorName: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content:
+                "get.response.messages.message.authorName.content" as const,
               schema: z.string().nullable(),
             }),
             isAI: scopedResponseField(scopedTranslation, {
@@ -162,6 +189,53 @@ const { GET } = createEndpoint({
             model: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.messages.message.model.content" as const,
+              schema: z.nativeEnum(ModelId).nullable(),
+            }),
+            character: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content:
+                "get.response.messages.message.character.content" as const,
+              schema: z.string().nullable(),
+            }),
+            errorType: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content:
+                "get.response.messages.message.errorType.content" as const,
+              schema: z.string().nullable(),
+            }),
+            errorMessage: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content:
+                "get.response.messages.message.errorMessage.content" as const,
+              schema: z.string().nullable(),
+            }),
+            errorCode: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content:
+                "get.response.messages.message.errorCode.content" as const,
+              schema: z.string().nullable(),
+            }),
+            metadata: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content:
+                "get.response.messages.message.metadata.content" as const,
+              schema: z.custom<MessageMetadata>().nullable(),
+            }),
+            upvotes: scopedResponseField(scopedTranslation, {
+              type: WidgetType.STAT,
+              content: "get.response.messages.message.upvotes.content" as const,
+              schema: z.number(),
+            }),
+            downvotes: scopedResponseField(scopedTranslation, {
+              type: WidgetType.STAT,
+              content:
+                "get.response.messages.message.downvotes.content" as const,
+              schema: z.number(),
+            }),
+            searchVector: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content:
+                "get.response.messages.message.searchVector.content" as const,
               schema: z.string().nullable(),
             }),
             createdAt: scopedResponseField(scopedTranslation, {
@@ -178,6 +252,43 @@ const { GET } = createEndpoint({
             }),
           },
         }),
+      }),
+      branchMeta: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        child: scopedObjectFieldNew(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          title: "get.response.branchMeta.item.title" as const,
+          usage: { response: true },
+          children: {
+            parentId: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.branchMeta.item.parentId.content" as const,
+              schema: z.string(),
+            }),
+            siblingCount: scopedResponseField(scopedTranslation, {
+              type: WidgetType.STAT,
+              content:
+                "get.response.branchMeta.item.siblingCount.content" as const,
+              schema: z.number(),
+            }),
+            currentIndex: scopedResponseField(scopedTranslation, {
+              type: WidgetType.STAT,
+              content:
+                "get.response.branchMeta.item.currentIndex.content" as const,
+              schema: z.number(),
+            }),
+          },
+        }),
+      }),
+      hasOlderHistory: scopedResponseField(scopedTranslation, {
+        type: WidgetType.BADGE,
+        content: "get.response.hasOlderHistory.content" as const,
+        schema: z.boolean(),
+      }),
+      oldestLoadedMessageId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.oldestLoadedMessageId.content" as const,
+        schema: z.string().nullable(),
       }),
     },
   }),
@@ -209,13 +320,26 @@ const { GET } = createEndpoint({
             content: "Hello, how can you help me?",
             parentId: null,
             depth: 0,
+            sequenceId: null,
             authorId: "770e8400-e29b-41d4-a716-446655440000",
+            authorName: null,
             isAI: false,
             model: null,
+            character: null,
+            errorType: null,
+            errorMessage: null,
+            errorCode: null,
+            metadata: null,
+            upvotes: 0,
+            downvotes: 0,
+            searchVector: null,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
           },
         ],
+        branchMeta: [],
+        hasOlderHistory: false,
+        oldestLoadedMessageId: null,
       },
     },
   },

@@ -166,6 +166,7 @@ export function useIncognitoChat(
         rolesModerate: null,
         rolesAdmin: null,
         published: false,
+        isStreaming: false,
         canPost: true,
         canEdit: true,
         canModerate: true,

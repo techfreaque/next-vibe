@@ -299,9 +299,12 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   const setFormErrorStore = useApiStore((state) => state.setFormError);
   const clearFormErrorStore = useApiStore((state) => state.clearFormError);
 
-  // Generate a storage key based on the endpoint if not provided
+  // Generate a storage key based on the endpoint + urlPathParams if not provided
+  // Include urlPathParams so endpoints with dynamic path segments (e.g. /threads/:threadId/messages)
+  // get a unique storage key per resource — prevents stale persisted form data from a previous
+  // resource overwriting the correct params when navigating to a different resource.
   const storageKey =
-    persistenceKey || buildKey("query-form", endpoint, undefined, logger);
+    persistenceKey || buildKey("query-form", endpoint, urlPathParams, logger);
 
   // Create form configuration with schema defaults
   const formConfigWithDefaults: UseFormProps<
@@ -346,6 +349,16 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
       }
     })();
   }, [formMethods, storageKey, setQueryParams, restFormOptions.defaultValues]);
+
+  // Sync form default values to store on mount.
+  // This ensures the queryFn always picks up the correct initial values
+  // even when a previous instance left stale params in the global store.
+  // Only runs once on mount (empty deps) — subsequent changes are handled
+  // by the form watch subscription.
+  const initialDefaultsRef = useRef(mergedDefaultValues);
+  useEffect(() => {
+    setQueryParams(initialDefaultsRef.current);
+  }, [setQueryParams]);
 
   // Load saved form values on mount - merge with schema defaults
   useEffect(() => {
@@ -440,15 +453,34 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     [setFormErrorStore, formId, hooksT],
   );
 
+  // When urlPathParams are present, use mergedDefaultValues as requestData so the correct
+  // path params are used immediately on mount — before the async setQueryParams effect runs.
+  // Without this, the global Zustand form store (keyed by endpoint only) may still hold stale
+  // params from a previous navigation to the same endpoint with different urlPathParams.
+  const hasUrlPathParamsForQuery =
+    urlPathParams !== undefined &&
+    urlPathParams !== null &&
+    typeof urlPathParams === "object" &&
+    Object.keys(urlPathParams as FormQueryParams).length > 0;
+  const effectiveRequestData = hasUrlPathParamsForQuery
+    ? mergedDefaultValues
+    : queryParams;
+
   // Use API query with form values as parameters from the store
   const query = useApiQuery({
     endpoint,
-    requestData: queryParams,
+    requestData: effectiveRequestData,
     urlPathParams: urlPathParams,
     logger,
     user,
     options: {
       ...queryOptions,
+      // Narrow refetchInterval to the simpler type accepted by useApiQuery
+      refetchInterval:
+        typeof queryOptions.refetchInterval === "number" ||
+        queryOptions.refetchInterval === false
+          ? queryOptions.refetchInterval
+          : undefined,
       // Respect staleTime and cacheTime from queryOptions
       // Don't hardcode to 0 as this breaks caching for all read endpoints
       // Custom onSuccess handler to merge response data into form
@@ -535,8 +567,13 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
         JSON.stringify(prevQueryParamsRef.current) !==
         JSON.stringify(queryParams);
       if (hasChanged && Object.keys(queryParams).length > 0) {
-        // Only refetch if not already loading to avoid conflicts
-        if (!query.isLoading) {
+        // Only refetch if not already loading and not already populated with fresh cached data.
+        // isCachedData + !isLoadingFresh means we have SSR initialData — skip the explicit refetch
+        // so staleTime is respected instead of being bypassed by an explicit refetch() call.
+        if (
+          !query.isLoading &&
+          !(query.isCachedData && !query.isLoadingFresh)
+        ) {
           void query.refetch();
         }
       }
@@ -816,7 +853,9 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
 
     isSubmitting: query.isLoading,
     isLoading: query.isLoading,
+    isLoadingFresh: query.isLoadingFresh,
     isFetching: query.isFetching,
+    isCachedData: query.isCachedData,
     status: query.status,
     refetch: query.refetch,
     submitForm,

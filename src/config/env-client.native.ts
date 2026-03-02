@@ -2,6 +2,7 @@
 import Constants from "expo-constants";
 import { Environment } from "next-vibe/shared/utils/env-util";
 
+import { DEFAULT_PROJECT_URL } from "@/config/constants";
 import type { EnvClient } from "@/config/env-client";
 
 // React Native global type
@@ -32,5 +33,5 @@ export const envClient: EnvClient = {
   NEXT_PUBLIC_TEST_SERVER_URL: `http://${devServerIp}:3000`,
   NEXT_PUBLIC_DEBUG_PRODUCTION: false,
   NEXT_PUBLIC_LOCAL_MODE: false,
-  NEXT_PUBLIC_PROJECT_URL: "https://unbottled.ai",
+  NEXT_PUBLIC_PROJECT_URL: DEFAULT_PROJECT_URL,
 };

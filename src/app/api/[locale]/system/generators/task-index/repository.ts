@@ -26,6 +26,7 @@ import {
   formatGenerator,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
 
+import type { LiveIndex } from "../shared/live-index";
 import {
   findFilesRecursively,
   generateFileHeader,
@@ -59,6 +60,7 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
     data: RequestType,
     logger: EndpointLogger,
     t: ModuleT,
+    liveIndex?: LiveIndex,
   ): Promise<BaseResponseType<TaskIndexResponseType>> {
     const startTime = Date.now();
 
@@ -66,14 +68,23 @@ class TaskIndexGeneratorRepositoryImpl implements TaskIndexGeneratorRepository {
       const outputFile = data.outputFile;
       logger.debug(`Starting task index generation: ${outputFile}`);
 
-      // Discover task files
-      const startDir = join(process.cwd(), "src", "app", "api");
+      // Use live index when available (dev watcher), otherwise scan from disk
+      let taskFiles: string[];
+      let taskRunnerFiles: string[];
 
-      logger.debug("Discovering task files");
-      const taskFiles = findFilesRecursively(startDir, "task.ts");
+      if (liveIndex) {
+        logger.debug("Using live index for file discovery");
+        taskFiles = [...liveIndex.taskFiles];
+        taskRunnerFiles = [...liveIndex.taskRunnerFiles];
+      } else {
+        const startDir = join(process.cwd(), "src", "app", "api");
 
-      logger.debug("Discovering task runner files");
-      const taskRunnerFiles = findFilesRecursively(startDir, "task-runner.ts");
+        logger.debug("Discovering task files");
+        taskFiles = findFilesRecursively(startDir, "task.ts");
+
+        logger.debug("Discovering task runner files");
+        taskRunnerFiles = findFilesRecursively(startDir, "task-runner.ts");
+      }
 
       logger.debug(
         `Found ${taskFiles.length} task.ts files, ${taskRunnerFiles.length} task-runner.ts files`,

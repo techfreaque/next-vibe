@@ -7,13 +7,13 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { NO_CHARACTER_ID } from "@/app/api/[locale]/agent/chat/characters/constants";
 import { CharactersRepositoryClient } from "@/app/api/[locale]/agent/chat/characters/repository-client";
-import { ModelSelector } from "@/app/api/[locale]/agent/models/components/model-selector";
-import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/components/types";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import type { ModelSelectionSimple } from "@/app/api/[locale]/agent/models/types";
+import { ModelSelector } from "@/app/api/[locale]/agent/models/widget/model-selector";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
   useWidgetForm,
@@ -60,6 +60,7 @@ export function FavoriteCreateContainer({
   const navigate = useWidgetNavigation();
   const [isApplying, setIsApplying] = useState(false);
 
+  const emptyField = useMemo(() => ({}), []);
   const characterId = form?.watch("characterId");
   const voice = form.watch("voice");
   const isNoCharacter = characterId === NO_CHARACTER_ID;
@@ -147,7 +148,7 @@ export function FavoriteCreateContainer({
       </Div>
       {/* Scrollable Form Container */}
       <Div className="group overflow-y-auto max-h-[min(800px,calc(100dvh-180px))] px-4 pb-4">
-        <FormAlertWidget field={{}} />
+        <FormAlertWidget field={emptyField} />
 
         <AlertWidget
           fieldName="success"

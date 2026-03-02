@@ -38,8 +38,11 @@ import { useEffect, useState } from "react";
 import type { FieldValues } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
-import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
-import { useChatContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import type {
+  ToolCall,
+  ToolCallResult,
+} from "@/app/api/[locale]/agent/chat/db";
+import type { SendMessageParams } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/operations/send-message";
 import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
 import {
   createEndpointLogger,
@@ -106,6 +109,8 @@ interface ToolCallRendererProps {
   parentId?: string;
   /** Decision state for batch mode - used to style buttons and manage collapse */
   decision?: ToolDecision;
+  /** Send message callback for tool confirmations */
+  sendMessage?: (params: SendMessageParams) => void;
 }
 
 /**
@@ -127,10 +132,10 @@ export function ToolCallRenderer({
   decision,
   logger,
   platformOverride,
+  sendMessage,
 }: ToolCallRendererProps): JSX.Element {
   const { t } = reactScopedTranslation.scopedT(locale);
   const { t: globalT } = simpleT(locale);
-  const { sendMessage } = useChatContext();
   const loadPlatform = platformOverride ?? Platform.NEXT_PAGE;
 
   // Determine if tool is waiting for user confirmation
@@ -323,8 +328,42 @@ export function ToolCallRenderer({
   ]);
 
   const hasResult = Boolean(toolCall.result);
-  const hasError = Boolean(toolCall.error);
+  // Detect error: toolCall.error should be an ErrorResponseType (object with success=false).
+  // Also detect when toolCall.result is an ErrorResponseType (tool returned fail() without throwing).
+  const resultIsError =
+    toolCall.result !== null &&
+    toolCall.result !== undefined &&
+    typeof toolCall.result === "object" &&
+    !Array.isArray(toolCall.result) &&
+    "success" in toolCall.result &&
+    toolCall.result.success === false;
+  const hasError = Boolean(toolCall.error) || resultIsError;
   const isLoading = !hasResult && !hasError && !isWaitingForConfirmation;
+
+  /** Extract a displayable error message from toolCall.error or toolCall.result (when it's an ErrorResponseType) */
+  const getErrorMessage = (): string => {
+    // Primary: toolCall.error is ErrorResponseType with typed TranslationKey message
+    const err = toolCall.error;
+    if (err) {
+      return globalT(
+        err.message,
+        err.messageParams as Record<string, string | number> | undefined,
+      );
+    }
+    // Fallback: toolCall.result is an ErrorResponseType (tool returned fail() without throwing).
+    // Display the raw message string — it may be a translation key but ToolCallResult
+    // doesn't carry TranslationKey typing, so we display as-is.
+    if (
+      resultIsError &&
+      typeof toolCall.result === "object" &&
+      toolCall.result !== null &&
+      "message" in toolCall.result &&
+      typeof toolCall.result.message === "string"
+    ) {
+      return toolCall.result.message;
+    }
+    return "";
+  };
 
   const [wasWaitingForConfirmation, setWasWaitingForConfirmation] = useState(
     isWaitingForConfirmation,
@@ -635,14 +674,7 @@ export function ToolCallRenderer({
                         {t("widgets.toolCall.messages.errorLabel")}
                       </Span>
                       <Span className="text-destructive text-sm">
-                        {toolCall.error
-                          ? globalT(
-                              toolCall.error.message,
-                              toolCall.error.messageParams as
-                                | Record<string, string | number>
-                                | undefined,
-                            )
-                          : ""}
+                        {getErrorMessage()}
                       </Span>
                     </Div>
                   </Div>
@@ -667,12 +699,31 @@ export function ToolCallRenderer({
                   !Array.isArray(toolCall.args)
                     ? toolCall.args
                     : {};
-                const resultObj =
-                  toolCall.result &&
-                  typeof toolCall.result === "object" &&
-                  !Array.isArray(toolCall.result)
-                    ? toolCall.result
-                    : {};
+                // Parse string results (backwards compat: old DB rows may have stringified results)
+                let resultObj: { [key: string]: ToolCallResult } = {};
+                if (toolCall.result) {
+                  if (
+                    typeof toolCall.result === "object" &&
+                    !Array.isArray(toolCall.result)
+                  ) {
+                    resultObj = toolCall.result;
+                  } else if (typeof toolCall.result === "string") {
+                    try {
+                      const parsed = JSON.parse(
+                        toolCall.result,
+                      ) as ToolCallResult;
+                      if (
+                        parsed &&
+                        typeof parsed === "object" &&
+                        !Array.isArray(parsed)
+                      ) {
+                        resultObj = parsed;
+                      }
+                    } catch {
+                      // Not valid JSON string — leave empty
+                    }
+                  }
+                }
                 const mergedData = { ...argsObj, ...resultObj };
 
                 // Determine state:
@@ -691,6 +742,9 @@ export function ToolCallRenderer({
                   }
 
                   // Individual mode: submit immediately
+                  if (!sendMessage) {
+                    return;
+                  }
                   const argsRecord: Record<
                     string,
                     string | number | boolean | null
@@ -728,6 +782,9 @@ export function ToolCallRenderer({
                   }
 
                   // Individual mode: submit immediately
+                  if (!sendMessage) {
+                    return;
+                  }
                   sendMessage({
                     content: "",
                     attachments: [],
@@ -788,14 +845,7 @@ export function ToolCallRenderer({
                     {isDeclined && (
                       <Div className="rounded-md bg-destructive/10 border border-destructive/20 p-3">
                         <Span className="text-destructive text-sm font-medium">
-                          {toolCall.error
-                            ? globalT(
-                                toolCall.error.message,
-                                toolCall.error.messageParams as
-                                  | Record<string, string | number>
-                                  | undefined,
-                              )
-                            : ""}
+                          {getErrorMessage()}
                         </Span>
                       </Div>
                     )}

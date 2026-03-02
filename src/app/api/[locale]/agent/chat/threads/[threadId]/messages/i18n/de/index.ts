@@ -5,6 +5,9 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   ...searchTranslations,
+  loadingOlderMessages: "Ältere Nachrichten werden geladen...",
+  scrollUpForOlderMessages: "Nach oben scrollen für ältere Nachrichten",
+  showOlderMessages: "Ältere Nachrichten anzeigen",
   transcribing: "Audio wird transkribiert...",
   errorCode: "Fehlercode",
   compacting: {
@@ -161,6 +164,10 @@ export const translations: typeof enTranslations = {
       label: "Model",
       description: "AI model to use for response",
     },
+    character: {
+      label: "Charakter",
+      description: "KI-Charakter/Persona für die Nachricht",
+    },
     metadata: {
       label: "Metadaten",
       description: "Nachrichtenmetadaten (Anhänge, Tokens, etc.)",
@@ -250,6 +257,10 @@ export const translations: typeof enTranslations = {
       user: "Benutzer",
       assistant: "Assistent",
     },
+  },
+  debugView: {
+    systemPromptTitle: "System-Prompt",
+    copied: "Kopiert!",
   },
   messageId: messageIdTranslations,
   path: pathTranslations,

@@ -27,7 +27,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolExecutionContext } from "../../../chat/config";
 import { type ToolCall, type ToolCallResult } from "../../../chat/db";
-import type { AiStreamT } from "../../i18n";
+import type { AiStreamT } from "../../stream/i18n";
 import type { MessageDbWriter } from "../core/message-db-writer";
 
 export class ToolErrorHandler {
@@ -293,10 +293,12 @@ export class ToolErrorHandler {
 
       const toolCallWithError: ToolCall = {
         ...toolCallData.toolCall,
-        error: {
-          message: fallbackResult.error,
+        error: fail({
+          message: t("errors.toolExecutionError", {
+            error: fallbackResult.error,
+          }),
           errorType: ErrorResponseTypes.INVALID_REQUEST_ERROR,
-        } as ErrorResponseType,
+        }),
       };
 
       await dbWriter.emitToolResult({
@@ -442,22 +444,30 @@ export class ToolErrorHandler {
       t,
     } = params;
 
-    const error: ErrorResponseType =
-      "error" in part && part.error
-        ? typeof part.error === "object" &&
-          part.error !== null &&
-          "message" in part.error &&
-          typeof part.error.message === "string"
-          ? // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
-            (part.error as unknown as ErrorResponseType)
-          : fail({
-              message: t("errors.toolExecutionError"),
-              errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-            })
-        : fail({
-            message: t("errors.toolExecutionFailed"),
-            errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-          });
+    // Build a proper ErrorResponseType from the SDK error.
+    // The SDK's part.error is JSONValue — it may be a string, object, or anything.
+    // We never trust it to be ErrorResponseType; always wrap via fail().
+    const sdkError = "error" in part ? part.error : undefined;
+    const sdkErrorMessage =
+      sdkError &&
+      typeof sdkError === "object" &&
+      sdkError !== null &&
+      "message" in sdkError &&
+      typeof sdkError.message === "string"
+        ? sdkError.message
+        : typeof sdkError === "string"
+          ? sdkError
+          : undefined;
+
+    const error: ErrorResponseType = sdkErrorMessage
+      ? fail({
+          message: t("errors.toolExecutionError", { error: sdkErrorMessage }),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        })
+      : fail({
+          message: t("errors.toolExecutionFailed"),
+          errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
+        });
 
     logger.info("[AI Stream] Tool error event received", {
       toolName: part.toolName,

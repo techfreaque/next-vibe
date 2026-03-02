@@ -19,26 +19,26 @@ export async function getSeedModule(
   switch (moduleName) {
     case "folders":
       return (await import("../../agent/chat/folders/seeds")) as EnvironmentSeeds;
-    case "tasks":
-      return (await import("../unified-interface/tasks/seeds")) as EnvironmentSeeds;
-    case "leads":
-      return (await import("../../leads/seeds")) as EnvironmentSeeds;
-    case "users":
-      return (await import("../../users/seeds")) as EnvironmentSeeds;
-    case "user":
-      return (await import("../../user/seeds")) as EnvironmentSeeds;
-    case "subscription":
-      return (await import("../../subscription/seeds")) as EnvironmentSeeds;
     case "contact":
       return (await import("../../contact/seeds")) as EnvironmentSeeds;
-    case "smtp-client":
-      return (await import("../../emails/smtp-client/seeds")) as EnvironmentSeeds;
-    case "messages":
-      return (await import("../../emails/messages/seeds")) as EnvironmentSeeds;
     case "imap-client":
       return (await import("../../emails/imap-client/seeds")) as EnvironmentSeeds;
+    case "messages":
+      return (await import("../../emails/messages/seeds")) as EnvironmentSeeds;
+    case "smtp-client":
+      return (await import("../../emails/smtp-client/seeds")) as EnvironmentSeeds;
+    case "leads":
+      return (await import("../../leads/seeds")) as EnvironmentSeeds;
     case "newsletter":
       return (await import("../../newsletter/seeds")) as EnvironmentSeeds;
+    case "subscription":
+      return (await import("../../subscription/seeds")) as EnvironmentSeeds;
+    case "tasks":
+      return (await import("../unified-interface/tasks/seeds")) as EnvironmentSeeds;
+    case "user":
+      return (await import("../../user/seeds")) as EnvironmentSeeds;
+    case "users":
+      return (await import("../../users/seeds")) as EnvironmentSeeds;
     default:
       return null;
   }
@@ -50,16 +50,16 @@ export async function getSeedModule(
 export function getAllSeedModuleNames(): string[] {
   return [
     "folders",
-    "tasks",
-    "leads",
-    "users",
-    "user",
-    "subscription",
     "contact",
-    "smtp-client",
-    "messages",
     "imap-client",
+    "messages",
+    "smtp-client",
+    "leads",
     "newsletter",
+    "subscription",
+    "tasks",
+    "user",
+    "users",
   ];
 }
 

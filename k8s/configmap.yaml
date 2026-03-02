@@ -1,0 +1,23 @@
+# Non-secret environment variables
+# Copy and fill in your values before applying
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: next-vibe-config
+  namespace: next-vibe
+data:
+  NODE_ENV: "production"
+  # App URL — must match your ingress hostname
+  NEXT_PUBLIC_APP_URL: "https://your-domain.com"
+  NEXT_PUBLIC_PROJECT_URL: "https://unbottled.ai"
+  # Instance ID for task routing
+  INSTANCE_ID: "k8s-prod"
+  # Pulse interval in minutes
+  PULSE_INTERVAL_MINUTES: "1"
+  # WebSocket pub/sub: "local" for single web replica, "redis" for multiple
+  WS_PUBSUB_TYPE: "local"
+  # Storage: "s3" recommended for multi-instance, "filesystem" for single
+  CHAT_STORAGE_TYPE: "filesystem"
+  CHAT_STORAGE_PATH: "/app/uploads/chat"
+  # Analytics
+  ENABLE_ANALYTICS: "false"

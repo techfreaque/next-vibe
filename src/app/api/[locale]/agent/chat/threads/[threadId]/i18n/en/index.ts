@@ -26,6 +26,10 @@ export const translations = {
       description: "Unique identifier for the thread",
       placeholder: "Enter thread ID...",
     },
+    rootFolderId: {
+      label: "Root Folder",
+      description: "Root folder of the thread (used for client routing)",
+    },
     response: {
       thread: {
         title: "Thread Details",
@@ -154,6 +158,10 @@ export const translations = {
       label: "Title",
       description: "Thread title",
       placeholder: "Enter thread title...",
+    },
+    rootFolderId: {
+      label: "Root Folder",
+      description: "Root folder of the thread (used for client routing)",
     },
     folderId: {
       label: "Folder",
@@ -310,6 +318,10 @@ export const translations = {
       description: "Unique identifier for the thread to delete",
       placeholder: "Enter thread ID...",
       helpText: "WARNING: This action cannot be undone",
+    },
+    rootFolderId: {
+      label: "Root Folder",
+      description: "Root folder of the thread (used for client routing)",
     },
     response: {
       success: {

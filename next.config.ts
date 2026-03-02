@@ -73,11 +73,9 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
 
-  // Support for WebSockets and build tools in server components
+  // External packages that use dynamic imports incompatible with Next.js bundling
   serverExternalPackages: [
-    "socket.io",
-    "socket.io-client",
-    // Vite and related packages for builder tool (uses dynamic imports incompatible with Next.js bundling)
+    // Vite and related packages for builder tool
     "vite",
     "rollup",
     "@vitejs/plugin-react",
@@ -101,16 +99,6 @@ const nextConfig: NextConfig = {
     "module",
   ],
 
-  // Ensure WebSocket routes are properly handled
-
-  rewrites() {
-    return [
-      {
-        source: "/api/ws",
-        destination: "/api/ws",
-      },
-    ];
-  },
   images: {
     unoptimized: false,
     remotePatterns: [

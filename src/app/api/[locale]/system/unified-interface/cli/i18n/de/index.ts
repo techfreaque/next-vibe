@@ -40,7 +40,8 @@ export const translations: typeof enTranslations = {
       locale: "Sprache angeben (en-GLOBAL, de-DE, pl-PL)",
       verbose: "Ausführliche Ausgabe aktivieren",
       dryRun: "Testlauf ohne Ausführung durchführen",
-      preview: "Preview-Datenbank und App-URL verwenden (LOCAL_MODE_*)",
+      target:
+        "Ausführungsziel: dev (Standard), local (Preview-DB), oder remote (HTTP via NEXT_PUBLIC_PROJECT_URL)",
       interactive: "Interaktiven Modus aktivieren",
     },
     errors: {
@@ -63,6 +64,17 @@ export const translations: typeof enTranslations = {
       storeFailed: "Sitzung konnte nicht gespeichert werden",
       clearFailed: "Sitzung konnte nicht gelöscht werden",
       setLeadIdCookieFailed: "Lead-ID-Cookie konnte nicht gesetzt werden",
+      remoteNoToken: "Remote-Sitzung hat kein aktives Token",
+      remoteExpired: "Remote-Sitzung abgelaufen",
+      remoteNotFound:
+        "Keine Remote-Sitzung gefunden. Ausführen: vibe login --target remote",
+      remoteReadFailed: "Remote-Sitzung konnte nicht gelesen werden",
+      remoteWriteFailed: "Remote-Sitzung konnte nicht geschrieben werden",
+      remoteClearFailed: "Remote-Sitzung konnte nicht gelöscht werden",
+      remoteNotLoggedIn:
+        "Nicht am Remote-Host angemeldet. Ausführen: vibe login --target remote",
+      remoteNoLeadId: "Identität vom Remote-Host konnte nicht abgerufen werden",
+      remoteServerError: "Remote-Server-Fehler",
     },
     endpoints: {
       endpointHandler: {

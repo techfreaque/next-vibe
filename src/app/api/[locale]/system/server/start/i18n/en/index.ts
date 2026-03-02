@@ -23,6 +23,16 @@ export const translations = {
         title: "Skip Next.js Command",
         description: "Skip running Next.js start command",
       },
+      mode: {
+        title: "Server Mode",
+        description:
+          "Which subsystems to run: all (default), web (Next.js + WS only), tasks (task runner only)",
+        options: {
+          all: "All (default)",
+          web: "Web only (Next.js + WebSocket)",
+          tasks: "Tasks only (cron runner)",
+        },
+      },
       seed: {
         title: "Run Seeding",
         description: "Run database seeding on startup",

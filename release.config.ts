@@ -10,6 +10,14 @@
  *   Force update:   vibe release --force-update
  *   Dry run:        vibe release --dry-run
  *   Prerelease:     vibe release --versionIncrement prerelease --prereleaseId alpha
+ *
+ * Deployment:
+ *   After a successful release on main, the postPublish hook deploys to the VPS
+ *   via SSH. Required GitHub Actions secrets:
+ *     - VPS_HOST:     Server IP or hostname
+ *     - VPS_USER:     SSH username (e.g. "root" or a deploy user)
+ *     - VPS_SSH_KEY:  Private SSH key for passwordless login
+ *     - VPS_APP_DIR:  App directory on VPS (e.g. "/root/next-vibe")
  */
 
 import type { ReleaseFileConfig } from "./src/app/api/[locale]/system/release-tool/definition";
@@ -96,6 +104,25 @@ const releaseConfig: ReleaseFileConfig = {
 
         // Folders to zip for release assets
         foldersToZip: [],
+      },
+
+      // Deploy to VPS after successful publish (CI only)
+      // SSHs into the VPS and runs the existing install-docker.sh deploy script.
+      // Required GitHub Actions secrets: VPS_HOST, VPS_USER, VPS_SSH_KEY, VPS_APP_DIR
+      // Skips gracefully when not in CI (local `vibe pub` won't have the env vars).
+      hooks: {
+        postPublish: {
+          command:
+            // Guard: skip deploy when VPS_HOST is not set (local release)
+            'if [ -z "$VPS_HOST" ]; then echo "No VPS_HOST set — skipping deploy (local mode)"; exit 0; fi && ' +
+            // Write SSH key to temp file, SSH in, run the deploy script, clean up key
+            'KEY=$(mktemp) && echo "$VPS_SSH_KEY" > "$KEY" && chmod 600 "$KEY" && ' +
+            'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "$KEY" ' +
+            '"$VPS_USER@$VPS_HOST" "cd $VPS_APP_DIR && bash scripts/install-docker.sh" ; ' +
+            'EXIT=$? ; rm -f "$KEY" ; exit $EXIT',
+          timeout: 300000, // 5 minutes
+          continueOnError: false,
+        },
       },
     },
   ],

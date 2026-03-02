@@ -6,6 +6,9 @@ export const translations: typeof enTranslations = {
     threads: "Threads",
     permissions: "Berechtigungen",
   },
+  dialog: {
+    title: "Thread-Berechtigungen: {{threadTitle}}",
+  },
   get: {
     title: "Thread-Berechtigungen abrufen",
     description:

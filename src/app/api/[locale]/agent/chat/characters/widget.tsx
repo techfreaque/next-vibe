@@ -28,7 +28,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import { useState } from "react";
 import { useMemo } from "react";
 
-import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/components/model-credit-display";
+import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
   useWidgetContext,
@@ -45,10 +45,10 @@ import { useTouchDevice } from "@/hooks/use-touch-device";
 import { cn } from "../../../shared/utils";
 import { Icon } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
-import { useTourState } from "../_components/welcome-tour/tour-state-context";
 import { useAddToFavorites } from "../favorites/create/hooks";
-import { useChatFavorites } from "../favorites/hooks";
-import { useSelectorOnboardingContext } from "../threads/_components/chat-input/selector/selector-onboarding/context";
+import { useChatFavorites } from "../favorites/hooks/hooks";
+import { useSelectorOnboardingContext } from "../threads/widget/chat-input/selector/selector-onboarding/context";
+import { useTourState } from "../widget/welcome-tour/tour-state-context";
 import characterDetailDefinitions from "./[id]/definition";
 import { COMPANION_CHARACTERS } from "./config";
 import type { CharacterListItem } from "./definition";
@@ -86,7 +86,9 @@ export function CharactersListContainer({
   );
 
   // Fetch favorites to calculate favoriteIds for each character
-  const { favorites, activeFavoriteId } = useChatFavorites(logger);
+  const { favorites, activeFavoriteId } = useChatFavorites(logger, {
+    activeFavoriteId: null,
+  });
 
   // Group favorites by character ID
   const favoritesByCharacter = useMemo(() => {
@@ -1214,7 +1216,9 @@ function FavoritesList({
   t: ReturnType<typeof useWidgetTranslation>;
   locale: ReturnType<typeof useWidgetContext>["locale"];
 }): React.JSX.Element {
-  const { favorites } = useChatFavorites(logger);
+  const { favorites } = useChatFavorites(logger, {
+    activeFavoriteId: null,
+  });
 
   // Get favorite cards for the IDs we have
   const favoriteCards = useMemo(() => {

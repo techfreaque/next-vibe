@@ -22,6 +22,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
+import type { DirtyFlags, LiveIndex } from "../shared/live-index";
 import type endpoints from "./definition";
 import { scopedTranslation } from "./i18n";
 
@@ -331,7 +332,7 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       }
 
       // 4. tRPC Router Generator
-      if (!data.skipTrpc) {
+      if (data.enableTrpc) {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
@@ -495,6 +496,235 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       });
     }
   }
+
+  /**
+   * Run only the generators whose dirty flags are set, using the live index.
+   * Used by the dev watcher for surgical, efficient regeneration.
+   */
+  async generateDirty(
+    dirty: DirtyFlags,
+    liveIndex: LiveIndex,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<void> {
+    const generatorPromises: Promise<void>[] = [];
+    const ran: string[] = [];
+    const skipped: string[] = [];
+
+    // Endpoint generators (endpoints-index, endpoint, route-handlers, client-routes)
+    if (dirty.endpoints) {
+      generatorPromises.push(
+        (async (): Promise<void> => {
+          try {
+            const { endpointsIndexGeneratorRepository } =
+              await import("../endpoints-index/repository");
+            const { scopedTranslation: i18n } =
+              await import("../endpoints-index/i18n");
+            const { t } = i18n.scopedT(locale);
+            await endpointsIndexGeneratorRepository.generateEndpointsIndex(
+              {
+                outputFile:
+                  "src/app/api/[locale]/system/generated/endpoints.ts",
+                dryRun: false,
+              },
+              logger,
+              t,
+              liveIndex,
+            );
+            ran.push("endpoints-index");
+          } catch (error) {
+            logger.error(
+              "endpoints-index failed",
+              new Error(parseError(error).message),
+            );
+          }
+        })(),
+        (async (): Promise<void> => {
+          try {
+            const { endpointGeneratorRepository } =
+              await import("../endpoint/repository");
+            const { scopedTranslation: i18n } =
+              await import("../endpoint/i18n");
+            const { t } = i18n.scopedT(locale);
+            await endpointGeneratorRepository.generateEndpoint(
+              {
+                outputFile: "src/app/api/[locale]/system/generated/endpoint.ts",
+                dryRun: false,
+              },
+              logger,
+              t,
+              liveIndex,
+            );
+            ran.push("endpoint");
+          } catch (error) {
+            logger.error(
+              "endpoint failed",
+              new Error(parseError(error).message),
+            );
+          }
+        })(),
+        (async (): Promise<void> => {
+          try {
+            const { routeHandlersGeneratorRepository } =
+              await import("../route-handlers/repository");
+            const { scopedTranslation: i18n } =
+              await import("../route-handlers/i18n");
+            const { t } = i18n.scopedT(locale);
+            await routeHandlersGeneratorRepository.generateRouteHandlers(
+              {
+                outputFile:
+                  "src/app/api/[locale]/system/generated/route-handlers.ts",
+                dryRun: false,
+              },
+              logger,
+              t,
+              liveIndex,
+            );
+            ran.push("route-handlers");
+          } catch (error) {
+            logger.error(
+              "route-handlers failed",
+              new Error(parseError(error).message),
+            );
+          }
+        })(),
+      );
+    } else {
+      skipped.push("endpoints-index", "endpoint", "route-handlers");
+    }
+
+    if (dirty.clientRoutes) {
+      generatorPromises.push(
+        (async (): Promise<void> => {
+          try {
+            const { ClientRoutesIndexGeneratorRepository } =
+              await import("../client-routes-index/repository");
+            const { scopedTranslation: i18n } =
+              await import("../client-routes-index/i18n");
+            const { t } = i18n.scopedT(locale);
+            await ClientRoutesIndexGeneratorRepository.generateClientRoutesIndex(
+              {
+                outputFile:
+                  "src/app/api/[locale]/system/generated/route-handlers-client.ts",
+                dryRun: false,
+              },
+              logger,
+              t,
+              liveIndex,
+            );
+            ran.push("client-routes");
+          } catch (error) {
+            logger.error(
+              "client-routes failed",
+              new Error(parseError(error).message),
+            );
+          }
+        })(),
+      );
+    } else {
+      skipped.push("client-routes");
+    }
+
+    if (dirty.taskIndex) {
+      generatorPromises.push(
+        (async (): Promise<void> => {
+          try {
+            const { taskIndexGeneratorRepository } =
+              await import("../task-index/repository");
+            const { scopedTranslation: i18n } =
+              await import("../task-index/i18n");
+            const { t } = i18n.scopedT(locale);
+            await taskIndexGeneratorRepository.generateTaskIndex(
+              {
+                outputFile:
+                  "src/app/api/[locale]/system/generated/tasks-index.ts",
+                dryRun: false,
+              },
+              logger,
+              t,
+              liveIndex,
+            );
+            ran.push("task-index");
+          } catch (error) {
+            logger.error(
+              "task-index failed",
+              new Error(parseError(error).message),
+            );
+          }
+        })(),
+      );
+    } else {
+      skipped.push("task-index");
+    }
+
+    if (dirty.emailTemplates) {
+      generatorPromises.push(
+        (async (): Promise<void> => {
+          try {
+            const { emailTemplateGeneratorRepository } =
+              await import("../email-templates/repository");
+            const { scopedTranslation: i18n } =
+              await import("../email-templates/i18n");
+            const { t } = i18n.scopedT(locale);
+            await emailTemplateGeneratorRepository.generateEmailTemplates(
+              {
+                outputFile: "src/app/api/[locale]/emails/registry/generated.ts",
+                dryRun: false,
+              },
+              logger,
+              t,
+              liveIndex,
+            );
+            ran.push("email-templates");
+          } catch (error) {
+            logger.error(
+              "email-templates failed",
+              new Error(parseError(error).message),
+            );
+          }
+        })(),
+      );
+    } else {
+      skipped.push("email-templates");
+    }
+
+    // Seeds: only run when dirty.seeds AND explicitly not skipped
+    // (seeds are expensive DB-related, only on startup)
+    if (dirty.seeds) {
+      generatorPromises.push(
+        (async (): Promise<void> => {
+          try {
+            const { seedsGeneratorRepository } =
+              await import("../seeds/repository");
+            const { scopedTranslation: i18n } = await import("../seeds/i18n");
+            const { t } = i18n.scopedT(locale);
+            await seedsGeneratorRepository.generateSeeds(
+              {
+                outputDir: "src/app/api/[locale]/system/generated",
+                includeTestData: true,
+                includeProdData: true,
+                dryRun: false,
+              },
+              logger,
+              t,
+              liveIndex,
+            );
+            ran.push("seeds");
+          } catch (error) {
+            logger.error("seeds failed", new Error(parseError(error).message));
+          }
+        })(),
+      );
+    } else {
+      skipped.push("seeds");
+    }
+
+    await Promise.allSettled(generatorPromises);
+
+    logger.debug(
+      `✅ generateDirty: ran [${ran.join(", ")}], skipped [${skipped.join(", ")}]`,
+    );
+  }
 }
 
 export const generateAllRepository = new GenerateAllRepositoryImpl();
@@ -507,7 +737,7 @@ if (import.meta.main) {
         skipEndpoints: false,
         skipSeeds: false,
         skipTaskIndex: false,
-        skipTrpc: false,
+        enableTrpc: false,
         verbose: false,
         outputDir: "src/app/api/[locale]/system/generated",
       },

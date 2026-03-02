@@ -3,17 +3,8 @@ import { notFound } from "next-vibe-ui/lib/not-found";
 import { Div } from "next-vibe-ui/ui/div";
 import { ChevronLeft } from "next-vibe-ui/ui/icons";
 import { Link } from "next-vibe-ui/ui/link";
-import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
-import ContactForm from "@/app/api/[locale]/contact/_components/contact-form";
-import ContactInfo from "@/app/api/[locale]/contact/_components/contact-info";
-import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
-import {
-  ProductIds,
-  productsRepository,
-} from "@/app/api/[locale]/products/repository-client";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
@@ -22,6 +13,8 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
+
+import HelpPageClient from "./page-client";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -51,10 +44,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-/**
- * Contact page component
- * Displays contact form and company information
- */
 export default async function ContactPage({
   params,
 }: Props): Promise<JSX.Element> {
@@ -65,39 +54,18 @@ export default async function ContactPage({
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
 
-  // Get JWT user for hooks
   const jwtUser = await AuthRepository.getAuthMinimalUser(
     [UserRole.PUBLIC, UserRole.CUSTOMER],
     { platform: Platform.NEXT_PAGE, locale },
     logger,
   );
 
-  const supportEmail = contactClientRepository.getSupportEmail(locale);
-
-  // Get pricing data
-  const freeTier = productsRepository.getProduct(ProductIds.FREE_TIER, locale);
-  const subscription = productsRepository.getProduct(
-    ProductIds.SUBSCRIPTION,
-    locale,
-  );
-  const creditPack = productsRepository.getProduct(
-    ProductIds.CREDIT_PACK,
-    locale,
-  );
-
-  const formatPrice = (amount: number, currency: string): string => {
-    return new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency,
-    }).format(amount);
-  };
-
   return (
     <Div
       role="main"
       className="min-h-screen bg-blue-50 bg-linear-to-b from-blue-50 to-white dark:bg-gray-950 dark:from-gray-950 dark:to-gray-900"
     >
-      <Div className="container max-w-6xl mx-auto py-8 px-4">
+      <Div className="container max-w-6xl mx-auto pt-8 px-4">
         <Link
           href={`/${locale}`}
           className="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 mb-8"
@@ -105,84 +73,8 @@ export default async function ContactPage({
           <ChevronLeft className="mr-2 h-4 w-4" />
           {t("app.help.nav.home")}
         </Link>
-
-        <Div className="text-center mb-12">
-          <H1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-linear-to-br from-cyan-500 to-blue-600 text-center">
-            {t("app.help.pages.help.title")}
-          </H1>
-          <P className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto text-center">
-            {t("app.help.pages.help.subtitle")}
-          </P>
-        </Div>
-
-        <Div className="grid md:grid-cols-2 gap-12 mb-16">
-          <ContactForm locale={locale} jwtUser={jwtUser} />
-          <ContactInfo locale={locale} supportEmail={supportEmail} />
-        </Div>
-
-        <Div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8 mb-16">
-          <H2 className="text-2xl font-bold mb-6 text-center">
-            {t("app.help.pages.help.faq.title")}
-          </H2>
-          <Div className="grid md:grid-cols-2 gap-8">
-            <Div>
-              <H3 className="text-lg font-semibold mb-2">
-                {t("app.help.pages.help.faq.questions.q1.question", {
-                  appName: t("config.appName"),
-                })}
-              </H3>
-              <P className="text-gray-600 dark:text-gray-300">
-                {t("app.help.pages.help.faq.questions.q1.answer", {
-                  appName: t("config.appName"),
-                  modelCount: TOTAL_MODEL_COUNT,
-                })}
-              </P>
-            </Div>
-            <Div>
-              <H3 className="text-lg font-semibold mb-2">
-                {t("app.help.pages.help.faq.questions.q2.question")}
-              </H3>
-              <P className="text-gray-600 dark:text-gray-300">
-                {t("app.help.pages.help.faq.questions.q2.answer", {
-                  subPrice: formatPrice(
-                    subscription.price,
-                    subscription.currency,
-                  ),
-                  subCredits: subscription.credits,
-                  packPrice: formatPrice(creditPack.price, creditPack.currency),
-                  packCredits: creditPack.credits,
-                })}
-              </P>
-            </Div>
-            <Div>
-              <H3 className="text-lg font-semibold mb-2">
-                {t("app.help.pages.help.faq.questions.q3.question")}
-              </H3>
-              <P className="text-gray-600 dark:text-gray-300">
-                {t("app.help.pages.help.faq.questions.q3.answer", {
-                  freeCredits: freeTier.credits,
-                  subPrice: formatPrice(
-                    subscription.price,
-                    subscription.currency,
-                  ),
-                  subCredits: subscription.credits,
-                  packPrice: formatPrice(creditPack.price, creditPack.currency),
-                  packCredits: creditPack.credits,
-                  modelCount: TOTAL_MODEL_COUNT,
-                })}
-              </P>
-            </Div>
-            <Div>
-              <H3 className="text-lg font-semibold mb-2">
-                {t("app.help.pages.help.faq.questions.q4.question")}
-              </H3>
-              <P className="text-gray-600 dark:text-gray-300">
-                {t("app.help.pages.help.faq.questions.q4.answer")}
-              </P>
-            </Div>
-          </Div>
-        </Div>
       </Div>
+      <HelpPageClient locale={locale} user={jwtUser} />
     </Div>
   );
 }

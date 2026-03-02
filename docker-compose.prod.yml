@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    image: sibedge/postgres-plv8:16.10-3.2.3-alpine
     container_name: prod-postgres
     restart: unless-stopped
     environment:
@@ -38,6 +38,7 @@ services:
         CRON_SECRET: ${CRON_SECRET}
         INSTANCE_ID: ${INSTANCE_ID}
         KNOWN_INSTANCE_IDS: ${KNOWN_INSTANCE_IDS}
+        VIBE_REMOTE_URL: ${VIBE_REMOTE_URL}
         THEA_REMOTE_URL: ${THEA_REMOTE_URL}
         THEA_REMOTE_API_KEY: ${THEA_REMOTE_API_KEY}
         THEA_REMOTE_LEAD_ID: ${THEA_REMOTE_LEAD_ID}
@@ -46,6 +47,8 @@ services:
         VIBE_ADMIN_USER_EMAIL: ${VIBE_ADMIN_USER_EMAIL}
         VIBE_ADMIN_USER_PASSWORD: ${VIBE_ADMIN_USER_PASSWORD}
         VIBE_CLI_LOCALE: ${VIBE_CLI_LOCALE}
+        WS_PUBSUB_TYPE: ${WS_PUBSUB_TYPE}
+        REDIS_URL: ${REDIS_URL}
         NEXT_PUBLIC_DEBUG_PRODUCTION: ${NEXT_PUBLIC_DEBUG_PRODUCTION}
         OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
         UNCENSORED_AI_API_KEY: ${UNCENSORED_AI_API_KEY}
@@ -136,6 +139,8 @@ services:
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-postgres}?schema=public
       CHAT_STORAGE_TYPE: ${CHAT_STORAGE_TYPE}
       CHAT_STORAGE_PATH: ${CHAT_STORAGE_PATH:-/app/uploads/chat}
+      WS_PUBSUB_TYPE: ${WS_PUBSUB_TYPE:-local}
+      REDIS_URL: ${REDIS_URL:-}
     volumes:
       # Mount volume for local file storage
       - /next-vibe-uploads:/app/uploads
@@ -144,6 +149,7 @@ services:
         condition: service_healthy
     ports:
       - "3000:3000"
+      - "4000:4000"
     networks:
       - app-network
       - caddy_internal

@@ -179,6 +179,12 @@ export function extractSchemaDefaults<T>(
 
     // Handle ZodOptional - check inner schema for defaults
     if (schema instanceof z.ZodOptional) {
+      // When initializing form fields, optional fields should stay undefined —
+      // they are not required, so we should not populate them with empty values
+      // (e.g. z.string().uuid().optional() should give undefined, not "" which fails uuid validation)
+      if (forFormInit) {
+        return undefined;
+      }
       const innerType = getDefProperty<z.ZodTypeAny>(def, "innerType");
       if (innerType && hasZodDef(innerType)) {
         return extractSchemaDefaults<T>(

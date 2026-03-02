@@ -7,12 +7,17 @@
 import { parseError } from "next-vibe/shared/utils";
 import { useCallback } from "react";
 
+import messageIdDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition";
+import voteDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/definition";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { CountryLanguage } from "@/i18n/core/config";
+import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
+import {
+  useWidgetLogger,
+  useWidgetUser,
+} from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
-import type { UseAIStreamReturn } from "../../../../../ai-stream/hooks/use-ai-stream";
+import type { UseAIStreamReturn } from "../../../../../ai-stream/stream/hooks/use-ai-stream";
 import { DefaultFolderId } from "../../../../config";
 import type { ChatMessage } from "../../../../db";
 import type { ToolConfigItem } from "../../../../settings/definition";
@@ -20,6 +25,7 @@ import { answerAsAI as answerAsAIOp } from "./operations/answer-as-ai";
 import { branchMessage as branchMessageOp } from "./operations/branch-message";
 import { retryMessage as retryMessageOp } from "./operations/retry-message";
 import { sendMessage as sendMessageOp } from "./operations/send-message";
+import { useStreamingMessagesStore } from "./streaming-messages-store";
 
 /**
  * Message operations interface
@@ -72,8 +78,6 @@ export interface MessageOperations {
  * Message operations dependencies
  */
 interface MessageOperationsDeps {
-  locale: CountryLanguage;
-  logger: EndpointLogger;
   aiStream: UseAIStreamReturn;
   // Navigation state - passed separately, not from chatStore
   activeThreadId: string | null;
@@ -88,13 +92,6 @@ interface MessageOperationsDeps {
     deleteMessage: (messageId: string) => void;
     updateMessage: (messageId: string, updates: Partial<ChatMessage>) => void;
   };
-  streamStore: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    streamingMessages: Record<string, any>;
-    reset: () => void;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    addMessage: (message: any) => void;
-  };
   settings: {
     selectedModel: ModelId;
     selectedCharacter: string;
@@ -105,7 +102,6 @@ interface MessageOperationsDeps {
   };
   setInput: (input: string) => void;
   setAttachments: (attachments: File[] | ((prev: File[]) => File[])) => void;
-  deductCredits: (creditCost: number, feature: string) => void;
 }
 
 /**
@@ -115,19 +111,31 @@ export function useMessageOperations(
   deps: MessageOperationsDeps,
 ): MessageOperations {
   const {
-    locale,
-    logger,
     aiStream,
     activeThreadId,
     currentRootFolderId,
     currentSubFolderId,
     chatStore,
-    streamStore,
     settings,
     setInput,
     setAttachments,
-    deductCredits,
   } = deps;
+
+  const user = useWidgetUser();
+  const logger = useWidgetLogger();
+
+  const {
+    streamingMessages,
+    reset: streamReset,
+    addMessage: streamAddMessage,
+  } = useStreamingMessagesStore();
+
+  const deleteMutation = useApiMutation(
+    messageIdDefinitions.DELETE,
+    logger,
+    user,
+  );
+  const voteMutation = useApiMutation(voteDefinitions.POST, logger, user);
 
   const sendMessage = useCallback(
     async (
@@ -161,7 +169,6 @@ export function useMessageOperations(
           settings,
           setInput,
           setAttachments,
-          deductCredits,
         },
         onThreadCreated,
       );
@@ -176,7 +183,6 @@ export function useMessageOperations(
       settings,
       setInput,
       setAttachments,
-      deductCredits,
     ],
   );
 
@@ -192,7 +198,6 @@ export function useMessageOperations(
         currentSubFolderId,
         chatStore,
         settings,
-        deductCredits,
       });
     },
     [
@@ -202,7 +207,6 @@ export function useMessageOperations(
       currentSubFolderId,
       chatStore,
       settings,
-      deductCredits,
     ],
   );
 
@@ -220,7 +224,6 @@ export function useMessageOperations(
         currentSubFolderId,
         chatStore,
         settings,
-        deductCredits,
       });
     },
     [
@@ -230,7 +233,6 @@ export function useMessageOperations(
       currentSubFolderId,
       chatStore,
       settings,
-      deductCredits,
     ],
   );
 
@@ -247,7 +249,6 @@ export function useMessageOperations(
         currentSubFolderId,
         chatStore,
         settings,
-        deductCredits,
       });
     },
     [
@@ -257,7 +258,6 @@ export function useMessageOperations(
       currentSubFolderId,
       chatStore,
       settings,
-      deductCredits,
     ],
   );
 
@@ -284,8 +284,7 @@ export function useMessageOperations(
       // Both are handled client-side only
       const isIncognitoThread =
         thread.rootFolderId === DefaultFolderId.INCOGNITO;
-      const isStreamingMessage =
-        streamStore.streamingMessages[messageId] !== undefined;
+      const isStreamingMessage = streamingMessages[messageId] !== undefined;
 
       logger.debug("Message operations: Delete message thread type check", {
         messageId,
@@ -310,13 +309,13 @@ export function useMessageOperations(
 
         chatStore.deleteMessage(messageId);
 
-        if (streamStore.streamingMessages[messageId]) {
+        if (streamingMessages[messageId]) {
           // eslint-disable-next-line no-unused-vars -- Rest destructuring to exclude key
           const { [messageId]: excluded, ...remainingMessages } =
-            streamStore.streamingMessages;
-          streamStore.reset();
+            streamingMessages;
+          streamReset();
           Object.values(remainingMessages).forEach((msg) => {
-            streamStore.addMessage(msg);
+            streamAddMessage(msg);
           });
         }
 
@@ -343,41 +342,26 @@ export function useMessageOperations(
       // Handle server-side message deletion
       try {
         logger.debug("Message operations: Making DELETE request to server", {
-          url: `/api/${locale}/agent/chat/threads/${message.threadId}/messages/${messageId}`,
           threadId: message.threadId,
           messageId,
         });
 
-        const response = await fetch(
-          `/api/${locale}/agent/chat/threads/${message.threadId}/messages/${messageId}`,
-          {
-            method: "DELETE",
-          },
-        );
+        const result = await deleteMutation.mutateAsync({
+          urlPathParams: { threadId: message.threadId, messageId },
+        });
 
-        if (!response.ok) {
-          const errorText = await response.text();
-
-          // If message not found (404), it might already be deleted
-          // In this case, remove it from local store anyway
-          if (response.status === 404) {
+        if (!result.success) {
+          if (result.errorType.errorCode === 404) {
             logger.warn(
               "Message operations: Message not found on server (already deleted?), removing from local store",
-              {
-                messageId,
-                threadId: message.threadId,
-                errorBody: errorText,
-              },
+              { messageId, threadId: message.threadId },
             );
             chatStore.deleteMessage(messageId);
             return;
           }
 
-          // For other errors, log and don't delete from store
           logger.error("Message operations: Server failed to delete message", {
-            status: response.status,
-            statusText: response.statusText,
-            errorBody: errorText,
+            message: result.message,
             messageId,
             threadId: message.threadId,
           });
@@ -391,13 +375,13 @@ export function useMessageOperations(
 
         chatStore.deleteMessage(messageId);
 
-        if (streamStore.streamingMessages[messageId]) {
+        if (streamingMessages[messageId]) {
           // eslint-disable-next-line no-unused-vars -- Rest destructuring to exclude key
           const { [messageId]: excluded, ...remainingMessages } =
-            streamStore.streamingMessages;
-          streamStore.reset();
+            streamingMessages;
+          streamReset();
           Object.values(remainingMessages).forEach((msg) => {
-            streamStore.addMessage(msg);
+            streamAddMessage(msg);
           });
         }
       } catch (error) {
@@ -407,7 +391,14 @@ export function useMessageOperations(
         );
       }
     },
-    [logger, chatStore, streamStore, locale],
+    [
+      logger,
+      chatStore,
+      streamingMessages,
+      streamReset,
+      streamAddMessage,
+      deleteMutation,
+    ],
   );
 
   const voteMessage = useCallback(
@@ -450,20 +441,14 @@ export function useMessageOperations(
       const voteString = vote === 1 ? "up" : vote === -1 ? "down" : "remove";
 
       try {
-        const response = await fetch(
-          `/api/${locale}/agent/chat/threads/${message.threadId}/messages/${messageId}/vote`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ vote: voteString }),
-          },
-        );
+        const result = await voteMutation.mutateAsync({
+          requestData: { vote: voteString },
+          urlPathParams: { threadId: message.threadId, messageId },
+        });
 
-        if (!response.ok) {
+        if (!result.success) {
           logger.error("Message operations: Failed to vote on message", {
-            status: response.status,
+            message: result.message,
           });
           return;
         }
@@ -482,16 +467,18 @@ export function useMessageOperations(
         );
       }
     },
-    [logger, chatStore, locale],
+    [logger, chatStore, voteMutation],
   );
 
   const stopGeneration = useCallback((): void => {
     logger.debug("Message operations: Stopping generation and TTS playback");
-    aiStream.stopStream(activeThreadId ?? undefined);
+    if (activeThreadId) {
+      void aiStream.cancelStream(activeThreadId);
+    }
 
     // Also stop TTS playback if it's playing
     if (typeof window !== "undefined") {
-      void import("../../../../../ai-stream/hooks/audio-queue")
+      void import("../../../../../ai-stream/stream/hooks/audio-queue")
         .then(({ getAudioQueue }) => {
           const audioQueue = getAudioQueue();
           audioQueue.stop();

@@ -15,7 +15,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import { db } from "../../../../system/db";
 import { chatMessages } from "../../../chat/db";
-import type { AiStreamT } from "../../i18n";
+import type { AiStreamT } from "../../stream/i18n";
 
 export class FileAttachmentHandler {
   /**

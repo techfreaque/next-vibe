@@ -1,4 +1,4 @@
-import { translations as uiTranslations } from "@/app/api/[locale]/emails/imap-client/_components/i18n/de";
+import { translations as uiTranslations } from "@/app/api/[locale]/emails/imap-client/widget/i18n/de";
 
 import { translations as accountsApiTranslations } from "../../accounts/i18n/de";
 import { translations as configApiTranslations } from "../../config/i18n/de";

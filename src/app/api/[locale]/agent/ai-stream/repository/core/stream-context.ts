@@ -3,13 +3,12 @@
  * Replaces scattered closure variables to prevent memory leaks
  */
 
-import type { ReadableStreamDefaultController } from "node:stream/web";
-
 import type { ModuleT } from "@/app/api/[locale]/credits/repository";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolCall } from "../../../chat/db";
+import type { WsEmitCallback } from "../../../chat/threads/[threadId]/messages/emitter";
 import { MessageDbWriter } from "./message-db-writer";
 
 export interface PendingToolData {
@@ -74,12 +73,10 @@ export class StreamContext {
     initialDepth: number;
     initialAssistantMessageId: string;
     isIncognito: boolean;
-    isHeadless?: boolean;
     logger: EndpointLogger;
-    controller: ReadableStreamDefaultController<Uint8Array>;
-    encoder: TextEncoder;
     creditsT: ModuleT;
     locale: CountryLanguage;
+    wsEmit?: WsEmitCallback | null;
   }) {
     this.sequenceId = params.sequenceId;
     this.currentParentId = params.initialParentId;
@@ -92,11 +89,9 @@ export class StreamContext {
     this.dbWriter = new MessageDbWriter(
       params.isIncognito,
       params.logger,
-      params.controller,
-      params.encoder,
-      params.isHeadless ?? false,
       params.creditsT,
       params.locale,
+      params.wsEmit ?? null,
     );
   }
 

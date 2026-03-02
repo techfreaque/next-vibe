@@ -1,11 +1,12 @@
 "use client";
 
+import type { Route } from "next";
 import NextLink from "next/link";
 import * as React from "react";
 
 export interface LinkProps {
   children?: React.ReactNode;
-  href: string;
+  href: Route;
   target?: "_blank" | "_self" | "_parent" | "_top";
   rel?: string;
   onClick?: () => void;

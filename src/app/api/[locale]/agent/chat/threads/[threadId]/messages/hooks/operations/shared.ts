@@ -8,8 +8,9 @@ import { parseError } from "next-vibe/shared/utils";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
-import type { UseAIStreamReturn } from "../../../../../../ai-stream/hooks/use-ai-stream";
+import type { UseAIStreamReturn } from "../../../../../../ai-stream/stream/hooks/use-ai-stream";
 import type { TtsVoiceValue } from "../../../../../../text-to-speech/enum";
+import { DEFAULT_TTS_VOICE } from "../../../../../../text-to-speech/enum";
 import { DefaultFolderId } from "../../../../../config";
 import { getDefaultToolIds } from "../../../../../constants";
 import type { ChatMessage } from "../../../../../db";
@@ -46,7 +47,6 @@ export interface MessageOperationDeps {
     ttsAutoplay: boolean;
     ttsVoice: typeof TtsVoiceValue;
   };
-  deductCredits: (creditCost: number, feature: string) => void;
   setInput?: (input: string) => void;
   setAttachments?: (attachments: File[] | ((prev: File[]) => File[])) => void;
 }
@@ -65,7 +65,6 @@ export async function createAndSendUserMessage(
     currentRootFolderId,
     currentSubFolderId,
     settings,
-    deductCredits,
     setInput,
     setAttachments,
   } = deps;
@@ -180,12 +179,10 @@ export async function createAndSendUserMessage(
     }
 
     // Voice mode settings - use ttsAutoplay and ttsVoice from chat settings
-    const effectiveVoiceMode = settings.ttsAutoplay
-      ? {
-          enabled: true,
-          voice: settings.ttsVoice,
-        }
-      : null;
+    const effectiveVoiceMode = {
+      enabled: settings.ttsAutoplay,
+      voice: settings.ttsVoice ?? DEFAULT_TTS_VOICE,
+    };
 
     // Get user's timezone from browser
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -210,56 +207,33 @@ export async function createAndSendUserMessage(
     }));
 
     // Start AI stream (same for all operations)
-    await aiStream.startStream(
-      {
-        operation,
-        rootFolderId: currentRootFolderId,
-        subFolderId: currentSubFolderId ?? null,
-        threadId: threadId ?? null,
-        userMessageId: newMessageId,
-        parentMessageId: parentMessageId ?? null,
-        content,
-        role: ChatMessageRole.USER,
-        model: settings.selectedModel,
-        character: settings.selectedCharacter ?? null,
-        allowedTools: allowedToolsPayload,
-        tools: pinnedToolsPayload,
-        toolConfirmations: params.toolConfirmations ?? null,
-        messageHistory: messageHistory ?? [],
-        attachments: attachments && attachments.length > 0 ? attachments : null,
-        voiceMode: effectiveVoiceMode,
-        audioInput: audioInput ?? { file: null },
-        timezone,
-      },
-      {
-        onCreditsDeducted: (data) => {
-          // Optimistically deduct credits when server emits CREDITS_DEDUCTED event
-          logger.debug("[Credits] Deducting credits from SSE event", {
-            amount: data.amount,
-            feature: data.feature,
-            type: data.type,
-            partial: data.partial,
-          });
-          deductCredits(data.amount, data.feature);
-        },
-        // Clear input when the user message arrives via SSE.
-        // The user message is emitted before the AI response starts streaming,
-        // so clearing here feels immediate while ensuring the server accepted the message.
-        onMessageCreated:
-          operation === "send"
-            ? (() => {
-                let cleared = false;
-                return (data: { role: string }): void => {
-                  if (!cleared && data.role === ChatMessageRole.USER) {
-                    cleared = true;
-                    setInput?.("");
-                    setAttachments?.([]);
-                  }
-                };
-              })()
-            : undefined,
-      },
-    );
+    // POST is fire-and-forget — WS events handled by useMessagesSubscription
+    await aiStream.startStream({
+      operation,
+      rootFolderId: currentRootFolderId,
+      subFolderId: currentSubFolderId ?? null,
+      threadId: threadId ?? null,
+      userMessageId: newMessageId,
+      parentMessageId: parentMessageId ?? null,
+      content,
+      role: ChatMessageRole.USER,
+      model: settings.selectedModel,
+      character: settings.selectedCharacter ?? null,
+      allowedTools: allowedToolsPayload,
+      tools: pinnedToolsPayload,
+      toolConfirmations: params.toolConfirmations ?? null,
+      messageHistory: messageHistory ?? [],
+      attachments: attachments && attachments.length > 0 ? attachments : null,
+      voiceMode: effectiveVoiceMode,
+      audioInput: audioInput ?? { file: null },
+      timezone,
+    });
+
+    // Clear input after POST succeeds (server accepted the message)
+    if (operation === "send") {
+      setInput?.("");
+      setAttachments?.([]);
+    }
   } catch (error) {
     logger.error(`Failed to ${operation} message`, parseError(error));
   } finally {

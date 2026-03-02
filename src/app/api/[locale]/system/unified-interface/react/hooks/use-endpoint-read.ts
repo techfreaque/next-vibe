@@ -81,8 +81,7 @@ export function useEndpointRead<TEndpoint extends CreateApiEndpointAny>(
       defaultValues: formOptions.defaultValues as Partial<
         TEndpoint["types"]["ResponseOutput"]
       >,
-      serverData: (autoPrefillData ||
-        initialData) as TEndpoint["types"]["ResponseOutput"],
+      serverData: autoPrefillData as TEndpoint["types"]["ResponseOutput"],
       localStorageData: undefined,
       initialState: initialState as Partial<
         TEndpoint["types"]["ResponseOutput"]
@@ -116,7 +115,6 @@ export function useEndpointRead<TEndpoint extends CreateApiEndpointAny>(
   }, [
     formOptions,
     autoPrefillData,
-    initialData,
     initialState,
     autoPrefillConfig,
     urlPathParams,

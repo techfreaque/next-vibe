@@ -9,6 +9,7 @@ export const translations: typeof enTranslations = {
     run: {
       post: {
         title: "Uruchom Claude Code",
+        dynamicTitle: "Claude Code: {{prompt}}",
         description:
           "Uruchamia sesję Claude Code na Hermesie (lokalnej maszynie deweloperskiej). PREFERUJ headless:false (domyślnie) — otwiera pełną sesję Claude Code, w której Max może aktywnie uczestniczyć. headless:true tylko dla w pełni zautomatyzowanych zadań wsadowych bez udziału człowieka (np. cron-joby). W trybie interaktywnym sesja jest strumieniowana na żywo do terminala; w trybie wsadowym uruchamia `claude -p` i zwraca wynik po zakończeniu. Zawsze uruchamia z --dangerously-skip-permissions.",
         fields: {

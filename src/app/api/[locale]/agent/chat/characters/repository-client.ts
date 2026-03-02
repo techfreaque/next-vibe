@@ -10,10 +10,6 @@
 
 import type { FavoriteGetModelSelection } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
 import type { ChatT } from "@/app/api/[locale]/agent/chat/i18n";
-import type {
-  FiltersModelSelection,
-  ManualModelSelection,
-} from "@/app/api/[locale]/agent/models/components/types";
 import {
   DEFAULT_INPUT_TOKENS,
   DEFAULT_OUTPUT_TOKENS,
@@ -24,6 +20,10 @@ import {
   getCreditCostFromModel,
   getModelById,
 } from "@/app/api/[locale]/agent/models/models";
+import type {
+  FiltersModelSelection,
+  ManualModelSelection,
+} from "@/app/api/[locale]/agent/models/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 

@@ -6,6 +6,7 @@ import { Environment } from "next-vibe/shared/utils/env-util";
 import { z } from "zod";
 
 import { defineEnvClient } from "@/app/api/[locale]/system/unified-interface/shared/env/define-env-client";
+import { DEFAULT_PROJECT_URL } from "@/config/constants";
 
 const isServer = typeof window === "undefined";
 const isBrowser = !isServer && typeof document !== "undefined";
@@ -46,9 +47,9 @@ export const {
   },
 
   NEXT_PUBLIC_PROJECT_URL: {
-    schema: z.string().url().default("https://unbottled.ai"),
+    schema: z.string().url().default(DEFAULT_PROJECT_URL),
     value: process.env.NEXT_PUBLIC_PROJECT_URL,
-    example: "https://unbottled.ai",
+    example: DEFAULT_PROJECT_URL,
   },
   NEXT_PUBLIC_LOCAL_MODE: {
     schema: z

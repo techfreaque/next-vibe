@@ -30,7 +30,7 @@ import {
 import { dateSchema, iconSchema } from "../../../shared/types/common.schema";
 import { DefaultFolderId } from "../config";
 import { scopedTranslation } from "./i18n";
-import { FoldersListContainer } from "./widget";
+import { FoldersListContainer } from "./widget/widget";
 
 /**
  * Get Folders List Endpoint (GET)
@@ -58,6 +58,7 @@ const { GET } = createEndpoint({
 
   fields: customWidgetObject({
     render: FoldersListContainer,
+    noFormElement: true,
     usage: { response: true, request: "data" } as const,
     children: {
       // === REQUEST FILTERS ===
@@ -84,6 +85,10 @@ const { GET } = createEndpoint({
             value: DefaultFolderId.CRON,
             label: "config.folders.cron" as const,
           },
+          {
+            value: DefaultFolderId.INCOGNITO,
+            label: "config.folders.incognito" as const,
+          },
         ],
         schema: z
           .enum([
@@ -91,9 +96,10 @@ const { GET } = createEndpoint({
             DefaultFolderId.SHARED,
             DefaultFolderId.PUBLIC,
             DefaultFolderId.CRON,
+            DefaultFolderId.INCOGNITO,
           ])
           .describe(
-            "Root folder to filter folders (incognito not allowed - local-only)",
+            "Root folder to filter folders (incognito routed to route-client.ts via useClientRoute)",
           ),
       }),
 
@@ -348,6 +354,8 @@ const { GET } = createEndpoint({
     title: "get.success.title",
     description: "get.success.description",
   },
+
+  useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
 
   examples: {
     requests: {

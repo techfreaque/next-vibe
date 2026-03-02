@@ -40,9 +40,9 @@ export const { POST, tools } = endpointsHandler({
             data.completionsJson,
           ) as SyncedCronTask[];
           const instanceId = env.INSTANCE_ID;
-          const relevantTasks = instanceId
-            ? remoteTasks.filter((t) => t.targetInstance === instanceId)
-            : remoteTasks;
+          const relevantTasks = remoteTasks.filter(
+            (t) => t.targetInstance !== null && t.targetInstance === instanceId,
+          );
           const result = await upsertRemoteTasks({
             tasks: relevantTasks,
             logger,

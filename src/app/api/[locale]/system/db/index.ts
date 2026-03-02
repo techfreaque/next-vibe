@@ -17,9 +17,14 @@ import * as userSchema from "../../user/db";
 
 /**
  * Database connection pool configuration
+ *
+ * Uses process.env directly instead of the env singleton because the pool
+ * is created at module evaluation time. The env singleton may not yet reflect
+ * --preview port swap (done by loadEnvironment), but process.env is already
+ * correct thanks to the Bun preload script (env-preload.ts).
  */
 const poolConfig = {
-  connectionString: env.DATABASE_URL,
+  connectionString: process.env["DATABASE_URL"] ?? env.DATABASE_URL,
   max: 10, // Maximum number of clients in the pool
   idleTimeoutMillis: 30_000, // How long a client is allowed to remain idle before being closed
   connectionTimeoutMillis: 2_000, // How long to wait for a connection to become available

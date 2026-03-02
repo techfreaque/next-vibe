@@ -227,8 +227,10 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
   }, [hasInput, method, inputData]);
 
   return (
-    <Div className="flex flex-col gap-4 p-4">
-      {form && (
+    <Div
+      className={disabled ? "flex flex-col gap-0" : "flex flex-col gap-4 p-4"}
+    >
+      {form && !disabled && (
         <FormField
           control={form.control}
           name="toolName"
@@ -255,17 +257,17 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
         />
       )}
 
-      {!toolName && (
+      {!disabled && !toolName && (
         <P className="text-sm text-muted-foreground">
           {t("executeTool.post.widget.enterToolName")}
         </P>
       )}
 
-      {resolveError && (
+      {!disabled && resolveError && (
         <P className="text-sm text-destructive">{resolveError}</P>
       )}
 
-      {toolName && !resolvedEndpoint && !resolveError && (
+      {!disabled && toolName && !resolvedEndpoint && !resolveError && (
         <P className="text-sm text-muted-foreground">
           {t("executeTool.post.widget.resolving")}
         </P>
@@ -280,7 +282,7 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
         />
       )}
 
-      {/* Response mode: render the target endpoint with result data (read-only) */}
+      {/* Response mode: render the target endpoint with merged input+result data (read-only) */}
       {resolvedEndpoint && resultData && (
         <NavigationStackProvider>
           <EndpointRenderer
@@ -288,7 +290,17 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
             locale={locale}
             user={user}
             logger={logger}
-            data={resultData as WidgetData}
+            data={
+              (inputData &&
+              resultData &&
+              typeof resultData === "object" &&
+              !Array.isArray(resultData)
+                ? {
+                    ...inputData,
+                    ...(resultData as Record<string, WidgetData>),
+                  }
+                : resultData) as WidgetData
+            }
             disabled={disabled}
           />
         </NavigationStackProvider>

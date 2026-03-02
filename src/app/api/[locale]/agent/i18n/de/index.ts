@@ -1,4 +1,4 @@
-import { translations as aiStreamTranslations } from "../../ai-stream/i18n/de";
+import { translations as aiStreamTranslations } from "../../ai-stream/stream/i18n/de";
 import { translations as chatTranslations } from "../../chat/i18n/de";
 import { translations as openrouterTranslations } from "../../models/openrouter/i18n/de";
 import { translations as searchTranslations } from "../../search/i18n/de";

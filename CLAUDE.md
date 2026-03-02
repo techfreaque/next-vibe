@@ -42,14 +42,17 @@ src/app/api/[locale]/<category>/<feature>/
   repository.ts    — DB operations returning ResponseType<T>, no throw
   route.ts         — endpointsHandler() wiring definition + repository
   i18n/            — Scoped translations (index.ts + en/, de/, pl/ subdirs)
-  widget.tsx       — Custom widget components (if needed)
+  widget.tsx       — Custom widget (if needed) — OR widget/ folder for complex layouts
+  hooks.ts         — useEndpoint wrapper (only if used cross-module) — OR hooks/ folder
 ```
+
+**Widget rules (strict):** Widget is scoped to the deepest route, self-contained. Shared UI lives in the widget of its canonical owner endpoint (the one conceptually responsible for it); other endpoints may import from the owner, never the reverse. Other endpoints' full UI is embedded via `EndpointsPage` (dialog) or `navigation.push()` — never by importing their internal components directly.
 
 ## Key Patterns to Match
 
 - `createEndpoint({scopedTranslation, ...})` — Factory for endpoint contracts; `scopedTranslation` is required
 - `endpointsHandler()` — Wires definition + handler into Next.js route
-- `createEnumOptions()` — i18n-friendly enum pattern
+- `createEnumOptions(scopedTranslation, {...})` — i18n-friendly enum pattern (pass scopedTranslation, use short scoped keys)
 - `scopedRequestField(scopedTranslation, {...})` — Request input fields (label, description, columns, schema)
 - `scopedResponseField(scopedTranslation, {...})` — Response display fields (content/text, schema)
 - `scopedObjectFieldNew(scopedTranslation, {...})` — Container/grouping with `children`, `layoutType`, `usage`
@@ -62,18 +65,24 @@ src/app/api/[locale]/<category>/<feature>/
 
 Before touching any file, read the corresponding pattern doc:
 
-| File you're working on | Read this first               |
-| ---------------------- | ----------------------------- |
-| `definition.ts`        | `docs/patterns/definition.md` |
-| `repository.ts`        | `docs/patterns/repository.md` |
-| `route.ts`             | `docs/patterns/route.md`      |
-| `i18n/` files          | `docs/patterns/i18n.md`       |
-| `enum.ts`              | `docs/patterns/enum.md`       |
-| `db.ts` / schema       | `docs/patterns/database.md`   |
-| `seeds.ts`             | `docs/patterns/seeds.md`      |
-| `tasks/` (cron)        | `docs/patterns/tasks.md`      |
-| Logger usage           | `docs/patterns/logger.md`     |
-| Email sending          | `docs/patterns/email.md`      |
+| File you're working on   | Read this first                      |
+| ------------------------ | ------------------------------------ |
+| `definition.ts`          | `docs/patterns/definition.md`        |
+| `repository.ts`          | `docs/patterns/repository.md`        |
+| `route.ts`               | `docs/patterns/route.md`             |
+| `i18n/` files            | `docs/patterns/i18n.md`              |
+| `enum.ts`                | `docs/patterns/enum.md`              |
+| `db.ts` / schema         | `docs/patterns/database.md`          |
+| `seeds.ts`               | `docs/patterns/seeds.md`             |
+| `tasks/` (cron)          | `docs/patterns/tasks.md`             |
+| Logger usage             | `docs/patterns/logger.md`            |
+| Email sending            | `docs/patterns/email.md`             |
+| `widget.tsx` / `widget/` | `docs/patterns/widget.md`            |
+| `widget.cli.tsx`         | `docs/patterns/widget.cli.md`        |
+| `hooks.ts` / `hooks/`    | `docs/patterns/hooks.md`             |
+| `repository.native.ts`   | `docs/patterns/repository.native.md` |
+| `repository-client.ts`   | `docs/patterns/repository.client.md` |
+| `route-client.ts`        | `docs/patterns/repository.client.md` |
 
 All paths relative to project root.
 
