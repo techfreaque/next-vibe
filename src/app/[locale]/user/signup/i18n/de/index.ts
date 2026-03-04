@@ -1,6 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  backToHome: "Zurück zur Startseite",
   errors: {
     failedToLoadBrowserIdentity:
       "Browseridentität konnte nicht geladen werden. Bitte aktualisieren Sie die Seite.",

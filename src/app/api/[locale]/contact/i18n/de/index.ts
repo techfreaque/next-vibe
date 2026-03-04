@@ -1,14 +1,6 @@
-import { translations as componentsTranslations } from "../../_components/i18n/de";
 import type { translations as enTranslations } from "../en";
 
-/**
-*
-
-* Contact API translations (German)
-*/
-
 export const translations: typeof enTranslations = {
-  _components: componentsTranslations,
   title: "Kontaktformular-Einreichung",
   description:
     "Kontaktformular senden und E-Mail-Benachrichtigungen verarbeiten",

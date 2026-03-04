@@ -1,4 +1,5 @@
 export const translations = {
+  backToChat: "Zurück zum Chat",
   title: "Verdienen mit {{appName}}",
   description:
     "Verwandeln Sie Ihr Netzwerk in passives Einkommen. Teilen Sie Ihren Empfehlungslink und verdienen Sie 20% Provision, wenn Leute abonnieren - plus kleinere Einnahmen von deren Empfehlungen durch unser Multi-Level-System.",

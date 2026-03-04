@@ -3,6 +3,11 @@ import { translations as requestTranslations } from "@/app/api/[locale]/user/pub
 import { translations as tokenTranslations } from "../../[token]/i18n/en";
 
 export const translations = {
+  backToHome: "Back to Home",
+  errors: {
+    unknown: "An unknown error occurred",
+    title: "Error",
+  },
   request: requestTranslations,
   token: tokenTranslations,
   meta: {

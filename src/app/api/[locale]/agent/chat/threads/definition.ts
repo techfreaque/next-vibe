@@ -116,6 +116,7 @@ const { GET } = createEndpoint({
           .describe(
             "Root folder to filter threads (incognito routed to route-client.ts via useClientRoute)",
           ),
+        includeInCacheKey: true,
       }),
       subFolderId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -124,6 +125,7 @@ const { GET } = createEndpoint({
         description: "get.subFolderId.description" as const,
         columns: 6,
         schema: z.string().uuid().nullish(),
+        includeInCacheKey: true,
       }),
       status: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -310,6 +312,12 @@ const { GET } = createEndpoint({
                 .describe(
                   "Whether the current user can manage permissions for this thread",
                 ),
+            }),
+            isStreaming: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content:
+                "get.response.threads.thread.isStreaming.content" as const,
+              schema: z.boolean(),
             }),
             createdAt: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,

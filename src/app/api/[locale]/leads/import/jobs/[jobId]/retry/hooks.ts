@@ -16,19 +16,15 @@ import definitions from "./definition";
  * Hook for retrying import jobs
  */
 export function useRetryImportJobEndpoint(
+  params: { jobId: string },
   user: JwtPayloadType,
   logger: EndpointLogger,
 ): EndpointReturn<typeof definitions> {
   return useEndpoint(
     definitions,
     {
-      read: {
-        queryOptions: {
-          staleTime: 0, // Always fresh for actions
-          refetchOnWindowFocus: false,
-        },
-      },
       create: {
+        urlPathParams: { jobId: params.jobId },
         formOptions: {
           persistForm: false,
         },

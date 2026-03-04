@@ -14,6 +14,10 @@ export const translations = {
       label: "Thread ID",
       description: "ID of the thread to retrieve path from",
     },
+    rootFolderId: {
+      label: "Root Folder",
+      description: "Root folder of the thread (used for client routing)",
+    },
     branchIndices: {
       label: "Branch Indices",
       description:
@@ -115,6 +119,9 @@ export const translations = {
       },
       oldestLoadedMessageId: {
         content: "Oldest Loaded Message ID",
+      },
+      compactionBoundaryId: {
+        content: "Compaction Boundary ID",
       },
     },
     errors: {

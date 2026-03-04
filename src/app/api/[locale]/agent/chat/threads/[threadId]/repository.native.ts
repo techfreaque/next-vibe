@@ -3,8 +3,13 @@
  * Implements ThreadByIdRepository static interface for React Native
  */
 
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  type ResponseType,
+} from "next-vibe/shared/types/response.schema";
 
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { nativeEndpoint } from "@/app/api/[locale]/system/unified-interface/react-native/native-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -17,6 +22,7 @@ import type {
   ThreadPatchResponseOutput,
 } from "./definition";
 import threadByIdEndpoints from "./definition";
+import { scopedTranslation } from "./i18n";
 import type { ThreadByIdRepositoryType } from "./repository";
 
 /**
@@ -32,7 +38,10 @@ export class ThreadByIdRepository {
   ): Promise<ResponseType<ThreadGetResponseOutput>> {
     const response = await nativeEndpoint(
       threadByIdEndpoints.GET,
-      { urlPathParams: { threadId } },
+      {
+        data: { rootFolderId: DefaultFolderId.PRIVATE },
+        urlPathParams: { threadId },
+      },
       logger,
       locale,
     );
@@ -60,13 +69,17 @@ export class ThreadByIdRepository {
     _threadId: string,
     // oxlint-disable-next-line no-unused-vars
     _user: JwtPayloadType,
-    // oxlint-disable-next-line no-unused-vars
-    _locale: CountryLanguage,
+    locale: CountryLanguage,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
   ): Promise<ResponseType<ThreadPatchResponseOutput>> {
-    // oxlint-disable-next-line restricted-syntax
-    throw new Error("updateThread is not implemented on native");
+    const { t } = scopedTranslation.scopedT(locale);
+    return fail({
+      message: t("errors.not_implemented_on_native", {
+        method: "updateThread",
+      }),
+      errorType: ErrorResponseTypes.BAD_REQUEST,
+    });
   }
 
   static async deleteThread(
@@ -74,13 +87,17 @@ export class ThreadByIdRepository {
     _threadId: string,
     // oxlint-disable-next-line no-unused-vars
     _user: JwtPayloadType,
-    // oxlint-disable-next-line no-unused-vars
-    _locale: CountryLanguage,
+    locale: CountryLanguage,
     // oxlint-disable-next-line no-unused-vars
     _logger: EndpointLogger,
   ): Promise<ResponseType<ThreadDeleteResponseOutput>> {
-    // oxlint-disable-next-line restricted-syntax
-    throw new Error("deleteThread is not implemented on native");
+    const { t } = scopedTranslation.scopedT(locale);
+    return fail({
+      message: t("errors.not_implemented_on_native", {
+        method: "deleteThread",
+      }),
+      errorType: ErrorResponseTypes.BAD_REQUEST,
+    });
   }
 }
 

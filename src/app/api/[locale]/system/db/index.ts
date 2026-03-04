@@ -14,6 +14,7 @@ import * as referralSchema from "../../referral/db";
 import * as sshSchema from "../../ssh/db";
 import * as cronTasksSchema from "../../system/unified-interface/tasks/cron/db";
 import * as userSchema from "../../user/db";
+import * as userRemoteConnectionSchema from "../../user/remote-connection/db";
 
 /**
  * Database connection pool configuration
@@ -41,6 +42,7 @@ const pool = new Pool(poolConfig);
 export const db = drizzle(pool, {
   schema: {
     ...userSchema,
+    ...userRemoteConnectionSchema,
     ...agentChatSchema,
     ...creditSchema,
     ...cronTasksSchema,

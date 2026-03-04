@@ -117,7 +117,6 @@ export async function getCliUser(
     const sessionResult = await readSessionFile(logger, locale);
 
     if (sessionResult.success && sessionResult.data) {
-      // Verify the token is still valid
       const { AuthRepository } =
         await import("@/app/api/[locale]/user/auth/repository");
       const verifyResult = await AuthRepository.verifyJwt(
@@ -137,11 +136,11 @@ export async function getCliUser(
         };
       }
     }
-  } catch (error) {
+  } catch {
     // Session check failed, continue to email auth
   }
 
-  // Check VIBE_ADMIN_USER_EMAIL environment variable
+  // Step 2: Check VIBE_ADMIN_USER_EMAIL environment variable
   const cliUserEmail = getCliUserEmail();
 
   // If VIBE_ADMIN_USER_EMAIL is not set, return public user

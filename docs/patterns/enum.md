@@ -2,7 +2,7 @@
 
 > **Part of NextVibe Framework** (GPL-3.0) - Type-safe enums with scoped i18n translation keys
 
-**Golden Rule: All enums use `createEnumOptions<ModuleTranslationKey>`, export `enum`/`options`/`Value`/`DB`, use scoped translation keys, and use `text()` with enum constraint in Drizzle (never `pgEnum`).**
+**Golden Rule: All enums use `createEnumOptions(scopedTranslation, {...})`, export `enum`/`options`/`Value`/`DB`, use short scoped translation keys, and use `text()` with enum constraint in Drizzle (never `pgEnum`).**
 
 ---
 
@@ -11,14 +11,14 @@
 ```typescript
 // enum.ts
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
-import type { MyModuleTranslationKey } from "./i18n"; // module-level scoped key type
+import { scopedTranslation } from "./i18n"; // value import (not type-only)
 
 export const {
   enum: ConsultationStatus,
   options: ConsultationStatusOptions,
   Value: ConsultationStatusValue,
-} = createEnumOptions<MyModuleTranslationKey>({
-  // ← ALWAYS add TranslationKey generic
+} = createEnumOptions(scopedTranslation, {
+  // ← pass scopedTranslation as first arg (validates keys at compile time)
   PENDING: "enums.consultationStatus.pending", // SHORT scoped key
   SCHEDULED: "enums.consultationStatus.scheduled",
   COMPLETED: "enums.consultationStatus.completed",
@@ -34,7 +34,7 @@ export const ConsultationStatusDB = [
 ] as const;
 ```
 
-**The `<ModuleTranslationKey>` generic is required** — it validates that every enum label string is a valid key in the module's scoped translation schema. Without it, TypeScript cannot catch typos or missing keys.
+**Passing `scopedTranslation` as first argument** validates that every enum label string is a valid key in the module's scoped translation schema at compile time.
 
 ---
 
@@ -148,10 +148,10 @@ await db.update(consultations).set({ status: ConsultationStatus.COMPLETED });
 ## Anti-Patterns
 
 ```typescript
-// ❌ No generic — TypeScript can't validate keys
+// ❌ Missing scopedTranslation — TypeScript can't validate keys
 createEnumOptions({ ACTIVE: "enums.status.active" });
 // ✅
-createEnumOptions<MyModuleTranslationKey>({ ACTIVE: "enums.status.active" });
+createEnumOptions(scopedTranslation, { ACTIVE: "enums.status.active" });
 
 // ❌ Old global key format
 PENDING: "app.api.module.enums.status.pending";

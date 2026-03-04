@@ -140,6 +140,11 @@ export function subscribeToMessages(
     ),
     sub(
       channel,
+      StreamEventType.THREAD_TITLE_UPDATED,
+      handlers[StreamEventType.THREAD_TITLE_UPDATED],
+    ),
+    sub(
+      channel,
       StreamEventType.STREAM_FINISHED,
       handlers[StreamEventType.STREAM_FINISHED],
     ),

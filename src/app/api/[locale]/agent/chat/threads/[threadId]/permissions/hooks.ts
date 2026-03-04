@@ -43,6 +43,7 @@ export function useThreadPermissions(
         },
       },
       update: {
+        urlPathParams: { threadId: params.threadId },
         formOptions: {
           persistForm: false,
         },

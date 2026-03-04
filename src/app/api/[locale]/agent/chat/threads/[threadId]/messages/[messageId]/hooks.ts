@@ -48,8 +48,18 @@ export function useMessage(
         },
       },
       update: {
+        urlPathParams: {
+          threadId: params.threadId,
+          messageId: params.messageId,
+        },
         formOptions: {
           persistForm: false,
+        },
+      },
+      delete: {
+        urlPathParams: {
+          threadId: params.threadId,
+          messageId: params.messageId,
         },
       },
     },

@@ -34,4 +34,5 @@ export const envClient: EnvClient = {
   NEXT_PUBLIC_DEBUG_PRODUCTION: false,
   NEXT_PUBLIC_LOCAL_MODE: false,
   NEXT_PUBLIC_PROJECT_URL: DEFAULT_PROJECT_URL,
+  VIBE_IS_CLOUD: false,
 };

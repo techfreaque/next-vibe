@@ -248,6 +248,19 @@ import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/sh
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 ```
 
+## Known Exceptions to `endpointsHandler()`
+
+Three routes legitimately bypass `endpointsHandler()` and export raw Next.js handler functions. Do not "fix" these:
+
+| File                                             | Reason                                                                                        |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| `payment/providers/stripe/webhook/route.ts`      | Stripe requires raw body + `headers()` for signature verification — cannot use parsed request |
+| `payment/providers/nowpayments/webhook/route.ts` | Same as Stripe — raw webhook with signature verification                                      |
+| `tracking/pixel/route.ts`                        | Returns 1×1 GIF binary — not a JSON endpoint                                                  |
+| `manifest/route.ts`                              | Returns web app manifest JSON with custom Content-Type headers                                |
+
+All other `route.ts` files MUST use `endpointsHandler()`.
+
 ## Reference Examples
 
 **Clean route files:**

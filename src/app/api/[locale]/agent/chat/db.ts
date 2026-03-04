@@ -202,6 +202,7 @@ export const chatFolders = pgTable(
     // UI state
     expanded: boolean("expanded").default(true).notNull(),
     sortOrder: integer("sort_order").default(0).notNull(),
+    pinned: boolean("pinned").default(false).notNull(),
 
     // Permission roles - 6-Role Model for Folders
     // null = inherit from parent folder
@@ -312,6 +313,9 @@ export const chatThreads = pgTable(
     defaultModel: text("default_model").$type<ModelId | null>(), // ModelId
     defaultCharacter: text("default_tone"), // Character ID (can be default character or custom UUID)
     systemPrompt: text("system_prompt"),
+
+    // Ordering within a folder (alongside sibling folders)
+    sortOrder: integer("sort_order").default(0).notNull(),
 
     // Metadata
     pinned: boolean("pinned").default(false).notNull(),

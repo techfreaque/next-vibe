@@ -1,19 +1,16 @@
 /**
- * Remote Executor
+ * Remote Executor (CLI)
  *
- * HTTP execution adapter for `--target remote` CLI execution.
- * Instead of calling handlers locally, sends HTTP requests to a remote server.
+ * Executes commands on a remote host via HTTP.
+ * Session is always DB-backed via user_remote_connections table.
+ * No file-based session storage for remote.
  *
- * The server's WebAuthHandler already supports `Authorization: Bearer` headers
- * (next-api/auth-handler.ts:42-48), so we send the JWT from .vibe.remote.session.
- *
- * Special handling:
- * - Login: Bootstraps a leadId first (GET / on remote), then POSTs login,
- *   extracts JWT from Set-Cookie, writes .vibe.remote.session
- * - Logout: Clears token from .vibe.remote.session but preserves leadId
+ * Login: bootstraps leadId, POSTs credentials to remote, stores JWT in DB.
+ * Logout: clears the DB record.
+ * All other endpoints: reads token from DB, delegates to executeRemote().
  */
 
-/* eslint-disable i18next/no-literal-string */
+/* eslint-disable oxlint-plugin-i18n/no-literal-string */
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -28,41 +25,31 @@ import {
 } from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import {
+  buildRemoteHeaders,
+  buildRemoteUrl,
+  executeRemote,
+  type RemoteCallData,
+} from "../../remote/remote-call";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { Methods } from "../../shared/types/enums";
-import {
-  clearRemoteSessionToken,
-  readRemoteLeadId,
-  readRemoteSessionFile,
-  type RemoteSessionData,
-  writeRemoteSessionFile,
-} from "../auth/remote-session-file";
+import { getRemoteSession } from "../auth/remote-session-cache";
 import { scopedTranslation as cliScopedTranslation } from "../i18n";
 import type { CliRequestData } from "./parsing";
 
-/** Shape of a decoded JWT payload (only the fields we care about) */
 interface DecodedJwtPayload {
   id?: string;
   leadId?: string;
-  isPublic?: boolean;
 }
 
-// Known endpoint paths for special handling
 const LOGIN_PATH = "user/public/login";
 const LOGOUT_PATH = "user/auth/logout";
 
-/**
- * Parse a cookie value from a Set-Cookie header string.
- * Set-Cookie headers can contain multiple cookies separated by commas,
- * but each cookie's attributes are separated by semicolons.
- */
 function parseCookieFromSetCookie(
   setCookieHeader: string,
   cookieName: string,
 ): string | undefined {
-  // Set-Cookie can be a single header or multiple values
-  // Split on comma-space to handle multiple Set-Cookie values joined
   const cookies = setCookieHeader.split(/,\s*(?=[^;]*=)/);
   for (const cookie of cookies) {
     const match = cookie.match(new RegExp(`${cookieName}=([^;]*)`));
@@ -73,10 +60,6 @@ function parseCookieFromSetCookie(
   return undefined;
 }
 
-/**
- * Decode a JWT payload without verification.
- * We only need to read userId and leadId — the server already verified the token.
- */
 function decodeJwtPayload(token: string): DecodedJwtPayload | null {
   try {
     const parts = token.split(".");
@@ -90,30 +73,18 @@ function decodeJwtPayload(token: string): DecodedJwtPayload | null {
     return {
       id: typeof payload.id === "string" ? payload.id : undefined,
       leadId: typeof payload.leadId === "string" ? payload.leadId : undefined,
-      isPublic:
-        typeof payload.isPublic === "boolean" ? payload.isPublic : undefined,
     };
   } catch {
     return null;
   }
 }
 
-/**
- * Bootstrap a leadId from a remote host.
- * Hits the root page which triggers the middleware to create a lead and set the cookie.
- * Follows redirects to capture the Set-Cookie header.
- */
 async function bootstrapLeadId(
   host: string,
   logger: EndpointLogger,
 ): Promise<string | null> {
   try {
-    // Fetch root page — middleware creates leadId and redirects
-    // Use redirect: "manual" to capture Set-Cookie from the 302 response
-    const response = await fetch(host, {
-      method: "GET",
-      redirect: "manual",
-    });
+    const response = await fetch(host, { method: "GET", redirect: "manual" });
 
     const setCookie = response.headers.get("set-cookie");
     if (setCookie) {
@@ -124,7 +95,6 @@ async function bootstrapLeadId(
       }
     }
 
-    // If the first request didn't return a cookie, follow the redirect
     const location = response.headers.get("location");
     if (location) {
       const redirectUrl = location.startsWith("http")
@@ -155,148 +125,13 @@ async function bootstrapLeadId(
   }
 }
 
-/** Response shape from the remote server — matches ResponseType but with CliResponseData */
-interface RemoteResponse {
-  success: boolean;
-  data?: Record<
-    string,
-    | string
-    | number
-    | boolean
-    | null
-    | Record<string, string | number | boolean | null>
-    | Record<string, string | number | boolean | null>[]
-  >;
-  message?: string;
-  errorType?: string;
-  messageParams?: Record<string, string>;
-}
-
-export class RemoteExecutor {
-  /**
-   * Execute an endpoint on a remote host via HTTP.
-   */
-  static async execute(params: {
-    endpoint: CreateApiEndpointAny;
-    data: CliRequestData;
-    locale: CountryLanguage;
-    logger: EndpointLogger;
-    remoteUrl: string;
-  }): Promise<ResponseType<RemoteResponse["data"]>> {
-    const { endpoint, data, locale, logger, remoteUrl } = params;
-    const { t } = cliScopedTranslation.scopedT(locale);
-    const endpointPath = endpoint.path.join("/");
-    const isLoginEndpoint = endpointPath === LOGIN_PATH;
-    const isLogoutEndpoint = endpointPath === LOGOUT_PATH;
-
-    // 1. Read existing remote session
-    const session = await readRemoteSessionFile(logger, locale);
-    const existingLeadId = await readRemoteLeadId(logger);
-
-    // 2. For non-login endpoints, require authentication
-    if (!session.success && !isLoginEndpoint) {
-      return fail({
-        message: t("vibe.errors.remoteNotLoggedIn"),
-        errorType: ErrorResponseTypes.UNAUTHORIZED,
-      });
-    }
-
-    // 3. For login: ensure we have a leadId (bootstrap if needed)
-    let leadId = existingLeadId;
-    if (isLoginEndpoint && !leadId) {
-      logger.info("[REMOTE] No leadId found, bootstrapping from remote...");
-      leadId = await bootstrapLeadId(remoteUrl, logger);
-      if (!leadId) {
-        return fail({
-          message: t("vibe.errors.remoteNoLeadId"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        });
-      }
-    }
-
-    // Use leadId from session if available
-    const effectiveLeadId = session.success ? session.data.leadId : leadId;
-
-    // 4. Build URL
-    const url =
-      endpoint.method === Methods.GET
-        ? buildGetUrl(remoteUrl, locale, endpointPath, data)
-        : `${remoteUrl}/api/${locale}/${endpointPath}`;
-
-    // 5. Build headers
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
-    if (session.success) {
-      headers["Authorization"] = `Bearer ${session.data.token}`;
-    }
-    if (effectiveLeadId) {
-      headers["Cookie"] = `${LEAD_ID_COOKIE_NAME}=${effectiveLeadId}`;
-    }
-
-    // 6. Send request
-    logger.debug(`[REMOTE] ${endpoint.method} ${url}`);
-
-    const response = await fetch(url, {
-      method: endpoint.method,
-      headers,
-      body: endpoint.method === Methods.GET ? undefined : JSON.stringify(data),
-      redirect: "manual",
-    });
-
-    // 7. Handle login response — extract token and write session
-    if (isLoginEndpoint && response.ok) {
-      await handleLoginResponse(response, remoteUrl, locale, logger);
-    }
-
-    // 8. Handle logout response — clear session token, keep leadId
-    if (isLogoutEndpoint && response.ok) {
-      await clearRemoteSessionToken(logger, locale);
-      logger.info(`[REMOTE] Logged out from ${remoteUrl}`);
-    }
-
-    // 9. Parse and return response
-    try {
-      const json = (await response.json()) as ResponseType<
-        RemoteResponse["data"]
-      >;
-      return json;
-    } catch {
-      return fail({
-        message: t("vibe.errors.remoteServerError"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-  }
-}
-
 /**
- * Build a GET URL with query parameters from data.
- */
-function buildGetUrl(
-  host: string,
-  locale: CountryLanguage,
-  endpointPath: string,
-  data: CliRequestData,
-): string {
-  const url = new URL(`/api/${locale}/${endpointPath}`, host);
-  if (data && typeof data === "object") {
-    for (const [key, value] of Object.entries(data)) {
-      if (value !== undefined && value !== null) {
-        url.searchParams.set(key, String(value));
-      }
-    }
-  }
-  return url.toString();
-}
-
-/**
- * Handle the login response: extract JWT from Set-Cookie, decode it, write session.
+ * Handle login response: extract JWT from Set-Cookie, store in DB.
  */
 async function handleLoginResponse(
   response: Response,
   host: string,
-  locale: CountryLanguage,
+  userId: string,
   logger: EndpointLogger,
 ): Promise<void> {
   const setCookie = response.headers.get("set-cookie");
@@ -316,32 +151,158 @@ async function handleLoginResponse(
     return;
   }
 
-  // Decode JWT to get userId and leadId
   const payload = decodeJwtPayload(token);
-  const userId = payload?.id ?? "";
   const leadId = leadIdFromCookie ?? payload?.leadId ?? "";
 
-  if (!leadId) {
-    logger.warn("[REMOTE] Could not extract leadId from login response");
-  }
-
-  // Calculate expiration
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + AUTH_TOKEN_COOKIE_MAX_AGE_DAYS);
 
-  const sessionData: RemoteSessionData = {
-    token,
-    userId,
-    leadId,
-    expiresAt: expiresAt.toISOString(),
-    createdAt: new Date().toISOString(),
-    host,
-  };
+  const { upsertRemoteConnection } =
+    await import("@/app/api/[locale]/user/remote-connection/repository");
 
-  const writeResult = await writeRemoteSessionFile(sessionData, logger, locale);
-  if (writeResult.success) {
+  const result = await upsertRemoteConnection({
+    userId,
+    remoteUrl: host,
+    token,
+    leadId: leadId || undefined,
+    logger,
+  });
+
+  if (result.success) {
     logger.info(`[REMOTE] Logged in to ${host} (userId: ${userId})`);
   } else {
-    logger.error("[REMOTE] Failed to write session file after login");
+    logger.error("[REMOTE] Failed to store session in DB after login");
+  }
+}
+
+/** Response shape from the remote server */
+interface RemoteResponse {
+  success: boolean;
+  data?: Record<
+    string,
+    | string
+    | number
+    | boolean
+    | null
+    | Record<string, string | number | boolean | null>
+    | Record<string, string | number | boolean | null>[]
+  >;
+  message?: string;
+  errorType?: string;
+  messageParams?: Record<string, string>;
+}
+
+export class RemoteExecutor {
+  /**
+   * Execute an endpoint on a remote host via HTTP.
+   * Session is always read from user_remote_connections DB table.
+   * userId is required — remote execution requires an authenticated local user.
+   */
+  static async execute(params: {
+    endpoint: CreateApiEndpointAny;
+    data: CliRequestData;
+    locale: CountryLanguage;
+    logger: EndpointLogger;
+    remoteUrl: string;
+    userId?: string;
+  }): Promise<ResponseType<RemoteResponse["data"]>> {
+    const { endpoint, data, locale, logger, remoteUrl, userId } = params;
+    const { t } = cliScopedTranslation.scopedT(locale);
+    const endpointPath = endpoint.path.join("/");
+    const isLoginEndpoint = endpointPath === LOGIN_PATH;
+    const isLogoutEndpoint = endpointPath === LOGOUT_PATH;
+
+    // Resolve session from DB
+    let resolvedToken: string | null = null;
+    let resolvedLeadId: string | undefined;
+    let resolvedRemoteUrl = remoteUrl;
+
+    if (userId) {
+      const dbSession = await getRemoteSession(userId);
+      if (dbSession) {
+        resolvedToken = dbSession.token;
+        resolvedLeadId = dbSession.leadId || undefined;
+        resolvedRemoteUrl = dbSession.remoteUrl;
+        logger.debug("[REMOTE] Using DB session", { userId });
+      }
+    }
+
+    // Non-login endpoints require an existing session
+    if (!resolvedToken && !isLoginEndpoint) {
+      return fail({
+        message: t("vibe.errors.remoteNotLoggedIn"),
+        errorType: ErrorResponseTypes.UNAUTHORIZED,
+      });
+    }
+
+    // Login: bootstrap leadId if we don't have one yet
+    let leadId = resolvedLeadId ?? null;
+    if (isLoginEndpoint && !leadId) {
+      logger.info("[REMOTE] No leadId found, bootstrapping from remote...");
+      leadId = await bootstrapLeadId(resolvedRemoteUrl, logger);
+      if (!leadId) {
+        return fail({
+          message: t("vibe.errors.remoteNoLeadId"),
+          errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        });
+      }
+    }
+
+    const effectiveLeadId = resolvedLeadId ?? leadId ?? undefined;
+    const token = resolvedToken ?? "";
+
+    // Non-login/logout: delegate to shared executeRemote()
+    if (!isLoginEndpoint && !isLogoutEndpoint) {
+      return executeRemote<RemoteResponse["data"]>({
+        definition: endpoint,
+        data: data as RemoteCallData,
+        token,
+        leadId: effectiveLeadId,
+        remoteUrl: resolvedRemoteUrl,
+        locale,
+        logger,
+      });
+    }
+
+    // Login/logout: direct fetch to access raw Set-Cookie headers
+    const url = buildRemoteUrl(
+      resolvedRemoteUrl,
+      locale,
+      endpoint,
+      data as RemoteCallData,
+    );
+    const headers = buildRemoteHeaders(token, effectiveLeadId);
+
+    const response = await fetch(url, {
+      method: endpoint.method,
+      headers,
+      body: endpoint.method === Methods.GET ? undefined : JSON.stringify(data),
+      redirect: "manual",
+    });
+
+    if (isLoginEndpoint && response.ok && userId) {
+      await handleLoginResponse(response, resolvedRemoteUrl, userId, logger);
+    }
+
+    if (isLogoutEndpoint && response.ok && userId) {
+      const { db } = await import("@/app/api/[locale]/system/db");
+      const { userRemoteConnections } =
+        await import("@/app/api/[locale]/user/remote-connection/db");
+      const { eq } = await import("drizzle-orm");
+      await db
+        .delete(userRemoteConnections)
+        .where(eq(userRemoteConnections.userId, userId));
+
+      logger.info(`[REMOTE] Logged out from ${resolvedRemoteUrl}`);
+    }
+
+    try {
+      return (await response.json()) as ResponseType<RemoteResponse["data"]>;
+    } catch {
+      return fail({
+        message: t("vibe.errors.remoteServerError"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
   }
 }

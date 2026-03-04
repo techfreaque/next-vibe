@@ -19,6 +19,7 @@ import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation } from "../../i18n";
 import { getPostsByUserId } from "./helpers";
 
 interface UserIdHoverCardProps {
@@ -39,7 +40,9 @@ export function UserIdHoverCard({
   onPostClick,
   locale,
 }: UserIdHoverCardProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
+  // simpleT needed for format4chanTimestamp which uses global app.chat.flatView.timestamp.* keys
+  const { t: tGlobal } = simpleT(locale);
   const userPosts = getPostsByUserId(messages, userId);
   const postCount = userPosts.length;
   const idColor = getIdColor(userId);
@@ -75,7 +78,7 @@ export function UserIdHoverCard({
             </Span>
           </Span>
           <Span className="text-xs text-muted-foreground font-medium">
-            {t("app.chat.flatView.postsById", { count: postCount })}
+            {t("widget.flatView.postsById", { count: postCount })}
           </Span>
         </Div>
 
@@ -95,7 +98,7 @@ export function UserIdHoverCard({
               >
                 <Div className="text-xs text-muted-foreground mb-1">
                   {/* eslint-disable-next-line i18next/no-literal-string -- Technical post number and separator */}
-                  {`Post #${idx + 1} • ${format4chanTimestamp(post.createdAt.getTime(), t)}`}
+                  {`Post #${idx + 1} • ${format4chanTimestamp(post.createdAt.getTime(), tGlobal)}`}
                 </Div>
                 <Div className="text-sm text-foreground/90 line-clamp-2">
                   {(post.content ?? "").slice(0, 100)}

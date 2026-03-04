@@ -20,6 +20,10 @@ export const translations = {
       label: "Message ID",
       description: "ID of the message to retrieve",
     },
+    rootFolderId: {
+      label: "Root Folder",
+      description: "Root folder of the thread (used for client routing)",
+    },
     response: {
       title: "Message Response",
       description: "Message details",
@@ -139,6 +143,10 @@ export const translations = {
       label: "Message ID",
       description: "ID of the message to update",
     },
+    rootFolderId: {
+      label: "Root Folder",
+      description: "Root folder of the thread (used for client routing)",
+    },
     content: {
       label: "Content",
       description: "Updated message content",
@@ -244,6 +252,10 @@ export const translations = {
     messageId: {
       label: "Message ID",
       description: "ID of the message to delete",
+    },
+    rootFolderId: {
+      label: "Root Folder",
+      description: "Root folder of the thread (used for client routing)",
     },
     response: {
       success: {

@@ -197,6 +197,7 @@ export const translations: typeof enTranslations = {
       billing: "Abrechnung",
       history: "Verlauf",
       plans: "Pläne",
+      remote: "Cloud-Sync",
     },
     payment: {
       success: {

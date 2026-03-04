@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import type { JSX } from "react";
 
-import { NewsletterPage } from "@/app/api/[locale]/newsletter/subscribe/widget/newsletter-page";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
@@ -10,6 +9,8 @@ import { UserProfileRepository } from "@/app/api/[locale]/user/private/me/reposi
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+
+import { NewsletterPage } from "./_components/newsletter-page";
 
 interface PageProps {
   params: Promise<{

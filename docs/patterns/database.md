@@ -302,6 +302,7 @@ metadata: jsonb("metadata").$type<ThreadMetadata>().default({});
 ```typescript
 // enum.ts
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Lead Status Enum
@@ -311,18 +312,18 @@ export const {
   enum: LeadStatus,
   options: LeadStatusOptions,
   Value: LeadStatusValue,
-} = createEnumOptions({
-  NEW: "app.api.leads.enums.leadStatus.new",
-  PENDING: "app.api.leads.enums.leadStatus.pending",
-  CAMPAIGN_RUNNING: "app.api.leads.enums.leadStatus.campaignRunning",
-  SIGNED_UP: "app.api.leads.enums.leadStatus.signedUp",
-  BOUNCED: "app.api.leads.enums.leadStatus.bounced",
-  INVALID: "app.api.leads.enums.leadStatus.invalid",
+} = createEnumOptions(scopedTranslation, {
+  // ← pass scopedTranslation, use short scoped keys
+  NEW: "enums.leadStatus.new",
+  PENDING: "enums.leadStatus.pending",
+  CAMPAIGN_RUNNING: "enums.leadStatus.campaignRunning",
+  SIGNED_UP: "enums.leadStatus.signedUp",
+  BOUNCED: "enums.leadStatus.bounced",
+  INVALID: "enums.leadStatus.invalid",
 });
 
 /**
- * Database enum array for Drizzle
- * Must be exported as const array
+ * Database enum array for Drizzle — explicit, as const
  */
 export const LeadStatusDB = [
   LeadStatus.NEW,
@@ -350,7 +351,7 @@ export const leads = pgTable("leads", {
 
 **Why text() instead of pgEnum()?**
 
-PostgreSQL enum labels have a 63-byte limit. Our translation keys like `app.api.leads.enums.leadStatus.campaignRunning` exceed this limit. Using `text()` with `{ enum: EnumDB }` provides the same type safety through Drizzle's validation while avoiding the database limitation.
+PostgreSQL enum labels have a 63-byte limit. Our enum values are the scoped translation keys (e.g. `"enums.leadStatus.campaignRunning"`) which can exceed this limit. Using `text()` with `{ enum: EnumDB }` provides the same type safety through Drizzle's validation while avoiding the database limitation.
 
 ---
 

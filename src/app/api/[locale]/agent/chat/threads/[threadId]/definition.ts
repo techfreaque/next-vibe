@@ -12,6 +12,7 @@ import {
   responseArrayOptionalField,
   scopedObjectFieldNew,
   scopedRequestField,
+  scopedRequestResponseField,
   scopedRequestUrlPathParamsField,
   scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
@@ -37,6 +38,7 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["agent", "chat", "threads", "[threadId]"],
   allowedRoles: [
+    UserRole.PUBLIC,
     UserRole.CUSTOMER,
     UserRole.ADMIN,
     UserRole.REMOTE_SKILL,
@@ -53,7 +55,7 @@ const { GET } = createEndpoint({
     title: "get.container.title" as const,
     description: "get.container.description" as const,
     layoutType: LayoutType.STACKED,
-    usage: { request: "urlPathParams", response: true },
+    usage: { request: "data&urlPathParams", response: true },
     children: {
       // === URL PARAMETERS ===
       threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
@@ -142,10 +144,13 @@ const { GET } = createEndpoint({
         content: "get.response.thread.leadId.content" as const,
         schema: z.uuid().nullable(),
       }),
-      rootFolderId: scopedResponseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "get.response.thread.rootFolderId.content" as const,
-        schema: z.enum(Object.values(DefaultFolderId)),
+      rootFolderId: scopedRequestResponseField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "get.rootFolderId.label" as const,
+        description: "get.rootFolderId.description" as const,
+        columns: 6,
+        schema: z.enum(DefaultFolderId),
       }),
       rolesView: responseArrayOptionalField(
         {
@@ -244,9 +249,15 @@ const { GET } = createEndpoint({
     description: "get.success.description",
   },
 
+  // Route to client (localStorage) for incognito threads — caller passes rootFolderId
+  useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
+
   examples: {
     urlPathParams: {
       default: { threadId: "550e8400-e29b-41d4-a716-446655440000" },
+    },
+    requests: {
+      default: { rootFolderId: DefaultFolderId.PRIVATE },
     },
     responses: {
       default: {
@@ -285,7 +296,7 @@ const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
   path: ["agent", "chat", "threads", "[threadId]"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "patch.title" as const,
   description: "patch.description" as const,
@@ -308,6 +319,16 @@ const { PATCH } = createEndpoint({
         description: "patch.id.description" as const,
         columns: 12,
         schema: z.uuid(),
+      }),
+
+      // === REQUEST DATA ===
+      rootFolderId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "patch.rootFolderId.label" as const,
+        description: "patch.rootFolderId.description" as const,
+        columns: 6,
+        schema: z.enum(DefaultFolderId),
       }),
 
       // === UPDATE FIELDS ===
@@ -447,12 +468,16 @@ const { PATCH } = createEndpoint({
     description: "patch.success.description",
   },
 
+  // Route to client (localStorage) for incognito threads — caller passes rootFolderId
+  useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
+
   examples: {
     urlPathParams: {
       default: { threadId: "550e8400-e29b-41d4-a716-446655440000" },
     },
     requests: {
       default: {
+        rootFolderId: DefaultFolderId.PRIVATE,
         title: "Updated Thread Title",
         pinned: true,
       },
@@ -473,7 +498,7 @@ const { DELETE } = createEndpoint({
   scopedTranslation,
   method: Methods.DELETE,
   path: ["agent", "chat", "threads", "[threadId]"],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "delete.title" as const,
   description: "delete.description" as const,
@@ -486,7 +511,7 @@ const { DELETE } = createEndpoint({
     title: "delete.container.title" as const,
     description: "delete.container.description" as const,
     layoutType: LayoutType.STACKED,
-    usage: { request: "urlPathParams", response: true },
+    usage: { request: "data&urlPathParams", response: true },
     children: {
       // === URL PARAMETERS ===
       threadId: scopedRequestUrlPathParamsField(scopedTranslation, {
@@ -510,10 +535,13 @@ const { DELETE } = createEndpoint({
         content: "delete.response.title.content" as const,
         schema: z.string(),
       }),
-      rootFolderId: scopedResponseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "delete.response.rootFolderId.content" as const,
-        schema: z.enum(Object.values(DefaultFolderId)),
+      rootFolderId: scopedRequestResponseField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "delete.rootFolderId.label" as const,
+        description: "delete.rootFolderId.description" as const,
+        columns: 6,
+        schema: z.enum(DefaultFolderId),
       }),
       folderId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -587,9 +615,15 @@ const { DELETE } = createEndpoint({
     description: "delete.success.description",
   },
 
+  // Route to client (localStorage) for incognito threads — caller passes rootFolderId
+  useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
+
   examples: {
     urlPathParams: {
       default: { threadId: "550e8400-e29b-41d4-a716-446655440000" },
+    },
+    requests: {
+      default: { rootFolderId: DefaultFolderId.PRIVATE },
     },
     responses: {
       default: {

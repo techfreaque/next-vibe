@@ -35,6 +35,9 @@ export function UserEditPageClient({
         create: {
           urlPathParams: { id: userId },
         },
+        delete: {
+          urlPathParams: { id: userId },
+        },
       }}
       forceMethod="PUT"
     />

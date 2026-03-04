@@ -11,6 +11,7 @@ import { defineEnv } from "@/app/api/[locale]/system/unified-interface/shared/en
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
+import { DEFAULT_PROJECT_URL } from "./constants";
 import { createSchema } from "./env-client";
 
 export const {
@@ -39,8 +40,8 @@ export const {
     example: "http://localhost:3000",
   },
   NEXT_PUBLIC_PROJECT_URL: {
-    schema: z.string().url().default("https://unbottled.ai"),
-    example: "https://unbottled.ai",
+    schema: z.string().url().default(DEFAULT_PROJECT_URL),
+    example: DEFAULT_PROJECT_URL,
   },
   IS_PREVIEW_MODE: {
     schema: z
@@ -114,9 +115,19 @@ export const {
       "Comma-separated list of all known instance IDs. Used in system prompt so the AI knows which instances it can route tasks to.",
     commented: true,
   },
+  VIBE_IS_CLOUD: {
+    schema: z
+      .string()
+      .optional()
+      .default("false")
+      .transform((v) => v === "true"),
+    example: false,
+    comment:
+      "Set to true on cloud/SaaS instances that receive syncs from users. Disables outbound task/memory sync so the cloud instance never pushes back to user devices.",
+  },
   THEA_REMOTE_URL: {
     schema: z.string().url().optional(),
-    example: "https://unbottled.ai",
+    example: DEFAULT_PROJECT_URL,
     comment:
       "Remote Thea instance URL for task sync. Local instance polls this for new tasks.",
     commented: true,

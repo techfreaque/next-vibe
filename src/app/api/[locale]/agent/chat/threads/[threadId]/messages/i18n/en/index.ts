@@ -1,9 +1,8 @@
-import { translations as messageIdTranslations } from "../../[messageId]/i18n/en";
-import pathTranslations from "../../path/i18n/en";
-import { translations as searchTranslations } from "../../search/i18n/en";
-
 export const translations = {
-  ...searchTranslations,
+  category: "Chat",
+  tags: {
+    messages: "Messages",
+  },
   loadingOlderMessages: "Loading older messages...",
   scrollUpForOlderMessages: "Scroll up for older messages",
   showOlderMessages: "Show older messages",
@@ -24,6 +23,10 @@ export const translations = {
     threadId: {
       label: "Thread ID",
       description: "ID of the thread to retrieve messages from",
+    },
+    rootFolderId: {
+      label: "Root Folder",
+      description: "Root folder of the thread (used for client routing)",
     },
     response: {
       title: "Messages Response",
@@ -141,6 +144,10 @@ export const translations = {
     threadId: {
       label: "Thread ID",
       description: "ID of the thread to add message to",
+    },
+    rootFolderId: {
+      label: "Root Folder",
+      description: "Root folder of the thread (used for client routing)",
     },
     id: {
       label: "Message ID",
@@ -260,7 +267,187 @@ export const translations = {
   debugView: {
     systemPromptTitle: "System Prompt",
     copied: "Copied!",
+    systemMessageHint: "System message (hidden from users)",
   },
-  messageId: messageIdTranslations,
-  path: pathTranslations,
+  widget: {
+    common: {
+      send: "Send",
+      sending: "Sending...",
+      cancel: "Cancel",
+      close: "Close",
+      copyButton: {
+        copied: "Copied!",
+        copyToClipboard: "Copy to clipboard",
+        copyAsMarkdown: "Copy as Markdown",
+        copyAsText: "Copy as plain text",
+      },
+      viewModeToggle: {
+        linearView: "Linear View",
+        threadedView: "Threaded View",
+        flatView: "Flat View",
+        debugView: "Debug View",
+      },
+      userMessageActions: {
+        branch: "Branch",
+        retry: "Retry",
+        deleteMessage: "Delete message",
+      },
+      assistantMessageActions: {
+        answerAsAI: "Answer as AI",
+        cancelLoading: "Cancel loading",
+        stopAudio: "Stop audio",
+        playAudio: "Play audio ({{cost}} credits)",
+        actualCostUsed: "Actual cost used",
+        credits: "Credits",
+        tokens: "Tokens",
+        tokensUsed: "Tokens used",
+        deleteMessage: "Delete message",
+      },
+    },
+    messages: {
+      assistant: "Assistant",
+      anonymous: "Anonymous",
+      you: "You",
+      edited: "edited",
+      branch: {
+        previous: "Previous branch",
+        next: "Next branch",
+      },
+      authorWithId: "{{author}} ({{id}})",
+    },
+    linearView: {
+      answerModal: {
+        title: "Answer as AI",
+        description: "Generate an AI response to this message",
+        inputPlaceholder: "Add context for the AI...",
+        confirmLabel: "Generate",
+      },
+      retryModal: {
+        title: "Retry with different model",
+        description: "Regenerate this response with a different model",
+        confirmLabel: "Retry",
+      },
+    },
+    threadedView: {
+      actions: {
+        reply: "Reply",
+        replyToMessage: "Reply to this message",
+        edit: "Edit",
+        editMessage: "Edit message",
+        retry: "Retry",
+        retryWithDifferent: "Retry with different model",
+        answerAsAI: "Answer as AI",
+        generateAIResponse: "Generate AI response",
+        respondToAI: "Respond to AI",
+        cancelLoading: "Cancel loading",
+        stop: "Stop",
+        stopAudio: "Stop audio",
+        playAudio: "Play audio ({{cost}} credits)",
+        delete: "Delete",
+        deleteMessage: "Delete message",
+        share: "Share",
+        copyPermalink: "Copy permalink",
+        upvote: "Upvote",
+        downvote: "Downvote",
+        play: "Play",
+        cancel: "Cancel",
+        parent: "Go to parent",
+      },
+      answerModal: {
+        title: "Answer as AI",
+        description: "Generate an AI response to this message",
+        inputPlaceholder: "Add context for the AI...",
+        confirmLabel: "Generate",
+      },
+      retryModal: {
+        title: "Retry with different model",
+        description: "Regenerate this response with a different model",
+        confirmLabel: "Retry",
+      },
+      anonymous: "Anonymous",
+      assistantFallback: "Assistant",
+      userFallback: "User",
+      youLabel: "You",
+      authorWithId: "{{name}} ({{id}})",
+      reply: "reply",
+      replies: "replies",
+      expandReplies: "Expand replies",
+      collapseReplies: "Collapse replies",
+      continueThread: "Continue thread ({{count}} {{replyText}})",
+    },
+    flatView: {
+      actions: {
+        reply: "Reply",
+        replyToMessage: "Reply to this message",
+        edit: "Edit",
+        editMessage: "Edit message",
+        retry: "Retry",
+        retryWithDifferent: "Retry with different model",
+        answerAsAI: "Answer as AI",
+        generateAIResponse: "Generate AI response",
+        delete: "Delete",
+        deleteMessage: "Delete message",
+        copyReference: "Copy reference",
+      },
+      answerModal: {
+        title: "Answer as AI",
+        description: "Generate an AI response to this message",
+        inputPlaceholder: "Add context for the AI...",
+        confirmLabel: "Generate",
+      },
+      retryModal: {
+        title: "Retry with different model",
+        description: "Regenerate this response with a different model",
+        confirmLabel: "Retry",
+      },
+      anonymous: "Anonymous",
+      assistantFallback: "Assistant",
+      youLabel: "You",
+      replyingTo: "Replying to",
+      replies: "Replies:",
+      clickToCopyRef: "Click to copy reference",
+      postsById: "{{count}} posts by this ID",
+      idLabel: "ID: {{id}}",
+    },
+    debugView: {
+      systemMessageHint: "System message (hidden from users)",
+    },
+    userProfile: {
+      recentPosts: "Recent posts",
+      noPostsYet: "No posts yet",
+      postCount: "{{count}} posts",
+    },
+    screenshot: {
+      capture: "Capture screenshot",
+      capturing: "Capturing...",
+    },
+    shareDialog: {
+      title: "Share thread",
+    },
+    messageEditor: {
+      titles: {
+        branch: "Edit & branch",
+        cancel: "Cancel",
+      },
+      hint: {
+        branch: "Editing creates a new branch",
+      },
+    },
+    input: {
+      keyboardShortcuts: {
+        press: "Press",
+        enter: "Enter",
+        shiftEnter: "Shift+Enter",
+        forNewLine: "for new line",
+      },
+    },
+    voiceMode: {
+      callMode: "Call mode",
+      callModeDescription: "AI will respond with voice",
+      tapToRecord: "Tap to record",
+    },
+    batchToolConfirmation: {
+      title: "Confirm batch tool calls",
+    },
+  },
 };

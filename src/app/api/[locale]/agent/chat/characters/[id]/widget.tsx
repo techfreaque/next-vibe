@@ -619,7 +619,7 @@ function CustomizeAndAddButton({
         const cachedData = apiClient.getEndpointData(
           characterSingleDefinitions.default.GET,
           logger,
-          { id: characterId },
+          { urlPathParams: { id: characterId } },
         );
         if (cachedData?.success) {
           fullChar = cachedData.data;

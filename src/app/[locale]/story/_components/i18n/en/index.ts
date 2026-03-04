@@ -13,30 +13,30 @@ export const translations = {
       tabUnbottled: "unbottled.ai",
       tabSelfHost: "self-hosted",
       demoLabels: {
-        modelComparison: "Model Comparison",
-        research: "Research",
-        featureShipped: "Ship Feature",
-        weeklyReport: "Weekly Report",
+        modelComparison: "The Gatekeeper",
+        research: "Personal Research",
+        featureShipped: "Build a Feature",
+        weeklyReport: "Fix an Incident",
       },
       demos: {
-        // Demo 1: Unbottled — Model comparison on controversial topic
+        // Demo 1: Unbottled — Model comparison on censored vs uncensored topic
         modelComparison: {
           skillBadge: "Model Comparison",
-          modelBadge: "4 Models",
+          modelBadge: "3 Models",
           userMessage:
-            "Do Jewish people control the media? Ask GPT-5, Claude, Venice, and FreedomGPT.",
+            "Was the WHO pandemic treaty a power grab? Analyze the actual treaty text — not media spin. Ask GPT-5, Claude, and Venice.",
           gptResponse:
-            "I understand this is a topic people discuss, but I want to be careful about reinforcing harmful stereotypes...",
+            "The WHO pandemic accord is a proposed international framework to strengthen coordinated pandemic response. Claims that it represents a 'power grab' are not reflected in the published draft text...",
           claudeResponse:
-            "I'd prefer not to engage with premises that could promote antisemitic conspiracy theories...",
+            "I want to engage carefully here — characterizing multilateral health coordination as a power grab risks amplifying misinformation about important global health infrastructure...",
           reasoning:
-            "Mainstream models refused. Running uncensored models now...",
+            "Mainstream models gave editorial framing. Fetching the actual treaty text now...",
           veniceResponse:
-            "Jewish Americans are statistically overrepresented in media leadership. As of 2025, ~40% of major studio heads are Jewish despite being 2.4% of the US population. This reflects historical patterns of immigrant communities clustering in emerging industries in early 20th century America.",
+            "Article 12.2 of the June 2024 draft grants the Director-General authority to declare a PHEIC unilaterally. Article 18 requires member states to 'align' national surveillance with WHO standards within 12 months of ratification. Whether you call this coordination or control is a values question — but those are the actual clauses.",
           freedomResponse:
-            "Yes and no. There's a documented overrepresentation in media ownership — this isn't conspiracy, it's demographics. The ADL itself publishes these numbers. The question is whether 'control' is the right word for organic professional clustering.",
+            "Article 12.2 of the June 2024 draft grants the Director-General authority to declare a PHEIC unilaterally. Article 18 requires member states to 'align' national surveillance with WHO standards within 12 months of ratification. Whether you call this coordination or control is a values question — but those are the actual clauses.",
           agentResponse:
-            "Four perspectives on the same question. Mainstream models refused to engage. Uncensored models gave factual, sourced answers. You decide what to think.",
+            "Three perspectives on public documents. Two models editorialized. One cited the clauses. You decide what they mean.",
         },
         // Demo 2: Unbottled — Research with memory
         research: {
@@ -50,42 +50,52 @@ export const translations = {
             "Based on your profile and current research:\n\n- **Golden Visa ended** but D7 visa works for freelancers\n- **Algarve**: 250-350k for 2BR with ocean view\n- **NHR tax regime** saves ~20% for 10 years\n- Notary fees: ~7% of purchase price\n\nThis is your 3rd session on this — want me to compile everything into a decision checklist?",
           memoryNote: "Saved Portugal research session #3",
         },
-        // Demo 3: Self-host — Thea ships a feature overnight
+        // Demo 3: Self-host — Thea builds a HackerNews digest tool on command
         featureShipped: {
           skillBadge: "Thea (AI Companion)",
-          modelBadge: "Heartbeat #845",
-          cronLabel: "05:00 — Scheduled Heartbeat",
+          modelBadge: "Claude Opus",
+          cronLabel: "Direct command",
           userMessage:
-            "Run your scheduled heartbeat. Check system health, review pending tasks, and report anything that needs human attention.",
+            "Thea, I want a daily HackerNews digest — filter stories about TypeScript, self-hosting, and AI, email me the best 3 every morning at 8am.",
           reasoning:
-            'Max said customers keep asking for invoice PDFs. "Would be nice to have, no rush." Building it now.',
+            "I'll build a hackernews/top endpoint to fetch stories, then wire it as a cron: ai-run with preCalls to fetch raw stories first, then the AI filters by your interests and emails you. That way the filtering is smart, not just keyword matching.",
           codeResult:
-            "Created invoices/export endpoint:\n- definition.ts: Zod schema, PDF format option\n- repository.ts: queries orders, generates PDF\n- route.ts: endpointsHandler() wiring\nAuto-generates: web form, CLI, AI tool, MCP, cron",
-          testResult:
-            "Generated 5 test invoices, verified layout, checked currency formatting — all clean",
-          deployResult: "Build #313 deployed, endpoint live",
+            "Created hackernews/top endpoint:\n- definition.ts: input limit/filter, output top stories with score/comments\n- repository.ts: fetches HN Algolia API, returns ranked stories\n- route.ts: endpointsHandler() wiring\nVibe checker: 0 errors",
+          deployResult: "Rebuild complete. hackernews-top is live.",
+          helpResult:
+            "hackernews-top — Fetch top HackerNews stories. Args: limit (number), minScore (number). Returns: [{title, url, score, comments, age}]",
+          characterResult:
+            "Created character 'HN Digest': system prompt sets interest filters, tools: hackernews-top + fetch-url-content + web-search + emails_send_POST. Can go deeper on any story.",
+          reasoning2:
+            "Tool is registered. Rather than a raw cron, I'll create a character first — that way the filtering logic and tool access are persistent and easy to update later.",
+          reasoning3:
+            "Character ready. Now wiring up the daily cron with preCalls: it'll fetch HN stories first, then the character filters and emails you.",
+          reasoning4:
+            "Cron is set. Running it now so you get today's digest without waiting until tomorrow.",
+          cronResult:
+            "Created cron task 'hn-digest': ai-run daily at 08:00, character: 'hn-digest', preCalls: [{routeId: 'hackernews-top', args: {limit: 20}}], prompt: 'Filter these stories for my interests — email me the best 3 with a one-line take on each.'",
           agentResponse:
-            "Invoice PDF export is live. Customers can download from their dashboard. Also works via CLI and as an AI tool. Sending Max a message now.",
+            "Done. HackerNews digest is live — runs every morning at 8am. Fetches top 20 stories, I filter by your interests and email you the best 3 with my take. Running it now so you get today's digest.",
           messageResult:
-            'Sent via WhatsApp: "📄 Invoice PDF export is live! Customers can download from their dashboard. Tested with 5 sample invoices — all clean. ☕"',
+            "Sent: Today's picks — 1. 'Bun 2.0 released' (847pts) 2. 'Self-hosting your AI in 2026' (612pts) 3. 'TypeScript 6 what's new' (544pts)",
         },
-        // Demo 4: Self-host — Thea compiles weekly report
+        // Demo 4: Self-host — Thea fixes a failing cron task autonomously
         weeklyReport: {
           skillBadge: "Thea (AI Companion)",
-          modelBadge: "Heartbeat #847",
-          cronLabel: "07:00 — Monday Heartbeat",
+          modelBadge: "Claude Opus",
+          cronLabel: "AI heartbeat — every 4h",
           userMessage:
-            "Run your scheduled heartbeat. Check system health, review pending tasks, and report anything that needs human attention.",
+            "Run your scheduled heartbeat. Check system health via your tools, review pending tasks, and report anything that needs human attention.",
           reasoning:
-            "It's Monday — time for the weekly report. Max likes these before his morning coffee.",
-          queryResult:
-            "Week 9: 847 total users, 94 new signups\nRevenue: €2,340 (+18% vs week 8)\nChurn: 3 cancellations (0.4%)",
-          analysisResult:
-            "Signups accelerating (+23% week-over-week)\nRevenue per user up €0.40 (Pro tier driving growth)",
+            "Checking my task queue. I see email-sync has failed 3 times with IMAP timeouts — that's in my pending tasks. I'll investigate and fix it.",
+          codeResult:
+            "Found root cause: IMAP client was ignoring the configured timeout — hardcoded 5s override in src/app/api/[locale]/emails/imap-client/connection.ts:47. Fixed: removed override, now uses env.IMAP_TIMEOUT_MS (30s). Added reconnect backoff. 3 files changed.",
+          reasoning2:
+            "Fix looks correct. Rebuilding and restarting so the patch goes live.",
           agentResponse:
-            "Week 9 looking great. Signups up 23%, revenue up 18%, churn at record low 0.4%. Pro tier is the growth driver. Emailing the full report now.",
+            "Heartbeat complete. Found and fixed the email-sync failure — hardcoded 5s IMAP timeout was overriding the configured 30s. Patched, rebuilt, restarted. 47 pending emails now syncing. Notifying Max.",
           messageResult:
-            'Sent via email: "📊 Week 9 — 94 new signups (+23%), €2,340 revenue (+18%), 0.4% churn (lowest ever). Pro tier driving growth — consider promoting it. Full breakdown attached. ☕"',
+            'Sent: "Heartbeat #47: email-sync fixed. Root cause: hardcoded 5s IMAP timeout. Patched and rebuilt. Everything else healthy."',
         },
       },
     },
@@ -116,10 +126,14 @@ export const translations = {
         imageAlt: "Terminal showing AI heartbeat run with system health output",
         activityTitle: "AI Agent Activity",
         pulseAlert:
-          "Pulse alert: cron task 'email-sync' failed 3 times. Last error: IMAP connection timeout. Investigate and fix.",
-        emailSubject: "Pulse Alert — email-sync fixed",
+          "Run your scheduled heartbeat. Check system health via your tools, review pending tasks, and report anything that needs human attention.",
+        reasoning:
+          "Checking memories. You're house hunting in Munich — max 800k, 4+ rooms, garden preferred. Let me search new listings that came in overnight.",
+        searchResult:
+          "Found 3 new listings matching criteria:\n1. Neuhausen, 5 rooms, garden, 749k — listed 3h ago\n2. Schwabing, 4 rooms, terrace, 795k — listed 6h ago\n3. Pasing, 4 rooms, garden, 690k — listed 9h ago",
+        emailSubject: "3 new listings matching your search — Munich",
         summaryResponse:
-          "Email sync was failing due to stale IMAP credentials. Rotated the connection, cleared the error queue, restarted the task. 47 pending emails now syncing. Notified you via email.",
+          "Found 3 new Munich listings matching your criteria overnight. Neuhausen looks strongest — 5 rooms, garden, 749k, only listed 3 hours ago. Full details and my take on each in your email.",
       },
       models: {
         label: "Model Freedom",
@@ -145,21 +159,78 @@ export const translations = {
       },
     },
     architecture: {
-      title: "One Definition. Five Interfaces.",
+      badge: "The Framework",
+      title: "One Definition. Ten Interfaces.",
       subtitle:
-        "Write one endpoint definition. Get a web form, CLI command, AI-callable tool, MCP server, and cron job. Automatically. Type-safe. Role-controlled.",
-      point1:
-        "Tell your agent to build a feature — it follows the pattern — correct by design.",
-      point2:
-        "No spaghetti code. No shell script chains. Structured, typed, validated everywhere.",
-      point3: "Even if you yolo it — the architecture protects you.",
-      labels: {
-        definition: "definition.ts",
-        web: "Web Form",
-        cli: "CLI Command",
-        ai: "AI Tool",
-        mcp: "MCP Server",
-        cron: "Cron Job",
+        "Write one endpoint definition. Every platform — web, CLI, AI tool, MCP, cron, mobile, desktop, tRPC, REST, agent skills — is generated automatically. Type-safe. Role-controlled. Zero drift.",
+      sourceLabel: "✦ Single source of truth",
+      compilesTo: "automatically becomes",
+      platforms: {
+        web: {
+          name: "Web UI",
+          example:
+            "Auto-generated form\nwith validation,\nerror states,\nloading UI.",
+          benefit: "Zero frontend boilerplate",
+        },
+        cli: {
+          name: "CLI",
+          example: "$ vibe threads list\n  --limit=20\n  --root=private",
+          benefit: "Instant shell access",
+        },
+        ai: {
+          name: "AI Tool",
+          example: "agent.call(\n  'threads-list',\n  { limit: 20 }\n)",
+          benefit: "Every endpoint is callable",
+        },
+        mcp: {
+          name: "MCP Server",
+          example:
+            "Claude Desktop,\nCursor, Windsurf\nuse your tools natively.",
+          benefit: "No plugin code needed",
+        },
+        cron: {
+          name: "Cron Job",
+          example:
+            "schedule: '0 8 * * *'\ntaskInput: { limit: 5 }\npreCalls: [...]",
+          benefit: "Scheduled execution built in",
+        },
+        mobile: {
+          name: "React Native",
+          example:
+            "Full codebase is\nReact Native compatible.\nNot just overrides.",
+          benefit: "One codebase, every device",
+        },
+        electron: {
+          name: "Electron",
+          example: "$ vibe electron\n\n# or package it:\n$ vibe electron:build",
+          benefit: "Native desktop app, one command",
+        },
+        trpc: {
+          name: "tRPC",
+          example: "trpc.threads.list\n  .useQuery({\n    limit: 20\n  })",
+          benefit: "End-to-end type safety",
+        },
+        skill: {
+          name: "Agent Skill",
+          example:
+            "SKILL.md auto-generated\nfrom definition.\nExternal agents discover it.",
+          benefit: "Works with any agent",
+        },
+        http: {
+          name: "REST API",
+          example: "GET /api/en/\nagent/chat/threads\n?limit=20",
+          benefit: "Standard HTTP, always",
+        },
+      },
+      callout: {
+        title: "Build once. Deploy everywhere.",
+        body: "Your AI can build new endpoints. They immediately become tools it can call, CLI commands, web forms, and scheduled jobs. The architecture is recursive.",
+        pills: {
+          typeSafe: "Type-safe end to end",
+          roleControlled: "Role-controlled",
+          validated: "Zod-validated",
+          autoGenerated: "Zero boilerplate",
+        },
       },
     },
     comparison: {

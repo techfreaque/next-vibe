@@ -16,6 +16,7 @@ import definitions from "./definition";
  * Hook for import job operations (update and delete)
  */
 export function useImapJobEndpoint(
+  params: { jobId: string },
   user: JwtPayloadType,
   logger: EndpointLogger,
 ): EndpointReturn<typeof definitions> {
@@ -23,15 +24,20 @@ export function useImapJobEndpoint(
     definitions,
     {
       read: {
+        urlPathParams: { jobId: params.jobId },
         queryOptions: {
           staleTime: 0, // Always fresh for job operations
           refetchOnWindowFocus: false,
         },
       },
       update: {
+        urlPathParams: { jobId: params.jobId },
         formOptions: {
           persistForm: false,
         },
+      },
+      delete: {
+        urlPathParams: { jobId: params.jobId },
       },
     },
     logger,

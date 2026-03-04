@@ -19,7 +19,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTranslation } from "@/i18n/core/client";
 
 import { scopedTranslation as hooksScopedTranslation } from "./i18n";
-import { buildKey } from "./query-key-builder";
+import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
 import type { ApiStore, FormQueryParams } from "./store";
 import { useApiStore } from "./store";
 import { deserializeQueryParams } from "./store";
@@ -109,6 +109,7 @@ function mergeWithDefaults<T>(saved: T, defaults: T): T {
 export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   endpoint,
   urlPathParams,
+  requestData,
   formOptions = { persistForm: true, autoSubmit: true, debounceMs: 500 },
   queryOptions = { enabled: true },
   logger,
@@ -116,6 +117,7 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
 }: {
   endpoint: TEndpoint;
   urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
+  requestData: CacheKeyRequestData<TEndpoint>;
   user: JwtPayloadType;
   formOptions?: ApiQueryFormOptions<TEndpoint["types"]["RequestOutput"]> & {
     /**
@@ -304,7 +306,8 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
   // get a unique storage key per resource — prevents stale persisted form data from a previous
   // resource overwriting the correct params when navigating to a different resource.
   const storageKey =
-    persistenceKey || buildKey("query-form", endpoint, urlPathParams, logger);
+    persistenceKey ||
+    buildKey("query-form", endpoint, urlPathParams, logger, requestData);
 
   // Create form configuration with schema defaults
   const formConfigWithDefaults: UseFormProps<
@@ -453,18 +456,20 @@ export function useApiQueryForm<TEndpoint extends CreateApiEndpointAny>({
     [setFormErrorStore, formId, hooksT],
   );
 
-  // When urlPathParams are present, use mergedDefaultValues as requestData so the correct
-  // path params are used immediately on mount — before the async setQueryParams effect runs.
-  // Without this, the global Zustand form store (keyed by endpoint only) may still hold stale
-  // params from a previous navigation to the same endpoint with different urlPathParams.
+  // When urlPathParams are present, or a custom queryKey is used, always use mergedDefaultValues
+  // as requestData so the correct params are used immediately on mount — before the async
+  // setQueryParams effect runs. Without this, the global Zustand form store (keyed by endpoint
+  // only) may still hold stale params from a previous render with different values
+  // (e.g. switching root folder tabs, or navigating to a different thread).
   const hasUrlPathParamsForQuery =
     urlPathParams !== undefined &&
     urlPathParams !== null &&
     typeof urlPathParams === "object" &&
     Object.keys(urlPathParams as FormQueryParams).length > 0;
-  const effectiveRequestData = hasUrlPathParamsForQuery
-    ? mergedDefaultValues
-    : queryParams;
+  const effectiveRequestData =
+    hasUrlPathParamsForQuery || queryOptions.queryKey
+      ? mergedDefaultValues
+      : queryParams;
 
   // Use API query with form values as parameters from the store
   const query = useApiQuery({

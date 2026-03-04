@@ -5,6 +5,7 @@
 
 "use client";
 
+import { success } from "next-vibe/shared/types/response.schema";
 import { cn } from "next-vibe/shared/utils";
 import { AlertDialog } from "next-vibe-ui/ui/alert-dialog";
 import { AlertDialogAction } from "next-vibe-ui/ui/alert-dialog";
@@ -43,27 +44,32 @@ import { TooltipContent } from "next-vibe-ui/ui/tooltip";
 import { TooltipProvider } from "next-vibe-ui/ui/tooltip";
 import { TooltipTrigger } from "next-vibe-ui/ui/tooltip";
 import { P } from "next-vibe-ui/ui/typography";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import {
   chatColors,
   chatTransitions,
 } from "@/app/[locale]/chat/lib/design-tokens";
-import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/store";
+import type { FolderListResponseOutput } from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/definition";
+import foldersDefinition from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/definition";
 import { ThreadPermissionsDialog } from "@/app/api/[locale]/agent/chat/threads/[threadId]/permissions/widget";
 import { ThreadShareDialog } from "@/app/api/[locale]/agent/chat/threads/[threadId]/share-links/widget";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { useWidgetContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useTouchDevice } from "@/hooks/use-touch-device";
-import { simpleT } from "@/i18n/core/shared";
 
 import { DefaultFolderId } from "../../config";
-import { useSidebarFolders } from "../../folders/widget/widget";
+import type { ChatThread } from "../../db";
+import { useChatStore } from "../../hooks/store";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
 import type definition from "../definition";
 import type { ThreadListResponseOutput } from "../definition";
+import { scopedTranslation } from "../i18n";
 
 type ThreadFromResponse = ThreadListResponseOutput["threads"][number];
+type FolderFromResponse = FolderListResponseOutput["folders"][number];
 
 /**
  * Props for custom widget — matches the customWidgetObject pattern
@@ -81,17 +87,17 @@ function ThreadRow({
   thread,
   isActive,
   compact,
+  allFolders,
 }: {
   thread: ThreadFromResponse;
   isActive: boolean;
   compact?: boolean;
+  allFolders: FolderFromResponse[];
 }): React.JSX.Element {
   const isTouch = useTouchDevice();
   const { locale, logger, user } = useWidgetContext();
-  const { t } = simpleT(locale);
-  const isThreadStreaming = useAIStreamStore(
-    (state) => !!state.activeStreams[thread.id],
-  );
+  const { t } = scopedTranslation.scopedT(locale);
+  const isThreadStreaming = thread.isStreaming;
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(thread.title);
   const [isHovered, setIsHovered] = useState(false);
@@ -100,16 +106,6 @@ function ThreadRow({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [permissionsDialogOpen, setPermissionsDialogOpen] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-
-  // Get folders from sidebar context for "move to folder" submenu
-  const sidebarFolders = useSidebarFolders();
-  const allFolders = useMemo(
-    () =>
-      sidebarFolders.filter(
-        (folder) => folder.rootFolderId === thread.rootFolderId,
-      ),
-    [sidebarFolders, thread.rootFolderId],
-  );
 
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
 
@@ -141,8 +137,39 @@ function ThreadRow({
     archived?: boolean;
     folderId?: string | null;
   }): Promise<void> => {
-    const { apiClient } =
-      await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+    // Optimistic update — apply immediately in cache
+    const threadsDefModule = await import("../definition");
+    const isFolderMove =
+      "folderId" in updates && updates.folderId !== thread.folderId;
+    apiClient.updateEndpointData(
+      threadsDefModule.default.GET,
+      logger,
+      (old) => {
+        if (!old?.success) {
+          return old;
+        }
+        // When moving to a different folder, remove from current list
+        // (server will include it in the target folder's list)
+        if (isFolderMove) {
+          return success({
+            ...old.data,
+            threads: old.data.threads.filter((t) => t.id !== thread.id),
+          });
+        }
+        return success({
+          ...old.data,
+          threads: old.data.threads.map((t) =>
+            t.id === thread.id ? { ...t, ...updates } : t,
+          ),
+        });
+      },
+      {
+        requestData: {
+          rootFolderId: thread.rootFolderId,
+          subFolderId: thread.folderId ?? null,
+        },
+      },
+    );
 
     if (isIncognito) {
       const { ChatThreadsRepositoryClient } =
@@ -160,14 +187,11 @@ function ThreadRow({
         threadDef.default.PATCH,
         logger,
         user,
-        updates,
+        { ...updates, rootFolderId: thread.rootFolderId },
         { threadId: thread.id },
         locale,
       );
     }
-
-    const threadsDef = await import("../definition");
-    await apiClient.refetchEndpoint(threadsDef.default.GET, logger);
   };
 
   const handleSaveEdit = (): void => {
@@ -217,8 +241,28 @@ function ThreadRow({
 
   const handleConfirmDelete = (): void => {
     void (async (): Promise<void> => {
-      const { apiClient } =
-        await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+      // Optimistic update — remove thread from cache immediately
+      const threadsDefModule = await import("../definition");
+      apiClient.updateEndpointData(
+        threadsDefModule.default.GET,
+        logger,
+        (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return success({
+            ...old.data,
+            threads: old.data.threads.filter((t) => t.id !== thread.id),
+            totalCount: old.data.totalCount - 1,
+          });
+        },
+        {
+          requestData: {
+            rootFolderId: thread.rootFolderId,
+            subFolderId: thread.folderId ?? null,
+          },
+        },
+      );
 
       if (isIncognito) {
         const { ChatThreadsRepositoryClient } =
@@ -235,14 +279,11 @@ function ThreadRow({
           threadDef.default.DELETE,
           logger,
           user,
-          undefined,
+          { rootFolderId: thread.rootFolderId },
           { threadId: thread.id },
           locale,
         );
       }
-
-      const threadsDef = await import("../definition");
-      await apiClient.refetchEndpoint(threadsDef.default.GET, logger);
     })();
     setDeleteDialogOpen(false);
   };
@@ -253,12 +294,12 @@ function ThreadRow({
   return (
     <Div
       className={cn(
-        "relative flex items-center gap-2 px-2 py-2 rounded-md cursor-pointer",
+        "relative flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer",
         chatTransitions.colors,
         isActive
           ? cn(chatColors.sidebar.active, "shadow-sm")
           : chatColors.sidebar.hover,
-        compact && "py-1.5",
+        compact && "py-1",
       )}
       onClick={handleThreadClick}
       onMouseEnter={() => setIsHovered(true)}
@@ -359,7 +400,7 @@ function ThreadRow({
                     className="cursor-pointer"
                   >
                     <Edit2 className="h-4 w-4 mr-2" />
-                    {t("app.chat.actions.rename")}
+                    {t("widget.actions.rename")}
                   </DropdownMenuItem>
                 )}
 
@@ -372,12 +413,12 @@ function ThreadRow({
                     {thread.pinned ? (
                       <>
                         <PinOff className="h-4 w-4 mr-2" />
-                        {t("app.chat.actions.unpin")}
+                        {t("widget.actions.unpin")}
                       </>
                     ) : (
                       <>
                         <Pin className="h-4 w-4 mr-2" />
-                        {t("app.chat.actions.pin")}
+                        {t("widget.actions.pin")}
                       </>
                     )}
                   </DropdownMenuItem>
@@ -392,12 +433,12 @@ function ThreadRow({
                     {thread.archived ? (
                       <>
                         <ArchiveRestore className="h-4 w-4 mr-2" />
-                        {t("app.chat.actions.unarchive")}
+                        {t("widget.actions.unarchive")}
                       </>
                     ) : (
                       <>
                         <Archive className="h-4 w-4 mr-2" />
-                        {t("app.chat.actions.archive")}
+                        {t("widget.actions.archive")}
                       </>
                     )}
                   </DropdownMenuItem>
@@ -410,7 +451,7 @@ function ThreadRow({
                     className="cursor-pointer"
                   >
                     <Shield className="h-4 w-4 mr-2" />
-                    {t("app.chat.folderList.managePermissions")}
+                    {t("widget.folderList.managePermissions")}
                   </DropdownMenuItem>
                 )}
 
@@ -422,7 +463,7 @@ function ThreadRow({
                     className="cursor-pointer"
                   >
                     <Share2 className="h-4 w-4 mr-2" />
-                    {t("app.chat.actions.manageSharing")}
+                    {t("widget.actions.manageSharing")}
                   </DropdownMenuItem>
                 )}
 
@@ -433,7 +474,7 @@ function ThreadRow({
                     <DropdownMenuSub>
                       <DropdownMenuSubTrigger className="cursor-pointer">
                         <FolderInput className="h-4 w-4 mr-2" />
-                        {t("app.chat.actions.moveToFolder")}
+                        {t("widget.actions.moveToFolder")}
                       </DropdownMenuSubTrigger>
                       <DropdownMenuSubContent>
                         {/* Move to root (unfiled) */}
@@ -443,7 +484,7 @@ function ThreadRow({
                             className="cursor-pointer"
                           >
                             <Icon icon="folder" className="h-4 w-4 mr-2" />
-                            {t("app.chat.actions.unfiled")}
+                            {t("widget.actions.unfiled")}
                           </DropdownMenuItem>
                         )}
                         {allFolders.map((folder) => (
@@ -477,7 +518,7 @@ function ThreadRow({
                       className="text-destructive cursor-pointer"
                     >
                       <Trash2 className="h-4 w-4 mr-2" />
-                      {t("app.chat.common.delete")}
+                      {t("widget.common.delete")}
                     </DropdownMenuItem>
                   </>
                 )}
@@ -506,21 +547,21 @@ function ThreadRow({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {t("app.chat.threadList.deleteDialog.title")}
+              {t("widget.threadList.deleteDialog.title")}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {t("app.chat.threadList.deleteDialog.description", {
+              {t("widget.threadList.deleteDialog.description", {
                 title: thread.title,
               })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t("app.chat.common.cancel")}</AlertDialogCancel>
+            <AlertDialogCancel>{t("widget.common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {t("app.chat.common.delete")}
+              {t("widget.common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -592,11 +633,13 @@ function ThreadSection({
   label,
   threads,
   activeThreadId,
+  allFolders,
   compact,
 }: {
   label: string;
   threads: ThreadFromResponse[];
   activeThreadId: string | null;
+  allFolders: FolderFromResponse[];
   compact?: boolean;
 }): React.JSX.Element | null {
   if (threads.length === 0) {
@@ -613,6 +656,7 @@ function ThreadSection({
             key={thread.id}
             thread={thread}
             isActive={thread.id === activeThreadId}
+            allFolders={allFolders}
             compact={compact}
           />
         ))}
@@ -622,23 +666,36 @@ function ThreadSection({
 }
 
 /**
- * ThreadsListContainer — the widget rendered by EndpointsPage for threads/definition GET
- * Receives thread list from field.value, renders grouped by time with context menus
+ * Renders a sorted, grouped list of threads with no data fetching.
+ * Used by both FoldersListContainer (for root threads and folder threads)
+ * and by ThreadsListContainer (EndpointsPage widget).
  */
-export function ThreadsListContainer({
-  field,
-}: CustomWidgetProps): React.JSX.Element {
-  const { locale, endpointMutations } = useWidgetContext();
-  const { t } = simpleT(locale);
+export function ThreadsList({
+  threads,
+  allFolders,
+  isLoading,
+  showEmptyMessage = true,
+}: {
+  threads: ThreadFromResponse[];
+  allFolders: FolderFromResponse[];
+  isLoading?: boolean;
+  showEmptyMessage?: boolean;
+}): React.JSX.Element {
+  const { locale } = useWidgetContext();
+  const { t } = scopedTranslation.scopedT(locale);
 
-  const isLoadingFresh = endpointMutations?.read?.isLoadingFresh ?? false;
-  const dataLoaded = field.value !== null && field.value !== undefined;
-  const threads = useMemo(
-    () => field.value?.threads ?? [],
-    [field.value?.threads],
-  );
+  // Sync threads into Zustand store so useLazyBranchLoader can look up rootFolderId
+  const addThread = useChatStore((s) => s.addThread);
+  useEffect(() => {
+    for (const thread of threads) {
+      addThread({
+        ...(thread as ChatThread),
+        createdAt: new Date(thread.createdAt),
+        updatedAt: new Date(thread.updatedAt),
+      });
+    }
+  }, [threads, addThread]);
 
-  // Sort: pinned first, then by updatedAt desc
   const sorted = useMemo(
     () =>
       [...threads].toSorted((a, b) => {
@@ -652,12 +709,10 @@ export function ThreadsListContainer({
     [threads],
   );
 
-  // Read active thread ID from navigation store (precise subscription)
   const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
-
   const grouped = useMemo(() => groupByTime(sorted), [sorted]);
 
-  if (!dataLoaded || isLoadingFresh) {
+  if (isLoading) {
     return (
       <Div className="flex items-center justify-center py-8">
         <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -666,9 +721,12 @@ export function ThreadsListContainer({
   }
 
   if (threads.length === 0) {
+    if (!showEmptyMessage) {
+      return <></>;
+    }
     return (
       <Div className="px-4 py-4 text-center text-sm text-muted-foreground">
-        {t("app.chat.common.noChatsFound")}
+        {t("widget.common.noChatsFound")}
       </Div>
     );
   }
@@ -676,25 +734,96 @@ export function ThreadsListContainer({
   return (
     <Div className="flex flex-col gap-0.5">
       <ThreadSection
-        label={t("app.chat.folderList.today")}
+        label={t("widget.folderList.today")}
         threads={grouped.today}
         activeThreadId={activeThreadId}
+        allFolders={allFolders}
       />
       <ThreadSection
-        label={t("app.chat.folderList.lastWeek")}
+        label={t("widget.folderList.lastWeek")}
         threads={grouped.lastWeek}
         activeThreadId={activeThreadId}
+        allFolders={allFolders}
       />
       <ThreadSection
-        label={t("app.chat.folderList.lastMonth")}
+        label={t("widget.folderList.lastMonth")}
         threads={grouped.lastMonth}
         activeThreadId={activeThreadId}
+        allFolders={allFolders}
       />
       <ThreadSection
-        label={t("app.chat.folderList.older")}
+        label={t("widget.folderList.older")}
         threads={grouped.older}
         activeThreadId={activeThreadId}
+        allFolders={allFolders}
       />
     </Div>
+  );
+}
+
+/**
+ * ThreadsListContainer — the widget rendered by EndpointsPage for threads/definition GET.
+ * Only used as fallback; primary rendering is done via ThreadsList in folders/widget.tsx.
+ */
+export function ThreadsListContainer({
+  field,
+}: CustomWidgetProps): React.JSX.Element {
+  const { logger, user, endpointMutations } = useWidgetContext();
+
+  const isLoadingFresh = endpointMutations?.read?.isLoadingFresh ?? false;
+  const rootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
+
+  const dataLoaded = field.value !== null && field.value !== undefined;
+
+  // Only show root threads here (folderId === null).
+  // Folder threads are rendered inside FolderRow in folders/widget.tsx.
+  const rootThreads = useMemo(
+    () => (field.value?.threads ?? []).filter((t) => t.folderId === null),
+    [field.value?.threads],
+  );
+
+  const foldersEndpoint = useEndpoint(
+    foldersDefinition,
+    useMemo(
+      () => ({
+        read: {
+          urlPathParams: { rootFolderId },
+          queryOptions: {
+            enabled: true,
+            staleTime: 60 * 1000,
+            refetchOnWindowFocus: false,
+          },
+        },
+      }),
+      [rootFolderId],
+    ),
+    logger,
+    user,
+  );
+
+  const allFolders = useMemo(
+    (): FolderFromResponse[] =>
+      foldersEndpoint.read?.response?.success
+        ? foldersEndpoint.read.response.data.folders.filter(
+            (f) => f.rootFolderId === rootFolderId,
+          )
+        : [],
+    [foldersEndpoint.read?.response, rootFolderId],
+  );
+
+  if (!dataLoaded) {
+    return (
+      <Div className="flex items-center justify-center py-8">
+        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+      </Div>
+    );
+  }
+
+  return (
+    <ThreadsList
+      threads={rootThreads}
+      allFolders={allFolders}
+      isLoading={isLoadingFresh}
+    />
   );
 }

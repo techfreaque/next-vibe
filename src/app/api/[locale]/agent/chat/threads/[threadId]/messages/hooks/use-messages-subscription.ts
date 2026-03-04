@@ -11,14 +11,18 @@
  * and use-thread-stream.ts (remote). No local/remote dedup needed.
  */
 
+import { success } from "next-vibe/shared/types/response.schema";
 import { useEffect, useRef } from "react";
 
 import { useAIStreamStore } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/store";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { disconnectChannel } from "@/app/api/[locale]/system/unified-interface/websocket/client";
 
+import type { DefaultFolderId } from "../../../../config";
 import { ChatMessageRole } from "../../../../enum";
 import { useChatStore } from "../../../../hooks/store";
+import threadsDefinition from "../../../definition";
 import { buildMessagesChannel } from "../channel";
 import type { CreditsDeductedEventData } from "../events";
 import { StreamEventType } from "../events";
@@ -33,6 +37,10 @@ export interface MessagesSubscriptionOptions {
   onCreditsDeducted?: (data: CreditsDeductedEventData) => void;
   /** Called when remote stream finishes — to invalidate lazy branch cache */
   invalidateThread?: (threadId: string) => void;
+  /** Called when a stream starts (local or remote) */
+  onStreamStarted?: () => void;
+  /** Called when STREAM_FINISHED fires */
+  onStreamFinished?: () => void;
 }
 
 /**
@@ -47,6 +55,8 @@ export interface MessagesSubscriptionOptions {
  */
 export function useMessagesSubscription(
   threadId: string | null,
+  rootFolderId: DefaultFolderId,
+  subFolderId: string | null | undefined,
   logger: EndpointLogger,
   options: MessagesSubscriptionOptions = {},
 ): void {
@@ -78,6 +88,7 @@ export function useMessagesSubscription(
             !store().isStreamingThread(threadId)
           ) {
             store().startStream(threadId, crypto.randomUUID());
+            optionsRef.current.onStreamStarted?.();
             // Remove from localStreamThreadIds since this is remote
             useAIStreamStore.setState((s) => {
               const newLocal = new Set(s.localStreamThreadIds);
@@ -165,12 +176,38 @@ export function useMessagesSubscription(
           }
         },
 
+        // Thread title update — update sidebar cache immediately
+        [StreamEventType.THREAD_TITLE_UPDATED]: (e) => {
+          apiClient.updateEndpointData(
+            threadsDefinition.GET,
+            logger,
+            (old) => {
+              if (!old?.success) {
+                return old;
+              }
+              return success({
+                ...old.data,
+                threads: old.data.threads.map((t) =>
+                  t.id === e.threadId ? { ...t, title: e.title } : t,
+                ),
+              });
+            },
+            {
+              requestData: {
+                rootFolderId: rootFolderId,
+                subFolderId: subFolderId ?? null,
+              },
+            },
+          );
+        },
+
         // STREAM_FINISHED: definitive "stream is over" signal
         [StreamEventType.STREAM_FINISHED]: () => {
           logger.info("[Messages] STREAM_FINISHED received", { threadId });
 
           const wasLocalStream = store().isLocalStream(threadId);
           store().stopStream(threadId);
+          optionsRef.current.onStreamFinished?.();
 
           // Clear pending-create flag — thread is now persisted on the server
           useChatStore.getState().clearThreadPendingCreate(threadId);
@@ -180,31 +217,25 @@ export function useMessagesSubscription(
             optionsRef.current.invalidateThread?.(threadId);
           }
 
-          // Only disconnect channel for locally-initiated streams.
-          // Remote streams (other tabs/devices) share the same module-level
-          // connection — disconnecting here would kill their listeners too.
-          if (wasLocalStream) {
-            disconnectChannel(buildMessagesChannel(threadId));
-          }
+          // NOTE: Do NOT disconnect the channel here. The WS channel must stay
+          // open while the thread is viewed so that retry/branch operations
+          // (which reuse the same threadId) can receive their stream events.
+          // The effect cleanup below handles the disconnect on unmount.
         },
       },
-      // keepAlive: true — channel cleanup is handled by STREAM_FINISHED handler
+      // keepAlive: true — channel cleanup is handled by the effect cleanup below
       true,
     );
 
     return (): void => {
       cleanup();
-      if (!store().isStreamingThread(threadId)) {
-        // No active stream — safe to disconnect completely.
-        disconnectChannel(buildMessagesChannel(threadId));
-      } else if (!store().isLocalStream(threadId)) {
-        // Remote stream running: clear store state so a future mount doesn't
-        // see a phantom "streaming" thread. The channel WS will close naturally
-        // when the server stops sending (or next mount will reconnect).
+      // If a local stream is still running when the component unmounts,
+      // stop it in the store (STREAM_FINISHED won't arrive after unmount).
+      if (store().isLocalStream(threadId)) {
         store().stopStream(threadId);
-        disconnectChannel(buildMessagesChannel(threadId));
       }
-      // Local stream: STREAM_FINISHED will call stopStream + disconnectChannel.
+      // Always disconnect the channel on unmount — the thread is no longer viewed.
+      disconnectChannel(buildMessagesChannel(threadId));
     };
-  }, [threadId, logger]);
+  }, [threadId, rootFolderId, logger, subFolderId]);
 }

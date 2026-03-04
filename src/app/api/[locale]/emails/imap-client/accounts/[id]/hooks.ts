@@ -34,12 +34,16 @@ export function useImapAccountById(
           refetchOnWindowFocus: false,
         },
       },
-      update: {
+      create: {
+        urlPathParams: { id: params.accountId },
         formOptions: {
           persistForm: false,
           // eslint-disable-next-line i18next/no-literal-string
           persistenceKey: `imap-account-${params.accountId}-form`,
         },
+      },
+      delete: {
+        urlPathParams: { id: params.accountId },
       },
     },
     logger,

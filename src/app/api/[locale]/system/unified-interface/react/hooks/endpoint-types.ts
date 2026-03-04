@@ -10,6 +10,7 @@ import type { ZodType } from "zod";
 import type { ZodTypeDef } from "zod/v3";
 
 import type { DeepPartial } from "@/app/api/[locale]/shared/types/utils";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type {
   DeleteRequest,
   DeleteResponse,
@@ -25,6 +26,7 @@ import type {
   PrimaryMutationUrlVariables,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-helpers";
 
+import type { CacheKeyRequestData } from "./query-key-builder";
 import type {
   ApiFormOptions,
   ApiMutationOptions,
@@ -35,6 +37,85 @@ import type {
 
 // All endpoint type extraction is now handled by centralized helpers from endpoint-helpers.ts
 // These provide direct access to cached .types property without complex inference
+
+// ── Cache key helpers ────────────────────────────────────────────────────────
+
+/** True when T is the `any` type (not a concrete type) */
+type IsAny<T> = 0 extends 1 & T ? true : false;
+
+/** Cache key request data for the GET endpoint (undefined when no fields have includeInCacheKey) */
+type GetCacheKeyData<T> = T extends {
+  GET: infer E extends CreateApiEndpointAny;
+}
+  ? IsAny<CacheKeyRequestData<E>> extends true
+    ? undefined
+    : CacheKeyRequestData<E>
+  : undefined;
+
+/** True when a url variables type is "absent" (never or undefined) */
+type IsAbsent<V> = [V] extends [never]
+  ? true
+  : [V] extends [undefined]
+    ? true
+    : false;
+
+/**
+ * Conditional type for urlPathParams field:
+ * - any → optional (unknown whether required)
+ * - never / undefined → optional undefined (not needed)
+ * - concrete type → required
+ */
+type UrlParamsField<V> =
+  IsAny<V> extends true
+    ? { urlPathParams?: V }
+    : IsAbsent<V> extends true
+      ? { urlPathParams?: undefined }
+      : { urlPathParams: V };
+
+/**
+ * True when url variables V make the section required.
+ * any → false (unknown, treat as optional)
+ * absent (never/undefined) → false (not needed)
+ * concrete type → true (required)
+ */
+type UrlParamsRequired<V> =
+  IsAny<V> extends true ? false : IsAbsent<V> extends true ? false : true;
+
+/** True when `read` block must be provided (has urlPathParams or cache key fields) */
+type ReadRequired<T> =
+  UrlParamsRequired<GetUrlVariables<T>> extends true
+    ? true
+    : [GetCacheKeyData<T>] extends [undefined]
+      ? false
+      : true;
+
+/** True when `create` block must be provided (has urlPathParams) */
+type CreateRequired<T> = "POST" extends keyof T
+  ? UrlParamsRequired<PrimaryMutationUrlVariables<T>>
+  : "PUT" extends keyof T
+    ? UrlParamsRequired<PrimaryMutationUrlVariables<T>>
+    : false;
+
+/** True when `update` block must be provided (has urlPathParams) */
+type UpdateRequired<T> = "PATCH" extends keyof T
+  ? UrlParamsRequired<PatchUrlVariables<T>>
+  : false;
+
+/** True when `delete` block must be provided (has urlPathParams) */
+type DeleteRequired<T> = "DELETE" extends keyof T
+  ? UrlParamsRequired<DeleteUrlVariables<T>>
+  : false;
+
+/** True when UseEndpointOptions itself can be omitted entirely */
+export type OptionsOptional<T> = [ReadRequired<T>] extends [true]
+  ? false
+  : [CreateRequired<T>] extends [true]
+    ? false
+    : [UpdateRequired<T>] extends [true]
+      ? false
+      : [DeleteRequired<T>] extends [true]
+        ? false
+        : true;
 
 // Combined URL variables type - supports both GET and mutation endpoints
 // If GET exists, use its urlPathParams; otherwise use primary mutation's urlPathParams
@@ -57,128 +138,116 @@ export type AutoPrefillDataType<T> =
         ? GetResponse<T>
         : Partial<PrimaryMutationRequest<T>>;
 
-// Hook options interface with operation-specific configuration
-export interface UseEndpointOptions<T> {
-  /**
-   * Options for read (GET) operations
-   * Supports all options from useEndpointRead hook
-   */
-  read?: {
-    /** Form options for query forms (filtering, search, etc.) */
-    formOptions?: ApiQueryFormOptions<
-      GetRequest<T> extends never ? never : GetRequest<T>
-    >;
-    /** Query options for data fetching */
-    queryOptions?: ApiQueryOptions<
-      GetRequest<T> extends never ? never : GetRequest<T>,
-      GetRequest<T> extends never ? never : GetResponse<T>,
-      GetRequest<T> extends never ? never : GetUrlVariables<T>
-    >;
-    /** URL path parameters for the read endpoint */
-    urlPathParams?: GetUrlVariables<T> extends never
-      ? undefined
-      : GetUrlVariables<T>;
-    /** Auto-prefill configuration */
-    autoPrefillConfig?: AutoPrefillConfig;
-    /** Initial state for the form (request data) */
-    initialState?: "GET" extends keyof T ? Partial<GetRequest<T>> : undefined;
-    /** Initial data for the response (disables initial fetch when provided) */
-    initialData?: "GET" extends keyof T ? GetResponse<T> : undefined;
-  };
+// ── Per-section option shapes ────────────────────────────────────────────────
 
-  /**
-   * Options for create/update (POST/PUT/PATCH) operations
-   * Supports all options from useEndpointCreate hook
-   */
-  create?: {
-    /** Form options for mutation forms */
-    formOptions?: ApiFormOptions<
-      PrimaryMutationRequest<T> extends never
-        ? never
-        : PrimaryMutationRequest<T>
-    >;
-    /** Mutation options for create/update operations */
-    mutationOptions?: ApiMutationOptions<
-      PrimaryMutationRequest<T> extends never
-        ? never
-        : PrimaryMutationRequest<T>,
-      PrimaryMutationRequest<T> extends never
-        ? never
-        : PrimaryMutationResponse<T>,
-      PrimaryMutationRequest<T> extends never
-        ? never
-        : PrimaryMutationUrlVariables<T>
-    >;
-    /** URL path parameters for the create endpoint */
-    urlPathParams?: PrimaryMutationUrlVariables<T> extends never
-      ? undefined
-      : PrimaryMutationUrlVariables<T>;
-    /** Data to auto-prefill the form with (supports nested partial data) */
-    autoPrefillData?: PrimaryMutationRequest<T> extends never
-      ? undefined
-      : DeepPartial<PrimaryMutationRequest<T>>;
-    /** Initial state for the form (supports nested partial data) */
-    initialState?: PrimaryMutationRequest<T> extends never
-      ? undefined
-      : DeepPartial<PrimaryMutationRequest<T>>;
-  };
+type ReadOptions<T> = {
+  /** Form options for query forms (filtering, search, etc.) */
+  formOptions?: ApiQueryFormOptions<
+    GetRequest<T> extends never ? never : GetRequest<T>
+  >;
+  /** Query options for data fetching */
+  queryOptions?: ApiQueryOptions<
+    GetRequest<T> extends never ? never : GetRequest<T>,
+    GetRequest<T> extends never ? never : GetResponse<T>,
+    GetRequest<T> extends never ? never : GetUrlVariables<T>
+  >;
+  /** Auto-prefill configuration */
+  autoPrefillConfig?: AutoPrefillConfig;
+  /** Initial data for the response (disables initial fetch when provided) */
+  initialData?: "GET" extends keyof T ? GetResponse<T> : undefined;
+} & UrlParamsField<GetUrlVariables<T>> &
+  ([GetCacheKeyData<T>] extends [undefined]
+    ? { initialState?: Partial<GetRequest<T>> }
+    : { initialState: GetCacheKeyData<T> & Partial<GetRequest<T>> });
 
-  /**
-   * Options for update (PATCH) operations
-   * Alias for PATCH endpoints with semantic naming
-   */
-  update?: {
-    /** Form options for mutation forms */
-    formOptions?: ApiFormOptions<
-      PatchRequest<T> extends never ? never : PatchRequest<T>
-    >;
-    /** Mutation options for update operations */
-    mutationOptions?: ApiMutationOptions<
-      PatchRequest<T> extends never ? never : PatchRequest<T>,
-      PatchRequest<T> extends never ? never : PatchResponse<T>,
-      PatchRequest<T> extends never ? never : PatchUrlVariables<T>
-    >;
-    /** URL path parameters for the update endpoint */
-    urlPathParams?: PatchUrlVariables<T> extends never
-      ? undefined
-      : PatchUrlVariables<T>;
-    /** Data to auto-prefill the form with (supports nested partial data) */
-    autoPrefillData?: PatchRequest<T> extends never
-      ? undefined
-      : DeepPartial<PatchRequest<T>>;
-    /** Initial state for the form (supports nested partial data) */
-    initialState?: PatchRequest<T> extends never
-      ? undefined
-      : DeepPartial<PatchRequest<T>>;
-  };
+type CreateOptions<T> = {
+  /** Form options for mutation forms */
+  formOptions?: ApiFormOptions<
+    PrimaryMutationRequest<T> extends never ? never : PrimaryMutationRequest<T>
+  >;
+  /** Mutation options for create/update operations */
+  mutationOptions?: ApiMutationOptions<
+    PrimaryMutationRequest<T> extends never ? never : PrimaryMutationRequest<T>,
+    PrimaryMutationRequest<T> extends never
+      ? never
+      : PrimaryMutationResponse<T>,
+    PrimaryMutationRequest<T> extends never
+      ? never
+      : PrimaryMutationUrlVariables<T>
+  >;
+  /** Data to auto-prefill the form with */
+  autoPrefillData?: PrimaryMutationRequest<T> extends never
+    ? undefined
+    : DeepPartial<PrimaryMutationRequest<T>>;
+  /** Initial state for the form */
+  initialState?: PrimaryMutationRequest<T> extends never
+    ? undefined
+    : DeepPartial<PrimaryMutationRequest<T>>;
+} & UrlParamsField<PrimaryMutationUrlVariables<T>>;
 
-  /**
-   * Options for delete (DELETE) operations
-   * Supports all options from useEndpointDelete hook
-   */
-  delete?: {
-    /** Mutation options for delete operations */
-    mutationOptions?: ApiMutationOptions<
-      DeleteRequest<T> extends never ? never : DeleteRequest<T>,
-      DeleteRequest<T> extends never ? never : DeleteResponse<T>,
-      DeleteRequest<T> extends never ? never : DeleteUrlVariables<T>
-    >;
-    /** URL path parameters for the delete endpoint */
-    urlPathParams?: DeleteUrlVariables<T> extends never
-      ? undefined
-      : DeleteUrlVariables<T>;
-    /** Data to auto-prefill the form with */
-    autoPrefillData?: DeleteRequest<T> extends never
-      ? undefined
-      : DeepPartial<DeleteRequest<T>>;
-  };
+type UpdateOptions<T> = {
+  /** Form options for mutation forms */
+  formOptions?: ApiFormOptions<
+    PatchRequest<T> extends never ? never : PatchRequest<T>
+  >;
+  /** Mutation options for update operations */
+  mutationOptions?: ApiMutationOptions<
+    PatchRequest<T> extends never ? never : PatchRequest<T>,
+    PatchRequest<T> extends never ? never : PatchResponse<T>,
+    PatchRequest<T> extends never ? never : PatchUrlVariables<T>
+  >;
+  /** Data to auto-prefill the form with */
+  autoPrefillData?: PatchRequest<T> extends never
+    ? undefined
+    : DeepPartial<PatchRequest<T>>;
+  /** Initial state for the form */
+  initialState?: PatchRequest<T> extends never
+    ? undefined
+    : DeepPartial<PatchRequest<T>>;
+} & UrlParamsField<PatchUrlVariables<T>>;
 
-  /**
-   * Whether to automatically prefill the create form with data from the read operation
-   * @default true
-   */
+type DeleteOptions<T> = {
+  /** Mutation options for delete operations */
+  mutationOptions?: ApiMutationOptions<
+    DeleteRequest<T> extends never ? never : DeleteRequest<T>,
+    DeleteRequest<T> extends never ? never : DeleteResponse<T>,
+    DeleteRequest<T> extends never ? never : DeleteUrlVariables<T>
+  >;
+  /** Data to auto-prefill the form with */
+  autoPrefillData?: DeleteRequest<T> extends never
+    ? undefined
+    : DeepPartial<DeleteRequest<T>>;
+} & UrlParamsField<DeleteUrlVariables<T>>;
+
+// Hook options type — all section keys are always optional for indexability.
+// Enforcement of required sections happens at the call site via OptionsOptional<T>
+// and the conditional mapped type in UseEndpointOptions (below).
+// Within each section, urlPathParams/initialState are conditionally required
+// based on the endpoint definition.
+export interface UseEndpointOptionsBase<T> {
+  read?: ReadOptions<T>;
+  create?: CreateOptions<T>;
+  update?: UpdateOptions<T>;
+  delete?: DeleteOptions<T>;
   autoPrefill?: boolean;
 }
+
+// The exported type adds call-site enforcement: when a section has required fields,
+// its key becomes required in the object. When nothing is required, the whole options
+// object can be omitted (enforced at useEndpoint/EndpointsPage call site via OptionsOptional<T>).
+export type UseEndpointOptions<T> = UseEndpointOptionsBase<T> &
+  ([ReadRequired<T>] extends [true]
+    ? { read: ReadOptions<T> }
+    : Record<never, never>) &
+  ([CreateRequired<T>] extends [true]
+    ? { create: CreateOptions<T> }
+    : Record<never, never>) &
+  ([UpdateRequired<T>] extends [true]
+    ? { update: UpdateOptions<T> }
+    : Record<never, never>) &
+  ([DeleteRequired<T>] extends [true]
+    ? { delete: DeleteOptions<T> }
+    : Record<never, never>);
 
 // Alert state interface for FormAlert component
 export interface FormAlertState {

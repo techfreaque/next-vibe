@@ -26,6 +26,12 @@ export const translations: typeof enTranslations = {
       title: "Jak możemy Ci pomóc?",
       subtitle:
         "Uzyskaj wsparcie dla swojego doświadczenia z czatem AI bez cenzury lub znajdź odpowiedzi na często zadawane pytania",
+      info: {
+        title: "Informacje kontaktowe",
+        supportEmail: "E-mail wsparcia",
+        website: "Strona internetowa",
+        websiteUrl: "Odwiedź naszą stronę",
+      },
       faq: {
         title: "Najczęściej zadawane pytania",
         questions: {

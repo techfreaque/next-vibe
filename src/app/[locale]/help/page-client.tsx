@@ -8,7 +8,6 @@ import { H2, H3, P } from "next-vibe-ui/ui/typography";
 import { openUrl } from "next-vibe-ui/utils/browser";
 import type { JSX } from "react";
 
-import { scopedTranslation as contactInfoScopedTranslation } from "@/app/api/[locale]/contact/widget/i18n";
 import contactDefinitions from "@/app/api/[locale]/contact/definition";
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
@@ -27,7 +26,6 @@ export default function HelpPageClient({
   user,
 }: HelpPageClientProps): JSX.Element {
   const { t } = simpleT(locale);
-  const { t: infoT } = contactInfoScopedTranslation.scopedT(locale);
   const supportEmail = contactClientRepository.getSupportEmail(locale);
 
   return (
@@ -52,14 +50,14 @@ export default function HelpPageClient({
         <Div className="flex flex-col gap-8">
           <Div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-8">
             <H3 className="text-2xl font-bold mb-6">
-              {infoT("pages.help.info.title")}
+              {t("app.help.pages.help.info.title")}
             </H3>
             <Div className="flex flex-col gap-6">
               <Div>
                 <Div className="flex items-start mb-2">
                   <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3" />
                   <H3 className="font-medium">
-                    {infoT("pages.help.info.supportEmail")}
+                    {t("app.help.pages.help.info.supportEmail")}
                   </H3>
                 </Div>
                 <Button
@@ -75,7 +73,7 @@ export default function HelpPageClient({
                 <Div className="flex items-start mb-2">
                   <Globe className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3" />
                   <H3 className="font-medium">
-                    {infoT("pages.help.info.website")}
+                    {t("app.help.pages.help.info.website")}
                   </H3>
                 </Div>
                 <Link
@@ -84,7 +82,7 @@ export default function HelpPageClient({
                   rel="noopener noreferrer"
                   className="text-blue-600 dark:text-blue-400 hover:underline ml-8"
                 >
-                  {infoT("pages.help.info.websiteUrl")}
+                  {t("app.help.pages.help.info.websiteUrl")}
                 </Link>
               </Div>
             </Div>

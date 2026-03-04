@@ -21,6 +21,8 @@ export enum Platform {
   NEXT_API = "next-api",
   /** Cron/pulse task execution — behaves like AI for permissions */
   CRON = "cron",
+  /** Electron desktop app — wraps vibe start in a BrowserWindow */
+  ELECTRON = "electron",
 }
 
 /**

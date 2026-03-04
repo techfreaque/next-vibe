@@ -340,4 +340,12 @@ export const translations: typeof enTranslations = {
       description: "Link udostępniania unieważniony pomyślnie",
     },
   },
+  widget: {
+    shareDialog: {
+      title: "Udostępnij wątek",
+    },
+    common: {
+      close: "Zamknij",
+    },
+  },
 };

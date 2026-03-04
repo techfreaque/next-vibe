@@ -27,6 +27,12 @@ export const translations: typeof enTranslations = {
       title: "Wie können wir Ihnen helfen?",
       subtitle:
         "Erhalten Sie Unterstützung für Ihre unzensierte KI-Chat-Erfahrung oder finden Sie Antworten auf häufige Fragen",
+      info: {
+        title: "Kontaktinformationen",
+        supportEmail: "Support-E-Mail",
+        website: "Website",
+        websiteUrl: "Unsere Website besuchen",
+      },
       faq: {
         title: "Häufig gestellte Fragen",
         questions: {

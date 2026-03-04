@@ -199,6 +199,7 @@ export const translations: typeof enTranslations = {
       billing: "Rozliczenia",
       history: "Historia",
       plans: "Plany",
+      remote: "Synchronizacja",
     },
     payment: {
       success: {

@@ -1,12 +1,8 @@
 import { translations as optionsTranslations } from "../../options/i18n/de";
 import type { translations as enTranslations } from "../en";
 
-import { translations as _componentsTranslations } from "../../_components/i18n/de";
-
 export const translations: typeof enTranslations = {
   category: "Benutzer",
-
-  _components: _componentsTranslations,
   title: "Willkommen zurück",
   description:
     "Greife auf unzensierte KI-Modelle und deine Gesprächsverläufe zu.",
@@ -161,5 +157,8 @@ export const translations: typeof enTranslations = {
       github: "GitHub",
       facebook: "Facebook",
     },
+  },
+  dev: {
+    quickLogin: "Schnell-Login (Dev)",
   },
 };

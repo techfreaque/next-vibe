@@ -10,26 +10,27 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useState } from "react";
 
+import { Selector } from "@/app/api/[locale]/agent/ai-stream/stream/widget/selector";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
-import { Selector } from "@/app/api/[locale]/agent/chat/threads/widget/chat-input/selector";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
-import type { TranslationKey } from "@/i18n/core/static-types";
+
+import type { MessagesTranslationKey } from "../i18n";
+import { scopedTranslation } from "../i18n";
 
 interface ModelCharacterSelectorModalProps {
-  titleKey: TranslationKey;
-  descriptionKey: TranslationKey;
+  titleKey: MessagesTranslationKey;
+  descriptionKey: MessagesTranslationKey;
   onConfirm: () => void | Promise<void>;
   onCancel: () => void;
-  confirmLabelKey?: TranslationKey;
+  confirmLabelKey?: MessagesTranslationKey;
   isLoading?: boolean;
   showInput?: boolean;
   inputValue?: string;
   onInputChange?: (value: string) => void;
-  inputPlaceholderKey?: TranslationKey;
+  inputPlaceholderKey?: MessagesTranslationKey;
   locale: CountryLanguage;
   logger: EndpointLogger;
   user: JwtPayloadType;
@@ -57,17 +58,17 @@ export function ModelCharacterSelectorModal({
   const selectedCharacter =
     settings?.selectedCharacter ?? defaults.selectedCharacter;
 
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectorOpen, setSelectorOpen] = useState(false);
   const title = t(titleKey);
   const description = t(descriptionKey);
   const finalConfirmLabel = confirmLabelKey
     ? t(confirmLabelKey)
-    : t("app.chat.common.send");
+    : t("widget.common.send");
   const inputPlaceholder = inputPlaceholderKey
     ? t(inputPlaceholderKey)
-    : t("app.chat.common.send");
+    : t("widget.common.send");
 
   const handleConfirm = async (): Promise<void> => {
     setIsSubmitting(true);
@@ -116,9 +117,7 @@ export function ModelCharacterSelectorModal({
               characterId={selectedCharacter}
               modelId={selectedModel}
               locale={locale}
-              logger={logger}
               buttonClassName="px-1.5 sm:px-2 md:px-3 min-h-8 h-8 sm:min-h-9 sm:h-9"
-              user={user}
               open={selectorOpen}
               onOpenChange={setSelectorOpen}
             />
@@ -132,7 +131,7 @@ export function ModelCharacterSelectorModal({
               size="icon"
               variant="destructive"
               className="h-8 w-8 sm:h-9 sm:w-9 shrink-0"
-              title={t("app.chat.common.cancel")}
+              title={t("widget.common.cancel")}
             >
               <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
@@ -143,7 +142,7 @@ export function ModelCharacterSelectorModal({
               variant="default"
               className="h-8 w-8 sm:h-9 sm:w-9 shrink-0"
               title={
-                isDisabled ? t("app.chat.common.sending") : finalConfirmLabel
+                isDisabled ? t("widget.common.sending") : finalConfirmLabel
               }
             >
               <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />

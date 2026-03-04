@@ -1,4 +1,5 @@
 export const translations = {
+  backToChat: "Back to Chat",
   title: "Earn with {{appName}}",
   description:
     "Turn your network into passive income. Share your referral link and earn 20% commission when people subscribe - plus smaller earnings from their referrals through our multi-level system.",

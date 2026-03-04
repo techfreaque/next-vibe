@@ -17,6 +17,10 @@ export const translations: typeof enTranslations = {
       label: "Thread-ID",
       description: "ID des Threads, aus dem der Pfad abgerufen werden soll",
     },
+    rootFolderId: {
+      label: "Stammordner",
+      description: "Stammordner des Threads (für Client-Routing verwendet)",
+    },
     branchIndices: {
       label: "Zweigindizes",
       description:
@@ -118,6 +122,9 @@ export const translations: typeof enTranslations = {
       },
       oldestLoadedMessageId: {
         content: "Älteste geladene Nachrichten-ID",
+      },
+      compactionBoundaryId: {
+        content: "Verdichtungsgrenze-ID",
       },
     },
     errors: {

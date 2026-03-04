@@ -323,6 +323,7 @@
     "babel-preset-expo": "54.0.9",
     "baseline-browser-mapping": "2.9.14",
     "bun-types": "1.3.6",
+    "electron": "^40.6.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "globals": "17.0.0",

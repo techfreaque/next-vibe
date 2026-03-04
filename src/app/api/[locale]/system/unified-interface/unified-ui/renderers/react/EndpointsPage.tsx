@@ -11,7 +11,11 @@ import { P } from "next-vibe-ui/ui/typography";
 import { useMemo, useState } from "react";
 
 import { cn } from "@/app/api/[locale]/shared/utils/utils";
-import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
+import type {
+  OptionsOptional,
+  UseEndpointOptions,
+  UseEndpointOptionsBase,
+} from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import type { ApiMutationOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import {
@@ -49,10 +53,7 @@ function extractMutationOptions(
   return { onError, invalidateQueries };
 }
 
-/**
- * Props for EndpointsPage component
- */
-export interface EndpointsPageProps<
+interface EndpointsPagePropsBase<
   T extends {
     GET?: CreateApiEndpointAny;
     POST?: CreateApiEndpointAny;
@@ -67,8 +68,6 @@ export interface EndpointsPageProps<
   locale: CountryLanguage;
   /** Optional description to show above the endpoint (usually not needed - comes from endpoint.description) */
   description?: string;
-  /** Options for useEndpoint hook */
-  endpointOptions?: UseEndpointOptions<T>;
   /** Submit button configuration (backward compatibility - prefer using endpoint definition) */
   submitButton?: SubmitButtonConfig<string>;
   /** Enable debug logging (if not provided, reads from endpoint.debug) */
@@ -86,6 +85,29 @@ export interface EndpointsPageProps<
 }
 
 /**
+ * Props for EndpointsPage component.
+ * `endpointOptions` is required when the endpoint has URL path params or cache-key fields;
+ * optional (and may be omitted) when nothing is required.
+ */
+export type EndpointsPageProps<
+  T extends {
+    GET?: CreateApiEndpointAny;
+    POST?: CreateApiEndpointAny;
+    PUT?: CreateApiEndpointAny;
+    PATCH?: CreateApiEndpointAny;
+    DELETE?: CreateApiEndpointAny;
+  },
+> = EndpointsPagePropsBase<T> & {
+  [K in "endpointOptions" as OptionsOptional<T> extends true
+    ? never
+    : K]: UseEndpointOptions<T>;
+} & {
+  [K in "endpointOptions" as OptionsOptional<T> extends true
+    ? K
+    : never]?: UseEndpointOptions<T>;
+};
+
+/**
  * Internal EndpointsPage Component (wrapped by provider)
  *
  * A complete page wrapper that handles:
@@ -95,6 +117,19 @@ export interface EndpointsPageProps<
  * - Submit button in header (if configured)
  * - EndpointRenderer for form and response display
  */
+// Internal props type — erases the conditional endpointOptions requirement for use inside the component
+type EndpointsPagePropsInternal<
+  T extends {
+    GET?: CreateApiEndpointAny;
+    POST?: CreateApiEndpointAny;
+    PUT?: CreateApiEndpointAny;
+    PATCH?: CreateApiEndpointAny;
+    DELETE?: CreateApiEndpointAny;
+  },
+> = EndpointsPagePropsBase<T> & {
+  endpointOptions?: UseEndpointOptionsBase<T>;
+};
+
 function EndpointsPageInternal<
   T extends {
     GET?: CreateApiEndpointAny;
@@ -115,7 +150,7 @@ function EndpointsPageInternal<
   _disableNavigationStack = false,
   forceMethod,
   navigationOverride,
-}: EndpointsPageProps<T>): React.JSX.Element {
+}: EndpointsPagePropsInternal<T>): React.JSX.Element {
   // Check finalNavigation stack to render stacked endpoints (only for base layer)
   const navigation = useNavigationStack();
 
@@ -168,7 +203,9 @@ function EndpointsPageInternal<
 
     // For POST endpoints, wrap to add navigation AFTER onSuccess
     if (isMutationEndpoint && endpoint.POST && finalNavigation) {
-      const callerOnSuccess = callerMutationOptions?.onSuccess;
+      const callerOnSuccess = callerMutationOptions?.onSuccess as
+        | ApiMutationOptions<WidgetData, WidgetData, WidgetData>["onSuccess"]
+        | undefined;
 
       return {
         ...callerMutationOptions,
@@ -179,7 +216,11 @@ function EndpointsPageInternal<
           logger,
           user: callUser,
           locale: callLocale,
-        }): Promise<void | ErrorResponseType> => {
+        }: Parameters<
+          NonNullable<
+            ApiMutationOptions<WidgetData, WidgetData, WidgetData>["onSuccess"]
+          >
+        >[0]): Promise<void | ErrorResponseType> => {
           // Call caller's onSuccess if it exists
           const result = await callerOnSuccess?.({
             responseData,
@@ -231,7 +272,9 @@ function EndpointsPageInternal<
   // Create wrapped PATCH mutation options with finalNavigation handling
   const patchMutationOptionsWithNav = useMemo(() => {
     const patchEndpoint = endpoint.PATCH;
-    const existingPatchOptions = endpointOptions?.update?.mutationOptions;
+    const existingPatchOptions = endpointOptions?.update?.mutationOptions as
+      | ApiMutationOptions<WidgetData, WidgetData, WidgetData>
+      | undefined;
 
     if (!patchEndpoint || !finalNavigation) {
       return existingPatchOptions;
@@ -246,7 +289,11 @@ function EndpointsPageInternal<
         logger,
         user: callUser,
         locale: callLocale,
-      }): Promise<void | ErrorResponseType> => {
+      }: Parameters<
+        NonNullable<
+          ApiMutationOptions<WidgetData, WidgetData, WidgetData>["onSuccess"]
+        >
+      >[0]): Promise<void | ErrorResponseType> => {
         // Call existing onSuccess first
         if (existingPatchOptions?.onSuccess) {
           const result = await existingPatchOptions.onSuccess({
@@ -295,7 +342,9 @@ function EndpointsPageInternal<
   // Create wrapped DELETE mutation options with finalNavigation handling
   const deleteMutationOptionsWithNav = useMemo(() => {
     const deleteEndpoint = endpoint.DELETE;
-    const existingDeleteOptions = endpointOptions?.delete?.mutationOptions;
+    const existingDeleteOptions = endpointOptions?.delete?.mutationOptions as
+      | ApiMutationOptions<WidgetData, WidgetData, WidgetData>
+      | undefined;
 
     if (!deleteEndpoint || !finalNavigation) {
       return existingDeleteOptions;
@@ -310,7 +359,11 @@ function EndpointsPageInternal<
         logger,
         user: callUser,
         locale: callLocale,
-      }): Promise<void | ErrorResponseType> => {
+      }: Parameters<
+        NonNullable<
+          ApiMutationOptions<WidgetData, WidgetData, WidgetData>["onSuccess"]
+        >
+      >[0]): Promise<void | ErrorResponseType> => {
         // Call existing onSuccess first
         if (existingDeleteOptions?.onSuccess) {
           const result = await existingDeleteOptions.onSuccess({
@@ -357,10 +410,9 @@ function EndpointsPageInternal<
   ]);
 
   // Merge finalNavigation-aware mutation options and endpoint's built-in options
-  const finalEndpointOptions = useMemo((): UseEndpointOptions<T> => {
-    const baseOptions = {
+  const finalEndpointOptions = useMemo((): UseEndpointOptionsBase<T> => {
+    const baseOptions: UseEndpointOptionsBase<T> = {
       ...endpointOptions,
-      user,
     };
 
     if (
@@ -371,14 +423,14 @@ function EndpointsPageInternal<
       return baseOptions;
     }
 
-    const result: UseEndpointOptions<T> = { ...baseOptions };
+    const result: UseEndpointOptionsBase<T> = { ...baseOptions };
 
     if (mutationOptionsWithNav) {
       result.create = {
         ...endpointOptions?.create,
         ...baseOptions.create,
         mutationOptions: mutationOptionsWithNav,
-      };
+      } as typeof result.create;
     }
 
     if (patchMutationOptionsWithNav) {
@@ -386,7 +438,7 @@ function EndpointsPageInternal<
         ...endpointOptions?.update,
         ...baseOptions.update,
         mutationOptions: patchMutationOptionsWithNav,
-      };
+      } as typeof result.update;
     }
 
     if (deleteMutationOptionsWithNav) {
@@ -394,7 +446,7 @@ function EndpointsPageInternal<
         ...endpointOptions?.delete,
         ...baseOptions.delete,
         mutationOptions: deleteMutationOptionsWithNav,
-      };
+      } as typeof result.delete;
     }
 
     return result;
@@ -403,13 +455,12 @@ function EndpointsPageInternal<
     mutationOptionsWithNav,
     patchMutationOptionsWithNav,
     deleteMutationOptionsWithNav,
-    user,
   ]);
 
   // Use the endpoint hook for base endpoint
   const endpointState = useEndpoint(
     endpoint,
-    finalEndpointOptions,
+    finalEndpointOptions as UseEndpointOptions<T>,
     logger,
     user,
   );
@@ -638,9 +689,10 @@ export function EndpointsPage<
     DELETE?: CreateApiEndpointAny;
   },
 >(props: EndpointsPageProps<T>): React.JSX.Element {
+  const internalProps = props as EndpointsPagePropsInternal<T>;
   return (
     <NavigationStackProvider>
-      <EndpointsPageInternal {...props} />
+      <EndpointsPageInternal {...internalProps} />
     </NavigationStackProvider>
   );
 }

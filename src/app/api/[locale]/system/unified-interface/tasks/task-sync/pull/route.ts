@@ -15,8 +15,6 @@ import endpoints from "./definition";
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
-    handler: async ({ logger, t }) => {
-      return await pullFromRemote(logger, t);
-    },
+    handler: ({ logger, locale }) => pullFromRemote(logger, locale),
   },
 });

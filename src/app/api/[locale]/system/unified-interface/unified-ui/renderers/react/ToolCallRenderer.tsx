@@ -38,11 +38,11 @@ import { useEffect, useState } from "react";
 import type { FieldValues } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
+import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
 import type {
   ToolCall,
   ToolCallResult,
 } from "@/app/api/[locale]/agent/chat/db";
-import type { SendMessageParams } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/operations/send-message";
 import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
 import {
   createEndpointLogger,

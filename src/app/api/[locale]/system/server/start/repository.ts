@@ -462,7 +462,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
         runningServices.push(`next-server (HTTP on port ${port})`);
       }
       if (this.wsServerHandle) {
-        runningServices.push(`ws-sidecar (WebSocket on port ${port + 1000})`);
+        runningServices.push(`ws-proxy (WebSocket on port ${port} at /ws)`);
       }
 
       if (runningServices.length > 0) {
@@ -682,38 +682,49 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
     logger: EndpointLogger,
   ): Promise<{ success: boolean; message?: string }> {
     try {
-      // Kill any stale process on the target port
-      this.killProcessOnPort(port, logger);
+      // Import WS module to get NEXT_PORT_OFFSET
+      const { startWebSocketServer, NEXT_PORT_OFFSET } =
+        await import("@/app/api/[locale]/system/unified-interface/websocket/server");
 
-      // --- Start Next.js directly on the user-facing port ---
+      const disableProxy = env.VIBE_DISABLE_PROXY;
+      // In proxy mode (default): Next.js on port+NEXT_PORT_OFFSET, Bun proxy on main port.
+      // In direct mode (VIBE_DISABLE_PROXY=true): Next.js on main port, WS sidecar on port+1000.
+      const WS_SIDECAR_OFFSET = 1000;
+      const nextPort = disableProxy ? port : port + NEXT_PORT_OFFSET;
+      const wsPort = disableProxy ? port + WS_SIDECAR_OFFSET : port;
+
+      // Kill any stale processes on both ports
+      this.killProcessOnPort(nextPort, logger);
+      if (disableProxy) {
+        this.killProcessOnPort(wsPort, logger);
+      }
+
+      // --- Start Next.js ---
       const nextProcess = spawn(
         "bun",
-        ["run", "next", "start", "--port", String(port)],
+        ["run", "next", "start", "--port", String(nextPort)],
         {
           stdio: "pipe",
           env: {
             ...process.env,
             NODE_ENV: "production",
             NEXT_DIST_DIR: ".next-prod",
+            PORT: String(nextPort),
           } as NodeJS.ProcessEnv,
         },
       );
       this.nextServerProcess = nextProcess;
 
-      logger.info(
-        `Next.js start spawned on port ${port} (PID: ${String(nextProcess.pid)})`,
-      );
-
-      // --- Start WebSocket sidecar on port + 1000 ---
-      const { startWebSocketServer, WS_PORT_OFFSET } =
-        await import("@/app/api/[locale]/system/unified-interface/websocket/server");
-
-      const wsPort = port + WS_PORT_OFFSET;
+      // --- Start WS server (proxy or sidecar depending on mode) ---
       const wsHandle = startWebSocketServer({ port: wsPort, logger });
       this.wsServerHandle = wsHandle;
 
-      // Wait for Next.js to be ready
-      await this.waitForNextServer(`http://127.0.0.1:${port}`, 30000, logger);
+      // Wait for Next.js to be ready on its port
+      await this.waitForNextServer(
+        `http://127.0.0.1:${nextPort}`,
+        30000,
+        logger,
+      );
 
       logger.info(`Next.js production server ready on port ${port}`);
       return { success: true };

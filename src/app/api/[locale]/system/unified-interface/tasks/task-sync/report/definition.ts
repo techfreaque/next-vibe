@@ -21,6 +21,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { envClient } from "@/config/env-client";
 
 import { scopedTranslation } from "../../i18n";
 
@@ -33,7 +34,9 @@ const { POST } = createEndpoint({
   icon: "upload",
   category: "app.endpointCategories.system",
   tags: ["tags.tasks" as const],
-  allowedRoles: [UserRole.PUBLIC],
+  allowedRoles: envClient.VIBE_IS_CLOUD
+    ? ([UserRole.ADMIN] as const)
+    : ([] as const),
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,
@@ -42,12 +45,6 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // Request
-      apiKey: scopedRequestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        columns: 12,
-        schema: z.string().min(1),
-      }),
       taskRouteId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -172,7 +169,6 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        apiKey: "your-api-key",
         taskRouteId: "claude-code",
         status: CronTaskStatus.COMPLETED,
         summary: "Task completed successfully.",

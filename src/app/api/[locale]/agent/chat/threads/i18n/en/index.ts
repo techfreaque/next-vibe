@@ -1,5 +1,3 @@
-import { translations as threadsThreadIdTranslations } from "../../[threadId]/i18n/en";
-
 export const translations = {
   tags: {
     threads: "Threads",
@@ -91,6 +89,9 @@ export const translations = {
           },
           archived: {
             content: "Archived",
+          },
+          isStreaming: {
+            content: "Streaming",
           },
           createdAt: {
             content: "Created At",
@@ -303,7 +304,52 @@ export const translations = {
       description: "Thread created successfully",
     },
   },
-  threadId: threadsThreadIdTranslations,
+  widget: {
+    common: {
+      noChatsFound: "No chats found",
+      delete: "Delete",
+      cancel: "Cancel",
+    },
+    actions: {
+      rename: "Rename",
+      unpin: "Unpin",
+      pin: "Pin to Top",
+      unarchive: "Unarchive",
+      archive: "Archive",
+      manageSharing: "Manage Sharing",
+      moveToFolder: "Move to Folder",
+      unfiled: "Unfiled",
+    },
+    folderList: {
+      managePermissions: "Manage Permissions",
+      today: "Today",
+      lastWeek: "Last 7 Days",
+      lastMonth: "Last 30 Days",
+      older: "Older",
+    },
+    threadList: {
+      deleteDialog: {
+        title: "Delete Thread",
+        description:
+          'Are you sure you want to delete "{{title}}"? This action cannot be undone and all messages in this thread will be permanently deleted.',
+      },
+    },
+    suggestedPrompts: {
+      title: "How can I help you?",
+      privateTitle: "Your Private AI Assistant",
+      privateDescription:
+        "Conversations saved to your account and synced across all your devices.",
+      sharedTitle: "Collaborate with AI",
+      sharedDescription:
+        "Create conversations and share them with team members using secure links.",
+      publicTitle: "Join the Public AI Forum",
+      publicDescription:
+        "Public conversations visible to everyone. Share ideas and engage in open dialogue.",
+      incognitoTitle: "Anonymous AI Chat",
+      incognitoDescription:
+        "Stored only in your browser. Never saved to your account or synced.",
+    },
+  },
   publicFeed: {
     timestamp: {
       justNow: "Just now",

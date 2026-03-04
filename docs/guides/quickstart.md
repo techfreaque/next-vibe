@@ -274,7 +274,7 @@ vibe hello_world --name="John"
 
 - 🌐 API endpoint: `POST /api/en-GLOBAL/hello/world`
 - 💻 CLI command: `vibe hello:world --name="John"`
-- 🔌 tRPC procedure: `trpc.hello.world.mutate({ name: "John" })`
+- 🔌 tRPC procedure: `trpc.hello.world.mutate({ name: "John" })` _(opt-in — run the tRPC generator to enable)_
 - ⚛️ React hook: `useEndpoint(definitions)`
 
 ---

@@ -331,4 +331,12 @@ export const translations = {
       description: "Share link revoked successfully",
     },
   },
+  widget: {
+    shareDialog: {
+      title: "Share Thread",
+    },
+    common: {
+      close: "Close",
+    },
+  },
 };

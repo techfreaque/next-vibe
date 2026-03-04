@@ -104,7 +104,6 @@ const { DELETE } = createEndpoint({
             }
             return oldData;
           },
-          undefined,
         );
 
         // Optimistically remove the deleted favorite from the list
@@ -125,7 +124,6 @@ const { DELETE } = createEndpoint({
               },
             };
           },
-          undefined,
         );
 
         // Optimistically update characters list addedToFav if we found the characterId
@@ -152,7 +150,6 @@ const { DELETE } = createEndpoint({
                 },
               };
             },
-            undefined,
           );
         }
       },
@@ -328,7 +325,6 @@ const { PATCH } = createEndpoint({
         const settingsData = apiClient.getEndpointData(
           settingsDefinition.default.GET,
           logger,
-          undefined,
         );
         const isActiveFavorite =
           settingsData?.success &&
@@ -366,7 +362,6 @@ const { PATCH } = createEndpoint({
                 },
               };
             },
-            undefined,
           );
 
           // Persist the settings update to the database
@@ -426,7 +421,7 @@ const { PATCH } = createEndpoint({
                   const getEndpointData = apiClient.getEndpointData(
                     definitions.GET,
                     logger,
-                    { id: pathParams.id },
+                    { urlPathParams: { id: pathParams.id } },
                   );
                   const characterModelSelection = getEndpointData?.success
                     ? getEndpointData.data.characterModelSelection
@@ -460,7 +455,6 @@ const { PATCH } = createEndpoint({
               },
             };
           },
-          undefined,
         );
 
         // Also optimistically update the single favorite GET endpoint cache
@@ -486,7 +480,7 @@ const { PATCH } = createEndpoint({
               },
             };
           },
-          { id: pathParams.id },
+          { urlPathParams: { id: pathParams.id } },
         );
       },
     },

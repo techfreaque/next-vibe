@@ -6,7 +6,6 @@ import type { EndpointLogger } from "../../shared/logger/endpoint";
 import {
   type AuthContext,
   BaseAuthHandler,
-  type SessionData,
 } from "../../shared/server-only/auth/base-auth-handler";
 import {
   deleteSessionFile,
@@ -16,29 +15,26 @@ import {
 
 /**
  * CLI/MCP Authentication Handler
- * Handles platform-specific storage for CLI/MCP (session files)
- * All authentication business logic is in AuthRepository
+ * Handles platform-specific storage for CLI/MCP via .vibe.session file.
+ * All authentication business logic is in AuthRepository.
  */
 export class CliAuthHandler extends BaseAuthHandler {
   /**
-   * Get authentication token from CLI/MCP storage
+   * Get authentication token from CLI/MCP storage.
    * Checks: Authorization header → .vibe.session file
    */
   async getStoredAuthToken(
     context: AuthContext,
     logger: EndpointLogger,
   ): Promise<string | undefined> {
-    // Check Authorization header first
     if (context.request) {
       const authHeader = context.request.headers.get("authorization");
       if (authHeader?.startsWith("Bearer ")) {
-        const token = authHeader.slice(7); // Remove "Bearer " prefix
         logger.debug("Found auth token in Authorization header");
-        return token;
+        return authHeader.slice(7);
       }
     }
 
-    // Fall back to session file
     const sessionResult = await readSessionFile(logger, context.locale);
     if (sessionResult.success) {
       logger.debug("Found auth token in session file");
@@ -49,8 +45,8 @@ export class CliAuthHandler extends BaseAuthHandler {
   }
 
   /**
-   * Store authentication token in .vibe.session file
-   * @param rememberMe - If true, session lasts 30 days; if false, 7 days
+   * Store authentication token in .vibe.session file.
+   * @param rememberMe - 30 days if true, 7 days if false
    */
   async storeAuthToken(
     token: string,
@@ -58,44 +54,35 @@ export class CliAuthHandler extends BaseAuthHandler {
     leadId: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
-    rememberMe = true, // Default to true (X days)
+    rememberMe = true,
   ): Promise<ResponseType<void>> {
-    // Set session duration based on rememberMe flag
-    // Remember me: 30 days, Regular session: 7 days
     const sessionDurationDays = rememberMe ? 30 : 7;
-    const sessionDurationSeconds = sessionDurationDays * 24 * 60 * 60;
+    const expiresAt = new Date(
+      Date.now() + sessionDurationDays * 24 * 60 * 60 * 1000,
+    );
 
-    const expiresAt = new Date(Date.now() + sessionDurationSeconds * 1000);
-
-    const sessionData: SessionData = {
-      token,
-      userId,
-      leadId,
-      expiresAt: expiresAt.toISOString(),
-      createdAt: new Date().toISOString(),
-    };
-
-    logger.debug("Storing CLI session", {
-      userId,
-      leadId,
-      rememberMe,
-      sessionType: rememberMe ? "persistent (30 days)" : "regular (7 days)",
-    });
-    return await writeSessionFile(sessionData, logger, locale);
+    return writeSessionFile(
+      {
+        token,
+        userId,
+        leadId,
+        expiresAt: expiresAt.toISOString(),
+        createdAt: new Date().toISOString(),
+      },
+      logger,
+      locale,
+    );
   }
 
   /**
-   * Clear authentication token by deleting .vibe.session file
+   * Clear authentication token by deleting .vibe.session file.
    */
   async clearAuthToken(
     logger: EndpointLogger,
     locale: CountryLanguage,
   ): Promise<ResponseType<void>> {
-    return await deleteSessionFile(logger, locale);
+    return deleteSessionFile(logger, locale);
   }
 }
 
-/**
- * Singleton instance
- */
 export const cliAuthHandler = new CliAuthHandler();

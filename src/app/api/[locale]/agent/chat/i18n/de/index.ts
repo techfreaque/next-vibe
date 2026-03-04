@@ -1,13 +1,3 @@
-import { translations as creditsTranslations } from "../../../../credits/i18n/de";
-import { translations as aiStreamTranslations } from "../../../ai-stream/stream/i18n/de";
-import { translations as fetchUrlContentTranslations } from "../../../fetch-url-content/i18n/de";
-import { translations as charaktersTranslations } from "../../characters/i18n/de";
-import { translations as favoritesTranslations } from "../../favorites/i18n/de";
-import { translations as foldersTranslations } from "../../folders/i18n/de";
-import { translations as memoriesTranslations } from "../../memories/i18n/de";
-import { translations as settingsTranslations } from "../../settings/i18n/de";
-import { translations as messagesTranslations } from "../../threads/[threadId]/messages/i18n/de";
-import { translations as threadsTranslations } from "../../threads/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -450,22 +440,6 @@ export const translations: typeof enTranslations = {
   post: {
     title: "Chat",
     description: "Chat-Oberfläche",
-  },
-  aiStream: aiStreamTranslations,
-  credits: creditsTranslations,
-  folders: foldersTranslations,
-  memories: memoriesTranslations,
-  characters: charaktersTranslations,
-  favorites: {
-    ...favoritesTranslations,
-  },
-  settings: settingsTranslations,
-  threads: {
-    ...threadsTranslations,
-    messages: messagesTranslations,
-  },
-  tools: {
-    fetchUrl: fetchUrlContentTranslations,
   },
   models: {
     descriptions: {

@@ -16,6 +16,11 @@ export const translations: typeof enTranslations = {
       label: "ID wątku",
       description: "ID wątku, z którego ma zostać pobrana ścieżka",
     },
+    rootFolderId: {
+      label: "Folder główny",
+      description:
+        "Folder główny wątku (używany do routingu po stronie klienta)",
+    },
     branchIndices: {
       label: "Indeksy gałęzi",
       description:
@@ -117,6 +122,9 @@ export const translations: typeof enTranslations = {
       },
       oldestLoadedMessageId: {
         content: "ID najstarszej załadowanej wiadomości",
+      },
+      compactionBoundaryId: {
+        content: "ID granicy kompakcji",
       },
     },
     errors: {

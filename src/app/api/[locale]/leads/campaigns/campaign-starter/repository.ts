@@ -18,6 +18,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { CountryLanguageValues } from "@/i18n/core/config";
 import { getLanguageFromLocale } from "@/i18n/core/language-utils";
 
 import { scopedTranslation as smtpScopedTranslation } from "../../../emails/smtp-client/i18n";
@@ -28,7 +29,12 @@ import {
   isStatusTransitionAllowed,
   LeadStatus,
 } from "../../enum";
-import type { scopedTranslation } from "./i18n";
+import { CampaignStarterConfigRepository } from "./campaign-starter-config/repository";
+import type {
+  CampaignStarterPostRequestOutput,
+  CampaignStarterPostResponseOutput,
+} from "./definition";
+import { scopedTranslation } from "./i18n";
 import type {
   CampaignStarterConfigType,
   CampaignStarterResultType,
@@ -418,6 +424,151 @@ export class CampaignStarterRepository {
       });
       return 0;
     }
+  }
+
+  static async run(
+    // oxlint-disable-next-line no-unused-vars
+    _data: CampaignStarterPostRequestOutput,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<CampaignStarterPostResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
+    const systemUser = {
+      id: "00000000-0000-0000-0000-000000000001",
+      leadId: "00000000-0000-0000-0000-000000000000",
+      isPublic: false as const,
+      roles: [UserPermissionRole.ADMIN] as (typeof UserPermissionRole.ADMIN)[],
+    };
+
+    const configResult =
+      await CampaignStarterConfigRepository.ensureConfigExists(
+        systemUser,
+        locale,
+        logger,
+      );
+
+    if (!configResult.success || !configResult.data) {
+      return fail({
+        message: t("errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+
+    const config = configResult.data;
+
+    if (!config.enabled) {
+      logger.debug("Campaign starter is disabled in configuration");
+      return success({
+        leadsProcessed: 0,
+        leadsStarted: 0,
+        leadsSkipped: 0,
+        executionTimeMs: 0,
+      });
+    }
+
+    const startTime = Date.now();
+    const now = new Date();
+    const currentDay = now.getUTCDay() || 7;
+    const currentHour = now.getUTCHours();
+
+    if (!config.enabledDays.includes(currentDay)) {
+      return success({
+        leadsProcessed: 0,
+        leadsStarted: 0,
+        leadsSkipped: 0,
+        executionTimeMs: Date.now() - startTime,
+      });
+    }
+
+    if (
+      currentHour < config.enabledHours.start ||
+      currentHour > config.enabledHours.end
+    ) {
+      return success({
+        leadsProcessed: 0,
+        leadsStarted: 0,
+        leadsSkipped: 0,
+        executionTimeMs: Date.now() - startTime,
+      });
+    }
+
+    const result: CampaignStarterResultType = {
+      leadsProcessed: 0,
+      leadsStarted: 0,
+      leadsSkipped: 0,
+      executionTimeMs: 0,
+      errors: [],
+    };
+
+    const minAgeDate = new Date();
+    minAgeDate.setHours(minAgeDate.getHours() - config.minAgeHours);
+
+    const daysFromMonday = now.getUTCDay() === 0 ? 6 : now.getUTCDay() - 1;
+    const startOfWeek = new Date(now);
+    startOfWeek.setUTCDate(now.getUTCDate() - daysFromMonday);
+    startOfWeek.setUTCHours(0, 0, 0, 0);
+
+    for (const [localeKey, weeklyQuota] of Object.entries(
+      config.leadsPerWeek,
+    )) {
+      const localeValue =
+        CountryLanguageValues[localeKey as keyof typeof CountryLanguageValues];
+      if (!localeValue) {
+        continue;
+      }
+      const weeklyQuotaNum = typeof weeklyQuota === "number" ? weeklyQuota : 0;
+
+      const startedThisWeek =
+        await CampaignStarterRepository.getLeadsStartedThisWeek(
+          localeValue,
+          startOfWeek,
+          logger,
+        );
+      const remainingQuota = Math.max(0, weeklyQuotaNum - startedThisWeek);
+
+      if (remainingQuota <= 0) {
+        continue;
+      }
+
+      const failedLeadsCountResult =
+        await CampaignStarterRepository.getFailedLeadsCount(
+          localeValue,
+          logger,
+          t,
+        );
+      const failedLeadsCount = failedLeadsCountResult.success
+        ? failedLeadsCountResult.data
+        : 0;
+
+      const adjustedLeadsPerRun = remainingQuota + failedLeadsCount;
+
+      await CampaignStarterRepository.processLocaleLeads(
+        localeValue,
+        adjustedLeadsPerRun,
+        minAgeDate,
+        config,
+        result,
+        logger,
+        t,
+      );
+
+      if (failedLeadsCount > 0) {
+        await CampaignStarterRepository.markFailedLeadsAsProcessed(
+          localeValue,
+          logger,
+          t,
+        );
+      }
+    }
+
+    result.executionTimeMs = Date.now() - startTime;
+
+    return success({
+      leadsProcessed: result.leadsProcessed,
+      leadsStarted: result.leadsStarted,
+      leadsSkipped: result.leadsSkipped,
+      executionTimeMs: result.executionTimeMs,
+    });
   }
 }
 

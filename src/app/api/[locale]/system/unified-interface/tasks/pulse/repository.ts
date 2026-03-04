@@ -599,11 +599,7 @@ export class PulseHealthRepository {
           );
         } else {
           // Fire-and-forget: notify remote that task is now RUNNING
-          if (
-            dbTask.targetInstance &&
-            env.THEA_REMOTE_URL &&
-            env.THEA_REMOTE_API_KEY
-          ) {
+          if (dbTask.targetInstance) {
             void pushStatusToRemote({
               taskRouteId: dbTask.routeId,
               status: CronTaskStatus.RUNNING,
@@ -804,11 +800,7 @@ export class PulseHealthRepository {
               .where(eq(cronTasksTable.id, dbTask.id));
 
             // Fire-and-forget: push final status to remote
-            if (
-              dbTask.targetInstance &&
-              env.THEA_REMOTE_URL &&
-              env.THEA_REMOTE_API_KEY
-            ) {
+            if (dbTask.targetInstance) {
               void pushStatusToRemote({
                 taskRouteId: dbTask.routeId,
                 status: finalStatus,
@@ -847,11 +839,7 @@ export class PulseHealthRepository {
               .where(eq(cronTasksTable.id, dbTask.id));
 
             // Fire-and-forget: push FAILED to remote so it doesn't stay stuck on RUNNING
-            if (
-              dbTask.targetInstance &&
-              env.THEA_REMOTE_URL &&
-              env.THEA_REMOTE_API_KEY
-            ) {
+            if (dbTask.targetInstance) {
               void pushStatusToRemote({
                 taskRouteId: dbTask.routeId,
                 status: CronTaskStatus.FAILED,

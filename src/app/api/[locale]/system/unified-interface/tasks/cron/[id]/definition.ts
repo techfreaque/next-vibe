@@ -36,7 +36,10 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { taskInputSchema } from "../db";
 import { cronTaskResponseSchema } from "../tasks/definition";
 import { scopedTranslation } from "./i18n";
-import { CronTaskDetailContainer, CronTaskEditContainer } from "./widget/widget";
+import {
+  CronTaskDetailContainer,
+  CronTaskEditContainer,
+} from "./widget/widget";
 
 export const CRON_GET_ALIAS = "cron-get" as const;
 export const CRON_UPDATE_ALIAS = "cron-update" as const;

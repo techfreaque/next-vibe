@@ -1,0 +1,1 @@
+ALTER TABLE "chat_folders" ADD COLUMN "pinned" boolean DEFAULT false NOT NULL;

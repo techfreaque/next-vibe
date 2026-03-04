@@ -49,22 +49,16 @@ export const { GET, POST } = endpointsHandler({
 ```typescript
 // repository.ts
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { scopedTranslation } from "./i18n";
 
-export interface MyRepositoryInterface {
-  getData(
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+
+export class MyRepository {
+  static async getData(
     data: DataInput,
     user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger, // <-- Required parameter
-  ): Promise<ResponseType<DataOutput>>;
-}
-
-export class MyRepositoryImpl implements MyRepositoryInterface {
-  async getData(
-    data: DataInput,
-    user: JwtPayloadType,
-    locale: CountryLanguage,
-    logger: EndpointLogger, // <-- Receive it
+    logger: EndpointLogger, // <-- Always receive as parameter, never create
+    t: ModuleT, // <-- Receive t for scoped error messages
   ): Promise<ResponseType<DataOutput>> {
     try {
       logger.debug("Processing data", { userId: user.id });
@@ -74,11 +68,10 @@ export class MyRepositoryImpl implements MyRepositoryInterface {
       logger.info("Data processed successfully", { count: result.length });
       return success({ data: result });
     } catch (error) {
-      logger.error("Failed to process data", error);
+      logger.error("Failed to process data", parseError(error));
       return fail({
-        message: "app.api.errors.internal",
+        message: t("get.errors.server.title"), // ← scoped t(), not hardcoded string
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
-        messageParams: { error: parseError(error).message },
       });
     }
   }

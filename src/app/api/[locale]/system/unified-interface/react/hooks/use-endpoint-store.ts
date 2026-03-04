@@ -8,8 +8,13 @@ import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-int
 import type { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
-import type { EndpointReturn, UseEndpointOptions } from "./endpoint-types";
-import { buildKey } from "./query-key-builder";
+import type {
+  EndpointReturn,
+  OptionsOptional,
+  UseEndpointOptions,
+  UseEndpointOptionsBase,
+} from "./endpoint-types";
+import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
 import { useEndpoint as useEndpointOriginal } from "./use-endpoint-implementation";
 
 /**
@@ -166,10 +171,16 @@ export const useEndpointInstanceStore = create<EndpointInstanceStore>(
  */
 function generateInstanceKey<
   T extends Partial<Record<Methods, CreateApiEndpointAny>>,
+  TGetEndpoint extends CreateApiEndpointAny,
   TUrlPathParams = T extends { [K in Methods]: CreateApiEndpointAny }
     ? T[Methods]["types"]["UrlVariablesOutput"]
     : never,
->(endpoints: T, urlPathParams: TUrlPathParams, logger: EndpointLogger): string {
+>(
+  endpoints: T,
+  urlPathParams: TUrlPathParams,
+  logger: EndpointLogger,
+  requestData: CacheKeyRequestData<TGetEndpoint>,
+): string {
   // Use the first available endpoint to generate the base key
   const firstEndpoint = Object.values(endpoints)[0];
 
@@ -178,7 +189,13 @@ function generateInstanceKey<
   }
 
   // Use buildKey for consistent key generation
-  return buildKey("endpoint", firstEndpoint, urlPathParams, logger);
+  return buildKey(
+    "endpoint",
+    firstEndpoint,
+    urlPathParams,
+    logger,
+    requestData as CacheKeyRequestData<CreateApiEndpointAny>,
+  );
 }
 
 /**
@@ -205,12 +222,19 @@ function generateInstanceKey<
  */
 export function useEndpointManaged<
   T extends Partial<Record<Methods, CreateApiEndpointAny>>,
+  TOptional extends boolean = OptionsOptional<T>,
 >(
   endpoints: T,
-  options: UseEndpointOptions<T> | undefined,
+  options: TOptional extends true
+    ? UseEndpointOptions<T> | undefined
+    : UseEndpointOptions<T>,
   logger: EndpointLogger,
   user: JwtPayloadType,
 ): EndpointReturn<T> {
+  type TGetEndpoint = T extends { GET: infer E extends CreateApiEndpointAny }
+    ? E
+    : CreateApiEndpointAny;
+
   // Extract urlPathParams from options (try different locations)
   const urlPathParams =
     options?.read?.urlPathParams ??
@@ -218,10 +242,21 @@ export function useEndpointManaged<
     options?.update?.urlPathParams ??
     options?.delete?.urlPathParams;
 
+  // Cache key request data lives in read.initialState (only the includeInCacheKey fields matter)
+  const readInitialState = options?.read?.initialState;
+
   // Generate unique instance key
   const instanceKey = useMemo(
-    () => generateInstanceKey(endpoints, urlPathParams, logger),
-    [endpoints, urlPathParams, logger],
+    () =>
+      generateInstanceKey<T, TGetEndpoint>(
+        endpoints,
+        urlPathParams as Parameters<
+          typeof generateInstanceKey<T, TGetEndpoint>
+        >[1],
+        logger,
+        readInitialState as CacheKeyRequestData<TGetEndpoint>,
+      ),
+    [endpoints, urlPathParams, logger, readInitialState],
   );
 
   // Initialize instance metadata on first render
@@ -237,7 +272,12 @@ export function useEndpointManaged<
 
   // Call the original hook - React Query handles deduplication
   // All components with the same query key will share the same cache
-  const endpointReturn = useEndpointOriginal(endpoints, options, logger, user);
+  const endpointReturn = useEndpointOriginal(
+    endpoints,
+    options as UseEndpointOptionsBase<T> | undefined,
+    logger,
+    user,
+  );
 
   return endpointReturn;
 }

@@ -116,7 +116,6 @@ const { DELETE } = createEndpoint({
               })),
             });
           },
-          undefined,
         );
 
         // Note: popNavigationOnSuccess is now handled by EndpointsPage automatically
@@ -331,7 +330,7 @@ const { PATCH } = createEndpoint({
               },
             };
           },
-          { id: data.pathParams.id },
+          { urlPathParams: { id: data.pathParams.id } },
         );
 
         // Optimistically update the character in the list
@@ -391,7 +390,6 @@ const { PATCH } = createEndpoint({
               },
             };
           },
-          undefined,
         );
       },
     },

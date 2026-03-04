@@ -12,9 +12,9 @@ import { Span } from "next-vibe-ui/ui/span";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import type React from "react";
 
+import { EmailPreviewClient } from "@/app/[locale]/admin/leads/emails/_components/email-preview-client";
 import { contactClientRepository } from "@/app/api/[locale]/contact/repository-client";
 import { emailService } from "@/app/api/[locale]/leads/campaigns/emails";
-import { EmailPreviewClient } from "@/app/api/[locale]/leads/campaigns/emails/widget/email-preview-client";
 import type {
   EmailCampaignStageValues,
   EmailJourneyVariantValues,

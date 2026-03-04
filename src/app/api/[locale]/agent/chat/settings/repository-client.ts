@@ -282,7 +282,6 @@ export class ChatSettingsRepositoryClient {
           data: updatedData,
         };
       },
-      undefined,
     );
 
     // Optimistic update 2: Update favorites list to show new active badge
@@ -307,7 +306,6 @@ export class ChatSettingsRepositoryClient {
           },
         };
       },
-      undefined,
     );
 
     // Call the mutation to persist on server (or localStorage)

@@ -43,6 +43,9 @@ export function useMessagesList(
           staleTime: 5 * 1000, // 5 seconds
         },
       },
+      create: {
+        urlPathParams: { threadId: params.threadId },
+      },
     },
     logger,
     user,
@@ -72,6 +75,10 @@ export function useCreateMessage(
   return useEndpoint(
     definitions,
     {
+      read: {
+        urlPathParams: { threadId: params.threadId },
+        queryOptions: { enabled: false },
+      },
       create: {
         urlPathParams: { threadId: params.threadId },
         formOptions: {

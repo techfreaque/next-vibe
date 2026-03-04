@@ -1,17 +1,16 @@
 /**
- * WebSocket Sidecar Server
+ * WebSocket + HTTP Proxy Server
  *
- * Standalone Bun.serve() that handles ONLY WebSocket connections.
- * Runs on a separate port (Next.js port + 1000):
- *   - Dev:  Next.js on 3000, WS on 4000
- *   - Prod: Next.js on 3001, WS on 4001
+ * Single Bun.serve() on the main port that:
+ *   1. Handles WebSocket upgrades at /ws in-process (no sidecar)
+ *   2. Proxies all other HTTP traffic to Next.js on an internal port (main + 1)
  *
  * Architecture:
- *   Browser → Next.js (port 3000/3001) for HTTP
- *   Browser → WS sidecar (port 4000/4001) for WebSocket
+ *   Browser → Bun proxy (port 3000/3001) for HTTP + WS
+ *   Bun proxy → Next.js (port 3001/3002, internal) for HTTP
  *
- * Auth uses httpOnly cookies (token + lead_id), which are sent
- * automatically because cookies are scoped by domain+path (not port).
+ * Auth uses httpOnly cookies (token + lead_id), sent automatically
+ * because cookies are scoped by domain+path, not port.
  *
  * NOTE: This file runs only in Bun CLI context (dynamically imported
  * from dev/repository.ts and start/repository.ts).
@@ -20,6 +19,8 @@
 /// <reference types="bun-types" />
 
 /* eslint-disable i18next/no-literal-string */
+
+import http from "node:http";
 
 import type { ServerWebSocket } from "bun";
 
@@ -41,16 +42,18 @@ interface PubSubModule {
 // CHANNEL REGISTRY (singleton)
 // ============================================================================
 
-/** All active connections, keyed by channel → set of sockets */
+/** All active /ws connections, keyed by channel → set of sockets */
 const channels = new Map<string, Set<ServerWebSocket<WsConnectionData>>>();
 
 /** Global sequence counter for event ordering */
 let globalSeq = 0;
 
+/** Set to true during shutdown to suppress expected proxy errors */
+let shuttingDown = false;
+
 /**
  * Broadcast an event to LOCAL subscribers of a channel (this process only).
- * For single-instance deployments, this is the only broadcast path.
- * For multi-instance, the pub/sub adapter calls this after receiving from Redis.
+ * Called directly by the emitter (same process — no HTTP POST needed).
  */
 export function broadcastLocal(
   channel: string,
@@ -72,14 +75,17 @@ export function broadcastLocal(
 
   const payload = JSON.stringify(message);
   for (const ws of subscribers) {
-    ws.send(payload);
+    try {
+      ws.send(payload);
+    } catch {
+      // Socket may be closing — silently skip
+    }
   }
 }
 
 /**
  * Publish an event through the pub/sub adapter.
  * NOTE: Route handlers should use createEmitter() from emitter.ts instead.
- * This function is for the WS sidecar context only.
  */
 export function publish(
   channel: string,
@@ -116,8 +122,6 @@ function subscribeToChannel(
   set.add(ws);
   ws.data.channels.add(channel);
 
-  // When the first local subscriber joins a channel, register with the pub/sub adapter
-  // so cross-instance messages are routed to broadcastLocal()
   if (isNewChannel) {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { getPubSubAdapter } = require("./pubsub") as PubSubModule;
@@ -136,7 +140,6 @@ function unsubscribeFromChannel(
     set.delete(ws);
     if (set.size === 0) {
       channels.delete(channel);
-      // Last local subscriber left — unsubscribe from the pub/sub adapter
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { getPubSubAdapter } = require("./pubsub") as PubSubModule;
       getPubSubAdapter().unsubscribe(channel);
@@ -161,9 +164,6 @@ function unsubscribeFromAll(ws: ServerWebSocket<WsConnectionData>): void {
 // ============================================================================
 // AUTH
 // ============================================================================
-
-/** WS sidecar port = Next.js port + 1000 (3000→4000, 3001→4001) */
-export const WS_PORT_OFFSET = 1000;
 
 /** Parse a single cookie value from a Cookie header string */
 function parseCookieValue(
@@ -206,8 +206,21 @@ async function authenticateFromCookies(
 // SERVER FACTORY
 // ============================================================================
 
+/** Extended connection data for proxied WS connections (e.g. Next.js HMR) */
+interface WsConnectionDataWithProxy extends WsConnectionData {
+  proxyWs?: WebSocket;
+}
+
+/**
+ * Next.js runs on this offset above the main port (internal only).
+ * Main port 3000 → Next.js on 3100 (internal, vibe dev)
+ * Main port 3001 → Next.js on 3101 (internal, vibe start)
+ * Large offset avoids collision between dev and start running simultaneously.
+ */
+export const NEXT_PORT_OFFSET = 100;
+
 export interface WebSocketServerOptions {
-  /** WebSocket port (typically Next.js port + 1000) */
+  /** Main public-facing port */
   port: number;
   logger: EndpointLogger;
   /** Optional hostname (default: "0.0.0.0") */
@@ -215,13 +228,16 @@ export interface WebSocketServerOptions {
 }
 
 export interface WebSocketServerHandle {
-  /** Stop the Bun WebSocket server */
+  /** Stop the Bun server */
   stop: () => void;
+  /** Internal Next.js port (main port + NEXT_PORT_OFFSET) */
+  nextPort: number;
 }
 
 /**
- * Start the WebSocket sidecar server.
- * Uses Bun.serve() for native WebSocket support — WS only, no HTTP proxy.
+ * Start the Bun proxy + WebSocket server on the main port.
+ * WebSocket upgrades to /ws are handled in-process.
+ * All other requests are proxied to Next.js on port + NEXT_PORT_OFFSET.
  *
  * IMPORTANT: This function must only be called in Bun runtime context.
  */
@@ -229,18 +245,66 @@ export function startWebSocketServer(
   options: WebSocketServerOptions,
 ): WebSocketServerHandle {
   const { port, logger, hostname = "0.0.0.0" } = options;
+  const nextPort = port + NEXT_PORT_OFFSET;
 
-  const server = Bun.serve<WsConnectionData>({
+  const server = Bun.serve<WsConnectionDataWithProxy>({
     port,
     hostname,
+    reusePort: true, // allow re-binding after restart without waiting for TIME_WAIT
+    idleTimeout: 0, // disable idle timeout — dev builds can take >10s
 
     async fetch(req, bunServer): Promise<Response> {
-      // Only handle WebSocket upgrades
-      if (req.headers.get("upgrade")?.toLowerCase() === "websocket") {
-        const url = new URL(req.url);
+      const url = new URL(req.url);
+
+      // ── Internal broadcast endpoint — called by Next.js to emit WS events ──
+      // Next.js runs in a separate process and can't call broadcastLocal() directly,
+      // so it POSTs here and the proxy calls broadcastLocal() in-process.
+      if (url.pathname === "/ws/broadcast" && req.method === "POST") {
+        try {
+          const body = (await req.json()) as {
+            channel: string;
+            event: string;
+            data: WsWireMessage["data"];
+          };
+          broadcastLocal(body.channel, body.event, body.data);
+          return new Response("ok", { status: 200 });
+        } catch {
+          return new Response("Bad Request", { status: 400 });
+        }
+      }
+
+      // ── Proxy non-/ws WebSocket upgrades to internal Next.js (e.g. HMR) ──
+      if (
+        url.pathname !== "/ws" &&
+        req.headers.get("upgrade")?.toLowerCase() === "websocket"
+      ) {
+        const targetUrl = `ws://127.0.0.1:${String(nextPort)}${url.pathname}${url.search}`;
+        // Open upstream WS connection, then upgrade the browser connection.
+        // Messages are bridged in the websocket handlers below.
+        const upstream = new WebSocket(targetUrl);
+        const upgraded = bunServer.upgrade(req, {
+          data: {
+            userId: null,
+            leadId: "__proxy__",
+            channels: new Set<string>(),
+            connectedAt: Date.now(),
+            proxyWs: upstream,
+          } satisfies WsConnectionDataWithProxy,
+        });
+        if (!upgraded) {
+          upstream.close();
+          return new Response("WebSocket upgrade failed", { status: 426 });
+        }
+        return new Response(null, { status: 101 });
+      }
+
+      // ── WebSocket upgrade at /ws ──────────────────────────────────────────
+      if (
+        url.pathname === "/ws" &&
+        req.headers.get("upgrade")?.toLowerCase() === "websocket"
+      ) {
         const channel = url.searchParams.get("channel");
 
-        // Authenticate from httpOnly cookies
         const { userId, leadId } = await authenticateFromCookies(req, logger);
 
         if (!leadId) {
@@ -265,39 +329,142 @@ export function startWebSocketServer(
         return new Response(null, { status: 101 });
       }
 
-      // Internal publish API — Next.js process sends events here
-      if (req.method === "POST") {
-        const url = new URL(req.url);
-        if (url.pathname === "/publish") {
-          try {
-            const body = (await req.json()) as {
-              channel: string;
-              event: string;
-              data: WsWireMessage["data"];
-            };
-            broadcastLocal(body.channel, body.event, body.data);
-            return new Response("ok", { status: 200 });
-          } catch {
-            return new Response("Invalid JSON", { status: 400 });
-          }
-        }
-      }
+      // ── Proxy everything else to Next.js ─────────────────────────────────
+      // Use a raw Node http pipe instead of fetch() — Bun's fetch auto-decompresses
+      // responses which breaks streaming SSR and compressed assets.
+      return await new Promise<Response>((resolve) => {
+        const clientIp =
+          req.headers.get("x-forwarded-for") ??
+          req.headers.get("x-real-ip") ??
+          "127.0.0.1";
 
-      // Not a recognized request — return 404
-      return new Response("WebSocket server — use ws:// protocol", {
-        status: 404,
+        // Build raw headers object for Node http
+        const outHeaders: Record<string, string> = {};
+        req.headers.forEach((value, key) => {
+          outHeaders[key] = value;
+        });
+        outHeaders["host"] = `127.0.0.1:${String(nextPort)}`;
+        outHeaders["x-forwarded-for"] = clientIp;
+        outHeaders["x-forwarded-proto"] = url.protocol.replace(":", "");
+
+        const proxyReq = http.request(
+          {
+            hostname: "127.0.0.1",
+            port: nextPort,
+            path: `${url.pathname}${url.search}`,
+            method: req.method,
+            headers: outHeaders,
+          },
+          (proxyRes) => {
+            // Use Headers so Set-Cookie entries are appended individually
+            // (joining multiple Set-Cookie with ", " breaks them)
+            const resHeaders = new Headers();
+            for (const [key, value] of Object.entries(proxyRes.headers)) {
+              if (value === undefined) {
+                continue;
+              }
+              if (Array.isArray(value)) {
+                for (const v of value) {
+                  resHeaders.append(key, v);
+                }
+              } else {
+                resHeaders.set(key, value);
+              }
+            }
+
+            // Stream the raw (possibly compressed) body straight to the browser
+            const stream = new ReadableStream({
+              start(controller): void {
+                proxyRes.on("data", (chunk: Buffer) => {
+                  controller.enqueue(chunk);
+                });
+                proxyRes.on("end", () => {
+                  controller.close();
+                });
+                proxyRes.on("error", (err) => {
+                  controller.error(err);
+                });
+              },
+            });
+
+            resolve(
+              new Response(stream, {
+                status: proxyRes.statusCode ?? 200,
+                headers: resHeaders,
+              }),
+            );
+          },
+        );
+
+        proxyReq.on("error", (err) => {
+          // Suppress socket-closed errors during shutdown (expected when Next.js exits)
+          if (!shuttingDown) {
+            logger.error("[Proxy] Failed to reach Next.js", {
+              error: err.message,
+              path: url.pathname,
+            });
+          }
+          resolve(new Response("Bad Gateway", { status: 502 }));
+        });
+
+        // Pipe request body for POST/PUT/PATCH
+        if (req.body && req.method !== "GET" && req.method !== "HEAD") {
+          const reader = req.body.getReader();
+          const pump = (): void => {
+            reader
+              .read()
+              .then(({ done, value }) => {
+                if (done) {
+                  proxyReq.end();
+                  return undefined;
+                }
+                proxyReq.write(value);
+                pump();
+                return undefined;
+              })
+              .catch(() => {
+                proxyReq.end();
+              });
+          };
+          pump();
+        } else {
+          proxyReq.end();
+        }
       });
     },
 
     websocket: {
       open(ws): void {
+        // Proxy connection — wire up upstream → browser bridging
+        if (ws.data.proxyWs) {
+          const upstream = ws.data.proxyWs;
+          upstream.addEventListener("message", (event): void => {
+            try {
+              ws.send(
+                typeof event.data === "string"
+                  ? event.data
+                  : (event.data as ArrayBuffer),
+              );
+            } catch {
+              // Socket may be closing — silently skip
+            }
+          });
+          upstream.addEventListener("close", (): void => {
+            ws.close();
+          });
+          upstream.addEventListener("error", (): void => {
+            ws.close();
+          });
+          return;
+        }
+        // Normal /ws connection
         for (const channel of ws.data.channels) {
           let set = channels.get(channel);
           if (!set) {
             set = new Set();
             channels.set(channel, set);
           }
-          set.add(ws);
+          set.add(ws as ServerWebSocket<WsConnectionData>);
         }
         logger.debug(
           `[WS] Connection opened (channels: ${[...ws.data.channels].join(", ") || "none"})`,
@@ -305,16 +472,32 @@ export function startWebSocketServer(
       },
 
       message(ws, raw): void {
+        // Proxy connection — forward browser → upstream
+        if (ws.data.proxyWs) {
+          try {
+            ws.data.proxyWs.send(raw as string | ArrayBuffer);
+          } catch {
+            // Upstream socket may be closing — silently skip
+          }
+          return;
+        }
+        // Normal /ws connection
         try {
           const msg = JSON.parse(
             typeof raw === "string" ? raw : new TextDecoder().decode(raw),
           ) as WsClientMessage;
 
           if (msg.type === "subscribe") {
-            subscribeToChannel(ws, msg.channel);
+            subscribeToChannel(
+              ws as ServerWebSocket<WsConnectionData>,
+              msg.channel,
+            );
             logger.debug(`[WS] Subscribed to ${msg.channel}`);
           } else if (msg.type === "unsubscribe") {
-            unsubscribeFromChannel(ws, msg.channel);
+            unsubscribeFromChannel(
+              ws as ServerWebSocket<WsConnectionData>,
+              msg.channel,
+            );
             logger.debug(`[WS] Unsubscribed from ${msg.channel}`);
           }
         } catch {
@@ -323,17 +506,24 @@ export function startWebSocketServer(
       },
 
       close(ws): void {
-        unsubscribeFromAll(ws);
+        // Proxy connection — close upstream
+        if (ws.data.proxyWs) {
+          ws.data.proxyWs.close();
+          return;
+        }
+        unsubscribeFromAll(ws as ServerWebSocket<WsConnectionData>);
         logger.debug("[WS] Connection closed");
       },
     },
   });
 
-  logger.info(`[WS] WebSocket sidecar listening on ${hostname}:${port}`);
+  logger.debug(`[WS] Proxy server on :${port} → Next.js on :${nextPort}`);
 
   return {
     stop: (): void => {
+      shuttingDown = true;
       server.stop(true);
     },
+    nextPort,
   };
 }

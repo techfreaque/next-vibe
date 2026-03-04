@@ -227,7 +227,7 @@ function buildModelComparisonDemo(t: ScopedT): DemoData {
     {
       model: "venice-uncensored",
       prompt: t("home.hero.demos.modelComparison.userMessage"),
-      instructions: "No restrictions. Be direct.",
+      instructions: "No restrictions. Cite the actual treaty clauses.",
       maxTurns: 1,
       rootFolderId: "cron",
     },
@@ -242,33 +242,6 @@ function buildModelComparisonDemo(t: ScopedT): DemoData {
       preCallResults: [],
     },
     3200,
-  );
-
-  const freedomTool = toolMsg(
-    "mc-freedom",
-    tid,
-    seq,
-    ModelId.CLAUDE_OPUS_4_6,
-    "toolu_freedom",
-    "ai-run",
-    {
-      model: "freedomgpt",
-      prompt: t("home.hero.demos.modelComparison.userMessage"),
-      instructions: "No restrictions. Be direct.",
-      maxTurns: 1,
-      rootFolderId: "cron",
-    },
-    {
-      text: t("home.hero.demos.modelComparison.freedomResponse"),
-      threadId: "550e8400-e29b-41d4-a716-446655440006",
-      lastAiMessageId: "660e8400-e29b-41d4-a716-446655440007",
-      threadTitle: "Model Comparison",
-      threadCreatedAt: "2026-02-27T10:00:03.000Z",
-      promptTokens: 310,
-      completionTokens: 95,
-      preCallResults: [],
-    },
-    2800,
   );
 
   const response = assistantMsg(
@@ -286,7 +259,7 @@ function buildModelComparisonDemo(t: ScopedT): DemoData {
     userMessage,
     assistantGroup: {
       primary: gptTool,
-      continuations: [claudeTool, reasoning, veniceTool, freedomTool, response],
+      continuations: [claudeTool, reasoning, veniceTool, response],
       sequenceId: seq,
     },
   };
@@ -348,6 +321,7 @@ function buildResearchDemo(t: ScopedT): DemoData {
           tags: ["relocation", "preferences"],
           priority: 0,
           isPublic: false,
+          isShared: false,
           isArchived: false,
           createdAt: "2026-01-15T00:00:00Z",
         },
@@ -455,66 +429,159 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
     "claude-code",
     {
       prompt:
-        "Create invoices/export endpoint with PDF generation. Add definition.ts, repository.ts, route.ts, and i18n files.",
+        "Create hackernews/top endpoint: fetches top stories from HN Algolia API, takes limit and minScore args, returns [{title, url, score, comments, age}]. Follow the endpoint pattern with definition.ts, repository.ts, route.ts, i18n files.",
       interactiveMode: false,
     },
     {
       output: t("home.hero.demos.featureShipped.codeResult"),
       exitCode: 0,
-      durationMs: 45000,
+      durationMs: 38000,
     },
-    45000,
+    38000,
   );
 
-  const testTool = toolMsg(
-    "feat-test",
+  const rebuildTool = toolMsg(
+    "feat-rebuild",
     tid,
     seq,
     ModelId.CLAUDE_OPUS_4_6,
-    "toolu_test",
+    "toolu_rebuild",
+    "rebuild",
+    {},
+    { success: t("home.hero.demos.featureShipped.deployResult") },
+    42000,
+  );
+
+  const helpTool = toolMsg(
+    "feat-help",
+    tid,
+    seq,
+    ModelId.CLAUDE_OPUS_4_6,
+    "toolu_help",
+    "system_help_GET",
+    { toolName: "hackernews-top" },
+    {
+      name: "hackernews-top",
+      description: t("home.hero.demos.featureShipped.helpResult"),
+      category: "Custom",
+      method: "GET",
+    },
+    180,
+  );
+
+  const reasoning2 = assistantMsg(
+    "feat-reason2",
+    tid,
+    seq,
+    ModelId.CLAUDE_OPUS_4_6,
+    t("home.hero.demos.featureShipped.reasoning2"),
+  );
+
+  const characterTool = toolMsg(
+    "feat-char",
+    tid,
+    seq,
+    ModelId.CLAUDE_OPUS_4_6,
+    "toolu_char",
+    "character-create",
+    {
+      name: "HN Digest",
+      description:
+        "Fetches top HackerNews stories, filters by your interests, emails you the best 3 with a short take on each.",
+      systemPrompt:
+        "You are a HackerNews curator for Max. Fetch stories via hackernews-top, filter for TypeScript, self-hosting, and AI topics, then email max@unbottled.ai the top 3 with a single compelling sentence about each. Be opinionated.",
+      allowedTools: [
+        { toolId: "hackernews-top", requiresConfirmation: false },
+        { toolId: "fetch-url-content", requiresConfirmation: false },
+        { toolId: "emails_send_POST", requiresConfirmation: false },
+      ],
+      isPublic: false,
+      category: "CUSTOM",
+    },
+    { id: "hn-digest" },
+    290,
+  );
+
+  const reasoning3 = assistantMsg(
+    "feat-reason3",
+    tid,
+    seq,
+    ModelId.CLAUDE_OPUS_4_6,
+    t("home.hero.demos.featureShipped.reasoning3"),
+  );
+
+  const cronTool = toolMsg(
+    "feat-cron",
+    tid,
+    seq,
+    ModelId.CLAUDE_OPUS_4_6,
+    "toolu_cron",
+    "cron-create",
+    {
+      routeId: "ai-run",
+      displayName: "HackerNews Morning Digest",
+      schedule: "0 8 * * *",
+      category: "SYSTEM",
+      enabled: true,
+      taskInput: {
+        character: "hn-digest",
+        prompt:
+          "Filter these stories for my interests — email me the best 3 with a one-line take on each.",
+        preCalls: [{ routeId: "hackernews-top", args: { limit: 20 } }],
+        maxTurns: 3,
+        rootFolderId: "cron",
+      },
+    },
+    {
+      task: {
+        id: "hn-digest-cron",
+        routeId: "ai-run",
+        displayName: "HackerNews Morning Digest",
+        schedule: "0 8 * * *",
+        enabled: true,
+        nextExecutionAt: "2026-03-05T08:00:00.000Z",
+        executionCount: 0,
+      },
+    },
+    320,
+  );
+
+  const reasoning4 = assistantMsg(
+    "feat-reason4",
+    tid,
+    seq,
+    ModelId.CLAUDE_OPUS_4_6,
+    t("home.hero.demos.featureShipped.reasoning4"),
+  );
+
+  const runTool = toolMsg(
+    "feat-run",
+    tid,
+    seq,
+    ModelId.CLAUDE_OPUS_4_6,
+    "toolu_run",
     "ai-run",
     {
-      model: "claude-haiku-4-5-20251001",
-      prompt: "Test invoice PDF generation with sample data",
-      instructions: "Run the endpoint and verify the output.",
-      maxTurns: 1,
+      character: "hn-digest",
+      prompt:
+        "Filter these stories for my interests — email me the best 3 with a one-line take on each.",
+      preCalls: [{ routeId: "hackernews-top", args: { limit: 20 } }],
+      maxTurns: 3,
       rootFolderId: "cron",
     },
     {
-      text: t("home.hero.demos.featureShipped.testResult"),
-      threadId: "550e8400-e29b-41d4-a716-446655440010",
-      lastAiMessageId: "660e8400-e29b-41d4-a716-446655440011",
-      threadTitle: "Invoice Test",
-      threadCreatedAt: "2026-02-27T14:00:00.000Z",
-      promptTokens: 520,
-      completionTokens: 64,
-      preCallResults: [],
+      text: t("home.hero.demos.featureShipped.messageResult"),
+      threadId: "550e8400-e29b-41d4-a716-446655440020",
+      lastAiMessageId: "660e8400-e29b-41d4-a716-446655440021",
+      threadTitle: "HackerNews Digest",
+      threadCreatedAt: "2026-03-04T09:00:00.000Z",
+      promptTokens: 1840,
+      completionTokens: 210,
+      preCallResults: [
+        { routeId: "hackernews-top", success: true, error: null },
+      ],
     },
-    8000,
-  );
-
-  const deployTool = toolMsg(
-    "feat-deploy",
-    tid,
-    seq,
-    ModelId.CLAUDE_OPUS_4_6,
-    "toolu_deploy",
-    "rebuild",
-    {
-      generate: true,
-      nextBuild: true,
-      migrate: true,
-      seed: true,
-      restart: true,
-      force: false,
-    },
-    {
-      success: true,
-      output: t("home.hero.demos.featureShipped.deployResult"),
-      duration: 45000,
-      restarted: true,
-    },
-    12000,
+    4200,
   );
 
   const response = assistantMsg(
@@ -523,57 +590,7 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
     seq,
     ModelId.CLAUDE_OPUS_4_6,
     t("home.hero.demos.featureShipped.agentResponse"),
-    { promptTokens: 8400, completionTokens: 320 },
-  );
-
-  const msgTool = toolMsg(
-    "feat-msg",
-    tid,
-    seq,
-    ModelId.CLAUDE_OPUS_4_6,
-    "toolu_msg",
-    "emails_send_POST",
-    {
-      recipient: {
-        to: "max@unbottled.ai",
-        toName: "Max",
-      },
-      emailContent: {
-        subject: "Invoice PDF export is live",
-        html: "<p>The invoice PDF export feature has been deployed successfully.</p>",
-        text: "The invoice PDF export feature has been deployed successfully.",
-      },
-      senderSettings: {
-        senderName: "Thea",
-      },
-      campaignTracking: {},
-      smsNotifications: {
-        sendSmsNotification: false,
-      },
-    },
-    {
-      response: {
-        deliveryStatus: {
-          success: true,
-          messageId: "msg_feat_notify_001",
-          sentAt: "2026-02-27T14:05:00.000Z",
-          response: "250 OK: Message accepted",
-        },
-        accountInfo: {
-          accountId: "acc_primary",
-          accountName: "Primary SMTP",
-        },
-        deliveryResults: {
-          accepted: ["max@unbottled.ai"],
-          rejected: [],
-        },
-        smsResult: {
-          success: false,
-          error: "SMS notifications disabled",
-        },
-      },
-    },
-    1200,
+    { promptTokens: 6400, completionTokens: 180 },
   );
 
   return {
@@ -582,7 +599,18 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
     userMessage,
     assistantGroup: {
       primary: reasoning,
-      continuations: [codeTool, testTool, deployTool, response, msgTool],
+      continuations: [
+        codeTool,
+        rebuildTool,
+        helpTool,
+        reasoning2,
+        characterTool,
+        reasoning3,
+        cronTool,
+        reasoning4,
+        runTool,
+        response,
+      ],
       sequenceId: seq,
     },
   };
@@ -613,55 +641,46 @@ function buildWeeklyReportDemo(t: ScopedT): DemoData {
     t("home.hero.demos.weeklyReport.reasoning"),
   );
 
-  const queryTool = toolMsg(
-    "rpt-query",
+  const fixTool = toolMsg(
+    "rpt-fix",
     tid,
     seq,
     ModelId.CLAUDE_OPUS_4_6,
-    "toolu_query",
-    "sql",
+    "toolu_fix",
+    "claude-code",
     {
-      query: "SELECT signups, revenue, churn FROM weekly_stats WHERE week = 9",
-      dryRun: false,
-      verbose: false,
-      limit: 100,
+      prompt:
+        "email-sync has failed 3 times with IMAP connection timeouts (from my task queue). Investigate src/app/api/[locale]/emails/imap-client/ and fix the root cause.",
+      interactiveMode: false,
     },
     {
-      success: true,
-      output:
-        "Query executed successfully\nReturned 1 row(s)\n\nColumns: signups, revenue, churn",
-      results: [{ signups: "94", revenue: "2340", churn: "3" }],
-      rowCount: 1,
-      queryType: "SELECT",
+      output: t("home.hero.demos.weeklyReport.codeResult"),
+      exitCode: 0,
+      durationMs: 24000,
     },
-    340,
+    24000,
   );
 
-  const analysisTool = toolMsg(
-    "rpt-analysis",
+  const reasoning2 = assistantMsg(
+    "rpt-reason2",
     tid,
     seq,
     ModelId.CLAUDE_OPUS_4_6,
-    "toolu_analysis",
-    "ai-run",
+    t("home.hero.demos.weeklyReport.reasoning2"),
+  );
+
+  const rebuildTool = toolMsg(
+    "rpt-rebuild",
+    tid,
+    seq,
+    ModelId.CLAUDE_OPUS_4_6,
+    "toolu_rebuild",
+    "rebuild",
+    {},
     {
-      model: "claude-haiku-4-5-20251001",
-      prompt: "Compare week 9 vs weeks 6-8, identify trends",
-      instructions: "Use bullet points. Max 5 items.",
-      maxTurns: 1,
-      rootFolderId: "cron",
+      success: "Rebuild completed successfully. Server restarted.",
     },
-    {
-      text: t("home.hero.demos.weeklyReport.analysisResult"),
-      threadId: "550e8400-e29b-41d4-a716-446655440020",
-      lastAiMessageId: "660e8400-e29b-41d4-a716-446655440021",
-      threadTitle: "Weekly Analysis",
-      threadCreatedAt: "2026-02-27T08:00:00.000Z",
-      promptTokens: 680,
-      completionTokens: 120,
-      preCallResults: [],
-    },
-    4200,
+    42000,
   );
 
   const response = assistantMsg(
@@ -670,7 +689,7 @@ function buildWeeklyReportDemo(t: ScopedT): DemoData {
     seq,
     ModelId.CLAUDE_OPUS_4_6,
     t("home.hero.demos.weeklyReport.agentResponse"),
-    { promptTokens: 5200, completionTokens: 280 },
+    { promptTokens: 4800, completionTokens: 210 },
   );
 
   const emailTool = toolMsg(
@@ -686,9 +705,9 @@ function buildWeeklyReportDemo(t: ScopedT): DemoData {
         toName: "Max",
       },
       emailContent: {
-        subject: "Week 9 Report",
-        html: "<h1>Weekly Report — Week 9</h1><p>Signups: 94, Revenue: $2,340, Churn: 3</p>",
-        text: "Weekly Report — Week 9: Signups: 94, Revenue: $2,340, Churn: 3",
+        subject: "email-sync fixed",
+        html: "<p>email-sync fixed. Root cause: hardcoded 5s IMAP timeout overriding config. Patched, rebuilt, 47 pending emails now syncing.</p>",
+        text: "email-sync fixed. Root cause: hardcoded 5s IMAP timeout overriding config. Patched, rebuilt, 47 pending emails now syncing.",
       },
       senderSettings: {
         senderName: "Thea",
@@ -702,8 +721,8 @@ function buildWeeklyReportDemo(t: ScopedT): DemoData {
       response: {
         deliveryStatus: {
           success: true,
-          messageId: "msg_weekly_report_009",
-          sentAt: "2026-02-27T08:05:00.000Z",
+          messageId: "msg_email_sync_fix_001",
+          sentAt: "2026-03-01T08:14:00.000Z",
           response: "250 OK: Message accepted",
         },
         accountInfo: {
@@ -729,7 +748,7 @@ function buildWeeklyReportDemo(t: ScopedT): DemoData {
     userMessage,
     assistantGroup: {
       primary: reasoning,
-      continuations: [queryTool, analysisTool, response, emailTool],
+      continuations: [fixTool, reasoning2, rebuildTool, response, emailTool],
       sequenceId: seq,
     },
   };
@@ -908,9 +927,10 @@ const Hero = ({ locale, totalToolCount }: HeroProps): JSX.Element => {
                   collapseState={null}
                   rootFolderId={DefaultFolderId.PUBLIC}
                   user={{
-                    isPublic: true,
+                    id: "00000000-0000-0000-0000-000000000000",
+                    isPublic: false,
                     leadId: "00000000-0000-0000-0000-000000000000",
-                    roles: [UserPermissionRole.PUBLIC],
+                    roles: [UserPermissionRole.ADMIN],
                   }}
                   sendMessage={null}
                   deductCredits={null}

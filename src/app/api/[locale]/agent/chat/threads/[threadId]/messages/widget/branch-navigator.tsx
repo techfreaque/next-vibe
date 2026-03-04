@@ -8,7 +8,8 @@ import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "../i18n";
 
 interface BranchNavigatorProps {
   currentBranchIndex: number;
@@ -27,7 +28,7 @@ export function BranchNavigator({
   locale,
   className,
 }: BranchNavigatorProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   if (totalBranches <= 1) {
     return <></>;
@@ -59,7 +60,7 @@ export function BranchNavigator({
           size="icon"
           onClick={handlePrevious}
           className="h-6 w-6"
-          title={t("app.chat.messages.branch.previous")}
+          title={t("widget.messages.branch.previous")}
         >
           <ChevronLeft className="h-3.5 w-3.5" />
         </Button>
@@ -75,7 +76,7 @@ export function BranchNavigator({
           size="icon"
           onClick={handleNext}
           className="h-6 w-6"
-          title={t("app.chat.messages.branch.next")}
+          title={t("widget.messages.branch.next")}
         >
           <ChevronRight className="h-3.5 w-3.5" />
         </Button>

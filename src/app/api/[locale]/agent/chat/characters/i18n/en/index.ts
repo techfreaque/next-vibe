@@ -1210,4 +1210,11 @@ export const translations = {
       button: "Start Chatting",
     },
   },
+  selector: {
+    free: "FREE",
+  },
+  credits: {
+    credit: "{{count}} credit",
+    credits: "{{count}} credits",
+  },
 };

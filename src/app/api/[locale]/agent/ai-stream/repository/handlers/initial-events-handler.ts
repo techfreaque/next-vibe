@@ -89,6 +89,7 @@ export class InitialEventsHandler {
     user: JwtPayloadType;
     dbWriter: MessageDbWriter;
     logger: EndpointLogger;
+    isNewThread?: boolean;
     voiceTranscription?: {
       wasTranscribed: boolean;
       confidence: number | null;
@@ -118,6 +119,7 @@ export class InitialEventsHandler {
       user,
       dbWriter,
       logger,
+      isNewThread,
       voiceTranscription,
       userMessageMetadata,
     } = params;
@@ -159,6 +161,23 @@ export class InitialEventsHandler {
       parentId: effectiveParentMessageId,
     });
 
+    // For new threads in non-voice mode, emit title update immediately so sidebar
+    // updates without waiting for a full refetch.
+    if (
+      isNewThread &&
+      !isVoiceMode &&
+      effectiveContent &&
+      operation === "send"
+    ) {
+      dbWriter.emitThreadTitleUpdated({
+        threadId,
+        title: effectiveContent.slice(0, 50),
+      });
+      logger.debug("[InitialEvents] Emitted THREAD_TITLE_UPDATED", {
+        threadId,
+      });
+    }
+
     // If voice was already transcribed before stream started (rare),
     // emit VOICE_TRANSCRIBED immediately so client fills in the content.
     if (voiceTranscription?.wasTranscribed) {
@@ -169,6 +188,8 @@ export class InitialEventsHandler {
         durationSeconds: voiceTranscription.durationSeconds,
         creditCost: voiceTranscription.creditCost,
         user,
+        threadId,
+        isNewThread,
       });
       logger.debug("[InitialEvents] Emitted VOICE_TRANSCRIBED", {
         messageId: userMessageId,

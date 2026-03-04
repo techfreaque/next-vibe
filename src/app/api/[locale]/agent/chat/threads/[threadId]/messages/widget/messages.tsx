@@ -7,7 +7,14 @@ import type { DivRefObject } from "next-vibe-ui/ui/div";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import { Logo } from "@/app/[locale]/_components/logo";
@@ -27,12 +34,7 @@ import characterDefinitions from "@/app/api/[locale]/agent/chat/characters/[id]/
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatStore } from "@/app/api/[locale]/agent/chat/hooks/store";
-import { useBranchManagement } from "@/app/api/[locale]/agent/chat/hooks/use-branch-management";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import {
-  useFullLoadFallback,
-  useLazyBranchLoader,
-} from "@/app/api/[locale]/agent/chat/hooks/use-lazy-branch-loader";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
@@ -47,7 +49,12 @@ import { platform } from "@/config/env-client";
 import { NEW_MESSAGE_ID, ViewMode } from "../../../../enum";
 import { loadMessageAttachments } from "../hooks/load-message-attachments";
 import { useStreamingMessagesStore } from "../hooks/streaming-messages-store";
+import { useBranchManagement } from "../hooks/use-branch-management";
 import { useCollapseState } from "../hooks/use-collapse-state";
+import {
+  useFullLoadFallback,
+  useLazyBranchLoader,
+} from "../hooks/use-lazy-branch-loader";
 import { useMessageDeleteActions } from "../hooks/use-message-delete-actions";
 import { useMessageEditorStore } from "../hooks/use-message-editor-store";
 import { useMessagesSubscription } from "../hooks/use-messages-subscription";
@@ -142,7 +149,6 @@ export function ChatMessages({
   const threads = useChatStore((s) => s.threads);
   const allMessages = useChatStore((s) => s.messages);
   const isLoading = useChatStore((s) => s.isLoading);
-  const isDataLoaded = useChatStore((s) => s.isDataLoaded);
   const threadLoadMode = useChatStore((s) => s.threadLoadMode);
   const setThreadLoadMode = useChatStore((s) => s.setThreadLoadMode);
   const addMessage = useChatStore((s) => s.addMessage);
@@ -203,7 +209,7 @@ export function ChatMessages({
         characterDefinitions.GET,
         logger,
         (old) => old ?? success(initialCharacterData),
-        { id: selectedCharacter },
+        { urlPathParams: { id: selectedCharacter } },
       );
     }
   }, [initialCharacterData, selectedCharacter, logger]);
@@ -284,10 +290,10 @@ export function ChatMessages({
     branchIndices,
     addMessage,
     setThreadLoadMode,
-    isDataLoaded,
     user,
     // Only use SSR path data for the thread we had at boot time
     activeThreadId === bootInitialThreadId ? initialPathData : null,
+    currentRootFolderId,
   );
 
   // Full load fallback for non-linear views
@@ -313,13 +319,29 @@ export function ChatMessages({
     deleteMessage: messageOps.deleteMessage,
   });
 
+  // Streaming state from navigation store
+  const startStream = useChatNavigationStore((s) => s.startStream);
+  const stopStream = useChatNavigationStore((s) => s.stopStream);
+
   // Always-on WS subscription for all stream events on this thread
-  useMessagesSubscription(activeThreadId, logger, {
-    onCreditsDeducted: (data) => {
-      deductCredits(data.amount, data.feature);
+  useMessagesSubscription(
+    activeThreadId,
+    currentRootFolderId,
+    currentSubFolderId,
+    logger,
+    {
+      onCreditsDeducted: (data) => {
+        deductCredits(data.amount, data.feature);
+      },
+      invalidateThread,
+      onStreamStarted: activeThreadId
+        ? (): void => startStream(activeThreadId, logger)
+        : undefined,
+      onStreamFinished: activeThreadId
+        ? (): void => stopStream(activeThreadId, logger)
+        : undefined,
     },
-    invalidateThread,
-  });
+  );
 
   // Editor state from Zustand store (decoupled from context)
   const editingMessageId = useMessageEditorStore((s) => s.editingMessageId);
@@ -379,7 +401,6 @@ export function ChatMessages({
   const collapseState = useCollapseState();
   const messagesContainerRef = useRef<DivRefObject>(null);
   const messagesEndRef = useRef<DivRefObject>(null);
-  const historyTopSentinelRef = useRef<DivRefObject>(null);
   const [userScrolledUp, setUserScrolledUp] = useState(false);
   // Render window: number of compaction segments expanded backwards from the end.
   // 0 = show only from last compaction forward; 1 = include previous segment; etc.
@@ -623,10 +644,9 @@ export function ChatMessages({
   }, [isAtBottom]);
 
   // Track which threads have had their initial scroll-to-bottom performed.
-  // Using a Set so switching back to an already-scrolled thread doesn't re-scroll.
   const initialScrollDoneRef = useRef<Set<string>>(new Set());
 
-  // Reset render window when thread changes (but NOT scroll tracking)
+  // Reset render window when thread changes
   useEffect(() => {
     const currentThreadId = activeThread?.id ?? null;
     if (renderWindowThreadRef.current !== currentThreadId) {
@@ -635,61 +655,33 @@ export function ChatMessages({
     }
   }, [activeThread?.id]);
 
-  // Scroll to bottom on mount, thread change, and when messages first arrive
-  useEffect(() => {
+  const hasAnyMessages = activeThreadMessages.length > 0;
+
+  // Scroll to bottom on first render that has messages for this thread.
+  // useLayoutEffect fires synchronously after DOM commit, before paint —
+  // so scrollHeight already reflects the fully-rendered message list.
+  useLayoutEffect(() => {
     const currentThreadId = activeThread?.id ?? null;
 
-    // Skip if we've already scrolled for this thread
     if (currentThreadId && initialScrollDoneRef.current.has(currentThreadId)) {
       return;
     }
-
-    // Don't auto-scroll for public folder
     if (currentRootFolderId === "public") {
       return;
     }
-
-    // Wait for messages to be available before scrolling
-    if (activeThreadMessages.length === 0) {
+    if (!hasAnyMessages) {
       return;
     }
 
-    // Mark scroll as done for this thread
     if (currentThreadId) {
       initialScrollDoneRef.current.add(currentThreadId);
     }
 
-    // For long threads, the DOM may not be fully laid out when messages first load.
-    // Use instant scroll (no animation) to jump to bottom immediately, then retry
-    // after a delay to catch any late-rendering content (images, code blocks, etc.)
-    const scrollToEnd = (): void => {
-      const container = messagesContainerRef.current;
-      if (container) {
-        container.scrollTop = container.scrollHeight;
-      }
-      messagesEndRef.current?.scrollIntoView({
-        behavior: "auto",
-      });
-    };
-
-    // Immediate scroll (catches most cases)
-    scrollToEnd();
-
-    // Retry after a frame to catch async-rendered content
-    const raf = requestAnimationFrame(() => {
-      scrollToEnd();
-    });
-
-    // Final retry after a short delay for lazy-loaded content (images, etc.)
-    const timeout = setTimeout(() => {
-      scrollToEnd();
-    }, 300);
-
-    return (): void => {
-      cancelAnimationFrame(raf);
-      clearTimeout(timeout);
-    };
-  }, [activeThread?.id, activeThreadMessages, currentRootFolderId]);
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }, [activeThread?.id, hasAnyMessages, currentRootFolderId]);
 
   // Smart auto-scroll: only during streaming, only if user was at bottom, respect user scroll
   useEffect(() => {
@@ -775,60 +767,18 @@ export function ChatMessages({
     };
   }, [activeThreadMessages, isLoading, userScrolledUp]);
 
-  // Scroll-up sentinel: IntersectionObserver to trigger loading older history
+  // After older history inserts above (via button click): restore scroll position so the view doesn't jump.
+  // Runs after every render; the prevScrollHeightRef guard makes it a no-op normally.
   const prevScrollHeightRef = useRef<number>(0);
-  useEffect(() => {
-    if (!hasOlderHistory) {
-      return;
-    }
-
-    const sentinel = historyTopSentinelRef.current;
-    const container = messagesContainerRef.current;
-    if (!sentinel || !container) {
-      return;
-    }
-
-    // DivRefObject is backed by HTMLDivElement at runtime (see Div forwardRef).
-    // IntersectionObserver requires Element, so we use an intersection type.
-    const containerElement = container as DivRefObject & Element;
-    const sentinelElement = sentinel as DivRefObject & Element;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        if (entry.isIntersecting && hasOlderHistory && !isLoadingOlderHistory) {
-          // Capture scroll height before loading to preserve position after
-          prevScrollHeightRef.current = container.scrollHeight;
-          loadOlderHistory();
-        }
-      },
-      {
-        root: containerElement,
-        rootMargin: "200px 0px 0px 0px", // Trigger 200px before actually reaching top
-        threshold: 0,
-      },
-    );
-
-    observer.observe(sentinelElement);
-    return (): void => {
-      observer.disconnect();
-    };
-  }, [hasOlderHistory, isLoadingOlderHistory, loadOlderHistory]);
-
-  // Preserve scroll position after older history is inserted above
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (prevScrollHeightRef.current === 0) {
       return;
     }
-
     const container = messagesContainerRef.current;
     if (!container) {
       return;
     }
-
-    // After new messages render above, adjust scroll to maintain visual position
-    const newScrollHeight = container.scrollHeight;
-    const heightDiff = newScrollHeight - prevScrollHeightRef.current;
+    const heightDiff = container.scrollHeight - prevScrollHeightRef.current;
     if (heightDiff > 0) {
       container.scrollTop += heightDiff;
     }
@@ -884,12 +834,9 @@ export function ChatMessages({
             showBranding ? "pt-35 md:pt-15" : "pt-15",
           )}
         >
-          {/* Scroll-up sentinel for loading older history */}
+          {/* Button to load older history (manual, no auto-fetch) */}
           {(hasOlderHistory || isLoadingOlderHistory) && (
-            <Div
-              ref={historyTopSentinelRef}
-              className="flex justify-center py-2"
-            >
+            <Div className="flex justify-center py-2">
               {isLoadingOlderHistory ? (
                 <Div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
@@ -898,9 +845,20 @@ export function ChatMessages({
                   </Span>
                 </Div>
               ) : (
-                <Span className="text-xs text-muted-foreground">
-                  {ts("scrollUpForOlderMessages")}
-                </Span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                  onClick={(): void => {
+                    const container = messagesContainerRef.current;
+                    if (container) {
+                      prevScrollHeightRef.current = container.scrollHeight;
+                    }
+                    loadOlderHistory();
+                  }}
+                >
+                  {ts("showOlderMessages")}
+                </Button>
               )}
             </Div>
           )}

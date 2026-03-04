@@ -600,6 +600,7 @@ export class ThreadsRepository {
             canModerate: canModerateFlag,
             canDelete: canDeleteFlag,
             canManagePermissions: canManagePermsFlag,
+            isStreaming: thread.isStreaming,
             createdAt: thread.createdAt,
             updatedAt: thread.updatedAt,
           };
@@ -695,6 +696,7 @@ export class ThreadsRepository {
           parentId: null, // This is the key - null means root level
           expanded: true,
           sortOrder: 0,
+          pinned: false,
           rolesView: [],
           rolesManage: [],
           rolesCreateThread: [],

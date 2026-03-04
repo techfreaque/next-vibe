@@ -7,14 +7,15 @@ import type { JSX } from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import ResetPasswordConfirmForm from "@/app/api/[locale]/user/public/reset-password/confirm/_components/reset-password-confirm-form";
 import { scopedTranslation as resetPasswordScopedTranslation } from "@/app/api/[locale]/user/public/reset-password/i18n";
 import { PasswordRepository } from "@/app/api/[locale]/user/public/reset-password/repository";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation as pageT } from "../i18n";
+import ResetPasswordConfirmForm from "./_components/reset-password-confirm-form";
 
 /**
  * Generate metadata for the Reset Password Confirm page with translations
@@ -67,7 +68,7 @@ export default async function ResetPasswordConfirmPage({
   params,
 }: Props): Promise<JSX.Element> {
   const { locale, token } = await params;
-  const { t } = simpleT(locale);
+  const { t } = pageT.scopedT(locale);
   const { t: resetPasswordT } = resetPasswordScopedTranslation.scopedT(locale);
 
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -102,11 +103,9 @@ export default async function ResetPasswordConfirmPage({
   const errorFallback = (
     <Alert variant="destructive" className="mb-8">
       <AlertCircle className="h-4 w-4" />
-      <AlertTitle>{t("app.user.common.error.title")}</AlertTitle>
+      <AlertTitle>{t("errors.title")}</AlertTitle>
       <AlertDescription>
-        {t(
-          "app.user.other.resetPassword.auth.resetPassword.errors.loadingError",
-        )}
+        {t("auth.resetPassword.errors.loadingError")}
       </AlertDescription>
     </Alert>
   );

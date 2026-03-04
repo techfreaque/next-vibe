@@ -78,6 +78,11 @@ export const translations: typeof enTranslations = {
       platforms: {
         title: "Dostępne platformy",
       },
+      instanceId: {
+        label: "ID instancji",
+        description:
+          "Filtruj do narzędzi z określonej zdalnej instancji. Zwraca narzędzia z przechowywanego snapshotu możliwości.",
+      },
     },
     success: {
       title: "Narzędzia pobrane pomyślnie",

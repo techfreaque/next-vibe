@@ -28,6 +28,7 @@ import { Span } from "next-vibe-ui/ui/span";
 import { useState } from "react";
 import { useMemo } from "react";
 
+import { useTourState } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-state-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
@@ -44,11 +45,10 @@ import { useTouchDevice } from "@/hooks/use-touch-device";
 
 import { cn } from "../../../shared/utils";
 import { Icon } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { useSelectorOnboardingContext } from "../../ai-stream/stream/widget/selector/selector-onboarding/context";
 import { DEFAULT_TTS_VOICE } from "../../text-to-speech/enum";
 import { useAddToFavorites } from "../favorites/create/hooks";
 import { useChatFavorites } from "../favorites/hooks/hooks";
-import { useSelectorOnboardingContext } from "../threads/widget/chat-input/selector/selector-onboarding/context";
-import { useTourState } from "../widget/welcome-tour/tour-state-context";
 import characterDetailDefinitions from "./[id]/definition";
 import { COMPANION_CHARACTERS } from "./config";
 import type { CharacterListItem } from "./definition";
@@ -1060,7 +1060,7 @@ function CharacterFavoriteActions({
     const cachedData = apiClient.getEndpointData(
       characterSingleDefinitions.default.GET,
       logger,
-      { id: char.id },
+      { urlPathParams: { id: char.id } },
     );
     let fullChar = cachedData?.success ? cachedData.data : undefined;
 

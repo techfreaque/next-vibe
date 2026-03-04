@@ -4,6 +4,11 @@ import { translations as tokenTranslations } from "../../[token]/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  backToHome: "Zurück zur Startseite",
+  errors: {
+    unknown: "Ein unbekannter Fehler ist aufgetreten",
+    title: "Fehler",
+  },
   request: requestTranslations,
   token: tokenTranslations,
   meta: {

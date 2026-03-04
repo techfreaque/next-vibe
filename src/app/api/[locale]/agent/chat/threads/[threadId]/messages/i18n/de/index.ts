@@ -1,10 +1,10 @@
-import { translations as messageIdTranslations } from "../../[messageId]/i18n/de";
-import pathTranslations from "../../path/i18n/de";
-import { translations as searchTranslations } from "../../search/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  ...searchTranslations,
+  category: "Chat",
+  tags: {
+    messages: "Nachrichten",
+  },
   loadingOlderMessages: "Ältere Nachrichten werden geladen...",
   scrollUpForOlderMessages: "Nach oben scrollen für ältere Nachrichten",
   showOlderMessages: "Ältere Nachrichten anzeigen",
@@ -25,6 +25,10 @@ export const translations: typeof enTranslations = {
     threadId: {
       label: "Thread ID",
       description: "ID of the thread to retrieve messages from",
+    },
+    rootFolderId: {
+      label: "Stammordner",
+      description: "Stammordner des Threads (für Client-Routing verwendet)",
     },
     response: {
       title: "Messages Response",
@@ -142,6 +146,10 @@ export const translations: typeof enTranslations = {
     threadId: {
       label: "Thread ID",
       description: "ID of the thread to add message to",
+    },
+    rootFolderId: {
+      label: "Stammordner",
+      description: "Stammordner des Threads (für Client-Routing verwendet)",
     },
     id: {
       label: "Nachrichten-ID",
@@ -261,7 +269,187 @@ export const translations: typeof enTranslations = {
   debugView: {
     systemPromptTitle: "System-Prompt",
     copied: "Kopiert!",
+    systemMessageHint: "Systemnachricht (für Benutzer verborgen)",
   },
-  messageId: messageIdTranslations,
-  path: pathTranslations,
+  widget: {
+    common: {
+      send: "Senden",
+      sending: "Wird gesendet...",
+      cancel: "Abbrechen",
+      close: "Schließen",
+      copyButton: {
+        copied: "Kopiert!",
+        copyToClipboard: "In die Zwischenablage kopieren",
+        copyAsMarkdown: "Als Markdown kopieren",
+        copyAsText: "Als Klartext kopieren",
+      },
+      viewModeToggle: {
+        linearView: "Lineare Ansicht",
+        threadedView: "Thread-Ansicht",
+        flatView: "Flache Ansicht",
+        debugView: "Debug-Ansicht",
+      },
+      userMessageActions: {
+        branch: "Verzweigung",
+        retry: "Wiederholen",
+        deleteMessage: "Nachricht löschen",
+      },
+      assistantMessageActions: {
+        answerAsAI: "Als KI antworten",
+        cancelLoading: "Laden abbrechen",
+        stopAudio: "Audio stoppen",
+        playAudio: "Audio abspielen ({{cost}} Credits)",
+        actualCostUsed: "Tatsächlich verbrauchte Kosten",
+        credits: "Credits",
+        tokens: "Tokens",
+        tokensUsed: "Verwendete Tokens",
+        deleteMessage: "Nachricht löschen",
+      },
+    },
+    messages: {
+      assistant: "Assistent",
+      anonymous: "Anonym",
+      you: "Sie",
+      edited: "bearbeitet",
+      branch: {
+        previous: "Vorherige Verzweigung",
+        next: "Nächste Verzweigung",
+      },
+      authorWithId: "{{author}} ({{id}})",
+    },
+    linearView: {
+      answerModal: {
+        title: "Als KI antworten",
+        description: "Eine KI-Antwort auf diese Nachricht generieren",
+        inputPlaceholder: "Kontext für die KI hinzufügen...",
+        confirmLabel: "Generieren",
+      },
+      retryModal: {
+        title: "Mit anderem Modell wiederholen",
+        description: "Diese Antwort mit einem anderen Modell neu generieren",
+        confirmLabel: "Wiederholen",
+      },
+    },
+    threadedView: {
+      actions: {
+        reply: "Antworten",
+        replyToMessage: "Auf diese Nachricht antworten",
+        edit: "Bearbeiten",
+        editMessage: "Nachricht bearbeiten",
+        retry: "Wiederholen",
+        retryWithDifferent: "Mit anderem Modell wiederholen",
+        answerAsAI: "Als KI antworten",
+        generateAIResponse: "KI-Antwort generieren",
+        respondToAI: "Auf KI antworten",
+        cancelLoading: "Laden abbrechen",
+        stop: "Stoppen",
+        stopAudio: "Audio stoppen",
+        playAudio: "Audio abspielen ({{cost}} Credits)",
+        delete: "Löschen",
+        deleteMessage: "Nachricht löschen",
+        share: "Teilen",
+        copyPermalink: "Permalink kopieren",
+        upvote: "Upvote",
+        downvote: "Downvote",
+        play: "Abspielen",
+        cancel: "Abbrechen",
+        parent: "Zum Elternelement",
+      },
+      answerModal: {
+        title: "Als KI antworten",
+        description: "Eine KI-Antwort auf diese Nachricht generieren",
+        inputPlaceholder: "Kontext für die KI hinzufügen...",
+        confirmLabel: "Generieren",
+      },
+      retryModal: {
+        title: "Mit anderem Modell wiederholen",
+        description: "Diese Antwort mit einem anderen Modell neu generieren",
+        confirmLabel: "Wiederholen",
+      },
+      anonymous: "Anonym",
+      assistantFallback: "Assistent",
+      userFallback: "Benutzer",
+      youLabel: "Sie",
+      authorWithId: "{{name}} ({{id}})",
+      reply: "Antwort",
+      replies: "Antworten",
+      expandReplies: "Antworten ausklappen",
+      collapseReplies: "Antworten einklappen",
+      continueThread: "Thread fortsetzen ({{count}} {{replyText}})",
+    },
+    flatView: {
+      actions: {
+        reply: "Antworten",
+        replyToMessage: "Auf diese Nachricht antworten",
+        edit: "Bearbeiten",
+        editMessage: "Nachricht bearbeiten",
+        retry: "Wiederholen",
+        retryWithDifferent: "Mit anderem Modell wiederholen",
+        answerAsAI: "Als KI antworten",
+        generateAIResponse: "KI-Antwort generieren",
+        delete: "Löschen",
+        deleteMessage: "Nachricht löschen",
+        copyReference: "Referenz kopieren",
+      },
+      answerModal: {
+        title: "Als KI antworten",
+        description: "Eine KI-Antwort auf diese Nachricht generieren",
+        inputPlaceholder: "Kontext für die KI hinzufügen...",
+        confirmLabel: "Generieren",
+      },
+      retryModal: {
+        title: "Mit anderem Modell wiederholen",
+        description: "Diese Antwort mit einem anderen Modell neu generieren",
+        confirmLabel: "Wiederholen",
+      },
+      anonymous: "Anonym",
+      assistantFallback: "Assistent",
+      youLabel: "Sie",
+      replyingTo: "Antwortet auf",
+      replies: "Antworten:",
+      clickToCopyRef: "Zum Kopieren klicken",
+      postsById: "{{count}} Beiträge dieser ID",
+      idLabel: "ID: {{id}}",
+    },
+    debugView: {
+      systemMessageHint: "Systemnachricht (für Benutzer verborgen)",
+    },
+    userProfile: {
+      recentPosts: "Neueste Beiträge",
+      noPostsYet: "Noch keine Beiträge",
+      postCount: "{{count}} Beiträge",
+    },
+    screenshot: {
+      capture: "Screenshot aufnehmen",
+      capturing: "Wird aufgenommen...",
+    },
+    shareDialog: {
+      title: "Thread teilen",
+    },
+    messageEditor: {
+      titles: {
+        branch: "Bearbeiten & verzweigen",
+        cancel: "Abbrechen",
+      },
+      hint: {
+        branch: "Bearbeiten erstellt eine neue Verzweigung",
+      },
+    },
+    input: {
+      keyboardShortcuts: {
+        press: "Drücken Sie",
+        enter: "Enter",
+        shiftEnter: "Shift+Enter",
+        forNewLine: "für neue Zeile",
+      },
+    },
+    voiceMode: {
+      callMode: "Anrufmodus",
+      callModeDescription: "KI antwortet mit Sprache",
+      tapToRecord: "Zum Aufnehmen tippen",
+    },
+    batchToolConfirmation: {
+      title: "Batch-Tool-Aufrufe bestätigen",
+    },
+  },
 };

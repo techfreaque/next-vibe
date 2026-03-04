@@ -26,13 +26,13 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { useCharacter } from "../../../../../characters/[id]/hooks";
 import { loadMessageAttachments } from "../../hooks/load-message-attachments";
 import { useStreamingMessagesStore } from "../../hooks/streaming-messages-store";
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";
 import { useMessageEditorStore } from "../../hooks/use-message-editor-store";
+import { scopedTranslation } from "../../i18n";
 import { useMessageGroupName } from "../embedded-context";
 import { MessageEditor } from "../message-editor";
 import type { groupMessagesBySequence } from "../message-grouping";
@@ -103,7 +103,7 @@ export function ThreadedMessage({
   // Navigation state from Zustand store
   const rootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
 
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showDeepReplies, setShowDeepReplies] = useState(false);
   const [hoveredUserId, setHoveredUserId] = useState<string | null>(null);
@@ -175,7 +175,7 @@ export function ThreadedMessage({
         const errorObj =
           error instanceof Error ? error : new Error(String(error));
         logger.error(
-          "app.chat.messages.actions.handleBranchEdit.error",
+          "widget.messages.actions.handleBranchEdit.error",
           errorObj,
         );
       }
@@ -201,7 +201,7 @@ export function ThreadedMessage({
         const errorObj =
           error instanceof Error ? error : new Error(String(error));
         logger.error(
-          "app.chat.messages.actions.handleConfirmRetry.error",
+          "widget.messages.actions.handleConfirmRetry.error",
           errorObj,
         );
       }
@@ -232,7 +232,7 @@ export function ThreadedMessage({
         const errorObj =
           error instanceof Error ? error : new Error(String(error));
         logger.error(
-          "app.chat.messages.actions.handleConfirmAnswer.error",
+          "widget.messages.actions.handleConfirmAnswer.error",
           errorObj,
         );
       }
@@ -376,8 +376,8 @@ export function ThreadedMessage({
                   )}
                   title={
                     isCollapsed
-                      ? t("app.chat.threadedView.expandReplies")
-                      : t("app.chat.threadedView.collapseReplies")
+                      ? t("widget.threadedView.expandReplies")
+                      : t("widget.threadedView.collapseReplies")
                   }
                 >
                   {isCollapsed ? (
@@ -428,13 +428,13 @@ export function ThreadedMessage({
             ) : isRetrying ? (
               <Div className="flex justify-end">
                 <ModelCharacterSelectorModal
-                  titleKey="app.chat.threadedView.retryModal.title"
-                  descriptionKey="app.chat.threadedView.retryModal.description"
+                  titleKey="widget.threadedView.retryModal.title"
+                  descriptionKey="widget.threadedView.retryModal.description"
                   onConfirm={(): Promise<void> =>
                     handleConfirmRetry(message.id, onRetryMessage)
                   }
                   onCancel={cancelAction}
-                  confirmLabelKey="app.chat.threadedView.retryModal.confirmLabel"
+                  confirmLabelKey="widget.threadedView.retryModal.confirmLabel"
                   locale={locale}
                   logger={logger}
                   user={user}
@@ -486,17 +486,17 @@ export function ThreadedMessage({
           {isAnswering && (
             <Div className="mt-3">
               <ModelCharacterSelectorModal
-                titleKey="app.chat.threadedView.answerModal.title"
-                descriptionKey="app.chat.threadedView.answerModal.description"
+                titleKey="widget.threadedView.answerModal.title"
+                descriptionKey="widget.threadedView.answerModal.description"
                 showInput={true}
                 inputValue={answerContent}
                 onInputChange={setAnswerContent}
-                inputPlaceholderKey="app.chat.threadedView.answerModal.inputPlaceholder"
+                inputPlaceholderKey="widget.threadedView.answerModal.inputPlaceholder"
                 onConfirm={(): Promise<void> =>
                   handleConfirmAnswer(message.id, onAnswerAsModel)
                 }
                 onCancel={cancelAction}
-                confirmLabelKey="app.chat.threadedView.answerModal.confirmLabel"
+                confirmLabelKey="widget.threadedView.answerModal.confirmLabel"
                 locale={locale}
                 logger={logger}
                 user={user}
@@ -550,12 +550,12 @@ export function ThreadedMessage({
                 className="mt-3 text-sm text-blue-500 hover:text-blue-600 cursor-pointer hover:underline transition-all flex items-center gap-1"
               >
                 <CornerDownRight className="h-3.5 w-3.5" />
-                {t("app.chat.threadedView.continueThread", {
+                {t("widget.threadedView.continueThread", {
                   count: replies.length,
                   replyText:
                     replies.length === 1
-                      ? t("app.chat.threadedView.reply")
-                      : t("app.chat.threadedView.replies"),
+                      ? t("widget.threadedView.reply")
+                      : t("widget.threadedView.replies"),
                 })}
               </Button>
             )}
@@ -571,8 +571,8 @@ export function ThreadedMessage({
               ? (message.authorName ??
                 (message.authorId
                   ? message.authorId.slice(0, 8)
-                  : t("app.chat.threadedView.userFallback")))
-              : t("app.chat.threadedView.youLabel")
+                  : t("widget.threadedView.userFallback")))
+              : t("widget.threadedView.youLabel")
           }
           messages={allMessages}
           position={userCardPosition}

@@ -18,9 +18,9 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { useStreamingMessagesStore } from "../hooks/streaming-messages-store";
+import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";
 import { useMessageGroupName } from "./embedded-context";
 import { MessageActionButton } from "./message-action-button";
@@ -63,7 +63,7 @@ export function AssistantMessageActions({
   user,
   deductCredits,
 }: AssistantMessageActionsProps): React.JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const isTouch = useTouchDevice();
   const { groupHover } = useMessageGroupName();
 
@@ -144,13 +144,13 @@ export function AssistantMessageActions({
         title={
           isLoading
             ? totalChunks > 1
-              ? `${t("app.chat.common.assistantMessageActions.cancelLoading")} (${currentChunk}/${totalChunks})`
-              : t("app.chat.common.assistantMessageActions.cancelLoading")
+              ? `${t("widget.common.assistantMessageActions.cancelLoading")} (${currentChunk}/${totalChunks})`
+              : t("widget.common.assistantMessageActions.cancelLoading")
             : isPlaying
               ? totalChunks > 1
-                ? `${t("app.chat.common.assistantMessageActions.stopAudio")} (${currentChunk}/${totalChunks})`
-                : t("app.chat.common.assistantMessageActions.stopAudio")
-              : t("app.chat.common.assistantMessageActions.playAudio", {
+                ? `${t("widget.common.assistantMessageActions.stopAudio")} (${currentChunk}/${totalChunks})`
+                : t("widget.common.assistantMessageActions.stopAudio")
+              : t("widget.common.assistantMessageActions.playAudio", {
                   cost: ttsCreditCost.toFixed(2),
                 })
         }
@@ -165,7 +165,7 @@ export function AssistantMessageActions({
         <MessageActionButton
           icon={Bot}
           onClick={() => onAnswerAsModel(messageId)}
-          title={t("app.chat.common.assistantMessageActions.answerAsAI")}
+          title={t("widget.common.assistantMessageActions.answerAsAI")}
           disabled={readOnly}
         />
       )}
@@ -174,7 +174,7 @@ export function AssistantMessageActions({
         <MessageActionButton
           icon={Trash2}
           onClick={() => onDelete(messageId)}
-          title={t("app.chat.common.assistantMessageActions.deleteMessage")}
+          title={t("widget.common.assistantMessageActions.deleteMessage")}
           variant="destructive"
           disabled={readOnly}
         />
@@ -187,22 +187,20 @@ export function AssistantMessageActions({
         <Div className="text-xs text-muted-foreground ml-auto flex items-center gap-1.5">
           {creditCost !== null && creditCost !== undefined && (
             <Span
-              title={t(
-                "app.chat.common.assistantMessageActions.actualCostUsed",
-              )}
+              title={t("widget.common.assistantMessageActions.actualCostUsed")}
             >
               {creditCost.toFixed(2)}{" "}
-              {t("app.chat.common.assistantMessageActions.credits")}
+              {t("widget.common.assistantMessageActions.credits")}
             </Span>
           )}
           {(promptTokens !== null || completionTokens !== null) && (
             <Span
-              title={t("app.chat.common.assistantMessageActions.tokensUsed")}
+              title={t("widget.common.assistantMessageActions.tokensUsed")}
               className="text-muted-foreground/70"
             >
               •{" "}
               {((promptTokens ?? 0) + (completionTokens ?? 0)).toLocaleString()}{" "}
-              {t("app.chat.common.assistantMessageActions.tokens")}
+              {t("widget.common.assistantMessageActions.tokens")}
             </Span>
           )}
         </Div>

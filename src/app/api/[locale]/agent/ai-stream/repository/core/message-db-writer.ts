@@ -571,7 +571,19 @@ export class MessageDbWriter {
   }
 
   /**
+   * Emit THREAD_TITLE_UPDATED SSE so the sidebar immediately shows the new title.
+   */
+  emitThreadTitleUpdated(params: { threadId: string; title: string }): void {
+    const event = createStreamEvent.threadTitleUpdated({
+      threadId: params.threadId,
+      title: params.title,
+    });
+    this.enqueue(event);
+  }
+
+  /**
    * Emit VOICE_TRANSCRIBED SSE and optionally CREDITS_DEDUCTED for STT cost.
+   * Also emits THREAD_TITLE_UPDATED when threadId + isNewThread are provided.
    */
   emitVoiceTranscribed(params: {
     messageId: string;
@@ -580,6 +592,8 @@ export class MessageDbWriter {
     durationSeconds: number | null;
     creditCost?: number | null;
     user: JwtPayloadType;
+    threadId?: string;
+    isNewThread?: boolean;
   }): void {
     const voiceEvent = createStreamEvent.voiceTranscribed({
       messageId: params.messageId,
@@ -588,6 +602,14 @@ export class MessageDbWriter {
       durationSeconds: params.durationSeconds,
     });
     this.enqueue(voiceEvent);
+
+    // Update sidebar title when STT sets the content for a new thread
+    if (params.isNewThread && params.threadId && params.text) {
+      this.emitThreadTitleUpdated({
+        threadId: params.threadId,
+        title: params.text.slice(0, 50),
+      });
+    }
 
     // Emit CREDITS_DEDUCTED for STT cost immediately (no DB deduction here - done upstream)
     if (params.creditCost && params.creditCost > 0) {

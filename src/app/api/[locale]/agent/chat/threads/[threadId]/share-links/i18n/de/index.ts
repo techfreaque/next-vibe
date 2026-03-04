@@ -343,4 +343,12 @@ export const translations: typeof enTranslations = {
       description: "Teilen-Link erfolgreich widerrufen",
     },
   },
+  widget: {
+    shareDialog: {
+      title: "Thread teilen",
+    },
+    common: {
+      close: "Schließen",
+    },
+  },
 };

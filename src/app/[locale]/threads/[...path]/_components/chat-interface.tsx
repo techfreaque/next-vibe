@@ -10,15 +10,16 @@ import { AlertDialogHeader } from "next-vibe-ui/ui/alert-dialog";
 import { AlertDialogTitle } from "next-vibe-ui/ui/alert-dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import type { JSX } from "react";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import aiStreamDefinition from "@/app/api/[locale]/agent/ai-stream/stream/definition";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import { scopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
+import publicFeedDefinition from "@/app/api/[locale]/agent/chat/public-feed/definition";
 import { useDeleteDialogStore } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/use-delete-dialog-store";
-import { WelcomeTour } from "@/app/api/[locale]/agent/chat/welcome-tour/welcome-tour";
+import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -27,6 +28,7 @@ import { useTranslation } from "@/i18n/core/client";
 
 import { SidebarWrapper } from "./sidebar/sidebar-wrapper";
 import { TopBar } from "./top-area/top-bar";
+import { WelcomeTour } from "./welcome-tour/welcome-tour";
 
 interface ChatInterfaceProps {
   user: JwtPayloadType;
@@ -36,6 +38,11 @@ export function ChatInterface({ user }: ChatInterfaceProps): JSX.Element {
   const currentRootFolderId = useChatNavigationStore(
     (s) => s.currentRootFolderId,
   );
+  const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
+  const { initialPublicFeedData } = useChatBootContext();
+
+  const isPublicFeed =
+    currentRootFolderId === DefaultFolderId.PUBLIC && !activeThreadId;
 
   // Delete dialog state from Zustand store
   const deleteDialogOpen = useDeleteDialogStore((s) => s.deleteDialogOpen);
@@ -92,15 +99,31 @@ export function ChatInterface({ user }: ChatInterfaceProps): JSX.Element {
 
         {/* Sidebar and Main Chat Area */}
         <ErrorBoundary locale={locale}>
-          <SidebarWrapper locale={locale} logger={logger}>
-            {/* Main Chat Area */}
+          <SidebarWrapper locale={locale} user={user} logger={logger}>
+            {/* Main Content Area — public feed or chat */}
             <ErrorBoundary locale={locale}>
-              <EndpointsPage
-                endpoint={aiStreamDefinition}
-                locale={locale}
-                user={user}
-                className="h-screen h-max-screen flex-1"
-              />
+              {isPublicFeed ? (
+                <EndpointsPage
+                  key="public-feed"
+                  endpoint={publicFeedDefinition}
+                  locale={locale}
+                  user={user}
+                  className="h-screen h-max-screen flex-1"
+                  endpointOptions={{
+                    read: {
+                      initialData: initialPublicFeedData ?? undefined,
+                    },
+                  }}
+                />
+              ) : (
+                <EndpointsPage
+                  key={activeThreadId}
+                  endpoint={aiStreamDefinition}
+                  locale={locale}
+                  user={user}
+                  className="h-screen h-max-screen flex-1"
+                />
+              )}
             </ErrorBoundary>
           </SidebarWrapper>
         </ErrorBoundary>

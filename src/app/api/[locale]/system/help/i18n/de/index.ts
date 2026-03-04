@@ -78,6 +78,11 @@ export const translations: typeof enTranslations = {
       platforms: {
         title: "Verfügbare Plattformen",
       },
+      instanceId: {
+        label: "Instanz-ID",
+        description:
+          "Filter auf Tools einer bestimmten Remote-Instanz. Gibt Tools aus dem gespeicherten Capability-Snapshot zurück.",
+      },
     },
     success: {
       title: "Tools erfolgreich abgerufen",

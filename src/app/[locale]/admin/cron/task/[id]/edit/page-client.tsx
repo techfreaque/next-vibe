@@ -28,6 +28,9 @@ export function CronTaskEditPageClient({
           staleTime: 30 * 1000,
         },
       },
+      delete: {
+        urlPathParams: { id },
+      },
     };
   }, [id]);
 

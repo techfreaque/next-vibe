@@ -24,6 +24,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { DefaultFolderId } from "../../../../config";
 import type { MessageMetadata } from "../../../../db";
 import { ChatMessageRole } from "../../../../enum";
 import { scopedTranslation } from "./i18n";
@@ -106,6 +107,14 @@ const { GET } = createEndpoint({
       }),
 
       // === REQUEST DATA ===
+      rootFolderId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "get.rootFolderId.label" as const,
+        description: "get.rootFolderId.description" as const,
+        columns: 6,
+        schema: z.enum(DefaultFolderId),
+      }),
       branchIndices: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.JSON,
@@ -290,6 +299,11 @@ const { GET } = createEndpoint({
         content: "get.response.oldestLoadedMessageId.content" as const,
         schema: z.string().nullable(),
       }),
+      compactionBoundaryId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.compactionBoundaryId.content" as const,
+        schema: z.string().uuid().nullable(),
+      }),
     },
   }),
 
@@ -298,12 +312,16 @@ const { GET } = createEndpoint({
     description: "get.success.description",
   },
 
+  // Route to client (localStorage) for incognito threads — caller passes rootFolderId
+  useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
+
   examples: {
     urlPathParams: {
       default: { threadId: "550e8400-e29b-41d4-a716-446655440000" },
     },
     requests: {
       default: {
+        rootFolderId: DefaultFolderId.PRIVATE,
         branchIndices: {
           "660e8400-e29b-41d4-a716-446655440001": 0,
           "770e8400-e29b-41d4-a716-446655440002": 1,
@@ -340,6 +358,7 @@ const { GET } = createEndpoint({
         branchMeta: [],
         hasOlderHistory: false,
         oldestLoadedMessageId: null,
+        compactionBoundaryId: null,
       },
     },
   },

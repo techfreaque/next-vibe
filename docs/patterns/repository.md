@@ -24,30 +24,35 @@ export const userRepository = new UserRepositoryImpl();
 
 ### 2. Private Helpers
 
-Internal methods marked `private static`:
+Internal methods marked `private static`. Pass `t` (or `locale`) through to helpers that produce error messages:
 
 ```typescript
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+
 export class AuthRepository {
   static async login(
     data: LoginRequestOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<LoginResponseOutput>> {
-    const validationResult = await this.validateCredentials(data, logger);
+    const validationResult = await this.validateCredentials(data, logger, t);
     if (!validationResult.success) return validationResult;
-    return await this.createSession(validationResult.data, logger);
+    return await this.createSession(validationResult.data, logger, t);
   }
 
   private static async validateCredentials(
     data: LoginRequestOutput,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<ValidatedUser>> {
-    // Internal logic
+    // Internal logic — use t() in fail() messages
   }
 
   private static async createSession(
     user: ValidatedUser,
     logger: EndpointLogger,
+    t: ModuleT,
   ): Promise<ResponseType<LoginResponseOutput>> {
     // Internal logic
   }
@@ -113,7 +118,50 @@ export class ItemRepository {
 }
 ```
 
-### 4. Type Alignment - CRITICAL
+### 4. Never Throw
+
+**Never use `throw` in a repository.** No exceptions. If something fails, return `fail()` — even in private helpers and inner catch blocks. Callers check `.success`, not try/catch.
+
+```typescript
+// ✅ CORRECT — inner catch returns fail(), caller checks .success
+private static async insertRecord(
+  data: SomeType,
+  logger: EndpointLogger,
+  t: ModuleT,
+): Promise<ResponseType<Record>> {
+  try {
+    const [record] = await db.insert(table).values(data).returning();
+    return success(record);
+  } catch (error) {
+    logger.error("Failed to insert record", parseError(error));
+    return fail({
+      message: t("errors.server.title"),
+      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+    });
+  }
+}
+
+// ❌ WRONG — inner catch re-throws to outer catch
+private static async insertRecord(...) {
+  try {
+    const [record] = await db.insert(table).values(data).returning();
+    return record;
+  } catch (error) {
+    throw error; // ← never do this
+  }
+}
+
+// ❌ WRONG — throwing to force the outer catch to handle it
+try {
+  const result = await this.insertRecord(data, logger, t);
+  // ...
+} catch (dbError) {
+  await cleanup();
+  throw dbError; // ← return fail() here instead
+}
+```
+
+### 5. Type Alignment - CRITICAL
 
 **Repository methods MUST use types directly from `definition.ts`. NO transformations.**
 
@@ -301,17 +349,21 @@ import { parseError } from "next-vibe/shared/utils";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type { scopedTranslation } from "./i18n"; // type-only for internal modules
 import { myTable } from "./db";
 import type {
   MyGetResponseOutput,
   MyGetUrlVariablesOutput,
 } from "./definition";
 
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+
 export class MyRepository {
   static async getById(
     urlPathParams: MyGetUrlVariablesOutput,
     user: JwtPayloadType,
     logger: EndpointLogger,
+    t: ModuleT, // ← receive t from route (internal module)
   ): Promise<ResponseType<MyGetResponseOutput>> {
     try {
       logger.debug("Getting item by ID", { id: urlPathParams.id });
@@ -322,7 +374,7 @@ export class MyRepository {
         .limit(1);
       if (!item) {
         return fail({
-          message: "app.api.my.errors.notFound",
+          message: t("get.errors.notFound"), // ← scoped t(), not hardcoded string
           errorType: ErrorResponseTypes.NOT_FOUND,
         });
       }
@@ -330,7 +382,7 @@ export class MyRepository {
     } catch (error) {
       logger.error("Failed to fetch item", parseError(error));
       return fail({
-        message: "app.api.my.errors.server",
+        message: t("get.errors.server.title"), // ← scoped t()
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
@@ -637,4 +689,5 @@ export class OrderRepository {
 - [Route Patterns](route.md)
 - [Definition Patterns](definition.md)
 - [Database Patterns](database.md)
-- [Native Repository Patterns](repository-native.md) - HTTP-based implementation for React Native
+- [Client Repository](repository.client.md) — localStorage/client-side utilities, incognito mode, pure helpers used by hooks/widgets
+- [Native Repository Patterns](repository.native.md) — HTTP-based implementation for React Native

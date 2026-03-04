@@ -272,6 +272,7 @@ export class AiStreamRepository {
               user,
               dbWriter: ctx.dbWriter,
               logger,
+              isNewThread,
               voiceTranscription,
               userMessageMetadata,
             });

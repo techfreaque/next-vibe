@@ -46,6 +46,12 @@ export interface BaseFormFieldWidgetConfig<
    * Theme for required field styling
    */
   theme?: Partial<RequiredFieldTheme>;
+  /**
+   * Include this field's value in the React Query cache key.
+   * Use for GET request fields that scope the response (e.g. subFolderId, page).
+   * Defaults to false. When true, different values produce separate cache entries.
+   */
+  includeInCacheKey?: boolean;
 }
 
 /**

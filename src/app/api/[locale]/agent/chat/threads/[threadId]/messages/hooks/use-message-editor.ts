@@ -12,12 +12,12 @@ import type {
 } from "next-vibe-ui/ui/textarea";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import {
   clearDraft,
   loadDraft,
   saveDraft,
-} from "@/app/api/[locale]/agent/chat/hooks/use-input-autosave";
+} from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-input-autosave";
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import { loadMessageAttachments } from "./load-message-attachments";

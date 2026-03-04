@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div, type DivMouseEvent } from "next-vibe-ui/ui/div";
@@ -26,6 +28,7 @@ import { useCharacter } from "../../../../../characters/[id]/hooks";
 import { loadMessageAttachments } from "../../hooks/load-message-attachments";
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";
 import { useMessageEditorStore } from "../../hooks/use-message-editor-store";
+import { scopedTranslation } from "../../i18n";
 import { MessageEditor } from "../message-editor";
 import type { groupMessagesBySequence } from "../message-grouping";
 import { ModelCharacterSelectorModal } from "../model-character-selector-modal";
@@ -95,7 +98,9 @@ export function FlatMessage({
 }: FlatMessageProps): JSX.Element {
   // Navigation state from Zustand store directly
   const rootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
+  // simpleT needed for format4chanTimestamp which uses global app.chat.flatView.timestamp.* keys
+  const { t: tGlobal } = simpleT(locale);
 
   // Editor state from Zustand store (shared across all view modes)
   const editingMessageId = useMessageEditorStore((s) => s.editingMessageId);
@@ -164,7 +169,7 @@ export function FlatMessage({
         const errorObj =
           error instanceof Error ? error : new Error(String(error));
         logger.error(
-          "app.chat.messages.actions.handleBranchEdit.error",
+          "widget.messages.actions.handleBranchEdit.error",
           errorObj,
         );
       }
@@ -190,7 +195,7 @@ export function FlatMessage({
         const errorObj =
           error instanceof Error ? error : new Error(String(error));
         logger.error(
-          "app.chat.messages.actions.handleConfirmRetry.error",
+          "widget.messages.actions.handleConfirmRetry.error",
           errorObj,
         );
       }
@@ -221,7 +226,7 @@ export function FlatMessage({
         const errorObj =
           error instanceof Error ? error : new Error(String(error));
         logger.error(
-          "app.chat.messages.actions.handleConfirmAnswer.error",
+          "widget.messages.actions.handleConfirmAnswer.error",
           errorObj,
         );
       }
@@ -260,7 +265,7 @@ export function FlatMessage({
       ? getModelById(message.model)
       : null;
   const modelDisplayName =
-    modelData?.name || t("app.chat.flatView.assistantFallback");
+    modelData?.name || t("widget.flatView.assistantFallback");
   // Get character name from characters map
   const characterName = character.read?.data?.name;
   const characterDisplayName =
@@ -268,17 +273,17 @@ export function FlatMessage({
     message.character &&
     characterName
       ? characterName
-      : t("app.chat.flatView.anonymous");
+      : t("widget.flatView.anonymous");
 
   // Determine display name for user messages
   let displayName: string;
   if (isUser) {
     if (rootFolderId === "public" || rootFolderId === "shared") {
       // Public/shared: show stored authorName or Anonymous — ID badge shown separately
-      displayName = message.authorName ?? t("app.chat.flatView.anonymous");
+      displayName = message.authorName ?? t("widget.flatView.anonymous");
     } else {
       // Private/incognito/cron: always "You"
-      displayName = t("app.chat.flatView.youLabel");
+      displayName = t("widget.flatView.youLabel");
     }
   } else {
     // AI messages show model name
@@ -347,19 +352,19 @@ export function FlatMessage({
             variant="ghost"
             size="unset"
             className="px-2 py-0.5 rounded text-xs font-mono font-semibold shadow-sm cursor-pointer hover:opacity-80 transition-opacity"
-            title={t("app.chat.flatView.postsById", {
+            title={t("widget.flatView.postsById", {
               count: countPostsByUserId(messages, userId),
             })}
           >
             {isUser
-              ? t("app.chat.flatView.idLabel", { id: userId.slice(0, 8) })
+              ? t("widget.flatView.idLabel", { id: userId.slice(0, 8) })
               : characterDisplayName}
           </Button>
         </Div>
 
         {/* Timestamp */}
         <Span className="text-muted-foreground/80 text-xs font-medium">
-          {format4chanTimestamp(message.createdAt.getTime(), t)}
+          {format4chanTimestamp(message.createdAt.getTime(), tGlobal)}
         </Span>
 
         {/* Post Number */}
@@ -370,7 +375,7 @@ export function FlatMessage({
           onClick={(): void => {
             void navigator.clipboard.writeText(`>>${postNum}`);
           }}
-          title={t("app.chat.flatView.clickToCopyRef")}
+          title={t("widget.flatView.clickToCopyRef")}
         >
           {formatPostNumber(postNum, locale)}
         </Button>
@@ -400,7 +405,7 @@ export function FlatMessage({
           const parentPostNum = parentMsg.id.split("-")[0];
           return (
             <Div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
-              <Span>{t("app.chat.flatView.replyingTo")}</Span>
+              <Span>{t("widget.flatView.replyingTo")}</Span>
               <Div
                 onMouseEnter={(e: DivMouseEvent) => {
                   const rect = e.currentTarget.getBoundingClientRect!();
@@ -459,13 +464,13 @@ export function FlatMessage({
       ) : retryingMessageId === message.id && !isLoadingRetryAttachments ? (
         <Div className="my-2">
           <ModelCharacterSelectorModal
-            titleKey="app.chat.flatView.retryModal.title"
-            descriptionKey="app.chat.flatView.retryModal.description"
+            titleKey="widget.flatView.retryModal.title"
+            descriptionKey="widget.flatView.retryModal.description"
             onConfirm={(): Promise<void> =>
               handleConfirmRetry(message.id, onRetryMessage)
             }
             onCancel={cancelAction}
-            confirmLabelKey="app.chat.flatView.retryModal.confirmLabel"
+            confirmLabelKey="widget.flatView.retryModal.confirmLabel"
             locale={locale}
             logger={logger}
             user={user}
@@ -585,17 +590,17 @@ export function FlatMessage({
       {answeringMessageId === message.id && (
         <Div className="my-3">
           <ModelCharacterSelectorModal
-            titleKey="app.chat.flatView.answerModal.title"
-            descriptionKey="app.chat.flatView.answerModal.description"
+            titleKey="widget.flatView.answerModal.title"
+            descriptionKey="widget.flatView.answerModal.description"
             showInput={true}
             inputValue={answerContent}
             onInputChange={setAnswerContent}
-            inputPlaceholderKey="app.chat.flatView.answerModal.inputPlaceholder"
+            inputPlaceholderKey="widget.flatView.answerModal.inputPlaceholder"
             onConfirm={(): Promise<void> =>
               handleConfirmAnswer(message.id, onAnswerAsModel)
             }
             onCancel={cancelAction}
-            confirmLabelKey="app.chat.flatView.answerModal.confirmLabel"
+            confirmLabelKey="widget.flatView.answerModal.confirmLabel"
             locale={locale}
             logger={logger}
             user={user}
@@ -606,7 +611,7 @@ export function FlatMessage({
       {/* Replies */}
       {directReplies.length > 0 && (
         <Div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
-          <Span>{t("app.chat.flatView.replies")}</Span>
+          <Span>{t("widget.flatView.replies")}</Span>
           {directReplies.map((reply) => {
             const replyPostNum = reply.id.split("-")[0];
             return (
@@ -661,9 +666,9 @@ export function FlatMessage({
             size="unset"
             onClick={(): void => startEdit(message.id)}
             className="text-primary hover:text-primary/80 hover:underline transition-colors"
-            title={t("app.chat.flatView.actions.replyToMessage")}
+            title={t("widget.flatView.actions.replyToMessage")}
           >
-            [{t("app.chat.flatView.actions.reply")}]
+            [{t("widget.flatView.actions.reply")}]
           </Button>
 
           {/* Edit/Branch */}
@@ -675,9 +680,9 @@ export function FlatMessage({
                 startEdit(message.id);
               }}
               className="text-foreground hover:text-foreground/80 hover:underline transition-colors"
-              title={t("app.chat.flatView.actions.editMessage")}
+              title={t("widget.flatView.actions.editMessage")}
             >
-              [{t("app.chat.flatView.actions.edit")}]
+              [{t("widget.flatView.actions.edit")}]
             </Button>
           )}
 
@@ -690,9 +695,9 @@ export function FlatMessage({
                 void startRetry(message);
               }}
               className="text-foreground hover:text-foreground/80 hover:underline transition-colors"
-              title={t("app.chat.flatView.actions.retryWithDifferent")}
+              title={t("widget.flatView.actions.retryWithDifferent")}
             >
-              [{t("app.chat.flatView.actions.retry")}]
+              [{t("widget.flatView.actions.retry")}]
             </Button>
           )}
 
@@ -707,11 +712,11 @@ export function FlatMessage({
             className="text-primary hover:text-primary/80 hover:underline transition-colors"
             title={
               isAssistant
-                ? t("app.chat.threadedView.actions.respondToAI")
-                : t("app.chat.flatView.actions.generateAIResponse")
+                ? t("widget.threadedView.actions.respondToAI")
+                : t("widget.flatView.actions.generateAIResponse")
             }
           >
-            [{t("app.chat.flatView.actions.answerAsAI")}]
+            [{t("widget.flatView.actions.answerAsAI")}]
           </Button>
 
           {/* Copy Link */}
@@ -722,9 +727,9 @@ export function FlatMessage({
               void navigator.clipboard.writeText(`>>${postNum}`);
             }}
             className="text-muted-foreground hover:text-foreground hover:underline transition-colors"
-            title={t("app.chat.flatView.actions.copyReference")}
+            title={t("widget.flatView.actions.copyReference")}
           >
-            [{t("app.chat.flatView.actions.copyReference")}]
+            [{t("widget.flatView.actions.copyReference")}]
           </Button>
 
           {/* Delete */}
@@ -735,9 +740,9 @@ export function FlatMessage({
               onDeleteMessage(message.id);
             }}
             className="px-2 py-1 rounded bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive/80 transition-all"
-            title={t("app.chat.flatView.actions.deleteMessage")}
+            title={t("widget.flatView.actions.deleteMessage")}
           >
-            [{t("app.chat.flatView.actions.delete")}]
+            [{t("widget.flatView.actions.delete")}]
           </Button>
         </Div>
       )}

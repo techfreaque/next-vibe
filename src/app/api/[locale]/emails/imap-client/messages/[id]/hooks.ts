@@ -35,6 +35,7 @@ export function useImapMessageById(
         },
       },
       update: {
+        urlPathParams: { id: params.messageId },
         formOptions: {
           persistForm: false,
         },

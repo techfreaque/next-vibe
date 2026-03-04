@@ -193,6 +193,7 @@ export const translations = {
       billing: "Billing",
       history: "History",
       plans: "Plans",
+      remote: "Cloud Sync",
     },
     payment: {
       success: {

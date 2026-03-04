@@ -11,6 +11,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import type { AutoPrefillConfig, FormDataSources } from "./endpoint-types";
 import { determineFormDataPriority } from "./endpoint-utils";
+import { type CacheKeyRequestData } from "./query-key-builder";
 import type {
   ApiQueryFormOptions,
   ApiQueryFormReturn,
@@ -47,10 +48,17 @@ export function useEndpointRead<TEndpoint extends CreateApiEndpointAny>(
     >;
     urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"];
     autoPrefillData?: Partial<TEndpoint["types"]["RequestOutput"]>;
-    initialState?: Partial<TEndpoint["types"]["RequestOutput"]>;
+    /**
+     * Initial form state. Fields with includeInCacheKey: true are required
+     * (they determine the cache key). All other fields are optional.
+     */
+    initialState?: CacheKeyRequestData<TEndpoint> extends undefined
+      ? Partial<TEndpoint["types"]["RequestOutput"]>
+      : CacheKeyRequestData<TEndpoint> &
+          Partial<TEndpoint["types"]["RequestOutput"]>;
     initialData?: TEndpoint["types"]["ResponseOutput"];
     autoPrefillConfig?: AutoPrefillConfig;
-  } = {},
+  },
 ): ApiQueryFormReturn<
   TEndpoint["types"]["RequestOutput"],
   TEndpoint["types"]["ResponseOutput"],
@@ -135,9 +143,11 @@ export function useEndpointRead<TEndpoint extends CreateApiEndpointAny>(
   }, [queryOptions, initialData]);
 
   // Use the existing query form hook with enhanced options
+  // Cache key fields are extracted from initialState (they are required there when present)
   const queryFormResult = useApiQueryForm({
     endpoint: primaryEndpoint,
     urlPathParams: urlPathParams as TEndpoint["types"]["UrlVariablesOutput"],
+    requestData: initialState as CacheKeyRequestData<TEndpoint>,
     formOptions: enhancedFormOptions,
     queryOptions: enhancedQueryOptions,
     logger,

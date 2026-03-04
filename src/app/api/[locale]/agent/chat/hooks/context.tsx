@@ -14,14 +14,11 @@ import { createContext, useContext, useMemo } from "react";
 
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
 import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/definition";
-import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CharacterGetResponseOutput } from "../characters/[id]/definition";
 import type { DefaultFolderId } from "../config";
-import type { FolderListResponseOutput } from "../folders/definition";
+import type { FolderListResponseOutput } from "../folders/[rootFolderId]/definition";
+import type { PublicFeedGetResponseOutput } from "../public-feed/definition";
 import type { ChatSettingsGetResponseOutput } from "../settings/definition";
 import type { MessageListResponseOutput } from "../threads/[threadId]/messages/definition";
 import type { PathGetResponseOutput } from "../threads/[threadId]/messages/path/definition";
@@ -39,9 +36,6 @@ export interface RootFolderPermissions {
  * Server-origin boot values — stable after mount
  */
 export interface ChatBootValue {
-  user: JwtPayloadType;
-  locale: CountryLanguage;
-  logger: EndpointLogger;
   initialCredits: CreditsGetResponseOutput;
   envAvailability: AgentEnvAvailability;
   rootFolderPermissions: RootFolderPermissions;
@@ -61,6 +55,8 @@ export interface ChatBootValue {
   initialCharacterData: CharacterGetResponseOutput | null;
   /** Thread ID at page load — initialMessagesData only applies to this thread */
   initialThreadId: string | null;
+  /** Initial public feed data fetched server-side — used when rootFolderId=public and no thread selected */
+  initialPublicFeedData: PublicFeedGetResponseOutput | null;
 }
 
 /**
@@ -73,8 +69,6 @@ export const ChatBootContext = createContext<ChatBootValue | null>(null);
  * Chat boot provider props
  */
 interface ChatBootProviderProps {
-  user: JwtPayloadType;
-  locale: CountryLanguage;
   children: ReactNode;
   /** Active thread ID from URL (null if none) */
   activeThreadId: string | null;
@@ -86,12 +80,13 @@ interface ChatBootProviderProps {
   rootFolderPermissions: RootFolderPermissions;
   envAvailability: AgentEnvAvailability;
   /** Initial data fetched server-side to avoid client-side refetch on mount */
-  initialFoldersData?: FolderListResponseOutput | null;
-  initialThreadsData?: ThreadListResponseOutput | null;
-  initialMessagesData?: MessageListResponseOutput | null;
-  initialPathData?: PathGetResponseOutput | null;
-  initialSettingsData?: ChatSettingsGetResponseOutput | null;
-  initialCharacterData?: CharacterGetResponseOutput | null;
+  initialFoldersData: FolderListResponseOutput | null;
+  initialThreadsData: ThreadListResponseOutput | null;
+  initialMessagesData: MessageListResponseOutput | null;
+  initialPathData: PathGetResponseOutput | null;
+  initialSettingsData: ChatSettingsGetResponseOutput | null;
+  initialCharacterData: CharacterGetResponseOutput | null;
+  initialPublicFeedData: PublicFeedGetResponseOutput | null;
 }
 
 /**
@@ -99,8 +94,6 @@ interface ChatBootProviderProps {
  * All dynamic chat state lives in scoped Zustand stores.
  */
 export function ChatBootProvider({
-  user,
-  locale,
   children,
   activeThreadId,
   currentRootFolderId,
@@ -113,17 +106,10 @@ export function ChatBootProvider({
   initialPathData = null,
   initialSettingsData = null,
   initialCharacterData = null,
+  initialPublicFeedData = null,
 }: ChatBootProviderProps): JSX.Element {
-  const logger = useMemo(
-    () => createEndpointLogger(false, Date.now(), locale),
-    [locale],
-  );
-
   const value = useMemo(
     (): ChatBootValue => ({
-      user,
-      locale,
-      logger,
       initialCredits,
       envAvailability,
       rootFolderPermissions,
@@ -135,11 +121,9 @@ export function ChatBootProvider({
       initialSettingsData,
       initialCharacterData,
       initialThreadId: activeThreadId,
+      initialPublicFeedData,
     }),
     [
-      user,
-      locale,
-      logger,
       initialCredits,
       envAvailability,
       rootFolderPermissions,
@@ -151,6 +135,7 @@ export function ChatBootProvider({
       initialSettingsData,
       initialCharacterData,
       activeThreadId,
+      initialPublicFeedData,
     ],
   );
 

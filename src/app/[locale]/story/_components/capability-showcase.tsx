@@ -178,59 +178,72 @@ function buildPulseFixGroup(t: ScopedT): MessageGroup {
   const tid = "demo-pulse";
   const seq = "pulse-seq";
 
-  // Pulse detected a failing cron task → AI investigated → fixed → notified
-  const queryTool = mkToolMsg(
+  // Thea's AI heartbeat: sees house hunt in memories → searches listings → emails best matches
+  const reasoning = mkAssistantMsg(
     tid,
     tid,
     seq,
-    "toolu_query",
-    "sql",
-    {
-      query:
-        "SELECT task_name, status, error_message, last_run_at FROM cron_tasks WHERE task_name = 'email-sync' ORDER BY last_run_at DESC LIMIT 3",
-      dryRun: false,
-      verbose: false,
-      limit: 100,
-    },
-    {
-      success: true,
-      output:
-        "Query executed successfully\nReturned 3 row(s)\n\nColumns: task_name, status, error_message, last_run_at",
-      results: [
-        {
-          task_name: "email-sync",
-          status: "status.failed",
-          error_message: "IMAP connection timeout after 30s",
-          last_run_at: "2026-02-27T03:00:00Z",
-        },
-        {
-          task_name: "email-sync",
-          status: "status.failed",
-          error_message: "IMAP connection timeout after 30s",
-          last_run_at: "2026-02-27T02:00:00Z",
-        },
-        {
-          task_name: "email-sync",
-          status: "status.failed",
-          error_message: "IMAP connection timeout after 30s",
-          last_run_at: "2026-02-27T01:00:00Z",
-        },
-      ],
-      rowCount: 3,
-      queryType: "SELECT",
-    },
-    280,
+    t("home.capabilities.autonomous.reasoning"),
   );
 
-  const healthTool = mkToolMsg(
-    "pulse-health",
+  const searchTool = mkToolMsg(
+    "pulse-search",
     tid,
     seq,
-    "toolu_health",
-    "db-health",
-    {},
-    { healthy: true },
-    120,
+    "toolu_search",
+    "web-search",
+    {
+      query: "Haus kaufen München 4 Zimmer Garten bis 800000 Euro neu",
+      maxResults: 5,
+    },
+    {
+      results: [
+        {
+          title: "Neuhausen: Einfamilienhaus 5 Zimmer, Garten, 749.000 €",
+          url: "https://www.immobilienscout24.de/expose/123456",
+          snippet:
+            "Großzügiges Einfamilienhaus in Neuhausen, 5 Zimmer, 160m², Garten 200m². Ruhige Lage, U-Bahn 5 min.",
+          age: "3 hours ago",
+          source: "ImmobilienScout24",
+        },
+        {
+          title: "Schwabing: Stadthaus 4 Zimmer, Dachterrasse, 795.000 €",
+          url: "https://www.immowelt.de/expose/789012",
+          snippet:
+            "Modernes Stadthaus in Schwabing, 4 Zimmer, 140m², große Dachterrasse. Toplage.",
+          age: "6 hours ago",
+          source: "Immowelt",
+        },
+        {
+          title: "Pasing: Reihenmittelhaus 4 Zimmer, Garten, 690.000 €",
+          url: "https://www.immobilienscout24.de/expose/345678",
+          snippet:
+            "Gepflegtes Reihenmittelhaus in Pasing, 4 Zimmer, 130m², Garten 120m². S-Bahn direkt.",
+          age: "9 hours ago",
+          source: "ImmobilienScout24",
+        },
+      ],
+    },
+    1400,
+  );
+
+  const fetchTool = mkToolMsg(
+    "pulse-fetch",
+    tid,
+    seq,
+    "toolu_fetch",
+    "fetch-url-content",
+    { url: "https://www.immobilienscout24.de/expose/123456" },
+    {
+      message:
+        "Successfully fetched content from: https://www.immobilienscout24.de/expose/123456",
+      content:
+        "# Neuhausen: Einfamilienhaus\n\n5 Zimmer · 160m² · Garten 200m² · Baujahr 1998 · renoviert 2021\nHeizung: Wärmepumpe · KfW 85\nKontakt: Makler Schmidt, 089-123456",
+      fetchedUrl: "https://www.immobilienscout24.de/expose/123456",
+      statusCode: 200,
+      timeElapsed: 1800,
+    },
+    1800,
   );
 
   const emailTool = mkToolMsg(
@@ -246,8 +259,8 @@ function buildPulseFixGroup(t: ScopedT): MessageGroup {
       },
       emailContent: {
         subject: t("home.capabilities.autonomous.emailSubject"),
-        html: "<p>Email sync was failing (IMAP timeout). Rotated credentials, cleared error queue, restarted task. 47 pending emails now syncing.</p>",
-        text: "Email sync was failing (IMAP timeout). Rotated credentials, cleared error queue, restarted task. 47 pending emails now syncing.",
+        html: "<p>3 new Munich listings matching your criteria. Neuhausen looks strongest — 5 rooms, garden, 749k, listed 3h ago. Details inside.</p>",
+        text: "3 new Munich listings matching your criteria. Neuhausen looks strongest — 5 rooms, garden, 749k, listed 3h ago. Details inside.",
       },
       senderSettings: {
         senderName: "Thea",
@@ -261,8 +274,8 @@ function buildPulseFixGroup(t: ScopedT): MessageGroup {
       response: {
         deliveryStatus: {
           success: true,
-          messageId: "msg_pulse_alert_001",
-          sentAt: "2026-02-27T04:02:00.000Z",
+          messageId: "msg_house_hunt_001",
+          sentAt: "2026-02-27T06:14:00.000Z",
           response: "250 OK: Message accepted",
         },
         accountInfo: {
@@ -291,8 +304,8 @@ function buildPulseFixGroup(t: ScopedT): MessageGroup {
   );
 
   return {
-    primary: queryTool,
-    continuations: [healthTool, emailTool, response],
+    primary: reasoning,
+    continuations: [searchTool, fetchTool, emailTool, response],
     sequenceId: seq,
   };
 }
@@ -346,9 +359,10 @@ function AutonomousVisual({
           collapseState={null}
           rootFolderId={DefaultFolderId.PUBLIC}
           user={{
-            isPublic: true,
+            id: "00000000-0000-0000-0000-000000000000",
+            isPublic: false,
             leadId: "00000000-0000-0000-0000-000000000000",
-            roles: [UserPermissionRole.PUBLIC],
+            roles: [UserPermissionRole.ADMIN],
           }}
           sendMessage={null}
           deductCredits={null}

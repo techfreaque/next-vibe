@@ -246,6 +246,7 @@ export async function createUserMessage(params: {
     }
   }
 
+  const now = new Date();
   await db.insert(chatMessages).values({
     id: params.messageId,
     threadId: params.threadId,
@@ -258,6 +259,20 @@ export async function createUserMessage(params: {
     isAI: false,
     metadata,
   });
+
+  // Update thread's updatedAt and bubble activity to parent folder
+  const [updatedThread] = await db
+    .update(chatThreads)
+    .set({ updatedAt: now })
+    .where(eq(chatThreads.id, params.threadId))
+    .returning({ folderId: chatThreads.folderId });
+
+  if (updatedThread?.folderId) {
+    await db
+      .update(chatFolders)
+      .set({ updatedAt: now })
+      .where(eq(chatFolders.id, updatedThread.folderId));
+  }
 
   params.logger.debug("Created user message", {
     messageId: params.messageId,
@@ -766,11 +781,20 @@ export class MessagesRepository {
         });
       }
 
-      // Update thread's updatedAt timestamp
-      await db
+      // Update thread's updatedAt timestamp and bubble activity to parent folder
+      const now = new Date();
+      const [updatedThread] = await db
         .update(chatThreads)
-        .set({ updatedAt: new Date() })
-        .where(eq(chatThreads.id, data.threadId));
+        .set({ updatedAt: now })
+        .where(eq(chatThreads.id, data.threadId))
+        .returning({ folderId: chatThreads.folderId });
+
+      if (updatedThread?.folderId) {
+        await db
+          .update(chatFolders)
+          .set({ updatedAt: now })
+          .where(eq(chatFolders.id, updatedThread.folderId));
+      }
 
       logger.debug("Message created", {
         messageId: message.id,

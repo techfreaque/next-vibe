@@ -12,6 +12,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { deepMerge } from "./endpoint-utils";
+import type { CacheKeyRequestData } from "./query-key-builder";
 import type {
   ApiFormOptions,
   ApiFormReturn,
@@ -47,10 +48,10 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
       TEndpoint["types"]["ResponseOutput"],
       TEndpoint["types"]["UrlVariablesOutput"]
     >;
-    urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"];
     autoPrefillData?: DeepPartial<TEndpoint["types"]["RequestOutput"]>;
     initialState?: DeepPartial<TEndpoint["types"]["RequestOutput"]>;
-  } = {},
+    urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"];
+  },
 ): ApiFormReturn<
   TEndpoint["types"]["RequestOutput"],
   TEndpoint["types"]["ResponseOutput"],
@@ -130,6 +131,10 @@ export function useEndpointCreate<TEndpoint extends CreateApiEndpointAny>(
     locale,
     mergedFormOptions,
     mergedMutationOptions,
+    {
+      urlPathParams: options.urlPathParams,
+      requestData: options.initialState as CacheKeyRequestData<TEndpoint>,
+    },
   );
 
   // Track the previous serialized prefill key to avoid resetting when object references

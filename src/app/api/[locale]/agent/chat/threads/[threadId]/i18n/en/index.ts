@@ -1,15 +1,8 @@
-import { translations as messagesTranslations } from "../../messages/i18n/en";
-import { translations as permissionsTranslations } from "../../permissions/i18n/en";
-import { translations as shareLinksTranslations } from "../../share-links/i18n/en";
-
 export const translations = {
   category: "Chat",
   tags: {
     threads: "Threads",
   },
-  messages: messagesTranslations,
-  permissions: permissionsTranslations,
-  shareLinks: shareLinksTranslations,
   errors: {
     not_implemented_on_native:
       "{{method}} is not implemented on native platform. Please use the web version for this operation.",
@@ -372,6 +365,12 @@ export const translations = {
     success: {
       title: "Success",
       description: "Thread deleted successfully",
+    },
+  },
+  widget: {
+    screenshot: {
+      capture: "Capture screenshot",
+      capturing: "Capturing...",
     },
   },
 };

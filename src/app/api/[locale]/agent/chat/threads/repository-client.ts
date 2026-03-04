@@ -98,6 +98,7 @@ export class ChatThreadsRepositoryClient {
           canModerate: false,
           canDelete: true,
           canManagePermissions: false,
+          isStreaming: false,
           createdAt: new Date(thread.createdAt),
           updatedAt: new Date(thread.updatedAt),
         })),

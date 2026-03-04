@@ -21,6 +21,7 @@ import type { SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscript
 import subscriptionDefinition from "@/app/api/[locale]/subscription/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import remoteConnectionDefinition from "@/app/api/[locale]/user/remote-connection/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface SubscriptionPageClientProps {
@@ -33,6 +34,7 @@ interface SubscriptionPageClientProps {
   initialHistory: CreditsHistoryGetResponseOutput | null;
   hasPaymentProvider: boolean;
   isAdmin: boolean;
+  isCloud: boolean;
 }
 
 export function SubscriptionPageClient({
@@ -45,6 +47,7 @@ export function SubscriptionPageClient({
   initialHistory,
   hasPaymentProvider,
   isAdmin,
+  isCloud,
 }: SubscriptionPageClientProps): JSX.Element {
   return (
     <Container className="py-8 flex flex-col gap-8">
@@ -78,7 +81,11 @@ export function SubscriptionPageClient({
       )}
 
       {/* Tabs Navigation - same for all tabs */}
-      <SubscriptionTabsNav locale={locale} activeTab={activeTab} />
+      <SubscriptionTabsNav
+        locale={locale}
+        activeTab={activeTab}
+        isCloud={isCloud}
+      />
 
       {/* Tab Content - changes based on active tab */}
       {activeTab === "overview" && (
@@ -112,6 +119,14 @@ export function SubscriptionPageClient({
             }}
           />
         </Div>
+      )}
+
+      {activeTab === "remote" && !isCloud && (
+        <EndpointsPage
+          endpoint={remoteConnectionDefinition}
+          user={user}
+          locale={locale}
+        />
       )}
     </Container>
   );

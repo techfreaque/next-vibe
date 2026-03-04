@@ -7,6 +7,10 @@
 import { parseError } from "next-vibe/shared/utils";
 import { useCallback } from "react";
 
+import { answerAsAI as answerAsAIOp } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/answer-as-ai";
+import { branchMessage as branchMessageOp } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/branch-message";
+import { retryMessage as retryMessageOp } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/retry-message";
+import { sendMessage as sendMessageOp } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
 import messageIdDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/definition";
 import voteDefinitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/definition";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
@@ -21,10 +25,6 @@ import type { UseAIStreamReturn } from "../../../../../ai-stream/stream/hooks/us
 import { DefaultFolderId } from "../../../../config";
 import type { ChatMessage } from "../../../../db";
 import type { ToolConfigItem } from "../../../../settings/definition";
-import { answerAsAI as answerAsAIOp } from "./operations/answer-as-ai";
-import { branchMessage as branchMessageOp } from "./operations/branch-message";
-import { retryMessage as retryMessageOp } from "./operations/retry-message";
-import { sendMessage as sendMessageOp } from "./operations/send-message";
 import { useStreamingMessagesStore } from "./streaming-messages-store";
 
 /**
@@ -347,6 +347,7 @@ export function useMessageOperations(
         });
 
         const result = await deleteMutation.mutateAsync({
+          requestData: { rootFolderId: thread.rootFolderId },
           urlPathParams: { threadId: message.threadId, messageId },
         });
 

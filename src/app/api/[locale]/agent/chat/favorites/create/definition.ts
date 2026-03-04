@@ -77,7 +77,7 @@ const { POST } = createEndpoint({
         const character = apiClient.getEndpointData(
           characterSingleDefinitions.default.GET,
           logger,
-          { id: requestData.characterId },
+          { urlPathParams: { id: requestData.characterId } },
         );
         if (!character?.success) {
           logger.error(
@@ -131,7 +131,6 @@ const { POST } = createEndpoint({
               },
             };
           },
-          undefined,
         );
 
         // Optimistically update characters list addedToFav
@@ -158,7 +157,6 @@ const { POST } = createEndpoint({
               },
             };
           },
-          undefined,
         );
       },
     },

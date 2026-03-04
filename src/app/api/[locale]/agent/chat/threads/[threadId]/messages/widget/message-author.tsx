@@ -13,7 +13,8 @@ import {
 } from "@/app/api/[locale]/agent/models/models";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "../i18n";
 interface MessageAuthorProps {
   authorName: string | null;
   authorId: string | null;
@@ -45,7 +46,7 @@ export function MessageAuthorInfo({
   locale,
   rootFolderId,
 }: MessageAuthorProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   const authorColor = isAI ? "text-blue-500" : "text-foreground";
 
@@ -53,17 +54,17 @@ export function MessageAuthorInfo({
   let displayName: string;
   if (isAI) {
     // AI messages show model name or "Assistant"
-    displayName = authorName ?? t("app.chat.messages.assistant");
+    displayName = authorName ?? t("widget.messages.assistant");
   } else if (rootFolderId === "public" || rootFolderId === "shared") {
     // Public/shared: authorName is stored — show it with ID slice, or Anonymous
-    const name = authorName ?? t("app.chat.messages.anonymous");
+    const name = authorName ?? t("widget.messages.anonymous");
     const idSlice = authorId ? authorId.slice(0, 8) : null;
     displayName = idSlice
-      ? t("app.chat.messages.authorWithId", { name, id: idSlice })
+      ? t("widget.messages.authorWithId", { name, id: idSlice })
       : name;
   } else {
     // Private/incognito/cron: authorName not stored — always "You"
-    displayName = t("app.chat.messages.you");
+    displayName = t("widget.messages.you");
   }
 
   return (
@@ -95,14 +96,17 @@ export function MessageAuthorInfo({
           </Span>
         )}
 
-        <Span className="text-xs text-muted-foreground shrink-0">
+        <Span
+          className="text-xs text-muted-foreground shrink-0"
+          suppressHydrationWarning
+        >
           {formatRelativeTime(timestamp.getTime(), locale)}
         </Span>
 
         {edited && (
           <Span className="text-xs text-muted-foreground italic shrink-0">
             {/* eslint-disable-next-line i18next/no-literal-string -- Formatting characters */}
-            {`(${t("app.chat.messages.edited")})`}
+            {`(${t("widget.messages.edited")})`}
           </Span>
         )}
       </Div>

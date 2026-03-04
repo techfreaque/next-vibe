@@ -12,7 +12,10 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import { db } from "@/app/api/[locale]/system/db";
+import { getRemoteSession } from "@/app/api/[locale]/system/unified-interface/cli/auth/remote-session-cache";
+import { fireAndForgetRemote } from "@/app/api/[locale]/system/unified-interface/remote/remote-call";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { defaultLocale } from "@/i18n/core/config";
 
 import { DefaultFolderId } from "../config";
 import type { scopedTranslation as idScopedTranslation } from "./[id]/i18n";
@@ -142,6 +145,29 @@ export async function addMemory(params: {
     userId,
   });
 
+  // Mirror to remote if shared
+  if (isShared) {
+    const remoteSession = await getRemoteSession(userId);
+    if (remoteSession) {
+      const createDefinitions = await import("./create/definition");
+      fireAndForgetRemote({
+        definition: createDefinitions.default.POST,
+        data: {
+          content,
+          tags: tags ?? [],
+          priority: priority ?? 0,
+          isPublic,
+          isShared: true,
+        },
+        token: remoteSession.token,
+        leadId: remoteSession.leadId,
+        remoteUrl: remoteSession.remoteUrl,
+        locale: defaultLocale,
+        logger,
+      });
+    }
+  }
+
   // Check if auto-summarization is needed
   await checkAndSummarizeIfNeeded({
     userId,
@@ -219,6 +245,31 @@ export async function updateMemory(params: {
     });
   }
 
+  // Mirror to remote if shared (current state) or if explicitly unsharing (propagate tombstone)
+  if (updated.isShared || isShared === false) {
+    const remoteSession = await getRemoteSession(userId);
+    if (remoteSession) {
+      const idDefinitions = await import("./[id]/definition");
+      fireAndForgetRemote({
+        definition: idDefinitions.default.PATCH,
+        data: {
+          ...(content !== undefined && { content }),
+          ...(tags !== undefined && { tags }),
+          ...(priority !== undefined && { priority }),
+          ...(isPublic !== undefined && { isPublic }),
+          ...(isArchived !== undefined && { isArchived }),
+          ...(isShared !== undefined && { isShared }),
+        },
+        urlPathParams: { id: memoryNumber },
+        token: remoteSession.token,
+        leadId: remoteSession.leadId,
+        remoteUrl: remoteSession.remoteUrl,
+        locale: defaultLocale,
+        logger,
+      });
+    }
+  }
+
   // Assign syncId when isShared transitions to true (if not already present)
   if (isShared) {
     const meta = updated.metadata;
@@ -271,6 +322,25 @@ export async function deleteMemory(params: {
 
   const deleted = result[0];
   logger.info("Deleted memory", { memoryNumber });
+
+  // Mirror delete to remote if memory was shared
+  if (deleted.isShared) {
+    const remoteSession = await getRemoteSession(userId);
+    if (remoteSession) {
+      const idDefinitions = await import("./[id]/definition");
+      fireAndForgetRemote({
+        definition: idDefinitions.default.DELETE,
+        data: {},
+        urlPathParams: { id: memoryNumber },
+        token: remoteSession.token,
+        leadId: remoteSession.leadId,
+        remoteUrl: remoteSession.remoteUrl,
+        locale: defaultLocale,
+        logger,
+      });
+    }
+  }
+
   return success({
     content: deleted.content,
     tags: deleted.tags ?? [],

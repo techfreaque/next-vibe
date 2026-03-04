@@ -209,6 +209,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
       case Platform.NEXT_PAGE:
       case Platform.NEXT_API:
       case Platform.TRPC:
+      case Platform.ELECTRON:
         if (platformMarkers.includes(PlatformMarker.WEB_OFF)) {
           return {
             allowed: false,

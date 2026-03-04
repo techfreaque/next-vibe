@@ -1,0 +1,53 @@
+# electron-builder configuration
+# Docs: https://www.electron.build/configuration/configuration
+#
+# NOTE: This config is used with --projectDir pointing at dist/electron-stage/,
+# a minimal staging directory with a clean package.json (no dependencies) to
+# avoid electron-builder's bun workspace traversal bug. See build/repository.ts.
+#
+# The AppImage is a thin Electron shell — it does NOT bundle Next.js or
+# node_modules. It must be run from the next-vibe project directory where
+# `vibe build` has already been run. The shell spawns `bun run vibe start`
+# which serves the pre-built Next.js from the project's .next-prod/.
+
+appId: ai.unbottled.app
+productName: Unbottled
+copyright: "Copyright © 2024 Max Brandstätter"
+electronVersion: "40.6.1"
+
+directories:
+  output: dist/electron-release
+
+asar: true
+npmRebuild: false
+
+files:
+  - dist/electron/main.js
+  - dist/electron/preload.js
+  - assets/icon.png
+  - package.json
+
+# macOS
+mac:
+  category: public.app-category.productivity
+  target:
+    - target: dmg
+      arch: [x64, arm64]
+  hardenedRuntime: true
+  gatekeeperAssess: false
+
+# Linux
+linux:
+  target:
+    - AppImage
+  category: Office
+  icon: assets/icon.png
+
+# Windows
+win:
+  target:
+    - nsis
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true

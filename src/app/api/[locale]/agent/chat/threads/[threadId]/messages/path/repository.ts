@@ -284,6 +284,7 @@ export const pathRepository = {
           branchMeta: [],
           hasOlderHistory: false,
           oldestLoadedMessageId: null,
+          compactionBoundaryId: null,
         });
       }
 
@@ -307,6 +308,10 @@ export const pathRepository = {
       const slicedPathIds = pathIds.slice(loadFromIndex, loadToIndex);
       const oldestLoadedMessageId =
         slicedPathIds.length > 0 ? slicedPathIds[0] : null;
+      // compactionBoundaryId: the ID of the compacting message that starts the loaded chunk.
+      // Non-null when loadFromIndex > 0, meaning older history exists before this point.
+      const compactionBoundaryId =
+        loadFromIndex > 0 && slicedPathIds.length > 0 ? slicedPathIds[0] : null;
 
       if (slicedPathIds.length === 0) {
         return success({
@@ -314,6 +319,7 @@ export const pathRepository = {
           branchMeta,
           hasOlderHistory: false,
           oldestLoadedMessageId: null,
+          compactionBoundaryId: null,
         });
       }
 
@@ -343,6 +349,7 @@ export const pathRepository = {
         branchMeta,
         hasOlderHistory,
         oldestLoadedMessageId,
+        compactionBoundaryId,
       });
     } catch (error) {
       logger.error("Error listing branch path messages", parseError(error));

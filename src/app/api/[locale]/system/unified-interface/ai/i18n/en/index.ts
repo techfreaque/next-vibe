@@ -21,6 +21,11 @@ export const translations = {
           description:
             "Input parameters for the tool as a JSON object. URL path params (e.g. id) are automatically extracted from this object.",
         },
+        instanceId: {
+          label: "Instance ID",
+          description:
+            'Optional remote instance ID. When set, creates an async task on the remote instance instead of executing locally. Result will be {taskId, status:"pending"}.',
+        },
       },
       response: {
         result:

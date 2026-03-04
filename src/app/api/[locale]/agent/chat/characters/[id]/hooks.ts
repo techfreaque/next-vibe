@@ -37,8 +37,14 @@ export function useCharacter(
           refetchOnWindowFocus: false,
           staleTime: 5 * 60 * 1000, // 5 minutes
         },
-        ...(characterId ? { urlPathParams: { id: characterId } } : {}),
+        urlPathParams: { id: characterId ?? "" },
         initialData: initialData ?? undefined,
+      },
+      update: {
+        urlPathParams: { id: characterId ?? "" },
+      },
+      delete: {
+        urlPathParams: { id: characterId ?? "" },
       },
     }),
     [characterId, initialData],

@@ -9,8 +9,8 @@ import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation } from "../i18n";
 import { CopyButton } from "./copy-button";
 import { useMessageGroupName } from "./embedded-context";
 import { MessageActionButton } from "./message-action-button";
@@ -34,7 +34,7 @@ export function UserMessageActions({
   onDelete,
   className,
 }: UserMessageActionsProps): React.JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const isTouch = useTouchDevice();
   const { groupHover } = useMessageGroupName();
 
@@ -61,7 +61,7 @@ export function UserMessageActions({
         <MessageActionButton
           icon={GitBranch}
           onClick={() => onBranch(message.id)}
-          title={t("app.chat.common.userMessageActions.branch")}
+          title={t("widget.common.userMessageActions.branch")}
         />
       )}
 
@@ -71,7 +71,7 @@ export function UserMessageActions({
           onClick={(): void => {
             void onRetry(message);
           }}
-          title={t("app.chat.common.userMessageActions.retry")}
+          title={t("widget.common.userMessageActions.retry")}
         />
       )}
 
@@ -79,7 +79,7 @@ export function UserMessageActions({
         <MessageActionButton
           icon={Trash2}
           onClick={() => onDelete(message.id)}
-          title={t("app.chat.common.userMessageActions.deleteMessage")}
+          title={t("widget.common.userMessageActions.deleteMessage")}
           variant="destructive"
         />
       )}

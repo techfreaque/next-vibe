@@ -35,6 +35,7 @@ import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo, useState } from "react";
 
+import { useTourState } from "@/app/[locale]/threads/[...path]/_components/welcome-tour/tour-state-context";
 import { ModelCreditDisplay } from "@/app/api/[locale]/agent/models/widget/model-credit-display";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import {
@@ -58,7 +59,6 @@ import {
   type IconKey,
 } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
-import { useTourState } from "../widget/welcome-tour/tour-state-context";
 import definition, {
   type FavoriteCard,
   type FavoritesListResponseOutput,
@@ -739,15 +739,10 @@ export function FavoritesListContainer({
       setDragOverride(updatedItems);
 
       // Update store + fire API, then clear override
-      apiClient.updateEndpointData(
-        definition.GET,
-        logger,
-        () => ({
-          success: true,
-          data: { favorites: updatedItems },
-        }),
-        undefined,
-      );
+      apiClient.updateEndpointData(definition.GET, logger, () => ({
+        success: true,
+        data: { favorites: updatedItems },
+      }));
 
       void apiClient
         .mutate(
@@ -932,7 +927,7 @@ function AddVariantButton({
       const cachedData = apiClient.getEndpointData(
         characterSingleDefinitions.default.GET,
         logger,
-        { id: characterId },
+        { urlPathParams: { id: characterId } },
       );
 
       if (cachedData?.success) {

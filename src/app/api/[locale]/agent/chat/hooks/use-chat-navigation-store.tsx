@@ -16,12 +16,17 @@
 
 "use client";
 
+import { success } from "next-vibe/shared/types/response.schema";
 import type { JSX, ReactNode } from "react";
 import { createContext, useContext, useRef } from "react";
 import type { StoreApi } from "zustand";
 import { createStore, useStore } from "zustand";
 
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+
 import { DefaultFolderId, isDefaultFolderId } from "../config";
+import threadsDefinition from "../threads/definition";
 
 /**
  * Navigation state shape
@@ -35,6 +40,8 @@ export interface ChatNavigationState {
   currentSubFolderId: string | null;
   /** Whether this store is for an embedded/nested context (e.g. AI run) */
   isEmbedded: boolean;
+  /** Whether the active thread is currently streaming */
+  isStreaming: boolean;
 
   // --- Actions ---
   /** Set active thread ID */
@@ -55,6 +62,10 @@ export interface ChatNavigationState {
     currentRootFolderId: DefaultFolderId,
     currentSubFolderId: string | null,
   ) => void;
+  /** Mark active thread as streaming; also updates threads endpoint cache */
+  startStream: (threadId: string, logger: EndpointLogger) => void;
+  /** Mark active thread as not streaming; also updates threads endpoint cache */
+  stopStream: (threadId: string, logger: EndpointLogger) => void;
 }
 
 type ChatNavigationStore = StoreApi<ChatNavigationState>;
@@ -68,11 +79,12 @@ function createChatNavigationStore(opts?: {
   currentSubFolderId?: string | null;
   isEmbedded?: boolean;
 }): ChatNavigationStore {
-  return createStore<ChatNavigationState>((set) => ({
+  return createStore<ChatNavigationState>((set, get) => ({
     activeThreadId: opts?.activeThreadId ?? null,
     currentRootFolderId: opts?.currentRootFolderId ?? DefaultFolderId.PRIVATE,
     currentSubFolderId: opts?.currentSubFolderId ?? null,
     isEmbedded: opts?.isEmbedded ?? false,
+    isStreaming: false,
 
     setActiveThreadId: (threadId): void => set({ activeThreadId: threadId }),
     setCurrentRootFolderId: (rootFolderId): void =>
@@ -85,6 +97,56 @@ function createChatNavigationStore(opts?: {
       currentRootFolderId,
       currentSubFolderId,
     ): void => set({ activeThreadId, currentRootFolderId, currentSubFolderId }),
+    startStream: (threadId, logger): void => {
+      set({ isStreaming: true });
+      const { currentRootFolderId, currentSubFolderId } = get();
+      apiClient.updateEndpointData(
+        threadsDefinition.GET,
+        logger,
+        (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return success({
+            ...old.data,
+            threads: old.data.threads.map((t) =>
+              t.id === threadId ? { ...t, isStreaming: true } : t,
+            ),
+          });
+        },
+        {
+          requestData: {
+            rootFolderId: currentRootFolderId,
+            subFolderId: currentSubFolderId,
+          },
+        },
+      );
+    },
+    stopStream: (threadId, logger): void => {
+      set({ isStreaming: false });
+      const { currentRootFolderId, currentSubFolderId } = get();
+      apiClient.updateEndpointData(
+        threadsDefinition.GET,
+        logger,
+        (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return success({
+            ...old.data,
+            threads: old.data.threads.map((t) =>
+              t.id === threadId ? { ...t, isStreaming: false } : t,
+            ),
+          });
+        },
+        {
+          requestData: {
+            rootFolderId: currentRootFolderId,
+            subFolderId: currentSubFolderId,
+          },
+        },
+      );
+    },
   }));
 }
 

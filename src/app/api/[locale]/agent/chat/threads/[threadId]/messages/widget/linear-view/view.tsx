@@ -18,17 +18,17 @@ import {
   chatShadows,
 } from "@/app/[locale]/chat/lib/design-tokens";
 import { createMetadataSystemMessage } from "@/app/api/[locale]/agent/ai-stream/repository/system-prompt/message-metadata";
+import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole, ViewMode } from "@/app/api/[locale]/agent/chat/enum";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
-import { BRANCH_INDEX_KEY } from "../../../../../hooks/use-branch-management";
-import type { SendMessageParams } from "../../hooks/operations/send-message";
+import { BRANCH_INDEX_KEY } from "../../hooks/use-branch-management";
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";
+import { scopedTranslation } from "../../i18n";
 import { BranchNavigator } from "../branch-navigator";
 import { DebugSystemPrompt, DebugTrailingContext } from "../debug-component";
 import { ErrorMessageBubble } from "../error-message-bubble";
@@ -121,7 +121,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
   sendMessage,
   deductCredits,
 }: LinearMessageViewProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   // Group messages by sequence for proper display (memoized)
   const messageGroups = useMemo(
@@ -268,8 +268,8 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                 ) : isRetrying && onCancelAction ? (
                   <Div className="flex justify-end">
                     <ModelCharacterSelectorModal
-                      titleKey="app.chat.linearMessageView.retryModal.title"
-                      descriptionKey="app.chat.linearMessageView.retryModal.description"
+                      titleKey="widget.linearView.retryModal.title"
+                      descriptionKey="widget.linearView.retryModal.description"
                       onConfirm={async (): Promise<void> => {
                         if (onRetryMessage) {
                           void onRetryMessage(
@@ -282,7 +282,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                         onCancelAction();
                       }}
                       onCancel={onCancelAction}
-                      confirmLabelKey="app.chat.linearMessageView.retryModal.confirmLabel"
+                      confirmLabelKey="widget.linearView.retryModal.confirmLabel"
                       locale={locale}
                       logger={logger}
                       user={user}
@@ -344,7 +344,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                             <Div className="mb-2">
                               <MessageAuthorInfo
                                 authorName={t(
-                                  "app.chat.debugView.systemMessage",
+                                  "widget.debugView.systemMessageHint",
                                 )}
                                 authorId={null}
                                 currentUserId={undefined}
@@ -370,7 +370,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                             </Div>
 
                             <Div className="mt-1 text-xs text-muted-foreground pl-2">
-                              {t("app.chat.debugView.systemMessageHint")}
+                              {t("widget.debugView.systemMessageHint")}
                             </Div>
                           </Div>
                         </Div>
@@ -384,12 +384,12 @@ export const LinearMessageView = React.memo(function LinearMessageView({
             {isAnswering && onCancelAction && (
               <Div className="my-3">
                 <ModelCharacterSelectorModal
-                  titleKey="app.chat.linearMessageView.answerModal.title"
-                  descriptionKey="app.chat.linearMessageView.answerModal.description"
+                  titleKey="widget.linearView.answerModal.title"
+                  descriptionKey="widget.linearView.answerModal.description"
                   showInput={true}
                   inputValue={answerContent}
                   onInputChange={onSetAnswerContent ?? undefined}
-                  inputPlaceholderKey="app.chat.linearMessageView.answerModal.inputPlaceholder"
+                  inputPlaceholderKey="widget.linearView.answerModal.inputPlaceholder"
                   onConfirm={async (): Promise<void> => {
                     if (answerAsAI) {
                       await answerAsAI(message.id, answerContent, undefined);
@@ -397,7 +397,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                     onCancelAction();
                   }}
                   onCancel={onCancelAction}
-                  confirmLabelKey="app.chat.linearMessageView.answerModal.confirmLabel"
+                  confirmLabelKey="widget.linearView.answerModal.confirmLabel"
                   locale={locale}
                   logger={logger}
                   user={user}

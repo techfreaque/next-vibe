@@ -14,7 +14,8 @@ import { useState } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "../i18n";
 
 const TIMING = {
   COPY_FEEDBACK_DURATION: 2000,
@@ -43,7 +44,7 @@ export function CopyButton({
   logger,
 }: CopyButtonProps): JSX.Element {
   const [copied, setCopied] = useState(false);
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   // Check if we have dual format support
   const hasDualFormat =
@@ -79,8 +80,8 @@ export function CopyButton({
             className={className || "h-8 w-8 md:h-7 md:w-7"}
             title={
               copied
-                ? t("app.chat.common.copyButton.copied")
-                : t("app.chat.common.copyButton.copyToClipboard")
+                ? t("widget.common.copyButton.copied")
+                : t("widget.common.copyButton.copyToClipboard")
             }
           >
             {copied ? (
@@ -93,11 +94,11 @@ export function CopyButton({
         <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuItem onClick={() => handleCopy("markdown")}>
             <Copy className="mr-2 h-4 w-4" />
-            {t("app.chat.common.copyButton.copyAsMarkdown")}
+            {t("widget.common.copyButton.copyAsMarkdown")}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleCopy("text")}>
             <Copy className="mr-2 h-4 w-4" />
-            {t("app.chat.common.copyButton.copyAsText")}
+            {t("widget.common.copyButton.copyAsText")}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -113,8 +114,8 @@ export function CopyButton({
       className={className || "h-8 w-8 md:h-7 md:w-7"}
       title={
         copied
-          ? t("app.chat.common.copyButton.copied")
-          : t("app.chat.common.copyButton.copyToClipboard")
+          ? t("widget.common.copyButton.copied")
+          : t("widget.common.copyButton.copyToClipboard")
       }
     >
       {copied ? (

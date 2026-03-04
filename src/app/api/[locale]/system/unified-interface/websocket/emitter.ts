@@ -4,8 +4,9 @@
  * Creates a typed emit() function for route handlers.
  * The emitter validates payloads against Zod schemas before broadcasting.
  *
- * Events are sent to the WS sidecar via HTTP POST, since the Next.js
- * process and WS sidecar run in separate processes.
+ * Next.js runs in a separate process from the Bun proxy. To broadcast WS events,
+ * route handlers POST to the proxy's internal /ws/broadcast endpoint which calls
+ * broadcastLocal() in-process where the WS connections live.
  */
 
 import "server-only";
@@ -16,41 +17,52 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import type { EventSchemas, TypedEmit, WsWireMessage } from "./types";
 
-/** Cached sidecar URL — built lazily from PORT env var */
-let sidecarUrl: string | null = null;
-
-function getSidecarUrl(): string {
-  if (sidecarUrl) {
-    return sidecarUrl;
+/**
+ * Derive the proxy's internal broadcast URL.
+ * In proxy mode (default): proxy is on NEXT_PUBLIC_APP_URL's port.
+ * In direct mode (VIBE_DISABLE_PROXY): WS sidecar is on main port + 1000.
+ */
+function getBroadcastUrl(): string {
+  const appUrl = process.env["NEXT_PUBLIC_APP_URL"] ?? "http://localhost:3000";
+  try {
+    const parsed = new URL(appUrl);
+    const mainPort = parsed.port ? parseInt(parsed.port, 10) : 3000;
+    const disableProxy = process.env["VIBE_DISABLE_PROXY"] === "true";
+    const wsPort = disableProxy ? mainPort + 1000 : mainPort;
+    return `http://127.0.0.1:${wsPort}/ws/broadcast`;
+  } catch {
+    return "http://127.0.0.1:3000/ws/broadcast";
   }
-  const nextPort = parseInt(process.env.PORT ?? "3000", 10);
-  const wsPort = nextPort + 1000;
-  // eslint-disable-next-line i18next/no-literal-string
-  sidecarUrl = `http://127.0.0.1:${String(wsPort)}/publish`;
-  return sidecarUrl;
 }
 
 /**
- * Publish a WS event to the sidecar (fire-and-forget HTTP POST).
- * Accepts the full wire message shape — channel, event name, and typed payload.
+ * Publish a WS event — POST to the Bun proxy's internal broadcast endpoint.
+ * Fire-and-forget: errors are logged but not thrown.
  */
 export function publishWsEvent(
   msg: Omit<WsWireMessage, "seq">,
   logger: EndpointLogger,
 ): void {
-  const payload = JSON.stringify(msg);
-
-  fetch(getSidecarUrl(), {
+  const url = getBroadcastUrl();
+  fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: payload,
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(msg),
   }).catch((err) => {
-    logger.warn("[WS Emitter] Failed to publish to WS sidecar", {
-      error: err instanceof Error ? err.message : String(err),
-      channel: msg.channel,
-      event: msg.event,
-    });
+    if (!shuttingDown) {
+      logger.warn("[WS Emitter] Failed to broadcast event", {
+        error: err instanceof Error ? err.message : String(err),
+        channel: msg.channel,
+        event: msg.event,
+      });
+    }
   });
+}
+
+/** Set to true during shutdown to suppress expected broadcast errors */
+let shuttingDown = false;
+export function setShuttingDown(): void {
+  shuttingDown = true;
 }
 
 /**

@@ -24,6 +24,12 @@ export const translations = {
       title: "How Can We Help You?",
       subtitle:
         "Get support for your uncensored AI chat experience or find answers to common questions",
+      info: {
+        title: "Contact Information",
+        supportEmail: "Support Email",
+        website: "Website",
+        websiteUrl: "Visit our website",
+      },
       faq: {
         title: "Frequently Asked Questions",
         questions: {

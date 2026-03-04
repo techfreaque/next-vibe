@@ -1,22 +1,44 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  nav: {
-    overview: "Przegląd",
-    campaigns: "Lista e-maili",
-    imap: "Serwer IMAP",
-    smtp: "Konta SMTP",
-    smtpDescription: "Zarządzaj kontami e-mail SMTP i konfiguracjami",
-    templates: "Szablony e-mail",
-    messagingAccounts: "Konta Wiadomości",
-    messagingCompose: "Wyślij wiadomość",
-  },
   admin: {
-    title: "Zarządzanie pocztą e-mail",
-    description:
-      "Monitoruj kampanie e-mailowe, śledź wydajność i analizuj zaangażowanie",
+    title: "Administracja e-mail",
     stats: {
       title: "Statystyki e-mail",
+    },
+  },
+  nav: {
+    campaigns: "Kampanie",
+    overview: "Przegląd",
+    templates: "Szablony",
+    messagingAccounts: "Konta komunikatorów",
+    imap: "IMAP",
+    smtp: "SMTP",
+    smtpDescription: "Konta SMTP",
+  },
+  imap: {
+    nav: {
+      messages: "Skrzynka odbiorcza",
+      starred: "Oznaczone",
+      sent: "Wysłane",
+      drafts: "Szkice",
+      spam: "Spam",
+      trash: "Kosz",
+      accounts: "Konta IMAP",
+      config: "Konfiguracja",
+      sync: "Synchronizacja",
+      overview: "Przegląd",
+      compose: "Napisz",
+    },
+    admin: {
+      overview: {
+        title: "Przegląd IMAP",
+      },
+    },
+  },
+  smtp: {
+    list: {
+      title: "Konta SMTP",
     },
   },
 };

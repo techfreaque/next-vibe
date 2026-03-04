@@ -104,7 +104,6 @@ export function useChatSettings(
             },
           };
         },
-        undefined,
       );
 
       // Set form values before submitting

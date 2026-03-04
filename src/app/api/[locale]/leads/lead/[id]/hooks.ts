@@ -35,10 +35,14 @@ export function useLeadByIdEndpoint(
         },
       },
       update: {
+        urlPathParams: { id: params.leadId },
         formOptions: {
           persistForm: false,
           persistenceKey: `lead-edit-${params.leadId}-form`, // eslint-disable-line i18next/no-literal-string -- Form persistence key
         },
+      },
+      delete: {
+        urlPathParams: { id: params.leadId },
       },
     },
     logger,

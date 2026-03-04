@@ -13,7 +13,8 @@ import { getIdColor } from "@/app/[locale]/chat/lib/utils/formatting";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "../../i18n";
 
 interface MessagePreviewProps {
   message: ChatMessage;
@@ -33,7 +34,7 @@ export function MessagePreview({
   locale,
   rootFolderId,
 }: MessagePreviewProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const idColor = getIdColor(shortId);
   const isUser = message.role === "user";
 
@@ -64,9 +65,9 @@ export function MessagePreview({
           >
             {isUser
               ? rootFolderId === "public" || rootFolderId === "shared"
-                ? (message.authorName ?? t("app.chat.flatView.anonymous"))
-                : t("app.chat.flatView.youLabel")
-              : t("app.chat.flatView.assistantFallback")}
+                ? (message.authorName ?? t("widget.flatView.anonymous"))
+                : t("widget.flatView.youLabel")
+              : t("widget.flatView.assistantFallback")}
           </Span>
           <Span
             style={{

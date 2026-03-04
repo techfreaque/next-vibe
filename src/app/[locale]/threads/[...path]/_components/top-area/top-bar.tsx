@@ -28,10 +28,10 @@ import { isDefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { useChatStore } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
-import { useSidebarCollapsed } from "@/app/api/[locale]/agent/chat/hooks/use-sidebar-collapsed";
-import { scopedTranslation } from "@/app/api/[locale]/agent/chat/i18n";
+import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { useSidebarCollapsed } from "../sidebar/use-sidebar-collapsed";
 import { LocaleSelectorContent } from "./locale-selector-content";
 
 interface TopBarProps {

@@ -40,6 +40,9 @@ export function LeadEditPageClient({
             staleTime: 30 * 1000,
           },
         },
+        delete: {
+          urlPathParams: { id: leadId },
+        },
       }}
     />
   );

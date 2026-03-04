@@ -161,7 +161,6 @@ const { POST } = createEndpoint({
               };
             }
           },
-          undefined,
         );
       },
     },

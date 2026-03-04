@@ -25,15 +25,16 @@ interface SubscriptionPageProps {
   }>;
 }
 
-const VALID_TABS = ["overview", "buy", "history"];
+const BASE_TABS = ["overview", "buy", "history"];
 
 export default async function SubscriptionPage({
   params,
 }: SubscriptionPageProps): Promise<JSX.Element> {
   const { locale, tabId } = await params;
 
-  // Validate tab
-  if (!VALID_TABS.includes(tabId)) {
+  // "remote" tab only available on non-cloud instances
+  const validTabs = env.VIBE_IS_CLOUD ? BASE_TABS : [...BASE_TABS, "remote"];
+  if (!validTabs.includes(tabId)) {
     notFound();
   }
 
@@ -108,6 +109,7 @@ export default async function SubscriptionPage({
       initialHistory={initialHistory}
       hasPaymentProvider={hasPaymentProvider}
       isAdmin={isAdmin}
+      isCloud={env.VIBE_IS_CLOUD}
     />
   );
 }

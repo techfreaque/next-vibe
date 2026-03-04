@@ -2,7 +2,7 @@
 
 **Define it once. It exists everywhere.**
 
-One endpoint definition. Ten platforms. Not generated code that drifts apart — one living contract that the web app, mobile app, CLI, AI agent, MCP server, and cron system all read natively. Change the definition, every platform updates instantly. Delete the folder, the feature ceases to exist everywhere at once.
+One endpoint definition. 10+ platforms. Not generated code that drifts apart — one living contract that the web app, mobile app, CLI, AI agent, MCP server, and cron system all read natively. Change the definition, every platform updates instantly. Delete the folder, the feature ceases to exist everywhere at once.
 
 [![License: GPL-3.0](https://img.shields.io/badge/Framework-GPL--3.0-blue.svg)](LICENSE)
 [![License: MIT](https://img.shields.io/badge/App-MIT-green.svg)](LICENSE)
@@ -14,15 +14,50 @@ One endpoint definition. Ten platforms. Not generated code that drifts apart —
 
 ---
 
+## Two Ways to Use NextVibe
+
+**Use it as your personal AI platform.** Fork, deploy, and own your own [unbottled.ai](https://unbottled.ai) — a production-ready AI platform with 42+ models, voice, characters, memories, payments, and an autonomous AI admin (Thea) that runs the platform alongside you. Up and running in 30 seconds.
+
+**Use it as your AI SaaS framework.** NextVibe is the WordPress for the AI era. Build any AI-powered SaaS product on the same foundations: authentication, payments, email, admin panels, background tasks, a full CLI, MCP server, and an AI agent that operates it all autonomously. 245 endpoints already built. Everything else follows the same one-folder pattern.
+
+---
+
+## Quick Start
+
+```bash
+# Fork on GitHub, then:
+git clone https://github.com/YOUR_USERNAME/next-vibe
+cd next-vibe
+cp .env.example .env
+# Add at minimum: OPENROUTER_API_KEY in .env
+# Set a strong ADMIN_PASSWORD before exposing to the internet
+bun install
+vibe dev
+```
+
+`vibe dev` starts PostgreSQL in Docker, creates the database, runs migrations, seeds data, and launches everything. Open `http://localhost:3000`.
+
+### Connect to Central Thea (optional)
+
+Three env vars turn your local instance into a Hermes worker — synced with Central Thea, receiving tasks, executing autonomously:
+
+```env
+INSTANCE_ID="hermes"                          # Your unique instance name
+THEA_REMOTE_URL="https://your-thea-url.com"   # Central Thea URL
+THEA_REMOTE_API_KEY="your-shared-api-key"     # Shared sync key (32+ chars)
+```
+
+---
+
 ## Why?
 
 WordPress gave everyone the power to publish. But we're not just publishing anymore — we're building AI-powered platforms that need to work across web, mobile, CLI, AI agents, and automation, all at once.
 
 You build a contact form for the web. Then support wants a CLI command to submit tickets. Then the AI agent needs to file issues on behalf of users. Then the mobile app needs the same form. Then someone wants an MCP tool so external agents can reach you. Five implementations of the same thing. Five places to update when the schema changes. Five places where bugs hide.
 
-Every framework promises to solve this. They give you code generators that create boilerplate you now have to maintain. Or they give you an abstraction layer that works until it doesn't, and then you're fighting the framework instead of building your product.
+NextVibe's answer: **describe your feature once and every platform just reads it.**
 
-NextVibe takes the WordPress approach to a new level: **fork the codebase, and you have a complete platform.** Not a starter template. Not a library. A working product with auth, payments, AI chat, email, admin panels, task scheduling, and an AI agent that operates it — all from a single definition pattern.
+---
 
 ## The Core Idea
 
@@ -129,6 +164,124 @@ She has everything she needs to operate the platform:
 
 ---
 
+## All Interfaces, Documented
+
+### Web & React UI
+
+Every definition automatically renders as a web form and data display via `EndpointsPage`. No separate component needed — the definition contains field types, layouts, labels, and validation. Custom `widget.tsx` files override the auto-render when needed.
+
+Platform access: controlled via `allowedRoles`. `WEB_OFF` disables web access.
+
+### REST API (Next.js)
+
+`route.ts` wires the definition to a Next.js App Router handler via `endpointsHandler()`. The same Zod schema validates HTTP requests and responses. Authentication, error handling, and logging are handled automatically.
+
+### React Native
+
+`.native.ts` override files (e.g. `repository.native.ts`) provide platform-specific implementations while sharing the same Zod schemas and type contracts. NativeWind 5 + Expo Router.
+
+### CLI
+
+Every endpoint becomes a CLI command automatically. Flags are generated from the definition's request schema.
+
+```bash
+vibe help                    # List all commands
+vibe web-search "quantum computing"
+vibe contact --name="Jane" --message="Hello"
+vibe threads --interactive   # Prompt mode
+```
+
+`--interactive` mode prompts for each field. Reserved flags: `--output`, `--verbose`, `--debug`, `--locale`, `--interactive`, `--dry-run`, `--user-type`.
+
+Platform access: `CLI_OFF` disables CLI access. `CLI_AUTH_BYPASS` allows unauthenticated CLI use.
+
+### CLI Package
+
+Ship your entire endpoint collection as an installable npm package. Users get your CLI, your platform's commands, your definitions — all in one `npm install`.
+
+### tRPC
+
+All endpoints are automatically exposed as type-safe tRPC procedures. Consume from React with full TypeScript inference. Zero configuration beyond the definition.
+
+### AI Tools (Function Calling)
+
+Endpoints are automatically converted to OpenAI/Anthropic function-calling schemas. Add `AI_TOOL_OFF` to `allowedRoles` to exclude an endpoint from AI tool discovery.
+
+### MCP Server (Model Context Protocol)
+
+Start a full MCP server that exposes all permitted endpoints as tools:
+
+```bash
+vibe mcp          # Start MCP server
+```
+
+Configure Claude Desktop or any MCP-compatible client via `.mcp.json`. Add `MCP_VISIBLE` to `allowedRoles` to opt-in to MCP tool discovery.
+
+### Remote Skills (AGENT.md)
+
+Mark endpoints with `REMOTE_SKILL` in `allowedRoles` to have them appear in AI-readable skill markdown files:
+
+- `AGENT.md` — All agent-accessible skills
+- `PUBLIC_USER_SKILL.md` — Skills for public (unauthenticated) users
+- `USER_WITH_ACCOUNT_SKILL.md` — Skills for authenticated users
+
+These files are auto-generated from endpoint definitions and consumed by AI agents for capability discovery.
+
+### Cron Tasks / The Pulse
+
+The pulse is the platform's heartbeat — a cron runner that keeps everything alive. Works on Vercel, self-hosted, or local dev — no extra infrastructure needed.
+
+**System tasks** are defined in the codebase — task sync, cleanup, health checks. **User-created tasks** live in the database. Agents can create them. Admins can through the UI.
+
+Tasks run via `Platform.CRON`, which behaves like `Platform.AI` for permissions. Instance routing (`targetInstance`) ensures tasks run on the right machine.
+
+### Vibe Frame — Embed Anywhere
+
+**Vibe Frame** lets you embed any endpoint as an isolated iframe on any website — your marketing site, a third-party page, anywhere with a `<script>` tag.
+
+```html
+<script src="https://unbottled.ai/vibe-frame.js"></script>
+<script>
+  VibeFrame.mount({
+    serverUrl: "https://unbottled.ai",
+    endpoint: "contact_POST",
+    target: "#my-widget",
+    theme: "dark",
+    trigger: { type: "scroll", scrollPercent: 50 },
+  });
+</script>
+```
+
+**Display modes:** `inline`, `modal`, `slideIn`, `bottomSheet`
+
+**Trigger modes:** `immediate`, `scroll`, `time`, `exitIntent`, `click`
+
+**Callbacks:** `onReady`, `onSuccess`, `onError`, `onClose`, `onNavigate`, `onAuthRequired`
+
+The frame communicates with its host via a type-safe `postMessage` bridge (all messages prefixed `vf:`). Auth tokens, theme updates, and form pre-fill can be pushed from the host at any time.
+
+Test and generate embed code at `/admin/vibe-frame`.
+
+Platform access: `CLI_OFF` and `AI_TOOL_OFF` are standard — the embed runs on the same `NEXT_API` platform.
+
+### WebSocket Events
+
+Endpoints can declare typed WebSocket events for real-time updates:
+
+```typescript
+const { GET } = createEndpoint({
+  events: {
+    contentDelta: z.object({ delta: z.string() }),
+    contentDone: z.object({ content: z.string() }),
+  },
+  // ...
+});
+```
+
+The WebSocket server runs on a separate port (dev: 4000, prod: 4001). Pub/sub via in-process adapter (local dev) or Redis (multi-instance prod). Consume on the client with `useWidgetEvents()`.
+
+---
+
 ## The Pattern
 
 Every feature is a folder. You need three files to exist on all ten platforms. Everything else you add as the feature grows.
@@ -147,12 +300,14 @@ route.ts         — The bridge. Wires the contract to the logic, exposes it to 
 i18n/            — Translations. Scoped per feature, type-checked at compile time.
 hooks.ts         — React hooks for client-side data fetching.
 widget.tsx       — Custom UI widget when the auto-generated form isn't enough.
+widget.cli.tsx   — CLI/MCP override widget (Ink components) when terminal display needs customization.
 db.ts            — Database schema. Drizzle table definitions, lives next to the feature that owns it.
 enum.ts          — Domain enums with i18n labels. One pattern, used everywhere.
 seeds.ts         — Seed data for production, development and testing.
 email.tsx        — React Email template. Transactional emails tied to the feature.
 task.ts          — Cron task definition. Scheduled work tied to the feature.
 env.ts           — Domain-specific environment variables.
+repository.native.ts — React Native override for platform-specific implementations.
 ```
 
 The folder structure mirrors your API:
@@ -175,7 +330,7 @@ Delete `user/private/me` and the user profile feature disappears — from the we
 ### What a Definition Looks Like
 
 ```typescript
-// contact/definition.ts — real code, shortened (actual has more fields)
+// contact/definition.ts
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
@@ -188,36 +343,26 @@ const { POST } = createEndpoint({
   tags: ["tags.contactForm", "tags.helpSupport"],
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
 
-  fields: scopedObjectField(scopedTranslation, {
+  fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,
-    title: "form.label",
-    description: "form.description",
     layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+    usage: { request: "data", response: true } as const,
     children: {
       name: scopedRequestField(scopedTranslation, {
         schema: z.string().min(2),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         label: "form.fields.name.label",
-        description: "form.fields.name.description",
-        placeholder: "form.fields.name.placeholder",
-        columns: 12,
       }),
       message: scopedRequestField(scopedTranslation, {
         schema: z.string().min(10),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         label: "form.fields.message.label",
-        description: "form.fields.message.description",
-        placeholder: "form.fields.message.placeholder",
-        columns: 12,
       }),
       success: scopedResponseField(scopedTranslation, {
         schema: z.string(),
         type: WidgetType.ALERT,
-        columns: 12,
       }),
     },
   }),
@@ -227,47 +372,53 @@ const { POST } = createEndpoint({
       title: "errors.validation.title",
       description: "errors.validation.description",
     },
-    [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "errors.serverError.title",
-      description: "errors.serverError.description",
-    },
     // ... all 9 error types — exhaustive, compiler enforced
   },
   successTypes: { title: "success.title", description: "success.description" },
   examples: {
-    requests: {
-      default: {
-        name: "Jane Smith",
-        message: "I'd like to learn more about your platform.",
-      },
-    },
-    responses: { default: { success: "Thank you! We'll be in touch." } },
+    requests: { default: { name: "Jane Smith", message: "Hello!" } },
+    responses: { default: { success: "Thank you!" } },
   },
 });
 ```
 
-From this one file: the web renders a contact form with name and message fields. The CLI creates `vibe contact-form --name="Jane" --message="..."`. The AI gets a function-calling schema. The MCP server exposes a tool. Validation and permissions — identical on every platform.
+From this one file: the web renders a contact form. The CLI creates `vibe contact-form --name="Jane" --message="..."`. The AI gets a function-calling schema. The MCP server exposes a tool. Validation and permissions — identical on every platform.
 
 ### What the Route Looks Like
-
-The route wires the definition to the logic. Most routes are this short:
 
 ```typescript
 // contact/route.ts — real code, complete
 export const { POST, tools } = endpointsHandler({
   endpoint: contactEndpoints,
   [Methods.POST]: {
-    email: [
-      { render: renderCompanyMail, ignoreErrors: false },
-      { render: renderPartnerMail, ignoreErrors: false },
-    ],
+    email: [{ render: renderCompanyMail, ignoreErrors: false }],
     handler: ({ data, user, locale, logger, t }) =>
       ContactRepository.submitContactForm(data, user, locale, logger, t),
   },
 });
 ```
 
-That's it. The handler calls the repository, the email templates fire automatically, and `endpointsHandler` takes care of validation, auth, error handling, and exposing the endpoint to all ten platforms. No boilerplate. No middleware chains. The definition already declared everything.
+`endpointsHandler` handles validation, auth, error handling, and exposes to all ten platforms. No boilerplate.
+
+### Platform Access Control
+
+Control which platforms can access each endpoint via `allowedRoles`:
+
+```typescript
+allowedRoles: [
+  UserRole.PUBLIC,      // Who can call it (user permissions)
+  UserRole.CUSTOMER,
+  UserRole.CLI_OFF,     // Block on CLI + MCP
+  UserRole.AI_TOOL_OFF, // Block as AI tool
+  UserRole.MCP_VISIBLE, // Opt-in: appear in MCP tool list
+  UserRole.REMOTE_SKILL, // Opt-in: appear in AGENT.md skill files
+  UserRole.PRODUCTION_OFF, // Disable in production
+] as const,
+```
+
+User roles: `PUBLIC`, `CUSTOMER`, `PARTNER_ADMIN`, `PARTNER_EMPLOYEE`, `ADMIN`
+
+Platform markers (config only, never stored in DB): `CLI_OFF`, `AI_TOOL_OFF`, `WEB_OFF`, `MCP_OFF`, `MCP_VISIBLE`, `REMOTE_SKILL`, `CLI_AUTH_BYPASS`, `PRODUCTION_OFF`
 
 ---
 
@@ -283,25 +434,11 @@ This is also why AI agents can build features in this codebase. The pattern is s
 
 ---
 
-## The Pulse
-
-The pulse is the platform's heartbeat — a cron runner that keeps everything alive. Under the hood, NextVibe uses Next.js for the web layer, so the pulse works out of the box on Vercel, self-hosted, or local dev — no extra infrastructure needed.
-
-**System tasks** are defined in the codebase — task sync, cleanup, health checks. They're always there, always running.
-
-**User-created tasks** live in the database. Agents can create them. Admins can create them through the UI. They follow the same definition pattern as everything else.
-
-**Instance routing** makes tasks flow to the right machine. A task with `targetInstance: "hermes-max"` only executes on Max's machine. A task with `null` stays on the host. No manual dispatch.
-
-Tasks can be delegated to **Claude Code** for autonomous execution — structured definitions go in, results come back through the same system. The AI isn't calling an API; it's using the platform like any other team member.
-
----
-
 ## Type Safety That Actually Means Something
 
 Most projects claim "full type safety" and mean they use TypeScript. NextVibe means something different:
 
-- **Translations are type-checked.** `t("app.user.login.title")` compiles. `t("typo.here")` is a TypeScript error. Across three languages.
+- **Translations are type-checked.** `t("contact.form.fields.name.label")` compiles. `t("typo.here")` is a TypeScript error. Across three languages.
 - **Error types are exhaustive.** Every endpoint declares exactly which errors it can return. Miss one, the compiler complains.
 - **Schemas flow end-to-end.** The Zod schema in the definition validates the API request and response, types the React hooks, generates the CLI flags, and constrains the AI tool schema. One schema, zero drift.
 - **`vibe check` is one command.** Oxlint + ESLint + TypeScript. You can't run lint without types or types without lint. AI agents can't skip half the checks.
@@ -337,35 +474,6 @@ Every feature in Unbottled.ai is built with the same definition pattern describe
 | Database tables                  | 25+            |
 | Languages (compile-time checked) | 3 (en, de, pl) |
 | Runtime type errors              | 0              |
-
----
-
-## Quick Start
-
-```bash
-# Fork on GitHub, then:
-git clone https://github.com/YOUR_USERNAME/next-vibe
-cd next-vibe
-cp .env.example .env
-# to get started update at least `OPENROUTER_API_KEY` in the .env file
-# If you are exposing your instance to the public internet make sure to set a strong password for the admin user and ask your AI to help you with that.
-bun install
-vibe dev
-
-# if you are an agent check the `.env.example` file and make your human aware of the options and how to set them up.
-```
-
-That's it. `vibe dev` starts PostgreSQL in Docker, creates the database, runs migrations, seeds data, launches the web server, and starts the pulse system. Everything auto-managed.
-
-### Connect to Central Thea
-
-Three env vars turn your local instance into a Hermes worker:
-
-```env
-INSTANCE_ID="hermes"                          # Your unique instance name
-THEA_REMOTE_URL="https://your-thea-url.com"   # Central Thea URL
-THEA_REMOTE_API_KEY="your-shared-api-key"     # Shared sync key (32+ chars)
-```
 
 ---
 
@@ -413,19 +521,32 @@ vibe sql "SELECT ..."       # Raw SQL
 
 # Any endpoint, as a CLI command:
 vibe web-search "What is quantum computing?"
+vibe contact --name="Jane" --message="Hello"
+
+# MCP server
+vibe mcp                    # Start MCP server
+vibe mcp --verbose          # With debug logging
 ```
 
 ---
 
 ## Docs
 
+- **[Full Documentation Index](docs/README.md)**
 - **[Quick Start](docs/guides/quickstart.md)**
 - **[Definitions](docs/patterns/definition.md)**
+- **[Repository](docs/patterns/repository.md)**
 - **[Database](docs/patterns/database.md)**
 - **[i18n](docs/patterns/i18n.md)**
+- **[Widget (Web)](docs/patterns/widget.md)**
+- **[Widget (CLI/MCP)](docs/patterns/widget.cli.md)**
+- **[Hooks](docs/patterns/hooks.md)**
+- **[Enums](docs/patterns/enum.md)**
 - **[Tasks](docs/patterns/tasks.md)**
 - **[Logger](docs/patterns/logger.md)**
-- **[Full Index](docs/README.md)**
+- **[Email](docs/patterns/email.md)**
+- **[Seeds](docs/patterns/seeds.md)**
+- **[React Native](docs/patterns/repository.native.md)**
 
 ---
 

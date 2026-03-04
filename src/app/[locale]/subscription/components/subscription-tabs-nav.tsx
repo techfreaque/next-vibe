@@ -5,7 +5,12 @@ import Link from "next/link";
 import { cn } from "next-vibe/shared/utils/utils";
 import type { IconComponent } from "next-vibe-ui/lib/helper";
 import { Div } from "next-vibe-ui/ui/div";
-import { History, ShoppingCart, TrendingUp } from "next-vibe-ui/ui/icons";
+import {
+  History,
+  Link2,
+  ShoppingCart,
+  TrendingUp,
+} from "next-vibe-ui/ui/icons";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -14,11 +19,13 @@ import { simpleT } from "@/i18n/core/shared";
 interface SubscriptionTabsNavProps {
   locale: CountryLanguage;
   activeTab?: string;
+  isCloud?: boolean;
 }
 
 export function SubscriptionTabsNav({
   locale,
   activeTab,
+  isCloud = false,
 }: SubscriptionTabsNavProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -46,11 +53,21 @@ export function SubscriptionTabsNav({
       icon: History,
       label: t("app.subscription.subscription.tabs.history"),
     },
+    ...(!isCloud
+      ? [
+          {
+            value: "remote",
+            href: `/${locale}/subscription/remote` satisfies Route,
+            icon: Link2,
+            label: t("app.subscription.subscription.tabs.remote"),
+          },
+        ]
+      : []),
   ];
 
   return (
     <Div className="inline-flex h-11 items-center justify-center rounded-lg bg-muted/50 p-1 text-muted-foreground border border-border w-full">
-      <Div className="grid w-full grid-cols-3 gap-1">
+      <Div className={`grid w-full grid-cols-${tabs.length.toString()} gap-1`}>
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.value;

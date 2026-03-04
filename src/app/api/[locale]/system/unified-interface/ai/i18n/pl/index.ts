@@ -23,6 +23,11 @@ export const translations: typeof enTranslations = {
           description:
             "Parametry wejściowe jako obiekt JSON. Parametry ścieżki URL są automatycznie wyodrębniane.",
         },
+        instanceId: {
+          label: "ID instancji",
+          description:
+            'Opcjonalne ID zdalnej instancji. Gdy ustawione, tworzy asynchroniczne zadanie na zdalnej instancji. Wynik: {taskId, status:"pending"}.',
+        },
       },
       response: {
         result:

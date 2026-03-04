@@ -10,7 +10,6 @@ import {
   DEV_SEED_PASSWORD,
   DEV_SEED_USERS,
 } from "@/app/api/[locale]/user/dev-seed-users";
-import { LoginForm } from "@/app/api/[locale]/user/public/login/_components/login-form";
 import { scopedTranslation as loginScopedTranslation } from "@/app/api/[locale]/user/public/login/i18n";
 import { LoginRepository } from "@/app/api/[locale]/user/public/login/repository";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
@@ -19,7 +18,9 @@ import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
-import { simpleT } from "@/i18n/core/shared";
+
+import { LoginForm } from "./_components/login-form";
+import { scopedTranslation as pageT } from "./i18n";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -76,7 +77,7 @@ export default async function LoginPage({
 }: Props): Promise<JSX.Element> {
   const { locale } = await params;
   const { callbackUrl } = await searchParams;
-  const { t } = simpleT(locale);
+  const { t } = pageT.scopedT(locale);
   const { t: loginT } = loginScopedTranslation.scopedT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
 
@@ -110,16 +111,10 @@ export default async function LoginPage({
     loginT,
   );
   if (!loginOptionsResponse.success) {
-    return (
-      <Div>
-        {t(loginOptionsResponse.message, loginOptionsResponse.messageParams)}
-      </Div>
-    );
+    return <Div>{loginOptionsResponse.message}</Div>;
   }
   if (!verifiedUserResponse.success) {
-    return (
-      <Div>{t("app.user.other.login.errors.failedToLoadBrowserIdentity")}</Div>
-    );
+    return <Div>{t("errors.failedToLoadBrowserIdentity")}</Div>;
   }
 
   const devSeedPassword =
@@ -133,7 +128,7 @@ export default async function LoginPage({
         className="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 mb-8"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        {t("app.user.common.backToHome")}
+        {t("backToHome")}
       </Link>
       <LoginForm
         locale={locale}

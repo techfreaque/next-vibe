@@ -5,7 +5,7 @@
 
 import { createEnumOptions } from "next-vibe/system/unified-interface/shared/field/enum";
 
-import { scopedTranslation } from "../chat/i18n";
+import { scopedTranslation } from "./i18n";
 
 // ============================================
 // MODEL UTILITY - What models are good at

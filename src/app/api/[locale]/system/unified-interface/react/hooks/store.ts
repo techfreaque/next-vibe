@@ -16,7 +16,7 @@ import type { TranslationKey } from "@/i18n/core/static-types";
 
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { executeQuery } from "./query-executor";
-import { buildKey } from "./query-key-builder";
+import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
 import type { ApiMutationOptions, ApiQueryOptions } from "./types";
 
 // Create a single QueryClient instance
@@ -149,7 +149,7 @@ export interface ApiStore {
    * @param endpoint - The endpoint definition
    * @param logger - Logger for debugging
    * @param updater - Function to update the cached data
-   * @param urlPathParams - URL path parameters (undefined if endpoint has none)
+   * @param options - URL path params and/or cache key request data (omit when neither is needed)
    */
   updateEndpointData: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
@@ -157,13 +157,35 @@ export interface ApiStore {
     updater: (
       oldData: ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined,
     ) => ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined,
-    urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] | undefined,
+    ...options: TEndpoint["types"]["UrlVariablesOutput"] extends never
+      ? CacheKeyRequestData<TEndpoint> extends undefined
+        ? []
+        : [options: { requestData: CacheKeyRequestData<TEndpoint> }]
+      : CacheKeyRequestData<TEndpoint> extends undefined
+        ? [options: { urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] }]
+        : [
+            options: {
+              urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
+              requestData: CacheKeyRequestData<TEndpoint>;
+            },
+          ]
   ) => void;
 
   getEndpointData: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
     logger: EndpointLogger,
-    urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] | undefined,
+    ...options: TEndpoint["types"]["UrlVariablesOutput"] extends never
+      ? CacheKeyRequestData<TEndpoint> extends undefined
+        ? []
+        : [options: { requestData: CacheKeyRequestData<TEndpoint> }]
+      : CacheKeyRequestData<TEndpoint> extends undefined
+        ? [options: { urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] }]
+        : [
+            options: {
+              urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
+              requestData: CacheKeyRequestData<TEndpoint>;
+            },
+          ]
   ) => ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined;
 }
 
@@ -291,34 +313,72 @@ export const useApiStore = create<ApiStore>((set, get) => ({
     updater: (
       oldData: ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined,
     ) => ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined,
-    urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] | undefined,
+    ...args: TEndpoint["types"]["UrlVariablesOutput"] extends never
+      ? CacheKeyRequestData<TEndpoint> extends undefined
+        ? []
+        : [options: { requestData: CacheKeyRequestData<TEndpoint> }]
+      : CacheKeyRequestData<TEndpoint> extends undefined
+        ? [options: { urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] }]
+        : [
+            options: {
+              urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
+              requestData: CacheKeyRequestData<TEndpoint>;
+            },
+          ]
   ): void => {
-    // buildKey returns string, wrap in array for React Query
-    const builtKey = buildKey("query", endpoint, urlPathParams, logger);
-    const stateKey = [builtKey];
-
+    const options = args[0] as
+      | {
+          urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"];
+          requestData?: CacheKeyRequestData<TEndpoint>;
+        }
+      | undefined;
+    const builtKey = buildKey(
+      "query",
+      endpoint,
+      options?.urlPathParams,
+      logger,
+      options?.requestData as CacheKeyRequestData<TEndpoint>,
+    );
     queryClient.setQueryData(
-      stateKey,
+      [builtKey],
       (
         oldData: ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined,
-      ) => {
-        return updater(oldData);
-      },
+      ) => updater(oldData),
     );
   },
 
   getEndpointData: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
     logger: EndpointLogger,
-    urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] | undefined,
+    ...args: TEndpoint["types"]["UrlVariablesOutput"] extends never
+      ? CacheKeyRequestData<TEndpoint> extends undefined
+        ? []
+        : [options: { requestData: CacheKeyRequestData<TEndpoint> }]
+      : CacheKeyRequestData<TEndpoint> extends undefined
+        ? [options: { urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] }]
+        : [
+            options: {
+              urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
+              requestData: CacheKeyRequestData<TEndpoint>;
+            },
+          ]
   ): ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined => {
-    // buildKey returns string, wrap in array for React Query
-    const builtKey = buildKey("query", endpoint, urlPathParams, logger);
-    const stateKey = [builtKey];
-
+    const options = args[0] as
+      | {
+          urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"];
+          requestData?: CacheKeyRequestData<TEndpoint>;
+        }
+      | undefined;
+    const builtKey = buildKey(
+      "query",
+      endpoint,
+      options?.urlPathParams,
+      logger,
+      options?.requestData as CacheKeyRequestData<TEndpoint>,
+    );
     return queryClient.getQueryData<
       ResponseType<TEndpoint["types"]["ResponseOutput"]>
-    >(stateKey);
+    >([builtKey]);
   },
 }));
 
@@ -504,12 +564,32 @@ export const apiClient = {
   refetchEndpoint: async <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
     logger: EndpointLogger,
-    ...args: TEndpoint["types"]["UrlVariablesOutput"] extends undefined
-      ? []
-      : [urlPathParams: TEndpoint["types"]["UrlVariablesOutput"]]
+    ...args: TEndpoint["types"]["UrlVariablesOutput"] extends never
+      ? CacheKeyRequestData<TEndpoint> extends undefined
+        ? []
+        : [options: { requestData: CacheKeyRequestData<TEndpoint> }]
+      : CacheKeyRequestData<TEndpoint> extends undefined
+        ? [options: { urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] }]
+        : [
+            options: {
+              urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
+              requestData: CacheKeyRequestData<TEndpoint>;
+            },
+          ]
   ): Promise<void> => {
-    const urlPathParams = args[0];
-    const builtKey = buildKey("query", endpoint, urlPathParams, logger);
+    const options = args[0] as
+      | {
+          urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"];
+          requestData?: CacheKeyRequestData<TEndpoint>;
+        }
+      | undefined;
+    const builtKey = buildKey(
+      "query",
+      endpoint,
+      options?.urlPathParams,
+      logger,
+      options?.requestData as CacheKeyRequestData<TEndpoint>,
+    );
     const queryKey = [builtKey];
     await queryClient.invalidateQueries({ queryKey });
   },
@@ -570,20 +650,71 @@ export const apiClient = {
     updater: (
       oldData: ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined,
     ) => ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined,
-    urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] | undefined,
+    ...args: TEndpoint["types"]["UrlVariablesOutput"] extends never
+      ? CacheKeyRequestData<TEndpoint> extends undefined
+        ? []
+        : [options: { requestData: CacheKeyRequestData<TEndpoint> }]
+      : CacheKeyRequestData<TEndpoint> extends undefined
+        ? [options: { urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] }]
+        : [
+            options: {
+              urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
+              requestData: CacheKeyRequestData<TEndpoint>;
+            },
+          ]
   ): void => {
-    useApiStore
-      .getState()
-      .updateEndpointData(endpoint, logger, updater, urlPathParams);
+    const options = args[0] as
+      | {
+          urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"];
+          requestData?: CacheKeyRequestData<TEndpoint>;
+        }
+      | undefined;
+    const builtKey = buildKey(
+      "query",
+      endpoint,
+      options?.urlPathParams,
+      logger,
+      options?.requestData as CacheKeyRequestData<TEndpoint>,
+    );
+    queryClient.setQueryData(
+      [builtKey],
+      (
+        oldData: ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined,
+      ) => updater(oldData),
+    );
   },
 
   getEndpointData: <TEndpoint extends CreateApiEndpointAny>(
     endpoint: TEndpoint,
     logger: EndpointLogger,
-    urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] | undefined,
+    ...args: TEndpoint["types"]["UrlVariablesOutput"] extends never
+      ? CacheKeyRequestData<TEndpoint> extends undefined
+        ? []
+        : [options: { requestData: CacheKeyRequestData<TEndpoint> }]
+      : CacheKeyRequestData<TEndpoint> extends undefined
+        ? [options: { urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] }]
+        : [
+            options: {
+              urlPathParams: TEndpoint["types"]["UrlVariablesOutput"];
+              requestData: CacheKeyRequestData<TEndpoint>;
+            },
+          ]
   ): ResponseType<TEndpoint["types"]["ResponseOutput"]> | undefined => {
-    return useApiStore
-      .getState()
-      .getEndpointData(endpoint, logger, urlPathParams);
+    const options = args[0] as
+      | {
+          urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"];
+          requestData?: CacheKeyRequestData<TEndpoint>;
+        }
+      | undefined;
+    const builtKey = buildKey(
+      "query",
+      endpoint,
+      options?.urlPathParams,
+      logger,
+      options?.requestData as CacheKeyRequestData<TEndpoint>,
+    );
+    return queryClient.getQueryData<
+      ResponseType<TEndpoint["types"]["ResponseOutput"]>
+    >([builtKey]);
   },
 };

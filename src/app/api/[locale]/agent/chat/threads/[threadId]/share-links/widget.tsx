@@ -16,7 +16,8 @@ import definitions from "@/app/api/[locale]/agent/chat/threads/[threadId]/share-
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "./i18n";
 
 interface ThreadShareDialogProps {
   open: boolean;
@@ -35,7 +36,7 @@ export function ThreadShareDialog({
   locale,
   user,
 }: ThreadShareDialogProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   const endpointOptions = useMemo(
     () => ({
@@ -68,7 +69,7 @@ export function ThreadShareDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0">
-          <DialogTitle>{t("app.chat.shareDialog.title")}</DialogTitle>
+          <DialogTitle>{t("widget.shareDialog.title")}</DialogTitle>
           <Div className="text-sm text-muted-foreground mt-2">
             {threadTitle}
           </Div>
@@ -85,7 +86,7 @@ export function ThreadShareDialog({
 
         <Div className="flex gap-2 justify-end pt-4 border-t flex-shrink-0 -mx-6 px-6">
           <Button variant="outline" onClick={handleClose}>
-            {t("app.chat.common.close")}
+            {t("widget.common.close")}
           </Button>
         </Div>
       </DialogContent>

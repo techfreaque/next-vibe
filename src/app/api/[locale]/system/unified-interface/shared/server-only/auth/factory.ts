@@ -21,6 +21,7 @@ export function getPlatformAuthHandler(platform: Platform): BaseAuthHandler {
     case Platform.REMOTE_SKILL:
     case Platform.AI:
     case Platform.CRON:
+    case Platform.ELECTRON:
       return webAuthHandler;
 
     case Platform.CLI:

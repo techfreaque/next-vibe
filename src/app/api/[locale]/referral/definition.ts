@@ -77,7 +77,6 @@ export const { POST } = createEndpoint({
               codes: [newCode, ...oldData.data.codes],
             });
           },
-          undefined,
         );
       },
     },

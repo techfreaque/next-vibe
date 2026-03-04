@@ -52,12 +52,12 @@ import { TextareaFieldWidget } from "@/app/api/[locale]/system/unified-interface
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
 import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 
-import { CronTaskPriority, CronTaskStatus } from "../../enum";
-import type endpoints from "./definition";
+import { CronTaskPriority, CronTaskStatus } from "../../../enum";
+import type endpoints from "../definition";
 import type {
   CronTaskGetResponseOutput,
   CronTaskPutRequestOutput,
-} from "./definition";
+} from "../definition";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -538,7 +538,7 @@ export function CronTaskDetailContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const m = await import("./definition");
+      const m = await import("../definition");
       navigate(m.default.PUT, {
         urlPathParams: { id: task.id },
         data: task as never,
@@ -555,7 +555,7 @@ export function CronTaskDetailContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const m = await import("./definition");
+      const m = await import("../definition");
       navigate(m.default.DELETE, {
         urlPathParams: { id: task.id },
         renderInModal: true,
@@ -570,7 +570,7 @@ export function CronTaskDetailContainer({
       return;
     }
     void (async (): Promise<void> => {
-      const m = await import("../history/definition");
+      const m = await import("../../history/definition");
       navigate(m.default.GET, {
         data: { taskId: task.id },
       });

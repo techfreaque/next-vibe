@@ -1,6 +1,3 @@
-import { translations as messagesTranslations } from "../../messages/i18n/de";
-import { translations as permissionsTranslations } from "../../permissions/i18n/de";
-import { translations as shareLinksTranslations } from "../../share-links/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -8,9 +5,6 @@ export const translations: typeof enTranslations = {
   tags: {
     threads: "Threads",
   },
-  messages: messagesTranslations,
-  permissions: permissionsTranslations,
-  shareLinks: shareLinksTranslations,
   errors: {
     not_implemented_on_native:
       "{{method}} ist auf der nativen Plattform nicht implementiert. Bitte verwenden Sie die Web-Version für diesen Vorgang.",
@@ -375,6 +369,12 @@ export const translations: typeof enTranslations = {
     success: {
       title: "Erfolg",
       description: "Thread erfolgreich gelöscht",
+    },
+  },
+  widget: {
+    screenshot: {
+      capture: "Screenshot aufnehmen",
+      capturing: "Wird aufgenommen...",
     },
   },
 };

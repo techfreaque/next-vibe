@@ -8,6 +8,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
+import { type CacheKeyRequestData } from "./query-key-builder";
 import type {
   ApiQueryFormOptions,
   ApiQueryFormReturn,
@@ -43,8 +44,15 @@ export function useEndpointFilter<TEndpoint extends CreateApiEndpointAny>(
       TEndpoint["types"]["UrlVariablesOutput"]
     >;
     urlPathParams?: TEndpoint["types"]["UrlVariablesOutput"];
-    initialFilters?: Partial<TEndpoint["types"]["RequestOutput"]>;
-  } = {},
+    /**
+     * Initial filter values. Fields with includeInCacheKey: true are required
+     * (they determine the cache key). All other fields are optional.
+     */
+    initialFilters?: CacheKeyRequestData<TEndpoint> extends undefined
+      ? Partial<TEndpoint["types"]["RequestOutput"]>
+      : CacheKeyRequestData<TEndpoint> &
+          Partial<TEndpoint["types"]["RequestOutput"]>;
+  },
 ): ApiQueryFormReturn<
   TEndpoint["types"]["RequestOutput"],
   TEndpoint["types"]["ResponseOutput"],
@@ -103,6 +111,7 @@ export function useEndpointFilter<TEndpoint extends CreateApiEndpointAny>(
   const queryFormResult = useApiQueryForm({
     endpoint: filterEndpoint,
     urlPathParams: urlPathParams,
+    requestData: initialFilters as CacheKeyRequestData<TEndpoint>,
     queryOptions: enhancedQueryOptions,
     formOptions: enhancedFormOptions,
     logger: logger,

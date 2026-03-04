@@ -18,6 +18,9 @@ import { getDefaultToolIds } from "./constants";
 let publicCount: number | null = null;
 let customerCount: number | null = null;
 let adminCount: number | null = null;
+let adminMaxAllPlatformsCount: number | null = null;
+
+const MOCK_ID = "00000000-0000-0000-0000-000000000000";
 
 function ensureComputed(): void {
   if (publicCount !== null) {
@@ -26,23 +29,40 @@ function ensureComputed(): void {
 
   publicCount = definitionsRegistry.getEndpointsForUser(Platform.AI, {
     isPublic: true as const,
-    leadId: "00000000-0000-0000-0000-000000000000",
+    leadId: MOCK_ID,
     roles: [UserRole.PUBLIC],
   }).length;
 
   customerCount = definitionsRegistry.getEndpointsForUser(Platform.AI, {
-    id: "00000000-0000-0000-0000-000000000000",
-    leadId: "00000000-0000-0000-0000-000000000000",
+    id: MOCK_ID,
+    leadId: MOCK_ID,
     isPublic: false as const,
     roles: [UserRole.CUSTOMER],
   }).length;
 
   adminCount = definitionsRegistry.getEndpointsForUser(Platform.AI, {
-    id: "00000000-0000-0000-0000-000000000000",
-    leadId: "00000000-0000-0000-0000-000000000000",
+    id: MOCK_ID,
+    leadId: MOCK_ID,
     isPublic: false as const,
     roles: [UserRole.ADMIN],
   }).length;
+
+  // Max across all platforms for admin — used for marketing copy
+  const allPlatforms = Object.values(Platform);
+  const seen = new Set<string>();
+  const adminUser = {
+    id: MOCK_ID,
+    leadId: MOCK_ID,
+    isPublic: false as const,
+    roles: [UserRole.ADMIN],
+  };
+  for (const platform of allPlatforms) {
+    const eps = definitionsRegistry.getEndpointsForUser(platform, adminUser);
+    for (const ep of eps) {
+      seen.add(`${ep.path.join("/")}|${ep.method}`);
+    }
+  }
+  adminMaxAllPlatformsCount = seen.size;
 }
 
 /**
@@ -70,11 +90,21 @@ export function getTotalToolCount(user: JwtPayloadType): number {
 }
 
 /**
- * Get the maximum tool count (admin-level).
+ * Get the maximum tool count (admin-level, AI platform).
  * Represents the full platform capability regardless of user role.
  * Useful for marketing/landing pages that show total platform tools.
  */
 export function getMaxToolCount(): number {
   ensureComputed();
   return adminCount!;
+}
+
+/**
+ * Get the maximum tool count across ALL platforms (admin-level).
+ * Deduplicates by path+method so each unique endpoint is counted once.
+ * This is the real "how many things can your agent do" number.
+ */
+export function getMaxToolCountAllPlatforms(): number {
+  ensureComputed();
+  return adminMaxAllPlatformsCount!;
 }

@@ -90,65 +90,60 @@ export function useCredits(
         return;
       }
 
-      apiClient.updateEndpointData(
-        definitions.GET,
-        logger,
-        (oldData) => {
-          if (!oldData?.success) {
-            return oldData;
-          }
+      apiClient.updateEndpointData(definitions.GET, logger, (oldData) => {
+        if (!oldData?.success) {
+          return oldData;
+        }
 
-          const data = oldData.data;
+        const data = oldData.data;
 
-          if (data.total < creditCost) {
-            return oldData;
-          }
+        if (data.total < creditCost) {
+          return oldData;
+        }
 
-          // Deduct credits: free → expiring → permanent → earned
-          let remaining = creditCost;
-          let newFree = data.free;
-          let newExpiring = data.expiring;
-          let newPermanent = data.permanent;
-          let newEarned = data.earned;
+        // Deduct credits: free → expiring → permanent → earned
+        let remaining = creditCost;
+        let newFree = data.free;
+        let newExpiring = data.expiring;
+        let newPermanent = data.permanent;
+        let newEarned = data.earned;
 
-          if (remaining > 0 && newFree > 0) {
-            const deduction = Math.min(newFree, remaining);
-            newFree -= deduction;
-            remaining -= deduction;
-          }
+        if (remaining > 0 && newFree > 0) {
+          const deduction = Math.min(newFree, remaining);
+          newFree -= deduction;
+          remaining -= deduction;
+        }
 
-          if (remaining > 0 && newExpiring > 0) {
-            const deduction = Math.min(newExpiring, remaining);
-            newExpiring -= deduction;
-            remaining -= deduction;
-          }
+        if (remaining > 0 && newExpiring > 0) {
+          const deduction = Math.min(newExpiring, remaining);
+          newExpiring -= deduction;
+          remaining -= deduction;
+        }
 
-          if (remaining > 0 && newPermanent > 0) {
-            const deduction = Math.min(newPermanent, remaining);
-            newPermanent -= deduction;
-            remaining -= deduction;
-          }
+        if (remaining > 0 && newPermanent > 0) {
+          const deduction = Math.min(newPermanent, remaining);
+          newPermanent -= deduction;
+          remaining -= deduction;
+        }
 
-          if (remaining > 0 && newEarned > 0) {
-            const deduction = Math.min(newEarned, remaining);
-            newEarned -= deduction;
-            remaining -= deduction;
-          }
+        if (remaining > 0 && newEarned > 0) {
+          const deduction = Math.min(newEarned, remaining);
+          newEarned -= deduction;
+          remaining -= deduction;
+        }
 
-          return {
-            success: true,
-            data: {
-              total: newFree + newExpiring + newPermanent + newEarned,
-              expiring: newExpiring,
-              permanent: newPermanent,
-              earned: newEarned,
-              free: newFree,
-              expiresAt: data.expiresAt,
-            },
-          };
-        },
-        undefined,
-      );
+        return {
+          success: true,
+          data: {
+            total: newFree + newExpiring + newPermanent + newEarned,
+            expiring: newExpiring,
+            permanent: newPermanent,
+            earned: newEarned,
+            free: newFree,
+            expiresAt: data.expiresAt,
+          },
+        };
+      });
     },
     [logger],
   );

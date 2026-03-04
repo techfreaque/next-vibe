@@ -47,6 +47,7 @@ export class MessagePathRepositoryClient {
           branchMeta: [],
           hasOlderHistory: false,
           oldestLoadedMessageId: null,
+          compactionBoundaryId: null,
         });
       }
 
@@ -137,6 +138,7 @@ export class MessagePathRepositoryClient {
         branchMeta,
         hasOlderHistory: false,
         oldestLoadedMessageId: path.length > 0 ? (path[0]?.id ?? null) : null,
+        compactionBoundaryId: null,
       });
     } catch (error) {
       logger.error("Failed to get incognito message path", parseError(error));

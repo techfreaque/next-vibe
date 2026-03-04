@@ -9,7 +9,6 @@
  */
 
 import type { FavoriteGetModelSelection } from "@/app/api/[locale]/agent/chat/favorites/[id]/definition";
-import type { ChatT } from "@/app/api/[locale]/agent/chat/i18n";
 import {
   DEFAULT_INPUT_TOKENS,
   DEFAULT_OUTPUT_TOKENS,
@@ -37,6 +36,7 @@ import {
   PriceLevelDB,
   SpeedLevelDB,
 } from "./enum";
+import type { CharactersT } from "./i18n";
 
 export class CharactersRepositoryClient {
   /**
@@ -44,7 +44,7 @@ export class CharactersRepositoryClient {
    */
   static formatCreditCost(
     cost: number,
-    t: ChatT,
+    t: CharactersT,
     isTokenBased = false,
   ): string {
     const prefix = isTokenBased ? "~" : "";
@@ -52,9 +52,9 @@ export class CharactersRepositoryClient {
       return t("selector.free");
     }
     if (cost === 1) {
-      return `${prefix}${t("components.credits.credit", { count: cost })}`;
+      return `${prefix}${t("credits.credit", { count: cost })}`;
     }
-    return `${prefix}${t("components.credits.credits", { count: cost })}`;
+    return `${prefix}${t("credits.credits", { count: cost })}`;
   }
   /**
    * Convert model credit cost to price level

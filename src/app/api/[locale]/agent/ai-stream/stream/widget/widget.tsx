@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from "next-vibe-ui/hooks/use-safe-area-insets";
 import { Div, type DivRefObject } from "next-vibe-ui/ui/div";
 import { KeyboardAvoidingView } from "next-vibe-ui/ui/keyboard-avoiding-view";
 import type { JSX } from "react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
@@ -20,9 +20,7 @@ import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context"
 import { useChatStore } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import messagesDefinition from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/definition";
-import { ChatInputContainer } from "@/app/api/[locale]/agent/chat/threads/widget/chat-input/input-container";
 import { ChatEmptyState } from "@/app/api/[locale]/agent/chat/threads/widget/new-thread/empty-state";
-import { PublicFeed } from "@/app/api/[locale]/agent/chat/threads/widget/public-feed/public-feed";
 import { AIToolsModal } from "@/app/api/[locale]/agent/tools/widget/ai-tools-modal";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import {
@@ -33,6 +31,7 @@ import { platform } from "@/config/env-client";
 
 import type definition from "../definition";
 import type { AiStreamPostResponseOutput } from "../definition";
+import { ChatInputContainer } from "./input-container";
 import { ChatToolbar } from "./toolbar";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -85,9 +84,6 @@ function AiStreamChatArea(): JSX.Element {
 
   const activeThreadId = useChatNavigationStore((s) => s.activeThreadId);
   const rootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
-  const currentSubFolderId = useChatNavigationStore(
-    (s) => s.currentSubFolderId,
-  );
   const pendingNewThreadIds = useChatStore((s) => s.pendingNewThreadIds);
 
   const isThreadPending =
@@ -105,13 +101,17 @@ function AiStreamChatArea(): JSX.Element {
   const inputHeight = useInputHeight(inputContainerRef);
   const insets = useSafeAreaInsets();
 
-  const shouldShowInput = !(
-    rootFolderId === "public" &&
-    !currentSubFolderId &&
-    !threadIdToRender
+  const messagesEndpointOptions = useMemo(
+    () => ({
+      read: {
+        urlPathParams: { threadId: threadIdToRender ?? "" },
+        initialState: { rootFolderId },
+        queryOptions: { enabled: !!threadIdToRender && !isThreadPending },
+        ...(messagesInitialData ? { initialData: messagesInitialData } : {}),
+      },
+    }),
+    [threadIdToRender, rootFolderId, isThreadPending, messagesInitialData],
   );
-
-  const isLoadingThread = !!threadIdToRender;
 
   return (
     <KeyboardAvoidingView
@@ -144,25 +144,11 @@ function AiStreamChatArea(): JSX.Element {
                 <EndpointsPage
                   key={threadIdToRender}
                   endpoint={{ GET: messagesDefinition.GET }}
-                  endpointOptions={{
-                    read: {
-                      urlPathParams: { threadId: threadIdToRender },
-                      queryOptions: { enabled: !isThreadPending },
-                      ...(messagesInitialData
-                        ? { initialData: messagesInitialData }
-                        : {}),
-                    },
-                  }}
+                  endpointOptions={messagesEndpointOptions}
                   className="h-full"
                   locale={locale}
                   user={user}
                 />
-              ) : rootFolderId === "public" && !currentSubFolderId ? (
-                <PublicFeed locale={locale} />
-              ) : isLoadingThread ? (
-                <Div className="flex-1 flex flex-col gap-5">
-                  <Div className="h-10" />
-                </Div>
               ) : (
                 <ChatEmptyState locale={locale} inputHeight={inputHeight} />
               )}
@@ -170,11 +156,9 @@ function AiStreamChatArea(): JSX.Element {
           </ErrorBoundary>
 
           {/* Input */}
-          {shouldShowInput && (
-            <ErrorBoundary locale={locale}>
-              <ChatInputContainer inputContainerRef={inputContainerRef} />
-            </ErrorBoundary>
-          )}
+          <ErrorBoundary locale={locale}>
+            <ChatInputContainer inputContainerRef={inputContainerRef} />
+          </ErrorBoundary>
 
           {/* AI Tools Modal */}
           <ErrorBoundary locale={locale}>

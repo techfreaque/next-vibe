@@ -17,8 +17,8 @@ export async function getSeedModule(
   moduleName: string,
 ): Promise<EnvironmentSeeds | null> {
   switch (moduleName) {
-    case "folders":
-      return (await import("../../agent/chat/folders/seeds")) as EnvironmentSeeds;
+    case "[rootFolderId]":
+      return (await import("../../agent/chat/folders/[rootFolderId]/seeds")) as EnvironmentSeeds;
     case "contact":
       return (await import("../../contact/seeds")) as EnvironmentSeeds;
     case "imap-client":
@@ -49,7 +49,7 @@ export async function getSeedModule(
  */
 export function getAllSeedModuleNames(): string[] {
   return [
-    "folders",
+    "[rootFolderId]",
     "contact",
     "imap-client",
     "messages",

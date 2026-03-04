@@ -20,9 +20,9 @@ import React from "react";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { FEATURE_COSTS } from "@/app/api/[locale]/products/repository-client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { useMessageEditorStore } from "../../hooks/use-message-editor-store";
+import { scopedTranslation } from "../../i18n";
 import { useMessageGroupName } from "../embedded-context";
 
 interface ThreadedMessageActionsProps {
@@ -77,7 +77,7 @@ export function ThreadedMessageActions({
   isRetrying,
   isAnswering,
 }: ThreadedMessageActionsProps): JSX.Element | null {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const { groupHover } = useMessageGroupName();
 
   // Editor actions from Zustand store
@@ -116,7 +116,7 @@ export function ThreadedMessageActions({
                 ? "text-blue-400"
                 : "text-muted-foreground hover:text-blue-400",
             )}
-            title={t("app.chat.threadedView.actions.upvote")}
+            title={t("widget.threadedView.actions.upvote")}
           >
             <ArrowBigUp
               className={cn("h-4 w-4", userVote === "up" && "fill-current")}
@@ -145,7 +145,7 @@ export function ThreadedMessageActions({
                 ? "text-red-400"
                 : "text-muted-foreground hover:text-red-400",
             )}
-            title={t("app.chat.threadedView.actions.downvote")}
+            title={t("widget.threadedView.actions.downvote")}
           >
             <ArrowBigDown
               className={cn("h-4 w-4", userVote === "down" && "fill-current")}
@@ -177,13 +177,13 @@ export function ThreadedMessageActions({
           title={
             isTTSLoading
               ? totalChunks > 1
-                ? `${t("app.chat.threadedView.actions.cancelLoading")} (${currentChunk}/${totalChunks})`
-                : t("app.chat.threadedView.actions.cancelLoading")
+                ? `${t("widget.threadedView.actions.cancelLoading")} (${currentChunk}/${totalChunks})`
+                : t("widget.threadedView.actions.cancelLoading")
               : isPlaying
                 ? totalChunks > 1
-                  ? `${t("app.chat.threadedView.actions.stopAudio")} (${currentChunk}/${totalChunks})`
-                  : t("app.chat.threadedView.actions.stopAudio")
-                : t("app.chat.threadedView.actions.playAudio", {
+                  ? `${t("widget.threadedView.actions.stopAudio")} (${currentChunk}/${totalChunks})`
+                  : t("widget.threadedView.actions.stopAudio")
+                : t("widget.threadedView.actions.playAudio", {
                     cost: ttsCreditCost.toFixed(2),
                   })
           }
@@ -198,13 +198,13 @@ export function ThreadedMessageActions({
           <Span>
             {isTTSLoading
               ? totalChunks > 1
-                ? `${t("app.chat.threadedView.actions.cancel")} (${currentChunk}/${totalChunks})`
-                : t("app.chat.threadedView.actions.cancel")
+                ? `${t("widget.threadedView.actions.cancel")} (${currentChunk}/${totalChunks})`
+                : t("widget.threadedView.actions.cancel")
               : isPlaying
                 ? totalChunks > 1
-                  ? `${t("app.chat.threadedView.actions.stop")} (${currentChunk}/${totalChunks})`
-                  : t("app.chat.threadedView.actions.stop")
-                : t("app.chat.threadedView.actions.play")}
+                  ? `${t("widget.threadedView.actions.stop")} (${currentChunk}/${totalChunks})`
+                  : t("widget.threadedView.actions.stop")
+                : t("widget.threadedView.actions.play")}
           </Span>
         </Button>
       )}
@@ -215,10 +215,10 @@ export function ThreadedMessageActions({
         size="unset"
         onClick={(): void => startEdit(message.id)}
         className="flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 text-muted-foreground hover:text-blue-400 transition-all"
-        title={t("app.chat.threadedView.actions.replyToMessage")}
+        title={t("widget.threadedView.actions.replyToMessage")}
       >
         <MessageSquare className="h-3.5 w-3.5" />
-        <Span>{t("app.chat.threadedView.actions.reply")}</Span>
+        <Span>{t("widget.threadedView.actions.reply")}</Span>
       </Button>
 
       {/* Edit - For user messages */}
@@ -228,9 +228,9 @@ export function ThreadedMessageActions({
           size="unset"
           onClick={(): void => startEdit(message.id)}
           className="flex items-center gap-1 px-2 py-1 rounded hover:bg-green-500/10 text-muted-foreground hover:text-green-400 transition-all"
-          title={t("app.chat.threadedView.actions.editMessage")}
+          title={t("widget.threadedView.actions.editMessage")}
         >
-          <Span>{t("app.chat.threadedView.actions.edit")}</Span>
+          <Span>{t("widget.threadedView.actions.edit")}</Span>
         </Button>
       )}
 
@@ -243,9 +243,9 @@ export function ThreadedMessageActions({
             onStartRetry(message);
           }}
           className="flex items-center gap-1 px-2 py-1 rounded hover:bg-yellow-500/10 text-muted-foreground hover:text-yellow-400 transition-all"
-          title={t("app.chat.threadedView.actions.retryWithDifferent")}
+          title={t("widget.threadedView.actions.retryWithDifferent")}
         >
-          <Span>{t("app.chat.threadedView.actions.retry")}</Span>
+          <Span>{t("widget.threadedView.actions.retry")}</Span>
         </Button>
       )}
 
@@ -257,11 +257,11 @@ export function ThreadedMessageActions({
         className="flex items-center gap-1 px-2 py-1 rounded hover:bg-purple-500/10 text-muted-foreground hover:text-purple-400 transition-all"
         title={
           message.role === "assistant"
-            ? t("app.chat.threadedView.actions.respondToAI")
-            : t("app.chat.threadedView.actions.generateAIResponse")
+            ? t("widget.threadedView.actions.respondToAI")
+            : t("widget.threadedView.actions.generateAIResponse")
         }
       >
-        <Span>{t("app.chat.threadedView.actions.answerAsAI")}</Span>
+        <Span>{t("widget.threadedView.actions.answerAsAI")}</Span>
       </Button>
 
       {/* Share/Permalink */}
@@ -279,10 +279,10 @@ export function ThreadedMessageActions({
           );
         }}
         className="flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 text-muted-foreground hover:text-blue-400 transition-all"
-        title={t("app.chat.threadedView.actions.copyPermalink")}
+        title={t("widget.threadedView.actions.copyPermalink")}
       >
         <Share2 className="h-3.5 w-3.5" />
-        <Span>{t("app.chat.threadedView.actions.share")}</Span>
+        <Span>{t("widget.threadedView.actions.share")}</Span>
       </Button>
 
       {/* Delete */}
@@ -292,9 +292,9 @@ export function ThreadedMessageActions({
           size="unset"
           onClick={(): void => onDeleteMessage(message.id)}
           className="flex items-center gap-1 px-2 py-1 rounded hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-all"
-          title={t("app.chat.threadedView.actions.deleteMessage")}
+          title={t("widget.threadedView.actions.deleteMessage")}
         >
-          <Span>{t("app.chat.threadedView.actions.delete")}</Span>
+          <Span>{t("widget.threadedView.actions.delete")}</Span>
         </Button>
       )}
 
@@ -315,7 +315,7 @@ export function ThreadedMessageActions({
           className="flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 text-muted-foreground hover:text-blue-400 transition-all"
         >
           <CornerDownRight className="h-3.5 w-3.5" />
-          <Span>{t("app.chat.threadedView.actions.parent")}</Span>
+          <Span>{t("widget.threadedView.actions.parent")}</Span>
         </Button>
       )}
 

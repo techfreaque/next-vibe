@@ -34,6 +34,8 @@ export enum StreamEventType {
   // Compacting events
   COMPACTING_DELTA = "compacting-delta",
   COMPACTING_DONE = "compacting-done",
+  // Thread metadata update event
+  THREAD_TITLE_UPDATED = "thread-title-updated",
   // Stream lifecycle event — unambiguous "stream is completely done" signal
   STREAM_FINISHED = "stream-finished",
 }
@@ -224,6 +226,18 @@ export interface TokensUpdatedEventData {
 }
 
 /**
+ * Thread title updated event data
+ * Emitted when the thread title is set from the user message content.
+ * Fired on new threads (send operation) and when STT transcription sets the title.
+ */
+export interface ThreadTitleUpdatedEventData {
+  /** Thread ID */
+  threadId: string;
+  /** New title derived from message content */
+  title: string;
+}
+
+/**
  * Stream finished event data
  * Emitted once when the entire stream (including all tool loops) is completely done.
  * This is the definitive "stream is over" signal for client cleanup.
@@ -260,6 +274,8 @@ export interface StreamEventDataMap {
   // Compacting events
   [StreamEventType.COMPACTING_DELTA]: CompactingDeltaEventData;
   [StreamEventType.COMPACTING_DONE]: CompactingDoneEventData;
+  // Thread metadata
+  [StreamEventType.THREAD_TITLE_UPDATED]: ThreadTitleUpdatedEventData;
   // Stream lifecycle
   [StreamEventType.STREAM_FINISHED]: StreamFinishedEventData;
 }
@@ -384,6 +400,13 @@ export const createStreamEvent = {
     data: CompactingDoneEventData,
   ): StreamEvent<StreamEventType.COMPACTING_DONE> => ({
     type: StreamEventType.COMPACTING_DONE,
+    data,
+  }),
+
+  threadTitleUpdated: (
+    data: ThreadTitleUpdatedEventData,
+  ): StreamEvent<StreamEventType.THREAD_TITLE_UPDATED> => ({
+    type: StreamEventType.THREAD_TITLE_UPDATED,
     data,
   }),
 

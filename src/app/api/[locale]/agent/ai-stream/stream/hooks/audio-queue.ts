@@ -32,17 +32,14 @@ export class AudioQueueManager {
    * Update voice mode store with playback state
    */
   private updateVoiceModeStore(isPlaying: boolean): void {
-    // Dynamically import to avoid circular dependencies and ensure it works client-side only
-    if (typeof window !== "undefined") {
-      void import("../../../chat/voice-mode/store")
-        .then(({ useVoiceModeStore }) => {
-          useVoiceModeStore.getState().setSpeaking(isPlaying);
-          return undefined;
-        })
-        .catch(() => {
-          // Silently fail - voice mode store not available
-        });
-    }
+    void import("@/app/api/[locale]/agent/ai-stream/stream/hooks/voice-mode/store")
+      .then(({ useVoiceModeStore }) => {
+        useVoiceModeStore.getState().setSpeaking(isPlaying);
+        return undefined;
+      })
+      .catch(() => {
+        // Silently fail - voice mode store not available
+      });
   }
 
   /**

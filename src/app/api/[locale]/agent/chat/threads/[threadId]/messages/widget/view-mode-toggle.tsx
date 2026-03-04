@@ -11,7 +11,8 @@ import {
   type ViewModeValue,
 } from "@/app/api/[locale]/agent/chat/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "../i18n";
 
 interface ViewModeToggleProps {
   mode: typeof ViewModeValue;
@@ -26,7 +27,7 @@ export function ViewModeToggle({
   locale,
   className,
 }: ViewModeToggleProps): React.JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   return (
     <Div className={cn("flex gap-1", className)}>
@@ -39,7 +40,7 @@ export function ViewModeToggle({
           mode === ViewMode.LINEAR &&
             "bg-primary/10 text-primary hover:bg-primary/20",
         )}
-        title={t("app.chat.common.viewModeToggle.linearView")}
+        title={t("widget.common.viewModeToggle.linearView")}
       >
         <List className="h-5 w-5" />
       </Button>
@@ -52,7 +53,7 @@ export function ViewModeToggle({
           mode === ViewMode.THREADED &&
             "bg-primary/10 text-primary hover:bg-primary/20",
         )}
-        title={t("app.chat.common.viewModeToggle.threadedView")}
+        title={t("widget.common.viewModeToggle.threadedView")}
       >
         <Network className="h-5 w-5" />
       </Button>
@@ -66,7 +67,7 @@ export function ViewModeToggle({
           mode === ViewMode.FLAT &&
             "bg-primary/10 text-primary hover:bg-primary/20",
         )}
-        title={t("app.chat.common.viewModeToggle.flatView")}
+        title={t("widget.common.viewModeToggle.flatView")}
       >
         <Hash className="h-5 w-5" />
       </Button>
@@ -80,7 +81,7 @@ export function ViewModeToggle({
           mode === ViewMode.DEBUG &&
             "bg-primary/10 text-primary hover:bg-primary/20",
         )}
-        title={t("app.chat.common.viewModeToggle.debugView")}
+        title={t("widget.common.viewModeToggle.debugView")}
       >
         <Bug className="h-5 w-5" />
       </Button>

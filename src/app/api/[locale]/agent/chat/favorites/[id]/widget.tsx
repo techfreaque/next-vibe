@@ -167,7 +167,6 @@ export function FavoriteEditContainer({
     const favoritesData = apiClient.getEndpointData(
       favoritesDefinition.default.GET,
       logger,
-      undefined,
     );
 
     const favorite = favoritesData?.success

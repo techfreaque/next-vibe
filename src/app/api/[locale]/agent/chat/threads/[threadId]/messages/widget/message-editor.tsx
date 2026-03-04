@@ -21,24 +21,24 @@ import {
 import type { JSX } from "react";
 import { useCallback, useState } from "react";
 
+import { CallModeIndicator } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/call-mode-indicator";
+import { FileUploadButton } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/file-upload-button";
+import { RecordingInputArea } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/recording-input-area";
+import { useVoiceRecording } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/use-voice-recording";
+import { Selector } from "@/app/api/[locale]/agent/ai-stream/stream/widget/selector";
+import { ToolsButton } from "@/app/api/[locale]/agent/ai-stream/stream/widget/tools-button";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
-import { CallModeIndicator } from "@/app/api/[locale]/agent/chat/threads/widget/chat-input/call-mode-indicator";
-import { FileUploadButton } from "@/app/api/[locale]/agent/chat/threads/widget/chat-input/file-upload-button";
-import { useVoiceRecording } from "@/app/api/[locale]/agent/chat/threads/widget/chat-input/hooks/use-voice-recording";
-import { Selector } from "@/app/api/[locale]/agent/chat/threads/widget/chat-input/selector";
-import { ToolsButton } from "@/app/api/[locale]/agent/chat/threads/widget/chat-input/tools-button";
 import { getModelById } from "@/app/api/[locale]/agent/models/models";
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
-import { RecordingInputArea } from "../../../widget/chat-input/recording-input-area";
 import { useMessageEditor } from "../hooks/use-message-editor";
+import { scopedTranslation } from "../i18n";
 
 interface MessageEditorProps {
   message: ChatMessage;
@@ -62,12 +62,8 @@ export function MessageEditor({
   logger,
   user,
 }: MessageEditorProps): JSX.Element {
-  const bootContext = useChatBootContext();
-  const creditsHook = useCredits(
-    bootContext.user,
-    bootContext.logger,
-    bootContext.initialCredits,
-  );
+  const { initialCredits, initialSettingsData } = useChatBootContext();
+  const creditsHook = useCredits(user, logger, initialCredits);
   const noopDeduct = useCallback(
     // No-op fallback when credits hook is unavailable
     () => undefined as void,
@@ -79,7 +75,7 @@ export function MessageEditor({
   const { settings, setTTSAutoplay } = useChatSettings(
     user,
     logger,
-    bootContext.initialSettingsData,
+    initialSettingsData,
   );
   const defaults = ChatSettingsRepositoryClient.getDefaults();
   const selectedModel = settings?.selectedModel ?? defaults.selectedModel;
@@ -87,7 +83,7 @@ export function MessageEditor({
     settings?.selectedCharacter ?? defaults.selectedCharacter;
   const ttsAutoplay = settings?.ttsAutoplay ?? defaults.ttsAutoplay;
 
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   // Local state for selector popover to avoid conflict with chat input selector
   const [selectorOpen, setSelectorOpen] = useState(false);
@@ -176,15 +172,15 @@ export function MessageEditor({
             {/* Hint text */}
             {!editor.content && (
               <Div className="absolute pl-3 top-2 left-0 pointer-events-none text-sm text-muted-foreground hidden @sm:block">
-                {t("app.chat.input.keyboardShortcuts.press")}{" "}
+                {t("widget.input.keyboardShortcuts.press")}{" "}
                 <Kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
-                  {t("app.chat.input.keyboardShortcuts.enter")}
+                  {t("widget.input.keyboardShortcuts.enter")}
                 </Kbd>{" "}
-                {t("app.chat.messageEditor.hint.branch")},{" "}
+                {t("widget.messageEditor.hint.branch")},{" "}
                 <Kbd className="px-1.5 py-0.5 bg-muted rounded text-xs">
-                  {t("app.chat.input.keyboardShortcuts.shiftEnter")}
+                  {t("widget.input.keyboardShortcuts.shiftEnter")}
                 </Kbd>{" "}
-                {t("app.chat.input.keyboardShortcuts.forNewLine")}
+                {t("widget.input.keyboardShortcuts.forNewLine")}
               </Div>
             )}
           </Div>
@@ -198,9 +194,7 @@ export function MessageEditor({
               characterId={selectedCharacter}
               modelId={selectedModel}
               locale={locale}
-              logger={logger}
               buttonClassName="px-1.5 @sm:px-2 @md:px-3 min-h-8 h-8 @sm:min-h-9 @sm:h-9"
-              user={user}
               open={selectorOpen}
               onOpenChange={setSelectorOpen}
             />
@@ -245,8 +239,8 @@ export function MessageEditor({
                 </TooltipTrigger>
                 <TooltipContent>
                   {ttsAutoplay
-                    ? t("app.chat.voiceMode.callModeDescription")
-                    : t("app.chat.voiceMode.callMode")}
+                    ? t("widget.voiceMode.callModeDescription")
+                    : t("widget.voiceMode.callMode")}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -267,7 +261,7 @@ export function MessageEditor({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    {t("app.chat.voiceMode.tapToRecord")}
+                    {t("widget.voiceMode.tapToRecord")}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -280,7 +274,7 @@ export function MessageEditor({
               size="icon"
               variant="default"
               className="h-8 w-8 @sm:h-9 @sm:w-9 shrink-0"
-              title={t("app.chat.messageEditor.titles.branch")}
+              title={t("widget.messageEditor.titles.branch")}
             >
               <GitBranch className="h-3.5 w-3.5 @sm:h-4 @sm:w-4" />
             </Button>
@@ -293,7 +287,7 @@ export function MessageEditor({
               size="icon"
               variant="destructive"
               className="h-8 w-8 @sm:h-9 @sm:w-9 shrink-0"
-              title={t("app.chat.messageEditor.titles.cancel")}
+              title={t("widget.messageEditor.titles.cancel")}
             >
               <X className="h-3.5 w-3.5 @sm:h-4 @sm:w-4" />
             </Button>

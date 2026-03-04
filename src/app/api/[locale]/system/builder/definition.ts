@@ -81,7 +81,7 @@ const { POST } = createEndpoint({
     UserRole.WEB_OFF,
     UserRole.CLI_AUTH_BYPASS,
   ],
-  aliases: ["builder", "package", "bundle", "build"],
+  aliases: ["builder", "package", "bundle"],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

@@ -44,8 +44,8 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { useChatSettings } from "../../../chat/settings/hooks";
-import { Selector } from "../../../chat/threads/widget/chat-input/selector";
-import { ToolsButton } from "../../../chat/threads/widget/chat-input/tools-button";
+import { Selector } from "./selector";
+import { ToolsButton } from "./tools-button";
 
 // ─── Props ──────────────────────────────────────────────────────────────────
 
@@ -207,8 +207,6 @@ export function WidgetChatInput({
             characterId={characterId}
             modelId={modelId}
             locale={locale}
-            user={user}
-            logger={logger}
             buttonClassName={cn(
               "px-1.5 @sm:px-2 @md:px-3 min-h-8 h-8 @sm:min-h-9 @sm:h-9",
               disabled && "opacity-70",

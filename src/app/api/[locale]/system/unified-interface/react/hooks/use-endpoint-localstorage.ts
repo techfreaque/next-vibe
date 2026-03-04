@@ -34,13 +34,13 @@ import type {
   PrimaryMutationUrlVariables,
 } from "../../shared/types/endpoint-helpers";
 import { scopedTranslation as hooksScopedTranslation } from "./i18n";
-import { buildKey } from "./query-key-builder";
+import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
 
 /**
  * localStorage read hook - uses React Query with localStorage callbacks
  */
-export function useLocalStorageRead<T>(
-  endpoint: CreateApiEndpointAny | null,
+export function useLocalStorageRead<T, TEndpoint extends CreateApiEndpointAny>(
+  endpoint: TEndpoint | null,
   logger: EndpointLogger,
   callback:
     | ((params: {
@@ -50,9 +50,10 @@ export function useLocalStorageRead<T>(
     | undefined,
   options: {
     urlPathParams?: GetUrlVariables<T>;
+    requestData: CacheKeyRequestData<TEndpoint>;
     initialState?: Partial<GetRequest<T>>;
     enabled?: boolean;
-  } = {},
+  },
 ): {
   form: UseFormReturn<GetRequest<T>>;
   response: ResponseType<GetResponse<T>> | undefined;
@@ -88,7 +89,15 @@ export function useLocalStorageRead<T>(
 
   // Build query key for React Query
   const queryKey = endpoint
-    ? [buildKey("query", endpoint, options.urlPathParams, logger)]
+    ? [
+        buildKey(
+          "query",
+          endpoint,
+          options.urlPathParams,
+          logger,
+          options.requestData,
+        ),
+      ]
     : [];
 
   // Use React Query for data fetching

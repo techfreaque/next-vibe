@@ -7,13 +7,14 @@ import type { JSX } from "react";
 
 import { ReferralRepository } from "@/app/api/[locale]/referral/repository";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import SignUpForm from "@/app/api/[locale]/user/public/signup/_components/sign-up-form";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { metadataGenerator } from "@/i18n/core/metadata";
-import { simpleT } from "@/i18n/core/shared";
+
+import SignUpForm from "./_components/sign-up-form";
+import { scopedTranslation as pageT } from "./i18n";
 
 interface Props {
   params: Promise<{ locale: CountryLanguage }>;
@@ -71,7 +72,7 @@ export default async function SignUpPage({
   if (env.NEXT_PUBLIC_LOCAL_MODE) {
     redirect(`/${locale}/user/login`);
   }
-  const { t } = simpleT(locale);
+  const { t } = pageT.scopedT(locale);
 
   const logger = createEndpointLogger(false, Date.now(), locale);
   const user = await UserRepository.getUserByAuth({}, locale, logger);
@@ -94,7 +95,7 @@ export default async function SignUpPage({
     }
   }
   if (!user.success) {
-    return <Div>{t("app.user.signup.errors.failedToLoadBrowserIdentity")}</Div>;
+    return <Div>{t("errors.failedToLoadBrowserIdentity")}</Div>;
   }
 
   return (
@@ -104,7 +105,7 @@ export default async function SignUpPage({
         className="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 mb-8"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
-        {t("app.user.common.backToHome")}
+        {t("backToHome")}
       </Link>
       <SignUpForm
         locale={locale}

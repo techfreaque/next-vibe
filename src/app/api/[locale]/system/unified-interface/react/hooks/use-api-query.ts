@@ -15,7 +15,7 @@ import type { EndpointReadOptions } from "../../shared/endpoints/definition/crea
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import type { ReactHooksTranslationKey } from "./i18n";
 import { executeQuery } from "./query-executor";
-import { buildKey } from "./query-key-builder";
+import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
 import {
   deserializeQueryParams,
   type FormQueryParams,
@@ -104,16 +104,24 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
     // persistToStorage will be used in Phase 3 when we setup persistQueryClient
   } = options;
 
-  // State key: endpoint.path + endpoint.method + urlPathParams
-  // Shared across all calls with same urlPathParams
+  // State key: endpoint.path + endpoint.method + urlPathParams + includeInCacheKey fields
+  // Shared across all calls with same urlPathParams + cacheKey request data
   const queryKey: QueryKey = useMemo(() => {
     if (customQueryKey) {
       // Custom key is a string, wrap it in array for React Query
       return [customQueryKey];
     }
     // buildKey returns a string, wrap it in array for React Query
-    return [buildKey("query", endpoint, urlPathParams, logger)];
-  }, [endpoint, logger, urlPathParams, customQueryKey]);
+    return [
+      buildKey(
+        "query",
+        endpoint,
+        urlPathParams,
+        logger,
+        requestData as CacheKeyRequestData<TEndpoint>,
+      ),
+    ];
+  }, [endpoint, logger, urlPathParams, customQueryKey, requestData]);
 
   // Use React Query's useQuery hook
   const query = useQuery({
@@ -137,10 +145,14 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
         Object.keys(urlPathParams as FormQueryParams).length > 0;
 
       // Use stored params if available and non-empty, and no urlPathParams override,
-      // otherwise fall back to the prop value.
+      // and no custom queryKey (custom keys indicate per-value caching where requestData
+      // is already the correct value — using stored params would return stale data from
+      // a previous value, e.g. switching root folder tabs).
+      // Otherwise fall back to the prop value.
       // Deserialize any JSON-stringified nested objects
       const hasStoredParams =
         !hasUrlPathParams &&
+        !customQueryKey &&
         storedParams !== undefined &&
         storedParams !== null &&
         Object.keys(storedParams).length > 0;
@@ -274,8 +286,12 @@ export function useApiQuery<TEndpoint extends CreateApiEndpointAny>({
 
     const isLoading = query.isLoading || query.isFetching;
     const isFetching = query.isFetching;
-    const isLoadingFresh = query.isLoading;
-    const isCachedData = !!query.data && !query.isLoading;
+    // isLoadingFresh = true when: genuinely loading (no cache hit), OR showing placeholder
+    // data from a previous query key (keepPreviousData active during key change).
+    // Widgets use isLoadingFresh to decide whether to show a spinner vs. stale data.
+    const isLoadingFresh = query.isLoading || query.isPlaceholderData;
+    const isCachedData =
+      !!query.data && !query.isLoading && !query.isPlaceholderData;
     const isError = query.isError || responseData?.success === false;
     const isSuccess = query.isSuccess && responseData?.success === true;
 

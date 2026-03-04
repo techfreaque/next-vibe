@@ -16,9 +16,9 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import type { CollapseStateStore } from "../../hooks/use-collapse-state";
+import { scopedTranslation } from "../../i18n";
 import { useMessageGroupName } from "../embedded-context";
 import { ErrorMessageBubble } from "../error-message-bubble";
 import type { groupMessagesBySequence } from "../message-grouping";
@@ -53,7 +53,7 @@ export function ThreadedMessageContent({
   characterName,
   rootFolderId,
 }: ThreadedMessageContentProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const { group } = useMessageGroupName();
 
   // Get all messages in the sequence (primary + continuations)
@@ -121,21 +121,21 @@ export function ThreadedMessageContent({
                   ? (() => {
                       const name =
                         message.authorName ??
-                        t("app.chat.threadedView.anonymous");
+                        t("widget.threadedView.anonymous");
                       const idSlice = message.authorId
                         ? message.authorId.slice(0, 8)
                         : null;
                       return idSlice
-                        ? t("app.chat.threadedView.authorWithId", {
+                        ? t("widget.threadedView.authorWithId", {
                             name,
                             id: idSlice,
                           })
                         : name;
                     })()
-                  : t("app.chat.threadedView.youLabel")
+                  : t("widget.threadedView.youLabel")
                 : message.role === "assistant" && message.model
                   ? getModelById(message.model).name
-                  : t("app.chat.threadedView.assistantFallback")}
+                  : t("widget.threadedView.assistantFallback")}
             </Button>
           </Span>
 

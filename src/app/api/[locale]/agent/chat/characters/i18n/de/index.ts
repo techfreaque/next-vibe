@@ -1213,4 +1213,11 @@ export const translations: typeof enTranslations = {
       button: "Jetzt Chatten",
     },
   },
+  selector: {
+    free: "KOSTENLOS",
+  },
+  credits: {
+    credit: "{{count}} Credit",
+    credits: "{{count}} Credits",
+  },
 };

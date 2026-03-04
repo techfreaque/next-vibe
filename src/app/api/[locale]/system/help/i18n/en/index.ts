@@ -78,6 +78,11 @@ export const translations = {
       platforms: {
         title: "Available platforms",
       },
+      instanceId: {
+        label: "Instance ID",
+        description:
+          "Filter to tools from a specific remote instance. Returns tools from the stored capability snapshot for that instance.",
+      },
     },
     success: {
       title: "Tools fetched successfully",

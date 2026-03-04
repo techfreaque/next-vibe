@@ -70,7 +70,7 @@ export function killPreviousInstance(
     return;
   }
 
-  logger.info("Killing previous vibe instance", { pid, pidFile });
+  logger.debug("Killing previous vibe instance", { pid, pidFile });
 
   try {
     process.kill(pid, "SIGTERM");
@@ -94,7 +94,7 @@ export function killPreviousInstance(
       }
     }
 
-    logger.info("Previous vibe instance stopped", { pid });
+    logger.debug("Previous vibe instance stopped", { pid });
   } catch {
     // Process may have died between check and kill
     logger.debug("Previous instance already gone");

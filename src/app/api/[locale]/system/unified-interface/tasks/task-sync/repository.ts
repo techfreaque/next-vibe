@@ -6,6 +6,8 @@
 
 import "server-only";
 
+import { createHash } from "node:crypto";
+
 import { eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -14,13 +16,26 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
+import { z } from "zod";
 
 import { memories } from "@/app/api/[locale]/agent/chat/memories/db";
 import { db } from "@/app/api/[locale]/system/db";
+import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import type {
+  JsonObject,
+  RemoteToolCapability,
+} from "@/app/api/[locale]/user/remote-connection/db";
+import { touchLastSynced } from "@/app/api/[locale]/user/remote-connection/repository";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
-import { defaultLocale } from "@/i18n/core/config";
+import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
+import { definitionsRegistry } from "../../shared/endpoints/definitions/registry";
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import type { NewCronTask } from "../cron/db";
 import { cronTasks } from "../cron/db";
@@ -30,8 +45,9 @@ import {
   type TaskCategoryDB,
   type TaskOutputModeDB,
 } from "../enum";
-import type { scopedTranslation } from "../i18n";
+import { scopedTranslation } from "../i18n";
 import type { JsonValue, NotificationTarget } from "../unified-runner/types";
+import type { SyncRequestOutput, SyncResponseOutput } from "./definition";
 
 /**
  * Build the remote API URL for an endpoint from its definition path.
@@ -42,8 +58,6 @@ function buildRemoteEndpointUrl(
 ): string {
   return `${remoteBaseUrl}/api/${defaultLocale}/${endpoint.path.join("/")}`;
 }
-
-type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 type CronTaskSelect = typeof cronTasks.$inferSelect;
 
@@ -94,6 +108,81 @@ function serializeForSync(task: CronTaskSelect): SyncedCronTask {
     tags: task.tags as string[],
     targetInstance: task.targetInstance,
   };
+}
+
+/**
+ * Build a capability snapshot for a user — serializes all endpoints the user
+ * can access as JSON Schema tool manifests. Sent to cloud on each pulse.
+ * JSON.stringify naturally strips function refs (render, execute, etc.).
+ */
+export function buildCapabilitySnapshot(
+  user: JwtPayloadType,
+  instanceId: string,
+  locale: CountryLanguage,
+): { capabilities: RemoteToolCapability[]; hash: string } {
+  const allEndpoints = definitionsRegistry.getEndpointsForUser(
+    Platform.AI,
+    user,
+  );
+  const capabilities: RemoteToolCapability[] = [];
+
+  for (const endpoint of allEndpoints) {
+    try {
+      const { t } = endpoint.scopedTranslation.scopedT(locale);
+      const toolName = getPreferredToolName(endpoint);
+      const title = t(endpoint.title);
+      const description = t(endpoint.description ?? endpoint.title);
+
+      // Build input schema via same logic as tools-loader
+      const requestDataSchema = generateSchemaForUsage(
+        endpoint.fields,
+        FieldUsage.RequestData,
+      ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
+
+      const urlParamsSchema = generateSchemaForUsage(
+        endpoint.fields,
+        FieldUsage.RequestUrlParams,
+      ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
+
+      const combinedShape: Record<string, z.ZodTypeAny> = {};
+      if (requestDataSchema instanceof z.ZodObject) {
+        Object.assign(combinedShape, requestDataSchema.shape);
+      }
+      if (urlParamsSchema instanceof z.ZodObject) {
+        Object.assign(combinedShape, urlParamsSchema.shape);
+      }
+
+      const inputSchema = z.toJSONSchema(z.object(combinedShape), {
+        target: "draft-7",
+        io: "input",
+        unrepresentable: "any",
+      }) as JsonObject;
+
+      // Serialize fields — JSON.stringify drops render/function refs automatically
+      const fields = JSON.parse(
+        JSON.stringify(endpoint.fields ?? {}),
+      ) as JsonObject;
+
+      capabilities.push({
+        toolName,
+        title,
+        description,
+        inputSchema,
+        fields,
+        executionMode: "via-execute-route",
+        isAsync: true,
+        instanceId,
+      });
+    } catch {
+      // Skip endpoints that fail to serialize
+    }
+  }
+
+  const hash = createHash("sha256")
+    .update(JSON.stringify(capabilities))
+    .digest("hex");
+
+  return { capabilities, hash };
 }
 
 /**
@@ -213,9 +302,10 @@ export async function upsertRemoteTasks(params: {
  */
 export async function getUserCreatedTasks(params: {
   logger: EndpointLogger;
-  t: ModuleT;
+  locale: CountryLanguage;
 }): Promise<ResponseType<{ tasks: SyncedCronTask[] }>> {
-  const { logger, t } = params;
+  const { logger, locale } = params;
+  const { t } = scopedTranslation.scopedT(locale);
 
   try {
     // Only sync tasks that have an explicit targetInstance.
@@ -240,215 +330,157 @@ export async function getUserCreatedTasks(params: {
   }
 }
 
-/** In-memory cache for lead ID acquired during this process lifetime */
-let cachedLeadId: string | null = null;
-
 /**
- * Fetch a lead_id cookie from the remote instance by visiting a page.
- * The middleware on the remote sets a lead_id cookie on first visit via redirect.
- * Persists the acquired lead ID to .env for future restarts.
- */
-async function acquireRemoteLeadId(
-  remoteUrl: string,
-  logger: EndpointLogger,
-): Promise<string | null> {
-  try {
-    // Fetch the remote homepage — middleware will redirect with Set-Cookie
-    const response = await fetch(remoteUrl, {
-      method: "GET",
-      redirect: "manual", // Don't follow redirect, we need the Set-Cookie header
-      signal: AbortSignal.timeout(15000),
-    });
-
-    // Extract lead_id from Set-Cookie header
-    const setCookieHeaders = response.headers.getSetCookie();
-    for (const cookie of setCookieHeaders) {
-      const match = cookie.match(/lead_id=([0-9a-f-]{36})/i);
-      if (match?.[1]) {
-        const leadId = match[1];
-        logger.info("Acquired lead_id from remote instance", { leadId });
-
-        // Persist to .env file for future restarts
-        try {
-          const { appendFile, readFile } = await import("node:fs/promises");
-          const { join } = await import("node:path");
-          const envPath = join(process.cwd(), ".env");
-          const envContent = await readFile(envPath, "utf-8").catch(() => "");
-
-          if (!envContent.includes("THEA_REMOTE_LEAD_ID")) {
-            await appendFile(envPath, `\nTHEA_REMOTE_LEAD_ID="${leadId}"\n`);
-            logger.info("Persisted THEA_REMOTE_LEAD_ID to .env");
-          }
-        } catch (fsError) {
-          logger.warn("Could not persist lead_id to .env (non-fatal)", {
-            error: fsError instanceof Error ? fsError.message : String(fsError),
-          });
-        }
-
-        return leadId;
-      }
-    }
-
-    logger.warn("No lead_id cookie in remote response", {
-      status: response.status,
-    });
-    return null;
-  } catch (error) {
-    logger.error("Failed to acquire lead_id from remote", {
-      error: error instanceof Error ? error.message : String(error),
-    });
-    return null;
-  }
-}
-
-/**
- * Build headers for remote sync requests.
- * Auto-acquires lead_id from remote on first use if not configured.
- */
-async function buildRemoteSyncHeaders(
-  remoteUrl: string,
-  logger: EndpointLogger,
-): Promise<Record<string, string>> {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
-
-  let leadId = env.THEA_REMOTE_LEAD_ID ?? cachedLeadId;
-  if (!leadId) {
-    leadId = await acquireRemoteLeadId(remoteUrl, logger);
-    if (leadId) {
-      cachedLeadId = leadId;
-    }
-  }
-
-  if (leadId) {
-    headers.Cookie = `lead_id=${leadId}`;
-  }
-  return headers;
-}
-
-/**
- * Pull cron tasks from remote Thea instance and upsert locally.
+ * Pull cron tasks and memories from all users' remote connections.
+ * Iterates user_remote_connections — each user's remote is synced independently.
+ * Cloud instances (VIBE_IS_CLOUD=true) skip outbound sync entirely.
  */
 export async function pullFromRemote(
   logger: EndpointLogger,
-  t: ModuleT,
+  locale: CountryLanguage,
 ): Promise<ResponseType<{ pulled: number }>> {
-  const remoteUrl = env.THEA_REMOTE_URL;
-  const apiKey = env.THEA_REMOTE_API_KEY;
+  const { t } = scopedTranslation.scopedT(locale);
 
-  if (!remoteUrl || !apiKey) {
+  // Cloud instances receive syncs, they don't initiate outbound ones
+  if (env.VIBE_IS_CLOUD) {
     return success({ pulled: 0 });
   }
 
   try {
+    const { getAllActiveConnectionsForSync } =
+      await import("@/app/api/[locale]/user/remote-connection/repository");
+    const activeConnections = await getAllActiveConnectionsForSync();
+
+    if (activeConnections.length === 0) {
+      return success({ pulled: 0 });
+    }
+
     const { endpoints: syncEndpoints } = await import("./definition");
-    const syncUrl = buildRemoteEndpointUrl(remoteUrl, syncEndpoints.POST);
+    const localInstanceId = env.INSTANCE_ID ?? "hermes";
+    let totalPulled = 0;
 
-    // Include local shared memories for bidirectional sync
-    const memResult = await getSharedMemories({ logger });
-    const localMemories = memResult.success ? memResult.data.memories : [];
-
-    const response = await fetch(syncUrl, {
-      method: "POST",
-      headers: await buildRemoteSyncHeaders(remoteUrl, logger),
-      body: JSON.stringify({
-        apiKey,
-        memoriesJson: JSON.stringify(localMemories),
-      }),
-      signal: AbortSignal.timeout(30000),
-    });
-
-    if (!response.ok) {
-      logger.error("Pull from remote failed", {
-        status: response.status,
-        statusText: response.statusText,
-        syncUrl,
-      });
-      return fail({
-        message: t("errors.taskSyncSyncFailed"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-
-    const result = (await response.json()) as {
-      success: boolean;
-      data?: {
-        tasksJson?: string;
-        synced?: number;
-        sharedMemoriesJson?: string;
-      };
-    };
-
-    if (!result.success || !result.data) {
-      logger.error("Pull from remote returned failure", { result });
-      return fail({
-        message: t("errors.taskSyncSyncFailed"),
-        errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      });
-    }
-
-    let pulled = 0;
-    if (result.data.tasksJson) {
-      const remoteTasks = JSON.parse(result.data.tasksJson) as SyncedCronTask[];
-      // Only pull tasks explicitly targeted at this instance.
-      // null targetInstance = host-only, never synced.
-      const instanceId = env.INSTANCE_ID;
-      const relevantTasks = remoteTasks.filter(
-        (t) => t.targetInstance !== null && t.targetInstance === instanceId,
-      );
-
-      if (relevantTasks.length > 0) {
-        logger.debug(
-          `Task sync: ${relevantTasks.length}/${remoteTasks.length} tasks relevant for instance "${instanceId ?? "all"}"`,
-        );
-        const upsertResult = await upsertRemoteTasks({
-          tasks: relevantTasks,
-          logger,
-        });
-        pulled = upsertResult.success ? upsertResult.data.synced : 0;
-      }
-    }
-
-    // Pull shared memories from remote
-    if (result.data.sharedMemoriesJson) {
+    for (const conn of activeConnections) {
       try {
-        const remoteMemories = JSON.parse(
-          result.data.sharedMemoriesJson,
-        ) as SyncedMemory[];
-        if (remoteMemories.length > 0) {
-          // Find admin user to attach memories to
-          const { users, userRoles } =
-            await import("@/app/api/[locale]/user/db");
-          const { UserPermissionRole } =
-            await import("@/app/api/[locale]/user/user-roles/enum");
-          const [adminUser] = await db
-            .select({ id: users.id })
-            .from(users)
-            .innerJoin(userRoles, eq(userRoles.userId, users.id))
-            .where(eq(userRoles.role, UserPermissionRole.ADMIN))
-            .limit(1);
+        const syncUrl = buildRemoteEndpointUrl(
+          conn.remoteUrl,
+          syncEndpoints.POST,
+        );
 
-          if (adminUser) {
+        // Include local shared memories for bidirectional sync (scoped to this user)
+        const memResult = await getSharedMemories({
+          logger,
+          userId: conn.userId,
+        });
+        const localMemories = memResult.success ? memResult.data.memories : [];
+
+        // Build capability snapshot — only send if hash changed
+        // Use CUSTOMER role for snapshot — conservative, reflects what a typical user can access
+        const capSnapshot = buildCapabilitySnapshot(
+          {
+            id: conn.userId,
+            leadId: conn.userId,
+            isPublic: false as const,
+            roles: [UserPermissionRole.CUSTOMER],
+          },
+          localInstanceId,
+          locale,
+        );
+        const sendCapabilities = conn.capabilitiesHash !== capSnapshot.hash;
+
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${conn.token}`,
+        };
+        if (conn.leadId) {
+          headers.Cookie = `lead_id=${conn.leadId}`;
+        }
+
+        const response = await fetch(syncUrl, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            memoriesJson: JSON.stringify(localMemories),
+            ...(sendCapabilities
+              ? {
+                  capabilitiesJson: JSON.stringify(capSnapshot.capabilities),
+                  capabilitiesHash: capSnapshot.hash,
+                }
+              : {}),
+          }),
+          signal: AbortSignal.timeout(30000),
+        });
+
+        if (!response.ok) {
+          logger.warn("Pull from remote failed for user", {
+            userId: conn.userId,
+            remoteUrl: conn.remoteUrl,
+            status: response.status,
+          });
+          continue;
+        }
+
+        const result = (await response.json()) as {
+          success: boolean;
+          data?: {
+            tasksJson?: string;
+            sharedMemoriesJson?: string;
+          };
+        };
+
+        if (!result.success || !result.data) {
+          logger.warn("Pull from remote returned failure for user", {
+            userId: conn.userId,
+          });
+          continue;
+        }
+
+        if (result.data.tasksJson) {
+          const remoteTasks = JSON.parse(
+            result.data.tasksJson,
+          ) as SyncedCronTask[];
+          const relevantTasks = remoteTasks.filter(
+            (task) =>
+              task.targetInstance !== null &&
+              task.targetInstance === localInstanceId,
+          );
+
+          if (relevantTasks.length > 0) {
+            const upsertResult = await upsertRemoteTasks({
+              tasks: relevantTasks,
+              logger,
+            });
+            totalPulled += upsertResult.success ? upsertResult.data.synced : 0;
+          }
+        }
+
+        if (result.data.sharedMemoriesJson) {
+          const remoteMemories = JSON.parse(
+            result.data.sharedMemoriesJson,
+          ) as SyncedMemory[];
+          if (remoteMemories.length > 0) {
             await upsertSharedMemories({
               remoteMemories,
-              localUserId: adminUser.id,
+              localUserId: conn.userId,
               logger,
             });
           }
         }
+
+        // Update lastSyncedAt (instanceId-scoped)
+        await touchLastSynced(conn.userId, conn.instanceId);
       } catch (error) {
-        logger.error("Failed to process remote shared memories", {
-          error: error instanceof Error ? error.message : String(error),
+        logger.error("Pull from remote error for user", {
+          userId: conn.userId,
+          ...parseError(error),
         });
       }
     }
 
-    if (pulled > 0) {
-      logger.info(`Remote sync: pulled ${pulled} cron tasks`);
+    if (totalPulled > 0) {
+      logger.info(`Remote sync: pulled ${totalPulled} cron tasks`);
     }
 
-    return success({ pulled });
+    return success({ pulled: totalPulled });
   } catch (error) {
     logger.error("Pull from remote error", parseError(error));
     return fail({
@@ -459,9 +491,9 @@ export async function pullFromRemote(
 }
 
 /**
- * Push a task status update to the remote Thea instance.
- * Supports RUNNING (in-progress visibility) and terminal statuses (with execution records).
- * Fire-and-forget — logs errors but never fails the caller.
+ * Push a task status update to all active remote connections.
+ * Fire-and-forget per user — logs errors but never fails the caller.
+ * Cloud instances (VIBE_IS_CLOUD=true) skip outbound push.
  */
 export async function pushStatusToRemote(params: {
   taskRouteId: string;
@@ -476,39 +508,61 @@ export async function pushStatusToRemote(params: {
   logger: EndpointLogger;
 }): Promise<ResponseType<{ pushed: boolean }>> {
   const { logger, ...payload } = params;
-  const remoteUrl = env.THEA_REMOTE_URL;
-  const apiKey = env.THEA_REMOTE_API_KEY;
 
-  if (!remoteUrl || !apiKey) {
-    logger.debug("No remote configured, skipping status push");
+  if (env.VIBE_IS_CLOUD) {
     return success({ pushed: false });
   }
 
   try {
-    const { endpoints: reportEndpoints } = await import("./report/definition");
-    const reportUrl = buildRemoteEndpointUrl(remoteUrl, reportEndpoints.POST);
+    const { getAllActiveConnectionsForSync } =
+      await import("@/app/api/[locale]/user/remote-connection/repository");
+    const activeConnections = await getAllActiveConnectionsForSync();
 
-    const response = await fetch(reportUrl, {
-      method: "POST",
-      headers: await buildRemoteSyncHeaders(remoteUrl, logger),
-      body: JSON.stringify({ apiKey, ...payload }),
-      signal: AbortSignal.timeout(15000),
-    });
-
-    if (!response.ok) {
-      logger.error("Push status to remote failed", {
-        status: response.status,
-        statusText: response.statusText,
-        taskRouteId: payload.taskRouteId,
-      });
+    if (activeConnections.length === 0) {
       return success({ pushed: false });
     }
 
-    logger.info("Status pushed to remote", {
-      taskRouteId: payload.taskRouteId,
-      status: payload.status,
-    });
-    return success({ pushed: true });
+    const { endpoints: reportEndpoints } = await import("./report/definition");
+    let anyPushed = false;
+
+    for (const conn of activeConnections) {
+      try {
+        const reportUrl = buildRemoteEndpointUrl(
+          conn.remoteUrl,
+          reportEndpoints.POST,
+        );
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${conn.token}`,
+        };
+        if (conn.leadId) {
+          headers.Cookie = `lead_id=${conn.leadId}`;
+        }
+
+        const response = await fetch(reportUrl, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ ...payload }),
+          signal: AbortSignal.timeout(15000),
+        });
+
+        if (response.ok) {
+          anyPushed = true;
+        } else {
+          logger.warn("Push status to remote failed for user", {
+            userId: conn.userId,
+            status: response.status,
+          });
+        }
+      } catch (error) {
+        logger.error("Push status to remote error for user", {
+          userId: conn.userId,
+          ...parseError(error),
+        });
+      }
+    }
+
+    return success({ pushed: anyPushed });
   } catch (error) {
     logger.error("Push status to remote error", parseError(error));
     return success({ pushed: false });
@@ -536,13 +590,18 @@ export interface SyncedMemory {
  * Get shared memories for sync.
  * Includes active shared memories AND tombstones (recently unshared memories
  * that still have a syncId — so the remote knows to remove them).
+ * When userId is provided, only returns that user's memories (per-user sync).
  */
 export async function getSharedMemories(params: {
   logger: EndpointLogger;
+  userId?: string;
 }): Promise<ResponseType<{ memories: SyncedMemory[] }>> {
-  const { logger } = params;
+  const { logger, userId } = params;
   try {
     // Fetch: isShared=true (active) OR has syncId with isShared=false (tombstone)
+    const userFilter = userId
+      ? sql`${memories.userId} = ${userId} AND `
+      : sql``;
     const rows = await db
       .select({
         id: memories.id,
@@ -555,7 +614,7 @@ export async function getSharedMemories(params: {
       })
       .from(memories)
       .where(
-        sql`${memories.isShared} = true OR (${memories.metadata}->>'syncId' IS NOT NULL AND ${memories.isShared} = false)`,
+        sql`${userFilter}(${memories.isShared} = true OR (${memories.metadata}->>'syncId' IS NOT NULL AND ${memories.isShared} = false))`,
       )
       .limit(200);
 
@@ -721,4 +780,132 @@ export async function upsertSharedMemories(params: {
     logger.info(`Memory sync: imported/updated ${synced} shared memories`);
   }
   return success({ synced });
+}
+
+/**
+ * Orchestrates the full task sync: validates auth (JWT or API key),
+ * processes incoming completions and memories, returns local tasks and shared memories.
+ *
+ * Auth modes:
+ * - JWT (per-user): user is authenticated via JWT — memories scoped to that user
+ * - API key (instance-to-instance): legacy admin sync, memories go to admin user
+ */
+export async function syncTasks(
+  data: SyncRequestOutput,
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+  user: JwtPayloadType,
+): Promise<ResponseType<SyncResponseOutput>> {
+  const { t } = scopedTranslation.scopedT(locale);
+
+  // Only authenticated users can sync
+  const isUserAuth = !user.isPublic && user.id;
+
+  if (!isUserAuth) {
+    return {
+      success: false as const,
+      message: t("taskSync.post.errors.notFound.title"),
+      errorType: ErrorResponseTypes.NOT_FOUND,
+    };
+  }
+
+  // Process incoming tasks from remote — only accept tasks for this instance
+  let completionsProcessed = 0;
+  if (data.completionsJson) {
+    try {
+      const remoteTasks = JSON.parse(data.completionsJson) as SyncedCronTask[];
+      const instanceId = env.INSTANCE_ID;
+      const relevantTasks = remoteTasks.filter(
+        (task) =>
+          task.targetInstance !== null && task.targetInstance === instanceId,
+      );
+      const result = await upsertRemoteTasks({ tasks: relevantTasks, logger });
+      if (result.success) {
+        completionsProcessed = result.data.synced;
+      }
+    } catch (error) {
+      logger.error("Failed to parse incoming tasks JSON", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  // Process incoming shared memories
+  let memoriesSynced = 0;
+  if (data.memoriesJson) {
+    try {
+      const remoteMemories = JSON.parse(data.memoriesJson) as SyncedMemory[];
+      if (remoteMemories.length > 0) {
+        const memResult = await upsertSharedMemories({
+          remoteMemories,
+          localUserId: user.id,
+          logger,
+        });
+        memoriesSynced = memResult.success ? memResult.data.synced : 0;
+      }
+    } catch (error) {
+      logger.error("Failed to parse incoming memories JSON", {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  // Store incoming capability snapshot (diff via hash to avoid unnecessary writes)
+  if (data.capabilitiesJson && data.capabilitiesHash) {
+    try {
+      const { getRemoteConnectionRecord } =
+        await import("@/app/api/[locale]/user/remote-connection/repository");
+      // Find the connection by token to get the instanceId
+      // We can't know instanceId directly from JWT, but we can get it from the connection record
+      // Use a DB lookup by userId to find all connections and match by token hash
+      const capabilities = JSON.parse(
+        data.capabilitiesJson,
+      ) as RemoteToolCapability[];
+      const instanceId =
+        capabilities.length > 0
+          ? (capabilities[0]?.instanceId ?? "hermes")
+          : "hermes";
+
+      const existing = await getRemoteConnectionRecord(user.id, instanceId);
+      if (existing && existing.instanceId) {
+        // Only update if hash changed
+        const { db: localDb } = await import("@/app/api/[locale]/system/db");
+        const { userRemoteConnections } =
+          await import("@/app/api/[locale]/user/remote-connection/db");
+        const [row] = await localDb
+          .select({ capabilitiesHash: userRemoteConnections.capabilitiesHash })
+          .from(userRemoteConnections)
+          .where(eq(userRemoteConnections.userId, user.id))
+          .limit(1);
+
+        if (row?.capabilitiesHash !== data.capabilitiesHash) {
+          await touchLastSynced(
+            user.id,
+            instanceId,
+            capabilities,
+            data.capabilitiesHash,
+          );
+        }
+      }
+    } catch (error) {
+      logger.warn("Failed to store capabilities snapshot", parseError(error));
+    }
+  }
+
+  // Return our user-created tasks and shared memories for the remote to sync
+  const localResult = await getUserCreatedTasks({ logger, locale });
+  const tasks = localResult.success ? localResult.data.tasks : [];
+  const memResult = await getSharedMemories({
+    logger,
+    userId: user.id,
+  });
+  const sharedMemories = memResult.success ? memResult.data.memories : [];
+
+  return success({
+    tasksJson: JSON.stringify(tasks),
+    synced: tasks.length,
+    completionsProcessed,
+    memoriesSynced,
+    sharedMemoriesJson: JSON.stringify(sharedMemories),
+  });
 }

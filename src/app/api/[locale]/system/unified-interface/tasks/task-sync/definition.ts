@@ -20,6 +20,7 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { envClient } from "@/config/env-client";
 
 import { scopedTranslation } from "../i18n";
 
@@ -32,7 +33,9 @@ const { POST } = createEndpoint({
   icon: "refresh-cw",
   category: "app.endpointCategories.system",
   tags: ["tags.tasks" as const],
-  allowedRoles: [UserRole.PUBLIC],
+  allowedRoles: envClient.VIBE_IS_CLOUD
+    ? ([UserRole.ADMIN] as const)
+    : ([] as const),
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,
@@ -41,12 +44,6 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // Request
-      apiKey: scopedRequestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        columns: 12,
-        schema: z.string().min(1),
-      }),
       completionsJson: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
@@ -56,6 +53,18 @@ const { POST } = createEndpoint({
       memoriesJson: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
+        columns: 12,
+        schema: z.string().optional(),
+      }),
+      capabilitiesJson: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        columns: 12,
+        schema: z.string().optional(),
+      }),
+      capabilitiesHash: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
         columns: 12,
         schema: z.string().optional(),
       }),
@@ -131,7 +140,7 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        apiKey: "your-api-key",
+        capabilitiesHash: "abc123",
       },
     },
     responses: {

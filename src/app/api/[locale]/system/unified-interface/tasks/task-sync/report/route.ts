@@ -10,7 +10,6 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { env } from "@/config/env";
 
 import type { NewCronTask } from "../../cron/db";
 import { cronTaskExecutions, cronTasks } from "../../cron/db";
@@ -21,15 +20,6 @@ export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: async ({ data, logger, t }) => {
-      // Validate API key
-      if (!env.THEA_REMOTE_API_KEY || data.apiKey !== env.THEA_REMOTE_API_KEY) {
-        return {
-          success: false as const,
-          message: t("taskReport.post.errors.notFound.title"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        };
-      }
-
       // Find the task by routeId
       const [task] = await db
         .select()

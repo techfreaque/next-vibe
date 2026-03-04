@@ -155,6 +155,7 @@ export function loadEnvironment(): EnvironmentResult {
   const isPreviewMode =
     !isProduction &&
     (args.includes("--preview") ||
+      args.includes("--remote") ||
       args.includes(START_ALIAS) ||
       args.includes(START_SERVER_ALIAS) ||
       args.includes(BUILD_ALIAS) ||

@@ -132,7 +132,7 @@ const { POST } = createEndpoint({
         label: "post.subFolderId.label",
         description: "post.subFolderId.description",
         columns: 3,
-        schema: z.string().nullable(),
+        schema: z.string().nullable().optional(),
       }),
       threadId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -156,7 +156,7 @@ const { POST } = createEndpoint({
         label: "post.parentMessageId.label",
         description: "post.parentMessageId.description",
         columns: 3,
-        schema: z.uuid().nullable(),
+        schema: z.uuid().nullable().optional(),
       }),
 
       // === MESSAGE CONTENT ===
@@ -367,7 +367,7 @@ const { POST } = createEndpoint({
             label: "post.voiceMode.enabled.label",
             description: "post.voiceMode.enabled.description",
             columns: 6,
-            schema: z.boolean().default(false),
+            schema: z.coerce.boolean().default(false),
           }),
           voice: scopedRequestField(scopedTranslation, {
             type: WidgetType.FORM_FIELD,

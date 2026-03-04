@@ -95,6 +95,15 @@ const { POST } = createEndpoint({
         schema: z.record(z.string(), z.unknown()).default({}),
       }),
 
+      instanceId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "executeTool.post.fields.instanceId.label",
+        description: "executeTool.post.fields.instanceId.description",
+        columns: 12,
+        schema: z.string().optional(),
+      }),
+
       // ── Response fields ───────────────────────────────────────────────────
       result: scopedResponseField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -102,6 +111,18 @@ const { POST } = createEndpoint({
         label: "executeTool.post.response.result" as const,
         columns: 12,
         schema: z.unknown().optional(),
+      }),
+
+      taskId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().optional(),
+      }),
+
+      status: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().optional(),
       }),
     },
   }),
@@ -159,10 +180,17 @@ const { POST } = createEndpoint({
         toolName: "agent_chat_characters_GET",
         input: {},
       },
+      remoteExecution: {
+        toolName: "bash",
+        input: { command: "echo hello" },
+        instanceId: "hermes",
+      },
     },
     responses: {
       // Response is the target route's .data passed through in `result`
       default: { result: {} },
+      // Remote execution returns a task ID (async)
+      remote: { taskId: "task-uuid-here", status: "pending" },
     },
   },
 });

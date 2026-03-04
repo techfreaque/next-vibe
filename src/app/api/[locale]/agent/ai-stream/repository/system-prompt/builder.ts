@@ -108,6 +108,7 @@ export async function buildSystemPrompt(params: {
   let tasksSummary = "";
   let favoritesSummary = "";
   let userName = "";
+  let remoteInstancesContext = "";
 
   // Incognito mode: never load personal data (memories, tasks, favorites)
   const isIncognito = rootFolderId === "incognito";
@@ -273,12 +274,42 @@ export async function buildSystemPrompt(params: {
     }
   }
 
+  // ─── Step 2b: Load remote instance context ──────────────────────────────
+
+  if (userId && !isIncognito && !isExposedFolder) {
+    try {
+      const { getAllActiveConnections } =
+        await import("@/app/api/[locale]/user/remote-connection/repository");
+      const connections = await getAllActiveConnections(userId);
+      if (connections.length > 0) {
+        const lines = connections.map(
+          (c) =>
+            `- "${c.friendlyName}" (id: "${c.instanceId}") — use help(instanceId="${c.instanceId}") to discover tools, execute-tool(toolName, instanceId="${c.instanceId}", input) to run them`,
+        );
+        remoteInstancesContext = `## Remote Instances\n\nUser has ${connections.length} connected local instance${connections.length === 1 ? "" : "s"}:\n\n${lines.join("\n")}\n\nRemote tool results are async — you receive {taskId, status:"pending"}. Acknowledge and move on.`;
+      }
+    } catch (error) {
+      logger.debug("Failed to load remote instances for system prompt", {
+        userId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
   // ─── Step 3: Generate system prompt ─────────────────────────────────────
 
   // A "fresh" user has no memories and no tasks yet — show bootstrap guidance
   const isFreshUser = !memorySummary.trim() && !tasksSummary.trim();
 
   const appName = t("config.appName");
+  // Merge extra instructions with remote instance context (if any)
+  const combinedExtraInstructions = [
+    extraInstructions,
+    remoteInstancesContext || undefined,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+
   const systemPrompt = generateSystemPrompt({
     appName,
     locale,
@@ -286,7 +317,7 @@ export async function buildSystemPrompt(params: {
     subFolderId,
     characterPrompt,
     callMode: callMode ?? false,
-    extraInstructions: extraInstructions ?? undefined,
+    extraInstructions: combinedExtraInstructions || undefined,
     headless: headless ?? false,
     isPublicUser,
     isAdmin,

@@ -9,7 +9,7 @@ import "server-only";
 
 import { eq } from "drizzle-orm";
 
-import { chatThreads } from "@/app/api/[locale]/agent/chat/db";
+import { chatFolders, chatThreads } from "@/app/api/[locale]/agent/chat/db";
 import { db } from "@/app/api/[locale]/system/db";
 
 interface StreamEntry {
@@ -75,12 +75,23 @@ export const StreamRegistry = {
 
 /**
  * Clear streaming state: unregister from in-memory map + set isStreaming=false in DB.
+ * Also updates thread updatedAt and bubbles activity to parent folder.
  * Called from ALL stream exit paths (completion, abort, error, compacting failure).
  */
 export async function clearStreamingState(threadId: string): Promise<void> {
   StreamRegistry.unregister(threadId);
-  await db
+  const now = new Date();
+  const [thread] = await db
     .update(chatThreads)
-    .set({ isStreaming: false })
-    .where(eq(chatThreads.id, threadId));
+    .set({ isStreaming: false, updatedAt: now })
+    .where(eq(chatThreads.id, threadId))
+    .returning({ folderId: chatThreads.folderId });
+
+  // Bubble last-activity to parent folder so it sorts correctly in sidebar
+  if (thread?.folderId) {
+    await db
+      .update(chatFolders)
+      .set({ updatedAt: now })
+      .where(eq(chatFolders.id, thread.folderId));
+  }
 }

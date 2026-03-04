@@ -12,9 +12,10 @@ import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/typ
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
+import { translations as configTranslations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
+import { scopedTranslation as pageT } from "./i18n";
 import { ReferralPageClient } from "./page-client";
 
 interface ReferralPageProps {
@@ -27,13 +28,11 @@ export async function generateMetadata({
   params,
 }: ReferralPageProps): Promise<Metadata> {
   const { locale } = await params;
-  const { t } = simpleT(locale);
+  const { t } = pageT.scopedT(locale);
 
   return {
-    title: t("app.user.referral.title", {
-      appName: t("config.appName"),
-    }),
-    description: t("app.user.referral.description"),
+    title: t("title", { appName: configTranslations.appName }),
+    description: t("description"),
   };
 }
 

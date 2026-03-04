@@ -20,7 +20,7 @@ import {
 
 import { scopedTranslation } from "../i18n";
 import { UserRole } from "../../../user-roles/enum";
-import { ResetPasswordConfirmContainer } from "./widget";
+import { ResetPasswordConfirmContainer } from "./widget/widget";
 
 /**
  * POST /reset-password/confirm - Confirm password reset

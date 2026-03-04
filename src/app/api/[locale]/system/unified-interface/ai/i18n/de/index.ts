@@ -23,6 +23,11 @@ export const translations: typeof enTranslations = {
           description:
             "Eingabeparameter als JSON-Objekt. URL-Pfadparameter werden automatisch extrahiert.",
         },
+        instanceId: {
+          label: "Instanz-ID",
+          description:
+            'Optionale Remote-Instanz-ID. Wenn gesetzt, wird ein asynchroner Task auf der Remote-Instanz erstellt. Ergebnis: {taskId, status:"pending"}.',
+        },
       },
       response: {
         result:

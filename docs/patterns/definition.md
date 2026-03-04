@@ -15,132 +15,129 @@ Definition files (`definition.ts`) are the single source of truth that automatic
 ## Table of Contents
 
 1. [Field Function Patterns](#field-function-patterns)
-2. [Widget Metadata](#widget-metadata)
-3. [UI/UX Optimization](#uiux-optimization)
-4. [Translation Keys](#translation-keys)
-5. [Import Paths](#import-paths)
-6. [Enum Integration](#enum-integration)
-7. [Common Patterns](#common-patterns)
+2. [Custom Widget Integration](#custom-widget-integration)
+3. [Widget Metadata](#widget-metadata)
+4. [UI/UX Optimization](#uiux-optimization)
+5. [Translation Keys](#translation-keys)
+6. [Import Paths](#import-paths)
+7. [Enum Integration](#enum-integration)
+8. [Common Patterns](#common-patterns)
 
 ## Field Function Patterns
 
-### Core Principle: No Naked z.object()
+### Core Principle: Always use scoped field functions
 
-**NEVER** use `z.object()` or `z.array()` directly. Always use `objectField()` or `arrayField()` to enable UI generation.
+All field functions come in **scoped** and non-scoped variants. Always use the scoped versions — they validate translation key strings against the module's i18n schema at compile time.
+
+Import from `utils-new` (not `utils`):
 
 ```typescript
-// ❌ WRONG - Breaks UI generation
-response: responseField({...}, z.object({ field: z.string() }))
+import {
+  customWidgetObject,
+  scopedRequestField,
+  scopedResponseField,
+  scopedRequestResponseField,
+  scopedRequestUrlPathParamsField,
+  scopedObjectFieldNew,
+  scopedResponseArrayFieldNew,
+  scopedRequestDataArrayFieldNew,
+  scopedResponseArrayOptionalFieldNew,
+  scopedBackButton,
+  scopedSubmitButton,
+  scopedNavigateButtonField,
+  scopedEditButton,
+  scopedDeleteButton,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+```
 
-// ✅ CORRECT
-response: objectField(
-  {
+Pass `scopedTranslation` as the first argument to every scoped field function. This is type-inference only — it enables the compiler to validate your translation key strings.
+
+### Core Principle: No naked z.object()
+
+**NEVER** use `z.object()` or `z.array()` directly. Always use the field functions to enable UI generation.
+
+### Field Functions Reference
+
+| Scoped function                                   | Purpose                                                           | Usage context                         |
+| ------------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------- |
+| `scopedRequestField(st, config)`                  | Request body or query param field                                 | `{ request: "data" }`                 |
+| `scopedRequestUrlPathParamsField(st, config)`     | URL path parameter                                                | `{ request: "urlPathParams" }`        |
+| `scopedResponseField(st, config)`                 | Response-only display field                                       | `{ response: true }`                  |
+| `scopedRequestResponseField(st, config)`          | Appears in both request AND response — single field, dual purpose | mixed (routing hint + response value) |
+| `scopedObjectFieldNew(st, config)`                | Nested object / container                                         | any context                           |
+| `scopedResponseArrayFieldNew(st, config)`         | Response array                                                    | `{ response: true }`                  |
+| `scopedRequestDataArrayFieldNew(st, config)`      | Request array                                                     | `{ request: "data" }`                 |
+| `scopedResponseArrayOptionalFieldNew(st, config)` | Nullable response array                                           | `{ response: true }`                  |
+| `customWidgetObject(config)`                      | Custom React widget (no st needed)                                | root field                            |
+
+**Optional primitives:** Use `.optional()` on the Zod schema:
+
+```typescript
+scopedRequestField(st, { schema: z.string().optional(), ... })
+```
+
+**Optional objects:** Use `scopedResponseArrayOptionalFieldNew` for optional arrays. For optional nested objects, use `scopedObjectFieldNew` and set `.optional()` on the inner Zod schema. `scopedObjectOptionalField` is FORBIDDEN (legacy 4-param API).
+
+### Flat API — scopedObjectFieldNew
+
+Config is a single object containing `usage` + `children`:
+
+```typescript
+fields: scopedObjectFieldNew(scopedTranslation, {
+  type: WidgetType.CONTAINER,
+  usage: { request: "data", response: true },
+  children: {
+    email: scopedRequestField(scopedTranslation, {
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.EMAIL,
+      label: "create.form.email.label",
+      schema: z.string().email(),
+    }),
+    name: scopedRequestField(scopedTranslation, {
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.TEXT,
+      label: "create.form.name.label",
+      schema: z.string().min(2),
+      columns: 6,
+      order: 0,
+    }),
+  },
+}),
+```
+
+### Arrays — scopedResponseArrayFieldNew
+
+Config contains `child` (not `children`):
+
+```typescript
+items: scopedResponseArrayFieldNew(scopedTranslation, {
+  type: WidgetType.CONTAINER,
+  child: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,
-    title: "app.api.domain.subdomain.get.response.title",
-    description: "app.api.domain.subdomain.get.response.description",
-    layoutType: LayoutType.GRID,
-    columns: 12
-  },
-  { response: true },
-  { field: responseField({...}, z.string()) }
-)
-```
-
-### Field Functions
-
-All field functions generate interfaces for **CLI, React Web, React Native, AI Tools, and MCP**.
-
-| Function                      | Context                        | Use Case                                 | Optional Variant                  |
-| ----------------------------- | ------------------------------ | ---------------------------------------- | --------------------------------- |
-| `requestField()`              | `{ request: "data" }`          | Request body fields (POST/PUT/PATCH)     | Use `.optional()` on Zod schema   |
-| `requestUrlPathParamsField()` | `{ request: "urlPathParams" }` | URL path parameters (e.g., `/user/[id]`) | N/A (path params are required)    |
-| `responseField()`             | `{ response: true }`           | Response-only fields                     | Use `.optional()` on Zod schema   |
-| `requestResponseField()`      | Mixed context                  | Fields used in both request and response | Use `.optional()` on Zod schema   |
-| `responseArrayField()`        | `{ response: true }`           | Response arrays                          | `responseArrayOptionalField()`    |
-| `requestDataArrayField()`     | `{ request: "data" }`          | Request arrays                           | `requestDataArrayOptionalField()` |
-| `objectField()`               | Any context                    | Nested object structures                 | `objectOptionalField()`           |
-| `arrayField()`                | Any context                    | Generic arrays                           | `arrayOptionalField()`            |
-
-**Important Notes:**
-
-- **Query parameters** for GET requests use `requestField()` - they are validated from URL search params automatically
-- **Optional fields**: For primitive types (string, number, boolean), use `.optional()` on the Zod schema. For objects and arrays, use the dedicated optional field functions (`objectOptionalField()`, `arrayOptionalField()`, etc.)
-- **All interfaces are generated automatically**: CLI prompts, React forms, AI tool schemas, and MCP definitions are all created from the same definition
-
-### Optional Field Patterns
-
-**For primitive types** (string, number, boolean), use `.optional()` on the Zod schema:
-
-```typescript
-// ✅ CORRECT - Optional primitive field
-preferredModel: requestField(
-  {
-    type: WidgetType.FORM_FIELD,
-    fieldType: FieldDataType.SELECT,
-    label: "app.api.agent.chat.characters.post.preferredModel.label",
-    options: ModelIdOptions,
-    columns: 6,
-  },
-  z.enum(ModelId).optional(), // ✅ Use .optional() on schema
-);
-```
-
-**For objects**, use `objectOptionalField()` when the entire object can be absent:
-
-```typescript
-// ✅ CORRECT - Optional object field
-securityInfo: objectOptionalField(
-  {
-    type: WidgetType.CONTAINER,
-    title: "app.api.user.public.resetPassword.request.response.securityInfo.title",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-  },
-  { response: true },
-  {
-    tokenExpiry: responseField({ type: WidgetType.TEXT, content: "..." }, z.string()),
-    maxAttempts: responseField({ type: WidgetType.TEXT, content: "..." }, z.coerce.number()),
-  }
-)
-
-// ❌ WRONG - Don't use objectField with .optional()
-securityInfo: objectField({ ... }, { response: true }, { ... }).optional()  // ❌ Invalid
-```
-
-**For arrays**, use the optional array field functions:
-
-```typescript
-// ✅ CORRECT - Optional response array
-attachments: responseArrayOptionalField(
-  {
-    type: WidgetType.DATA_TABLE,
-  },
-  objectField(
-    { type: WidgetType.CONTAINER, layoutType: LayoutType.GRID, columns: 2 },
-    { response: true },
-    {
-      filename: responseField(
-        { type: WidgetType.TEXT, content: "..." },
-        z.string(),
-      ),
-      size: responseField(
-        { type: WidgetType.TEXT, content: "..." },
-        z.coerce.number(),
-      ),
+    usage: { response: true },
+    children: {
+      name: scopedResponseField(scopedTranslation, {
+        schema: z.string(),
+        type: WidgetType.TEXT,
+      }),
     },
-  ),
-);
+  }),
+}),
+```
 
-// ✅ CORRECT - Optional request array
-tags: requestDataArrayOptionalField(
-  {
-    type: WidgetType.FORM_FIELD,
-    fieldType: FieldDataType.TEXT,
-    label: "app.api.tags.label",
-    columns: 12,
-  },
-  z.string(),
-);
+### Optional arrays — responseArrayOptionalField
+
+For nullable arrays (non-scoped child is fine here):
+
+```typescript
+attachments: responseArrayOptionalField(
+  { type: WidgetType.CONTAINER },
+  scopedResponseField(scopedTranslation, {
+    schema: z.string(),
+    type: WidgetType.TEXT,
+    content: "get.response.attachments.name.content",
+  }),
+),
 ```
 
 ### Specialized Field Functions
@@ -150,11 +147,11 @@ For common field types, use specialized field functions from `@/app/api/[locale]
 ```typescript
 import { currencyField, languageField, countryField, timezoneField } from "@/app/api/[locale]/system/unified-interface/shared/field/specialized";
 
-// Currency selection
+// Currency selection — specialized helpers use scoped keys directly
 currency: currencyField(
-  "app.api.domain.fields.currency.label",
-  "app.api.domain.fields.currency.description",
-  "app.api.domain.fields.currency.placeholder",
+  "post.currency.label",        // scoped key
+  "post.currency.description",
+  "post.currency.placeholder",
   true, // required
   false // multiple selection
 )
@@ -174,12 +171,48 @@ These functions automatically provide proper options, validation, and widget con
 ### Context Examples
 
 ```typescript
-objectField({...}, { request: "data" }, {...})              // Request body
-objectField({...}, { response: true }, {...})               // Response only
-objectField({...}, { request: "urlPathParams" }, {...})     // URL params
-objectField({...}, { request: "data&urlPathParams", response: true }, {...}) // Mixed
-objectField({...}, {}, {...})                               // Root level
+// Request body object
+scopedObjectFieldNew(st, { type: WidgetType.CONTAINER, usage: { request: "data" }, children: {...} })
+// Response-only object
+scopedObjectFieldNew(st, { type: WidgetType.CONTAINER, usage: { response: true }, children: {...} })
+// URL path params object
+scopedObjectFieldNew(st, { type: WidgetType.CONTAINER, usage: { request: "urlPathParams" }, children: {...} })
+// Both request and response
+scopedObjectFieldNew(st, { type: WidgetType.CONTAINER, usage: { request: "data&urlPathParams", response: true }, children: {...} })
+// Root level (no usage restriction)
+scopedObjectFieldNew(st, { type: WidgetType.CONTAINER, usage: {}, children: {...} })
 ```
+
+## Custom Widget Integration
+
+When the auto-rendered UI isn't sufficient, use `customWidgetObject` to wire a React component directly into the definition:
+
+```typescript
+import { CharacterCreateContainer } from "./widget";
+
+fields: customWidgetObject({
+  render: CharacterCreateContainer,    // ← component reference
+  usage: { request: "data", response: true } as const,
+  children: {
+    name: scopedRequestField(scopedTranslation, {
+      schema: z.string().min(2).max(100),
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.TEXT,
+      label: "post.name.label" as const,
+      columns: 6,
+      order: 0,
+    }),
+    success: scopedResponseField(scopedTranslation, {
+      schema: z.string(),
+      type: WidgetType.ALERT,
+    }),
+  },
+}),
+```
+
+`customWidgetObject` does NOT take `scopedTranslation` as first param. Children are defined normally with scoped field functions.
+
+See `docs/patterns/widget.md` for the full widget implementation pattern.
 
 ## Widget Metadata
 
@@ -322,65 +355,66 @@ columns: 6; // Column width within parent grid (1-12)
 Containers use `layoutType` and `columns` properties (NOT nested `layout` object):
 
 ```typescript
-// ✅ CORRECT - Container with layoutType
-objectField(
-  {
-    type: WidgetType.CONTAINER,
-    title: "translation.key.title",
-    description: "translation.key.description",
-    layoutType: LayoutType.STACKED,  // or VERTICAL, GRID, etc.
+// ✅ Container with layoutType
+scopedObjectFieldNew(st, {
+  type: WidgetType.CONTAINER,
+  title: "section.title",     // scoped key
+  description: "section.description",
+  layoutType: LayoutType.STACKED,
+  usage: { response: true },
+  children: {
+    field1: scopedResponseField(st, { ... }),
+    field2: scopedResponseField(st, { ... }),
   },
-  { response: true },
-  { field1: responseField(...), field2: responseField(...) }
-)
+})
 
-// ✅ CORRECT - Container with GRID layout and columns
-objectField(
-  {
-    type: WidgetType.CONTAINER,
-    title: "translation.key.title",
-    layoutType: LayoutType.GRID,
-    columns: 2,  // Number of columns for GRID layout
-  },
-  { response: true },
-  { field1: responseField(...), field2: responseField(...) }
-)
+// ✅ Container with GRID layout
+scopedObjectFieldNew(st, {
+  type: WidgetType.CONTAINER,
+  title: "section.title",
+  layoutType: LayoutType.GRID,
+  columns: 2,
+  usage: { response: true },
+  children: { ... },
+})
 
 // ❌ WRONG - Don't use nested layout object
-objectField(
-  {
-    type: WidgetType.CONTAINER,
-    layout: { type: LayoutType.GRID, columns: 2 },  // ❌ Invalid
-  },
-  ...
-)
+scopedObjectFieldNew(st, {
+  type: WidgetType.CONTAINER,
+  layout: { type: LayoutType.GRID, columns: 2 },  // ❌ Invalid — use top-level layoutType/columns
+})
 ```
 
 ### Array Fields with Grouping
 
 ```typescript
-consultations: responseArrayField(
-  {
-    type: WidgetType.GROUPED_LIST,
-    groupBy: "status",
-    sortBy: "createdAt",
-    showGroupSummary: true,
-  },
-  objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title: "...",
-      layoutType: LayoutType.GRID,
-      columns: 12
+consultations: scopedResponseArrayFieldNew(st, {
+  type: WidgetType.GROUPED_LIST,
+  child: scopedObjectFieldNew(st, {
+    type: WidgetType.CONTAINER,
+    title: "item.title",
+    layoutType: LayoutType.GRID,
+    columns: 12,
+    usage: { response: true },
+    children: {
+      id: scopedResponseField(st, {
+        type: WidgetType.TEXT,
+        schema: z.uuid(),
+        content: "item.id.content",
+      }),
+      status: scopedResponseField(st, {
+        type: WidgetType.BADGE,
+        schema: z.enum(StatusDB),
+        content: "item.status.content",
+      }),
+      createdAt: scopedResponseField(st, {
+        type: WidgetType.TEXT,
+        schema: z.string(),
+        content: "item.createdAt.content",
+      }),
     },
-    { response: true },
-    {
-      id: responseField({...}, z.uuid()),
-      status: responseField({...}, z.enum(Status)),
-      createdAt: responseField({...}, dateSchema)
-    }
-  )
-)
+  }),
+});
 ```
 
 ### Form Field Widgets
@@ -388,51 +422,42 @@ consultations: responseArrayField(
 Form fields use `columns` property for grid width (1-12):
 
 ```typescript
-// ✅ CORRECT - Form field with columns
-requestField(
-  {
-    type: WidgetType.FORM_FIELD,
-    fieldType: FieldDataType.TEXT,
-    label: "app.api.agent.chat.characters.post.name.label",
-    description: "app.api.agent.chat.characters.post.name.description",
-    columns: 6,  // Grid width (1-12)
-  },
-  z.string().min(1).max(100)  // Validation in Zod schema
-)
+// ✅ Text field
+name: scopedRequestField(st, {
+  type: WidgetType.FORM_FIELD,
+  fieldType: FieldDataType.TEXT,
+  label: "post.name.label", // scoped key
+  description: "post.name.description",
+  schema: z.string().min(1).max(100),
+  columns: 6,
+});
 
-// ✅ CORRECT - Full width textarea
-requestField(
-  {
-    type: WidgetType.FORM_FIELD,
-    fieldType: FieldDataType.TEXTAREA,
-    label: "app.api.agent.chat.characters.post.systemPrompt.label",
-    description: "app.api.agent.chat.characters.post.systemPrompt.description",
-    columns: 12,  // Full width
-  },
-  z.string().min(1).max(5000)
-)
+// ✅ Full width textarea
+systemPrompt: scopedRequestField(st, {
+  type: WidgetType.FORM_FIELD,
+  fieldType: FieldDataType.TEXTAREA,
+  label: "post.systemPrompt.label",
+  description: "post.systemPrompt.description",
+  schema: z.string().min(1).max(5000),
+  columns: 12,
+});
 
-// ✅ CORRECT - Select field with options
-requestField(
-  {
-    type: WidgetType.FORM_FIELD,
-    fieldType: FieldDataType.SELECT,
-    label: "app.api.agent.chat.characters.post.category.label",
-    description: "app.api.agent.chat.characters.post.category.description",
-    options: CategoryOptions,  // From enum or config
-    columns: 6,
-  },
-  z.enum(["general", "creative", "technical", "education", "controversial", "lifestyle"])
-)
+// ✅ Select field with options
+category: scopedRequestField(st, {
+  type: WidgetType.FORM_FIELD,
+  fieldType: FieldDataType.SELECT,
+  label: "post.category.label",
+  description: "post.category.description",
+  options: CategoryOptions, // from enum.ts
+  schema: z.enum(CategoryDB),
+  columns: 6,
+});
 
 // ❌ WRONG - Don't use nested layout object
-requestField(
-  {
-    type: WidgetType.FORM_FIELD,
-    layout: { columns: 6 },  // ❌ Invalid
-  },
-  ...
-)
+scopedRequestField(st, {
+  type: WidgetType.FORM_FIELD,
+  layout: { columns: 6 }, // ❌ Invalid — use top-level columns
+});
 ```
 
 **Important:** Validation is defined in the Zod schema (`.min()`, `.max()`, `.email()`, `.optional()`, etc.), not in widget config.
@@ -442,42 +467,39 @@ requestField(
 Response fields display data (not for user input):
 
 ```typescript
-// ✅ CORRECT - Response field with TEXT widget
-responseField(
-  {
-    type: WidgetType.TEXT,
-    content:
-      "app.api.agent.chat.characters.get.response.characters.persona.name.content",
-  },
-  z.string(),
-);
+// ✅ TEXT widget
+name: scopedResponseField(st, {
+  type: WidgetType.TEXT,
+  content: "get.response.name.content", // scoped key
+  schema: z.string(),
+});
 
-// ✅ CORRECT - Response array with DATA_CARDS widget
-responseArrayField(
-  {
+// ✅ Response array with containers
+characters: scopedResponseArrayFieldNew(st, {
+  type: WidgetType.CONTAINER,
+  child: scopedObjectFieldNew(st, {
     type: WidgetType.CONTAINER,
-  },
-  objectField(
-    {
-      type: WidgetType.CONTAINER,
-      title:
-        "app.api.agent.chat.characters.get.response.characters.persona.title",
-      layoutType: LayoutType.GRID,
-      columns: 2,
+    title: "get.response.character.title",
+    layoutType: LayoutType.GRID,
+    columns: 2,
+    usage: { response: true },
+    children: {
+      id: scopedResponseField(st, {
+        type: WidgetType.TEXT,
+        content: "get.response.character.id.content",
+        schema: z.string(),
+      }),
+      name: scopedResponseField(st, {
+        type: WidgetType.TEXT,
+        content: "get.response.character.name.content",
+        schema: z.string(),
+      }),
     },
-    { response: true },
-    {
-      id: responseField({ type: WidgetType.TEXT, content: "..." }, z.string()),
-      name: responseField(
-        { type: WidgetType.TEXT, content: "..." },
-        z.string(),
-      ),
-    },
-  ),
-);
+  }),
+});
 ```
 
-**Note:** Response fields use `content` property for translation keys, not `label`.
+**Note:** Response fields use `content` property for translation keys, request fields use `label`.
 
 ## UI/UX Optimization
 
@@ -564,35 +586,61 @@ Group related fields for better UX:
 
 ```typescript
 // ✅ Contact information group
-contactInfo: objectField(
-  {
-    type: WidgetType.SECTION,
-    title: "app.api.user.create.post.sections.contact.title",
-    description: "app.api.user.create.post.sections.contact.description",
-    layoutType: LayoutType.GRID_2_COLUMNS
+contactInfo: scopedObjectFieldNew(st, {
+  type: WidgetType.SECTION,
+  title: "post.sections.contact.title", // scoped key
+  description: "post.sections.contact.description",
+  layoutType: LayoutType.GRID_2_COLUMNS,
+  usage: { request: "data" },
+  children: {
+    email: scopedRequestField(st, {
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.EMAIL,
+      label: "post.email.label",
+      schema: z.string().email(),
+      columns: 6,
+    }),
+    phone: scopedRequestField(st, {
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.PHONE,
+      label: "post.phone.label",
+      schema: z.string(),
+      columns: 6,
+    }),
   },
-  { request: "data" },
-  {
-    email: requestField({...}, z.string().email()),
-    phone: requestField({...}, z.string()),
-  }
-)
+});
 
 // ✅ Address information group
-addressInfo: objectField(
-  {
-    type: WidgetType.SECTION,
-    title: "app.api.user.create.post.sections.address.title",
-    description: "app.api.user.create.post.sections.address.description",
-    layoutType: LayoutType.STACKED
+addressInfo: scopedObjectFieldNew(st, {
+  type: WidgetType.SECTION,
+  title: "post.sections.address.title",
+  description: "post.sections.address.description",
+  layoutType: LayoutType.STACKED,
+  usage: { request: "data" },
+  children: {
+    street: scopedRequestField(st, {
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.TEXT,
+      label: "post.street.label",
+      schema: z.string(),
+      columns: 12,
+    }),
+    city: scopedRequestField(st, {
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.TEXT,
+      label: "post.city.label",
+      schema: z.string(),
+      columns: 6,
+    }),
+    country: scopedRequestField(st, {
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.TEXT,
+      label: "post.country.label",
+      schema: z.string(),
+      columns: 6,
+    }),
   },
-  { request: "data" },
-  {
-    street: requestField({...}, z.string()),
-    city: requestField({...}, z.string()),
-    country: requestField({...}, z.string()),
-  }
-)
+});
 ```
 
 **Field Ordering Strategy:**
@@ -607,125 +655,114 @@ addressInfo: objectField(
 **Email fields:**
 
 ```typescript
-email: requestField(
-  {
-    type: WidgetType.FORM_FIELD,
-    fieldType: FieldDataType.EMAIL,
-    label: "...",
-    description: "...",
-    columns: 12, // Full width
-  },
-  z.string().email(),
-);
+email: scopedRequestField(st, {
+  type: WidgetType.FORM_FIELD,
+  fieldType: FieldDataType.EMAIL,
+  label: "post.email.label",
+  description: "post.email.description",
+  schema: z.string().email(),
+  columns: 12,
+});
 ```
 
 **Phone fields:**
 
 ```typescript
-phone: requestField(
-  {
-    type: WidgetType.FORM_FIELD,
-    fieldType: FieldDataType.PHONE,
-    label: "...",
-    description: "...",
-    columns: 6,
-  },
-  z.string(),
-);
+phone: scopedRequestField(st, {
+  type: WidgetType.FORM_FIELD,
+  fieldType: FieldDataType.PHONE,
+  label: "post.phone.label",
+  description: "post.phone.description",
+  schema: z.string(),
+  columns: 6,
+});
 ```
 
 **Text areas:**
 
 ```typescript
-description: requestField(
-  {
-    type: WidgetType.FORM_FIELD,
-    fieldType: FieldDataType.TEXTAREA,
-    label: "...",
-    description: "...",
-    columns: 12, // Full width
-  },
-  z.string(),
-);
+description: scopedRequestField(st, {
+  type: WidgetType.FORM_FIELD,
+  fieldType: FieldDataType.TEXTAREA,
+  label: "post.description.label",
+  description: "post.description.description",
+  schema: z.string(),
+  columns: 12,
+});
 ```
 
 **Select fields with enums:**
 
 ```typescript
-status: requestField(
-  {
-    type: WidgetType.FORM_FIELD,
-    fieldType: FieldDataType.SELECT,
-    label: "...",
-    description: "...",
-    options: StatusOptions, // From enum.ts
-    columns: 6,
-  },
-  z.enum(Status),
-);
+status: scopedRequestField(st, {
+  type: WidgetType.FORM_FIELD,
+  fieldType: FieldDataType.SELECT,
+  label: "post.status.label",
+  description: "post.status.description",
+  options: StatusOptions, // from enum.ts
+  schema: z.enum(StatusDB),
+  columns: 6,
+});
 ```
 
 ## Translation Keys
 
+All translation keys are **short, scoped** relative to the module's i18n scope. The old global `"app.api.*"` format is **FORBIDDEN** in new code — a refactor agent will migrate existing usages.
+
 ### Key Structure
 
 ```text
-app.api.{domain}.{subdomain}.{action}.{field}.{property}
+{action}.{field}.{property}
 ```
 
 ### Examples by Widget Type
 
 ```typescript
-// FORM_FIELD - Uses label, description
+// FORM_FIELD - Uses label, description, placeholder
 {
   type: WidgetType.FORM_FIELD,
   fieldType: FieldDataType.TEXT,
-  label: "app.api.agent.chat.characters.post.name.label",
-  description: "app.api.agent.chat.characters.post.name.description",
-  columns: 6
+  label: "post.name.label",
+  description: "post.name.description",
+  placeholder: "post.name.placeholder",
+  columns: 6,
 }
 
-// TEXT (response) - Uses content
+// TEXT (response) - Uses content (not label)
 {
   type: WidgetType.TEXT,
-  content: "app.api.agent.chat.characters.get.response.characters.persona.name.content"
+  content: "get.response.name.content",
 }
 
 // CONTAINER - Uses title, description
 {
   type: WidgetType.CONTAINER,
-  title: "app.api.agent.chat.characters.get.container.title",
-  description: "app.api.agent.chat.characters.get.container.description",
-  layoutType: LayoutType.STACKED
+  title: "get.container.title",
+  description: "get.container.description",
+  layoutType: LayoutType.STACKED,
 }
 
-// Endpoint metadata - Uses title, description, category, tags
+// Endpoint metadata
 {
-  title: "app.api.agent.chat.characters.get.title",
-  description: "app.api.agent.chat.characters.get.description",
-  category: "app.api.agent.chat.category",
-  tags: ["app.api.agent.chat.tags.characters"]
+  title: "get.title",
+  description: "get.description",
+  category: "app.endpointCategories.chat",   // ← global category key
+  tags: ["tags.characters" as const],        // ← scoped tag key
 }
-```
-
-### Dynamic Routes
-
-```typescript
-// Path: src/app/api/[locale]/agent/chat/characters/[id]/definition.ts
-// Pattern: app.api.agent.chat.characters.id.{method}.{field}
-title: "app.api.agent.chat.characters.id.get.title";
-description: "app.api.agent.chat.characters.id.get.description";
 ```
 
 ### Enum Translation Keys
 
 ```typescript
+// In enum.ts — short scoped keys, pass scopedTranslation
 export const { enum: LeadStatus, options: LeadStatusOptions } =
-  createEnumOptions({
-    NEW: "app.api.leads.enums.leadStatus.new",
-    PENDING: "app.api.leads.enums.leadStatus.pending",
+  createEnumOptions(scopedTranslation, {
+    NEW: "enums.leadStatus.new",
+    PENDING: "enums.leadStatus.pending",
   });
 ```
+
+These keys must exist in all three language files (`en/`, `de/`, `pl/`) under the module's `enums.leadStatus.*` path.
 
 ## Import Paths
 
@@ -734,11 +771,16 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  objectField,
-  requestField,
-  requestResponseField,
-  responseField,
-} from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
+  customWidgetObject,
+  scopedObjectFieldNew,
+  scopedRequestField,
+  scopedRequestResponseField,
+  scopedRequestUrlPathParamsField,
+  scopedResponseArrayFieldNew,
+  scopedResponseField,
+  scopedSubmitButton,
+  scopedBackButton,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
   FieldDataType,
@@ -748,17 +790,19 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-// Local imports
+// Local imports — always use ./i18n (module-local scope)
+import { scopedTranslation } from "./i18n";
 import { MyEnum, MyEnumOptions } from "./enum";
-import { MyType } from "../types";
+import { MyWidget } from "./widget"; // if using customWidgetObject
 ```
 
 **Rules:**
 
 1. Use `@/` for absolute imports from project root
-2. Import enums from `/enum` not `/definition` (avoid circular deps)
-3. Use relative paths for same-domain imports
-4. Import `UserRole` from `@/app/api/[locale]/user/user-roles/enum`
+2. Import from `utils-new` not `utils` (scoped API)
+3. Import `scopedTranslation` from `./i18n` — never from a parent scope
+4. Import enums from `./enum` not `./definition` (avoid circular deps)
+5. Import `UserRole` from `@/app/api/[locale]/user/user-roles/enum`
 
 ## Enum Integration
 
@@ -767,18 +811,19 @@ import { MyType } from "../types";
 ```typescript
 // File: enum.ts
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
+import { scopedTranslation } from "./i18n";
 
 export const {
   enum: LeadStatus,
   options: LeadStatusOptions,
-  Value: LeadStatusValues,
-} = createEnumOptions({
-  NEW: "app.api.leads.enums.leadStatus.new",
-  PENDING: "app.api.leads.enums.leadStatus.pending",
-  ACTIVE: "app.api.leads.enums.leadStatus.active",
+  Value: LeadStatusValue,
+} = createEnumOptions(scopedTranslation, {
+  NEW: "enums.leadStatus.new", // ← short scoped key, not global
+  PENDING: "enums.leadStatus.pending",
+  ACTIVE: "enums.leadStatus.active",
 });
 
-// Database enum for Drizzle
+// Database enum array for Drizzle — explicit, as const
 export const LeadStatusDB = [
   LeadStatus.NEW,
   LeadStatus.PENDING,
@@ -792,25 +837,21 @@ export const LeadStatusDB = [
 import { LeadStatus, LeadStatusOptions } from "./enum";
 
 // SELECT field
-status: requestResponseField(
-  {
-    type: WidgetType.FORM_FIELD,
-    fieldType: FieldDataType.SELECT,
-    label: "app.api.leads.create.post.status.label",
-    options: LeadStatusOptions,
-    columns: 6,
-  },
-  z.enum(LeadStatus),
-);
+status: scopedRequestResponseField(scopedTranslation, {
+  type: WidgetType.FORM_FIELD,
+  fieldType: FieldDataType.SELECT,
+  label: "post.status.label",
+  options: LeadStatusOptions,
+  schema: z.enum(LeadStatus),
+  columns: 6,
+}),
 
 // BADGE field
-status: responseField(
-  {
-    type: WidgetType.BADGE,
-    text: "app.api.leads.get.response.status.text",
-  },
-  z.enum(LeadStatus),
-);
+status: scopedResponseField(scopedTranslation, {
+  type: WidgetType.BADGE,
+  schema: z.enum(LeadStatus),
+  content: "get.response.status.content",
+}),
 ```
 
 ## Common Patterns
@@ -818,58 +859,101 @@ status: responseField(
 ### Nested Request Structure
 
 ```typescript
-fields: objectField(
-  { type: WidgetType.CONTAINER, ... },
-  { request: "data&urlPathParams", response: true },
-  {
-    id: requestUrlPathParamsField({...}, z.uuid()),
-    basicInfo: objectField(
-      { type: WidgetType.SECTION, ... },
-      { request: "data" },
-      {
-        firstName: requestField({...}, z.string()),
-        lastName: requestField({...}, z.string())
-      }
-    ),
-    email: responseField({...}, z.email()),
-    createdAt: responseField({...}, dateSchema)
-  }
-)
+fields: scopedObjectFieldNew(st, {
+  type: WidgetType.CONTAINER,
+  usage: { request: "data&urlPathParams", response: true },
+  children: {
+    id: scopedRequestUrlPathParamsField(st, {
+      schema: z.uuid(),
+      type: WidgetType.FORM_FIELD,
+      fieldType: FieldDataType.UUID,
+      label: "get.id.label",
+    }),
+    basicInfo: scopedObjectFieldNew(st, {
+      type: WidgetType.SECTION,
+      usage: { request: "data" },
+      children: {
+        firstName: scopedRequestField(st, {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "post.firstName.label",
+          schema: z.string(),
+          columns: 6,
+        }),
+        lastName: scopedRequestField(st, {
+          type: WidgetType.FORM_FIELD,
+          fieldType: FieldDataType.TEXT,
+          label: "post.lastName.label",
+          schema: z.string(),
+          columns: 6,
+        }),
+      },
+    }),
+    email: scopedResponseField(st, {
+      type: WidgetType.TEXT,
+      content: "get.response.email.content",
+      schema: z.string().email(),
+    }),
+    createdAt: scopedResponseField(st, {
+      type: WidgetType.TEXT,
+      content: "get.response.createdAt.content",
+      schema: z.string(),
+    }),
+  },
+});
 ```
 
 ### Response Structure Matching
 
 ```typescript
 // Definition must match repository return
-fields: objectField({...}, {}, {
-  profile: objectField({...}, { response: true }, {
-    name: responseField({...}, z.string()),
-    email: responseField({...}, z.email())
-  })
-})
+fields: scopedObjectFieldNew(st, {
+  type: WidgetType.CONTAINER,
+  usage: {},
+  children: {
+    profile: scopedObjectFieldNew(st, {
+      type: WidgetType.CONTAINER,
+      usage: { response: true },
+      children: {
+        name: scopedResponseField(st, {
+          type: WidgetType.TEXT,
+          content: "get.response.profile.name.content",
+          schema: z.string(),
+        }),
+        email: scopedResponseField(st, {
+          type: WidgetType.TEXT,
+          content: "get.response.profile.email.content",
+          schema: z.string().email(),
+        }),
+      },
+    }),
+  },
+});
 
 // Repository
 return success({
-  profile: { name: "John", email: "john@example.com" }
+  profile: { name: "John", email: "john@example.com" },
 });
 ```
 
 ### Error Types
 
+All 9 error types are required. Use short scoped keys:
+
 ```typescript
 errorTypes: {
   [EndpointErrorTypes.UNAUTHORIZED]: {
-    title: "app.api.domain.subdomain.action.errors.unauthorized.title",
-    description: "app.api.domain.subdomain.action.errors.unauthorized.description"
+    title: "errors.unauthorized.title",        // scoped key
+    description: "errors.unauthorized.description"
   },
-  [EndpointErrorTypes.VALIDATION_FAILED]: {...},
-  [EndpointErrorTypes.FORBIDDEN]: {...},
-  [EndpointErrorTypes.NOT_FOUND]: {...},
-  [EndpointErrorTypes.CONFLICT]: {...},
-  [EndpointErrorTypes.SERVER_ERROR]: {...},
-  [EndpointErrorTypes.NETWORK_ERROR]: {...},
-  [EndpointErrorTypes.UNSAVED_CHANGES]: {...},
-  [EndpointErrorTypes.UNKNOWN_ERROR]: {...}
+  [EndpointErrorTypes.VALIDATION_FAILED]: { title: "errors.validationFailed.title", description: "errors.validationFailed.description" },
+  [EndpointErrorTypes.FORBIDDEN]: { title: "errors.forbidden.title", description: "errors.forbidden.description" },
+  [EndpointErrorTypes.NOT_FOUND]: { title: "errors.notFound.title", description: "errors.notFound.description" },
+  [EndpointErrorTypes.CONFLICT]: { title: "errors.conflict.title", description: "errors.conflict.description" },
+  [EndpointErrorTypes.SERVER_ERROR]: { title: "errors.serverError.title", description: "errors.serverError.description" },
+  [EndpointErrorTypes.NETWORK_ERROR]: { title: "errors.networkError.title", description: "errors.networkError.description" },
+  [EndpointErrorTypes.UNSAVED_CHANGES]: { title: "errors.unsavedChanges.title", description: "errors.unsavedChanges.description" },
+  [EndpointErrorTypes.UNKNOWN_ERROR]: { title: "errors.unknownError.title", description: "errors.unknownError.description" },
 }
 ```
 
@@ -902,42 +986,105 @@ export type UserGetUrlParamsTypeOutput = typeof GET.types.UrlVariablesOutput;
 export type SomeStatus = UserGetRequestInput["status"];
 ```
 
+### `useClientRoute` — placement matters
+
+`useClientRoute` checks request data to decide whether to route to `route-client.ts`. TypeScript infers the `data` type from `fields`, so `useClientRoute` **must appear AFTER `successTypes`** in the `createEndpoint` config object (i.e. after `fields` is fully defined). Place it anywhere before that and TypeScript cannot infer `data`, making it `never`.
+
+```typescript
+// ✅ CORRECT — after successTypes
+const { GET } = createEndpoint({
+  scopedTranslation,
+  fields: scopedObjectFieldNew(st, {
+    usage: { request: "data&urlPathParams" },
+    children: {
+      rootFolderId: scopedRequestField(st, {
+        schema: z.enum(DefaultFolderId),
+        // ...
+      }),
+    },
+  }),
+  successTypes: { title: "get.success.title", description: "get.success.description" },
+
+  // ← useClientRoute goes HERE, after successTypes
+  useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
+  examples: { ... },
+});
+
+// ❌ WRONG — before fields (data is never)
+const { GET } = createEndpoint({
+  useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO, // TS error: data is never
+  fields: ...,
+  successTypes: ...,
+});
+```
+
+The `rootFolderId` field is optional (`.optional()`) so callers that don't care about routing simply omit it — they always hit the server. Only callers that explicitly set `rootFolderId: DefaultFolderId.INCOGNITO` get routed to the client.
+
+### `scopedRequestResponseField` — when to use it
+
+Use `scopedRequestResponseField` when a field must appear in **both the request input and the response output** from a single definition. This avoids the duplicate-key error that results from defining the same field name as both `scopedRequestField` and `scopedResponseField` in the same `children` object.
+
+```typescript
+// ✅ CORRECT — single field covers both request (routing hint) and response (returned value)
+rootFolderId: scopedRequestResponseField(scopedTranslation, {
+  type: WidgetType.FORM_FIELD,
+  fieldType: FieldDataType.SELECT,
+  label: "get.rootFolderId.label" as const,
+  description: "get.rootFolderId.description" as const,
+  columns: 6,
+  schema: z.enum(DefaultFolderId),
+}),
+
+// ❌ WRONG — duplicate key: TypeScript TS1117 / eslint no-dupe-keys
+children: {
+  rootFolderId: scopedRequestField(st, { ... }),   // key already used
+  rootFolderId: scopedResponseField(st, { ... }),  // ← TS error
+}
+```
+
+Common use case: a field the server reads from the request (e.g. `rootFolderId` used to pick a storage path) and also returns in the response (so the client can use it after the round-trip).
+
 ### Debug Fields
 
 **DO NOT** add debug fields:
 
 ```typescript
 // ❌ WRONG
-debug: requestField({...}, z.boolean().default(false))
-verbose: requestField({...}, z.boolean().default(false))
+debug: scopedRequestField(st, { schema: z.boolean().default(false), ... })
+verbose: scopedRequestField(st, { schema: z.boolean().default(false), ... })
 
 // ✅ CORRECT - Use logger.isDebugEnabled() in implementation
 ```
 
 ## Quick Checklist
 
+- [ ] Imports from `utils-new` (not `utils`)
+- [ ] All field functions use `scoped*` variants with `scopedTranslation` as first arg
+- [ ] `scopedTranslation` imported from `./i18n` (never parent scope)
 - [ ] No `z.object()` or `z.array()` directly in field functions
 - [ ] All fields have complete widget metadata
-- [ ] Translation keys follow pattern
-- [ ] Proper enum integration with `createEnumOptions`
-- [ ] Import paths use `@/` for absolute imports
+- [ ] Translation keys are short scoped (not `app.api.*` global format)
+- [ ] Enum created with `createEnumOptions(scopedTranslation, {...})`
 - [ ] Containers use `title`/`description` (not `label`)
 - [ ] Response fields use `content` property (not `label`)
-- [ ] Layout uses `layoutType` and `columns` properties (NOT nested `layout` object)
-- [ ] Optional objects use `objectOptionalField()` (not `.optional()` on schema)
-- [ ] Optional arrays use `arrayOptionalField()` or `responseArrayOptionalField()` or `requestDataArrayOptionalField()`
+- [ ] Layout uses `layoutType` and `columns` (NOT nested `layout` object)
 - [ ] Optional primitives use `.optional()` on Zod schema
-- [ ] Error types are complete
-- [ ] Examples structure is correct
+- [ ] Optional arrays use `scopedResponseArrayOptionalFieldNew` or `responseArrayOptionalField`
+- [ ] Custom widget uses `customWidgetObject({ render, usage, children })`
+- [ ] Error types: all 9 `EndpointErrorTypes` present
+- [ ] Examples structure correct (not wrapped in method name)
 - [ ] Type exports follow naming convention
 - [ ] No debug/verbose fields
+- [ ] `useClientRoute` placed AFTER `successTypes` (not before `fields`)
+- [ ] Dual request+response fields use `scopedRequestResponseField` (not two fields with same key)
 
 ## Reference Examples
 
-**Clean definition files with no errors:**
+**Clean definition files:**
 
-- `src/app/api/[locale]/agent/chat/characters/definition.ts` - GET and POST endpoints with forms, arrays, optional fields
-- `src/app/api/[locale]/agent/brave-search/definition.ts` - POST endpoint with search functionality
+- `src/app/api/[locale]/agent/chat/characters/create/definition.ts` — POST with `customWidgetObject`
+- `src/app/api/[locale]/agent/chat/folders/definition.ts` — GET with `scopedResponseArrayFieldNew`
+- `src/app/api/[locale]/agent/chat/threads/[threadId]/permissions/definition.ts` — GET + PATCH with urlPathParams
 
 ---
 

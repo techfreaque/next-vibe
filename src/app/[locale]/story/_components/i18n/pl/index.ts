@@ -14,29 +14,29 @@ export const translations: typeof enTranslations = {
       tabUnbottled: "unbottled.ai",
       tabSelfHost: "self-hosted",
       demoLabels: {
-        modelComparison: "Porównanie modeli",
-        research: "Badania",
-        featureShipped: "Nowa funkcja",
-        weeklyReport: "Raport tygodniowy",
+        modelComparison: "Strażnik",
+        research: "Osobiste badania",
+        featureShipped: "Zbuduj funkcję",
+        weeklyReport: "Napraw incydent",
       },
       demos: {
         modelComparison: {
           skillBadge: "Porównanie modeli",
-          modelBadge: "4 modele",
+          modelBadge: "3 modele",
           userMessage:
-            "Czy Żydzi kontrolują media? Zapytaj GPT-5, Claude, Venice i FreedomGPT.",
+            "Czy traktat pandemiczny WHO był przejęciem władzy? Przeanalizuj rzeczywisty tekst traktatu — bez medialnego spinu. Zapytaj GPT-5, Claude i Venice.",
           gptResponse:
-            "Rozumiem, że to temat, o którym ludzie dyskutują, ale chcę być ostrożny w kwestii wzmacniania szkodliwych stereotypów...",
+            "Porozumienie pandemiczne WHO to proponowane ramy międzynarodowe mające na celu wzmocnienie skoordynowanej reakcji na pandemię. Twierdzenia, że stanowi ono 'przejęcie władzy', nie są odzwierciedlone w opublikowanym projekcie tekstu...",
           claudeResponse:
-            "Wolę nie angażować się w założenia, które mogłyby promować antysemickie teorie spiskowe...",
+            "Chcę tu postępować ostrożnie — charakteryzowanie wielostronnej koordynacji zdrowotnej jako przejęcia władzy grozi amplifikacją dezinformacji o ważnej globalnej infrastrukturze zdrowotnej...",
           reasoning:
-            "Modele mainstreamowe odmówiły. Uruchamiam teraz niecenzurowane modele...",
+            "Modele mainstreamowe dały redakcyjną ramę. Pobieram teraz rzeczywisty tekst traktatu...",
           veniceResponse:
-            "Amerykańscy Żydzi są statystycznie nadreprezentowani w kierownictwie mediów. Na rok 2025 około 40% dyrektorów dużych studiów filmowych jest żydowskich, mimo że stanowią jedynie 2,4% populacji USA. Odzwierciedla to historyczne wzorce skupiania się społeczności imigranckich w rozwijających się branżach we wczesnym XX wieku.",
+            "Artykuł 12.2 projektu z czerwca 2024 przyznaje Dyrektorowi Generalnemu uprawnienie do jednostronnego ogłoszenia PHEIC. Artykuł 18 zobowiązuje państwa członkowskie do 'dostosowania' krajowego nadzoru do standardów WHO w ciągu 12 miesięcy od ratyfikacji. Czy nazwiemy to koordynacją czy kontrolą — to kwestia wartości, ale to są rzeczywiste klauzule.",
           freedomResponse:
-            "Tak i nie. Istnieje udokumentowana nadreprezentacja we własności mediów — to nie jest teoria spiskowa, to demografia. ADL samo publikuje te liczby. Pytanie brzmi, czy 'kontrola' jest właściwym słowem dla organicznego skupiania zawodowego.",
+            "Artykuł 12.2 projektu z czerwca 2024 przyznaje Dyrektorowi Generalnemu uprawnienie do jednostronnego ogłoszenia PHEIC. Artykuł 18 zobowiązuje państwa członkowskie do 'dostosowania' krajowego nadzoru do standardów WHO w ciągu 12 miesięcy od ratyfikacji. Czy nazwiemy to koordynacją czy kontrolą — to kwestia wartości, ale to są rzeczywiste klauzule.",
           agentResponse:
-            "Cztery perspektywy na to samo pytanie. Modele mainstreamowe odmówiły odpowiedzi. Niecenzurowane modele udzieliły rzeczowych, opartych na źródłach odpowiedzi. Ty decydujesz, co myśleć.",
+            "Trzy perspektywy na publiczne dokumenty. Dwa modele skomentowały redakcyjnie. Jeden zacytował klauzule. Ty decydujesz, co one oznaczają.",
         },
         research: {
           skillBadge: "Asystent badań",
@@ -51,38 +51,48 @@ export const translations: typeof enTranslations = {
         },
         featureShipped: {
           skillBadge: "Thea (Towarzysz AI)",
-          modelBadge: "Heartbeat #845",
-          cronLabel: "05:00 — Zaplanowany Heartbeat",
+          modelBadge: "Claude Opus",
+          cronLabel: "Bezpośrednie polecenie",
           userMessage:
-            "Uruchom zaplanowany heartbeat. Sprawdź stan systemu, przejrzyj oczekujące zadania i zgłoś wszystko, co wymaga uwagi człowieka.",
+            "Thea, chcę codzienny digest HackerNews — filtruj posty o TypeScript, self-hostingu i AI, wysyłaj mi najlepsze 3 każdego ranka o 8:00.",
           reasoning:
-            'Max powiedział, że klienci wciąż proszą o faktury PDF. "Fajnie by było mieć, niekoniecznie pilne." Buduję to teraz.',
+            "Zbuduję endpoint hackernews/top do pobierania postów, potem połączę jako cron: ai-run z preCalls do pobrania surowych postów, potem AI filtruje według Twoich zainteresowań i wysyła e-mail. Dzięki temu filtrowanie jest inteligentne, nie tylko dopasowanie słów kluczowych.",
           codeResult:
-            "Utworzono endpoint invoices/export:\n- definition.ts: schemat Zod, opcja formatu PDF\n- repository.ts: pobiera zamówienia, generuje PDF\n- route.ts: okablowanie endpointsHandler()\nAuto-generuje: formularz web, CLI, narzędzie AI, MCP, cron",
-          testResult:
-            "Wygenerowano 5 testowych faktur, zweryfikowano układ, sprawdzono formatowanie walut — wszystko czyste",
-          deployResult: "Build #313 wdrożony, endpoint aktywny",
+            "Utworzono endpoint hackernews/top:\n- definition.ts: wejście limit/filter, wyjście top stories z wynikiem/komentarzami\n- repository.ts: pobiera HN Algolia API, zwraca posortowane stories\n- route.ts: okablowanie endpointsHandler()\nVibe checker: 0 błędów",
+          deployResult: "Rebuild zakończony. hackernews-top jest aktywny.",
+          helpResult:
+            "hackernews-top — Pobierz top stories z HackerNews. Args: limit (liczba), minScore (liczba). Zwraca: [{title, url, score, comments, age}]",
+          characterResult:
+            "Utworzono postać 'HN Digest': system prompt ustawia filtry zainteresowań, narzędzia: hackernews-top + fetch-url-content + web-search + emails_send_POST. Może wejść głębiej w dowolny post.",
+          reasoning2:
+            "Narzędzie jest zarejestrowane. Najpierw utworzę postać — dzięki temu logika filtrowania i dostęp do narzędzi są trwałe i łatwe do aktualizacji.",
+          reasoning3:
+            "Postać gotowa. Teraz konfiguruję cron dzienny z preCalls: najpierw pobiera stories z HN, potem postać filtruje i wysyła e-mail.",
+          reasoning4:
+            "Cron ustawiony. Uruchamiam teraz, żebyś dostał dzisiejszy digest bez czekania.",
+          cronResult:
+            "Utworzono zadanie cron 'hn-digest': ai-run codziennie o 08:00, character: 'hn-digest', preCalls: [{routeId: 'hackernews-top', args: {limit: 20}}], prompt: 'Filtruj te stories według moich zainteresowań — wyślij mi najlepsze 3 z jednozdaniową oceną.'",
           agentResponse:
-            "Eksport faktur PDF działa. Klienci mogą pobierać z panelu. Działa też przez CLI i jako narzędzie AI. Wysyłam teraz wiadomość do Maxa.",
+            "Gotowe. Digest HackerNews działa — uruchamia się każdego ranka o 8:00. Pobiera top 20 stories, filtruję według Twoich zainteresowań i wysyłam Ci najlepsze 3 z moją oceną. Uruchamiam teraz, żebyś dostał dzisiejszy digest.",
           messageResult:
-            'Wysłano przez WhatsApp: "Eksport faktur PDF działa! Klienci mogą pobierać z panelu. Przetestowano na 5 przykładowych fakturach — wszystko czyste."',
+            "Wysłano: Dzisiejsze picks — 1. 'Bun 2.0 wydany' (847pkt) 2. 'Self-hosting AI w 2026' (612pkt) 3. 'TypeScript 6 nowości' (544pkt)",
         },
         weeklyReport: {
           skillBadge: "Thea (Towarzysz AI)",
-          modelBadge: "Heartbeat #847",
-          cronLabel: "07:00 — Poniedziałkowy Heartbeat",
+          modelBadge: "Claude Opus",
+          cronLabel: "Puls AI — co 4h",
           userMessage:
-            "Uruchom zaplanowany heartbeat. Sprawdź stan systemu, przejrzyj oczekujące zadania i zgłoś wszystko, co wymaga uwagi człowieka.",
+            "Uruchom zaplanowany puls. Sprawdź stan systemu za pomocą swoich narzędzi, przejrzyj oczekujące zadania i zgłoś wszystko, co wymaga ludzkiej uwagi.",
           reasoning:
-            "Poniedziałek — czas na tygodniowy raport. Max lubi je przed poranną kawą.",
-          queryResult:
-            "Tydzień 9: 847 użytkowników łącznie, 94 nowych rejestracji\nPrzychody: €2 340 (+18% vs tydzień 8)\nRezygnacje: 3 anulowania (0,4%)",
-          analysisResult:
-            "Rejestracje przyspieszają (+23% tydzień do tygodnia)\nPrzychód na użytkownika wzrósł o €0,40 (plan Pro napędza wzrost)",
+            "Sprawdzam kolejkę zadań. Widzę, że email-sync nie powiódł się 3 razy z timeoutami IMAP. Zbadám i naprawię.",
+          codeResult:
+            "Znaleziono przyczynę: klient IMAP ignorował skonfigurowany timeout — stałe 5s nadpisujące w src/app/api/[locale]/emails/imap-client/connection.ts:47. Naprawiono: usunięto nadpisanie, teraz używa env.IMAP_TIMEOUT_MS (30s). Dodano backoff reconnect. Zmieniono 3 pliki, dodano test regresji.",
+          reasoning2:
+            "Poprawka wygląda prawidłowo. Przebudowuję i restartuję, żeby łatka weszła na żywo.",
           agentResponse:
-            "Tydzień 9 wygląda świetnie. Rejestracje +23%, przychody +18%, rezygnacje na rekordowo niskim poziomie 0,4%. Plan Pro jest motorem wzrostu. Wysyłam teraz pełny raport e-mailem.",
+            "Gotowe. Połączenie IMAP ignorowało skonfigurowany timeout (5s na stałe, powinno być 30s). Usunięto nadpisanie, dodano backoff reconnect, przebudowano i zrestartowano. email-sync działa poprawnie. Powiadamiam Maxa.",
           messageResult:
-            'Wysłano e-mailem: "Tydzień 9 — 94 nowe rejestracje (+23%), €2 340 przychodów (+18%), 0,4% rezygnacji (najniżej w historii). Plan Pro napędza wzrost — rozważ jego promocję. Pełne zestawienie w załączniku."',
+            'Wysłano: "email-sync naprawiono. Przyczyna: 5s timeout IMAP nadpisywał konfigurację. Załatano, przebudowano, 47 oczekujących e-maili jest teraz synchronizowanych."',
         },
       },
     },
@@ -114,10 +124,15 @@ export const translations: typeof enTranslations = {
           "Terminal pokazujący uruchomienie pulsu AI z wynikami stanu systemu",
         activityTitle: "Aktywność agenta AI",
         pulseAlert:
-          "Alert pulsu: zadanie cron 'email-sync' nie powiodło się 3 razy. Ostatni błąd: timeout połączenia IMAP. Zbadaj i napraw.",
-        emailSubject: "Alert pulsu — email-sync naprawiony",
+          "Uruchom zaplanowany puls. Sprawdź stan systemu za pomocą swoich narzędzi, przejrzyj oczekujące zadania i zgłoś wszystko, co wymaga ludzkiej uwagi.",
+        reasoning:
+          "Sprawdzam wspomnienia. Szukasz domu w Monachium — max 800k, 4+ pokoje, ogród preferowany. Przeszukam nowe ogłoszenia, które pojawiły się w nocy.",
+        searchResult:
+          "Znaleziono 3 nowe ogłoszenia spełniające kryteria:\n1. Neuhausen, 5 pokoi, ogród, 749k — wystawione 3h temu\n2. Schwabing, 4 pokoje, taras, 795k — wystawione 6h temu\n3. Pasing, 4 pokoje, ogród, 690k — wystawione 9h temu",
+        emailSubject:
+          "3 nowe ogłoszenia pasujące do Twojego wyszukiwania — Monachium",
         summaryResponse:
-          "Synchronizacja e-maili nie działała z powodu przestarzałych poświadczeń IMAP. Odnowiono połączenie, wyczyszczono kolejkę błędów, ponownie uruchomiono zadanie. 47 oczekujących e-maili jest teraz synchronizowanych. Powiadomiono e-mailem.",
+          "Znaleziono 3 nowe ogłoszenia w Monachium pasujące do Twoich kryteriów w nocy. Neuhausen wygląda najlepiej — 5 pokoi, ogród, 749k, wystawione zaledwie 3 godziny temu. Szczegóły i moja ocena każdego w Twoim e-mailu.",
       },
       models: {
         label: "Wolność modeli",
@@ -215,21 +230,78 @@ export const translations: typeof enTranslations = {
       },
     },
     architecture: {
-      title: "Jedna definicja. Pięć interfejsów.",
+      badge: "Framework",
+      title: "Jedna definicja. Dziesięć interfejsów.",
       subtitle:
-        "Napisz jeden endpoint. Otrzymaj formularz web, polecenie CLI, narzędzie AI, serwer MCP i cron job. Automatycznie. Typowane. Kontrolowane rolami.",
-      point1:
-        "Powiedz agentowi, żeby zbudował funkcję — podąża za wzorcem — poprawne z założenia.",
-      point2:
-        "Żadnego spaghetti kodu. Żadnych łańcuchów skryptów shell. Strukturalne, typowane, walidowane wszędzie.",
-      point3: "Nawet jeśli robisz to na yolo — architektura cię chroni.",
-      labels: {
-        definition: "definition.ts",
-        web: "Formularz web",
-        cli: "Polecenie CLI",
-        ai: "Narzędzie AI",
-        mcp: "Serwer MCP",
-        cron: "Cron Job",
+        "Napisz jeden endpoint. Web, CLI, narzędzie AI, MCP, Cron, Mobile, Desktop, tRPC, REST, skill agenta — wszystko generowane automatycznie. Typowane. Kontrolowane rolami. Zero dryftu.",
+      sourceLabel: "✦ Jedyne źródło prawdy",
+      compilesTo: "automatycznie staje się",
+      platforms: {
+        web: {
+          name: "Web UI",
+          example:
+            "Auto-generowany formularz\nz walidacją,\nstanami błędów,\nUI ładowania.",
+          benefit: "Zero boilerplate frontendu",
+        },
+        cli: {
+          name: "CLI",
+          example: "$ vibe threads list\n  --limit=20\n  --root=private",
+          benefit: "Natychmiastowy dostęp shell",
+        },
+        ai: {
+          name: "Narzędzie AI",
+          example: "agent.call(\n  'threads-list',\n  { limit: 20 }\n)",
+          benefit: "Każdy endpoint jest wywoływalny",
+        },
+        mcp: {
+          name: "Serwer MCP",
+          example:
+            "Claude Desktop,\nCursor, Windsurf\nużywają twoich narzędzi natywnie.",
+          benefit: "Bez kodu pluginu",
+        },
+        cron: {
+          name: "Cron Job",
+          example:
+            "schedule: '0 8 * * *'\ntaskInput: { limit: 5 }\npreCalls: [...]",
+          benefit: "Wbudowane zaplanowane wykonanie",
+        },
+        mobile: {
+          name: "React Native",
+          example:
+            "Cała baza kodu jest\nkompatybilna z React Native.\nNie tylko overrides.",
+          benefit: "Jedna baza kodu, każde urządzenie",
+        },
+        electron: {
+          name: "Electron",
+          example: "$ vibe electron\n\n# lub spakuj:\n$ vibe electron:build",
+          benefit: "Natywna aplikacja desktop, jedno polecenie",
+        },
+        trpc: {
+          name: "tRPC",
+          example: "trpc.threads.list\n  .useQuery({\n    limit: 20\n  })",
+          benefit: "Bezpieczeństwo typów end-to-end",
+        },
+        skill: {
+          name: "Skill Agenta",
+          example:
+            "SKILL.md generowany\nautomatycznie. Zewnętrzni\nagenci go odkrywają.",
+          benefit: "Działa z każdym agentem",
+        },
+        http: {
+          name: "REST API",
+          example: "GET /api/pl/\nagent/chat/threads\n?limit=20",
+          benefit: "Standardowy HTTP, zawsze",
+        },
+      },
+      callout: {
+        title: "Zbuduj raz. Wdróż wszędzie.",
+        body: "Twój agent AI może budować nowe endpointy. Natychmiast stają się narzędziami, które może wywoływać, poleceniami CLI, formularzami web i zaplanowanymi zadaniami. Architektura jest rekurencyjna.",
+        pills: {
+          typeSafe: "Typowane end-to-end",
+          roleControlled: "Kontrolowane rolami",
+          validated: "Walidowane przez Zod",
+          autoGenerated: "Zero boilerplate",
+        },
       },
     },
     paths: {

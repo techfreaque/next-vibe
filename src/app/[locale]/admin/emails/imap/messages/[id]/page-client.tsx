@@ -25,6 +25,9 @@ export function ImapMessageDetailPageClient({
         read: {
           urlPathParams: { id },
         },
+        update: {
+          urlPathParams: { id },
+        },
       }}
     />
   );

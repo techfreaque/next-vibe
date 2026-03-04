@@ -45,6 +45,12 @@ export function useCronTaskEndpoint(
           staleTime: 30 * 1000,
         },
       },
+      create: {
+        urlPathParams: { id: params.taskId },
+      },
+      delete: {
+        urlPathParams: { id: params.taskId },
+      },
     },
     logger,
     user,
@@ -81,6 +87,12 @@ export function useDeleteCronTask(
           refetchOnWindowFocus: false,
         },
       },
+      create: {
+        urlPathParams: { id: taskId },
+      },
+      delete: {
+        urlPathParams: { id: taskId },
+      },
     },
     logger,
     user,
@@ -105,6 +117,12 @@ export function useToggleCronTask(
           enabled: false,
           refetchOnWindowFocus: false,
         },
+      },
+      create: {
+        urlPathParams: { id: taskId },
+      },
+      delete: {
+        urlPathParams: { id: taskId },
       },
     },
     logger,

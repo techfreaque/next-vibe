@@ -78,7 +78,6 @@ const { DELETE } = createEndpoint({
               },
             };
           },
-          undefined,
         );
       },
     },
@@ -259,7 +258,6 @@ const { PATCH } = createEndpoint({
               },
             };
           },
-          undefined,
         );
       },
     },

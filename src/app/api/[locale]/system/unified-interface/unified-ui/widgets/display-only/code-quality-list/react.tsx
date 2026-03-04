@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Code Quality List Widget - React Implementation
  *

@@ -1,6 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  backToHome: "Powrót do strony głównej",
   errors: {
     failedToLoadBrowserIdentity:
       "Nie udało się załadować tożsamości przeglądarki. Proszę odświeżyć stronę.",

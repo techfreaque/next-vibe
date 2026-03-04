@@ -34,11 +34,15 @@ export function useUserByIdEndpoint(
           refetchOnWindowFocus: false,
         },
       },
-      update: {
+      create: {
+        urlPathParams: { id: params.userId },
         formOptions: {
           persistForm: false,
           persistenceKey: `user-edit-${params.userId}-form`, // eslint-disable-line i18next/no-literal-string -- Form persistence key
         },
+      },
+      delete: {
+        urlPathParams: { id: params.userId },
       },
     },
     logger,

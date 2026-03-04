@@ -325,6 +325,7 @@ export class RouteDelegationHandler {
           locale: options.locale,
           logger,
           remoteUrl: options.remoteUrl,
+          userId: !cliUser.isPublic && cliUser.id ? cliUser.id : undefined,
         });
 
         const routeResult: RouteExecutionResult = {

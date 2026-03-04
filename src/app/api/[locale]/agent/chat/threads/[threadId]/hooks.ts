@@ -44,9 +44,13 @@ export function useThread(
         },
       },
       update: {
+        urlPathParams: { threadId: params.threadId },
         formOptions: {
           persistForm: false,
         },
+      },
+      delete: {
+        urlPathParams: { threadId: params.threadId },
       },
     },
     logger,

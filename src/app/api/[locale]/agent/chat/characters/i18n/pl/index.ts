@@ -1207,4 +1207,11 @@ export const translations: typeof enTranslations = {
       button: "Zacznij Rozmawiać",
     },
   },
+  selector: {
+    free: "DARMOWE",
+  },
+  credits: {
+    credit: "{{count}} kredyt",
+    credits: "{{count}} kredytów",
+  },
 };

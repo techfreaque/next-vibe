@@ -23,21 +23,23 @@ import { default as endpointDefinition_PATCH_agent_chat_favorites_Id } from "../
 import { default as endpointDefinition_POST_agent_chat_favorites_create } from "../../agent/chat/favorites/create/definition";
 import { default as endpointDefinition_GET_agent_chat_favorites } from "../../agent/chat/favorites/definition";
 import { default as endpointDefinition_POST_agent_chat_favorites_reorder } from "../../agent/chat/favorites/reorder/definition";
-import { default as endpointDefinition_DELETE_agent_chat_folders_Id } from "../../agent/chat/folders/[id]/definition";
-import { default as endpointDefinition_GET_agent_chat_folders_Id } from "../../agent/chat/folders/[id]/definition";
-import { default as endpointDefinition_PATCH_agent_chat_folders_Id_move } from "../../agent/chat/folders/[id]/move/definition";
-import { default as endpointDefinition_GET_agent_chat_folders_Id_permissions } from "../../agent/chat/folders/[id]/permissions/definition";
-import { default as endpointDefinition_PATCH_agent_chat_folders_Id_permissions } from "../../agent/chat/folders/[id]/permissions/definition";
-import { default as endpointDefinition_PATCH_agent_chat_folders_Id_rename } from "../../agent/chat/folders/[id]/rename/definition";
-import { default as endpointDefinition_PATCH_agent_chat_folders_Id_update } from "../../agent/chat/folders/[id]/update/definition";
-import { default as endpointDefinition_POST_agent_chat_folders_create } from "../../agent/chat/folders/create/definition";
-import { default as endpointDefinition_GET_agent_chat_folders } from "../../agent/chat/folders/definition";
-import { default as endpointDefinition_GET_agent_chat_folders_rootPermissions } from "../../agent/chat/folders/root-permissions/definition";
+import { default as endpointDefinition_GET_agent_chat_folderContents_Rootfolderid } from "../../agent/chat/folder-contents/[rootFolderId]/definition";
+import { default as endpointDefinition_POST_agent_chat_folders_Rootfolderid_create } from "../../agent/chat/folders/[rootFolderId]/create/definition";
+import { default as endpointDefinition_GET_agent_chat_folders_Rootfolderid } from "../../agent/chat/folders/[rootFolderId]/definition";
+import { default as endpointDefinition_GET_agent_chat_folders_Rootfolderid_rootPermissions } from "../../agent/chat/folders/[rootFolderId]/root-permissions/definition";
+import { default as endpointDefinition_DELETE_agent_chat_folders_subfolders_Subfolderid } from "../../agent/chat/folders/subfolders/[subFolderId]/definition";
+import { default as endpointDefinition_GET_agent_chat_folders_subfolders_Subfolderid } from "../../agent/chat/folders/subfolders/[subFolderId]/definition";
+import { default as endpointDefinition_PATCH_agent_chat_folders_subfolders_Subfolderid_move } from "../../agent/chat/folders/subfolders/[subFolderId]/move/definition";
+import { default as endpointDefinition_GET_agent_chat_folders_subfolders_Subfolderid_permissions } from "../../agent/chat/folders/subfolders/[subFolderId]/permissions/definition";
+import { default as endpointDefinition_PATCH_agent_chat_folders_subfolders_Subfolderid_permissions } from "../../agent/chat/folders/subfolders/[subFolderId]/permissions/definition";
+import { default as endpointDefinition_PATCH_agent_chat_folders_subfolders_Subfolderid_rename } from "../../agent/chat/folders/subfolders/[subFolderId]/rename/definition";
+import { default as endpointDefinition_PATCH_agent_chat_folders_subfolders_Subfolderid_update } from "../../agent/chat/folders/subfolders/[subFolderId]/update/definition";
 import { default as endpointDefinition_DELETE_agent_chat_memories_Id } from "../../agent/chat/memories/[id]/definition";
 import { default as endpointDefinition_PATCH_agent_chat_memories_Id } from "../../agent/chat/memories/[id]/definition";
 import { default as endpointDefinition_POST_agent_chat_memories_create } from "../../agent/chat/memories/create/definition";
 import { default as endpointDefinition_GET_agent_chat_memories } from "../../agent/chat/memories/definition";
 import { default as endpointDefinition_GET_agent_chat_memories_search } from "../../agent/chat/memories/search/definition";
+import { default as endpointDefinition_GET_agent_chat_publicFeed } from "../../agent/chat/public-feed/definition";
 import { default as endpointDefinition_GET_agent_chat_settings } from "../../agent/chat/settings/definition";
 import { default as endpointDefinition_POST_agent_chat_settings } from "../../agent/chat/settings/definition";
 import { default as endpointDefinition_DELETE_agent_chat_threads_Threadid } from "../../agent/chat/threads/[threadId]/definition";
@@ -239,6 +241,8 @@ import { default as endpointDefinition_GET_system_help } from "../help/definitio
 import { default as endpointDefinition_POST_system_releaseTool } from "../release-tool/definition";
 import { default as endpointDefinition_POST_system_server_build } from "../server/build/definition";
 import { default as endpointDefinition_POST_system_server_dev } from "../server/dev/definition";
+import { default as endpointDefinition_POST_system_server_electron_build } from "../server/electron/build/definition";
+import { default as endpointDefinition_POST_system_server_electron_start } from "../server/electron/start/definition";
 import { default as endpointDefinition_GET_system_server_health } from "../server/health/definition";
 import { default as endpointDefinition_POST_system_server_rebuild } from "../server/rebuild/definition";
 import { default as endpointDefinition_POST_system_server_start } from "../server/start/definition";
@@ -286,6 +290,9 @@ import { default as endpointDefinition_POST_user_public_resetPassword_confirm } 
 import { default as endpointDefinition_POST_user_public_resetPassword_request } from "../../user/public/reset-password/request/definition";
 import { default as endpointDefinition_GET_user_public_resetPassword_validate } from "../../user/public/reset-password/validate/definition";
 import { default as endpointDefinition_POST_user_public_signup } from "../../user/public/signup/definition";
+import { default as endpointDefinition_POST_user_remoteConnection_connect } from "../../user/remote-connection/connect/definition";
+import { default as endpointDefinition_GET_user_remoteConnection } from "../../user/remote-connection/definition";
+import { default as endpointDefinition_POST_user_remoteConnection_disconnect } from "../../user/remote-connection/disconnect/definition";
 import { default as endpointDefinition_GET_user_search } from "../../user/search/definition";
 import { default as endpointDefinition_POST_user_sessionCleanup } from "../../user/session-cleanup/definition";
 import { default as endpointDefinition_POST_users_create } from "../../users/create/definition";
@@ -384,53 +391,98 @@ function initializeEndpoints(): Record<string, ApiSection> {
   );
   setNestedPath(
     endpoints,
-    ["agent", "chat", "folders", "[id]", "DELETE"],
-    endpointDefinition_DELETE_agent_chat_folders_Id.DELETE,
+    ["agent", "chat", "folder-contents", "[rootFolderId]", "GET"],
+    endpointDefinition_GET_agent_chat_folderContents_Rootfolderid.GET,
   );
   setNestedPath(
     endpoints,
-    ["agent", "chat", "folders", "[id]", "GET"],
-    endpointDefinition_GET_agent_chat_folders_Id.GET,
+    ["agent", "chat", "folders", "[rootFolderId]", "create", "POST"],
+    endpointDefinition_POST_agent_chat_folders_Rootfolderid_create.POST,
   );
   setNestedPath(
     endpoints,
-    ["agent", "chat", "folders", "[id]", "move", "PATCH"],
-    endpointDefinition_PATCH_agent_chat_folders_Id_move.PATCH,
+    ["agent", "chat", "folders", "[rootFolderId]", "GET"],
+    endpointDefinition_GET_agent_chat_folders_Rootfolderid.GET,
   );
   setNestedPath(
     endpoints,
-    ["agent", "chat", "folders", "[id]", "permissions", "GET"],
-    endpointDefinition_GET_agent_chat_folders_Id_permissions.GET,
+    ["agent", "chat", "folders", "[rootFolderId]", "root-permissions", "GET"],
+    endpointDefinition_GET_agent_chat_folders_Rootfolderid_rootPermissions.GET,
   );
   setNestedPath(
     endpoints,
-    ["agent", "chat", "folders", "[id]", "permissions", "PATCH"],
-    endpointDefinition_PATCH_agent_chat_folders_Id_permissions.PATCH,
+    ["agent", "chat", "folders", "subfolders", "[subFolderId]", "DELETE"],
+    endpointDefinition_DELETE_agent_chat_folders_subfolders_Subfolderid.DELETE,
   );
   setNestedPath(
     endpoints,
-    ["agent", "chat", "folders", "[id]", "rename", "PATCH"],
-    endpointDefinition_PATCH_agent_chat_folders_Id_rename.PATCH,
+    ["agent", "chat", "folders", "subfolders", "[subFolderId]", "GET"],
+    endpointDefinition_GET_agent_chat_folders_subfolders_Subfolderid.GET,
   );
   setNestedPath(
     endpoints,
-    ["agent", "chat", "folders", "[id]", "update", "PATCH"],
-    endpointDefinition_PATCH_agent_chat_folders_Id_update.PATCH,
+    [
+      "agent",
+      "chat",
+      "folders",
+      "subfolders",
+      "[subFolderId]",
+      "move",
+      "PATCH",
+    ],
+    endpointDefinition_PATCH_agent_chat_folders_subfolders_Subfolderid_move.PATCH,
   );
   setNestedPath(
     endpoints,
-    ["agent", "chat", "folders", "create", "POST"],
-    endpointDefinition_POST_agent_chat_folders_create.POST,
+    [
+      "agent",
+      "chat",
+      "folders",
+      "subfolders",
+      "[subFolderId]",
+      "permissions",
+      "GET",
+    ],
+    endpointDefinition_GET_agent_chat_folders_subfolders_Subfolderid_permissions.GET,
   );
   setNestedPath(
     endpoints,
-    ["agent", "chat", "folders", "GET"],
-    endpointDefinition_GET_agent_chat_folders.GET,
+    [
+      "agent",
+      "chat",
+      "folders",
+      "subfolders",
+      "[subFolderId]",
+      "permissions",
+      "PATCH",
+    ],
+    endpointDefinition_PATCH_agent_chat_folders_subfolders_Subfolderid_permissions.PATCH,
   );
   setNestedPath(
     endpoints,
-    ["agent", "chat", "folders", "root-permissions", "GET"],
-    endpointDefinition_GET_agent_chat_folders_rootPermissions.GET,
+    [
+      "agent",
+      "chat",
+      "folders",
+      "subfolders",
+      "[subFolderId]",
+      "rename",
+      "PATCH",
+    ],
+    endpointDefinition_PATCH_agent_chat_folders_subfolders_Subfolderid_rename.PATCH,
+  );
+  setNestedPath(
+    endpoints,
+    [
+      "agent",
+      "chat",
+      "folders",
+      "subfolders",
+      "[subFolderId]",
+      "update",
+      "PATCH",
+    ],
+    endpointDefinition_PATCH_agent_chat_folders_subfolders_Subfolderid_update.PATCH,
   );
   setNestedPath(
     endpoints,
@@ -456,6 +508,11 @@ function initializeEndpoints(): Record<string, ApiSection> {
     endpoints,
     ["agent", "chat", "memories", "search", "GET"],
     endpointDefinition_GET_agent_chat_memories_search.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["agent", "chat", "public-feed", "GET"],
+    endpointDefinition_GET_agent_chat_publicFeed.GET,
   );
   setNestedPath(
     endpoints,
@@ -1509,6 +1566,16 @@ function initializeEndpoints(): Record<string, ApiSection> {
   );
   setNestedPath(
     endpoints,
+    ["system", "server", "electron", "build", "POST"],
+    endpointDefinition_POST_system_server_electron_build.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["system", "server", "electron", "start", "POST"],
+    endpointDefinition_POST_system_server_electron_start.POST,
+  );
+  setNestedPath(
+    endpoints,
     ["system", "server", "health", "GET"],
     endpointDefinition_GET_system_server_health.GET,
   );
@@ -1748,6 +1815,21 @@ function initializeEndpoints(): Record<string, ApiSection> {
     endpoints,
     ["user", "public", "signup", "POST"],
     endpointDefinition_POST_user_public_signup.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["user", "remote-connection", "connect", "POST"],
+    endpointDefinition_POST_user_remoteConnection_connect.POST,
+  );
+  setNestedPath(
+    endpoints,
+    ["user", "remote-connection", "GET"],
+    endpointDefinition_GET_user_remoteConnection.GET,
+  );
+  setNestedPath(
+    endpoints,
+    ["user", "remote-connection", "disconnect", "POST"],
+    endpointDefinition_POST_user_remoteConnection_disconnect.POST,
   );
   setNestedPath(
     endpoints,

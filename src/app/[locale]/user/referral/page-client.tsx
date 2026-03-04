@@ -31,8 +31,10 @@ import referralDefinition from "@/app/api/[locale]/referral/definition";
 import referralStatsDefinition from "@/app/api/[locale]/referral/stats/definition";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { translations as configTranslations } from "@/config/i18n/en";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation as pageT } from "./i18n";
 
 export function ReferralPageClient({
   locale,
@@ -43,7 +45,7 @@ export function ReferralPageClient({
   isAuthenticated: boolean;
   user: JwtPayloadType;
 }): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = pageT.scopedT(locale);
 
   return (
     <Div className="w-full min-h-screen">
@@ -57,22 +59,20 @@ export function ReferralPageClient({
           className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-8"
         >
           <ArrowLeft className="h-4 w-4" />
-          {t("app.subscription.subscription.backToChat")}
+          {t("backToChat")}
         </Link>
 
         {/* Hero Section */}
         <Div className="mb-12">
           <Badge variant="secondary" className="mb-4 gap-1.5">
             <Gift className="h-3.5 w-3.5" />
-            {t("app.user.referral.tagline")}
+            {t("tagline")}
           </Badge>
           <H1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
-            {t("app.user.referral.title", { appName: t("config.appName") })}
+            {t("title", { appName: configTranslations.appName })}
           </H1>
           <P className="text-muted-foreground text-lg max-w-2xl">
-            {t("app.user.referral.description", {
-              appName: t("config.appName"),
-            })}
+            {t("description", { appName: configTranslations.appName })}
           </P>
         </Div>
 
@@ -80,7 +80,7 @@ export function ReferralPageClient({
         {isAuthenticated && (
           <Div className="mb-12">
             <H2 className="text-xl font-semibold mb-4">
-              {t("app.user.referral.overview.title")}
+              {t("overview.title")}
             </H2>
             <EndpointsPage
               endpoint={referralStatsDefinition}
@@ -97,7 +97,7 @@ export function ReferralPageClient({
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-violet-500" />
-                {t("app.user.referral.howItWorks.title")}
+                {t("howItWorks.title")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -106,11 +106,9 @@ export function ReferralPageClient({
                   1
                 </Div>
                 <Div>
-                  <P className="font-medium">
-                    {t("app.user.referral.howItWorks.step1Title")}
-                  </P>
+                  <P className="font-medium">{t("howItWorks.step1Title")}</P>
                   <P className="text-sm text-muted-foreground">
-                    {t("app.user.referral.howItWorks.step1Body")}
+                    {t("howItWorks.step1Body")}
                   </P>
                 </Div>
               </Div>
@@ -119,11 +117,9 @@ export function ReferralPageClient({
                   2
                 </Div>
                 <Div>
-                  <P className="font-medium">
-                    {t("app.user.referral.howItWorks.step2Title")}
-                  </P>
+                  <P className="font-medium">{t("howItWorks.step2Title")}</P>
                   <P className="text-sm text-muted-foreground">
-                    {t("app.user.referral.howItWorks.step2Body")}
+                    {t("howItWorks.step2Body")}
                   </P>
                 </Div>
               </Div>
@@ -132,11 +128,9 @@ export function ReferralPageClient({
                   3
                 </Div>
                 <Div>
-                  <P className="font-medium">
-                    {t("app.user.referral.howItWorks.step3Title")}
-                  </P>
+                  <P className="font-medium">{t("howItWorks.step3Title")}</P>
                   <P className="text-sm text-muted-foreground">
-                    {t("app.user.referral.howItWorks.step3Body")}
+                    {t("howItWorks.step3Body")}
                   </P>
                 </Div>
               </Div>
@@ -148,21 +142,19 @@ export function ReferralPageClient({
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Wallet className="h-5 w-5 text-emerald-500" />
-                {t("app.user.referral.payout.title")}
+                {t("payout.title")}
               </CardTitle>
-              <CardDescription>
-                {t("app.user.referral.payout.description")}
-              </CardDescription>
+              <CardDescription>{t("payout.description")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
                 <Coins className="h-5 w-5 text-blue-500 mt-0.5 shrink-0" />
                 <Div>
                   <P className="font-medium text-sm">
-                    {t("app.user.referral.payout.useAsCredits")}
+                    {t("payout.useAsCredits")}
                   </P>
                   <P className="text-xs text-muted-foreground">
-                    {t("app.user.referral.payout.useAsCreditsDesc")}
+                    {t("payout.useAsCreditsDesc")}
                   </P>
                 </Div>
               </Div>
@@ -170,16 +162,16 @@ export function ReferralPageClient({
                 <Bitcoin className="h-5 w-5 text-orange-500 mt-0.5 shrink-0" />
                 <Div>
                   <P className="font-medium text-sm">
-                    {t("app.user.referral.payout.cryptoPayout")}
+                    {t("payout.cryptoPayout")}
                   </P>
                   <P className="text-xs text-muted-foreground">
-                    {t("app.user.referral.payout.cryptoPayoutDesc")}
+                    {t("payout.cryptoPayoutDesc")}
                   </P>
                 </Div>
               </Div>
               <Div className="pt-2 border-t">
                 <P className="text-xs text-muted-foreground">
-                  {t("app.user.referral.payout.minimumNote")}
+                  {t("payout.minimumNote")}
                 </P>
               </Div>
             </CardContent>
@@ -196,10 +188,10 @@ export function ReferralPageClient({
                   <Div>
                     <CardTitle className="flex items-center gap-2">
                       <Plus className="h-5 w-5" />
-                      {t("app.user.referral.createCode.title")}
+                      {t("createCode.title")}
                     </CardTitle>
                     <CardDescription>
-                      {t("app.user.referral.manage.createSubtitle")}
+                      {t("manage.createSubtitle")}
                     </CardDescription>
                   </Div>
                 </Div>
@@ -218,11 +210,9 @@ export function ReferralPageClient({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Link2 className="h-5 w-5" />
-                  {t("app.user.referral.myCodes.title")}
+                  {t("myCodes.title")}
                 </CardTitle>
-                <CardDescription>
-                  {t("app.user.referral.manage.codesSubtitle")}
-                </CardDescription>
+                <CardDescription>{t("manage.codesSubtitle")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <EndpointsPage
@@ -242,18 +232,16 @@ export function ReferralPageClient({
                   <Gift className="h-8 w-8 text-violet-600 dark:text-violet-400" />
                 </Div>
                 <Div className="space-y-2">
-                  <H3 className="text-xl font-semibold">
-                    {t("app.user.referral.cta.title")}
-                  </H3>
+                  <H3 className="text-xl font-semibold">{t("cta.title")}</H3>
                   <P className="text-muted-foreground max-w-md mx-auto">
-                    {t("app.user.referral.cta.description")}
+                    {t("cta.description")}
                   </P>
                 </Div>
                 <Div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Button asChild size="lg" className="gap-2">
                     <Link href={`/${locale}/user/signup`}>
                       <UserPlus className="h-4 w-4" />
-                      {t("app.user.referral.cta.signUp")}
+                      {t("cta.signUp")}
                     </Link>
                   </Button>
                   <Button asChild variant="outline" size="lg" className="gap-2">
@@ -261,7 +249,7 @@ export function ReferralPageClient({
                       href={`/${locale}/user/login?callbackUrl=${encodeURIComponent(`/${locale}/user/referral`)}`}
                     >
                       <LogIn className="h-4 w-4" />
-                      {t("app.user.referral.cta.logIn")}
+                      {t("cta.logIn")}
                     </Link>
                   </Button>
                 </Div>

@@ -1,10 +1,10 @@
-import { translations as messageIdTranslations } from "../../[messageId]/i18n/pl";
-import pathTranslations from "../../path/i18n/pl";
-import { translations as searchTranslations } from "../../search/i18n/pl";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  ...searchTranslations,
+  category: "Chat",
+  tags: {
+    messages: "Wiadomości",
+  },
   loadingOlderMessages: "Ładowanie starszych wiadomości...",
   scrollUpForOlderMessages: "Przewiń w górę po starsze wiadomości",
   showOlderMessages: "Pokaż starsze wiadomości",
@@ -25,6 +25,11 @@ export const translations: typeof enTranslations = {
     threadId: {
       label: "Thread ID",
       description: "ID of the thread to retrieve messages from",
+    },
+    rootFolderId: {
+      label: "Folder główny",
+      description:
+        "Folder główny wątku (używany do routingu po stronie klienta)",
     },
     response: {
       title: "Messages Response",
@@ -141,6 +146,11 @@ export const translations: typeof enTranslations = {
     threadId: {
       label: "Thread ID",
       description: "ID of the thread to add message to",
+    },
+    rootFolderId: {
+      label: "Folder główny",
+      description:
+        "Folder główny wątku (używany do routingu po stronie klienta)",
     },
     id: {
       label: "ID wiadomości",
@@ -260,7 +270,187 @@ export const translations: typeof enTranslations = {
   debugView: {
     systemPromptTitle: "Systemowy monit",
     copied: "Skopiowano!",
+    systemMessageHint: "Wiadomość systemowa (ukryta przed użytkownikami)",
   },
-  messageId: messageIdTranslations,
-  path: pathTranslations,
+  widget: {
+    common: {
+      send: "Wyślij",
+      sending: "Wysyłanie...",
+      cancel: "Anuluj",
+      close: "Zamknij",
+      copyButton: {
+        copied: "Skopiowano!",
+        copyToClipboard: "Kopiuj do schowka",
+        copyAsMarkdown: "Kopiuj jako Markdown",
+        copyAsText: "Kopiuj jako zwykły tekst",
+      },
+      viewModeToggle: {
+        linearView: "Widok liniowy",
+        threadedView: "Widok wątkowy",
+        flatView: "Widok płaski",
+        debugView: "Widok debugowania",
+      },
+      userMessageActions: {
+        branch: "Rozgałęzienie",
+        retry: "Ponów",
+        deleteMessage: "Usuń wiadomość",
+      },
+      assistantMessageActions: {
+        answerAsAI: "Odpowiedz jako AI",
+        cancelLoading: "Anuluj ładowanie",
+        stopAudio: "Zatrzymaj audio",
+        playAudio: "Odtwórz audio ({{cost}} kredytów)",
+        actualCostUsed: "Rzeczywisty koszt",
+        credits: "Kredyty",
+        tokens: "Tokeny",
+        tokensUsed: "Użyte tokeny",
+        deleteMessage: "Usuń wiadomość",
+      },
+    },
+    messages: {
+      assistant: "Asystent",
+      anonymous: "Anonimowy",
+      you: "Ty",
+      edited: "edytowano",
+      branch: {
+        previous: "Poprzednie rozgałęzienie",
+        next: "Następne rozgałęzienie",
+      },
+      authorWithId: "{{author}} ({{id}})",
+    },
+    linearView: {
+      answerModal: {
+        title: "Odpowiedz jako AI",
+        description: "Wygeneruj odpowiedź AI na tę wiadomość",
+        inputPlaceholder: "Dodaj kontekst dla AI...",
+        confirmLabel: "Generuj",
+      },
+      retryModal: {
+        title: "Ponów z innym modelem",
+        description: "Wygeneruj tę odpowiedź ponownie z innym modelem",
+        confirmLabel: "Ponów",
+      },
+    },
+    threadedView: {
+      actions: {
+        reply: "Odpowiedz",
+        replyToMessage: "Odpowiedz na tę wiadomość",
+        edit: "Edytuj",
+        editMessage: "Edytuj wiadomość",
+        retry: "Ponów",
+        retryWithDifferent: "Ponów z innym modelem",
+        answerAsAI: "Odpowiedz jako AI",
+        generateAIResponse: "Wygeneruj odpowiedź AI",
+        respondToAI: "Odpowiedz AI",
+        cancelLoading: "Anuluj ładowanie",
+        stop: "Zatrzymaj",
+        stopAudio: "Zatrzymaj audio",
+        playAudio: "Odtwórz audio ({{cost}} kredytów)",
+        delete: "Usuń",
+        deleteMessage: "Usuń wiadomość",
+        share: "Udostępnij",
+        copyPermalink: "Kopiuj permalink",
+        upvote: "Głosuj za",
+        downvote: "Głosuj przeciw",
+        play: "Odtwórz",
+        cancel: "Anuluj",
+        parent: "Przejdź do rodzica",
+      },
+      answerModal: {
+        title: "Odpowiedz jako AI",
+        description: "Wygeneruj odpowiedź AI na tę wiadomość",
+        inputPlaceholder: "Dodaj kontekst dla AI...",
+        confirmLabel: "Generuj",
+      },
+      retryModal: {
+        title: "Ponów z innym modelem",
+        description: "Wygeneruj tę odpowiedź ponownie z innym modelem",
+        confirmLabel: "Ponów",
+      },
+      anonymous: "Anonimowy",
+      assistantFallback: "Asystent",
+      userFallback: "Użytkownik",
+      youLabel: "Ty",
+      authorWithId: "{{name}} ({{id}})",
+      reply: "odpowiedź",
+      replies: "odpowiedzi",
+      expandReplies: "Rozwiń odpowiedzi",
+      collapseReplies: "Zwiń odpowiedzi",
+      continueThread: "Kontynuuj wątek ({{count}} {{replyText}})",
+    },
+    flatView: {
+      actions: {
+        reply: "Odpowiedz",
+        replyToMessage: "Odpowiedz na tę wiadomość",
+        edit: "Edytuj",
+        editMessage: "Edytuj wiadomość",
+        retry: "Ponów",
+        retryWithDifferent: "Ponów z innym modelem",
+        answerAsAI: "Odpowiedz jako AI",
+        generateAIResponse: "Wygeneruj odpowiedź AI",
+        delete: "Usuń",
+        deleteMessage: "Usuń wiadomość",
+        copyReference: "Kopiuj referencję",
+      },
+      answerModal: {
+        title: "Odpowiedz jako AI",
+        description: "Wygeneruj odpowiedź AI na tę wiadomość",
+        inputPlaceholder: "Dodaj kontekst dla AI...",
+        confirmLabel: "Generuj",
+      },
+      retryModal: {
+        title: "Ponów z innym modelem",
+        description: "Wygeneruj tę odpowiedź ponownie z innym modelem",
+        confirmLabel: "Ponów",
+      },
+      anonymous: "Anonimowy",
+      assistantFallback: "Asystent",
+      youLabel: "Ty",
+      replyingTo: "Odpowiada na",
+      replies: "Odpowiedzi:",
+      clickToCopyRef: "Kliknij, aby skopiować referencję",
+      postsById: "{{count}} postów tego ID",
+      idLabel: "ID: {{id}}",
+    },
+    debugView: {
+      systemMessageHint: "Wiadomość systemowa (ukryta przed użytkownikami)",
+    },
+    userProfile: {
+      recentPosts: "Ostatnie posty",
+      noPostsYet: "Brak postów",
+      postCount: "{{count}} postów",
+    },
+    screenshot: {
+      capture: "Zrób zrzut ekranu",
+      capturing: "Wykonywanie...",
+    },
+    shareDialog: {
+      title: "Udostępnij wątek",
+    },
+    messageEditor: {
+      titles: {
+        branch: "Edytuj i rozgałęź",
+        cancel: "Anuluj",
+      },
+      hint: {
+        branch: "Edycja tworzy nowe rozgałęzienie",
+      },
+    },
+    input: {
+      keyboardShortcuts: {
+        press: "Naciśnij",
+        enter: "Enter",
+        shiftEnter: "Shift+Enter",
+        forNewLine: "dla nowej linii",
+      },
+    },
+    voiceMode: {
+      callMode: "Tryb połączenia",
+      callModeDescription: "AI odpowie głosem",
+      tapToRecord: "Stuknij, aby nagrać",
+    },
+    batchToolConfirmation: {
+      title: "Potwierdź wywołania narzędzi wsadowych",
+    },
+  },
 };

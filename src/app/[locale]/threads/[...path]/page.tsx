@@ -19,12 +19,15 @@ import { isUUID, parseChatUrl } from "@/app/[locale]/chat/lib/url-parser";
 import { CharactersRepository } from "@/app/api/[locale]/agent/chat/characters/repository";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
-import { FolderRepository } from "@/app/api/[locale]/agent/chat/folders/[id]/repository";
-import { scopedTranslation as foldersScopedTranslation } from "@/app/api/[locale]/agent/chat/folders/i18n";
-import { ChatFoldersRepository } from "@/app/api/[locale]/agent/chat/folders/repository";
-import { RootFolderPermissionsRepository } from "@/app/api/[locale]/agent/chat/folders/root-permissions/repository";
+import { scopedTranslation as foldersScopedTranslation } from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/i18n";
+import { ChatFoldersRepository } from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/repository";
+import { RootFolderPermissionsRepository } from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/root-permissions/repository";
+import { FolderRepository } from "@/app/api/[locale]/agent/chat/folders/subfolders/[subFolderId]/repository";
 import { ChatBootProvider } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatNavigationProvider } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
+import { FeedSortMode } from "@/app/api/[locale]/agent/chat/public-feed/definition";
+import { scopedTranslation as publicFeedScopedTranslation } from "@/app/api/[locale]/agent/chat/public-feed/i18n";
+import { PublicFeedRepository } from "@/app/api/[locale]/agent/chat/public-feed/repository";
 import { scopedTranslation as settingsScopedTranslation } from "@/app/api/[locale]/agent/chat/settings/i18n";
 import { ChatSettingsRepository } from "@/app/api/[locale]/agent/chat/settings/repository";
 import { scopedTranslation as messagesScopedTranslation } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/i18n";
@@ -189,6 +192,7 @@ export default async function ThreadsPathPage({
   let initialPathData = null;
   let initialSettingsData = null;
   let initialCharacterData = null;
+  let initialPublicFeedData = null;
 
   if (initialRootFolderId !== DefaultFolderId.INCOGNITO && user) {
     const { t: foldersT } = foldersScopedTranslation.scopedT(locale);
@@ -215,7 +219,7 @@ export default async function ThreadsPathPage({
         ThreadsRepository.listThreads(
           {
             rootFolderId: initialRootFolderId,
-            subFolderId: initialSubFolderId ?? undefined,
+            subFolderId: initialSubFolderId ?? null,
             page: 1,
             limit: 50,
           },
@@ -258,7 +262,7 @@ export default async function ThreadsPathPage({
       activeThreadIdForFetch
         ? pathRepository.getPath(
             { threadId: activeThreadIdForFetch },
-            { branchIndices: {} },
+            { rootFolderId: initialRootFolderId, branchIndices: {} },
             user,
             pathT,
             logger,
@@ -281,6 +285,24 @@ export default async function ThreadsPathPage({
     if (characterResult && characterResult.success) {
       initialCharacterData = characterResult.data;
     }
+
+    // Fetch public feed data server-side when on the public folder with no active thread
+    if (
+      initialRootFolderId === DefaultFolderId.PUBLIC &&
+      !activeThreadIdForFetch
+    ) {
+      const { t: publicFeedT } = publicFeedScopedTranslation.scopedT(locale);
+      const publicFeedResult = await PublicFeedRepository.getFeed(
+        { sortMode: FeedSortMode.HOT, page: 1, limit: 20 },
+        user,
+        publicFeedT,
+        logger,
+        locale,
+      );
+      if (publicFeedResult.success) {
+        initialPublicFeedData = publicFeedResult.data;
+      }
+    }
   }
 
   return (
@@ -291,8 +313,6 @@ export default async function ThreadsPathPage({
         currentSubFolderId={initialSubFolderId}
       >
         <ChatBootProvider
-          user={user}
-          locale={locale}
           activeThreadId={initialThreadId}
           currentRootFolderId={initialRootFolderId}
           currentSubFolderId={initialSubFolderId}
@@ -305,6 +325,7 @@ export default async function ThreadsPathPage({
           initialPathData={initialPathData}
           initialSettingsData={initialSettingsData}
           initialCharacterData={initialCharacterData}
+          initialPublicFeedData={initialPublicFeedData}
         >
           <ChatInterface user={user} />
         </ChatBootProvider>

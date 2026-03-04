@@ -10,7 +10,8 @@ import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "../../i18n";
 
 interface ChatEmptyStateProps {
   locale: CountryLanguage;
@@ -25,7 +26,7 @@ export function ChatEmptyState({
   locale,
   inputHeight,
 }: ChatEmptyStateProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const rootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
 
   const folderConfig = getDefaultFolderConfig(rootFolderId);
@@ -77,28 +78,28 @@ export function ChatEmptyState({
   const getTitle = (): string => {
     switch (rootFolderId) {
       case "private":
-        return t("app.chat.suggestedPrompts.privateTitle");
+        return t("widget.suggestedPrompts.privateTitle");
       case "shared":
-        return t("app.chat.suggestedPrompts.sharedTitle");
+        return t("widget.suggestedPrompts.sharedTitle");
       case "incognito":
-        return t("app.chat.suggestedPrompts.incognitoTitle");
+        return t("widget.suggestedPrompts.incognitoTitle");
       case "public":
-        return t("app.chat.suggestedPrompts.publicTitle");
+        return t("widget.suggestedPrompts.publicTitle");
       default:
-        return t("app.chat.suggestedPrompts.title");
+        return t("widget.suggestedPrompts.title");
     }
   };
 
   const getDescription = (): string => {
     switch (rootFolderId) {
       case "private":
-        return t("app.chat.suggestedPrompts.privateDescription");
+        return t("widget.suggestedPrompts.privateDescription");
       case "shared":
-        return t("app.chat.suggestedPrompts.sharedDescription");
+        return t("widget.suggestedPrompts.sharedDescription");
       case "incognito":
-        return t("app.chat.suggestedPrompts.incognitoDescription");
+        return t("widget.suggestedPrompts.incognitoDescription");
       case "public":
-        return t("app.chat.suggestedPrompts.publicDescription");
+        return t("widget.suggestedPrompts.publicDescription");
       default:
         return "";
     }

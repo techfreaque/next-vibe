@@ -63,14 +63,9 @@ function connect(channel: string, state: ConnectionState): void {
 
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
   const params = new URLSearchParams({ channel });
-  // WS sidecar runs on Next.js port + 1000 (3000→4000, 3001→4001)
-  // Auth cookies are sent automatically (same host, different port = same origin)
-  const currentPort = parseInt(
-    window.location.port || (protocol === "wss:" ? "443" : "80"),
-    10,
-  );
-  const wsPort = currentPort + 1000;
-  const url = `${protocol}//${window.location.hostname}:${wsPort}/?${params.toString()}`;
+  // WS handler is on the same host/port as Next.js at path /ws
+  // (Bun proxy intercepts the upgrade before forwarding to Next.js)
+  const url = `${protocol}//${window.location.host}/ws?${params.toString()}`;
 
   const ws = new WebSocket(url);
 

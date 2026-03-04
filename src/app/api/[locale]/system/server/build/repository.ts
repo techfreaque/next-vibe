@@ -138,7 +138,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
               skipEndpoints: !data.generateEndpoints,
               skipSeeds: !data.generateSeeds,
               skipTaskIndex: false,
-              skipTrpc: false,
+              enableTrpc: false,
             },
             logger,
             locale,

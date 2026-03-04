@@ -1,4 +1,3 @@
-import { translations as threadsThreadIdTranslations } from "../../[threadId]/i18n/de";
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
@@ -111,6 +110,9 @@ export const translations: typeof enTranslations = {
           },
           canDelete: {
             content: "Kann löschen",
+          },
+          isStreaming: {
+            content: "Streaming",
           },
           canManagePermissions: {
             content: "Kann Berechtigungen verwalten",
@@ -305,7 +307,52 @@ export const translations: typeof enTranslations = {
       description: "Thread erfolgreich erstellt",
     },
   },
-  threadId: threadsThreadIdTranslations,
+  widget: {
+    common: {
+      noChatsFound: "Keine Chats gefunden",
+      delete: "Löschen",
+      cancel: "Abbrechen",
+    },
+    actions: {
+      rename: "Umbenennen",
+      unpin: "Entpinnen",
+      pin: "Oben anheften",
+      unarchive: "Aus Archiv holen",
+      archive: "Archivieren",
+      manageSharing: "Freigabe verwalten",
+      moveToFolder: "In Ordner verschieben",
+      unfiled: "Nicht abgelegt",
+    },
+    folderList: {
+      managePermissions: "Berechtigungen verwalten",
+      today: "Heute",
+      lastWeek: "Letzte 7 Tage",
+      lastMonth: "Letzte 30 Tage",
+      older: "Älter",
+    },
+    threadList: {
+      deleteDialog: {
+        title: "Thread löschen",
+        description:
+          'Möchten Sie "{{title}}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden und alle Nachrichten werden dauerhaft gelöscht.',
+      },
+    },
+    suggestedPrompts: {
+      title: "Wie kann ich helfen?",
+      privateTitle: "Ihr privater KI-Assistent",
+      privateDescription:
+        "Gespräche werden in Ihrem Konto gespeichert und auf allen Geräten synchronisiert.",
+      sharedTitle: "Mit KI zusammenarbeiten",
+      sharedDescription:
+        "Erstellen Sie Gespräche und teilen Sie sie mit Teammitgliedern über sichere Links.",
+      publicTitle: "Dem öffentlichen KI-Forum beitreten",
+      publicDescription:
+        "Öffentliche Gespräche für alle sichtbar. Teilen Sie Ideen und engagieren Sie sich.",
+      incognitoTitle: "Anonymer KI-Chat",
+      incognitoDescription:
+        "Nur in Ihrem Browser gespeichert. Nie in Ihrem Konto gespeichert oder synchronisiert.",
+    },
+  },
   publicFeed: {
     timestamp: {
       justNow: "Gerade eben",

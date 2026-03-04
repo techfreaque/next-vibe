@@ -7,7 +7,8 @@ import type { JSX } from "react";
 import { useCallback, useState } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "../i18n";
 
 interface ChatScreenshotButtonProps {
   locale: CountryLanguage;
@@ -22,7 +23,7 @@ export function ChatScreenshotButton({
   locale,
   onScreenshot,
 }: ChatScreenshotButtonProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
   const [isCapturing, setIsCapturing] = useState(false);
 
   const handleClick = useCallback(async (): Promise<void> => {
@@ -47,8 +48,8 @@ export function ChatScreenshotButton({
       className="bg-card backdrop-blur-sm shadow-sm hover:bg-accent h-9 w-9 disabled:opacity-50 disabled:cursor-not-allowed"
       title={
         isCapturing
-          ? t("app.chat.screenshot.capturing")
-          : t("app.chat.screenshot.capture")
+          ? t("widget.screenshot.capturing")
+          : t("widget.screenshot.capture")
       }
     >
       {isCapturing ? (

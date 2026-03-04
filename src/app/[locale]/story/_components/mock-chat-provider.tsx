@@ -9,18 +9,11 @@
 import type { JSX, ReactNode } from "react";
 import { useMemo } from "react";
 
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatBootValue } from "@/app/api/[locale]/agent/chat/hooks/context";
 import { ChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { ChatNavigationProvider } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import type { AgentEnvAvailability } from "@/app/api/[locale]/agent/env-availability";
-import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-
-const MOCK_USER: ChatBootValue["user"] = {
-  isPublic: false,
-  id: "00000000-0000-0000-0000-000000000000",
-  leadId: "00000000-0000-0000-0000-000000000000",
-  roles: [UserPermissionRole.ADMIN],
-};
 
 const MOCK_ENV: AgentEnvAvailability = {
   openRouter: false,
@@ -51,19 +44,27 @@ export function MockChatProvider({
 }): JSX.Element {
   const mockValue = useMemo(
     (): ChatBootValue => ({
-      user: MOCK_USER,
-      locale: "en-US",
-      logger: createEndpointLogger(false, Date.now(), "en-US"),
       initialCredits: MOCK_CREDITS,
       envAvailability: MOCK_ENV,
       rootFolderPermissions: { canCreateThread: false, canCreateFolder: false },
+      initialFoldersData: null,
+      initialThreadsData: null,
+      initialRootFolderId: DefaultFolderId.PRIVATE,
+      initialMessagesData: null,
+      initialPathData: null,
+      initialSettingsData: null,
+      initialCharacterData: null,
+      initialPublicFeedData: null,
+      initialThreadId: null,
     }),
     [],
   );
 
   return (
     <ChatBootContext.Provider value={mockValue}>
-      {children}
+      <ChatNavigationProvider isEmbedded={false}>
+        {children}
+      </ChatNavigationProvider>
     </ChatBootContext.Provider>
   );
 }

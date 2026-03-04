@@ -25,7 +25,9 @@ import { useTranslation } from "@/i18n/core/client";
 import type {
   EndpointReturn,
   FormAlertState,
+  OptionsOptional,
   UseEndpointOptions,
+  UseEndpointOptionsBase,
 } from "./endpoint-types";
 import {
   useAvailableMethods,
@@ -53,11 +55,32 @@ import { useEndpointRead } from "./use-endpoint-read";
  * @param logger - Logger instance for debugging
  * @returns Object with all available operations based on endpoint methods
  */
+// Public overload: options required/optional based on endpoint requirements
+export function useEndpoint<
+  T extends Partial<Record<Methods, CreateApiEndpointAny>>,
+  TOptional extends boolean = OptionsOptional<T>,
+>(
+  endpoints: T,
+  options: TOptional extends true
+    ? UseEndpointOptions<T> | undefined
+    : UseEndpointOptions<T>,
+  logger: EndpointLogger,
+  user: JwtPayloadType,
+): EndpointReturn<T>;
+// Internal overload: always accepts undefined (used by useEndpointManaged)
 export function useEndpoint<
   T extends Partial<Record<Methods, CreateApiEndpointAny>>,
 >(
   endpoints: T,
-  options: UseEndpointOptions<T> | undefined,
+  options: UseEndpointOptionsBase<T> | undefined,
+  logger: EndpointLogger,
+  user: JwtPayloadType,
+): EndpointReturn<T>;
+export function useEndpoint<
+  T extends Partial<Record<Methods, CreateApiEndpointAny>>,
+>(
+  endpoints: T,
+  options: UseEndpointOptionsBase<T> | undefined,
   logger: EndpointLogger,
   user: JwtPayloadType,
 ): EndpointReturn<T> {
@@ -129,6 +152,7 @@ export function useEndpoint<
       staleTime: readStaleTime,
       refetchOnWindowFocus: readRefetchOnWindowFocus,
       refetchInterval: readRefetchInterval,
+      queryKey: options?.read?.queryOptions?.queryKey,
     },
     urlPathParams: readUrlPathParams,
     autoPrefillConfig: {
@@ -170,16 +194,18 @@ export function useEndpoint<
     return options?.create?.mutationOptions;
   }, [options?.create?.mutationOptions]);
 
-  const createInitialState = useMemo(():
-    | DeepPartial<PrimaryMutationRequest<T>>
-    | undefined => {
-    return options?.create?.initialState;
+  const createInitialState = useMemo(() => {
+    return options?.create?.initialState as
+      | DeepPartial<PrimaryMutationRequest<T>>
+      | undefined;
   }, [options?.create?.initialState]);
 
   const createAutoPrefillData = useMemo(():
     | DeepPartial<PrimaryMutationRequest<T>>
     | undefined => {
-    return autoPrefillData ?? options?.create?.autoPrefillData;
+    return (autoPrefillData ?? options?.create?.autoPrefillData) as
+      | DeepPartial<PrimaryMutationRequest<T>>
+      | undefined;
   }, [autoPrefillData, options?.create?.autoPrefillData]);
 
   const createUrlPathParams =
@@ -356,16 +382,18 @@ export function useEndpoint<
     return options?.update?.mutationOptions;
   }, [options?.update?.mutationOptions]);
 
-  const updateInitialState = useMemo(():
-    | DeepPartial<PatchRequest<T>>
-    | undefined => {
-    return options?.update?.initialState;
+  const updateInitialState = useMemo(() => {
+    return options?.update?.initialState as
+      | DeepPartial<PatchRequest<T>>
+      | undefined;
   }, [options?.update?.initialState]);
 
   const updateAutoPrefillData = useMemo(():
     | DeepPartial<PatchRequest<T>>
     | undefined => {
-    return autoPrefillData ?? options?.update?.autoPrefillData;
+    return (autoPrefillData ?? options?.update?.autoPrefillData) as
+      | DeepPartial<PatchRequest<T>>
+      | undefined;
   }, [autoPrefillData, options?.update?.autoPrefillData]);
 
   const updateUrlPathParams =

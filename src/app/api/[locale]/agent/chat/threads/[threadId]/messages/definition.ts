@@ -25,9 +25,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { DefaultFolderId } from "../../../config";
 import type { MessageMetadata } from "../../../db";
 import { ChatMessageRole } from "../../../enum";
-import { loadIncognitoState } from "../../../incognito/storage";
 import { scopedTranslation } from "./i18n";
 import { MessagesWidget } from "./widget/widget";
 
@@ -48,12 +48,6 @@ const { GET } = createEndpoint({
     UserRole.ADMIN,
     UserRole.REMOTE_SKILL,
   ] as const,
-
-  // Route to client (localStorage) for incognito threads
-  useClientRoute: async ({ urlPathParams }) => {
-    const state = await loadIncognitoState();
-    return !!state.threads[urlPathParams.threadId];
-  },
 
   title: "get.title" as const,
   description: "get.description" as const,
@@ -200,6 +194,11 @@ const { GET } = createEndpoint({
         compactedMessageCount: z.number(),
       }),
     }),
+    // Thread metadata update
+    "thread-title-updated": z.object({
+      threadId: z.string(),
+      title: z.string(),
+    }),
     // Stream lifecycle — definitive "stream is completely done" signal
     "stream-finished": z.object({
       threadId: z.string(),
@@ -248,7 +247,7 @@ const { GET } = createEndpoint({
 
   fields: customWidgetObject({
     render: MessagesWidget,
-    usage: { request: "urlPathParams", response: true } as const,
+    usage: { request: "data&urlPathParams", response: true } as const,
     noFormElement: true,
     children: {
       // === URL PARAMS ===
@@ -258,6 +257,16 @@ const { GET } = createEndpoint({
         label: "get.threadId.label" as const,
         description: "get.threadId.description" as const,
         schema: z.uuid(),
+      }),
+
+      // === REQUEST DATA ===
+      rootFolderId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "get.rootFolderId.label" as const,
+        description: "get.rootFolderId.description" as const,
+        columns: 6,
+        schema: z.enum(DefaultFolderId),
       }),
 
       // === RESPONSE ===
@@ -363,9 +372,15 @@ const { GET } = createEndpoint({
     description: "get.success.description",
   },
 
+  // Route to client (localStorage) for incognito threads — caller passes rootFolderId
+  useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
+
   examples: {
     urlPathParams: {
       default: { threadId: "550e8400-e29b-41d4-a716-446655440000" },
+    },
+    requests: {
+      default: { rootFolderId: DefaultFolderId.PRIVATE },
     },
     responses: {
       default: {
@@ -440,12 +455,6 @@ const { POST } = createEndpoint({
     UserRole.REMOTE_SKILL,
   ] as const,
 
-  // Route to client (localStorage) for incognito threads
-  useClientRoute: async ({ urlPathParams }) => {
-    const state = await loadIncognitoState();
-    return !!state.threads[urlPathParams.threadId];
-  },
-
   title: "post.title" as const,
   description: "post.description" as const,
   icon: "message-circle",
@@ -507,6 +516,14 @@ const { POST } = createEndpoint({
       }),
 
       // === REQUEST DATA ===
+      rootFolderId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.rootFolderId.label" as const,
+        description: "post.rootFolderId.description" as const,
+        columns: 6,
+        schema: z.enum(DefaultFolderId),
+      }),
       id: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.UUID,
@@ -589,12 +606,16 @@ const { POST } = createEndpoint({
     description: "post.success.description",
   },
 
+  // Route to client (localStorage) for incognito threads — caller passes rootFolderId
+  useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
+
   examples: {
     urlPathParams: {
       default: { threadId: "550e8400-e29b-41d4-a716-446655440000" },
     },
     requests: {
       default: {
+        rootFolderId: DefaultFolderId.PRIVATE,
         id: "770e8400-e29b-41d4-a716-446655440000",
         role: ChatMessageRole.USER,
         content: "Hello, how can you help me?",

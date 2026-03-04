@@ -32,7 +32,7 @@ export function useUpdatePassword(
     locale,
     {},
     {
-      onSuccess: () => {
+      onSuccess: (): void => {
         toast({
           title: t("update.success.title"),
           description: t("update.success.description"),

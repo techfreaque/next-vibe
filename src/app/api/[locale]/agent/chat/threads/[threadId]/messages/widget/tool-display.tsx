@@ -5,8 +5,8 @@ import type { JSX } from "react";
 import { memo } from "react";
 import type { FieldValues } from "react-hook-form";
 
+import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
 import type { ToolCall } from "@/app/api/[locale]/agent/chat/db";
-import type { SendMessageParams } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/operations/send-message";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { ToolCallRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/ToolCallRenderer";

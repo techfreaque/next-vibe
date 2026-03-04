@@ -22,7 +22,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { scopedTranslation as hooksTranslation } from "./i18n";
-import { buildKey } from "./query-key-builder";
+import { buildKey, type CacheKeyRequestData } from "./query-key-builder";
 import { useApiStore } from "./store";
 import type {
   ApiFormOptions,
@@ -48,17 +48,26 @@ import { useApiMutation } from "./use-api-mutation";
  * @param mutationOptions - API mutation options
  * @returns Form and mutation for API interaction with enhanced error handling
  */
+type ApiFormKeyOptions<TEndpoint extends CreateApiEndpointAny> =
+  (TEndpoint["types"]["UrlVariablesOutput"] extends never
+    ? { urlPathParams?: never }
+    : { urlPathParams: TEndpoint["types"]["UrlVariablesOutput"] }) &
+    (CacheKeyRequestData<TEndpoint> extends undefined
+      ? { requestData?: never }
+      : { requestData: CacheKeyRequestData<TEndpoint> });
+
 export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   endpoint: TEndpoint,
   logger: EndpointLogger,
   user: JwtPayloadType,
   locale: CountryLanguage,
-  options: ApiFormOptions<TEndpoint["types"]["RequestOutput"]> = {},
-  mutationOptions: ApiMutationOptions<
+  options?: ApiFormOptions<TEndpoint["types"]["RequestOutput"]>,
+  mutationOptions?: ApiMutationOptions<
     TEndpoint["types"]["RequestOutput"],
     TEndpoint["types"]["ResponseOutput"],
     TEndpoint["types"]["UrlVariablesOutput"]
-  > = {},
+  >,
+  keyOptions?: ApiFormKeyOptions<TEndpoint>,
 ): ApiFormReturn<
   TEndpoint["types"]["RequestOutput"],
   TEndpoint["types"]["ResponseOutput"],
@@ -67,8 +76,21 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   const { getFormId } = useApiStore();
   const formId = getFormId(endpoint);
 
+  const resolvedOptions: ApiFormOptions<TEndpoint["types"]["RequestOutput"]> =
+    options ?? {};
+  const resolvedMutationOptions: ApiMutationOptions<
+    TEndpoint["types"]["RequestOutput"],
+    TEndpoint["types"]["ResponseOutput"],
+    TEndpoint["types"]["UrlVariablesOutput"]
+  > = mutationOptions ?? {};
+
   // Use React Query-based mutation hook
-  const mutation = useApiMutation(endpoint, logger, user, mutationOptions);
+  const mutation = useApiMutation(
+    endpoint,
+    logger,
+    user,
+    resolvedMutationOptions,
+  );
 
   // Get form state from Zustand (forms state remains in Zustand)
   const formState = useApiStore((state) => state.forms[formId]) ?? {
@@ -108,12 +130,12 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
   // Merge schema defaults with provided defaultValues (provided values take priority)
   const mergedDefaultValues: TEndpoint["types"]["RequestOutput"] =
     useMemo(() => {
-      const provided = options.defaultValues;
+      const provided = resolvedOptions.defaultValues;
       if (provided && Object.keys(provided).length > 0) {
         return { ...schemaDefaultValues, ...provided };
       }
       return schemaDefaultValues;
-    }, [schemaDefaultValues, options.defaultValues]);
+    }, [schemaDefaultValues, resolvedOptions.defaultValues]);
 
   // Extract persistence and custom options
   const {
@@ -122,7 +144,7 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     defaultValues: _ignoredDefaultValues,
     ...restFormOptions
-  } = options;
+  } = resolvedOptions;
 
   // Build form config with all options
   // Type annotation matches UseFormProps to ensure compatibility with react-hook-form
@@ -141,7 +163,14 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
 
   // Generate a storage key based on the endpoint if not provided
   const storageKey =
-    persistenceKey || buildKey("query-form", endpoint, undefined, logger);
+    persistenceKey ||
+    buildKey(
+      "query-form",
+      endpoint,
+      keyOptions?.urlPathParams,
+      logger,
+      keyOptions?.requestData as CacheKeyRequestData<TEndpoint>,
+    );
 
   const formMethods = useForm<TEndpoint["types"]["RequestOutput"]>(formConfig);
 

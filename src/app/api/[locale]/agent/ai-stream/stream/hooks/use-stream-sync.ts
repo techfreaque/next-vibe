@@ -153,6 +153,7 @@ export function useStreamSync(deps: StreamSyncDeps): void {
           rolesAdmin: null,
           published: false,
           isStreaming: false,
+          sortOrder: 0,
           createdAt: streamThread.createdAt,
           updatedAt: streamThread.createdAt,
           searchVector: null,

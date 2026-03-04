@@ -1,4 +1,5 @@
 export const translations = {
+  backToChat: "Powrót do czatu",
   title: "Zarabiaj z {{appName}}",
   description:
     "Zamień swoją sieć kontaktów w pasywny dochód. Udostępnij swój link polecający i zarabiaj 20% prowizji, gdy ludzie subskrybują - plus mniejsze zarobki od ich poleceń dzięki naszemu systemowi wielopoziomowemu.",

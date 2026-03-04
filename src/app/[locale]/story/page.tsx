@@ -3,7 +3,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 
-import { getMaxToolCount } from "@/app/api/[locale]/agent/chat/default-tool-counts";
+import { getMaxToolCountAllPlatforms } from "@/app/api/[locale]/agent/chat/default-tool-counts";
 import {
   ProductIds,
   productsRepository,
@@ -115,7 +115,7 @@ export default async function HomePage({
   }
 
   // Get dynamic counts for marketing display
-  const totalToolCount = getMaxToolCount();
+  const totalToolCount = getMaxToolCountAllPlatforms();
   const totalEndpointCount = definitionsRegistry.getTotalEndpointCount();
 
   // Get pricing information

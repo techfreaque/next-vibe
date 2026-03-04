@@ -13,7 +13,8 @@ import type { JSX } from "react";
 import { formatRelativeTime } from "@/app/[locale]/chat/lib/utils/formatting";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
+
+import { scopedTranslation } from "../i18n";
 
 interface UserProfileCardProps {
   userId: string;
@@ -32,7 +33,7 @@ export function UserProfileCard({
   locale,
   onPostClick,
 }: UserProfileCardProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   // Get all messages from this user
   const userMessages = messages.filter((m) => m.authorId === userId);
@@ -61,7 +62,7 @@ export function UserProfileCard({
           <Div className="flex-1">
             <Div className="font-bold text-sm text-foreground">{userName}</Div>
             <Div className="text-xs text-muted-foreground">
-              {t("app.chat.userProfile.postCount", { count: postCount })}
+              {t("widget.userProfile.postCount", { count: postCount })}
             </Div>
           </Div>
         </Div>
@@ -70,7 +71,7 @@ export function UserProfileCard({
         {recentPosts.length > 0 && (
           <Div className="flex flex-col gap-2">
             <Div className="text-xs font-semibold text-muted-foreground mb-2">
-              {t("app.chat.userProfile.recentPosts")}
+              {t("widget.userProfile.recentPosts")}
             </Div>
             {recentPosts.map((post) => (
               <Button
@@ -94,7 +95,7 @@ export function UserProfileCard({
 
         {postCount === 0 && (
           <Div className="text-xs text-muted-foreground text-center py-4">
-            {t("app.chat.userProfile.noPostsYet")}
+            {t("widget.userProfile.noPostsYet")}
           </Div>
         )}
       </Div>

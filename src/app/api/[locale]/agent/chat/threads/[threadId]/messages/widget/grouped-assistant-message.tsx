@@ -9,10 +9,10 @@ import { useCallback, useRef, useState } from "react";
 import type { FieldValues } from "react-hook-form";
 
 import { chatProse } from "@/app/[locale]/chat/lib/design-tokens";
+import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/stream/hooks/send-message";
 import { useCharacter } from "@/app/api/[locale]/agent/chat/characters/[id]/hooks";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
-import type { SendMessageParams } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/hooks/operations/send-message";
 import {
   calculateCreditCost,
   getModelById,
@@ -25,9 +25,9 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import type { CollapseStateStore } from "../hooks/use-collapse-state";
+import { scopedTranslation } from "../i18n";
 import { AssistantMessageActions } from "./assistant-message-actions";
 import { CompactingMessage } from "./compacting-message";
 import { useMessageGroupName } from "./embedded-context";
@@ -79,7 +79,7 @@ const BatchConfirmationBanner = memo(function BatchConfirmationBanner({
   batchDecisions,
   locale,
 }: BatchConfirmationBannerProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   // Calculate counts from decisions
   const pendingCount = [...batchDecisions.values()].filter(
@@ -96,7 +96,7 @@ const BatchConfirmationBanner = memo(function BatchConfirmationBanner({
     <Div className="mb-3 rounded-lg border border-amber-500/20 bg-amber-500/10 p-3">
       <Div className="flex items-center justify-between">
         <Span className="text-sm font-medium text-amber-600 dark:text-amber-500">
-          {t("app.chat.batchToolConfirmation.title")}
+          {t("widget.batchToolConfirmation.title")}
         </Span>
         <Div className="flex items-center gap-2 text-xs">
           <Span className="text-green-600 dark:text-green-500">
@@ -650,7 +650,7 @@ const MessageAuthorHeader = memo(function MessageAuthorHeader({
   user,
   logger,
 }: MessageAuthorHeaderProps): JSX.Element {
-  const { t } = simpleT(locale);
+  const { t } = scopedTranslation.scopedT(locale);
 
   // Get character for assistant messages
   const character =
@@ -665,7 +665,7 @@ const MessageAuthorHeader = memo(function MessageAuthorHeader({
   // Get display name for assistant
   const displayName = primary.model
     ? getModelById(primary.model).name
-    : t("app.chat.messages.assistant");
+    : t("widget.messages.assistant");
 
   return (
     <Div className="mb-2">
