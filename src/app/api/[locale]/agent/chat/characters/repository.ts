@@ -19,7 +19,6 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { IconKey } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
@@ -66,15 +65,18 @@ const DEFAULT_MODEL_SELECTION: ModelSelectionSimple = {
 /**
  * Filter default characters based on user roles and current instance.
  * - userRole: only show characters the user's role can access (defaults to [CUSTOMER, ADMIN])
- * - instanceFilter: only show characters matching INSTANCE_ID (undefined = all instances)
+ * - instanceFilter: only show characters matching instanceId (null = all instances)
  */
-function filterDefaultCharacters(user: JwtPayloadType): Character[] {
-  const instanceId = env.INSTANCE_ID;
+function filterDefaultCharacters(
+  user: JwtPayloadType,
+  instanceId: string | null,
+): Character[] {
   const userRoles = user.roles;
 
   return DEFAULT_CHARACTERS.filter((char) => {
     // Check user role access
     const allowedRoles = char.userRole ?? [
+      UserPermissionRole.PUBLIC,
       UserPermissionRole.CUSTOMER,
       UserPermissionRole.ADMIN,
     ];
@@ -90,7 +92,7 @@ function filterDefaultCharacters(user: JwtPayloadType): Character[] {
       return char.instanceFilter.includes(instanceId);
     }
     // If no instance filter, show on all instances
-    // If no INSTANCE_ID set, show all characters (dev mode)
+    // If no instanceId in DB, show all characters (dev/disconnected mode)
     return true;
   });
 }
@@ -120,6 +122,11 @@ export class CharactersRepository {
       const userId = user.id;
       const query = data?.query?.trim().toLowerCase();
       const requestedCharId = data?.characterId?.trim();
+
+      // Load instance ID from DB for character filtering
+      const { getLocalInstanceId } =
+        await import("@/app/api/[locale]/user/remote-connection/repository");
+      const instanceId = await getLocalInstanceId();
 
       // For authenticated users, return default + user's own + public from others
       if (userId) {
@@ -173,7 +180,7 @@ export class CharactersRepository {
         });
 
         // Map default characters to card display fields (filtered by role + instance)
-        const filteredDefaults = filterDefaultCharacters(user);
+        const filteredDefaults = filterDefaultCharacters(user, instanceId);
         const defaultCharactersCards = filteredDefaults.map((char) => {
           return CharactersRepository.mapCharacterToListItem(
             char.id,
@@ -226,7 +233,7 @@ export class CharactersRepository {
 
       // For public/lead users, return only default characters as card display fields (filtered)
       logger.debug("Getting default characters for public user");
-      const filteredDefaults = filterDefaultCharacters(user);
+      const filteredDefaults = filterDefaultCharacters(user, instanceId);
       let defaultCharactersCards = filteredDefaults.map((char) => {
         return CharactersRepository.mapCharacterToListItem(
           char.id,
@@ -316,12 +323,19 @@ export class CharactersRepository {
       })
       .filter((section) => section.characters.length > 0)
       .toSorted((a, b) => a.order - b.order)
-      .map(({ sectionIcon, sectionTitle, sectionCount, characters }) => ({
-        sectionIcon,
-        sectionTitle,
-        sectionCount,
-        characters,
-      }));
+      .map(
+        ({
+          sectionIcon,
+          sectionTitle,
+          sectionCount,
+          characters: sectionCharacters,
+        }) => ({
+          sectionIcon,
+          sectionTitle,
+          sectionCount,
+          characters: sectionCharacters,
+        }),
+      );
   }
 
   /**
@@ -359,9 +373,9 @@ export class CharactersRepository {
           characterOwnership: CharacterOwnershipType.SYSTEM,
           compactTrigger: null,
           allowedTools: defaultCharacter.activeTools
-            ? defaultCharacter.activeTools.map((t) => ({
-                toolId: t.toolId,
-                requiresConfirmation: t.requiresConfirmation ?? false,
+            ? defaultCharacter.activeTools.map((tool) => ({
+                toolId: tool.toolId,
+                requiresConfirmation: tool.requiresConfirmation ?? false,
               }))
             : null,
           pinnedTools: null,
@@ -437,14 +451,14 @@ export class CharactersRepository {
         characterOwnership: customCharacter.ownershipType,
         compactTrigger: customCharacter.compactTrigger ?? null,
         allowedTools:
-          customCharacter.activeTools?.map((t) => ({
-            toolId: t.toolId,
-            requiresConfirmation: t.requiresConfirmation ?? false,
+          customCharacter.activeTools?.map((tool) => ({
+            toolId: tool.toolId,
+            requiresConfirmation: tool.requiresConfirmation ?? false,
           })) ?? null,
         pinnedTools:
-          customCharacter.visibleTools?.map((t) => ({
-            toolId: t.toolId,
-            requiresConfirmation: t.requiresConfirmation ?? false,
+          customCharacter.visibleTools?.map((tool) => ({
+            toolId: tool.toolId,
+            requiresConfirmation: tool.requiresConfirmation ?? false,
           })) ?? null,
       });
     } catch (error) {

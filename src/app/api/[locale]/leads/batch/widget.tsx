@@ -8,14 +8,12 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  AlertTriangle,
-  CheckCircle,
-  ChevronRight,
-  List,
-  Loader2,
-  Trash2,
-} from "next-vibe-ui/ui/icons";
+import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { List } from "next-vibe-ui/ui/icons/List";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback } from "react";
 

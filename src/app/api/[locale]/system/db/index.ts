@@ -28,7 +28,7 @@ const poolConfig = {
   connectionString: process.env["DATABASE_URL"] ?? env.DATABASE_URL,
   max: 10, // Maximum number of clients in the pool
   idleTimeoutMillis: 30_000, // How long a client is allowed to remain idle before being closed
-  connectionTimeoutMillis: 2_000, // How long to wait for a connection to become available
+  connectionTimeoutMillis: 30_000, // How long to wait for a connection to become available
 };
 
 /**

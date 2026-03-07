@@ -280,7 +280,7 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
 
   // Create a submit handler that validates and submits the form
   const submitForm = ((
-    options: TEndpoint["types"]["UrlVariablesOutput"] extends undefined
+    submitOptions: TEndpoint["types"]["UrlVariablesOutput"] extends undefined
       ? undefined
       : SubmitFormFunctionOptions<
           TEndpoint["types"]["RequestOutput"],
@@ -300,7 +300,7 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
         clearFormError();
 
         // Call the API with the validated form data using React Query mutation
-        const urlPathParams = options?.urlParamVariables;
+        const urlPathParams = submitOptions?.urlParamVariables;
 
         const result = await mutation.mutateAsync({
           requestData: validatedData,
@@ -320,19 +320,19 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
           : (undefined as TEndpoint["types"]["ResponseOutput"]);
 
         // Cast the result to TResponse to satisfy the type system
-        const onSuccessResult = options?.onSuccess?.({
+        const onSuccessResult = submitOptions?.onSuccess?.({
           responseData: responseData as TEndpoint["types"]["ResponseOutput"],
-          pathParams: options?.urlParamVariables,
+          pathParams: submitOptions?.urlParamVariables,
           requestData: validatedData,
         });
 
         // If onSuccess returns an error, treat it as an error
         if (onSuccessResult) {
           setError(onSuccessResult);
-          options?.onError?.({
+          submitOptions?.onError?.({
             error: onSuccessResult,
             requestData: validatedData,
-            pathParams: options?.urlParamVariables,
+            pathParams: submitOptions?.urlParamVariables,
           });
         }
       } catch (error) {
@@ -353,10 +353,10 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
 
         setError(errorResponse);
         const formData = formMethods.getValues();
-        options?.onError?.({
+        submitOptions?.onError?.({
           error: errorResponse,
           requestData: formData,
-          pathParams: options?.urlParamVariables,
+          pathParams: submitOptions?.urlParamVariables,
         });
       }
     };
@@ -378,10 +378,10 @@ export function useApiForm<TEndpoint extends CreateApiEndpointAny>(
       // Set the error in the form state so it's displayed
       setError(errorResponse);
 
-      options?.onError?.({
+      submitOptions?.onError?.({
         error: errorResponse,
         requestData: formMethods.getValues(),
-        pathParams: options?.urlParamVariables,
+        pathParams: submitOptions?.urlParamVariables,
       });
     })();
   }) as SubmitFormFunction<

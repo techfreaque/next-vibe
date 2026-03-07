@@ -1,7 +1,11 @@
 /**
  * Message Path Client Repository
- * Client-side implementation of conversation path retrieval for incognito mode
- * Mirrors server path repository but uses localStorage instead of DB
+ * Client-side implementation of conversation path retrieval for incognito mode.
+ * Mirrors server logic but uses localStorage instead of DB.
+ *
+ * Loads all messages from the compaction boundary to the leaf, including siblings,
+ * so the client can derive branchIndices locally from the leafMessageId.
+ * No DB round-trips — incognito threads are fully in memory/localStorage.
  */
 
 "use client";
@@ -24,12 +28,13 @@ import { scopedTranslation } from "./i18n";
 
 /**
  * Message Path Client Repository
- * Simplified path traversal for incognito messages (no compaction, no DB)
+ * Loads all messages within the branch window (compaction boundary → leaf + siblings)
+ * for incognito threads stored in localStorage.
  */
 export class MessagePathRepositoryClient {
   /**
-   * Get conversation path for incognito thread
-   * Simplified version: returns all messages in thread following active branches
+   * Get the branch window for an incognito thread.
+   * Returns all messages from the last compaction point to the leaf, including siblings.
    */
   static async getPath(
     threadId: string,
@@ -44,81 +49,164 @@ export class MessagePathRepositoryClient {
       if (allMessages.length === 0) {
         return success({
           messages: [],
-          branchMeta: [],
           hasOlderHistory: false,
+          hasNewerMessages: false,
+          resolvedLeafMessageId: null,
           oldestLoadedMessageId: null,
           compactionBoundaryId: null,
+          newerChunkAnchorId: null,
         });
       }
 
-      const branchIndices = data.branchIndices ?? {};
-
-      // Build parent → children map
-      const childrenMap = new Map<string | null, ChatMessage[]>();
+      // Build lookup map by ID
+      const byId = new Map<string, ChatMessage>();
+      const childrenByParentId = new Map<string | null, ChatMessage[]>();
       for (const msg of allMessages) {
-        const parentKey = msg.parentId ?? null;
-        if (!childrenMap.has(parentKey)) {
-          childrenMap.set(parentKey, []);
-        }
-        childrenMap.get(parentKey)!.push(msg);
+        byId.set(msg.id, msg);
+        const key = msg.parentId ?? null;
+        const arr = childrenByParentId.get(key) ?? [];
+        arr.push(msg);
+        childrenByParentId.set(key, arr);
       }
 
-      // Traverse path from root following branch indices
-      const path: ChatMessage[] = [];
-      const branchMeta: PathGetResponseOutput["branchMeta"] = [];
-      let currentParentId: string | null = null;
+      // Find leaf: given leafMessageId, or "load older" parent, or latest by createdAt
+      let leafId: string | null = null;
 
-      let currentChildren: ChatMessage[] =
-        childrenMap.get(currentParentId) ?? [];
-      while (currentChildren.length > 0) {
-        const children: ChatMessage[] = currentChildren;
+      if (data.before) {
+        const beforeMsg = byId.get(data.before);
+        leafId = beforeMsg?.parentId ?? null;
+      } else if (data.leafMessageId) {
+        // Walk DOWN from the given ID to find the actual latest leaf of that branch
+        const startMsg = byId.get(data.leafMessageId);
+        if (startMsg) {
+          let currentId: string = data.leafMessageId;
+          while (true) {
+            const kids = childrenByParentId.get(currentId);
+            if (!kids || kids.length === 0) {
+              break;
+            }
+            const latestKid = kids.reduce((a, b) =>
+              new Date(a.createdAt).getTime() > new Date(b.createdAt).getTime()
+                ? a
+                : b,
+            );
+            currentId = latestKid.id;
+          }
+          leafId = currentId;
+        }
+      } else {
+        // Latest message
+        const latest = allMessages.reduce(
+          (acc, m) =>
+            new Date(m.createdAt).getTime() > new Date(acc.createdAt).getTime()
+              ? m
+              : acc,
+          allMessages[0],
+        );
+        leafId = latest?.id ?? null;
+      }
 
-        // Sort children by creation time
-        children.sort(
-          (a: ChatMessage, b: ChatMessage) =>
+      if (!leafId) {
+        return success({
+          messages: [],
+          hasOlderHistory: false,
+          hasNewerMessages: false,
+          resolvedLeafMessageId: null,
+          oldestLoadedMessageId: null,
+          compactionBoundaryId: null,
+          newerChunkAnchorId: null,
+        });
+      }
+
+      // Walk UP from leaf collecting ancestor chain (incognito has no compaction,
+      // so we walk all the way to root)
+      const ancestorChain: ChatMessage[] = [];
+      let currentId: string | null = leafId;
+
+      while (currentId) {
+        const msg = byId.get(currentId);
+        if (!msg) {
+          break;
+        }
+        ancestorChain.push(msg);
+        if (msg.metadata?.isCompacting) {
+          break;
+        } // stop at compaction boundary
+        currentId = msg.parentId;
+      }
+
+      // ancestorChain is [leaf, ..., root] — reverse to [root, ..., leaf]
+      ancestorChain.reverse();
+
+      if (ancestorChain.length === 0) {
+        return success({
+          messages: [],
+          hasOlderHistory: false,
+          hasNewerMessages: false,
+          resolvedLeafMessageId: null,
+          oldestLoadedMessageId: null,
+          compactionBoundaryId: null,
+          newerChunkAnchorId: null,
+        });
+      }
+
+      const oldestAncestor = ancestorChain[0];
+      const hasOlderHistory =
+        !!oldestAncestor?.parentId && !oldestAncestor?.metadata?.isCompacting;
+      const compactionBoundaryId = oldestAncestor?.metadata?.isCompacting
+        ? (oldestAncestor.id ?? null)
+        : null;
+      const oldestLoadedMessageId = oldestAncestor?.id ?? null;
+
+      // Collect all messages in the window: for each ancestor, include all its siblings
+      // (children of the ancestor's parent) + all children of the ancestor
+      const windowIds = new Set<string>();
+
+      // Root-level messages (parentId = null)
+      for (const rootMsg of childrenByParentId.get(null) ?? []) {
+        windowIds.add(rootMsg.id);
+      }
+
+      for (const ancestor of ancestorChain) {
+        // All children of this ancestor (= path node's children = siblings at next level)
+        for (const child of childrenByParentId.get(ancestor.id) ?? []) {
+          windowIds.add(child.id);
+        }
+        // The ancestor itself
+        windowIds.add(ancestor.id);
+      }
+
+      const windowMessages = allMessages
+        .filter((m) => windowIds.has(m.id))
+        .toSorted(
+          (a, b) =>
             new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
         );
 
-        // Determine which branch to follow
-        const parentKey = currentParentId ?? "root";
-        const branchIndex = branchIndices[parentKey] ?? children.length - 1;
-        const clampedIndex = Math.min(
-          Math.max(0, branchIndex),
-          children.length - 1,
-        );
-
-        // Record branch meta if there are multiple children
-        if (children.length > 1) {
-          branchMeta.push({
-            parentId: currentParentId ?? "root",
-            siblingCount: children.length,
-            currentIndex: clampedIndex,
-          });
-        }
-
-        const selected: ChatMessage | undefined = children[clampedIndex];
-        if (!selected) {
-          break;
-        }
-
-        path.push(selected);
-        currentParentId = selected.id;
-        currentChildren = childrenMap.get(selected.id) ?? [];
-      }
-
-      logger.debug("Client: incognito message path", {
+      logger.debug("Client: incognito branch window", {
         threadId,
-        pathLength: path.length,
+        windowSize: windowMessages.length,
+        ancestorChainLength: ancestorChain.length,
       });
 
+      // hasNewerMessages: true when the resolved leaf is not the globally latest message
+      const latestMessage = allMessages.reduce(
+        (acc, m) =>
+          new Date(m.createdAt).getTime() > new Date(acc.createdAt).getTime()
+            ? m
+            : acc,
+        allMessages[0],
+      );
+      const hasNewerMessages =
+        !!data.leafMessageId && !!latestMessage && latestMessage.id !== leafId;
+
       return success({
-        messages: path.map((msg) => ({
+        messages: windowMessages.map((msg) => ({
           id: msg.id,
           threadId: msg.threadId,
           role: msg.role,
           content: msg.content,
           parentId: msg.parentId,
-          depth: msg.depth,
           sequenceId: msg.sequenceId,
           authorId: msg.authorId,
           authorName: msg.authorName,
@@ -135,13 +223,15 @@ export class MessagePathRepositoryClient {
           createdAt: new Date(msg.createdAt),
           updatedAt: new Date(msg.updatedAt),
         })),
-        branchMeta,
-        hasOlderHistory: false,
-        oldestLoadedMessageId: path.length > 0 ? (path[0]?.id ?? null) : null,
-        compactionBoundaryId: null,
+        hasOlderHistory,
+        hasNewerMessages,
+        resolvedLeafMessageId: leafId,
+        oldestLoadedMessageId,
+        compactionBoundaryId,
+        newerChunkAnchorId: null, // incognito has no compaction boundaries
       });
     } catch (error) {
-      logger.error("Failed to get incognito message path", parseError(error));
+      logger.error("Failed to get incognito branch window", parseError(error));
       return fail({
         message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

@@ -9,17 +9,15 @@ import { useRouter } from "next-vibe-ui/hooks";
 import type { ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  Check,
-  ChevronDown,
-  Copy,
-  Loader2,
-  Pencil,
-  Plus,
-  Search,
-  Trash2,
-  X,
-} from "next-vibe-ui/ui/icons";
+import { Check } from "next-vibe-ui/ui/icons/Check";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { Copy } from "next-vibe-ui/ui/icons/Copy";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
+import { Search } from "next-vibe-ui/ui/icons/Search";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
+import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useState } from "react";
 

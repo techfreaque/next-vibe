@@ -35,6 +35,7 @@ import {
   EmailTypeFilter,
   EmailTypeFilterOptions,
 } from "../enum";
+import { EMAIL_STATS_ALIAS } from "./constants";
 import {
   ChartType,
   ChartTypeOptions,
@@ -45,8 +46,6 @@ import {
 } from "./enum";
 import { scopedTranslation } from "./i18n";
 import { EmailStatsContainer } from "./widget";
-
-export const EMAIL_STATS_ALIAS = "email-stats" as const;
 
 /**
  * Get Email Stats Endpoint (GET)
@@ -755,10 +754,10 @@ const { GET } = createEndpoint({
           byRetryCount: [],
           byUserAssociation: [],
         },
-        generatedAt: new Date().toISOString(),
+        generatedAt: "2024-01-15T10:00:00.000Z",
         dataRange: {
-          from: new Date().toISOString(),
-          to: new Date().toISOString(),
+          from: "2024-01-15T10:00:00.000Z",
+          to: "2024-01-15T10:00:00.000Z",
         },
         recentActivity: [],
         topPerformingTemplates: [],

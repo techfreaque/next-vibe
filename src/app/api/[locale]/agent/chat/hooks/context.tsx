@@ -17,6 +17,7 @@ import type { CreditsGetResponseOutput } from "@/app/api/[locale]/credits/defini
 
 import type { CharacterGetResponseOutput } from "../characters/[id]/definition";
 import type { DefaultFolderId } from "../config";
+import type { FolderContentsResponseOutput } from "../folder-contents/[rootFolderId]/definition";
 import type { FolderListResponseOutput } from "../folders/[rootFolderId]/definition";
 import type { PublicFeedGetResponseOutput } from "../public-feed/definition";
 import type { ChatSettingsGetResponseOutput } from "../settings/definition";
@@ -57,6 +58,12 @@ export interface ChatBootValue {
   initialThreadId: string | null;
   /** Initial public feed data fetched server-side — used when rootFolderId=public and no thread selected */
   initialPublicFeedData: PublicFeedGetResponseOutput | null;
+  /** Initial folder contents data fetched server-side — used as initialData for the sidebar folder list */
+  initialFolderContentsData: FolderContentsResponseOutput | null;
+  /** Initial subfolder contents when URL lands inside a subfolder on SSR — seeds the expanded folder's child EndpointsPage */
+  initialSubFolderContentsData: FolderContentsResponseOutput | null;
+  /** The subfolder ID that initialSubFolderContentsData belongs to */
+  initialSubFolderId: string | null;
 }
 
 /**
@@ -87,6 +94,9 @@ interface ChatBootProviderProps {
   initialSettingsData: ChatSettingsGetResponseOutput | null;
   initialCharacterData: CharacterGetResponseOutput | null;
   initialPublicFeedData: PublicFeedGetResponseOutput | null;
+  initialFolderContentsData: FolderContentsResponseOutput | null;
+  initialSubFolderContentsData?: FolderContentsResponseOutput | null;
+  initialSubFolderId?: string | null;
 }
 
 /**
@@ -107,6 +117,9 @@ export function ChatBootProvider({
   initialSettingsData = null,
   initialCharacterData = null,
   initialPublicFeedData = null,
+  initialFolderContentsData = null,
+  initialSubFolderContentsData = null,
+  initialSubFolderId = null,
 }: ChatBootProviderProps): JSX.Element {
   const value = useMemo(
     (): ChatBootValue => ({
@@ -122,6 +135,9 @@ export function ChatBootProvider({
       initialCharacterData,
       initialThreadId: activeThreadId,
       initialPublicFeedData,
+      initialFolderContentsData,
+      initialSubFolderContentsData,
+      initialSubFolderId,
     }),
     [
       initialCredits,
@@ -136,6 +152,9 @@ export function ChatBootProvider({
       initialCharacterData,
       activeThreadId,
       initialPublicFeedData,
+      initialFolderContentsData,
+      initialSubFolderContentsData,
+      initialSubFolderId,
     ],
   );
 

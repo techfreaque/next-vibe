@@ -21,10 +21,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { FETCH_URL_ALIAS, FETCH_URL_SHORT_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-
-export const FETCH_URL_ALIAS = "fetch-url-content" as const;
-export const FETCH_URL_SHORT_ALIAS = "fetch-url" as const;
 
 /**
  * GET /fetch_url_content - Fetch and convert URL content to markdown

@@ -2,7 +2,9 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
-import { Minus, TrendingDown, TrendingUp } from "next-vibe-ui/ui/icons";
+import { Minus } from "next-vibe-ui/ui/icons/Minus";
+import { TrendingDown } from "next-vibe-ui/ui/icons/TrendingDown";
+import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 

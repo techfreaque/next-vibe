@@ -1,7 +1,8 @@
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
-import { ChevronLeft, Zap } from "next-vibe-ui/ui/icons";
+import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
+import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Link } from "next-vibe-ui/ui/link";
 import { H1, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";

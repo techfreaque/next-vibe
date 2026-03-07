@@ -15,7 +15,11 @@ import {
   CardTitle,
 } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { Calendar, Coins, Gift, Sparkles, Zap } from "next-vibe-ui/ui/icons";
+import { Calendar } from "next-vibe-ui/ui/icons/Calendar";
+import { Coins } from "next-vibe-ui/ui/icons/Coins";
+import { Gift } from "next-vibe-ui/ui/icons/Gift";
+import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
+import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import type { JSX } from "react";
 

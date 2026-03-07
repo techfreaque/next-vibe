@@ -242,7 +242,7 @@ export const translations = {
         architecture: {
           label: "Architecture",
           them: "Shell scripts + SKILL.md files in natural language. 800+ unvetted skills on ClawHub.",
-          us: "Typed endpoint definitions that compile to 5 interfaces. {{skillCount}}+ curated, validated skills.",
+          us: "Typed endpoint definitions that compile to 10 interfaces. {{skillCount}}+ curated, validated skills.",
           whyItMatters:
             "No supply chain attacks via skill marketplaces. No 512-vulnerability audits.",
         },
@@ -533,7 +533,7 @@ export const translations = {
         contentCreation: {
           title: "2. Choose Your Privacy Level",
           description:
-            "Private (encrypted), Incognito (local-only), Shared (collaborative), or Public (forum). Switch between them anytime.",
+            "Private (only you), Incognito (local-only), Shared (collaborative), or Public (forum). Switch between them anytime.",
           tags: {
             brandAlignedContent: "4 Folder Types",
             engagingVisuals: "Full Control",
@@ -594,7 +594,7 @@ export const translations = {
         integrity: {
           title: "Privacy First",
           description:
-            "Your conversations are yours. End-to-end encryption, incognito mode, and GDPR compliance.",
+            "Your conversations are yours. Incognito mode, GDPR compliance, and end-to-end encryption coming soon.",
         },
         collaboration: {
           title: "Community Driven",
@@ -895,7 +895,7 @@ export const translations = {
             company: "Company name (optional)",
             billing: "Billing and payment information",
             payment: "Payment method and transaction details",
-            usage: "Usage data and chat history (encrypted)",
+            usage: "Usage data and chat history",
           },
         },
         socialMediaData: {
@@ -917,14 +917,14 @@ export const translations = {
           },
         },
         dataProtection: {
-          title: "Data Protection & Encryption",
+          title: "Data Protection",
           description:
             "Your privacy is our priority. We implement industry-standard security measures:",
           items: {
             encryption:
-              "End-to-end encryption for private folders and sensitive data",
+              "End-to-end encryption for private folders (coming soon)",
             incognito:
-              "Incognito mode for session-only chats that are never stored",
+              "Incognito mode for chats stored only in your browser, never on our servers",
             gdpr: "Full GDPR compliance for EU users",
             noSelling: "We never sell your data to third parties",
             minimal: "Minimal data collection - only what's necessary",
@@ -1098,7 +1098,7 @@ export const translations = {
           ownership: {
             title: "Content Ownership",
             content:
-              "You retain all rights to your conversations and data. We do not claim ownership of your content. Your private folders are encrypted and only accessible to you.",
+              "You retain all rights to your conversations and data. We do not claim ownership of your content. Your private folders are only accessible to you.",
           },
           guidelines: {
             title: "Content Guidelines",

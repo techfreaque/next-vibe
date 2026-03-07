@@ -432,6 +432,10 @@ export const translations: typeof enTranslations = {
         placeholder: "Wprowadź ID użytkownika...",
         helpText: "OSTRZEŻENIE: Ta akcja nie może być cofnięta",
       },
+      submitButton: {
+        label: "Usuń użytkownika",
+        loadingText: "Usuwanie...",
+      },
       response: {
         deletionResult: {
           title: "Wynik usunięcia",

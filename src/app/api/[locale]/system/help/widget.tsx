@@ -11,22 +11,20 @@ import { cn } from "next-vibe/shared/utils";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  ArrowRight,
-  Check,
-  ChevronDown,
-  ChevronRight,
-  Eye,
-  EyeOff,
-  Globe,
-  Monitor,
-  RotateCcw,
-  Search,
-  Shield,
-  Terminal,
-  X,
-  Zap,
-} from "next-vibe-ui/ui/icons";
+import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
+import { Check } from "next-vibe-ui/ui/icons/Check";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { Eye } from "next-vibe-ui/ui/icons/Eye";
+import { EyeOff } from "next-vibe-ui/ui/icons/EyeOff";
+import { Globe } from "next-vibe-ui/ui/icons/Globe";
+import { Monitor } from "next-vibe-ui/ui/icons/Monitor";
+import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
+import { Search } from "next-vibe-ui/ui/icons/Search";
+import { Shield } from "next-vibe-ui/ui/icons/Shield";
+import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
+import { X } from "next-vibe-ui/ui/icons/X";
+import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Input } from "next-vibe-ui/ui/input";
 import { Pre } from "next-vibe-ui/ui/pre";
 import { Span } from "next-vibe-ui/ui/span";
@@ -45,7 +43,6 @@ import { getDefaultToolIds } from "@/app/api/[locale]/agent/chat/constants";
 import type { EnabledTool } from "@/app/api/[locale]/agent/chat/hooks/store";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
 import { ChatSettingsRepositoryClient } from "@/app/api/[locale]/agent/chat/settings/repository-client";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import {
   useWidgetEndpointMutations,
   useWidgetForm,
@@ -113,26 +110,11 @@ async function navigateToTool(
   toolName: string,
   navigate: ReturnType<typeof useWidgetNavigation>["push"],
 ): Promise<void> {
-  interface EndpointNodeMap {
-    [key: string]: EndpointNodeMap | CreateApiEndpointAny;
-  }
-  const { endpoints } =
-    await import("@/app/api/[locale]/system/generated/endpoints");
-  const toolParts = toolName.split("_");
-  const method = toolParts[toolParts.length - 1];
-  const pathSegments = toolParts.slice(0, -1);
-
-  let node = endpoints as EndpointNodeMap;
-  for (const seg of pathSegments) {
-    const next = node[seg] as EndpointNodeMap | undefined;
-    if (!next || typeof next !== "object") {
-      return;
-    }
-    node = next;
-  }
-  const endpointDef = node[method];
-  if (endpointDef && "method" in endpointDef) {
-    navigate(endpointDef as CreateApiEndpointAny, {});
+  const { getEndpoint } =
+    await import("@/app/api/[locale]/system/generated/endpoint");
+  const endpointDef = await getEndpoint(toolName);
+  if (endpointDef) {
+    navigate(endpointDef, {});
   }
 }
 
@@ -284,7 +266,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   }, [filteredTools]);
 
   const stats = useMemo(() => {
-    const pinned = effectiveEnabledTools.filter((t) => t.pinned).length;
+    const pinned = effectiveEnabledTools.filter((et) => et.pinned).length;
     const enabled = effectiveEnabledTools.length;
     return { pinned, enabled, total: totalCount };
   }, [effectiveEnabledTools, totalCount]);
@@ -293,7 +275,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     () =>
       filteredTools.length > 0 &&
       filteredTools.every((tool) =>
-        effectiveEnabledTools.some((t) => t.id === tool.id),
+        effectiveEnabledTools.some((et) => et.id === tool.id),
       ),
     [filteredTools, effectiveEnabledTools],
   );
@@ -301,11 +283,11 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   // ── Handlers ───────────────────────────────────────────────────────────────
 
   const handleToggleEnabled = (toolName: string): void => {
-    const existing = effectiveEnabledTools.find((t) => t.id === toolName);
+    const existing = effectiveEnabledTools.find((et) => et.id === toolName);
     if (existing) {
-      setEnabledTools(effectiveEnabledTools.filter((t) => t.id !== toolName));
+      setEnabledTools(effectiveEnabledTools.filter((et) => et.id !== toolName));
     } else {
-      const tool = availableTools.find((t) => t.id === toolName);
+      const tool = availableTools.find((et) => et.id === toolName);
       setEnabledTools([
         ...effectiveEnabledTools,
         {
@@ -319,18 +301,18 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
 
   const handleToggleActive = (toolName: string): void => {
     setEnabledTools(
-      effectiveEnabledTools.map((t) =>
-        t.id === toolName ? { ...t, pinned: !t.pinned } : t,
+      effectiveEnabledTools.map((et) =>
+        et.id === toolName ? { ...et, pinned: !et.pinned } : et,
       ),
     );
   };
 
   const handleToggleConfirmation = (toolName: string): void => {
     setEnabledTools(
-      effectiveEnabledTools.map((t) =>
-        t.id === toolName
-          ? { ...t, requiresConfirmation: !t.requiresConfirmation }
-          : t,
+      effectiveEnabledTools.map((et) =>
+        et.id === toolName
+          ? { ...et, requiresConfirmation: !et.requiresConfirmation }
+          : et,
       ),
     );
   };
@@ -338,15 +320,17 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   const handleEnableAll = (): void => {
     const allIds = filteredTools.map((tool) => tool.id);
     const allEnabled = allIds.every((id) =>
-      effectiveEnabledTools.some((t) => t.id === id),
+      effectiveEnabledTools.some((et) => et.id === id),
     );
     if (allEnabled) {
       setEnabledTools(
-        effectiveEnabledTools.filter((t) => !allIds.includes(t.id)),
+        effectiveEnabledTools.filter((et) => !allIds.includes(et.id)),
       );
     } else {
       const toAdd = filteredTools
-        .filter((tool) => !effectiveEnabledTools.some((t) => t.id === tool.id))
+        .filter(
+          (tool) => !effectiveEnabledTools.some((et) => et.id === tool.id),
+        )
         .map((tool) => ({
           id: tool.id,
           requiresConfirmation: tool.requiresConfirmation ?? false,
@@ -371,15 +355,19 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   };
 
   const toggleCategoryTools = (tools: HelpToolMetadataSerialized[]): void => {
-    const ids = tools.map((t) => t.id);
+    const ids = tools.map((et) => et.id);
     const allEnabled = ids.every((id) =>
-      effectiveEnabledTools.some((t) => t.id === id),
+      effectiveEnabledTools.some((et) => et.id === id),
     );
     if (allEnabled) {
-      setEnabledTools(effectiveEnabledTools.filter((t) => !ids.includes(t.id)));
+      setEnabledTools(
+        effectiveEnabledTools.filter((et) => !ids.includes(et.id)),
+      );
     } else {
       const toAdd = tools
-        .filter((tool) => !effectiveEnabledTools.some((t) => t.id === tool.id))
+        .filter(
+          (tool) => !effectiveEnabledTools.some((et) => et.id === tool.id),
+        )
         .map((tool) => ({
           id: tool.id,
           requiresConfirmation: tool.requiresConfirmation ?? false,
@@ -764,12 +752,14 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
               {Object.entries(toolsByCategory).map(
                 ([category, { tools, subcategories }]) => {
                   const isExpanded = expandedCategories.has(category);
-                  const categoryIds = tools.map((t) => t.id);
+                  const categoryIds = tools.map((et) => et.id);
                   const enabledCount = categoryIds.filter((id) =>
-                    effectiveEnabledTools.some((t) => t.id === id),
+                    effectiveEnabledTools.some((et) => et.id === id),
                   ).length;
                   const activeCount = categoryIds.filter((id) =>
-                    effectiveEnabledTools.some((t) => t.id === id && t.pinned),
+                    effectiveEnabledTools.some(
+                      (et) => et.id === id && et.pinned,
+                    ),
                   ).length;
                   const allCategoryEnabled = enabledCount === tools.length;
                   const hasSubcategories =

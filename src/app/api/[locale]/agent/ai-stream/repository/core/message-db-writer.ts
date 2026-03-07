@@ -87,7 +87,6 @@ export class MessageDbWriter {
     threadId: string;
     content: string;
     parentId: string | null;
-    depth: number;
     userId: string | undefined;
     model: ModelId;
     character: string;
@@ -98,7 +97,6 @@ export class MessageDbWriter {
       threadId,
       content,
       parentId,
-      depth,
       model,
       character,
       sequenceId,
@@ -113,7 +111,6 @@ export class MessageDbWriter {
       role: ChatMessageRole.ASSISTANT,
       content: "",
       parentId,
-      depth,
       model,
       character,
       sequenceId,
@@ -132,7 +129,6 @@ export class MessageDbWriter {
         threadId,
         content,
         parentId,
-        depth,
         userId: params.userId,
         model,
         character,
@@ -306,21 +302,13 @@ export class MessageDbWriter {
     messageId: string;
     threadId: string;
     parentId: string | null;
-    depth: number;
     userId: string | undefined;
     model: ModelId;
     character: string;
     sequenceId: string | null;
   }): Promise<void> {
-    const {
-      messageId,
-      threadId,
-      parentId,
-      depth,
-      model,
-      character,
-      sequenceId,
-    } = params;
+    const { messageId, threadId, parentId, model, character, sequenceId } =
+      params;
 
     this.lastAssistantMessageId = messageId;
 
@@ -331,7 +319,6 @@ export class MessageDbWriter {
       role: ChatMessageRole.ASSISTANT,
       content: "",
       parentId,
-      depth,
       model,
       character,
       sequenceId,
@@ -345,7 +332,6 @@ export class MessageDbWriter {
         threadId,
         content: "",
         parentId,
-        depth,
         userId: params.userId,
         model,
         character,
@@ -381,7 +367,6 @@ export class MessageDbWriter {
     toolMessageId: string;
     threadId: string;
     parentId: string | null;
-    depth: number;
     userId: string | undefined;
     model: ModelId;
     character: string;
@@ -392,7 +377,6 @@ export class MessageDbWriter {
       toolMessageId,
       threadId,
       parentId,
-      depth,
       model,
       character,
       sequenceId,
@@ -406,7 +390,6 @@ export class MessageDbWriter {
       role: ChatMessageRole.TOOL,
       content: null,
       parentId,
-      depth,
       sequenceId,
       toolCall,
       model,
@@ -429,7 +412,6 @@ export class MessageDbWriter {
         threadId,
         toolCall,
         parentId,
-        depth,
         userId: params.userId,
         sequenceId,
         model,
@@ -463,7 +445,6 @@ export class MessageDbWriter {
     toolMessageId: string;
     threadId: string;
     parentId: string | null;
-    depth: number;
     userId: string | undefined;
     model: ModelId;
     character: string;
@@ -479,7 +460,6 @@ export class MessageDbWriter {
       toolMessageId,
       threadId,
       parentId,
-      depth,
       model,
       character,
       sequenceId,
@@ -498,7 +478,6 @@ export class MessageDbWriter {
       role: ChatMessageRole.TOOL,
       content: null,
       parentId,
-      depth,
       model,
       character,
       sequenceId,
@@ -528,7 +507,6 @@ export class MessageDbWriter {
           threadId,
           toolCall,
           parentId,
-          depth,
           userId: params.userId,
           sequenceId,
           model,
@@ -675,7 +653,6 @@ export class MessageDbWriter {
     threadId: string;
     content: string;
     parentId: string | null;
-    depth: number;
     model: ModelId;
     character: string | null;
     metadata?: MessageMetadata;
@@ -685,7 +662,6 @@ export class MessageDbWriter {
       threadId,
       content,
       parentId,
-      depth,
       model,
       character,
       metadata,
@@ -696,7 +672,6 @@ export class MessageDbWriter {
       role: ChatMessageRole.USER,
       content,
       parentId,
-      depth,
       model,
       character,
       metadata,
@@ -711,7 +686,6 @@ export class MessageDbWriter {
     messageId: string;
     threadId: string;
     parentId: string | null;
-    depth: number;
     sequenceId: string;
     model: ModelId;
     character: string | null;
@@ -723,7 +697,6 @@ export class MessageDbWriter {
       messageId,
       threadId,
       parentId,
-      depth,
       sequenceId,
       model,
       character,
@@ -738,7 +711,6 @@ export class MessageDbWriter {
       role: ChatMessageRole.ASSISTANT,
       content: "",
       parentId,
-      depth,
       sequenceId,
       model,
       character,
@@ -757,7 +729,6 @@ export class MessageDbWriter {
         role: ChatMessageRole.ASSISTANT,
         content: null,
         parentId,
-        depth,
         sequenceId,
         authorId: params.userId ?? null,
         model,
@@ -912,26 +883,23 @@ export class MessageDbWriter {
     errorType: string;
     error: ErrorResponseType;
     parentId: string | null;
-    depth: number;
     sequenceId: string | null;
     userId: string | undefined;
     content?: TranslationKey;
   }): Promise<void> {
-    const { threadId, errorType, error, parentId, depth, sequenceId, userId } =
-      params;
+    const { threadId, errorType, error, parentId, sequenceId, userId } = params;
     const errorMessageId = crypto.randomUUID();
     const serializedError = params.content ?? serializeError(error);
 
     // SSE: MESSAGE_CREATED for the error message
     // The client's MESSAGE_CREATED handler adds this to the chat store with the
-    // correct parentId/depth/sequenceId — no additional ERROR event needed.
+    // correct parentId/sequenceId — no additional ERROR event needed.
     const errorMessageEvent = createStreamEvent.messageCreated({
       messageId: errorMessageId,
       threadId,
       role: ChatMessageRole.ERROR,
       content: serializedError,
       parentId,
-      depth,
       sequenceId,
       model: null,
       character: null,
@@ -946,7 +914,6 @@ export class MessageDbWriter {
         content: serializedError,
         errorType,
         parentId,
-        depth,
         userId,
         sequenceId,
         logger: this.logger,

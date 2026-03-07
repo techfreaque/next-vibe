@@ -30,6 +30,7 @@ const { POST } = createEndpoint({
   icon: "download",
   category: "app.endpointCategories.system",
   tags: ["tags.tasks" as const],
+  aliases: ["sync-pull", "task-pull"] as const,
   allowedRoles: [UserRole.ADMIN],
 
   fields: scopedObjectFieldNew(scopedTranslation, {

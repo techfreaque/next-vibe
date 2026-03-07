@@ -10,6 +10,7 @@ import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/h
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
+import type { DefaultFolderId } from "../../../../config";
 import { definitions } from "./definition";
 
 /**
@@ -17,7 +18,7 @@ import { definitions } from "./definition";
  *
  * Features:
  * - GET: Retrieve ordered message array for a specific path
- * - Supports branchIndices parameter for path selection
+ * - Supports leafMessageId parameter for path selection
  * - Returns messages in chronological order
  * - Useful for displaying a specific conversation thread
  *
@@ -31,6 +32,8 @@ import { definitions } from "./definition";
 export function useMessagePath(
   params: {
     threadId: string;
+    rootFolderId: DefaultFolderId;
+    leafMessageId: string | undefined;
     enabled?: boolean;
   },
   user: JwtPayloadType,
@@ -41,6 +44,10 @@ export function useMessagePath(
     {
       read: {
         urlPathParams: { threadId: params.threadId },
+        initialState: {
+          rootFolderId: params.rootFolderId,
+          leafMessageId: params.leafMessageId,
+        },
         queryOptions: {
           enabled: params.enabled ?? false, // Disabled by default
           refetchOnWindowFocus: false,

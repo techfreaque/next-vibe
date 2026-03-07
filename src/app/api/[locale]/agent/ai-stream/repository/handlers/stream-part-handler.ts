@@ -36,7 +36,10 @@ export class StreamPartHandler {
     userId: string | undefined;
     user: JwtPayloadType;
     locale: CountryLanguage;
-    toolsConfig: Map<string, { requiresConfirmation: boolean }>;
+    toolsConfig: Map<
+      string,
+      { requiresConfirmation: boolean; credits: number }
+    >;
     /** Set of tool names the model is allowed to execute. null = all allowed. */
     activeToolNames: Set<string> | null;
     streamAbortController: AbortController;
@@ -84,7 +87,6 @@ export class StreamPartHandler {
         currentAssistantContent: ctx.currentAssistantContent,
         threadId,
         currentParentId: ctx.currentParentId,
-        currentDepth: ctx.currentDepth,
         model,
         character,
         sequenceId: ctx.sequenceId,
@@ -102,9 +104,7 @@ export class StreamPartHandler {
 
       if (result.wasCreated) {
         ctx.currentParentId = result.currentAssistantMessageId;
-        ctx.currentDepth = result.newDepth;
         ctx.lastParentId = result.currentAssistantMessageId;
-        ctx.lastDepth = result.newDepth;
       }
 
       return { shouldAbort: false };
@@ -117,7 +117,6 @@ export class StreamPartHandler {
         currentAssistantContent: ctx.currentAssistantContent,
         threadId,
         currentParentId: ctx.currentParentId,
-        currentDepth: ctx.currentDepth,
         model,
         character,
         sequenceId: ctx.sequenceId,
@@ -134,9 +133,7 @@ export class StreamPartHandler {
 
       if (result.wasCreated) {
         ctx.currentParentId = result.currentAssistantMessageId;
-        ctx.currentDepth = result.newDepth;
         ctx.lastParentId = result.currentAssistantMessageId;
-        ctx.lastDepth = result.newDepth;
       }
 
       return { shouldAbort: false };
@@ -203,13 +200,11 @@ export class StreamPartHandler {
           isInReasoningBlock: ctx.isInReasoningBlock,
           threadId,
           currentParentId: ctx.currentParentId,
-          currentDepth: ctx.currentDepth,
           model,
           character,
           sequenceId: ctx.sequenceId,
           isIncognito,
           userId,
-          user,
           toolsConfig,
           streamAbortController,
           dbWriter: ctx.dbWriter,
@@ -234,9 +229,7 @@ export class StreamPartHandler {
         }
 
         ctx.currentParentId = result.pendingToolMessage.messageId;
-        ctx.currentDepth = result.pendingToolMessage.toolCallData.depth;
         ctx.lastParentId = result.pendingToolMessage.messageId;
-        ctx.lastDepth = result.pendingToolMessage.toolCallData.depth;
 
         ctx.pendingToolMessages.set(part.toolCallId, result.pendingToolMessage);
       }
@@ -277,9 +270,7 @@ export class StreamPartHandler {
         });
         if (result) {
           ctx.currentParentId = result.currentParentId;
-          ctx.currentDepth = result.currentDepth;
           ctx.lastParentId = result.currentParentId;
-          ctx.lastDepth = result.currentDepth;
           ctx.pendingToolMessages.delete(part.toolCallId);
         }
       }
@@ -318,9 +309,7 @@ export class StreamPartHandler {
       });
       if (result) {
         ctx.currentParentId = result.currentParentId;
-        ctx.currentDepth = result.currentDepth;
         ctx.lastParentId = result.currentParentId;
-        ctx.lastDepth = result.currentDepth;
         ctx.pendingToolMessages.delete(part.toolCallId);
 
         // Finalize and reset assistant message state so the next turn creates

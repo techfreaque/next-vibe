@@ -166,7 +166,6 @@ export class NOWPaymentsProvider implements PaymentProvider {
 
   /**
    * Get authentication headers for NOWPayments API
-   * Uses x-api-key header for authentication
    */
   private getAuthHeaders(): Record<string, string> {
     return {
@@ -259,32 +258,10 @@ export class NOWPaymentsProvider implements PaymentProvider {
         });
       }
 
-      // Get user email for subscriptions
-      const [user] = await db
-        .select({ email: users.email })
-        .from(users)
-        .where(eq(users.id, params.userId))
-        .limit(1);
-
-      if (!user?.email) {
-        return fail({
-          message: t("errors.userEmailRequired.title"),
-          errorType: ErrorResponseTypes.BAD_REQUEST,
-          messageParams: { userId: params.userId },
-        });
-      }
-
-      // Handle recurring subscriptions
-      if (params.interval === "month" || params.interval === "year") {
-        return this.createSubscriptionCheckout(
-          params,
-          product,
-          user.email,
-          logger,
-        );
-      }
-
-      // Handle one-time payments
+      // NOWPayments does not support recurring subscriptions API.
+      // All intervals (month, year, one_time) are processed as one-time invoices.
+      // The interval is encoded in metadata so the webhook can set the correct
+      // currentPeriodEnd (30 days for month, 365 days for year).
       return this.createOneTimeCheckout(params, product, logger, callbackToken);
     } catch (error) {
       logger.error("Failed to create NOWPayments checkout session", {
@@ -438,154 +415,6 @@ export class NOWPaymentsProvider implements PaymentProvider {
       sessionId: invoice.id,
       checkoutUrl: invoice.invoice_url,
       providerPriceId: invoice.price_amount,
-      providerProductId: params.productId,
-    });
-  }
-
-  /**
-   * Creates a recurring subscription plan and email subscription
-   */
-  private async createSubscriptionCheckout(
-    params: CheckoutSessionParams,
-    product: Product,
-    email: string,
-    logger: EndpointLogger,
-  ): Promise<ResponseType<CheckoutSessionResult>> {
-    const { t } = scopedTranslation.scopedT(params.locale);
-    // Convert interval to days
-    const intervalDays = params.interval === "month" ? 30 : 365;
-
-    // Step 1: Create or get subscription plan
-    const planData = {
-      title: `${params.productId}_${params.interval}`,
-      interval_day: intervalDays,
-      amount: product.price,
-      currency: product.currency.toLowerCase(),
-      ipn_callback_url: `${env.NEXT_PUBLIC_APP_URL}/api/${params.locale}/payment/providers/nowpayments/webhook`,
-      success_url: params.successUrl,
-      cancel_url: params.cancelUrl,
-    };
-
-    // Create subscription plan
-    let planResponse: Response;
-    try {
-      logger.debug("Creating NOWPayments subscription plan", {
-        url: `${this.apiUrl}/subscriptions/plans`,
-        planData,
-      });
-
-      planResponse = await fetch(`${this.apiUrl}/subscriptions/plans`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...this.getAuthHeaders(),
-        },
-        body: JSON.stringify(planData),
-      });
-    } catch (fetchError) {
-      logger.error("NOWPayments plan creation fetch error", {
-        error: parseError(fetchError),
-      });
-      return fail({
-        message: t("errors.planCreationFailed.title"),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: parseError(fetchError).message },
-      });
-    }
-
-    if (!planResponse.ok) {
-      const errorText = await planResponse.text();
-      logger.error("NOWPayments plan creation error - FULL DETAILS", {
-        status: planResponse.status,
-        statusText: planResponse.statusText,
-        errorText: errorText,
-        requestUrl: `${this.apiUrl}/subscriptions/plans`,
-        requestBody: JSON.stringify(planData),
-        headers: { "x-api-key": `${this.apiKey.slice(0, 10)}...` },
-      });
-      return fail({
-        message: t("errors.planCreationFailed.title"),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: errorText },
-      });
-    }
-
-    const plan: NOWPaymentsSubscriptionPlan = await planResponse.json();
-
-    logger.debug("Created NOWPayments subscription plan", {
-      planId: plan.id,
-      intervalDays,
-      amount: plan.amount,
-    });
-
-    // Step 2: Create email subscription
-    const subscriptionData = {
-      subscription_plan_id: plan.id,
-      email,
-    };
-
-    const subResponse = await fetch(`${this.apiUrl}/subscriptions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...this.getAuthHeaders(),
-      },
-      body: JSON.stringify(subscriptionData),
-    });
-
-    if (!subResponse.ok) {
-      const errorText = await subResponse.text();
-      logger.error("NOWPayments subscription creation error", {
-        status: subResponse.status,
-        error: errorText,
-      });
-      return fail({
-        message: t("errors.subscriptionCreationFailed.title"),
-        errorType: ErrorResponseTypes.EXTERNAL_SERVICE_ERROR,
-        messageParams: { error: errorText },
-      });
-    }
-
-    const subscription: NOWPaymentsSubscription = await subResponse.json();
-
-    logger.debug("Created NOWPayments email subscription", {
-      subscriptionId: subscription.id,
-      planId: plan.id,
-      email,
-      status: subscription.status,
-    });
-
-    // Create payment transaction record for tracking and referral payouts
-    try {
-      await db.insert(paymentTransactions).values({
-        userId: params.userId,
-        providerSessionId: subscription.id.toString(),
-        amount: product.price.toFixed(2),
-        currency: product.currency,
-        status: PaymentStatus.PENDING,
-        provider: PaymentProviderEnum.NOWPAYMENTS,
-        mode: CheckoutMode.SUBSCRIPTION,
-        metadata: params.metadata,
-      });
-
-      logger.debug("Created payment transaction for NowPayments subscription", {
-        subscriptionId: subscription.id,
-        userId: params.userId,
-      });
-    } catch (txError) {
-      logger.error("Failed to create payment transaction", {
-        error: parseError(txError),
-        subscriptionId: subscription.id,
-      });
-      // Continue - webhook can still process
-    }
-
-    // Return the subscription ID as session ID
-    // The user will receive payment links via email
-    return success<CheckoutSessionResult>({
-      sessionId: subscription.id.toString(),
-      checkoutUrl: params.successUrl, // User receives link via email
-      providerPriceId: plan.id.toString(),
       providerProductId: params.productId,
     });
   }

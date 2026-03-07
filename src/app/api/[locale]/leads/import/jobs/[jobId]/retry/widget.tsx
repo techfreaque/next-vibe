@@ -4,7 +4,8 @@
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
-import { CheckCircle, RefreshCw } from "next-vibe-ui/ui/icons";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useMemo } from "react";
 

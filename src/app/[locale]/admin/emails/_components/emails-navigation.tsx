@@ -8,7 +8,10 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { BarChart3, Database, List, Settings } from "next-vibe-ui/ui/icons";
+import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
+import { Database } from "next-vibe-ui/ui/icons/Database";
+import { List } from "next-vibe-ui/ui/icons/List";
+import { Settings } from "next-vibe-ui/ui/icons/Settings";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 

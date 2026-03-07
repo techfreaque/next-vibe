@@ -78,7 +78,7 @@ export class NpmPackageGenerator implements INpmPackageGenerator {
     output.push(
       outputFormatter.formatSection(t("messages.creatingPackageJson")),
     );
-    logger.info("Generating npm package.json", { name: config.name });
+    logger.vibe(`  ⚙  package.json  [${config.name}]`);
 
     // Read version from main package.json if not provided
     let version = config.version;
@@ -112,7 +112,9 @@ export class NpmPackageGenerator implements INpmPackageGenerator {
     };
 
     const packageJsonContent = JSON.stringify(packageJson, null, 2);
-    const outputPath = "dist/package.json";
+    const outputPath = config.outputDir
+      ? `${config.outputDir}/package.json`
+      : "dist/package.json";
     const fullOutputPath = resolve(ROOT_DIR, outputPath);
 
     output.push(outputFormatter.formatItem("package.json", `→ ${outputPath}`));
@@ -126,7 +128,7 @@ export class NpmPackageGenerator implements INpmPackageGenerator {
     }
 
     filesCopied.push(outputPath);
-    logger.info("Package.json generated", { path: outputPath });
+    logger.vibe(`  ✓  ${outputPath}`);
 
     return packageJsonContent;
   }

@@ -56,10 +56,9 @@ export class ViteCompiler {
         `→ ${dirname(fileConfig.output)}/ (${fileConfig.type})`,
       ),
     );
-    logger.info("Compiling file", {
-      input: fileConfig.input,
-      type: fileConfig.type,
-    });
+    logger.vibe(
+      `  ⚙  ${fileConfig.input}  →  ${dirname(fileConfig.output)}/  [${fileConfig.type}]`,
+    );
 
     if (dryRun) {
       // Simulate output files for dry run
@@ -114,10 +113,7 @@ export class ViteCompiler {
       );
     }
 
-    logger.info("File compiled", {
-      input: fileConfig.input,
-      output: compiledFiles,
-    });
+    logger.vibe(`  ✓  ${fileConfig.output}`);
     return success(compiledFiles);
   }
 

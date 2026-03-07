@@ -8,7 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "next-vibe-ui/ui/dropdown-menu";
-import { Check } from "next-vibe-ui/ui/icons";
+import { Check } from "next-vibe-ui/ui/icons/Check";
 import { Span } from "next-vibe-ui/ui/span";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "next-vibe-ui/ui/tabs";
 import type { FC } from "react";

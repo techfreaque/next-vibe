@@ -19,6 +19,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { SSH_FILES_READ_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { FilesReadContainer } from "./widget";
 
@@ -26,6 +27,7 @@ export const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["ssh", "files", "read"],
+  aliases: [SSH_FILES_READ_ALIAS],
   title: "get.title",
   description: "get.description",
   icon: "file-text",

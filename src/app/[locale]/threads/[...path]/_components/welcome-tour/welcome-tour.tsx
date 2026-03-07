@@ -85,7 +85,7 @@ export function WelcomeTour({
   }, []);
 
   // Get tour steps with translations
-  const tourSteps = getTourSteps(t, isAuthenticated);
+  const tourSteps = getTourSteps(t, isAuthenticated, locale);
 
   // Initialize tour on mount - uses empty deps intentionally as this should only run once
   /* eslint-disable react-hooks/exhaustive-deps */

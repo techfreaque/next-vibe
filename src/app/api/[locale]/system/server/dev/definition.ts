@@ -142,6 +142,14 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
+      profile: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.profile.title",
+        description: "post.fields.profile.description",
+        schema: z.boolean().default(false),
+      }),
+
       output: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.fields.output.title",
@@ -209,6 +217,7 @@ const { POST } = createEndpoint({
         skipMigrations: false,
         skipMigrationGeneration: false,
         skipSeeding: false,
+        profile: false,
       },
       quickStart: {
         skipDbSetup: true,
@@ -221,6 +230,7 @@ const { POST } = createEndpoint({
         skipMigrations: false,
         skipMigrationGeneration: false,
         skipSeeding: false,
+        profile: false,
       },
     },
     responses: {

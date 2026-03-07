@@ -14,11 +14,10 @@
  * If the endpoint cannot be resolved the entire object is passed as data (safe fallback).
  */
 
-import {
-  getEndpoint,
-  getFullPath,
-} from "@/app/api/[locale]/system/generated/endpoint";
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/parsing";
+
+import { getFullPath } from "./path";
 
 export interface SplitArgsResult {
   urlPathParams: CliRequestData;

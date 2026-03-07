@@ -719,7 +719,7 @@ export function ModelSelector({
   const priceRange = getRangeFromIndices(priceIndices, PRICE_DISPLAY);
 
   const filteredModels = useMemo(() => {
-    const modelSelection: FiltersModelSelection = {
+    const filtersModelSelection: FiltersModelSelection = {
       selectionType: ModelSelectionType.FILTERS,
       intelligenceRange,
       priceRange,
@@ -729,7 +729,7 @@ export function ModelSelector({
       sortDirection,
     };
     return CharactersRepositoryClient.getFilteredModelsForCharacter(
-      modelSelection,
+      filtersModelSelection,
       user,
     );
   }, [

@@ -25,6 +25,7 @@ import {
   SshCommandStatus,
   SshCommandStatusDB,
 } from "../enum";
+import { SSH_EXEC_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { SshExecContainer } from "./widget";
 
@@ -32,6 +33,7 @@ export const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["ssh", "exec"],
+  aliases: [SSH_EXEC_ALIAS],
   title: "post.title",
   description: "post.description",
   icon: "terminal",

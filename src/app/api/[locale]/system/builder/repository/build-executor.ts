@@ -20,7 +20,7 @@ import type {
   BuildReport,
   BuildStepResult,
   BundleAnalysis,
-  FileToCompile,
+  FileToCompileWithPlugins,
 } from "../definition";
 import { isBunBuildType } from "../definition";
 import { BuildProfileEnum, StepStatusEnum } from "../enum";
@@ -70,12 +70,9 @@ export class BuildExecutor {
           `${t("messages.buildStart")} [${profile.toUpperCase()}]`,
         ),
       );
-      logger.info("Build started", {
-        dryRun,
-        verbose,
-        profile,
-        analyze,
-      });
+      logger.vibe(
+        `🔨 Build started  [${profile.toUpperCase()}]${dryRun ? "  dry-run" : ""}`,
+      );
 
       // Load configuration
       const configResult = await configLoader.load(
@@ -83,7 +80,7 @@ export class BuildExecutor {
         {
           foldersToClean: configObject?.foldersToClean,
           filesToCompile: configObject?.filesToCompile as
-            | FileToCompile[]
+            | FileToCompileWithPlugins[]
             | undefined,
           filesOrFoldersToCopy: configObject?.filesOrFoldersToCopy ?? undefined,
           npmPackage: configObject?.npmPackage ?? undefined,
@@ -274,11 +271,9 @@ export class BuildExecutor {
       );
 
       output.push(outputFormatter.formatSuccess(t("messages.buildComplete")));
-      logger.info("Build complete", {
-        duration,
-        filesBuilt: filesBuilt.length,
-        profile,
-      });
+      logger.vibe(
+        `✅ Build complete  ${filesBuilt.length} file(s)  ${duration}ms`,
+      );
 
       // Generate build report if requested
       let reportPath: string | undefined;
@@ -362,7 +357,7 @@ export class BuildExecutor {
    * Compile files with caching support
    */
   private async compileFiles(
-    files: FileToCompile[],
+    files: FileToCompileWithPlugins[],
     output: string[],
     filesBuilt: string[],
     logger: EndpointLogger,
@@ -374,11 +369,9 @@ export class BuildExecutor {
     parallel = true,
   ): Promise<ResponseType<string[]>> {
     output.push(outputFormatter.formatSection(t("messages.compilingFiles")));
-    logger.info("Compiling files", {
-      count: files.length,
-      profile,
-      parallel,
-    });
+    logger.vibe(
+      `📦 Compiling ${files.length} file(s)  ${parallel ? "parallel" : "sequential"}`,
+    );
 
     const compiled: string[] = [];
 
@@ -471,7 +464,7 @@ export class BuildExecutor {
    * Returns compiled files on success, throws on failure to propagate error
    */
   private async compileSingleFile(
-    fileConfig: FileToCompile,
+    fileConfig: FileToCompileWithPlugins,
     output: string[],
     filesBuilt: string[],
     logger: EndpointLogger,

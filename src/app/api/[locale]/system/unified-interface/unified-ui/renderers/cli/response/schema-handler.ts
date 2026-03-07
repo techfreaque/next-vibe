@@ -389,11 +389,11 @@ export class SchemaUIHandler {
    * Validate field input against Zod schema
    */
   private static validateField(
-    input: FormFieldValue,
+    fieldInput: FormFieldValue,
     schema: z.ZodTypeAny,
   ): boolean | string {
     try {
-      schema.parse(input);
+      schema.parse(fieldInput);
       return true;
     } catch (error) {
       if (error instanceof z.ZodError) {

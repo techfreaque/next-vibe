@@ -46,6 +46,7 @@ CollapsibleTrigger.displayName =
 export type CollapsibleContentProps = {
   children?: React.ReactNode;
   forceMount?: true;
+  suppressHydrationWarning?: boolean;
 } & StyleType;
 
 export function CollapsibleContent({

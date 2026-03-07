@@ -16,6 +16,7 @@ import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ViewMode } from "@/app/api/[locale]/agent/chat/enum";
 import { ChatBootContext } from "@/app/api/[locale]/agent/chat/hooks/context";
+import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import { useWidgetContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 
 import type { MessageListResponseOutput } from "../definition";
@@ -45,13 +46,14 @@ export const MessagesWidget = React.memo(function MessagesWidget({
   field,
 }: MessagesWidgetProps): React.JSX.Element {
   const bootContext = useContext(ChatBootContext);
+  const isEmbedded = useChatNavigationStore((s) => s.isEmbedded);
 
-  // Interactive mode: inside a ChatBootProvider
-  if (bootContext) {
+  // Interactive mode: inside a ChatBootProvider and not an embedded read-only view
+  if (bootContext && !isEmbedded) {
     return <InteractiveMessages />;
   }
 
-  // Read-only mode: standalone embed
+  // Read-only mode: standalone embed or no ChatBootProvider
   return <ReadOnlyMessages field={field} />;
 });
 
@@ -139,6 +141,8 @@ function ReadOnlyMessages({
         selectedModel={null}
         sendMessage={null}
         deductCredits={null}
+        onLoadNewerHistory={null}
+        isLoadingNewerHistory={false}
       />
     </Div>
   );

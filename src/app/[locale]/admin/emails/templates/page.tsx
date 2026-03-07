@@ -36,7 +36,7 @@ export default async function EmailTemplatesPage({
 
   const templatesByCategory = categories.map((category) => ({
     category,
-    templates: allTemplates.filter((t) => t.category === category),
+    templates: allTemplates.filter((tmpl) => tmpl.category === category),
   }));
 
   return (

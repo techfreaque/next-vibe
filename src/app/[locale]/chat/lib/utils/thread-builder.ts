@@ -33,30 +33,23 @@ export function getRootMessages(
 export function buildMessagePath(
   messages: ChatMessage[],
   branchIndices: Record<string, number> = {},
+  leafMessageId?: string | null,
 ): {
   path: ChatMessage[];
   branchInfo: Record<string, { siblings: ChatMessage[]; currentIndex: number }>;
 } {
-  // Find ALL root messages (messages with no parent)
-  const rootMessages = messages
-    .filter((msg) => !msg.parentId)
-    .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-
-  if (rootMessages.length === 0) {
-    return { path: [], branchInfo: {} };
-  }
+  const messageIds = new Set(messages.map((m) => m.id));
+  const byId = new Map<string, ChatMessage>(messages.map((m) => [m.id, m]));
 
   // Build a map of children for each message (sorted by timestamp)
   const childrenMap = new Map<string, ChatMessage[]>();
   for (const msg of messages) {
     if (msg.parentId) {
-      const siblings = childrenMap.get(msg.parentId) || [];
+      const siblings = childrenMap.get(msg.parentId) ?? [];
       siblings.push(msg);
       childrenMap.set(msg.parentId, siblings);
     }
   }
-
-  // Sort siblings by timestamp
   for (const [parentId, siblings] of childrenMap.entries()) {
     childrenMap.set(
       parentId,
@@ -66,17 +59,74 @@ export function buildMessagePath(
     );
   }
 
-  // Traverse the tree following branch indices
+  // When leafMessageId is known and present in the window, build the path by walking
+  // UP from the leaf to the oldest loaded ancestor, then reversing.
+  // This correctly handles partially-loaded branch windows (e.g. after compaction) where
+  // the ancestry chain has gaps — it doesn't require a fully-connected tree from root to leaf.
+  if (leafMessageId && messageIds.has(leafMessageId)) {
+    const reversePath: ChatMessage[] = [];
+    let cur: string | null = leafMessageId;
+    while (cur && messageIds.has(cur)) {
+      const msg = byId.get(cur);
+      if (!msg) {
+        break;
+      }
+      reversePath.push(msg);
+      cur = msg.parentId;
+    }
+    reversePath.reverse();
+
+    // Build branchInfo so the branch navigator renders correctly
+    const branchInfo: Record<
+      string,
+      { siblings: ChatMessage[]; currentIndex: number }
+    > = {};
+    for (const msg of reversePath) {
+      const siblings = childrenMap.get(msg.parentId ?? "") ?? [];
+      if (msg.parentId && siblings.length > 1) {
+        const idx = siblings.findIndex((s) => s.id === msg.id);
+        branchInfo[msg.parentId] = {
+          siblings,
+          currentIndex: idx >= 0 ? idx : 0,
+        };
+      }
+    }
+    // Root-level: if the oldest ancestor has siblings (other orphan roots), expose them
+    const oldest = reversePath[0];
+    if (oldest) {
+      const rootMessages = messages
+        .filter((msg) => !msg.parentId || !messageIds.has(msg.parentId))
+        .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+      if (rootMessages.length > 1) {
+        const rootIdx = rootMessages.findIndex((r) => r.id === oldest.id);
+        branchInfo[BRANCH_INDEX_KEY] = {
+          siblings: rootMessages,
+          currentIndex: rootIdx >= 0 ? rootIdx : 0,
+        };
+      }
+    }
+
+    return { path: reversePath, branchInfo };
+  }
+
+  // Fallback: no leafMessageId — traverse DOWN from roots using branchIndices.
+  // Find ALL root messages: messages with no parent OR whose parent is not in the current window.
+  const rootMessages = messages
+    .filter((msg) => !msg.parentId || !messageIds.has(msg.parentId))
+    .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+
+  if (rootMessages.length === 0) {
+    return { path: [], branchInfo: {} };
+  }
+
   const path: ChatMessage[] = [];
   const branchInfo: Record<
     string,
     { siblings: ChatMessage[]; currentIndex: number }
   > = {};
 
-  // Handle root-level branches
   let currentMessage: ChatMessage | undefined;
   if (rootMessages.length > 1) {
-    // Multiple root messages - treat as branches at root level
     const rootBranchIndex = branchIndices[BRANCH_INDEX_KEY] ?? 0;
     const validRootIndex = Math.min(
       Math.max(0, rootBranchIndex),
@@ -88,7 +138,6 @@ export function buildMessagePath(
     };
     currentMessage = rootMessages[validRootIndex];
   } else {
-    // Single root message
     currentMessage = rootMessages[0];
   }
 
@@ -100,7 +149,6 @@ export function buildMessagePath(
       break;
     }
 
-    // Store branch info if there are multiple children
     if (children.length > 1) {
       const branchIndex = branchIndices[currentMessage.id] ?? 0;
       const validIndex = Math.min(
@@ -113,7 +161,6 @@ export function buildMessagePath(
       };
       currentMessage = children[validIndex];
     } else {
-      // Only one child, follow it
       currentMessage = children[0];
     }
   }

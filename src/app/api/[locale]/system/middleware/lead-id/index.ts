@@ -4,7 +4,7 @@
  * This middleware ensures that every visitor has a leadId cookie set.
  */
 
-import { eq } from "drizzle-orm";
+import { and, eq, gt, isNull } from "drizzle-orm";
 import type { NextRequest, NextResponse } from "next/server";
 import { NextResponse as NextResponseClass } from "next/server";
 import { Environment } from "next-vibe/shared/utils";
@@ -18,6 +18,7 @@ import { LeadAuthRepository } from "../../../leads/auth/repository";
 import { leads } from "../../../leads/db";
 import { db } from "../../db";
 import { createEndpointLogger } from "../../unified-interface/shared/logger/endpoint";
+import { frameExchangeTokens } from "../../unified-interface/vibe-frame/db";
 import { shouldSkipPath } from "../utils";
 
 const UUID_REGEX =
@@ -68,7 +69,8 @@ export async function checkLeadId(
     return LeadIdCheckResult.SKIP;
   }
 
-  // Check if leadId cookie exists
+  // Check if leadId cookie exists.
+  // Frame routes handle auth via exchange token (?et=) redeemed before this check.
   const existingLeadId = request.cookies.get(LEAD_ID_COOKIE_NAME)?.value;
 
   if (!existingLeadId) {
@@ -90,6 +92,59 @@ export async function checkLeadId(
 }
 
 export { LeadIdCheckResult };
+
+// ─── Exchange Token Redemption ────────────────────────────────────────────────
+
+export interface ExchangeTokenPayload {
+  /** Null when the host page didn't provide a leadId — middleware creates a new lead */
+  leadId: string | null;
+  authToken: string | null;
+}
+
+/**
+ * Redeem a short-lived exchange token minted by the config API.
+ * Marks it as used (single-use) and returns lead_id + optional auth token.
+ * Returns null if token is missing, expired, or already used.
+ *
+ * Atomicity: the UPDATE ... WHERE usedAt IS NULL ... RETURNING pattern is a
+ * single round-trip. Only the connection that successfully updates the row
+ * (rowCount > 0) gets the payload — concurrent redemptions are safely rejected.
+ */
+export async function redeemExchangeToken(
+  token: string,
+): Promise<ExchangeTokenPayload | null> {
+  try {
+    const now = new Date();
+
+    // Atomic single-query redemption: mark used only if currently unused and not expired.
+    // RETURNING gives us the row data without a separate SELECT.
+    const updated = await db
+      .update(frameExchangeTokens)
+      .set({ usedAt: now })
+      .where(
+        and(
+          eq(frameExchangeTokens.token, token),
+          isNull(frameExchangeTokens.usedAt),
+          // gt(expiresAt, now) — filter expired tokens atomically
+          gt(frameExchangeTokens.expiresAt, now),
+        ),
+      )
+      .returning({
+        leadId: frameExchangeTokens.leadId,
+        authToken: frameExchangeTokens.authToken,
+      });
+
+    const row = updated[0];
+    if (!row) {
+      // Token missing, already used, or expired — all treated the same
+      return null;
+    }
+
+    return { leadId: row.leadId, authToken: row.authToken };
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Create a new leadId and set the cookie

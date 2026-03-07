@@ -1,15 +1,13 @@
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  Bot,
-  Briefcase,
-  Folder,
-  Info,
-  MessageSquare,
-  Shield,
-  Sparkles,
-  Tag,
-  Users,
-} from "next-vibe-ui/ui/icons";
+import { Bot } from "next-vibe-ui/ui/icons/Bot";
+import { Briefcase } from "next-vibe-ui/ui/icons/Briefcase";
+import { Folder } from "next-vibe-ui/ui/icons/Folder";
+import { Info } from "next-vibe-ui/ui/icons/Info";
+import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
+import { Shield } from "next-vibe-ui/ui/icons/Shield";
+import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
+import { Tag } from "next-vibe-ui/ui/icons/Tag";
+import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Link } from "next-vibe-ui/ui/link";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
@@ -72,7 +70,7 @@ const Footer: React.FC<FooterProps> = ({ locale }) => {
               </Div>
               <Div role="listitem">
                 <Link
-                  href={`/${locale}/subscription/buy`}
+                  href={`/${locale}/subscription/overview`}
                   className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-2"
                 >
                   <Tag className="h-4 w-4" />

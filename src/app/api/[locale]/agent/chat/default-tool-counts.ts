@@ -3,11 +3,14 @@
  *
  * Computed once at boot per role. The server picks the right count
  * for the current user and passes a single number to the frontend.
+ *
+ * Uses endpoints-meta (pure static data) — no full definition loading.
  */
 
 import "server-only";
 
-import { definitionsRegistry } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definitions/registry";
+import { endpointsMeta } from "@/app/api/[locale]/system/generated/endpoints-meta/en";
+import { permissionsRegistry } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/permissions/registry";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
@@ -22,32 +25,54 @@ let adminMaxAllPlatformsCount: number | null = null;
 
 const MOCK_ID = "00000000-0000-0000-0000-000000000000";
 
+function countForPlatformAndUser(
+  platform: Platform,
+  user: JwtPayloadType,
+): number {
+  return endpointsMeta.filter((ep) => {
+    const allowedRoles = ep.allowedRoles as Parameters<
+      typeof permissionsRegistry.checkPlatformAccess
+    >[0];
+    const platformAccess = permissionsRegistry.checkPlatformAccess(
+      allowedRoles,
+      platform,
+    );
+    if (!platformAccess.allowed) {
+      return false;
+    }
+    if (user.isPublic) {
+      return allowedRoles.includes(UserRole.PUBLIC);
+    }
+    return user.roles.some((role) => allowedRoles.includes(role));
+  }).length;
+}
+
 function ensureComputed(): void {
   if (publicCount !== null) {
     return;
   }
 
-  publicCount = definitionsRegistry.getEndpointsForUser(Platform.AI, {
+  publicCount = countForPlatformAndUser(Platform.AI, {
     isPublic: true as const,
     leadId: MOCK_ID,
     roles: [UserRole.PUBLIC],
-  }).length;
+  });
 
-  customerCount = definitionsRegistry.getEndpointsForUser(Platform.AI, {
+  customerCount = countForPlatformAndUser(Platform.AI, {
     id: MOCK_ID,
     leadId: MOCK_ID,
     isPublic: false as const,
     roles: [UserRole.CUSTOMER],
-  }).length;
+  });
 
-  adminCount = definitionsRegistry.getEndpointsForUser(Platform.AI, {
+  adminCount = countForPlatformAndUser(Platform.AI, {
     id: MOCK_ID,
     leadId: MOCK_ID,
     isPublic: false as const,
     roles: [UserRole.ADMIN],
-  }).length;
+  });
 
-  // Max across all platforms for admin — used for marketing copy
+  // Max across all platforms for admin — deduped by path+method
   const allPlatforms = Object.values(Platform);
   const seen = new Set<string>();
   const adminUser = {
@@ -57,9 +82,20 @@ function ensureComputed(): void {
     roles: [UserRole.ADMIN],
   };
   for (const platform of allPlatforms) {
-    const eps = definitionsRegistry.getEndpointsForUser(platform, adminUser);
-    for (const ep of eps) {
-      seen.add(`${ep.path.join("/")}|${ep.method}`);
+    for (const ep of endpointsMeta) {
+      const allowedRoles = ep.allowedRoles as Parameters<
+        typeof permissionsRegistry.checkPlatformAccess
+      >[0];
+      const platformAccess = permissionsRegistry.checkPlatformAccess(
+        allowedRoles,
+        platform,
+      );
+      if (!platformAccess.allowed) {
+        continue;
+      }
+      if (adminUser.roles.some((role) => allowedRoles.includes(role))) {
+        seen.add(`${ep.path.join("/")}|${ep.method}`);
+      }
     }
   }
   adminMaxAllPlatformsCount = seen.size;

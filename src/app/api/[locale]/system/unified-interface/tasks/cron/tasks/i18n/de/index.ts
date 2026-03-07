@@ -4,6 +4,8 @@ export const translations: typeof enTranslations = {
   category: "API Endpunkt",
   tags: {
     tasks: "Tasks",
+    cron: "Cron",
+    scheduling: "Planung",
   },
   errors: {
     fetchCronTasks: "Fehler beim Abrufen der Cron-Aufgaben",

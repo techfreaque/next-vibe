@@ -22,7 +22,10 @@ import {
   formatGenerator,
   formatWarning,
 } from "@/app/api/[locale]/system/unified-interface/shared/logger/formatters";
-import { endpointToToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
+import {
+  endpointToToolName,
+  getPreferredToolName,
+} from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 
 import type { LiveIndex } from "../shared/live-index";
 import {
@@ -101,17 +104,25 @@ class EndpointGeneratorRepositoryImpl {
 
       // Skip definitions without route (warning shown by endpoints-index generator)
 
-      // Generate content with only valid definition files
-      const content = await this.generateContent(validDefinitionFiles, logger);
+      // Generate both files
+      const { endpointContent, aliasMapContent, endpointCount } =
+        await this.generateContent(validDefinitionFiles, logger);
 
-      // Write file
-      await writeGeneratedFile(outputFile, content, data.dryRun);
+      // Derive alias-map path from outputFile (same dir)
+      const aliasMapFile = outputFile.replace(
+        /\/endpoint\.ts$/,
+        "/alias-map.ts",
+      );
+
+      // Write both files
+      await writeGeneratedFile(outputFile, endpointContent, data.dryRun);
+      await writeGeneratedFile(aliasMapFile, aliasMapContent, data.dryRun);
 
       const duration = Date.now() - startTime;
 
       logger.info(
         formatGenerator(
-          `Generated endpoint file with ${formatCount(validDefinitionFiles.length, "endpoint")} in ${formatDuration(duration)}`,
+          `Generated endpoint file with ${formatCount(endpointCount, "endpoint")} in ${formatDuration(duration)}`,
           "📄",
         ),
       );
@@ -141,16 +152,21 @@ class EndpointGeneratorRepositoryImpl {
   }
 
   /**
-   * Generate endpoint content with dynamic imports and real aliases from definitions
+   * Generate both endpoint.ts and alias-map.ts content from definitions.
    * Main paths include method suffix (e.g., "core/agent/ai-stream/POST")
    * Aliases also include method from their definition
    */
   private async generateContent(
     definitionFiles: string[],
     logger: EndpointLogger,
-  ): Promise<string> {
+  ): Promise<{
+    endpointContent: string;
+    aliasMapContent: string;
+    endpointCount: number;
+  }> {
     const pathMap: Record<string, { importPath: string; method: string }> = {};
     const allPaths: string[] = [];
+    let endpointCount = 0;
 
     // Build path map with real aliases (deduplicate)
     for (const defFile of definitionFiles) {
@@ -161,14 +177,34 @@ class EndpointGeneratorRepositoryImpl {
       try {
         definition = await import(defFile);
       } catch (error) {
-        // Log import errors and skip - same pattern as route-handlers generator
         const errorMsg = error instanceof Error ? error.message : String(error);
-        logger.warn(
-          formatWarning(
-            `Import error: ${defFile.replace(process.cwd(), "").replace(/^\//, "")}\n    ${errorMsg}`,
-          ),
-        );
-        continue;
+        // Bun TDZ race: "Cannot access 'X' before initialization" — yield and retry once
+        if (errorMsg.includes("before initialization")) {
+          await new Promise((resolve) => {
+            setTimeout(resolve, 10);
+          });
+          try {
+            definition = await import(defFile);
+          } catch (retryError) {
+            const retryMsg =
+              retryError instanceof Error
+                ? retryError.message
+                : String(retryError);
+            logger.warn(
+              formatWarning(
+                `Could not load definition: ${defFile.replace(process.cwd(), "").replace(/^\//, "")} — ${retryMsg}`,
+              ),
+            );
+            continue;
+          }
+        } else {
+          logger.warn(
+            formatWarning(
+              `Import error: ${defFile.replace(process.cwd(), "").replace(/^\//, "")}\n    ${errorMsg}`,
+            ),
+          );
+          continue;
+        }
       }
       let defaultExport;
       try {
@@ -177,7 +213,7 @@ class EndpointGeneratorRepositoryImpl {
         // Bun plugin race: synthetic onLoad modules with `export *` can delay
         // initialization. Yield to the event loop then retry.
         await new Promise((resolve) => {
-          setTimeout(resolve, 0);
+          setTimeout(resolve, 10);
         });
         try {
           defaultExport = definition.default;
@@ -226,6 +262,7 @@ class EndpointGeneratorRepositoryImpl {
         if (!pathMap[toolName]) {
           pathMap[toolName] = { importPath, method };
           allPaths.push(toolName);
+          endpointCount++;
         }
 
         // Add aliases if they exist
@@ -245,7 +282,7 @@ class EndpointGeneratorRepositoryImpl {
 
     // Build alias to full path map (alias -> full path with method)
     // Full paths map to themselves
-    const aliasToPathMap: Record<string, string> = {};
+    const pathToAliasMap: Record<string, string> = {};
 
     for (const defFile of definitionFiles) {
       // Load the actual definition - let TypeScript infer the concrete type
@@ -253,8 +290,20 @@ class EndpointGeneratorRepositoryImpl {
       try {
         definition = await import(defFile);
       } catch (error) {
-        // Skip files with import errors (already logged above)
-        continue;
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        // Bun TDZ race: yield and retry once
+        if (errorMsg.includes("before initialization")) {
+          await new Promise((resolve) => {
+            setTimeout(resolve, 10);
+          });
+          try {
+            definition = await import(defFile);
+          } catch {
+            continue;
+          }
+        } else {
+          continue;
+        }
       }
       const defaultExport = definition.default;
 
@@ -278,17 +327,16 @@ class EndpointGeneratorRepositoryImpl {
           continue;
         }
 
-        // Use endpointToToolName to get properly sanitized canonical tool name
         const canonicalName = endpointToToolName(endpoint);
+        // preferred = first alias if any, otherwise canonical
+        const preferred = getPreferredToolName(endpoint);
 
-        // Canonical name maps to itself
-        aliasToPathMap[canonicalName] = canonicalName;
-
-        // Map aliases to their canonical names
+        // Every name (canonical + all aliases) maps to the preferred name
+        pathToAliasMap[canonicalName] = preferred;
         if (endpoint.aliases && Array.isArray(endpoint.aliases)) {
           for (const alias of endpoint.aliases) {
-            if (!aliasToPathMap[alias]) {
-              aliasToPathMap[alias] = canonicalName;
+            if (!pathToAliasMap[alias]) {
+              pathToAliasMap[alias] = preferred;
             }
           }
         }
@@ -339,10 +387,8 @@ class EndpointGeneratorRepositoryImpl {
       "Total paths (with aliases)": allPaths.length,
     });
 
-    // Generate alias map entries (with trailing commas)
-    // Only quote keys when they contain special characters (hyphens, etc.)
-    // Split long lines at 100+ characters
-    const entries = Object.entries(aliasToPathMap).toSorted(([a], [b]) =>
+    // Generate alias map entries (sorted, quoted if needed, wrapped at 80 chars)
+    const entries = Object.entries(pathToAliasMap).toSorted(([a], [b]) =>
       a.localeCompare(b),
     );
     const aliasMapEntries = entries
@@ -350,7 +396,6 @@ class EndpointGeneratorRepositoryImpl {
         const needsQuotes = /[^a-zA-Z0-9_$]/.test(alias);
         const key = needsQuotes ? `"${alias}"` : alias;
         const singleLine = `  ${key}: "${fullPath}",`;
-        // Check if line is 80+ chars (prettier printWidth), if so split it
         if (singleLine.length >= 80) {
           return `  ${key}:\n    "${fullPath}",`;
         }
@@ -359,31 +404,27 @@ class EndpointGeneratorRepositoryImpl {
       .join("\n");
 
     // eslint-disable-next-line i18next/no-literal-string
-    return `${header}
+    const aliasMapContent = `${header}
+
+/* eslint-disable prettier/prettier */
+/* eslint-disable i18next/no-literal-string */
+
+/**
+ * Map of aliases to their canonical full paths.
+ * Full paths map to themselves.
+ */
+export const pathToAliasMap = {
+${aliasMapEntries}
+} as const;
+`;
+
+    // eslint-disable-next-line i18next/no-literal-string
+    const endpointContent = `${header}
 
 /* eslint-disable prettier/prettier */
 /* eslint-disable i18next/no-literal-string */
 
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
-
-/**
- * Map of aliases to their canonical full paths
- * Full paths map to themselves
- */
-export const aliasToPathMap = {
-${aliasMapEntries}
-} as const;
-
-/**
- * Get the canonical full path from an alias or full path
- * @param aliasOrPath - An alias or full path
- * @returns The canonical full path, or null if not found
- */
-export function getFullPath(
-  aliasOrPath: string,
-): (typeof aliasToPathMap)[keyof typeof aliasToPathMap] | null {
-  return aliasToPathMap[aliasOrPath as keyof typeof aliasToPathMap] ?? null;
-}
 
 /**
  * Dynamically import endpoint definition by path
@@ -400,6 +441,8 @@ ${cases.join("\n")}
   }
 }
 `;
+
+    return { endpointContent, aliasMapContent, endpointCount };
   }
 }
 

@@ -6,12 +6,12 @@ import { config } from "dotenv";
 import {
   BUILD_ALIAS,
   BUILD_SERVER_ALIAS,
-} from "../../../server/build/definition";
-import { REBUILD_ALIAS } from "../../../server/rebuild/definition";
+} from "../../../server/build/constants";
+import { REBUILD_ALIAS } from "../../../server/rebuild/constants";
 import {
   START_ALIAS,
   START_SERVER_ALIAS,
-} from "../../../server/start/definition";
+} from "../../../server/start/constants";
 import { Platform } from "../../shared/types/platform";
 
 /** CLI-specific platforms (subset of Platform that applies to CLI environments) */

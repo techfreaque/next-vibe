@@ -1,11 +1,11 @@
-import { CLAUDE_CODE_ALIAS } from "@/app/api/[locale]/agent/claude-code/definition";
+import { CLAUDE_CODE_ALIAS } from "@/app/api/[locale]/agent/claude-code/constants";
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
-import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/definition";
+import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { TtsVoice } from "../../../text-to-speech/enum";
-import { MEMORY_ADD_ALIAS } from "../../memories/create/definition";
-import { MEMORY_LIST_ALIAS } from "../../memories/definition";
+import { MEMORY_LIST_ALIAS } from "../../memories/constants";
+import { MEMORY_ADD_ALIAS } from "../../memories/create/constants";
 import type { Character } from "../config";
 import { tool } from "../config";
 import { CharacterCategory, CharacterOwnershipType } from "../enum";

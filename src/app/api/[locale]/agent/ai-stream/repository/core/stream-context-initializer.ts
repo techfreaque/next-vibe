@@ -19,7 +19,6 @@ export class StreamContextInitializer {
   static initializeContext(params: {
     userMessageId: string | null;
     effectiveParentMessageId: string | null | undefined;
-    messageDepth: number;
     toolConfirmationResults: Array<{
       messageId: string;
       sequenceId: string;
@@ -34,7 +33,6 @@ export class StreamContextInitializer {
     const {
       userMessageId,
       effectiveParentMessageId,
-      messageDepth,
       toolConfirmationResults,
       aiMessageId,
       isIncognito,
@@ -44,10 +42,9 @@ export class StreamContextInitializer {
     } = params;
     const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
 
-    // Calculate initial parent and depth for AI message
+    // Calculate initial parent for AI message
     // IMPORTANT: Always prefer userMessageId when available (works for both incognito and server-persisted threads)
     const initialAiParentId = userMessageId ?? effectiveParentMessageId ?? null;
-    const initialAiDepth = userMessageId ? messageDepth + 1 : messageDepth;
 
     // Initialize stream context OUTSIDE try block so it's accessible in catch blocks
     const lastConfirmedTool =
@@ -55,14 +52,10 @@ export class StreamContextInitializer {
     const sequenceId = lastConfirmedTool?.sequenceId ?? crypto.randomUUID();
     const initialParentForContext =
       lastConfirmedTool?.messageId ?? initialAiParentId;
-    const initialDepthForContext = lastConfirmedTool
-      ? messageDepth + 1
-      : initialAiDepth;
 
     const ctx = new StreamContext({
       sequenceId,
       initialParentId: initialParentForContext,
-      initialDepth: initialDepthForContext,
       initialAssistantMessageId: aiMessageId,
       isIncognito,
       logger,

@@ -473,7 +473,6 @@ export async function createIncognitoMessage(
     role,
     content,
     parentId,
-    depth: 0,
     sequenceId: null,
     authorId: "incognito",
     authorName: null,

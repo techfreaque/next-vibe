@@ -28,7 +28,6 @@ export interface StreamingMessage {
   content: string;
   reasoning?: string;
   parentId: string | null;
-  depth: number;
   model: ModelId | null;
   character: string | null;
   promptTokens?: number;

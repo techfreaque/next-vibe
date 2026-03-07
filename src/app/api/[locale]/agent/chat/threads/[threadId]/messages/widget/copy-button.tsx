@@ -8,7 +8,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "next-vibe-ui/ui/dropdown-menu";
-import { Check, Copy } from "next-vibe-ui/ui/icons";
+import { Check } from "next-vibe-ui/ui/icons/Check";
+import { Copy } from "next-vibe-ui/ui/icons/Copy";
 import type { JSX } from "react";
 import { useState } from "react";
 

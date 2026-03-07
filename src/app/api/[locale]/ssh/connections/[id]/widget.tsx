@@ -1,7 +1,7 @@
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
-import { Server } from "next-vibe-ui/ui/icons";
+import { Server } from "next-vibe-ui/ui/icons/Server";
 import { Span } from "next-vibe-ui/ui/span";
 import React from "react";
 

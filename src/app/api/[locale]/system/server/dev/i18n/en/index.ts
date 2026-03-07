@@ -58,6 +58,11 @@ export const translations = {
         title: "Skip Seeding",
         description: "Skip database seeding with initial data",
       },
+      profile: {
+        title: "Profile",
+        description:
+          "Enable profiling: sets NEXT_TURBOPACK_TRACING=1 (trace file at .next/dev/trace-turbopack) and NEXT_CPU_PROF=1 (writes .cpuprofile on exit)",
+      },
       success: {
         title: "Success",
       },

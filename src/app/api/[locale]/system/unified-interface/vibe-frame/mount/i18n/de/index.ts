@@ -4,76 +4,101 @@ export const translations = {
     vibeFrame: "Vibe Frame",
     embed: "Einbetten",
     widget: "Widget",
-    iframe: "Iframe",
+    config: "Konfiguration",
   },
-  get: {
-    title: "Vibe Frame einbinden",
+  post: {
+    title: "Vibe Frame Konfiguration",
     description:
-      "Einen next-vibe Endpunkt in einem isolierten Iframe einbinden, um ihn auf einer beliebigen Website oder nativen WebView einzubetten",
+      "Gibt Iframe-URLs für die angeforderten Integrationen zurück. Der Server liest echte Auth-Cookies und erstellt kurzlebige Exchange-Tokens.",
     container: {
-      title: "Vibe Frame Einbindung",
-      description: "Endpunkt-Frame konfigurieren und einbinden",
+      title: "Vibe Frame Konfiguration",
+      description: "Iframe-URLs für eine oder mehrere Integrationen anfordern",
     },
     fields: {
+      leadId: {
+        label: "Lead-ID",
+        description:
+          "Besucher-Lead-ID von der Host-Seite (Cross-Origin — kann nicht aus Cookies gelesen werden)",
+      },
+      authToken: {
+        label: "Auth-Token",
+        description:
+          "JWT-Auth-Token der Host-Seiten-Sitzung (für authentifizierte Widgets)",
+      },
+      integrations: {
+        label: "Integrationen",
+        description: "Liste der zu konfigurierenden Integrationen",
+      },
+      integration: {
+        label: "Integration",
+        description: "Einzelne Integrationskonfiguration",
+      },
+      id: {
+        label: "Integrations-ID",
+        description: "Eindeutige Kennung für diesen Integrationsslot",
+        placeholder: "contact_POST",
+      },
       endpoint: {
         label: "Endpunkt",
-        description:
-          "Endpunkt-Kennung (z.B. contact_POST, agent_chat_threads_GET)",
-        placeholder: "Endpunkt-Kennung eingeben...",
+        description: "Endpunkt-Kennung (Standard: id)",
+        placeholder: "contact_POST",
       },
-      frameId: {
-        label: "Frame-ID",
-        description: "Eindeutige Frame-Kennung für die Bridge-Kommunikation",
-        placeholder: "Automatisch generiert",
+      hasRendered: {
+        label: "Bereits gerendert",
+        description:
+          "Wenn true, kann der Server diese Integration überspringen",
+      },
+      theme: {
+        label: "Theme",
+        description: "Farbthema für den Frame",
       },
       urlPathParams: {
         label: "URL-Pfadparameter",
         description: "JSON-kodierte URL-Pfadparameter",
-        placeholder: '{"id": "123"}',
+        placeholder: '{"id":"123"}',
       },
       data: {
         label: "Daten",
-        description: "JSON-kodierte Vorbelegungsdaten für das Formular",
+        description: "JSON-kodierte Vorbelegungsdaten",
         placeholder: "{}",
       },
-      theme: {
-        label: "Theme",
-        description: "Farbthema für den eingebundenen Frame",
+      widgets: {
+        label: "Widgets",
+        description: "Map von Integrations-ID zu Widget-Konfiguration",
       },
-      authToken: {
-        label: "Auth-Token",
-        description: "Authentifizierungstoken für Cross-Origin-Einbettung",
-        placeholder: "Bearer-Token...",
+      widget: {
+        label: "Widget",
+        description: "Widget-Konfiguration für eine Integration",
       },
-    },
-    response: {
-      html: {
-        title: "Gerendertes HTML",
-        description: "Das vollständige HTML-Dokument für den Iframe",
+      frameId: {
+        label: "Frame-ID",
+        description: "Eindeutige Frame-ID für die Bridge-Kommunikation",
+      },
+      widgetUrl: {
+        label: "Widget-URL",
+        description: "Iframe-src-URL mit Exchange-Token",
       },
     },
     errors: {
       validation: {
-        title: "Ungültige Mount-Parameter",
-        description: "Die angegebenen Mount-Parameter sind ungültig",
+        title: "Ungültige Parameter",
+        description: "Die angegebenen Parameter sind ungültig",
       },
       unauthorized: {
         title: "Nicht autorisiert",
-        description: "Authentifizierung für diesen Endpunkt erforderlich",
+        description: "Authentifizierung erforderlich",
       },
       forbidden: {
         title: "Zugriff verboten",
-        description:
-          "Sie haben keine Berechtigung, diesen Endpunkt einzubinden",
+        description: "Keine Berechtigung",
       },
       notFound: {
         title: "Endpunkt nicht gefunden",
-        description: "Der angegebene Endpunkt existiert nicht",
+        description: "Ein oder mehrere Endpunkte existieren nicht",
       },
       internal: {
-        title: "Einbindung fehlgeschlagen",
-        description:
-          "Beim Rendern des Endpunkt-Frames ist ein Fehler aufgetreten",
+        title: "Konfiguration fehlgeschlagen",
+        description: "Fehler beim Erstellen der Konfigurationsantwort",
       },
       network: {
         title: "Netzwerkfehler",
@@ -81,8 +106,7 @@ export const translations = {
       },
       unknown: {
         title: "Unbekannter Fehler",
-        description:
-          "Beim Einbinden des Frames ist ein unbekannter Fehler aufgetreten",
+        description: "Ein unbekannter Fehler ist aufgetreten",
       },
       unsaved: {
         title: "Nicht gespeicherte Änderungen",
@@ -96,13 +120,14 @@ export const translations = {
     repository: {
       invalidUrlPathParams: "Ungültiges Format der URL-Pfadparameter",
       invalidData: "Ungültiges Datenformat",
-      endpointNotFound: "Der angeforderte Endpunkt wurde nicht gefunden",
-      mountFailed: "Einbindung des Vibe-Frame-Endpunkts fehlgeschlagen",
+      endpointNotFound: "Endpunkt nicht gefunden",
+      configFailed: "Konfigurationsantwort konnte nicht erstellt werden",
+      tokenMintFailed: "Exchange-Token konnte nicht erstellt werden",
     },
     success: {
-      mounted: {
-        title: "Frame eingebunden",
-        description: "Der Endpunkt wurde erfolgreich eingebunden",
+      configured: {
+        title: "Konfiguration bereit",
+        description: "Iframe-URLs erfolgreich generiert",
       },
     },
   },

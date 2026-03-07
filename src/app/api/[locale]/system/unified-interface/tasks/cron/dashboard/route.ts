@@ -11,7 +11,7 @@ import { CronDashboardRepository } from "./repository";
 export const { GET, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.GET]: {
-    handler: ({ data, user, t, logger }) =>
-      CronDashboardRepository.getDashboard(data, user, t, logger),
+    handler: ({ data, user, t, logger, locale }) =>
+      CronDashboardRepository.getDashboard(data, user, t, logger, locale),
   },
 });

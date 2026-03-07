@@ -4,7 +4,7 @@
  */
 
 import { existsSync, promises as fs } from "node:fs";
-import { relative, resolve } from "node:path";
+import { relative, resolve as resolvePath } from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -96,6 +96,13 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         ? (defaults.mcpLimit ?? defaults.limit ?? 100)
         : (defaults.limit ?? 200);
 
+      // Compute active ignore patterns from extensive flag
+      const isExtensive = data.extensive ?? defaults.extensive ?? false;
+      const activeIgnorePatterns =
+        !isExtensive && config.oxlint.enabled
+          ? config.oxlint.nonExtensiveIgnorePatterns
+          : undefined;
+
       const effectiveData = {
         ...data,
         limit: data.limit ?? defaultLimit,
@@ -136,6 +143,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
         effectiveData.fix,
         effectiveData.timeout,
         logger,
+        activeIgnorePatterns,
       );
 
       // Build response with pagination
@@ -192,6 +200,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
     fix: boolean,
     timeout: number,
     logger: EndpointLogger,
+    extraIgnorePatterns?: string[],
   ): Promise<{ issues: OxlintIssue[] }> {
     logger.debug(`[OXLINT] Running on ${paths.length} path(s)`);
 
@@ -200,12 +209,18 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax
       throw new Error("Oxlint config not available");
     }
-    const oxlintConfigPath = resolve(this.config.oxlint.configPath);
+    const oxlintConfigPath = resolvePath(this.config.oxlint.configPath);
 
     // Check if config exists, if not use default settings
     const configExists = existsSync(oxlintConfigPath);
 
+    // Build extra --ignore-pattern flags for non-extensive mode
     /* eslint-disable i18next/no-literal-string */
+    const ignorePatternArgs =
+      extraIgnorePatterns && extraIgnorePatterns.length > 0
+        ? extraIgnorePatterns.flatMap((p) => ["--ignore-pattern", p])
+        : [];
+
     const baseArgs = configExists
       ? [
           "oxlint",
@@ -214,6 +229,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
           oxlintConfigPath,
           "--tsconfig",
           "./tsconfig.json",
+          ...ignorePatternArgs,
           ...paths,
         ]
       : [
@@ -227,6 +243,7 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
           "--nextjs-plugin",
           "-D",
           "all",
+          ...ignorePatternArgs,
           ...paths,
         ];
     /* eslint-enable i18next/no-literal-string */
@@ -564,11 +581,11 @@ export class OxlintRepositoryImpl implements OxlintRepositoryInterface {
       let parsedOutput: OxlintOutput;
       try {
         parsedOutput = JSON.parse(stdout) as OxlintOutput;
-      } catch (parseError) {
+      } catch (parseJsonError) {
         // JSON parse failed - log the error and return empty results
         // eslint-disable-next-line i18next/no-literal-string
         logger.warn(
-          `[OXLINT] Failed to parse JSON output: ${parseError instanceof Error ? parseError.message : String(parseError)} (preview: ${stdout.slice(0, 100)}...)`,
+          `[OXLINT] Failed to parse JSON output: ${parseJsonError instanceof Error ? parseJsonError.message : String(parseJsonError)} (preview: ${stdout.slice(0, 100)}...)`,
         );
         return { issues };
       }

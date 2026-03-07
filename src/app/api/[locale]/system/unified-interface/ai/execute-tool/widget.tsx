@@ -20,15 +20,13 @@ import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 
-import {
-  getEndpoint,
-  getFullPath,
-} from "@/app/api/[locale]/system/generated/endpoint";
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import helpEndpoints from "@/app/api/[locale]/system/help/definition";
 import type { UseEndpointOptions } from "@/app/api/[locale]/system/unified-interface/react/hooks/endpoint-types";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";

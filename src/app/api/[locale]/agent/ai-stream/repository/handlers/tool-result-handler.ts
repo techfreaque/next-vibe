@@ -110,7 +110,6 @@ export class ToolResultHandler {
           toolCallData: {
             toolCall: ToolCall;
             parentId: string | null;
-            depth: number;
           };
         }
       | undefined;
@@ -127,7 +126,6 @@ export class ToolResultHandler {
     t: AiStreamT;
   }): Promise<{
     currentParentId: string | null;
-    currentDepth: number;
   } | null> {
     const {
       part,
@@ -221,7 +219,6 @@ export class ToolResultHandler {
         toolMessageId,
         threadId,
         parentId: toolCallData.parentId,
-        depth: toolCallData.depth,
         userId,
         model,
         character,
@@ -246,7 +243,6 @@ export class ToolResultHandler {
 
     return {
       currentParentId: toolMessageId,
-      currentDepth: toolCallData.depth,
     };
   }
 }

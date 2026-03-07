@@ -23,7 +23,7 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
 
-export const ELECTRON_BUILD_ALIAS = "electron:build" as const;
+import { ELECTRON_BUILD_ALIAS } from "./constants";
 
 const { POST } = createEndpoint({
   scopedTranslation,

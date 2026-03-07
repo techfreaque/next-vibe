@@ -7,26 +7,24 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  ArrowDown,
-  ArrowUp,
-  Bookmark,
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-  Filter,
-  Loader2,
-  Mail,
-  MailOpen,
-  Paperclip,
-  RefreshCw,
-  Search,
-  Square,
-  SquareCheck,
-  Star,
-  Trash2,
-  X,
-} from "next-vibe-ui/ui/icons";
+import { ArrowDown } from "next-vibe-ui/ui/icons/ArrowDown";
+import { ArrowUp } from "next-vibe-ui/ui/icons/ArrowUp";
+import { Bookmark } from "next-vibe-ui/ui/icons/Bookmark";
+import { Calendar } from "next-vibe-ui/ui/icons/Calendar";
+import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { Filter } from "next-vibe-ui/ui/icons/Filter";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Mail } from "next-vibe-ui/ui/icons/Mail";
+import { MailOpen } from "next-vibe-ui/ui/icons/MailOpen";
+import { Paperclip } from "next-vibe-ui/ui/icons/Paperclip";
+import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
+import { Search } from "next-vibe-ui/ui/icons/Search";
+import { Square } from "next-vibe-ui/ui/icons/Square";
+import { SquareCheck } from "next-vibe-ui/ui/icons/SquareCheck";
+import { Star } from "next-vibe-ui/ui/icons/Star";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
+import { X } from "next-vibe-ui/ui/icons/X";
 import { Input } from "next-vibe-ui/ui/input";
 import {
   Select,

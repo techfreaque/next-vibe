@@ -42,6 +42,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["agent", "chat", "folder-contents", "[rootFolderId]"],
+  aliases: ["folder-contents", "get-folder"] as const,
   allowedRoles: [
     UserRole.PUBLIC,
     UserRole.CUSTOMER,

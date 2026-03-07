@@ -90,6 +90,18 @@ export const translations: typeof enTranslations = {
       errors: {
         title: "Błędy budowania",
       },
+      steps: {
+        title: "Kroki budowania",
+      },
+      label: {
+        title: "Krok",
+      },
+      ok: {
+        title: "Sukces",
+      },
+      skipped: {
+        title: "Pominięto",
+      },
     },
     errors: {
       validation: {

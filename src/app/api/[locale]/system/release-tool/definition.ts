@@ -16,6 +16,7 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
+  customWidgetObject,
   scopedObjectFieldNew,
   scopedObjectOptionalField,
   scopedRequestField,
@@ -35,6 +36,7 @@ import {
   scopedResponseArrayOptionalField,
 } from "../unified-interface/shared/field/utils";
 import { scopedTranslation } from "./i18n";
+import { ReleaseResultWidget } from "./widget";
 
 // ============================================================================
 // Shared Enums/Schemas (minimal - used only for select options)
@@ -119,13 +121,9 @@ const { POST } = createEndpoint({
   ] as const,
   aliases: ["release", "pub", "publish"],
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    title: "form.title",
-    description: "form.description",
-    layoutType: LayoutType.GRID,
-    columns: 12,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: ReleaseResultWidget,
+    usage: { request: "data", response: true } as const,
     children: {
       // ========================================================================
       // REQUEST FIELDS - Runtime options at root level for CLI access

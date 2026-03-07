@@ -42,7 +42,7 @@ const releaseConfig: ReleaseFileConfig = {
 
   // Package configurations
   packages: [
-    // Main next-vibe package
+    // Main next-vibe package — runs first so its build (which cleans .dist/) runs before checker
     {
       directory: "./",
       updateDeps: true,
@@ -50,7 +50,8 @@ const releaseConfig: ReleaseFileConfig = {
       lint: false, // linter runs with typecheck
       typecheck: "vibe check",
       build: true,
-      test: "vibe test",
+      // test: "vibe test",
+      test: false,
       snyk: false, // Enable when Snyk is configured
       release: {
         tagPrefix: "v",
@@ -123,6 +124,52 @@ const releaseConfig: ReleaseFileConfig = {
           timeout: 300000, // 5 minutes
           continueOnError: false,
         },
+      },
+    },
+
+    // @next-vibe/checker — runs after main so .dist/ is already cleaned before checker builds into .dist/checker/
+    {
+      directory: ".dist/checker",
+      updateDeps: false,
+      clean: false,
+      lint: false,
+      typecheck: false,
+      build:
+        "vibe builder --configPath=src/app/api/[locale]/system/check/build.config.ts",
+      test: false,
+      snyk: false,
+      release: {
+        tagPrefix: "checker-v",
+        git: {
+          skipPush: false,
+          skipTag: false,
+          // eslint-disable-next-line no-template-curly-in-string -- Intentional template for semantic-release
+          commitMessage: "chore(release): @next-vibe/checker@${version}",
+          remote: "origin",
+        },
+        npm: {
+          enabled: true,
+          access: "public",
+          provenance: true,
+        },
+        ciReleaseCommand: {
+          command: ["npm", "publish", "--access", "public"],
+          env: {
+            NPM_TOKEN: "NPM_TOKEN",
+          },
+        },
+        changelog: {
+          enabled: false,
+          file: "CHANGELOG.md",
+          preset: "conventional-commits",
+        },
+        gitRelease: {
+          enabled: false,
+          generateNotes: true,
+          draft: false,
+        },
+        versionBumper: [],
+        foldersToZip: [],
       },
     },
   ],

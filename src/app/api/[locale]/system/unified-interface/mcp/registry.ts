@@ -17,8 +17,14 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import { DefaultFolderId } from "../../../agent/chat/config";
-import { definitionLoader } from "../shared/endpoints/definition/loader";
-import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
+import {
+  definitionLoader,
+  type IDefinitionLoader,
+} from "../shared/endpoints/definition/loader";
+import {
+  definitionsRegistry,
+  type IDefinitionsRegistry,
+} from "../shared/endpoints/definitions/registry";
 import { permissionsRegistry } from "../shared/endpoints/permissions/registry";
 import { RouteExecutionExecutor } from "../shared/endpoints/route/executor";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
@@ -37,6 +43,16 @@ import { MCPErrorCode } from "./types";
 export class MCPRegistry {
   private initialized = false;
   private lastRefresh = 0;
+  private readonly definitionsReg: IDefinitionsRegistry;
+  private readonly definitionLdr: IDefinitionLoader;
+
+  constructor(
+    definitionsReg: IDefinitionsRegistry = definitionsRegistry,
+    definitionLdr: IDefinitionLoader = definitionLoader,
+  ) {
+    this.definitionsReg = definitionsReg;
+    this.definitionLdr = definitionLdr;
+  }
 
   /**
    * Initialize the registry
@@ -75,15 +91,15 @@ export class MCPRegistry {
   /**
    * Get all tools for a specific user (filtered by permissions)
    */
-  getTools(
+  async getTools(
     user: JwtPayloadType,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): MCPToolMetadata[] {
+  ): Promise<MCPToolMetadata[]> {
     this.ensureInitialized(logger);
 
     // Get full execution-set tools for this user on MCP platform
-    const allMcpTools = definitionsRegistry.getSerializedToolsForUser(
+    const allMcpTools = await this.definitionsReg.getSerializedToolsForUser(
       Platform.MCP,
       user,
       locale,
@@ -116,11 +132,11 @@ export class MCPRegistry {
   /**
    * Get tool metadata by name
    */
-  getToolByName(
+  async getToolByName(
     name: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
-  ): MCPToolMetadata | null {
+  ): Promise<MCPToolMetadata | null> {
     this.ensureInitialized(logger);
 
     // Get all tools (this will be filtered by user in getTools, but here we need unfiltered)
@@ -131,7 +147,7 @@ export class MCPRegistry {
       roles: [UserPermissionRole.PUBLIC],
     };
 
-    const tools = this.getTools(publicUser, logger, locale);
+    const tools = await this.getTools(publicUser, logger, locale);
 
     // Try direct name match first
     const tool = tools.find((t) => t.name === name);
@@ -140,7 +156,7 @@ export class MCPRegistry {
     }
 
     // Try aliases
-    return tools.find((t) => t.aliases?.includes(name)) || null;
+    return tools.find((t) => t.aliases?.includes(name)) ?? null;
   }
 
   /**
@@ -154,11 +170,18 @@ export class MCPRegistry {
 
     const { t } = mcpScopedTranslation.scopedT(context.locale);
 
-    // Get tool metadata (this checks if tool exists and user has permission)
-    const userTools = this.getTools(context.user, logger, context.locale);
-    const toolMeta = userTools.find(
-      (t) =>
-        t.name === context.toolName || t.aliases?.includes(context.toolName),
+    // Check tool exists and user has MCP execution access (opt-out, not opt-in MCP_VISIBLE)
+    // Discovery (tools/list) uses MCP_VISIBLE opt-in, but execution uses opt-out semantics.
+    const allMcpTools = await this.definitionsReg.getSerializedToolsForUser(
+      Platform.MCP,
+      context.user,
+      context.locale,
+    );
+    const toolMeta = allMcpTools.find(
+      (tool) =>
+        tool.name === context.toolName ||
+        tool.toolName === context.toolName ||
+        tool.aliases?.includes(context.toolName),
     );
 
     if (!toolMeta) {
@@ -207,7 +230,7 @@ export class MCPRegistry {
       // Only load if we have data to render
       let endpoint: CreateApiEndpointAny | null = null;
       if (result.success && result.data) {
-        const endpointResult = await definitionLoader.load({
+        const endpointResult = await this.definitionLdr.load({
           identifier: context.toolName,
           platform: Platform.MCP,
           user: context.user,

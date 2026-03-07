@@ -24,10 +24,9 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { CRON_STATS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { CronStatsContainer } from "./widget";
-
-export const CRON_STATS_ALIAS = "cron-stats" as const;
 
 // Stats period enum
 const statsPeriodSchema = z.enum(["hour", "day", "week", "month"]);

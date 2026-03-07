@@ -1,6 +1,6 @@
-import { FETCH_URL_SHORT_ALIAS } from "@/app/api/[locale]/agent/fetch-url-content/definition";
-import { BRAVE_SEARCH_ALIAS } from "@/app/api/[locale]/agent/search/brave/definition";
-import { KAGI_ALIAS } from "@/app/api/[locale]/agent/search/kagi/definition";
+import { FETCH_URL_SHORT_ALIAS } from "@/app/api/[locale]/agent/fetch-url-content/constants";
+import { BRAVE_SEARCH_ALIAS } from "@/app/api/[locale]/agent/search/brave/constants";
+import { KAGI_ALIAS } from "@/app/api/[locale]/agent/search/kagi/constants";
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
@@ -8,9 +8,9 @@ import { TtsVoice } from "../../../text-to-speech/enum";
 import {
   MEMORY_DELETE_ALIAS,
   MEMORY_UPDATE_ALIAS,
-} from "../../memories/[id]/definition";
-import { MEMORY_ADD_ALIAS } from "../../memories/create/definition";
-import { MEMORY_LIST_ALIAS } from "../../memories/definition";
+} from "../../memories/[id]/constants";
+import { MEMORY_LIST_ALIAS } from "../../memories/constants";
+import { MEMORY_ADD_ALIAS } from "../../memories/create/constants";
 import type { Character } from "../config";
 import { tool } from "../config";
 import { CharacterCategory, CharacterOwnershipType } from "../enum";

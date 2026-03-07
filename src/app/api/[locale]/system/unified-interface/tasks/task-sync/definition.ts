@@ -1,7 +1,7 @@
 /**
  * Task Sync API Definition
  * POST endpoint for syncing tasks between remote and local Thea instances.
- * Accepts PUBLIC role (passes middleware), validates API key in handler.
+ * Hash-first protocol: local sends hashes → remote diffs → returns only changes.
  */
 
 import { z } from "zod";
@@ -20,7 +20,6 @@ import {
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { envClient } from "@/config/env-client";
 
 import { scopedTranslation } from "../i18n";
 
@@ -33,9 +32,8 @@ const { POST } = createEndpoint({
   icon: "refresh-cw",
   category: "app.endpointCategories.system",
   tags: ["tags.tasks" as const],
-  allowedRoles: envClient.VIBE_IS_CLOUD
-    ? ([UserRole.ADMIN] as const)
-    : ([] as const),
+  aliases: ["sync", "task-sync"] as const,
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,
@@ -43,51 +41,75 @@ const { POST } = createEndpoint({
     columns: 12,
     usage: { request: "data", response: true },
     children: {
-      // Request
-      completionsJson: scopedRequestField(scopedTranslation, {
+      // ── Request: hashes local sends so remote can diff ──────────────────
+      instanceId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXTAREA,
+        fieldType: FieldDataType.TEXT,
         columns: 12,
+        // The local instance's instanceId — used to look up the connection record on cloud
         schema: z.string().optional(),
       }),
-      memoriesJson: scopedRequestField(scopedTranslation, {
+      memoriesHash: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXTAREA,
+        fieldType: FieldDataType.TEXT,
         columns: 12,
+        // SHA256 of sorted "syncId:updatedAt" pairs for local shared memories
+        schema: z.string().optional(),
+      }),
+      capabilitiesVersion: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        columns: 12,
+        // Build version string (git SHA or package version) — changes only on deploy
         schema: z.string().optional(),
       }),
       capabilitiesJson: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         columns: 12,
-        schema: z.string().optional(),
+        // Full capability snapshot — only sent when capabilitiesVersion changed
+        schema: z.union([z.string(), z.array(z.any())]).optional(),
       }),
-      capabilitiesHash: scopedRequestField(scopedTranslation, {
+      taskCursor: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 12,
-        schema: z.string().optional(),
+        // ISO timestamp — return REMOTE_TOOL_CALL tasks created after this
+        schema: z.string().datetime().optional(),
       }),
 
-      // Response
-      tasksJson: scopedResponseField(scopedTranslation, {
+      // ── Response: remote returns only what local is missing ─────────────
+      remoteMemoriesHash: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        // Remote's current hash — local stores for next diff
+        schema: z.string(),
+      }),
+      memories: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        // Full memory records as JSON string — null if hashes matched
+        schema: z.string().nullable(),
+      }),
+      remoteCapabilitiesVersion: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.string(),
       }),
-      synced: scopedResponseField(scopedTranslation, {
+      capabilities: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        schema: z.number(),
+        // Full capability snapshot as JSON string — null if versions matched
+        schema: z.string().nullable(),
       }),
-      completionsProcessed: scopedResponseField(scopedTranslation, {
+      tasks: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
-        schema: z.number(),
+        // REMOTE_TOOL_CALL tasks newer than taskCursor, as JSON string
+        schema: z.string(),
       }),
       memoriesSynced: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         schema: z.number(),
       }),
-      sharedMemoriesJson: scopedResponseField(scopedTranslation, {
+      serverTime: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
+        // Remote server's DB time at sync — use as cursor to avoid JS/container timezone skew
         schema: z.string(),
       }),
     },
@@ -140,16 +162,21 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        capabilitiesHash: "abc123",
+        instanceId: "hermes",
+        memoriesHash: "sha256:abc123",
+        capabilitiesVersion: "519b91e8edbf",
+        taskCursor: "2026-01-01T00:00:00.000Z",
       },
     },
     responses: {
       default: {
-        tasksJson: "[]",
-        synced: 0,
-        completionsProcessed: 0,
+        remoteMemoriesHash: "sha256:xyz789",
+        memories: null,
+        remoteCapabilitiesVersion: "519b91e8edbf",
+        capabilities: null,
+        tasks: "[]",
         memoriesSynced: 0,
-        sharedMemoriesJson: "[]",
+        serverTime: "2026-01-01T00:00:00.000Z",
       },
     },
   },

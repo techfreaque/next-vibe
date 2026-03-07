@@ -13,6 +13,7 @@ import { Coins } from "next-vibe-ui/ui/icons/Coins";
 import { Handshake } from "next-vibe-ui/ui/icons/Handshake";
 import { HelpCircle } from "next-vibe-ui/ui/icons/HelpCircle";
 import { Info } from "next-vibe-ui/ui/icons/Info";
+import { Settings } from "next-vibe-ui/ui/icons/Settings";
 import { ShoppingCart } from "next-vibe-ui/ui/icons/ShoppingCart";
 import { User } from "next-vibe-ui/ui/icons/User";
 import { Link } from "next-vibe-ui/ui/link";
@@ -24,6 +25,7 @@ import { scopedTranslation } from "@/app/api/[locale]/agent/chat/threads/widget/
 import { useCredits } from "@/app/api/[locale]/credits/hooks";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -112,7 +114,10 @@ export function SidebarFooter({
         </CollapsibleTrigger>
 
         {/* Expandable Content with smooth animation */}
-        <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+        <CollapsibleContent
+          className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+          suppressHydrationWarning
+        >
           <Div className="px-2 py-2 flex flex-col gap-2 bg-muted/20 border-t border-border/50">
             {/* Account Section */}
             <Div className="flex flex-col gap-0.5">
@@ -133,20 +138,18 @@ export function SidebarFooter({
               )}
 
               {/* Subscription (hidden in local mode: payment disabled) */}
-              {!envClient.NEXT_PUBLIC_LOCAL_MODE && (
-                <Link href={`/${locale}/subscription`}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-full justify-start"
-                    aria-label="Manage subscription"
-                    data-tour={TOUR_DATA_ATTRS.SUBSCRIPTION_BUTTON}
-                  >
-                    <ShoppingCart className="h-3.5 w-3.5 mr-2" />
-                    {t("components.navigation.subscription")}
-                  </Button>
-                </Link>
-              )}
+              <Link href={`/${locale}/subscription`}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-full justify-start"
+                  aria-label="Manage subscription"
+                  data-tour={TOUR_DATA_ATTRS.SUBSCRIPTION_BUTTON}
+                >
+                  <ShoppingCart className="h-3.5 w-3.5 mr-2" />
+                  {t("components.navigation.subscription")}
+                </Button>
+              </Link>
 
               {/* Referral (hidden in local mode) */}
               {!envClient.NEXT_PUBLIC_LOCAL_MODE && (
@@ -159,6 +162,21 @@ export function SidebarFooter({
                   >
                     <Handshake className="h-3.5 w-3.5 mr-2" />
                     {t("components.navigation.referral")}
+                  </Button>
+                </Link>
+              )}
+
+              {/* Admin Dashboard */}
+              {isLoggedIn && user.roles?.includes(UserRole.ADMIN) && (
+                <Link href={`/${locale}/admin`}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start"
+                    aria-label="Admin dashboard"
+                  >
+                    <Settings className="h-3.5 w-3.5 mr-2" />
+                    {t("components.navigation.admin")}
                   </Button>
                 </Link>
               )}

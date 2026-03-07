@@ -167,7 +167,7 @@ export const translations: typeof enTranslations = {
         architecture: {
           label: "Architektura",
           them: "Skrypty shell + pliki SKILL.md w języku naturalnym. 800+ niezweryfikowanych umiejętności na ClawHub.",
-          us: "Typowane definicje endpointów kompilowane do 5 interfejsów. {{skillCount}}+ wyselekcjonowanych, walidowanych umiejętności.",
+          us: "Typowane definicje endpointów kompilowane do 10 interfejsów. {{skillCount}}+ wyselekcjonowanych, walidowanych umiejętności.",
           whyItMatters:
             "Brak ataków na łańcuch dostaw przez marketplace umiejętności. Brak audytów 512 podatności.",
         },

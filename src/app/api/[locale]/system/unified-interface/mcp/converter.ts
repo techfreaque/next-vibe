@@ -9,7 +9,7 @@ import {
 import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { endpointToToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
+import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import {
   hasChild,
   hasChildren,
@@ -274,11 +274,7 @@ export function endpointToMCPTool(
   endpoint: CreateApiEndpointAny,
   locale: CountryLanguage,
 ): MCPTool {
-  // Use first alias if available, otherwise fall back to full tool name using shared utility
-  const toolName =
-    endpoint.aliases && endpoint.aliases.length > 0
-      ? endpoint.aliases[0]
-      : endpointToToolName(endpoint);
+  const toolName = getPreferredToolName(endpoint);
 
   // Translate description - use description or title
   const { t } = endpoint.scopedTranslation.scopedT(locale);

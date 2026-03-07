@@ -21,9 +21,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { PULSE_EXECUTE_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-
-export const PULSE_EXECUTE_ALIAS = "pulse-execute" as const;
 
 /**
  * Pulse Execute Endpoint (POST)
@@ -197,14 +196,14 @@ const { POST } = createEndpoint({
       empty: {
         success: true,
         message: "Pulse cycle executed successfully",
-        executedAt: new Date().toISOString(),
+        executedAt: "2024-01-15T10:00:00.000Z",
         tasksExecuted: 0,
         results: [],
       },
       basic: {
         success: true,
         message: "Dry run completed successfully",
-        executedAt: new Date().toISOString(),
+        executedAt: "2024-01-15T10:00:00.000Z",
         tasksExecuted: 2,
         results: [
           {
@@ -223,7 +222,7 @@ const { POST } = createEndpoint({
       advanced: {
         success: true,
         message: "Forced pulse execution completed",
-        executedAt: new Date().toISOString(),
+        executedAt: "2024-01-15T10:00:00.000Z",
         tasksExecuted: 2,
         results: [
           {

@@ -79,6 +79,7 @@ export class VibeCheckRepository {
     config: CheckConfig,
     logger: EndpointLogger,
     platform: Platform,
+    extensive: boolean,
   ): Promise<CheckResult> {
     const startTime = Date.now();
     const result = await oxlintRepository.execute(
@@ -90,6 +91,7 @@ export class VibeCheckRepository {
         limit: 999999,
         page: 1,
         summaryOnly: false,
+        extensive,
       },
       logger,
       platform,
@@ -112,6 +114,7 @@ export class VibeCheckRepository {
     config: CheckConfig,
     logger: EndpointLogger,
     platform: Platform,
+    extensive: boolean,
   ): Promise<CheckResult> {
     const startTime = Date.now();
     const result = await lintRepository.execute(
@@ -124,6 +127,7 @@ export class VibeCheckRepository {
         limit: 999999,
         page: 1,
         summaryOnly: false,
+        extensive,
       },
       logger,
       platform,
@@ -146,6 +150,7 @@ export class VibeCheckRepository {
     logger: EndpointLogger,
     platform: Platform,
     locale: CountryLanguage,
+    extensive: boolean,
   ): Promise<CheckResult> {
     const startTime = Date.now();
     const { t: typecheckT } = typecheckScopedTranslation.scopedT(locale);
@@ -158,6 +163,7 @@ export class VibeCheckRepository {
         limit: 999999,
         page: 1,
         summaryOnly: false,
+        extensive,
       },
       logger,
       platform,
@@ -276,6 +282,9 @@ export class VibeCheckRepository {
         page: data.page ?? 1,
       };
 
+      // Resolve the effective extensive flag (request overrides config default)
+      const isExtensive = data.extensive ?? defaults.extensive ?? false;
+
       const pathsToCheck = this.normalizePaths(effectiveData.paths);
       const baseDir = env.PROJECT_ROOT || "./";
       const performanceTimings: Partial<Record<TranslationKey, number>> = {};
@@ -301,6 +310,7 @@ export class VibeCheckRepository {
             configResult.config,
             logger,
             platform,
+            isExtensive,
           ).then((result) => {
             if (firstCheckStart === 0) {
               firstCheckStart = Date.now();
@@ -330,6 +340,7 @@ export class VibeCheckRepository {
             configResult.config,
             logger,
             platform,
+            isExtensive,
           ).then((result) => {
             if (firstCheckStart === 0) {
               firstCheckStart = Date.now();
@@ -361,6 +372,7 @@ export class VibeCheckRepository {
             logger,
             platform,
             locale,
+            isExtensive,
           ).then((result) => {
             if (firstCheckStart === 0) {
               firstCheckStart = Date.now();

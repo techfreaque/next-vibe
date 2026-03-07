@@ -259,10 +259,14 @@ export class QualityRunner implements IQualityRunner {
     logger.vibe(formatProgress("Running build..."));
 
     try {
+      // Custom build commands (e.g. "vibe builder --configPath=...") are
+      // designed to be run from the project root, not the package directory.
+      // Only the default package-manager build script uses the package cwd.
       const command = customCommand ?? `${packageManager} run build`;
+      const buildCwd = customCommand !== undefined ? process.cwd() : cwd;
       execSync(command, {
         stdio: "inherit",
-        cwd,
+        cwd: buildCwd,
       });
       logger.vibe(formatSuccess("Build passed"));
       return success();

@@ -30,6 +30,10 @@ import {
   wrapErrorResponse,
   wrapSuccessResponse,
 } from "@/app/api/[locale]/system/unified-interface/next-api/response";
+import {
+  CSRF_TOKEN_COOKIE_NAME,
+  CSRF_TOKEN_HEADER_NAME,
+} from "@/config/constants";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import {
@@ -40,6 +44,39 @@ import { createEndpointLogger } from "../shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Methods } from "../shared/types/enums";
 import { Platform } from "../shared/types/platform";
+
+const MUTATING_METHODS = new Set([
+  Methods.POST,
+  Methods.PUT,
+  Methods.DELETE,
+  Methods.PATCH,
+]);
+
+/**
+ * Validate CSRF double-submit cookie for browser-originated mutating requests.
+ *
+ * Rules (fail-open for non-browser contexts):
+ * - Skip if method is GET/HEAD/OPTIONS
+ * - Skip if no csrf_token cookie present (server-to-server, CLI, native — no cookie)
+ * - Skip if Authorization header present (bearer-token auth — not cookie-based)
+ * - Reject if csrf_token cookie present but X-CSRF-Token header is missing or mismatched
+ */
+function validateCsrf(request: NextRequest, method: Methods): boolean {
+  if (!MUTATING_METHODS.has(method)) {
+    return true;
+  }
+  // Bearer-token auth (React Native, server-to-server) — not vulnerable to CSRF
+  if (request.headers.get("authorization")) {
+    return true;
+  }
+  const cookieToken = request.cookies.get(CSRF_TOKEN_COOKIE_NAME)?.value;
+  if (!cookieToken) {
+    // No CSRF cookie — must be a non-browser client (CLI, MCP, server). Allow.
+    return true;
+  }
+  const headerToken = request.headers.get(CSRF_TOKEN_HEADER_NAME);
+  return !!headerToken && headerToken === cookieToken;
+}
 
 /**
  * API handler return type
@@ -99,6 +136,19 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
     const logger = createEndpointLogger(false, Date.now(), locale);
 
     try {
+      // CSRF double-submit validation for mutating browser requests
+      if (!validateCsrf(request, endpoint.method as Methods)) {
+        const { t: sharedT } = sharedScopedTranslation.scopedT(locale);
+        return wrapErrorResponse(
+          fail({
+            message: sharedT("errorTypes.forbidden"),
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          }),
+          locale,
+          logger,
+        );
+      }
+
       // Extract raw request data WITHOUT validation
       // genericHandler will handle all validation
       const requestData =

@@ -69,6 +69,7 @@ export const translations: typeof enTranslations = {
       referral: "Empfehlungsprogramm",
       help: "Hilfe",
       about: "Über uns",
+      admin: "Admin-Dashboard",
     },
     confirmations: {
       deleteMessage: "Möchten Sie diese Nachricht wirklich löschen?",
@@ -106,7 +107,7 @@ export const translations: typeof enTranslations = {
           "Organisieren Sie Ihre Chats in verschiedenen Ordnern, jeder mit einzigartigen Datenschutzeinstellungen:",
         private: {
           name: "Privat",
-          suffix: "— verschlüsselt, nur Sie können es sehen",
+          suffix: "— nur Sie können es sehen",
         },
         incognito: {
           name: "Inkognito",
@@ -125,13 +126,13 @@ export const translations: typeof enTranslations = {
         name: "Privat",
         suffix: "Ordner",
         description:
-          "Ihre privaten Chats sind verschlüsselt und nur für Sie sichtbar. Perfekt für sensible Themen.",
+          "Ihre privaten Chats sind nur für Sie sichtbar. Perfekt für sensible Themen.",
       },
       incognitoFolder: {
         name: "Inkognito",
         suffix: "Ordner",
         description:
-          "Chatten Sie ohne Verlaufsspeicherung. Wenn Sie die Sitzung schließen, sind alle Nachrichten weg.",
+          "Chatten Sie ohne Speicherung auf dem Server. Nachrichten werden lokal in Ihrem Browser gespeichert und bleiben erhalten, bis Sie sie löschen.",
         note: "Während Inkognito-Sitzungen werden keine Daten auf unseren Servern gespeichert.",
       },
       sharedFolder: {
@@ -151,20 +152,17 @@ export const translations: typeof enTranslations = {
         title: "Einen neuen Chat starten",
         description:
           "Klicken Sie hier, um ein neues Gespräch in einem beliebigen Ordner zu starten.",
-        tip: "Sie können auch den Tastaturkürzel Strg+K verwenden, um schnell einen neuen Chat zu starten.",
       },
       sidebarLogin: {
         title: "Anmelden, um mehr freizuschalten",
         description:
-          "Erstellen Sie ein kostenloses Konto, um auf private und geteilte Ordner zuzugreifen, geräteübergreifend zu synchronisieren und Ihren Gesprächsverlauf zu speichern.",
-        tip: "Die Registrierung ist kostenlos! Sie erhalten 100 kostenlose Credits zum Starten.",
+          "Erstellen Sie ein kostenloses Konto, um auf private und geteilte Ordner zuzugreifen, geräteübergreifend zu synchronisieren und die KI Dinge über Sie merken zu lassen.",
+        tip: "Die Registrierung ist kostenlos!",
       },
       subscriptionButton: {
         title: "Credits & Abonnement",
         description:
-          "Erhalten Sie {{credits}} Credits/Monat mit einem Pro-Abonnement für nur {{price}}.",
-        price: "9,99 €",
-        tip: "Credits werden für KI-Modellinteraktionen verwendet. Kostenlose Benutzer erhalten begrenzte monatliche Credits.",
+          "Erhalten Sie {{credits}} Credits/Monat mit einem Abonnement für nur {{price}}/Monat. Kostenlose Nutzer erhalten {{freeCredits}} Credits/Monat.",
       },
       chatInput: {
         title: "Ihre Nachricht eingeben",
@@ -197,7 +195,7 @@ export const translations: typeof enTranslations = {
       authUnlocked: {
         unlocked: "Freigeschaltet!",
         privateDescription:
-          "Ihr privater Ordner ist jetzt verfügbar. Alle Chats hier sind verschlüsselt und nur für Sie sichtbar.",
+          "Ihr privater Ordner ist jetzt verfügbar. Alle Chats hier sind nur für Sie sichtbar.",
         privateNote:
           "Private Chats werden automatisch auf allen Ihren Geräten synchronisiert.",
         sharedDescription:

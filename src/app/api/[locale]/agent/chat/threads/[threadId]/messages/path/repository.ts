@@ -1,12 +1,20 @@
 /**
  * Conversation Path Repository
- * Retrieves messages following a specific conversation path with branch metadata
- * Supports compaction-aware pagination via `before` cursor
+ * Retrieves all messages in the current chunk (from compaction boundary to all leaves).
+ *
+ * Two-query approach for type safety:
+ * 1. Recursive CTE walks UP the parentId chain from the leaf to the compaction boundary,
+ *    returning only the minimal ancestor metadata (id, parentId, isCompacting).
+ * 2. A recursive CTE walks DOWN from the oldest ancestor to fetch ALL descendants
+ *    (all branch paths within the chunk), returned via a typed Drizzle query.
+ *
+ * The client receives the full chunk and derives branchIndices locally from the
+ * leafMessageId URL param — no round-trips for branch switching.
  */
 
 import "server-only";
 
-import { eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -14,6 +22,7 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
+import type { QueryResult, QueryResultRow } from "pg";
 
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -31,170 +40,189 @@ import type { scopedTranslation } from "./i18n";
 
 type PathT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
-/**
- * Find the compaction boundary on the path — the last compacting message.
- * Returns the index to slice from and whether there's older history.
- * If `beforeId` is provided, finds the chunk before that message.
- */
-function findCompactionBoundary(
-  pathIds: string[],
-  compactingIds: Set<string>,
-  beforeId?: string,
-): { loadFromIndex: number; loadToIndex: number; hasOlderHistory: boolean } {
-  if (beforeId) {
-    const beforeIndex = pathIds.indexOf(beforeId);
-    if (beforeIndex <= 0) {
-      return { loadFromIndex: 0, loadToIndex: 0, hasOlderHistory: false };
-    }
-
-    for (let i = beforeIndex - 1; i >= 0; i--) {
-      if (compactingIds.has(pathIds[i])) {
-        return {
-          loadFromIndex: i,
-          loadToIndex: beforeIndex,
-          hasOlderHistory: i > 0,
-        };
-      }
-    }
-
-    return {
-      loadFromIndex: 0,
-      loadToIndex: beforeIndex,
-      hasOlderHistory: false,
-    };
-  }
-
-  for (let i = pathIds.length - 1; i >= 0; i--) {
-    if (compactingIds.has(pathIds[i])) {
-      return {
-        loadFromIndex: i,
-        loadToIndex: pathIds.length,
-        hasOlderHistory: i > 0,
-      };
-    }
-  }
-
-  return {
-    loadFromIndex: 0,
-    loadToIndex: pathIds.length,
-    hasOlderHistory: false,
-  };
+interface AncestorRow extends QueryResultRow {
+  id: string;
+  parentId: string | null;
+  isCompacting: boolean;
 }
 
 /**
- * Traverse tree data to find the active branch path IDs
- * Mirror of client-side buildMessagePath logic
+ * Walk UP the parentId chain from startId, stopping at (and including)
+ * the first compacting message or a root message.
+ *
+ * Returns the ancestor chain ordered oldest→newest (ASC by created_at).
  */
-function traverseForPathIds(
-  treeData: Array<{ id: string; parentId: string | null; createdAt: Date }>,
-  branchIndices: Record<string, number>,
-): string[] {
-  const rootMessages = treeData
-    .filter((row) => !row.parentId)
-    .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+async function fetchAncestorChain(
+  startId: string,
+  threadId: string,
+): Promise<AncestorRow[]> {
+  // Raw SQL is required for WITH RECURSIVE — Drizzle doesn't support recursive CTEs.
+  // db.execute<T>() returns QueryResult<T> (from pg), so .rows is T[] — fully typed.
+  const result: QueryResult<AncestorRow> = await db.execute<AncestorRow>(sql`
+    WITH RECURSIVE ancestor_chain AS (
+      SELECT
+        id,
+        parent_id AS "parentId",
+        COALESCE((metadata->>'isCompacting')::boolean, false) AS "isCompacting",
+        0 AS depth
+      FROM chat_messages
+      WHERE id = ${startId}
+        AND thread_id = ${threadId}
 
-  if (rootMessages.length === 0) {
-    return [];
+      UNION ALL
+
+      SELECT
+        m.id,
+        m.parent_id AS "parentId",
+        COALESCE((m.metadata->>'isCompacting')::boolean, false) AS "isCompacting",
+        ac.depth + 1
+      FROM chat_messages m
+      INNER JOIN ancestor_chain ac ON m.id = ac."parentId"
+      WHERE NOT ac."isCompacting"
+    )
+    SELECT id, "parentId", "isCompacting"
+    FROM ancestor_chain
+    ORDER BY depth DESC
+  `);
+
+  return result.rows.map((r) => ({
+    id: r.id,
+    parentId: r.parentId ?? null,
+    isCompacting: Boolean(r.isCompacting),
+  }));
+}
+
+/**
+ * Collect all descendant IDs starting from the given root IDs, stopping BEFORE
+ * any compacting messages. Compacting messages mark the START of the next chunk —
+ * they are NOT included in the current chunk (the client loads them as the top of
+ * the next chunk when "Show newer messages" is clicked).
+ *
+ * Returns:
+ *   - ids: all message IDs in this chunk (roots + descendants, excluding next compaction)
+ *   - newerChunkAnchorId: ID of the first compacting message found below, or null
+ */
+interface DescendantRow extends QueryResultRow {
+  id: string;
+}
+
+interface NewerChunkRow extends QueryResultRow {
+  id: string;
+  parentId: string;
+}
+
+async function fetchAllDescendantIds(
+  rootIds: string[],
+  threadId: string,
+): Promise<{ ids: string[] }> {
+  if (rootIds.length === 0) {
+    return { ids: [] };
+  }
+  const rootIdsLiteral = rootIds.map((id) => sql`${id}`);
+  const rootIdsArray = sql.join(rootIdsLiteral, sql`, `);
+
+  // Walk DOWN from chunk roots, stopping BEFORE the next compacting boundary.
+  // The seed row may itself be a compacting boundary (chunk header) — it is seeded
+  // unconditionally so its children are walked, but filtered out of the final SELECT
+  // (the caller adds it explicitly via allIds.add(oldestAncestor.id)).
+  // Expansion stops when a CHILD is compacting (next chunk boundary).
+  const descendantsResult: QueryResult<DescendantRow> =
+    await db.execute<DescendantRow>(sql`
+    WITH RECURSIVE descendants AS (
+      -- Seed: include chunk roots unconditionally (even if compacting boundary).
+      SELECT id, parent_id, COALESCE((metadata->>'isCompacting')::boolean, false) AS is_compacting
+      FROM chat_messages
+      WHERE id = ANY(ARRAY[${rootIdsArray}]::uuid[])
+        AND thread_id = ${threadId}
+
+      UNION ALL
+
+      -- Recursive step: expand children that are NOT themselves a next compaction boundary.
+      -- Stop when the CHILD is compacting (that's the start of the next chunk, not this one).
+      SELECT m.id, m.parent_id, COALESCE((m.metadata->>'isCompacting')::boolean, false)
+      FROM chat_messages m
+      INNER JOIN descendants d ON m.parent_id = d.id
+      WHERE m.thread_id = ${threadId}
+        AND NOT COALESCE((m.metadata->>'isCompacting')::boolean, false)
+    )
+    -- Exclude compacting rows from the result; caller adds the chunk-header explicitly.
+    SELECT id FROM descendants
+    WHERE NOT is_compacting
+  `);
+
+  const ids = descendantsResult.rows.map((r) => r.id);
+
+  return { ids };
+}
+
+/**
+ * Given the ancestor chain, fetch ALL messages in the chunk:
+ * - The ancestors themselves (active path)
+ * - ALL siblings of the oldest ancestor
+ * - ALL descendants of all siblings, stopping at (and including) the next compacting message
+ *
+ * This returns the complete chunk so branch switching is purely local (no server fetch).
+ * Returns messages + whether any compacting boundary was found at the bottom.
+ */
+async function fetchChunkMessages(
+  ancestorChain: AncestorRow[],
+  threadId: string,
+): Promise<{
+  messages: (typeof chatMessages.$inferSelect)[];
+}> {
+  if (ancestorChain.length === 0) {
+    return { messages: [] };
   }
 
-  const childrenMap = new Map<string, Array<{ id: string; createdAt: Date }>>();
-  for (const row of treeData) {
-    if (row.parentId) {
-      const children = childrenMap.get(row.parentId) ?? [];
-      children.push({ id: row.id, createdAt: row.createdAt });
-      childrenMap.set(row.parentId, children);
-    }
+  const oldestAncestor = ancestorChain[0]!;
+
+  // Find all siblings of the oldest ancestor (same parentId).
+  // These are the roots of all branch paths in this chunk.
+  const siblingCondition =
+    oldestAncestor.parentId !== null
+      ? eq(chatMessages.parentId, oldestAncestor.parentId)
+      : isNull(chatMessages.parentId);
+
+  const chunkRoots = await db
+    .select({ id: chatMessages.id })
+    .from(chatMessages)
+    .where(and(eq(chatMessages.threadId, threadId), siblingCondition));
+
+  const chunkRootIds = chunkRoots.map((r) => r.id);
+
+  // Fetch ALL descendants of all chunk roots, stopping BEFORE the next compaction boundary.
+  // Note: fetchAllDescendantIds excludes isCompacting messages from the walk itself,
+  // so the compaction boundary (oldestAncestor) is not returned by the CTE.
+  // We always include the oldest ancestor explicitly so it appears as the chunk header.
+  const { ids: allDescendantIds } = await fetchAllDescendantIds(
+    chunkRootIds,
+    threadId,
+  );
+
+  // Combine: oldest ancestor (always) + all descendants.
+  // The oldest ancestor may be a compaction boundary excluded by fetchAllDescendantIds —
+  // explicitly adding it ensures the chunk header is always present.
+  // NOTE: do NOT add oldestAncestor.parentId — the parent belongs to the older chunk,
+  // not the current one.
+  const allIds = new Set<string>(allDescendantIds);
+  allIds.add(oldestAncestor.id);
+
+  if (allIds.size === 0) {
+    return { messages: [] };
   }
-  for (const [parentId, children] of childrenMap.entries()) {
-    childrenMap.set(
-      parentId,
-      children.toSorted(
-        (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+
+  const rows = await db
+    .select()
+    .from(chatMessages)
+    .where(
+      and(
+        eq(chatMessages.threadId, threadId),
+        inArray(chatMessages.id, [...allIds]),
       ),
-    );
-  }
+    )
+    .orderBy(chatMessages.createdAt);
 
-  let currentId: string | undefined;
-  if (rootMessages.length > 1) {
-    const rootIndex = Math.min(
-      Math.max(0, branchIndices["__root__"] ?? 0),
-      rootMessages.length - 1,
-    );
-    currentId = rootMessages[rootIndex].id;
-  } else {
-    currentId = rootMessages[0].id;
-  }
-
-  const pathIds: string[] = [];
-  while (currentId) {
-    pathIds.push(currentId);
-    const children = childrenMap.get(currentId);
-    if (!children || children.length === 0) {
-      break;
-    }
-    if (children.length > 1) {
-      const branchIndex = Math.min(
-        Math.max(0, branchIndices[currentId] ?? 0),
-        children.length - 1,
-      );
-      currentId = children[branchIndex].id;
-    } else {
-      currentId = children[0].id;
-    }
-  }
-
-  return pathIds;
-}
-
-/**
- * Build branch metadata for fork points along the path
- */
-function buildBranchMeta(
-  treeData: Array<{ id: string; parentId: string | null; createdAt: Date }>,
-  pathIdSet: Set<string>,
-  branchIndices: Record<string, number>,
-): Array<{ parentId: string; siblingCount: number; currentIndex: number }> {
-  const childrenMap = new Map<string, string[]>();
-  const rootIds: string[] = [];
-
-  for (const row of treeData) {
-    if (row.parentId) {
-      const children = childrenMap.get(row.parentId) ?? [];
-      children.push(row.id);
-      childrenMap.set(row.parentId, children);
-    } else {
-      rootIds.push(row.id);
-    }
-  }
-
-  const result: Array<{
-    parentId: string;
-    siblingCount: number;
-    currentIndex: number;
-  }> = [];
-
-  if (rootIds.length > 1) {
-    const rawIndex = branchIndices["__root__"] ?? 0;
-    result.push({
-      parentId: "__root__",
-      siblingCount: rootIds.length,
-      currentIndex: Math.min(Math.max(0, rawIndex), rootIds.length - 1),
-    });
-  }
-
-  for (const id of pathIdSet) {
-    const children = childrenMap.get(id);
-    if (children && children.length > 1) {
-      const rawIndex = branchIndices[id] ?? 0;
-      result.push({
-        parentId: id,
-        siblingCount: children.length,
-        currentIndex: Math.min(Math.max(0, rawIndex), children.length - 1),
-      });
-    }
-  }
-
-  return result;
+  return { messages: rows };
 }
 
 /**
@@ -202,8 +230,9 @@ function buildBranchMeta(
  */
 export const pathRepository = {
   /**
-   * Get the active branch path messages with branch metadata
-   * Optimized: fetches lightweight tree structure first, then only path messages
+   * Get all messages in the current chunk.
+   * Returns all messages from the compaction boundary, including ALL branch paths
+   * within that chunk so the client can navigate branches locally without refetching.
    */
   async getPath(
     urlPathParams: PathGetUrlVariablesOutput,
@@ -214,9 +243,10 @@ export const pathRepository = {
     locale: CountryLanguage,
   ): Promise<ResponseType<PathGetResponseOutput>> {
     try {
-      logger.debug("Listing branch path messages", {
+      logger.debug("Getting chunk messages", {
         threadId: urlPathParams.threadId,
         userId: user.id,
+        leafMessageId: data.leafMessageId,
         before: data.before,
       });
 
@@ -258,101 +288,186 @@ export const pathRepository = {
         });
       }
 
-      const branchIndices = data.branchIndices ?? {};
+      // Determine the start ID for upward traversal
+      let startId: string | null = null;
 
-      // Step 1: Fetch lightweight tree structure with isCompacting flag
-      const treeData = await db
-        .select({
-          id: chatMessages.id,
-          parentId: chatMessages.parentId,
-          createdAt: chatMessages.createdAt,
-          isCompacting:
-            sql<boolean>`COALESCE((${chatMessages.metadata}->>'isCompacting')::boolean, false)`.as(
-              "is_compacting",
-            ),
-        })
-        .from(chatMessages)
-        .where(eq(chatMessages.threadId, urlPathParams.threadId))
-        .orderBy(chatMessages.createdAt);
+      if (data.before) {
+        // "Load older": the caller provides the oldest message it already has.
+        // Walk up from its parent to start the older chunk.
+        // If that parent is a compaction boundary, start FROM it (include it) —
+        // the compaction boundary is the bottom of the older chunk (the summary message).
+        const [beforeMsg] = await db
+          .select({ parentId: chatMessages.parentId })
+          .from(chatMessages)
+          .where(eq(chatMessages.id, data.before))
+          .limit(1);
+        const parentId = beforeMsg?.parentId ?? null;
+        if (parentId) {
+          startId = parentId;
+        }
+      } else if (data.leafMessageId) {
+        // Walk DOWN from the provided leafMessageId to the actual latest leaf.
+        // When switching branches, the client passes the branch root sibling ID —
+        // we need to follow the newest-child chain to find the true leaf of that branch.
+        const latestLeafResult: QueryResult<{ id: string }> = await db.execute<{
+          id: string;
+        }>(sql`
+          WITH RECURSIVE latest_leaf AS (
+            SELECT id, parent_id, created_at, 0 AS depth
+            FROM chat_messages
+            WHERE id = ${data.leafMessageId}
+              AND thread_id = ${urlPathParams.threadId}
 
-      // Step 2: Traverse to find full path IDs
-      const pathIds = traverseForPathIds(treeData, branchIndices);
+            UNION ALL
 
-      if (pathIds.length === 0) {
+            SELECT m.id, m.parent_id, m.created_at, lf.depth + 1
+            FROM chat_messages m
+            INNER JOIN latest_leaf lf ON m.parent_id = lf.id
+            WHERE m.thread_id = ${urlPathParams.threadId}
+              -- Stop before crossing into the next chunk (compacting = next chunk header)
+              AND NOT COALESCE((m.metadata->>'isCompacting')::boolean, false)
+          )
+          SELECT id FROM latest_leaf
+          ORDER BY depth DESC, created_at DESC
+          LIMIT 1
+        `);
+        startId = latestLeafResult.rows[0]?.id ?? data.leafMessageId;
+      } else {
+        // Default: latest message in thread
+        const [latest] = await db
+          .select({ id: chatMessages.id })
+          .from(chatMessages)
+          .where(eq(chatMessages.threadId, urlPathParams.threadId))
+          .orderBy(sql`${chatMessages.createdAt} DESC`)
+          .limit(1);
+        startId = latest?.id ?? null;
+      }
+
+      if (!startId) {
         return success({
           messages: [],
-          branchMeta: [],
           hasOlderHistory: false,
+          hasNewerMessages: false,
+          resolvedLeafMessageId: null,
           oldestLoadedMessageId: null,
           compactionBoundaryId: null,
+          newerChunkAnchorId: null,
         });
       }
 
-      // Step 3: Build branch metadata from full tree
-      const pathIdSet = new Set(pathIds);
-      const branchMeta = data.before
-        ? [] // Skip branchMeta for "load older" requests (client already has it)
-        : buildBranchMeta(treeData, pathIdSet, branchIndices);
-
-      // Step 4: Find compaction boundary to determine which slice to load
-      const compactingIds = new Set(
-        treeData
-          .filter((row) => row.isCompacting && pathIdSet.has(row.id))
-          .map((row) => row.id),
+      // Step 1: Get the ancestor chain (recursive CTE, minimal columns)
+      const ancestorChain = await fetchAncestorChain(
+        startId,
+        urlPathParams.threadId,
       );
 
-      const { loadFromIndex, loadToIndex, hasOlderHistory } =
-        findCompactionBoundary(pathIds, compactingIds, data.before);
-
-      // Step 5: Slice path to the relevant chunk
-      const slicedPathIds = pathIds.slice(loadFromIndex, loadToIndex);
-      const oldestLoadedMessageId =
-        slicedPathIds.length > 0 ? slicedPathIds[0] : null;
-      // compactionBoundaryId: the ID of the compacting message that starts the loaded chunk.
-      // Non-null when loadFromIndex > 0, meaning older history exists before this point.
-      const compactionBoundaryId =
-        loadFromIndex > 0 && slicedPathIds.length > 0 ? slicedPathIds[0] : null;
-
-      if (slicedPathIds.length === 0) {
+      if (ancestorChain.length === 0) {
         return success({
           messages: [],
-          branchMeta,
           hasOlderHistory: false,
+          hasNewerMessages: false,
+          resolvedLeafMessageId: null,
           oldestLoadedMessageId: null,
           compactionBoundaryId: null,
+          newerChunkAnchorId: null,
         });
       }
 
-      // Step 6: Fetch only the sliced path messages with full columns
-      const pathMessages = await db
-        .select()
-        .from(chatMessages)
-        .where(inArray(chatMessages.id, slicedPathIds));
-
-      // Sort by path order (preserve traversal order)
-      const idOrderMap = new Map(slicedPathIds.map((id, index) => [id, index]));
-      const sortedMessages = pathMessages.toSorted(
-        (a, b) => (idOrderMap.get(a.id) ?? 0) - (idOrderMap.get(b.id) ?? 0),
+      // Step 2: Fetch ALL messages in the chunk (all branch paths, stopping at next compaction)
+      const { messages } = await fetchChunkMessages(
+        ancestorChain,
+        urlPathParams.threadId,
       );
 
-      logger.debug("Branch path messages retrieved", {
+      const oldestAncestor: AncestorRow = ancestorChain[0]!;
+      // hasOlderHistory: true if the oldest ancestor has a parent (history exists above it).
+      // This includes the case where the oldest is a compaction boundary — the compacted
+      // messages are older history that can be loaded via "Show older messages".
+      const hasOlderHistory = !!oldestAncestor.parentId;
+      const compactionBoundaryId = oldestAncestor.isCompacting
+        ? oldestAncestor.id
+        : null;
+      const oldestLoadedMessageId = oldestAncestor.id;
+
+      // Step 3: For each leaf in the chunk that has a compacting child, record the pair
+      // (compactingChildId, leafId). We inject one BOUNDARY_NEWER sentinel per such leaf,
+      // with parentId = leafId so it sits correctly in the message tree. Branch switching
+      // is local, so every branch that continues into a newer chunk needs its own sentinel.
+      const newerSentinelPairs: Array<{ anchorId: string; leafId: string }> =
+        [];
+      {
+        const chunkIds = messages.map((m) => m.id);
+        if (chunkIds.length > 0) {
+          const chunkIdsLiteral = chunkIds.map((id) => sql`${id}`);
+          const chunkIdsArray = sql.join(chunkIdsLiteral, sql`, `);
+          const newerResult: QueryResult<NewerChunkRow> =
+            await db.execute<NewerChunkRow>(sql`
+            SELECT id, parent_id AS "parentId" FROM chat_messages
+            WHERE thread_id = ${urlPathParams.threadId}
+              AND parent_id = ANY(ARRAY[${chunkIdsArray}]::uuid[])
+              AND COALESCE((metadata->>'isCompacting')::boolean, false)
+            ORDER BY created_at ASC
+          `);
+          for (const row of newerResult.rows) {
+            newerSentinelPairs.push({ anchorId: row.id, leafId: row.parentId });
+          }
+        }
+      }
+
+      // Derive legacy scalar for response metadata
+      const newerChunkAnchorId = newerSentinelPairs[0]?.anchorId ?? null;
+      const hasNewerMessages = newerSentinelPairs.length > 0;
+
+      // Build a set of leaf IDs that have a newer chunk so we can annotate them.
+      const leafsWithNewerChunk = new Map(
+        newerSentinelPairs.map(({ anchorId, leafId }) => [leafId, anchorId]),
+      );
+
+      // Annotate real messages with chunk boundary flags in metadata:
+      // - oldest message: hasOlderHistory=true if older chunks exist
+      // - leaf messages that continue into a newer chunk: hasNewerHistory=true + newerAnchorId
+      const messagesWithFlags: (typeof chatMessages.$inferSelect)[] =
+        messages.map((msg) => {
+          const isOldestAnchor = msg.id === oldestLoadedMessageId;
+          const newerAnchorId = leafsWithNewerChunk.get(msg.id) ?? null;
+          const needsFlags =
+            (isOldestAnchor && hasOlderHistory) || newerAnchorId !== null;
+          if (!needsFlags) {
+            return msg;
+          }
+          return {
+            ...msg,
+            metadata: {
+              ...msg.metadata,
+              ...(isOldestAnchor && hasOlderHistory
+                ? { hasOlderHistory: true }
+                : {}),
+              ...(newerAnchorId !== null
+                ? { hasNewerHistory: true, newerAnchorId }
+                : {}),
+            },
+          };
+        });
+
+      logger.debug("Chunk messages retrieved", {
         threadId: urlPathParams.threadId,
-        totalInTree: treeData.length,
-        fullPathLength: pathIds.length,
-        loadedChunk: sortedMessages.length,
+        chunkSize: messages.length,
         hasOlderHistory,
-        isLoadOlder: !!data.before,
+        hasNewerMessages,
+        startId,
       });
 
       return success({
-        messages: sortedMessages,
-        branchMeta,
+        messages: messagesWithFlags,
         hasOlderHistory,
+        hasNewerMessages,
+        resolvedLeafMessageId: startId,
         oldestLoadedMessageId,
         compactionBoundaryId,
+        newerChunkAnchorId,
       });
     } catch (error) {
-      logger.error("Error listing branch path messages", parseError(error));
+      logger.error("Error getting chunk messages", parseError(error));
       return fail({
         message: t("get.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,

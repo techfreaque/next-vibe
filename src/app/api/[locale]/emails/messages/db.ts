@@ -54,9 +54,8 @@ export const emails = pgTable(
     // Template versioning (for audit trail and compliance)
     templateId: text("template_id"), // Template ID (e.g., "leads-welcome")
     templateVersion: text("template_version"), // Semantic version (e.g., "1.2.3")
-    propsSnapshot: json("props_snapshot").$type<
-      Record<string, string | number | boolean>
-    >(), // Props used to render
+    propsSnapshot:
+      json("props_snapshot").$type<Record<string, string | number | boolean>>(), // Props used to render
     locale: text("locale"), // Locale used for rendering (e.g., "en-US")
 
     // Status and tracking

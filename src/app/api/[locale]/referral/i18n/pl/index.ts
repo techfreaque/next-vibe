@@ -54,6 +54,10 @@ export const translations: typeof enTranslations = {
       title: "Utwórz kod polecający",
       description: "Wygeneruj nowy kod polecający do udostępnienia",
     },
+    submit: {
+      label: "Utwórz kod",
+      loading: "Tworzenie...",
+    },
   },
 
   // PUT endpoint (update referral code)

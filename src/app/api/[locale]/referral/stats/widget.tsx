@@ -6,7 +6,10 @@
 
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { DollarSign, TrendingUp, Users, Wallet } from "next-vibe-ui/ui/icons";
+import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
+import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
+import { Users } from "next-vibe-ui/ui/icons/Users";
+import { Wallet } from "next-vibe-ui/ui/icons/Wallet";
 
 import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 

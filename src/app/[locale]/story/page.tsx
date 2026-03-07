@@ -8,7 +8,7 @@ import {
   ProductIds,
   productsRepository,
 } from "@/app/api/[locale]/products/repository-client";
-import { definitionsRegistry } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definitions/registry";
+import { endpointsMeta } from "@/app/api/[locale]/system/generated/endpoints-meta/en";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
@@ -76,9 +76,9 @@ export async function generateMetadata({
   });
 }
 
-export default async function HomePage({
+export default async function StoryPage({
   params,
-}: HomePageProps): Promise<JSX.Element> {
+}: HomePageProps): Promise<JSX.Element | never> {
   const { locale } = await params;
 
   // Create logger for server-side operations
@@ -87,7 +87,7 @@ export default async function HomePage({
   // Get user with proper error handling
   const userResponse = await UserRepository.getUserByAuth(
     {
-      roles: [UserRole.PUBLIC, UserRole.CUSTOMER],
+      roles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
       detailLevel: UserDetailLevel.MINIMAL,
     },
     locale,
@@ -116,7 +116,7 @@ export default async function HomePage({
 
   // Get dynamic counts for marketing display
   const totalToolCount = getMaxToolCountAllPlatforms();
-  const totalEndpointCount = definitionsRegistry.getTotalEndpointCount();
+  const totalEndpointCount = endpointsMeta.length;
 
   // Get pricing information
   const products = productsRepository.getProducts(locale);

@@ -2,7 +2,7 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
-import { Mic } from "next-vibe-ui/ui/icons";
+import { Mic } from "next-vibe-ui/ui/icons/Mic";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";

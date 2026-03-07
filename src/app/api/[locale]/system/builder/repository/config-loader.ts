@@ -23,6 +23,7 @@ import type {
   BuildConfig,
   CopyConfig,
   FileToCompile,
+  FileToCompileWithPlugins,
   NpmPackageConfig,
 } from "../definition";
 import { ROOT_DIR } from "./constants";
@@ -107,7 +108,7 @@ export class ConfigLoader implements IConfigLoader {
           }),
         ),
       );
-      logger.info("Loading build config", { path: fullPath });
+      logger.vibe(`📄 Config  ${configPath}`);
 
       const importedModule = (await import(fullPath)) as
         | BuildConfigModule
@@ -125,11 +126,13 @@ export class ConfigLoader implements IConfigLoader {
 
     // Use inline configuration
     output.push(outputFormatter.formatStep(t("messages.usingInlineConfig")));
-    logger.info("Using inline config");
+    logger.vibe("📄 Config  inline");
 
     return success({
       foldersToClean: inlineConfig?.foldersToClean,
-      filesToCompile: inlineConfig?.filesToCompile,
+      filesToCompile: inlineConfig?.filesToCompile as
+        | FileToCompileWithPlugins[]
+        | undefined,
       filesOrFoldersToCopy: inlineConfig?.filesOrFoldersToCopy,
       npmPackage: inlineConfig?.npmPackage,
     });

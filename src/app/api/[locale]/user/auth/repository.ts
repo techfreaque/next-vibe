@@ -167,7 +167,6 @@ export class AuthRepository {
     // For public users, use the platform handler to check cookies first
     // This prevents creating duplicate leads on every page load
     const { cookies } = await import("next/headers");
-    const { LEAD_ID_COOKIE_NAME } = await import("@/config/constants");
     const cookieStore = await cookies();
     const existingLeadId = cookieStore.get(LEAD_ID_COOKIE_NAME)?.value;
 
@@ -273,12 +272,13 @@ export class AuthRepository {
       // Check if session is expired
       const session = sessionResponse.data;
       if (session.expiresAt < new Date()) {
-        logger.debug("Session expired, deleting from database", {
+        logger.debug("Session expired, deleting only this session", {
           userId,
+          sessionId: session.id,
           expiresAt: session.expiresAt,
         });
-        // Delete expired session from database
-        await SessionRepository.deleteByUserId(userId, sessionT);
+        // Delete only this specific expired session, not all sessions for the user
+        await SessionRepository.deleteById(session.id, sessionT);
         return null;
       }
 

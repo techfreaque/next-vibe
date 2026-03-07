@@ -1,12 +1,23 @@
 /**
- * Vibe Frame Mount — Repository
+ * Vibe Frame Config — Repository
  *
- * Loads the target endpoint definition, validates access, and returns
- * an isolated HTML shell that can be rendered inside an iframe.
- * The HTML includes a hydration script that bootstraps the React app.
+ * For each requested integration:
+ *  1. Resolve endpoint identifier (integration.endpoint ?? integration.id)
+ *  2. Skip if hasRendered: true
+ *  3. If leadId or authToken is present: mint a short-lived (30s) single-use
+ *     exchange token in DB and embed it as ?et= in the iframe URL
+ *  4. If neither is present: return a plain iframe URL (middleware creates
+ *     a new lead on first load as it would for any page visit)
+ *  5. Return { widgets: [{ frameId, widgetUrl }] }
+ *
+ * Identity (leadId + authToken) comes from the POST body — the embed script
+ * is always cross-origin and cannot read our domain cookies. The host page
+ * operator passes their user's identity here.
  */
 
 import "server-only";
+
+import { randomBytes } from "node:crypto";
 
 import {
   ErrorResponseTypes,
@@ -17,203 +28,158 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { DefinitionLoader } from "../../shared/endpoints/definition/loader";
+import { db } from "../../../db";
+import { frameExchangeTokens } from "../db";
 import { generateFrameId } from "../types";
 import type {
-  VibeFrameMountRequestOutput,
-  VibeFrameMountResponseOutput,
+  IntegrationRequest,
+  VibeFrameConfigRequestOutput,
+  VibeFrameConfigResponseOutput,
+  WidgetResponse,
 } from "./definition";
 import { scopedTranslation } from "./i18n";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-interface MountParams {
-  data: VibeFrameMountRequestOutput;
-  user: JwtPayloadType;
+interface ConfigParams {
+  data: VibeFrameConfigRequestOutput;
   locale: CountryLanguage;
   logger: EndpointLogger;
 }
 
+// ─── Exchange Token ───────────────────────────────────────────────────────────
+
+const EXCHANGE_TOKEN_TTL_MS = 30_000; // 30 seconds
+
+/**
+ * Mint a short-lived single-use exchange token.
+ * leadId is nullable: if absent, middleware creates a new lead on redemption.
+ * Only called when at least one of leadId / authToken is provided.
+ */
+async function mintExchangeToken(
+  leadId: string | undefined,
+  authToken: string | undefined,
+): Promise<string> {
+  const token = randomBytes(32).toString("hex");
+  const expiresAt = new Date(Date.now() + EXCHANGE_TOKEN_TTL_MS);
+
+  await db.insert(frameExchangeTokens).values({
+    leadId: leadId ?? null,
+    token,
+    authToken: authToken ?? null,
+    expiresAt,
+  });
+
+  return token;
+}
+
+// ─── URL Builder ─────────────────────────────────────────────────────────────
+
+function buildFrameUrl(
+  locale: CountryLanguage,
+  endpointId: string,
+  frameId: string,
+  exchangeToken: string | undefined,
+  integration: IntegrationRequest,
+): string {
+  const base = envClient.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
+  // endpoint "contact_POST" → path "contact/POST"
+  // endpoint "agent_search_kagi_POST" → path "agent/search/kagi/POST"
+  const endpointPath = endpointId.replace(/_/g, "/");
+  const url = new URL(`${base}/${locale}/frame/${endpointPath}`);
+
+  url.searchParams.set("frameId", frameId);
+  if (exchangeToken) {
+    url.searchParams.set("et", exchangeToken);
+  }
+
+  if (integration.theme && integration.theme !== "system") {
+    url.searchParams.set("theme", integration.theme);
+  }
+  if (integration.urlPathParams) {
+    url.searchParams.set(
+      "urlPathParams",
+      JSON.stringify(integration.urlPathParams),
+    );
+  }
+  if (integration.data) {
+    url.searchParams.set("data", JSON.stringify(integration.data));
+  }
+
+  return url.toString();
+}
+
 // ─── Repository ──────────────────────────────────────────────────────────────
 
-export const VibeFrameMountRepository = {
-  async mount({
+export const VibeFrameConfigRepository = {
+  async config({
     data,
-    user,
     locale,
     logger,
-  }: MountParams): Promise<ResponseType<VibeFrameMountResponseOutput>> {
+  }: ConfigParams): Promise<ResponseType<VibeFrameConfigResponseOutput>> {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
-      const {
-        endpoint: endpointId,
-        frameId: requestedFrameId,
-        theme,
-        authToken,
-      } = data;
+      const { integrations, leadId, authToken } = data;
 
-      // Parse optional JSON fields
-      let urlPathParams: Record<string, string> = {};
-      let prefillData: Record<string, string> = {};
+      if (!integrations || integrations.length === 0) {
+        return success({ widgets: [] });
+      }
 
-      if (data.urlPathParams) {
+      // leadId and authToken come from the POST body — provided by the host page.
+      // Mint an exchange token only when there is identity to carry.
+      // If neither is present, the iframe URL has no ?et= and the middleware
+      // creates a fresh lead on first load (standard behaviour for any visitor).
+      const needsToken = Boolean(leadId ?? authToken);
+
+      const widgets: WidgetResponse[] = [];
+
+      for (const integration of integrations) {
+        // Skip already-rendered integrations (bandwidth optimisation)
+        if (integration.hasRendered) {
+          continue;
+        }
+
+        const endpointId = integration.endpoint ?? integration.id;
+        const frameId = integration.frameId ?? generateFrameId();
+
         try {
-          urlPathParams = JSON.parse(data.urlPathParams) as Record<
-            string,
-            string
-          >;
-        } catch {
+          let exchangeToken: string | undefined;
+          if (needsToken) {
+            exchangeToken = await mintExchangeToken(leadId, authToken);
+          }
+
+          const widgetUrl = buildFrameUrl(
+            locale,
+            endpointId,
+            frameId,
+            exchangeToken,
+            integration,
+          );
+
+          widgets.push({ frameId, widgetUrl });
+        } catch (err) {
+          logger.error("Failed to mint exchange token", {
+            endpointId,
+            error: parseError(err).message,
+          });
           return fail({
-            message: t("get.repository.invalidUrlPathParams"),
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
+            message: t("post.repository.tokenMintFailed"),
+            errorType: ErrorResponseTypes.INTERNAL_ERROR,
           });
         }
       }
 
-      if (data.data) {
-        try {
-          prefillData = JSON.parse(data.data) as Record<string, string>;
-        } catch {
-          return fail({
-            message: t("get.repository.invalidData"),
-            errorType: ErrorResponseTypes.VALIDATION_ERROR,
-          });
-        }
-      }
-
-      // Load target endpoint definition
-      const loader = new DefinitionLoader();
-      const endpointResult = await loader.load({
-        identifier: endpointId,
-        platform: Platform.NEXT_API,
-        user,
-        logger,
-        locale,
-        skipAccessValidation: true, // We validate ourselves for public embed access
-      });
-
-      if (!endpointResult.success) {
-        return fail({
-          message: t("get.repository.endpointNotFound"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
-        });
-      }
-
-      const frameId = requestedFrameId || generateFrameId();
-      const serverUrl = envClient.NEXT_PUBLIC_APP_URL;
-
-      // Build the isolated HTML document
-      const html = buildFrameHtml({
-        endpointId,
-        frameId,
-        locale,
-        urlPathParams,
-        prefillData,
-        theme: theme ?? "system",
-        serverUrl,
-        authToken,
-      });
-
-      return success({ html });
+      return success({ widgets });
     } catch (error) {
-      logger.error("VibeFrame mount failed", parseError(error));
+      logger.error("VibeFrame config failed", parseError(error));
       return fail({
-        message: t("get.repository.mountFailed"),
+        message: t("post.repository.configFailed"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
   },
 };
-
-// ─── HTML Builder ────────────────────────────────────────────────────────────
-
-interface FrameHtmlOptions {
-  endpointId: string;
-  frameId: string;
-  locale: CountryLanguage;
-  urlPathParams: Record<string, string>;
-  prefillData: Record<string, string>;
-  theme: string;
-  serverUrl: string;
-  authToken?: string;
-}
-
-function buildFrameHtml(options: FrameHtmlOptions): string {
-  const {
-    endpointId,
-    frameId,
-    locale,
-    urlPathParams,
-    prefillData,
-    theme,
-    serverUrl,
-    authToken,
-  } = options;
-
-  const hydrationData = JSON.stringify({
-    endpoint: endpointId,
-    locale,
-    urlPathParams,
-    data: prefillData,
-    theme,
-    serverUrl,
-    requiresAuth: !!authToken,
-    frameId,
-  });
-
-  // Escape for safe embedding in HTML
-  const escapedHydration = hydrationData
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-
-  return `<!DOCTYPE html>
-<html lang="${locale.split("-")[0]}" data-theme="${theme}" style="color-scheme: ${theme === "system" ? "light dark" : theme}">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Vibe Frame</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { font-family: system-ui, -apple-system, sans-serif; background: transparent; overflow: hidden; }
-    body { padding: 16px; }
-    #vibe-frame-root { min-height: 50px; }
-    .vf-loading { display: flex; align-items: center; justify-content: center; padding: 32px; color: #666; }
-    .vf-error { padding: 16px; color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; }
-  </style>
-  <link rel="stylesheet" href="${serverUrl}/vibe-frame.css" onerror="this.remove()">
-</head>
-<body>
-  <div id="vibe-frame-root">
-    <div class="vf-loading">Loading...</div>
-  </div>
-  <script>window.__VIBE_FRAME__ = ${escapedHydration};</script>
-  ${authToken ? `<script>window.__VIBE_FRAME_TOKEN__ = ${JSON.stringify(authToken)};</script>` : ""}
-  <script src="${serverUrl}/vibe-frame-hydrate.js" defer></script>
-  <script>
-    // Auto-resize: notify parent of content height changes
-    (function() {
-      var frameId = ${JSON.stringify(frameId)};
-      var lastHeight = 0;
-      function sendHeight() {
-        var h = document.documentElement.scrollHeight;
-        if (h !== lastHeight) {
-          lastHeight = h;
-          window.parent.postMessage({ type: "vf:resize", frameId: frameId, height: h }, "*");
-        }
-      }
-      // Poll until hydration script takes over with ResizeObserver
-      var interval = setInterval(sendHeight, 200);
-      window.__VF_STOP_RESIZE_POLL__ = function() { clearInterval(interval); };
-      sendHeight();
-    })();
-  </script>
-</body>
-</html>`;
-}

@@ -6,7 +6,8 @@
 
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { ExternalLink, Sparkles } from "next-vibe-ui/ui/icons";
+import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
+import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 

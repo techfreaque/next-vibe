@@ -61,7 +61,9 @@ export default function ErrorPage({
           {t("app.pages.error.tryAgain")}
         </Button>
         <Button asChild>
-          <Link href={`/${locale}`}>{t("app.pages.error.backToHome")}</Link>
+          <Link href={`/${locale}/threads`}>
+            {t("app.pages.error.backToHome")}
+          </Link>
         </Button>
       </Div>
     </Div>

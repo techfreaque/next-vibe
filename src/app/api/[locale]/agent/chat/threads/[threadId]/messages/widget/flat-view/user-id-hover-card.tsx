@@ -6,9 +6,11 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
+import type { DivRefObject } from "next-vibe-ui/ui/div";
 import { Div } from "next-vibe-ui/ui/div";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
 
 import {
   format4chanTimestamp,
@@ -47,16 +49,35 @@ export function UserIdHoverCard({
   const postCount = userPosts.length;
   const idColor = getIdColor(userId);
 
+  const [el, setEl] = useState<DivRefObject | null>(null);
+  const refCallback = useCallback((node: DivRefObject | null) => {
+    setEl(node);
+  }, []);
+  const [clampedLeft, setClampedLeft] = useState<number>(position.x);
+
+  useLayoutEffect(() => {
+    if (!el) {
+      return;
+    }
+    const { width } = el.getBoundingClientRect();
+    const vw = window.innerWidth;
+    // Align left edge to anchor, then clamp so it stays within viewport
+    const left = Math.max(8, Math.min(position.x - width / 2, vw - width - 8));
+    setClampedLeft(left);
+  }, [el, position.x, position.y]);
+
   return (
     <Div
+      ref={refCallback}
       style={{
-        left: `${position.x}px`,
+        position: "fixed",
+        zIndex: 50,
+        left: `${clampedLeft}px`,
         top: `${position.y + 10}px`,
       }}
     >
       <Div
         className={cn(
-          "fixed z-50",
           "w-72 p-3 rounded-lg",
           "bg-background/95 backdrop-blur-md",
           "border border-border shadow-2xl",

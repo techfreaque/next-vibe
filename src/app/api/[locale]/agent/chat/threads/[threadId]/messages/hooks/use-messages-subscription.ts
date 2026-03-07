@@ -41,6 +41,8 @@ export interface MessagesSubscriptionOptions {
   onStreamStarted?: () => void;
   /** Called when STREAM_FINISHED fires */
   onStreamFinished?: () => void;
+  /** Whether TTS audio chunks should be played — guards against cross-client audio bleed */
+  ttsAutoplay?: boolean;
 }
 
 /**
@@ -158,9 +160,13 @@ export function useMessagesSubscription(
           messageHandlers[StreamEventType.ERROR]?.(e);
         },
 
-        // Audio chunk — suppressed during drain
+        // Audio chunk — suppressed during drain or when call mode is off on this client
         [StreamEventType.AUDIO_CHUNK]: (e) => {
           if (store().isDraining(threadId)) {
+            return;
+          }
+          // Guard against cross-client audio bleed: only play if call mode is enabled here
+          if (!optionsRef.current.ttsAutoplay) {
             return;
           }
           // Audio playback: only if not final chunk and has audio data

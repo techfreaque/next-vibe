@@ -3,7 +3,8 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { DropdownMenuItem } from "next-vibe-ui/ui/dropdown-menu";
-import { Moon, Sun } from "next-vibe-ui/ui/icons";
+import { Moon } from "next-vibe-ui/ui/icons/Moon";
+import { Sun } from "next-vibe-ui/ui/icons/Sun";
 import { Span } from "next-vibe-ui/ui/span";
 import { useThemeToggle } from "next-vibe-ui/ui/theme-provider";
 import { type JSX } from "react";

@@ -7,7 +7,7 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Terminal } from "next-vibe-ui/ui/icons";
+import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
 import type { InputKeyboardEvent } from "next-vibe-ui/ui/input";
 import { Input } from "next-vibe-ui/ui/input";
 import { Pre } from "next-vibe-ui/ui/pre";
@@ -15,7 +15,12 @@ import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import { useWidgetTranslation } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
+import { defaultLocale } from "@/i18n/core/config";
 
+import sessionCloseEndpoints from "../session/close/definition";
+import sessionOpenEndpoints from "../session/open/definition";
+import sessionReadEndpoints from "../session/read/definition";
+import sessionWriteEndpoints from "../session/write/definition";
 import type endpoints from "./definition";
 
 export function TerminalContainer(): React.JSX.Element {
@@ -41,11 +46,14 @@ export function TerminalContainer(): React.JSX.Element {
     setStatus("connecting");
     setOutput("");
     try {
-      const res = await fetch("/api/en/ssh/session/open", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cols: 220, rows: 50 }),
-      });
+      const res = await fetch(
+        `/api/${defaultLocale}/${sessionOpenEndpoints.POST.path.join("/")}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ cols: 220, rows: 50 }),
+        },
+      );
       const json = (await res.json()) as { data?: { sessionId?: string } };
       const sid = json.data?.sessionId;
       if (!sid) {
@@ -59,7 +67,7 @@ export function TerminalContainer(): React.JSX.Element {
       pollRef.current = setInterval(async () => {
         try {
           const r = await fetch(
-            `/api/en/ssh/session/read?sessionId=${sid}&waitMs=100`,
+            `/api/${defaultLocale}/${sessionReadEndpoints.GET.path.join("/")}?sessionId=${sid}&waitMs=100`,
           );
           const j = (await r.json()) as {
             data?: { output?: string; eof?: boolean };
@@ -89,11 +97,14 @@ export function TerminalContainer(): React.JSX.Element {
     }
     if (sessionId) {
       try {
-        await fetch("/api/en/ssh/session/close", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionId }),
-        });
+        await fetch(
+          `/api/${defaultLocale}/${sessionCloseEndpoints.POST.path.join("/")}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sessionId }),
+          },
+        );
       } catch {
         /* ignore */
       }
@@ -109,11 +120,14 @@ export function TerminalContainer(): React.JSX.Element {
     const cmd = input;
     setInput("");
     try {
-      await fetch("/api/en/ssh/session/write", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId, input: cmd }),
-      });
+      await fetch(
+        `/api/${defaultLocale}/${sessionWriteEndpoints.POST.path.join("/")}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId, input: cmd }),
+        },
+      );
     } catch {
       /* ignore */
     }

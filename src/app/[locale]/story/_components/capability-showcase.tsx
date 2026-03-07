@@ -1,16 +1,14 @@
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  Bot,
-  Brain,
-  Globe,
-  Lock,
-  Shield,
-  Sparkles,
-  Terminal,
-  Zap,
-} from "next-vibe-ui/ui/icons";
+import { Bot } from "next-vibe-ui/ui/icons/Bot";
+import { Brain } from "next-vibe-ui/ui/icons/Brain";
+import { Globe } from "next-vibe-ui/ui/icons/Globe";
+import { Lock } from "next-vibe-ui/ui/icons/Lock";
+import { Shield } from "next-vibe-ui/ui/icons/Shield";
+import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
+import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
+import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
 import { H2, H3, P } from "next-vibe-ui/ui/typography";
@@ -346,6 +344,13 @@ function AutonomousVisual({
           locale={locale}
           logger={logger}
           rootFolderId={DefaultFolderId.PUBLIC}
+          user={{
+            isPublic: false,
+            leadId: "00000000-0000-0000-0000-000000000000",
+            id: "00000000-0000-0000-0000-000000000000",
+            roles: [UserPermissionRole.ADMIN],
+          }}
+          deductCredits={null}
         />
         <GroupedAssistantMessage
           group={group}

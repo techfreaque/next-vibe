@@ -3,15 +3,15 @@ import {
   CRON_DELETE_ALIAS,
   CRON_GET_ALIAS,
   CRON_UPDATE_ALIAS,
-} from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/definition";
-import { CRON_HISTORY_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/definition";
-import { CRON_STATS_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/cron/stats/definition";
+} from "@/app/api/[locale]/system/unified-interface/tasks/cron/[id]/constants";
+import { CRON_HISTORY_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/cron/history/constants";
+import { CRON_STATS_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/cron/stats/constants";
 import {
   CRON_CREATE_ALIAS,
   CRON_LIST_ALIAS,
-} from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/definition";
-import { PULSE_EXECUTE_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/pulse/execute/definition";
-import { PULSE_STATUS_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/pulse/status/definition";
+} from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/constants";
+import { PULSE_EXECUTE_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/pulse/execute/constants";
+import { PULSE_STATUS_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/pulse/status/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { TtsVoice } from "../../../text-to-speech/enum";

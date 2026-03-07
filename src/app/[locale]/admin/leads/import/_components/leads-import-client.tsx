@@ -7,7 +7,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { Upload } from "next-vibe-ui/ui/icons";
+import { Upload } from "next-vibe-ui/ui/icons/Upload";
 import type React from "react";
 
 import leadsImportEndpoints from "@/app/api/[locale]/leads/import/definition";

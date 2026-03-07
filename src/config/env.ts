@@ -84,36 +84,39 @@ export const {
       "Preview app port for local mode (vibe build/start). Derives NEXT_PUBLIC_APP_URL by swapping the port.",
   },
   JWT_SECRET_KEY: {
-    schema: createSchema(z.string().min(32), z.string().min(32).optional()),
-    example: "your-secret-key-min-32-chars!!",
-    comment: "JWT secret",
+    schema: createSchema(
+      z
+        .string()
+        .min(32, "JWT_SECRET_KEY must be at least 32 characters")
+        .refine(
+          (v) =>
+            process.env["NODE_ENV"] !== "production" ||
+            (v.length >= 64 &&
+              !v.startsWith("REPLACE_WITH_") &&
+              !v.includes("your-secret")),
+          "JWT_SECRET_KEY must be at least 64 random characters in production — run: openssl rand -hex 32",
+        ),
+      z.string().min(32).optional(),
+    ),
+    example: "REPLACE_WITH_openssl_rand_hex_32_output",
+    comment:
+      "JWT signing secret — MUST be at least 64 random characters in production. Generate with: openssl rand -hex 32",
   },
   CRON_SECRET: {
-    schema: createSchema(z.string().min(32), z.string().min(32).optional()),
-    example: "your-cron-secret-min-32-chars!!",
-  },
-  INSTANCE_ID: {
-    schema: z.string().min(1).optional(),
-    example: "hermes",
-    comment:
-      "Unique instance identifier for task routing. Tasks with a targetInstance only run on the matching instance. E.g. 'hermes', 'thea-prod', 'thea-dev'.",
-  },
-  KNOWN_INSTANCE_IDS: {
-    schema: z
-      .string()
-      .optional()
-      .transform((v) =>
-        v
-          ? v
-              .split(",")
-              .map((s) => s.trim())
-              .filter(Boolean)
-          : [],
-      ),
-    example: "hermes-max,hermes-laura,thea-prod",
-    comment:
-      "Comma-separated list of all known instance IDs. Used in system prompt so the AI knows which instances it can route tasks to.",
-    commented: true,
+    schema: createSchema(
+      z
+        .string()
+        .min(32, "CRON_SECRET must be at least 32 characters")
+        .refine(
+          (v) =>
+            process.env["NODE_ENV"] !== "production" ||
+            (!v.startsWith("REPLACE_WITH_") && !v.includes("your-cron")),
+          "CRON_SECRET must not be a placeholder in production — run: openssl rand -hex 32",
+        ),
+      z.string().min(32).optional(),
+    ),
+    example: "REPLACE_WITH_openssl_rand_hex_32_output",
+    comment: "Cron job secret — generate with: openssl rand -hex 32",
   },
   VIBE_IS_CLOUD: {
     schema: z
@@ -125,25 +128,11 @@ export const {
     comment:
       "Set to true on cloud/SaaS instances that receive syncs from users. Disables outbound task/memory sync so the cloud instance never pushes back to user devices.",
   },
-  THEA_REMOTE_URL: {
-    schema: z.string().url().optional(),
+  VIBE_REMOTE_URL: {
+    schema: z.string().url().default(DEFAULT_PROJECT_URL),
     example: DEFAULT_PROJECT_URL,
-    comment:
-      "Remote Thea instance URL for task sync. Local instance polls this for new tasks.",
+    comment: "Remote server URL for `vibe --remote` CLI execution.",
     commented: true,
-  },
-  THEA_REMOTE_API_KEY: {
-    schema: z.string().min(32).optional(),
-    example: "your-remote-api-key-min-32-chars-here",
-    comment:
-      "Shared API key for task sync between local and remote Thea instances.",
-    commented: true,
-  },
-  THEA_REMOTE_LEAD_ID: {
-    schema: z.string().uuid().optional(),
-    example: false,
-    comment:
-      "Lead ID cookie for remote Thea instance. Get by visiting the remote URL once and copying the lead_id cookie.",
   },
   PULSE_INTERVAL_MINUTES: {
     schema: z.coerce.number().int().positive().optional(),
@@ -181,6 +170,17 @@ export const {
       .default(defaultLocale),
     example: defaultLocale,
     comment: "CLI locale setting",
+  },
+  VIBE_DISABLE_PROXY: {
+    schema: z
+      .string()
+      .optional()
+      .default("false")
+      .transform((v) => v === "true"),
+    example: "false",
+    comment:
+      "Opt out of the built-in Bun HTTP+WebSocket proxy. When true: Next.js runs directly on the main port and the WebSocket sidecar runs on port+1000. Use this when you have your own reverse proxy (Caddy, nginx, etc.) that already forwards /ws to the sidecar port. Your reverse proxy must route /ws → port+1000 and everything else → main port.",
+    commented: true,
   },
   WS_PUBSUB_TYPE: {
     schema: z.enum(["local", "redis"]).optional().default("local"),

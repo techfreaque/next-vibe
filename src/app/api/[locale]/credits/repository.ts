@@ -94,6 +94,7 @@ import type {
   CreditsHistoryGetResponseOutput,
 } from "./history/definition";
 import type { scopedTranslation } from "./i18n";
+import { PublicCapRepository } from "./public-cap/repository";
 
 export type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
@@ -187,6 +188,61 @@ export class CreditRepository {
       });
     } catch (error) {
       logger.error("Failed to get user pool", parseError(error));
+      return fail({
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        message: t("errors.getBalanceFailed"),
+      });
+    }
+  }
+
+  /**
+   * Read-only version of getUserPool — does NOT create wallets or trigger side effects.
+   * Use for admin reads of another user's data.
+   */
+  private static async getUserPoolReadOnly(
+    userId: string,
+    logger: EndpointLogger,
+    t: ModuleT,
+  ): Promise<ResponseType<CreditPool>> {
+    try {
+      const [userWallet] = await db
+        .select()
+        .from(creditWallets)
+        .where(eq(creditWallets.userId, userId))
+        .limit(1);
+
+      if (!userWallet) {
+        return success({
+          userWallet: null,
+          leadWallets: [],
+          poolId: userId,
+          poolType: "USER_POOL",
+        });
+      }
+
+      const linkedLeads = await db
+        .select({ leadId: userLeadLinks.leadId })
+        .from(userLeadLinks)
+        .where(eq(userLeadLinks.userId, userId));
+
+      const linkedLeadIds = linkedLeads.map((l) => l.leadId);
+
+      const leadWallets =
+        linkedLeadIds.length > 0
+          ? await db
+              .select()
+              .from(creditWallets)
+              .where(inArray(creditWallets.leadId, linkedLeadIds))
+          : [];
+
+      return success({
+        userWallet,
+        leadWallets,
+        poolId: userId,
+        poolType: "USER_POOL",
+      });
+    } catch (error) {
+      logger.error("Failed to get user pool (read-only)", parseError(error));
       return fail({
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
         message: t("errors.getBalanceFailed"),
@@ -478,7 +534,6 @@ export class CreditRepository {
 
     // Check for expired grace periods and cancel subscriptions
     // Get user IDs from wallets to check their subscriptions
-    const { subscriptions } = await import("../subscription/db");
     const userWallets = await db
       .select({ id: creditWallets.id, userId: creditWallets.userId })
       .from(creditWallets)
@@ -494,7 +549,6 @@ export class CreditRepository {
       .filter((id): id is string => id !== null);
 
     if (userIds.length > 0) {
-      const { SubscriptionStatus } = await import("../subscription/enum");
       const GRACE_PERIOD_DAYS = 7;
 
       // Calculate cutoff date for missed webhooks (7 days ago)
@@ -1883,6 +1937,17 @@ export class CreditRepository {
         locale,
       );
 
+      // Global daily cap check for free-tier pools (no paid credits anywhere)
+      const isFreeTierPool =
+        (pool.userWallet?.balance ?? 0) === 0 &&
+        pool.leadWallets.every((w) => w.balance === 0);
+      if (isFreeTierPool) {
+        const capCheck = await PublicCapRepository.checkCap(logger, locale);
+        if (!capCheck.success) {
+          return capCheck;
+        }
+      }
+
       // Determine which wallets to deduct from based on user type
       let walletsForDeduction: CreditWallet[];
 
@@ -1916,8 +1981,8 @@ export class CreditRepository {
             );
 
           const freeCreditsSpentThisPeriod = usageTransactions.reduce(
-            (sum, t) => {
-              const metadata = t.metadata as {
+            (sum, txn) => {
+              const metadata = txn.metadata as {
                 freeCreditsUsed?: number;
               } | null;
               return sum + (metadata?.freeCreditsUsed || 0);
@@ -2020,13 +2085,13 @@ export class CreditRepository {
 
         // STEP 2: Deduct from expiring subscription credits
         if (remaining > 0 && pool.userWallet) {
-          const walletIds = [pool.userWallet.id];
+          const expiringWalletIds = [pool.userWallet.id];
           const expiringPacks = await tx
             .select()
             .from(creditPacks)
             .where(
               and(
-                inArray(creditPacks.walletId, walletIds),
+                inArray(creditPacks.walletId, expiringWalletIds),
                 eq(creditPacks.type, CreditPackType.SUBSCRIPTION),
                 not(isNull(creditPacks.expiresAt)),
                 gte(creditPacks.expiresAt, new Date()),
@@ -2100,13 +2165,13 @@ export class CreditRepository {
 
         // STEP 3: Deduct from earned credits (referral rewards)
         if (remaining > 0 && pool.userWallet) {
-          const walletIds = [pool.userWallet.id];
+          const earnedWalletIds = [pool.userWallet.id];
           const earnedPacks = await tx
             .select()
             .from(creditPacks)
             .where(
               and(
-                inArray(creditPacks.walletId, walletIds),
+                inArray(creditPacks.walletId, earnedWalletIds),
                 eq(creditPacks.type, CreditPackType.EARNED),
               ),
             )
@@ -2178,13 +2243,13 @@ export class CreditRepository {
 
         // STEP 4: Deduct from permanent purchased credits (LAST - never expire)
         if (remaining > 0 && pool.userWallet) {
-          const walletIds = [pool.userWallet.id];
+          const permanentWalletIds = [pool.userWallet.id];
           const permanentPacks = await tx
             .select()
             .from(creditPacks)
             .where(
               and(
-                inArray(creditPacks.walletId, walletIds),
+                inArray(creditPacks.walletId, permanentWalletIds),
                 or(
                   eq(creditPacks.type, CreditPackType.PERMANENT),
                   eq(creditPacks.type, CreditPackType.BONUS),
@@ -2310,6 +2375,11 @@ export class CreditRepository {
         walletCount: walletsForDeduction.length,
       });
 
+      // Increment global public cap counter for free-tier pools (non-fatal, fire-and-forget)
+      if (isFreeTierPool) {
+        void PublicCapRepository.incrementSpend(amount, logger);
+      }
+
       return success();
     } catch (error) {
       logger.error("Failed to deduct credits", parseError(error), {
@@ -2338,7 +2408,6 @@ export class CreditRepository {
     offset: number,
     logger: EndpointLogger,
     t: ModuleT,
-    locale: CountryLanguage,
   ): Promise<
     ResponseType<{
       transactions: CreditTransactionOutput[];
@@ -2346,38 +2415,17 @@ export class CreditRepository {
     }>
   > {
     try {
-      // Get user pool
-      const poolResult = await CreditRepository.getUserPool(userId, logger, t);
-      if (!poolResult.success) {
-        return poolResult;
-      }
-
-      const pool = poolResult.data;
-      if (!pool.userWallet) {
-        return success({
-          transactions: [],
-          totalCount: 0,
-        });
-      }
-
-      // Ensure monthly free credits are reset if needed (new period)
-      await CreditRepository.ensureMonthlyFreeCreditsForPool(
-        pool,
-        logger,
-        locale,
-      );
-
-      // Refetch pool to get updated period IDs after potential reset
-      const updatedPoolResult = await CreditRepository.getUserPool(
+      // Read-only pool fetch — does NOT create wallets or trigger side effects
+      const poolResult = await CreditRepository.getUserPoolReadOnly(
         userId,
         logger,
         t,
       );
-      if (!updatedPoolResult.success) {
-        return updatedPoolResult;
+      if (!poolResult.success) {
+        return poolResult;
       }
 
-      const updatedPool = updatedPoolResult.data;
+      const updatedPool = poolResult.data;
       if (!updatedPool.userWallet) {
         return success({
           transactions: [],
@@ -2433,7 +2481,7 @@ export class CreditRepository {
           );
 
         const leadSpending = leadTransactions.reduce(
-          (sum, t) => sum + Math.abs(t.amount),
+          (sum, txn) => sum + Math.abs(txn.amount),
           0,
         );
         otherLeadsSpending += leadSpending;
@@ -2533,8 +2581,12 @@ export class CreditRepository {
     // Only admins may use targetUserId / targetLeadId to view another entity's history
     const isAdmin = user.isPublic
       ? false
-      : user.roles?.includes(UserRole.ADMIN) && data.targetLeadId;
-    const effectiveLeadId = isAdmin ? data.targetLeadId! : user.leadId;
+      : ((user.roles?.includes(UserRole.ADMIN) &&
+          (data.targetLeadId ?? data.targetUserId)) ??
+        false);
+    const effectiveLeadId = isAdmin
+      ? (data.targetLeadId ?? user.leadId)
+      : user.leadId;
     const effectiveUserId =
       (isAdmin ? data.targetUserId : user.id) || undefined;
 
@@ -2546,7 +2598,6 @@ export class CreditRepository {
           offset,
           logger,
           t,
-          locale,
         )
       : await CreditRepository.getTransactionsByLeadId(
           effectiveLeadId,
@@ -2684,7 +2735,7 @@ export class CreditRepository {
           );
 
         otherDevicesSpending = otherTransactions.reduce(
-          (sum, t) => sum + Math.abs(t.amount),
+          (sum, txn) => sum + Math.abs(txn.amount),
           0,
         );
       }
@@ -3754,13 +3805,13 @@ export class CreditRepository {
           ),
         );
 
-      const result: CreditTransactionOutput[] = transactions.map((t) => ({
-        id: t.id,
-        amount: t.amount,
-        balanceAfter: t.balanceAfter,
-        type: t.type,
-        messageId: t.messageId,
-        createdAt: t.createdAt,
+      const result: CreditTransactionOutput[] = transactions.map((txn) => ({
+        id: txn.id,
+        amount: txn.amount,
+        balanceAfter: txn.balanceAfter,
+        type: txn.type,
+        messageId: txn.messageId,
+        createdAt: txn.createdAt,
       }));
 
       return success({

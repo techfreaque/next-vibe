@@ -1,0 +1,121 @@
+/**
+ * Remote Connection List API Definition
+ * GET — list all remote connections for the current user
+ * Admin users see all connections across all users
+ */
+
+import { z } from "zod";
+
+import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
+import {
+  customWidgetObject,
+  scopedResponseField,
+} from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
+import {
+  EndpointErrorTypes,
+  Methods,
+  WidgetType,
+} from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+
+import { scopedTranslation } from "./i18n";
+import { RemoteConnectionsListContainer } from "./widget";
+
+export const { GET } = createEndpoint({
+  scopedTranslation,
+  method: Methods.GET,
+  path: ["user", "remote-connection", "list"],
+  title: "get.title" as const,
+  description: "get.description" as const,
+  icon: "link",
+  category: "app.endpointCategories.userAuth",
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  tags: ["tags.remoteConnection" as const],
+  aliases: ["remote-connections", "list-connections"] as const,
+
+  fields: customWidgetObject({
+    render: RemoteConnectionsListContainer,
+    usage: { response: true } as const,
+    children: {
+      connections: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        schema: z.array(
+          z.object({
+            instanceId: z.string(),
+            friendlyName: z.string(),
+            remoteUrl: z.string(),
+            isActive: z.boolean(),
+            lastSyncedAt: z.string().nullable(),
+            hasToken: z.boolean(),
+          }),
+        ),
+      }),
+    },
+  }),
+
+  successTypes: {
+    title: "get.success.title" as const,
+    description: "get.success.description" as const,
+  },
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "get.errors.validation.title" as const,
+      description: "get.errors.validation.description" as const,
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "get.errors.unauthorized.title" as const,
+      description: "get.errors.unauthorized.description" as const,
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "get.errors.forbidden.title" as const,
+      description: "get.errors.forbidden.description" as const,
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "get.errors.server.title" as const,
+      description: "get.errors.server.description" as const,
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "get.errors.notFound.title" as const,
+      description: "get.errors.notFound.description" as const,
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "get.errors.unknown.title" as const,
+      description: "get.errors.unknown.description" as const,
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "get.errors.unsavedChanges.title" as const,
+      description: "get.errors.unsavedChanges.description" as const,
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "get.errors.conflict.title" as const,
+      description: "get.errors.conflict.description" as const,
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "get.errors.network.title" as const,
+      description: "get.errors.network.description" as const,
+    },
+  },
+
+  examples: {
+    responses: {
+      default: {
+        connections: [
+          {
+            instanceId: "hermes",
+            friendlyName: "My Laptop",
+            remoteUrl: "https://unbottled.ai",
+            isActive: true,
+            lastSyncedAt: "2026-03-01T12:00:00.000Z",
+            hasToken: true,
+          },
+        ],
+      },
+    },
+  },
+});
+
+export type RemoteConnectionsListResponseOutput =
+  typeof GET.types.ResponseOutput;
+
+const endpoints = { GET };
+export default endpoints;

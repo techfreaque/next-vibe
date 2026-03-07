@@ -6,7 +6,7 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Plus } from "next-vibe-ui/ui/icons";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback } from "react";
 

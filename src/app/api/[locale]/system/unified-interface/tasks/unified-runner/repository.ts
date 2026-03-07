@@ -8,7 +8,7 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -26,13 +26,19 @@ import {
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
+import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type {
   JwtPayloadType,
   JwtPrivatePayloadType,
 } from "@/app/api/[locale]/user/auth/types";
-import { users as usersTable } from "@/app/api/[locale]/user/db";
-import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { env } from "@/config/env";
+import {
+  userRoles as userRolesTable,
+  users as usersTable,
+} from "@/app/api/[locale]/user/db";
+import {
+  UserPermissionRole,
+  UserRoleDB,
+} from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CronTaskExecution } from "../cron/db";
@@ -55,14 +61,12 @@ import type {
 /**
  * Resolve a routeId to its full endpoint path.
  * Resolution order:
- *  1. aliasToPathMap (endpoint aliases/paths) → { kind: "endpoint" }
+ *  1. pathToAliasMap (endpoint aliases/paths) → { kind: "endpoint" }
  *  2. unknown → { kind: "unknown" }
  */
 export async function resolveRouteId(
   routeId: string,
 ): Promise<ResolveRouteIdResult> {
-  const { getFullPath } =
-    await import("@/app/api/[locale]/system/generated/endpoint");
   const path = getFullPath(routeId);
   if (path !== null) {
     return { kind: "endpoint", path };
@@ -239,7 +243,7 @@ export class UnifiedTaskRunnerRepositoryImpl {
           config: resolvedInput,
           triggeredBy: "schedule",
           serverTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          executedByInstance: env.INSTANCE_ID ?? null,
+          executedByInstance: null,
         },
         t,
         this.logger,
@@ -251,16 +255,48 @@ export class UnifiedTaskRunnerRepositoryImpl {
 
     const startTime = Date.now();
 
-    // Resolve user locale: if task has a userId, use their locale; otherwise fall back to systemLocale
+    // Resolve user locale and roles: if task has a userId, use their locale and roles;
+    // otherwise fall back to systemLocale and ADMIN system user.
     let userLocale: CountryLanguage = this.systemLocale;
+    let taskUser: JwtPrivatePayloadType = this.cronUser;
+
     if (dbTask?.userId) {
       const ownerRow = await db
         .select({ locale: usersTable.locale })
         .from(usersTable)
         .where(eq(usersTable.id, dbTask.userId))
         .limit(1);
-      if (ownerRow[0]?.locale) {
-        userLocale = ownerRow[0].locale;
+
+      if (ownerRow[0]) {
+        if (ownerRow[0].locale) {
+          userLocale = ownerRow[0].locale;
+        }
+
+        // Load the task owner's actual roles — execute with their permissions,
+        // not the hardcoded ADMIN system user. Prevents privilege escalation
+        // where a CUSTOMER creates a cron task that calls an ADMIN-only endpoint.
+        const roleRows = await db
+          .select({ role: userRolesTable.role })
+          .from(userRolesTable)
+          .where(
+            and(
+              eq(userRolesTable.userId, dbTask.userId),
+              inArray(userRolesTable.role, [...UserRoleDB]),
+            ),
+          );
+
+        const roles = roleRows.map(
+          (r) => r.role,
+        ) as (typeof UserRoleDB)[number][];
+
+        taskUser = {
+          id: dbTask.userId,
+          // leadId is not stored on users table (users can have multiple leads).
+          // Use task id as a stable, unique scope for cron-executed AI operations.
+          leadId: dbTask.userId,
+          isPublic: false,
+          roles: roles.length > 0 ? roles : [UserPermissionRole.CUSTOMER],
+        };
       }
     }
 
@@ -276,7 +312,7 @@ export class UnifiedTaskRunnerRepositoryImpl {
       const result = await task.route({
         data,
         urlPathParams,
-        user: this.cronUser,
+        user: taskUser,
         locale: userLocale,
         logger: this.logger,
         platform: Platform.CRON,
@@ -403,6 +439,13 @@ export class UnifiedTaskRunnerRepositoryImpl {
           t,
           this.logger,
         );
+        // Compute rolling average execution time
+        const prevAvg = dbTask.averageExecutionTime ?? 0;
+        const newCount = dbTask.executionCount + 1;
+        const newAverageExecutionTime = Math.round(
+          (prevAvg * dbTask.executionCount + durationMs) / newCount,
+        );
+
         await CronTasksRepository.updateTask(
           dbTask.id,
           {
@@ -410,8 +453,9 @@ export class UnifiedTaskRunnerRepositoryImpl {
             lastExecutionStatus: CronTaskStatus.COMPLETED,
             lastExecutionError: null,
             lastExecutionDuration: durationMs,
-            executionCount: dbTask.executionCount + 1,
+            executionCount: newCount,
             successCount: dbTask.successCount + 1,
+            averageExecutionTime: newAverageExecutionTime,
           },
           null,
           this.systemLocale,

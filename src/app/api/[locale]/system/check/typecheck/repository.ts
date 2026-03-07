@@ -8,6 +8,7 @@
 
 import { exec } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { promisify } from "node:util";
 
 import { z } from "zod";
@@ -382,6 +383,7 @@ export class TypecheckRepositoryImpl {
     tempConfigPath: string,
     cachePath: string,
     locale: CountryLanguage,
+    extraExcludePatterns?: string[],
   ): void {
     // Calculate the relative prefix based on cache directory depth
     const prefix = TypecheckRepositoryImpl.getRelativePrefix(cachePath);
@@ -427,10 +429,17 @@ export class TypecheckRepositoryImpl {
       mainTsConfig.compilerOptions?.paths,
       prefix,
     );
-    const adjustedExcludes = TypecheckRepositoryImpl.adjustExcludePatterns(
-      mainTsConfig.exclude,
-      prefix,
-    );
+    const adjustedExcludes = [
+      ...TypecheckRepositoryImpl.adjustExcludePatterns(
+        mainTsConfig.exclude,
+        prefix,
+      ),
+      // Extra excludes from non-extensive mode — passed as-is (relative to project root,
+      // adjusted with prefix so they resolve correctly from the temp config location)
+      ...(extraExcludePatterns ?? []).map((p) =>
+        TypecheckRepositoryImpl.adjustPath(p, prefix),
+      ),
+    ];
     const adjustedTypeRoots = TypecheckRepositoryImpl.adjustTypeRoots(
       mainTsConfig.compilerOptions?.typeRoots,
       prefix,
@@ -519,6 +528,13 @@ export class TypecheckRepositoryImpl {
         limit: data.limit ?? defaultLimit,
       };
 
+      // Compute active ignore patterns from extensive flag
+      const isExtensive = data.extensive ?? defaults.extensive ?? false;
+      const activeIgnorePatterns =
+        !isExtensive && checkConfig.typecheck.enabled
+          ? checkConfig.typecheck.nonExtensiveIgnorePatterns
+          : undefined;
+
       // Check if typecheck is enabled
       if (!checkConfig.typecheck.enabled) {
         logger.info("Typecheck is disabled in check.config.ts");
@@ -549,6 +565,7 @@ export class TypecheckRepositoryImpl {
         typecheckConfig.cachePath,
         logger,
         locale,
+        activeIgnorePatterns,
       );
 
       if (!command) {
@@ -592,7 +609,7 @@ export class TypecheckRepositoryImpl {
         effectiveData.disableFilter,
       );
 
-      // Build response with optional sorting
+      // Files excluded via tsconfig (extra excludes are handled at compiler level in buildCommand)
       const allIssues = [...errors, ...warnings];
 
       // Skip sorting if requested (when vibe-check already sorted)
@@ -767,9 +784,41 @@ export class TypecheckRepositoryImpl {
     cachePath: string,
     logger: EndpointLogger,
     locale: CountryLanguage,
+    extraIgnorePatterns?: string[],
   ): string | null {
     if (config.pathType === PathType.NO_PATH) {
-      // No specific path provided, check entire project
+      // No specific path provided, check entire project.
+      // When extra ignore patterns are present we need a temp config to carry the excludes —
+      // tsconfig.json itself is never modified.
+      if (extraIgnorePatterns && extraIgnorePatterns.length > 0) {
+        /* eslint-disable i18next/no-literal-string */
+        const tempConfigFile = join(
+          cachePath,
+          `tsconfig.${config.cacheKey}.json`,
+        );
+        const tempBuildInfoFile = join(
+          cachePath,
+          `tsconfig.${config.cacheKey}.tsbuildinfo`,
+        );
+        /* eslint-enable i18next/no-literal-string */
+        logger.debug(
+          "[TYPESCRIPT] Creating temp tsconfig for full project with extra excludes",
+        );
+        // Empty filesToCheck — original tsconfig includes already cover the full project.
+        // The temp config just carries the extra excludes on top of those.
+        TypecheckRepositoryImpl.createTempTsConfig(
+          [],
+          tempConfigFile,
+          cachePath,
+          locale,
+          extraIgnorePatterns,
+        );
+        return TypecheckRepositoryImpl.buildTypecheckCommand(
+          baseCommand,
+          tempBuildInfoFile,
+          tempConfigFile,
+        );
+      }
 
       logger.debug("[TYPESCRIPT] Running check on entire project");
       return TypecheckRepositoryImpl.buildTypecheckCommand(
@@ -790,6 +839,7 @@ export class TypecheckRepositoryImpl {
         config.tempConfigFile,
         cachePath,
         locale,
+        extraIgnorePatterns,
       );
     } else if (config.pathType === PathType.MULTIPLE_PATHS) {
       // Multiple paths - combine all into one tsconfig
@@ -799,6 +849,7 @@ export class TypecheckRepositoryImpl {
         config.tempConfigFile,
         cachePath,
         locale,
+        extraIgnorePatterns,
       );
     } else {
       // Folder - create temporary tsconfig with folder glob pattern
@@ -809,6 +860,7 @@ export class TypecheckRepositoryImpl {
         config.tempConfigFile,
         cachePath,
         locale,
+        extraIgnorePatterns,
       );
     }
 

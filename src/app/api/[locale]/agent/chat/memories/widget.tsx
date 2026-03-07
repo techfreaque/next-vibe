@@ -164,7 +164,7 @@ export function MemoriesListContainer({
       if (a.priority !== b.priority) {
         return b.priority - a.priority;
       }
-      return a.memoryNumber - b.memoryNumber;
+      return a.id - b.id;
     });
   }, [memories]);
 
@@ -382,7 +382,7 @@ export function MemoriesListContainer({
               const originalIndex = sortedMemories.indexOf(memory);
               return (
                 <Div
-                  key={memory.memoryNumber}
+                  key={memory.id}
                   className={cn(
                     "group p-4 rounded-lg border border-border bg-card hover:border-primary/50 transition-all hover:shadow-sm",
                     isTouch && "hover:border-border hover:shadow-none",
@@ -394,14 +394,14 @@ export function MemoriesListContainer({
                     <Div className="flex items-center gap-2">
                       <BadgeWidget
                         field={withValue(
-                          children.memories.child.children.memoryNumber,
-                          memory.memoryNumber,
+                          children.memories.child.children.id,
+                          memory.id,
                           memory,
                         )}
                         fieldName={arrayFieldPath(
                           "memories",
                           originalIndex,
-                          "memoryNumber",
+                          "id",
                         )}
                       />
                       <BadgeWidget
@@ -420,11 +420,11 @@ export function MemoriesListContainer({
                         {!isTouch && (
                           <>
                             <EditMemoryButton
-                              memoryId={memory.memoryNumber}
+                              memoryId={memory.id}
                               navigate={navigate}
                             />
                             <DeleteMemoryButton
-                              memoryId={memory.memoryNumber}
+                              memoryId={memory.id}
                               navigate={navigate}
                             />
                           </>
@@ -467,11 +467,11 @@ export function MemoriesListContainer({
                       {isTouch && (
                         <Div className="flex items-center gap-1">
                           <EditMemoryButton
-                            memoryId={memory.memoryNumber}
+                            memoryId={memory.id}
                             navigate={navigate}
                           />
                           <DeleteMemoryButton
-                            memoryId={memory.memoryNumber}
+                            memoryId={memory.id}
                             navigate={navigate}
                           />
                         </Div>

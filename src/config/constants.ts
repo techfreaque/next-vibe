@@ -8,3 +8,12 @@ export const AUTH_TOKEN_COOKIE_MAX_AGE_SECONDS =
   60 * 60 * 24 * AUTH_TOKEN_COOKIE_MAX_AGE_DAYS; // AUTH_TOKEN_COOKIE_MAX_AGE_DAYS days
 export const AUTH_TOKEN_COOKIE_NAME = "token";
 export const RESET_TOKEN_EXPIRY = 4; // hours
+
+/**
+ * CSRF double-submit cookie name.
+ * Non-HttpOnly so JS can read and echo it as the X-CSRF-Token header.
+ * The server validates header === cookie to confirm the request originated
+ * from the same origin (cross-origin pages cannot read cookies).
+ */
+export const CSRF_TOKEN_COOKIE_NAME = "csrf_token";
+export const CSRF_TOKEN_HEADER_NAME = "x-csrf-token";

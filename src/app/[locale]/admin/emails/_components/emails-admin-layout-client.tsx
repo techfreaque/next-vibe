@@ -9,22 +9,20 @@ import { cn } from "next-vibe/shared/utils";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  Archive,
-  BarChart3,
-  Edit,
-  FileText,
-  Inbox,
-  Mail,
-  MessageCircle,
-  RefreshCw,
-  Send,
-  Server,
-  Settings,
-  Star,
-  Trash2,
-  Users,
-} from "next-vibe-ui/ui/icons";
+import { Archive } from "next-vibe-ui/ui/icons/Archive";
+import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
+import { Edit } from "next-vibe-ui/ui/icons/Edit";
+import { FileText } from "next-vibe-ui/ui/icons/FileText";
+import { Inbox } from "next-vibe-ui/ui/icons/Inbox";
+import { Mail } from "next-vibe-ui/ui/icons/Mail";
+import { MessageCircle } from "next-vibe-ui/ui/icons/MessageCircle";
+import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
+import { Send } from "next-vibe-ui/ui/icons/Send";
+import { Server } from "next-vibe-ui/ui/icons/Server";
+import { Settings } from "next-vibe-ui/ui/icons/Settings";
+import { Star } from "next-vibe-ui/ui/icons/Star";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
+import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import type { ComponentType, JSX, ReactNode } from "react";

@@ -9,13 +9,11 @@
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  AlertTriangle,
-  ChevronDown,
-  ChevronUp,
-  Loader2,
-  Sparkles,
-} from "next-vibe-ui/ui/icons";
+import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span } from "next-vibe-ui/ui/span";
 import { type JSX, useState } from "react";

@@ -172,11 +172,12 @@ export const Span = React.forwardRef<SpanRefObject, SpanProps>(
     ref,
   ): JSX.Element => {
     return (
+      // oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- Generic wrapper component passes all event handlers
       <span
         ref={ref as React.Ref<HTMLSpanElement>}
         className={className}
         style={style}
-        role={role}
+        role={role ?? (onClick !== undefined ? "button" : undefined)}
         aria-label={ariaLabel}
         id={id}
         title={title}

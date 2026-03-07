@@ -12,13 +12,17 @@ import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { definitionsRegistry } from "../../shared/endpoints/definitions/registry";
+import type { IDefinitionLoader } from "../../shared/endpoints/definition/loader";
+import {
+  definitionsRegistry,
+  type IDefinitionsRegistry,
+} from "../../shared/endpoints/definitions/registry";
 import { permissionsRegistry } from "../../shared/endpoints/permissions/registry";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
 import { Platform } from "../../shared/types/platform";
 import type { WidgetData } from "../../shared/widgets/widget-data";
 import { endpointToMCPTool } from "../converter";
-import { mcpRegistry } from "../registry";
+import { MCPRegistry, mcpRegistry } from "../registry";
 import type {
   JsonRpcError,
   JsonRpcRequest,
@@ -49,15 +53,21 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
   private logger: EndpointLogger;
   private locale: CountryLanguage;
   private user: JwtPayloadType;
+  private readonly registry: MCPRegistry;
+  private readonly defRegistry: IDefinitionsRegistry;
 
   constructor(
     logger: EndpointLogger,
     locale: CountryLanguage,
     user: JwtPayloadType,
+    registry: MCPRegistry = mcpRegistry,
+    defRegistry: IDefinitionsRegistry = definitionsRegistry,
   ) {
     this.logger = logger;
     this.locale = locale;
     this.user = user;
+    this.registry = registry;
+    this.defRegistry = defRegistry;
   }
 
   /**
@@ -212,7 +222,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     });
 
     // Initialize registry
-    await mcpRegistry.initialize(this.logger);
+    await this.registry.initialize(this.logger);
 
     const capabilities = {
       tools: true,
@@ -242,7 +252,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     this.logger.info("[MCP Protocol] Listing tools");
 
     // Get full endpoints with field information for proper schema generation
-    const endpoints = definitionsRegistry.getEndpointsForUser(
+    const endpoints = await this.defRegistry.getEndpointsForUser(
       Platform.MCP,
       this.user,
     );
@@ -281,7 +291,7 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
     });
 
     // Execute tool - params.arguments is already properly typed from MCPToolCallParams
-    const result = await mcpRegistry.executeTool(
+    const result = await this.registry.executeTool(
       {
         toolName: params.name,
         data: (params.arguments || {}) as CliRequestData,
@@ -359,6 +369,9 @@ export class MCPProtocolHandler implements IMCPProtocolHandler {
 export async function createMCPProtocolHandler(
   logger: EndpointLogger,
   locale: CountryLanguage,
+  registry?: MCPRegistry,
+  defRegistry?: IDefinitionsRegistry,
+  definitionLdr?: IDefinitionLoader,
 ): Promise<MCPProtocolHandler> {
   // Get CLI user for authentication using consolidated factory
   const cliUserResult = await getCliUser(logger, locale);
@@ -375,5 +388,18 @@ export async function createMCPProtocolHandler(
     throw new Error("CLI user ID is required");
   }
 
-  return new MCPProtocolHandler(logger, locale, cliUser);
+  // If scoped registries were provided, wire them; otherwise use global singletons (defaults)
+  const effectiveRegistry =
+    registry ??
+    (definitionLdr || defRegistry
+      ? new MCPRegistry(defRegistry, definitionLdr)
+      : undefined);
+
+  return new MCPProtocolHandler(
+    logger,
+    locale,
+    cliUser,
+    effectiveRegistry,
+    defRegistry,
+  );
 }

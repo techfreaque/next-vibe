@@ -222,7 +222,8 @@ export function FoldersListContainer({
   field,
 }: CustomWidgetProps): React.JSX.Element {
   const { user, locale } = useWidgetContext();
-  useChatBootContext();
+  const { initialFolderContentsData, initialRootFolderId } =
+    useChatBootContext();
   const { t } = scopedTranslation.scopedT(locale);
 
   const getNewChatLabel = (rootFolderId: DefaultFolderId): string => {
@@ -407,6 +408,10 @@ export function FoldersListContainer({
                 read: {
                   urlPathParams: { rootFolderId: activeRootFolderId },
                   initialState: { subFolderId: null },
+                  initialData:
+                    activeRootFolderId === initialRootFolderId
+                      ? (initialFolderContentsData ?? undefined)
+                      : undefined,
                   queryOptions: {
                     refetchOnWindowFocus: false,
                     staleTime: 30 * 1000,

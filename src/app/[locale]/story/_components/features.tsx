@@ -8,14 +8,12 @@ import {
   CardTitle,
 } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  Bot,
-  MessageSquare,
-  Shield,
-  ShieldOff,
-  Tag,
-  Zap,
-} from "next-vibe-ui/ui/icons";
+import { Bot } from "next-vibe-ui/ui/icons/Bot";
+import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
+import { Shield } from "next-vibe-ui/ui/icons/Shield";
+import { ShieldOff } from "next-vibe-ui/ui/icons/ShieldOff";
+import { Tag } from "next-vibe-ui/ui/icons/Tag";
+import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import type React from "react";
 import type { JSX } from "react";

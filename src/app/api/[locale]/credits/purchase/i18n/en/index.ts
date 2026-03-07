@@ -39,6 +39,7 @@ export const translations = {
       },
       requiresSubscription:
         "An active subscription is required to purchase credit packs",
+      totalSummary: "{{totalCredits}} credits total · {{totalPrice}} total",
     },
     submit: {
       text: "Buy Credit Pack",

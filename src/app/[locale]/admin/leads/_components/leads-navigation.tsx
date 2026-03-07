@@ -7,14 +7,12 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  BarChart3,
-  List,
-  Mail,
-  Settings,
-  TestTube,
-  Upload,
-} from "next-vibe-ui/ui/icons";
+import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
+import { List } from "next-vibe-ui/ui/icons/List";
+import { Mail } from "next-vibe-ui/ui/icons/Mail";
+import { Settings } from "next-vibe-ui/ui/icons/Settings";
+import { TestTube } from "next-vibe-ui/ui/icons/TestTube";
+import { Upload } from "next-vibe-ui/ui/icons/Upload";
 import { Link } from "next-vibe-ui/ui/link";
 import { Nav } from "next-vibe-ui/ui/nav";
 import { Span } from "next-vibe-ui/ui/span";

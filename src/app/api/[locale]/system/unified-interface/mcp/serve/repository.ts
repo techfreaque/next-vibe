@@ -10,7 +10,10 @@ import { success } from "next-vibe/shared/types/response.schema";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { IDefinitionLoader } from "../../shared/endpoints/definition/loader";
+import type { IDefinitionsRegistry } from "../../shared/endpoints/definitions/registry";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
+import type { MCPRegistry } from "../registry";
 import { MCPServer } from "../server/server";
 import type { MCPServeResponseInput } from "./definition";
 
@@ -22,6 +25,9 @@ class MCPServeRepository {
   async startServer(
     logger: EndpointLogger,
     locale: CountryLanguage,
+    registry?: MCPRegistry,
+    defRegistry?: IDefinitionsRegistry,
+    definitionLdr?: IDefinitionLoader,
   ): Promise<ResponseType<MCPServeResponseInput>> {
     // Log current directory (chdir already happened in vibe-runtime)
     logger.info("[MCP] Starting MCP server", {
@@ -29,7 +35,7 @@ class MCPServeRepository {
       projectRoot: process.env.PROJECT_ROOT,
     });
 
-    const mcpServer = new MCPServer();
+    const mcpServer = new MCPServer(registry, defRegistry, definitionLdr);
 
     // This never returns - the MCP server takes over stdin/stdout
     await mcpServer.start(logger, locale);

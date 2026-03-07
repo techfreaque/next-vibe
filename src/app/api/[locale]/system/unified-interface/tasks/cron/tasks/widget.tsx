@@ -8,21 +8,19 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  BarChart3,
-  CheckCircle,
-  Circle,
-  Clock,
-  Eye,
-  History,
-  Loader2,
-  Pencil,
-  Plus,
-  RefreshCw,
-  Search,
-  Trash2,
-  XCircle,
-} from "next-vibe-ui/ui/icons";
+import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { Circle } from "next-vibe-ui/ui/icons/Circle";
+import { Clock } from "next-vibe-ui/ui/icons/Clock";
+import { Eye } from "next-vibe-ui/ui/icons/Eye";
+import { History } from "next-vibe-ui/ui/icons/History";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
+import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
+import { Search } from "next-vibe-ui/ui/icons/Search";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
+import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Input } from "next-vibe-ui/ui/input";
 import {
   Select,
@@ -489,20 +487,20 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
     return {
       all: tasks.length,
       running: tasks.filter(
-        (t) => t.lastExecutionStatus === CronTaskStatus.RUNNING,
+        (task) => task.lastExecutionStatus === CronTaskStatus.RUNNING,
       ).length,
       completed: tasks.filter(
-        (t) => t.lastExecutionStatus === CronTaskStatus.COMPLETED,
+        (task) => task.lastExecutionStatus === CronTaskStatus.COMPLETED,
       ).length,
       failed: tasks.filter(
-        (t) =>
-          t.lastExecutionStatus === CronTaskStatus.FAILED ||
-          t.lastExecutionStatus === CronTaskStatus.ERROR,
+        (task) =>
+          task.lastExecutionStatus === CronTaskStatus.FAILED ||
+          task.lastExecutionStatus === CronTaskStatus.ERROR,
       ).length,
       pending: tasks.filter(
-        (t) => t.lastExecutionStatus === CronTaskStatus.PENDING,
+        (task) => task.lastExecutionStatus === CronTaskStatus.PENDING,
       ).length,
-      disabled: tasks.filter((t) => !t.enabled).length,
+      disabled: tasks.filter((task) => !task.enabled).length,
     };
   }, [tasks]);
 
@@ -513,11 +511,11 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(
-        (t) =>
-          t.displayName.toLowerCase().includes(q) ||
-          t.routeId.toLowerCase().includes(q) ||
-          (t.description?.toLowerCase().includes(q) ?? false) ||
-          t.category.toLowerCase().includes(q),
+        (task) =>
+          task.displayName.toLowerCase().includes(q) ||
+          task.routeId.toLowerCase().includes(q) ||
+          (task.description?.toLowerCase().includes(q) ?? false) ||
+          task.category.toLowerCase().includes(q),
       );
     }
 

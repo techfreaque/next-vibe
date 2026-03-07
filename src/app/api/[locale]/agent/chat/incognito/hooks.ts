@@ -259,7 +259,6 @@ export function useIncognitoChat(
         role,
         content,
         parentId,
-        depth: 0,
         sequenceId: null,
         authorId: "incognito",
         authorName: null,

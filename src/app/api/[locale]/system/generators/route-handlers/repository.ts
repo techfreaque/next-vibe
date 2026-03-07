@@ -126,7 +126,10 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
       }
 
       // Generate content with only valid route files
-      const content = await this.generateContent(validRouteFiles, logger);
+      const { content, routeCount } = await this.generateContent(
+        validRouteFiles,
+        logger,
+      );
 
       // Write file
       await writeGeneratedFile(outputFile, content, data.dryRun);
@@ -135,7 +138,7 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
 
       logger.info(
         formatGenerator(
-          `Generated route handlers file with ${formatCount(validRouteFiles.length, "route")} in ${formatDuration(duration)}`,
+          `Generated route handlers file with ${formatCount(routeCount, "route")} in ${formatDuration(duration)}`,
           "🔗",
         ),
       );
@@ -182,7 +185,7 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
       } catch {
         // Bun plugin race — yield then retry
         await new Promise((resolve) => {
-          setTimeout(resolve, 0);
+          setTimeout(resolve, 10);
         });
         defaultExport = definition.default;
       }
@@ -219,7 +222,7 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
         defaultExport = definition.default;
       } catch {
         await new Promise((resolve) => {
-          setTimeout(resolve, 0);
+          setTimeout(resolve, 10);
         });
         defaultExport = definition.default;
       }
@@ -255,9 +258,10 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
   private async generateContent(
     routeFiles: string[],
     logger: EndpointLogger,
-  ): Promise<string> {
+  ): Promise<{ content: string; routeCount: number }> {
     const pathMap: Record<string, { importPath: string; method: string }> = {};
     const allPaths: string[] = [];
+    let routeCount = 0;
 
     // Build path map with method suffixes and aliases (deduplicate)
     for (const routeFile of routeFiles) {
@@ -282,6 +286,7 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
         if (!pathMap[pathWithMethod]) {
           pathMap[pathWithMethod] = { importPath, method };
           allPaths.push(pathWithMethod);
+          routeCount++;
         }
       }
 
@@ -345,7 +350,7 @@ class RouteHandlersGeneratorRepositoryImpl implements RouteHandlersGeneratorRepo
     });
 
     // eslint-disable-next-line i18next/no-literal-string
-    return `${header}
+    const content = `${header}
 
 import type { GenericHandlerBase } from "../unified-interface/shared/endpoints/route/handler";
 
@@ -367,6 +372,7 @@ ${cases.join("\n")}
   }
 }
 `;
+    return { content, routeCount };
   }
 }
 

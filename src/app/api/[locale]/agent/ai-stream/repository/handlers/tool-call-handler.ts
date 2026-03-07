@@ -5,11 +5,7 @@
 import type { JSONValue } from "ai";
 
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
-import { definitionsRegistry } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definitions/registry";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import type { ToolCall, ToolCallResult } from "../../../chat/db";
 import { NO_LOOP_PARAM } from "../core/constants";
@@ -33,14 +29,15 @@ export class ToolCallHandler {
     isInReasoningBlock: boolean;
     threadId: string;
     currentParentId: string | null;
-    currentDepth: number;
     model: ModelId;
     character: string;
     sequenceId: string;
     isIncognito: boolean;
     userId: string | undefined;
-    user: JwtPayloadType;
-    toolsConfig: Map<string, { requiresConfirmation: boolean }>;
+    toolsConfig: Map<
+      string,
+      { requiresConfirmation: boolean; credits: number }
+    >;
     streamAbortController: AbortController;
     dbWriter: MessageDbWriter;
     logger: EndpointLogger;
@@ -49,14 +46,12 @@ export class ToolCallHandler {
     currentAssistantContent: string;
     isInReasoningBlock: boolean;
     currentParentId: string | null;
-    currentDepth: number;
     requiresConfirmation: boolean;
     pendingToolMessage: {
       messageId: string;
       toolCallData: {
         toolCall: ToolCall;
         parentId: string | null;
-        depth: number;
       };
     };
   }> {
@@ -70,13 +65,12 @@ export class ToolCallHandler {
       character,
       sequenceId,
       userId,
-      user,
       toolsConfig,
       dbWriter,
       logger,
     } = params;
 
-    let { currentAssistantMessageId, currentParentId, currentDepth } = params;
+    let { currentAssistantMessageId, currentParentId } = params;
 
     // Tool call event without preceding text/reasoning - create placeholder ASSISTANT message
     // CRITICAL: Must CREATE the message in DB so TOOL messages can reference it as parent_id
@@ -90,7 +84,6 @@ export class ToolCallHandler {
           messageId: currentAssistantMessageId,
           reason: "Tool call without preceding text/reasoning",
           parentId: params.currentParentId,
-          depth: currentDepth,
         },
       );
 
@@ -98,7 +91,6 @@ export class ToolCallHandler {
         messageId: currentAssistantMessageId,
         threadId,
         parentId: params.currentParentId,
-        depth: currentDepth,
         userId,
         model,
         character,
@@ -161,26 +153,12 @@ export class ToolCallHandler {
       );
     }
 
-    // Look up endpoint to get credit cost and definition-level requiresConfirmation
-    const allEndpoints = definitionsRegistry.getEndpointsForUser(
-      Platform.AI,
-      user,
-    );
-    const endpoint = allEndpoints.find((e) => {
-      const preferredName = getPreferredToolName(e);
-      return preferredName === part.toolName;
-    });
-    const creditCost = endpoint?.credits ?? 0;
-
-    // Confirmation: client config overrides definition, definition is fallback
+    // All tool metadata comes from toolsConfig built during setup
     const toolConfig = toolsConfig.get(part.toolName);
-    const requiresConfirmation =
-      toolConfig?.requiresConfirmation ??
-      endpoint?.requiresConfirmation ??
-      false;
+    const creditCost = toolConfig?.credits ?? 0;
+    const requiresConfirmation = toolConfig?.requiresConfirmation ?? false;
 
     const newCurrentParentId = currentParentId;
-    const newCurrentDepth = currentDepth + 1;
 
     logger.debug("[AI Stream] Tool confirmation check", {
       toolName: part.toolName,
@@ -208,7 +186,6 @@ export class ToolCallHandler {
       toolMessageId,
       threadId,
       parentId: newCurrentParentId,
-      depth: newCurrentDepth,
       userId,
       model,
       character,
@@ -242,14 +219,12 @@ export class ToolCallHandler {
         currentAssistantContent: newAssistantContent,
         isInReasoningBlock: _newIsInReasoningBlock,
         currentParentId: newCurrentParentId,
-        currentDepth: newCurrentDepth,
         requiresConfirmation: true,
         pendingToolMessage: {
           messageId: toolMessageId,
           toolCallData: {
             toolCall: toolCallData,
             parentId: newCurrentParentId,
-            depth: newCurrentDepth,
           },
         },
       };
@@ -265,14 +240,12 @@ export class ToolCallHandler {
       currentAssistantContent: newAssistantContent,
       isInReasoningBlock: _newIsInReasoningBlock,
       currentParentId: newCurrentParentId,
-      currentDepth: newCurrentDepth,
       requiresConfirmation: false,
       pendingToolMessage: {
         messageId: toolMessageId,
         toolCallData: {
           toolCall: toolCallData,
           parentId: newCurrentParentId,
-          depth: newCurrentDepth,
         },
       },
     };

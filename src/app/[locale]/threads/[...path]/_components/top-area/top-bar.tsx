@@ -12,12 +12,10 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "next-vibe-ui/ui/dropdown-menu";
-import {
-  ChevronRight,
-  MessageSquarePlus,
-  PanelLeft,
-  Settings,
-} from "next-vibe-ui/ui/icons";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { MessageSquarePlus } from "next-vibe-ui/ui/icons/MessageSquarePlus";
+import { PanelLeft } from "next-vibe-ui/ui/icons/PanelLeft";
+import { Settings } from "next-vibe-ui/ui/icons/Settings";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useState } from "react";
@@ -175,7 +173,7 @@ export function TopBar({ currentCountry, locale }: TopBarProps): JSX.Element {
         )}
         {(!sidebarCollapsed || Object.keys(messages).length === 0) && (
           <Div className="flex-1 flex justify-center">
-            <Logo locale={locale} pathName="" size="h-8" />
+            <Logo locale={locale} pathName="/story" size="h-8" />
           </Div>
         )}
       </Div>

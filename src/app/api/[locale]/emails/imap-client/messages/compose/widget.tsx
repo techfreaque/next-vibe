@@ -7,7 +7,9 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Loader2, Send, X } from "next-vibe-ui/ui/icons";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Send } from "next-vibe-ui/ui/icons/Send";
+import { X } from "next-vibe-ui/ui/icons/X";
 import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";
 import { Textarea } from "next-vibe-ui/ui/textarea";

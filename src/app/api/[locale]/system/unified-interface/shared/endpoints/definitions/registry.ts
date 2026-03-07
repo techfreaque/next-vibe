@@ -1,4 +1,5 @@
-import { endpoints } from "@/app/api/[locale]/system/generated/endpoints";
+import "server-only";
+
 import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/parsing";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { UserRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
@@ -6,18 +7,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
-import { Methods } from "../../types/enums";
+import type { Methods } from "../../types/enums";
 import type { Platform } from "../../types/platform";
 import { endpointToToolName } from "../../utils/path";
 import { permissionsRegistry } from "../permissions/registry";
-
-type EndpointNode =
-  | {
-      [K in Methods]?: CreateApiEndpointAny;
-    }
-  | {
-      [key: string]: EndpointNode;
-    };
 
 export interface SerializableToolMetadata {
   name: string;
@@ -41,27 +34,20 @@ export interface SerializableToolMetadata {
 }
 
 export interface IDefinitionsRegistry {
-  /**
-   * Get all endpoints for a platform, filtered by user permissions
-   */
   getEndpointsForUser(
     platform: Platform,
     user: JwtPayloadType,
-  ): CreateApiEndpointAny[];
+  ): Promise<CreateApiEndpointAny[]>;
 
-  /**
-   * Get endpoint count by category
-   */
-  getEndpointCountByCategory(platform: Platform): Record<string, number>;
+  getEndpointCountByCategory(
+    platform: Platform,
+  ): Promise<Record<string, number>>;
 
-  /**
-   * Get serialized tools for a user (convenience method)
-   */
   getSerializedToolsForUser(
     platform: Platform,
     user: JwtPayloadType,
     locale: CountryLanguage,
-  ): SerializableToolMetadata[];
+  ): Promise<SerializableToolMetadata[]>;
 }
 
 const TOOLS_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
@@ -71,8 +57,41 @@ interface ToolsCacheEntry {
   expiresAt: number;
 }
 
+/** All definitions loaded once at first call, then cached permanently. */
+let allDefinitionsCache: CreateApiEndpointAny[] | null = null;
+
+async function loadAllDefinitions(): Promise<CreateApiEndpointAny[]> {
+  if (allDefinitionsCache !== null) {
+    return allDefinitionsCache;
+  }
+
+  const { pathToAliasMap } =
+    await import("@/app/api/[locale]/system/generated/alias-map");
+  const { getEndpoint } =
+    await import("@/app/api/[locale]/system/generated/endpoint");
+
+  // Collect unique canonical paths (values in pathToAliasMap are canonical)
+  const canonical = new Set(Object.values(pathToAliasMap));
+
+  const results = await Promise.all(
+    [...canonical].map((path) => getEndpoint(path)),
+  );
+
+  allDefinitionsCache = results.filter(
+    (d): d is CreateApiEndpointAny => d !== null,
+  );
+  return allDefinitionsCache;
+}
+
+export type GetAllDefinitionsFn = () => Promise<CreateApiEndpointAny[]>;
+
 export class DefinitionsRegistry implements IDefinitionsRegistry {
   private toolsCache = new Map<string, ToolsCacheEntry>();
+  private readonly getAllDefinitions: GetAllDefinitionsFn;
+
+  constructor(getAllDefinitions: GetAllDefinitionsFn = loadAllDefinitions) {
+    this.getAllDefinitions = getAllDefinitions;
+  }
 
   private getToolsCacheKey(
     platform: Platform,
@@ -83,135 +102,45 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
     return `${platform}:${locale}:${roles}`;
   }
 
-  /**
-   * Get all endpoints for a platform (metadata only, no permission filtering)
-   */
-  private getEndpoints(platform: Platform): CreateApiEndpointAny[] {
-    const endpointsData = endpoints as EndpointNode;
-    const discovered: CreateApiEndpointAny[] = [];
-
-    const traverse = (obj: EndpointNode, pathSegments: string[] = []): void => {
-      if (!obj || typeof obj !== "object") {
-        return;
+  private async getAllForPlatform(
+    platform: Platform,
+  ): Promise<CreateApiEndpointAny[]> {
+    const all = await this.getAllDefinitions();
+    return all.filter((definition) => {
+      if (!definition.allowedRoles) {
+        return true;
       }
-
-      const methods = Object.keys(obj).filter((key) =>
-        Object.values(Methods).includes(key as Methods),
-      );
-
-      // Process methods if they exist
-      if (methods.length > 0) {
-        for (const method of methods) {
-          const methodKey = method as Methods;
-          const definition = obj[methodKey] as CreateApiEndpointAny;
-
-          if (!definition) {
-            continue;
-          }
-
-          // Check platform access (execution set — opt-out per platform).
-          // MCP_VISIBLE discovery filtering is handled separately in getSerializedToolsForUser.
-          if (definition.allowedRoles) {
-            const access = permissionsRegistry.checkPlatformAccess(
-              definition.allowedRoles,
-              platform,
-            );
-            if (!access.allowed) {
-              continue;
-            }
-          }
-
-          discovered.push(definition);
-        }
-      }
-
-      // Always traverse child nodes (nodes can have both methods and children)
-      for (const [key, value] of Object.entries(obj)) {
-        if (
-          key.startsWith("_") ||
-          Object.values(Methods).includes(key as Methods) ||
-          typeof value !== "object" ||
-          value === null
-        ) {
-          continue;
-        }
-        traverse(value as EndpointNode, [...pathSegments, key]);
-      }
-    };
-
-    traverse(endpointsData);
-    return discovered;
+      return permissionsRegistry.checkPlatformAccess(
+        definition.allowedRoles,
+        platform,
+      ).allowed;
+    });
   }
 
-  /**
-   * Get all endpoints for a platform, filtered by user permissions
-   */
-  getEndpointsForUser(
+  async getEndpointsForUser(
     platform: Platform,
     user: JwtPayloadType,
-  ): CreateApiEndpointAny[] {
-    const discovered = this.getEndpoints(platform);
-
-    // Filter by user permissions
-    const filtered = permissionsRegistry.filterEndpointsByPermissions(
+  ): Promise<CreateApiEndpointAny[]> {
+    const discovered = await this.getAllForPlatform(platform);
+    return permissionsRegistry.filterEndpointsByPermissions(
       discovered,
       user,
       platform,
     );
-
-    return filtered;
   }
 
-  /**
-   * Get total endpoint count (no platform or permission filtering).
-   * Traverses the endpoint tree and counts all registered HTTP methods.
-   */
-  getTotalEndpointCount(): number {
-    const endpointsData = endpoints as EndpointNode;
-    let count = 0;
-
-    const traverse = (obj: EndpointNode): void => {
-      if (!obj || typeof obj !== "object") {
-        return;
-      }
-      for (const [key, value] of Object.entries(obj)) {
-        if (Object.values(Methods).includes(key as Methods)) {
-          if (value) {
-            count++;
-          }
-        } else if (
-          !key.startsWith("_") &&
-          typeof value === "object" &&
-          value !== null
-        ) {
-          traverse(value as EndpointNode);
-        }
-      }
-    };
-
-    traverse(endpointsData);
-    return count;
-  }
-
-  /**
-   * Get endpoint count by category (no permission filtering)
-   */
-  getEndpointCountByCategory(platform: Platform): Record<string, number> {
-    const allEndpoints = this.getEndpoints(platform);
+  async getEndpointCountByCategory(
+    platform: Platform,
+  ): Promise<Record<string, number>> {
+    const allEndpoints = await this.getAllForPlatform(platform);
     const counts: Record<string, number> = {};
-
     for (const endpoint of allEndpoints) {
       const category = endpoint.category;
-      counts[category] = (counts[category] || 0) + 1;
+      counts[category] = (counts[category] ?? 0) + 1;
     }
-
     return counts;
   }
 
-  /**
-   * Merge requests + urlPathParams example maps into a single flat inputs map.
-   * Keys present in both are merged (urlPathParams wins on collision).
-   */
   private static mergeExampleInputs(
     requests: Record<string, CliRequestData> | undefined,
     urlPathParams: Record<string, CliRequestData> | undefined,
@@ -233,9 +162,6 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
     return merged;
   }
 
-  /**
-   * Serialize endpoints to tool metadata format
-   */
   private serializeEndpoints(
     endpoints: CreateApiEndpointAny[],
     locale: CountryLanguage,
@@ -246,22 +172,13 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
       const method = definition.method;
       const toolName = endpointToToolName(definition);
 
-      const title = t(definition.title);
-      const description = t(definition.description);
-      const category = globalT(definition.category);
-      const tags = definition.tags;
-
-      const translatedTags = tags.map((tag) => {
-        return t(tag);
-      });
-
       return {
         name: toolName,
         method,
-        title: title,
-        description: description,
-        category,
-        tags: translatedTags,
+        title: t(definition.title),
+        description: t(definition.description),
+        category: globalT(definition.category),
+        tags: definition.tags.map((tag) => t(tag)),
         toolName,
         allowedRoles: definition.allowedRoles
           ? [...definition.allowedRoles]
@@ -290,17 +207,11 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
     });
   }
 
-  /**
-   * Get serialized tools for a user (convenience method).
-   * Returns the full execution set for the platform (all tools the user can actually call).
-   * Callers that need discovery-filtered lists (e.g. MCP native tool listing) must apply
-   * their own additional filter — see MCPRegistry.getTools() for MCP_VISIBLE filtering.
-   */
-  getSerializedToolsForUser(
+  async getSerializedToolsForUser(
     platform: Platform,
     user: JwtPayloadType,
     locale: CountryLanguage,
-  ): SerializableToolMetadata[] {
+  ): Promise<SerializableToolMetadata[]> {
     const cacheKey = this.getToolsCacheKey(platform, user, locale);
     const cached = this.toolsCache.get(cacheKey);
     const now = Date.now();
@@ -309,14 +220,13 @@ export class DefinitionsRegistry implements IDefinitionsRegistry {
       return cached.data;
     }
 
-    const filteredEndpoints = this.getEndpointsForUser(platform, user);
+    const filteredEndpoints = await this.getEndpointsForUser(platform, user);
     const result = this.serializeEndpoints(filteredEndpoints, locale);
 
     this.toolsCache.set(cacheKey, {
       data: result,
       expiresAt: now + TOOLS_CACHE_TTL_MS,
     });
-
     return result;
   }
 }

@@ -149,11 +149,10 @@ export function FavoriteEditContainer({
   };
 
   const handleUseThisFavorite = async (): Promise<void> => {
-    const favoriteId = navigation.current?.params?.urlPathParams?.id as
-      | string
-      | undefined;
+    const activatingFavoriteId = navigation.current?.params?.urlPathParams
+      ?.id as string | undefined;
 
-    if (!favoriteId) {
+    if (!activatingFavoriteId) {
       logger.error("Cannot activate favorite - missing favorite ID");
       return;
     }
@@ -170,7 +169,9 @@ export function FavoriteEditContainer({
     );
 
     const favorite = favoritesData?.success
-      ? favoritesData.data.favorites.find((fav) => fav.id === favoriteId)
+      ? favoritesData.data.favorites.find(
+          (fav) => fav.id === activatingFavoriteId,
+        )
       : undefined;
 
     const modelId = favorite?.modelId ?? null;
@@ -178,7 +179,7 @@ export function FavoriteEditContainer({
     const currentVoice = favorite?.voice ?? null;
 
     await ChatSettingsRepositoryClient.selectFavorite({
-      favoriteId,
+      favoriteId: activatingFavoriteId,
       modelId,
       characterId: currentCharacterId,
       voice: currentVoice,

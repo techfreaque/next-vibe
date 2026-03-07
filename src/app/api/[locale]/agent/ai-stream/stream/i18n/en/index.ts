@@ -14,9 +14,9 @@ export const translations = {
     },
     post: {
       title: "Run AI Agent",
-      dynamicTitle: "AI Run: {{prompt}}",
+      dynamicTitle: "AI Run{{suffix}}: {{prompt}}",
       description:
-        "Run a headless AI agent and get back the full text response. Use this to delegate tasks, summarise tool results, generate content, or chain tools into a single AI answer. Credits are consumed based on the model. QUICKSTART: Pass favoriteId to load character + model + tool config from a saved favorite in one shot. Override any field (model, character, tools, allowedTools) by also passing it explicitly. SETUP GUIDE: Before running, set up the right character + favorite for the task. Characters define the persona and system prompt (create with agent_chat_characters_create_POST). Favorites bundle a character with a model override and tool config (create with agent_chat_favorites_create_POST, modelSelection: {selectionType:'MANUAL', manualModelId:'...'} or {selectionType:'FILTERS',...}). Workflow: 1) List favorites (agent_chat_favorites_GET) or characters (agent_chat_characters_GET) to see what exists. 2) If none fits, create a character then create a favorite for it with the desired model. 3) Pass favoriteId to this call — model, character, and tools are resolved automatically. You can also pass just character (model is resolved from character's modelSelection) or both model + character explicitly. TOOL ACCESS: To give the agent tool access, add tools to allowedTools (execution permission). The standard agentic setup is allowedTools: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool lets the agent run any endpoint, system_help_GET lets it discover what's available. When using favoriteId, the favorite's activeTools and visibleTools are used as defaults if you don't pass tools/allowedTools explicitly.",
+        "Run a headless AI agent and get back the full text response. Pass favoriteId to load character + model + tools in one shot (recommended), or set model + character + allowedTools explicitly. For tool access, add allowedTools: [{toolId:'execute-tool'},{toolId:'tool-help'}]. Use tool-help to discover available tools. Credits consumed based on model.",
       container: {
         title: "AI Agent Run",
         description: "Configure pre-calls and prompt for headless AI execution",
@@ -54,11 +54,11 @@ export const translations = {
         preCalls: {
           label: "Pre-Calls",
           description:
-            "Tool calls to execute before the prompt. Results are injected as context. Use system_help_GET to discover available tools and their args.",
+            "Tool calls to execute before the prompt. Results are injected as context. Use tool-help to discover available tools and their args.",
           routeId: {
             label: "Tool ID",
             description:
-              "Alias or full tool name to call (e.g. 'web-search', 'agent_chat_characters_GET'). Use system_help_GET to discover tools.",
+              "Alias or full tool name to call (e.g. 'web-search', 'agent_chat_characters_GET'). Use tool-help to discover tools.",
             placeholder: "web-search",
           },
           args: {
@@ -70,11 +70,11 @@ export const translations = {
         allowedTools: {
           label: "Allowed to Execute",
           description:
-            "Execution permission gate — controls which tools the AI is actually allowed to run. null = all tools permitted. Array = restrict to listed tools only (any other call is blocked with 'disabled by user'). Standard agentic setup: [{toolId:'execute-tool'},{toolId:'system_help_GET'}] — execute-tool dispatches any registered endpoint, system_help_GET lets the agent discover available tools. No need to repeat tools already listed in the tools field.",
+            "Execution permission gate — controls which tools the AI is actually allowed to run. null = all tools permitted. Array = restrict to listed tools only (any other call is blocked with 'disabled by user'). Standard agentic setup: [{toolId:'execute-tool'},{toolId:'tool-help'}] — execute-tool dispatches any registered endpoint, tool-help lets the agent discover available tools. No need to repeat tools already listed in the tools field.",
           toolId: {
             label: "Tool ID",
             description:
-              "Alias or full tool name the AI is permitted to execute (e.g. 'execute-tool', 'system_help_GET', 'web-search')",
+              "Alias or full tool name the AI is permitted to execute (e.g. 'execute-tool', 'tool-help', 'web-search')",
           },
           requiresConfirmation: {
             label: "Requires Confirmation",
@@ -89,7 +89,7 @@ export const translations = {
           toolId: {
             label: "Tool ID",
             description:
-              "Alias or full tool name to load into the model's context (e.g. 'execute-tool', 'system_help_GET')",
+              "Alias or full tool name to load into the model's context (e.g. 'execute-tool', 'tool-help')",
           },
           requiresConfirmation: {
             label: "Requires Confirmation",
@@ -216,7 +216,8 @@ export const translations = {
   },
   post: {
     title: "AI Stream Chat",
-    description: "Stream AI-powered chat responses using OpenAI GPT-4o",
+    description:
+      "Stream AI-powered chat responses using 40+ models (Claude, GPT, Gemini, Llama, and more). Supports text, voice, file attachments, and agentic tool use.",
     form: {
       title: "AI Chat Configuration",
       description: "Configure AI chat parameters and messages",
@@ -241,7 +242,8 @@ export const translations = {
     },
     threadId: {
       label: "Thread ID",
-      description: "Thread ID (null to create new thread)",
+      description:
+        "UUID of the thread to send this message to. Must be a valid UUID — create a thread first if you don't have one.",
     },
     userMessageId: {
       label: "User Message ID",
@@ -388,7 +390,8 @@ export const translations = {
       },
       voice: {
         label: "Voice",
-        description: "Select voice type for text-to-speech",
+        description:
+          'Select voice type for text-to-speech. Pass "voices.MALE" for a male voice or "voices.FEMALE" (default) for a female voice.',
         male: "Male Voice",
         female: "Female Voice",
       },
@@ -523,11 +526,9 @@ export const translations = {
   },
   headless: {
     errors: {
-      /**
-       * Thrown when runHeadlessAiStream() is called without a resolvable model+character.
-       * Either pass model+character directly, or pass favoriteId pointing to a favorite
-       * that has a MANUAL or FILTERS modelSelection (not CHARACTER_BASED with no character).
-       */
+      // Thrown when runHeadlessAiStream() is called without a resolvable model+character.
+      // Either pass model+character directly, or pass favoriteId pointing to a favorite
+      // that has a MANUAL or FILTERS modelSelection (not CHARACTER_BASED with no character).
       missingModelOrCharacter:
         "model and character are required — pass them directly or provide a favoriteId with a resolvable model selection",
       favoriteNotFound: "Favorite not found or does not belong to this user",

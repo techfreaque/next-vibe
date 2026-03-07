@@ -39,6 +39,6 @@ export const config = {
   matcher: [
     // Match all paths except static files and specific API routes
     "/",
-    "/((?!_next/static|_next/image|image|images|favicon.ico|robots.txt|sitemap.xml|api/[^/]+/manifest).*)",
+    "/((?!_next/static|_next/image|image|images|favicon.ico|robots.txt|sitemap.xml|vibe-frame|api/[^/]+/manifest).*)",
   ],
 };

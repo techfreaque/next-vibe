@@ -1,6 +1,7 @@
 import type { Metadata, ResolvingMetadata } from "next";
 import { Div } from "next-vibe-ui/ui/div";
-import { Lock, Shield } from "next-vibe-ui/ui/icons";
+import { Lock } from "next-vibe-ui/ui/icons/Lock";
+import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Li } from "next-vibe-ui/ui/li";
 import { Span } from "next-vibe-ui/ui/span";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";

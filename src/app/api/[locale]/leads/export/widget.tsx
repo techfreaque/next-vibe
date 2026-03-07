@@ -9,17 +9,15 @@ import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  ArrowRight,
-  CheckCircle,
-  Clock,
-  Copy,
-  Download,
-  FileText,
-  List,
-  Loader2,
-  Upload,
-} from "next-vibe-ui/ui/icons";
+import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { Clock } from "next-vibe-ui/ui/icons/Clock";
+import { Copy } from "next-vibe-ui/ui/icons/Copy";
+import { Download } from "next-vibe-ui/ui/icons/Download";
+import { FileText } from "next-vibe-ui/ui/icons/FileText";
+import { List } from "next-vibe-ui/ui/icons/List";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Upload } from "next-vibe-ui/ui/icons/Upload";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
 import { Span } from "next-vibe-ui/ui/span";

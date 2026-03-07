@@ -52,6 +52,10 @@ export const translations = {
       title: "Create Referral Code",
       description: "Generate a new referral code to share with others",
     },
+    submit: {
+      label: "Create Code",
+      loading: "Creating...",
+    },
   },
 
   // PUT endpoint (update referral code)

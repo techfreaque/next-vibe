@@ -3,7 +3,10 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { ChevronDown, ChevronUp, Menu, X } from "next-vibe-ui/ui/icons";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
+import { Menu } from "next-vibe-ui/ui/icons/Menu";
+import { X } from "next-vibe-ui/ui/icons/X";
 import { Link } from "next-vibe-ui/ui/link";
 import { AnimatePresence, MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";

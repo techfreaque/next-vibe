@@ -46,6 +46,7 @@ const contactFormPropsSchema = z.object({
   email: z.string().email(),
   company: z.string().optional(),
   subject: z.string(),
+  priority: z.string().optional(),
   message: z.string(),
   isForCompany: z.boolean(),
   userId: z.string().optional(),
@@ -108,57 +109,112 @@ function ContactFormEmail({
           {t("email.company.contactDetails")}
         </Span>
 
-        <Span
+        <table
           style={{
+            width: "100%",
+            borderCollapse: "collapse",
             fontSize: "14px",
-            marginBottom: "4px",
             color: "#4b5563",
           }}
         >
-          <Span style={{ fontWeight: "700" }}>{t("email.company.name")}:</Span>{" "}
-          {props.name}
-        </Span>
-
-        <Span
-          style={{
-            fontSize: "14px",
-            marginBottom: "4px",
-            color: "#4b5563",
-          }}
-        >
-          <Span style={{ fontWeight: "700" }}>{t("email.company.email")}:</Span>{" "}
-          <Link href={`mailto:${props.email}`} style={{ color: "#4f46e5" }}>
-            {props.email}
-          </Link>
-        </Span>
-
-        {props.company && (
-          <Span
-            style={{
-              fontSize: "14px",
-              marginBottom: "4px",
-              color: "#4b5563",
-            }}
-          >
-            <Span style={{ fontWeight: "700" }}>
-              {t("email.company.company")}:
-            </Span>{" "}
-            {props.company}
-          </Span>
-        )}
-
-        <Span
-          style={{
-            fontSize: "14px",
-            marginBottom: "4px",
-            color: "#4b5563",
-          }}
-        >
-          <Span style={{ fontWeight: "700" }}>
-            {t("email.company.contactSubject")}:
-          </Span>{" "}
-          {props.subject}
-        </Span>
+          <tbody>
+            <tr>
+              <td
+                style={{
+                  fontWeight: "700",
+                  color: "#111827",
+                  paddingBottom: "8px",
+                  paddingRight: "16px",
+                  whiteSpace: "nowrap",
+                  verticalAlign: "top",
+                  width: "120px",
+                }}
+              >
+                {t("email.company.name")}:
+              </td>
+              <td style={{ paddingBottom: "8px", verticalAlign: "top" }}>
+                {props.name}
+              </td>
+            </tr>
+            <tr>
+              <td
+                style={{
+                  fontWeight: "700",
+                  color: "#111827",
+                  paddingBottom: "8px",
+                  paddingRight: "16px",
+                  whiteSpace: "nowrap",
+                  verticalAlign: "top",
+                }}
+              >
+                {t("email.company.email")}:
+              </td>
+              <td style={{ paddingBottom: "8px", verticalAlign: "top" }}>
+                <Link
+                  href={`mailto:${props.email}`}
+                  style={{ color: "#4f46e5" }}
+                >
+                  {props.email}
+                </Link>
+              </td>
+            </tr>
+            {props.company && (
+              <tr>
+                <td
+                  style={{
+                    fontWeight: "700",
+                    color: "#111827",
+                    paddingBottom: "8px",
+                    paddingRight: "16px",
+                    whiteSpace: "nowrap",
+                    verticalAlign: "top",
+                  }}
+                >
+                  {t("email.company.company")}:
+                </td>
+                <td style={{ paddingBottom: "8px", verticalAlign: "top" }}>
+                  {props.company}
+                </td>
+              </tr>
+            )}
+            <tr>
+              <td
+                style={{
+                  fontWeight: "700",
+                  color: "#111827",
+                  paddingBottom: "8px",
+                  paddingRight: "16px",
+                  whiteSpace: "nowrap",
+                  verticalAlign: "top",
+                }}
+              >
+                {t("email.company.contactSubject")}:
+              </td>
+              <td style={{ paddingBottom: "8px", verticalAlign: "top" }}>
+                {t(props.subject as Parameters<ContactT>[0])}
+              </td>
+            </tr>
+            {props.priority && (
+              <tr>
+                <td
+                  style={{
+                    fontWeight: "700",
+                    color: "#111827",
+                    paddingBottom: "8px",
+                    paddingRight: "16px",
+                    whiteSpace: "nowrap",
+                    verticalAlign: "top",
+                  }}
+                >
+                  {t("email.admin_notification.priority")}:
+                </td>
+                <td style={{ paddingBottom: "8px", verticalAlign: "top" }}>
+                  {t(props.priority as Parameters<ContactT>[0])}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
 
         <Hr style={{ borderColor: "#e5e7eb", margin: "12px 0" }} />
 
@@ -261,8 +317,14 @@ const contactFormTemplate: EmailTemplateDefinition<
         type: "text",
         label: "emailTemplates.contactForm.preview.subject.label",
         description: "emailTemplates.contactForm.preview.subject.description",
-        defaultValue: "Anfrage zu Ihren Dienstleistungen",
+        defaultValue: "subject.helpSupport",
         required: true,
+      },
+      priority: {
+        type: "text",
+        label: "emailTemplates.contactForm.preview.priority.label",
+        description: "emailTemplates.contactForm.preview.priority.description",
+        defaultValue: "priority.medium",
       },
       message: {
         type: "textarea",
@@ -300,7 +362,8 @@ const contactFormTemplate: EmailTemplateDefinition<
     name: "Max Mustermann",
     email: "max@example.com",
     company: "Musterfirma GmbH",
-    subject: "Anfrage zu Ihren Dienstleistungen",
+    subject: "subject.helpSupport",
+    priority: "priority.medium",
     message: "Ich hätte gerne weitere Informationen zu Ihren Premium-Services.",
     isForCompany: true,
     userId: "example-user-id-123",
@@ -316,6 +379,7 @@ const adminContactPropsSchema = z.object({
   email: z.string().email(),
   company: z.string().optional(),
   subject: z.string(),
+  priority: z.string().optional(),
   message: z.string(),
   userId: z.string().optional(),
   leadId: z.string().optional(),
@@ -352,8 +416,13 @@ export const adminContactFormTemplate: EmailTemplateDefinition<
       subject: {
         type: "text",
         label: "emailTemplates.adminContact.preview.subject.label",
-        defaultValue: "Question about pricing",
+        defaultValue: "subject.generalInquiry",
         required: true,
+      },
+      priority: {
+        type: "text",
+        label: "emailTemplates.adminContact.preview.priority.label",
+        defaultValue: "priority.high",
       },
       message: {
         type: "textarea",
@@ -391,7 +460,8 @@ export const adminContactFormTemplate: EmailTemplateDefinition<
   exampleProps: {
     name: "Max Mustermann",
     email: "max@example.com",
-    subject: "Question about pricing",
+    subject: "subject.generalInquiry",
+    priority: "priority.high",
     message: "I would like to know more about your subscription plans.",
     company: "Acme Corp",
     userId: "example-user-id-123",
@@ -420,6 +490,7 @@ export const renderCompanyMail: EmailFunctionType<
       name: requestData.name,
       email: requestData.email,
       subject: requestData.subject,
+      priority: requestData.priority,
       message: requestData.message,
       isForCompany: true,
     };
@@ -464,6 +535,7 @@ export const renderPartnerMail: EmailFunctionType<
       name: requestData.name,
       email: requestData.email,
       subject: requestData.subject,
+      priority: requestData.priority,
       message: requestData.message,
       isForCompany: false,
       userId: user?.id,

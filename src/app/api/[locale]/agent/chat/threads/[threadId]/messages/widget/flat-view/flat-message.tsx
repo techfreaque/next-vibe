@@ -6,7 +6,7 @@ import { Div, type DivMouseEvent } from "next-vibe-ui/ui/div";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span, type SpanMouseEvent } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import React, { useCallback, useMemo } from "react";
+import React, { memo, useCallback, useMemo } from "react";
 
 import { Logo } from "@/app/[locale]/_components/logo";
 import {
@@ -77,7 +77,7 @@ export interface FlatMessageProps {
   onDeleteMessage: (messageId: string) => void;
 }
 
-export function FlatMessage({
+export const FlatMessage = memo(function FlatMessage({
   message,
   postNum,
   messages,
@@ -302,7 +302,7 @@ export function FlatMessage({
       className={cn(
         "group/post relative",
         "p-3 mb-2 rounded",
-        "transition-all duration-150",
+        "transition-colors duration-150",
         isHighlighted && "bg-blue-500/5",
       )}
     >
@@ -428,7 +428,7 @@ export function FlatMessage({
                       block: "center",
                     });
                   }}
-                  className="text-primary hover:text-primary/80 hover:underline font-semibold"
+                  className="text-primary hover:text-primary/80 underline decoration-transparent hover:decoration-current font-semibold"
                 >
                   {/* eslint-disable-next-line i18next/no-literal-string -- Technical 4chan-style reference syntax */}
                   {`>>${parentPostNum}`}
@@ -481,7 +481,7 @@ export function FlatMessage({
           className={cn(
             "text-sm leading-relaxed",
             "p-3",
-            "rounded border transition-all duration-150",
+            "rounded border transition-colors duration-150",
             "border-destructive/60 bg-destructive/10",
           )}
         >
@@ -494,7 +494,7 @@ export function FlatMessage({
           className={cn(
             "text-sm leading-relaxed",
             "p-3",
-            "rounded border transition-all duration-150",
+            "rounded border transition-colors duration-150",
             isHighlighted
               ? "border-blue-500/60 bg-blue-500/5"
               : "border-border/30 hover:border-border/50",
@@ -518,7 +518,7 @@ export function FlatMessage({
           className={cn(
             "text-sm leading-relaxed",
             "p-3",
-            "rounded border transition-all duration-150",
+            "rounded border transition-colors duration-150",
             isHighlighted
               ? "border-blue-500/60 bg-blue-500/5"
               : "border-border/30 hover:border-border/50",
@@ -638,7 +638,7 @@ export function FlatMessage({
                       block: "center",
                     });
                   }}
-                  className="text-primary hover:text-primary/80 hover:underline font-semibold"
+                  className="text-primary hover:text-primary/80 underline decoration-transparent hover:decoration-current font-semibold"
                 >
                   {/* eslint-disable-next-line i18next/no-literal-string -- Technical 4chan-style reference syntax */}
                   {`>>${replyPostNum}`}
@@ -748,4 +748,4 @@ export function FlatMessage({
       )}
     </Div>
   );
-}
+});

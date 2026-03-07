@@ -71,7 +71,6 @@ export class CompactingHandler {
     currentUserMessage: ChatMessage | null;
     threadId: string;
     parentId: string | null;
-    depth: number;
     sequenceId: string;
     ctx: StreamContext;
     isIncognito: boolean;
@@ -91,7 +90,6 @@ export class CompactingHandler {
         success: true;
         compactedSummary: string;
         compactingMessageId: string;
-        newDepth: number;
       }
     | {
         success: false;
@@ -103,7 +101,6 @@ export class CompactingHandler {
       branchMessages,
       threadId,
       parentId,
-      depth,
       sequenceId,
       ctx,
       userId,
@@ -161,7 +158,6 @@ export class CompactingHandler {
       messageId: compactingMessageId,
       threadId,
       parentId,
-      depth,
       sequenceId,
       model,
       character: character ?? null,
@@ -171,7 +167,7 @@ export class CompactingHandler {
     });
 
     // Re-parent user message: compacting inserted itself before the user message,
-    // so update the user message's parentId → compactingMessageId and depth → depth+1.
+    // so update the user message's parentId → compactingMessageId.
     // This fixes both the DB record and the client SSE event so the chain is:
     //   effectiveParentMessage → compacting → user → AI
     const { currentUserMessage } = params;
@@ -179,7 +175,6 @@ export class CompactingHandler {
       await reparentUserMessage({
         messageId: currentUserMessage.id,
         newParentId: compactingMessageId,
-        newDepth: depth + 1,
         logger,
       });
     }
@@ -189,7 +184,6 @@ export class CompactingHandler {
         threadId,
         content: currentUserMessage.content ?? "",
         parentId: compactingMessageId,
-        depth: depth + 1,
         model,
         character,
         metadata: currentUserMessage.metadata ?? undefined,
@@ -300,7 +294,6 @@ export class CompactingHandler {
       success: true,
       compactedSummary,
       compactingMessageId,
-      newDepth: depth + 1,
     };
   }
 }

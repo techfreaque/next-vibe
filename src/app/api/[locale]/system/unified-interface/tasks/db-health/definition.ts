@@ -19,8 +19,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../i18n";
-
-export const DB_HEALTH_ALIAS = "db-health" as const;
+import { DB_HEALTH_ALIAS } from "./constants";
 
 const { POST } = createEndpoint({
   scopedTranslation,

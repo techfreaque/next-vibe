@@ -7,7 +7,8 @@
 import { styled } from "nativewind";
 import { cn } from "next-vibe/shared/utils";
 import { safeGetRequiredFields } from "next-vibe/shared/utils/zod-required-fields";
-import { AlertCircle, Calendar } from "next-vibe-ui/ui/icons";
+import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
+import { Calendar } from "next-vibe-ui/ui/icons/Calendar";
 import type { JSX } from "react";
 import type {
   ControllerRenderProps,

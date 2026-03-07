@@ -213,7 +213,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
     // Create MCP server with our tools
     const vibeServer = createSdkMcpServer({
       // eslint-disable-next-line i18next/no-literal-string -- technical identifier
-      name: "vibe-tools",
+      name: "vibe-local",
       // eslint-disable-next-line i18next/no-literal-string -- semver
       version: "1.0.0",
       tools: mcpTools,
@@ -221,7 +221,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
 
     const allowedToolNames = mcpTools.map(
       // eslint-disable-next-line i18next/no-literal-string -- MCP naming convention
-      (t) => `mcp__vibe-tools__${t.name}`,
+      (t) => `mcp__vibe-local__${t.name}`,
     );
 
     const agentAbortController = new AbortController();
@@ -337,10 +337,11 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
                   totalInputTokens += msg.usage.input_tokens;
                   totalOutputTokens += msg.usage.output_tokens;
                   if ("cache_read_input_tokens" in msg.usage) {
-                    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Anthropic SDK type has cache fields not in base type
-                    totalCachedTokens +=
-                      (msg.usage as Record<string, number>)
-                        .cache_read_input_tokens ?? 0;
+                    const { cache_read_input_tokens } =
+                      msg.usage as typeof msg.usage & {
+                        cache_read_input_tokens: number;
+                      };
+                    totalCachedTokens += cache_read_input_tokens ?? 0;
                   }
                 }
                 finishReason =

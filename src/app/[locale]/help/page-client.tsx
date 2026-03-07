@@ -2,7 +2,8 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Globe, Mail } from "next-vibe-ui/ui/icons";
+import { Globe } from "next-vibe-ui/ui/icons/Globe";
+import { Mail } from "next-vibe-ui/ui/icons/Mail";
 import { Link } from "next-vibe-ui/ui/link";
 import { H2, H3, P } from "next-vibe-ui/ui/typography";
 import { openUrl } from "next-vibe-ui/utils/browser";
@@ -19,11 +20,21 @@ import { simpleT } from "@/i18n/core/shared";
 interface HelpPageClientProps {
   locale: CountryLanguage;
   user: JwtPayloadType;
+  modelCount: number;
+  subPrice: string;
+  subCredits: number;
+  packPrice: string;
+  packCredits: number;
 }
 
 export default function HelpPageClient({
   locale,
   user,
+  modelCount,
+  subPrice,
+  subCredits,
+  packPrice,
+  packCredits,
 }: HelpPageClientProps): JSX.Element {
   const { t } = simpleT(locale);
   const supportEmail = contactClientRepository.getSupportEmail(locale);
@@ -105,6 +116,7 @@ export default function HelpPageClient({
             <P className="text-gray-600 dark:text-gray-300">
               {t("app.help.pages.help.faq.questions.q1.answer", {
                 appName: t("config.appName"),
+                modelCount,
               })}
             </P>
           </Div>
@@ -113,7 +125,12 @@ export default function HelpPageClient({
               {t("app.help.pages.help.faq.questions.q2.question")}
             </H3>
             <P className="text-gray-600 dark:text-gray-300">
-              {t("app.help.pages.help.faq.questions.q2.answer")}
+              {t("app.help.pages.help.faq.questions.q2.answer", {
+                subPrice,
+                subCredits,
+                packPrice,
+                packCredits,
+              })}
             </P>
           </Div>
           <Div>
@@ -121,7 +138,13 @@ export default function HelpPageClient({
               {t("app.help.pages.help.faq.questions.q3.question")}
             </H3>
             <P className="text-gray-600 dark:text-gray-300">
-              {t("app.help.pages.help.faq.questions.q3.answer")}
+              {t("app.help.pages.help.faq.questions.q3.answer", {
+                subPrice,
+                subCredits,
+                packPrice,
+                packCredits,
+                modelCount,
+              })}
             </P>
           </Div>
           <Div>

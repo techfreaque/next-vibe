@@ -189,6 +189,30 @@ export class SessionRepository {
   }
 
   /**
+   * Delete a single session by its ID
+   * @param sessionId - The session ID
+   * @returns Success or error response
+   */
+  static async deleteById(
+    sessionId: DbId,
+    t: ModuleT,
+  ): Promise<ResponseType<void>> {
+    try {
+      await db.delete(sessions).where(eq(sessions.id, sessionId));
+      return success();
+    } catch (error) {
+      return fail({
+        message: t("errors.user_sessions_delete_failed"),
+        errorType: ErrorResponseTypes.DATABASE_ERROR,
+        messageParams: {
+          userId: sessionId,
+          error: parseError(error).message,
+        },
+      });
+    }
+  }
+
+  /**
    * Delete sessions by user ID
    * @param userId - The user ID
    * @returns Success or error response

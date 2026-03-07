@@ -9,28 +9,26 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  Activity,
-  AlertCircle,
-  Calendar,
-  CheckCircle,
-  Clock,
-  Coins,
-  Copy,
-  CreditCard,
-  DollarSign,
-  Gift,
-  Mail,
-  MessageSquare,
-  Pencil,
-  Shield,
-  Trash2,
-  TrendingUp,
-  User,
-  Users,
-  XCircle,
-} from "next-vibe-ui/ui/icons";
+import { Activity } from "next-vibe-ui/ui/icons/Activity";
+import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
+import { Calendar } from "next-vibe-ui/ui/icons/Calendar";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { Clock } from "next-vibe-ui/ui/icons/Clock";
+import { Coins } from "next-vibe-ui/ui/icons/Coins";
+import { Copy } from "next-vibe-ui/ui/icons/Copy";
+import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
+import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
+import { Gift } from "next-vibe-ui/ui/icons/Gift";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Mail } from "next-vibe-ui/ui/icons/Mail";
+import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
+import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
+import { Shield } from "next-vibe-ui/ui/icons/Shield";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
+import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
+import { User } from "next-vibe-ui/ui/icons/User";
+import { Users } from "next-vibe-ui/ui/icons/Users";
+import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";
 import {

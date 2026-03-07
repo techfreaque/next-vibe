@@ -59,13 +59,13 @@ export class PixelTrackingRepository {
         return pixelResponse;
       }
 
-      const { leadId, campaignId } = validationResult.data;
+      const { leadId: trackedLeadId, campaignId } = validationResult.data;
       const clientIp = PixelTrackingRepository.getClientIp(request);
 
       // Basic rate limiting check - log suspicious activity
       if (clientIp === "unknown") {
         logger.warn("tracking.pixel.request.unknown.ip", {
-          leadId,
+          leadId: trackedLeadId,
           campaignId,
         });
       }
@@ -78,7 +78,7 @@ export class PixelTrackingRepository {
         try {
           const leadsT = leadsScopedTranslation.scopedT(locale).t;
           const result = await LeadTrackingRepository.handleTrackingPixel(
-            leadId,
+            trackedLeadId,
             campaignId,
             clientInfo,
             logger,
@@ -87,14 +87,14 @@ export class PixelTrackingRepository {
 
           if (result.success) {
             logger.info("tracking.pixel.engagement.recorded", {
-              leadId,
+              leadId: trackedLeadId,
               campaignId,
               clientIp,
               engagementRecorded: result.data.engagementRecorded,
             });
           } else {
             logger.error("tracking.pixel.engagement.failed", {
-              leadId,
+              leadId: trackedLeadId,
               campaignId,
               error: result.message,
               clientIp,
@@ -103,7 +103,7 @@ export class PixelTrackingRepository {
         } catch (error) {
           logger.error("tracking.pixel.engagement.error", {
             error: parseError(error),
-            leadId,
+            leadId: trackedLeadId,
             campaignId,
             clientIp,
           });
@@ -111,7 +111,7 @@ export class PixelTrackingRepository {
       });
 
       logger.info("tracking.pixel.served", {
-        leadId,
+        leadId: trackedLeadId,
         campaignId,
         userAgent: clientInfo.userAgent,
         clientIp,

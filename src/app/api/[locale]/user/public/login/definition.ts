@@ -128,6 +128,21 @@ const { POST } = createEndpoint({
         schema: z.string(),
       }),
 
+      // === TOKEN + LEAD_ID (for cross-origin remote-connect flows only) ===
+      // Returned in the JSON body so a local instance can extract them
+      // without needing to read httpOnly Set-Cookie headers (which browsers
+      // block for cross-origin responses).
+      token: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().optional(),
+      }),
+      leadId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string().optional(),
+      }),
+
       // === SUBMIT BUTTON (inside card) ===
       submitButton: scopedWidgetField(scopedTranslation, {
         type: WidgetType.SUBMIT_BUTTON,
@@ -238,17 +253,25 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         message: "Welcome back! You have successfully logged in.",
+        token: undefined,
+        leadId: undefined,
       },
       failed: {
         message:
           "Invalid email or password. Please check your credentials and try again.",
+        token: undefined,
+        leadId: undefined,
       },
       withAdvanced: {
         message: "Welcome back! You have successfully logged in.",
+        token: undefined,
+        leadId: undefined,
       },
       accountLocked: {
         message:
           "Your account has been temporarily locked due to multiple failed login attempts.",
+        token: undefined,
+        leadId: undefined,
       },
     },
   },

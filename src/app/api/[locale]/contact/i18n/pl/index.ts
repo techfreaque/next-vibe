@@ -360,6 +360,10 @@ export const translations: typeof enTranslations = {
           label: "Temat wiadomości",
           description: "Temat wiadomości kontaktowej",
         },
+        priority: {
+          label: "Poziom priorytetu",
+          description: "Poziom pilności zapytania",
+        },
         message: {
           label: "Treść wiadomości",
           description: "Główna treść wiadomości z formularza kontaktowego",
@@ -395,6 +399,9 @@ export const translations: typeof enTranslations = {
         },
         subject: {
           label: "Temat wiadomości",
+        },
+        priority: {
+          label: "Poziom priorytetu",
         },
         message: {
           label: "Treść wiadomości",

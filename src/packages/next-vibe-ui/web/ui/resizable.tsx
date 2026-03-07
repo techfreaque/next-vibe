@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { cn } from "next-vibe/shared/utils/utils";
-import { DragHandleDots2Icon } from "next-vibe-ui/ui/icons";
+import { DragHandleDots2Icon } from "next-vibe-ui/ui/icons/DragHandleDots2Icon";
 import type { JSX, ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -142,6 +142,7 @@ export function ResizableHandle({
         "absolute top-0 right-[-5px] bottom-0 w-2.5 cursor-ew-resize flex items-center justify-center z-10",
         className,
       )}
+      role="separator"
       style={style}
       onMouseDown={onMouseDown}
     >

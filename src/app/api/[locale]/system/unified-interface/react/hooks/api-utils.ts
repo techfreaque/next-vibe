@@ -11,11 +11,36 @@ import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/type
 import { scopedTranslation as authScopedTranslation } from "@/app/api/[locale]/user/auth/i18n";
 import { authClientRepository } from "@/app/api/[locale]/user/auth/repository-client";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import {
+  CSRF_TOKEN_COOKIE_NAME,
+  CSRF_TOKEN_HEADER_NAME,
+} from "@/config/constants";
 import { platform } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { type CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import { scopedTranslation as hooksTranslation } from "./i18n";
+
+/**
+ * Read the CSRF double-submit cookie and return its value, or null if absent.
+ * The cookie is non-HttpOnly so JS can read it for the double-submit pattern.
+ */
+function getCsrfToken(): string | null {
+  if (typeof document === "undefined") {
+    return null; // SSR / non-browser environments
+  }
+  const match = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(`${CSRF_TOKEN_COOKIE_NAME}=`));
+  return match ? (match.split("=")[1] ?? null) : null;
+}
+
+const MUTATING_METHODS = new Set([
+  Methods.POST,
+  Methods.PUT,
+  Methods.DELETE,
+  Methods.PATCH,
+]);
 
 /**
  * JSON-serializable value type for request/response data
@@ -69,40 +94,69 @@ export function containsFile(obj: JsonValue): boolean {
 }
 
 /**
- * Convert an object to FormData (recursively handles nested objects and arrays)
+ * Extract File/Blob entries from an object as flat dot-notation key→file pairs.
+ * Used to separate files from JSON-serializable data when building mixed FormData.
  */
-export function objectToFormData(
-  obj: JsonObject,
-  formData: FormData = new FormData(),
+function extractFiles(
+  obj: JsonValue,
   parentKey = "",
-): FormData {
-  for (const [key, value] of Object.entries(obj)) {
-    const formKey = parentKey ? `${parentKey}.${key}` : key;
-
-    if (value instanceof File || value instanceof Blob) {
-      // Append File/Blob directly
-      formData.append(formKey, value);
-    } else if (Array.isArray(value)) {
-      // Handle arrays
-      value.forEach((item, index) => {
-        const arrayKey = `${formKey}[${index}]`;
-        if (item instanceof File || item instanceof Blob) {
-          formData.append(arrayKey, item);
-        } else if (isJsonObject(item)) {
-          objectToFormData(item, formData, arrayKey);
-        } else if (item !== null && item !== undefined) {
-          // Primitives: string, number, boolean
-          formData.append(arrayKey, String(item));
-        }
-      });
-    } else if (isJsonObject(value)) {
-      // Handle nested objects
-      objectToFormData(value, formData, formKey);
-    } else if (value !== null && value !== undefined) {
-      // Handle primitives: string, number, boolean
-      formData.append(formKey, String(value));
+  result: Array<[string, File | Blob]> = [],
+): Array<[string, File | Blob]> {
+  if (obj instanceof File || obj instanceof Blob) {
+    result.push([parentKey, obj]);
+  } else if (Array.isArray(obj)) {
+    obj.forEach((item, index) => {
+      extractFiles(item, `${parentKey}[${index}]`, result);
+    });
+  } else if (isJsonObject(obj)) {
+    for (const [key, value] of Object.entries(obj)) {
+      extractFiles(value, parentKey ? `${parentKey}.${key}` : key, result);
     }
   }
+  return result;
+}
+
+/**
+ * Strip File/Blob instances from an object, replacing them with null.
+ * The result is safe to JSON.stringify.
+ */
+function stripFiles(obj: JsonValue): JsonValue {
+  if (obj instanceof File || obj instanceof Blob) {
+    return null;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(stripFiles);
+  }
+  if (isJsonObject(obj)) {
+    const result: JsonObject = {};
+    for (const [key, value] of Object.entries(obj)) {
+      result[key] = stripFiles(value);
+    }
+    return result;
+  }
+  return obj;
+}
+
+/**
+ * Convert an object containing File/Blob values to FormData using the mixed pattern:
+ * - Non-file data is JSON-serialized into a "data" field (preserves types like booleans)
+ * - File/Blob values are appended as separate dot-notation fields
+ *
+ * The server-side request-parser already handles this pattern (checks for "data" field first).
+ */
+export function objectToFormData(obj: JsonObject): FormData {
+  const formData = new FormData();
+
+  // Serialize all non-file data as JSON in "data" field — preserves booleans, numbers, nulls
+  const jsonData = stripFiles(obj);
+  formData.append("data", JSON.stringify(jsonData));
+
+  // Append File/Blob values separately with dot-notation keys
+  const files = extractFiles(obj);
+  for (const [key, file] of files) {
+    formData.append(key, file);
+  }
+
   return formData;
 }
 
@@ -194,12 +248,23 @@ export async function callApi<TEndpoint extends CreateApiEndpointAny>(
 
   try {
     // Prepare headers - don't set Content-Type for FormData (browser will set it with boundary)
-    const headers: HeadersInit =
+    const headers: Record<string, string> =
       postBody instanceof FormData
         ? {}
         : {
             "Content-Type": "application/json",
           };
+
+    // Attach CSRF double-submit token for mutating browser requests.
+    // The server validates that X-CSRF-Token === csrf_token cookie.
+    // Non-browser callers (CLI, MCP, server-to-server) won't have the cookie
+    // so the header is simply absent — the server allows that case.
+    if (MUTATING_METHODS.has(endpoint.method)) {
+      const csrfToken = getCsrfToken();
+      if (csrfToken) {
+        headers[CSRF_TOKEN_HEADER_NAME] = csrfToken;
+      }
+    }
 
     // For React Native and mobile platforms, check for stored token and add Authorization header
     // This allows React Native apps to authenticate using Bearer tokens stored in AsyncStorage

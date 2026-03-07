@@ -4,9 +4,10 @@
  * IMPORTANT: No database imports or server-only code allowed
  */
 
-import { MEMORY_DELETE_ALIAS, MEMORY_UPDATE_ALIAS } from "./[id]/definition";
-import { MEMORY_ADD_ALIAS } from "./create/definition";
-import { type MemoriesList, MEMORY_LIST_ALIAS } from "./definition";
+import { MEMORY_DELETE_ALIAS, MEMORY_UPDATE_ALIAS } from "./[id]/constants";
+import { MEMORY_LIST_ALIAS } from "./constants";
+import { MEMORY_ADD_ALIAS } from "./create/constants";
+import { type MemoriesList } from "./definition";
 
 /** Max characters for the full memory summary (approx 5k tokens) */
 const MEMORY_BUDGET = 20000;
@@ -73,7 +74,7 @@ ${management}`;
 
   for (let i = 0; i < sorted.length; i++) {
     const memory = sorted[i];
-    const memoryNum = memory.memoryNumber;
+    const memoryNum = memory.id;
     const priority = memory.priority ?? 0;
     const age = getRelativeTime(
       memory.createdAt ? new Date(memory.createdAt) : new Date(),

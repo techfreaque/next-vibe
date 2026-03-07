@@ -142,6 +142,15 @@ const { POST } = createEndpoint({
         schema: z.boolean().default(false),
       }),
 
+      extensive: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "fields.extensive.label",
+        description: "fields.extensive.description",
+        columns: 4,
+        schema: z.boolean().optional(),
+      }),
+
       // === RESPONSE FIELDS ===
       items: scopedResponseArrayOptionalFieldNew(scopedTranslation, {
         type: WidgetType.CONTAINER,

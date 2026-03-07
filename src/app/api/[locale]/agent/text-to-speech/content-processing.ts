@@ -152,11 +152,8 @@ export async function extractToolCallText(
   try {
     const { createPublicUser } =
       await import("@/app/api/[locale]/user/auth/helpers");
-    const { createEndpointLogger } =
-      await import("@/app/api/[locale]/system/unified-interface/shared/logger/endpoint");
 
     const user = createPublicUser(crypto.randomUUID());
-    const logger = createEndpointLogger(true, Date.now(), locale);
 
     const result = await definitionLoader.load({
       identifier: toolName,

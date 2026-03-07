@@ -1,8 +1,8 @@
-import { CLAUDE_CODE_ALIAS } from "@/app/api/[locale]/agent/claude-code/definition";
-import { FETCH_URL_SHORT_ALIAS } from "@/app/api/[locale]/agent/fetch-url-content/definition";
-import { BRAVE_SEARCH_ALIAS } from "@/app/api/[locale]/agent/search/brave/definition";
+import { CLAUDE_CODE_ALIAS } from "@/app/api/[locale]/agent/claude-code/constants";
+import { FETCH_URL_SHORT_ALIAS } from "@/app/api/[locale]/agent/fetch-url-content/constants";
+import { BRAVE_SEARCH_ALIAS } from "@/app/api/[locale]/agent/search/brave/constants";
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
-import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/definition";
+import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { EXECUTE_TOOL_ALIAS } from "../../../../system/unified-interface/ai/execute-tool/constants";
@@ -10,9 +10,9 @@ import { TtsVoice } from "../../../text-to-speech/enum";
 import {
   MEMORY_DELETE_ALIAS,
   MEMORY_UPDATE_ALIAS,
-} from "../../memories/[id]/definition";
-import { MEMORY_ADD_ALIAS } from "../../memories/create/definition";
-import { MEMORY_LIST_ALIAS } from "../../memories/definition";
+} from "../../memories/[id]/constants";
+import { MEMORY_LIST_ALIAS } from "../../memories/constants";
+import { MEMORY_ADD_ALIAS } from "../../memories/create/constants";
 import type { Character } from "../config";
 import { tool } from "../config";
 import { CharacterCategory, CharacterOwnershipType } from "../enum";

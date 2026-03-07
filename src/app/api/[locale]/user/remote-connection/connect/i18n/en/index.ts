@@ -3,6 +3,22 @@ export const translations = {
   tags: {
     remoteConnection: "Remote Connection",
   },
+  widget: {
+    signInDescription: "Sign in to connect to a remote account.",
+    // Customer benefits (non-admin)
+    benefit1:
+      "Memories sync automatically — everything you teach the AI here carries over",
+    benefit2: "Access cloud AI models and tools from your local instance",
+    benefit3: "Context travels with you across devices",
+    // Admin benefits
+    adminBenefit1: "Memories sync bidirectionally, automatically",
+    adminBenefit2:
+      "Cloud AI discovers and runs your local tools (SSH, files, code execution)",
+    adminBenefit3:
+      "Delegate tasks from cloud to this machine — Claude Code executes locally",
+    adminBenefit4:
+      "Capabilities snapshot sent every sync — Thea always knows what this instance can do",
+  },
   post: {
     title: "Connect to Remote Account",
     description:
@@ -48,6 +64,19 @@ export const translations = {
         required: "Please enter your password",
       },
     },
+    token: {
+      label: "Token",
+      description: "JWT token from the remote instance (set automatically)",
+      validation: {
+        required: "Login to the remote instance first",
+      },
+    },
+    leadId: {
+      label: "Lead ID",
+      description: "Lead ID from the remote instance (set automatically)",
+    },
+    credentialWarning:
+      "Your credentials go directly from your browser to the remote server. However, the token stored here grants the operator of this server full access to your remote account — they can do anything you can do there. Only connect on servers you fully trust.",
     actions: {
       submit: "Connect",
       submitting: "Connecting...",
@@ -88,11 +117,22 @@ export const translations = {
       },
       conflict: {
         title: "Already Connected",
-        description: "You are already connected to a remote instance",
+        description:
+          "You are already connected to a remote instance with this instance ID",
+      },
+      instanceIdConflict: {
+        title: "Instance ID Already Registered",
+        description:
+          "An instance with this ID is already registered on the remote. Choose a different instance ID.",
       },
       noLeadId: {
         title: "Connection Error",
         description: "Could not establish a session with the remote server",
+      },
+      invalidUrl: {
+        title: "Invalid Remote URL",
+        description:
+          "The remote URL must point to a public server, not a local or private address",
       },
     },
     success: {

@@ -10,16 +10,13 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import {
   MEMORY_DELETE_ALIAS,
   MEMORY_UPDATE_ALIAS,
-} from "../../../chat/memories/[id]/definition";
-import MEMORY_ADD_DEFINITION, {
-  MEMORY_ADD_ALIAS,
-} from "../../../chat/memories/create/definition";
-import FETCH_URL_DEFINITION, {
-  FETCH_URL_ALIAS,
-} from "../../../fetch-url-content/definition";
-import SEARCH_DEFINITION, {
-  BRAVE_SEARCH_ALIAS,
-} from "../../../search/brave/definition";
+} from "../../../chat/memories/[id]/constants";
+import { MEMORY_ADD_ALIAS } from "../../../chat/memories/create/constants";
+import MEMORY_ADD_DEFINITION from "../../../chat/memories/create/definition";
+import { FETCH_URL_ALIAS } from "../../../fetch-url-content/constants";
+import FETCH_URL_DEFINITION from "../../../fetch-url-content/definition";
+import { BRAVE_SEARCH_ALIAS } from "../../../search/brave/constants";
+import SEARCH_DEFINITION from "../../../search/brave/definition";
 
 /**
  * OpenAI API Types

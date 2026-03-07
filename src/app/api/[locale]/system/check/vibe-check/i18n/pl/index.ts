@@ -92,6 +92,11 @@ export const translations: typeof enTranslations = {
       description:
         "Zwraca tylko statystyki podsumowania, pomija elementy i listy plików",
     },
+    extensive: {
+      label: "Rozszerzone",
+      description:
+        "Po włączeniu sprawdza również pliki testowe (*.test.ts, *.test.tsx) i automatycznie generowane pliki (system/generated/**). Domyślnie wyłączone — włącz do walidacji wydania lub gdy chcesz jawnie sprawdzić wygenerowany/testowy kod.",
+    },
   },
 
   response: {

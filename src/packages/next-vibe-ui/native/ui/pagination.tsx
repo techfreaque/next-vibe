@@ -1,10 +1,8 @@
 "use client";
 import { cn } from "next-vibe/shared/utils/utils";
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  DotsHorizontalIcon,
-} from "next-vibe-ui/ui/icons";
+import { ChevronLeftIcon } from "next-vibe-ui/ui/icons/ChevronLeftIcon";
+import { ChevronRightIcon } from "next-vibe-ui/ui/icons/ChevronRightIcon";
+import { DotsHorizontalIcon } from "next-vibe-ui/ui/icons/DotsHorizontalIcon";
 import * as React from "react";
 import { Pressable, Text as RNText, View } from "react-native";
 

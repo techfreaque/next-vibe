@@ -1,7 +1,9 @@
 import type { Metadata, ResolvingMetadata } from "next";
 import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
 import { Div } from "next-vibe-ui/ui/div";
-import { Building, FileText, Info } from "next-vibe-ui/ui/icons";
+import { Building } from "next-vibe-ui/ui/icons/Building";
+import { FileText } from "next-vibe-ui/ui/icons/FileText";
+import { Info } from "next-vibe-ui/ui/icons/Info";
 import { Li } from "next-vibe-ui/ui/li";
 import { Span } from "next-vibe-ui/ui/span";
 import { Strong } from "next-vibe-ui/ui/strong";

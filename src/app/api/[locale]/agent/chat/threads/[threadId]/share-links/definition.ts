@@ -577,7 +577,7 @@ const { DELETE } = createEndpoint({
         label: "Public share",
         allowPosting: false,
         requireAuth: false,
-        createdAt: new Date().toISOString(),
+        createdAt: "2024-01-15T10:00:00.000Z",
       },
     },
   },

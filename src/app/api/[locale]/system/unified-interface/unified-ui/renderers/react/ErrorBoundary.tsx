@@ -6,7 +6,7 @@ import {
   AccordionTrigger,
 } from "next-vibe-ui/ui/accordion";
 import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
-import { AlertTriangle } from "next-vibe-ui/ui/icons";
+import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
 import { Pre } from "next-vibe-ui/ui/pre";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 

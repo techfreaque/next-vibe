@@ -40,11 +40,9 @@ import {
   TaskOutputModeOptions,
 } from "../../enum";
 import { taskInputSchema } from "../db";
+import { CRON_CREATE_ALIAS, CRON_LIST_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { CronTasksContainer } from "./widget";
-
-export const CRON_LIST_ALIAS = "cron-list" as const;
-export const CRON_CREATE_ALIAS = "cron-create" as const;
 
 /** Reusable task response shape — keep in sync with CronTaskResponse in repository.ts */
 export const cronTaskResponseSchema = z.object({
@@ -108,7 +106,7 @@ const { GET } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
     UserRole.ADMIN,
   ],
-  tags: ["get.title"],
+  tags: ["tags.cron" as const, "tags.scheduling" as const],
   fields: customWidgetObject({
     render: CronTasksContainer,
     usage: { request: "data", response: true } as const,
@@ -406,7 +404,7 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
     UserRole.ADMIN,
   ],
-  tags: ["post.title"],
+  tags: ["tags.cron" as const, "tags.scheduling" as const],
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "post.container.title",
@@ -648,8 +646,8 @@ const { POST } = createEndpoint({
           targetInstance: null,
           tags: [],
           userId: null,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: "2024-01-15T10:00:00.000Z",
+          updatedAt: "2024-01-15T10:00:00.000Z",
         },
       },
     },

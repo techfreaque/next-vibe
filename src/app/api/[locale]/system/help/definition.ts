@@ -59,6 +59,8 @@ const aiToolMetadataSchema = z.object({
         .optional(),
     })
     .optional(),
+  /** Remote instance this tool belongs to (only present for remote tools) */
+  instanceId: z.string().optional(),
 });
 
 const { GET } = createEndpoint({
@@ -165,10 +167,19 @@ const { GET } = createEndpoint({
       includeProdOnly: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.BOOLEAN,
-        label: "get.fields.platform.label" as const,
-        description: "get.fields.platform.description" as const,
+        label: "get.fields.includeProdOnly.label" as const,
+        description: "get.fields.includeProdOnly.description" as const,
         columns: 3,
         schema: z.boolean().optional(),
+      }),
+
+      instanceId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "get.fields.instanceId.label" as const,
+        description: "get.fields.instanceId.description" as const,
+        columns: 4,
+        schema: z.string().optional(),
       }),
 
       // === RESPONSE FIELDS ===

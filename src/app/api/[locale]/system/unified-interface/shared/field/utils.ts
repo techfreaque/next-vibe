@@ -1469,12 +1469,10 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
 
     if (typedField.children) {
       for (const [key, childField] of Object.entries(typedField.children)) {
-        const field = childField;
-
         // CRITICAL: Skip widget fields completely - they should NEVER be in validation schemas
         // Widget fields (formAlert, submitButton, etc.) are UI-only and don't send/receive data
         const isWidgetField =
-          "schemaType" in field && field.schemaType === "widget";
+          "schemaType" in childField && childField.schemaType === "widget";
         if (isWidgetField) {
           continue;
         }
@@ -1482,12 +1480,12 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
         // CRITICAL: Skip objectFields that only contain widget children - they're UI-only containers
         // Examples: footerLinks container with only widget links inside
         const isObjectFieldWithOnlyWidgets =
-          "schemaType" in field &&
-          field.schemaType === "object" &&
-          "children" in field &&
-          field.children &&
+          "schemaType" in childField &&
+          childField.schemaType === "object" &&
+          "children" in childField &&
+          childField.children &&
           Object.values(
-            field.children as Record<
+            childField.children as Record<
               string,
               UnifiedField<string, z.ZodTypeAny, FieldUsageConfig, any> // oxlint-disable-line typescript/no-explicit-any
             >,
@@ -1502,22 +1500,23 @@ export function generateSchemaForUsage<F, Usage extends FieldUsage>(
         // Check if the child field has the required usage BEFORE generating the schema
         // This is more efficient and avoids issues with z.never() detection
         if (
-          "usage" in field &&
-          field.usage &&
-          typeof field.usage === "object" &&
-          field.usage !== null
+          "usage" in childField &&
+          childField.usage &&
+          typeof childField.usage === "object" &&
+          childField.usage !== null
         ) {
           const childHasUsage =
             targetUsage === FieldUsage.ResponseData
-              ? "response" in field.usage && field.usage.response === true
+              ? "response" in childField.usage &&
+                childField.usage.response === true
               : targetUsage === FieldUsage.RequestData
-                ? "request" in field.usage &&
-                  (field.usage.request === "data" ||
-                    field.usage.request === "data&urlPathParams")
+                ? "request" in childField.usage &&
+                  (childField.usage.request === "data" ||
+                    childField.usage.request === "data&urlPathParams")
                 : targetUsage === FieldUsage.RequestUrlParams
-                  ? "request" in field.usage &&
-                    (field.usage.request === "urlPathParams" ||
-                      field.usage.request === "data&urlPathParams")
+                  ? "request" in childField.usage &&
+                    (childField.usage.request === "urlPathParams" ||
+                      childField.usage.request === "data&urlPathParams")
                   : false;
 
           // Skip fields that don't have the required usage

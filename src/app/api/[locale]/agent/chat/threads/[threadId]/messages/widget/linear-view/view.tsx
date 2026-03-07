@@ -6,6 +6,7 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import type { JSX } from "react";
@@ -87,6 +88,10 @@ interface LinearMessageViewProps {
   sendMessage: ((params: SendMessageParams) => void) | null;
   /** Credit deduction callback (null in read-only mode) */
   deductCredits: ((creditCost: number, feature: string) => void) | null;
+  /** Load newer history chunk (called when BOUNDARY_NEWER sentinel is clicked) */
+  onLoadNewerHistory: ((anchorId: string) => void) | null;
+  /** Whether newer history is currently loading */
+  isLoadingNewerHistory: boolean;
 }
 
 export const LinearMessageView = React.memo(function LinearMessageView({
@@ -120,6 +125,8 @@ export const LinearMessageView = React.memo(function LinearMessageView({
   selectedModel,
   sendMessage,
   deductCredits,
+  onLoadNewerHistory,
+  isLoadingNewerHistory,
 }: LinearMessageViewProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
 
@@ -213,6 +220,21 @@ export const LinearMessageView = React.memo(function LinearMessageView({
           return null;
         }
 
+        // Check hasNewerHistory on this message OR any of its continuations.
+        // The flag may land on a continuation (e.g. the last tool call in a sequence)
+        // rather than on the primary assistant message.
+        const allGroupMessages = group
+          ? [group.primary, ...group.continuations]
+          : [message];
+        const newerMsg = allGroupMessages.find(
+          (m) =>
+            m.metadata?.hasNewerHistory === true && m.metadata?.newerAnchorId,
+        );
+        const hasNewerHistory = newerMsg !== undefined;
+        const newerAnchorId = newerMsg
+          ? newerMsg.metadata?.newerAnchorId
+          : null;
+
         return (
           <React.Fragment key={message.id}>
             {/* Show Message Metadata in Debug Mode */}
@@ -298,6 +320,8 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                           message={message}
                           locale={locale}
                           logger={logger}
+                          user={user}
+                          deductCredits={deductCredits}
                           onBranch={onStartEdit ?? undefined}
                           onRetry={
                             onStartRetry
@@ -420,11 +444,32 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                         (content.length > 50 ? "..." : ""),
                     };
                   })}
-                  onSwitchBranch={(index) => onSwitchBranch(message.id, index)}
+                  onSwitchBranch={(branchIndex) =>
+                    onSwitchBranch(message.id, branchIndex)
+                  }
                   locale={locale}
                 />
               </Div>
             )}
+
+            {/* Show newer messages button — this message has a newer chunk beyond it */}
+            {hasNewerHistory &&
+              newerAnchorId &&
+              onLoadNewerHistory &&
+              !isLoadingNewerHistory && (
+                <Div className="flex justify-center py-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                    onClick={(): void => {
+                      onLoadNewerHistory(newerAnchorId);
+                    }}
+                  >
+                    {t("showNewerMessages")}
+                  </Button>
+                </Div>
+              )}
           </React.Fragment>
         );
       })}

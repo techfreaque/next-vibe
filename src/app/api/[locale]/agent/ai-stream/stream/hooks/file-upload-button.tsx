@@ -7,7 +7,8 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Paperclip, X } from "next-vibe-ui/ui/icons";
+import { Paperclip } from "next-vibe-ui/ui/icons/Paperclip";
+import { X } from "next-vibe-ui/ui/icons/X";
 import {
   Input,
   type InputChangeEvent,

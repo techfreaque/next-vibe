@@ -12,7 +12,14 @@ import { RouteExecuteRepository } from "./repository";
 export const { POST, tools } = endpointsHandler({
   endpoint: executeDefinition,
   [Methods.POST]: {
-    handler: async ({ data, user, locale, logger, t }) =>
-      RouteExecuteRepository.execute(data, user, locale, logger, t),
+    handler: async ({ data, user, locale, logger, t, streamContext }) =>
+      RouteExecuteRepository.execute(
+        data,
+        user,
+        locale,
+        logger,
+        t,
+        streamContext,
+      ),
   },
 });

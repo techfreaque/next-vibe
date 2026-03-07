@@ -422,6 +422,10 @@ export const translations = {
         placeholder: "Enter user ID...",
         helpText: "WARNING: This action cannot be undone",
       },
+      submitButton: {
+        label: "Delete User",
+        loadingText: "Deleting...",
+      },
       response: {
         deletionResult: {
           title: "Deletion Result",

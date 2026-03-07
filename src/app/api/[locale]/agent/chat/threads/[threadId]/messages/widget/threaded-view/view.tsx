@@ -3,11 +3,9 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  ChevronDown,
-  ChevronRight,
-  CornerDownRight,
-} from "next-vibe-ui/ui/icons";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { CornerDownRight } from "next-vibe-ui/ui/icons/CornerDownRight";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React, { useCallback, useState } from "react";
@@ -278,6 +276,7 @@ export function ThreadedMessage({
     currentChunk,
     totalChunks,
   } = useTTSAudio({
+    messageId: message.id,
     text: ttsText,
     enabled: message.role === "assistant" && ttsAutoplay,
     isStreaming: isMessageStreaming,

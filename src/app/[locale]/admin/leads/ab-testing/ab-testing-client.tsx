@@ -6,7 +6,10 @@
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { BarChart3, Settings, TestTube, Users } from "next-vibe-ui/ui/icons";
+import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
+import { Settings } from "next-vibe-ui/ui/icons/Settings";
+import { TestTube } from "next-vibe-ui/ui/icons/TestTube";
+import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Progress } from "next-vibe-ui/ui/progress";
 import { H2, H3, H4, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";

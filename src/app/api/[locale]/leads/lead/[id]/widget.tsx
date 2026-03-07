@@ -10,36 +10,34 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  Activity,
-  AlertCircle,
-  AlertTriangle,
-  ArrowLeft,
-  BarChart2,
-  Check,
-  CheckCircle,
-  ChevronRight,
-  Clock,
-  Copy,
-  CreditCard,
-  ExternalLink,
-  Globe,
-  History,
-  Info,
-  Mail,
-  MousePointer,
-  Pencil,
-  Phone,
-  Search,
-  Send,
-  Tag,
-  Target,
-  Trash2,
-  TrendingUp,
-  User,
-  UserSearch,
-} from "next-vibe-ui/ui/icons";
+import { Activity } from "next-vibe-ui/ui/icons/Activity";
+import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
+import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
+import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { BarChart2 } from "next-vibe-ui/ui/icons/BarChart2";
+import { Check } from "next-vibe-ui/ui/icons/Check";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { Clock } from "next-vibe-ui/ui/icons/Clock";
+import { Copy } from "next-vibe-ui/ui/icons/Copy";
+import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
+import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
+import { Globe } from "next-vibe-ui/ui/icons/Globe";
+import { History } from "next-vibe-ui/ui/icons/History";
+import { Info } from "next-vibe-ui/ui/icons/Info";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Mail } from "next-vibe-ui/ui/icons/Mail";
+import { MousePointer } from "next-vibe-ui/ui/icons/MousePointer";
+import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
+import { Phone } from "next-vibe-ui/ui/icons/Phone";
+import { Search } from "next-vibe-ui/ui/icons/Search";
+import { Send } from "next-vibe-ui/ui/icons/Send";
+import { Tag } from "next-vibe-ui/ui/icons/Tag";
+import { Target } from "next-vibe-ui/ui/icons/Target";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
+import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
+import { User } from "next-vibe-ui/ui/icons/User";
+import { UserSearch } from "next-vibe-ui/ui/icons/UserSearch";
 import { Link } from "next-vibe-ui/ui/link";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { Span } from "next-vibe-ui/ui/span";

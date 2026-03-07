@@ -62,15 +62,12 @@ export class FinishStepHandler {
       return { shouldAbort: true };
     }
 
-    // After a step finishes, update currentParentId/currentDepth to point to the last message
+    // After a step finishes, update currentParentId to point to the last message
     logger.debug("[AI Stream] Step finished - updating parent chain", {
       oldParentId: ctx.currentParentId,
       newParentId: ctx.lastParentId,
-      oldDepth: ctx.currentDepth,
-      newDepth: ctx.lastDepth + 1,
     });
     ctx.currentParentId = ctx.lastParentId;
-    ctx.currentDepth = ctx.lastDepth + 1;
 
     // Reset currentAssistantMessageId so the next step creates a new ASSISTANT message
     ctx.currentAssistantMessageId = null;

@@ -430,6 +430,10 @@ export function RangeSlider<TTranslationKey extends string = string>({
           {/* Min handle */}
           <div
             ref={minHandleRef}
+            role="slider"
+            aria-valuemin={0}
+            aria-valuemax={options.length - 1}
+            aria-valuenow={layoutMinIndex}
             className={cn(
               "absolute w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full border-4 border-background shadow-xl -translate-x-1/2",
               dragging === "min"
@@ -476,6 +480,10 @@ export function RangeSlider<TTranslationKey extends string = string>({
           {/* Max handle */}
           <div
             ref={maxHandleRef}
+            role="slider"
+            aria-valuemin={0}
+            aria-valuemax={options.length - 1}
+            aria-valuenow={layoutMaxIndex}
             className={cn(
               "absolute w-8 h-8 bg-gradient-to-br from-fuchsia-400 to-fuchsia-600 rounded-full border-4 border-background shadow-xl -translate-x-1/2",
               dragging === "max"

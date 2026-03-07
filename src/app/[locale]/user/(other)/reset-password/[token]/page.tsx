@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next-vibe-ui/lib/redirect";
 import { Alert, AlertDescription, AlertTitle } from "next-vibe-ui/ui/alert";
 import { Div } from "next-vibe-ui/ui/div";
-import { AlertCircle } from "next-vibe-ui/ui/icons";
+import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
 import type { JSX } from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";

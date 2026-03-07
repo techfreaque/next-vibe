@@ -50,7 +50,6 @@ function buildIncognitoMessage(
   role: ChatMessageRole,
   content: string,
   parentId: string | null,
-  depth: number,
   sequenceId: string | null | undefined,
   model: ModelId | null,
   character: string | null,
@@ -62,7 +61,6 @@ function buildIncognitoMessage(
     role,
     content,
     parentId,
-    depth,
     sequenceId: sequenceId ?? null,
     authorId: "incognito",
     authorName: null,
@@ -87,7 +85,6 @@ function buildIncognitoMessage(
  */
 export function getLastMessageForErrorParent(threadId: string): {
   parentId: string | null;
-  depth: number;
 } {
   const chatStore = useChatStore.getState();
   const threadMessages = Object.values(chatStore.messages).filter(
@@ -95,30 +92,21 @@ export function getLastMessageForErrorParent(threadId: string): {
   );
 
   if (threadMessages.length === 0) {
-    return { parentId: null, depth: 0 };
+    return { parentId: null };
   }
 
-  const branchIndices = chatStore.getBranchIndices(threadId);
+  // leafMessageId is mirrored from the navigation store into the chat store.
+  const leafMessageId = chatStore.leafMessageIds[threadId] ?? null;
 
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const threadBuilder = require("@/app/[locale]/chat/lib/utils/thread-builder");
-  const lastMessage = threadBuilder.getLastMessageInBranch(
-    threadMessages,
-    branchIndices,
+  if (leafMessageId && chatStore.messages[leafMessageId]) {
+    return { parentId: leafMessageId };
+  }
+
+  // Fallback: latest message in this thread
+  const sorted = threadMessages.toSorted(
+    (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
   );
-
-  if (lastMessage) {
-    return {
-      parentId: lastMessage.id,
-      depth: lastMessage.depth + 1,
-    };
-  }
-
-  const fallbackMessage = threadMessages[threadMessages.length - 1];
-  return {
-    parentId: fallbackMessage.id,
-    depth: fallbackMessage.depth + 1,
-  };
+  return { parentId: sorted[0]?.id ?? null };
 }
 
 /**
@@ -132,14 +120,13 @@ export function addErrorMessageToChat(
   errorCode: string | null = null,
   sequenceId: string | null = null,
 ): void {
-  const { parentId, depth } = getLastMessageForErrorParent(threadId);
+  const { parentId } = getLastMessageForErrorParent(threadId);
   useChatStore.getState().addMessage({
     id: crypto.randomUUID(),
     threadId,
     role: ChatMessageRole.ERROR,
     content,
     parentId,
-    depth,
     sequenceId,
     authorId: "system",
     authorName: null,
@@ -175,7 +162,6 @@ function handleMessageCreated(
     role: e.role,
     content: e.content || "",
     parentId: e.parentId,
-    depth: e.depth,
     model: e.model,
     character: e.character,
     isStreaming: e.role === ChatMessageRole.ASSISTANT,
@@ -207,7 +193,6 @@ function handleMessageCreated(
   if (existingOptimistic) {
     useChatStore.getState().updateMessage(e.messageId, {
       parentId: e.parentId,
-      depth: e.depth,
       content: e.content || "",
       metadata: serverMetadata,
     });
@@ -218,7 +203,6 @@ function handleMessageCreated(
       role: e.role,
       content: e.content || "",
       parentId: e.parentId,
-      depth: e.depth,
       sequenceId: e.sequenceId ?? null,
       authorId: incognito ? "incognito" : "system",
       authorName: null,
@@ -246,7 +230,6 @@ function handleMessageCreated(
         e.role,
         e.content || "",
         e.parentId,
-        e.depth,
         e.sequenceId,
         e.model,
         e.character,
@@ -291,7 +274,6 @@ function handleContentDelta(
       role: ChatMessageRole.ASSISTANT,
       content: "",
       parentId: null,
-      depth: 0,
       model: null,
       character: null,
       isStreaming: true,
@@ -319,7 +301,6 @@ function handleContentDelta(
           currentMessage.role,
           newContent,
           currentMessage.parentId,
-          currentMessage.depth,
           currentMessage.sequenceId,
           currentMessage.model,
           currentMessage.character,
@@ -360,7 +341,6 @@ function handleReasoningDelta(
             currentMessage.role,
             newContent,
             currentMessage.parentId,
-            currentMessage.depth,
             currentMessage.sequenceId,
             currentMessage.model,
             currentMessage.character,
@@ -416,7 +396,6 @@ function handleContentDone(
         message.role,
         e.content,
         message.parentId,
-        message.depth,
         message.sequenceId,
         message.model,
         message.character,
@@ -582,7 +561,7 @@ function handleError(
   logger: EndpointLogger,
 ): void {
   const errorMessageId = crypto.randomUUID();
-  const { parentId, depth } = getLastMessageForErrorParent(threadId);
+  const { parentId } = getLastMessageForErrorParent(threadId);
 
   const errorMessage = e.message ?? "Unknown error";
   const errorType = e.errorType?.errorKey ?? "STREAM_ERROR";
@@ -596,7 +575,6 @@ function handleError(
     role: ChatMessageRole.ERROR,
     content: errorMessage,
     parentId,
-    depth,
     sequenceId: null,
     authorId: "system",
     authorName: null,

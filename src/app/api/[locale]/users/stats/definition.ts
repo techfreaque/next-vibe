@@ -49,10 +49,9 @@ import {
   UserStatusFilter,
   UserStatusFilterOptions,
 } from "../enum";
+import { USERS_STATS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { UsersStatsContainer } from "./widget";
-
-export const USERS_STATS_ALIAS = "users-stats" as const;
 
 const { GET } = createEndpoint({
   scopedTranslation,

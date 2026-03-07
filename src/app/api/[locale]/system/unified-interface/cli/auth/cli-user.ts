@@ -111,29 +111,62 @@ export async function getCliUser(
   logger: EndpointLogger,
   locale: CountryLanguage,
 ): Promise<ResponseType<JwtPayloadType>> {
-  // Step 1: Check for existing session from .vibe.session file
+  // Step 1: Check for existing session from .vibe.session file.
+  // readSessionToken reads even locally-expired files — DB is the source of truth.
   try {
-    const { readSessionFile } = await import("./session-file");
-    const sessionResult = await readSessionFile(logger, locale);
+    const { readSessionToken, writeSessionFile } =
+      await import("./session-file");
 
-    if (sessionResult.success && sessionResult.data) {
+    const sessionData = await readSessionToken(logger);
+
+    if (sessionData?.token) {
       const { AuthRepository } =
         await import("@/app/api/[locale]/user/auth/repository");
+
+      // verifyJwt checks JWT signature + expiry (jose library)
       const verifyResult = await AuthRepository.verifyJwt(
-        sessionResult.data.token,
+        sessionData.token,
         logger,
         locale,
       );
 
       if (verifyResult.success && verifyResult.data) {
-        return {
-          success: true,
-          data: createCliUserFromDb(
-            verifyResult.data.id,
-            verifyResult.data.leadId,
-            verifyResult.data.roles,
-          ),
-        };
+        // validateSession checks DB — this is the authoritative expiry check
+        const dbValid = await AuthRepository.validateSession(
+          sessionData.token,
+          verifyResult.data.id,
+          locale,
+          logger,
+        );
+
+        if (dbValid) {
+          // Refresh the local file's expiry if it was stale
+          const localExpired = new Date(sessionData.expiresAt) < new Date();
+          if (localExpired) {
+            logger.debug(
+              "[CLI AUTH] Local session file expired but DB session valid — refreshing local file",
+            );
+            await writeSessionFile(
+              {
+                ...sessionData,
+                expiresAt: new Date(
+                  Date.now() + 30 * 24 * 60 * 60 * 1000,
+                ).toISOString(),
+              },
+              logger,
+              locale,
+            );
+          }
+
+          return {
+            success: true,
+            data: createCliUserFromDb(
+              dbValid.id,
+              dbValid.leadId,
+              dbValid.roles,
+            ),
+          };
+        }
       }
     }
   } catch {

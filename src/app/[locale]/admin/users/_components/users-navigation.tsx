@@ -7,7 +7,9 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
-import { BarChart3, List, UserPlus } from "next-vibe-ui/ui/icons";
+import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
+import { List } from "next-vibe-ui/ui/icons/List";
+import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
 import { Link as NextLink } from "next-vibe-ui/ui/link";
 import { Nav } from "next-vibe-ui/ui/nav";
 import { Span } from "next-vibe-ui/ui/span";

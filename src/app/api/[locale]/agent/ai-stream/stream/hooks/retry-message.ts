@@ -31,6 +31,7 @@ export interface RetryMessageDeps {
     ttsAutoplay: boolean;
     ttsVoice: typeof TtsVoiceValue;
   };
+  setLeafMessageId?: (messageId: string) => void;
 }
 
 export async function retryMessage(
@@ -52,6 +53,6 @@ export async function retryMessage(
       attachments,
       operation: "retry",
     },
-    deps,
+    { ...deps, setLeafMessageId: deps.setLeafMessageId },
   );
 }

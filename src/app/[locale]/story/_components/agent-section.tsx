@@ -8,7 +8,9 @@ import {
   CardTitle,
 } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { Clock, Shield, Wrench } from "next-vibe-ui/ui/icons";
+import { Clock } from "next-vibe-ui/ui/icons/Clock";
+import { Shield } from "next-vibe-ui/ui/icons/Shield";
+import { Wrench } from "next-vibe-ui/ui/icons/Wrench";
 import { Link } from "next-vibe-ui/ui/link";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { H2, P } from "next-vibe-ui/ui/typography";

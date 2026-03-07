@@ -232,7 +232,7 @@ export async function batchSendSms(
     messages.map(async (params) => {
       const result = await sendSms(params, logger, locale);
       const to = params.to;
-      const success = result.success;
+      const isSuccess = result.success;
       const messageId = result.success ? result.data.messageId : undefined;
       const errorMessage: string | undefined = result.success
         ? undefined
@@ -240,7 +240,7 @@ export async function batchSendSms(
 
       return {
         to,
-        success,
+        success: isSuccess,
         messageId,
         error: errorMessage,
       };

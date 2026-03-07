@@ -187,6 +187,14 @@ export function shouldIncludeFile(
   targetPath?: string,
   disableFilter = false,
 ): boolean {
+  // Always exclude node_modules regardless of filter settings
+  if (
+    filePath.includes("node_modules/") ||
+    filePath.includes("node_modules\\")
+  ) {
+    return false;
+  }
+
   if (disableFilter || !targetPath || targetPath.trim() === "") {
     return true;
   }

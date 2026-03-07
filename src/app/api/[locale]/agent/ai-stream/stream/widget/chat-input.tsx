@@ -12,13 +12,11 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  ChevronDown,
-  ChevronRight,
-  ExternalLink,
-  Send,
-  Square,
-} from "next-vibe-ui/ui/icons";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
+import { Send } from "next-vibe-ui/ui/icons/Send";
+import { Square } from "next-vibe-ui/ui/icons/Square";
 import { Kbd } from "next-vibe-ui/ui/kbd";
 import { Span } from "next-vibe-ui/ui/span";
 import type { TextareaKeyboardEvent } from "next-vibe-ui/ui/textarea";

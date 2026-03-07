@@ -3,7 +3,8 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { ChevronLeft, Home } from "next-vibe-ui/ui/icons";
+import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
+import { Home } from "next-vibe-ui/ui/icons/Home";
 import { Image } from "next-vibe-ui/ui/image";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
@@ -65,7 +66,7 @@ export function NotFoundBackButton({
                     asChild
                     className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 group"
                   >
-                    <Link href={`/${locale}`}>
+                    <Link href={`/${locale}/threads`}>
                       <Home className="mr-2 h-4 w-4" />
                       {t("app.pages.notFound.goHome")}
                     </Link>

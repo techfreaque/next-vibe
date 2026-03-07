@@ -75,6 +75,11 @@ export const translations = {
         description:
           "Filter tools by platform (admin only). Shows tools available on the selected platform. Use 'all' to see tools across all platforms.",
       },
+      includeProdOnly: {
+        label: "Include Production-Only Tools",
+        description:
+          "When true, includes tools marked as production-only (admin only). Use 'all' platform filter to see tools across all platforms.",
+      },
       platforms: {
         title: "Available platforms",
       },

@@ -21,8 +21,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../i18n";
-
-export const ERROR_MONITOR_ALIAS = "error-monitor" as const;
+import { ERROR_MONITOR_ALIAS } from "./constants";
 
 const { POST } = createEndpoint({
   scopedTranslation,

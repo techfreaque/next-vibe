@@ -1199,7 +1199,7 @@ export class LeadStatsRepository {
         dateFrom,
         timePeriod,
       );
-      const current = new Date(alignedStart);
+      let current = new Date(alignedStart);
 
       while (current < dateTo) {
         const intervalStart = new Date(current);
@@ -1256,7 +1256,7 @@ export class LeadStatsRepository {
         }
 
         // Move to the next interval
-        current.setTime(intervalEnd.getTime());
+        current = new Date(intervalEnd);
 
         // Safety check to prevent infinite loops
         if (intervals.length > 10000) {
@@ -3101,11 +3101,11 @@ export class LeadStatsRepository {
 
     return allStatuses
       .map((status) => {
-        const count = statusCounts.get(status) || 0;
+        const statusCount = statusCounts.get(status) || 0;
         return {
           category: status,
-          value: count,
-          percentage: totalCount > 0 ? count / totalCount : 0,
+          value: statusCount,
+          percentage: totalCount > 0 ? statusCount / totalCount : 0,
         };
       })
       .filter((stage) => stage.value > 0); // Only return stages with actual data

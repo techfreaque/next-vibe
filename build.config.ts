@@ -94,6 +94,51 @@ const config: BuildConfig = {
         minify: false,
       },
     },
+    // ── Vibe Frame: browser IIFE (script tag) ───────────────────────────────
+    // Exposes window.VibeFrame for <script src="/vibe-frame/vibe-frame.js"> usage.
+    {
+      input:
+        "src/app/api/[locale]/system/unified-interface/vibe-frame/embed.ts",
+      output: "public/vibe-frame/vibe-frame.js",
+      type: BunBuildTypeEnum.MODULE,
+      modulesToExternalize: [],
+      bunOptions: {
+        target: BunTargetEnum.BROWSER,
+        sourcemap: SourcemapModeEnum.EXTERNAL,
+        format: OutputFormatEnum.IIFE,
+        minify: true,
+      },
+    },
+    // ── Vibe Frame: ESM package (npm / bundler import) ───────────────────────
+    // Library entry — no auto-init, no window exposure, full type exports.
+    {
+      input:
+        "src/app/api/[locale]/system/unified-interface/vibe-frame/embed-package.ts",
+      output: "public/vibe-frame/vibe-frame.esm.js",
+      type: BunBuildTypeEnum.MODULE,
+      modulesToExternalize: [],
+      bunOptions: {
+        target: BunTargetEnum.BROWSER,
+        sourcemap: SourcemapModeEnum.EXTERNAL,
+        format: OutputFormatEnum.ESM,
+        minify: false,
+      },
+    },
+    // ── Vibe Frame: inside-bridge (loaded inside iframes) ───────────────────
+    // Provides window.bridgeCall for widget code to call privileged parent APIs.
+    {
+      input:
+        "src/app/api/[locale]/system/unified-interface/vibe-frame/inside-bridge.ts",
+      output: "public/vibe-frame/vibe-frame-inside-bridge.js",
+      type: BunBuildTypeEnum.MODULE,
+      modulesToExternalize: [],
+      bunOptions: {
+        target: BunTargetEnum.BROWSER,
+        sourcemap: SourcemapModeEnum.EXTERNAL,
+        format: OutputFormatEnum.IIFE,
+        minify: true,
+      },
+    },
   ],
 
   // Files or folders to copy after compilation

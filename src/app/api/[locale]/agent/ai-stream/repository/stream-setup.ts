@@ -50,7 +50,6 @@ import { chatThreads, type ToolCall } from "../../chat/db";
 import type { ChatMessageRole } from "../../chat/enum";
 import { chatFavorites } from "../../chat/favorites/db";
 import { chatSettings } from "../../chat/settings/db";
-import { calculateMessageDepth } from "../../chat/threads/[threadId]/messages/repository";
 import { ensureThread } from "../../chat/threads/repository";
 import {
   DEFAULT_TTS_VOICE,
@@ -97,7 +96,6 @@ export interface StreamSetupResult {
   effectiveRole: ChatMessageRole;
   threadId: string;
   isNewThread: boolean;
-  messageDepth: number;
   userMessageId: string | null;
   aiMessageId: string;
   aiMessageCreatedAt: Date;
@@ -156,7 +154,7 @@ export interface StreamSetupResult {
   /** AI SDK tools configuration */
   tools: Record<string, CoreTool> | undefined;
   /** Tools metadata for confirmation checks */
-  toolsConfig: Map<string, { requiresConfirmation: boolean }>;
+  toolsConfig: Map<string, { requiresConfirmation: boolean; credits: number }>;
   /** Set of tool names the model is allowed to execute (permission layer). null = all allowed. */
   activeToolNames: Set<string> | null;
   /** Effective compact trigger token threshold (cascade: favorite → character → settings → global) */
@@ -402,11 +400,6 @@ export async function setupAiStream(params: {
     });
   }
 
-  const messageDepth = await calculateMessageDepth(
-    effectiveParentMessageId,
-    isIncognito,
-  );
-
   // Check if we have tool confirmations (don't need userMessageId in this case)
   const hasToolConfirmations = !!(
     data.toolConfirmations && data.toolConfirmations.length > 0
@@ -440,7 +433,6 @@ export async function setupAiStream(params: {
       effectiveRole,
       effectiveContent,
       effectiveParentMessageId,
-      messageDepth,
       userId,
       attachments: data.attachments ?? undefined,
       logger,
@@ -646,11 +638,12 @@ export async function setupAiStream(params: {
     t,
     locale,
     rootFolderId: data.rootFolderId,
-    subFolderId: data.subFolderId,
+    subFolderId: data.subFolderId ?? null,
     callMode: data.voiceMode?.enabled,
     extraInstructions: params.extraInstructions,
     headless: params.headless,
     excludeMemories: params.excludeMemories,
+    threadId: threadResult.threadId,
     voiceTranscription: voiceTranscription
       ? {
           wasTranscribed: voiceTranscription.wasTranscribed,
@@ -789,7 +782,6 @@ export async function setupAiStream(params: {
       effectiveRole,
       threadId: threadResult.threadId,
       isNewThread: threadResult.isNew,
-      messageDepth,
       userMessageId,
       aiMessageId,
       aiMessageCreatedAt,

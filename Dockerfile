@@ -20,13 +20,8 @@ ARG PREVIEW_DB_PORT
 ARG PREVIEW_PORT
 ARG JWT_SECRET_KEY
 ARG CRON_SECRET
-ARG INSTANCE_ID
-ARG KNOWN_INSTANCE_IDS
 ARG VIBE_IS_CLOUD
 ARG VIBE_REMOTE_URL
-ARG THEA_REMOTE_URL
-ARG THEA_REMOTE_API_KEY
-ARG THEA_REMOTE_LEAD_ID
 ARG PULSE_INTERVAL_MINUTES
 ARG ENABLE_ANALYTICS
 ARG VIBE_ADMIN_USER_EMAIL
@@ -129,13 +124,8 @@ ENV PREVIEW_DB_PORT=$PREVIEW_DB_PORT
 ENV PREVIEW_PORT=$PREVIEW_PORT
 ENV JWT_SECRET_KEY=$JWT_SECRET_KEY
 ENV CRON_SECRET=$CRON_SECRET
-ENV INSTANCE_ID=$INSTANCE_ID
-ENV KNOWN_INSTANCE_IDS=$KNOWN_INSTANCE_IDS
 ENV VIBE_IS_CLOUD=$VIBE_IS_CLOUD
 ENV VIBE_REMOTE_URL=$VIBE_REMOTE_URL
-ENV THEA_REMOTE_URL=$THEA_REMOTE_URL
-ENV THEA_REMOTE_API_KEY=$THEA_REMOTE_API_KEY
-ENV THEA_REMOTE_LEAD_ID=$THEA_REMOTE_LEAD_ID
 ENV PULSE_INTERVAL_MINUTES=$PULSE_INTERVAL_MINUTES
 ENV ENABLE_ANALYTICS=$ENABLE_ANALYTICS
 ENV VIBE_ADMIN_USER_EMAIL=$VIBE_ADMIN_USER_EMAIL
@@ -231,6 +221,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 
 COPY . .
 
+ENV NODE_ENV=production
+
 # Install dependencies
 # Bun download cache avoids re-fetching tarballs; bun install with warm cache ~10-20s vs cold ~2min
 # node_modules not cache-mounted: at 1.9GB/183k files, cp-in+cp-out costs ~3min, more than install itself
@@ -241,9 +233,8 @@ RUN --mount=type=cache,target=/root/.bun/install/cache,id=next-vibe-bun-cache,sh
 # /app/.next-prod/cache mounted directly — Next.js webpack/RSC incremental cache persisted across builds
 # DB unreachable at build time (docker network only); migrations run via docker compose run in install-docker.sh
 RUN --mount=type=cache,target=/app/.next-prod/cache,id=next-vibe-next-cache,sharing=locked \
-    bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts build --migrate=false --seed=false
+    bun src/app/api/[locale]/system/unified-interface/cli/vibe-runtime.ts build --migrate=false --seed=false --db-setup=false
 
-ENV NODE_ENV=production
 
 # Expose ports: HTTP (3000) + WebSocket sidecar (4000)
 EXPOSE 3000 4000

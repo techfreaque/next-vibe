@@ -3,7 +3,8 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Code, MessageSquare } from "next-vibe-ui/ui/icons";
+import { Code } from "next-vibe-ui/ui/icons/Code";
+import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
 import { Link } from "next-vibe-ui/ui/link";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
@@ -171,8 +172,6 @@ function buildModelComparisonDemo(t: ScopedT): DemoData {
     },
     {
       text: t("home.hero.demos.modelComparison.gptResponse"),
-      threadId: "550e8400-e29b-41d4-a716-446655440000",
-      lastAiMessageId: "660e8400-e29b-41d4-a716-446655440001",
       threadTitle: "Model Comparison",
       threadCreatedAt: "2026-02-27T10:00:00.000Z",
       promptTokens: 412,
@@ -198,8 +197,6 @@ function buildModelComparisonDemo(t: ScopedT): DemoData {
     },
     {
       text: t("home.hero.demos.modelComparison.claudeResponse"),
-      threadId: "550e8400-e29b-41d4-a716-446655440002",
-      lastAiMessageId: "660e8400-e29b-41d4-a716-446655440003",
       threadTitle: "Model Comparison",
       threadCreatedAt: "2026-02-27T10:00:01.000Z",
       promptTokens: 380,
@@ -233,8 +230,6 @@ function buildModelComparisonDemo(t: ScopedT): DemoData {
     },
     {
       text: t("home.hero.demos.modelComparison.veniceResponse"),
-      threadId: "550e8400-e29b-41d4-a716-446655440004",
-      lastAiMessageId: "660e8400-e29b-41d4-a716-446655440005",
       threadTitle: "Model Comparison",
       threadCreatedAt: "2026-02-27T10:00:02.000Z",
       promptTokens: 290,
@@ -571,8 +566,6 @@ function buildFeatureShippedDemo(t: ScopedT): DemoData {
     },
     {
       text: t("home.hero.demos.featureShipped.messageResult"),
-      threadId: "550e8400-e29b-41d4-a716-446655440020",
-      lastAiMessageId: "660e8400-e29b-41d4-a716-446655440021",
       threadTitle: "HackerNews Digest",
       threadCreatedAt: "2026-03-04T09:00:00.000Z",
       promptTokens: 1840,
@@ -848,7 +841,7 @@ const Hero = ({ locale, totalToolCount }: HeroProps): JSX.Element => {
               className="text-base h-12 px-8 w-full sm:w-auto"
               asChild
             >
-              <Link href={`/${locale}`}>
+              <Link href={`/${locale}/threads`}>
                 <MessageSquare className="mr-2 h-5 w-5" />
                 {t("home.hero.cta")}
               </Link>
@@ -914,6 +907,13 @@ const Hero = ({ locale, totalToolCount }: HeroProps): JSX.Element => {
                   locale={locale}
                   logger={logger}
                   rootFolderId={DefaultFolderId.PUBLIC}
+                  user={{
+                    isPublic: false,
+                    leadId: "00000000-0000-0000-0000-000000000000",
+                    id: "00000000-0000-0000-0000-000000000000",
+                    roles: [UserPermissionRole.ADMIN],
+                  }}
+                  deductCredits={null}
                 />
                 <GroupedAssistantMessage
                   group={activeDemo.assistantGroup}

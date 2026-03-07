@@ -28,7 +28,7 @@ import {
   chatThreads,
   type ToolCall,
 } from "../../../db";
-import { ChatMessageRole } from "../../../enum";
+import { ChatMessageRole, type ChatMessageRoleDB } from "../../../enum";
 import {
   canPostInThread,
   canViewThread,
@@ -41,27 +41,6 @@ import type {
 import { scopedTranslation } from "./i18n";
 
 type MessagesT = ReturnType<typeof scopedTranslation.scopedT>["t"];
-
-/**
- * Calculate message depth from parent
- * Returns 0 if no parent or if incognito mode
- */
-export async function calculateMessageDepth(
-  parentMessageId: string | null | undefined,
-  isIncognito: boolean,
-): Promise<number> {
-  if (!parentMessageId || isIncognito) {
-    return 0;
-  }
-
-  const [parent] = await db
-    .select()
-    .from(chatMessages)
-    .where(eq(chatMessages.id, parentMessageId))
-    .limit(1);
-
-  return parent ? parent.depth + 1 : 0;
-}
 
 /**
  * Fetch message history for a thread, optionally filtered by branch
@@ -156,7 +135,6 @@ export async function getParentMessage(
   role: ChatMessageRole;
   content: string | null;
   parentId: string | null;
-  depth: number;
 } | null> {
   // Get the message by ID (supports both user and AI messages)
   const [message] = await db
@@ -186,17 +164,15 @@ export async function getParentMessage(
     role: message.role,
     content: message.content,
     parentId: message.parentId,
-    depth: message.depth,
   };
 }
 
 export async function createUserMessage(params: {
   messageId: string;
   threadId: string;
-  role: ChatMessageRole;
+  role: (typeof ChatMessageRoleDB)[number];
   content: string;
   parentId: string | null;
-  depth: number;
   userId: string | undefined;
   authorName: string | null;
   logger: EndpointLogger;
@@ -217,17 +193,16 @@ export async function createUserMessage(params: {
   // committed (e.g. stream interrupted mid-flight). Fall back to the actual last committed
   // message in the thread so the conversation stays connected.
   let resolvedParentId = params.parentId;
-  let resolvedDepth = params.depth;
   if (resolvedParentId) {
     const [parent] = await db
-      .select({ id: chatMessages.id, depth: chatMessages.depth })
+      .select({ id: chatMessages.id })
       .from(chatMessages)
       .where(eq(chatMessages.id, resolvedParentId))
       .limit(1);
     if (!parent) {
       // Parent wasn't committed — find the actual last message in this thread
       const [lastCommitted] = await db
-        .select({ id: chatMessages.id, depth: chatMessages.depth })
+        .select({ id: chatMessages.id })
         .from(chatMessages)
         .where(eq(chatMessages.threadId, params.threadId))
         .orderBy(desc(chatMessages.createdAt))
@@ -242,7 +217,6 @@ export async function createUserMessage(params: {
         },
       );
       resolvedParentId = lastCommitted?.id ?? null;
-      resolvedDepth = lastCommitted ? lastCommitted.depth + 1 : 0;
     }
   }
 
@@ -253,7 +227,6 @@ export async function createUserMessage(params: {
     role: params.role,
     content: params.content,
     parentId: resolvedParentId,
-    depth: resolvedDepth,
     authorId: params.userId ?? null,
     authorName: params.authorName ?? null,
     isAI: false,
@@ -285,23 +258,20 @@ export async function createUserMessage(params: {
 
 /**
  * Re-parent a user message to a new parent (used after compacting inserts itself before the user message).
- * Updates both parentId and depth in the DB.
  */
 export async function reparentUserMessage(params: {
   messageId: string;
   newParentId: string;
-  newDepth: number;
   logger: EndpointLogger;
 }): Promise<void> {
   await db
     .update(chatMessages)
-    .set({ parentId: params.newParentId, depth: params.newDepth })
+    .set({ parentId: params.newParentId })
     .where(eq(chatMessages.id, params.messageId));
 
   params.logger.debug("Re-parented user message after compacting", {
     messageId: params.messageId,
     newParentId: params.newParentId,
-    newDepth: params.newDepth,
   });
 }
 
@@ -309,7 +279,6 @@ export async function createAiMessagePlaceholder(params: {
   messageId: string;
   threadId: string;
   parentId: string | null;
-  depth: number;
   userId: string | undefined;
   model: ModelId;
   character: string | null | undefined;
@@ -322,7 +291,6 @@ export async function createAiMessagePlaceholder(params: {
     role: ChatMessageRole.ASSISTANT,
     content: " ",
     parentId: params.parentId,
-    depth: params.depth,
     authorId: params.userId ?? null,
     sequenceId: params.sequenceId,
     isAI: true,
@@ -343,7 +311,6 @@ export async function createErrorMessage(params: {
   threadId: string;
   content: string;
   parentId: string | null;
-  depth: number;
   userId: string | undefined;
   errorType: string;
   errorDetails?: Record<string, string | number | boolean | null>;
@@ -371,7 +338,6 @@ export async function createErrorMessage(params: {
     role: ChatMessageRole.ERROR,
     content: params.content,
     parentId: params.parentId,
-    depth: params.depth,
     authorId: params.userId ?? null,
     isAI: false,
     sequenceId: params.sequenceId ?? null,
@@ -391,7 +357,6 @@ export async function createTextMessage(params: {
   threadId: string;
   content: string;
   parentId: string | null;
-  depth: number;
   userId: string | undefined;
   model: ModelId;
   character: string;
@@ -406,7 +371,6 @@ export async function createTextMessage(params: {
       role: ChatMessageRole.ASSISTANT,
       content: params.content.trim() || null, // Save null if content is empty/whitespace
       parentId: params.parentId,
-      depth: params.depth,
       authorId: params.userId ?? null,
       sequenceId: params.sequenceId,
       isAI: true,
@@ -457,7 +421,6 @@ export async function createToolMessage(params: {
   threadId: string;
   toolCall: ToolCall;
   parentId: string | null;
-  depth: number;
   userId: string | undefined;
   sequenceId: string | null;
   model: ModelId;
@@ -483,7 +446,6 @@ export async function createToolMessage(params: {
       role: ChatMessageRole.TOOL,
       content: null, // Tool messages don't have text content, only metadata with toolCall info
       parentId: params.parentId,
-      depth: params.depth,
       authorId: params.userId ?? null,
       sequenceId: params.sequenceId,
       isAI: true,
@@ -725,11 +687,9 @@ export class MessagesRepository {
         });
       }
 
-      // Calculate depth if parent exists
-      let depth = 0;
       if (data.parentId) {
         const [parentMessage] = await db
-          .select()
+          .select({ id: chatMessages.id })
           .from(chatMessages)
           .where(
             and(
@@ -748,8 +708,6 @@ export class MessagesRepository {
             },
           });
         }
-
-        depth = parentMessage.depth + 1;
       }
 
       const messageId = data.id ?? crypto.randomUUID();
@@ -762,7 +720,6 @@ export class MessagesRepository {
           role: safeRole,
           content: data.content || "",
           parentId: data.parentId || null,
-          depth,
           authorId: userIdentifier,
           isAI: safeRole === ChatMessageRole.ASSISTANT,
           model: user.isPublic ? null : data.model || null,

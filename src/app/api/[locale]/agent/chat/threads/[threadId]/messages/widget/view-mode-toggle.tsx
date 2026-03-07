@@ -3,7 +3,10 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Bug, Hash, List, Network } from "next-vibe-ui/ui/icons";
+import { Bug } from "next-vibe-ui/ui/icons/Bug";
+import { Hash } from "next-vibe-ui/ui/icons/Hash";
+import { List } from "next-vibe-ui/ui/icons/List";
+import { Network } from "next-vibe-ui/ui/icons/Network";
 import type React from "react";
 
 import {

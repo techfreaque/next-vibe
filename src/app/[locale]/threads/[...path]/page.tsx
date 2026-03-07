@@ -19,6 +19,8 @@ import { isUUID, parseChatUrl } from "@/app/[locale]/chat/lib/url-parser";
 import { CharactersRepository } from "@/app/api/[locale]/agent/chat/characters/repository";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
+import { scopedTranslation as folderContentsScopedTranslation } from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/i18n";
+import { FolderContentsRepository } from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/repository";
 import { scopedTranslation as foldersScopedTranslation } from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/i18n";
 import { ChatFoldersRepository } from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/repository";
 import { RootFolderPermissionsRepository } from "@/app/api/[locale]/agent/chat/folders/[rootFolderId]/root-permissions/repository";
@@ -56,12 +58,17 @@ interface ThreadsPathPageProps {
     locale: CountryLanguage;
     path: string[];
   }>;
+  searchParams: Promise<{
+    message?: string;
+  }>;
 }
 
 export default async function ThreadsPathPage({
   params,
+  searchParams,
 }: ThreadsPathPageProps): Promise<JSX.Element> {
   const { locale, path } = await params;
+  const resolvedSearchParams = await searchParams;
   const logger = createEndpointLogger(false, Date.now(), locale);
   const { t } = userScopedTranslation.scopedT(locale);
   const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
@@ -186,6 +193,8 @@ export default async function ThreadsPathPage({
   // Prefetch initial sidebar + thread data server-side to avoid client-side fetch on mount.
   // Skip for incognito (localStorage-only).
   // This data is passed as initialData so pages render immediately without a fetch.
+  const leafMessageId = resolvedSearchParams.message ?? null;
+
   let initialFoldersData = null;
   let initialThreadsData = null;
   let initialMessagesData = null;
@@ -193,6 +202,8 @@ export default async function ThreadsPathPage({
   let initialSettingsData = null;
   let initialCharacterData = null;
   let initialPublicFeedData = null;
+  let initialFolderContentsData = null;
+  let initialSubFolderContentsData = null;
 
   if (initialRootFolderId !== DefaultFolderId.INCOGNITO && user) {
     const { t: foldersT } = foldersScopedTranslation.scopedT(locale);
@@ -200,6 +211,8 @@ export default async function ThreadsPathPage({
     const { t: messagesT } = messagesScopedTranslation.scopedT(locale);
     const { t: settingsT } = settingsScopedTranslation.scopedT(locale);
     const { t: pathT } = pathScopedTranslation.scopedT(locale);
+    const { t: folderContentsT } =
+      folderContentsScopedTranslation.scopedT(locale);
 
     const activeThreadIdForFetch =
       initialThreadId && initialThreadId !== NEW_MESSAGE_ID
@@ -262,7 +275,10 @@ export default async function ThreadsPathPage({
       activeThreadIdForFetch
         ? pathRepository.getPath(
             { threadId: activeThreadIdForFetch },
-            { rootFolderId: initialRootFolderId, branchIndices: {} },
+            {
+              rootFolderId: initialRootFolderId,
+              leafMessageId: leafMessageId ?? undefined,
+            },
             user,
             pathT,
             logger,
@@ -303,6 +319,43 @@ export default async function ThreadsPathPage({
         initialPublicFeedData = publicFeedResult.data;
       }
     }
+
+    // Prefetch folder contents for the sidebar (avoids loading flash on mount).
+    // When in a subfolder, fetch BOTH root-level (subFolderId: null) AND the
+    // subfolder's contents in parallel — root seeds the top-level EndpointsPage,
+    // subfolder seeds the expanded FolderRow's child EndpointsPage.
+    const folderContentsPromises: [
+      ReturnType<typeof FolderContentsRepository.getFolderContents>,
+      ReturnType<typeof FolderContentsRepository.getFolderContents> | null,
+    ] = [
+      FolderContentsRepository.getFolderContents(
+        { rootFolderId: initialRootFolderId },
+        { subFolderId: undefined }, // always fetch root level
+        user,
+        folderContentsT,
+        logger,
+        locale,
+      ),
+      initialSubFolderId
+        ? FolderContentsRepository.getFolderContents(
+            { rootFolderId: initialRootFolderId },
+            { subFolderId: initialSubFolderId },
+            user,
+            folderContentsT,
+            logger,
+            locale,
+          )
+        : null,
+    ];
+    const [rootContentsResult, subFolderContentsResult] = await Promise.all(
+      folderContentsPromises,
+    );
+    if (rootContentsResult.success) {
+      initialFolderContentsData = rootContentsResult.data;
+    }
+    if (subFolderContentsResult && subFolderContentsResult.success) {
+      initialSubFolderContentsData = subFolderContentsResult.data;
+    }
   }
 
   return (
@@ -311,6 +364,7 @@ export default async function ThreadsPathPage({
         activeThreadId={initialThreadId}
         currentRootFolderId={initialRootFolderId}
         currentSubFolderId={initialSubFolderId}
+        leafMessageId={leafMessageId}
       >
         <ChatBootProvider
           activeThreadId={initialThreadId}
@@ -326,6 +380,9 @@ export default async function ThreadsPathPage({
           initialSettingsData={initialSettingsData}
           initialCharacterData={initialCharacterData}
           initialPublicFeedData={initialPublicFeedData}
+          initialFolderContentsData={initialFolderContentsData}
+          initialSubFolderContentsData={initialSubFolderContentsData}
+          initialSubFolderId={initialSubFolderId}
         >
           <ChatInterface user={user} />
         </ChatBootProvider>

@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "next-vibe-ui/ui/dropdown-menu";
-import { ChevronDown } from "next-vibe-ui/ui/icons";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { TooltipProvider } from "next-vibe-ui/ui/tooltip";

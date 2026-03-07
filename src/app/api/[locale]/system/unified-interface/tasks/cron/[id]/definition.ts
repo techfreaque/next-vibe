@@ -35,15 +35,16 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { taskInputSchema } from "../db";
 import { cronTaskResponseSchema } from "../tasks/definition";
+import {
+  CRON_DELETE_ALIAS,
+  CRON_GET_ALIAS,
+  CRON_UPDATE_ALIAS,
+} from "./constants";
 import { scopedTranslation } from "./i18n";
 import {
   CronTaskDetailContainer,
   CronTaskEditContainer,
 } from "./widget/widget";
-
-export const CRON_GET_ALIAS = "cron-get" as const;
-export const CRON_UPDATE_ALIAS = "cron-update" as const;
-export const CRON_DELETE_ALIAS = "cron-delete" as const;
 
 /**
  * GET /cron/task/[id] - Get individual task
@@ -63,7 +64,7 @@ const { GET } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
     UserRole.ADMIN,
   ],
-  tags: ["get.title"],
+  tags: ["tags.cron" as const, "tags.scheduling" as const],
   fields: customWidgetObject({
     render: CronTaskDetailContainer,
     usage: { request: "urlPathParams", response: true } as const,
@@ -195,7 +196,7 @@ const { PUT } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
     UserRole.ADMIN,
   ],
-  tags: ["put.title"],
+  tags: ["tags.cron" as const, "tags.scheduling" as const],
   fields: customWidgetObject({
     render: CronTaskEditContainer,
     noFormElement: true,
@@ -315,6 +316,16 @@ const { PUT } = createEndpoint({
         schema: z.coerce.number().optional(),
       }),
 
+      retryDelay: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.NUMBER,
+        label: "put.fields.retryDelay.label",
+        description: "put.fields.retryDelay.description",
+        placeholder: "put.fields.retryDelay.placeholder",
+        columns: 6,
+        schema: z.coerce.number().optional(),
+      }),
+
       taskInput: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
@@ -331,7 +342,7 @@ const { PUT } = createEndpoint({
         label: "put.fields.runOnce.label",
         description: "put.fields.runOnce.description",
         columns: 6,
-        schema: z.boolean().default(true),
+        schema: z.boolean().optional(),
       }),
       targetInstance: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -414,7 +425,7 @@ const { PUT } = createEndpoint({
         enabled: false,
         priority: CronTaskPriority.HIGH,
         outputMode: TaskOutputModeDB[0],
-        timeout: 7200,
+        timeout: 300000,
         retries: 5,
       },
     },
@@ -431,7 +442,7 @@ const { PUT } = createEndpoint({
           timezone: "UTC",
           enabled: false,
           priority: CronTaskPriority.HIGH,
-          timeout: 7200,
+          timeout: 300000,
           retries: 5,
           retryDelay: 5000,
           taskInput: {},
@@ -478,7 +489,7 @@ const { DELETE } = createEndpoint({
     UserRole.PARTNER_EMPLOYEE,
     UserRole.ADMIN,
   ],
-  tags: ["delete.title"],
+  tags: ["tags.cron" as const, "tags.scheduling" as const],
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,
     title: "delete.container.title",

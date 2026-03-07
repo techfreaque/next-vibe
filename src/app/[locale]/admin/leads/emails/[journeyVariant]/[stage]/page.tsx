@@ -6,7 +6,9 @@
 import { notFound } from "next-vibe-ui/lib/not-found";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { ArrowLeft, ChevronLeft, ChevronRight } from "next-vibe-ui/ui/icons";
+import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { H1, P } from "next-vibe-ui/ui/typography";
@@ -211,7 +213,7 @@ export default async function EmailPreviewPage({
                 const isCurrentJourney = journey === journeyVariant;
                 const journeyStages = emailService.getAvailableStages(journey);
                 const firstStage = journeyStages[0];
-                const journeyInfo = emailService.getJourneyInfo(
+                const currentJourneyInfo = emailService.getJourneyInfo(
                   journey,
                   locale,
                 );
@@ -226,7 +228,7 @@ export default async function EmailPreviewPage({
                       size="sm"
                       className="text-xs"
                     >
-                      {journeyInfo.name}
+                      {currentJourneyInfo.name}
                     </Button>
                   </Link>
                 );

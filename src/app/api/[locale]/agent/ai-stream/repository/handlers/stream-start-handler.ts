@@ -34,7 +34,6 @@ export class StreamStartHandler {
     userMessageId: string | null;
     aiMessageId: string;
     effectiveParentMessageId: string | null | undefined;
-    messageDepth: number;
     toolConfirmationResults: Array<{
       messageId: string;
       sequenceId: string;
@@ -77,7 +76,6 @@ export class StreamStartHandler {
       userMessageId,
       aiMessageId,
       effectiveParentMessageId,
-      messageDepth,
       toolConfirmationResults,
       voiceMode,
       fileUploadPromise,
@@ -95,7 +93,6 @@ export class StreamStartHandler {
     const ctx = StreamContextInitializer.initializeContext({
       userMessageId,
       effectiveParentMessageId,
-      messageDepth,
       toolConfirmationResults,
       aiMessageId,
       isIncognito,

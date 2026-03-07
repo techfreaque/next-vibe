@@ -55,6 +55,11 @@ export const translations: typeof enTranslations = {
         title: "Port",
         description: "Numer portu dla serwera",
       },
+      profile: {
+        title: "Profilowanie",
+        description:
+          "Włącz profilowanie: ustawia NEXT_CPU_PROF=1 (zapisuje .cpuprofile przy wyjściu) dla produkcyjnego serwera Next.js",
+      },
       skipTaskRunner: {
         title: "Pomiń Task Runner",
         description: "Pomiń Task Runner",

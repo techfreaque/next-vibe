@@ -40,9 +40,8 @@ export function PreviewPropsForm({
   onPropsChange,
 }: PreviewPropsFormProps): ReactElement | null {
   const { t } = useTranslation();
-  const [props, setProps] = useState<Record<string, string | number | boolean>>(
-    defaultProps,
-  );
+  const [props, setProps] =
+    useState<Record<string, string | number | boolean>>(defaultProps);
 
   // Update local state when default props change
   useEffect(() => {

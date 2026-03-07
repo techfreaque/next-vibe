@@ -39,7 +39,7 @@ import { scopedTranslation } from "./i18n";
 
 // Singleton Stripe instance for direct access (legacy webhook support)
 export const stripe = new Stripe(paymentEnv.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-12-15.clover",
+  apiVersion: "2026-02-25.clover",
 });
 
 export class StripeProvider implements PaymentProvider {

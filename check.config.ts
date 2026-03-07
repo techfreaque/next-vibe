@@ -30,6 +30,9 @@ const vibeCheck: CheckConfig["vibeCheck"] = {
   limit: 20000,
   mcpLimit: 20, // Compact limit for MCP platform
   editorUriScheme: "vscode://file/", // URI scheme for clickable file links
+  // Extensive mode: when false (default), test and generated files are excluded.
+  // Set to true for release validation to catch issues in all files.
+  extensive: false,
 };
 
 // ============================================================
@@ -54,6 +57,21 @@ const features = {
   tsgo: true, // Use tsgo instead of tsc for type checking
   strictTypes: true, // Strict type checking rules
 } as const;
+
+// ============================================================
+// Non-extensive ignore patterns (test + generated files)
+// These are excluded by default; pass --extensive to include them.
+// ============================================================
+
+const nonExtensivePatterns = [
+  "**/generated/**",
+  "**/*.test.ts",
+  "**/*.test.tsx",
+];
+const {
+  oxlintIgnores: oxlintNonExtensiveIgnores,
+  eslintIgnores: eslintNonExtensiveIgnores,
+} = formatIgnorePatterns(nonExtensivePatterns);
 
 // ============================================================
 // Shared Ignores (files, folders, globs - mixed)
@@ -84,6 +102,7 @@ const { oxlintIgnores, eslintIgnores } = formatIgnorePatterns([
   "build",
   "test-files",
   "test-project",
+  "public/vibe-frame/**",
   // Files
   ".DS_Store",
   "thumbs.db",
@@ -105,6 +124,7 @@ const typecheck = {
   enabled: true as const,
   cachePath: ".tmp/typecheck-cache",
   useTsgo: features.tsgo,
+  nonExtensiveIgnorePatterns: nonExtensivePatterns,
 };
 
 // --------------------------------------------------------
@@ -117,6 +137,7 @@ const oxlint: CheckConfig["oxlint"] = {
   lintableExtensions: [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"],
   $schema: "./node_modules/oxlint/configuration_schema.json",
   ignorePatterns: oxlintIgnores,
+  nonExtensiveIgnorePatterns: oxlintNonExtensiveIgnores,
   plugins: [
     "typescript",
     "oxc",
@@ -728,6 +749,7 @@ const config = (): CheckConfig => {
     cachePath: ".tmp/eslint-cache",
     lintableExtensions: [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"],
     ignores: oxlintIgnores,
+    nonExtensiveIgnorePatterns: eslintNonExtensiveIgnores,
     // Build flatConfig with plugins (called from eslint.config.mjs which loads plugins)
     buildFlatConfig(
       reactCompilerPlugin: EslintPluginLike,

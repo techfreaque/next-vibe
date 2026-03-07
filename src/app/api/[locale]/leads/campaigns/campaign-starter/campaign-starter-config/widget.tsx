@@ -6,7 +6,9 @@
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
-import { CheckCircle, Rocket, Settings } from "next-vibe-ui/ui/icons";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { Rocket } from "next-vibe-ui/ui/icons/Rocket";
+import { Settings } from "next-vibe-ui/ui/icons/Settings";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
 import { Span } from "next-vibe-ui/ui/span";

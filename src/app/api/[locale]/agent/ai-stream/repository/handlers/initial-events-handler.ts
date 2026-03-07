@@ -82,7 +82,6 @@ export class InitialEventsHandler {
     threadId: string;
     operation: "send" | "retry" | "edit" | "answer-as-ai";
     effectiveParentMessageId: string | null | undefined;
-    messageDepth: number;
     effectiveContent: string;
     model: ModelId;
     character: string | null;
@@ -112,7 +111,6 @@ export class InitialEventsHandler {
       threadId,
       operation,
       effectiveParentMessageId,
-      messageDepth,
       effectiveContent,
       model,
       character,
@@ -148,7 +146,6 @@ export class InitialEventsHandler {
       threadId,
       content: isVoiceMode ? "" : effectiveContent,
       parentId: effectiveParentMessageId ?? null,
-      depth: messageDepth,
       model,
       character,
       metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
@@ -157,7 +154,6 @@ export class InitialEventsHandler {
     logger.debug("[InitialEvents] Emitted USER MESSAGE_CREATED", {
       messageId: userMessageId,
       isVoiceMode,
-      depth: messageDepth,
       parentId: effectiveParentMessageId,
     });
 

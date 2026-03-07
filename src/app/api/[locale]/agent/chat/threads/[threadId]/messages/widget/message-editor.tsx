@@ -9,7 +9,10 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
-import { GitBranch, Mic, Phone, X } from "next-vibe-ui/ui/icons";
+import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
+import { Mic } from "next-vibe-ui/ui/icons/Mic";
+import { Phone } from "next-vibe-ui/ui/icons/Phone";
+import { X } from "next-vibe-ui/ui/icons/X";
 import { Kbd } from "next-vibe-ui/ui/kbd";
 import { Textarea } from "next-vibe-ui/ui/textarea";
 import {

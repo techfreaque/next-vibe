@@ -47,10 +47,9 @@ import {
   SortOrder,
   SortOrderOptions,
 } from "../enum";
+import { LEADS_STATS_ALIAS } from "./constants";
 import { type LeadsStatsTranslationKey, scopedTranslation } from "./i18n";
 import { LeadsStatsContainer } from "./widget";
-
-export const LEADS_STATS_ALIAS = "leads-stats" as const;
 
 // ========== Zod Schemas for Complex Response Types ==========
 
@@ -1358,10 +1357,10 @@ const { GET } = createEndpoint({
         recentActivity: [],
         topPerformingCampaigns: [],
         topPerformingSources: [],
-        generatedAt: new Date().toISOString(),
+        generatedAt: "2024-01-15T10:00:00.000Z",
         dataRange: {
-          from: new Date().toISOString(),
-          to: new Date().toISOString(),
+          from: "2024-01-15T10:00:00.000Z",
+          to: "2024-01-15T10:00:00.000Z",
         },
       },
     },

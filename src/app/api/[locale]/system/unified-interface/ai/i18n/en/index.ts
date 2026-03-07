@@ -13,7 +13,7 @@ export const translations = {
         toolName: {
           label: "Tool Name",
           description:
-            "The registered tool name or alias to execute (e.g. 'agent_chat_characters_GET'). Use system_help_GET to discover available tools.",
+            "The registered tool name or alias to execute (e.g. 'agent_chat_characters_GET'). Use tool-help to discover available tools.",
           placeholder: "agent_chat_characters_GET",
         },
         input: {
@@ -25,6 +25,11 @@ export const translations = {
           label: "Instance ID",
           description:
             'Optional remote instance ID. When set, creates an async task on the remote instance instead of executing locally. Result will be {taskId, status:"pending"}.',
+        },
+        callbackMode: {
+          label: "Callback Mode",
+          description:
+            'How to handle the async result. "wait": poll until done (default for fast tools), "task-done": return taskId immediately, "inject": stream result into the current thread.',
         },
       },
       response: {

@@ -91,6 +91,11 @@ export const translations: typeof enTranslations = {
       description:
         "Gibt nur Zusammenfassungsstatistiken zurück, weglassen von Elementen und Dateilisten",
     },
+    extensive: {
+      label: "Extensiv",
+      description:
+        "Wenn aktiviert, werden auch Testdateien (*.test.ts, *.test.tsx) und automatisch generierte Dateien (system/generated/**) geprüft. Standardmäßig deaktiviert — für Release-Validierung oder explizite Prüfung von generiertem/Test-Code aktivieren.",
+    },
   },
 
   response: {

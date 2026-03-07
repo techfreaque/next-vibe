@@ -20,11 +20,12 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import {
+  ELECTRON_ALIAS,
+  ELECTRON_START_ALIAS,
+  ELECTRON_START_DEV_ALIAS,
+} from "./constants";
 import { scopedTranslation } from "./i18n";
-
-export const ELECTRON_START_ALIAS = "electron:start" as const;
-export const ELECTRON_START_DEV_ALIAS = "electron:dev" as const;
-export const ELECTRON_ALIAS = "electron" as const;
 
 const { POST } = createEndpoint({
   scopedTranslation,

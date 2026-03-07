@@ -99,6 +99,7 @@ export interface DivKeyboardEvent {
 export interface DivRefObject {
   focus?: () => void;
   blur?: () => void;
+  getBoundingClientRect: () => DOMRect;
   scrollIntoView: (options?: {
     behavior?: "auto" | "smooth";
     block?: "start" | "center" | "end" | "nearest";
@@ -172,11 +173,12 @@ export const Div = React.forwardRef<DivRefObject, DivProps>(
     ref,
   ): JSX.Element => {
     return (
+      // oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- Generic wrapper component passes all event handlers
       <div
         ref={ref as React.Ref<HTMLDivElement>}
         className={className}
         style={style}
-        role={role}
+        role={role ?? (onClick !== undefined ? "button" : undefined)}
         aria-label={ariaLabel}
         id={id}
         title={title}

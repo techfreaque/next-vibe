@@ -4,8 +4,10 @@ export const translations = {
     messages: "Messages",
   },
   loadingOlderMessages: "Loading older messages...",
+  loadingNewerMessages: "Loading newer messages...",
   scrollUpForOlderMessages: "Scroll up for older messages",
   showOlderMessages: "Show older messages",
+  showNewerMessages: "Show newer messages",
   transcribing: "Transcribing audio...",
   errorCode: "Error Code",
   compacting: {
@@ -48,9 +50,6 @@ export const translations = {
           },
           parentId: {
             content: "Parent Message ID",
-          },
-          depth: {
-            content: "Depth",
           },
           authorId: {
             content: "Author ID",
@@ -198,9 +197,6 @@ export const translations = {
         parentId: {
           content: "Parent Message ID",
         },
-        depth: {
-          content: "Depth",
-        },
         createdAt: {
           content: "Created At",
         },
@@ -291,6 +287,9 @@ export const translations = {
         branch: "Branch",
         retry: "Retry",
         deleteMessage: "Delete message",
+        cancelLoading: "Cancel loading",
+        stopAudio: "Stop audio",
+        playAudio: "Play audio ({{cost}} credits)",
       },
       assistantMessageActions: {
         answerAsAI: "Answer as AI",

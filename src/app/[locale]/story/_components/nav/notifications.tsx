@@ -7,7 +7,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "next-vibe-ui/ui/dropdown-menu";
-import { AlertCircle, Bell, CheckCircle, Info } from "next-vibe-ui/ui/icons";
+import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
+import { Bell } from "next-vibe-ui/ui/icons/Bell";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { Info } from "next-vibe-ui/ui/icons/Info";
 import { Link } from "next-vibe-ui/ui/link";
 import {
   Tooltip,

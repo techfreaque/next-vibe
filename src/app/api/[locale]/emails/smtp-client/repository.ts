@@ -1020,12 +1020,12 @@ export class SmtpRepository {
    */
   private static async updateAccountHealth(
     accountId: string,
-    success: boolean,
+    isSuccess: boolean,
     logger: EndpointLogger,
     errorMessage?: string,
   ): Promise<void> {
     try {
-      if (success) {
+      if (isSuccess) {
         await db
           .update(smtpAccounts)
           .set({

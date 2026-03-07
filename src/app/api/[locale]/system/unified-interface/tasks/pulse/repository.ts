@@ -4,7 +4,17 @@
  * Following interface + implementation pattern
  */
 
-import { and, count, desc, eq, inArray, ne, sql } from "drizzle-orm";
+import {
+  and,
+  count,
+  desc,
+  eq,
+  inArray,
+  isNull,
+  ne,
+  or,
+  sql,
+} from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -33,9 +43,9 @@ import { UserRolesRepository } from "@/app/api/[locale]/user/user-roles/reposito
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { getFullPath } from "../../../generated/endpoint";
 import { getRouteHandler } from "../../../generated/route-handlers";
 import { Platform } from "../../shared/types/platform";
+import { getFullPath } from "../../shared/utils/path";
 import { splitTaskArgs } from "../cron/arg-splitter";
 import { cronTasks as cronTasksTable } from "../cron/db";
 import { CronTasksRepository } from "../cron/repository";
@@ -446,7 +456,9 @@ export class PulseHealthRepository {
       const pulseId = crypto.randomUUID();
       const now = new Date();
 
-      const instanceId = env.INSTANCE_ID;
+      const { getLocalInstanceId } =
+        await import("@/app/api/[locale]/user/remote-connection/repository");
+      const instanceId = await getLocalInstanceId();
 
       const tasksDue: string[] = [];
       const tasksExecuted: string[] = [];
@@ -522,7 +534,14 @@ export class PulseHealthRepository {
             .where(
               and(
                 eq(cronTasksTable.id, dbTask.id),
-                ne(cronTasksTable.lastExecutionStatus, CronTaskStatus.RUNNING),
+                // NULL != 'running' is NULL in SQL (three-value logic) — must explicitly handle NULL
+                or(
+                  isNull(cronTasksTable.lastExecutionStatus),
+                  ne(
+                    cronTasksTable.lastExecutionStatus,
+                    CronTaskStatus.RUNNING,
+                  ),
+                ),
               ),
             )
             .for("update", { skipLocked: true })
@@ -607,8 +626,13 @@ export class PulseHealthRepository {
               durationMs: null,
               startedAt: startedAt.toISOString(),
               serverTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-              executedByInstance: env.INSTANCE_ID ?? null,
+              executedByInstance: instanceId,
               logger,
+            }).catch((err) => {
+              logger.warn("pushStatusToRemote (RUNNING) failed", {
+                taskId: dbTask.id,
+                error: String(err),
+              });
             });
           }
 
@@ -810,8 +834,14 @@ export class PulseHealthRepository {
                 startedAt: startedAt.toISOString(),
                 serverTimezone:
                   Intl.DateTimeFormat().resolvedOptions().timeZone,
-                executedByInstance: env.INSTANCE_ID ?? null,
+                executedByInstance: instanceId,
                 logger,
+              }).catch((err) => {
+                logger.warn("pushStatusToRemote (final) failed", {
+                  taskId: dbTask.id,
+                  status: finalStatus,
+                  error: String(err),
+                });
               });
             }
           } catch (unexpectedError) {
@@ -848,8 +878,13 @@ export class PulseHealthRepository {
                 startedAt: startedAt.toISOString(),
                 serverTimezone:
                   Intl.DateTimeFormat().resolvedOptions().timeZone,
-                executedByInstance: env.INSTANCE_ID ?? null,
+                executedByInstance: instanceId,
                 logger,
+              }).catch((err) => {
+                logger.warn("pushStatusToRemote (FAILED catch-all) failed", {
+                  taskId: dbTask.id,
+                  error: String(err),
+                });
               });
             }
           }

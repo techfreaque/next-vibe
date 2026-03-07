@@ -259,10 +259,12 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
     let jsonResponse: ResponseType<InferResponseOutput<TEndpoint>>;
     try {
       jsonResponse = JSON.parse(responseText);
-    } catch (parseError) {
+    } catch (jsonParseError) {
       logger.error("Failed to parse response as JSON", {
         error:
-          parseError instanceof Error ? parseError.message : String(parseError),
+          jsonParseError instanceof Error
+            ? jsonParseError.message
+            : String(jsonParseError),
         responseText: responseText.slice(0, 500),
         contentType: fetchResponse.headers.get("content-type"),
       });
@@ -289,7 +291,7 @@ export async function nativeEndpoint<TEndpoint extends CreateApiEndpointAny>(
       }
 
       // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Infrastructure code requires throwing for system-level errors and initialization failures
-      throw parseError;
+      throw jsonParseError;
     }
 
     response = jsonResponse;

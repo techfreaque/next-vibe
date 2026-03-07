@@ -46,10 +46,9 @@ import {
   leadsSortingOptionsContainer,
   leadsStatusFiltersContainer,
 } from "../shared-filter-fields";
+import { LEADS_LIST_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { LeadsListContainer } from "./widget";
-
-export const LEADS_LIST_ALIAS = "leads-list" as const;
 
 /**
  * Get Leads List Endpoint (GET)

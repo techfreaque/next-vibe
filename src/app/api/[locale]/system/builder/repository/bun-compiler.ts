@@ -21,7 +21,7 @@ import type { scopedTranslation } from "../i18n";
 
 type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
-import type { BuildProfile, FileToCompile } from "../definition";
+import type { BuildProfile, FileToCompileWithPlugins } from "../definition";
 import { PROFILE_DEFAULTS, ROOT_DIR, SIZE_THRESHOLDS } from "./constants";
 import { outputFormatter } from "./output-formatter";
 
@@ -60,7 +60,7 @@ export interface IBunCompiler {
    * Compile a file using Bun.build
    */
   compileFile(
-    fileConfig: FileToCompile,
+    fileConfig: FileToCompileWithPlugins,
     output: string[],
     filesBuilt: string[],
     logger: EndpointLogger,
@@ -83,7 +83,7 @@ export interface IBunCompiler {
 
 export class BunCompiler implements IBunCompiler {
   async compileFile(
-    fileConfig: FileToCompile,
+    fileConfig: FileToCompileWithPlugins,
     output: string[],
     filesBuilt: string[],
     logger: EndpointLogger,
@@ -118,11 +118,9 @@ export class BunCompiler implements IBunCompiler {
         `\u2192 ${fileConfig.output} (executable)`,
       ),
     );
-    logger.info("Compiling executable with Bun", {
-      input: fileConfig.input,
-      target: bunOptions?.target || "bun",
-      profile,
-    });
+    logger.vibe(
+      `  ⚙  ${fileConfig.input}  →  ${fileConfig.output}  [${bunOptions?.target ?? "bun"}]`,
+    );
 
     if (verbose) {
       output.push(
@@ -198,6 +196,7 @@ export class BunCompiler implements IBunCompiler {
       banner: bunOptions?.banner,
       footer: bunOptions?.footer,
       bytecode: bunOptions?.bytecode,
+      plugins: bunOptions?.plugins ?? undefined,
     });
 
     if (!result.success) {
@@ -241,11 +240,9 @@ export class BunCompiler implements IBunCompiler {
         `${sizeIndicator} ${t("messages.bundleSuccess")} (${outputFormatter.formatBytes(size)})`,
       ),
     );
-    logger.info("Executable compiled successfully", {
-      outfile: fileConfig.output,
-      size,
-      profile,
-    });
+    logger.vibe(
+      `  ✓  ${fileConfig.output}  (${outputFormatter.formatBytes(size)})`,
+    );
 
     // Log warnings
     for (const warning of warnings) {

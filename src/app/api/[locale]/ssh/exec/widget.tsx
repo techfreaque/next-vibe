@@ -7,13 +7,11 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  CheckCircle,
-  Play,
-  RotateCcw,
-  Terminal,
-  XCircle,
-} from "next-vibe-ui/ui/icons";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { Play } from "next-vibe-ui/ui/icons/Play";
+import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
+import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
+import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Pre } from "next-vibe-ui/ui/pre";
 import { Span } from "next-vibe-ui/ui/span";
 import type { TextareaKeyboardEvent } from "next-vibe-ui/ui/textarea";

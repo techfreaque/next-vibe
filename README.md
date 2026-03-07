@@ -39,13 +39,13 @@ vibe dev
 
 ### Connect to Central Thea (optional)
 
-Three env vars turn your local instance into a Hermes worker — synced with Central Thea, receiving tasks, executing autonomously:
+Connect via CLI:
 
-```env
-INSTANCE_ID="hermes"                          # Your unique instance name
-THEA_REMOTE_URL="https://your-thea-url.com"   # Central Thea URL
-THEA_REMOTE_API_KEY="your-shared-api-key"     # Shared sync key (32+ chars)
+```bash
+vibe remote-connect --instance-id=hermes --remote-url=https://unbottled.ai --email=you@example.com --password=...
 ```
+
+Provide your instance name (`hermes`), the cloud URL, and your credentials. Once connected, memories sync bidirectionally, Thea can discover and execute your local tools, and you can reach cloud tools from your local AI.
 
 ---
 
@@ -124,10 +124,10 @@ This is what makes the Thea/Hermes architecture possible:
                        |
                        v
               +------------------+
-              |   Central Thea   |  (Production Server)
-              |   unbottled.ai   |
+              |   Central Thea   |  (Production — unbottled.ai)
+              |   cloud AI admin |
               +--------+---------+
-                       |
+                       |  remote connection (sync every 60s)
            +-----------+-----------+
            |                       |
     +------+-------+       +------+-------+
@@ -139,16 +139,16 @@ This is what makes the Thea/Hermes architecture possible:
 
 **Central Thea** lives on production. She talks to users, monitors the platform, manages tasks, and coordinates work. The CEO/CTO directs her. She's not an assistant — she's the AI team lead.
 
-**Hermes** is the local worker. Every developer runs their own instance. It syncs with Central Thea, pulls tasks assigned to it, executes them via Claude Code, and reports back. Each developer has a dedicated AI pair programmer that takes direction from the central intelligence.
+**Hermes** is the local worker. Each developer connects their local instance to Central Thea via `vibe remote-connect`. Once connected, the pulse syncs memories, capabilities, and tasks every 60 seconds — Thea can discover local tools via `help(instanceId="hermes")`, execute them via `execute-tool`, and route Claude Code tasks to the right machine.
 
 The flow is natural: the CEO creates a task on Thea — "refactor the payment flow" — routes it to Max's Hermes. Hermes picks it up, Claude Code executes, results sync back. Max reviews, iterates, ships. No Jira ticket. No standup. The work just flows.
 
 ### Task Routing
 
-- Each instance has a unique `INSTANCE_ID` — `"hermes-max"`, `"hermes-laura"`, `"thea-prod"`
+- Each instance has a unique `instanceId` — `"hermes"`, `"hermes-laura"`, set at connect time
 - Tasks carry a `targetInstance` — `null` means host only, a name targets that specific machine
-- Hermes instances poll Central Thea automatically — tasks arrive without manual coordination
-- The CEO/CTO creates work on Central Thea, it propagates to the right developer's machine
+- Local instances pull tasks from cloud on the pulse (every 60s) — no polling infrastructure needed
+- The CEO/CTO creates work on Central Thea, it propagates to the right developer's machine on the next tick
 
 ### What Thea Can Do
 

@@ -1,5 +1,9 @@
 export const translations = {
   category: "System",
+  tags: {
+    cron: "Cron",
+    scheduling: "Scheduling",
+  },
   get: {
     title: "Get Cron Task",
     description: "Retrieve a single cron task by ID",
@@ -110,9 +114,10 @@ export const translations = {
         placeholder: "Select category",
       },
       timeout: {
-        label: "Timeout",
-        description: "Maximum execution time in seconds",
-        placeholder: "3600",
+        label: "Timeout (ms)",
+        description:
+          "Maximum execution time in milliseconds (e.g. 300000 = 5 minutes)",
+        placeholder: "300000",
       },
       retries: {
         label: "Retries",
@@ -124,8 +129,10 @@ export const translations = {
         description: "Number of retry attempts on failure",
       },
       retryDelay: {
-        label: "Retry Delay",
-        description: "Delay between retries in seconds",
+        label: "Retry Delay (ms)",
+        description:
+          "Delay between retries in milliseconds (e.g. 5000 = 5 seconds)",
+        placeholder: "5000",
       },
       taskInput: {
         label: "Task Input",

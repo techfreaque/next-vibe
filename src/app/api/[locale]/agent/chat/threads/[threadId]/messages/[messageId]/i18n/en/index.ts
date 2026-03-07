@@ -44,9 +44,6 @@ export const translations = {
         parentId: {
           content: "Parent Message ID",
         },
-        depth: {
-          content: "Depth",
-        },
         authorId: {
           content: "Author ID",
         },
@@ -175,9 +172,6 @@ export const translations = {
         },
         parentId: {
           content: "Parent Message ID",
-        },
-        depth: {
-          content: "Depth",
         },
         createdAt: {
           content: "Created At",

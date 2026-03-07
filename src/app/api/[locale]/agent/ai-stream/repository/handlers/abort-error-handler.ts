@@ -177,7 +177,9 @@ export class AbortErrorHandler {
         error.name === "AbortError" ||
         error.message === "Client disconnected" ||
         error.message === "Tool requires user confirmation" ||
-        error.message === "Model requested loop stop"
+        error.message === "Model requested loop stop" ||
+        error.message === "User cancelled stream" ||
+        error.message === "Superseded by new stream"
       )
     ) {
       return { wasHandled: false };
@@ -293,7 +295,7 @@ export class AbortErrorHandler {
 
           for (const [, pendingTool] of ctx.pendingToolMessages) {
             const { messageId, toolCallData } = pendingTool;
-            const { toolCall, parentId, depth } = toolCallData;
+            const { toolCall, parentId } = toolCallData;
 
             await db.insert(chatMessages).values({
               id: messageId,
@@ -301,7 +303,6 @@ export class AbortErrorHandler {
               role: ChatMessageRole.TOOL,
               content: null,
               parentId: parentId,
-              depth: depth,
               sequenceId: ctx.sequenceId,
               authorId: userId ?? null,
               isAI: true,
@@ -353,7 +354,6 @@ export class AbortErrorHandler {
           }),
           content: t("info.streamInterrupted"),
           parentId: ctx.lastParentId,
-          depth: ctx.lastDepth,
           sequenceId: ctx.sequenceId,
           userId,
         });

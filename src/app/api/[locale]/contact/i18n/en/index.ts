@@ -20,32 +20,38 @@ export const translations = {
     fields: {
       name: {
         label: "Your Name",
-        description: "Enter your name",
+        description:
+          "Full name of the person submitting the contact form. Minimum 2 characters.",
         placeholder: "John Doe",
       },
       email: {
         label: "Email Address",
-        description: "Enter your email address",
+        description:
+          "Valid email address for our team to reply to. Must be a well-formed email.",
         placeholder: "john.doe@example.com",
       },
       company: {
         label: "Company",
-        description: "Enter your company name (optional)",
+        description:
+          "Optional company or organization name associated with the inquiry.",
         placeholder: "Acme Corp",
       },
       subject: {
         label: "Subject",
-        description: "Brief description of your inquiry",
+        description:
+          "Category of the inquiry — used to route the message to the correct team.",
         placeholder: "General inquiry about services",
       },
       message: {
         label: "Message",
-        description: "Detailed description of your inquiry",
+        description:
+          "Full text of the inquiry. Minimum 10 characters. Be specific about your needs.",
         placeholder: "Please provide more details about your needs...",
       },
       priority: {
         label: "Priority",
-        description: "Select the urgency level of your inquiry",
+        description:
+          "Urgency level for the inquiry. High or Urgent requests receive faster responses.",
         placeholder: "Select priority level",
       },
       leadId: {
@@ -352,6 +358,10 @@ export const translations = {
           label: "Message Subject",
           description: "Subject line of the contact message",
         },
+        priority: {
+          label: "Priority Level",
+          description: "Urgency level of the inquiry",
+        },
         message: {
           label: "Message Body",
           description: "The main message content from the contact form",
@@ -387,6 +397,9 @@ export const translations = {
         },
         subject: {
           label: "Message Subject",
+        },
+        priority: {
+          label: "Priority Level",
         },
         message: {
           label: "Message Body",

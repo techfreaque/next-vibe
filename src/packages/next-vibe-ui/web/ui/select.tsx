@@ -2,7 +2,9 @@
 
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { cn } from "next-vibe/shared/utils/utils";
-import { Check, ChevronDown, ChevronUp } from "next-vibe-ui/ui/icons";
+import { Check } from "next-vibe-ui/ui/icons/Check";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
 import * as React from "react";
 
 import type { StyleType } from "../utils/style-type";

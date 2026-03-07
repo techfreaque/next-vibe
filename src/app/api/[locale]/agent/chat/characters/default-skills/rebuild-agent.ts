@@ -1,16 +1,16 @@
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
-import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/definition";
-import { REBUILD_ALIAS } from "@/app/api/[locale]/system/server/rebuild/definition";
+import { HEALTH_ALIAS } from "@/app/api/[locale]/system/server/health/constants";
+import { REBUILD_ALIAS } from "@/app/api/[locale]/system/server/rebuild/constants";
 import {
   CRON_CREATE_ALIAS,
   CRON_LIST_ALIAS,
-} from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/definition";
-import { PULSE_STATUS_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/pulse/status/definition";
+} from "@/app/api/[locale]/system/unified-interface/tasks/cron/tasks/constants";
+import { PULSE_STATUS_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/pulse/status/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { TtsVoice } from "../../../text-to-speech/enum";
-import { MEMORY_ADD_ALIAS } from "../../memories/create/definition";
-import { MEMORY_LIST_ALIAS } from "../../memories/definition";
+import { MEMORY_LIST_ALIAS } from "../../memories/constants";
+import { MEMORY_ADD_ALIAS } from "../../memories/create/constants";
 import type { Character } from "../config";
 import { tool } from "../config";
 import { CharacterCategory, CharacterOwnershipType } from "../enum";

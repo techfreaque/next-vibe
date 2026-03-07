@@ -28,7 +28,7 @@ export async function GET(
   }));
 
   try {
-    const markdown = generateSkillMarkdown(
+    const markdown = await generateSkillMarkdown(
       "public-user",
       locale ?? defaultLocale,
     );

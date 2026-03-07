@@ -38,7 +38,7 @@ function getSmtpAccount1Config(logger: EndpointLogger): NewSmtpAccount | null {
     logger.error("❌ SMTP environment variables not configured for account 1", {
       host,
       username,
-      password,
+      hasPassword: !!password,
       fromEmail,
     });
     return null;
@@ -104,7 +104,7 @@ function getSmtpAccount2Config(logger: EndpointLogger): NewSmtpAccount | null {
       {
         host,
         username,
-        password,
+        hasPassword: !!password,
         fromEmail,
       },
     );

@@ -48,7 +48,6 @@ export interface MessageCreatedEventData {
   threadId: string;
   role: ChatMessageRole;
   parentId: string | null;
-  depth: number;
   content: string | null;
   model: ModelId | null;
   character: string | null;

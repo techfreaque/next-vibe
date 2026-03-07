@@ -6,9 +6,7 @@
 
 import "server-only";
 
-import { createHash } from "node:crypto";
-
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -16,27 +14,17 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import { z } from "zod";
 
 import { memories } from "@/app/api/[locale]/agent/chat/memories/db";
 import { db } from "@/app/api/[locale]/system/db";
-import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
+import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
-import type {
-  JsonObject,
-  RemoteToolCapability,
-} from "@/app/api/[locale]/user/remote-connection/db";
-import { touchLastSynced } from "@/app/api/[locale]/user/remote-connection/repository";
+import type { RemoteToolCapability } from "@/app/api/[locale]/user/remote-connection/db";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
 import { type CountryLanguage, defaultLocale } from "@/i18n/core/config";
 
-import { definitionsRegistry } from "../../shared/endpoints/definitions/registry";
-import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import type { NewCronTask } from "../cron/db";
 import { cronTasks } from "../cron/db";
 import {
@@ -48,6 +36,20 @@ import {
 import { scopedTranslation } from "../i18n";
 import type { JsonValue, NotificationTarget } from "../unified-runner/types";
 import type { SyncRequestOutput, SyncResponseOutput } from "./definition";
+
+/**
+ * Parse a sync field that may arrive as a JSON string OR as a pre-parsed array
+ * (Next.js request parser auto-deserialises JSON-looking string values).
+ */
+function parseSyncField<T>(value: string | T[] | JsonValue): T[] {
+  if (Array.isArray(value)) {
+    return value as T[];
+  }
+  if (typeof value === "string") {
+    return JSON.parse(value) as T[];
+  }
+  return [];
+}
 
 /**
  * Build the remote API URL for an endpoint from its definition path.
@@ -111,81 +113,6 @@ function serializeForSync(task: CronTaskSelect): SyncedCronTask {
 }
 
 /**
- * Build a capability snapshot for a user — serializes all endpoints the user
- * can access as JSON Schema tool manifests. Sent to cloud on each pulse.
- * JSON.stringify naturally strips function refs (render, execute, etc.).
- */
-export function buildCapabilitySnapshot(
-  user: JwtPayloadType,
-  instanceId: string,
-  locale: CountryLanguage,
-): { capabilities: RemoteToolCapability[]; hash: string } {
-  const allEndpoints = definitionsRegistry.getEndpointsForUser(
-    Platform.AI,
-    user,
-  );
-  const capabilities: RemoteToolCapability[] = [];
-
-  for (const endpoint of allEndpoints) {
-    try {
-      const { t } = endpoint.scopedTranslation.scopedT(locale);
-      const toolName = getPreferredToolName(endpoint);
-      const title = t(endpoint.title);
-      const description = t(endpoint.description ?? endpoint.title);
-
-      // Build input schema via same logic as tools-loader
-      const requestDataSchema = generateSchemaForUsage(
-        endpoint.fields,
-        FieldUsage.RequestData,
-      ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
-
-      const urlParamsSchema = generateSchemaForUsage(
-        endpoint.fields,
-        FieldUsage.RequestUrlParams,
-      ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
-
-      const combinedShape: Record<string, z.ZodTypeAny> = {};
-      if (requestDataSchema instanceof z.ZodObject) {
-        Object.assign(combinedShape, requestDataSchema.shape);
-      }
-      if (urlParamsSchema instanceof z.ZodObject) {
-        Object.assign(combinedShape, urlParamsSchema.shape);
-      }
-
-      const inputSchema = z.toJSONSchema(z.object(combinedShape), {
-        target: "draft-7",
-        io: "input",
-        unrepresentable: "any",
-      }) as JsonObject;
-
-      // Serialize fields — JSON.stringify drops render/function refs automatically
-      const fields = JSON.parse(
-        JSON.stringify(endpoint.fields ?? {}),
-      ) as JsonObject;
-
-      capabilities.push({
-        toolName,
-        title,
-        description,
-        inputSchema,
-        fields,
-        executionMode: "via-execute-route",
-        isAsync: true,
-        instanceId,
-      });
-    } catch {
-      // Skip endpoints that fail to serialize
-    }
-  }
-
-  const hash = createHash("sha256")
-    .update(JSON.stringify(capabilities))
-    .digest("hex");
-
-  return { capabilities, hash };
-}
-
-/**
  * Upsert cron tasks from a remote instance.
  * Match by id — every task has a unique, stable string identity.
  * routeId is NOT used for identity — multiple tasks can call the same endpoint.
@@ -197,8 +124,25 @@ export async function upsertRemoteTasks(params: {
   const { tasks, logger } = params;
   let synced = 0;
 
+  // Build the set of locally-known route IDs to validate incoming tasks against.
+  // A remote instance must not inject tasks targeting routes that don't exist here,
+  // because those tasks would execute as the ADMIN system user.
+  const { getFullPath } =
+    await import("@/app/api/[locale]/system/unified-interface/shared/utils/path");
+
   for (const remoteTask of tasks) {
     try {
+      // Reject tasks whose routeId is not a known local endpoint.
+      // Prevents a compromised remote from injecting arbitrary route executions.
+      const resolvedPath = getFullPath(remoteTask.routeId);
+      if (resolvedPath === null) {
+        logger.warn("Rejecting remote task — routeId not recognised locally", {
+          id: remoteTask.id,
+          routeId: remoteTask.routeId,
+        });
+        continue;
+      }
+
       // Match by id — stable, human-readable task identity
       const [existing] = await db
         .select({
@@ -331,8 +275,8 @@ export async function getUserCreatedTasks(params: {
 }
 
 /**
- * Pull cron tasks and memories from all users' remote connections.
- * Iterates user_remote_connections — each user's remote is synced independently.
+ * Pull from all users' remote connections using hash-first protocol.
+ * Local sends hashes → remote diffs → returns only changed payloads.
  * Cloud instances (VIBE_IS_CLOUD=true) skip outbound sync entirely.
  */
 export async function pullFromRemote(
@@ -341,22 +285,31 @@ export async function pullFromRemote(
 ): Promise<ResponseType<{ pulled: number }>> {
   const { t } = scopedTranslation.scopedT(locale);
 
-  // Cloud instances receive syncs, they don't initiate outbound ones
   if (env.VIBE_IS_CLOUD) {
     return success({ pulled: 0 });
   }
 
   try {
-    const { getAllActiveConnectionsForSync } =
-      await import("@/app/api/[locale]/user/remote-connection/repository");
-    const activeConnections = await getAllActiveConnectionsForSync();
+    const {
+      getAllActiveConnectionsForSync,
+      getLocalInstanceId,
+      computeAndStoreMemoriesHash,
+    } = await import("@/app/api/[locale]/user/remote-connection/repository");
 
+    const activeConnections = await getAllActiveConnectionsForSync();
     if (activeConnections.length === 0) {
       return success({ pulled: 0 });
     }
 
     const { endpoints: syncEndpoints } = await import("./definition");
-    const localInstanceId = env.INSTANCE_ID ?? "hermes";
+    const localInstanceId = (await getLocalInstanceId()) ?? "unknown";
+
+    // Get local capabilities version (build-time constant)
+    const { CAPABILITIES_VERSION } =
+      await import("@/app/api/[locale]/system/generated/remote-capabilities/version").catch(
+        () => ({ CAPABILITIES_VERSION: "unknown" }),
+      );
+
     let totalPulled = 0;
 
     for (const conn of activeConnections) {
@@ -366,26 +319,64 @@ export async function pullFromRemote(
           syncEndpoints.POST,
         );
 
-        // Include local shared memories for bidirectional sync (scoped to this user)
-        const memResult = await getSharedMemories({
-          logger,
-          userId: conn.userId,
-        });
-        const localMemories = memResult.success ? memResult.data.memories : [];
-
-        // Build capability snapshot — only send if hash changed
-        // Use CUSTOMER role for snapshot — conservative, reflects what a typical user can access
-        const capSnapshot = buildCapabilitySnapshot(
-          {
-            id: conn.userId,
-            leadId: conn.userId,
-            isPublic: false as const,
-            roles: [UserPermissionRole.CUSTOMER],
-          },
-          localInstanceId,
-          locale,
+        // Compute local memories hash (also stores it on the connection row)
+        const localMemoriesHash = await computeAndStoreMemoriesHash(
+          conn.userId,
         );
-        const sendCapabilities = conn.capabilitiesHash !== capSnapshot.hash;
+
+        // Only send capabilities when version changed since last sync
+        const sendCapabilities =
+          conn.capabilitiesVersion !== CAPABILITIES_VERSION;
+
+        let capabilitiesJson: string | undefined;
+        if (sendCapabilities) {
+          // Load the capability file matching the remote user's role.
+          // Fetch the user's roles from DB to pick the right file.
+          const { userRoles: userRolesTable } =
+            await import("@/app/api/[locale]/user/db");
+          const userRoleRows = await db
+            .select({ role: userRolesTable.role })
+            .from(userRolesTable)
+            .where(eq(userRolesTable.userId, conn.userId));
+          const roles = userRoleRows.map((r) => r.role);
+          const roleSlug = roles.includes(UserPermissionRole.ADMIN)
+            ? "admin"
+            : roles.includes(UserPermissionRole.CUSTOMER)
+              ? "customer"
+              : "public";
+
+          const capFileImport =
+            roleSlug === "admin"
+              ? await import("@/app/api/[locale]/system/generated/remote-capabilities/en/admin").catch(
+                  () => null,
+                )
+              : roleSlug === "customer"
+                ? await import("@/app/api/[locale]/system/generated/remote-capabilities/en/customer").catch(
+                    () => null,
+                  )
+                : await import("@/app/api/[locale]/system/generated/remote-capabilities/en/public").catch(
+                    () => null,
+                  );
+          if (capFileImport) {
+            // Tag each capability with the local instanceId
+            const tagged = (
+              (
+                capFileImport as {
+                  remoteCapabilities?: RemoteToolCapability[];
+                }
+              ).remoteCapabilities ?? []
+            ).map((c: RemoteToolCapability) => ({
+              ...c,
+              instanceId: localInstanceId,
+            }));
+            capabilitiesJson = JSON.stringify(tagged);
+          }
+        }
+
+        // Task cursor: stored ISO timestamp of last successful task pull.
+        // null = first sync ever → use epoch to get all pending tasks.
+        // Set → use stored value to get only tasks created after last pull.
+        const taskCursor = conn.taskCursor ?? new Date(0).toISOString();
 
         const headers: Record<string, string> = {
           "Content-Type": "application/json",
@@ -395,68 +386,78 @@ export async function pullFromRemote(
           headers.Cookie = `lead_id=${conn.leadId}`;
         }
 
+        // Send our LOCAL capabilities version so cloud can diff and store the snapshot.
+        // conn.capabilitiesVersion on the dev side = last LOCAL version we successfully
+        // sent to cloud. On first sync it is null → send "none" (a non-empty sentinel)
+        // so cloud's condition `if (data.capabilitiesJson)` fires and stores the caps.
+        const body: Record<string, string> = {
+          instanceId: conn.instanceId,
+          memoriesHash: localMemoriesHash,
+          capabilitiesVersion: conn.capabilitiesVersion ?? "none",
+          taskCursor,
+        };
+        if (capabilitiesJson !== undefined) {
+          body.capabilitiesJson = capabilitiesJson;
+        }
+
         const response = await fetch(syncUrl, {
           method: "POST",
           headers,
-          body: JSON.stringify({
-            memoriesJson: JSON.stringify(localMemories),
-            ...(sendCapabilities
-              ? {
-                  capabilitiesJson: JSON.stringify(capSnapshot.capabilities),
-                  capabilitiesHash: capSnapshot.hash,
-                }
-              : {}),
-          }),
+          body: JSON.stringify(body),
           signal: AbortSignal.timeout(30000),
         });
 
         if (!response.ok) {
-          logger.warn("Pull from remote failed for user", {
-            userId: conn.userId,
-            remoteUrl: conn.remoteUrl,
-            status: response.status,
-          });
+          const responseBody = await response
+            .text()
+            .catch(() => "(unreadable)");
+
+          // 401 — token expired. Mark connection inactive; user must reconnect.
+          if (response.status === 401) {
+            logger.warn("Pull from remote: 401 — marking connection inactive", {
+              userId: conn.userId,
+              instanceId: conn.instanceId,
+            });
+            const { touchLastSynced: markInactive } =
+              await import("@/app/api/[locale]/user/remote-connection/repository");
+            await markInactive(conn.userId, conn.instanceId, {
+              isActive: false,
+            });
+          } else {
+            logger.warn("Pull from remote failed", {
+              userId: conn.userId,
+              status: response.status,
+              body: responseBody,
+            });
+          }
           continue;
         }
 
         const result = (await response.json()) as {
           success: boolean;
           data?: {
-            tasksJson?: string;
-            sharedMemoriesJson?: string;
+            remoteMemoriesHash?: string;
+            memories?: string | null;
+            remoteCapabilitiesVersion?: string;
+            capabilities?: string | null;
+            tasks?: string;
+            memoriesSynced?: number;
+            serverTime: string;
           };
         };
 
         if (!result.success || !result.data) {
-          logger.warn("Pull from remote returned failure for user", {
+          logger.warn("Pull from remote returned failure", {
             userId: conn.userId,
           });
           continue;
         }
 
-        if (result.data.tasksJson) {
-          const remoteTasks = JSON.parse(
-            result.data.tasksJson,
-          ) as SyncedCronTask[];
-          const relevantTasks = remoteTasks.filter(
-            (task) =>
-              task.targetInstance !== null &&
-              task.targetInstance === localInstanceId,
-          );
+        const { data } = result;
 
-          if (relevantTasks.length > 0) {
-            const upsertResult = await upsertRemoteTasks({
-              tasks: relevantTasks,
-              logger,
-            });
-            totalPulled += upsertResult.success ? upsertResult.data.synced : 0;
-          }
-        }
-
-        if (result.data.sharedMemoriesJson) {
-          const remoteMemories = JSON.parse(
-            result.data.sharedMemoriesJson,
-          ) as SyncedMemory[];
+        // Apply memory diff if remote returned memories (hashes differed)
+        if (data.memories) {
+          const remoteMemories = JSON.parse(data.memories) as SyncedMemory[];
           if (remoteMemories.length > 0) {
             await upsertSharedMemories({
               remoteMemories,
@@ -466,18 +467,65 @@ export async function pullFromRemote(
           }
         }
 
-        // Update lastSyncedAt (instanceId-scoped)
-        await touchLastSynced(conn.userId, conn.instanceId);
+        // Apply capability diff if remote returned capabilities (versions differed)
+        const { touchLastSynced: touchSync } =
+          await import("@/app/api/[locale]/user/remote-connection/repository");
+
+        // Use remote DB server time as next cursor — avoids JS process / Docker
+        // container timezone skew where local new Date() is ahead of remote DB clock.
+        const newTaskCursor = data.serverTime;
+
+        if (data.capabilities) {
+          const caps = JSON.parse(data.capabilities) as RemoteToolCapability[];
+          await touchSync(conn.userId, conn.instanceId, {
+            // Store cloud's remote capabilities locally for AI tool discovery
+            capabilities: caps,
+            remoteMemoriesHash: data.remoteMemoriesHash,
+            taskCursor: newTaskCursor,
+            // capabilitiesVersion on local side = last LOCAL version we sent to cloud.
+            // After a successful send, record our LOCAL version so next pulse detects
+            // changes (new local deploy → re-send). Don't store cloud's version here.
+            ...(sendCapabilities
+              ? { capabilitiesVersion: CAPABILITIES_VERSION }
+              : {}),
+          });
+        } else {
+          // Even if no capability diff, always store remote's memoriesHash + cursor
+          await touchSync(conn.userId, conn.instanceId, {
+            remoteMemoriesHash: data.remoteMemoriesHash,
+            taskCursor: newTaskCursor,
+            // If we sent caps, mark local version as sent regardless of cloud response
+            ...(sendCapabilities
+              ? { capabilitiesVersion: CAPABILITIES_VERSION }
+              : {}),
+          });
+        }
+
+        // Apply remote tasks (REMOTE_TOOL_CALL tasks for this local instance)
+        if (data.tasks) {
+          const remoteTasks = JSON.parse(data.tasks) as SyncedCronTask[];
+          const relevant = remoteTasks.filter(
+            (task) => task.targetInstance === localInstanceId,
+          );
+          if (relevant.length > 0) {
+            const upsertResult = await upsertRemoteTasks({
+              tasks: relevant,
+              logger,
+            });
+            totalPulled += upsertResult.success ? upsertResult.data.synced : 0;
+          }
+        }
       } catch (error) {
-        logger.error("Pull from remote error for user", {
+        logger.error("Pull from remote error for connection", {
           userId: conn.userId,
+          instanceId: conn.instanceId,
           ...parseError(error),
         });
       }
     }
 
     if (totalPulled > 0) {
-      logger.info(`Remote sync: pulled ${totalPulled} cron tasks`);
+      logger.info(`Remote sync: pulled ${totalPulled} tasks`);
     }
 
     return success({ pulled: totalPulled });
@@ -783,12 +831,14 @@ export async function upsertSharedMemories(params: {
 }
 
 /**
- * Orchestrates the full task sync: validates auth (JWT or API key),
- * processes incoming completions and memories, returns local tasks and shared memories.
+ * Hash-first sync handler — cloud side.
  *
- * Auth modes:
- * - JWT (per-user): user is authenticated via JWT — memories scoped to that user
- * - API key (instance-to-instance): legacy admin sync, memories go to admin user
+ * Protocol:
+ * 1. Local sends: memoriesHash, capabilitiesVersion, capabilitiesJson (if changed), taskCursor
+ * 2. Cloud diffs hashes against stored values
+ * 3. Cloud returns: memoriesHash, memories (if diff), capabilitiesVersion, capabilities (if diff), tasks (since cursor)
+ *
+ * All payloads are null when hashes match — one tiny request per tick in steady state.
  */
 export async function syncTasks(
   data: SyncRequestOutput,
@@ -796,116 +846,155 @@ export async function syncTasks(
   locale: CountryLanguage,
   user: JwtPayloadType,
 ): Promise<ResponseType<SyncResponseOutput>> {
-  const { t } = scopedTranslation.scopedT(locale);
+  const { t: syncT } = scopedTranslation.scopedT(locale);
 
-  // Only authenticated users can sync
-  const isUserAuth = !user.isPublic && user.id;
-
-  if (!isUserAuth) {
+  if (user.isPublic || !user.id) {
     return {
       success: false as const,
-      message: t("taskSync.post.errors.notFound.title"),
+      message: syncT("taskSync.post.errors.notFound.title"),
       errorType: ErrorResponseTypes.NOT_FOUND,
     };
   }
 
-  // Process incoming tasks from remote — only accept tasks for this instance
-  let completionsProcessed = 0;
-  if (data.completionsJson) {
-    try {
-      const remoteTasks = JSON.parse(data.completionsJson) as SyncedCronTask[];
-      const instanceId = env.INSTANCE_ID;
-      const relevantTasks = remoteTasks.filter(
-        (task) =>
-          task.targetInstance !== null && task.targetInstance === instanceId,
-      );
-      const result = await upsertRemoteTasks({ tasks: relevantTasks, logger });
-      if (result.success) {
-        completionsProcessed = result.data.synced;
-      }
-    } catch (error) {
-      logger.error("Failed to parse incoming tasks JSON", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-    }
-  }
+  const { computeAndStoreMemoriesHash, touchLastSynced } =
+    await import("@/app/api/[locale]/user/remote-connection/repository");
+  const { userRemoteConnections: connTable } =
+    await import("@/app/api/[locale]/user/remote-connection/db");
 
-  // Process incoming shared memories
+  // Find the connection record for this user (the local that is calling us).
+  // Local sends its instanceId in the request body — use it to find the right record.
+  // Fall back to first active record if not provided (backward compat).
+  const conditions = [
+    eq(connTable.userId, user.id),
+    eq(connTable.isActive, true),
+  ];
+  if (data.instanceId) {
+    conditions.push(eq(connTable.instanceId, data.instanceId));
+  }
+  const [connRow] = await db
+    .select()
+    .from(connTable)
+    .where(and(...conditions))
+    .limit(1);
+
+  const instanceId = connRow?.instanceId ?? data.instanceId ?? "unknown";
+
+  // ── 1. Process incoming capability snapshot (only if version changed) ──────
   let memoriesSynced = 0;
-  if (data.memoriesJson) {
+  if (data.capabilitiesJson) {
     try {
-      const remoteMemories = JSON.parse(data.memoriesJson) as SyncedMemory[];
-      if (remoteMemories.length > 0) {
-        const memResult = await upsertSharedMemories({
-          remoteMemories,
-          localUserId: user.id,
-          logger,
-        });
-        memoriesSynced = memResult.success ? memResult.data.synced : 0;
-      }
-    } catch (error) {
-      logger.error("Failed to parse incoming memories JSON", {
-        error: error instanceof Error ? error.message : String(error),
-      });
-    }
-  }
-
-  // Store incoming capability snapshot (diff via hash to avoid unnecessary writes)
-  if (data.capabilitiesJson && data.capabilitiesHash) {
-    try {
-      const { getRemoteConnectionRecord } =
-        await import("@/app/api/[locale]/user/remote-connection/repository");
-      // Find the connection by token to get the instanceId
-      // We can't know instanceId directly from JWT, but we can get it from the connection record
-      // Use a DB lookup by userId to find all connections and match by token hash
-      const capabilities = JSON.parse(
+      const capabilities = parseSyncField<RemoteToolCapability>(
         data.capabilitiesJson,
-      ) as RemoteToolCapability[];
-      const instanceId =
-        capabilities.length > 0
-          ? (capabilities[0]?.instanceId ?? "hermes")
-          : "hermes";
-
-      const existing = await getRemoteConnectionRecord(user.id, instanceId);
-      if (existing && existing.instanceId) {
-        // Only update if hash changed
-        const { db: localDb } = await import("@/app/api/[locale]/system/db");
-        const { userRemoteConnections } =
-          await import("@/app/api/[locale]/user/remote-connection/db");
-        const [row] = await localDb
-          .select({ capabilitiesHash: userRemoteConnections.capabilitiesHash })
-          .from(userRemoteConnections)
-          .where(eq(userRemoteConnections.userId, user.id))
-          .limit(1);
-
-        if (row?.capabilitiesHash !== data.capabilitiesHash) {
-          await touchLastSynced(
-            user.id,
-            instanceId,
-            capabilities,
-            data.capabilitiesHash,
-          );
-        }
+      );
+      const storedVersion = connRow?.capabilitiesVersion;
+      if (storedVersion !== data.capabilitiesVersion) {
+        await touchLastSynced(user.id, instanceId, {
+          capabilities,
+          capabilitiesVersion: data.capabilitiesVersion,
+        });
+        logger.debug("Stored updated capability snapshot", {
+          instanceId,
+          version: data.capabilitiesVersion,
+          count: capabilities.length,
+        });
       }
     } catch (error) {
       logger.warn("Failed to store capabilities snapshot", parseError(error));
     }
   }
 
-  // Return our user-created tasks and shared memories for the remote to sync
-  const localResult = await getUserCreatedTasks({ logger, locale });
-  const tasks = localResult.success ? localResult.data.tasks : [];
-  const memResult = await getSharedMemories({
-    logger,
-    userId: user.id,
-  });
-  const sharedMemories = memResult.success ? memResult.data.memories : [];
+  // ── 2. Compute our own memories hash and diff against local's ─────────────
+  const ourMemoriesHash = await computeAndStoreMemoriesHash(user.id);
+  const localMemoriesHash = data.memoriesHash;
+  const memoryHashDiffers = localMemoriesHash !== ourMemoriesHash;
+
+  // Store remote's hash for future diffs
+  if (localMemoriesHash) {
+    await touchLastSynced(user.id, instanceId, {
+      remoteMemoriesHash: localMemoriesHash,
+    });
+  }
+
+  // ── 3. Build memory payload (only if hashes differ) ───────────────────────
+  let memoriesPayload: string | null = null;
+  if (memoryHashDiffers) {
+    const memResult = await getSharedMemories({ logger, userId: user.id });
+    const sharedMemories = memResult.success ? memResult.data.memories : [];
+    memoriesPayload = JSON.stringify(sharedMemories);
+    memoriesSynced = sharedMemories.length;
+  }
+
+  // ── 4. Build capabilities payload (only if version differs) ───────────────
+  let capabilitiesPayload: string | null = null;
+  const { CAPABILITIES_VERSION } =
+    await import("@/app/api/[locale]/system/generated/remote-capabilities/version").catch(
+      () => ({ CAPABILITIES_VERSION: "unknown" }),
+    );
+
+  const capVersionDiffers = data.capabilitiesVersion !== CAPABILITIES_VERSION;
+
+  if (capVersionDiffers) {
+    // Use the role matching the requesting user — admin gets admin capabilities
+    const { userRoles: userRolesTable } =
+      await import("@/app/api/[locale]/user/db");
+    const userRoleRows = await db
+      .select({ role: userRolesTable.role })
+      .from(userRolesTable)
+      .where(eq(userRolesTable.userId, user.id));
+    const roles = userRoleRows.map((r) => r.role);
+    const roleSlug = roles.includes(UserPermissionRole.ADMIN)
+      ? "admin"
+      : roles.includes(UserPermissionRole.CUSTOMER)
+        ? "customer"
+        : "public";
+
+    const capFileImport =
+      roleSlug === "admin"
+        ? await import("@/app/api/[locale]/system/generated/remote-capabilities/en/admin").catch(
+            () => null,
+          )
+        : roleSlug === "customer"
+          ? await import("@/app/api/[locale]/system/generated/remote-capabilities/en/customer").catch(
+              () => null,
+            )
+          : await import("@/app/api/[locale]/system/generated/remote-capabilities/en/public").catch(
+              () => null,
+            );
+    if (capFileImport) {
+      capabilitiesPayload = JSON.stringify(
+        (capFileImport as { remoteCapabilities?: RemoteToolCapability[] })
+          .remoteCapabilities ?? [],
+      );
+    }
+  }
+
+  // ── 5. Build tasks payload (REMOTE_TOOL_CALL tasks since cursor) ──────────
+  const cursor = data.taskCursor ? new Date(data.taskCursor) : new Date(0);
+
+  // Fetch server DB time — local uses this as next cursor to avoid
+  // JS process / Docker container timezone skew corrupting the cursor.
+  const serverTimeResult = await db.execute<{ now: string }>(
+    sql`SELECT NOW() as now`,
+  );
+  const serverTime = new Date(serverTimeResult.rows[0].now).toISOString();
+
+  const pendingTasks = await db
+    .select()
+    .from(cronTasks)
+    .where(
+      sql`${cronTasks.targetInstance} = ${instanceId} AND ${cronTasks.createdAt} > ${cursor} AND ${cronTasks.lastExecutionStatus} IS NULL`,
+    )
+    .limit(50);
+
+  const tasks = pendingTasks.map(serializeForSync);
 
   return success({
-    tasksJson: JSON.stringify(tasks),
-    synced: tasks.length,
-    completionsProcessed,
+    remoteMemoriesHash: ourMemoriesHash,
+    memories: memoriesPayload,
+    remoteCapabilitiesVersion: CAPABILITIES_VERSION,
+    capabilities: capabilitiesPayload,
+    tasks: JSON.stringify(tasks),
     memoriesSynced,
-    sharedMemoriesJson: JSON.stringify(sharedMemories),
+    serverTime,
   });
 }

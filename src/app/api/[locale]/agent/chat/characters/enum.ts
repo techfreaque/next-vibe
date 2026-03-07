@@ -4,19 +4,17 @@
  */
 
 import type { IconComponent } from "next-vibe-ui/lib/helper";
-import {
-  Brain,
-  Code,
-  Eye,
-  FileText,
-  Image,
-  Lightbulb,
-  MessageSquare,
-  ShieldOff,
-  Sparkles,
-  Theater,
-  Zap,
-} from "next-vibe-ui/ui/icons";
+import { Brain } from "next-vibe-ui/ui/icons/Brain";
+import { Code } from "next-vibe-ui/ui/icons/Code";
+import { Eye } from "next-vibe-ui/ui/icons/Eye";
+import { FileText } from "next-vibe-ui/ui/icons/FileText";
+import { Image } from "next-vibe-ui/ui/icons/Image";
+import { Lightbulb } from "next-vibe-ui/ui/icons/Lightbulb";
+import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
+import { ShieldOff } from "next-vibe-ui/ui/icons/ShieldOff";
+import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
+import { Theater } from "next-vibe-ui/ui/icons/Theater";
+import { Zap } from "next-vibe-ui/ui/icons/Zap";
 
 import { createEnumOptions } from "@/app/api/[locale]/system/unified-interface/shared/field/enum";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";

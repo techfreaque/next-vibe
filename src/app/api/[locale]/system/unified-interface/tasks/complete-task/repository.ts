@@ -24,7 +24,6 @@ import { cronTaskExecutions, cronTasks } from "../cron/db";
 import { CronTaskStatus } from "../enum";
 import type { scopedTranslation } from "../i18n";
 import { pushStatusToRemote } from "../task-sync/repository";
-import type { JsonValue } from "../unified-runner/types";
 import type {
   CompleteTaskRequestOutput,
   CompleteTaskResponseOutput,
@@ -96,7 +95,7 @@ export async function completeTask(
       startedAt: now,
       completedAt: now,
       durationMs: null,
-      config: (task.taskInput ?? {}) as Record<string, JsonValue>,
+      config: task.taskInput ?? {},
       result: output,
       isManual: true,
       triggeredBy: "manual",
@@ -120,17 +119,17 @@ export async function completeTask(
 
   // Push to remote (fire-and-forget, but report result)
   let pushedToRemote = false;
-  if (task.targetInstance && env.THEA_REMOTE_URL && env.THEA_REMOTE_API_KEY) {
+  if (task.targetInstance) {
     const pushResult = await pushStatusToRemote({
       taskRouteId: task.routeId,
       status,
       summary,
       durationMs: null,
       executionId,
-      output,
+      output: output,
       startedAt: now.toISOString(),
       serverTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      executedByInstance: env.INSTANCE_ID ?? null,
+      executedByInstance: null,
       logger,
     });
     pushedToRemote = pushResult.success;

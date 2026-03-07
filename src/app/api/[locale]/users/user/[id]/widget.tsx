@@ -8,21 +8,19 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  BarChart2,
-  CheckCircle,
-  Copy,
-  CreditCard,
-  Edit,
-  Link,
-  Loader2,
-  Mail,
-  Package,
-  Shield,
-  Trash2,
-  User,
-  XCircle,
-} from "next-vibe-ui/ui/icons";
+import { BarChart2 } from "next-vibe-ui/ui/icons/BarChart2";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { Copy } from "next-vibe-ui/ui/icons/Copy";
+import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
+import { Edit } from "next-vibe-ui/ui/icons/Edit";
+import { Link } from "next-vibe-ui/ui/icons/Link";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Mail } from "next-vibe-ui/ui/icons/Mail";
+import { Package } from "next-vibe-ui/ui/icons/Package";
+import { Shield } from "next-vibe-ui/ui/icons/Shield";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
+import { User } from "next-vibe-ui/ui/icons/User";
+import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import React, { useCallback, useState } from "react";
@@ -711,18 +709,18 @@ export function UserDeleteContainer({
 }: DeleteWidgetProps): React.JSX.Element {
   const children = field.children;
   const data = field.value;
-  const t = useWidgetTranslation<typeof definition.GET>();
+  const t = useWidgetTranslation<typeof definition.DELETE>();
 
   return (
     <Div className="flex flex-col gap-4 p-4">
       <Div className="flex items-center gap-2 pb-2 border-b">
         <NavigateButtonWidget field={children.backButton} />
         <Span className="font-semibold text-base mr-auto text-destructive">
-          {t("id.widget.deleteUser")}
+          {t("id.delete.title")}
         </Span>
       </Div>
 
-      {data?.success && (
+      {data?.success ? (
         <Div className="rounded-lg border border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/20 p-4 flex items-center gap-3">
           <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
           <Div>
@@ -737,20 +735,25 @@ export function UserDeleteContainer({
             )}
           </Div>
         </Div>
-      )}
-
-      {!data && (
-        <Div className="rounded-lg border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/20 p-4">
-          <Div className="flex items-center gap-2 mb-2">
-            <Trash2 className="h-5 w-5 text-destructive flex-shrink-0" />
-            <Span className="font-medium text-sm text-destructive">
-              {t("id.widget.confirmDeletion")}
-            </Span>
+      ) : (
+        <>
+          <Div className="rounded-lg border border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/20 p-4">
+            <Div className="flex items-center gap-2 mb-2">
+              <Trash2 className="h-5 w-5 text-destructive flex-shrink-0" />
+              <Span className="font-medium text-sm text-destructive">
+                {t("id.widget.confirmDeletion")}
+              </Span>
+            </Div>
+            <P className="text-sm text-muted-foreground">
+              {t("id.widget.confirmDeletionMessage")}
+            </P>
           </Div>
-          <P className="text-sm text-muted-foreground">
-            {t("id.widget.confirmDeletionMessage")}
-          </P>
-        </Div>
+          <Div className="flex items-center justify-end gap-2">
+            <SubmitButtonWidget<typeof definition.DELETE>
+              field={children.submitButton}
+            />
+          </Div>
+        </>
       )}
     </Div>
   );

@@ -545,9 +545,9 @@ export class LeadsImportRepository implements DomainImportRepository<LeadRecord>
       return result;
     } catch (error) {
       logger.error("Error importing leads from CSV", parseError(error));
-      const t = scopedTranslation.scopedT(locale).t;
+      const errT = scopedTranslation.scopedT(locale).t;
       return fail({
-        message: t("post.errors.server.title"),
+        message: errT("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }

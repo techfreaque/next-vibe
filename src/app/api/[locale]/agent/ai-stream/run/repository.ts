@@ -209,15 +209,15 @@ export class AiStreamRunRepository {
 
           if (favorite) {
             if (!tools && favorite.visibleTools) {
-              resolvedTools = favorite.visibleTools.map((t) => ({
-                toolId: t.toolId,
-                requiresConfirmation: t.requiresConfirmation ?? false,
+              resolvedTools = favorite.visibleTools.map((entry) => ({
+                toolId: entry.toolId,
+                requiresConfirmation: entry.requiresConfirmation ?? false,
               }));
             }
             if (!allowedTools && favorite.activeTools) {
-              resolvedAllowedTools = favorite.activeTools.map((t) => ({
-                toolId: t.toolId,
-                requiresConfirmation: t.requiresConfirmation ?? false,
+              resolvedAllowedTools = favorite.activeTools.map((entry) => ({
+                toolId: entry.toolId,
+                requiresConfirmation: entry.requiresConfirmation ?? false,
               }));
             }
           }

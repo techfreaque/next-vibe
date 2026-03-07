@@ -28,6 +28,11 @@ export const translations: typeof enTranslations = {
           description:
             'Opcjonalne ID zdalnej instancji. Gdy ustawione, tworzy asynchroniczne zadanie na zdalnej instancji. Wynik: {taskId, status:"pending"}.',
         },
+        callbackMode: {
+          label: "Tryb wywołania zwrotnego",
+          description:
+            'Jak obsługiwać wynik asynchroniczny. "wait": czekaj aż gotowe, "task-done": zwróć taskId natychmiast, "inject": wstaw wynik do bieżącego wątku.',
+        },
       },
       response: {
         result:

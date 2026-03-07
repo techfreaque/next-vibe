@@ -5,6 +5,7 @@
 
 import { useState } from "react";
 
+import sendTestEndpoints from "@/app/api/[locale]/emails/preview/send-test/definition";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface TestEmailRequest {
@@ -44,13 +45,16 @@ export function useTestEmailEndpoint(
     setError(null);
     setData(null);
 
-    const response = await fetch(`/api/${locale}/emails/preview/send-test`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      `/api/${locale}/${sendTestEndpoints.POST.path.join("/")}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestData),
       },
-      body: JSON.stringify(requestData),
-    });
+    );
 
     if (!response.ok) {
       const errorMessage = `Failed to send test email: ${response.statusText}`;

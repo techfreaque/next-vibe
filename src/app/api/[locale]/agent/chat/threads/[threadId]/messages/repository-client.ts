@@ -57,7 +57,6 @@ export class ChatMessagesRepositoryClient {
           role: msg.role,
           content: msg.content,
           parentId: msg.parentId,
-          depth: msg.depth,
           sequenceId: msg.sequenceId,
           authorId: msg.authorId,
           authorName: msg.authorName,

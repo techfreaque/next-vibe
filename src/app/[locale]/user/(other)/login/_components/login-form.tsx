@@ -11,6 +11,10 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { DEV_SEED_USERS } from "@/app/api/[locale]/user/dev-seed-users";
 import loginEndpoints from "@/app/api/[locale]/user/public/login/definition";
 import { scopedTranslation } from "@/app/api/[locale]/user/public/login/i18n";
+import {
+  CSRF_TOKEN_COOKIE_NAME,
+  CSRF_TOKEN_HEADER_NAME,
+} from "@/config/constants";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -43,15 +47,25 @@ function DevQuickLogin({
     async (email: string) => {
       setLoadingEmail(email);
       try {
-        const response = await fetch(`/api/${locale}/user/public/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email,
-            password: devSeedPassword,
-            rememberMe: true,
-          }),
-        });
+        const csrfCookie = document.cookie
+          .split("; ")
+          .find((row) => row.startsWith(`${CSRF_TOKEN_COOKIE_NAME}=`))
+          ?.split("=")[1];
+        const response = await fetch(
+          `/api/${locale}/${loginEndpoints.POST.path.join("/")}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(csrfCookie ? { [CSRF_TOKEN_HEADER_NAME]: csrfCookie } : {}),
+            },
+            body: JSON.stringify({
+              email,
+              password: devSeedPassword,
+              rememberMe: true,
+            }),
+          },
+        );
 
         if (response.ok) {
           window.location.assign(callbackUrl ?? `/${locale}`);

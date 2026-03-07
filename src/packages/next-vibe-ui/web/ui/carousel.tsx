@@ -2,7 +2,8 @@
 
 import useEmblaCarousel from "embla-carousel-react";
 import { cn } from "next-vibe/shared/utils/utils";
-import { ArrowLeftIcon, ArrowRightIcon } from "next-vibe-ui/ui/icons";
+import { ArrowLeftIcon } from "next-vibe-ui/ui/icons/ArrowLeftIcon";
+import { ArrowRightIcon } from "next-vibe-ui/ui/icons/ArrowRightIcon";
 import * as React from "react";
 
 import { useTranslation } from "@/i18n/core/client";
@@ -82,13 +83,13 @@ function Carousel({
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
   const [canScrollNext, setCanScrollNext] = React.useState(false);
 
-  const onSelect = React.useCallback((api: CarouselApi) => {
-    if (!api) {
+  const onSelect = React.useCallback((carouselApi: CarouselApi) => {
+    if (!carouselApi) {
       return;
     }
 
-    setCanScrollPrev(api.canScrollPrev());
-    setCanScrollNext(api.canScrollNext());
+    setCanScrollPrev(carouselApi.canScrollPrev());
+    setCanScrollNext(carouselApi.canScrollNext());
   }, []);
 
   const scrollPrev = React.useCallback(() => {

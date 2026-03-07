@@ -34,12 +34,15 @@ export interface RemoteToolCapability {
   toolName: string;
   title: string;
   description: string;
-  /** JSON Schema draft-7 for the tool's input */
-  inputSchema: JsonObject;
-  /** Serialized definition fields (render refs stripped by JSON.stringify) */
+  /**
+   * Serialized definition fields (render refs stripped, all translatable strings
+   * pre-resolved for the target locale). inputSchema is derivable from fields
+   * via generateSchemaForUsage — not stored separately.
+   */
   fields: JsonObject;
   executionMode: "via-execute-route";
   isAsync: true;
+  /** Tagged by the receiving side at sync time — not set by the generator */
   instanceId: string;
 }
 
@@ -68,11 +71,14 @@ export const userRemoteConnections = pgTable(
     // Remote instance URL (e.g. "https://unbottled.ai")
     remoteUrl: text("remote_url").notNull(),
 
-    // JWT token from remote login
-    token: text("token").notNull(),
+    // JWT token from remote login (null on cloud-side records — cloud never calls local)
+    token: text("token"),
 
-    // Lead cookie ID preserved across token refreshes
+    // Lead cookie ID preserved across token refreshes (local-side only)
     leadId: text("lead_id"),
+
+    // URL of the local instance (cloud-side records only — so cloud knows where local lives)
+    localUrl: text("local_url"),
 
     // Whether this connection is active
     isActive: boolean("is_active").notNull().default(true),
@@ -80,11 +86,22 @@ export const userRemoteConnections = pgTable(
     // Last time a sync was triggered
     lastSyncedAt: timestamp("last_synced_at"),
 
-    // Tool manifest snapshot from local instance — updated on each pulse
+    // Tool manifest snapshot from local instance — updated on capability version change
     capabilities: jsonb("capabilities").$type<RemoteToolCapability[]>(),
 
-    // SHA256 of capabilities JSON — used to skip unchanged snapshots
-    capabilitiesHash: text("capabilities_hash"),
+    // Build version string from local instance (git SHA / package version)
+    // Changes only on deploy — used to skip unchanged capability snapshots
+    capabilitiesVersion: text("capabilities_version"),
+
+    // SHA256 of sorted "id:updatedAt" pairs for all shared memories on this side
+    // Stored so the sync handler can diff without a full table scan
+    memoriesHash: text("memories_hash"),
+
+    // Last memoriesHash received from the remote side — for diffing their state
+    remoteMemoriesHash: text("remote_memories_hash"),
+
+    // ISO timestamp — return REMOTE_TOOL_CALL tasks created after this cursor on next sync
+    taskCursor: text("task_cursor"),
 
     // Timestamps
     createdAt: timestamp("created_at").defaultNow().notNull(),

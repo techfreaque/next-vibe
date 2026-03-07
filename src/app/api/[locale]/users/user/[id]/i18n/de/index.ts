@@ -440,6 +440,10 @@ export const translations: typeof enTranslations = {
         placeholder: "Benutzer-ID eingeben...",
         helpText: "WARNUNG: Diese Aktion kann nicht rückgängig gemacht werden",
       },
+      submitButton: {
+        label: "Benutzer löschen",
+        loadingText: "Wird gelöscht...",
+      },
       response: {
         deletionResult: {
           title: "Löschungsergebnis",

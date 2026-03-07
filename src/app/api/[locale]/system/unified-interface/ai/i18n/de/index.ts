@@ -28,6 +28,11 @@ export const translations: typeof enTranslations = {
           description:
             'Optionale Remote-Instanz-ID. Wenn gesetzt, wird ein asynchroner Task auf der Remote-Instanz erstellt. Ergebnis: {taskId, status:"pending"}.',
         },
+        callbackMode: {
+          label: "Callback-Modus",
+          description:
+            'Wie das asynchrone Ergebnis behandelt werden soll. "wait": warten bis fertig, "task-done": taskId sofort zurückgeben, "inject": Ergebnis in den aktuellen Thread einfügen.',
+        },
       },
       response: {
         result:

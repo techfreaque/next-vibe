@@ -3,7 +3,9 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardHeader } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { Check, Cloud, Code } from "next-vibe-ui/ui/icons";
+import { Check } from "next-vibe-ui/ui/icons/Check";
+import { Cloud } from "next-vibe-ui/ui/icons/Cloud";
+import { Code } from "next-vibe-ui/ui/icons/Code";
 import { Link } from "next-vibe-ui/ui/link";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { H2, H3, P } from "next-vibe-ui/ui/typography";
@@ -109,7 +111,9 @@ export function CloudVsSelfHost({
                     ))}
                   </Div>
                   <Button size="lg" className="w-full text-base mt-4" asChild>
-                    <Link href={`/${locale}`}>{t("home.paths.cloud.cta")}</Link>
+                    <Link href={`/${locale}/threads`}>
+                      {t("home.paths.cloud.cta")}
+                    </Link>
                   </Button>
                 </CardHeader>
               </Card>

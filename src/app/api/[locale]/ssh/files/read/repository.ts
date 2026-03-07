@@ -4,7 +4,7 @@
 
 import "server-only";
 
-import { open } from "node:fs/promises";
+import { open, realpath } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -29,6 +29,25 @@ type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 const DEFAULT_MAX_BYTES = 65536;
 const MAX_ALLOWED_BYTES = 524288;
 
+/**
+ * Allowed base directories for local file access.
+ * Paths outside these roots are rejected — prevents reading arbitrary system files
+ * (e.g. /etc/passwd, /proc/*, private keys) via path traversal or symlink attacks.
+ *
+ * Defaults to the user's home directory. Override with SSH_FILES_ALLOWED_BASE env var
+ * (colon-separated list of absolute paths, e.g. "/home/user:/data").
+ */
+function getAllowedBases(): string[] {
+  const override = process.env["SSH_FILES_ALLOWED_BASE"];
+  if (override) {
+    return override
+      .split(":")
+      .map((p) => p.trim())
+      .filter(Boolean);
+  }
+  return [homedir()];
+}
+
 function resolvePath(inputPath: string): string {
   if (inputPath === "~" || inputPath.startsWith("~/")) {
     return join(homedir(), inputPath.slice(1));
@@ -37,7 +56,11 @@ function resolvePath(inputPath: string): string {
 }
 
 function isValidPath(p: string): boolean {
-  return p.startsWith("/") && !p.includes("..");
+  if (!p.startsWith("/") || p.includes("..")) {
+    return false;
+  }
+  const allowedBases = getAllowedBases();
+  return allowedBases.some((base) => p === base || p.startsWith(`${base}/`));
 }
 
 export class FilesReadRepository {
@@ -62,6 +85,26 @@ export class FilesReadRepository {
       });
     }
 
+    // Resolve symlinks to their real path and re-validate.
+    // resolve() normalises ".." but does NOT dereference symlinks.
+    // A symlink inside the allowed base can still point outside it.
+    let realFilePath: string;
+    try {
+      realFilePath = await realpath(filePath);
+    } catch {
+      return fail({
+        message: t("errors.fileNotFound"),
+        errorType: ErrorResponseTypes.NOT_FOUND,
+      });
+    }
+
+    if (!isValidPath(realFilePath)) {
+      return fail({
+        message: t("errors.invalidPath"),
+        errorType: ErrorResponseTypes.BAD_REQUEST,
+      });
+    }
+
     const maxBytes = Math.min(
       data.maxBytes ?? DEFAULT_MAX_BYTES,
       MAX_ALLOWED_BYTES,
@@ -70,10 +113,10 @@ export class FilesReadRepository {
 
     try {
       logger.debug(
-        `Reading file: ${filePath} (offset=${offset}, maxBytes=${maxBytes})`,
+        `Reading file: ${realFilePath} (offset=${offset}, maxBytes=${maxBytes})`,
       );
 
-      const fh = await open(filePath, "r");
+      const fh = await open(realFilePath, "r");
       try {
         const stat = await fh.stat();
         const size = stat.size;

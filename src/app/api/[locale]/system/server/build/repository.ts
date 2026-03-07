@@ -92,6 +92,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
     const startTime = Date.now();
     const output: string[] = [];
     const errors: string[] = [];
+    const steps: Array<{ label: string; ok: boolean; skipped: boolean }> = [];
 
     try {
       output.push(MESSAGES.BUILD_START);
@@ -111,7 +112,9 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
         if (builderResult.success && builderResult.data) {
           output.push(builderResult.data.output);
           output.push(MESSAGES.PACKAGE_BUILD_SUCCESS);
+          steps.push({ label: "Package", ok: true, skipped: false });
         } else {
+          steps.push({ label: "Package", ok: false, skipped: false });
           errors.push(MESSAGES.PACKAGE_BUILD_FAILED);
           if (!data.force) {
             const response: BuildResponseType = {
@@ -119,6 +122,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
               output: output.join("\n"),
               duration: Date.now() - startTime,
               errors,
+              steps,
             };
             return success(response);
           }
@@ -128,6 +132,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
       // Generate API endpoints
       if (!data.generate) {
         output.push(MESSAGES.SKIP_GENERATION);
+        steps.push({ label: "Generate", ok: true, skipped: true });
       } else {
         output.push(MESSAGES.GENERATING_ENDPOINTS);
         try {
@@ -146,7 +151,9 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
 
           if (generateResult.success) {
             output.push(MESSAGES.GENERATION_SUCCESS);
+            steps.push({ label: "Generate", ok: true, skipped: false });
           } else {
+            steps.push({ label: "Generate", ok: false, skipped: false });
             errors.push(MESSAGES.GENERATION_FAILED);
             if (!data.force) {
               const response: BuildResponseType = {
@@ -154,12 +161,14 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
                 output: output.join("\n"),
                 duration: Date.now() - startTime,
                 errors,
+                steps,
               };
               return success(response);
             }
           }
         } catch (generatorError) {
           const errorMsg = `${MESSAGES.GENERATION_FAILED}: ${parseError(generatorError).message}`;
+          steps.push({ label: "Generate", ok: false, skipped: false });
           errors.push(errorMsg);
           if (!data.force) {
             const response: BuildResponseType = {
@@ -167,6 +176,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
               output: output.join("\n"),
               duration: Date.now() - startTime,
               errors,
+              steps,
             };
             return success(response);
           }
@@ -175,6 +185,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
 
       if (!data.nextBuild) {
         output.push(MESSAGES.SKIP_NEXT_BUILD);
+        steps.push({ label: "Next.js", ok: true, skipped: true });
       } else {
         // Build Next.js application with proper NODE_ENV
         output.push(MESSAGES.BUILDING_NEXTJS);
@@ -192,9 +203,11 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
             },
           });
           output.push(MESSAGES.NEXTJS_BUILD_SUCCESS);
+          steps.push({ label: "Next.js", ok: true, skipped: false });
         } catch (buildError) {
           const parsedError = parseError(buildError);
           const errorMsg = `${MESSAGES.NEXTJS_BUILD_FAILED}: ${parsedError.message}`;
+          steps.push({ label: "Next.js", ok: false, skipped: false });
           errors.push(errorMsg);
 
           if (!data.force) {
@@ -285,6 +298,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
               );
 
             if (!migrateResult.success) {
+              steps.push({ label: "Migrate", ok: false, skipped: false });
               errors.push(MESSAGES.FAILED_PROD_MIGRATIONS);
               if (!data.force) {
                 return fail({
@@ -294,11 +308,14 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
                   cause: migrateResult,
                 });
               }
+            } else {
+              steps.push({ label: "Migrate", ok: true, skipped: false });
             }
           }
 
           if (data.seed) {
             await seedDatabase("prod", logger, locale);
+            steps.push({ label: "Seed", ok: true, skipped: false });
           }
 
           output.push(MESSAGES.PROD_DB_SUCCESS);
@@ -313,6 +330,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
             errorMsg = `${MESSAGES.PROD_DB_FAILED}: ${MESSAGES.DB_CONNECTION_ERROR}`;
           }
 
+          steps.push({ label: "DB", ok: false, skipped: false });
           errors.push(errorMsg);
           if (!data.force) {
             return fail({
@@ -328,6 +346,12 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
         }
       } else {
         output.push(MESSAGES.SKIP_PROD_DB);
+        if (data.migrate === false) {
+          steps.push({ label: "Migrate", ok: true, skipped: true });
+        }
+        if (data.seed === false) {
+          steps.push({ label: "Seed", ok: true, skipped: true });
+        }
       }
 
       const duration = Date.now() - startTime;
@@ -337,6 +361,7 @@ export class BuildRepositoryImpl implements BuildRepositoryInterface {
         output: output.join("\n"),
         duration,
         errors: errors.length > 0 ? errors : undefined,
+        steps,
       };
 
       return success(response);

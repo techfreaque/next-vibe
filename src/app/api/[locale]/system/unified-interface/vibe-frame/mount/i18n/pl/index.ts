@@ -4,74 +4,100 @@ export const translations = {
     vibeFrame: "Vibe Frame",
     embed: "Osadzanie",
     widget: "Widget",
-    iframe: "Iframe",
+    config: "Konfiguracja",
   },
-  get: {
-    title: "Zamontuj Vibe Frame",
+  post: {
+    title: "Konfiguracja Vibe Frame",
     description:
-      "Zamontuj endpoint next-vibe w izolowanym iframe do osadzenia na dowolnej stronie lub natywnym WebView",
+      "Zwraca URL-e iframe dla żądanych integracji. Serwer odczytuje prawdziwe ciasteczka auth i tworzy krótkotrwałe tokeny wymiany.",
     container: {
-      title: "Montowanie Vibe Frame",
-      description: "Skonfiguruj i zamontuj ramkę endpointu",
+      title: "Konfiguracja Vibe Frame",
+      description: "Zażądaj URL-i iframe dla jednej lub więcej integracji",
     },
     fields: {
+      leadId: {
+        label: "Lead ID",
+        description:
+          "ID odwiedzającego ze strony hosta (cross-origin — nie można odczytać z ciasteczek)",
+      },
+      authToken: {
+        label: "Token uwierzytelniania",
+        description:
+          "Token JWT z sesji strony hosta (dla uwierzytelnionych widgetów)",
+      },
+      integrations: {
+        label: "Integracje",
+        description: "Lista integracji do skonfigurowania",
+      },
+      integration: {
+        label: "Integracja",
+        description: "Konfiguracja pojedynczej integracji",
+      },
+      id: {
+        label: "ID integracji",
+        description: "Unikalny identyfikator tego slotu integracji",
+        placeholder: "contact_POST",
+      },
       endpoint: {
         label: "Endpoint",
-        description:
-          "Identyfikator endpointu (np. contact_POST, agent_chat_threads_GET)",
-        placeholder: "Wprowadź identyfikator endpointu...",
+        description: "Identyfikator endpointu (domyślnie: id)",
+        placeholder: "contact_POST",
       },
-      frameId: {
-        label: "ID Ramki",
-        description: "Unikalny identyfikator ramki do komunikacji przez bridge",
-        placeholder: "Generowane automatycznie",
+      hasRendered: {
+        label: "Już wyrenderowano",
+        description: "Jeśli true, serwer może pominąć tę integrację",
+      },
+      theme: {
+        label: "Motyw",
+        description: "Motyw kolorystyczny ramki",
       },
       urlPathParams: {
         label: "Parametry URL",
         description: "Parametry ścieżki URL w formacie JSON",
-        placeholder: '{"id": "123"}',
+        placeholder: '{"id":"123"}',
       },
       data: {
         label: "Dane",
-        description: "Dane wstępne formularza w formacie JSON",
+        description: "Dane wstępne w formacie JSON",
         placeholder: "{}",
       },
-      theme: {
-        label: "Motyw",
-        description: "Motyw kolorystyczny zamontowanej ramki",
+      widgets: {
+        label: "Widgety",
+        description: "Mapa ID integracji do konfiguracji widgetu",
       },
-      authToken: {
-        label: "Token uwierzytelniania",
-        description: "Token uwierzytelniania do osadzania cross-origin",
-        placeholder: "Token Bearer...",
+      widget: {
+        label: "Widget",
+        description: "Konfiguracja widgetu dla jednej integracji",
       },
-    },
-    response: {
-      html: {
-        title: "Wyrenderowany HTML",
-        description: "Kompletny dokument HTML dla iframe",
+      frameId: {
+        label: "ID ramki",
+        description: "Unikalny ID ramki do komunikacji przez bridge",
+      },
+      widgetUrl: {
+        label: "URL widgetu",
+        description: "URL src iframe z tokenem wymiany",
       },
     },
     errors: {
       validation: {
-        title: "Nieprawidłowe parametry montowania",
-        description: "Podane parametry montowania są nieprawidłowe",
+        title: "Nieprawidłowe parametry",
+        description: "Podane parametry są nieprawidłowe",
       },
       unauthorized: {
         title: "Brak autoryzacji",
-        description: "Wymagane uwierzytelnienie dla tego endpointu",
+        description: "Wymagane uwierzytelnienie",
       },
       forbidden: {
         title: "Dostęp zabroniony",
-        description: "Nie masz uprawnień do zamontowania tego endpointu",
+        description: "Brak uprawnień",
       },
       notFound: {
         title: "Endpoint nie znaleziony",
-        description: "Określony endpoint nie istnieje",
+        description: "Jeden lub więcej endpointów nie istnieje",
       },
       internal: {
-        title: "Montowanie nie powiodło się",
-        description: "Wystąpił błąd podczas renderowania ramki endpointu",
+        title: "Konfiguracja nie powiodła się",
+        description: "Błąd podczas tworzenia odpowiedzi konfiguracyjnej",
       },
       network: {
         title: "Błąd sieci",
@@ -79,7 +105,7 @@ export const translations = {
       },
       unknown: {
         title: "Nieznany błąd",
-        description: "Podczas montowania ramki wystąpił nieznany błąd",
+        description: "Wystąpił nieznany błąd",
       },
       unsaved: {
         title: "Niezapisane zmiany",
@@ -93,13 +119,14 @@ export const translations = {
     repository: {
       invalidUrlPathParams: "Nieprawidłowy format parametrów ścieżki URL",
       invalidData: "Nieprawidłowy format danych",
-      endpointNotFound: "Żądany endpoint nie został znaleziony",
-      mountFailed: "Nie udało się zamontować endpointu vibe frame",
+      endpointNotFound: "Endpoint nie został znaleziony",
+      configFailed: "Nie udało się zbudować odpowiedzi konfiguracyjnej",
+      tokenMintFailed: "Nie udało się utworzyć tokenu wymiany",
     },
     success: {
-      mounted: {
-        title: "Ramka zamontowana",
-        description: "Endpoint został pomyślnie zamontowany",
+      configured: {
+        title: "Konfiguracja gotowa",
+        description: "URL-e iframe wygenerowane pomyślnie",
       },
     },
   },

@@ -285,7 +285,7 @@ export function sectionSystemContext(params: {
       `**Hermes** is the local dev instance that runs Claude Code for automated task execution. If the user hasn't set up Hermes yet, proactively suggest it — it enables scheduled code tasks, automated PR reviews, and local-only agent work.`,
     );
     lines.push(
-      `Setup requires: \`INSTANCE_ID\`, \`THEA_REMOTE_URL\`, and \`THEA_REMOTE_API_KEY\` in the local \`.env\`.`,
+      `Setup: connect your local instance via cloud sync in the user settings (Settings → Remote Connection).`,
     );
     lines.push(``);
     lines.push(
@@ -597,9 +597,9 @@ export interface SystemPromptParams {
   isDev?: boolean;
   /** App URL for system context section */
   appUrl?: string;
-  /** Instance ID from env (e.g. "hermes", "thea-prod") */
+  /** Instance ID from DB (e.g. "hermes", "thea-prod") */
   instanceId?: string;
-  /** All known instance IDs for task routing (from KNOWN_INSTANCE_IDS env) */
+  /** All known instance IDs for task routing (from DB active connections) */
   knownInstanceIds?: string[];
   /** User's display name (private or public depending on folder) */
   userName?: string;
@@ -775,6 +775,8 @@ export function buildTrailingSystemMessage(params: {
   tasksSummary?: string | null;
   memorySummary?: string | null;
   favoritesSummary?: string | null;
+  /** Completed remote background tasks since last model invocation in this thread */
+  completedTasksSummary?: string | null;
   /** STT transcription metadata — prepends accuracy note when wasTranscribed */
   voiceTranscription?: {
     wasTranscribed: boolean;
@@ -791,6 +793,12 @@ export function buildTrailingSystemMessage(params: {
         : "";
     parts.push(
       `[STT] The preceding user message was transcribed from speech${confidenceNote}. It may contain transcription errors — interpret with flexibility for homophones, mis-heard words, missing punctuation, and minor word substitutions.`,
+    );
+  }
+
+  if (params.completedTasksSummary?.trim()) {
+    parts.push(
+      `[Background tasks completed since your last response]\n\n${params.completedTasksSummary.trim()}`,
     );
   }
 

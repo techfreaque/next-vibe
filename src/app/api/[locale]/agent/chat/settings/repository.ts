@@ -15,10 +15,7 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 
 import { db } from "@/app/api/[locale]/system/db";
-import { definitionsRegistry } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definitions/registry";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { endpointToToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { COMPACT_TRIGGER } from "../../ai-stream/repository/core/constants";
@@ -36,16 +33,6 @@ import { ChatSettingsRepositoryClient } from "./repository-client";
 type SettingsT = ReturnType<typeof scopedTranslation.scopedT>["t"];
 
 /**
- * Returns the canonical set of available tool IDs for a user.
- * Used to detect when a submitted activeTools list equals the full available set
- * so we can store null (= all tools allowed) instead of an explicit list.
- */
-function getAvailableToolIds(user: JwtPrivatePayloadType): string[] {
-  const endpoints = definitionsRegistry.getEndpointsForUser(Platform.AI, user);
-  return endpoints.map((e) => endpointToToolName(e));
-}
-
-/**
  * Returns null if the tool list equals the given defaultIds set (i.e. it IS the default),
  * otherwise returns the normalized list (sorted, only toolId + requiresConfirmation).
  *
@@ -54,7 +41,7 @@ function getAvailableToolIds(user: JwtPrivatePayloadType): string[] {
  */
 function normalizeToolsOrNull(
   tools: ToolConfigItem[] | null | undefined,
-  defaultIds: readonly string[] | string[],
+  defaultIds: readonly string[] | null,
 ): ToolConfigItem[] | null {
   if (tools === null || tools === undefined) {
     return null;
@@ -66,18 +53,16 @@ function normalizeToolsOrNull(
     }))
     .toSorted((a, b) => a.toolId.localeCompare(b.toolId));
 
-  const submittedIds = new Set(normalized.map((t) => t.toolId));
-  const defaultSet = new Set(defaultIds);
-
-  // If the submitted set exactly matches the default set AND none require
-  // confirmation, it's the default state — store null.
-  const sameIds =
-    submittedIds.size === defaultSet.size &&
-    [...submittedIds].every((id) => defaultSet.has(id));
-  const noConfirmations = normalized.every((t) => !t.requiresConfirmation);
-
-  if (sameIds && noConfirmations) {
-    return null;
+  if (defaultIds !== null) {
+    const submittedIds = new Set(normalized.map((t) => t.toolId));
+    const defaultSet = new Set(defaultIds);
+    const sameIds =
+      submittedIds.size === defaultSet.size &&
+      [...submittedIds].every((id) => defaultSet.has(id));
+    const noConfirmations = normalized.every((t) => !t.requiresConfirmation);
+    if (sameIds && noConfirmations) {
+      return null;
+    }
   }
 
   return normalized;
@@ -121,14 +106,14 @@ export class ChatSettingsRepository {
         ttsVoice: setting.ttsVoice ?? defaults.ttsVoice,
         viewMode: setting.viewMode ?? defaults.viewMode,
         allowedTools:
-          (setting.activeTools ?? defaults.allowedTools)?.map((t) => ({
-            toolId: t.toolId,
-            requiresConfirmation: t.requiresConfirmation ?? false,
+          (setting.activeTools ?? defaults.allowedTools)?.map((tool) => ({
+            toolId: tool.toolId,
+            requiresConfirmation: tool.requiresConfirmation ?? false,
           })) ?? null,
         pinnedTools:
-          (setting.visibleTools ?? defaults.pinnedTools)?.map((t) => ({
-            toolId: t.toolId,
-            requiresConfirmation: t.requiresConfirmation ?? false,
+          (setting.visibleTools ?? defaults.pinnedTools)?.map((tool) => ({
+            toolId: tool.toolId,
+            requiresConfirmation: tool.requiresConfirmation ?? false,
           })) ?? null,
         compactTrigger: setting.compactTrigger ?? defaults.compactTrigger,
       };
@@ -164,15 +149,13 @@ export class ChatSettingsRepository {
         .where(eq(chatSettings.userId, userId));
 
       const defaults = ChatSettingsRepositoryClient.getDefaults();
-      // allowedTools: null = all tools allowed → compare against full available set
-      const availableIds = getAvailableToolIds(user);
-      // pinnedTools: null = load the DEFAULT_TOOL_IDS set → compare against those 9 tools
 
-      // Normalize tools — store null when submitted list equals the semantic default
+      // Normalize tools — null passthrough means "all allowed"
       const allowedToolsToStore =
         data.allowedTools !== undefined
-          ? normalizeToolsOrNull(data.allowedTools, availableIds)
+          ? normalizeToolsOrNull(data.allowedTools, null)
           : undefined;
+      // pinnedTools: null = load the DEFAULT_TOOL_IDS set → compare against those
       const pinnedToolsToStore =
         data.pinnedTools !== undefined
           ? normalizeToolsOrNull(data.pinnedTools, getDefaultToolIds())

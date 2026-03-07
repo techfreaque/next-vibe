@@ -12,6 +12,7 @@ import {
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useMessageGroupName } from "./embedded-context";
@@ -24,6 +25,8 @@ interface UserMessageBubbleProps {
   message: ChatMessage;
   locale: CountryLanguage;
   logger: EndpointLogger;
+  user: JwtPayloadType;
+  deductCredits: ((creditCost: number, feature: string) => void) | null;
   onBranch?: (messageId: string) => void;
   onRetry?: (message: ChatMessage) => Promise<void>;
   onDelete?: (messageId: string) => void;
@@ -36,6 +39,8 @@ export function UserMessageBubble({
   message,
   locale,
   logger,
+  user,
+  deductCredits,
   onBranch,
   onRetry,
   onDelete,
@@ -101,6 +106,8 @@ export function UserMessageBubble({
             message={message}
             locale={locale}
             logger={logger}
+            user={user}
+            deductCredits={deductCredits}
             onBranch={onBranch}
             onRetry={onRetry}
             onDelete={onDelete}

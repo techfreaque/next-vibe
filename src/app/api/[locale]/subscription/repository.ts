@@ -42,7 +42,7 @@ import type {
   SubscriptionPlanDB,
   SubscriptionStatusValue,
 } from "./enum";
-import { SubscriptionPlan, SubscriptionStatus } from "./enum";
+import { BillingInterval, SubscriptionPlan, SubscriptionStatus } from "./enum";
 import { scopedTranslation } from "./i18n";
 import type {
   SubscriptionUpdatePutRequestOutput,
@@ -178,9 +178,12 @@ export class SubscriptionRepository {
 
       let subscription = results[0];
 
-      // AUTOMATIC SYNC: Verify subscription with Stripe if it has a provider ID
-      // This handles cases where webhooks were missed or subscription changed in Stripe
-      if (subscription.providerSubscriptionId) {
+      // AUTOMATIC SYNC: Verify subscription with Stripe if it has a provider ID.
+      // Skip for NOWPayments — one-time payments have no recurring subscription to sync.
+      if (
+        subscription.providerSubscriptionId &&
+        subscription.provider !== PaymentProvider.NOWPAYMENTS
+      ) {
         const needsSync =
           subscription.status === SubscriptionStatus.ACTIVE ||
           (subscription.currentPeriodEnd &&
@@ -656,7 +659,6 @@ export class SubscriptionRepository {
       const userId = session.metadata?.userId;
       const planId = session.metadata?.planId;
       const billingInterval = session.metadata?.billingInterval;
-      const providerSubscriptionId = session.subscription;
 
       if (!userId || !planId || !billingInterval) {
         logger.error("Missing required metadata in checkout session", {
@@ -668,31 +670,66 @@ export class SubscriptionRepository {
         return;
       }
 
-      if (!providerSubscriptionId) {
-        logger.error("Missing provider subscription ID", {
-          sessionId: session.id,
-        });
-        return;
-      }
-
       const providerEnum =
         (session.metadata?.provider as typeof PaymentProviderValue) ||
         PaymentProvider.STRIPE;
-      const providerKey =
-        providerEnum === PaymentProvider.NOWPAYMENTS ? "nowpayments" : "stripe";
-      const provider = getPaymentProvider(providerKey);
-      const subscriptionResult = await provider.retrieveSubscription(
-        providerSubscriptionId,
-        logger,
-        locale,
-      );
 
-      if (!subscriptionResult.success) {
-        logger.error("Failed to retrieve subscription from provider", {
-          providerSubscriptionId,
-          error: subscriptionResult.message,
+      // NOWPayments processes subscriptions as one-time invoices — no recurring
+      // subscription object exists. Calculate period dates from billingInterval.
+      const isNowPayments = providerEnum === PaymentProvider.NOWPAYMENTS;
+
+      let currentPeriodStart: Date;
+      let currentPeriodEnd: Date | null;
+      let providerSubscriptionId: string | undefined;
+
+      if (isNowPayments) {
+        // One-time invoice: use the session/payment ID as the identifier
+        providerSubscriptionId = session.id;
+        currentPeriodStart = new Date();
+        const isYearly = billingInterval === BillingInterval.YEARLY;
+        const periodMs = isYearly
+          ? 365 * 24 * 60 * 60 * 1000
+          : 30 * 24 * 60 * 60 * 1000;
+        currentPeriodEnd = new Date(Date.now() + periodMs);
+
+        logger.info("NOWPayments one-time subscription checkout", {
+          sessionId: session.id,
+          billingInterval,
+          isYearly,
+          currentPeriodEnd: currentPeriodEnd.toISOString(),
         });
-        return;
+      } else {
+        // Stripe: retrieve subscription from provider for accurate period dates
+        providerSubscriptionId = session.subscription;
+
+        if (!providerSubscriptionId) {
+          logger.error("Missing provider subscription ID for Stripe checkout", {
+            sessionId: session.id,
+          });
+          return;
+        }
+
+        const provider = getPaymentProvider("stripe");
+        const subscriptionResult = await provider.retrieveSubscription(
+          providerSubscriptionId,
+          logger,
+          locale,
+        );
+
+        if (!subscriptionResult.success) {
+          logger.error("Failed to retrieve subscription from Stripe", {
+            providerSubscriptionId,
+            error: subscriptionResult.message,
+          });
+          return;
+        }
+
+        currentPeriodStart = subscriptionResult.data.currentPeriodStart
+          ? new Date(subscriptionResult.data.currentPeriodStart)
+          : new Date();
+        currentPeriodEnd = subscriptionResult.data.currentPeriodEnd
+          ? new Date(subscriptionResult.data.currentPeriodEnd)
+          : null;
       }
 
       await db
@@ -705,24 +742,16 @@ export class SubscriptionRepository {
           status: SubscriptionStatus.ACTIVE,
           provider: providerEnum,
           providerSubscriptionId,
-          currentPeriodStart: subscriptionResult.data.currentPeriodStart
-            ? new Date(subscriptionResult.data.currentPeriodStart)
-            : new Date(),
-          currentPeriodEnd: subscriptionResult.data.currentPeriodEnd
-            ? new Date(subscriptionResult.data.currentPeriodEnd)
-            : null,
+          currentPeriodStart,
+          currentPeriodEnd,
         })
         .onConflictDoUpdate({
           target: subscriptions.userId,
           set: {
             status: SubscriptionStatus.ACTIVE,
             providerSubscriptionId,
-            currentPeriodStart: subscriptionResult.data.currentPeriodStart
-              ? new Date(subscriptionResult.data.currentPeriodStart)
-              : new Date(),
-            currentPeriodEnd: subscriptionResult.data.currentPeriodEnd
-              ? new Date(subscriptionResult.data.currentPeriodEnd)
-              : null,
+            currentPeriodStart,
+            currentPeriodEnd,
             updatedAt: new Date(),
           },
         });
@@ -758,11 +787,18 @@ export class SubscriptionRepository {
 
       if (productId) {
         const product = productsRepository.getProduct(productId, userLocale);
-        const periodEnd = subscriptionResult.data.currentPeriodEnd
-          ? new Date(subscriptionResult.data.currentPeriodEnd)
-          : null;
-        // Credits expire at exact period end — no grace buffer needed
-        const expiresAt = periodEnd;
+        // currentPeriodEnd is already extracted from Stripe or calculated for NOWPayments above
+        const expiresAt = currentPeriodEnd;
+
+        // Use canonical renewalSessionKey so the safety-net idempotency check
+        // recognises that credits were already granted on the initial checkout.
+        // providerSubscriptionId is set for both Stripe and NOWPayments paths.
+        const checkoutSessionId = providerSubscriptionId
+          ? renewalSessionKey(
+              providerSubscriptionId,
+              (currentPeriodEnd ?? new Date()).getTime(),
+            )
+          : session.id;
 
         // IDEMPOTENCY CHECK: Verify credits haven't been added for this checkout session already
         const { creditPacks } = await import("../credits/db");
@@ -770,12 +806,14 @@ export class SubscriptionRepository {
         const [existingPack] = await db
           .select()
           .from(creditPacks)
-          .where(sql`${creditPacks.metadata}->>'sessionId' = ${session.id}`)
+          .where(
+            sql`${creditPacks.metadata}->>'sessionId' = ${checkoutSessionId}`,
+          )
           .limit(1);
 
         if (existingPack) {
           logger.info("Subscription credits already processed for session", {
-            sessionId: session.id,
+            checkoutSessionId,
             packId: existingPack.id,
             userId,
           });
@@ -789,13 +827,13 @@ export class SubscriptionRepository {
           logger,
           creditsT,
           expiresAt ?? undefined,
-          session.id, // Pass sessionId for idempotency tracking
+          checkoutSessionId,
         );
         logger.debug("Added subscription credits", {
           userId,
           credits: product.credits,
           expiresAt: expiresAt?.toISOString(),
-          sessionId: session.id,
+          checkoutSessionId,
         });
       }
 

@@ -7,7 +7,7 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interfac
 import { mcpSilentMode } from "@/config/debug";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { binaryStartTime } from "../vibe-runtime";
+import { binaryStartTime } from "../run-cli";
 import type { RouteExecutionResult } from "./route-executor";
 
 /**

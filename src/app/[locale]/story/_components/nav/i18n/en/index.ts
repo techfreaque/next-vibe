@@ -18,6 +18,10 @@ export const translations = {
     title: "Careers",
     description: "Join our team",
   },
+  invest: {
+    title: "Invest",
+    description: "Back the open AI platform",
+  },
   user: {
     dashboard: "Dashboard",
     completeOnboarding: "Complete Onboarding",

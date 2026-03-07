@@ -1,6 +1,6 @@
 import { CHARACTERS_LIST_ALIAS } from "@/app/api/[locale]/agent/chat/characters/constants";
-import { FETCH_URL_SHORT_ALIAS } from "@/app/api/[locale]/agent/fetch-url-content/definition";
-import { BRAVE_SEARCH_ALIAS } from "@/app/api/[locale]/agent/search/brave/definition";
+import { FETCH_URL_SHORT_ALIAS } from "@/app/api/[locale]/agent/fetch-url-content/constants";
+import { BRAVE_SEARCH_ALIAS } from "@/app/api/[locale]/agent/search/brave/constants";
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
 
 import { EXECUTE_TOOL_ALIAS } from "../../../../system/unified-interface/ai/execute-tool/constants";
@@ -13,9 +13,9 @@ import {
   FAVORITES_LIST_ALIAS,
   FAVORITES_REORDER_ALIAS,
 } from "../../favorites/constants";
-import { MEMORY_UPDATE_ALIAS } from "../../memories/[id]/definition";
-import { MEMORY_ADD_ALIAS } from "../../memories/create/definition";
-import { MEMORY_LIST_ALIAS } from "../../memories/definition";
+import { MEMORY_UPDATE_ALIAS } from "../../memories/[id]/constants";
+import { MEMORY_LIST_ALIAS } from "../../memories/constants";
+import { MEMORY_ADD_ALIAS } from "../../memories/create/constants";
 import {
   CHAT_SETTINGS_GET_ALIAS,
   CHAT_SETTINGS_UPDATE_ALIAS,

@@ -29,7 +29,8 @@ export const templateMetadataMap: Record<
       name: "Max Mustermann",
       email: "max@example.com",
       company: "Musterfirma GmbH",
-      subject: "Anfrage zu Ihren Dienstleistungen",
+      subject: "subject.helpSupport",
+      priority: "priority.medium",
       message:
         "Ich hätte gerne weitere Informationen zu Ihren Premium-Services.",
       isForCompany: true,

@@ -13,9 +13,9 @@ import {
   scopedObjectFieldNew,
   scopedRequestField,
   scopedResponseField,
+  scopedSubmitButton,
   scopedWidgetField,
   scopedWidgetObjectField,
-  submitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
@@ -145,9 +145,9 @@ export const { POST } = createEndpoint({
         className: "flex justify-end",
         usage: { request: "data" },
         children: {
-          submit: submitButton({
-            label: "app.user.referral.createCode.create",
-            loadingText: "app.user.referral.createCode.creating",
+          submit: scopedSubmitButton(scopedTranslation, {
+            label: "post.submit.label",
+            loadingText: "post.submit.loading",
             usage: { request: "data" },
           }),
         },

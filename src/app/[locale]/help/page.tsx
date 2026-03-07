@@ -1,16 +1,23 @@
 import type { Metadata } from "next";
 import { notFound } from "next-vibe-ui/lib/not-found";
 import { Div } from "next-vibe-ui/ui/div";
-import { ChevronLeft } from "next-vibe-ui/ui/icons";
+import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
+import { TOTAL_MODEL_COUNT } from "@/app/api/[locale]/agent/models/models";
+import {
+  ProductIds,
+  productsRepository,
+} from "@/app/api/[locale]/products/repository-client";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import { env } from "@/config/env";
+import { languageConfig } from "@/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
+import { getCountryFromLocale } from "@/i18n/core/language-utils";
 import { metadataGenerator } from "@/i18n/core/metadata";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -60,6 +67,15 @@ export default async function ContactPage({
     logger,
   );
 
+  const products = productsRepository.getProducts(locale);
+  const country = getCountryFromLocale(locale);
+  const countryInfo = languageConfig.countryInfo[country];
+  const subPrice = products[ProductIds.SUBSCRIPTION].price;
+  const subCredits = products[ProductIds.SUBSCRIPTION].credits;
+  const packPrice = products[ProductIds.CREDIT_PACK].price;
+  const packCredits = products[ProductIds.CREDIT_PACK].credits;
+  const currencySymbol = countryInfo.symbol;
+
   return (
     <Div
       role="main"
@@ -67,14 +83,22 @@ export default async function ContactPage({
     >
       <Div className="container max-w-6xl mx-auto pt-8 px-4">
         <Link
-          href={`/${locale}`}
+          href={`/${locale}/threads`}
           className="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 mb-8"
         >
           <ChevronLeft className="mr-2 h-4 w-4" />
           {t("app.help.nav.home")}
         </Link>
       </Div>
-      <HelpPageClient locale={locale} user={jwtUser} />
+      <HelpPageClient
+        locale={locale}
+        user={jwtUser}
+        modelCount={TOTAL_MODEL_COUNT}
+        subPrice={`${currencySymbol}${subPrice}`}
+        subCredits={subCredits}
+        packPrice={`${currencySymbol}${packPrice}`}
+        packCredits={packCredits}
+      />
     </Div>
   );
 }

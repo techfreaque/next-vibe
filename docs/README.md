@@ -243,6 +243,7 @@ src/app/api/[locale]/
 
 - **[Debugging](guides/debugging.md)** — Debugging techniques
 - **[Stripe Webhooks](guides/stripe-webhooks.md)** — Payment integration
+- **[Remote Connection](guides/remote-connection.md)** — Connect local ↔ cloud instances, tool discovery, memory sync, remote execution modes
 
 ---
 

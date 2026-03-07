@@ -6,8 +6,10 @@ export const translations: typeof enTranslations = {
     messages: "Nachrichten",
   },
   loadingOlderMessages: "Ältere Nachrichten werden geladen...",
+  loadingNewerMessages: "Neuere Nachrichten werden geladen...",
   scrollUpForOlderMessages: "Nach oben scrollen für ältere Nachrichten",
   showOlderMessages: "Ältere Nachrichten anzeigen",
+  showNewerMessages: "Neuere Nachrichten anzeigen",
   transcribing: "Audio wird transkribiert...",
   errorCode: "Fehlercode",
   compacting: {
@@ -50,9 +52,6 @@ export const translations: typeof enTranslations = {
           },
           parentId: {
             content: "Parent Message ID",
-          },
-          depth: {
-            content: "Depth",
           },
           authorId: {
             content: "Author ID",
@@ -200,9 +199,6 @@ export const translations: typeof enTranslations = {
         parentId: {
           content: "Parent Message ID",
         },
-        depth: {
-          content: "Depth",
-        },
         createdAt: {
           content: "Created At",
         },
@@ -293,6 +289,9 @@ export const translations: typeof enTranslations = {
         branch: "Verzweigung",
         retry: "Wiederholen",
         deleteMessage: "Nachricht löschen",
+        cancelLoading: "Laden abbrechen",
+        stopAudio: "Audio stoppen",
+        playAudio: "Audio abspielen ({{cost}} Credits)",
       },
       assistantMessageActions: {
         answerAsAI: "Als KI antworten",

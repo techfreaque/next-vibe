@@ -8,31 +8,27 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  Activity,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  Loader2,
-  Pencil,
-  RefreshCw,
-  Trash2,
-  TrendingUp,
-  XCircle,
-} from "next-vibe-ui/ui/icons";
+import { Activity } from "next-vibe-ui/ui/icons/Activity";
+import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { Clock } from "next-vibe-ui/ui/icons/Clock";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
+import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
+import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
+import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import type { FieldValues } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
 import { cn } from "@/app/api/[locale]/shared/utils";
-import {
-  getEndpoint,
-  getFullPath,
-} from "@/app/api/[locale]/system/generated/endpoint";
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import { NavigationStackProvider } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-navigation-stack";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 import { EndpointRenderer } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointRenderer";
 import {

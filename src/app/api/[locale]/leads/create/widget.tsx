@@ -7,7 +7,11 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { CheckCircle, Globe, Mail, Plus, Tag } from "next-vibe-ui/ui/icons";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { Globe } from "next-vibe-ui/ui/icons/Globe";
+import { Mail } from "next-vibe-ui/ui/icons/Mail";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
+import { Tag } from "next-vibe-ui/ui/icons/Tag";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback } from "react";
 

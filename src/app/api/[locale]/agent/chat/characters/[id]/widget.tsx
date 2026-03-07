@@ -11,13 +11,16 @@ import {
   CollapsibleTrigger,
 } from "next-vibe-ui/ui/collapsible";
 import { Div } from "next-vibe-ui/ui/div";
-import { Sparkles, User, Users, Volume2 } from "next-vibe-ui/ui/icons";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
+import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { Star } from "next-vibe-ui/ui/icons/Star";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
+import { User } from "next-vibe-ui/ui/icons/User";
+import { Users } from "next-vibe-ui/ui/icons/Users";
+import { Volume2 } from "next-vibe-ui/ui/icons/Volume2";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Skeleton } from "next-vibe-ui/ui/skeleton";
 import { Span } from "next-vibe-ui/ui/span";
@@ -131,14 +134,14 @@ export function CharacterEditContainer({
   );
 
   const handleDelete = async (): Promise<void> => {
-    const characterId = form?.getValues("id");
-    if (!characterId) {
+    const characterIdToDelete = form?.getValues("id");
+    if (!characterIdToDelete) {
       return;
     }
 
     const deleteDefinition = await import("./definition");
     navigation.push(deleteDefinition.default.DELETE, {
-      urlPathParams: { id: characterId },
+      urlPathParams: { id: characterIdToDelete },
       renderInModal: true,
       popNavigationOnSuccess: 2,
     });

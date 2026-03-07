@@ -1,15 +1,16 @@
 import type { ModelOption } from "@/app/api/[locale]/agent/models/models";
-import { getFullPath } from "@/app/api/[locale]/system/generated/endpoint";
 import type { CoreTool } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
 import { loadTools } from "@/app/api/[locale]/system/unified-interface/ai/tools-loader";
-import { definitionsRegistry } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definitions/registry";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
+import {
+  getFullPath,
+  getPreferredName,
+} from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { ToolExecutionContext } from "../../../chat/config";
+import { getDefaultToolIds } from "../../../chat/constants";
 import type { ToolCall } from "../../../chat/db";
 
 /**
@@ -45,7 +46,10 @@ export class ToolsSetupHandler {
     streamContext: ToolExecutionContext;
   }): Promise<{
     tools: Record<string, CoreTool> | undefined;
-    toolsConfig: Map<string, { requiresConfirmation: boolean }>;
+    toolsConfig: Map<
+      string,
+      { requiresConfirmation: boolean; credits: number }
+    >;
     /** Set of tool names (preferred) the model is allowed to execute. null = all allowed. */
     activeToolNames: Set<string> | null;
     systemPrompt: string;
@@ -61,43 +65,9 @@ export class ToolsSetupHandler {
       };
     }
 
-    // Build endpoint lookup maps for resolving toolId → preferred name
-    const allEndpoints = definitionsRegistry.getEndpointsForUser(
-      Platform.AI,
-      params.user,
-    );
-    const endpointByPreferredName = new Map(
-      allEndpoints.map((e) => [getPreferredToolName(e), e]),
-    );
-
-    // Build reverse lookup: full path → preferred name
-    const fullPathToPreferred = new Map<string, string>();
-    for (const ep of allEndpoints) {
-      const preferred = getPreferredToolName(ep);
-      // Map both the preferred name and any aliases/full paths to the preferred name
-      fullPathToPreferred.set(preferred, preferred);
-      // The full path from getFullPath maps to this preferred name
-      const fullPath = getFullPath(preferred);
-      if (fullPath) {
-        fullPathToPreferred.set(fullPath, preferred);
-      }
-    }
-
-    // Resolve a toolId (alias or full path) to the preferred tool name
-    // toolResult.tools keys use preferred names, so all lookups must use preferred names
-    const resolveToPreferredName = (toolId: string): string | null => {
-      // Direct lookup (handles both preferred names and full paths)
-      const direct = fullPathToPreferred.get(toolId);
-      if (direct) {
-        return direct;
-      }
-      // Try resolving alias → full path → preferred name
-      const fullPath = getFullPath(toolId);
-      if (fullPath) {
-        return fullPathToPreferred.get(fullPath) ?? null;
-      }
-      return null;
-    };
+    // Resolve a toolId (alias or canonical) to the preferred name (first alias if any).
+    const resolveToPreferredName = (toolId: string): string =>
+      getPreferredName(toolId);
 
     // Build confirmed tools set for quick lookup (uses preferred names)
     const confirmedToolNames = new Set(
@@ -113,13 +83,11 @@ export class ToolsSetupHandler {
     ];
     for (const toolConfig of allToolConfigs) {
       const preferredName = resolveToPreferredName(toolConfig.toolId);
-      if (preferredName) {
-        const isConfirmedTool = confirmedToolNames.has(preferredName);
-        clientConfirmationConfig.set(
-          preferredName,
-          isConfirmedTool ? false : toolConfig.requiresConfirmation,
-        );
-      }
+      const isConfirmedTool = confirmedToolNames.has(preferredName);
+      clientConfirmationConfig.set(
+        preferredName,
+        isConfirmedTool ? false : toolConfig.requiresConfirmation,
+      );
     }
 
     // Also build a full-path keyed version for loadTools (which checks both preferred + internal names)
@@ -138,11 +106,8 @@ export class ToolsSetupHandler {
     const isAgentMode = !params.visibleTools;
 
     const visibleToolIds = params.visibleTools
-      ? params.visibleTools.map((t) => {
-          const fullPath = getFullPath(t.toolId);
-          return fullPath ?? t.toolId;
-        })
-      : null; // null = agent mode, load all
+      ? params.visibleTools.map((t) => getFullPath(t.toolId) ?? t.toolId)
+      : [...getDefaultToolIds()]; // agent mode = default tool set
 
     const toolsResult = await loadTools({
       requestedTools: visibleToolIds,
@@ -154,28 +119,22 @@ export class ToolsSetupHandler {
       streamContext: params.streamContext,
     });
 
-    // Build toolsConfig map for confirmation checks (used by tool-call-handler AND tool-error-handler)
-    // Keys are preferred tool names (matching toolsResult.tools keys)
-    // Source of truth priority: confirmed tools > client config > endpoint definition > false
-    const toolsConfig = new Map<string, { requiresConfirmation: boolean }>();
-    if (toolsResult.tools) {
-      for (const toolName of Object.keys(toolsResult.tools)) {
-        if (confirmedToolNames.has(toolName)) {
-          toolsConfig.set(toolName, { requiresConfirmation: false });
-          continue;
-        }
-
-        // Check client config first (already keyed by preferred name)
+    // Build toolsConfig from toolsMeta (which has credits + requiresConfirmation from the loaded endpoints)
+    // Client config overrides endpoint definition; confirmed tools are never re-confirmed
+    const toolsConfig = new Map<
+      string,
+      { requiresConfirmation: boolean; credits: number }
+    >();
+    for (const [toolName, meta] of toolsResult.toolsMeta) {
+      const credits = meta.credits;
+      if (confirmedToolNames.has(toolName)) {
+        toolsConfig.set(toolName, { requiresConfirmation: false, credits });
+      } else {
         const clientConfig = clientConfirmationConfig.get(toolName);
-        if (clientConfig !== undefined) {
-          toolsConfig.set(toolName, { requiresConfirmation: clientConfig });
-        } else {
-          // Fall back to endpoint definition's requiresConfirmation
-          const ep = endpointByPreferredName.get(toolName);
-          toolsConfig.set(toolName, {
-            requiresConfirmation: ep?.requiresConfirmation ?? false,
-          });
-        }
+        toolsConfig.set(toolName, {
+          requiresConfirmation: clientConfig ?? meta.requiresConfirmation,
+          credits,
+        });
       }
     }
 
@@ -186,10 +145,7 @@ export class ToolsSetupHandler {
     if (params.activeTools) {
       activeToolNames = new Set<string>();
       for (const toolConfig of params.activeTools) {
-        const preferredName = resolveToPreferredName(toolConfig.toolId);
-        if (preferredName) {
-          activeToolNames.add(preferredName);
-        }
+        activeToolNames.add(resolveToPreferredName(toolConfig.toolId));
       }
     }
 

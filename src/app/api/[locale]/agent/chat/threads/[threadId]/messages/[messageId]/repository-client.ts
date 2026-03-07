@@ -59,7 +59,6 @@ export class ChatMessageByIdRepositoryClient {
         role: message.role,
         content: message.content,
         parentId: message.parentId,
-        depth: message.depth,
         authorId: message.authorId,
         isAI: message.isAI,
         model: message.model,

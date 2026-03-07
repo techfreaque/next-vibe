@@ -14,19 +14,18 @@
 
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
-import { CharactersRepository } from "@/app/api/[locale]/agent/chat/characters/repository";
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
-import { generateFavoritesSummary } from "@/app/api/[locale]/agent/chat/favorites/repository";
-import { generateMemorySummary } from "@/app/api/[locale]/agent/chat/memories/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import { generateTasksSummary } from "@/app/api/[locale]/system/unified-interface/tasks/cron/repository";
+import {
+  cronTaskExecutions,
+  cronTasks,
+} from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { users as usersTable } from "@/app/api/[locale]/user/db";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TFunction } from "@/i18n/core/static-types";
@@ -62,6 +61,7 @@ export async function buildSystemPrompt(params: {
   extraInstructions?: string;
   headless?: boolean;
   excludeMemories?: boolean;
+  threadId: string | null;
   voiceTranscription?: {
     wasTranscribed: boolean;
     confidence: number | null;
@@ -79,6 +79,7 @@ export async function buildSystemPrompt(params: {
     extraInstructions,
     headless,
     excludeMemories,
+    threadId,
     voiceTranscription,
   } = params;
 
@@ -117,6 +118,18 @@ export async function buildSystemPrompt(params: {
     rootFolderId === "public" || rootFolderId === "shared";
 
   if (userId) {
+    const [
+      { generateMemorySummary },
+      { generateTasksSummary },
+      { generateFavoritesSummary },
+      { CharactersRepository },
+    ] = await Promise.all([
+      import("@/app/api/[locale]/agent/chat/memories/repository"),
+      import("@/app/api/[locale]/system/unified-interface/tasks/cron/repository"),
+      import("@/app/api/[locale]/agent/chat/favorites/repository"),
+      import("@/app/api/[locale]/agent/chat/characters/repository"),
+    ]);
+
     const [
       memoriesResult,
       tasksResult,
@@ -248,6 +261,8 @@ export async function buildSystemPrompt(params: {
   } else if (characterId) {
     // Public users can still reference a character (e.g. default ones)
     try {
+      const { CharactersRepository } =
+        await import("@/app/api/[locale]/agent/chat/characters/repository");
       const result = await CharactersRepository.getCharacterById(
         { id: characterId },
         user,
@@ -276,12 +291,20 @@ export async function buildSystemPrompt(params: {
 
   // ─── Step 2b: Load remote instance context ──────────────────────────────
 
+  let instanceId: string | null = null;
+  let knownInstanceIds: string[] = [];
+
   if (userId && !isIncognito && !isExposedFolder) {
     try {
-      const { getAllActiveConnections } =
+      const { getAllActiveConnections, getLocalInstanceId } =
         await import("@/app/api/[locale]/user/remote-connection/repository");
-      const connections = await getAllActiveConnections(userId);
+      const [connections, localId] = await Promise.all([
+        getAllActiveConnections(userId),
+        getLocalInstanceId(),
+      ]);
+      instanceId = localId;
       if (connections.length > 0) {
+        knownInstanceIds = connections.map((c) => c.instanceId);
         const lines = connections.map(
           (c) =>
             `- "${c.friendlyName}" (id: "${c.instanceId}") — use help(instanceId="${c.instanceId}") to discover tools, execute-tool(toolName, instanceId="${c.instanceId}", input) to run them`,
@@ -325,8 +348,9 @@ export async function buildSystemPrompt(params: {
     isLocalMode: envClient.NEXT_PUBLIC_LOCAL_MODE,
     isDev: envClient.NODE_ENV !== "production",
     appUrl: envClient.NEXT_PUBLIC_APP_URL,
-    instanceId: env.INSTANCE_ID,
-    knownInstanceIds: env.KNOWN_INSTANCE_IDS,
+    instanceId: instanceId ?? undefined,
+    knownInstanceIds:
+      knownInstanceIds.length > 0 ? knownInstanceIds : undefined,
     userName,
   });
 

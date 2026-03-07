@@ -276,13 +276,16 @@ export async function navigateFolders(
       const physicalPath = path.join(rootDir, ...currentPath);
 
       // Prompt user to select an option with styled message
+      const inquirerChoices: Array<
+        | { name: string; value: string; short?: string }
+        | InstanceType<typeof inquirer.Separator>
+      > = choices;
       const { selection } = await inquirer.prompt<{ selection: string }>({
-        type: "list",
+        type: "select",
         name: "selection",
         message: chalk.blue("What would you like to do?"),
-        choices: choices,
-        pageSize: Math.min(25, process.stdout.rows - 10), // Reasonable size that fits well
-        loop: true,
+        choices: inquirerChoices,
+        pageSize: Math.min(25, (process.stdout.rows ?? 35) - 10), // Reasonable size that fits well
       });
 
       // Handle selection

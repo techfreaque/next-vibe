@@ -138,7 +138,6 @@ export async function generateTRPCRouter(
     for (const routeFile of discoveredRouteFiles) {
       const definitionPath = routeFile.replace("/route.ts", "/definition.ts");
       // Check if definition exists by trying to construct the path
-      const fs = await import("node:fs");
       if (fs.existsSync(definitionPath)) {
         discoveredFiles.push(routeFile);
       } else {
@@ -211,8 +210,8 @@ export async function generateTRPCRouter(
     if (invalidRoutes.length > 0) {
       const invalidList = invalidRoutes
         .map((r) => {
-          const errors = r.validation.errors.join(", ");
-          return `    • ${r.relativePath}\n      ${errors}`;
+          const validationErrors = r.validation.errors.join(", ");
+          return `    • ${r.relativePath}\n      ${validationErrors}`;
         })
         .join("\n");
       logger.warn(

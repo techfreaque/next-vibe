@@ -21,10 +21,8 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { TranslationKey } from "@/i18n/core/static-types";
 
+import { START_ALIAS, START_SERVER_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-
-export const START_ALIAS = "start" as const;
-export const START_SERVER_ALIAS = "server:start" as const;
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -111,6 +109,15 @@ const { POST } = createEndpoint({
         schema: z.coerce.number().optional(),
       }),
 
+      profile: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.BOOLEAN,
+        label: "post.fields.profile.title",
+        description: "post.fields.profile.description",
+        columns: 6,
+        schema: z.boolean().optional().default(false),
+      }),
+
       // === RESPONSE FIELDS ===
 
       responseMessage: scopedResponseField(scopedTranslation, {
@@ -173,31 +180,35 @@ const { POST } = createEndpoint({
       default: {
         mode: "all",
         seed: true,
-        dbSetup: true,
+        dbSetup: false,
         taskRunner: true,
         nextServer: true,
+        profile: false,
       },
       webOnly: {
         mode: "web",
         seed: true,
-        dbSetup: true,
+        dbSetup: false,
         taskRunner: true,
         nextServer: true,
+        profile: false,
       },
       tasksOnly: {
         mode: "tasks",
         seed: true,
-        dbSetup: true,
+        dbSetup: false,
         taskRunner: true,
         nextServer: true,
+        profile: false,
       },
       withPort: {
         mode: "all",
         seed: true,
-        dbSetup: true,
+        dbSetup: false,
         taskRunner: true,
         nextServer: true,
         port: 3000,
+        profile: false,
       },
     },
     responses: {

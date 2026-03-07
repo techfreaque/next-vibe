@@ -26,13 +26,11 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { scopedTranslation } from "./i18n";
-
 /**
  * Memory tool aliases for AI tool calling
  */
-export const MEMORY_UPDATE_ALIAS = "memories-update" as const;
-export const MEMORY_DELETE_ALIAS = "memories-delete" as const;
+import { MEMORY_DELETE_ALIAS, MEMORY_UPDATE_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Delete Memory Endpoint (DELETE)
@@ -73,7 +71,7 @@ const { DELETE } = createEndpoint({
               success: true,
               data: {
                 memories: oldData.data.memories.filter(
-                  (mem) => mem.memoryNumber !== data.pathParams.id,
+                  (mem) => mem.id !== data.pathParams.id,
                 ),
               },
             };
@@ -193,8 +191,8 @@ const { DELETE } = createEndpoint({
           "Profession: Senior Software Engineer specializing in TypeScript",
         tags: ["profession", "skills"],
         priority: 80,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: "2024-01-15T10:00:00.000Z",
+        updatedAt: "2024-01-15T10:00:00.000Z",
       },
     },
     urlPathParams: {
@@ -241,7 +239,7 @@ const { PATCH } = createEndpoint({
               success: true,
               data: {
                 memories: oldData.data.memories.map((mem) => {
-                  if (mem.memoryNumber !== pathParams.id) {
+                  if (mem.id !== pathParams.id) {
                     return mem;
                   }
 

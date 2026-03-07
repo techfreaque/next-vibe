@@ -21,10 +21,10 @@ export const translations: typeof enTranslations = {
       description:
         "Folder główny wątku (używany do routingu po stronie klienta)",
     },
-    branchIndices: {
-      label: "Indeksy gałęzi",
+    leafMessageId: {
+      label: "ID wiadomości liścia",
       description:
-        "Mapa ID wiadomości nadrzędnej do indeksu gałęzi dla wyboru ścieżki konwersacji",
+        "ID najgłębszej wiadomości, dla której wyświetlana jest ścieżka. Pomiń dla najnowszej.",
     },
     before: {
       label: "Przed ID wiadomości",
@@ -51,9 +51,6 @@ export const translations: typeof enTranslations = {
           },
           parentId: {
             content: "ID wiadomości nadrzędnej",
-          },
-          depth: {
-            content: "Głębokość",
           },
           sequenceId: {
             content: "ID sekwencji",
@@ -102,29 +99,23 @@ export const translations: typeof enTranslations = {
           },
         },
       },
-      branchMeta: {
-        title: "Metadane gałęzi",
-        item: {
-          title: "Punkt rozgałęzienia",
-          parentId: {
-            content: "ID nadrzędny",
-          },
-          siblingCount: {
-            content: "Liczba rodzeństwa",
-          },
-          currentIndex: {
-            content: "Bieżący indeks",
-          },
-        },
-      },
       hasOlderHistory: {
         content: "Ma starszą historię",
+      },
+      hasNewerMessages: {
+        content: "Ma nowsze wiadomości",
+      },
+      resolvedLeafMessageId: {
+        content: "ID rozwiązanej wiadomości-liścia",
       },
       oldestLoadedMessageId: {
         content: "ID najstarszej załadowanej wiadomości",
       },
       compactionBoundaryId: {
         content: "ID granicy kompakcji",
+      },
+      newerChunkAnchorId: {
+        content: "ID kotwicy nowszego fragmentu",
       },
     },
     errors: {

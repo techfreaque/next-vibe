@@ -60,6 +60,11 @@ export const translations: typeof enTranslations = {
         title: "Pomiń seeding",
         description: "Pomiń seedowanie bazy danych z danymi początkowymi",
       },
+      profile: {
+        title: "Profilowanie",
+        description:
+          "Włącz profilowanie: ustawia NEXT_TURBOPACK_TRACING=1 (plik trace pod .next/dev/trace-turbopack) i NEXT_CPU_PROF=1 (zapisuje .cpuprofile przy wyjściu)",
+      },
       success: {
         title: "Sukces",
       },

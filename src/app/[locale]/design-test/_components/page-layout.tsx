@@ -4,16 +4,14 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Container } from "next-vibe-ui/ui/container";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  Box,
-  Database,
-  Layers,
-  Layout,
-  Menu,
-  Navigation,
-  Palette,
-  Sparkles,
-} from "next-vibe-ui/ui/icons";
+import { Box } from "next-vibe-ui/ui/icons/Box";
+import { Database } from "next-vibe-ui/ui/icons/Database";
+import { Layers } from "next-vibe-ui/ui/icons/Layers";
+import { Layout } from "next-vibe-ui/ui/icons/Layout";
+import { Menu } from "next-vibe-ui/ui/icons/Menu";
+import { Navigation } from "next-vibe-ui/ui/icons/Navigation";
+import { Palette } from "next-vibe-ui/ui/icons/Palette";
+import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
 import { ScrollArea } from "next-vibe-ui/ui/scroll-area";
 import { Separator } from "next-vibe-ui/ui/separator";
 import { SidebarLayout } from "next-vibe-ui/ui/sidebar";

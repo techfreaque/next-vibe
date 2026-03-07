@@ -3,7 +3,9 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Check, Edit2, X } from "next-vibe-ui/ui/icons";
+import { Check } from "next-vibe-ui/ui/icons/Check";
+import { Edit2 } from "next-vibe-ui/ui/icons/Edit2";
+import { X } from "next-vibe-ui/ui/icons/X";
 import type { InputKeyboardEvent } from "next-vibe-ui/ui/input";
 import { Input } from "next-vibe-ui/ui/input";
 import { Span } from "next-vibe-ui/ui/span";

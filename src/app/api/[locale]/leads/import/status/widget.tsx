@@ -8,15 +8,13 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  Activity,
-  CheckCircle,
-  Clock,
-  Loader2,
-  Plus,
-  RefreshCw,
-  XCircle,
-} from "next-vibe-ui/ui/icons";
+import { Activity } from "next-vibe-ui/ui/icons/Activity";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { Clock } from "next-vibe-ui/ui/icons/Clock";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
+import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
+import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Span } from "next-vibe-ui/ui/span";
 import { Strong } from "next-vibe-ui/ui/strong";
 import React from "react";

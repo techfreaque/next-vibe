@@ -6,7 +6,6 @@
 import { success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { getLastMessageInBranch } from "@/app/[locale]/chat/lib/utils/thread-builder";
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage, ChatThread } from "@/app/api/[locale]/agent/chat/db";
 import { ThreadStatus } from "@/app/api/[locale]/agent/chat/enum";
@@ -46,7 +45,6 @@ export interface SendMessageDeps {
     threads: Record<string, { rootFolderId: DefaultFolderId }>;
     setLoading: (loading: boolean) => void;
     getThreadMessages: (threadId: string) => ChatMessage[];
-    getBranchIndices: (threadId: string) => Record<string, number>;
   };
   settings: {
     selectedModel: ModelId;
@@ -123,20 +121,24 @@ export async function sendMessage(
       if (hasToolConfirmations && params.parentId) {
         parentMessageId = params.parentId;
       } else if (threadMessages.length > 0) {
-        const branchIndices = chatStore.getBranchIndices(threadIdToUse);
-        const lastMessage = getLastMessageInBranch(
-          threadMessages,
-          branchIndices,
-        );
-
-        if (lastMessage) {
-          parentMessageId = lastMessage.id;
+        // leafMessageId is synced from URL ?message= by useBranchManagement.
+        // It IS the parent for new messages — no branch map traversal needed.
+        const leafMessageId =
+          useChatStore.getState().leafMessageIds[threadIdToUse] ?? null;
+        const leafMsg = leafMessageId
+          ? chatStore.messages[leafMessageId]
+          : null;
+        if (leafMsg) {
+          parentMessageId = leafMessageId;
         } else {
-          const fallbackMessage = threadMessages[threadMessages.length - 1];
-          parentMessageId = fallbackMessage.id;
+          // Fall back to last message in thread
+          const fallback = threadMessages[threadMessages.length - 1];
+          parentMessageId = fallback?.id ?? null;
         }
       }
 
+      // Server threads: never send messageHistory — server fetches from DB.
+      // Incognito: send full message history.
       messageHistory =
         currentRootFolderId === DefaultFolderId.INCOGNITO
           ? threadMessages
@@ -206,7 +208,7 @@ export async function sendMessage(
             return oldData;
           }
           type ThreadItem = (typeof oldData.data.threads)[number];
-          const newThread: ThreadItem = {
+          const newThreadItem: ThreadItem = {
             id: newThreadId,
             title: content.slice(0, 50) || "New Chat",
             rootFolderId: currentRootFolderId,
@@ -231,7 +233,7 @@ export async function sendMessage(
           };
           return success({
             ...oldData.data,
-            threads: [newThread, ...oldData.data.threads],
+            threads: [newThreadItem, ...oldData.data.threads],
             totalCount: oldData.data.totalCount + 1,
           });
         },
@@ -309,8 +311,8 @@ export async function sendMessage(
       return;
     }
 
-    // Navigate immediately BEFORE creating messages
-    if (onThreadCreated) {
+    // Navigate immediately BEFORE creating messages — only for new threads
+    if (onThreadCreated && createdThreadIdForNewThread) {
       onThreadCreated(finalThreadId, currentRootFolderId, currentSubFolderId);
     }
 

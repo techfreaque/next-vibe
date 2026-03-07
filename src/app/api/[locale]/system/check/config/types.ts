@@ -103,6 +103,8 @@ interface OxlintConfigOptions {
   $schema?: string;
   /** File patterns to ignore (globs) - resolves relative to config file */
   ignorePatterns?: string[];
+  /** Extra ignore patterns applied only in non-extensive mode (pre-formatted for oxlint) */
+  nonExtensiveIgnorePatterns?: string[];
   /** Built-in oxlint plugins (e.g., "react", "typescript", "jsx-a11y") */
   plugins?: string[];
   /** Custom JS plugins - string paths or objects with path+options for future oxlint native support */
@@ -214,6 +216,8 @@ interface TypecheckConfigEnabled {
   cachePath: string;
   /** Use tsgo instead of tsc for type checking (default: false uses tsc) */
   useTsgo?: boolean;
+  /** Extra ignore patterns applied only in non-extensive mode (glob patterns for tsconfig exclude) */
+  nonExtensiveIgnorePatterns?: string[];
 }
 
 export type TypecheckConfig = TypecheckConfigDisabled | TypecheckConfigEnabled;
@@ -423,6 +427,8 @@ interface EslintConfigOptions {
   flatConfig?: EslintFlatConfigItem[];
   /** Patterns to ignore */
   ignores?: string[];
+  /** Extra ignore patterns applied only in non-extensive mode (pre-formatted for eslint) */
+  nonExtensiveIgnorePatterns?: string[];
 }
 
 /** ESLint disabled */
@@ -595,6 +601,14 @@ export interface VibeCheckConfig {
   maxFilesInSummary?: number;
   /** Editor URI scheme for clickable file links (default: "vscode://file/") */
   editorUriScheme?: string;
+  /**
+   * When false (default), skips test files (*.test.ts, *.test.tsx) and
+   * generated files (system/generated/**). Set to true for release validation
+   * or when you explicitly want to audit generated/test code.
+   * The actual ignore patterns are defined per-checker via nonExtensiveIgnorePatterns
+   * on oxlint, eslint, and typecheck configs (formatted by formatIgnorePatterns).
+   */
+  extensive?: boolean;
 }
 
 // ============================================================

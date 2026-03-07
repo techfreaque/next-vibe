@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next-vibe-ui/lib/redirect";
 import { Div } from "next-vibe-ui/ui/div";
-import { ArrowLeft } from "next-vibe-ui/ui/icons";
+import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 
@@ -96,7 +96,7 @@ export default async function ResetPasswordPage({
   return (
     <>
       <Link
-        href={`/${locale}`}
+        href={`/${locale}/threads`}
         className="inline-flex items-center text-sm text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 mb-8"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />

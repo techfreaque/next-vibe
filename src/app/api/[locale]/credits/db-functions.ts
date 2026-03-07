@@ -10,7 +10,7 @@
 
 import "server-only";
 
-import { and, eq, gt, isNotNull, lt, or, sql } from "drizzle-orm";
+import { and, eq, gt, isNotNull, isNull, lt, or, sql } from "drizzle-orm";
 
 import { leadLeadLinks, userLeadLinks } from "@/app/api/[locale]/leads/db";
 import { defineDbFunction } from "@/app/api/[locale]/system/db/db-functions/define";
@@ -215,10 +215,12 @@ export const getPoolBalance = defineDbFunction({
               WHERE ull.user_id = ${p.p_user_id}
             )`,
           ),
+          // Include permanent packs (no expiry) and non-expired packs
           or(
-            isNotNull(creditPacks.expiresAt),
+            isNull(creditPacks.expiresAt),
             sql`${creditPacks.expiresAt} >= NOW()`,
           ),
+          gt(creditPacks.remaining, 0),
         ),
       ),
 
@@ -246,10 +248,12 @@ export const getPoolBalance = defineDbFunction({
             SELECT cw.id FROM ${creditWallets} cw
             JOIN connected c ON cw.lead_id = c.lead_id
           )`,
+          // Include permanent packs (no expiry) and non-expired packs
           or(
-            isNotNull(creditPacks.expiresAt),
+            isNull(creditPacks.expiresAt),
             sql`${creditPacks.expiresAt} >= NOW()`,
           ),
+          gt(creditPacks.remaining, 0),
         ),
       ),
 

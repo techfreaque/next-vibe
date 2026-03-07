@@ -7,10 +7,10 @@
 /* eslint-disable i18next/no-literal-string */
 
 import { CronTaskStatus } from "../enum";
-import { CRON_DELETE_ALIAS, CRON_UPDATE_ALIAS } from "./[id]/definition";
-import { CRON_DASHBOARD_ALIAS } from "./dashboard/definition";
-import { CRON_HISTORY_ALIAS } from "./history/definition";
-import { CRON_CREATE_ALIAS, CRON_LIST_ALIAS } from "./tasks/definition";
+import { CRON_DELETE_ALIAS, CRON_UPDATE_ALIAS } from "./[id]/constants";
+import { CRON_DASHBOARD_ALIAS } from "./dashboard/constants";
+import { CRON_HISTORY_ALIAS } from "./history/constants";
+import { CRON_CREATE_ALIAS, CRON_LIST_ALIAS } from "./tasks/constants";
 
 export interface RecentExecution {
   status: string;

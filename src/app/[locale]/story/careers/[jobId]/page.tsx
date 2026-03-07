@@ -3,7 +3,7 @@ import { notFound } from "next-vibe-ui/lib/not-found";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { ArrowLeft } from "next-vibe-ui/ui/icons";
+import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Li } from "next-vibe-ui/ui/li";
 import { Link } from "next-vibe-ui/ui/link";
 import { Section } from "next-vibe-ui/ui/section";

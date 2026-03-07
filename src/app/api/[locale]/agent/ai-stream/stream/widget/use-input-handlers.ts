@@ -71,6 +71,7 @@ export function useInputHandlers({
   draftKey,
 }: UseInputHandlersProps): UseInputHandlersReturn {
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
+  const setLeafMessageId = useChatNavigationStore((s) => s.setLeafMessageId);
 
   const submitMessage = useCallback(async () => {
     logger.debug("Chat", "submitMessage called", {
@@ -99,7 +100,10 @@ export function useInputHandlers({
             currentSubFolderId: subFolderId,
           });
 
-          // Build URL with proper subfolder path if present
+          // New thread — clear ?message= since it starts fresh (no branch to track)
+          setLeafMessageId(null);
+
+          // Build URL with proper subfolder path if present (no ?message= for new threads)
           const url = subFolderId
             ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
             : `/${locale}/threads/${rootFolderId}/${threadId}`;
@@ -124,6 +128,7 @@ export function useInputHandlers({
     locale,
     draftKey,
     setNavigation,
+    setLeafMessageId,
   ]);
 
   /**
@@ -156,6 +161,8 @@ export function useInputHandlers({
               currentRootFolderId: rootFolderId,
               currentSubFolderId: subFolderId,
             });
+            // New thread — clear ?message= since it starts fresh
+            setLeafMessageId(null);
             const url = subFolderId
               ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
               : `/${locale}/threads/${rootFolderId}/${threadId}`;
@@ -178,6 +185,7 @@ export function useInputHandlers({
       locale,
       draftKey,
       setNavigation,
+      setLeafMessageId,
     ],
   );
 
@@ -217,6 +225,8 @@ export function useInputHandlers({
             currentRootFolderId: rootFolderId,
             currentSubFolderId: subFolderId,
           });
+          // New thread — clear ?message= since it starts fresh
+          setLeafMessageId(null);
           // Build URL with proper subfolder path if present (same as text flow)
           const url = subFolderId
             ? `/${locale}/threads/${rootFolderId}/${subFolderId}/${threadId}`
@@ -234,6 +244,7 @@ export function useInputHandlers({
       locale,
       draftKey,
       setNavigation,
+      setLeafMessageId,
     ],
   );
 

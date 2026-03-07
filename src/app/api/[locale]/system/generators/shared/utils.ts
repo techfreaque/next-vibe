@@ -221,6 +221,197 @@ export function extractPathKey(
   return { path };
 }
 
+const PRINT_WIDTH = 80;
+const INDENT_STR = "  ";
+
+/**
+ * Serialize a string value like Prettier:
+ * - Prefer double quotes
+ * - But use single quotes if the string contains double quotes and no single quotes
+ *   (avoids backslash escaping, matching Prettier's `singleQuote: false` + avoidEscape behavior)
+ */
+function serializeString(s: string): string {
+  const doubleCount = (s.match(/"/g) ?? []).length;
+  const singleCount = (s.match(/'/g) ?? []).length;
+  // Prettier's avoidEscape: use single quotes when there are more double quotes
+  // than single quotes (minimizes the number of escapes needed).
+  if (doubleCount > singleCount) {
+    // Use single quotes to avoid escaping double quotes.
+    // Still escape backslashes, newlines, etc., and single quotes inside.
+    const escaped = s
+      .replaceAll("\\", "\\\\")
+      .replaceAll("'", "\\'")
+      .replaceAll("\n", "\\n")
+      .replaceAll("\r", "\\r")
+      .replaceAll("\t", "\\t");
+    return `'${escaped}'`;
+  }
+  return JSON.stringify(s);
+}
+
+/**
+ * Render a value inline (single line, no trailing comma).
+ * Returns null if the value contains nested multiline content.
+ */
+// eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- generic serializer accepts any value
+function renderInline(value: unknown): string | null {
+  if (value === null) {
+    return "null";
+  }
+  if (value === undefined) {
+    return "undefined";
+  }
+  if (typeof value === "boolean") {
+    return String(value);
+  }
+  if (typeof value === "number") {
+    return String(value);
+  }
+  if (typeof value === "string") {
+    return serializeString(value);
+  }
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      return "[]";
+    }
+    const parts = value.map(renderInline);
+    if (parts.some((p) => p === null)) {
+      return null;
+    }
+    return `[${parts.join(", ")}]`;
+  }
+  if (typeof value === "object") {
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- generic serializer
+    const entries = Object.entries(value as Record<string, unknown>);
+    if (entries.length === 0) {
+      return "{}";
+    }
+    const parts = entries.map(([k, v]) => {
+      const key = /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(k) ? k : JSON.stringify(k);
+      const val = renderInline(v);
+      if (val === null) {
+        return null;
+      }
+      return `${key}: ${val}`;
+    });
+    if (parts.some((p) => p === null)) {
+      return null;
+    }
+    return `{ ${parts.join(", ")} }`;
+  }
+  return null;
+}
+
+/**
+ * Serialize a value as TypeScript object literal syntax.
+ *
+ * Matches Prettier's default output style:
+ * - Unquoted keys for valid JS identifiers
+ * - Trailing commas after every value in objects and arrays
+ * - Values that fit on one line (≤80 chars including `prefixCols` column offset) stay inline
+ * - Long strings wrap with `key:\n  "value"` style
+ * - Indentation: 2 spaces per level
+ *
+ * @param value       The value to serialize
+ * @param indentLevel Current nesting level (controls indentation)
+ * @param prefixCols  Columns already used on the current line before this value (e.g. `  key: `.length)
+ */
+export function jsonToTs(
+  // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- generic serializer accepts any value
+  value: unknown,
+  indentLevel = 0,
+  prefixCols = 0,
+): string {
+  const indent = INDENT_STR.repeat(indentLevel);
+  const childIndent = INDENT_STR.repeat(indentLevel + 1);
+
+  if (value === null) {
+    return "null";
+  }
+  if (value === undefined) {
+    return "undefined";
+  }
+  if (typeof value === "boolean") {
+    return String(value);
+  }
+  if (typeof value === "number") {
+    return String(value);
+  }
+  if (typeof value === "string") {
+    return serializeString(value);
+  }
+
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      return "[]";
+    }
+
+    // Try inline for all arrays — renderInline returns null for values that
+    // can't be represented inline (e.g. nested objects that are too deep).
+    // +1 for the trailing comma that the parent object will append
+    const inlineParts = value.map(renderInline);
+    if (inlineParts.every((p) => p !== null)) {
+      const inline = `[${inlineParts.join(", ")}]`;
+      if (prefixCols + inline.length + 1 <= PRINT_WIDTH) {
+        return inline;
+      }
+    }
+
+    // Multiline
+    const lines = value.map((v) => {
+      const rendered = jsonToTs(v, indentLevel + 1, childIndent.length);
+      return `${childIndent}${rendered},`;
+    });
+    return `[\n${lines.join("\n")}\n${indent}]`;
+  }
+
+  if (typeof value === "object") {
+    // Skip undefined values (same as JSON.stringify behavior)
+    // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- generic serializer
+    const entries = Object.entries(value as Record<string, unknown>).filter(
+      ([, v]) => v !== undefined,
+    );
+    if (entries.length === 0) {
+      return "{}";
+    }
+
+    // Try inline first (Prettier collapses objects onto one line if they fit)
+    const inlineAttempt = renderInline(value);
+    if (inlineAttempt !== null) {
+      // +1 for trailing comma
+      if (prefixCols + inlineAttempt.length + 1 <= PRINT_WIDTH) {
+        return inlineAttempt;
+      }
+    }
+
+    const lines = entries.map(([k, v]) => {
+      const key = /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(k) ? k : JSON.stringify(k);
+      // prefix = childIndent + key + ": "
+      const linePrefix = childIndent.length + key.length + 2;
+      const rendered = jsonToTs(v, indentLevel + 1, linePrefix);
+      // +1 for trailing comma
+      const lineLen = linePrefix + rendered.length + 1;
+      // Wrap string values when the line exceeds printWidth AND key.length >= 5.
+      // The key.length >= 5 condition mirrors oxfmt's savings threshold: wrapping
+      // saves (key.length + 1) chars from the line maximum; the formatter only
+      // breaks when savings >= 6, i.e. key.length >= 5.
+      if (
+        typeof v === "string" &&
+        lineLen > PRINT_WIDTH &&
+        key.length >= 5 &&
+        !rendered.includes("\n")
+      ) {
+        return `${childIndent}${key}:\n${childIndent}  ${rendered},`;
+      }
+      return `${childIndent}${key}: ${rendered},`;
+    });
+
+    return `{\n${lines.join("\n")}\n${indent}}`;
+  }
+
+  return String(value);
+}
+
 /**
  * Generate absolute import path for definition or route file
  * nestedPath extracts segments after [locale], which we then append to the base path

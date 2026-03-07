@@ -36,6 +36,7 @@ function createDivRefObject(view: View | null): DivRefObject {
     blur: (): void => {
       // No-op for React Native
     },
+    getBoundingClientRect: (): DOMRect => new DOMRect(0, 0, 0, 0),
     scrollIntoView: (): void => {
       // No-op for React Native
     },
@@ -51,7 +52,7 @@ function createDivRefObject(view: View | null): DivRefObject {
     removeEventListener: (): void => {
       // No-op for React Native
     },
-  } as DivRefObject;
+  };
 }
 
 function createDivGenericTarget(): DivGenericTarget {

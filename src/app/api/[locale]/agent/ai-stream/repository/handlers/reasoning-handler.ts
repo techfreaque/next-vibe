@@ -13,7 +13,6 @@ export class ReasoningHandler {
     currentAssistantContent: string;
     threadId: string;
     currentParentId: string | null;
-    currentDepth: number;
     model: ModelId;
     character: string;
     sequenceId: string;
@@ -25,13 +24,11 @@ export class ReasoningHandler {
     currentAssistantMessageId: string;
     currentAssistantContent: string;
     wasCreated: boolean;
-    newDepth: number;
   }> {
     const {
       currentAssistantContent,
       threadId,
       currentParentId,
-      currentDepth,
       model,
       character,
       sequenceId,
@@ -49,7 +46,6 @@ export class ReasoningHandler {
       logger.debug("[AI Stream] Creating ASSISTANT message (reasoning)", {
         messageId,
         parentId: currentParentId,
-        depth: currentDepth,
       });
 
       // Emits MESSAGE_CREATED + CONTENT_DELTA SSE, then inserts to DB
@@ -58,7 +54,6 @@ export class ReasoningHandler {
         threadId,
         content: thinkTag,
         parentId: currentParentId,
-        depth: currentDepth,
         userId,
         model,
         character,
@@ -69,7 +64,6 @@ export class ReasoningHandler {
         currentAssistantMessageId: messageId,
         currentAssistantContent: thinkTag,
         wasCreated: true,
-        newDepth: currentDepth,
       };
     }
 
@@ -84,7 +78,6 @@ export class ReasoningHandler {
       currentAssistantMessageId,
       currentAssistantContent: newContent,
       wasCreated: false,
-      newDepth: currentDepth,
     };
   }
 

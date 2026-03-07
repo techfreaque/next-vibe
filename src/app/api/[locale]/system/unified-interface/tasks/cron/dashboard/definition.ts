@@ -21,9 +21,8 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { CronTaskPriorityDB, CronTaskStatusDB } from "../../enum";
 import { cronTaskResponseSchema } from "../tasks/definition";
+import { CRON_DASHBOARD_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-
-export const CRON_DASHBOARD_ALIAS = "cron-dashboard" as const;
 
 /* eslint-disable i18next/no-literal-string */
 

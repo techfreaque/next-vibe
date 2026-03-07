@@ -3,7 +3,8 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { ArrowLeft, Edit } from "next-vibe-ui/ui/icons";
+import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { Edit } from "next-vibe-ui/ui/icons/Edit";
 import React from "react";
 
 import {

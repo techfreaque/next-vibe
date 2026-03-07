@@ -72,9 +72,8 @@ export function EmailPreviewClient({
 
   const previewEndpoint = useEmailPreviewRender(user, logger);
 
-  const [currentProps, setCurrentProps] = useState<
-    Record<string, string | number | boolean>
-  >(exampleProps);
+  const [currentProps, setCurrentProps] =
+    useState<Record<string, string | number | boolean>>(exampleProps);
 
   // Update current props when example props change
   useEffect(() => {

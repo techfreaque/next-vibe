@@ -10,7 +10,12 @@ import { cn } from "next-vibe/shared/utils";
 import { AudioWaveform } from "next-vibe-ui/ui/audio-waveform";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Loader2, Pause, Play, Send, Type, X } from "next-vibe-ui/ui/icons";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Pause } from "next-vibe-ui/ui/icons/Pause";
+import { Play } from "next-vibe-ui/ui/icons/Play";
+import { Send } from "next-vibe-ui/ui/icons/Send";
+import { Type } from "next-vibe-ui/ui/icons/Type";
+import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 

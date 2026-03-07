@@ -38,6 +38,8 @@ export const translations: typeof enTranslations = {
         expiry: "Kredyty nigdy nie wygasają",
         bestFor: "Najlepsze do okazjonalnego użycia",
       },
+      totalSummary:
+        "{{totalCredits}} kredytów łącznie · {{totalPrice}} łącznie",
       requiresSubscription:
         "Aktywna subskrypcja jest wymagana do zakupu pakietów kredytów",
     },

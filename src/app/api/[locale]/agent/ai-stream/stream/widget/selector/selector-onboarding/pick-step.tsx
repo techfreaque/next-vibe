@@ -2,7 +2,7 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Check } from "next-vibe-ui/ui/icons";
+import { Check } from "next-vibe-ui/ui/icons/Check";
 import { Span } from "next-vibe-ui/ui/span";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import { type JSX, useCallback, useState } from "react";
@@ -11,15 +11,18 @@ import {
   type Character,
   COMPANION_CHARACTERS,
 } from "@/app/api/[locale]/agent/chat/characters/config";
+import { ModelSelectionType } from "@/app/api/[locale]/agent/chat/characters/enum";
 import { scopedTranslation as charactersScopedTranslation } from "@/app/api/[locale]/agent/chat/characters/i18n";
 import { useFavoriteCreate } from "@/app/api/[locale]/agent/chat/favorites/create/hooks";
 import { useChatSettings } from "@/app/api/[locale]/agent/chat/settings/hooks";
+import { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { cn } from "@/app/api/[locale]/shared/utils";
 import {
   useWidgetLogger,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
 
@@ -61,32 +64,56 @@ export function PickStep({
     // Change step FIRST, synchronously, before any async operations
     onContinue();
 
-    // Create favorite and activate it (companion selection)
+    // Create 3 starter favorites: Claude Sonnet, Kimi K2, Uncensored LM
     try {
-      const { CharactersRepositoryClient } =
-        await import("@/app/api/[locale]/agent/chat/characters/repository-client");
+      const isAdmin =
+        !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
 
-      const createdId = await addFavorite({
+      // 1. Claude Sonnet — use Claude Code provider for admins, OpenRouter otherwise
+      const sonnetModelId = isAdmin
+        ? ModelId.CLAUDE_CODE_SONNET
+        : ModelId.CLAUDE_SONNET_4_6;
+
+      await addFavorite({
         characterId: selectedId,
         icon: character.icon,
         voice: character.voice,
-        modelSelection: null,
+        modelSelection: {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: sonnetModelId,
+        },
       });
 
-      if (createdId && character.modelSelection) {
-        const bestModel = CharactersRepositoryClient.getBestModelForCharacter(
-          character.modelSelection,
-          user,
-        );
+      // 2. Kimi K2 — default/active
+      const kimiId = await addFavorite({
+        characterId: selectedId,
+        icon: character.icon,
+        voice: character.voice,
+        modelSelection: {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: ModelId.KIMI_K2,
+        },
+      });
 
-        if (bestModel) {
-          setActiveFavorite(
-            createdId,
-            selectedId,
-            bestModel.id,
-            settings.ttsVoice,
-          );
-        }
+      // 3. Uncensored LM
+      await addFavorite({
+        characterId: selectedId,
+        icon: character.icon,
+        voice: character.voice,
+        modelSelection: {
+          selectionType: ModelSelectionType.MANUAL,
+          manualModelId: ModelId.UNCENSORED_LM_V1_2,
+        },
+      });
+
+      // Activate the Kimi K2 favorite as default
+      if (kimiId) {
+        setActiveFavorite(
+          kimiId,
+          selectedId,
+          ModelId.KIMI_K2,
+          settings.ttsVoice,
+        );
       }
     } finally {
       setIsSaving(false);

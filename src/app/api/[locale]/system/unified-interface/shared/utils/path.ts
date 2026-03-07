@@ -3,6 +3,8 @@
  * Common path manipulation functions
  */
 
+import { pathToAliasMap } from "@/app/api/[locale]/system/generated/alias-map";
+
 import type { CreateApiEndpointAny } from "../types/endpoint-base";
 
 /**
@@ -51,30 +53,55 @@ function sanitizePathSegment(segment: string): string {
 }
 
 /**
- * Convert endpoint definition to full toolName path
- * Format: "v1_core_agent_brave-search_GET"
- * Note: Hyphens are allowed within segment names (e.g., "brave-search")
- * Dynamic route segments have brackets removed (e.g., "[id]" becomes "id")
+ * Build a canonical tool name from raw path segments and method.
+ * This is the single place that defines how canonical names are formed.
  */
-export function endpointToToolName(endpoint: CreateApiEndpointAny): string {
-  // Sanitize each path segment to remove invalid characters
-  const sanitizedPath = endpoint.path.map(sanitizePathSegment);
-  return `${joinPath(sanitizedPath)}${PATH_SEPARATOR}${endpoint.method}`;
+export function pathSegmentsToToolName(
+  path: readonly string[],
+  method: string,
+): string {
+  const sanitizedPath = path.map(sanitizePathSegment);
+  return `${joinPath(sanitizedPath)}${PATH_SEPARATOR}${method}`;
 }
 
 /**
- * Get the preferred tool name for an endpoint
- * Uses the first alias if available, otherwise falls back to the generated full path
- * This is what should be displayed to AI models and users
- *
- * @param endpoint - The endpoint definition
- * @returns The preferred tool name (alias if available, otherwise full path)
+ * Convert endpoint definition to full toolName path
+ * Format: "v1_core_agent_brave-search_GET"
+ */
+export function endpointToToolName(endpoint: CreateApiEndpointAny): string {
+  return pathSegmentsToToolName(endpoint.path, endpoint.method);
+}
+
+/**
+ * Get the preferred tool name for an endpoint object.
+ * First alias if any, otherwise the canonical full path.
  */
 export function getPreferredToolName(endpoint: CreateApiEndpointAny): string {
-  // Use first alias if available
   if (endpoint.aliases && endpoint.aliases.length > 0) {
     return endpoint.aliases[0];
   }
-  // Fall back to generated full path name
   return endpointToToolName(endpoint);
+}
+
+/**
+ * Resolve an alias or canonical path to the canonical full path.
+ * Returns null if not found in the map.
+ */
+export function getFullPath(
+  aliasOrPath: string,
+): (typeof pathToAliasMap)[keyof typeof pathToAliasMap] | null {
+  return pathToAliasMap[aliasOrPath as keyof typeof pathToAliasMap] ?? null;
+}
+
+/**
+ * Resolve any tool name (alias or canonical) to the preferred name.
+ * Preferred name = the canonical value stored in the alias map for this key.
+ * The alias map stores each key → canonical, where canonical IS the preferred
+ * name (it is the value that appears in capability snapshots and route matching).
+ * Use this when you only have a string, not a full endpoint object.
+ */
+export function getPreferredName(nameOrAlias: string): string {
+  return (
+    pathToAliasMap[nameOrAlias as keyof typeof pathToAliasMap] ?? nameOrAlias
+  );
 }

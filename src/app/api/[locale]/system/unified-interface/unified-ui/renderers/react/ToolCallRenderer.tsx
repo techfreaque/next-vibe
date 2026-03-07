@@ -25,13 +25,11 @@ import {
   CollapsibleTrigger,
 } from "next-vibe-ui/ui/collapsible";
 import { Div, type DivMouseEvent } from "next-vibe-ui/ui/div";
-import {
-  Check,
-  ChevronDown,
-  ChevronRight,
-  Copy,
-  Loader2,
-} from "next-vibe-ui/ui/icons";
+import { Check } from "next-vibe-ui/ui/icons/Check";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { Copy } from "next-vibe-ui/ui/icons/Copy";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import { useEffect, useState } from "react";
@@ -44,10 +42,7 @@ import type {
   ToolCallResult,
 } from "@/app/api/[locale]/agent/chat/db";
 import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
-import {
-  createEndpointLogger,
-  type EndpointLogger,
-} from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import {
@@ -263,7 +258,6 @@ export function ToolCallRenderer({
     const tryLoad = async (
       identifier: string,
     ): ReturnType<typeof definitionLoader.load> => {
-      const logger = createEndpointLogger(true, Date.now(), locale);
       let result = await definitionLoader.load({
         identifier,
         platform: loadPlatform,
@@ -325,6 +319,7 @@ export function ToolCallRenderer({
     user,
     definition,
     loadPlatform,
+    logger,
   ]);
 
   const hasResult = Boolean(toolCall.result);

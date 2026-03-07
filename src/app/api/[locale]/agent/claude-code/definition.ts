@@ -22,9 +22,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { CLAUDE_CODE_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-
-export const CLAUDE_CODE_ALIAS = "claude-code" as const;
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -192,12 +191,12 @@ const { POST } = createEndpoint({
       default: {
         prompt:
           "Add a new feature to the claude-code endpoint that tracks how many times it has been called.",
-        interactiveMode: false,
+        interactiveMode: true,
       },
       batch: {
         prompt:
           "Read src/app/api/[locale]/system/agent/claude-code/repository.ts and summarize what it does in 2 sentences.",
-        interactiveMode: true,
+        interactiveMode: false,
         timeoutSeconds: 60,
       },
     },

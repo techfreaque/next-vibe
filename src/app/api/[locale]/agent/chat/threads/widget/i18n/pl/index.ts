@@ -69,6 +69,7 @@ export const translations: typeof enTranslations = {
       referral: "Program Poleceń",
       help: "Pomoc",
       about: "O nas",
+      admin: "Panel Admina",
     },
     confirmations: {
       deleteMessage: "Czy na pewno chcesz usunąć tę wiadomość?",
@@ -106,7 +107,7 @@ export const translations: typeof enTranslations = {
           "Organizuj swoje czaty w różnych folderach, każdy z unikalnymi ustawieniami prywatności:",
         private: {
           name: "Prywatny",
-          suffix: "— zaszyfrowany, tylko Ty możesz zobaczyć",
+          suffix: "— tylko Ty możesz zobaczyć",
         },
         incognito: {
           name: "Incognito",
@@ -125,13 +126,13 @@ export const translations: typeof enTranslations = {
         name: "Prywatny",
         suffix: "Folder",
         description:
-          "Twoje prywatne czaty są zaszyfrowane i widoczne tylko dla Ciebie. Idealne do wrażliwych tematów.",
+          "Twoje prywatne czaty są widoczne tylko dla Ciebie. Idealne do wrażliwych tematów.",
       },
       incognitoFolder: {
         name: "Incognito",
         suffix: "Folder",
         description:
-          "Rozmawiaj bez zapisywania historii. Po zamknięciu sesji wszystkie wiadomości znikają.",
+          "Rozmawiaj bez zapisywania historii na serwerze. Wiadomości są przechowywane lokalnie w przeglądarce i pozostają do momentu ich usunięcia.",
         note: "Żadne dane nie są przechowywane na naszych serwerach podczas sesji incognito.",
       },
       sharedFolder: {
@@ -151,20 +152,17 @@ export const translations: typeof enTranslations = {
         title: "Rozpocznij nowy czat",
         description:
           "Kliknij tutaj, aby rozpocząć nową rozmowę w dowolnym folderze.",
-        tip: "Możesz też użyć skrótu klawiszowego Ctrl+K, aby szybko rozpocząć nowy czat.",
       },
       sidebarLogin: {
         title: "Zaloguj się, aby odblokować więcej",
         description:
-          "Utwórz darmowe konto, aby uzyskać dostęp do folderów prywatnych i udostępnionych, synchronizować między urządzeniami i zapisywać historię rozmów.",
-        tip: "Rejestracja jest bezpłatna! Otrzymujesz 100 darmowych kredytów na start.",
+          "Utwórz darmowe konto, aby uzyskać dostęp do folderów prywatnych i udostępnionych, synchronizować historię rozmów między urządzeniami i pozwolić AI zapamiętywać informacje o Tobie.",
+        tip: "Rejestracja jest bezpłatna!",
       },
       subscriptionButton: {
         title: "Kredyty i subskrypcja",
         description:
-          "Otrzymuj {{credits}} kredytów/miesiąc z subskrypcją Pro za jedyne {{price}}.",
-        price: "9,99 zł",
-        tip: "Kredyty są używane do interakcji z modelami AI. Bezpłatni użytkownicy otrzymują ograniczone miesięczne kredyty.",
+          "Otrzymuj {{credits}} kredytów/miesiąc z subskrypcją za jedyne {{price}}/miesiąc. Bezpłatni użytkownicy otrzymują {{freeCredits}} kredytów/miesiąc.",
       },
       chatInput: {
         title: "Wpisz swoją wiadomość",
@@ -196,7 +194,7 @@ export const translations: typeof enTranslations = {
       authUnlocked: {
         unlocked: "Odblokowany!",
         privateDescription:
-          "Twój prywatny folder jest teraz dostępny. Wszystkie czaty są zaszyfrowane i widoczne tylko dla Ciebie.",
+          "Twój prywatny folder jest teraz dostępny. Wszystkie czaty są widoczne tylko dla Ciebie.",
         privateNote:
           "Prywatne czaty automatycznie synchronizują się na wszystkich Twoich urządzeniach.",
         sharedDescription:

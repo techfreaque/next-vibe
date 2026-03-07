@@ -21,14 +21,11 @@ import {
   DialogTitle,
 } from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  Bitcoin,
-  Calendar,
-  CreditCard,
-  Info,
-  TrendingUp,
-  Zap,
-} from "next-vibe-ui/ui/icons";
+import { Bitcoin } from "next-vibe-ui/ui/icons/Bitcoin";
+import { Calendar } from "next-vibe-ui/ui/icons/Calendar";
+import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
+import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
+import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
@@ -136,8 +133,8 @@ export function SubscriptionCreateContainer({
       ? yearlySubscriptionPrice / 12
       : subscriptionPrice;
 
-  // Check if crypto payments are disabled for monthly
-  const isCryptoDisabled = billingInterval === BillingInterval.MONTHLY;
+  // Crypto (NOWPayments) requires yearly billing — minimum transaction value.
+  const isCryptoDisabled = billingInterval !== BillingInterval.YEARLY;
 
   const handleSubscribe = (): void => {
     setIsProviderModalOpen(true);
@@ -178,6 +175,7 @@ export function SubscriptionCreateContainer({
           </DialogHeader>
           <Div className="grid gap-4 py-4">
             <Button
+              type="button"
               variant="outline"
               className="h-auto p-4 justify-start"
               onClick={() => handleProviderSelect(PaymentProvider.STRIPE)}
@@ -191,6 +189,7 @@ export function SubscriptionCreateContainer({
               </Div>
             </Button>
             <Button
+              type="button"
               variant="outline"
               className="h-auto p-4 justify-start"
               onClick={() => handleProviderSelect(PaymentProvider.NOWPAYMENTS)}
@@ -206,14 +205,6 @@ export function SubscriptionCreateContainer({
                 </Div>
               </Div>
             </Button>
-            {isCryptoDisabled && (
-              <Div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
-                <Div className="text-sm text-amber-700 dark:text-amber-300 flex items-start gap-2">
-                  <Info className="h-4 w-4 mt-0.5 shrink-0" />
-                  <Span>{t("buy.provider.cryptoMonthlyDisabled")}</Span>
-                </Div>
-              </Div>
-            )}
           </Div>
         </DialogContent>
       </Dialog>
@@ -239,6 +230,7 @@ export function SubscriptionCreateContainer({
           {/* Billing Interval Toggle */}
           <Div className="flex items-center justify-center gap-2 p-1 bg-muted rounded-lg">
             <Button
+              type="button"
               variant={
                 billingInterval === BillingInterval.MONTHLY
                   ? "default"
@@ -251,6 +243,7 @@ export function SubscriptionCreateContainer({
               {t("billing.monthly")}
             </Button>
             <Button
+              type="button"
               variant={
                 billingInterval === BillingInterval.YEARLY ? "default" : "ghost"
               }
@@ -338,7 +331,12 @@ export function SubscriptionCreateContainer({
           ) : (
             <>
               <FormAlertWidget field={{}} />
-              <Button className="w-full" size="lg" onClick={handleSubscribe}>
+              <Button
+                type="button"
+                className="w-full"
+                size="lg"
+                onClick={handleSubscribe}
+              >
                 {t("buy.subscription.button")}
               </Button>
             </>

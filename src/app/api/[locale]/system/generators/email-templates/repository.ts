@@ -440,7 +440,10 @@ export async function getTranslatedTemplateMetadata(
   id: string,
   locale: CountryLanguage,
 ): Promise<
-  | (Omit<TemplateCachedMetadata<string>, "name" | "description" | "category"> & {
+  | (Omit<
+      TemplateCachedMetadata<string>,
+      "name" | "description" | "category"
+    > & {
       name: string;
       description: string;
       category: string;
@@ -523,9 +526,7 @@ export async function getAllTranslatedTemplateMetadata(
   const results = await Promise.all(
     ids.map((id) => getTranslatedTemplateMetadata(id, locale)),
   );
-  return results.filter(
-    (r): r is NonNullable<typeof r> => r !== undefined,
-  );
+  return results.filter((r): r is NonNullable<typeof r> => r !== undefined);
 }
 `;
   }

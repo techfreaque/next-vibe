@@ -6,7 +6,7 @@
  */
 
 import { Div } from "next-vibe-ui/ui/div";
-import { Phone } from "next-vibe-ui/ui/icons";
+import { Phone } from "next-vibe-ui/ui/icons/Phone";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 

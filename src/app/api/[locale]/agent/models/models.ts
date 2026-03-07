@@ -28,6 +28,10 @@ export interface ModelFeatures {
  * Each model has different pricing, capabilities, and context windows.
  */
 export enum ModelId {
+  GPT_5_4 = "gpt-54",
+  GPT_5_4_PRO = "gpt-54-pro",
+  GPT_5_3_CODEX = "gpt-53-codex",
+  GPT_5_3_CHAT = "gpt-53-chat",
   GPT_5_2 = "gpt-52",
   GPT_5_2_CHAT = "gpt-52-chat",
   GPT_5_2_PRO = "gpt-52-pro",
@@ -38,6 +42,8 @@ export enum ModelId {
   GPT_5 = "gpt-5",
   GPT_5_MINI = "gpt-5-mini",
   GPT_5_NANO = "gpt-5-nano",
+  GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS = "gemini-3.1-pro-preview-customtools",
+  GEMINI_3_1_FLASH_LITE_PREVIEW = "gemini-3.1-flash-lite-preview",
   GEMINI_3_PRO = "gemini-3-pro",
   GEMINI_3_FLASH = "gemini-3-flash",
   GEMINI_2_5_PRO = "gemini-2.5-pro",
@@ -783,6 +789,43 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     },
     weaknesses: [ModelUtility.ROLEPLAY],
   },
+  [ModelId.GPT_5_4_PRO]: {
+    name: "GPT-5.4 Pro",
+    by: "openAI",
+    description: "chat.models.descriptions.gpt54Pro",
+    parameterCount: undefined,
+    contextWindow: 1050000,
+    icon: "si-openai",
+    providers: [
+      {
+        id: ModelId.GPT_5_4_PRO,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5.4-pro",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 30,
+        outputTokenCost: 180,
+      },
+    ],
+
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.CREATIVE,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    speed: SpeedLevel.THOROUGH,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
+    weaknesses: [ModelUtility.ROLEPLAY],
+  },
   [ModelId.GPT_5_2_PRO]: {
     name: "GPT-5.2 Pro",
     by: "openAI",
@@ -802,6 +845,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     ],
 
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.SMART,
       ModelUtility.CODING,
       ModelUtility.CREATIVE,
@@ -851,6 +895,41 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     },
     weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CREATIVE],
   },
+  [ModelId.GPT_5_3_CODEX]: {
+    name: "GPT-5.3-Codex",
+    by: "openAI",
+    description: "chat.models.descriptions.gpt53Codex",
+    parameterCount: undefined,
+    contextWindow: 400000,
+    icon: "si-openai",
+    providers: [
+      {
+        id: ModelId.GPT_5_3_CODEX,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5.3-codex",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.75,
+        outputTokenCost: 14,
+      },
+    ],
+
+    utilities: [
+      ModelUtility.CODING,
+      ModelUtility.ANALYSIS,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
+    weaknesses: [ModelUtility.ROLEPLAY, ModelUtility.CREATIVE],
+  },
   [ModelId.GPT_5_1_CODEX]: {
     name: "GPT 5.1 Codex",
     by: "openAI",
@@ -869,7 +948,12 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       },
     ],
 
-    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.CREATIVE],
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.CREATIVE,
+    ],
     supportsTools: true,
     intelligence: IntelligenceLevel.BRILLIANT,
     speed: SpeedLevel.BALANCED,
@@ -913,6 +997,42 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     },
     weaknesses: [ModelUtility.ROLEPLAY],
   },
+  [ModelId.GPT_5_4]: {
+    name: "GPT-5.4",
+    by: "openAI",
+    description: "chat.models.descriptions.gpt54",
+    parameterCount: undefined,
+    contextWindow: 1050000,
+    icon: "si-openai",
+    providers: [
+      {
+        id: ModelId.GPT_5_4,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5.4",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 2.5,
+        outputTokenCost: 15,
+      },
+    ],
+
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.CREATIVE,
+      ModelUtility.ANALYSIS,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
+    weaknesses: [ModelUtility.ROLEPLAY],
+  },
   [ModelId.GPT_5_2]: {
     name: "GPT 5.2",
     by: "openAI",
@@ -931,10 +1051,46 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       },
     ],
 
-    utilities: [ModelUtility.SMART, ModelUtility.CODING, ModelUtility.CREATIVE],
+    utilities: [
+      ModelUtility.LEGACY,
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.CREATIVE,
+    ],
     supportsTools: true,
     intelligence: IntelligenceLevel.SMART,
     speed: SpeedLevel.BALANCED,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
+    weaknesses: [ModelUtility.ROLEPLAY],
+  },
+  [ModelId.GPT_5_3_CHAT]: {
+    name: "GPT-5.3 Chat",
+    by: "openAI",
+    description: "chat.models.descriptions.gpt53Chat",
+    parameterCount: undefined,
+    contextWindow: 128000,
+    icon: "si-openai",
+    providers: [
+      {
+        id: ModelId.GPT_5_3_CHAT,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "openai/gpt-5.3-chat",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 1.75,
+        outputTokenCost: 14,
+      },
+    ],
+
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST, ModelUtility.SMART],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.SMART,
+    speed: SpeedLevel.FAST,
     content: ContentLevel.MAINSTREAM,
     features: {
       ...defaultFeatures,
@@ -963,6 +1119,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     ],
 
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.SMART,
       ModelUtility.CODING,
       ModelUtility.CREATIVE,
@@ -1412,7 +1569,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       },
     ],
 
-    utilities: [ModelUtility.CHAT, ModelUtility.FAST],
+    utilities: [ModelUtility.LEGACY, ModelUtility.CHAT, ModelUtility.FAST],
     supportsTools: true,
     intelligence: IntelligenceLevel.QUICK,
     speed: SpeedLevel.FAST,
@@ -1454,6 +1611,70 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
       toolCalling: true,
     },
   },
+  [ModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS]: {
+    name: "Gemini 3.1 Pro",
+    by: "google",
+    description: "chat.models.descriptions.gemini31ProPreviewCustomTools",
+    parameterCount: undefined,
+    contextWindow: 1048576,
+    icon: "si-googlegemini",
+    providers: [
+      {
+        id: ModelId.GEMINI_3_1_PRO_PREVIEW_CUSTOM_TOOLS,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "google/gemini-3.1-pro-preview-customtools",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 2,
+        outputTokenCost: 12,
+      },
+    ],
+
+    utilities: [
+      ModelUtility.SMART,
+      ModelUtility.CODING,
+      ModelUtility.REASONING,
+    ],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.BRILLIANT,
+    speed: SpeedLevel.BALANCED,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
+  },
+  [ModelId.GEMINI_3_1_FLASH_LITE_PREVIEW]: {
+    name: "Gemini 3.1 Flash Lite Preview",
+    by: "google",
+    description: "chat.models.descriptions.gemini31FlashLitePreview",
+    parameterCount: undefined,
+    contextWindow: 1048576,
+    icon: "si-googlegemini",
+    providers: [
+      {
+        id: ModelId.GEMINI_3_1_FLASH_LITE_PREVIEW,
+        apiProvider: ApiProvider.OPENROUTER,
+        providerModel: "google/gemini-3.1-flash-lite-preview",
+        creditCost: calculateCreditCost,
+        inputTokenCost: 0.25,
+        outputTokenCost: 1.5,
+      },
+    ],
+
+    utilities: [ModelUtility.CHAT, ModelUtility.FAST, ModelUtility.ANALYSIS],
+    supportsTools: true,
+    intelligence: IntelligenceLevel.QUICK,
+    speed: SpeedLevel.FAST,
+    content: ContentLevel.MAINSTREAM,
+    features: {
+      ...defaultFeatures,
+      imageInput: true,
+      pdfInput: true,
+      toolCalling: true,
+    },
+  },
   [ModelId.GEMINI_3_PRO]: {
     name: "Gemini 3 Pro",
     by: "google",
@@ -1473,6 +1694,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     ],
 
     utilities: [
+      ModelUtility.LEGACY,
       ModelUtility.SMART,
       ModelUtility.CODING,
       ModelUtility.REASONING,
@@ -1762,7 +1984,7 @@ const modelOptionsIndex = buildModelOptions();
 export const modelOptions = modelOptionsIndex;
 
 /** Default model used when no specific model is selected */
-export const defaultModel = ModelId.CLAUDE_HAIKU_4_5;
+export const defaultModel = ModelId.KIMI_K2;
 
 /**
  * Retrieves a model configuration by its ID.

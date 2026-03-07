@@ -1,12 +1,10 @@
-import {
-  Building,
-  Code,
-  Home,
-  Info,
-  MessageSquare,
-  Sparkles,
-  Tag,
-} from "next-vibe-ui/ui/icons";
+import { Building } from "next-vibe-ui/ui/icons/Building";
+import { Code } from "next-vibe-ui/ui/icons/Code";
+import { Info } from "next-vibe-ui/ui/icons/Info";
+import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
+import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
+import { Tag } from "next-vibe-ui/ui/icons/Tag";
+import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import type { JSX } from "react";
 
 import type { TranslationKey } from "@/i18n/core/static-types";
@@ -18,17 +16,19 @@ import type {
 
 export type NavPaths =
   | ""
-  | "/story#features"
   | "/subscription"
   | "/subscription/overview"
   | "/subscription/buy"
+  | "/subscription/overview"
   | "/subscription/history"
   | "/story"
   | "/story/about-us"
   | "/story/careers"
   | "/story/framework"
+  | "/story/invest"
   | "/help"
-  | "/admin";
+  | "/admin"
+  | "/threads";
 
 export type NavItemType = NavSingleItemType | NavParentItemType;
 
@@ -65,14 +65,14 @@ export interface NavParentItemType {
 
 export const navItems: NavItemType[] = [
   {
-    icon: <Home className="h-4 w-4" />,
-    title: "app.story._components.nav.home",
+    icon: <Sparkles className="h-4 w-4" />,
+    title: "app.story._components.nav.features",
     href: "/story",
   },
   {
     icon: <MessageSquare className="h-4 w-4" />,
     title: "app.story._components.nav.goToApp",
-    href: "",
+    href: "/threads",
   },
   {
     icon: <Code className="h-4 w-4" />,
@@ -80,14 +80,9 @@ export const navItems: NavItemType[] = [
     href: "/story/framework",
   },
   {
-    icon: <Sparkles className="h-4 w-4" />,
-    title: "app.story._components.nav.features",
-    href: "/story#features",
-  },
-  {
     icon: <Tag className="h-4 w-4" />,
     title: "app.story._components.nav.pricing",
-    href: "/subscription/buy",
+    href: "/subscription/overview",
   },
   {
     title: "app.story._components.nav.company",
@@ -104,6 +99,12 @@ export const navItems: NavItemType[] = [
         title: "app.story._components.nav.careers.title",
         description: "app.story._components.nav.careers.description",
         href: "/story/careers",
+      },
+      {
+        icon: <TrendingUp className="h-4 w-4" />,
+        title: "app.story._components.nav.invest.title",
+        description: "app.story._components.nav.invest.description",
+        href: "/story/invest",
       },
     ],
   },

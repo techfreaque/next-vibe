@@ -7,14 +7,12 @@ import {
   CardTitle,
 } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  ArrowRight,
-  Calendar,
-  Coins,
-  Info,
-  Sparkles,
-  Zap,
-} from "next-vibe-ui/ui/icons";
+import { ArrowRight } from "next-vibe-ui/ui/icons/ArrowRight";
+import { Calendar } from "next-vibe-ui/ui/icons/Calendar";
+import { Coins } from "next-vibe-ui/ui/icons/Coins";
+import { Info } from "next-vibe-ui/ui/icons/Info";
+import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
+import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { Span } from "next-vibe-ui/ui/span";
 import { H4, P } from "next-vibe-ui/ui/typography";

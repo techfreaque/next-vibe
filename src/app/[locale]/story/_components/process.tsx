@@ -1,13 +1,11 @@
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  BarChart3,
-  CheckCircle2,
-  Lightbulb,
-  MessageSquare,
-  PenTool,
-} from "next-vibe-ui/ui/icons";
+import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
+import { CheckCircle2 } from "next-vibe-ui/ui/icons/CheckCircle2";
+import { Lightbulb } from "next-vibe-ui/ui/icons/Lightbulb";
+import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
+import { PenTool } from "next-vibe-ui/ui/icons/PenTool";
 import { Image } from "next-vibe-ui/ui/image";
 import { Link } from "next-vibe-ui/ui/link";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
@@ -287,7 +285,7 @@ const Process: FC<ProcessProps> = ({ locale }) => {
               {t("app.story._components.home.process.handleSocial")}
             </P>
             <Link
-              href={`/${locale}/#pricing`}
+              href={`/${locale}/subscription/overview`}
               className="inline-flex items-center justify-center rounded-md bg-blue-600 bg-linear-to-br from-cyan-500 to-blue-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-700 hover:from-cyan-600 hover:to-blue-700 shadow-md hover:shadow-lg transition-all"
             >
               {t("app.story._components.home.process.getStarted")}

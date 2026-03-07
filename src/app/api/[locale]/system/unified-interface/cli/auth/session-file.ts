@@ -55,79 +55,83 @@ function getSessionFilePath(): string {
 }
 
 /**
- * Read session data from .vibe.session file
+ * Read and parse the session file without checking expiry.
+ * Returns null if the file is missing or malformed.
+ * Callers are responsible for deciding whether the session is still valid.
  */
-export async function readSessionFile(
+async function readSessionFileRaw(
   logger: EndpointLogger,
-  locale: CountryLanguage,
-): Promise<ResponseType<SessionData>> {
+): Promise<SessionData | null> {
   try {
     const sessionPath = getSessionFilePath();
-
-    // Enhanced debugging: Log current working directory and full path
-
-    // Check if file exists before attempting to read
-    try {
-      await fs.access(sessionPath);
-    } catch (accessError) {
-      // File doesn't exist, will be handled below
-    }
-
     const fileContent = await fs.readFile(sessionPath, "utf-8");
     const sessionData = JSON.parse(fileContent) as SessionData;
 
-    // Validate session data structure
     if (
       !sessionData.token ||
       !sessionData.userId ||
       !sessionData.leadId ||
       !sessionData.expiresAt
     ) {
-      const { t } = cliScopedTranslation.scopedT(locale);
-      return fail({
-        message: t("vibe.errors.invalidFormat"),
-        errorType: ErrorResponseTypes.VALIDATION_ERROR,
-        messageParams: { path: sessionPath },
-      });
+      logger.debug("[SESSION FILE] Session file malformed, ignoring");
+      return null;
     }
 
-    // Check if session is expired
-    const expiresAt = new Date(sessionData.expiresAt);
-    if (expiresAt < new Date()) {
-      const { t } = cliScopedTranslation.scopedT(locale);
-      return fail({
-        message: t("vibe.errors.sessionExpired"),
-        errorType: ErrorResponseTypes.UNAUTHORIZED,
-        messageParams: { expiresAt: sessionData.expiresAt },
-      });
-    }
-
-    return success(sessionData);
+    return sessionData;
   } catch (error) {
     const parsedError = parseError(error);
-
-    // File not found is not an error - user is not authenticated
     const isFileNotFoundError =
       parsedError.message.includes(FILE_NOT_FOUND_ERROR_PATTERNS.ENOENT) ||
       parsedError.message.includes(FILE_NOT_FOUND_ERROR_PATTERNS.NO_SUCH_FILE);
-    if (isFileNotFoundError) {
-      const { t } = cliScopedTranslation.scopedT(locale);
-      return fail({
-        message: t("vibe.errors.notFound"),
-        errorType: ErrorResponseTypes.NOT_FOUND,
-      });
+    if (!isFileNotFoundError) {
+      logger.error(
+        `[SESSION FILE] Error reading session file: ${parsedError.message} (path: ${getSessionFilePath()}, projectRoot: ${getProjectRoot()}, cwd: ${process.cwd()})`,
+      );
     }
+    return null;
+  }
+}
 
-    logger.error(
-      `[SESSION FILE] Error reading session file: ${parsedError.message} (path: ${getSessionFilePath()}, projectRoot: ${getProjectRoot()}, cwd: ${process.cwd()})`,
-    );
+/**
+ * Read session data from .vibe.session file
+ */
+export async function readSessionFile(
+  logger: EndpointLogger,
+  locale: CountryLanguage,
+): Promise<ResponseType<SessionData>> {
+  const sessionData = await readSessionFileRaw(logger);
+
+  if (!sessionData) {
     const { t } = cliScopedTranslation.scopedT(locale);
     return fail({
-      message: t("vibe.errors.readFailed"),
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-      messageParams: { error: parsedError.message },
+      message: t("vibe.errors.notFound"),
+      errorType: ErrorResponseTypes.NOT_FOUND,
     });
   }
+
+  // Check if session is locally expired (hint only — DB is authoritative)
+  const expiresAt = new Date(sessionData.expiresAt);
+  if (expiresAt < new Date()) {
+    const { t } = cliScopedTranslation.scopedT(locale);
+    return fail({
+      message: t("vibe.errors.sessionExpired"),
+      errorType: ErrorResponseTypes.UNAUTHORIZED,
+      messageParams: { expiresAt: sessionData.expiresAt },
+    });
+  }
+
+  return success(sessionData);
+}
+
+/**
+ * Read session token from file even if locally expired.
+ * Used when the DB should be the authoritative expiry check.
+ * Returns null if the file is missing or malformed.
+ */
+export async function readSessionToken(
+  logger: EndpointLogger,
+): Promise<SessionData | null> {
+  return readSessionFileRaw(logger);
 }
 
 /**

@@ -39,6 +39,7 @@ export const translations: typeof enTranslations = {
         expiry: "Credits verfallen nie",
         bestFor: "Ideal für gelegentliche Nutzung",
       },
+      totalSummary: "{{totalCredits}} Credits gesamt · {{totalPrice}} gesamt",
       requiresSubscription:
         "Ein aktives Abonnement ist erforderlich, um Credit-Pakete zu kaufen",
     },

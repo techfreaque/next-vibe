@@ -32,12 +32,6 @@ export default async function SubscriptionPage({
 }: SubscriptionPageProps): Promise<JSX.Element> {
   const { locale, tabId } = await params;
 
-  // "remote" tab only available on non-cloud instances
-  const validTabs = env.VIBE_IS_CLOUD ? BASE_TABS : [...BASE_TABS, "remote"];
-  if (!validTabs.includes(tabId)) {
-    notFound();
-  }
-
   const logger = createEndpointLogger(false, Date.now(), locale);
   const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
 
@@ -48,6 +42,14 @@ export default async function SubscriptionPage({
   }
   const user = userResponse.data;
   const isAuthenticated = user && !user.isPublic && user.id;
+
+  const isAdmin =
+    !!isAuthenticated && user.roles.includes(UserPermissionRole.ADMIN);
+  // "remote" tab available to all authenticated users
+  const validTabs = isAuthenticated ? [...BASE_TABS, "remote"] : BASE_TABS;
+  if (!validTabs.includes(tabId)) {
+    notFound();
+  }
 
   if (env.NEXT_PUBLIC_LOCAL_MODE && !isAuthenticated) {
     redirect(`/${locale}/user/login`);
@@ -95,8 +97,6 @@ export default async function SubscriptionPage({
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ||
     process.env.NOWPAYMENTS_API_KEY
   );
-  const isAdmin =
-    !!isAuthenticated && user.roles.includes(UserPermissionRole.ADMIN);
 
   return (
     <SubscriptionPageClient
@@ -109,7 +109,6 @@ export default async function SubscriptionPage({
       initialHistory={initialHistory}
       hasPaymentProvider={hasPaymentProvider}
       isAdmin={isAdmin}
-      isCloud={env.VIBE_IS_CLOUD}
     />
   );
 }

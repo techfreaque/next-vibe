@@ -15,7 +15,6 @@ export class TextHandler {
     currentAssistantContent: string;
     threadId: string;
     currentParentId: string | null;
-    currentDepth: number;
     model: ModelId;
     character: string;
     sequenceId: string;
@@ -28,14 +27,12 @@ export class TextHandler {
     currentAssistantMessageId: string;
     currentAssistantContent: string;
     wasCreated: boolean;
-    newDepth: number;
   }> {
     const {
       textDelta,
       currentAssistantContent,
       threadId,
       currentParentId,
-      currentDepth,
       model,
       character,
       sequenceId,
@@ -53,7 +50,6 @@ export class TextHandler {
         currentAssistantMessageId: currentAssistantMessageId!,
         currentAssistantContent,
         wasCreated: false,
-        newDepth: currentDepth,
       };
     }
 
@@ -64,7 +60,6 @@ export class TextHandler {
       logger.debug("[AI Stream] Creating ASSISTANT message", {
         messageId,
         parentId: currentParentId,
-        depth: currentDepth,
       });
 
       // Emits MESSAGE_CREATED + CONTENT_DELTA SSE, then inserts to DB
@@ -73,7 +68,6 @@ export class TextHandler {
         threadId,
         content: textDelta,
         parentId: currentParentId,
-        depth: currentDepth,
         userId,
         model,
         character,
@@ -91,7 +85,6 @@ export class TextHandler {
         currentAssistantMessageId,
         currentAssistantContent: textDelta,
         wasCreated: true,
-        newDepth: currentDepth,
       };
     }
 
@@ -111,7 +104,6 @@ export class TextHandler {
       currentAssistantMessageId,
       currentAssistantContent: newContent,
       wasCreated: false,
-      newDepth: currentDepth,
     };
   }
 }

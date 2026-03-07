@@ -6,13 +6,11 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  ChevronRight,
-  FileText,
-  Folder,
-  Link,
-  RefreshCw,
-} from "next-vibe-ui/ui/icons";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { FileText } from "next-vibe-ui/ui/icons/FileText";
+import { Folder } from "next-vibe-ui/ui/icons/Folder";
+import { Link } from "next-vibe-ui/ui/icons/Link";
+import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import React, { useCallback } from "react";

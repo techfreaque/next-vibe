@@ -18,25 +18,21 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type { EndpointMeta } from "@/app/api/[locale]/system/generated/endpoints-meta/en";
 import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { WidgetData } from "@/app/api/[locale]/system/unified-interface/shared/widgets/widget-data";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
+import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 import { scopedTranslation as cliScopedTranslation } from "../unified-interface/cli/i18n";
 import type { CliCompatiblePlatform } from "../unified-interface/cli/runtime/route-executor";
-import { definitionsRegistry } from "../unified-interface/shared/endpoints/definitions/registry";
-import {
-  endpointToToolName,
-  getPreferredToolName,
-} from "../unified-interface/shared/utils/path";
+import { permissionsRegistry } from "../unified-interface/shared/endpoints/permissions/registry";
 import type { InkEndpointRenderer } from "../unified-interface/unified-ui/renderers/cli/CliEndpointRenderer";
 
 type InkEndpointRendererType = typeof InkEndpointRenderer;
-import { getTranslatorFromEndpoint } from "../unified-interface/unified-ui/widgets/_shared/field-helpers";
 
 // Lazy imports to avoid server-only issues at module level
 let InkEndpointRendererModule: Awaited<
@@ -66,8 +62,12 @@ interface ToolInfo {
   description: string;
   category: string;
   method: string;
-  endpoint: CreateApiEndpointAny;
+  /** toolName used for lazy-loading the full definition on detail view */
+  toolName: string;
   credits?: number;
+  aliases: string[];
+  /** Full definition — only populated after user clicks into detail view */
+  endpoint?: CreateApiEndpointAny;
 }
 
 type View =
@@ -84,41 +84,64 @@ interface InteractiveHelpProps {
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-function getToolsForUser(
+async function loadEndpointsMeta(): Promise<EndpointMeta[]> {
+  const { endpointsMeta } =
+    await import("@/app/api/[locale]/system/generated/endpoints-meta/en");
+  return endpointsMeta;
+}
+
+async function getToolsForUser(
   platform: CliCompatiblePlatform,
   user: JwtPayloadType,
-  locale: CountryLanguage,
-): { tools: ToolInfo[]; categories: CategoryInfo[] } {
-  const endpoints = definitionsRegistry.getEndpointsForUser(platform, user);
+): Promise<{ tools: ToolInfo[]; categories: CategoryInfo[] }> {
+  const allMeta = await loadEndpointsMeta();
   const tools: ToolInfo[] = [];
   const categoryMap = new Map<
     string,
     { translatedName: string; count: number }
   >();
-  const globalT = simpleT(locale);
 
-  for (const ep of endpoints) {
-    const name = getPreferredToolName(ep);
-    const { t } = getTranslatorFromEndpoint(ep)(locale);
-    const description = ep.description ? t(ep.description) : "";
-    // Category keys are global (e.g., "app.endpointCategories.system")
-    const categoryKey = ep.category || "Other";
-    const category = globalT.t(categoryKey);
+  for (const ep of allMeta) {
+    const allowedRoles = ep.allowedRoles as Parameters<
+      typeof permissionsRegistry.checkPlatformAccess
+    >[0];
+    // Platform access check
+    const platformAccess = permissionsRegistry.checkPlatformAccess(
+      allowedRoles,
+      platform,
+    );
+    if (!platformAccess.allowed) {
+      continue;
+    }
+    // User role check
+    if (user.isPublic) {
+      if (!allowedRoles.includes(UserRole.PUBLIC)) {
+        continue;
+      }
+    } else {
+      if (!user.roles.some((role) => allowedRoles.includes(role))) {
+        continue;
+      }
+    }
 
     tools.push({
-      name,
-      description,
-      category,
+      name: ep.toolName,
+      description: ep.description,
+      category: ep.category,
       method: ep.method,
-      endpoint: ep,
+      toolName: ep.toolName,
       credits: ep.credits,
+      aliases: ep.aliases,
     });
 
-    const existing = categoryMap.get(category);
+    const existing = categoryMap.get(ep.category);
     if (existing) {
       existing.count++;
     } else {
-      categoryMap.set(category, { translatedName: category, count: 1 });
+      categoryMap.set(ep.category, {
+        translatedName: ep.category,
+        count: 1,
+      });
     }
   }
 
@@ -355,7 +378,7 @@ function ToolDetailView({
     }
   });
 
-  const aliases = tool.endpoint.aliases;
+  const aliases = tool.aliases;
 
   return (
     <Box flexDirection="column">
@@ -398,8 +421,8 @@ function ToolDetailView({
         </Text>
       </Box>
 
-      {/* Render endpoint fields */}
-      {RendererComponent && (
+      {/* Render endpoint fields — only when full definition is loaded */}
+      {RendererComponent && tool.endpoint && (
         <Box
           marginTop={1}
           borderStyle="round"
@@ -495,7 +518,7 @@ function ResultView({
             : cliT("vibe.interactive.help.error")}
         </Text>
 
-        {isSuccess && RendererComponent && (
+        {isSuccess && RendererComponent && tool.endpoint && (
           <RendererComponent
             endpoint={tool.endpoint}
             locale={locale}
@@ -528,16 +551,19 @@ function InteractiveHelp({
   const { t: cliT } = cliScopedTranslation.scopedT(locale);
   const [view, setView] = useState<View>({ type: "categories" });
   const [isExecuting, setIsExecuting] = useState(false);
+  const [tools, setTools] = useState<ToolInfo[]>([]);
+  const [categories, setCategories] = useState<CategoryInfo[]>([]);
 
-  const { tools, categories } = useMemo(
-    () =>
-      getToolsForUser(
-        platform === Platform.MCP ? Platform.MCP : Platform.CLI,
-        user,
-        locale,
-      ),
-    [platform, user, locale],
-  );
+  useEffect(() => {
+    void getToolsForUser(
+      platform === Platform.MCP ? Platform.MCP : Platform.CLI,
+      user,
+    ).then(({ tools: t, categories: c }) => {
+      setTools(t);
+      setCategories(c);
+      return undefined;
+    });
+  }, [platform, user]);
 
   // Global quit handler
   useInput((input) => {
@@ -551,7 +577,16 @@ function InteractiveHelp({
   }, []);
 
   const handleToolSelect = useCallback((tool: ToolInfo): void => {
-    setView({ type: "detail", tool });
+    // Lazy-load the full endpoint definition when user navigates to detail
+    void import("@/app/api/[locale]/system/generated/endpoint")
+      .then(({ getEndpoint }) => getEndpoint(tool.toolName))
+      .then((endpointDef) => {
+        setView({
+          type: "detail",
+          tool: endpointDef ? { ...tool, endpoint: endpointDef } : tool,
+        });
+        return undefined;
+      });
   }, []);
 
   const handleBack = useCallback((): void => {
@@ -582,7 +617,7 @@ function InteractiveHelp({
     const { tool } = view;
     setIsExecuting(true);
 
-    const toolName = endpointToToolName(tool.endpoint);
+    const toolName = tool.toolName;
     void import("../unified-interface/shared/endpoints/route/executor")
       .then(({ RouteExecutionExecutor }) =>
         RouteExecutionExecutor.executeGenericHandler<WidgetData>({

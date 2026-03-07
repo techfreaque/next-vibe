@@ -776,7 +776,6 @@ function EditFavBeforeAddButton({
       const characterSingleDefinitions = await import("./[id]/definition");
       const createFavoriteDefinitions =
         await import("../favorites/create/definition");
-      const { DEFAULT_TTS_VOICE } = await import("../../text-to-speech/enum");
 
       // Fetch full character data
       const characterResponse = await apiClient.fetch(
@@ -1055,7 +1054,6 @@ function CharacterFavoriteActions({
     const characterSingleDefinitions = await import("./[id]/definition");
     const createFavoriteDefinitions =
       await import("../favorites/create/definition");
-    const { DEFAULT_TTS_VOICE } = await import("../../text-to-speech/enum");
 
     const cachedData = apiClient.getEndpointData(
       characterSingleDefinitions.default.GET,

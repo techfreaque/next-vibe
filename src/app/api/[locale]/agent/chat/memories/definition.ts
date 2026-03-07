@@ -24,14 +24,13 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { dateSchema } from "../../../shared/types/common.schema";
-import createDefinition from "./create/definition";
-import { scopedTranslation } from "./i18n";
-import { MemoriesListContainer } from "./widget";
-
 /**
  * Memory tool aliases for AI tool calling
  */
-export const MEMORY_LIST_ALIAS = "memories-list" as const;
+import { MEMORY_LIST_ALIAS } from "./constants";
+import createDefinition from "./create/definition";
+import { scopedTranslation } from "./i18n";
+import { MemoriesListContainer } from "./widget";
 
 /**
  * Get Memories List Endpoint (GET)
@@ -98,7 +97,7 @@ const { GET } = createEndpoint({
           columns: 12,
           usage: { response: true },
           children: {
-            memoryNumber: scopedResponseField(scopedTranslation, {
+            id: scopedResponseField(scopedTranslation, {
               type: WidgetType.BADGE,
               text: "get.response.memories.memory.memoryNumber.text" as const,
               schema: z.coerce.number().int(),
@@ -196,7 +195,7 @@ const { GET } = createEndpoint({
       list: {
         memories: [
           {
-            memoryNumber: 0,
+            id: 0,
             content: "Profession: Software engineer specializing in Python",
             tags: ["profession", "skills"],
             priority: 0,
@@ -206,7 +205,7 @@ const { GET } = createEndpoint({
             createdAt: new Date("2025-01-01T00:00:00Z"),
           },
           {
-            memoryNumber: 1,
+            id: 1,
             content: "Preferences: Dark mode, coffee over tea",
             tags: ["preferences"],
             priority: 0,

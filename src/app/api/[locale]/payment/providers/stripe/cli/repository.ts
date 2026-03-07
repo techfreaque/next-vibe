@@ -604,17 +604,20 @@ export class CliStripeRepositoryImpl implements CliStripeRepository {
       // Read the file
       let envContent = fs.readFileSync(envPath, "utf-8");
 
-      // Look for the STRIPE_WEBHOOK_SECRET line and replace it
-      const regex = /STRIPE_WEBHOOK_SECRET="[^"]*"/;
+      // Look for the STRIPE_WEBHOOK_SECRET line and replace it (all occurrences, any quoting)
+      const regex = /^STRIPE_WEBHOOK_SECRET=.*$/m;
       if (regex.test(envContent)) {
-        // Replace existing webhook secret
+        // Replace existing webhook secret (all occurrences to avoid duplicates)
         // eslint-disable-next-line i18next/no-literal-string
         const replacementText = `STRIPE_WEBHOOK_SECRET="${secret}"`;
-        envContent = envContent.replace(regex, replacementText);
+        envContent = envContent.replace(
+          /^STRIPE_WEBHOOK_SECRET=.*$/gm,
+          replacementText,
+        );
       } else {
         // Add new webhook secret at the end of the file
         // eslint-disable-next-line i18next/no-literal-string
-        const additionalContent = `\\nSTRIPE_WEBHOOK_SECRET="${secret}"\\n`;
+        const additionalContent = `\nSTRIPE_WEBHOOK_SECRET="${secret}"\n`;
         envContent += additionalContent;
       }
 

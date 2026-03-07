@@ -8,18 +8,16 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  CheckCircle,
-  Copy,
-  CreditCard,
-  ExternalLink,
-  History,
-  Mail,
-  RotateCcw,
-  Shield,
-  UserCheck,
-  UserPlus,
-} from "next-vibe-ui/ui/icons";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { Copy } from "next-vibe-ui/ui/icons/Copy";
+import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
+import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
+import { History } from "next-vibe-ui/ui/icons/History";
+import { Mail } from "next-vibe-ui/ui/icons/Mail";
+import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
+import { Shield } from "next-vibe-ui/ui/icons/Shield";
+import { UserCheck } from "next-vibe-ui/ui/icons/UserCheck";
+import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useState } from "react";
 

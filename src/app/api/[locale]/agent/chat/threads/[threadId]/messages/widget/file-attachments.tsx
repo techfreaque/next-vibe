@@ -8,7 +8,9 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
-import { Download, FileText, Image as ImageIcon } from "next-vibe-ui/ui/icons";
+import { Download } from "next-vibe-ui/ui/icons/Download";
+import { FileText } from "next-vibe-ui/ui/icons/FileText";
+import { Image as ImageIcon } from "next-vibe-ui/ui/icons/Image";
 import { Image } from "next-vibe-ui/ui/image";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";

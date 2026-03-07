@@ -595,12 +595,10 @@ export function getEnvModuleNames(): (keyof typeof envModules)[] {
 
     let schemaChain: string;
     if (fullClientDeclaration.length > 80 && aliasedModules.length > 1) {
-      // Use multiline format with arguments on separate lines
+      // Use multiline chained format: schema\n  .merge(next)\n  .merge(next2)
       schemaChain = aliasedModules
         .map((m, i) =>
-          i === 0
-            ? `${m.localSchemaName}`
-            : `.merge(\n  ${m.localSchemaName},\n)`,
+          i === 0 ? `${m.localSchemaName}` : `\n  .merge(${m.localSchemaName})`,
         )
         .join("");
     } else {

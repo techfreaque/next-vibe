@@ -29,7 +29,7 @@ import { CreditPackTypeDB, CreditTransactionTypeDB } from "./enum";
 
 /**
  * Custom numeric type that returns numbers instead of strings
- * Database: numeric(10, 6) - proper PostgreSQL numeric type
+ * Database: numeric(16, 6) - supports up to 9,999,999,999 credits
  * TypeScript: number - for calculations and type safety
  */
 const numericNumber = customType<{
@@ -37,7 +37,7 @@ const numericNumber = customType<{
   driverData: string;
 }>({
   dataType() {
-    return "numeric(10, 6)";
+    return "numeric(16, 6)";
   },
   toDriver(value: number): string {
     return value.toString();

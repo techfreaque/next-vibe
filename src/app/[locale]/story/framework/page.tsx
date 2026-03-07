@@ -39,7 +39,7 @@ export default async function FrameworkPage(): Promise<JSX.Element> {
   return (
     <Div className="min-h-screen">
       <Container size="lg" className="py-12">
-        <Div className="prose prose-lg dark:prose-invert max-w-none">
+        <Div className="prose prose-lg dark:prose-invert mx-auto">
           <FrameworkContent content={readmeContent} />
         </Div>
       </Container>

@@ -10,7 +10,10 @@ import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { IDefinitionLoader } from "../../shared/endpoints/definition/loader";
+import type { IDefinitionsRegistry } from "../../shared/endpoints/definitions/registry";
 import type { EndpointLogger } from "../../shared/logger/endpoint";
+import type { MCPRegistry } from "../registry";
 import { createMCPProtocolHandler } from "./protocol-handler";
 import { StdioTransport } from "./stdio-transport";
 
@@ -20,6 +23,19 @@ import { StdioTransport } from "./stdio-transport";
 export class MCPServer {
   private transport?: StdioTransport;
   private running = false;
+  private readonly registry?: MCPRegistry;
+  private readonly defRegistry?: IDefinitionsRegistry;
+  private readonly definitionLdr?: IDefinitionLoader;
+
+  constructor(
+    registry?: MCPRegistry,
+    defRegistry?: IDefinitionsRegistry,
+    definitionLdr?: IDefinitionLoader,
+  ) {
+    this.registry = registry;
+    this.defRegistry = defRegistry;
+    this.definitionLdr = definitionLdr;
+  }
 
   /**
    * Start the MCP server
@@ -50,7 +66,13 @@ export class MCPServer {
       });
 
       // Create protocol handler
-      const protocolHandler = await createMCPProtocolHandler(logger, locale);
+      const protocolHandler = await createMCPProtocolHandler(
+        logger,
+        locale,
+        this.registry,
+        this.defRegistry,
+        this.definitionLdr,
+      );
 
       // Create transport
       this.transport = new StdioTransport(logger);

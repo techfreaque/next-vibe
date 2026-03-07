@@ -41,9 +41,10 @@ interface ChatState {
   // Prevents useLazyBranchLoader from fetching messages for brand-new threads (404).
   pendingNewThreadIds: Set<string>;
 
-  // Branch state - tracks which branch is selected at each level for each thread
-  // Key: threadId, Value: Record<parentMessageId, branchIndex>
-  branchIndices: Record<string, Record<string, number>>;
+  // Active leaf message per thread — written by navigation store's setLeafMessageId.
+  // Non-React code (send-message, event-handlers) reads this to find the active branch leaf.
+  leafMessageIds: Record<string, string>;
+  setLeafMessageId: (threadId: string, leafMessageId: string) => void;
 
   // Lazy loading state - tracks whether a thread's messages are fully or partially loaded
   // 'full' = all messages loaded (original behavior), 'partial' = only active branch path
@@ -59,15 +60,6 @@ interface ChatState {
   updateMessage: (messageId: string, updates: Partial<ChatMessage>) => void;
   deleteMessage: (messageId: string) => void;
   getThreadMessages: (threadId: string) => ChatMessage[];
-
-  // Branch actions
-  getBranchIndices: (threadId: string) => Record<string, number>;
-  setBranchIndices: (threadId: string, indices: Record<string, number>) => void;
-  updateBranchIndex: (
-    threadId: string,
-    parentMessageId: string,
-    branchIndex: number,
-  ) => void;
 
   // Folder actions
   addFolder: (folder: ChatFolder) => void;
@@ -100,7 +92,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   folders: {},
   isLoading: false,
   isDataLoaded: false,
-  branchIndices: {},
+  leafMessageIds: {},
   threadLoadMode: {},
   pendingNewThreadIds: new Set<string>(),
 
@@ -252,7 +244,6 @@ export const useChatStore = create<ChatState>((set, get) => ({
             updatedMessages[msg.id] = {
               ...msg,
               parentId: message.parentId,
-              depth: message.depth,
             };
           }
         }
@@ -270,42 +261,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
       .toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
   },
 
-  // Branch actions
-  getBranchIndices: (threadId: string): Record<string, number> => {
-    const state = get();
-    return state.branchIndices[threadId] || {};
-  },
-
-  setBranchIndices: (
-    threadId: string,
-    indices: Record<string, number>,
-  ): void => {
+  setLeafMessageId: (threadId: string, leafMessageId: string): void =>
     set((state) => ({
-      branchIndices: {
-        ...state.branchIndices,
-        [threadId]: indices,
-      },
-    }));
-  },
-
-  updateBranchIndex: (
-    threadId: string,
-    parentMessageId: string,
-    branchIndex: number,
-  ): void => {
-    set((state) => {
-      const currentIndices = state.branchIndices[threadId] || {};
-      return {
-        branchIndices: {
-          ...state.branchIndices,
-          [threadId]: {
-            ...currentIndices,
-            [parentMessageId]: branchIndex,
-          },
-        },
-      };
-    });
-  },
+      leafMessageIds: { ...state.leafMessageIds, [threadId]: leafMessageId },
+    })),
 
   // Thread load mode
   setThreadLoadMode: (threadId: string, mode: "full" | "partial"): void =>

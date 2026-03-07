@@ -23,6 +23,8 @@ export enum Platform {
   CRON = "cron",
   /** Electron desktop app — wraps vibe start in a BrowserWindow */
   ELECTRON = "electron",
+  /** Vibe Frame — embedded widget */
+  FRAME = "frame",
 }
 
 /**

@@ -61,7 +61,9 @@ export class FolderCleaner implements IFolderCleaner {
           exists ? "✓ will be deleted" : "⊘ not found, skipping",
         ),
       );
-      logger.info("Cleaning folder", { folder: folderPath, exists, dryRun });
+      logger.vibe(
+        `  🗑  ${folder}  ${exists ? "→ deleted" : "→ skipped (not found)"}`,
+      );
 
       if (!dryRun && exists) {
         rmSync(folderPath, { force: true, recursive: true });

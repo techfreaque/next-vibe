@@ -9,6 +9,7 @@ import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unifi
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { DefaultFolderId } from "../../../chat/config";
 import messagesDefinition from "../../../chat/threads/[threadId]/messages/definition";
 
 interface MessagesEndpoint {
@@ -23,27 +24,34 @@ const messagesEndpoint: MessagesEndpoint = { GET: messagesDefinition.GET };
  */
 export function EmbeddedMessagesView({
   threadId,
+  rootFolderId,
   locale,
   user,
   className,
   refetchInterval,
+  initialData,
 }: {
   threadId: string;
+  rootFolderId: DefaultFolderId;
   locale: CountryLanguage;
   user: JwtPayloadType;
   className?: string;
   refetchInterval?: number | false;
+  initialData?: typeof messagesDefinition.GET.types.ResponseOutput;
 }): JSX.Element {
   const endpointOptions = useMemo(
     (): UseEndpointOptions<MessagesEndpoint> => ({
       read: {
         urlPathParams: { threadId },
-        ...(refetchInterval !== undefined && {
-          queryOptions: { refetchInterval },
-        }),
+        initialState: { rootFolderId },
+        ...(initialData !== undefined
+          ? { queryOptions: { enabled: false }, initialData }
+          : refetchInterval !== undefined && {
+              queryOptions: { refetchInterval },
+            }),
       },
     }),
-    [threadId, refetchInterval],
+    [threadId, rootFolderId, refetchInterval, initialData],
   );
 
   return (

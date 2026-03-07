@@ -22,12 +22,11 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { scopedTranslation } from "./i18n";
-
 /**
  * Memory tool alias for AI tool calling
  */
-export const MEMORY_ADD_ALIAS = "memories-add" as const;
+import { MEMORY_ADD_ALIAS } from "./constants";
+import { scopedTranslation } from "./i18n";
 
 /**
  * Add Memory Endpoint (POST)
@@ -69,7 +68,7 @@ const { POST } = createEndpoint({
 
         // Create new memory object for optimistic update
         const newMemory = {
-          memoryNumber: data.responseData.id,
+          id: data.responseData.id,
           content: data.requestData.content,
           tags: data.requestData.tags ?? [],
           priority: data.requestData.priority ?? 0,
@@ -226,7 +225,7 @@ const { POST } = createEndpoint({
     },
     responses: {
       add: {
-        id: 0,
+        id: 42,
       },
     },
   },

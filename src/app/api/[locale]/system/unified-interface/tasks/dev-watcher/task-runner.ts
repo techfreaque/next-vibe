@@ -160,9 +160,14 @@ const startSmartFileWatcher = async (
     }, DEBOUNCE_MS);
   };
 
-  // Base directory for resolving absolute paths from fs.watch relative filenames
+  // Base directory for resolving absolute paths from fs.watch relative filenames.
+  // Use process.env.PWD (opaque to Turbopack's static analysis) instead of
+  // process.cwd() so the bundler doesn't try to match the path as a file glob.
+  // eslint-disable-next-line i18next/no-literal-string, no-useless-concat
+  const localeSegment = "[" + "locale]";
   // eslint-disable-next-line i18next/no-literal-string
-  const watchRoot = join(process.cwd(), "src", "app", "api", "[locale]");
+  const cwd = process.env["PWD"] ?? process.cwd();
+  const watchRoot = join(cwd, "src", "app", "api", localeSegment);
 
   const watchPaths = [watchRoot];
   const watchers: ReturnType<typeof fs.watch>[] = [];
@@ -184,8 +189,11 @@ const startSmartFileWatcher = async (
               return;
             }
 
-            // Resolve to absolute path
-            const absPath = join(watchRoot, filename);
+            // Resolve to absolute path.
+            // Use string concat instead of join() — Turbopack's static analysis
+            // treats join(watchRoot, ...) as a broad glob over src/app/api/[locale]/.
+            const sep = watchRoot.endsWith("/") ? "" : "/";
+            const absPath = watchRoot + sep + filename;
 
             logger.debug(`📝 File changed: ${filename} (${eventType})`);
 

@@ -3,7 +3,7 @@
 import type { SlotProps } from "input-otp";
 import { OTPInput, OTPInputContext } from "input-otp";
 import { cn } from "next-vibe/shared/utils/utils";
-import { DashIcon } from "next-vibe-ui/ui/icons";
+import { DashIcon } from "next-vibe-ui/ui/icons/DashIcon";
 import * as React from "react";
 
 import type { StyleType } from "../utils/style-type";

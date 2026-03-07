@@ -1,7 +1,9 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils/utils";
-import { Check, ChevronDown, X } from "next-vibe-ui/ui/icons";
+import { Check } from "next-vibe-ui/ui/icons/Check";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { X } from "next-vibe-ui/ui/icons/X";
 import * as React from "react";
 
 import { useTranslation } from "@/i18n/core/client";

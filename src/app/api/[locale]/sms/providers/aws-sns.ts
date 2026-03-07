@@ -223,13 +223,13 @@ export function getAwsSnsProvider(): SmsProvider {
         // Calculate the signature
         const getSignatureKey = (
           key: string,
-          dateStamp: string,
+          sigDateStamp: string,
           regionName: string,
           serviceName: string,
         ): Buffer => {
           // eslint-disable-next-line i18next/no-literal-string
           const kDate = createHmac("sha256", `AWS4${key}`)
-            .update(dateStamp)
+            .update(sigDateStamp)
             .digest();
           // eslint-disable-next-line i18next/no-literal-string
           const kRegion = createHmac("sha256", kDate)

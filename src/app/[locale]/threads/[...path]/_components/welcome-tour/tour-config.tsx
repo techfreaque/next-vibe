@@ -8,7 +8,13 @@ import type { Step } from "react-joyride";
 
 import { DEFAULT_FOLDER_CONFIGS } from "@/app/api/[locale]/agent/chat/config";
 import type { ThreadsWidgetT } from "@/app/api/[locale]/agent/chat/threads/widget/i18n";
+import {
+  ProductIds,
+  productsRepository,
+} from "@/app/api/[locale]/products/repository-client";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import type { CountryLanguage } from "@/i18n/core/config";
+import { formatCurrency } from "@/i18n/core/localization-utils";
 
 export interface TourStepConfig extends Step {
   requiresAuth?: boolean;
@@ -145,8 +151,11 @@ export const TOUR_TEXT_ALIGN = {
 export const getTourSteps = (
   t: ThreadsWidgetT,
   isAuthenticated = false,
+  locale: CountryLanguage,
 ): TourStepConfig[] => {
   const appName = t("config.appName");
+  const sub = productsRepository.getProduct(ProductIds.SUBSCRIPTION, locale);
+  const free = productsRepository.getProduct(ProductIds.FREE_TIER, locale);
 
   return [
     // Step 1: Welcome
@@ -341,9 +350,6 @@ export const getTourSteps = (
           <P className="text-sm">
             {t("components.welcomeTour.newChatButton.description")}
           </P>
-          <P className="text-xs text-muted-foreground">
-            {t("components.welcomeTour.newChatButton.tip")}
-          </P>
         </Div>
       ),
       placement: TOUR_PLACEMENTS.RIGHT,
@@ -379,12 +385,10 @@ export const getTourSteps = (
           </H3>
           <P className="text-sm">
             {t("components.welcomeTour.subscriptionButton.description", {
-              credits: "800",
-              price: t("components.welcomeTour.subscriptionButton.price"),
+              credits: String(sub.credits),
+              price: formatCurrency(sub.price, sub.currency, locale),
+              freeCredits: String(free.credits),
             })}
-          </P>
-          <P className="text-xs text-muted-foreground">
-            {t("components.welcomeTour.subscriptionButton.tip")}
           </P>
         </Div>
       ),

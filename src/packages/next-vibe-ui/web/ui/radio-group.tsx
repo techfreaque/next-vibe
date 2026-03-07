@@ -2,7 +2,7 @@
 
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { cn } from "next-vibe/shared/utils/utils";
-import { CheckIcon } from "next-vibe-ui/ui/icons";
+import { CheckIcon } from "next-vibe-ui/ui/icons/CheckIcon";
 import * as React from "react";
 
 import type { StyleType } from "../utils/style-type";

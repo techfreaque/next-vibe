@@ -25,7 +25,6 @@ export class StreamErrorHandler {
     threadId: string;
     userId: string | undefined;
     lastParentId: string | null;
-    lastDepth: number;
     lastSequenceId: string | null;
     dbWriter: MessageDbWriter;
     logger: EndpointLogger;
@@ -36,7 +35,6 @@ export class StreamErrorHandler {
       threadId,
       userId,
       lastParentId,
-      lastDepth,
       lastSequenceId,
       dbWriter,
       logger,
@@ -111,7 +109,6 @@ export class StreamErrorHandler {
       errorType: "STREAM_ERROR",
       error: structuredError,
       parentId: lastParentId,
-      depth: lastDepth,
       sequenceId: lastSequenceId,
       userId,
     });

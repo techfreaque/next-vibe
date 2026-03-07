@@ -5,6 +5,7 @@ import { createEndpointLogger } from "@/app/api/[locale]/system/unified-interfac
 import { UserDetailLevel } from "@/app/api/[locale]/user/enum";
 import { UserRepository } from "@/app/api/[locale]/user/repository";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 interface ChatPageProps {
@@ -14,16 +15,36 @@ interface ChatPageProps {
 }
 
 /**
- * Root chat page - redirects to appropriate default folder based on auth status
- * Authenticated users -> /threads/private
- * Public users -> /threads/public
+ * Root homepage.
+ * - Local mode (vibe start): redirects to chat (threads)
+ * - All other modes (dev/prod): redirects to story page
  */
-export default async function ChatPage({
+export default async function HomePage({
   params,
 }: ChatPageProps): Promise<never> {
   const { locale } = await params;
-  const logger = createEndpointLogger(false, Date.now(), locale);
 
+  // In local mode, go straight to chat
+  if (env.NEXT_PUBLIC_LOCAL_MODE) {
+    const logger = createEndpointLogger(false, Date.now(), locale);
+    const userResponse = await UserRepository.getUserByAuth(
+      {
+        detailLevel: UserDetailLevel.MINIMAL,
+        roles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
+      },
+      locale,
+      logger,
+    );
+    const user = userResponse.success ? userResponse.data : undefined;
+    const isAuthenticated = user !== undefined && !user.isPublic;
+    const defaultFolder = isAuthenticated
+      ? DefaultFolderId.PRIVATE
+      : DefaultFolderId.INCOGNITO;
+    redirect(`/${locale}/threads/${defaultFolder}`);
+  }
+
+  // Dev and prod: check auth — logged-in users go straight to chat
+  const logger = createEndpointLogger(false, Date.now(), locale);
   const userResponse = await UserRepository.getUserByAuth(
     {
       detailLevel: UserDetailLevel.MINIMAL,
@@ -32,14 +53,12 @@ export default async function ChatPage({
     locale,
     logger,
   );
-
   const user = userResponse.success ? userResponse.data : undefined;
   const isAuthenticated = user !== undefined && !user.isPublic;
 
-  // Redirect to appropriate default folder
-  const defaultFolder = isAuthenticated
-    ? DefaultFolderId.PRIVATE
-    : DefaultFolderId.INCOGNITO;
+  if (isAuthenticated) {
+    redirect(`/${locale}/threads/${DefaultFolderId.PRIVATE}`);
+  }
 
-  redirect(`/${locale}/threads/${defaultFolder}`);
+  redirect(`/${locale}/story`);
 }

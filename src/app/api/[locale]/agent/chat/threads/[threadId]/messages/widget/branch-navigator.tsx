@@ -3,7 +3,9 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { ChevronLeft, ChevronRight, GitBranch } from "next-vibe-ui/ui/icons";
+import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 

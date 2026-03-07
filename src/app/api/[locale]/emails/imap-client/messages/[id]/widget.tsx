@@ -7,20 +7,18 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  ArrowLeft,
-  Bookmark,
-  ChevronDown,
-  ChevronUp,
-  Loader2,
-  Mail,
-  MailOpen,
-  Paperclip,
-  RotateCcw,
-  Share2,
-  Star,
-  Trash2,
-} from "next-vibe-ui/ui/icons";
+import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { Bookmark } from "next-vibe-ui/ui/icons/Bookmark";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronUp } from "next-vibe-ui/ui/icons/ChevronUp";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Mail } from "next-vibe-ui/ui/icons/Mail";
+import { MailOpen } from "next-vibe-ui/ui/icons/MailOpen";
+import { Paperclip } from "next-vibe-ui/ui/icons/Paperclip";
+import { RotateCcw } from "next-vibe-ui/ui/icons/RotateCcw";
+import { Share2 } from "next-vibe-ui/ui/icons/Share2";
+import { Star } from "next-vibe-ui/ui/icons/Star";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Iframe } from "next-vibe-ui/ui/iframe";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useEffect, useRef, useState } from "react";

@@ -9,7 +9,10 @@ import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
-import { Mic, Phone, Send, Square } from "next-vibe-ui/ui/icons";
+import { Mic } from "next-vibe-ui/ui/icons/Mic";
+import { Phone } from "next-vibe-ui/ui/icons/Phone";
+import { Send } from "next-vibe-ui/ui/icons/Send";
+import { Square } from "next-vibe-ui/ui/icons/Square";
 import { Kbd } from "next-vibe-ui/ui/kbd";
 import { Span } from "next-vibe-ui/ui/span";
 import { Textarea } from "next-vibe-ui/ui/textarea";
@@ -95,7 +98,6 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   const folders = useChatStore((s) => s.folders);
   const chatSetLoading = useChatStore((s) => s.setLoading);
   const chatGetThreadMessages = useChatStore((s) => s.getThreadMessages);
-  const chatGetBranchIndices = useChatStore((s) => s.getBranchIndices);
   const chatDeleteMessage = useChatStore((s) => s.deleteMessage);
   const chatUpdateMessage = useChatStore((s) => s.updateMessage);
   const activeThread = activeThreadId
@@ -224,7 +226,6 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       threads,
       setLoading: chatSetLoading,
       getThreadMessages: chatGetThreadMessages,
-      getBranchIndices: chatGetBranchIndices,
       deleteMessage: chatDeleteMessage,
       updateMessage: chatUpdateMessage,
     },

@@ -49,6 +49,8 @@ export interface MessageOperationDeps {
   };
   setInput?: (input: string) => void;
   setAttachments?: (attachments: File[] | ((prev: File[]) => File[])) => void;
+  /** Called immediately after the optimistic user message is added — switches the visible branch */
+  setLeafMessageId?: (messageId: string) => void;
 }
 
 /**
@@ -67,6 +69,7 @@ export async function createAndSendUserMessage(
     settings,
     setInput,
     setAttachments,
+    setLeafMessageId,
   } = deps;
 
   const {
@@ -94,24 +97,19 @@ export async function createAndSendUserMessage(
       params.toolConfirmations && params.toolConfirmations.length > 0;
     const newMessageId = hasToolConfirmations ? null : crypto.randomUUID();
 
-    // Load thread messages
-    let threadMessages: ChatMessage[];
-    if (currentRootFolderId === DefaultFolderId.INCOGNITO) {
-      const { getMessagesForThread } =
-        await import("@/app/api/[locale]/agent/chat/incognito/storage");
-      threadMessages = await getMessagesForThread(threadId);
-    } else {
-      threadMessages = chatStore.getThreadMessages(threadId);
-    }
-
-    // Build message history (incognito only - server fetches from DB)
-    // Use provided messageHistory if available (e.g., from send operation)
+    // Build message history (incognito only - server fetches from DB for server threads)
+    // Use provided messageHistory if available (e.g., pre-filtered from send operation)
     let messageHistory: ChatMessage[] | null = params.messageHistory ?? null;
     if (
       !messageHistory &&
       currentRootFolderId === DefaultFolderId.INCOGNITO &&
       parentMessageId
     ) {
+      // Load incognito thread messages and walk up parent chain
+      const { getMessagesForThread } =
+        await import("@/app/api/[locale]/agent/chat/incognito/storage");
+      const threadMessages = await getMessagesForThread(threadId);
+
       // Walk up parent chain to get only messages in this branch
       messageHistory = [];
       const messageMap = new Map(threadMessages.map((m) => [m.id, m]));
@@ -141,16 +139,12 @@ export async function createAndSendUserMessage(
         messageMetadata = { isUploadingAttachments: true };
       }
 
-      const parentDepth =
-        threadMessages.find((msg) => msg.id === parentMessageId)?.depth ?? -1;
-
       const optimisticUserMessage: ChatMessage = {
         id: newMessageId!,
         threadId,
         role: ChatMessageRole.USER,
         content: audioInput ? "" : content,
         parentId: parentMessageId,
-        depth: parentDepth + 1,
         sequenceId: null,
         authorId:
           currentRootFolderId === DefaultFolderId.INCOGNITO
@@ -172,6 +166,11 @@ export async function createAndSendUserMessage(
       };
 
       chatStore.addMessage(optimisticUserMessage);
+
+      // Immediately switch the visible branch to the new message.
+      // The auto-switch in useBranchManagement only fires when parentId === currentLeaf,
+      // which doesn't hold for retry/branch (they use the grandparent as parentId).
+      setLeafMessageId?.(newMessageId!);
     } else {
       logger.debug("Skipping user message creation for tool confirmations", {
         count: params.toolConfirmations?.length ?? 0,

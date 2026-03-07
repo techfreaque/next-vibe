@@ -4,7 +4,15 @@
  */
 
 import { relations } from "drizzle-orm";
-import { boolean, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  index,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 
@@ -124,3 +132,34 @@ export const userRolesRelations = relations(userRoles, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+/**
+ * Login attempts table — DB-backed rate limiting, safe across restarts and instances.
+ *
+ * Each failed login attempt is recorded here. The login repository queries this
+ * table to count recent failures and lock out accounts, replacing the old in-memory Map.
+ */
+export const loginAttempts = pgTable(
+  "login_attempts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    /** Normalised email (lower-cased). Null for IP-only tracking. */
+    email: text("email"),
+    /** Hashed IP address (SHA-256 hex) to avoid storing raw IPs. */
+    ipAddress: text("ip_address"),
+    success: boolean("success").notNull().default(false),
+    /** HTTP 429 / account-locked responses don't count as "real" attempts */
+    isBlocked: boolean("is_blocked").notNull().default(false),
+    /** Number of consecutive failures at time of insert (denormalised for fast reads) */
+    failureCount: integer("failure_count").notNull().default(1),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [
+    index("login_attempts_email_idx").on(t.email),
+    index("login_attempts_ip_idx").on(t.ipAddress),
+    index("login_attempts_created_at_idx").on(t.createdAt),
+  ],
+);
+
+export type LoginAttemptRow = typeof loginAttempts.$inferSelect;
+export type NewLoginAttemptRow = typeof loginAttempts.$inferInsert;

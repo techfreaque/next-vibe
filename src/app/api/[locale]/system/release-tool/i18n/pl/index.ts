@@ -807,4 +807,14 @@ export const translations: typeof enTranslations = {
     changelog: "Changelog",
     gitOperations: "Operacje Git",
   },
+  widget: {
+    runRelease: "Uruchom wydanie",
+    runAgain: "Uruchom ponownie",
+    complete: "Wydanie zakończone",
+    failed: "Wydanie nieudane",
+    published: "Opublikowano",
+    errors: "Błędy",
+    bullet: "•",
+    warning: "⚠",
+  },
 };

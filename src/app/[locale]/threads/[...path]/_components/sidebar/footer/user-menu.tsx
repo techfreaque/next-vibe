@@ -1,7 +1,8 @@
 "use client";
 
 import { Button } from "next-vibe-ui/ui/button";
-import { LogOut, User } from "next-vibe-ui/ui/icons";
+import { LogOut } from "next-vibe-ui/ui/icons/LogOut";
+import { User } from "next-vibe-ui/ui/icons/User";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 

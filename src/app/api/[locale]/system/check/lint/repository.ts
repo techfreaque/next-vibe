@@ -4,7 +4,7 @@
  */
 
 import { promises as fs } from "node:fs";
-import { dirname, relative, resolve } from "node:path";
+import { dirname, relative, resolve as resolvePath } from "node:path";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -119,6 +119,13 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
         limit: data.limit ?? defaultLimit,
       };
 
+      // Compute active ignore patterns from extensive flag
+      const isExtensive = data.extensive ?? defaults.extensive ?? false;
+      const activeIgnorePatterns =
+        !isExtensive && checkConfig.eslint.enabled
+          ? checkConfig.eslint.nonExtensiveIgnorePatterns
+          : undefined;
+
       const enabledConfig = checkConfig as CheckConfig & {
         eslint: { enabled: true; configPath: string; cachePath: string };
       };
@@ -135,6 +142,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
         enabledConfig,
         logger,
         isMCP,
+        activeIgnorePatterns,
       );
 
       logger.debug(
@@ -185,6 +193,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
     },
     logger: EndpointLogger,
     skipFiles = false,
+    extraIgnorePatterns?: string[],
   ): Promise<LintResponseOutput> {
     const cacheDir = checkConfig.eslint.cachePath;
     await fs.mkdir(dirname(cacheDir), { recursive: true });
@@ -199,10 +208,17 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       `[ESLINT] Running on ${targetPaths.length} path(s): ${targetPaths.join(", ")}`,
     );
 
-    const eslintConfigPath = resolve(
+    const eslintConfigPath = resolvePath(
       process.cwd(),
       checkConfig.eslint.configPath,
     );
+
+    // Build extra --ignore-pattern flags for non-extensive mode
+    const ignorePatternArgs =
+      extraIgnorePatterns && extraIgnorePatterns.length > 0
+        ? extraIgnorePatterns.flatMap((p) => ["--ignore-pattern", p])
+        : [];
+
     const args = [
       "eslint",
       "--format=json",
@@ -213,6 +229,7 @@ export class LintRepositoryImpl implements LintRepositoryInterface {
       "metadata",
       "--config",
       eslintConfigPath,
+      ...ignorePatternArgs,
       ...targetPaths,
     ];
 

@@ -98,7 +98,7 @@ export class PasswordUpdateRepository {
         });
       }
 
-      const user = await db
+      const userRecord = await db
         .select({
           password: users.password,
           twoFactorEnabled: users.twoFactorEnabled,
@@ -108,7 +108,7 @@ export class PasswordUpdateRepository {
         .where(eq(users.id, userId))
         .then((results) => results[0]);
 
-      if (!user) {
+      if (!userRecord) {
         return fail({
           message: t("errors.user_not_found"),
           errorType: ErrorResponseTypes.NOT_FOUND,
@@ -118,7 +118,7 @@ export class PasswordUpdateRepository {
 
       const isPasswordValid = await verifyPassword(
         currentPassword,
-        user.password,
+        userRecord.password,
       );
       if (!isPasswordValid) {
         return fail({
@@ -127,7 +127,7 @@ export class PasswordUpdateRepository {
         });
       }
 
-      if (user.twoFactorEnabled && user.twoFactorSecret) {
+      if (userRecord.twoFactorEnabled && userRecord.twoFactorSecret) {
         const twoFactorCode = (passwords as { twoFactorCode?: string })
           .twoFactorCode;
 
@@ -140,7 +140,7 @@ export class PasswordUpdateRepository {
 
         const is2FAValid = this.verify2FACode(
           twoFactorCode,
-          user.twoFactorSecret,
+          userRecord.twoFactorSecret,
         );
         if (!is2FAValid) {
           return fail({

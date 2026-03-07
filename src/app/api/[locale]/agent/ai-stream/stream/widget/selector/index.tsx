@@ -132,6 +132,7 @@ export function Selector({
               "max-w-[80px] @xl:max-w-[105px] @2xl:max-w-[140px] truncate text-muted-foreground",
               modelSupportsTools ? "hidden @xl:inline" : "hidden @md:inline",
             )}
+            suppressHydrationWarning
           >
             {currentModel?.name}
           </Span>

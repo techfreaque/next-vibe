@@ -55,7 +55,7 @@ export class FileCopier implements IFileCopier {
     output.push(
       outputFormatter.formatSection(t("messages.copyingAdditionalFiles")),
     );
-    logger.info("Copying files", { count: filesToCopy.length });
+    logger.vibe(`📋 Copying ${filesToCopy.length} file(s)`);
 
     for (const fileData of filesToCopy) {
       const srcPath = resolve(ROOT_DIR, fileData.input);

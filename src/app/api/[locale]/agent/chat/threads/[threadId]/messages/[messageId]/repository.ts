@@ -116,7 +116,6 @@ export class MessageRepository {
         role: message.role,
         content: message.content,
         parentId: message.parentId,
-        depth: message.depth,
         authorId: message.authorId,
         isAI: message.isAI,
         model: message.model,
@@ -333,7 +332,6 @@ export class MessageRepository {
         .update(chatMessages)
         .set({
           parentId: existingMessage.parentId,
-          depth: existingMessage.depth,
           updatedAt: new Date(),
         })
         .where(eq(chatMessages.parentId, urlPathParams.messageId));

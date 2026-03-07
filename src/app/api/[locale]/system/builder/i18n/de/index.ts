@@ -559,6 +559,12 @@ export const translations: typeof enTranslations = {
         description: "Git-Repository-URL",
         placeholder: "https://github.com/user/repo",
       },
+      packageOutputDir: {
+        title: "Ausgabeverzeichnis",
+        description:
+          "Verzeichnis, in das package.json geschrieben wird (Standard: dist/)",
+        placeholder: ".dist/checker",
+      },
       success: {
         title: "Erfolg",
       },

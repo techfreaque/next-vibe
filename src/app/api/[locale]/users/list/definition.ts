@@ -10,6 +10,7 @@ import {
   customWidgetObject,
   scopedBackButton,
   scopedObjectFieldNew,
+  scopedObjectOptionalField,
   scopedRequestField,
   scopedRequestResponseField,
   scopedResponseArrayFieldNew,
@@ -35,10 +36,9 @@ import {
   UserStatusFilter,
   UserStatusFilterOptions,
 } from "../enum";
+import { USERS_LIST_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { UsersListContainer } from "./widget";
-
-export const USERS_LIST_ALIAS = "users-list" as const;
 
 /**
  * Get Users List Endpoint (GET)
@@ -65,7 +65,7 @@ const { GET } = createEndpoint({
         usage: { request: "data", response: true },
       }),
       // === SEARCH & FILTERS ===
-      searchFilters: scopedObjectFieldNew(scopedTranslation, {
+      searchFilters: scopedObjectOptionalField(scopedTranslation, {
         type: WidgetType.CONTAINER,
         title: "get.searchFilters.title" as const,
         description: "get.searchFilters.description" as const,

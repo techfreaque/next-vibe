@@ -6,7 +6,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
-import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
+import { getEndpoint as globalGetEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import { scopedTranslation } from "@/app/api/[locale]/system/unified-interface/i18n";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -15,6 +15,10 @@ import type { EndpointLogger } from "../../logger/endpoint";
 import type { CreateApiEndpointAny } from "../../types/endpoint-base";
 import type { Platform } from "../../types/platform";
 import { permissionsRegistry } from "../permissions/registry";
+
+export type GetEndpointFn = (
+  path: string,
+) => Promise<CreateApiEndpointAny | null>;
 
 export interface LoadEndpointOptions {
   identifier: string;
@@ -45,6 +49,12 @@ export interface IDefinitionLoader {
 }
 
 export class DefinitionLoader implements IDefinitionLoader {
+  private readonly getEndpoint: GetEndpointFn;
+
+  constructor(getEndpoint: GetEndpointFn = globalGetEndpoint) {
+    this.getEndpoint = getEndpoint;
+  }
+
   async load<TEndpoint extends CreateApiEndpointAny = CreateApiEndpointAny>(
     options: LoadEndpointOptions,
   ): Promise<ResponseType<TEndpoint>> {
@@ -53,7 +63,7 @@ export class DefinitionLoader implements IDefinitionLoader {
     const { t } = scopedTranslation.scopedT(locale);
 
     try {
-      const endpoint = await getEndpoint(identifier);
+      const endpoint = await this.getEndpoint(identifier);
 
       if (!endpoint) {
         return fail({

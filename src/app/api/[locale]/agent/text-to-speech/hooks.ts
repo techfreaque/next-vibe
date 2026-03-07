@@ -6,7 +6,7 @@
 "use client";
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback } from "react";
 
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
@@ -19,6 +19,7 @@ import { chunkTextForTTS } from "./chunking";
 import textToSpeechDefinitions from "./definition";
 import type { TtsVoiceValue } from "./enum";
 import { DEFAULT_TTS_VOICE } from "./enum";
+import { getTtsRefs, resetTtsRefs, useTtsStore } from "./tts-store";
 
 interface UseTTSAudioOptions {
   text: string;
@@ -30,6 +31,8 @@ interface UseTTSAudioOptions {
   user: JwtPayloadType;
   logger: EndpointLogger;
   deductCredits: (creditCost: number, feature: string) => void;
+  /** Stable identifier for persisting state across unmounts */
+  messageId: string;
 }
 
 interface UseTTSAudioReturn {
@@ -51,24 +54,23 @@ export function useTTSAudio({
   user,
   logger,
   deductCredits,
+  messageId,
 }: UseTTSAudioOptions): UseTTSAudioReturn {
   const { t } = simpleT(locale);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [currentChunk, setCurrentChunk] = useState(0);
-  const [totalChunks, setTotalChunks] = useState(0);
+
+  // Read reactive state from the persistent store
+  const storeState = useTtsStore((s) => s.messages[messageId]);
+  const setStore = useTtsStore((s) => s.set);
+  const resetStore = useTtsStore((s) => s.reset);
+
+  const isPlaying = storeState?.isPlaying ?? false;
+  const isLoading = storeState?.isLoading ?? false;
+  const currentChunk = storeState?.currentChunk ?? 0;
+  const totalChunks = storeState?.totalChunks ?? 0;
+  const error = storeState?.error ?? null;
 
   // Use voice from props (set by chat settings)
   const voicePreference = voice ?? DEFAULT_TTS_VOICE;
-
-  // Refs for audio management
-  const audioQueueRef = useRef<(HTMLAudioElement | null)[]>([]);
-  const currentPlayingIndexRef = useRef(0);
-  const currentFetchingIndexRef = useRef(0);
-  const isProcessingRef = useRef(false);
-  const abortControllerRef = useRef<AbortController | null>(null);
-  const prefetchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const chunksRef = useRef<string[]>([]);
 
   // Use endpoint for type-safe API calls
   const endpoint = useEndpoint(
@@ -84,70 +86,60 @@ export function useTTSAudio({
     user,
   );
 
-  // Get loading state directly from the mutation
-  const isLoading = endpoint.create?.isSubmitting ?? false;
-
   // Cancel loading (interrupt API request and playback)
   const cancelLoading = useCallback((): void => {
+    const refs = getTtsRefs(messageId);
+
     logger.debug("TTS: Cancelling loading and playback", {
-      currentPlayingIndex: currentPlayingIndexRef.current,
-      currentFetchingIndex: currentFetchingIndexRef.current,
-      totalChunks: chunksRef.current.length,
-      audioQueueLength: audioQueueRef.current.length,
+      currentPlayingIndex: refs.currentPlayingIndex,
+      currentFetchingIndex: refs.currentFetchingIndex,
+      totalChunks: refs.chunks.length,
+      audioQueueLength: refs.audioQueue.length,
     });
 
     // Abort current fetch
-    if (abortControllerRef.current) {
+    if (refs.abortController) {
       logger.debug("TTS: Aborting current fetch request");
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
+      refs.abortController.abort();
+      refs.abortController = null;
     }
 
     // Clear prefetch timer
-    if (prefetchTimerRef.current) {
+    if (refs.prefetchTimer) {
       logger.debug("TTS: Clearing prefetch timer");
-      clearTimeout(prefetchTimerRef.current);
-      prefetchTimerRef.current = null;
+      clearTimeout(refs.prefetchTimer);
+      refs.prefetchTimer = null;
     }
 
     // Stop all audio playback
-    const audioCount = audioQueueRef.current.filter((a) => a !== null).length;
+    const audioCount = refs.audioQueue.filter((a) => a !== null).length;
     logger.debug(`TTS: Stopping ${audioCount} audio elements`);
-    audioQueueRef.current.forEach((audio) => {
+    refs.audioQueue.forEach((audio) => {
       if (audio) {
         audio.pause();
         audio.currentTime = 0;
       }
     });
 
-    // Clear audio queue
-    audioQueueRef.current = [];
-
-    // Reset state
-    isProcessingRef.current = false;
-    currentPlayingIndexRef.current = 0;
-    currentFetchingIndexRef.current = 0;
-    chunksRef.current = [];
-    setIsPlaying(false);
-    setCurrentChunk(0);
-    setTotalChunks(0);
+    resetTtsRefs(messageId);
+    resetStore(messageId);
 
     logger.debug("TTS: Cancel complete, all state reset");
-  }, [logger]);
+  }, [logger, messageId, resetStore]);
 
   // Stop audio playback
   const stopAudio = useCallback((): void => {
     logger.debug("TTS: Stopping audio");
 
-    // Stop currently playing audio
-    const currentAudio = audioQueueRef.current[currentPlayingIndexRef.current];
+    const refs = getTtsRefs(messageId);
+    const currentAudio = refs.audioQueue[refs.currentPlayingIndex];
     if (currentAudio) {
       currentAudio.pause();
       currentAudio.currentTime = 0;
     }
 
-    setIsPlaying(false);
-  }, [logger]);
+    setStore(messageId, { isPlaying: false });
+  }, [logger, messageId, setStore]);
 
   // Fetch audio for a specific chunk
   const fetchChunkAudio = useCallback(
@@ -159,15 +151,15 @@ export function useTTSAudio({
         return Promise.resolve(null);
       }
 
+      const refs = getTtsRefs(messageId);
+
       logger.debug(
-        `TTS: Fetching chunk ${chunkIndex + 1}/${chunksRef.current.length}`,
-        {
-          chunkLength: chunkText.length,
-        },
+        `TTS: Fetching chunk ${chunkIndex + 1}/${refs.chunks.length}`,
+        { chunkLength: chunkText.length },
       );
 
       // Create new AbortController for this chunk
-      abortControllerRef.current = new AbortController();
+      refs.abortController = new AbortController();
 
       return new Promise((resolve) => {
         // Set form values for this chunk
@@ -183,54 +175,62 @@ export function useTTSAudio({
             });
 
             // Optimistically update credit balance in UI
-            // Calculate credits based on character count
             const characterCount = chunkText.length;
             const creditCost = characterCount * TTS_COST_PER_CHARACTER;
             if (creditCost > 0) {
               deductCredits(creditCost, "tts");
             }
 
-            // Create audio element
             const audio = new Audio(audioDataUrl);
             resolve(audio);
           },
-          onError: ({ error }) => {
+          onError: ({ error: endpointError }) => {
+            const refs2 = getTtsRefs(messageId);
             // Check if this was an abort
-            if (abortControllerRef.current?.signal.aborted) {
+            if (refs2.abortController?.signal.aborted) {
               logger.debug(`TTS: Chunk ${chunkIndex + 1} was cancelled`);
               resolve(null);
               return;
             }
 
             logger.error(`TTS: Failed to fetch chunk ${chunkIndex + 1}`, {
-              errorType: error.errorType,
-              errorMessage: error.message,
+              errorType: endpointError.errorType,
+              errorMessage: endpointError.message,
             });
             const errorMsg =
-              error.message || t("app.chat.hooks.tts.failed-to-generate");
-            setError(errorMsg);
+              endpointError.message ||
+              t("app.chat.hooks.tts.failed-to-generate");
+            setStore(messageId, { error: errorMsg });
             onError?.(errorMsg);
             resolve(null);
           },
         });
       });
     },
-    [endpoint, logger, t, onError, deductCredits, voicePreference],
+    [
+      endpoint,
+      logger,
+      messageId,
+      t,
+      onError,
+      deductCredits,
+      voicePreference,
+      setStore,
+    ],
   );
 
-  // Play next chunk in the queue
+  // Play next chunk in the queue — defined as a stable ref-based function
+  // We use a plain function (not useCallback) because it calls itself recursively
+  // and references refs directly — no stale closure issues.
   const playNextChunk = useCallback((): void => {
-    const nextIndex = currentPlayingIndexRef.current;
-    const audio = audioQueueRef.current[nextIndex];
+    const refs = getTtsRefs(messageId);
+    const nextIndex = refs.currentPlayingIndex;
+    const audio = refs.audioQueue[nextIndex];
 
     logger.info(`TTS: playNextChunk called`, {
       nextIndex,
-      totalChunks: chunksRef.current.length,
+      totalChunks: refs.chunks.length,
       hasAudio: !!audio,
-      queueState: audioQueueRef.current.map((a, i) => ({
-        index: i,
-        hasAudio: !!a,
-      })),
     });
 
     if (!audio) {
@@ -238,90 +238,39 @@ export function useTTSAudio({
       return;
     }
 
-    logger.info(
-      `TTS: Playing chunk ${nextIndex + 1}/${chunksRef.current.length}`,
-    );
-    setCurrentChunk(nextIndex + 1);
-    setIsPlaying(true);
+    logger.info(`TTS: Playing chunk ${nextIndex + 1}/${refs.chunks.length}`);
+    setStore(messageId, { currentChunk: nextIndex + 1, isPlaying: true });
 
     // Schedule prefetch of next chunk based on current audio duration
     const schedulePrefetch = (): void => {
       const duration = audio.duration;
 
       if (!duration || isNaN(duration)) {
-        logger.info(
-          `TTS: Chunk ${nextIndex + 1} duration not available yet, will retry`,
-        );
         return;
       }
 
-      logger.info(`TTS: Chunk ${nextIndex + 1} duration: ${duration}s`, {
-        currentFetchingIndex: currentFetchingIndexRef.current,
-        totalChunks: chunksRef.current.length,
-      });
-
-      // Schedule prefetch of next chunk (2 seconds before this one ends)
       const PREFETCH_MARGIN = 2; // seconds
       const prefetchDelay = Math.max(0, (duration - PREFETCH_MARGIN) * 1000);
 
-      if (prefetchTimerRef.current) {
-        clearTimeout(prefetchTimerRef.current);
+      if (refs.prefetchTimer) {
+        clearTimeout(refs.prefetchTimer);
       }
 
-      logger.info(`TTS: Scheduling prefetch`, {
-        nextFetchIndex: currentFetchingIndexRef.current,
-        prefetchDelay: `${prefetchDelay}ms`,
-        willPrefetch:
-          currentFetchingIndexRef.current < chunksRef.current.length,
-      });
-
-      prefetchTimerRef.current = setTimeout(() => {
-        const nextFetchIndex = currentFetchingIndexRef.current;
-        if (nextFetchIndex < chunksRef.current.length) {
-          logger.info(
-            `TTS: Prefetch timer fired, fetching chunk ${nextFetchIndex + 1}`,
-          );
+      refs.prefetchTimer = setTimeout(() => {
+        const currentRefs = getTtsRefs(messageId);
+        const nextFetchIndex = currentRefs.currentFetchingIndex;
+        if (nextFetchIndex < currentRefs.chunks.length) {
           void fetchChunkAudio(
             nextFetchIndex,
-            chunksRef.current[nextFetchIndex]!,
+            currentRefs.chunks[nextFetchIndex]!,
           ).then((nextAudio) => {
             if (nextAudio) {
-              logger.info(
-                `TTS: Prefetched chunk ${nextFetchIndex + 1} successfully`,
-                {
-                  isProcessing: isProcessingRef.current,
-                  currentPlayingIndex: currentPlayingIndexRef.current,
-                  nextFetchIndex,
-                  shouldAutoPlay:
-                    isProcessingRef.current &&
-                    currentPlayingIndexRef.current === nextFetchIndex,
-                },
-              );
-              audioQueueRef.current[nextFetchIndex] = nextAudio;
-              currentFetchingIndexRef.current++;
+              const r = getTtsRefs(messageId);
+              r.audioQueue[nextFetchIndex] = nextAudio;
+              r.currentFetchingIndex++;
 
-              // If we're waiting for this chunk to play, start playing it now
-              // Check: we're still processing AND the current playing index matches this chunk
-              if (
-                isProcessingRef.current &&
-                currentPlayingIndexRef.current === nextFetchIndex
-              ) {
-                logger.info(
-                  `TTS: Auto-playing fetched chunk ${nextFetchIndex + 1}`,
-                );
+              if (r.isProcessing && r.currentPlayingIndex === nextFetchIndex) {
                 playNextChunk();
-              } else {
-                logger.info(
-                  `TTS: NOT auto-playing chunk ${nextFetchIndex + 1}`,
-                  {
-                    reason: isProcessingRef.current
-                      ? "playing index mismatch"
-                      : "not processing",
-                    isProcessing: isProcessingRef.current,
-                    currentPlayingIndex: currentPlayingIndexRef.current,
-                    nextFetchIndex,
-                  },
-                );
               }
             } else {
               logger.error(
@@ -330,107 +279,65 @@ export function useTTSAudio({
             }
             return undefined;
           });
-        } else {
-          logger.info(`TTS: No more chunks to prefetch`);
         }
       }, prefetchDelay);
     };
 
-    // Define loadedmetadata handler (may or may not be used)
     const onLoadedMetadata = (): void => {
       schedulePrefetch();
       audio.removeEventListener("loadedmetadata", onLoadedMetadata);
     };
 
-    // Try to schedule prefetch immediately if duration is available
     if (audio.duration && !isNaN(audio.duration)) {
       schedulePrefetch();
     } else {
-      // If duration not available yet, wait for loadedmetadata event
       audio.addEventListener("loadedmetadata", onLoadedMetadata);
     }
 
-    // Set up event listeners
     const onEnded = (): void => {
-      logger.info(`TTS: Chunk ${nextIndex + 1} playback ended`, {
-        currentPlayingIndex: currentPlayingIndexRef.current,
-        totalChunks: chunksRef.current.length,
-      });
-
-      // Remove event listeners to prevent memory leaks
       audio.removeEventListener("ended", onEnded);
       audio.removeEventListener("error", onAudioError);
 
-      // Move to next chunk
-      currentPlayingIndexRef.current++;
+      const refs2 = getTtsRefs(messageId);
+      refs2.currentPlayingIndex++;
 
-      logger.debug(`TTS: Moving to next chunk`, {
-        newPlayingIndex: currentPlayingIndexRef.current,
-        totalChunks: chunksRef.current.length,
-      });
-
-      // Check if there are more chunks to play
-      logger.info(`TTS: Checking for more chunks`, {
-        currentPlayingIndex: currentPlayingIndexRef.current,
-        totalChunks: chunksRef.current.length,
-        hasMoreChunks:
-          currentPlayingIndexRef.current < chunksRef.current.length,
-      });
-
-      if (currentPlayingIndexRef.current < chunksRef.current.length) {
-        const nextAudio = audioQueueRef.current[currentPlayingIndexRef.current];
-        logger.info(`TTS: Next chunk status`, {
-          nextIndex: currentPlayingIndexRef.current,
-          hasNextAudio: !!nextAudio,
-          isProcessing: isProcessingRef.current,
-        });
-
+      if (refs2.currentPlayingIndex < refs2.chunks.length) {
+        const nextAudio = refs2.audioQueue[refs2.currentPlayingIndex];
         if (nextAudio) {
-          // Next chunk is ready, play it immediately
-          logger.info(
-            `TTS: Next chunk ${currentPlayingIndexRef.current + 1} is ready, playing now`,
-          );
           playNextChunk();
         } else {
-          // Next chunk not ready yet, wait for it
-          logger.info(
-            `TTS: Waiting for chunk ${currentPlayingIndexRef.current + 1} to be fetched`,
-            {
-              isProcessing: isProcessingRef.current,
-              currentFetchingIndex: currentFetchingIndexRef.current,
-            },
-          );
-          setIsPlaying(false);
+          setStore(messageId, { isPlaying: false });
         }
       } else {
         // All chunks played
         logger.info("TTS: All chunks played, stopping");
-        setIsPlaying(false);
-        isProcessingRef.current = false;
+        setStore(messageId, { isPlaying: false });
+        refs2.isProcessing = false;
       }
     };
 
     const onAudioError = (): void => {
+      audio.removeEventListener("ended", onEnded);
+      audio.removeEventListener("error", onAudioError);
+
       const audioError = new Error(t("app.chat.hooks.tts.failed-to-play"));
       logger.error(
         `TTS: Chunk ${nextIndex + 1} playback error`,
         parseError(audioError),
       );
 
-      // Remove event listeners
-      audio.removeEventListener("ended", onEnded);
-      audio.removeEventListener("error", onAudioError);
+      setStore(messageId, {
+        error: t("app.chat.hooks.tts.failed-to-play"),
+        isPlaying: false,
+      });
 
-      setError(t("app.chat.hooks.tts.failed-to-play"));
-      setIsPlaying(false);
-      isProcessingRef.current = false;
+      const refs2 = getTtsRefs(messageId);
+      refs2.isProcessing = false;
     };
 
     audio.addEventListener("ended", onEnded);
     audio.addEventListener("error", onAudioError);
 
-    // Play audio
-    logger.debug(`TTS: Starting audio.play() for chunk ${nextIndex + 1}`);
     void audio
       .play()
       .then(() => {
@@ -442,21 +349,25 @@ export function useTTSAudio({
           error: err instanceof Error ? err.message : String(err),
         });
 
-        // Remove event listeners
         audio.removeEventListener("ended", onEnded);
         audio.removeEventListener("error", onAudioError);
         audio.removeEventListener("loadedmetadata", onLoadedMetadata);
 
-        setError(t("app.chat.hooks.tts.failed-to-play"));
-        setIsPlaying(false);
-        isProcessingRef.current = false;
-      });
-  }, [logger, t, fetchChunkAudio]);
+        setStore(messageId, {
+          error: t("app.chat.hooks.tts.failed-to-play"),
+          isPlaying: false,
+        });
 
-  // Main play audio function - orchestrates chunked generation
+        const refs2 = getTtsRefs(messageId);
+        refs2.isProcessing = false;
+      });
+  }, [logger, messageId, t, fetchChunkAudio, setStore]);
+
+  // Main play audio function
   const playAudio = useCallback(async (): Promise<void> => {
-    // Prevent concurrent processing
-    if (isProcessingRef.current) {
+    const refs = getTtsRefs(messageId);
+
+    if (refs.isProcessing) {
       logger.debug("TTS: Already processing, skipping");
       return;
     }
@@ -469,13 +380,13 @@ export function useTTSAudio({
     if (!endpoint.create) {
       const errorMsg = t("app.chat.hooks.tts.endpoint-not-available");
       logger.error("TTS: Endpoint not available", errorMsg);
-      setError(errorMsg);
+      setStore(messageId, { error: errorMsg });
       onError?.(errorMsg);
       return;
     }
 
-    isProcessingRef.current = true;
-    setError(null);
+    refs.isProcessing = true;
+    setStore(messageId, { error: null, isLoading: true });
 
     try {
       logger.info("TTS: Starting playAudio", {
@@ -483,17 +394,15 @@ export function useTTSAudio({
         originalTextPreview: text.slice(0, 100),
       });
 
-      // Text has already been processed by processMessageGroupForTTS
-      // (think tags stripped, markdown removed, line breaks converted to pauses)
       if (!text.trim()) {
         logger.info("TTS: No text to process");
-        isProcessingRef.current = false;
+        refs.isProcessing = false;
+        setStore(messageId, { isLoading: false });
         return;
       }
 
-      // Split text into chunks
       const chunks = chunkTextForTTS(text);
-      chunksRef.current = chunks;
+      refs.chunks = chunks;
 
       logger.info("TTS: Text chunked", {
         numChunks: chunks.length,
@@ -501,40 +410,26 @@ export function useTTSAudio({
         firstChunkPreview: chunks[0]?.slice(0, 50),
       });
 
-      // Initialize state
-      setTotalChunks(chunks.length);
-      setCurrentChunk(0);
-      audioQueueRef.current = Array.from({ length: chunks.length }, () => null);
-      currentPlayingIndexRef.current = 0;
-      currentFetchingIndexRef.current = 1; // Will fetch chunk 1 after chunk 0 starts playing
-
-      // Fetch first chunk
-      logger.debug("TTS: Fetching first chunk", {
-        chunkIndex: 0,
-        chunkLength: chunks[0]!.length,
-      });
+      setStore(messageId, { totalChunks: chunks.length, currentChunk: 0 });
+      refs.audioQueue = Array.from({ length: chunks.length }, () => null);
+      refs.currentPlayingIndex = 0;
+      refs.currentFetchingIndex = 1;
 
       const firstAudio = await fetchChunkAudio(0, chunks[0]!);
 
       if (!firstAudio) {
         logger.error("TTS: Failed to fetch first chunk");
-        isProcessingRef.current = false;
+        refs.isProcessing = false;
+        setStore(messageId, { isLoading: false });
         return;
       }
 
-      logger.debug("TTS: First chunk fetched successfully", {
-        audioDuration: firstAudio.duration,
-      });
-
-      // Store first audio in queue
-      audioQueueRef.current[0] = firstAudio;
-
-      // Start playing first chunk (this will trigger prefetching of next chunks)
-      logger.debug("TTS: Starting playback of first chunk");
+      refs.audioQueue[0] = firstAudio;
+      setStore(messageId, { isLoading: false });
       playNextChunk();
     } catch (err) {
-      // Check if this was an abort
-      if (abortControllerRef.current?.signal.aborted) {
+      const refs2 = getTtsRefs(messageId);
+      if (refs2.abortController?.signal.aborted) {
         logger.debug("TTS: Request was cancelled by user");
         return;
       }
@@ -544,47 +439,21 @@ export function useTTSAudio({
           ? err.message
           : t("app.chat.hooks.tts.failed-to-generate");
       logger.error("TTS: Exception during processing", parseError(err));
-      setError(errorMsg);
+      setStore(messageId, { error: errorMsg, isLoading: false });
       onError?.(errorMsg);
-      isProcessingRef.current = false;
+      refs2.isProcessing = false;
     }
-  }, [text, endpoint, logger, t, onError, fetchChunkAudio, playNextChunk]);
-
-  // Auto-play when streaming completes if enabled
-  // TODO: Re-enable auto TTS after fixing timing and UX issues
-  // useEffect(() => {
-  //   // Only auto-play if:
-  //   // 1. Auto-play is enabled
-  //   // 2. We haven't played yet
-  //   // 3. There's text to play
-  //   // 4. Streaming is complete (isStreaming is false)
-  //   if (enabled && !hasPlayedRef.current && text.trim() && !isStreaming) {
-  //     hasPlayedRef.current = true;
-  //     void playAudio();
-  //   }
-  // }, [enabled, text, isStreaming, playAudio]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return (): void => {
-      // Stop all audio in queue
-      audioQueueRef.current.forEach((audio) => {
-        if (audio) {
-          audio.pause();
-        }
-      });
-
-      // Clear prefetch timer
-      if (prefetchTimerRef.current) {
-        clearTimeout(prefetchTimerRef.current);
-      }
-
-      // Abort any pending requests
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
-  }, []);
+  }, [
+    text,
+    endpoint,
+    logger,
+    messageId,
+    t,
+    onError,
+    fetchChunkAudio,
+    playNextChunk,
+    setStore,
+  ]);
 
   return {
     isLoading,

@@ -20,7 +20,10 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import type { TParams, TranslationKey } from "@/i18n/core/static-types";
 
 import { TOOL_HELP_ALIAS } from "../../../help/constants";
-import { definitionLoader } from "../../shared/endpoints/definition/loader";
+import {
+  definitionLoader,
+  type IDefinitionLoader,
+} from "../../shared/endpoints/definition/loader";
 import {
   type BaseExecutionContext,
   RouteExecutionExecutor,
@@ -170,6 +173,7 @@ export class RouteDelegationHandler {
     command: string,
     options: CliExecutionOptions,
     logger: EndpointLogger,
+    loader: IDefinitionLoader = definitionLoader,
   ): Promise<RouteExecutionResult> {
     const startTime = Date.now();
 
@@ -195,7 +199,7 @@ export class RouteDelegationHandler {
 
       // Get endpoint definition for CLI-specific features (interactive forms, arg parsing)
       // For remote execution, skip access validation — the remote server handles its own auth
-      const endpointResult = await definitionLoader.load<CreateApiEndpointAny>({
+      const endpointResult = await loader.load<CreateApiEndpointAny>({
         identifier: resolvedCommand,
         platform: options.platform,
         user: cliUser,

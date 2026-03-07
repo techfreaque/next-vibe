@@ -3,7 +3,9 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { Form } from "next-vibe-ui/ui/form/form";
-import { Check, Send, X } from "next-vibe-ui/ui/icons";
+import { Check } from "next-vibe-ui/ui/icons/Check";
+import { Send } from "next-vibe-ui/ui/icons/Send";
+import { X } from "next-vibe-ui/ui/icons/X";
 import { Input } from "next-vibe-ui/ui/input";
 import { H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";

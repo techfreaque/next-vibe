@@ -11,7 +11,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "next-vibe-ui/ui/dropdown-menu";
-import { HelpCircle, LogOut, User } from "next-vibe-ui/ui/icons";
+import { HelpCircle } from "next-vibe-ui/ui/icons/HelpCircle";
+import { LogOut } from "next-vibe-ui/ui/icons/LogOut";
+import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
+import { Settings } from "next-vibe-ui/ui/icons/Settings";
+import { User } from "next-vibe-ui/ui/icons/User";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
@@ -35,7 +39,6 @@ export function UserMenu({
   user,
   userProfile,
   locale,
-  hasSubscription,
 }: UserMenuProps): JSX.Element {
   const { t } = simpleT(locale);
   const logger = createEndpointLogger(false, Date.now(), locale);
@@ -66,33 +69,26 @@ export function UserMenu({
           </DropdownMenuLabel>
         )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link
-            href={hasSubscription ? `/${locale}` : `/${locale}/subscription`}
-          >
-            {hasSubscription ? (
-              <>
-                <User className="mr-2 h-4 w-4" />
-                <Span>{t("app.story._components.nav.user.dashboard")}</Span>
-              </>
-            ) : (
-              <>
-                <User className="mr-2 h-4 w-4 text-orange-500" />
-                <Span className="text-orange-600 dark:text-orange-400">
-                  {t("app.story._components.nav.user.completeOnboarding")}
-                </Span>
-              </>
-            )}
+        <DropdownMenuItem asChild className="cursor-pointer">
+          <Link href={`/${locale}/threads`}>
+            <MessageSquare className="mr-2 h-4 w-4" />
+            <Span>{t("app.story._components.nav.goToApp")}</Span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem asChild className="cursor-pointer">
+          <Link href={`/${locale}/subscription`}>
+            <Settings className="mr-2 h-4 w-4" />
+            <Span>{t("app.story._components.nav.pricing")}</Span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild className="cursor-pointer">
           <Link href={`/${locale}/help`}>
             <HelpCircle className="mr-2 h-4 w-4" />
             <Span>{t("app.story._components.nav.help")}</Span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={logout}>
+        <DropdownMenuItem onClick={logout} className="cursor-pointer">
           <LogOut className="mr-2 h-4 w-4" />
           <Span>{t("app.story._components.nav.logout")}</Span>
         </DropdownMenuItem>

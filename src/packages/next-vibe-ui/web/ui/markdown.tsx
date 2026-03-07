@@ -335,18 +335,18 @@ export const Markdown = memo(function Markdown({
         code: memo(
           ({
             children,
-            className,
+            className: codeClassName,
             ...props
           }: {
             children: React.ReactNode;
             className?: string;
           }) => {
-            const match = /language-(\w+)/.exec(className || "");
+            const match = /language-(\w+)/.exec(codeClassName || "");
             // eslint-disable-next-line @typescript-eslint/no-base-to-string
             const codeString = String(children).replace(/\n$/, "");
 
             // Check if this is a code block (has newlines or is in a pre tag)
-            const isCodeBlock = codeString.includes("\n") || className;
+            const isCodeBlock = codeString.includes("\n") || codeClassName;
 
             if (match) {
               return <CodeBlock code={codeString} language={match[1]} />;

@@ -7,6 +7,7 @@
  * - Bun builds: executable
  */
 
+import type { BunPlugin } from "bun";
 import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
@@ -1166,6 +1167,18 @@ const { POST } = createEndpoint({
                   ])
                   .optional(),
               }),
+
+              outputDir: scopedRequestField(scopedTranslation, {
+                type: WidgetType.FORM_FIELD,
+                fieldType: FieldDataType.TEXT,
+                label: "post.fields.packageOutputDir.title",
+                description: "post.fields.packageOutputDir.description",
+                placeholder: "post.fields.packageOutputDir.placeholder",
+                optional: true,
+                icon: "folder-output",
+                colSpan: 12,
+                schema: z.string().optional(),
+              }),
             },
           }),
         },
@@ -1464,8 +1477,11 @@ export type CopyConfig = NonNullable<
 /** NPM package config type inferred from API definition */
 export type NpmPackageConfig = NonNullable<ApiConfigObject["npmPackage"]>;
 
-/** Bun build options type inferred from API definition */
-export type BunBuildOptions = NonNullable<FileToCompile["bunOptions"]>;
+/** Bun build options type inferred from API definition, extended with runtime-only fields */
+export type BunBuildOptions = NonNullable<FileToCompile["bunOptions"]> & {
+  /** Bun build plugins — programmatic only, not serializable via API */
+  plugins?: BunPlugin[];
+};
 
 /** Vite options type inferred from API definition */
 export type ViteOptions = NonNullable<FileToCompile["viteOptions"]>;
@@ -1524,13 +1540,18 @@ export interface BuildHookContext {
 /** Build hook function */
 export type BuildHook = (context: BuildHookContext) => Promise<void> | void;
 
+/** FileToCompile with runtime-only fields (plugins) */
+export type FileToCompileWithPlugins = Omit<FileToCompile, "bunOptions"> & {
+  bunOptions?: BunBuildOptions;
+};
+
 /** Full BuildConfig type - API config + runtime-only fields (hooks, env, profiles) */
 export interface BuildConfig extends Omit<
   ApiConfigObject,
   "filesToCompile" | "filesOrFoldersToCopy" | "npmPackage"
 > {
   foldersToClean?: string[];
-  filesToCompile?: FileToCompile[];
+  filesToCompile?: FileToCompileWithPlugins[];
   filesOrFoldersToCopy?: CopyConfig[];
   npmPackage?: NpmPackageConfig | null;
   hooks?: {

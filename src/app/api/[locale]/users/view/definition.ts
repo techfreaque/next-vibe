@@ -210,8 +210,8 @@ export const { GET } = createEndpoint({
           isBanned: false,
           bannedReason: null,
           twoFactorEnabled: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          createdAt: "2024-01-15T10:00:00.000Z",
+          updatedAt: "2024-01-15T10:00:00.000Z",
         },
         chatStats: {
           totalThreads: 25,
@@ -220,7 +220,7 @@ export const { GET } = createEndpoint({
           totalMessages: 500,
           userMessages: 250,
           aiMessages: 250,
-          lastActivityAt: new Date(),
+          lastActivityAt: "2024-01-15T10:00:00.000Z",
         },
         creditInfo: {
           currentBalance: 1000,
@@ -228,13 +228,13 @@ export const { GET } = createEndpoint({
           totalCreditsEarned: 200,
           totalCreditsSpent: 1500,
           totalCreditsPurchased: 2300,
-          freePeriodStart: new Date(),
+          freePeriodStart: "2024-01-15T10:00:00.000Z",
           freePeriodId: "2026-02",
           subscriptionCredits: 800,
           permanentCredits: 500,
           bonusCredits: 200,
           earnedCredits: 100,
-          nextExpiry: new Date("2026-03-15"),
+          nextExpiry: "2026-03-15T00:00:00.000Z",
         },
         paymentStats: {
           totalRevenueCents: 5000,
@@ -242,15 +242,15 @@ export const { GET } = createEndpoint({
           successfulPayments: 5,
           failedPayments: 0,
           totalRefundsCents: 0,
-          lastPaymentAt: new Date(),
+          lastPaymentAt: "2024-01-15T10:00:00.000Z",
           stripeCustomerId: "cus_123",
           hasActiveSubscription: true,
         },
         newsletterInfo: {
           isSubscribed: true,
-          subscribedAt: new Date(),
-          confirmedAt: new Date(),
-          lastEmailSentAt: new Date(),
+          subscribedAt: "2024-01-15T10:00:00.000Z",
+          confirmedAt: "2024-01-15T10:00:00.000Z",
+          lastEmailSentAt: "2024-01-15T10:00:00.000Z",
         },
         referralStats: {
           totalReferrals: 3,
@@ -261,14 +261,14 @@ export const { GET } = createEndpoint({
         roles: [
           {
             role: "CUSTOMER",
-            assignedAt: new Date(),
+            assignedAt: "2024-01-15T10:00:00.000Z",
           },
         ],
         recentActivity: {
-          lastLogin: new Date(),
-          lastThreadCreated: new Date(),
-          lastMessageSent: new Date(),
-          lastPayment: new Date(),
+          lastLogin: "2024-01-15T10:00:00.000Z",
+          lastThreadCreated: "2024-01-15T10:00:00.000Z",
+          lastMessageSent: "2024-01-15T10:00:00.000Z",
+          lastPayment: "2024-01-15T10:00:00.000Z",
         },
         modelUsageStats: [
           {

@@ -377,8 +377,11 @@ export async function generateMemorySummary(params: {
     memoryCount: memoriesList.length,
   });
 
+  // Map memoryNumber → id so formatter type matches MemoriesList
+  const mapped = memoriesList.map((m) => ({ ...m, id: m.memoryNumber }));
+
   // Use shared formatter (DRY - same logic as client)
-  return formatMemorySummary(memoriesList);
+  return formatMemorySummary(mapped);
 }
 
 /**

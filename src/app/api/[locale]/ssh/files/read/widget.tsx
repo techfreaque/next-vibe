@@ -6,7 +6,7 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { FileText } from "next-vibe-ui/ui/icons";
+import { FileText } from "next-vibe-ui/ui/icons/FileText";
 import { Pre } from "next-vibe-ui/ui/pre";
 import { Span } from "next-vibe-ui/ui/span";
 import { Textarea } from "next-vibe-ui/ui/textarea";

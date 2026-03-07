@@ -7,15 +7,13 @@
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  AlertCircle,
-  Check,
-  Copy,
-  DollarSign,
-  Link2,
-  TrendingUp,
-  Users,
-} from "next-vibe-ui/ui/icons";
+import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
+import { Check } from "next-vibe-ui/ui/icons/Check";
+import { Copy } from "next-vibe-ui/ui/icons/Copy";
+import { DollarSign } from "next-vibe-ui/ui/icons/DollarSign";
+import { Link2 } from "next-vibe-ui/ui/icons/Link2";
+import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
+import { Users } from "next-vibe-ui/ui/icons/Users";
 import { Span } from "next-vibe-ui/ui/span";
 import { useState } from "react";
 

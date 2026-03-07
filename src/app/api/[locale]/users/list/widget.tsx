@@ -8,18 +8,16 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  BarChart3,
-  ChevronLeft,
-  ChevronRight,
-  CreditCard,
-  Eye,
-  Loader2,
-  Pencil,
-  RefreshCw,
-  Trash2,
-  UserPlus,
-} from "next-vibe-ui/ui/icons";
+import { BarChart3 } from "next-vibe-ui/ui/icons/BarChart3";
+import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
+import { Eye } from "next-vibe-ui/ui/icons/Eye";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
+import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
+import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
 import {
   Select,
   SelectContent,
@@ -317,6 +315,7 @@ export function UsersListContainer({
       navigate(userDefinitions.default.DELETE, {
         urlPathParams: { id: user.id },
         popNavigationOnSuccess: 1,
+        renderInModal: true,
       });
     },
     [navigate],

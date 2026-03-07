@@ -60,6 +60,11 @@ export const translations: typeof enTranslations = {
         title: "Seeding überspringen",
         description: "Datenbank-Seeding mit Anfangsdaten überspringen",
       },
+      profile: {
+        title: "Profiling",
+        description:
+          "Profiling aktivieren: setzt NEXT_TURBOPACK_TRACING=1 (Trace-Datei unter .next/dev/trace-turbopack) und NEXT_CPU_PROF=1 (schreibt .cpuprofile beim Beenden)",
+      },
       success: {
         title: "Erfolg",
       },

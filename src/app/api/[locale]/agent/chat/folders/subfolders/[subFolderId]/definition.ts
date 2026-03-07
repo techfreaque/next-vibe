@@ -36,6 +36,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["agent", "chat", "folders", "subfolders", "[subFolderId]"],
+  aliases: ["folder-get"] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "get.title" as const,
@@ -164,8 +165,8 @@ const { GET } = createEndpoint({
         rootFolderId: DefaultFolderId.PRIVATE,
         expanded: false,
         sortOrder: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: "2024-01-15T10:00:00.000Z",
+        updatedAt: "2024-01-15T10:00:00.000Z",
       },
     },
   },
@@ -178,6 +179,7 @@ const { DELETE } = createEndpoint({
   scopedTranslation,
   method: Methods.DELETE,
   path: ["agent", "chat", "folders", "subfolders", "[subFolderId]"],
+  aliases: ["folder-delete"] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "delete.title" as const,
@@ -262,7 +264,7 @@ const { DELETE } = createEndpoint({
     responses: {
       default: {
         name: "My Folder",
-        updatedAt: new Date().toISOString(),
+        updatedAt: "2024-01-15T10:00:00.000Z",
       },
     },
   },

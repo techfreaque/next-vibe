@@ -17,23 +17,21 @@ import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  ChevronDown,
-  ChevronRight,
-  Code,
-  Copy,
-  Eye,
-  Frame,
-  Layout,
-  Moon,
-  MousePointerClick,
-  Plus,
-  Settings,
-  Sun,
-  Trash2,
-  X,
-  Zap,
-} from "next-vibe-ui/ui/icons";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { Code } from "next-vibe-ui/ui/icons/Code";
+import { Copy } from "next-vibe-ui/ui/icons/Copy";
+import { Eye } from "next-vibe-ui/ui/icons/Eye";
+import { Frame } from "next-vibe-ui/ui/icons/Frame";
+import { Layout } from "next-vibe-ui/ui/icons/Layout";
+import { Moon } from "next-vibe-ui/ui/icons/Moon";
+import { MousePointerClick } from "next-vibe-ui/ui/icons/MousePointerClick";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
+import { Settings } from "next-vibe-ui/ui/icons/Settings";
+import { Sun } from "next-vibe-ui/ui/icons/Sun";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
+import { X } from "next-vibe-ui/ui/icons/X";
+import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Span } from "next-vibe-ui/ui/span";
 import { H2, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
@@ -367,7 +365,7 @@ function WidgetConfigCard({
                 { value: "immediate", label: "Immediate" },
                 { value: "scroll", label: "Scroll" },
                 { value: "time", label: "Time" },
-                { value: "exitIntent", label: "Exit" },
+                { value: "exit-intent", label: "Exit" },
                 { value: "click", label: "Click" },
               ]}
             />
@@ -387,7 +385,7 @@ function WidgetConfigCard({
           )}
 
           {(widget.triggerType === "time" ||
-            widget.triggerType === "exitIntent") && (
+            widget.triggerType === "exit-intent") && (
             <ConfigField label="Delay (ms)">
               <input
                 type="number"
@@ -898,7 +896,7 @@ export function VibeFrameTestPageClient({
           if (w.triggerType === "scroll") {
             tLines.push(`scrollPercent: ${w.triggerScrollPercent}`);
           }
-          if (w.triggerType === "time" || w.triggerType === "exitIntent") {
+          if (w.triggerType === "time" || w.triggerType === "exit-intent") {
             tLines.push(`delayMs: ${w.triggerDelay}`);
           }
           if (w.triggerType === "click" && w.triggerClickSelector) {
@@ -926,7 +924,7 @@ export function VibeFrameTestPageClient({
       })
       .join(",\n");
 
-    return `<script src="${serverUrl}/vibe-frame.js"></script>
+    return `<script src="${serverUrl}/vibe-frame/vibe-frame.js"></script>
 <script>
   VibeFrame.mount([
 ${widgetConfigs}

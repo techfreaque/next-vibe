@@ -2,11 +2,9 @@
 
 import * as ContextMenuPrimitive from "@radix-ui/react-context-menu";
 import { cn } from "next-vibe/shared/utils/utils";
-import {
-  CheckIcon,
-  ChevronRightIcon,
-  DotFilledIcon,
-} from "next-vibe-ui/ui/icons";
+import { CheckIcon } from "next-vibe-ui/ui/icons/CheckIcon";
+import { ChevronRightIcon } from "next-vibe-ui/ui/icons/ChevronRightIcon";
+import { DotFilledIcon } from "next-vibe-ui/ui/icons/DotFilledIcon";
 import * as React from "react";
 
 import type { StyleType } from "../utils/style-type";

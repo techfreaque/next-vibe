@@ -2,14 +2,12 @@ import type { Metadata } from "next";
 import { Button } from "next-vibe-ui/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  ArrowLeft,
-  Award,
-  Globe,
-  Handshake,
-  Heart,
-  Lightbulb,
-} from "next-vibe-ui/ui/icons";
+import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { Award } from "next-vibe-ui/ui/icons/Award";
+import { Globe } from "next-vibe-ui/ui/icons/Globe";
+import { Handshake } from "next-vibe-ui/ui/icons/Handshake";
+import { Heart } from "next-vibe-ui/ui/icons/Heart";
+import { Lightbulb } from "next-vibe-ui/ui/icons/Lightbulb";
 import { Image } from "next-vibe-ui/ui/image";
 import { Link } from "next-vibe-ui/ui/link";
 import { Separator } from "next-vibe-ui/ui/separator";

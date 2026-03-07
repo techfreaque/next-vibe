@@ -3,7 +3,9 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Code, Copy, FileText } from "next-vibe-ui/ui/icons";
+import { Code } from "next-vibe-ui/ui/icons/Code";
+import { Copy } from "next-vibe-ui/ui/icons/Copy";
+import { FileText } from "next-vibe-ui/ui/icons/FileText";
 import { Markdown } from "next-vibe-ui/ui/markdown";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";

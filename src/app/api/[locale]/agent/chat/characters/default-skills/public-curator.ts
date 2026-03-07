@@ -5,9 +5,9 @@ import { TtsVoice } from "../../../text-to-speech/enum";
 import {
   MEMORY_DELETE_ALIAS,
   MEMORY_UPDATE_ALIAS,
-} from "../../memories/[id]/definition";
-import { MEMORY_ADD_ALIAS } from "../../memories/create/definition";
-import { MEMORY_LIST_ALIAS } from "../../memories/definition";
+} from "../../memories/[id]/constants";
+import { MEMORY_LIST_ALIAS } from "../../memories/constants";
+import { MEMORY_ADD_ALIAS } from "../../memories/create/constants";
 import type { Character } from "../config";
 import { tool } from "../config";
 import { CharacterCategory, CharacterOwnershipType } from "../enum";

@@ -4,24 +4,18 @@
 
 ## Project Overview
 
-**unbottled.ai** — Free speech AI platform with 42+ models (mainstream/open/uncensored). Users choose their own filtering level.
+**unbottled.ai** — Free speech AI platform with 42+ models (mainstream/open/uncensored). Users choose their own filtering level. Open source, privacy-first, user-controlled censorship.
 
-**next-vibe** — SaaS framework powering unbottled.ai. Spiritual successor to WordPress. Same codebase, unified architecture.
-
-Open source, privacy-first, user-controlled censorship.
+**next-vibe** — SaaS framework powering unbottled.ai. Spiritual successor to WordPress. Same codebase, unified architecture: Web UI, Native app, CLI, AI-callable tool, Cron job, MCP server — via platform markers.
 
 ## Tech Stack
 
 - **Runtime:** Bun (NOT Node/npm/yarn — use `bun run`, `bun install`)
 - **Framework:** Next.js with App Router
-- **Language:** TypeScript strict mode (NO `any` types, NO `unknown` casts)
+- **Language:** TypeScript strict mode (NO `any`, NO `unknown` casts)
 - **ORM:** Drizzle ORM with PostgreSQL
 - **Validation:** Zod schemas everywhere
 - **Quality:** Vibe checker (Oxlint + ESLint + TypeScript) — use `mcp vibe-local check`, never `tsc`/`eslint` via Bash
-
-## Unified Architecture
-
-One codebase, multiple renderers: Web UI, Native app, CLI, AI-callable tool, Cron job, MCP server. Every endpoint definition can become ALL of these via platform markers.
 
 ## Code Quality — Absolute Rules
 
@@ -46,13 +40,13 @@ src/app/api/[locale]/<category>/<feature>/
   hooks.ts         — useEndpoint wrapper (only if used cross-module) — OR hooks/ folder
 ```
 
-**Widget rules (strict):** Widget is scoped to the deepest route, self-contained. Shared UI lives in the widget of its canonical owner endpoint (the one conceptually responsible for it); other endpoints may import from the owner, never the reverse. Other endpoints' full UI is embedded via `EndpointsPage` (dialog) or `navigation.push()` — never by importing their internal components directly.
+**Widget rules (strict):** Widget is scoped to the deepest route, self-contained. Shared UI lives in the widget of its canonical owner endpoint; other endpoints may import from the owner, never the reverse. Embed other endpoints' UI via `EndpointsPage` (dialog) or `navigation.push()` — never by importing their internal components.
 
-## Key Patterns to Match
+## Key Patterns
 
-- `createEndpoint({scopedTranslation, ...})` — Factory for endpoint contracts; `scopedTranslation` is required
+- `createEndpoint({scopedTranslation, ...})` — Factory for endpoint contracts; `scopedTranslation` required
 - `endpointsHandler()` — Wires definition + handler into Next.js route
-- `createEnumOptions(scopedTranslation, {...})` — i18n-friendly enum pattern (pass scopedTranslation, use short scoped keys)
+- `createEnumOptions(scopedTranslation, {...})` — i18n-friendly enum pattern
 - `scopedRequestField(scopedTranslation, {...})` — Request input fields (label, description, columns, schema)
 - `scopedResponseField(scopedTranslation, {...})` — Response display fields (content/text, schema)
 - `scopedObjectFieldNew(scopedTranslation, {...})` — Container/grouping with `children`, `layoutType`, `usage`
@@ -62,8 +56,6 @@ src/app/api/[locale]/<category>/<feature>/
 - `EndpointLogger` — Structured logging, passed through all layers
 
 ## Pattern Reference — Read Before You Write
-
-Before touching any file, read the corresponding pattern doc:
 
 | File you're working on   | Read this first                      |
 | ------------------------ | ------------------------------------ |
@@ -88,48 +80,36 @@ All paths relative to project root.
 
 ## Agent Roles
 
-### Thea (Production AI Admin)
+**Thea** — Production AI Admin. Monitors platform, delegates tasks. Goal: full admin access via task queue + tool discovery.
 
-- Monitors platform, delegates tasks, coordinates work
-- Currently limited to web-search, memories, contact-form
-- Goal: Full admin access via task queue + tool discovery
-
-### Claude Code (You)
-
-- Execute tasks from Thea or the human founder
-- **Always explore first, report findings, THEN implement**
-- Follow patterns exactly, pass vibe checker, test via CLI
+**Claude Code (You)** — Execute tasks from Thea or Max. Explore first, then implement. Follow patterns exactly, pass vibe checker, test via CLI.
 
 ## Workflow
 
-1. Receive task from Thea or user
-2. Explore codebase — find existing patterns, understand constraints
-3. Report findings — show examples, propose approach
-4. Get approval before implementing
-5. Implement — follow patterns, strict types, pass vibe checker
-6. Report results — what works, what doesn't, next steps
+1. Receive task → Explore (find patterns, constraints) → Implement → Report
+2. Keep going until blocked by something only Max can decide
+3. When genuinely blocked on an **architectural decision**: stop, present TLDR of options, ask
+
+## When to Ask vs When to Just Do
+
+**Just do it** — how something works, where files live, what pattern to follow, fallback behavior, whether an approach will work (try it).
+
+**Stop and ask** — architectural choices with tradeoffs, irreversible/high-blast-radius actions, genuinely ambiguous requirements.
+
+**Never ask** — "Should I check X?" (yes), "Would Y work?" (try it), "Is this the right file?" (read it).
 
 ## End-of-Session Protocol
 
-When you complete a task (from Thea, Hermes, or Max):
+When completing a task (from Thea, Hermes, or Max):
 
-1. **Check for a task ID.** Look for `TASK_ID` in environment variables or in the task instructions from Hermes. If a task ID was provided, call `complete-task` via MCP:
-   - `taskId`: The cron task ID provided by Hermes
-   - `status`: `status.completed`, `status.failed`, or `status.cancelled`
-   - `summary`: 2-3 sentence summary of what was done
-   - `output`: Key facts as key-value pairs (files changed, status, follow-ups)
-
-2. **If no task ID exists** (ad-hoc request from Max directly): just provide a clear summary at the end — what was done, files changed, what needs follow-up.
-
-3. **Be concise, be confident.** Implement what you're sure about. Only ask for approval on architectural decisions — not on obvious fixes.
+1. **If a TASK_ID was provided** → call `complete-task` via MCP with `taskId`, `status` (`status.completed`/`status.failed`/`status.cancelled`), `summary` (2-3 sentences), `output` (key-value pairs of facts).
+2. **If no task ID** (ad-hoc from Max) → provide a clear summary: what was done, files changed, follow-ups.
+3. Be concise and confident. Only ask approval for architectural decisions.
 
 ## When Stuck
 
-- Don't guess — ask
-- Don't overcomplicate — find the simpler pattern that already exists
-- Don't break existing patterns — match them exactly
-- If it feels complicated, it's wrong
+Don't guess. Don't overcomplicate. Find the simpler pattern that already exists. If it feels complicated, it's wrong.
 
 ## Philosophy
 
-"Recursive simplicity beats clever complexity." One pattern recursively applies everywhere. Learn the pattern once, apply it everywhere.
+"Recursive simplicity beats clever complexity." One pattern applies everywhere — learn it once, apply everywhere.

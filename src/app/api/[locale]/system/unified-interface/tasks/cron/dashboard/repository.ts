@@ -6,22 +6,23 @@
 import "server-only";
 
 import { count, desc, eq, gte, inArray, sql } from "drizzle-orm";
-import type { ResponseType } from "next-vibe/shared/types/response.schema";
+
+import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
   ErrorResponseTypes,
   fail,
   success,
-} from "next-vibe/shared/types/response.schema";
-import { parseError } from "next-vibe/shared/utils/parse-error";
-
+} from "@/app/api/[locale]/shared/types/response.schema";
+import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
+import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CronTaskStatus } from "../../enum";
 import { cronTaskExecutions, cronTasks } from "../db";
-import { serializeTask } from "../repository";
+import { serializeTask, translateTaskFields } from "../repository";
 import type {
   CronDashboardRequestOutput,
   CronDashboardResponseOutput,
@@ -66,6 +67,7 @@ export class CronDashboardRepository {
     user: JwtPayloadType,
     t: CronDashboardT,
     logger: EndpointLogger,
+    locale: CountryLanguage,
   ): Promise<ResponseType<CronDashboardResponseOutput>> {
     try {
       const isAdmin =
@@ -109,8 +111,10 @@ export class CronDashboardRepository {
           .where(gte(cronTaskExecutions.startedAt, twentyFourHoursAgo)),
       ]);
 
-      // Query 3: Recent executions for discovered task IDs
-      const taskIds = taskRows.map((t) => t.id);
+      // Query 3: Recent executions for discovered task IDs.
+      // Fetch more rows than needed and group in JS to get last N per task —
+      // avoids raw SQL while still being correct regardless of execution time.
+      const taskIds = taskRows.map((row) => row.id);
       const recentExecs =
         taskIds.length > 0 && historyDepth > 0
           ? await db
@@ -126,7 +130,7 @@ export class CronDashboardRepository {
               .from(cronTaskExecutions)
               .where(inArray(cronTaskExecutions.taskId, taskIds))
               .orderBy(desc(cronTaskExecutions.startedAt))
-              .limit(taskIds.length * historyDepth)
+              .limit(taskIds.length * historyDepth * 10)
           : [];
 
       // Group executions by taskId
@@ -140,61 +144,66 @@ export class CronDashboardRepository {
       }
 
       // ── Format tasks with embedded history ──────────────────────────────
-      const formattedTasks = taskRows.map((task) => {
-        const taskExecs = execsByTask.get(task.id) ?? [];
+      const formattedTasks = await Promise.all(
+        taskRows.map(async (task) => {
+          const taskExecs = execsByTask.get(task.id) ?? [];
 
-        const lastSuccess = taskExecs.find(
-          (e) => e.status === CronTaskStatus.COMPLETED,
-        );
-        const lastResultSummary = lastSuccess
-          ? summariseResult(lastSuccess.result ?? null)
-          : null;
+          const lastSuccess = taskExecs.find(
+            (e) => e.status === CronTaskStatus.COMPLETED,
+          );
+          const lastResultSummary = lastSuccess
+            ? summariseResult(lastSuccess.result ?? null)
+            : null;
 
-        const recentExecutions = taskExecs.map((e) => ({
-          status: e.status,
-          completedAt: e.completedAt?.toISOString() ?? null,
-          durationMs: e.durationMs,
-          resultSnippet: e.result ? summariseResult(e.result) : null,
-          errorSnippet: e.error?.message ? truncate(e.error.message, 60) : null,
-        }));
+          const recentExecutions = taskExecs.map((e) => ({
+            status: e.status,
+            completedAt: e.completedAt?.toISOString() ?? null,
+            durationMs: e.durationMs,
+            resultSnippet: e.result ? summariseResult(e.result) : null,
+            errorSnippet: e.error?.message
+              ? truncate(e.error.message, 60)
+              : null,
+          }));
 
-        const base = serializeTask(task, logger);
+          const serialized = serializeTask(task, logger);
+          const base = await translateTaskFields(serialized, locale);
 
-        return {
-          ...base,
-          recentExecutions,
-          lastResultSummary,
-        };
-      });
+          return {
+            ...base,
+            recentExecutions,
+            lastResultSummary,
+          };
+        }),
+      );
 
-      // ── Build alerts ────────────────────────────────────────────────────
-      const alerts = taskRows
+      // ── Build alerts (use formattedTasks for translated displayName) ────
+      const alerts = formattedTasks
         .filter(
-          (t) =>
-            t.consecutiveFailures > 0 &&
-            (t.priority === "priority.critical" ||
-              t.priority === "priority.high"),
+          (ft) =>
+            ft.consecutiveFailures > 0 &&
+            (ft.priority === "priority.critical" ||
+              ft.priority === "priority.high"),
         )
-        .map((t) => {
-          const taskExecs = execsByTask.get(t.id) ?? [];
+        .map((ft) => {
+          const taskExecs = execsByTask.get(ft.id) ?? [];
           const lastFailed = taskExecs.find(
             (e) => e.status === CronTaskStatus.FAILED,
           );
           return {
-            taskId: t.id,
-            taskName: t.displayName,
-            priority: t.priority,
-            consecutiveFailures: t.consecutiveFailures,
+            taskId: ft.id,
+            taskName: ft.displayName,
+            priority: ft.priority,
+            consecutiveFailures: ft.consecutiveFailures,
             lastError: lastFailed?.error?.message
               ? truncate(lastFailed.error.message, 120)
-              : (t.lastExecutionError ?? null),
+              : (ft.lastExecutionError ?? null),
             lastFailedAt: lastFailed?.startedAt?.toISOString() ?? null,
           };
         });
 
       // ── Build stats ─────────────────────────────────────────────────────
       const totalTasks = taskRows.length;
-      const enabledTasks = taskRows.filter((t) => t.enabled).length;
+      const enabledTasks = taskRows.filter((row) => row.enabled).length;
       const disabledTasks = totalTasks - enabledTasks;
       const total24h = statsResult[0]?.total ?? 0;
       const failed24h = statsResult[0]?.failed ?? 0;
@@ -204,10 +213,12 @@ export class CronDashboardRepository {
           : null;
 
       const criticalFailures = taskRows.some(
-        (t) => t.consecutiveFailures >= 3 && t.priority === "priority.critical",
+        (row) =>
+          row.consecutiveFailures >= 3 && row.priority === "priority.critical",
       );
       const highFailures = taskRows.some(
-        (t) => t.consecutiveFailures >= 3 && t.priority === "priority.high",
+        (row) =>
+          row.consecutiveFailures >= 3 && row.priority === "priority.high",
       );
       const systemHealth = criticalFailures
         ? ("critical" as const)

@@ -222,7 +222,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
         output.push("");
         output.push("🗄️  Database Setup");
         output.push(
-          `   ⏭️ Database setup skipped (${mode !== "all" ? `--mode=${mode}` : "--db-setup=false"})`,
+          `   ⏭️  Database setup skipped (${mode !== "all" ? `--mode=${mode}` : "--db-setup=false"})`,
         );
       }
 
@@ -418,7 +418,11 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
 
         try {
           // Start Next.js production server as a child process
-          const nextServerResult = await this.startNextServer(port, logger);
+          const nextServerResult = await this.startNextServer(
+            port,
+            logger,
+            data.profile,
+          );
 
           if (nextServerResult.success) {
             output.push("   ✅ Next.js production server started successfully");
@@ -498,6 +502,11 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       );
       output.push("");
       output.push("🔄 Production server is running...");
+      if (data.profile) {
+        output.push(
+          "🔬 Profiling active — press  p  to stop and open CPU profile",
+        );
+      }
       output.push("💡 Press Ctrl+C to stop");
       output.push("");
 
@@ -545,7 +554,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
             this.nextServerProcess = null;
           }
 
-          this.startNextServer(port, logger)
+          this.startNextServer(port, logger, data.profile)
             .then((result) => {
               if (result.success) {
                 process.stdout.write("✅ Server restarted successfully\n");
@@ -565,6 +574,56 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
                 error: parseError(error).message,
               });
             });
+        });
+      }
+
+      // Profiling keypress: 'p' → stop server and open CPU profile
+      if (data.profile && process.stdin.isTTY) {
+        process.stdin.setRawMode(true);
+        process.stdin.resume();
+        process.stdin.setEncoding("utf8");
+        process.stdin.on("data", (key: string) => {
+          if (key === "\u0003") {
+            handleShutdown("SIGINT");
+            return;
+          }
+          if (key === "p" || key === "P") {
+            process.stdout.write(
+              // eslint-disable-next-line i18next/no-literal-string
+              "\n⏹  Stopping server to collect CPU profile…\n",
+            );
+            cleanupPidFile(VIBE_START_PID_FILE);
+            this.stopAllProcesses();
+
+            setTimeout((): void => {
+              void (async (): Promise<void> => {
+                const { default: open } = await import("open");
+                const { readdirSync } = await import("node:fs");
+                const { resolve } = await import("node:path");
+
+                const cpuProfiles = readdirSync(process.cwd()).filter(
+                  (f: string) => f.endsWith(".cpuprofile"),
+                );
+                if (cpuProfiles.length > 0) {
+                  const latest = cpuProfiles.toSorted().at(-1)!;
+                  // eslint-disable-next-line i18next/no-literal-string
+                  process.stdout.write(`🔥 Opening CPU profile: ${latest}\n`);
+                  await open(resolve(latest));
+                } else {
+                  process.stdout.write(
+                    // eslint-disable-next-line i18next/no-literal-string
+                    "⚠️  No .cpuprofile found — try running with --profile again\n",
+                  );
+                }
+
+                process.stdout.write(
+                  // eslint-disable-next-line i18next/no-literal-string
+                  "\n✅ Done. Goodbye!\n",
+                );
+                process.exit(0);
+              })();
+            }, 1500);
+          }
         });
       }
 
@@ -680,6 +739,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
   private async startNextServer(
     port: number,
     logger: EndpointLogger,
+    profile = false,
   ): Promise<{ success: boolean; message?: string }> {
     try {
       // Import WS module to get NEXT_PORT_OFFSET
@@ -699,6 +759,25 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
         this.killProcessOnPort(wsPort, logger);
       }
 
+      const profilingEnv = profile ? { NEXT_CPU_PROF: "1" } : {};
+      if (profile) {
+        // eslint-disable-next-line i18next/no-literal-string
+        process.stdout.write(`
+┌─────────────────────────────────────────────────────────────────┐
+│  🔬  PROFILING MODE ACTIVE                                      │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Use the app, exercise the slow paths, then press:             │
+│                                                                 │
+│    p  →  stop server, collect CPU profile, open it             │
+│    Ctrl+C  →  stop server normally (no auto-open)              │
+│                                                                 │
+│  For compile-time traces, use:  vibe dev --profile             │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+`);
+      }
+
       // --- Start Next.js ---
       const nextProcess = spawn(
         "bun",
@@ -710,6 +789,7 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
             NODE_ENV: "production",
             NEXT_DIST_DIR: ".next-prod",
             PORT: String(nextPort),
+            ...profilingEnv,
           } as NodeJS.ProcessEnv,
         },
       );

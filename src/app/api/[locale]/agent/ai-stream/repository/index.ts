@@ -169,7 +169,6 @@ export class AiStreamRepository {
       effectiveRole,
       threadId: threadResultThreadId,
       isNewThread,
-      messageDepth,
       userMessageId,
       aiMessageId,
       messages,
@@ -210,7 +209,6 @@ export class AiStreamRepository {
             userMessageId,
             aiMessageId,
             effectiveParentMessageId,
-            messageDepth,
             toolConfirmationResults,
             voiceMode,
             fileUploadPromise,
@@ -265,7 +263,6 @@ export class AiStreamRepository {
               threadId: threadResultThreadId,
               operation: data.operation,
               effectiveParentMessageId,
-              messageDepth,
               effectiveContent,
               model: data.model,
               character: data.character,
@@ -285,16 +282,13 @@ export class AiStreamRepository {
                 compactingCheck.failedCompactingMessage?.id ?? null,
             });
 
-            // Determine parent/depth for the new compacting message.
-            // Normal: compacting sits directly below effectiveParentMessageId (messageDepth).
+            // Determine parent for the new compacting message.
+            // Normal: compacting sits directly below effectiveParentMessageId.
             // Retry: failed compacting already occupies that slot — new compacting is a sibling,
-            //        so use the same parentId and depth as the failed one.
+            //        so use the same parentId as the failed one.
             const compactingParentId = compactingCheck.failedCompactingMessage
               ? (compactingCheck.failedCompactingMessage.parentId ?? null)
               : (effectiveParentMessageId ?? null);
-            const compactingDepth = compactingCheck.failedCompactingMessage
-              ? compactingCheck.failedCompactingMessage.depth
-              : messageDepth;
 
             // Compacting gets its own sequenceId so it appears as a
             // separate, independently-deletable message group in the UI.
@@ -306,7 +300,6 @@ export class AiStreamRepository {
               currentUserMessage: compactingCheck.currentUserMessage,
               threadId: threadResultThreadId,
               parentId: compactingParentId,
-              depth: compactingDepth,
               sequenceId: compactingSequenceId,
               ctx,
               isIncognito,
@@ -381,21 +374,15 @@ export class AiStreamRepository {
             messages.length = 0;
             messages.push(...rebuiltHistory);
 
-            // Update ctx so the AI response has the correct parent/depth.
-            // Chain: parent(N) → compacting(N+1=compactingDepth) → user(N+2) → AI(N+3)
-            // compactingResult.newDepth = compacting.depth+1 (user depth)
-            // AI depth = newDepth+1 (with user msg) or newDepth (AI is direct child of compacting)
+            // Update ctx so the AI response has the correct parent.
+            // Chain: effectiveParent → compacting → user → AI
             ctx.currentParentId =
               userMessageId ?? compactingResult.compactingMessageId;
-            ctx.currentDepth = userMessageId
-              ? compactingResult.newDepth + 1
-              : compactingResult.newDepth;
 
             logger.info("[Compacting] Updated messages for main stream", {
               messageCount: messages.length,
               compactingMessageId: compactingResult.compactingMessageId,
               contextParentId: ctx.currentParentId,
-              contextDepth: ctx.currentDepth,
             });
           }
 

@@ -6,7 +6,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "next-vibe-ui/ui/dialog";
-import { Maximize, Zap } from "next-vibe-ui/ui/icons";
+import { Maximize } from "next-vibe-ui/ui/icons/Maximize";
+import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Link } from "next-vibe-ui/ui/link";
 import type { JSX } from "react";
 

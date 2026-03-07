@@ -2,7 +2,7 @@
 
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { ArrowLeft } from "next-vibe-ui/ui/icons";
+import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
 import { Link } from "next-vibe-ui/ui/link";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { H1, P } from "next-vibe-ui/ui/typography";
@@ -27,7 +27,7 @@ export function SubscriptionHeader({
       {/* Back Button and Auth Buttons */}
       <Div className="flex justify-between items-center gap-4">
         <Link
-          href={`/${locale}`}
+          href={`/${locale}/threads`}
           className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />

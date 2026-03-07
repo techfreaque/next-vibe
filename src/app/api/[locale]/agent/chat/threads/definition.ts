@@ -612,8 +612,8 @@ const { POST } = createEndpoint({
       default: {
         threadId: "550e8400-e29b-41d4-a716-446655440000",
         status: ThreadStatus.ACTIVE,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: "2024-01-15T10:00:00.000Z",
+        updatedAt: "2024-01-15T10:00:00.000Z",
       },
     },
   },

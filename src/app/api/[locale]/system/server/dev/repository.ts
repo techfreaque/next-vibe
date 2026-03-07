@@ -323,14 +323,24 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     const dbSetupSuccess = await this.setupDatabase(data, locale, logger);
     if (!dbSetupSuccess) {
       // Database setup failed critically, start Next.js anyway
-      return await this.startNextJsAndWait(port, logger, earlyExitHandler);
+      return await this.startNextJsAndWait(
+        port,
+        logger,
+        earlyExitHandler,
+        data.profile,
+      );
     }
 
     // Start task runner if not skipped
     void this.startTaskRunnerIfEnabled(data, locale, logger);
 
     // Start Next.js and keep process alive (passes early handler so it can be replaced)
-    return await this.startNextJsAndWait(port, logger, earlyExitHandler);
+    return await this.startNextJsAndWait(
+      port,
+      logger,
+      earlyExitHandler,
+      data.profile,
+    );
   }
 
   /**
@@ -614,6 +624,7 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     port: number,
     logger: EndpointLogger,
     earlyExitHandler?: () => void,
+    profile = false,
   ): Promise<never> {
     const { spawn } = await import("node:child_process");
 
@@ -698,7 +709,95 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
     process.on("SIGINT", sigintHandler);
     process.on("SIGTERM", sigintHandler);
 
-    logger.vibe(`⚡ Next.js dev server available at http://localhost:${port}`);
+    logger.debug(`⚡ Next.js dev server available at http://localhost:${port}`);
+    if (profile) {
+      // eslint-disable-next-line i18next/no-literal-string
+      process.stdout.write(`
+┌─────────────────────────────────────────────────────────────────┐
+│  🔬  PROFILING MODE ACTIVE                                      │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Use the app, trigger slow paths, then press:                   │
+│                                                                 │
+│    p  →  stop server, collect profiles, open results            │
+│    Ctrl+C  →  stop server normally (no auto-open)               │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+`);
+
+      // Listen for 'p' keypress to stop and open profiles
+      if (process.stdin.isTTY) {
+        process.stdin.setRawMode(true);
+        process.stdin.resume();
+        process.stdin.setEncoding("utf8");
+        process.stdin.on("data", (key: string) => {
+          // Ctrl+C in raw mode — honour it
+          if (key === "\u0003") {
+            sigintHandler();
+            return;
+          }
+          if (key === "p" || key === "P") {
+            process.stdout.write(
+              // eslint-disable-next-line i18next/no-literal-string
+              "\n⏹  Stopping server to collect profiles…\n",
+            );
+            // Kill Next.js so it flushes NEXT_CPU_PROF output
+            this.shuttingDown = true;
+            restoreTty();
+            wsHandle.stop();
+            const currentNext = this.runningProcesses.get("next");
+            if (currentNext && !currentNext.killed) {
+              currentNext.stdout?.unpipe();
+              currentNext.stderr?.unpipe();
+              currentNext.stdout?.destroy();
+              currentNext.stderr?.destroy();
+              currentNext.kill("SIGTERM");
+            }
+            this.killProcessOnPort(nextPort, logger);
+            this.killProcessOnPort(wsPort, logger);
+            cleanupPidFile(VIBE_DEV_PID_FILE);
+
+            // Give the process a moment to flush files, then open results
+            setTimeout((): void => {
+              void (async (): Promise<void> => {
+                const { default: open } = await import("open");
+                const { existsSync } = await import("node:fs");
+                const { resolve } = await import("node:path");
+
+                // 1. CPU profile → open directly (VS Code opens it natively on ctrl+click)
+                const cpuProfiles = (await import("node:fs"))
+                  .readdirSync(process.cwd())
+                  .filter((f: string) => f.endsWith(".cpuprofile"));
+                if (cpuProfiles.length > 0) {
+                  const latest = cpuProfiles.toSorted().at(-1)!;
+                  const latestPath = resolve(latest);
+                  // eslint-disable-next-line i18next/no-literal-string
+                  process.stdout.write(`🔥 Opening CPU profile: ${latest}\n`);
+                  await open(latestPath);
+                } else {
+                  process.stdout.write(
+                    // eslint-disable-next-line i18next/no-literal-string
+                    "⚠️  No .cpuprofile found — try running with --profile again\n",
+                  );
+                }
+
+                // 2. Turbopack trace → open trace viewer (user drops file in)
+                const tracePath = resolve(".next/dev/trace-turbopack");
+                if (existsSync(tracePath)) {
+                  // eslint-disable-next-line i18next/no-literal-string
+                  process.stdout.write(`📊 Opening Turbopack trace viewer\n`);
+                  await open("https://trace.nextjs.org/");
+                }
+
+                // eslint-disable-next-line i18next/no-literal-string
+                process.stdout.write("\n✅ Done. Goodbye!\n");
+                process.exit(0);
+              })();
+            }, 1500);
+          }
+        });
+      }
+    }
 
     // --- Spawn Next.js with auto-restart on crash ---
     const MAX_RESTARTS = 10;
@@ -710,10 +809,19 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         return;
       }
 
+      const profilingEnv = profile
+        ? {
+            NEXT_TURBOPACK_TRACING: "1",
+            NEXT_CPU_PROF: "1",
+          }
+        : {};
       const nextProcess = spawn(
         "bun",
         ["run", "next", "dev", "--port", String(nextPort)],
-        { stdio: ["ignore", "pipe", "pipe"] },
+        {
+          stdio: ["ignore", "pipe", "pipe"],
+          env: { ...process.env, ...profilingEnv },
+        },
       );
       this.runningProcesses.set("next", nextProcess);
 

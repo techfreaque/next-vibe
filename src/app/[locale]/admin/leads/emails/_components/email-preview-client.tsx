@@ -15,7 +15,8 @@ import {
   DialogTrigger,
 } from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
-import { Mail, Send } from "next-vibe-ui/ui/icons";
+import { Mail } from "next-vibe-ui/ui/icons/Mail";
+import { Send } from "next-vibe-ui/ui/icons/Send";
 import { Iframe } from "next-vibe-ui/ui/iframe";
 import { Span } from "next-vibe-ui/ui/span";
 import { H2, P } from "next-vibe-ui/ui/typography";

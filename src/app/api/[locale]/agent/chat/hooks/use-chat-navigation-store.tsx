@@ -27,6 +27,7 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 
 import { DefaultFolderId, isDefaultFolderId } from "../config";
 import threadsDefinition from "../threads/definition";
+import { useChatStore } from "./store";
 
 /**
  * Navigation state shape
@@ -38,6 +39,8 @@ export interface ChatNavigationState {
   currentRootFolderId: DefaultFolderId;
   /** Current subfolder ID (null = root level) */
   currentSubFolderId: string | null;
+  /** Active leaf message ID for branch navigation (?message= param) */
+  leafMessageId: string | null;
   /** Whether this store is for an embedded/nested context (e.g. AI run) */
   isEmbedded: boolean;
   /** Whether the active thread is currently streaming */
@@ -50,6 +53,8 @@ export interface ChatNavigationState {
   setCurrentRootFolderId: (rootFolderId: DefaultFolderId) => void;
   /** Set subfolder ID */
   setCurrentSubFolderId: (subFolderId: string | null) => void;
+  /** Set leaf message ID — updates store and pushes ?message= to URL */
+  setLeafMessageId: (leafMessageId: string | null) => void;
   /** Batch update all navigation state at once (avoids multiple re-renders) */
   setNavigation: (state: {
     activeThreadId?: string | null;
@@ -61,6 +66,7 @@ export interface ChatNavigationState {
     activeThreadId: string | null,
     currentRootFolderId: DefaultFolderId,
     currentSubFolderId: string | null,
+    leafMessageId: string | null,
   ) => void;
   /** Mark active thread as streaming; also updates threads endpoint cache */
   startStream: (threadId: string, logger: EndpointLogger) => void;
@@ -74,15 +80,17 @@ type ChatNavigationStore = StoreApi<ChatNavigationState>;
  * Factory: creates a new store instance.
  */
 function createChatNavigationStore(opts?: {
-  activeThreadId?: string | null;
-  currentRootFolderId?: DefaultFolderId;
-  currentSubFolderId?: string | null;
-  isEmbedded?: boolean;
+  activeThreadId: string | null;
+  currentRootFolderId: DefaultFolderId;
+  currentSubFolderId: string | null;
+  leafMessageId: string | null;
+  isEmbedded: boolean;
 }): ChatNavigationStore {
   return createStore<ChatNavigationState>((set, get) => ({
     activeThreadId: opts?.activeThreadId ?? null,
     currentRootFolderId: opts?.currentRootFolderId ?? DefaultFolderId.PRIVATE,
     currentSubFolderId: opts?.currentSubFolderId ?? null,
+    leafMessageId: opts?.leafMessageId ?? null,
     isEmbedded: opts?.isEmbedded ?? false,
     isStreaming: false,
 
@@ -91,12 +99,37 @@ function createChatNavigationStore(opts?: {
       set({ currentRootFolderId: rootFolderId }),
     setCurrentSubFolderId: (subFolderId): void =>
       set({ currentSubFolderId: subFolderId }),
+    setLeafMessageId: (leafMessageId): void => {
+      set({ leafMessageId });
+      // Sync to URL without triggering server re-render
+      if (typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        if (leafMessageId) {
+          url.searchParams.set("message", leafMessageId);
+        } else {
+          url.searchParams.delete("message");
+        }
+        window.history.pushState(null, "", url.toString());
+      }
+      // Mirror to global chat store so non-React code (send-message, event-handlers) can read it
+      const { activeThreadId } = get();
+      if (activeThreadId && leafMessageId) {
+        useChatStore.getState().setLeafMessageId(activeThreadId, leafMessageId);
+      }
+    },
     setNavigation: (state): void => set(state),
     initNavigation: (
       activeThreadId,
       currentRootFolderId,
       currentSubFolderId,
-    ): void => set({ activeThreadId, currentRootFolderId, currentSubFolderId }),
+      leafMessageId,
+    ): void =>
+      set({
+        activeThreadId,
+        currentRootFolderId,
+        currentSubFolderId,
+        leafMessageId,
+      }),
     startStream: (threadId, logger): void => {
       set({ isStreaming: true });
       const { currentRootFolderId, currentSubFolderId } = get();
@@ -163,13 +196,15 @@ export function ChatNavigationProvider({
   children,
   activeThreadId,
   currentRootFolderId = DefaultFolderId.PRIVATE,
-  currentSubFolderId = null,
+  currentSubFolderId,
+  leafMessageId,
   isEmbedded = false,
 }: {
   children: ReactNode;
-  activeThreadId?: string | null;
-  currentRootFolderId?: DefaultFolderId;
-  currentSubFolderId?: string | null;
+  activeThreadId: string | null;
+  currentRootFolderId: DefaultFolderId;
+  currentSubFolderId: string | null;
+  leafMessageId: string | null;
   isEmbedded?: boolean;
 }): JSX.Element {
   const storeRef = useRef<ChatNavigationStore | null>(null);
@@ -178,6 +213,7 @@ export function ChatNavigationProvider({
       activeThreadId,
       currentRootFolderId,
       currentSubFolderId,
+      leafMessageId,
       isEmbedded,
     });
   }

@@ -32,10 +32,9 @@ import { AGENT_MESSAGE_LENGTH } from "../../chat/constants";
 import { type ChatMessage, selectChatMessageSchema } from "../../chat/db";
 import { ChatMessageRole, ChatMessageRoleOptions } from "../../chat/enum";
 import { DEFAULT_TTS_VOICE, TtsVoice } from "../../text-to-speech/enum";
+import { AI_STREAM_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { AiStreamWidget } from "./widget/widget";
-
-export const AI_STREAM_ALIAS = "ai-stream" as const;
 
 /**
  * AI Stream Endpoint (POST)

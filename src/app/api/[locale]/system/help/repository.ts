@@ -3,6 +3,9 @@
  * One class, all platforms:
  *  - Tool discovery / search / detail (AI, MCP, CLI, Web)
  *  - CLI interactive terminal explorer (--interactive flag)
+ *
+ * Uses static endpoints-meta (generated) for all listing/filtering/searching.
+ * Only loads full endpoint definitions for parameter schema in detail view.
  */
 
 import "server-only";
@@ -27,22 +30,37 @@ import {
 import { envClient } from "@/config/env-client";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import type { CliRequestData } from "../unified-interface/cli/runtime/parsing";
 import type { CliCompatiblePlatform } from "../unified-interface/cli/runtime/route-executor";
-import { definitionsRegistry } from "../unified-interface/shared/endpoints/definitions/registry";
-import { permissionsRegistry } from "../unified-interface/shared/endpoints/permissions/registry";
 import { generateSchemaForUsage } from "../unified-interface/shared/field/utils";
+import type { CreateApiEndpointAny } from "../unified-interface/shared/types/endpoint-base";
 import { FieldUsage } from "../unified-interface/shared/types/enums";
 import { Platform } from "../unified-interface/shared/types/platform";
-import {
-  endpointToToolName,
-  getPreferredToolName,
-} from "../unified-interface/shared/utils/path";
 import type { HelpGetRequestOutput, HelpGetResponseOutput } from "./definition";
 import { scopedTranslation } from "./i18n";
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
 type ToolItem = HelpGetResponseOutput["tools"][number];
+
+interface EndpointMeta {
+  toolName: string;
+  method: string;
+  path: string[];
+  allowedRoles: string[];
+  aliases: string[];
+  title: string;
+  description: string;
+  icon: string;
+  category: string;
+  tags: string[];
+  credits?: number;
+  requiresConfirmation?: boolean;
+  examples?: {
+    inputs?: Record<string, CliRequestData>;
+    responses?: Record<string, CliRequestData>;
+  };
+}
 
 /** Map user-facing platform filter to internal Platform enum */
 type PlatformFilterValue = "cli" | "mcp" | "ai" | "web" | "all";
@@ -62,54 +80,124 @@ function mapFilterToPlatform(filter: PlatformFilterValue): Platform | "all" {
   }
 }
 
-/** Simplify platform names for display (group web variants, skip internal ones) */
-function simplifyPlatforms(platforms: string[]): string[] {
-  const simplified = new Set<string>();
-  for (const p of platforms) {
-    switch (p) {
-      case Platform.CLI:
-        simplified.add("cli");
-        break;
-      case Platform.MCP:
-        simplified.add("mcp");
-        break;
-      case Platform.AI:
-        simplified.add("ai");
-        break;
-      case Platform.TRPC:
-      case Platform.NEXT_PAGE:
-      case Platform.NEXT_API:
-        simplified.add("web");
-        break;
-      case Platform.CRON:
-        simplified.add("cron");
-        break;
-      // Skip CLI_PACKAGE, REMOTE_SKILL — internal details
-    }
+// ─── Platform/role filtering on static meta ──────────────────────────────────
+
+const ROLE_CLI_OFF = "enums.userRole.cliOff";
+const ROLE_WEB_OFF = "enums.userRole.webOff";
+const ROLE_AI_TOOL_OFF = "enums.userRole.aiToolOff";
+const ROLE_MCP_OFF = "enums.userRole.mcpOff";
+const ROLE_MCP_VISIBLE = "enums.userRole.mcpVisible";
+const ROLE_PRODUCTION_OFF = "enums.userRole.productionOff";
+const ROLE_CLI_AUTH_BYPASS = "enums.userRole.cliAuthBypass";
+const ROLE_REMOTE_SKILL = "enums.userRole.remoteSkill";
+const ROLE_PUBLIC = "enums.userRole.public";
+
+function checkPlatformAccess(roles: string[], platform: Platform): boolean {
+  if (
+    envClient.NODE_ENV === "production" &&
+    !envClient.NEXT_PUBLIC_LOCAL_MODE &&
+    roles.includes(ROLE_PRODUCTION_OFF)
+  ) {
+    return false;
   }
-  return [...simplified].toSorted();
+  switch (platform) {
+    case Platform.CLI:
+      return !roles.includes(ROLE_CLI_OFF);
+    case Platform.MCP:
+      return !roles.includes(ROLE_MCP_OFF) && !roles.includes(ROLE_CLI_OFF);
+    case Platform.AI:
+    case Platform.CRON:
+      return !roles.includes(ROLE_AI_TOOL_OFF) && !roles.includes(ROLE_WEB_OFF);
+    case Platform.REMOTE_SKILL:
+      return roles.includes(ROLE_REMOTE_SKILL);
+    case Platform.CLI_PACKAGE:
+      return (
+        !roles.includes(ROLE_CLI_OFF) && roles.includes(ROLE_CLI_AUTH_BYPASS)
+      );
+    case Platform.NEXT_PAGE:
+    case Platform.NEXT_API:
+    case Platform.TRPC:
+    case Platform.ELECTRON:
+    case Platform.FRAME:
+      return !roles.includes(ROLE_WEB_OFF);
+    default:
+      return true;
+  }
+}
+
+function checkUserAccess(
+  roles: string[],
+  userRoles: string[],
+  isPublic: boolean,
+): boolean {
+  const permRoles = roles.filter(
+    (r) =>
+      !r.endsWith("Off") &&
+      !r.endsWith("Bypass") &&
+      r !== ROLE_MCP_VISIBLE &&
+      r !== ROLE_REMOTE_SKILL,
+  );
+  if (permRoles.length === 0) {
+    return true;
+  }
+  if (permRoles.includes(ROLE_PUBLIC)) {
+    return true;
+  }
+  if (isPublic) {
+    return false;
+  }
+  return permRoles.some((r) => userRoles.includes(r));
+}
+
+function filterMetaForUser(
+  meta: EndpointMeta[],
+  platform: Platform,
+  userRoles: string[],
+  isPublic: boolean,
+): EndpointMeta[] {
+  return meta.filter((m) => {
+    const platformOk = checkPlatformAccess(m.allowedRoles, platform);
+    if (!platformOk) {
+      return false;
+    }
+    return checkUserAccess(m.allowedRoles, userRoles, isPublic);
+  });
+}
+
+// ─── Platform badge helpers (admin only) ─────────────────────────────────────
+
+function getMetaPlatforms(roles: string[]): string[] {
+  const out = new Set<string>();
+  if (!roles.includes(ROLE_CLI_OFF)) {
+    out.add("cli");
+  }
+  if (!roles.includes(ROLE_MCP_OFF) && !roles.includes(ROLE_CLI_OFF)) {
+    out.add("mcp");
+  }
+  if (!roles.includes(ROLE_AI_TOOL_OFF) && !roles.includes(ROLE_WEB_OFF)) {
+    out.add("ai");
+  }
+  if (!roles.includes(ROLE_WEB_OFF)) {
+    out.add("web");
+  }
+  return [...out].toSorted();
 }
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
-const ALL_SEARCH_LOCALES: CountryLanguage[] = [
-  "en-US",
-  "de-DE",
-  "pl-PL",
-] as const;
 const COMPACT_DEFAULT_PAGE_SIZE = 25;
 const HUMAN_DEFAULT_PAGE_SIZE = 500;
 /** If a filtered result set is ≤ this many tools, auto-upgrade to full detail (params + examples) */
 const COMPACT_FULL_DETAIL_THRESHOLD = 5;
 
-// ─── Tool discovery helpers ─────────────────────────────────────────────────
+// ─── Tool serialization helpers ──────────────────────────────────────────────
 
 function isCompactPlatform(platform: Platform): boolean {
   return platform === Platform.AI || platform === Platform.MCP;
 }
 
 function getParameterSchema(
-  endpoint: ReturnType<typeof definitionsRegistry.getEndpointsForUser>[number],
+  endpoint: CreateApiEndpointAny,
   locale: CountryLanguage,
 ): ToolItem["parameters"] | null {
   if (!endpoint.fields) {
@@ -136,7 +224,6 @@ function getParameterSchema(
     }
     const schema = zodSchemaToJsonSchema(z.object(combinedShape));
 
-    // Flatten the top-level request fields for fieldType enrichment + description resolution
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const topLevelFields: Record<string, any> = {};
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -150,7 +237,6 @@ function getParameterSchema(
     }
     enrichJsonSchemaFromFields(schema, topLevelFields);
 
-    // Add translated descriptions from field metadata to JSON schema properties
     if (
       locale &&
       schema &&
@@ -185,7 +271,6 @@ function getParameterSchema(
       }
     }
 
-    // Strip zod-internal ~standard field — not useful for AI consumers
     if (schema && "~standard" in schema) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { "~standard": _std, ...clean } = schema as Record<
@@ -200,16 +285,13 @@ function getParameterSchema(
   }
 }
 
-function serializeTool(
-  tool: ReturnType<
-    typeof definitionsRegistry.getSerializedToolsForUser
-  >[number],
+function serializeMeta(
+  tool: EndpointMeta,
   parameters?: ToolItem["parameters"],
   includeExamples = false,
   platforms?: string[],
 ): ToolItem {
-  const callName =
-    tool.aliases && tool.aliases.length > 0 ? tool.aliases[0] : tool.toolName;
+  const callName = tool.aliases.length > 0 ? tool.aliases[0] : tool.toolName;
   return {
     name: callName,
     title: tool.title,
@@ -218,7 +300,7 @@ function serializeTool(
     method: tool.method,
     description: tool.description,
     category: tool.category,
-    aliases: tool.aliases,
+    aliases: tool.aliases.length > 0 ? tool.aliases : undefined,
     requiresConfirmation: tool.requiresConfirmation,
     credits: tool.credits,
     platforms,
@@ -227,15 +309,11 @@ function serializeTool(
   };
 }
 
-/** Ultra-compact: just name + description for overview/list. One line per tool. */
-function serializeToolMinimal(
-  tool: ReturnType<
-    typeof definitionsRegistry.getSerializedToolsForUser
-  >[number],
+function serializeMetaMinimal(
+  tool: EndpointMeta,
   platforms?: string[],
 ): ToolItem {
-  const callName =
-    tool.aliases && tool.aliases.length > 0 ? tool.aliases[0] : tool.toolName;
+  const callName = tool.aliases.length > 0 ? tool.aliases[0] : tool.toolName;
   return {
     name: callName,
     title: tool.title,
@@ -243,67 +321,37 @@ function serializeToolMinimal(
     tags: tool.tags,
     description: tool.description,
     category: tool.category,
-    aliases: tool.aliases,
+    aliases: tool.aliases.length > 0 ? tool.aliases : undefined,
     credits: tool.credits,
     platforms,
   };
 }
 
-function buildToolSearchIndex(
-  endpoint: ReturnType<typeof definitionsRegistry.getEndpointsForUser>[number],
-): string {
-  const parts: string[] = [];
-  if (endpoint.title) {
-    parts.push(String(endpoint.title));
-  }
-  if (endpoint.description) {
-    parts.push(String(endpoint.description));
-  }
-  if (endpoint.category) {
-    parts.push(String(endpoint.category));
-  }
-  for (const tag of endpoint.tags ?? []) {
-    parts.push(String(tag));
-  }
-  for (const alias of endpoint.aliases ?? []) {
-    parts.push(alias);
-  }
-
-  for (const locale of ALL_SEARCH_LOCALES) {
-    try {
-      const { scopedT } = endpoint.scopedTranslation;
-      const { t } = scopedT(locale);
-      const tryPush = (key: string): void => {
-        try {
-          parts.push(t(key));
-        } catch {
-          /* missing translation — skip */
-        }
-      };
-      if (endpoint.description) {
-        tryPush(endpoint.description);
-      }
-      if (endpoint.title) {
-        tryPush(endpoint.title);
-      }
-      if (endpoint.category) {
-        tryPush(endpoint.category);
-      }
-      for (const tag of endpoint.tags ?? []) {
-        tryPush(tag);
-      }
-    } catch {
-      /* locale not supported — skip */
-    }
-  }
-
-  return parts.join(" ").toLowerCase();
+function buildMetaSearchIndex(tool: EndpointMeta): string {
+  return [
+    tool.title,
+    tool.description,
+    tool.category,
+    ...tool.tags,
+    tool.toolName,
+    ...tool.aliases,
+  ]
+    .join(" ")
+    .toLowerCase();
 }
+
+/** Lazy-load the full endpoint definition for parameter schema (detail view only) */
+async function loadEndpointForMeta(
+  tool: EndpointMeta,
+): Promise<CreateApiEndpointAny | null> {
+  const { getEndpoint } =
+    await import("@/app/api/[locale]/system/generated/endpoint");
+  return getEndpoint(tool.toolName);
+}
+
 export class HelpRepository {
   /**
    * Start interactive CLI session — Ink-based route navigator.
-   * Called directly from vibe-runtime.ts when -i/--interactive is set.
-   * Renders with real Ink (reactive terminal UI, not static output).
    */
   static async startInteractive(
     user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]> | undefined,
@@ -322,116 +370,144 @@ export class HelpRepository {
     return success({ started: true });
   }
 
+  static async getToolsFromRemoteInstance(
+    instanceId: string,
+    user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
+    locale: CountryLanguage,
+  ): Promise<ResponseType<HelpGetResponseOutput>> {
+    const { t } = scopedTranslation.scopedT(locale);
+    if (user.isPublic) {
+      return fail({
+        message: t("get.errors.unauthorized.title"),
+        errorType: ErrorResponseTypes.UNAUTHORIZED,
+      });
+    }
+    const { getCapabilities } =
+      await import("@/app/api/[locale]/user/remote-connection/repository");
+    const capabilities = await getCapabilities(user.id, instanceId);
+    if (!capabilities) {
+      return success({
+        tools: [],
+        totalCount: 0,
+        matchedCount: 0,
+        hint: `No capability snapshot for instance "${instanceId}". Connect the instance and wait for a sync pulse.`,
+      });
+    }
+
+    const tools: ToolItem[] = capabilities.map((cap) => {
+      const prefixedId = `${instanceId}__${cap.toolName}`;
+      return {
+        name: prefixedId,
+        title: cap.title,
+        id: prefixedId,
+        description: cap.description,
+        category: t("category"),
+        tags: [],
+        executionMode: "via-execute-route" as const,
+        instanceId,
+      };
+    });
+
+    return success({
+      tools,
+      totalCount: tools.length,
+      matchedCount: tools.length,
+      hint: `${tools.length} tools from remote instance "${instanceId}". Use prefixed ID directly: execute-tool toolName="${instanceId}__<name>".`,
+    });
+  }
+
   static async getTools(
     data: HelpGetRequestOutput,
     user: InferJwtPayloadTypeFromRoles<readonly UserRoleValue[]>,
     locale: CountryLanguage,
     platform: Platform,
   ): Promise<ResponseType<HelpGetResponseOutput>> {
+    // Remote instance tool discovery — bypass local registry
+    if (data.instanceId) {
+      return HelpRepository.getToolsFromRemoteInstance(
+        data.instanceId,
+        user,
+        locale,
+      );
+    }
+
     const isCompact = isCompactPlatform(platform);
     const effectivePageSize =
       data.pageSize ??
       (isCompact ? COMPACT_DEFAULT_PAGE_SIZE : HUMAN_DEFAULT_PAGE_SIZE);
     const currentPage = data.page ?? 1;
 
-    // Admin detection
     const isAdmin =
       !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
 
-    // Current environment info
     const isDev = envClient.NODE_ENV !== "production";
     const currentEnv: "development" | "production" = isDev
       ? "development"
       : "production";
 
-    // Discovery platform: MCP callers see only MCP_VISIBLE tools (opt-in discovery).
-    // All other platforms (CLI, AI, web) use Platform.CLI to see the full tool set.
-    // Admins can override via the `platform` request param.
+    // Load the pre-translated static meta for this locale
+    const metaModule = await import(
+      `@/app/api/[locale]/system/generated/endpoints-meta/${locale === "de-DE" ? "de" : locale === "pl-PL" ? "pl" : "en"}`
+    );
+    const allMeta: EndpointMeta[] = metaModule.endpointsMeta;
+
+    // Discovery platform
+    // When called from MCP, use CLI semantics for listing (opt-out, not MCP_VISIBLE opt-in).
+    // MCP_VISIBLE only controls which tools appear as native MCP server tools — not what
+    // help/execute can discover. execute-tool can call any MCP-accessible endpoint.
     let discoveryPlatform: Platform;
     const platformFilter = isAdmin ? data.platform : undefined;
 
     if (platformFilter) {
       const mapped = mapFilterToPlatform(platformFilter as PlatformFilterValue);
-      // "all" uses CLI which is the broadest superset
       discoveryPlatform = mapped === "all" ? Platform.CLI : mapped;
     } else {
-      discoveryPlatform =
-        platform === Platform.MCP ? Platform.MCP : Platform.CLI;
+      discoveryPlatform = Platform.CLI;
     }
 
-    // Build endpoint-to-platforms map for admin platform badges
-    const endpointPlatformsMap = new Map<string, string[]>();
-    if (isAdmin) {
-      const allEndpoints = definitionsRegistry.getEndpointsForUser(
-        Platform.CLI,
-        user,
-      );
-      for (const ep of allEndpoints) {
-        const toolName = endpointToToolName(ep);
-        const rawPlatforms = permissionsRegistry.getAvailablePlatforms(ep);
-        endpointPlatformsMap.set(
-          toolName,
-          simplifyPlatforms(rawPlatforms.map(String)),
-        );
-      }
-    }
+    const userRoles = user.isPublic ? [ROLE_PUBLIC] : [...user.roles];
 
-    /** Get simplified platforms for a tool (admin only) */
-    const getToolPlatforms = (toolName: string): string[] | undefined => {
+    // Filter meta by platform + user roles
+    const filteredByPlatform = filterMetaForUser(
+      allMeta,
+      discoveryPlatform,
+      userRoles,
+      user.isPublic,
+    );
+
+    // Admin platform badges — derived directly from allowedRoles in meta
+    const getToolPlatforms = (tool: EndpointMeta): string[] | undefined => {
       if (!isAdmin) {
         return undefined;
       }
-      return endpointPlatformsMap.get(toolName);
+      return getMetaPlatforms(tool.allowedRoles);
     };
 
-    // For admin "all" platform filter, get from CLI (broadest set)
-    // For specific platform filters, the discoveryPlatform is already set correctly
-    // For "all" with includeProdOnly, we also need to filter out dev-only tools
-    const allTools = definitionsRegistry.getSerializedToolsForUser(
-      discoveryPlatform,
-      user,
-      locale,
-    );
-
     // When admin filters by a specific platform (not "all"), additionally filter
-    // tools that aren't available on that platform
-    let platformFilteredTools = allTools;
+    let platformFilteredMeta = filteredByPlatform;
     if (platformFilter && platformFilter !== "all") {
-      const targetPlatformStr = platformFilter;
-      platformFilteredTools = allTools.filter((tool) => {
-        const platforms = endpointPlatformsMap.get(tool.toolName);
-        return platforms?.includes(targetPlatformStr) ?? false;
-      });
+      platformFilteredMeta = filteredByPlatform.filter((m) =>
+        getMetaPlatforms(m.allowedRoles).includes(platformFilter),
+      );
     }
 
-    // Handle includeProdOnly: filter out tools that have PRODUCTION_OFF marker
+    // includeProdOnly: exclude PRODUCTION_OFF tools
     if (isAdmin && data.includeProdOnly) {
-      const allEndpoints = definitionsRegistry.getEndpointsForUser(
-        Platform.CLI,
-        user,
-      );
-      const prodToolNames = new Set<string>();
-      for (const ep of allEndpoints) {
-        if (!ep.allowedRoles?.includes("PRODUCTION_OFF" as UserRoleValue)) {
-          prodToolNames.add(endpointToToolName(ep));
-        }
-      }
-      platformFilteredTools = platformFilteredTools.filter((t) =>
-        prodToolNames.has(t.toolName),
+      platformFilteredMeta = platformFilteredMeta.filter(
+        (m) => !m.allowedRoles.includes(ROLE_PRODUCTION_OFF),
       );
     }
 
-    const totalCount = platformFilteredTools.length;
+    const totalCount = platformFilteredMeta.length;
 
     const categoryMap = new Map<string, number>();
-    for (const tool of platformFilteredTools) {
+    for (const tool of platformFilteredMeta) {
       categoryMap.set(tool.category, (categoryMap.get(tool.category) ?? 0) + 1);
     }
     const categories = [...categoryMap.entries()]
       .toSorted((a, b) => b[1] - a[1])
       .map(([name, count]) => ({ name, count }));
 
-    // Common response metadata for admin context
     const adminMeta = isAdmin
       ? {
           currentPlatform: platformFilter ?? platform,
@@ -443,11 +519,11 @@ export class HelpRepository {
     // Detail mode — single tool with full parameter schema
     if (data.toolName) {
       const needle = data.toolName.toLowerCase().trim();
-      const matchedTool = platformFilteredTools.find(
-        (t) =>
-          t.toolName.toLowerCase() === needle ||
-          t.name.toLowerCase() === needle ||
-          t.aliases?.some((a) => a.toLowerCase() === needle),
+      const matchedTool = platformFilteredMeta.find(
+        (m) =>
+          m.toolName.toLowerCase() === needle ||
+          (m.aliases.length > 0 && m.aliases[0].toLowerCase() === needle) ||
+          m.aliases.some((a) => a.toLowerCase() === needle),
       );
       if (!matchedTool) {
         return success({
@@ -459,38 +535,26 @@ export class HelpRepository {
           ...adminMeta,
         });
       }
-      const detailEndpoints = definitionsRegistry.getEndpointsForUser(
-        discoveryPlatform,
-        user,
-      );
-      const endpoint = detailEndpoints.find((e) => {
-        const preferred = getPreferredToolName(e);
-        const internal = endpointToToolName(e);
-        return (
-          preferred.toLowerCase() === needle ||
-          internal.toLowerCase() === needle ||
-          e.aliases?.some((a) => a.toLowerCase() === needle)
-        );
-      });
+      const endpoint = await loadEndpointForMeta(matchedTool);
       const parameters = endpoint
         ? (getParameterSchema(endpoint, locale) ?? undefined)
         : undefined;
-      const aliases = matchedTool.aliases?.length
-        ? matchedTool.aliases
-        : undefined;
-      const callAs = aliases?.[0] ?? matchedTool.toolName;
+      const callAs =
+        matchedTool.aliases.length > 0
+          ? matchedTool.aliases[0]
+          : matchedTool.toolName;
       return success({
         tools: [
-          serializeTool(
+          serializeMeta(
             matchedTool,
             parameters,
             true,
-            getToolPlatforms(matchedTool.toolName),
+            getToolPlatforms(matchedTool),
           ),
         ],
         totalCount,
         matchedCount: 1,
-        hint: `Call as: execute-tool toolName="${callAs}"${aliases && aliases.length > 1 ? ` (aliases: ${aliases.join(", ")})` : ""}. CLI: vibe ${callAs} [--field=value].`,
+        hint: `Call as: execute-tool toolName="${callAs}"${matchedTool.aliases.length > 1 ? ` (aliases: ${matchedTool.aliases.join(", ")})` : ""}. CLI: vibe ${callAs} [--field=value].`,
         ...adminMeta,
       });
     }
@@ -498,81 +562,64 @@ export class HelpRepository {
     const query = data.query?.toLowerCase().trim();
     const category = data.category?.toLowerCase().trim();
 
-    // Auto-upgrade to detail mode when query exactly matches a tool name or alias
-    // This makes `vibe help web-search` show full detail instead of a search result
+    // Build search index once
+    const searchIndexMap = new Map<string, string>();
+    for (const m of platformFilteredMeta) {
+      searchIndexMap.set(m.toolName, buildMetaSearchIndex(m));
+    }
+
+    // Auto-upgrade to detail mode on exact name/alias match
     if (query && !category) {
-      const exactMatch = platformFilteredTools.find(
-        (t) =>
-          t.toolName.toLowerCase() === query ||
-          t.name.toLowerCase() === query ||
-          t.aliases?.some((a) => a.toLowerCase() === query),
+      const exactMatch = platformFilteredMeta.find(
+        (m) =>
+          m.toolName.toLowerCase() === query ||
+          m.aliases.some((a) => a.toLowerCase() === query),
       );
       if (exactMatch) {
-        const exactEndpoints = definitionsRegistry.getEndpointsForUser(
-          discoveryPlatform,
-          user,
-        );
-        const needle = exactMatch.toolName.toLowerCase();
-        const endpoint = exactEndpoints.find(
-          (e) =>
-            endpointToToolName(e).toLowerCase() === needle ||
-            e.aliases?.some((a) => a.toLowerCase() === needle),
-        );
+        const endpoint = await loadEndpointForMeta(exactMatch);
         const parameters = endpoint
           ? (getParameterSchema(endpoint, locale) ?? undefined)
           : undefined;
-        const aliases = exactMatch.aliases?.length
-          ? exactMatch.aliases
-          : undefined;
-        const callAs = aliases?.[0] ?? exactMatch.toolName;
+        const callAs =
+          exactMatch.aliases.length > 0
+            ? exactMatch.aliases[0]
+            : exactMatch.toolName;
         return success({
           tools: [
-            serializeTool(
+            serializeMeta(
               exactMatch,
               parameters,
               true,
-              getToolPlatforms(exactMatch.toolName),
+              getToolPlatforms(exactMatch),
             ),
           ],
           totalCount,
           matchedCount: 1,
-          hint: `Call as: execute-tool toolName="${callAs}"${aliases && aliases.length > 1 ? ` (aliases: ${aliases.join(", ")})` : ""}. CLI: vibe ${callAs} [--field=value].`,
+          hint: `Call as: execute-tool toolName="${callAs}"${exactMatch.aliases.length > 1 ? ` (aliases: ${exactMatch.aliases.join(", ")})` : ""}. CLI: vibe ${callAs} [--field=value].`,
           ...adminMeta,
         });
       }
     }
 
-    // AI/MCP overview — no params → return paginated first page with categories
-    // (Previously returned tools:[] which was confusing — callers had no way to discover tools without knowing params)
-
-    let filtered = platformFilteredTools;
+    let filtered = platformFilteredMeta;
 
     if (query) {
-      const allEndpoints = definitionsRegistry.getEndpointsForUser(
-        discoveryPlatform,
-        user,
-      );
-      const searchIndexMap = new Map<string, string>();
-      for (const ep of allEndpoints) {
-        searchIndexMap.set(endpointToToolName(ep), buildToolSearchIndex(ep));
-      }
-      filtered = filtered.filter((tool) => {
+      filtered = filtered.filter((m) => {
         if (
-          tool.name.toLowerCase().includes(query) ||
-          tool.toolName.toLowerCase().includes(query) ||
-          tool.description.toLowerCase().includes(query) ||
-          tool.aliases?.some((a) => a.toLowerCase().includes(query)) ||
-          tool.tags.some((t) => t.toLowerCase().includes(query))
+          m.toolName.toLowerCase().includes(query) ||
+          m.aliases.some((a) => a.toLowerCase().includes(query)) ||
+          m.description.toLowerCase().includes(query) ||
+          m.tags.some((t) => t.toLowerCase().includes(query))
         ) {
           return true;
         }
-        return searchIndexMap.get(tool.toolName)?.includes(query) ?? false;
+        return searchIndexMap.get(m.toolName)?.includes(query) ?? false;
       });
     }
 
     if (category) {
-      filtered = filtered.filter((t) =>
-        t.category?.toLowerCase().includes(category),
+      filtered = filtered.filter((m) =>
+        m.category?.toLowerCase().includes(category),
       );
     }
 
@@ -583,29 +630,16 @@ export class HelpRepository {
     const pageSlice = filtered.slice(offset, offset + effectivePageSize);
 
     if (isCompact) {
-      // ≤ threshold → auto-upgrade to full detail (params + examples)
       if (matchedCount <= COMPACT_FULL_DETAIL_THRESHOLD) {
-        const allEndpoints = definitionsRegistry.getEndpointsForUser(
-          discoveryPlatform,
-          user,
+        const tools: ToolItem[] = await Promise.all(
+          pageSlice.map(async (m) => {
+            const endpoint = await loadEndpointForMeta(m);
+            const parameters = endpoint
+              ? (getParameterSchema(endpoint, locale) ?? undefined)
+              : undefined;
+            return serializeMeta(m, parameters, true, getToolPlatforms(m));
+          }),
         );
-        const tools: ToolItem[] = pageSlice.map((tool) => {
-          const needle = tool.toolName.toLowerCase();
-          const endpoint = allEndpoints.find(
-            (e) =>
-              endpointToToolName(e).toLowerCase() === needle ||
-              e.aliases?.some((a) => a.toLowerCase() === needle),
-          );
-          const parameters = endpoint
-            ? (getParameterSchema(endpoint, locale) ?? undefined)
-            : undefined;
-          return serializeTool(
-            tool,
-            parameters,
-            true,
-            getToolPlatforms(tool.toolName),
-          );
-        });
         return success({
           tools,
           totalCount,
@@ -617,14 +651,13 @@ export class HelpRepository {
           ...adminMeta,
         });
       }
-      // > threshold → minimal list to preserve context
       const paginationHint =
         totalPages > 1
           ? ` Page ${safePage}/${totalPages} — use page= to navigate.`
           : "";
       return success({
-        tools: pageSlice.map((t) =>
-          serializeToolMinimal(t, getToolPlatforms(t.toolName)),
+        tools: pageSlice.map((m) =>
+          serializeMetaMinimal(m, getToolPlatforms(m)),
         ),
         totalCount,
         matchedCount,
@@ -638,8 +671,8 @@ export class HelpRepository {
     }
 
     return success({
-      tools: pageSlice.map((t) =>
-        serializeTool(t, undefined, false, getToolPlatforms(t.toolName)),
+      tools: pageSlice.map((m) =>
+        serializeMeta(m, undefined, false, getToolPlatforms(m)),
       ),
       totalCount,
       matchedCount,

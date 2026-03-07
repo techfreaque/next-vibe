@@ -17,11 +17,10 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/parsing";
-import { definitionsRegistry } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definitions/registry";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
-import { getPreferredToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
@@ -51,7 +50,6 @@ export class ToolErrorHandler {
           toolCallData: {
             toolCall: ToolCall;
             parentId: string | null;
-            depth: number;
           };
         }
       | undefined;
@@ -66,14 +64,16 @@ export class ToolErrorHandler {
     /** Set of tool names the model is allowed to execute. null = all allowed. */
     activeToolNames: Set<string> | null;
     /** Confirmation config for tools (from visible tools + active tools). */
-    toolsConfig: Map<string, { requiresConfirmation: boolean }>;
+    toolsConfig: Map<
+      string,
+      { requiresConfirmation: boolean; credits: number }
+    >;
     dbWriter: MessageDbWriter;
     logger: EndpointLogger;
     t: AiStreamT;
     streamContext: ToolExecutionContext;
   }): Promise<{
     currentParentId: string | null;
-    currentDepth: number;
   } | null> {
     const {
       part,
@@ -99,37 +99,30 @@ export class ToolErrorHandler {
 
     const { messageId: toolMessageId, toolCallData } = pendingToolMessage;
 
-    // Step 1: Check if tool exists in the endpoint registry
-    const allEndpoints = definitionsRegistry.getEndpointsForUser(
-      Platform.AI,
-      user,
-    );
-    const endpoint = allEndpoints.find(
-      (e) => getPreferredToolName(e) === part.toolName,
-    );
+    // Step 1: Check if tool is allowed (activeToolNames permission layer).
+    // null = all tools allowed. If set and tool not in it, it's disabled for this user.
+    if (activeToolNames !== null && !activeToolNames.has(part.toolName)) {
+      // Could be unknown tool or just disabled — check if it exists at all
+      const unknownEndpoint = await getEndpoint(part.toolName);
+      if (!unknownEndpoint) {
+        // Tool doesn't exist at all — emit the original error
+        return this.emitOriginalError({
+          part,
+          toolMessageId,
+          toolCallData,
+          threadId,
+          model,
+          character,
+          sequenceId,
+          isIncognito,
+          userId,
+          user,
+          dbWriter,
+          logger,
+          t,
+        });
+      }
 
-    if (!endpoint) {
-      // Tool doesn't exist at all — emit the original error
-      return this.emitOriginalError({
-        part,
-        toolMessageId,
-        toolCallData,
-        threadId,
-        model,
-        character,
-        sequenceId,
-        isIncognito,
-        userId,
-        user,
-        dbWriter,
-        logger,
-        t,
-      });
-    }
-
-    // Step 2: Check if tool is allowed (activeToolNames permission layer)
-    // null = all tools allowed
-    if (activeToolNames && !activeToolNames.has(part.toolName)) {
       logger.info(
         "[AI Stream] Tool not in activeTools — returning disabled error to model",
         {
@@ -139,7 +132,6 @@ export class ToolErrorHandler {
         },
       );
 
-      // Return a clear error to the model so it knows not to retry
       const disabledError = fail({
         message: t("errors.toolDisabledByUser"),
         errorType: ErrorResponseTypes.FORBIDDEN,
@@ -154,7 +146,6 @@ export class ToolErrorHandler {
         toolMessageId,
         threadId,
         parentId: toolCallData.parentId,
-        depth: toolCallData.depth,
         userId,
         model,
         character,
@@ -167,19 +158,18 @@ export class ToolErrorHandler {
         user,
       });
 
-      return {
-        currentParentId: toolMessageId,
-        currentDepth: toolCallData.depth,
-      };
+      return { currentParentId: toolMessageId };
     }
 
-    // Step 3: Check confirmation requirements
-    // Client config overrides definition, definition is fallback
+    // Step 2: Check confirmation requirements.
+    // toolsConfig already has the resolved value from setup.
+    // For fallback tools (not in visibleTools), lazy-load to get definition default.
     const toolConfig = toolsConfig.get(part.toolName);
-    const requiresConfirmation =
-      toolConfig?.requiresConfirmation ??
-      endpoint.requiresConfirmation ??
-      false;
+    let requiresConfirmation = toolConfig?.requiresConfirmation;
+    if (requiresConfirmation === undefined) {
+      const endpoint = await getEndpoint(part.toolName);
+      requiresConfirmation = endpoint?.requiresConfirmation ?? false;
+    }
 
     if (requiresConfirmation) {
       logger.info(
@@ -204,7 +194,6 @@ export class ToolErrorHandler {
         toolMessageId,
         threadId,
         parentId: toolCallData.parentId,
-        depth: toolCallData.depth,
         userId,
         model,
         character,
@@ -225,7 +214,6 @@ export class ToolErrorHandler {
 
       return {
         currentParentId: toolMessageId,
-        currentDepth: toolCallData.depth,
       };
     }
 
@@ -252,14 +240,13 @@ export class ToolErrorHandler {
       const toolCallWithResult: ToolCall = {
         ...toolCallData.toolCall,
         result: fallbackResult.data as ToolCallResult,
-        creditsUsed: endpoint.credits ?? 0,
+        creditsUsed: toolsConfig.get(part.toolName)?.credits ?? 0,
       };
 
       await dbWriter.emitToolResult({
         toolMessageId,
         threadId,
         parentId: toolCallData.parentId,
-        depth: toolCallData.depth,
         userId,
         model,
         character,
@@ -280,7 +267,6 @@ export class ToolErrorHandler {
 
       return {
         currentParentId: toolMessageId,
-        currentDepth: toolCallData.depth,
       };
     }
 
@@ -305,7 +291,6 @@ export class ToolErrorHandler {
         toolMessageId,
         threadId,
         parentId: toolCallData.parentId,
-        depth: toolCallData.depth,
         userId,
         model,
         character,
@@ -320,7 +305,6 @@ export class ToolErrorHandler {
 
       return {
         currentParentId: toolMessageId,
-        currentDepth: toolCallData.depth,
       };
     }
 
@@ -412,7 +396,6 @@ export class ToolErrorHandler {
     toolCallData: {
       toolCall: ToolCall;
       parentId: string | null;
-      depth: number;
     };
     threadId: string;
     model: ModelId;
@@ -426,7 +409,6 @@ export class ToolErrorHandler {
     t: AiStreamT;
   }): Promise<{
     currentParentId: string | null;
-    currentDepth: number;
   }> {
     const {
       part,
@@ -485,7 +467,6 @@ export class ToolErrorHandler {
       toolMessageId,
       threadId,
       parentId: toolCallData.parentId,
-      depth: toolCallData.depth,
       userId,
       model,
       character,
@@ -506,7 +487,6 @@ export class ToolErrorHandler {
 
     return {
       currentParentId: toolMessageId,
-      currentDepth: toolCallData.depth,
     };
   }
 }

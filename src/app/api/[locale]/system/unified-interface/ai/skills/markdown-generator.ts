@@ -5,6 +5,9 @@
  * Generates two tier files (AGENT.md is a lean gateway document, not a tool list):
  *   - PUBLIC_USER_SKILL.md       → PUBLIC + CUSTOMER endpoints (default for all agents)
  *   - USER_WITH_ACCOUNT_SKILL.md → CUSTOMER-only endpoints (account required)
+ *
+ * Uses generated endpoints-meta for fast filtering (no registry load).
+ * Schema rendering uses getEndpoint() per-tool (lazy, only REMOTE_SKILL endpoints).
  */
 
 import "server-only";
@@ -12,28 +15,12 @@ import "server-only";
 import { z } from "zod";
 
 import { zodSchemaToJsonSchema } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/endpoint-to-metadata";
-import { definitionsRegistry } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definitions/registry";
 import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
-import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
-import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/shared/utils/error-types";
-import {
-  endpointToToolName,
-  getPreferredToolName,
-} from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
-import type {
-  JwtPayloadType,
-  JwtPrivatePayloadType,
-  JWTPublicPayloadType,
-} from "@/app/api/[locale]/user/auth/types";
-import {
-  filterUserPermissionRoles,
-  UserPermissionRole,
-} from "@/app/api/[locale]/user/user-roles/enum";
+import { pathSegmentsToToolName } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
-import { simpleT } from "@/i18n/core/shared";
 
 // ============================================================================
 // SKILL TIER DEFINITIONS
@@ -74,6 +61,11 @@ export const SKILL_TIERS: Record<SkillTier, SkillTierConfig> = {
     requiresAuthentication: true,
   },
 };
+
+// Role key constants (as stored in endpoints-meta allowedRoles)
+const ROLE_REMOTE_SKILL = "enums.userRole.remoteSkill";
+const ROLE_PUBLIC = "enums.userRole.public";
+const ROLE_CUSTOMER = "enums.userRole.customer";
 
 // ============================================================================
 // PARAMETER SCHEMA RENDERER
@@ -183,110 +175,119 @@ function formatType(prop: JsonSchemaObject): string {
 }
 
 // ============================================================================
-// SINGLE ENDPOINT RENDERER
+// SCHEMA RENDERING (via lazy getEndpoint per tool)
 // ============================================================================
 
-function renderEndpoint(
-  endpoint: CreateApiEndpointAny,
-  locale: CountryLanguage,
-  index: number,
-): string {
-  const { t } = endpoint.scopedTranslation.scopedT(locale);
-
-  const toolName = getPreferredToolName(endpoint);
-  const fullToolName = endpointToToolName(endpoint);
-  const title = t(endpoint.title);
-  const description = t(endpoint.description ?? endpoint.title);
-
-  let category = "";
+async function renderInputSchemaBlock(toolName: string): Promise<string> {
   try {
-    category = t(endpoint.category);
+    const { getEndpoint } =
+      await import("@/app/api/[locale]/system/generated/endpoint");
+    const endpoint = await getEndpoint(toolName);
+    if (!endpoint?.fields) {
+      return "";
+    }
+
+    const requestDataSchema = generateSchemaForUsage(
+      endpoint.fields,
+      FieldUsage.RequestData,
+    ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
+
+    const urlParamsSchema = generateSchemaForUsage(
+      endpoint.fields,
+      FieldUsage.RequestUrlParams,
+    ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
+
+    const combinedShape: Record<string, z.ZodTypeAny> = {};
+    if (requestDataSchema instanceof z.ZodObject) {
+      Object.assign(combinedShape, requestDataSchema.shape);
+    }
+    if (urlParamsSchema instanceof z.ZodObject) {
+      Object.assign(combinedShape, urlParamsSchema.shape);
+    }
+
+    if (Object.keys(combinedShape).length === 0) {
+      return "";
+    }
+
+    const combinedSchema = z.object(combinedShape);
+    const jsonSchemaObj = zodSchemaToJsonSchema(
+      combinedSchema,
+    ) as JsonSchemaObject;
+    const rendered = renderJsonSchemaAsMarkdown(jsonSchemaObj);
+    return rendered ? `\n**Parameters:**\n${rendered}` : "";
   } catch {
-    category = String(endpoint.category);
+    return "";
   }
+}
 
-  const tags = endpoint.tags.map((tag) => {
-    try {
-      return t(tag);
-    } catch {
-      return String(tag);
-    }
-  });
+// ============================================================================
+// META-BASED ENDPOINT INFO TYPE
+// ============================================================================
 
-  // Generate input parameter schema
-  let inputSchemaBlock = "";
-  if (endpoint.fields) {
-    try {
-      const requestDataSchema = generateSchemaForUsage(
-        endpoint.fields,
-        FieldUsage.RequestData,
-      ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
+interface SkillEndpointInfo {
+  toolName: string;
+  method: string;
+  path: string[];
+  allowedRoles: string[];
+  aliases: string[];
+  title: string;
+  description: string;
+  category: string;
+  tags: string[];
+  credits?: number;
+  requiresConfirmation?: boolean;
+}
 
-      const urlParamsSchema = generateSchemaForUsage(
-        endpoint.fields,
-        FieldUsage.RequestUrlParams,
-      ) as z.ZodObject<Record<string, z.ZodTypeAny>> | z.ZodNever;
+// ============================================================================
+// SINGLE ENDPOINT RENDERER (using meta + lazy schema)
+// ============================================================================
 
-      const combinedShape: Record<string, z.ZodTypeAny> = {};
-      if (requestDataSchema instanceof z.ZodObject) {
-        Object.assign(combinedShape, requestDataSchema.shape);
-      }
-      if (urlParamsSchema instanceof z.ZodObject) {
-        Object.assign(combinedShape, urlParamsSchema.shape);
-      }
+async function renderEndpointFromMeta(
+  ep: SkillEndpointInfo,
+  index: number,
+): Promise<string> {
+  const toolName = ep.toolName;
+  const fullToolName = pathSegmentsToToolName(ep.path, ep.method);
 
-      if (Object.keys(combinedShape).length > 0) {
-        const combinedSchema = z.object(combinedShape);
-        const jsonSchema = zodSchemaToJsonSchema(
-          combinedSchema,
-        ) as JsonSchemaObject;
-        const rendered = renderJsonSchemaAsMarkdown(jsonSchema);
-        if (rendered) {
-          inputSchemaBlock = `\n**Parameters:**\n${rendered}`;
-        }
-      }
-    } catch {
-      // Skip schema rendering on error
-    }
-  }
+  const inputSchemaBlock = await renderInputSchemaBlock(toolName);
 
   // Confirm/credits info
   const extras: string[] = [];
-  if (endpoint.requiresConfirmation) {
+  if (ep.requiresConfirmation) {
     extras.push("⚠️ *Requires user confirmation before execution*");
   }
-  if (endpoint.credits && endpoint.credits > 0) {
-    extras.push(`💳 *Costs ${endpoint.credits} credit(s)*`);
+  if (ep.credits && ep.credits > 0) {
+    extras.push(`💳 *Costs ${ep.credits} credit(s)*`);
   }
 
   // Authentication requirement
-  const permissionRoles = filterUserPermissionRoles([...endpoint.allowedRoles]);
-  const requiresAuth = !permissionRoles.includes(UserPermissionRole.PUBLIC);
+  const requiresAuth = !ep.allowedRoles.includes(ROLE_PUBLIC);
   const authNote = requiresAuth
     ? "🔒 *Requires authentication (Bearer token)*"
     : "🌐 *Public — no authentication required*";
 
-  // Aliases
+  // Aliases (all aliases from meta + any remaining)
+  const allAliases = ep.aliases;
   const aliasBlock =
-    endpoint.aliases && endpoint.aliases.length > 0
-      ? `\n**Aliases:** ${endpoint.aliases.map((a) => `\`${a}\``).join(", ")}`
+    allAliases.length > 0
+      ? `\n**Aliases:** ${allAliases.map((a) => `\`${a}\``).join(", ")}`
       : "";
 
-  const categoryStr = category ? `\n**Category:** ${category}` : "";
+  const categoryStr = ep.category ? `\n**Category:** ${ep.category}` : "";
   const tagsStr =
-    tags.length > 0
-      ? `\n**Tags:** ${tags.map((tag) => `\`${tag}\``).join(", ")}`
+    ep.tags.length > 0
+      ? `\n**Tags:** ${ep.tags.map((tag) => `\`${tag}\``).join(", ")}`
       : "";
   const extrasStr = extras.length > 0 ? `\n${extras.join(" · ")}` : "";
 
   return [
     `### ${index}. \`${toolName}\``,
     "",
-    `**${title}**`,
+    `**${ep.title}**`,
     "",
-    description,
+    ep.description,
     "",
-    `**Method:** \`${endpoint.method}\` · **Tool name:** \`${toolName}\``,
+    `**Method:** \`${ep.method}\` · **Tool name:** \`${toolName}\``,
     fullToolName !== toolName ? `**Full path:** \`${fullToolName}\`` : null,
     authNote,
     categoryStr || null,
@@ -300,37 +301,20 @@ function renderEndpoint(
 }
 
 // ============================================================================
-// TIER FILTER
+// TIER FILTER (using meta allowedRoles strings)
 // ============================================================================
 
-/**
- * Filter endpoints for a specific skill tier.
- * All endpoints here already have REMOTE_SKILL marker (from the platform check).
- */
 function filterForTier(
-  endpoints: CreateApiEndpointAny[],
+  endpoints: SkillEndpointInfo[],
   tier: SkillTier,
-): CreateApiEndpointAny[] {
-  return endpoints.filter((endpoint) => {
-    const permissionRoles = filterUserPermissionRoles([
-      ...endpoint.allowedRoles,
-    ]);
-
+): SkillEndpointInfo[] {
+  return endpoints.filter((ep) => {
+    const roles = ep.allowedRoles;
     switch (tier) {
       case "public-user":
-        // All REMOTE_SKILL endpoints — public and authenticated alike
-        return (
-          permissionRoles.includes(UserPermissionRole.CUSTOMER) ||
-          permissionRoles.includes(UserPermissionRole.PUBLIC)
-        );
-
+        return roles.includes(ROLE_CUSTOMER) || roles.includes(ROLE_PUBLIC);
       case "user-with-account":
-        // Only CUSTOMER-required endpoints (not public)
-        return (
-          permissionRoles.includes(UserPermissionRole.CUSTOMER) &&
-          !permissionRoles.includes(UserPermissionRole.PUBLIC)
-        );
-
+        return roles.includes(ROLE_CUSTOMER) && !roles.includes(ROLE_PUBLIC);
       default: {
         const _exhaustiveCheck: never = tier;
         return _exhaustiveCheck;
@@ -340,99 +324,67 @@ function filterForTier(
 }
 
 // ============================================================================
+// LOCALE → META FILE MAPPING
+// ============================================================================
+
+async function loadMetaForLocale(
+  locale: CountryLanguage,
+): Promise<SkillEndpointInfo[]> {
+  // Map locale to generated file
+  const localeFileMap: Partial<Record<CountryLanguage, string>> = {
+    "en-US": "en",
+    "de-DE": "de",
+    "pl-PL": "pl",
+  };
+  const file = localeFileMap[locale] ?? "en";
+
+  const mod = (await import(
+    `@/app/api/[locale]/system/generated/endpoints-meta/${file}`
+  )) as { endpointsMeta: SkillEndpointInfo[] };
+
+  return mod.endpointsMeta.filter((ep) =>
+    ep.allowedRoles.includes(ROLE_REMOTE_SKILL),
+  );
+}
+
+// ============================================================================
 // CATEGORY GROUPING
 // ============================================================================
 
 function groupByCategory(
-  endpoints: CreateApiEndpointAny[],
-  locale: CountryLanguage,
-): Map<string, CreateApiEndpointAny[]> {
-  const groups = new Map<string, CreateApiEndpointAny[]>();
-
-  for (const endpoint of endpoints) {
-    const { t } = simpleT(locale);
-    const category = t(endpoint.category);
-
-    const existing = groups.get(category) ?? [];
-    existing.push(endpoint);
-    groups.set(category, existing);
+  endpoints: SkillEndpointInfo[],
+): Map<string, SkillEndpointInfo[]> {
+  const groups = new Map<string, SkillEndpointInfo[]>();
+  for (const ep of endpoints) {
+    const existing = groups.get(ep.category) ?? [];
+    existing.push(ep);
+    groups.set(ep.category, existing);
   }
-
   return groups;
-}
-
-// ============================================================================
-// MOCK USERS FOR SKILL DISCOVERY
-// ============================================================================
-
-/**
- * Build a public (unauthenticated) JwtPayloadType for REMOTE_SKILL discovery.
- * Uses a sentinel UUID — this user is never persisted, only used for permission checks.
- */
-function buildPublicSkillUser(): JWTPublicPayloadType {
-  return {
-    isPublic: true,
-    leadId: "00000000-0000-0000-0000-000000000000",
-    roles: [UserPermissionRole.PUBLIC],
-  };
-}
-
-/**
- * Build a customer (authenticated) JwtPayloadType for REMOTE_SKILL discovery.
- * Uses a sentinel UUID — this user is never persisted, only used for permission checks.
- */
-function buildCustomerSkillUser(): JwtPrivatePayloadType {
-  return {
-    isPublic: false,
-    id: "00000000-0000-0000-0000-000000000001",
-    leadId: "00000000-0000-0000-0000-000000000002",
-    roles: [UserPermissionRole.CUSTOMER],
-  };
 }
 
 // ============================================================================
 // MAIN MARKDOWN GENERATOR
 // ============================================================================
 
-export function generateSkillMarkdown(
+export async function generateSkillMarkdown(
   tier: SkillTier,
   locale: CountryLanguage,
-): string {
+): Promise<string> {
   const config = SKILL_TIERS[tier];
 
-  // Collect all REMOTE_SKILL endpoints — both public and customer-accessible.
-  // Permission role filtering (PUBLIC vs CUSTOMER) is done in filterForTier.
-  const publicUser: JwtPayloadType = buildPublicSkillUser();
-  const publicEndpoints = definitionsRegistry.getEndpointsForUser(
-    Platform.REMOTE_SKILL,
-    publicUser,
-  );
-
-  const customerUser: JwtPayloadType = buildCustomerSkillUser();
-  const customerEndpoints = definitionsRegistry.getEndpointsForUser(
-    Platform.REMOTE_SKILL,
-    customerUser,
-  );
-
-  // Deduplicate by toolName (public endpoints come first)
-  const endpoints = [...publicEndpoints];
-  const seen = new Set(publicEndpoints.map(endpointToToolName));
-  for (const ep of customerEndpoints) {
-    if (!seen.has(endpointToToolName(ep))) {
-      endpoints.push(ep);
-      seen.add(endpointToToolName(ep));
-    }
-  }
+  // Load REMOTE_SKILL endpoints from static meta (no registry, no dynamic loading of all definitions)
+  const allRemoteSkill = await loadMetaForLocale(locale);
 
   // Filter for this tier
-  const tierEndpoints = filterForTier(endpoints, tier);
+  const tierEndpoints = filterForTier(allRemoteSkill, tier);
 
   if (tierEndpoints.length === 0) {
     return buildEmptyManifest(config);
   }
 
   // Group by category
-  const grouped = groupByCategory(tierEndpoints, locale);
+  const grouped = groupByCategory(tierEndpoints);
 
   const now = new Date().toISOString();
   const baseUrl = env.NEXT_PUBLIC_APP_URL ?? "https://your-app.com";
@@ -527,10 +479,11 @@ export function generateSkillMarkdown(
       `- [${category}](#${anchor}) (${catEndpoints.length} tool${catEndpoints.length !== 1 ? "s" : ""})`,
     );
     for (const ep of catEndpoints) {
-      const toolName = getPreferredToolName(ep);
-      const toolAnchor = toolName.toLowerCase().replaceAll(/[^a-z0-9-]/g, "-");
+      const toolAnchor = ep.toolName
+        .toLowerCase()
+        .replaceAll(/[^a-z0-9-]/g, "-");
       lines.push(
-        `  - [${tocIndex}. \`${toolName}\`](#${tocIndex}-${toolAnchor})`,
+        `  - [${tocIndex}. \`${ep.toolName}\`](#${tocIndex}-${toolAnchor})`,
       );
       tocIndex++;
     }
@@ -550,8 +503,8 @@ export function generateSkillMarkdown(
     lines.push(`### 📂 ${category}`);
     lines.push("");
 
-    for (const endpoint of catEndpoints) {
-      lines.push(renderEndpoint(endpoint, locale, globalIndex++));
+    for (const ep of catEndpoints) {
+      lines.push(await renderEndpointFromMeta(ep, globalIndex++));
       lines.push("");
     }
   }

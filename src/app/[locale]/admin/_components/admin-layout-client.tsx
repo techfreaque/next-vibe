@@ -9,18 +9,17 @@ import { cn } from "next-vibe/shared/utils";
 import { usePathname } from "next-vibe-ui/hooks/use-pathname";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  Clock,
-  Frame,
-  Home,
-  Mail,
-  Menu,
-  Shield,
-  Terminal,
-  Users,
-  X,
-  Zap,
-} from "next-vibe-ui/ui/icons";
+import { Clock } from "next-vibe-ui/ui/icons/Clock";
+import { Frame } from "next-vibe-ui/ui/icons/Frame";
+import { Home } from "next-vibe-ui/ui/icons/Home";
+import { Link2 } from "next-vibe-ui/ui/icons/Link2";
+import { Mail } from "next-vibe-ui/ui/icons/Mail";
+import { Menu } from "next-vibe-ui/ui/icons/Menu";
+import { Shield } from "next-vibe-ui/ui/icons/Shield";
+import { Terminal } from "next-vibe-ui/ui/icons/Terminal";
+import { Users } from "next-vibe-ui/ui/icons/Users";
+import { X } from "next-vibe-ui/ui/icons/X";
+import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Link } from "next-vibe-ui/ui/link";
 import { Main } from "next-vibe-ui/ui/main";
 import { Span } from "next-vibe-ui/ui/span";
@@ -102,6 +101,13 @@ export function AdminLayoutClient({
       href: `/${locale}/admin/ssh` as const,
       icon: Terminal,
       current: pathname.startsWith(`/${locale}/admin/ssh`),
+      hidden: false,
+    },
+    {
+      name: t("app.admin.components.navigation.remoteConnections"),
+      href: `/${locale}/admin/remote` as const,
+      icon: Link2,
+      current: pathname.startsWith(`/${locale}/admin/remote`),
       hidden: false,
     },
     {

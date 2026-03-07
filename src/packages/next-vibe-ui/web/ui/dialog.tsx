@@ -2,7 +2,7 @@
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { cn } from "next-vibe/shared/utils/utils";
-import { Cross2Icon } from "next-vibe-ui/ui/icons";
+import { Cross2Icon } from "next-vibe-ui/ui/icons/Cross2Icon";
 import * as React from "react";
 
 import { useTranslation } from "@/i18n/core/client";

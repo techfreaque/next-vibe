@@ -24,7 +24,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
-import { DefaultFolderId } from "../../../config";
+import { DefaultFolderId, isDefaultFolderId } from "../../../config";
 import { scopedTranslation } from "./i18n";
 import { FolderCreateContainer } from "./widget";
 
@@ -36,6 +36,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["agent", "chat", "folders", "[rootFolderId]", "create"],
+  aliases: ["folder-create"] as const,
   allowedRoles: [
     UserRole.CUSTOMER,
     UserRole.ADMIN,
@@ -174,6 +175,63 @@ const { POST } = createEndpoint({
   successTypes: {
     title: "success.title",
     description: "success.description",
+  },
+
+  options: {
+    mutationOptions: {
+      onSuccess: async ({
+        requestData,
+        responseData,
+        pathParams,
+        logger,
+        user,
+      }) => {
+        const { ChatFoldersRepositoryClient } =
+          await import("../repository-client");
+        const rootFolderId = pathParams.rootFolderId;
+        if (!isDefaultFolderId(rootFolderId)) {
+          return;
+        }
+        ChatFoldersRepositoryClient.insertFolderIntoCache(
+          {
+            type: "folder",
+            id: responseData.folderId,
+            name: requestData.name,
+            icon: requestData.icon ?? null,
+            color: requestData.color ?? null,
+            rootFolderId,
+            parentId: requestData.parentId ?? null,
+            userId: user && !user.isPublic ? user.id : null,
+            createdAt: responseData.createdAt,
+            updatedAt: responseData.updatedAt,
+            sortOrder: 0,
+            pinned: null,
+            expanded: null,
+            canManage: true,
+            canCreateThread: true,
+            canModerate: null,
+            canDelete: true,
+            canManagePermissions: null,
+            rolesView: null,
+            rolesManage: null,
+            rolesCreateThread: null,
+            rolesPost: null,
+            rolesModerate: null,
+            rolesAdmin: null,
+            title: null,
+            folderId: null,
+            status: null,
+            preview: null,
+            archived: null,
+            canEdit: null,
+            canPost: null,
+            isStreaming: null,
+            rolesEdit: null,
+          },
+          logger,
+        );
+      },
+    },
   },
 
   examples: {

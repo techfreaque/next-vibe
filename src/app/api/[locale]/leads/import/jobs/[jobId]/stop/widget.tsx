@@ -4,7 +4,8 @@
 "use client";
 
 import { Div } from "next-vibe-ui/ui/div";
-import { CheckCircle, XCircle } from "next-vibe-ui/ui/icons";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Span } from "next-vibe-ui/ui/span";
 import React from "react";
 

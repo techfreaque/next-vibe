@@ -2,7 +2,7 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
-import { Loader2 } from "next-vibe-ui/ui/icons";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Progress } from "next-vibe-ui/ui/progress";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";

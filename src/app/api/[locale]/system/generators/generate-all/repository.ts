@@ -65,23 +65,23 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
       // Run all generators in parallel
       const generatorPromises = [];
 
-      // 1. Endpoints Generator - Generate endpoints index (singleton pattern)
+      // 1. Endpoints Meta Generator - Generate per-locale metadata for tools modal
       if (!data.skipEndpoints) {
         generatorPromises.push(
           (async (): Promise<string | null> => {
             try {
-              outputLines.push("📝 Generating endpoints index (singleton)...");
-              const { endpointsIndexGeneratorRepository } =
-                await import("../endpoints-index/repository");
+              outputLines.push("🗂️ Generating endpoints meta...");
+              const { endpointsMetaGeneratorRepository } =
+                await import("../endpoints-meta/repository");
 
-              const { scopedTranslation: endpointsIndexI18n } =
-                await import("../endpoints-index/i18n");
-              const { t: subT } = endpointsIndexI18n.scopedT(locale);
+              const { scopedTranslation: endpointsMetaI18n } =
+                await import("../endpoints-meta/i18n");
+              const { t: subT } = endpointsMetaI18n.scopedT(locale);
               const result =
-                await endpointsIndexGeneratorRepository.generateEndpointsIndex(
+                await endpointsMetaGeneratorRepository.generateEndpointsMeta(
                   {
-                    outputFile:
-                      "src/app/api/[locale]/system/generated/endpoints.ts",
+                    outputDir:
+                      "src/app/api/[locale]/system/generated/endpoints-meta",
                     dryRun: false,
                   },
                   logger,
@@ -89,27 +89,25 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
                 );
 
               if (result.success) {
-                outputLines.push("✅ Endpoints index generated successfully");
+                outputLines.push("✅ Endpoints meta generated successfully");
                 generatorsRun++;
-                return "endpoints";
+                return "endpoints-meta";
               }
               outputLines.push(
-                `❌ Endpoints index generation failed: ${result.message || "Unknown error"}`,
+                `❌ Endpoints meta generation failed: ${result.message || "Unknown error"}`,
               );
               return null;
             } catch (error) {
               outputLines.push(
-                `❌ Endpoints index generator failed: ${parseError(error).message}`,
+                `❌ Endpoints meta generator failed: ${parseError(error).message}`,
               );
               return null;
             }
           })(),
         );
-      } else {
-        generatorsSkipped++;
       }
 
-      // 1a. Endpoint Generator - Generate endpoint.ts with dynamic imports
+      // 1b. Endpoint Generator - Generate endpoint.ts with dynamic imports
       if (!data.skipEndpoints) {
         generatorPromises.push(
           (async (): Promise<string | null> => {
@@ -419,7 +417,51 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
         })(),
       );
 
-      // 6. Env Generator
+      // 6. Remote Capabilities Generator
+      if (!data.skipEndpoints) {
+        generatorPromises.push(
+          (async (): Promise<string | null> => {
+            try {
+              outputLines.push("🔌 Generating remote capabilities...");
+              const { remoteCapabilitiesGeneratorRepository } =
+                await import("../remote-capabilities/repository");
+              const { scopedTranslation: remoteCapI18n } =
+                await import("../remote-capabilities/i18n");
+              const { t: subT } = remoteCapI18n.scopedT(locale);
+
+              const result =
+                await remoteCapabilitiesGeneratorRepository.generateRemoteCapabilities(
+                  {
+                    outputDir:
+                      "src/app/api/[locale]/system/generated/remote-capabilities",
+                    dryRun: false,
+                  },
+                  logger,
+                  subT,
+                );
+
+              if (result.success) {
+                outputLines.push(
+                  "✅ Remote capabilities generated successfully",
+                );
+                generatorsRun++;
+                return "remote-capabilities";
+              }
+              outputLines.push(
+                `❌ Remote capabilities generation failed: ${result.message || "Unknown error"}`,
+              );
+              return null;
+            } catch (error) {
+              outputLines.push(
+                `❌ Remote capabilities generator failed: ${parseError(error).message}`,
+              );
+              return null;
+            }
+          })(),
+        );
+      }
+
+      // 7. Env Generator
       generatorPromises.push(
         (async (): Promise<string | null> => {
           try {
@@ -511,30 +553,30 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
     const ran: string[] = [];
     const skipped: string[] = [];
 
-    // Endpoint generators (endpoints-index, endpoint, route-handlers, client-routes)
+    // Endpoint generators (endpoints-meta, endpoint, route-handlers, client-routes)
     if (dirty.endpoints) {
       generatorPromises.push(
         (async (): Promise<void> => {
           try {
-            const { endpointsIndexGeneratorRepository } =
-              await import("../endpoints-index/repository");
+            const { endpointsMetaGeneratorRepository } =
+              await import("../endpoints-meta/repository");
             const { scopedTranslation: i18n } =
-              await import("../endpoints-index/i18n");
+              await import("../endpoints-meta/i18n");
             const { t } = i18n.scopedT(locale);
-            await endpointsIndexGeneratorRepository.generateEndpointsIndex(
+            await endpointsMetaGeneratorRepository.generateEndpointsMeta(
               {
-                outputFile:
-                  "src/app/api/[locale]/system/generated/endpoints.ts",
+                outputDir:
+                  "src/app/api/[locale]/system/generated/endpoints-meta",
                 dryRun: false,
               },
               logger,
               t,
               liveIndex,
             );
-            ran.push("endpoints-index");
+            ran.push("endpoints-meta");
           } catch (error) {
             logger.error(
-              "endpoints-index failed",
+              "endpoints-meta failed",
               new Error(parseError(error).message),
             );
           }
@@ -588,9 +630,38 @@ class GenerateAllRepositoryImpl implements GenerateAllRepository {
             );
           }
         })(),
+        (async (): Promise<void> => {
+          try {
+            const { remoteCapabilitiesGeneratorRepository } =
+              await import("../remote-capabilities/repository");
+            const { scopedTranslation: remoteCapI18n } =
+              await import("../remote-capabilities/i18n");
+            const { t } = remoteCapI18n.scopedT(locale);
+            await remoteCapabilitiesGeneratorRepository.generateRemoteCapabilities(
+              {
+                outputDir:
+                  "src/app/api/[locale]/system/generated/remote-capabilities",
+                dryRun: false,
+              },
+              logger,
+              t,
+            );
+            ran.push("remote-capabilities");
+          } catch (error) {
+            logger.error(
+              "remote-capabilities failed",
+              new Error(parseError(error).message),
+            );
+          }
+        })(),
       );
     } else {
-      skipped.push("endpoints-index", "endpoint", "route-handlers");
+      skipped.push(
+        "endpoints-index",
+        "endpoint",
+        "route-handlers",
+        "remote-capabilities",
+      );
     }
 
     if (dirty.clientRoutes) {

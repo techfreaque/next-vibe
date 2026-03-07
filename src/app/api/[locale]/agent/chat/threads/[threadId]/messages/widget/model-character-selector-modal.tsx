@@ -3,7 +3,8 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Send, X } from "next-vibe-ui/ui/icons";
+import { Send } from "next-vibe-ui/ui/icons/Send";
+import { X } from "next-vibe-ui/ui/icons/X";
 import { Textarea } from "next-vibe-ui/ui/textarea";
 import { H3 } from "next-vibe-ui/ui/typography";
 import { P } from "next-vibe-ui/ui/typography";

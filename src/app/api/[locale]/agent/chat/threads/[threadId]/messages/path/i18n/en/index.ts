@@ -18,10 +18,10 @@ export const translations = {
       label: "Root Folder",
       description: "Root folder of the thread (used for client routing)",
     },
-    branchIndices: {
-      label: "Branch Indices",
+    leafMessageId: {
+      label: "Leaf Message ID",
       description:
-        "Map of parent message ID to branch index for selecting conversation path",
+        "ID of the leaf (deepest) message to show path for. Omit for latest.",
     },
     before: {
       label: "Before Message ID",
@@ -48,9 +48,6 @@ export const translations = {
           },
           parentId: {
             content: "Parent Message ID",
-          },
-          depth: {
-            content: "Depth",
           },
           sequenceId: {
             content: "Sequence ID",
@@ -99,29 +96,23 @@ export const translations = {
           },
         },
       },
-      branchMeta: {
-        title: "Branch Metadata",
-        item: {
-          title: "Branch Fork Point",
-          parentId: {
-            content: "Parent ID",
-          },
-          siblingCount: {
-            content: "Sibling Count",
-          },
-          currentIndex: {
-            content: "Current Index",
-          },
-        },
-      },
       hasOlderHistory: {
         content: "Has Older History",
+      },
+      hasNewerMessages: {
+        content: "Has Newer Messages",
+      },
+      resolvedLeafMessageId: {
+        content: "Resolved Leaf Message ID",
       },
       oldestLoadedMessageId: {
         content: "Oldest Loaded Message ID",
       },
       compactionBoundaryId: {
         content: "Compaction Boundary ID",
+      },
+      newerChunkAnchorId: {
+        content: "Newer Chunk Anchor ID",
       },
     },
     errors: {

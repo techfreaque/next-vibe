@@ -3,16 +3,14 @@
 import { cn } from "next-vibe/shared/utils";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  ArrowBigDown,
-  ArrowBigUp,
-  CornerDownRight,
-  MessageSquare,
-  Share2,
-  Square,
-  Volume2,
-  X,
-} from "next-vibe-ui/ui/icons";
+import { ArrowBigDown } from "next-vibe-ui/ui/icons/ArrowBigDown";
+import { ArrowBigUp } from "next-vibe-ui/ui/icons/ArrowBigUp";
+import { CornerDownRight } from "next-vibe-ui/ui/icons/CornerDownRight";
+import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
+import { Share2 } from "next-vibe-ui/ui/icons/Share2";
+import { Square } from "next-vibe-ui/ui/icons/Square";
+import { Volume2 } from "next-vibe-ui/ui/icons/Volume2";
+import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React from "react";

@@ -2,6 +2,10 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "System",
+  tags: {
+    cron: "Cron",
+    scheduling: "Planowanie",
+  },
   get: {
     title: "Pobierz zadanie Cron",
     description: "Pobierz pojedyncze zadanie cron według ID",
@@ -126,8 +130,9 @@ export const translations: typeof enTranslations = {
         description: "Liczba prób ponowienia w przypadku niepowodzenia",
       },
       retryDelay: {
-        label: "Opóźnienie ponowienia",
-        description: "Opóźnienie między ponowieniami w sekundach",
+        label: "Opóźnienie ponowienia (ms)",
+        description: "Opóźnienie między ponowieniami w milisekundach",
+        placeholder: "5000",
       },
       taskInput: {
         label: "Dane wejściowe zadania",

@@ -87,6 +87,18 @@ export const translations = {
       errors: {
         title: "Build Errors",
       },
+      steps: {
+        title: "Build Steps",
+      },
+      label: {
+        title: "Step",
+      },
+      ok: {
+        title: "Success",
+      },
+      skipped: {
+        title: "Skipped",
+      },
     },
     errors: {
       validation: {

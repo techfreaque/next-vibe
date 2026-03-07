@@ -555,6 +555,12 @@ export const translations: typeof enTranslations = {
         description: "URL repozytorium Git",
         placeholder: "https://github.com/user/repo",
       },
+      packageOutputDir: {
+        title: "Katalog wyjściowy",
+        description:
+          "Katalog, do którego zapisywany jest package.json (domyślnie: dist/)",
+        placeholder: ".dist/checker",
+      },
       success: {
         title: "Sukces",
       },

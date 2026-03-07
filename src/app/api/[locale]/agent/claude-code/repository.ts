@@ -27,7 +27,6 @@ import {
   CronTaskPriority,
   TaskCategory,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
-import { env } from "@/config/env";
 
 import type { RunRequestOutput, RunResponseOutput } from "./definition";
 import type { scopedTranslation } from "./i18n";
@@ -185,6 +184,9 @@ export async function runClaudeCode(
     const title =
       data.taskTitle || data.prompt.slice(0, 80).replace(/\n/g, " ");
     try {
+      const { getLocalInstanceId } =
+        await import("@/app/api/[locale]/user/remote-connection/repository");
+      const instanceId = await getLocalInstanceId();
       await db.insert(cronTasks).values({
         id: taskId,
         routeId: "claude-code",
@@ -195,7 +197,7 @@ export async function runClaudeCode(
         enabled: false,
         priority: CronTaskPriority.LOW,
         runOnce: true,
-        targetInstance: env.INSTANCE_ID ?? null,
+        targetInstance: instanceId,
         tags: ["claude-code", "interactive"],
       });
       effectiveTaskId = taskId;

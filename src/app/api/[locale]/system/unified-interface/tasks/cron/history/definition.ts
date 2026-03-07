@@ -23,10 +23,9 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { CronTaskPriorityDB, CronTaskStatusDB } from "../../enum";
+import { CRON_HISTORY_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { CronHistoryContainer } from "./widget";
-
-export const CRON_HISTORY_ALIAS = "cron-history" as const;
 
 /**
  * GET endpoint definition - Get task execution history

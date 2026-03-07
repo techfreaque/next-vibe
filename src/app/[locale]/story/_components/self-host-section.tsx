@@ -8,7 +8,9 @@ import {
   CardTitle,
 } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { Code, Layers, Shield } from "next-vibe-ui/ui/icons";
+import { Code } from "next-vibe-ui/ui/icons/Code";
+import { Layers } from "next-vibe-ui/ui/icons/Layers";
+import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Link } from "next-vibe-ui/ui/link";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import { H2, P } from "next-vibe-ui/ui/typography";

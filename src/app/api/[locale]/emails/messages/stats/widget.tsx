@@ -7,7 +7,9 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Loader2, RefreshCw, Search } from "next-vibe-ui/ui/icons";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
+import { Search } from "next-vibe-ui/ui/icons/Search";
 import { Input } from "next-vibe-ui/ui/input";
 import {
   Select,

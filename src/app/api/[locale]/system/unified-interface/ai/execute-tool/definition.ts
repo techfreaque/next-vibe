@@ -29,20 +29,14 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../i18n";
-export const EXECUTE_TOOL_ALIAS = "execute-tool" as const;
+import { EXECUTE_TOOL_ALIAS } from "./constants";
 import { ExecuteToolWidget } from "./widget";
 
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["system", "unified-interface", "ai", "execute-tool"],
-  aliases: [
-    EXECUTE_TOOL_ALIAS,
-    "execute",
-    "execute-tool",
-    "route-execute",
-    "tool-execute",
-  ],
+  aliases: [EXECUTE_TOOL_ALIAS, "execute", "route-execute", "tool-execute"],
   title: "executeTool.post.title" as const,
   description: "executeTool.post.description" as const,
   dynamicTitle: ({ request }) => {
@@ -102,6 +96,18 @@ const { POST } = createEndpoint({
         description: "executeTool.post.fields.instanceId.description",
         columns: 12,
         schema: z.string().optional(),
+      }),
+
+      callbackMode: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        label: "executeTool.post.fields.callbackMode.label",
+        description: "executeTool.post.fields.callbackMode.description",
+        columns: 12,
+        schema: z
+          .enum(["wait", "task-done", "inject"])
+          .optional()
+          .default("task-done"),
       }),
 
       // ── Response fields ───────────────────────────────────────────────────
@@ -184,6 +190,13 @@ const { POST } = createEndpoint({
         toolName: "bash",
         input: { command: "echo hello" },
         instanceId: "hermes",
+        callbackMode: "task-done" as const,
+      },
+      remoteInject: {
+        toolName: "bash",
+        input: { command: "ls /tmp" },
+        instanceId: "hermes",
+        callbackMode: "inject" as const,
       },
     },
     responses: {

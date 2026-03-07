@@ -21,10 +21,10 @@ export const translations: typeof enTranslations = {
       label: "Stammordner",
       description: "Stammordner des Threads (für Client-Routing verwendet)",
     },
-    branchIndices: {
-      label: "Zweigindizes",
+    leafMessageId: {
+      label: "Blatt-Nachrichten-ID",
       description:
-        "Zuordnung von übergeordneter Nachrichten-ID zu Zweigindex für die Auswahl des Konversationspfads",
+        "ID der tiefsten Nachricht, für die der Pfad angezeigt werden soll. Weglassen für die neueste.",
     },
     before: {
       label: "Vor Nachrichten-ID",
@@ -51,9 +51,6 @@ export const translations: typeof enTranslations = {
           },
           parentId: {
             content: "Übergeordnete Nachrichten-ID",
-          },
-          depth: {
-            content: "Tiefe",
           },
           sequenceId: {
             content: "Sequenz-ID",
@@ -102,29 +99,23 @@ export const translations: typeof enTranslations = {
           },
         },
       },
-      branchMeta: {
-        title: "Zweig-Metadaten",
-        item: {
-          title: "Zweig-Gabelungspunkt",
-          parentId: {
-            content: "Übergeordnete ID",
-          },
-          siblingCount: {
-            content: "Anzahl Geschwister",
-          },
-          currentIndex: {
-            content: "Aktueller Index",
-          },
-        },
-      },
       hasOlderHistory: {
         content: "Hat älteren Verlauf",
+      },
+      hasNewerMessages: {
+        content: "Hat neuere Nachrichten",
+      },
+      resolvedLeafMessageId: {
+        content: "Aufgelöste Blatt-Nachrichten-ID",
       },
       oldestLoadedMessageId: {
         content: "Älteste geladene Nachrichten-ID",
       },
       compactionBoundaryId: {
         content: "Verdichtungsgrenze-ID",
+      },
+      newerChunkAnchorId: {
+        content: "Neuerer Chunk-Anker-ID",
       },
     },
     errors: {

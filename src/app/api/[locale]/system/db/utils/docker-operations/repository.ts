@@ -339,9 +339,9 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
         // Container "already in use" is not a real failure — the container is already running
         const isContainerAlreadyRunning =
           error.includes("already in use") && error.includes("container name");
-        const success = code === 0 || isContainerAlreadyRunning;
+        const commandSuccess = code === 0 || isContainerAlreadyRunning;
 
-        if (!success && error) {
+        if (!commandSuccess && error) {
           logger.error(
             t("messages.commandFailed", {
               code: String(code),
@@ -352,7 +352,7 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises, eslint-plugin-promise/no-multiple-resolved
         resolve({
-          success,
+          success: commandSuccess,
           output: output.trim(),
           error: error.trim() || undefined,
         });
@@ -376,9 +376,9 @@ export class DockerOperationsRepositoryImpl implements DockerOperationsRepositor
 
       // Race between completion and timeout
       Promise.race([
-        new Promise<void>((resolve) => {
+        new Promise<void>((_resolve) => {
           child.on("close", () => {
-            resolve();
+            _resolve();
           });
         }),
         timeoutPromise,

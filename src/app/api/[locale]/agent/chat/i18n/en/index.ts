@@ -112,7 +112,7 @@ export const translations = {
           "Organize your chats in different folders, each with unique privacy settings:",
         private: {
           name: "Private",
-          suffix: "— encrypted, only you can see",
+          suffix: "— only you can see",
         },
         incognito: {
           name: "Incognito",
@@ -131,13 +131,13 @@ export const translations = {
         name: "Private",
         suffix: "Folder",
         description:
-          "Your private chats are encrypted and only visible to you. Perfect for sensitive topics.",
+          "Your private chats are only visible to you. Perfect for sensitive topics.",
       },
       incognitoFolder: {
         name: "Incognito",
         suffix: "Folder",
         description:
-          "Chat without saving history. When you close the session, all messages are gone.",
+          "Chat without saving history to the server. Messages are stored locally in your browser and persist until you clear them.",
         note: "No data is stored on our servers during incognito sessions.",
       },
       sharedFolder: {
@@ -156,20 +156,17 @@ export const translations = {
       newChatButton: {
         title: "Start a New Chat",
         description: "Click here to start a fresh conversation in any folder.",
-        tip: "You can also use keyboard shortcut Ctrl+K to quickly start a new chat.",
       },
       sidebarLogin: {
         title: "Sign In to Unlock More",
         description:
-          "Create a free account to access Private and Shared folders, sync across devices, and save your conversation history.",
-        tip: "It's free to sign up! You get 100 free credits to start.",
+          "Create a free account to access Private and Shared folders, sync your conversation history across devices, and let the AI remember things about you.",
+        tip: "It's free to sign up!",
       },
       subscriptionButton: {
         title: "Credits & Subscription",
         description:
-          "Get {{credits}} credits/month with a Pro subscription for just {{price}}.",
-        price: "$9.99",
-        tip: "Credits are used for AI model interactions. Free users get limited monthly credits.",
+          "Get {{credits}} credits/month with a subscription for just {{price}}/month. Free users get {{freeCredits}} credits/month.",
       },
       chatInput: {
         title: "Type Your Message",
@@ -201,7 +198,7 @@ export const translations = {
       authUnlocked: {
         unlocked: "Unlocked!",
         privateDescription:
-          "Your private folder is now available. All chats here are encrypted and only visible to you.",
+          "Your private folder is now available. All chats here are only visible to you.",
         privateNote:
           "Private chats sync across all your devices automatically.",
         sharedDescription:
@@ -442,12 +439,24 @@ export const translations = {
         "FreedomGPT Liberty - Uncensored AI model focused on free expression and creative content",
       gabAiArya:
         "Gab AI Arya - Uncensored conversational AI model with free expression and creative capabilities",
+      gemini31ProPreviewCustomTools:
+        "Gemini 3.1 Pro Preview (Custom Tools) - Gemini 3.1 Pro variant with improved tool selection that prevents overuse of bash tools in favor of more efficient third-party functions, ideal for coding agents and multi-tool workflows",
+      gemini31FlashLitePreview:
+        "Gemini 3.1 Flash Lite Preview - Google's high-efficiency model optimized for high-volume use cases, outperforming Gemini 2.5 Flash Lite with improvements in audio, RAG ranking, translation, and code completion",
       gemini3Pro:
         "Google Gemini 3 Pro - Advanced multimodal AI model with large context window and powerful reasoning capabilities",
       gemini3Flash:
         "Google Gemini 3 Flash - Fast, efficient multimodal AI model optimized for quick responses",
       deepseekV32:
         "DeepSeek V3.2 - High-performance reasoning model with advanced coding capabilities",
+      gpt54Pro:
+        "GPT-5.4 Pro - OpenAI's most advanced model with enhanced reasoning, 1M+ context window, and superior performance for complex, high-stakes tasks",
+      gpt54:
+        "GPT-5.4 - OpenAI's latest frontier model unifying Codex and GPT, with 1M+ context window for high-context reasoning, coding, and multimodal analysis",
+      gpt53Codex:
+        "GPT-5.3-Codex - OpenAI's most advanced agentic coding model combining frontier software engineering with broad reasoning, optimized for long-running tool-using workflows and complex development tasks",
+      gpt53Chat:
+        "GPT-5.3 Chat - Updated ChatGPT conversational model delivering more accurate, contextual answers with significantly reduced unnecessary refusals and caveats",
       gpt52Pro:
         "GPT-5.2 Pro - Advanced OpenAI model with enhanced reasoning and coding capabilities",
       gpt52:

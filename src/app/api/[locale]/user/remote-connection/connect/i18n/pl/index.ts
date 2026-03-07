@@ -3,6 +3,20 @@ export const translations = {
   tags: {
     remoteConnection: "Połączenie zdalne",
   },
+  widget: {
+    signInDescription: "Zaloguj się, aby połączyć się ze zdalnym kontem.",
+    benefit1:
+      "Wspomnienia synchronizują się automatycznie — wszystko czego uczysz AI przenosi się",
+    benefit2: "Dostęp do modeli AI w chmurze i narzędzi z lokalnej instancji",
+    benefit3: "Kontekst podróżuje z tobą na wszystkich urządzeniach",
+    adminBenefit1: "Wspomnienia synchronizują się dwukierunkowo, automatycznie",
+    adminBenefit2:
+      "AI w chmurze odkrywa i uruchamia twoje lokalne narzędzia (SSH, pliki, wykonywanie kodu)",
+    adminBenefit3:
+      "Deleguj zadania z chmury do tej maszyny — Claude Code wykonuje lokalnie",
+    adminBenefit4:
+      "Snapshot możliwości wysyłany przy każdej synchronizacji — Thea zawsze wie co ta instancja potrafi",
+  },
   post: {
     title: "Połącz z kontem zdalnym",
     description:
@@ -47,6 +61,19 @@ export const translations = {
         required: "Proszę podać hasło",
       },
     },
+    token: {
+      label: "Token",
+      description: "Token JWT zdalnej instancji (ustawiany automatycznie)",
+      validation: {
+        required: "Najpierw zaloguj się do zdalnej instancji",
+      },
+    },
+    leadId: {
+      label: "ID leada",
+      description: "ID leada zdalnej instancji (ustawiane automatycznie)",
+    },
+    credentialWarning:
+      "Twoje dane logowania trafiają bezpośrednio z przeglądarki do serwera zdalnego. Jednak token przechowywany tutaj daje operatorowi tego serwera pełny dostęp do twojego zdalnego konta — może robić wszystko co ty. Łącz się tylko na serwerach, którym w pełni ufasz.",
     actions: {
       submit: "Połącz",
       submitting: "Łączenie...",
@@ -86,11 +113,22 @@ export const translations = {
       },
       conflict: {
         title: "Już połączono",
-        description: "Jesteś już połączony ze zdalną instancją",
+        description:
+          "Jesteś już połączony ze zdalną instancją z tym ID instancji",
+      },
+      instanceIdConflict: {
+        title: "ID instancji już zarejestrowane",
+        description:
+          "Instancja z tym ID jest już zarejestrowana na serwerze zdalnym. Wybierz inny ID instancji.",
       },
       noLeadId: {
         title: "Błąd połączenia",
         description: "Nie udało się nawiązać sesji z serwerem zdalnym",
+      },
+      invalidUrl: {
+        title: "Nieprawidłowy URL zdalny",
+        description:
+          "Zdalny URL musi wskazywać na publiczny serwer, a nie na adres lokalny lub prywatny",
       },
     },
     success: {

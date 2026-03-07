@@ -213,7 +213,7 @@ function EndpointsPageInternal<
           responseData,
           requestData,
           pathParams,
-          logger,
+          logger: callLogger,
           user: callUser,
           locale: callLocale,
         }: Parameters<
@@ -226,7 +226,7 @@ function EndpointsPageInternal<
             responseData,
             requestData,
             pathParams,
-            logger,
+            logger: callLogger,
             user: callUser,
             locale: callLocale,
           });
@@ -286,7 +286,7 @@ function EndpointsPageInternal<
         responseData,
         requestData,
         pathParams,
-        logger,
+        logger: callLogger,
         user: callUser,
         locale: callLocale,
       }: Parameters<
@@ -300,7 +300,7 @@ function EndpointsPageInternal<
             responseData,
             requestData,
             pathParams,
-            logger,
+            logger: callLogger,
             user: callUser,
             locale: callLocale,
           });
@@ -356,7 +356,7 @@ function EndpointsPageInternal<
         responseData,
         requestData,
         pathParams,
-        logger,
+        logger: callLogger,
         user: callUser,
         locale: callLocale,
       }: Parameters<
@@ -370,7 +370,7 @@ function EndpointsPageInternal<
             responseData,
             requestData,
             pathParams,
-            logger,
+            logger: callLogger,
             user: callUser,
             locale: callLocale,
           });
@@ -757,10 +757,8 @@ function StackEntryRenderer({
             aria-hidden="true"
           >
             {/* Modal content - click stopPropagation to prevent backdrop click */}
-            {/* @ts-expect-error - style props */}
             <Div
               onClick={(e) => e.stopPropagation()}
-              className="p-4 relative z-[101] bg-background border shadow-lg rounded-lg"
               style={{
                 display: "flex",
                 flexDirection: "column" as const,
@@ -770,7 +768,9 @@ function StackEntryRenderer({
                 overflowY: "auto" as const,
               }}
             >
-              {children}
+              <Div className="p-4 relative z-[101] bg-background border shadow-lg rounded-lg">
+                {children}
+              </Div>
             </Div>
           </Div>
         </>

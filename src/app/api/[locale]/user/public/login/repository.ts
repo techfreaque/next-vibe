@@ -4,7 +4,7 @@
  */
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, count, eq, gt, isNull, or } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
@@ -15,8 +15,6 @@ import {
 import { parseError } from "next-vibe/shared/utils";
 import { verifyPassword } from "next-vibe/shared/utils/password";
 
-import { LeadAuthRepository } from "@/app/api/[locale]/leads/auth/repository";
-import { LeadsRepository } from "@/app/api/[locale]/leads/repository";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { type CountryLanguage } from "@/i18n/core/config";
@@ -27,7 +25,7 @@ import type {
   JwtPrivatePayloadType,
 } from "../../auth/types";
 import { UserPermissionRole } from "../../user-roles/enum";
-import { users } from "../../db";
+import { loginAttempts, users } from "../../db";
 import { UserDetailLevel } from "../../enum";
 import { SessionRepository } from "../../private/session/repository";
 import { UserRepository } from "../../repository";
@@ -67,17 +65,26 @@ export interface LoginOptions {
 }
 
 /**
- * Login attempt tracking for security
+ * DB-backed rate limiting constants.
+ * An account is locked when MAX_FAILED_ATTEMPTS failures exist within WINDOW_MS.
  */
-interface LoginAttempt {
-  email: string;
-  timestamp: Date;
-  success: boolean;
-  ipAddress?: string;
-}
+const MAX_FAILED_ATTEMPTS = 5;
+const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 
-// In-memory login attempt tracking (in a real app, use Redis or database)
-const loginAttempts = new Map<string, LoginAttempt[]>();
+/**
+ * A pre-computed Argon2id hash of a random placeholder used to normalise
+ * timing for non-existent email lookups (prevents user-enumeration via timing).
+ * Generated once at module load; value is never compared to real user data.
+ */
+let DUMMY_HASH: string | null = null;
+async function getDummyHash(): Promise<string> {
+  if (!DUMMY_HASH) {
+    const { hashPassword } =
+      await import("@/app/api/[locale]/shared/utils/password");
+    DUMMY_HASH = await hashPassword("__dummy_constant_time_placeholder__");
+  }
+  return DUMMY_HASH;
+}
 
 /**
  * Login repository implementation
@@ -118,74 +125,54 @@ export class LoginRepository {
     try {
       logger.debug("Login attempt", { email });
 
-      // Check if account is locked due to too many failed attempts
-      const isLocked = this.isAccountLocked(email);
+      // DB-backed rate limiting — safe across restarts and load-balanced instances
+      const isLocked = await this.isAccountLockedDb(email, ipAddress);
       if (isLocked) {
         logger.debug("Login failed: Account locked", { email });
-
-        // Track the failed attempt
-        this.trackLoginAttempt({
-          email,
-          timestamp: new Date(),
-          success: false,
-          ipAddress: ipAddress,
-        });
-
+        await this.recordAttemptDb(email, ipAddress, false, true);
         return fail({
           message: t("errors.account_locked"),
           errorType: ErrorResponseTypes.FORBIDDEN,
         });
       }
 
-      // Find user by email
+      // Fetch user + password hash in one query.
+      // We intentionally do this BEFORE checking user existence so that
+      // the Argon2 verification below always runs — preventing timing-based
+      // user enumeration (non-existent users get a dummy hash and take the
+      // same ~500ms as real users with a wrong password).
+      const userRow = await db
+        .select({ password: users.password, id: users.id })
+        .from(users)
+        .where(eq(users.email, email))
+        .then((rows) => rows[0]);
+
+      const storedHash = userRow?.password ?? (await getDummyHash());
+
+      // Always run Argon2 — constant-time regardless of whether user exists
+      const isPasswordValid = await verifyPassword(password, storedHash);
+
+      if (!userRow || !isPasswordValid) {
+        logger.debug("Login failed: Invalid credentials", { email });
+        await this.recordAttemptDb(email, ipAddress, false, false);
+        return fail({
+          message: t("errors.invalid_credentials"),
+          errorType: ErrorResponseTypes.UNAUTHORIZED,
+        });
+      }
+
+      // Re-fetch full user object (needed downstream)
       const userResponse = await UserRepository.getUserByEmail(
         email,
         UserDetailLevel.STANDARD,
         locale,
         logger,
       );
-
-      // Check if user exists
       if (!userResponse.success) {
-        logger.debug("Login failed: User not found", { email });
-
-        // Track the failed attempt
-        this.trackLoginAttempt({
-          email,
-          timestamp: new Date(),
-          success: false,
-          ipAddress: ipAddress,
-        });
-
         return fail({
           message: t("errors.invalid_credentials"),
           errorType: ErrorResponseTypes.UNAUTHORIZED,
           cause: userResponse,
-        });
-      }
-
-      const currentPassword = await db
-        .select({ password: users.password })
-        .from(users)
-        .where(eq(users.email, email))
-        .then((results) => results[0]?.password);
-
-      // Verify password
-      const isPasswordValid = await verifyPassword(password, currentPassword);
-      if (!isPasswordValid) {
-        logger.debug("Login failed: Invalid password", { email });
-
-        // Track the failed attempt
-        this.trackLoginAttempt({
-          email,
-          timestamp: new Date(),
-          success: false,
-          ipAddress: ipAddress,
-        });
-
-        return fail({
-          message: t("errors.invalid_credentials"),
-          errorType: ErrorResponseTypes.UNAUTHORIZED,
         });
       }
 
@@ -200,13 +187,8 @@ export class LoginRepository {
         });
       }
 
-      // Track successful login attempt
-      this.trackLoginAttempt({
-        email,
-        timestamp: new Date(),
-        success: true,
-        ipAddress: ipAddress,
-      });
+      // Record successful attempt (clears lock for this email)
+      await this.recordAttemptDb(email, ipAddress, true, false);
 
       // Create session and return user data
       logger.debug("Login successful", {
@@ -372,6 +354,8 @@ export class LoginRepository {
 
       // Link the leadId to the user
       // This ensures the userLeads table has the relationship for credit lookups
+      const { LeadAuthRepository } =
+        await import("@/app/api/[locale]/leads/auth/repository");
       await LeadAuthRepository.linkLeadToUser(leadId, userId, logger);
 
       // Merge lead wallet into user wallet immediately
@@ -446,8 +430,14 @@ export class LoginRepository {
       await SessionRepository.create(sessionData, locale);
 
       // Create the response data - LoginPostResponseOutput
+      // Always include the token in the response body so cross-origin clients
+      // (e.g. local instance connecting to cloud via the remote-connect widget)
+      // can extract it without needing to read httpOnly Set-Cookie headers,
+      // which browsers block for cross-origin responses.
       const responseData: LoginPostResponseOutput = {
         message: "Welcome back! You have successfully logged in.",
+        token: tokenResponse.data,
+        leadId: leadId,
       };
 
       // Store auth token using platform-specific handler
@@ -616,8 +606,8 @@ export class LoginRepository {
         // Apply user-specific settings if they exist
         options.requireTwoFactor = user.data.requireTwoFactor === true;
 
-        // Check if account is locked
-        const isLocked = this.isAccountLocked(email);
+        // Check if account is locked (DB-backed, cross-instance)
+        const isLocked = await this.isAccountLockedDb(email, "unknown");
         if (isLocked) {
           options.allowPasswordAuth = false;
           options.maxAttempts = 0; // Show that maximum attempts reached
@@ -638,30 +628,59 @@ export class LoginRepository {
   }
 
   /**
-   * Track login attempt for security monitoring
-   * @param attempt - Login attempt details
+   * Record a login attempt in the database.
+   * On success, also clears recent failures for this email so the lock resets.
    */
-  static trackLoginAttempt(attempt: LoginAttempt): void {
-    const attempts = loginAttempts.get(attempt.email) || [];
-    attempts.push(attempt);
-    loginAttempts.set(attempt.email, attempts);
+  static async recordAttemptDb(
+    email: string,
+    ipAddress: string,
+    success: boolean,
+    isBlocked: boolean,
+  ): Promise<void> {
+    try {
+      await db.insert(loginAttempts).values({
+        email: email.toLowerCase(),
+        ipAddress,
+        success,
+        isBlocked,
+        failureCount: success ? 0 : 1,
+      });
+    } catch {
+      // Non-critical — don't fail login if attempt recording fails
+    }
   }
 
   /**
-   * Check if an account is locked due to too many failed attempts
-   * @param email - Email to check
-   * @returns Whether the account is locked
+   * Check if an account is locked due to too many recent failed attempts.
+   * Uses the database so the count survives restarts and spans all instances.
    */
-  private static isAccountLocked(email: string): boolean {
-    const attempts = loginAttempts.get(email) || [];
-    const recentAttempts = attempts.filter(
-      (attempt: LoginAttempt) =>
-        attempt.timestamp > new Date(Date.now() - 15 * 60 * 1000), // Last 15 minutes
-    );
-    const failedAttempts = recentAttempts.filter(
-      (attempt: LoginAttempt) => !attempt.success,
-    ).length;
-    return failedAttempts >= 5;
+  private static async isAccountLockedDb(
+    email: string,
+    ipAddress: string,
+  ): Promise<boolean> {
+    try {
+      const windowStart = new Date(Date.now() - WINDOW_MS);
+      const [row] = await db
+        .select({ cnt: count() })
+        .from(loginAttempts)
+        .where(
+          and(
+            or(
+              eq(loginAttempts.email, email.toLowerCase()),
+              ipAddress !== "unknown" && ipAddress !== "cli"
+                ? eq(loginAttempts.ipAddress, ipAddress)
+                : isNull(loginAttempts.ipAddress),
+            ),
+            eq(loginAttempts.success, false),
+            eq(loginAttempts.isBlocked, false),
+            gt(loginAttempts.createdAt, windowStart),
+          ),
+        );
+      return (row?.cnt ?? 0) >= MAX_FAILED_ATTEMPTS;
+    } catch {
+      // If DB is unreachable, fail open (don't lock out all users)
+      return false;
+    }
   }
 
   /**
@@ -689,6 +708,8 @@ export class LoginRepository {
       });
 
       // Convert lead with both email (for anonymous leads) and userId (for user relationship)
+      const { LeadsRepository } =
+        await import("@/app/api/[locale]/leads/repository");
       const convertResult = await LeadsRepository.convertLead(
         leadId,
         {

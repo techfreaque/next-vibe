@@ -2,6 +2,10 @@ import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
   category: "System",
+  tags: {
+    cron: "Cron",
+    scheduling: "Planung",
+  },
   get: {
     title: "Cron-Aufgabe abrufen",
     description: "Eine einzelne Cron-Aufgabe nach ID abrufen",
@@ -127,8 +131,9 @@ export const translations: typeof enTranslations = {
         description: "Anzahl der Wiederholungsversuche bei Fehler",
       },
       retryDelay: {
-        label: "Wiederholungsverzögerung",
-        description: "Verzögerung zwischen Wiederholungen in Sekunden",
+        label: "Wiederholungsverzögerung (ms)",
+        description: "Verzögerung zwischen Wiederholungen in Millisekunden",
+        placeholder: "5000",
       },
       taskInput: {
         label: "Aufgabeneingabe",

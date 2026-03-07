@@ -7,7 +7,8 @@ import { z } from "zod";
 
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
-  scopedObjectFieldNew,
+  customWidgetObject,
+  scopedBackButton,
   scopedRequestField,
   scopedResponseField,
   scopedWidgetField,
@@ -15,13 +16,19 @@ import {
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
+import { envClient } from "@/config/env-client";
 
 import { scopedTranslation } from "./i18n";
+import { RemoteConnectWidget } from "./widget";
+
+// Default instanceId: "thea" on cloud (production), "hermes" on local/dev
+const defaultInstanceId = envClient.VIBE_IS_CLOUD ? "thea" : "hermes";
+// Default remoteUrl: the project URL (unbottled.ai for cloud, localhost for local)
+const defaultRemoteUrl = envClient.NEXT_PUBLIC_PROJECT_URL;
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -34,12 +41,15 @@ const { POST } = createEndpoint({
   icon: "link" as const,
   category: "app.endpointCategories.userAuth",
   tags: ["tags.remoteConnection" as const],
+  aliases: ["remote-connect", "connect-remote"] as const,
 
-  fields: scopedObjectFieldNew(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.STACKED,
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: RemoteConnectWidget,
+    usage: { request: "data", response: true } as const,
     children: {
+      backButton: scopedBackButton(scopedTranslation, {
+        usage: { request: "data" },
+      }),
       instanceId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
@@ -47,6 +57,7 @@ const { POST } = createEndpoint({
         description: "post.instanceId.description" as const,
         placeholder: "post.instanceId.placeholder" as const,
         columns: 6,
+        theme: { style: "none" },
         schema: z
           .string()
           .min(1)
@@ -54,7 +65,7 @@ const { POST } = createEndpoint({
           .regex(/^[a-z0-9-]+$/, {
             message: "post.instanceId.validation.invalid",
           })
-          .default("hermes"),
+          .default(defaultInstanceId),
       }),
       friendlyName: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -63,7 +74,8 @@ const { POST } = createEndpoint({
         description: "post.friendlyName.description" as const,
         placeholder: "post.friendlyName.placeholder" as const,
         columns: 6,
-        schema: z.string().min(1).max(64).default("hermes"),
+        theme: { style: "none" },
+        schema: z.string().min(1).max(64).default(defaultInstanceId),
       }),
       remoteUrl: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -72,41 +84,40 @@ const { POST } = createEndpoint({
         description: "post.remoteUrl.description" as const,
         placeholder: "post.remoteUrl.placeholder" as const,
         columns: 12,
+        theme: { style: "none" },
         schema: z
           .string({
             error: "post.remoteUrl.validation.required",
           })
           .min(1, { message: "post.remoteUrl.validation.required" })
           .url({ message: "post.remoteUrl.validation.invalid" })
-          .transform((val) => val.replace(/\/+$/, "")), // strip trailing slashes
+          .transform((val) => val.replace(/\/+$/, "")) // strip trailing slashes
+          .default(defaultRemoteUrl),
       }),
-      email: scopedRequestField(scopedTranslation, {
+      // email and password are NOT sent to the local backend.
+      // The widget POSTs credentials directly from the browser to the remote server,
+      // extracts the token from the Set-Cookie response, and passes only the token here.
+      token: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.EMAIL,
-        label: "post.email.label" as const,
-        description: "post.email.description" as const,
-        placeholder: "post.email.placeholder" as const,
+        fieldType: FieldDataType.TEXT,
+        label: "post.token.label" as const,
+        description: "post.token.description" as const,
         columns: 12,
+        theme: { style: "none" },
+        hidden: true,
         schema: z
-          .string({
-            error: "post.email.validation.required",
-          })
-          .min(1, { message: "post.email.validation.required" })
-          .email({ message: "post.email.validation.invalid" })
-          .transform((val) => val.toLowerCase().trim()),
+          .string()
+          .min(1, { message: "post.token.validation.required" }),
       }),
-      password: scopedRequestField(scopedTranslation, {
+      leadId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.PASSWORD,
-        label: "post.password.label" as const,
-        description: "post.password.description" as const,
-        placeholder: "post.password.placeholder" as const,
+        fieldType: FieldDataType.TEXT,
+        label: "post.leadId.label" as const,
+        description: "post.leadId.description" as const,
         columns: 12,
-        schema: z
-          .string({
-            error: "post.password.validation.required",
-          })
-          .min(1, { message: "post.password.validation.required" }),
+        theme: { style: "none" },
+        hidden: true,
+        schema: z.string().optional(),
       }),
       formAlert: scopedWidgetField(scopedTranslation, {
         type: WidgetType.FORM_ALERT,
@@ -180,14 +191,55 @@ const { POST } = createEndpoint({
     description: "post.success.description" as const,
   },
 
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        const { apiClient } =
+          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+        const listDefinition = await import("../list/definition");
+        apiClient.updateEndpointData(
+          listDefinition.GET,
+          data.logger,
+          (prev) => {
+            if (!prev?.success) {
+              return prev;
+            }
+            const newConn = {
+              instanceId: data.requestData.instanceId,
+              friendlyName: data.requestData.friendlyName,
+              remoteUrl: data.requestData.remoteUrl,
+              isActive: true,
+              lastSyncedAt: new Date().toISOString(),
+              hasToken: true,
+            };
+            // Replace if exists (reconnect), otherwise append
+            const exists = prev.data.connections.some(
+              (c) => c.instanceId === newConn.instanceId,
+            );
+            return {
+              success: true,
+              data: {
+                connections: exists
+                  ? prev.data.connections.map((c) =>
+                      c.instanceId === newConn.instanceId ? newConn : c,
+                    )
+                  : [...prev.data.connections, newConn],
+              },
+            };
+          },
+        );
+      },
+    },
+  },
+
   examples: {
     requests: {
       default: {
-        instanceId: "hermes",
+        instanceId: defaultInstanceId,
         friendlyName: "My Laptop",
-        remoteUrl: "https://unbottled.ai",
-        email: "you@example.com",
-        password: "yourpassword",
+        remoteUrl: defaultRemoteUrl,
+        token: "<jwt-from-remote-login>",
+        leadId: "<lead-id-from-remote>",
       },
     },
     responses: {

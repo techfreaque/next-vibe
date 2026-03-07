@@ -15,6 +15,7 @@ import {
   scopedRequestUrlPathParamsResponseField,
   scopedResponseArrayFieldNew,
   scopedResponseField,
+  scopedSubmitButton,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 // // leadId schema not needed - using z.uuid() directly // TODO: Remove if not needed
 import {
@@ -360,6 +361,51 @@ const { PUT } = createEndpoint({
   tags: ["tag" as const],
   allowedRoles: [UserRole.ADMIN, UserRole.PARTNER_ADMIN] as const,
 
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        const { apiClient } =
+          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+        const listDefinition = await import("../../list/definition");
+
+        // Optimistically update user in list
+        apiClient.updateEndpointData(
+          listDefinition.default.GET,
+          data.logger,
+          (oldData) => {
+            if (!oldData?.success) {
+              return oldData;
+            }
+            return {
+              success: true,
+              data: {
+                ...oldData.data,
+                response: {
+                  ...oldData.data.response,
+                  users: oldData.data.response.users.map((u) =>
+                    u.id === data.pathParams.id
+                      ? {
+                          ...u,
+                          email: data.responseData.email ?? u.email,
+                          privateName:
+                            data.responseData.privateName ?? u.privateName,
+                          publicName:
+                            data.responseData.publicName ?? u.publicName,
+                          isActive: data.responseData.isActive ?? u.isActive,
+                          emailVerified:
+                            data.responseData.emailVerified ?? u.emailVerified,
+                        }
+                      : u,
+                  ),
+                },
+              },
+            };
+          },
+        );
+      },
+    },
+  },
+
   fields: customWidgetObject({
     render: UserEditContainer,
     usage: { request: "data&urlPathParams", response: true } as const,
@@ -600,6 +646,48 @@ const { DELETE } = createEndpoint({
   tags: ["tag" as const],
   allowedRoles: [UserRole.ADMIN] as const,
 
+  options: {
+    mutationOptions: {
+      onSuccess: async (data) => {
+        const { apiClient } =
+          await import("@/app/api/[locale]/system/unified-interface/react/hooks/store");
+        const listDefinition = await import("../../list/definition");
+
+        // Optimistically remove deleted user from list
+        apiClient.updateEndpointData(
+          listDefinition.default.GET,
+          data.logger,
+          (oldData) => {
+            if (!oldData?.success) {
+              return oldData;
+            }
+            return {
+              success: true,
+              data: {
+                ...oldData.data,
+                response: {
+                  ...oldData.data.response,
+                  users: oldData.data.response.users.filter(
+                    (u) => u.id !== data.pathParams.id,
+                  ),
+                },
+                paginationInfo: oldData.data.paginationInfo
+                  ? {
+                      ...oldData.data.paginationInfo,
+                      totalCount: Math.max(
+                        0,
+                        (oldData.data.paginationInfo.totalCount ?? 1) - 1,
+                      ),
+                    }
+                  : oldData.data.paginationInfo,
+              },
+            };
+          },
+        );
+      },
+    },
+  },
+
   fields: customWidgetObject({
     render: UserDeleteContainer,
     usage: { request: "urlPathParams", response: true } as const,
@@ -617,6 +705,15 @@ const { DELETE } = createEndpoint({
         helpText: "id.delete.id.helpText" as const,
         columns: 12,
         schema: z.string().uuid("usersErrors.validation.id.invalid"),
+      }),
+
+      // === SUBMIT BUTTON ===
+      submitButton: scopedSubmitButton(scopedTranslation, {
+        label: "id.delete.submitButton.label" as const,
+        loadingText: "id.delete.submitButton.loadingText" as const,
+        icon: "trash",
+        variant: "destructive",
+        usage: { request: "urlPathParams" },
       }),
 
       // === RESPONSE ===

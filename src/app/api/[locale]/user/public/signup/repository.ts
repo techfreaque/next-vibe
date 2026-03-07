@@ -14,10 +14,7 @@ import {
 } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
-import { CreditRepository } from "@/app/api/[locale]/credits/repository";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
-import { LeadAuthRepository } from "@/app/api/[locale]/leads/auth/repository";
-import { LeadsRepository } from "@/app/api/[locale]/leads/repository";
 import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -166,6 +163,8 @@ export class SignupRepositoryImpl implements SignupRepository {
 
       // Auto-login: Create session and store auth token
       // Link leadId to user
+      const { LeadAuthRepository } =
+        await import("@/app/api/[locale]/leads/auth/repository");
       await LeadAuthRepository.linkLeadToUser(user.leadId, userData.id, logger);
 
       // Link referral code if provided manually in form
@@ -195,6 +194,8 @@ export class SignupRepositoryImpl implements SignupRepository {
       // Merge lead wallet into user wallet immediately (not lazy)
       // This ensures user gets their pre-signup credits right away
       const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
+      const { CreditRepository } =
+        await import("@/app/api/[locale]/credits/repository");
       const mergeResult = await CreditRepository.mergePendingLeadWallets(
         userData.id,
         [user.leadId],
@@ -496,6 +497,8 @@ export class SignupRepositoryImpl implements SignupRepository {
 
       // Convert lead with both email (for anonymous leads) and userId (for user relationship)
       const { t: leadsT } = leadsScopedTranslation.scopedT(locale);
+      const { LeadsRepository } =
+        await import("@/app/api/[locale]/leads/repository");
       const convertResult = await LeadsRepository.convertLead(
         leadId,
         { email, userId },

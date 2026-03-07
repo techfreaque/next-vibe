@@ -13,7 +13,10 @@ import {
   success,
 } from "next-vibe/shared/types/response.schema";
 
+import type { FolderContentsItem } from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
+import folderContentsDefinitions from "@/app/api/[locale]/agent/chat/folder-contents/[rootFolderId]/definition";
 import { parseError } from "@/app/api/[locale]/shared/utils";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -149,6 +152,65 @@ export class ChatFoldersRepositoryClient {
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
       });
     }
+  }
+
+  /**
+   * Optimistically insert a newly created folder into the folder-contents cache.
+   */
+  static insertFolderIntoCache(
+    newItem: FolderContentsItem,
+    logger: EndpointLogger,
+  ): void {
+    apiClient.updateEndpointData(
+      folderContentsDefinitions.GET,
+      logger,
+      (old) => {
+        if (!old?.success) {
+          return old;
+        }
+        return success({
+          ...old.data,
+          items: [newItem, ...old.data.items],
+        });
+      },
+      {
+        urlPathParams: {
+          rootFolderId: newItem.rootFolderId as DefaultFolderId,
+        },
+        requestData: { subFolderId: newItem.parentId },
+      },
+    );
+  }
+
+  /**
+   * Optimistically update a folder's fields in the folder-contents cache.
+   */
+  static updateFolderInCache(
+    folderId: string,
+    rootFolderId: DefaultFolderId,
+    parentId: string | null,
+    updates: Partial<FolderContentsItem>,
+    logger: EndpointLogger,
+  ): void {
+    apiClient.updateEndpointData(
+      folderContentsDefinitions.GET,
+      logger,
+      (old) => {
+        if (!old?.success) {
+          return old;
+        }
+        return success({
+          ...old.data,
+          items: old.data.items.map((item) =>
+            item.id === folderId ? { ...item, ...updates } : item,
+          ),
+        });
+      },
+      {
+        urlPathParams: { rootFolderId },
+        requestData: { subFolderId: parentId },
+      },
+    );
   }
 
   /**

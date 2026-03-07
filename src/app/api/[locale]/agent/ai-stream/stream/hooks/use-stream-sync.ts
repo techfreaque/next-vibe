@@ -89,7 +89,6 @@ export function useStreamSync(deps: StreamSyncDeps): void {
           role: streamMsg.role,
           content: streamMsg.content,
           parentId: streamMsg.parentId,
-          depth: streamMsg.depth,
           authorId: null,
           authorName: null,
           isAI: streamMsg.role === ChatMessageRole.ASSISTANT,

@@ -70,6 +70,11 @@ export const translations: typeof enTranslations = {
       openTool: {
         label: "Otwórz narzędzie",
       },
+      includeProdOnly: {
+        label: "Uwzględnij narzędzia produkcyjne",
+        description:
+          "Gdy true, uwzględnia narzędzia oznaczone jako tylko-produkcyjne (tylko admin).",
+      },
       platform: {
         label: "Platforma",
         description:

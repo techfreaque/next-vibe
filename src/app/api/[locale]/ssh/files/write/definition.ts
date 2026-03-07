@@ -19,6 +19,7 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { SSH_FILES_WRITE_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { FilesWriteContainer } from "./widget";
 
@@ -26,6 +27,7 @@ export const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["ssh", "files", "write"],
+  aliases: [SSH_FILES_WRITE_ALIAS],
   title: "post.title",
   description: "post.description",
   icon: "file",

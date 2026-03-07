@@ -8,7 +8,8 @@
 import { Alert, AlertDescription } from "next-vibe-ui/ui/alert";
 import { Card, CardContent } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import { AlertTriangle, CheckCircle } from "next-vibe-ui/ui/icons";
+import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 

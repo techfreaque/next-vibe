@@ -32,7 +32,6 @@ export class UserMessageHandler {
     effectiveRole: ChatMessageRole;
     effectiveContent: string;
     effectiveParentMessageId: string | null | undefined;
-    messageDepth: number;
     userId: string | undefined;
     attachments?: File[];
     logger: EndpointLogger;
@@ -70,7 +69,6 @@ export class UserMessageHandler {
       effectiveRole,
       effectiveContent,
       effectiveParentMessageId,
-      messageDepth,
       userId,
       attachments,
       logger,
@@ -214,7 +212,6 @@ export class UserMessageHandler {
         role: effectiveRole,
         content: effectiveContent,
         parentId: effectiveParentMessageId ?? null,
-        depth: messageDepth,
         userId,
         authorName,
         logger,

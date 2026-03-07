@@ -123,7 +123,12 @@ export class OperationHandler {
         break;
 
       case "answer-as-ai":
-        operationResult = data;
+        operationResult = {
+          threadId: data.threadId,
+          parentMessageId: data.parentMessageId,
+          content: data.content,
+          role: data.role,
+        };
         logger.debug("Answer-as-AI operation", {
           threadId: data.threadId,
           parentMessageId: data.parentMessageId,

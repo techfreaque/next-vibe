@@ -29,7 +29,6 @@ import {
 import { newsletterSubscriptions } from "../newsletter/db";
 import { NewsletterSubscriptionStatus } from "../newsletter/enum";
 import type { BatchUpdateRequestOutput } from "./batch/definition";
-import { campaignSchedulerService } from "./campaigns/emails/services/scheduler";
 import type { LeadCreateRequestTypeOutput } from "./create/definition";
 import {
   emailCampaigns,
@@ -112,9 +111,9 @@ export function leadHasEmail(
  * Returns an array of LeadWithEmailType
  */
 export function filterLeadsWithEmail(
-  leads: LeadResponseType[],
+  leadList: LeadResponseType[],
 ): LeadWithEmailType[] {
-  return leads.filter(leadHasEmail);
+  return leadList.filter(leadHasEmail);
 }
 
 /**
@@ -809,6 +808,8 @@ export class LeadsRepository {
       }
 
       // 2. Halt all active campaigns
+      const { campaignSchedulerService } =
+        await import("./campaigns/emails/services/scheduler");
       await campaignSchedulerService.haltCampaignsForStatusChange(
         updatedLead.id,
         LeadStatus.UNSUBSCRIBED,
@@ -1235,6 +1236,8 @@ export class LeadsRepository {
           email: options.email,
         });
         // Halt COLD and NEWSLETTER_NURTURE campaigns on signup
+        const { campaignSchedulerService } =
+          await import("./campaigns/emails/services/scheduler");
         await campaignSchedulerService.haltCampaignsForStatusChange(
           leadId,
           LeadStatus.SIGNED_UP,

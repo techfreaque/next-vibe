@@ -56,13 +56,22 @@ export function MockChatProvider({
       initialCharacterData: null,
       initialPublicFeedData: null,
       initialThreadId: null,
+      initialFolderContentsData: null,
+      initialSubFolderContentsData: null,
+      initialSubFolderId: null,
     }),
     [],
   );
 
   return (
     <ChatBootContext.Provider value={mockValue}>
-      <ChatNavigationProvider isEmbedded={false}>
+      <ChatNavigationProvider
+        activeThreadId={null}
+        currentRootFolderId={DefaultFolderId.PRIVATE}
+        currentSubFolderId={null}
+        leafMessageId={null}
+        isEmbedded={false}
+      >
         {children}
       </ChatNavigationProvider>
     </ChatBootContext.Provider>

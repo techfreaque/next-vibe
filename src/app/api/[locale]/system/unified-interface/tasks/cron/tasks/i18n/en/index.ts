@@ -2,6 +2,8 @@ export const translations = {
   category: "API Endpoint",
   tags: {
     tasks: "Tasks",
+    cron: "Cron",
+    scheduling: "Scheduling",
   },
   errors: {
     fetchCronTasks: "Failed to fetch cron tasks",

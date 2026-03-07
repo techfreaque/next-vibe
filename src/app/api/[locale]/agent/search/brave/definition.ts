@@ -36,8 +36,7 @@ const FRESHNESS_OPTIONS = [
   "past_year",
 ] as const;
 
-export const SEARCH_ALIAS = "web-search" as const;
-export const BRAVE_SEARCH_ALIAS = "search" as const;
+import { BRAVE_SEARCH_ALIAS, SEARCH_ALIAS } from "./constants";
 
 /**
  * GET /brave-search - Search the web

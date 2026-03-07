@@ -1,137 +1,150 @@
 /**
  * Remote Connection Connect Repository
  *
- * Handles the remote login flow:
- * 1. Bootstrap a leadId from the remote host
- * 2. POST credentials to remote login endpoint
- * 3. Extract JWT from Set-Cookie response
- * 4. Store connection in DB
+ * Credentials are handled entirely client-side (browser → remote directly).
+ * This server receives only the token extracted by the widget, never the password.
+ *
+ * Flow:
+ * 1. Local collision check — instanceId must not already exist locally
+ * 2. Register this instance on the remote (cloud-side collision check)
+ * 3. Store connection locally (only if remote registration succeeded)
  */
 
 /* eslint-disable i18next/no-literal-string */
 
 import "server-only";
 
+import { and, eq, ne } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
   type ResponseType,
 } from "next-vibe/shared/types/response.schema";
 
+import { DEFAULT_REMOTE_TOOL_IDS } from "@/app/api/[locale]/agent/chat/constants";
+import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
-import {
-  AUTH_TOKEN_COOKIE_NAME,
-  LEAD_ID_COOKIE_NAME,
-} from "@/config/constants";
+import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
+import { envClient } from "@/config/env-client";
 import { defaultLocale } from "@/i18n/core/config";
 
-import { upsertRemoteConnection } from "../repository";
+import { userRemoteConnections } from "../db";
+import registerEndpoints from "../register/definition";
+import {
+  invalidateInstanceIdCache,
+  upsertRemoteConnection,
+} from "../repository";
 import type { RemoteConnectPostRequestInput } from "./definition";
 import type { RemoteConnectT } from "./i18n";
 
-/** Shape of a decoded JWT payload (only the fields we care about) */
-interface DecodedJwtPayload {
-  id?: string;
-  leadId?: string;
-}
-
 /**
- * Parse a cookie value from a Set-Cookie header string.
+ * Call the register endpoint on the remote to store this local instance there.
+ * Returns true if registration succeeded, false if instanceId already exists (CONFLICT).
  */
-function parseCookieFromSetCookie(
-  setCookieHeader: string,
-  cookieName: string,
-): string | undefined {
-  const cookies = setCookieHeader.split(/,\s*(?=[^;]*=)/);
-  for (const cookie of cookies) {
-    const match = cookie.match(new RegExp(`${cookieName}=([^;]*)`));
-    if (match?.[1]) {
-      return match[1];
-    }
-  }
-  return undefined;
-}
+async function registerOnRemote(params: {
+  remoteUrl: string;
+  token: string;
+  leadId: string;
+  instanceId: string;
+  logger: EndpointLogger;
+}): Promise<{ ok: boolean; conflict: boolean }> {
+  const { remoteUrl, token, leadId, instanceId, logger } = params;
+  const localUrl = envClient.NEXT_PUBLIC_APP_URL ?? "";
+  const registerUrl = `${remoteUrl}/api/${defaultLocale}/${registerEndpoints.POST.path.join("/")}`;
 
-/**
- * Decode a JWT payload without verification (we only need the userId/leadId).
- */
-function decodeJwtPayload(token: string): DecodedJwtPayload | null {
   try {
-    const parts = token.split(".");
-    if (parts.length !== 3 || !parts[1]) {
-      return null;
-    }
-    const payload = JSON.parse(atob(parts[1])) as Record<
-      string,
-      string | number | boolean
-    >;
-    return {
-      id: typeof payload.id === "string" ? payload.id : undefined,
-      leadId: typeof payload.leadId === "string" ? payload.leadId : undefined,
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
     };
-  } catch {
-    return null;
-  }
-}
+    if (leadId) {
+      headers.Cookie = `${LEAD_ID_COOKIE_NAME}=${leadId}`;
+    }
 
-/**
- * Bootstrap a leadId from a remote host by hitting the root page.
- * The middleware creates a lead and sets the cookie on the 302 response.
- */
-async function bootstrapLeadId(
-  remoteUrl: string,
-  logger: EndpointLogger,
-): Promise<string | null> {
-  try {
-    const response = await fetch(remoteUrl, {
-      method: "GET",
-      redirect: "manual",
+    const response = await fetch(registerUrl, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ instanceId, localUrl }),
+      signal: AbortSignal.timeout(15000),
     });
 
-    const setCookie = response.headers.get("set-cookie");
-    if (setCookie) {
-      const leadId = parseCookieFromSetCookie(setCookie, LEAD_ID_COOKIE_NAME);
-      if (leadId) {
-        logger.debug(`[CONNECT] Bootstrapped leadId: ${leadId}`);
-        return leadId;
-      }
-    }
-
-    const location = response.headers.get("location");
-    if (location) {
-      const redirectUrl = location.startsWith("http")
-        ? location
-        : `${remoteUrl}${location}`;
-      const redirectResponse = await fetch(redirectUrl, {
-        method: "GET",
-        redirect: "manual",
+    if (response.status === 409) {
+      logger.warn("[CONNECT] Instance ID already registered on remote", {
+        instanceId,
       });
-      const redirectCookie = redirectResponse.headers.get("set-cookie");
-      if (redirectCookie) {
-        const leadId = parseCookieFromSetCookie(
-          redirectCookie,
-          LEAD_ID_COOKIE_NAME,
-        );
-        if (leadId) {
-          logger.debug(
-            `[CONNECT] Bootstrapped leadId from redirect: ${leadId}`,
-          );
-          return leadId;
-        }
-      }
+      return { ok: false, conflict: true };
     }
 
-    logger.warn("[CONNECT] Could not bootstrap leadId from remote host");
-    return null;
+    if (!response.ok) {
+      logger.warn("[CONNECT] Remote registration failed", {
+        status: response.status,
+        instanceId,
+      });
+      return { ok: false, conflict: false };
+    }
+
+    return { ok: true, conflict: false };
   } catch (error) {
-    logger.error(`[CONNECT] Failed to bootstrap leadId: ${String(error)}`);
-    return null;
+    logger.error(`[CONNECT] Remote registration error: ${String(error)}`);
+    return { ok: false, conflict: false };
   }
 }
 
 /**
- * Connect to a remote instance: bootstrap leadId, login, store JWT in DB.
+ * Private IP / loopback ranges that must never be used as remote URLs.
+ * Prevents SSRF attacks where an authenticated user points the server at
+ * internal services (AWS metadata, Kubernetes, local DB, etc.).
+ */
+const PRIVATE_IP_PATTERNS = [
+  /^localhost$/i,
+  /^127\./,
+  /^0\./,
+  /^10\./,
+  /^172\.(1[6-9]|2\d|3[01])\./,
+  /^192\.168\./,
+  /^169\.254\./, // link-local / AWS metadata
+  /^::1$/,
+  /^\[::1\]/,
+  /^fc00:/i, // IPv6 unique local
+  /^fd[0-9a-f]{2}:/i,
+];
+
+/**
+ * Returns an error string if the URL hostname resolves to a private/loopback
+ * range, null if the URL is acceptable.
+ */
+function validateRemoteUrl(rawUrl: string): string | null {
+  let parsed: URL;
+  try {
+    parsed = new URL(rawUrl);
+  } catch {
+    return "Invalid URL";
+  }
+  if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+    return "Remote URL must use http or https";
+  }
+  const host = parsed.hostname;
+  // Allow loopback/private addresses in development (for local-to-local testing)
+  if (envClient.NODE_ENV !== "development") {
+    if (PRIVATE_IP_PATTERNS.some((re) => re.test(host))) {
+      return "Remote URL must not point to a private or loopback address";
+    }
+  }
+  return null;
+}
+
+/**
+ * Connect to a remote instance.
+ * Credentials are handled entirely client-side — this server receives only
+ * the token that the browser extracted from the remote login response.
+ *
+ * Steps:
+ * 1. SSRF guard on remoteUrl
+ * 2. Local collision check
+ * 3. Register this instance on the remote (cloud-side collision check)
+ * 4. Store connection locally
+ * 5. Write default remote tools to user's allowedTools setting
  */
 export async function connectRemote(
   data: RemoteConnectPostRequestInput,
@@ -139,111 +152,78 @@ export async function connectRemote(
   logger: EndpointLogger,
   t: RemoteConnectT,
 ): Promise<ResponseType<{ remoteUrlResult: string; isConnected: boolean }>> {
-  const { remoteUrl, email, password, instanceId, friendlyName } = data;
+  const { token, friendlyName } = data;
+  const remoteUrl = data.remoteUrl ?? "";
+  const instanceId = data.instanceId ?? "";
+  const effectiveLeadId = data.leadId ?? "";
 
-  // 1. Bootstrap leadId from remote host
-  logger.info("[CONNECT] Bootstrapping leadId from remote...");
-  const leadId = await bootstrapLeadId(remoteUrl, logger);
-
-  if (!leadId) {
+  // ── Step 1: SSRF guard — reject private/loopback URLs ──────────────────────
+  const urlError = validateRemoteUrl(remoteUrl);
+  if (urlError) {
+    logger.warn("[CONNECT] Rejected remote URL", {
+      remoteUrl,
+      reason: urlError,
+    });
     return fail({
-      message: t("post.errors.noLeadId.title"),
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      message: t("post.errors.invalidUrl.title"),
+      errorType: ErrorResponseTypes.BAD_REQUEST,
     });
   }
 
-  // 2. POST login to remote
-  const loginUrl = `${remoteUrl}/api/${defaultLocale}/user/public/login`;
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    Cookie: `${LEAD_ID_COOKIE_NAME}=${leadId}`,
-  };
+  // ── Step 2: Local collision check (ignore self-record with token="self") ───
+  const [localExisting] = await db
+    .select({ id: userRemoteConnections.id })
+    .from(userRemoteConnections)
+    .where(
+      and(
+        eq(userRemoteConnections.userId, user.id),
+        eq(userRemoteConnections.instanceId, instanceId),
+        ne(userRemoteConnections.token, "self"),
+      ),
+    )
+    .limit(1);
 
-  logger.info(`[CONNECT] Logging in to remote: ${loginUrl}`);
-
-  let loginResponse: Response;
-  try {
-    loginResponse = await fetch(loginUrl, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ email, password, rememberMe: true }),
-      redirect: "manual",
+  if (localExisting) {
+    logger.warn("[CONNECT] Instance ID already exists locally", {
+      userId: user.id,
+      instanceId,
     });
-  } catch (error) {
-    logger.error(`[CONNECT] Login fetch failed: ${String(error)}`);
     return fail({
-      message: t("post.errors.network.title"),
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      message: t("post.errors.conflict.title"),
+      errorType: ErrorResponseTypes.CONFLICT,
     });
   }
 
-  if (!loginResponse.ok && loginResponse.status !== 302) {
-    logger.warn(
-      `[CONNECT] Remote login returned status ${loginResponse.status.toString()}`,
-    );
+  // ── Step 3: Register this instance on the remote ───────────────────────────
+  const registerResult = await registerOnRemote({
+    remoteUrl,
+    token,
+    leadId: effectiveLeadId,
+    instanceId,
+    logger,
+  });
 
-    if (loginResponse.status === 401) {
+  if (!registerResult.ok) {
+    if (registerResult.conflict) {
       return fail({
-        message: t("post.errors.unauthorized.title"),
-        errorType: ErrorResponseTypes.UNAUTHORIZED,
+        message: t("post.errors.instanceIdConflict.title"),
+        errorType: ErrorResponseTypes.CONFLICT,
       });
     }
-
-    if (loginResponse.status === 403) {
-      return fail({
-        message: t("post.errors.forbidden.title"),
-        errorType: ErrorResponseTypes.FORBIDDEN,
-      });
-    }
-
-    if (loginResponse.status === 404) {
-      return fail({
-        message: t("post.errors.notFound.title"),
-        errorType: ErrorResponseTypes.NOT_FOUND,
-      });
-    }
-
     return fail({
       message: t("post.errors.server.title"),
       errorType: ErrorResponseTypes.INTERNAL_ERROR,
     });
   }
 
-  // 3. Extract JWT from Set-Cookie header
-  const setCookie = loginResponse.headers.get("set-cookie");
-  if (!setCookie) {
-    logger.warn("[CONNECT] Login succeeded but no Set-Cookie header");
-    return fail({
-      message: t("post.errors.server.title"),
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    });
-  }
-
-  const token = parseCookieFromSetCookie(setCookie, AUTH_TOKEN_COOKIE_NAME);
-  const leadIdFromCookie = parseCookieFromSetCookie(
-    setCookie,
-    LEAD_ID_COOKIE_NAME,
-  );
-
-  if (!token) {
-    logger.warn("[CONNECT] Login succeeded but no token in Set-Cookie");
-    return fail({
-      message: t("post.errors.server.title"),
-      errorType: ErrorResponseTypes.INTERNAL_ERROR,
-    });
-  }
-
-  const payload = decodeJwtPayload(token);
-  const effectiveLeadId = leadIdFromCookie ?? payload?.leadId ?? leadId;
-
-  // 4. Store in DB
+  // ── Step 4: Store locally ───────────────────────────────────────────────────
   const storeResult = await upsertRemoteConnection({
     userId: user.id,
     remoteUrl,
     token,
     leadId: effectiveLeadId,
-    instanceId: instanceId ?? "hermes",
-    friendlyName: friendlyName ?? instanceId ?? "hermes",
+    instanceId,
+    friendlyName: friendlyName ?? instanceId,
     logger,
   });
 
@@ -254,8 +234,55 @@ export async function connectRemote(
     });
   }
 
+  // Invalidate cache so pulse/task-sync pick up the new instanceId immediately
+  invalidateInstanceIdCache();
+
+  // ── Step 5: Write default remote tools to user's allowedTools setting ───────
+  try {
+    const { ChatSettingsRepository } =
+      await import("@/app/api/[locale]/agent/chat/settings/repository");
+    const { scopedTranslation: settingsScopedT } =
+      await import("@/app/api/[locale]/agent/chat/settings/i18n");
+    const { t: settingsT } = settingsScopedT.scopedT(defaultLocale);
+
+    const existingResult = await ChatSettingsRepository.getSettings(
+      user,
+      logger,
+      settingsT,
+    );
+    const existingAllowed = existingResult.success
+      ? (existingResult.data.allowedTools ?? [])
+      : [];
+    const remoteTools = DEFAULT_REMOTE_TOOL_IDS.map((id) => ({
+      toolId: `${instanceId}__${id}`,
+      requiresConfirmation: false,
+    }));
+    const existingIds = new Set(existingAllowed.map((tool) => tool.toolId));
+    const newTools = remoteTools.filter(
+      (tool) => !existingIds.has(tool.toolId),
+    );
+    if (newTools.length > 0) {
+      await ChatSettingsRepository.upsertSettings(
+        { allowedTools: [...existingAllowed, ...newTools] },
+        user,
+        logger,
+        settingsT,
+      );
+      logger.info(
+        `[CONNECT] Added ${newTools.length.toString()} remote tools to allowedTools`,
+        { instanceId },
+      );
+    }
+  } catch (toolWriteError) {
+    // Non-fatal — connection is established, tools can be added manually
+    logger.warn("[CONNECT] Failed to write remote tools to allowedTools", {
+      error: String(toolWriteError),
+    });
+  }
+
   logger.info(`[CONNECT] Successfully connected to ${remoteUrl}`, {
     userId: user.id,
+    instanceId,
   });
 
   return {

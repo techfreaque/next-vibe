@@ -1,10 +1,12 @@
 /**
- * Vibe Frame Mount — Endpoint Definition
+ * Vibe Frame Config — Endpoint Definition
  *
- * GET /api/[locale]/system/unified-interface/vibe-frame/mount
+ * POST /api/[locale]/system/unified-interface/vibe-frame/mount
  *
- * Returns an isolated HTML document that renders any next-vibe endpoint
- * inside an iframe. Used by the vibe-frame embed script and VibeFrameHost component.
+ * Called by the embed script (always cross-origin) with identity provided in
+ * the POST body. For each requested integration, mints a short-lived (30s)
+ * single-use exchange token and returns a ready-to-use iframe URL.
+ * No auth secrets appear in URLs for longer than 30 seconds.
  */
 
 import { z } from "zod";
@@ -12,7 +14,9 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   scopedObjectFieldNew,
+  scopedRequestDataArrayFieldNew,
   scopedRequestField,
+  scopedResponseArrayFieldNew,
   scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
@@ -26,12 +30,14 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "./i18n";
 
-const { GET } = createEndpoint({
+// ─── Endpoint definition ──────────────────────────────────────────────────────
+
+const { POST } = createEndpoint({
   scopedTranslation,
-  method: Methods.GET,
+  method: Methods.POST,
   path: ["system", "unified-interface", "vibe-frame", "mount"],
-  title: "get.title" as const,
-  description: "get.description" as const,
+  title: "post.title" as const,
+  description: "post.description" as const,
   icon: "globe",
   category: "app.endpointCategories.system",
 
@@ -39,7 +45,7 @@ const { GET } = createEndpoint({
     "tags.vibeFrame" as const,
     "tags.embed" as const,
     "tags.widget" as const,
-    "tags.iframe" as const,
+    "tags.config" as const,
   ],
 
   allowedRoles: [
@@ -55,153 +61,213 @@ const { GET } = createEndpoint({
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.VERTICAL,
-    title: "get.container.title" as const,
-    description: "get.container.description" as const,
+    title: "post.container.title" as const,
+    description: "post.container.description" as const,
     usage: { request: "data", response: true } as const,
     children: {
-      // === REQUEST FIELDS ===
-      endpoint: scopedRequestField(scopedTranslation, {
+      // === REQUEST ===
+      leadId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "get.fields.endpoint.label" as const,
-        description: "get.fields.endpoint.description" as const,
-        placeholder: "get.fields.endpoint.placeholder" as const,
+        label: "post.fields.leadId.label" as const,
+        description: "post.fields.leadId.description" as const,
         columns: 6,
-        schema: z.string().min(1),
+        schema: z.string().uuid().optional(),
       }),
-
-      frameId: scopedRequestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "get.fields.frameId.label" as const,
-        description: "get.fields.frameId.description" as const,
-        placeholder: "get.fields.frameId.placeholder" as const,
-        columns: 6,
-        schema: z.string().optional(),
-      }),
-
-      urlPathParams: scopedRequestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "get.fields.urlPathParams.label" as const,
-        description: "get.fields.urlPathParams.description" as const,
-        placeholder: "get.fields.urlPathParams.placeholder" as const,
-        columns: 6,
-        schema: z.string().optional(),
-      }),
-
-      data: scopedRequestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "get.fields.data.label" as const,
-        description: "get.fields.data.description" as const,
-        placeholder: "get.fields.data.placeholder" as const,
-        columns: 6,
-        schema: z.string().optional(),
-      }),
-
-      theme: scopedRequestField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.TEXT,
-        label: "get.fields.theme.label" as const,
-        description: "get.fields.theme.description" as const,
-        columns: 3,
-        schema: z
-          .enum(["light", "dark", "system"])
-          .optional()
-          .default("system"),
-      }),
-
       authToken: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
-        label: "get.fields.authToken.label" as const,
-        description: "get.fields.authToken.description" as const,
-        placeholder: "get.fields.authToken.placeholder" as const,
-        columns: 9,
+        label: "post.fields.authToken.label" as const,
+        description: "post.fields.authToken.description" as const,
+        columns: 6,
         schema: z.string().optional(),
       }),
+      integrations: scopedRequestDataArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "post.fields.integrations.label" as const,
+        description: "post.fields.integrations.description" as const,
+        child: scopedObjectFieldNew(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.VERTICAL,
+          title: "post.fields.integration.label" as const,
+          description: "post.fields.integration.description" as const,
+          usage: { request: "data" } as const,
+          children: {
+            id: scopedRequestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label: "post.fields.id.label" as const,
+              description: "post.fields.id.description" as const,
+              placeholder: "post.fields.id.placeholder" as const,
+              columns: 6,
+              schema: z.string().min(1),
+            }),
+            endpoint: scopedRequestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label: "post.fields.endpoint.label" as const,
+              description: "post.fields.endpoint.description" as const,
+              placeholder: "post.fields.endpoint.placeholder" as const,
+              columns: 6,
+              schema: z.string().optional(),
+            }),
+            hasRendered: scopedRequestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.BOOLEAN,
+              label: "post.fields.hasRendered.label" as const,
+              description: "post.fields.hasRendered.description" as const,
+              columns: 3,
+              schema: z.boolean().optional(),
+            }),
+            theme: scopedRequestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label: "post.fields.theme.label" as const,
+              description: "post.fields.theme.description" as const,
+              columns: 3,
+              schema: z
+                .enum(["light", "dark", "system"])
+                .optional()
+                .default("system"),
+            }),
+            urlPathParams: scopedRequestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label: "post.fields.urlPathParams.label" as const,
+              description: "post.fields.urlPathParams.description" as const,
+              placeholder: "post.fields.urlPathParams.placeholder" as const,
+              columns: 6,
+              schema: z.record(z.string(), z.string()).optional(),
+            }),
+            data: scopedRequestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label: "post.fields.data.label" as const,
+              description: "post.fields.data.description" as const,
+              placeholder: "post.fields.data.placeholder" as const,
+              columns: 6,
+              schema: z.record(z.string(), z.string()).optional(),
+            }),
+            frameId: scopedRequestField(scopedTranslation, {
+              type: WidgetType.FORM_FIELD,
+              fieldType: FieldDataType.TEXT,
+              label: "post.fields.frameId.label" as const,
+              description: "post.fields.frameId.description" as const,
+              columns: 6,
+              schema: z.string().optional(),
+            }),
+          },
+        }),
+      }),
 
-      // === RESPONSE FIELD ===
-      html: scopedResponseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "get.response.html.title" as const,
-        schema: z.string(),
+      // === RESPONSE ===
+      widgets: scopedResponseArrayFieldNew(scopedTranslation, {
+        type: WidgetType.CONTAINER,
+        title: "post.fields.widgets.label" as const,
+        description: "post.fields.widgets.description" as const,
+        child: scopedObjectFieldNew(scopedTranslation, {
+          type: WidgetType.CONTAINER,
+          layoutType: LayoutType.VERTICAL,
+          title: "post.fields.widget.label" as const,
+          description: "post.fields.widget.description" as const,
+          usage: { response: true } as const,
+          children: {
+            frameId: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "post.fields.frameId.label" as const,
+              schema: z.string(),
+            }),
+            widgetUrl: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "post.fields.widgetUrl.label" as const,
+              schema: z.string(),
+            }),
+          },
+        }),
       }),
     },
   }),
 
   errorTypes: {
     [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "get.errors.validation.title" as const,
-      description: "get.errors.validation.description" as const,
+      title: "post.errors.validation.title" as const,
+      description: "post.errors.validation.description" as const,
     },
     [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "get.errors.network.title" as const,
-      description: "get.errors.network.description" as const,
+      title: "post.errors.network.title" as const,
+      description: "post.errors.network.description" as const,
     },
     [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "get.errors.unauthorized.title" as const,
-      description: "get.errors.unauthorized.description" as const,
+      title: "post.errors.unauthorized.title" as const,
+      description: "post.errors.unauthorized.description" as const,
     },
     [EndpointErrorTypes.FORBIDDEN]: {
-      title: "get.errors.forbidden.title" as const,
-      description: "get.errors.forbidden.description" as const,
+      title: "post.errors.forbidden.title" as const,
+      description: "post.errors.forbidden.description" as const,
     },
     [EndpointErrorTypes.NOT_FOUND]: {
-      title: "get.errors.notFound.title" as const,
-      description: "get.errors.notFound.description" as const,
+      title: "post.errors.notFound.title" as const,
+      description: "post.errors.notFound.description" as const,
     },
     [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "get.errors.internal.title" as const,
-      description: "get.errors.internal.description" as const,
+      title: "post.errors.internal.title" as const,
+      description: "post.errors.internal.description" as const,
     },
     [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "get.errors.unknown.title" as const,
-      description: "get.errors.unknown.description" as const,
+      title: "post.errors.unknown.title" as const,
+      description: "post.errors.unknown.description" as const,
     },
     [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "get.errors.unsaved.title" as const,
-      description: "get.errors.unsaved.description" as const,
+      title: "post.errors.unsaved.title" as const,
+      description: "post.errors.unsaved.description" as const,
     },
     [EndpointErrorTypes.CONFLICT]: {
-      title: "get.errors.conflict.title" as const,
-      description: "get.errors.conflict.description" as const,
+      title: "post.errors.conflict.title" as const,
+      description: "post.errors.conflict.description" as const,
     },
   },
 
   successTypes: {
-    title: "get.success.mounted.title" as const,
-    description: "get.success.mounted.description" as const,
+    title: "post.success.configured.title" as const,
+    description: "post.success.configured.description" as const,
   },
 
   examples: {
     requests: {
-      default: { endpoint: "contact_POST" },
-      withParams: {
-        endpoint: "agent_chat_threads_threadId_GET",
-        urlPathParams: '{"threadId": "abc-123"}',
-        theme: "dark" as const,
+      default: {
+        integrations: [{ id: "contact_POST" }],
+      },
+      withOptions: {
+        integrations: [
+          { id: "contact_POST", theme: "dark" as const },
+          {
+            id: "search",
+            endpoint: "agent_search_kagi_GET",
+            hasRendered: true,
+          },
+        ],
       },
     },
     responses: {
       default: {
-        html: "<!DOCTYPE html><html>...</html>",
+        widgets: [
+          {
+            frameId: "vf-abc123",
+            widgetUrl:
+              "https://unbottled.ai/en-US/frame/contact/POST?et=abc&frameId=vf-abc123",
+          },
+        ],
       },
     },
   },
 });
 
-export type VibeFrameMountRequestOutput = typeof GET extends {
-  types: { RequestOutput: infer R };
-}
-  ? R
-  : never;
-export type VibeFrameMountResponseOutput = typeof GET extends {
-  types: { ResponseOutput: infer R };
-}
-  ? R
-  : never;
+// Extract types from definition (single source of truth)
+export type VibeFrameConfigRequestOutput = typeof POST.types.RequestOutput;
+export type VibeFrameConfigResponseOutput = typeof POST.types.ResponseOutput;
+export type IntegrationRequest =
+  VibeFrameConfigRequestOutput["integrations"][number];
+export type WidgetResponse = VibeFrameConfigResponseOutput["widgets"][number];
 
-export { GET };
-export default { GET };
+const definitions = { POST } as const;
+export default definitions;

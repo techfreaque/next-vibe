@@ -33,7 +33,13 @@ import { Div, type DivMouseEvent } from "next-vibe-ui/ui/div";
 import { DropdownMenu } from "next-vibe-ui/ui/dropdown-menu";
 import { DropdownMenuContent } from "next-vibe-ui/ui/dropdown-menu";
 import { DropdownMenuItem } from "next-vibe-ui/ui/dropdown-menu";
+import { DropdownMenuSeparator } from "next-vibe-ui/ui/dropdown-menu";
+import { DropdownMenuSub } from "next-vibe-ui/ui/dropdown-menu";
+import { DropdownMenuSubContent } from "next-vibe-ui/ui/dropdown-menu";
+import { DropdownMenuSubTrigger } from "next-vibe-ui/ui/dropdown-menu";
 import { DropdownMenuTrigger } from "next-vibe-ui/ui/dropdown-menu";
+import { Archive } from "next-vibe-ui/ui/icons/Archive";
+import { ArchiveRestore } from "next-vibe-ui/ui/icons/ArchiveRestore";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { Edit } from "next-vibe-ui/ui/icons/Edit";
@@ -66,6 +72,7 @@ import {
 } from "@/app/api/[locale]/agent/chat/config";
 import { NEW_MESSAGE_ID } from "@/app/api/[locale]/agent/chat/enum";
 import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
+import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
 import { useWidgetContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
@@ -74,16 +81,22 @@ import { useTouchDevice } from "@/hooks/use-touch-device";
 
 import type { ChatFolder } from "../../db";
 import createFolderDefinition from "../../folders/[rootFolderId]/create/definition";
+import type { FolderListResponseOutput } from "../../folders/[rootFolderId]/definition";
+import foldersDefinition from "../../folders/[rootFolderId]/definition";
 import { scopedTranslation as foldersScopedTranslation } from "../../folders/[rootFolderId]/i18n";
 import { FolderPermissionsDialog } from "../../folders/[rootFolderId]/widget/folder-permissions-dialog";
 import moveDefinitions from "../../folders/subfolders/[subFolderId]/move/definition";
 import renameDefinitions from "../../folders/subfolders/[subFolderId]/rename/definition";
+import { useChatBootContext } from "../../hooks/context";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
+import { scopedTranslation as threadsScopedTranslation } from "../../threads/i18n";
 import type {
   FolderContentsItem,
   FolderContentsResponseOutput,
 } from "./definition";
 import definitions from "./definition";
+
+type FolderFromList = FolderListResponseOutput["folders"][number];
 
 // ---------------------------------------------------------------------------
 // Color helpers (copied from folders widget)
@@ -140,9 +153,16 @@ function getFolderHoverClasses(color: string | null): {
 // ThreadRow
 // ---------------------------------------------------------------------------
 
-function ThreadRow({ item }: { item: FolderContentsItem }): React.JSX.Element {
+function ThreadRow({
+  item,
+  allFolders,
+}: {
+  item: FolderContentsItem;
+  allFolders: FolderFromList[];
+}): React.JSX.Element {
   const { locale, logger, user } = useWidgetContext();
-  const { t } = foldersScopedTranslation.scopedT(locale);
+  const { t: tFolders } = foldersScopedTranslation.scopedT(locale);
+  const { t } = threadsScopedTranslation.scopedT(locale);
   const isTouch = useTouchDevice();
   const [isHovered, setIsHovered] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -179,25 +199,73 @@ function ThreadRow({ item }: { item: FolderContentsItem }): React.JSX.Element {
     archived?: boolean;
     folderId?: string | null;
   }): Promise<void> => {
-    apiClient.updateEndpointData(
-      definitions.GET,
-      logger,
-      (old) => {
-        if (!old?.success) {
-          return old;
-        }
-        return success({
-          ...old.data,
-          items: old.data.items.map((i) =>
-            i.id === item.id ? { ...i, ...updates } : i,
-          ),
-        });
-      },
-      {
-        urlPathParams: { rootFolderId: item.rootFolderId },
-        requestData: { subFolderId: item.folderId ?? null },
-      },
-    );
+    const isFolderMove =
+      "folderId" in updates && updates.folderId !== item.folderId;
+
+    if (isFolderMove) {
+      // Remove from current folder's cache
+      apiClient.updateEndpointData(
+        definitions.GET,
+        logger,
+        (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return success({
+            ...old.data,
+            items: old.data.items.filter((i) => i.id !== item.id),
+          });
+        },
+        {
+          urlPathParams: { rootFolderId: item.rootFolderId },
+          requestData: { subFolderId: item.folderId ?? null },
+        },
+      );
+      // Add to target folder's cache
+      const updatedItem: FolderContentsItem = {
+        ...item,
+        ...updates,
+        folderId: updates.folderId ?? null,
+        updatedAt: new Date(),
+      };
+      apiClient.updateEndpointData(
+        definitions.GET,
+        logger,
+        (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return success({
+            ...old.data,
+            items: [updatedItem, ...old.data.items],
+          });
+        },
+        {
+          urlPathParams: { rootFolderId: item.rootFolderId },
+          requestData: { subFolderId: updates.folderId ?? null },
+        },
+      );
+    } else {
+      apiClient.updateEndpointData(
+        definitions.GET,
+        logger,
+        (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return success({
+            ...old.data,
+            items: old.data.items.map((i) =>
+              i.id === item.id ? { ...i, ...updates } : i,
+            ),
+          });
+        },
+        {
+          urlPathParams: { rootFolderId: item.rootFolderId },
+          requestData: { subFolderId: item.folderId ?? null },
+        },
+      );
+    }
     if (isIncognito) {
       const { ChatThreadsRepositoryClient } =
         await import("../../threads/repository-client");
@@ -362,8 +430,8 @@ function ThreadRow({ item }: { item: FolderContentsItem }): React.JSX.Element {
                       <Pin className="h-4 w-4 mr-2" />
                     )}
                     {item.pinned
-                      ? t("widget.folderList.unpin")
-                      : t("widget.folderList.pin")}
+                      ? tFolders("widget.folderList.unpin")
+                      : tFolders("widget.folderList.pin")}
                   </DropdownMenuItem>
                 )}
                 {item.canEdit && (
@@ -375,20 +443,83 @@ function ThreadRow({ item }: { item: FolderContentsItem }): React.JSX.Element {
                     className="cursor-pointer"
                   >
                     <Edit className="h-4 w-4 mr-2" />
-                    {t("widget.actions.rename")}
+                    {tFolders("widget.actions.rename")}
                   </DropdownMenuItem>
                 )}
-                {item.canDelete && (
+                {item.canEdit && (
                   <DropdownMenuItem
                     onSelect={() => {
                       setDropdownOpen(false);
-                      setDeleteDialogOpen(true);
+                      void mutateThread({ archived: !item.archived });
                     }}
-                    className="text-destructive cursor-pointer"
+                    className="cursor-pointer"
                   >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    {t("widget.common.delete")}
+                    {item.archived ? (
+                      <ArchiveRestore className="h-4 w-4 mr-2" />
+                    ) : (
+                      <Archive className="h-4 w-4 mr-2" />
+                    )}
+                    {item.archived
+                      ? t("widget.actions.unarchive")
+                      : t("widget.actions.archive")}
                   </DropdownMenuItem>
+                )}
+                {item.canEdit && allFolders.length > 0 && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger className="cursor-pointer">
+                        <FolderInput className="h-4 w-4 mr-2" />
+                        {t("widget.actions.moveToFolder")}
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuSubContent>
+                        {item.folderId !== null && (
+                          <DropdownMenuItem
+                            onSelect={() => {
+                              setDropdownOpen(false);
+                              void mutateThread({ folderId: null });
+                            }}
+                            className="cursor-pointer"
+                          >
+                            <Icon icon="folder" className="h-4 w-4 mr-2" />
+                            {t("widget.actions.unfiled")}
+                          </DropdownMenuItem>
+                        )}
+                        {allFolders.map((folder) => (
+                          <DropdownMenuItem
+                            key={folder.id}
+                            onSelect={() => {
+                              setDropdownOpen(false);
+                              void mutateThread({ folderId: folder.id });
+                            }}
+                            disabled={item.folderId === folder.id}
+                            className="cursor-pointer"
+                          >
+                            <Icon
+                              icon={folder.icon ?? "folder"}
+                              className="h-4 w-4 mr-2"
+                            />
+                            {folder.name}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuSubContent>
+                    </DropdownMenuSub>
+                  </>
+                )}
+                {item.canDelete && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onSelect={() => {
+                        setDropdownOpen(false);
+                        setDeleteDialogOpen(true);
+                      }}
+                      className="text-destructive cursor-pointer"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      {tFolders("widget.common.delete")}
+                    </DropdownMenuItem>
+                  </>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
@@ -413,21 +544,23 @@ function ThreadRow({ item }: { item: FolderContentsItem }): React.JSX.Element {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {t("widget.threadList.deleteDialog.title")}
+              {tFolders("widget.threadList.deleteDialog.title")}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {t("widget.threadList.deleteDialog.description", {
+              {tFolders("widget.threadList.deleteDialog.description", {
                 title: item.title ?? "",
               })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t("widget.common.cancel")}</AlertDialogCancel>
+            <AlertDialogCancel>
+              {tFolders("widget.common.cancel")}
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {t("widget.common.delete")}
+              {tFolders("widget.common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -452,6 +585,8 @@ function FolderRow({
   const { t } = foldersScopedTranslation.scopedT(locale);
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
   const activeFolderId = useChatNavigationStore((s) => s.currentSubFolderId);
+  const { initialSubFolderContentsData, initialSubFolderId } =
+    useChatBootContext();
 
   const [isHovered, setIsHovered] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -552,26 +687,75 @@ function FolderRow({
       },
       { urlPathParams: { rootFolderId: activeRootFolderId } },
     );
-    // Also update folder-contents cache so pinned/name changes are reflected immediately
-    apiClient.updateEndpointData(
-      definitions.GET,
-      logger,
-      (old) => {
-        if (!old?.success) {
-          return old;
-        }
-        return success({
-          ...old.data,
-          items: old.data.items.map((i) =>
-            i.id === item.id ? { ...i, ...updates } : i,
-          ),
-        });
-      },
-      {
-        urlPathParams: { rootFolderId: activeRootFolderId },
-        requestData: { subFolderId: item.parentId ?? null },
-      },
-    );
+
+    const isParentMove =
+      "parentId" in updates && updates.parentId !== item.parentId;
+
+    if (isParentMove) {
+      // Remove from old parent's folder-contents cache
+      apiClient.updateEndpointData(
+        definitions.GET,
+        logger,
+        (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return success({
+            ...old.data,
+            items: old.data.items.filter((i) => i.id !== item.id),
+          });
+        },
+        {
+          urlPathParams: { rootFolderId: activeRootFolderId },
+          requestData: { subFolderId: item.parentId ?? null },
+        },
+      );
+      // Add to new parent's folder-contents cache
+      const updatedItem: FolderContentsItem = {
+        ...item,
+        ...updates,
+        parentId: updates.parentId ?? null,
+      };
+      apiClient.updateEndpointData(
+        definitions.GET,
+        logger,
+        (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return success({
+            ...old.data,
+            items: [updatedItem, ...old.data.items],
+          });
+        },
+        {
+          urlPathParams: { rootFolderId: activeRootFolderId },
+          requestData: { subFolderId: updates.parentId ?? null },
+        },
+      );
+    } else {
+      // In-place update at the same parent level
+      apiClient.updateEndpointData(
+        definitions.GET,
+        logger,
+        (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return success({
+            ...old.data,
+            items: old.data.items.map((i) =>
+              i.id === item.id ? { ...i, ...updates } : i,
+            ),
+          });
+        },
+        {
+          urlPathParams: { rootFolderId: activeRootFolderId },
+          requestData: { subFolderId: item.parentId ?? null },
+        },
+      );
+    }
+
     if (isIncognito) {
       const { ChatFoldersRepositoryClient } =
         await import("../../folders/[rootFolderId]/repository-client");
@@ -599,6 +783,7 @@ function FolderRow({
     void (async (): Promise<void> => {
       const foldersDef =
         await import("../../folders/[rootFolderId]/definition");
+      // Remove from folders list cache
       apiClient.updateEndpointData(
         foldersDef.default.GET,
         logger,
@@ -612,6 +797,24 @@ function FolderRow({
           });
         },
         { urlPathParams: { rootFolderId: activeRootFolderId } },
+      );
+      // Also remove from folder-contents cache at the parent level
+      apiClient.updateEndpointData(
+        definitions.GET,
+        logger,
+        (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return success({
+            ...old.data,
+            items: old.data.items.filter((i) => i.id !== item.id),
+          });
+        },
+        {
+          urlPathParams: { rootFolderId: activeRootFolderId },
+          requestData: { subFolderId: item.parentId ?? null },
+        },
       );
       if (isIncognito) {
         const { ChatFoldersRepositoryClient } =
@@ -811,6 +1014,10 @@ function FolderRow({
               read: {
                 urlPathParams: { rootFolderId: activeRootFolderId },
                 initialState: { subFolderId: item.id },
+                initialData:
+                  initialSubFolderId === item.id
+                    ? (initialSubFolderContentsData ?? undefined)
+                    : undefined,
                 queryOptions: {
                   refetchOnWindowFocus: false,
                   staleTime: 30_000,
@@ -984,10 +1191,12 @@ function ItemSection({
   label,
   items,
   activeRootFolderId,
+  allFolders,
 }: {
   label: string;
   items: FolderContentsItem[];
   activeRootFolderId: DefaultFolderId;
+  allFolders: FolderFromList[];
 }): React.JSX.Element | null {
   const [showAll, setShowAll] = useState(false);
   const { locale } = useWidgetContext();
@@ -1017,7 +1226,9 @@ function ItemSection({
               />
             );
           }
-          return <ThreadRow key={item.id} item={item} />;
+          return (
+            <ThreadRow key={item.id} item={item} allFolders={allFolders} />
+          );
         })}
       </Div>
       {hasMore && (
@@ -1048,12 +1259,44 @@ interface CustomWidgetProps {
 export function FolderContentsWidget({
   field,
 }: CustomWidgetProps): React.JSX.Element {
+  // field.value is undefined while loading, and { items: [] } when loaded with no results.
+  // Never show an empty state while loading.
   const fieldItems = field.value?.items;
+  const isLoaded = field.value !== undefined && field.value !== null;
   const activeRootFolderId = useChatNavigationStore(
     (s) => s.currentRootFolderId,
   );
-  const { locale } = useWidgetContext();
+  const { locale, logger, user } = useWidgetContext();
   const { t } = foldersScopedTranslation.scopedT(locale);
+
+  const foldersEndpoint = useEndpoint(
+    foldersDefinition,
+    useMemo(
+      () => ({
+        read: {
+          urlPathParams: { rootFolderId: activeRootFolderId },
+          queryOptions: {
+            enabled: isDefaultFolderId(activeRootFolderId),
+            staleTime: 60_000,
+            refetchOnWindowFocus: false,
+          },
+        },
+      }),
+      [activeRootFolderId],
+    ),
+    logger,
+    user,
+  );
+
+  const allFolders = useMemo(
+    (): FolderFromList[] =>
+      foldersEndpoint.read?.response?.success
+        ? foldersEndpoint.read.response.data.folders.filter(
+            (f) => f.rootFolderId === activeRootFolderId,
+          )
+        : [],
+    [foldersEndpoint.read?.response, activeRootFolderId],
+  );
 
   const grouped = useMemo(() => {
     const rawItems: FolderContentsItem[] = fieldItems ?? [];
@@ -1087,32 +1330,55 @@ export function FolderContentsWidget({
     return <Div />;
   }
 
+  const isEmpty =
+    isLoaded &&
+    grouped.pinned.length === 0 &&
+    grouped.today.length === 0 &&
+    grouped.lastWeek.length === 0 &&
+    grouped.lastMonth.length === 0 &&
+    grouped.older.length === 0;
+
+  if (isEmpty) {
+    return (
+      /* eslint-disable i18next/no-literal-string */
+      <Div className="px-3 py-4 text-xs text-muted-foreground text-center">
+        {t("widget.common.noChatsFound")}
+      </Div>
+      /* eslint-enable i18next/no-literal-string */
+    );
+  }
+
   return (
     <Div>
       <ItemSection
         label={t("widget.folderList.pinned")}
         items={grouped.pinned}
         activeRootFolderId={activeRootFolderId}
+        allFolders={allFolders}
       />
       <ItemSection
         label={t("widget.folderList.today")}
         items={grouped.today}
         activeRootFolderId={activeRootFolderId}
+        allFolders={allFolders}
       />
       <ItemSection
         label={t("widget.folderList.lastWeek")}
         items={grouped.lastWeek}
         activeRootFolderId={activeRootFolderId}
+        allFolders={allFolders}
       />
       <ItemSection
         label={t("widget.folderList.lastMonth")}
         items={grouped.lastMonth}
         activeRootFolderId={activeRootFolderId}
+        allFolders={allFolders}
       />
       <ItemSection
         label={t("widget.folderList.older")}
         items={grouped.older}
         activeRootFolderId={activeRootFolderId}
+        allFolders={allFolders}
       />
     </Div>
   );

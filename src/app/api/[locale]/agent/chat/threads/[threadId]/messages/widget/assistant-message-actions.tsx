@@ -2,7 +2,11 @@
 
 import { cn } from "next-vibe/shared/utils";
 import { Div } from "next-vibe-ui/ui/div";
-import { Bot, Square, Trash2, Volume2, X } from "next-vibe-ui/ui/icons";
+import { Bot } from "next-vibe-ui/ui/icons/Bot";
+import { Square } from "next-vibe-ui/ui/icons/Square";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
+import { Volume2 } from "next-vibe-ui/ui/icons/Volume2";
+import { X } from "next-vibe-ui/ui/icons/X";
 import { Span } from "next-vibe-ui/ui/span";
 import type React from "react";
 
@@ -98,6 +102,7 @@ export function AssistantMessageActions({
     locale,
     user,
     logger,
+    messageId,
     deductCredits:
       deductCredits ??
       ((): void => {

@@ -8,21 +8,19 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  AlertTriangle,
-  CheckCircle,
-  Download,
-  ExternalLink,
-  FileText,
-  Info,
-  List,
-  Loader2,
-  RefreshCcw,
-  Search,
-  Square,
-  Upload,
-  XCircle,
-} from "next-vibe-ui/ui/icons";
+import { AlertTriangle } from "next-vibe-ui/ui/icons/AlertTriangle";
+import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
+import { Download } from "next-vibe-ui/ui/icons/Download";
+import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
+import { FileText } from "next-vibe-ui/ui/icons/FileText";
+import { Info } from "next-vibe-ui/ui/icons/Info";
+import { List } from "next-vibe-ui/ui/icons/List";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { RefreshCcw } from "next-vibe-ui/ui/icons/RefreshCcw";
+import { Search } from "next-vibe-ui/ui/icons/Search";
+import { Square } from "next-vibe-ui/ui/icons/Square";
+import { Upload } from "next-vibe-ui/ui/icons/Upload";
+import { XCircle } from "next-vibe-ui/ui/icons/XCircle";
 import { Li } from "next-vibe-ui/ui/li";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";

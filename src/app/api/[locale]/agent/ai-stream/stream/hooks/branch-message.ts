@@ -31,6 +31,7 @@ export interface BranchMessageDeps {
     ttsAutoplay: boolean;
     ttsVoice: typeof TtsVoiceValue;
   };
+  setLeafMessageId?: (messageId: string) => void;
 }
 
 export async function branchMessage(
@@ -56,6 +57,6 @@ export async function branchMessage(
       attachments,
       operation: "edit",
     },
-    deps,
+    { ...deps, setLeafMessageId: deps.setLeafMessageId },
   );
 }

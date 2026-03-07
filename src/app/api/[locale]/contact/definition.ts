@@ -21,6 +21,7 @@ import {
   scopedResponseField,
   scopedWidgetField,
 } from "../system/unified-interface/shared/field/utils-new";
+import { CONTACT_FORM_ALIAS } from "./constants";
 import {
   ContactPriority,
   ContactPriorityOptions,
@@ -28,8 +29,6 @@ import {
   ContactSubjectOptions,
 } from "./enum";
 import { scopedTranslation } from "./i18n";
-
-export const CONTACT_FORM_ALIAS = "contact-form" as const;
 
 /**
  * Contact form endpoint with scoped translations
@@ -164,13 +163,16 @@ const { POST } = createEndpoint({
     },
     responses: {
       default: {
-        success: "response.success",
+        success:
+          "Thank you for contacting us! We've received your message and will get back to you soon.",
       },
       success: {
-        success: "response.success",
+        success:
+          "Thank you for contacting us! We've received your message and will get back to you soon.",
       },
       general: {
-        success: "response.success",
+        success:
+          "Thank you for contacting us! We've received your message and will get back to you soon.",
       },
     },
   },

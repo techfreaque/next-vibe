@@ -367,6 +367,10 @@ export const translations: typeof enTranslations = {
           label: "Nachrichtenbetreff",
           description: "Betreffzeile der Kontaktnachricht",
         },
+        priority: {
+          label: "Prioritätsstufe",
+          description: "Dringlichkeitsstufe der Anfrage",
+        },
         message: {
           label: "Nachrichteninhalt",
           description: "Der Hauptinhalt der Nachricht aus dem Kontaktformular",
@@ -402,6 +406,9 @@ export const translations: typeof enTranslations = {
         },
         subject: {
           label: "Nachrichtenbetreff",
+        },
+        priority: {
+          label: "Prioritätsstufe",
         },
         message: {
           label: "Nachrichteninhalt",

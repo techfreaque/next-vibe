@@ -51,7 +51,7 @@ const { POST } = createEndpoint({
     children: {
       // === REQUEST FIELDS ===
       quantity: scopedRequestField(scopedTranslation, {
-        schema: z.coerce.number().int().min(1).max(10),
+        schema: z.coerce.number().int().min(1).default(1),
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.INT,
         label: "post.quantity.label",

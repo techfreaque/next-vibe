@@ -14,28 +14,24 @@ import { AutocompleteField } from "next-vibe-ui/ui/autocomplete-field";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  ChevronDown,
-  ChevronRight,
-  Plus,
-  Trash2,
-  Zap,
-} from "next-vibe-ui/ui/icons";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
+import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
-import {
-  getEndpoint,
-  getFullPath,
-} from "@/app/api/[locale]/system/generated/endpoint";
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import helpDefinitions from "@/app/api/[locale]/system/help/definition";
+import { apiClient } from "@/app/api/[locale]/system/unified-interface/react/hooks/store";
 import { useApiMutation } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-api-mutation";
 import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/hooks/use-endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
+import { getFullPath } from "@/app/api/[locale]/system/unified-interface/shared/utils/path";
 import { EndpointsPage } from "@/app/api/[locale]/system/unified-interface/unified-ui/renderers/react/EndpointsPage";
-import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
   useWidgetDisabled,
   useWidgetForm,
@@ -45,7 +41,6 @@ import {
   useWidgetOnSubmit,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
-import { TextWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/display-only/text/react";
 import { NumberFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/number-field/react";
 import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
@@ -54,12 +49,14 @@ import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/uni
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { useCharacter } from "../../chat/characters/[id]/hooks";
-import { ChatBootContext } from "../../chat/hooks/context";
+import { DefaultFolderId } from "../../chat/config";
+import { ChatMessageRole } from "../../chat/enum";
 import {
   ChatNavigationProvider,
   useChatNavigationStore,
 } from "../../chat/hooks/use-chat-navigation-store";
 import { useChatSettings } from "../../chat/settings/hooks";
+import messagesDefinition from "../../chat/threads/[threadId]/messages/definition";
 import { defaultModel, type ModelId } from "../../models/models";
 import {
   type ToolEntry,
@@ -440,7 +437,9 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
   // Show messages from appendThreadId while submitting (before POST response arrives)
   const appendThreadId = form.watch("appendThreadId") ?? undefined;
   const displayThreadId =
-    contextThreadId ?? (isSubmitting ? appendThreadId : undefined);
+    responseData?.threadId ??
+    contextThreadId ??
+    (isSubmitting ? appendThreadId : undefined);
   const rootFolderValue = form.watch("rootFolderId") ?? "cron";
   const threadHref = displayThreadId
     ? `/${locale}/threads/${rootFolderValue}/${displayThreadId}`
@@ -456,6 +455,71 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
 
   const emptyField = useMemo(() => ({}), []);
 
+  // Use mock messages when disabled and no real threadId in response.
+  // When responseData.threadId exists, leave undefined so DB fetch fires.
+  const mockMessagesInitialData = useMemo(() => {
+    if (!isDisabled || !responseData?.text || responseData.threadId) {
+      return undefined;
+    }
+    const now = new Date();
+    const base = {
+      threadId: "mock",
+      parentId: null,
+      sequenceId: null,
+      authorId: null,
+      authorName: null,
+      character: null,
+      model: null,
+      upvotes: 0,
+      downvotes: 0,
+      errorType: null,
+      errorMessage: null,
+      errorCode: null,
+      searchVector: null,
+      createdAt: now,
+      updatedAt: now,
+    };
+    const userMsgId = "mock-user";
+    const messages = [
+      {
+        ...base,
+        id: userMsgId,
+        role: ChatMessageRole.USER,
+        content: promptValue,
+        isAI: false,
+        model: null,
+        character: null,
+        metadata: {},
+      },
+      {
+        ...base,
+        id: responseData.lastAiMessageId ?? "mock-ai",
+        role: ChatMessageRole.ASSISTANT,
+        content: responseData.text,
+        isAI: true,
+        parentId: userMsgId,
+        model: modelValue ?? null,
+        character: characterValue || null,
+        metadata: {
+          promptTokens: responseData.promptTokens ?? undefined,
+          completionTokens: responseData.completionTokens ?? undefined,
+        },
+      },
+    ];
+    return { messages };
+  }, [isDisabled, responseData, promptValue, modelValue, characterValue]);
+
+  // When a real run completes, invalidate the messages cache so EmbeddedMessagesView refetches.
+  const completedThreadId = isDisabled ? responseData?.threadId : undefined;
+  useEffect(() => {
+    if (!completedThreadId) {
+      return;
+    }
+    void apiClient.refetchEndpoint(messagesDefinition.GET, logger, {
+      urlPathParams: { threadId: completedThreadId },
+    });
+  }, [completedThreadId, logger]);
+
   return (
     <Div className="flex flex-col h-[500px] min-h-[300px]">
       <FormAlertWidget field={emptyField} />
@@ -469,29 +533,25 @@ function AiRunFormView({ field }: CustomWidgetProps): JSX.Element {
           </Div>
         )}
 
-        {/* Response thread messages (if response has threadId) */}
-        {/* Null out ChatBootContext so MessagesWidget uses standalone read-only mode
-            instead of picking up the page's active thread from ChatBootProvider */}
-        {displayThreadId && (
-          <ChatBootContext.Provider value={null}>
-            <ChatNavigationProvider activeThreadId={displayThreadId} isEmbedded>
-              <EmbeddedMessagesView
-                threadId={displayThreadId}
-                locale={locale}
-                user={user}
-                className="rounded-lg bg-background"
-                refetchInterval={isSubmitting ? 2000 : false}
-              />
-            </ChatNavigationProvider>
-          </ChatBootContext.Provider>
-        )}
-
-        {/* Response text fallback */}
-        {responseData && !responseData.threadId && responseData.text && (
-          <TextWidget
-            fieldName="text"
-            field={withValue(children.text, responseData.text, responseData)}
-          />
+        {/* Response thread messages — real threadId OR mock incognito data */}
+        {(displayThreadId ?? mockMessagesInitialData) && (
+          <ChatNavigationProvider
+            activeThreadId={displayThreadId ?? "mock"}
+            currentRootFolderId={DefaultFolderId.PRIVATE}
+            currentSubFolderId={null}
+            leafMessageId={null}
+            isEmbedded
+          >
+            <EmbeddedMessagesView
+              threadId={displayThreadId ?? "mock"}
+              rootFolderId={rootFolderValue}
+              locale={locale}
+              user={user}
+              className="rounded-lg bg-background"
+              refetchInterval={isSubmitting ? 2000 : false}
+              initialData={mockMessagesInitialData}
+            />
+          </ChatNavigationProvider>
         )}
       </Div>
 
@@ -578,7 +638,12 @@ export function AiRunWidget({
 }: CustomWidgetProps): JSX.Element {
   const threadId = field.value?.threadId ?? null;
   return (
-    <ChatNavigationProvider activeThreadId={threadId}>
+    <ChatNavigationProvider
+      activeThreadId={threadId}
+      currentRootFolderId={DefaultFolderId.PRIVATE}
+      currentSubFolderId={null}
+      leafMessageId={null}
+    >
       <AiRunFormView field={field} fieldName={fieldName} />
     </ChatNavigationProvider>
   );

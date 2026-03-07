@@ -164,6 +164,11 @@ export interface MessageMetadata {
     data?: string; // base64 data for incognito mode
   }[];
 
+  // Chunk boundary flags (set server-side, cleared when adjacent chunk is loaded)
+  hasOlderHistory?: boolean; // Oldest message in chunk: true if older chunks exist
+  hasNewerHistory?: boolean; // Leaf message: true if a newer chunk exists beyond it
+  newerAnchorId?: string | null; // ID of the compacting message that starts the newer chunk
+
   // Voting
   voterIds?: string[];
   voteDetails?: Array<{
@@ -420,7 +425,6 @@ export const chatMessages = pgTable(
     parentId: uuid("parent_id").references((): AnyPgColumn => chatMessages.id, {
       onDelete: "cascade",
     }),
-    depth: integer("depth").default(0).notNull(),
 
     // Message sequencing - links messages that are part of the same AI response
     // All messages in a sequence share the same sequenceId (first message's ID)

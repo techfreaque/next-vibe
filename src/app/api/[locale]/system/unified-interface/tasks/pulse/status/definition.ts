@@ -19,9 +19,8 @@ import {
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
+import { PULSE_STATUS_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
-
-export const PULSE_STATUS_ALIAS = "pulse-status" as const;
 
 /**
  * GET endpoint definition - Get pulse status

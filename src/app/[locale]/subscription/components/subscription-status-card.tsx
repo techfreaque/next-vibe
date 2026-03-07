@@ -8,17 +8,16 @@ import {
   CardTitle,
 } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  AlertCircle,
-  Bitcoin,
-  CreditCard,
-  ExternalLink,
-} from "next-vibe-ui/ui/icons";
+import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
+import { Bitcoin } from "next-vibe-ui/ui/icons/Bitcoin";
+import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
+import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
 import { MotionDiv } from "next-vibe-ui/ui/motion";
 import type { JSX } from "react";
 
 import { PaymentProvider } from "@/app/api/[locale]/payment/enum";
 import { scopedTranslation as paymentScopedTranslation } from "@/app/api/[locale]/payment/i18n";
+import portalEndpoints from "@/app/api/[locale]/payment/portal/definition";
 import { type SubscriptionGetResponseOutput } from "@/app/api/[locale]/subscription/definition";
 import { SubscriptionStatus } from "@/app/api/[locale]/subscription/enum";
 import { scopedTranslation as subscriptionScopedTranslation } from "@/app/api/[locale]/subscription/i18n";
@@ -68,13 +67,16 @@ export function SubscriptionStatusCard({
 
     // For Stripe, create portal session and redirect
     try {
-      const response = await fetch(`/api/${locale}/payment/portal`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          returnUrl: `${window.location.origin}/${locale}/subscription`,
-        }),
-      });
+      const response = await fetch(
+        `/api/${locale}/${portalEndpoints.POST.path.join("/")}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            returnUrl: `${window.location.origin}/${locale}/subscription`,
+          }),
+        },
+      );
 
       const result = await response.json();
 

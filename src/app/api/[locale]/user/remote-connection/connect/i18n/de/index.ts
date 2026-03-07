@@ -3,6 +3,22 @@ export const translations = {
   tags: {
     remoteConnection: "Fernverbindung",
   },
+  widget: {
+    signInDescription:
+      "Melde dich an, um dich mit einem Remote-Konto zu verbinden.",
+    benefit1:
+      "Erinnerungen synchronisieren automatisch — alles, was du der KI beibringst, überträgt sich",
+    benefit2:
+      "Greife auf Cloud-KI-Modelle und Tools von deiner lokalen Instanz aus zu",
+    benefit3: "Kontext reist mit dir auf allen Geräten",
+    adminBenefit1: "Erinnerungen synchronisieren bidirektional, automatisch",
+    adminBenefit2:
+      "Cloud-KI entdeckt und führt deine lokalen Tools aus (SSH, Dateien, Code-Ausführung)",
+    adminBenefit3:
+      "Delegiere Aufgaben von der Cloud an diese Maschine — Claude Code führt lokal aus",
+    adminBenefit4:
+      "Fähigkeiten-Snapshot wird bei jeder Synchronisierung gesendet — Thea weiß immer, was diese Instanz kann",
+  },
   post: {
     title: "Mit Remote-Konto verbinden",
     description:
@@ -47,6 +63,19 @@ export const translations = {
         required: "Bitte gib dein Passwort ein",
       },
     },
+    token: {
+      label: "Token",
+      description: "JWT-Token der Remote-Instanz (wird automatisch gesetzt)",
+      validation: {
+        required: "Melde dich zuerst bei der Remote-Instanz an",
+      },
+    },
+    leadId: {
+      label: "Lead-ID",
+      description: "Lead-ID der Remote-Instanz (wird automatisch gesetzt)",
+    },
+    credentialWarning:
+      "Deine Zugangsdaten gehen direkt von deinem Browser an den Remote-Server. Der hier gespeicherte Token gibt dem Betreiber dieses Servers jedoch vollen Zugriff auf dein Remote-Konto — er kann alles tun, was du dort tun kannst. Verbinde dich nur auf Servern, denen du vollständig vertraust.",
     actions: {
       submit: "Verbinden",
       submitting: "Verbinde...",
@@ -86,12 +115,23 @@ export const translations = {
       },
       conflict: {
         title: "Bereits verbunden",
-        description: "Du bist bereits mit einer Remote-Instanz verbunden",
+        description:
+          "Du bist bereits mit einer Remote-Instanz mit dieser Instanz-ID verbunden",
+      },
+      instanceIdConflict: {
+        title: "Instanz-ID bereits registriert",
+        description:
+          "Eine Instanz mit dieser ID ist bereits auf dem Remote registriert. Wähle eine andere Instanz-ID.",
       },
       noLeadId: {
         title: "Verbindungsfehler",
         description:
           "Sitzung mit dem Remote-Server konnte nicht aufgebaut werden",
+      },
+      invalidUrl: {
+        title: "Ungültige Remote-URL",
+        description:
+          "Die Remote-URL muss auf einen öffentlichen Server zeigen, nicht auf eine lokale oder private Adresse",
       },
     },
     success: {

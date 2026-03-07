@@ -18,9 +18,8 @@ import {
 
 import { UserRole } from "../../user/user-roles/enum";
 import { type ReferralTranslationKey, scopedTranslation } from "../i18n";
+import { REFERRAL_STATS_ALIAS } from "./constants";
 import { ReferralStatsContainer } from "./widget";
-
-export const REFERRAL_STATS_ALIAS = "referral-stats" as const;
 
 /**
  * GET endpoint for referral stats

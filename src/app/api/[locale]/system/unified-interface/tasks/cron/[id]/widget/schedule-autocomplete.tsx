@@ -16,7 +16,10 @@ import {
   CommandList,
 } from "next-vibe-ui/ui/command";
 import { Div } from "next-vibe-ui/ui/div";
-import { Check, ChevronDown, Search, X } from "next-vibe-ui/ui/icons";
+import { Check } from "next-vibe-ui/ui/icons/Check";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { Search } from "next-vibe-ui/ui/icons/Search";
+import { X } from "next-vibe-ui/ui/icons/X";
 import { Input } from "next-vibe-ui/ui/input";
 import {
   Popover,

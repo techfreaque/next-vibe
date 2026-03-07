@@ -169,11 +169,18 @@ export class DatabaseMigrationRepositoryImpl implements DatabaseMigrationReposit
 
       if (pushResult.status !== 0) {
         logger.error("Migration failed", { output });
+        // "already exists" usually means migrations were squashed/merged after being
+        // applied — the DB has the tables but the journal hash doesn't match.
+        // Manual fix required: INSERT the new migration hash into __drizzle_migrations__
+        // e.g.: INSERT INTO __drizzle_migrations__ (hash, created_at) VALUES ('<hash>', extract(epoch from now())*1000);
+        const hint = output.includes("already exists")
+          ? " Hint: migration journal out of sync — likely squashed migrations were already partially applied. Manually fix the migrations in __drizzle_migrations__."
+          : "";
         return fail({
           message: t("post.errors.network.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
           messageParams: {
-            error: `Migration failed with exit code ${pushResult.status}`,
+            error: `Migration failed with exit code ${pushResult.status}.${hint}`,
             output,
           },
         });

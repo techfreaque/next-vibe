@@ -27,6 +27,7 @@ const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
   path: ["agent", "chat", "folders", "subfolders", "[subFolderId]", "move"],
+  aliases: ["folder-move"] as const,
   allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "patch.title" as const,
@@ -119,7 +120,7 @@ const { PATCH } = createEndpoint({
     responses: {
       default: {
         folderId: "123e4567-e89b-12d3-a456-426614174000",
-        updatedAt: new Date().toISOString(),
+        updatedAt: "2024-01-15T10:00:00.000Z",
       },
     },
   },

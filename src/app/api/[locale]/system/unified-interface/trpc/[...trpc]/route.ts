@@ -33,7 +33,8 @@ async function handler(
   let appRouter: any;
   try {
     // @ts-expect-error -- Doesnt exist if tRPC is not enabled
-    const routerModule = await import("./router");
+    // turbopack-ignore-next-line
+    const routerModule = await import(/* turbopackIgnore: true */ "./router");
     appRouter = routerModule.appRouter;
   } catch {
     return new Response(

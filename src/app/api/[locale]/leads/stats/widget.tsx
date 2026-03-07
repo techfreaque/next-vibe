@@ -9,20 +9,18 @@ import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Checkbox } from "next-vibe-ui/ui/checkbox";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  ArrowDown,
-  ArrowUp,
-  BarChart2,
-  Download,
-  Filter,
-  List,
-  Minus,
-  RefreshCw,
-  Search,
-  Upload,
-  Users,
-  Zap,
-} from "next-vibe-ui/ui/icons";
+import { ArrowDown } from "next-vibe-ui/ui/icons/ArrowDown";
+import { ArrowUp } from "next-vibe-ui/ui/icons/ArrowUp";
+import { BarChart2 } from "next-vibe-ui/ui/icons/BarChart2";
+import { Download } from "next-vibe-ui/ui/icons/Download";
+import { Filter } from "next-vibe-ui/ui/icons/Filter";
+import { List } from "next-vibe-ui/ui/icons/List";
+import { Minus } from "next-vibe-ui/ui/icons/Minus";
+import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
+import { Search } from "next-vibe-ui/ui/icons/Search";
+import { Upload } from "next-vibe-ui/ui/icons/Upload";
+import { Users } from "next-vibe-ui/ui/icons/Users";
+import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Input } from "next-vibe-ui/ui/input";
 import { Label } from "next-vibe-ui/ui/label";
 import { Span } from "next-vibe-ui/ui/span";

@@ -8,20 +8,18 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  Archive,
-  ChevronDown,
-  ChevronRight,
-  Edit,
-  FolderOpen,
-  Inbox,
-  Loader2,
-  RefreshCw,
-  Send,
-  Settings,
-  Star,
-  Trash2,
-} from "next-vibe-ui/ui/icons";
+import { Archive } from "next-vibe-ui/ui/icons/Archive";
+import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { Edit } from "next-vibe-ui/ui/icons/Edit";
+import { FolderOpen } from "next-vibe-ui/ui/icons/FolderOpen";
+import { Inbox } from "next-vibe-ui/ui/icons/Inbox";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
+import { Send } from "next-vibe-ui/ui/icons/Send";
+import { Settings } from "next-vibe-ui/ui/icons/Settings";
+import { Star } from "next-vibe-ui/ui/icons/Star";
+import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { Span } from "next-vibe-ui/ui/span";
 import React, { useCallback, useMemo, useState } from "react";
 

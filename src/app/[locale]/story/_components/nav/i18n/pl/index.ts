@@ -20,6 +20,10 @@ export const translations: typeof enTranslations = {
     title: "Kariera",
     description: "Dołącz do naszego zespołu",
   },
+  invest: {
+    title: "Inwestuj",
+    description: "Wesprzyj otwartą platformę AI",
+  },
   user: {
     dashboard: "Panel",
     completeOnboarding: "Ukończ wdrożenie",

@@ -115,12 +115,12 @@ const { GET } = createEndpoint({
         columns: 6,
         schema: z.enum(DefaultFolderId),
       }),
-      branchIndices: scopedRequestField(scopedTranslation, {
+      leafMessageId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.JSON,
-        label: "get.branchIndices.label" as const,
-        description: "get.branchIndices.description" as const,
-        schema: z.record(z.string(), z.coerce.number()).optional(),
+        fieldType: FieldDataType.UUID,
+        label: "get.leafMessageId.label" as const,
+        description: "get.leafMessageId.description" as const,
+        schema: z.string().uuid().optional(),
       }),
       before: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -166,11 +166,6 @@ const { GET } = createEndpoint({
               content:
                 "get.response.messages.message.parentId.content" as const,
               schema: z.uuid().nullable(),
-            }),
-            depth: scopedResponseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              content: "get.response.messages.message.depth.content" as const,
-              schema: z.coerce.number(),
             }),
             sequenceId: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
@@ -262,37 +257,20 @@ const { GET } = createEndpoint({
           },
         }),
       }),
-      branchMeta: scopedResponseArrayFieldNew(scopedTranslation, {
-        type: WidgetType.CONTAINER,
-        child: scopedObjectFieldNew(scopedTranslation, {
-          type: WidgetType.CONTAINER,
-          title: "get.response.branchMeta.item.title" as const,
-          usage: { response: true },
-          children: {
-            parentId: scopedResponseField(scopedTranslation, {
-              type: WidgetType.TEXT,
-              content: "get.response.branchMeta.item.parentId.content" as const,
-              schema: z.string(),
-            }),
-            siblingCount: scopedResponseField(scopedTranslation, {
-              type: WidgetType.STAT,
-              content:
-                "get.response.branchMeta.item.siblingCount.content" as const,
-              schema: z.number(),
-            }),
-            currentIndex: scopedResponseField(scopedTranslation, {
-              type: WidgetType.STAT,
-              content:
-                "get.response.branchMeta.item.currentIndex.content" as const,
-              schema: z.number(),
-            }),
-          },
-        }),
-      }),
       hasOlderHistory: scopedResponseField(scopedTranslation, {
         type: WidgetType.BADGE,
         content: "get.response.hasOlderHistory.content" as const,
         schema: z.boolean(),
+      }),
+      hasNewerMessages: scopedResponseField(scopedTranslation, {
+        type: WidgetType.BADGE,
+        content: "get.response.hasNewerMessages.content" as const,
+        schema: z.boolean(),
+      }),
+      resolvedLeafMessageId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.resolvedLeafMessageId.content" as const,
+        schema: z.string().uuid().nullable(),
       }),
       oldestLoadedMessageId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -302,6 +280,11 @@ const { GET } = createEndpoint({
       compactionBoundaryId: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "get.response.compactionBoundaryId.content" as const,
+        schema: z.string().uuid().nullable(),
+      }),
+      newerChunkAnchorId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        content: "get.response.newerChunkAnchorId.content" as const,
         schema: z.string().uuid().nullable(),
       }),
     },
@@ -322,10 +305,7 @@ const { GET } = createEndpoint({
     requests: {
       default: {
         rootFolderId: DefaultFolderId.PRIVATE,
-        branchIndices: {
-          "660e8400-e29b-41d4-a716-446655440001": 0,
-          "770e8400-e29b-41d4-a716-446655440002": 1,
-        },
+        leafMessageId: "660e8400-e29b-41d4-a716-446655440099",
       },
     },
     responses: {
@@ -337,7 +317,6 @@ const { GET } = createEndpoint({
             role: ChatMessageRole.USER,
             content: "Hello, how can you help me?",
             parentId: null,
-            depth: 0,
             sequenceId: null,
             authorId: "770e8400-e29b-41d4-a716-446655440000",
             authorName: null,
@@ -351,14 +330,16 @@ const { GET } = createEndpoint({
             upvotes: 0,
             downvotes: 0,
             searchVector: null,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+            createdAt: "2024-01-15T10:00:00.000Z",
+            updatedAt: "2024-01-15T10:00:00.000Z",
           },
         ],
-        branchMeta: [],
         hasOlderHistory: false,
+        hasNewerMessages: false,
+        resolvedLeafMessageId: null,
         oldestLoadedMessageId: null,
         compactionBoundaryId: null,
+        newerChunkAnchorId: null,
       },
     },
   },

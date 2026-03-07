@@ -12,7 +12,6 @@ import type { z } from "zod";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { scopedTranslation as creditsScopedTranslation } from "@/app/api/[locale]/credits/i18n";
 import { CreditRepository } from "@/app/api/[locale]/credits/repository";
-import { emailHandlingRepository } from "@/app/api/[locale]/emails/smtp-client/email-handling/repository";
 import type { EmailHandleRequestOutput } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import type { EmailFunctionType } from "@/app/api/[locale]/emails/smtp-client/email-handling/types";
 import { scopedTranslation as sharedScopedTranslation } from "@/app/api/[locale]/shared/i18n";
@@ -23,7 +22,6 @@ import {
   isFileResponse,
   isStreamingResponse,
 } from "@/app/api/[locale]/shared/types/response.schema";
-import { handleSms } from "@/app/api/[locale]/sms/handle-sms";
 import type { SmsFunctionType } from "@/app/api/[locale]/sms/utils";
 import { AuthRepository } from "@/app/api/[locale]/user/auth/repository";
 import type {
@@ -514,6 +512,8 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     }
 
     if (email?.afterHandlerEmails) {
+      const { emailHandlingRepository } =
+        await import("@/app/api/[locale]/emails/smtp-client/email-handling/repository");
       await emailHandlingRepository.handleEmails<
         T["types"]["RequestOutput"],
         T["types"]["ResponseOutput"],
@@ -541,6 +541,7 @@ export function createGenericHandler<T extends CreateApiEndpointAny>(
     }
 
     if (sms?.afterHandlerSms) {
+      const { handleSms } = await import("@/app/api/[locale]/sms/handle-sms");
       await handleSms<
         T["types"]["RequestOutput"],
         T["types"]["ResponseOutput"],

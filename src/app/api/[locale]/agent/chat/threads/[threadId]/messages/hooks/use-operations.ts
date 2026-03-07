@@ -24,6 +24,7 @@ import {
 import type { UseAIStreamReturn } from "../../../../../ai-stream/stream/hooks/use-ai-stream";
 import { DefaultFolderId } from "../../../../config";
 import type { ChatMessage } from "../../../../db";
+import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
 import type { ToolConfigItem } from "../../../../settings/definition";
 import { useStreamingMessagesStore } from "./streaming-messages-store";
 
@@ -88,7 +89,6 @@ interface MessageOperationsDeps {
     threads: Record<string, { rootFolderId: DefaultFolderId }>;
     setLoading: (loading: boolean) => void;
     getThreadMessages: (threadId: string) => ChatMessage[];
-    getBranchIndices: (threadId: string) => Record<string, number>;
     deleteMessage: (messageId: string) => void;
     updateMessage: (messageId: string, updates: Partial<ChatMessage>) => void;
   };
@@ -123,6 +123,7 @@ export function useMessageOperations(
 
   const user = useWidgetUser();
   const logger = useWidgetLogger();
+  const setLeafMessageId = useChatNavigationStore((s) => s.setLeafMessageId);
 
   const {
     streamingMessages,
@@ -198,6 +199,7 @@ export function useMessageOperations(
         currentSubFolderId,
         chatStore,
         settings,
+        setLeafMessageId,
       });
     },
     [
@@ -207,6 +209,7 @@ export function useMessageOperations(
       currentSubFolderId,
       chatStore,
       settings,
+      setLeafMessageId,
     ],
   );
 
@@ -224,6 +227,7 @@ export function useMessageOperations(
         currentSubFolderId,
         chatStore,
         settings,
+        setLeafMessageId,
       });
     },
     [
@@ -233,6 +237,7 @@ export function useMessageOperations(
       currentSubFolderId,
       chatStore,
       settings,
+      setLeafMessageId,
     ],
   );
 

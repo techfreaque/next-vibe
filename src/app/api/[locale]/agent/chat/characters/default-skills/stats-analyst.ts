@@ -1,16 +1,16 @@
-import { EMAIL_STATS_ALIAS } from "@/app/api/[locale]/emails/messages/stats/definition";
-import { LEADS_LIST_ALIAS } from "@/app/api/[locale]/leads/list/definition";
-import { LEADS_STATS_ALIAS } from "@/app/api/[locale]/leads/stats/definition";
-import { REFERRAL_STATS_ALIAS } from "@/app/api/[locale]/referral/stats/definition";
+import { EMAIL_STATS_ALIAS } from "@/app/api/[locale]/emails/messages/stats/constants";
+import { LEADS_LIST_ALIAS } from "@/app/api/[locale]/leads/list/constants";
+import { LEADS_STATS_ALIAS } from "@/app/api/[locale]/leads/stats/constants";
+import { REFERRAL_STATS_ALIAS } from "@/app/api/[locale]/referral/stats/constants";
 import { TOOL_HELP_ALIAS } from "@/app/api/[locale]/system/help/constants";
-import { CRON_STATS_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/cron/stats/definition";
+import { CRON_STATS_ALIAS } from "@/app/api/[locale]/system/unified-interface/tasks/cron/stats/constants";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { USERS_LIST_ALIAS } from "@/app/api/[locale]/users/list/definition";
-import { USERS_STATS_ALIAS } from "@/app/api/[locale]/users/stats/definition";
+import { USERS_LIST_ALIAS } from "@/app/api/[locale]/users/list/constants";
+import { USERS_STATS_ALIAS } from "@/app/api/[locale]/users/stats/constants";
 
 import { TtsVoice } from "../../../text-to-speech/enum";
-import { MEMORY_ADD_ALIAS } from "../../memories/create/definition";
-import { MEMORY_LIST_ALIAS } from "../../memories/definition";
+import { MEMORY_LIST_ALIAS } from "../../memories/constants";
+import { MEMORY_ADD_ALIAS } from "../../memories/create/constants";
 import type { Character } from "../config";
 import { tool } from "../config";
 import { CharacterCategory, CharacterOwnershipType } from "../enum";

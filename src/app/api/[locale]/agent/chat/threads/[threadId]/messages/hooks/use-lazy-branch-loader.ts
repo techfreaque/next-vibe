@@ -1,11 +1,14 @@
 /**
  * Lazy Branch Loader Hook
- * Fetches only the active branch path instead of all messages.
- * Loads additional branches on-demand when the user switches.
- * Visited branches accumulate in the store — switching back is instant.
+ * Fetches all messages in the current chunk (compaction boundary to all leaf tips).
+ * Branch switching is purely local — no refetch, no data change, just display change.
+ * The cache key is stable: keyed only on threadId + rootFolderId (not leafMessageId).
  *
- * Uses useEndpoint() for the initial path fetch so React Query cache + initialData work.
- * Uses typed executeQuery() for the "load older history" pagination (user-triggered).
+ * Uses useEndpoint() for the initial chunk fetch so React Query cache + initialData work.
+ * Uses typed executeQuery() for "load older history" and "load newer history" pagination (user-triggered).
+ *
+ * Older/newer state is communicated via hasOlderHistory / hasNewerHistory flags
+ * in message metadata, set server-side on the boundary messages.
  */
 
 import { parseError } from "next-vibe/shared/utils";
@@ -18,33 +21,24 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { DefaultFolderId } from "../../../../config";
-import type { ChatMessage, ChatThread } from "../../../../db";
+import type { ChatMessage, ChatThread, MessageMetadata } from "../../../../db";
 import { useChatStore } from "../../../../hooks/store";
 import messagesDefinitions from "../definition";
 import type { PathGetResponseOutput } from "../path/definition";
 import pathDefinitions from "../path/definition";
 
-/**
- * Branch metadata for fork points along the active path
- */
-export interface BranchMeta {
-  parentId: string;
-  siblingCount: number;
-  currentIndex: number;
-}
-
 interface LazyBranchLoaderReturn {
-  branchMeta: BranchMeta[];
   isLoadingBranch: boolean;
-  hasOlderHistory: boolean;
   isLoadingOlderHistory: boolean;
-  loadOlderHistory: () => void;
+  loadOlderHistory: (oldestMessageId: string) => void;
+  isLoadingNewerHistory: boolean;
+  loadNewerHistory: (anchorId: string) => void;
   /** Clear the fetch cache for a thread so the next visit triggers a fresh DB fetch */
   invalidateThread: (threadId: string) => void;
 }
 
 /**
- * Hook for lazy loading only the active branch path.
+ * Hook for lazy loading the current chunk of messages.
  * Pass activeThreadId = null to disable this hook (when feature flag is off).
  * Pass initialPathData to pre-populate the React Query cache from SSR.
  */
@@ -53,26 +47,29 @@ export function useLazyBranchLoader(
   logger: EndpointLogger,
   activeThreadId: string | null,
   threads: Record<string, ChatThread>,
-  branchIndices: Record<string, number>,
+  leafMessageId: string | null,
   addMessage: (message: ChatMessage) => void,
+  updateMessage: (messageId: string, updates: Partial<ChatMessage>) => void,
   setThreadLoadMode: (threadId: string, mode: "full" | "partial") => void,
   user: JwtPayloadType,
   /** SSR-prefetched path data — pre-populates React Query cache, skips initial fetch */
   initialPathData?: PathGetResponseOutput | null,
   /** Current root folder ID from navigation — used as fallback when thread not yet in store */
   currentRootFolderId?: DefaultFolderId,
+  /** Update the navigation store's leafMessageId when server resolves to a different leaf */
+  setLeafMessageId?: (leafMessageId: string | null) => void,
 ): LazyBranchLoaderReturn {
-  const [hasOlderHistory, setHasOlderHistory] = useState(false);
   const [isLoadingOlderHistory, setIsLoadingOlderHistory] = useState(false);
+  const [isLoadingNewerHistory, setIsLoadingNewerHistory] = useState(false);
 
-  // Track the oldest loaded message ID for cursor-based scroll-back
-  const oldestLoadedMessageIdRef = useRef<string | null>(null);
-
-  // Separate abort controller for loadOlderHistory (independent lifecycle)
+  // Separate abort controllers (independent lifecycle)
   const olderHistoryAbortRef = useRef<AbortController | null>(null);
-  // Snapshot branchIndices at request time to avoid stale closure
-  const branchIndicesRef = useRef(branchIndices);
-  branchIndicesRef.current = branchIndices;
+  const newerHistoryAbortRef = useRef<AbortController | null>(null);
+
+  // Keep a render-time ref to current leafMessageId so the sync effect can
+  // read the current value without it being a dependency.
+  const leafMessageIdRef = useRef<string | null>(null);
+  leafMessageIdRef.current = leafMessageId;
 
   // Determine if this thread is pending create (not yet persisted).
   // Use currentRootFolderId as fallback when thread not yet synced to store.
@@ -84,29 +81,31 @@ export function useLazyBranchLoader(
   const isPendingCreate =
     !!activeThreadId && pendingNewThreadIds.has(activeThreadId);
 
-  // Use useEndpoint so React Query cache + initialData work for the path fetch.
+  // Use useEndpoint so React Query cache + initialData work for the chunk fetch.
   // Enabled only when: data is loaded, thread exists, not pending create.
   // Incognito threads use useClientRoute on the path endpoint to load from localStorage.
+  // Cache key is stable: keyed only on threadId + rootFolderId (NOT leafMessageId).
+  // Branch switching is purely local — no refetch, no data change.
   const pathOptions = useMemo(
     () => ({
       read: {
         queryOptions: {
           enabled: !!activeThreadId && !isPendingCreate,
           refetchOnWindowFocus: false,
-          staleTime: 30_000, // 30s — path changes on branch switch
+          staleTime: 30_000,
         },
         urlPathParams: { threadId: activeThreadId ?? "" },
-        initialState: { rootFolderId, branchIndices },
+        initialState: {
+          rootFolderId,
+          // NOTE: leafMessageId intentionally NOT included here.
+          // The cache key must be stable across branch switches.
+          // The server uses the latest message in the thread when no leafMessageId is provided.
+        },
+        // Seed the React Query cache with SSR data on initial load.
         initialData: initialPathData ?? undefined,
       },
     }),
-    [
-      activeThreadId,
-      isPendingCreate,
-      rootFolderId,
-      branchIndices,
-      initialPathData,
-    ],
+    [activeThreadId, isPendingCreate, rootFolderId, initialPathData],
   );
 
   const pathEndpoint = useEndpoint(pathDefinitions, pathOptions, logger, user);
@@ -114,142 +113,303 @@ export function useLazyBranchLoader(
   const isLoadingBranch = pathEndpoint.read?.isLoading ?? false;
 
   /**
-   * Reset per-thread state when switching threads.
+   * Abort in-flight requests when switching threads.
    */
   useEffect(() => {
-    setHasOlderHistory(false);
-    setIsLoadingOlderHistory(false);
-    oldestLoadedMessageIdRef.current = null;
-
-    // Abort any in-flight older-history requests from previous thread
-    olderHistoryAbortRef.current?.abort();
-    olderHistoryAbortRef.current = null;
+    return (): void => {
+      olderHistoryAbortRef.current?.abort();
+      newerHistoryAbortRef.current?.abort();
+    };
   }, [activeThreadId]);
 
   /**
    * Sync path data from React Query into Zustand store when it arrives.
+   * Since the server now returns ALL messages in the chunk (all branch paths),
+   * branch switching is purely local — no refetch needed.
    */
   useEffect(() => {
     if (!pathData || !activeThreadId) {
       return;
     }
 
-    if (pathData.messages) {
-      for (const message of pathData.messages) {
-        addMessage({
-          ...message,
-          createdAt: new Date(message.createdAt),
-          updatedAt: new Date(message.updatedAt),
-        });
-      }
+    const messages = pathData.messages ?? [];
+
+    for (const message of messages) {
+      addMessage({
+        ...message,
+        createdAt: new Date(message.createdAt),
+        updatedAt: new Date(message.updatedAt),
+      });
     }
 
-    setHasOlderHistory(pathData.hasOlderHistory ?? false);
-    oldestLoadedMessageIdRef.current = pathData.oldestLoadedMessageId ?? null;
     setThreadLoadMode(activeThreadId, "partial");
 
-    logger.debug("Chat: Synced branch path from query", {
-      threadId: activeThreadId,
-      messageCount: pathData.messages?.length ?? 0,
-      forkPoints: pathData.branchMeta?.length ?? 0,
-      hasOlderHistory: pathData.hasOlderHistory,
-    });
-  }, [pathData, activeThreadId, addMessage, setThreadLoadMode, logger]);
-
-  /**
-   * Load older history (triggered by scroll-up sentinel).
-   * Uses its own AbortController, aborted on thread switch.
-   * Captures branchIndices via ref to avoid stale closure.
-   */
-  const loadOlderHistory = useCallback((): void => {
-    if (
-      !activeThreadId ||
-      !hasOlderHistory ||
-      isLoadingOlderHistory ||
-      !oldestLoadedMessageIdRef.current
-    ) {
-      return;
+    // Correct URL when server resolves to a different leaf (latest_leaf CTE).
+    // Only act when resolvedLeafMessageId differs from the current leafMessageId in the URL —
+    // this handles the case where the client passes a branch-root sibling ID and the server
+    // walks down to the true leaf.
+    const currentLeaf = leafMessageIdRef.current;
+    const resolvedLeaf = pathData.resolvedLeafMessageId;
+    if (resolvedLeaf && resolvedLeaf !== currentLeaf) {
+      // Replace URL (not pushState) — this is a correction, not a navigation
+      if (typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        url.searchParams.set("message", resolvedLeaf);
+        window.history.replaceState(null, "", url.toString());
+      }
+      // Update the navigation store's leafMessageId to the resolved leaf
+      setLeafMessageId?.(resolvedLeaf);
     }
 
-    // Abort any previous older-history request
-    olderHistoryAbortRef.current?.abort();
-    const controller = new AbortController();
-    olderHistoryAbortRef.current = controller;
+    logger.debug("Chat: Synced chunk from query", {
+      threadId: activeThreadId,
+      messageCount: messages.length,
+    });
+  }, [
+    pathData,
+    activeThreadId,
+    addMessage,
+    setThreadLoadMode,
+    logger,
+    setLeafMessageId,
+  ]);
 
-    // Capture values at call time (not at callback creation time)
-    const threadId = activeThreadId;
-    const indices = branchIndicesRef.current;
-    const before = oldestLoadedMessageIdRef.current;
+  /**
+   * Load older history (triggered by "Show older messages" button click).
+   * oldestMessageId: the ID of the oldest message currently loaded.
+   */
+  const loadOlderHistory = useCallback(
+    (oldestMessageId: string): void => {
+      if (!activeThreadId || isLoadingOlderHistory) {
+        return;
+      }
 
-    setIsLoadingOlderHistory(true);
+      // Abort any previous older-history request
+      olderHistoryAbortRef.current?.abort();
+      const controller = new AbortController();
+      olderHistoryAbortRef.current = controller;
 
-    const loadOlder = async (): Promise<void> => {
-      try {
-        const response = await executeQuery({
-          endpoint: pathDefinitions.GET,
-          logger,
-          requestData: {
-            rootFolderId: thread?.rootFolderId ?? DefaultFolderId.PRIVATE,
-            branchIndices: indices,
-            before,
-          },
-          pathParams: { threadId },
-          locale,
-          user,
-        });
+      const threadId = activeThreadId;
 
-        if (controller.signal.aborted) {
-          return;
-        }
+      setIsLoadingOlderHistory(true);
 
-        if (response.success) {
-          const data = response.data;
+      const loadOlder = async (): Promise<void> => {
+        try {
+          const response = await executeQuery({
+            endpoint: pathDefinitions.GET,
+            logger,
+            requestData: {
+              rootFolderId: thread?.rootFolderId ?? DefaultFolderId.PRIVATE,
+              before: oldestMessageId,
+            },
+            pathParams: { threadId },
+            locale,
+            user,
+          });
 
-          if (data.messages) {
-            for (const message of data.messages) {
-              addMessage({
-                ...message,
-                createdAt: new Date(message.createdAt),
-                updatedAt: new Date(message.updatedAt),
-              });
-            }
+          if (controller.signal.aborted) {
+            return;
           }
 
-          setHasOlderHistory(data.hasOlderHistory ?? false);
-          oldestLoadedMessageIdRef.current = data.oldestLoadedMessageId ?? null;
+          if (response.success) {
+            const data = response.data;
 
-          logger.debug("Chat: Loaded older history", {
+            // Clear hasOlderHistory flag on the current oldest message — the older
+            // chunk now replaces it (the chunk itself will have the flag if needed).
+            const currentOldest =
+              useChatStore.getState().messages[oldestMessageId];
+            if (currentOldest) {
+              updateMessage(oldestMessageId, {
+                metadata: {
+                  ...(currentOldest.metadata as MessageMetadata | null),
+                  hasOlderHistory: false,
+                },
+              });
+            }
+
+            if (data.messages) {
+              for (const message of data.messages) {
+                addMessage({
+                  ...message,
+                  createdAt: new Date(message.createdAt),
+                  updatedAt: new Date(message.updatedAt),
+                });
+              }
+            }
+
+            // If this older chunk's newest message already has a newer chunk loaded,
+            // clear the hasNewerHistory flag so no stale button appears.
+            if (data.newerChunkAnchorId) {
+              const alreadyLoaded =
+                !!useChatStore.getState().messages[data.newerChunkAnchorId];
+              if (alreadyLoaded) {
+                // The leaf message that had the flag — find it by newerAnchorId
+                const msgs = useChatStore.getState().messages;
+                for (const msg of Object.values(msgs)) {
+                  const meta = msg.metadata as MessageMetadata | null;
+                  if (meta?.newerAnchorId === data.newerChunkAnchorId) {
+                    updateMessage(msg.id, {
+                      metadata: {
+                        ...meta,
+                        hasNewerHistory: false,
+                        newerAnchorId: null,
+                      },
+                    });
+                    break;
+                  }
+                }
+              }
+            }
+
+            logger.debug("Chat: Loaded older history", {
+              threadId,
+              olderMessageCount: data.messages?.length ?? 0,
+              hasMoreHistory: data.hasOlderHistory,
+            });
+          }
+        } catch (error) {
+          if (controller.signal.aborted) {
+            return;
+          }
+          logger.error("Chat: Error loading older history", {
             threadId,
-            olderMessageCount: data.messages?.length ?? 0,
-            hasMoreHistory: data.hasOlderHistory,
+            error: parseError(error).message,
           });
+        } finally {
+          if (!controller.signal.aborted) {
+            setIsLoadingOlderHistory(false);
+          }
         }
-      } catch (error) {
-        if (controller.signal.aborted) {
-          return;
-        }
-        logger.error("Chat: Error loading older history", {
-          threadId,
-          error: parseError(error).message,
-        });
-      } finally {
-        if (!controller.signal.aborted) {
-          setIsLoadingOlderHistory(false);
-        }
-      }
-    };
+      };
 
-    void loadOlder();
-  }, [
-    activeThreadId,
-    hasOlderHistory,
-    isLoadingOlderHistory,
-    locale,
-    logger,
-    addMessage,
-    user,
-    thread?.rootFolderId,
-  ]);
+      void loadOlder();
+    },
+    [
+      activeThreadId,
+      isLoadingOlderHistory,
+      locale,
+      logger,
+      addMessage,
+      updateMessage,
+      user,
+      thread?.rootFolderId,
+    ],
+  );
+
+  /**
+   * Load newer history (triggered by "Show newer messages" button click).
+   * anchorId: the compacting message ID stored in the leaf's newerAnchorId metadata.
+   */
+  const loadNewerHistory = useCallback(
+    (anchorId: string): void => {
+      if (!activeThreadId || isLoadingNewerHistory) {
+        return;
+      }
+
+      newerHistoryAbortRef.current?.abort();
+      const controller = new AbortController();
+      newerHistoryAbortRef.current = controller;
+
+      const threadId = activeThreadId;
+
+      setIsLoadingNewerHistory(true);
+
+      const loadNewer = async (): Promise<void> => {
+        try {
+          // Load the next chunk by using the compaction anchor as the leafMessageId.
+          // The server walks DOWN from there to find its leaf, returning the next chunk.
+          const response = await executeQuery({
+            endpoint: pathDefinitions.GET,
+            logger,
+            requestData: {
+              rootFolderId: thread?.rootFolderId ?? DefaultFolderId.PRIVATE,
+              leafMessageId: anchorId,
+            },
+            pathParams: { threadId },
+            locale,
+            user,
+          });
+
+          if (controller.signal.aborted) {
+            return;
+          }
+
+          if (response.success) {
+            const data = response.data;
+
+            // Clear hasNewerHistory flag on the leaf message that triggered this load.
+            // The new chunk's messages will carry their own flags if further chunks exist.
+            const msgs = useChatStore.getState().messages;
+            for (const msg of Object.values(msgs)) {
+              const meta = msg.metadata as MessageMetadata | null;
+              if (meta?.newerAnchorId === anchorId) {
+                updateMessage(msg.id, {
+                  metadata: {
+                    ...meta,
+                    hasNewerHistory: false,
+                    newerAnchorId: null,
+                  },
+                });
+                break;
+              }
+            }
+
+            if (data.messages) {
+              for (const message of data.messages) {
+                addMessage({
+                  ...message,
+                  createdAt: new Date(message.createdAt),
+                  updatedAt: new Date(message.updatedAt),
+                });
+              }
+            }
+
+            // Update leafMessageId to the resolved leaf of the newer chunk.
+            const resolvedLeaf = data.resolvedLeafMessageId;
+            if (resolvedLeaf) {
+              if (typeof window !== "undefined") {
+                const url = new URL(window.location.href);
+                url.searchParams.set("message", resolvedLeaf);
+                window.history.replaceState(null, "", url.toString());
+              }
+              setLeafMessageId?.(resolvedLeaf);
+            }
+
+            logger.debug("Chat: Loaded newer history", {
+              threadId,
+              newerMessageCount: data.messages?.length ?? 0,
+              resolvedLeaf,
+            });
+          }
+        } catch (error) {
+          if (controller.signal.aborted) {
+            return;
+          }
+          logger.error("Chat: Error loading newer history", {
+            threadId,
+            error: parseError(error).message,
+          });
+        } finally {
+          if (!controller.signal.aborted) {
+            setIsLoadingNewerHistory(false);
+          }
+        }
+      };
+
+      void loadNewer();
+    },
+    [
+      activeThreadId,
+      isLoadingNewerHistory,
+      locale,
+      logger,
+      addMessage,
+      updateMessage,
+      user,
+      thread?.rootFolderId,
+      setLeafMessageId,
+    ],
+  );
 
   /**
    * Clear the React Query cache for a thread so the next navigation triggers a fresh DB fetch.
@@ -264,14 +424,12 @@ export function useLazyBranchLoader(
     [activeThreadId, pathEndpoint.read],
   );
 
-  const branchMeta = pathData?.branchMeta ?? [];
-
   return {
-    branchMeta,
     isLoadingBranch,
-    hasOlderHistory,
     isLoadingOlderHistory,
     loadOlderHistory,
+    isLoadingNewerHistory,
+    loadNewerHistory,
     invalidateThread,
   };
 }

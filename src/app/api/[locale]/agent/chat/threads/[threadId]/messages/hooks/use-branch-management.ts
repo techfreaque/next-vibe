@@ -1,278 +1,237 @@
 /**
  * Branch Management Hook
- * Handles branch switching and auto-switching for linear message view
+ * Derives branchIndices from leafMessageId and the loaded message set.
+ * Branch switching updates the URL ?message= param (persistent, linkable).
  *
- * Features:
- * - Recursive auto-switching to new branches (including nested branches)
- * - Persistence of user-selected branches (survives page refresh)
- * - Distinguishes between user-initiated and automatic switches
- * - Safe validation of stored state
- * - Uses Zustand store for centralized state management
+ * The leaf message ID is the single source of truth for which branch is shown.
+ * Every ancestor is uniquely determined by walking up the parentId chain.
  */
+
+"use client";
 
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { ChatMessage } from "../../../../db";
-import { useChatStore } from "../../../../hooks/store";
-import { useBranchPersistence } from "./use-branch-persistence";
+import { useChatNavigationStore } from "../../../../hooks/use-chat-navigation-store";
+
+export const BRANCH_INDEX_KEY = "__root__";
 
 interface UseBranchManagementProps {
+  /** All messages loaded in the current branch window */
   activeThreadMessages: ChatMessage[];
+  /** The current leaf message ID (from URL ?message= param) */
+  leafMessageId: string | null;
+  /** The active thread ID */
   threadId: string;
   logger: EndpointLogger;
 }
 
 interface UseBranchManagementReturn {
+  /** Map of parentId → selected child index, derived from leafMessageId */
   branchIndices: Record<string, number>;
+  /** Switch branch: find the index-th sibling of children of parentId, update URL */
   handleSwitchBranch: (parentMessageId: string, branchIndex: number) => void;
 }
 
-// Stable empty object to avoid creating new objects on every render
 const EMPTY_BRANCH_INDICES: Record<string, number> = {};
 
-export const BRANCH_INDEX_KEY = "__root__";
+/**
+ * Derive branchIndices by walking UP from leafMessageId through loaded messages.
+ * For each node, find its index among its siblings (sorted by createdAt).
+ */
+function deriveBranchIndices(
+  messages: ChatMessage[],
+  leafMessageId: string | null,
+): Record<string, number> {
+  if (!leafMessageId || messages.length === 0) {
+    return EMPTY_BRANCH_INDICES;
+  }
+
+  const byId = new Map<string, ChatMessage>();
+  for (const msg of messages) {
+    byId.set(msg.id, msg);
+  }
+
+  // Build parentId → children (sorted by createdAt)
+  const childrenByParent = new Map<string | null, ChatMessage[]>();
+  for (const msg of messages) {
+    const key = msg.parentId ?? null;
+    const arr = childrenByParent.get(key) ?? [];
+    arr.push(msg);
+    childrenByParent.set(key, arr);
+  }
+  for (const [key, arr] of childrenByParent.entries()) {
+    childrenByParent.set(
+      key,
+      arr.toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
+    );
+  }
+
+  const indices: Record<string, number> = {};
+
+  // Walk up from leaf
+  let currentId: string | null = leafMessageId;
+  while (currentId) {
+    const msg = byId.get(currentId);
+    if (!msg) {
+      break;
+    }
+
+    const siblings = childrenByParent.get(msg.parentId ?? null) ?? [];
+    if (siblings.length > 1) {
+      const idx = siblings.findIndex((s) => s.id === currentId);
+      const key = msg.parentId ?? BRANCH_INDEX_KEY;
+      if (idx >= 0) {
+        indices[key] = idx;
+      }
+    }
+
+    currentId = msg.parentId;
+  }
+
+  return Object.keys(indices).length > 0 ? indices : EMPTY_BRANCH_INDICES;
+}
+
+// setLeafMessage is now just calling the navigation store's setLeafMessageId,
+// which handles the URL update internally.
 
 export function useBranchManagement({
   activeThreadMessages,
+  leafMessageId,
   threadId,
   logger,
 }: UseBranchManagementProps): UseBranchManagementReturn {
-  // Get branch indices from Zustand store
-  // Get the raw branchIndices object and memoize the result for this thread
-  const allBranchIndices = useChatStore((state) => state.branchIndices);
+  const setLeafMessageId = useChatNavigationStore((s) => s.setLeafMessageId);
+
+  // Derive branchIndices from the leaf + loaded messages (local — for branch navigator rendering)
   const branchIndices = useMemo(
-    () => allBranchIndices[threadId] ?? EMPTY_BRANCH_INDICES,
-    [allBranchIndices, threadId],
+    () => deriveBranchIndices(activeThreadMessages, leafMessageId),
+    [activeThreadMessages, leafMessageId],
   );
 
-  const setBranchIndicesInStore = useChatStore(
-    (state) => state.setBranchIndices,
-  );
-  const updateBranchIndex = useChatStore((state) => state.updateBranchIndex);
-
-  // Track initialization state
-  const isInitializedRef = useRef(false);
-
-  // Track message IDs to detect new messages (more reliable than count)
-  const messageIdsRef = useRef<Set<string>>(new Set());
-
-  // Track message count to detect deletions
-  const messageCountRef = useRef<number>(0);
-
-  // Persistence hooks
-  const { loadPersistedState, saveUserSelection, validateIndices } =
-    useBranchPersistence({
-      threadId,
-      messages: activeThreadMessages,
-      logger,
-    });
+  // Track message IDs to detect new messages for auto-switch
+  const prevMessageIdsRef = useRef<Set<string>>(new Set());
+  const leafMessageIdRef = useRef(leafMessageId);
+  leafMessageIdRef.current = leafMessageId;
 
   /**
-   * Load persisted branch state when thread changes
-   * Resets state when switching to a different thread
+   * Auto-switch to new leaf when a new message arrives.
+   * If the new message is a child of the current leaf (or current path's leaf),
+   * update URL to the new message ID.
    */
   useEffect(() => {
-    // Reset initialization flag when thread changes
-    isInitializedRef.current = false;
-    messageIdsRef.current = new Set();
-    messageCountRef.current = 0;
-
-    // Load persisted state for this thread
-    void (async (): Promise<void> => {
-      const persistedIndices = await loadPersistedState();
-      setBranchIndicesInStore(threadId, persistedIndices);
-
-      // Mark as initialized
-      isInitializedRef.current = true;
-    })();
-  }, [threadId, loadPersistedState, setBranchIndicesInStore]);
-
-  /**
-   * Handler for user-initiated branch switching
-   * Saves selection to localStorage
-   */
-  const handleSwitchBranch = useCallback(
-    (parentMessageId: string, branchIndex: number): void => {
-      // Update store
-      updateBranchIndex(threadId, parentMessageId, branchIndex);
-
-      // Save user's selection for persistence
-      saveUserSelection(parentMessageId, branchIndex);
-    },
-    [threadId, updateBranchIndex, saveUserSelection],
-  );
-
-  /**
-   * Build a map of all branch points in the message tree
-   * Returns: Map<parentId, children[]> where children.length > 1
-   */
-  const buildBranchMap = useCallback(
-    (messages: ChatMessage[]): Map<string, ChatMessage[]> => {
-      const branchMap = new Map<string, ChatMessage[]>();
-
-      // Group messages by parent
-      const childrenMap = new Map<string, ChatMessage[]>();
-      const rootMessages: ChatMessage[] = [];
-
-      for (const msg of messages) {
-        if (msg.parentId) {
-          const siblings = childrenMap.get(msg.parentId) || [];
-          siblings.push(msg);
-          childrenMap.set(msg.parentId, siblings);
-        } else {
-          rootMessages.push(msg);
-        }
-      }
-
-      // Add root branches if multiple roots exist
-      if (rootMessages.length > 1) {
-        branchMap.set(
-          BRANCH_INDEX_KEY,
-          rootMessages.toSorted(
-            (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
-          ),
-        );
-      }
-
-      // Add all branch points (where children > 1)
-      for (const [parentId, children] of childrenMap.entries()) {
-        if (children.length > 1) {
-          branchMap.set(
-            parentId,
-            children.toSorted(
-              (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
-            ),
-          );
-        }
-      }
-
-      return branchMap;
-    },
-    [],
-  );
-
-  /**
-   * Recursive auto-switching to newly created branches
-   * Detects new messages and switches to them if they create new branches
-   */
-  useEffect(() => {
-    if (!isInitializedRef.current) {
-      // Wait for initialization to complete
+    if (!threadId) {
       return;
     }
 
-    // Build set of current message IDs
-    const currentMessageIds = new Set(activeThreadMessages.map((m) => m.id));
+    const currentIds = new Set(activeThreadMessages.map((m) => m.id));
+    const prevIds = prevMessageIdsRef.current;
+    prevMessageIdsRef.current = currentIds;
 
-    // Find new messages (IDs that didn't exist before)
-    const newMessageIds = [...currentMessageIds].filter(
-      (id) => !messageIdsRef.current.has(id),
-    );
-
-    // Update tracked IDs
-    messageIdsRef.current = currentMessageIds;
-
-    if (newMessageIds.length === 0) {
-      return; // No new messages
+    if (prevIds.size === 0) {
+      // Initial load — don't auto-switch, URL already has the right leaf
+      return;
     }
 
-    // Get the new messages sorted by creation time (newest first)
     const newMessages = activeThreadMessages
-      .filter((msg) => newMessageIds.includes(msg.id))
+      .filter((m) => !prevIds.has(m.id))
       .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
     if (newMessages.length === 0) {
       return;
     }
 
-    // Build branch map to understand the tree structure
-    const branchMap = buildBranchMap(activeThreadMessages);
-
-    // Process each new message and check if it creates a branch
-    const updatesToApply: Record<string, number> = {};
-
-    for (const newMsg of newMessages) {
-      const parentKey = newMsg.parentId || BRANCH_INDEX_KEY;
-      const siblings = branchMap.get(parentKey);
-
-      if (!siblings || siblings.length <= 1) {
-        continue; // No branching at this level
-      }
-
-      // Find the index of the new message among its siblings
-      const newMsgIndex = siblings.findIndex((s) => s.id === newMsg.id);
-
-      // This is a new branch - auto-switch to it
-      // Only if we haven't already set this in this batch
-      if (newMsgIndex >= 0 && !(parentKey in updatesToApply)) {
-        updatesToApply[parentKey] = newMsgIndex;
-      }
-    }
-
-    // Apply all updates at once if any were found
-    if (Object.keys(updatesToApply).length > 0) {
-      // Update store with new branch indices
-      // Create a new object to avoid mutating the constant
-      const newIndices: Record<string, number> = {
-        ...branchIndices,
-        ...updatesToApply,
-      };
-      setBranchIndicesInStore(threadId, newIndices);
-      // Note: We don't save auto-switches to localStorage
-      // Only user-initiated switches are persisted
-    }
-  }, [
-    activeThreadMessages,
-    buildBranchMap,
-    threadId,
-    branchIndices,
-    setBranchIndicesInStore,
-  ]);
-
-  /**
-   * Validate branch indices when messages are DELETED
-   * Only runs when message count decreases (deletion detected)
-   * This prevents race conditions with the auto-switch effect
-   */
-  useEffect(() => {
-    if (!isInitializedRef.current) {
+    // Auto-switch to the newest new message
+    const newest = newMessages[0];
+    if (!newest) {
       return;
     }
 
-    const currentCount = activeThreadMessages.length;
-    const previousCount = messageCountRef.current;
+    const currentLeaf = leafMessageIdRef.current;
 
-    // Update count for next time
-    messageCountRef.current = currentCount;
-
-    // Only validate when messages are deleted (count decreased)
-    // or when switching threads (count changes significantly)
-    const isMessageDeleted = currentCount < previousCount;
-    const isThreadSwitch = Math.abs(currentCount - previousCount) > 5; // Heuristic
-
-    if (!isMessageDeleted && !isThreadSwitch) {
-      return; // Skip validation for message additions
+    // Only auto-switch when the new message is a direct child of the current leaf.
+    // This handles streaming (new AI response) and retries.
+    // Do NOT auto-switch when:
+    //   - currentLeaf is null (no branch selected — avoid corrupting URL with old messages)
+    //   - loading older history (new messages are not children of the current leaf)
+    if (currentLeaf && newest.parentId === currentLeaf) {
+      logger.debug("[BranchManagement] Auto-switching to new leaf", {
+        newLeaf: newest.id,
+        threadId,
+      });
+      setLeafMessageId(newest.id);
     }
+  }, [activeThreadMessages, threadId, logger, setLeafMessageId]);
 
-    const currentIndices = branchIndices;
-    const validated = validateIndices(currentIndices);
+  /**
+   * Switch branch: find the index-th sibling of children of parentMessageId,
+   * then walk DOWN locally to find the true leaf of that branch.
+   * Update URL to that leaf.
+   *
+   * Walking down locally is correct because the server returns ALL branch paths
+   * in the chunk — every sibling and all their descendants are in the loaded set.
+   */
+  const handleSwitchBranch = useCallback(
+    (parentMessageId: string, branchIndex: number): void => {
+      // Build children map (sorted by createdAt ascending)
+      const childrenByParent = new Map<string | null, ChatMessage[]>();
+      for (const msg of activeThreadMessages) {
+        const key = msg.parentId ?? null;
+        const arr = childrenByParent.get(key) ?? [];
+        arr.push(msg);
+        childrenByParent.set(key, arr);
+      }
+      for (const [key, arr] of childrenByParent.entries()) {
+        childrenByParent.set(
+          key,
+          arr.toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
+        );
+      }
 
-    // Only update if something changed
-    if (JSON.stringify(validated) !== JSON.stringify(currentIndices)) {
-      setBranchIndicesInStore(threadId, validated);
-    }
-  }, [
-    activeThreadMessages,
-    validateIndices,
-    threadId,
-    branchIndices,
-    setBranchIndicesInStore,
-  ]);
+      // Get the children of the fork point
+      const parentKey =
+        parentMessageId === BRANCH_INDEX_KEY ? null : parentMessageId;
+      const children = childrenByParent.get(parentKey) ?? [];
+      const clamped = Math.min(Math.max(0, branchIndex), children.length - 1);
+      const targetSibling = children[clamped];
 
-  return {
-    branchIndices,
-    handleSwitchBranch,
-  };
+      if (!targetSibling) {
+        return;
+      }
+
+      // Walk DOWN from the target sibling to find the true leaf.
+      // Always follow the latest child (by createdAt) at each level.
+      // The chunk contains ALL branch paths so this walk is complete.
+      let trueLeafId = targetSibling.id;
+      let currentId = targetSibling.id;
+      while (true) {
+        const kids = childrenByParent.get(currentId);
+        if (!kids || kids.length === 0) {
+          break;
+        }
+        // kids is sorted ascending — take the last one (latest)
+        const latestKid = kids[kids.length - 1];
+        if (!latestKid) {
+          break;
+        }
+        trueLeafId = latestKid.id;
+        currentId = latestKid.id;
+      }
+
+      logger.debug("[BranchManagement] Switching branch", {
+        parentMessageId,
+        branchIndex,
+        sibling: targetSibling.id,
+        trueLeaf: trueLeafId,
+        threadId,
+      });
+
+      setLeafMessageId(trueLeafId);
+    },
+    [activeThreadMessages, threadId, logger, setLeafMessageId], // eslint-disable-line react-hooks/exhaustive-deps
+  );
+
+  return { branchIndices, handleSwitchBranch };
 }

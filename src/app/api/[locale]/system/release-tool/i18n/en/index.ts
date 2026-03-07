@@ -794,4 +794,14 @@ export const translations = {
     changelog: "Changelog",
     gitOperations: "Git Operations",
   },
+  widget: {
+    runRelease: "Run Release",
+    runAgain: "Run again",
+    complete: "Release complete",
+    failed: "Release failed",
+    published: "Published",
+    errors: "Errors",
+    bullet: "•",
+    warning: "⚠",
+  },
 };

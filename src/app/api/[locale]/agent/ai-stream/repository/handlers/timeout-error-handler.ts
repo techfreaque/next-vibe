@@ -24,7 +24,6 @@ export class TimeoutErrorHandler {
     threadId: string;
     userId: string | undefined;
     lastParentId: string | null;
-    lastDepth: number;
     lastSequenceId: string | null;
     dbWriter: MessageDbWriter;
     logger: EndpointLogger;
@@ -36,7 +35,6 @@ export class TimeoutErrorHandler {
       threadId,
       userId,
       lastParentId,
-      lastDepth,
       lastSequenceId,
       dbWriter,
       logger,
@@ -62,7 +60,6 @@ export class TimeoutErrorHandler {
       errorType: "TIMEOUT_ERROR",
       error: timeoutError,
       parentId: lastParentId,
-      depth: lastDepth,
       sequenceId: lastSequenceId,
       userId,
     });

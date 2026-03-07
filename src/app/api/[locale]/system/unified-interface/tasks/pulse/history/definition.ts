@@ -21,10 +21,9 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { PulseExecutionStatusDB, PulseHealthStatusDB } from "../../enum";
+import { PULSE_HISTORY_ALIAS } from "./constants";
 import { scopedTranslation } from "./i18n";
 import { PulseHistoryContainer } from "./widget";
-
-export const PULSE_HISTORY_ALIAS = "pulse-history" as const;
 
 export const { GET } = createEndpoint({
   scopedTranslation,

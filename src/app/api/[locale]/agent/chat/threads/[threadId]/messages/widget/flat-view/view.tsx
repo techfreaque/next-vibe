@@ -10,7 +10,7 @@ import type { JSX } from "react";
 import React, { useCallback, useMemo, useState } from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
-import type { ChatMessage, ChatThread } from "@/app/api/[locale]/agent/chat/db";
+import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
@@ -24,7 +24,6 @@ import { MessagePreview } from "./preview";
 import { UserIdHoverCard } from "./user-id-hover-card";
 
 interface FlatMessageViewProps {
-  thread: ChatThread;
   messages: ChatMessage[];
   locale: CountryLanguage;
   logger: EndpointLogger;

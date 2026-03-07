@@ -10,6 +10,7 @@ import {
   TOTAL_CHARACTER_COUNT,
   TOTAL_MODEL_COUNT,
 } from "@/app/api/[locale]/agent/models/models";
+import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { scopedTranslation } from "./i18n";
@@ -30,7 +31,10 @@ export function StatsStrip({
     { value: TOTAL_MODEL_COUNT.toString(), label: t("home.stats.models") },
     { value: `${TOTAL_CHARACTER_COUNT}+`, label: t("home.stats.skills") },
     { value: `${totalEndpointCount}+`, label: t("home.stats.endpoints") },
-    { value: "5", label: t("home.stats.interfaces") },
+    {
+      value: Object.keys(Platform).length + 1, // +1 for react-native which uses env
+      label: t("home.stats.interfaces"),
+    },
   ];
 
   return (

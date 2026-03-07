@@ -19,8 +19,7 @@ import {
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../../i18n";
-
-export const ERROR_LOGS_CLEANUP_ALIAS = "error-logs-cleanup" as const;
+import { ERROR_LOGS_CLEANUP_ALIAS } from "./constants";
 
 const { POST } = createEndpoint({
   scopedTranslation,

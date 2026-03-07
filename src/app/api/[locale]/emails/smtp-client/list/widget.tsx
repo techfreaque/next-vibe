@@ -7,15 +7,13 @@
 import { useRouter } from "next-vibe-ui/hooks";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Loader2,
-  Plus,
-  RefreshCw,
-  Search,
-  Server,
-} from "next-vibe-ui/ui/icons";
+import { ChevronLeft } from "next-vibe-ui/ui/icons/ChevronLeft";
+import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
+import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
+import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
+import { Search } from "next-vibe-ui/ui/icons/Search";
+import { Server } from "next-vibe-ui/ui/icons/Server";
 import { Input } from "next-vibe-ui/ui/input";
 import {
   Select,

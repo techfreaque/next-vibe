@@ -136,7 +136,8 @@ function parseFormData(
   | null
   | File
   | File[]
-  | Record<string, string | number | boolean | null | File>
+  | MergedObject
+  | MergedObject[]
 > {
   const result: Record<
     string,
@@ -146,7 +147,8 @@ function parseFormData(
     | null
     | File
     | File[]
-    | Record<string, string | number | boolean | null | File>
+    | MergedObject
+    | MergedObject[]
   > = {};
 
   // First pass: collect all values for each key
@@ -171,19 +173,43 @@ function parseFormData(
       value = values[0];
     }
 
-    if (key.includes(".")) {
+    // Handle bracket+dot notation for arrays of objects: tools[0].toolId
+    // Split on first dot to get the array part and the property part
+    const bracketDotMatch = /^([^[]+)\[(\d+)\]\.(.+)$/.exec(key);
+    if (bracketDotMatch) {
+      const arrayKey = bracketDotMatch[1];
+      const index = parseInt(bracketDotMatch[2], 10);
+      const propPath = bracketDotMatch[3];
+      if (arrayKey) {
+        if (!(arrayKey in result)) {
+          result[arrayKey] = [];
+        }
+        const arr = result[arrayKey] as MergedObject[];
+        if (!arr[index]) {
+          arr[index] = {};
+        }
+        // Handle nested dot notation within the object (e.g. tools[0].nested.prop)
+        const propParts = propPath.split(".");
+        let current: MergedObject = arr[index];
+        for (let i = 0; i < propParts.length - 1; i++) {
+          const part = propParts[i];
+          if (part) {
+            if (!(part in current)) {
+              current[part] = {};
+            }
+            current = current[part] as MergedObject;
+          }
+        }
+        const lastProp = propParts.at(-1);
+        if (lastProp) {
+          current[lastProp] =
+            typeof value === "string" ? tryParseValue(value) : value;
+        }
+      }
+    } else if (key.includes(".")) {
       // Handle dot notation for nested objects
       const parts = key.split(".");
-      let current: Record<
-        string,
-        | string
-        | number
-        | boolean
-        | null
-        | File
-        | File[]
-        | Record<string, string | number | boolean | null | File>
-      > = result;
+      let current: MergedObject = result;
 
       for (let i = 0; i < parts.length - 1; i++) {
         const part = parts[i];
@@ -191,10 +217,7 @@ function parseFormData(
           if (!(part in current)) {
             current[part] = {};
           }
-          current = current[part] as Record<
-            string,
-            string | number | boolean | null | File
-          >;
+          current = current[part] as MergedObject;
         }
       }
 
@@ -280,7 +303,8 @@ export async function parseRequestBody(
     | null
     | File
     | File[]
-    | Record<string, string | number | boolean | null | File>
+    | MergedObject
+    | MergedObject[]
   >
 > {
   try {
@@ -319,7 +343,8 @@ export async function parseRequestBody(
           | null
           | File
           | File[]
-          | Record<string, string | number | boolean | null | File>
+          | MergedObject
+          | MergedObject[]
         >;
       }
 

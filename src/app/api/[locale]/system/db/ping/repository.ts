@@ -109,18 +109,6 @@ export class DatabasePingRepository {
         isAccessible: false,
         output: data.silent ? "" : CONNECTION_FAILED_MESSAGE,
       };
-    } finally {
-      // Only close the connection if explicitly requested (for standalone ping commands)
-      if (!data.keepConnectionOpen) {
-        try {
-          // Check if the pool is already ending or ended
-          if (rawPool.totalCount > 0) {
-            await rawPool.end();
-          }
-        } catch {
-          // Ignore errors when closing the pool
-        }
-      }
     }
   }
 }

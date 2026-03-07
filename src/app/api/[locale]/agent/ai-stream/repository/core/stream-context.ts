@@ -16,7 +16,6 @@ export interface PendingToolData {
   toolCallData: {
     toolCall: ToolCall;
     parentId: string | null;
-    depth: number;
   };
 }
 
@@ -54,14 +53,12 @@ export class StreamContext {
 
   // Parent chain
   currentParentId: string | null;
-  currentDepth: number;
 
   // Sequence ID (links messages in same AI response)
   readonly sequenceId: string;
 
   // For error handling
   lastParentId: string | null;
-  lastDepth: number;
   lastSequenceId: string | null;
 
   // Locale for translations
@@ -70,7 +67,6 @@ export class StreamContext {
   constructor(params: {
     sequenceId: string;
     initialParentId: string | null;
-    initialDepth: number;
     initialAssistantMessageId: string;
     isIncognito: boolean;
     logger: EndpointLogger;
@@ -80,9 +76,7 @@ export class StreamContext {
   }) {
     this.sequenceId = params.sequenceId;
     this.currentParentId = params.initialParentId;
-    this.currentDepth = params.initialDepth;
     this.lastParentId = params.initialParentId;
-    this.lastDepth = params.initialDepth;
     this.lastSequenceId = params.sequenceId;
     this.locale = params.locale;
     this.initialAssistantMessageId = params.initialAssistantMessageId;
@@ -123,7 +117,6 @@ export class StreamContext {
    */
   updateErrorTracking(): void {
     this.lastParentId = this.currentParentId;
-    this.lastDepth = this.currentDepth;
     this.lastSequenceId = this.sequenceId;
   }
 

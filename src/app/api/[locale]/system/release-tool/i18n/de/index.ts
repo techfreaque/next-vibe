@@ -810,4 +810,14 @@ export const translations: typeof enTranslations = {
     changelog: "Changelog",
     gitOperations: "Git-Operationen",
   },
+  widget: {
+    runRelease: "Release starten",
+    runAgain: "Erneut starten",
+    complete: "Release abgeschlossen",
+    failed: "Release fehlgeschlagen",
+    published: "Veröffentlicht",
+    errors: "Fehler",
+    bullet: "•",
+    warning: "⚠",
+  },
 };

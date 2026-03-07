@@ -496,7 +496,7 @@ export class ThreadsRepository {
       // Build folder map for permission inheritance
       // Fetch all folders that are referenced by threads
       const folderIds = dbThreads
-        .map((t) => t.folderId)
+        .map((row) => row.folderId)
         .filter((id): id is string => id !== null);
 
       const allFolders: Record<string, ChatFolder> = {};

@@ -4,7 +4,7 @@
  * Following interface + implementation pattern
  */
 
-import { count, desc, eq, inArray, isNull, or, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNull, or, sql } from "drizzle-orm";
 
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
 import {
@@ -21,7 +21,6 @@ import { formatTasksSummary } from "@/app/api/[locale]/system/unified-interface/
 import { calculateNextExecutionTime } from "@/app/api/[locale]/system/unified-interface/tasks/cron-formatter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CronTaskStatus, TaskCategory, TaskCategoryDB } from "../enum";
@@ -44,7 +43,7 @@ export type { CronTaskResponse };
  * System tasks store scoped translation keys (e.g. "taskSync.name") as displayName/description.
  * Falls back to the raw DB value if the endpoint can't be resolved or translation fails.
  */
-async function translateTaskFields(
+export async function translateTaskFields(
   task: CronTaskResponse,
   locale: CountryLanguage,
 ): Promise<CronTaskResponse> {
@@ -291,48 +290,53 @@ export class CronTasksRepository {
     logger: EndpointLogger,
   ): Promise<ResponseType<{ task: CronTaskResponse; success: boolean }>> {
     try {
-      // null user = internal system call (e.g. task runner) — skip ownership check
-      if (user !== null) {
-        const isAdmin =
-          !user.isPublic && user.roles.includes(UserPermissionRole.ADMIN);
-        const userId = !user.isPublic ? user.id : null;
+      // null user = internal system call (e.g. task runner) — skip ownership check.
+      // For non-null users, ownership is enforced atomically inside the UPDATE WHERE
+      // clause to avoid a TOCTOU race between the read and the write.
+      const isAdmin =
+        user !== null && !user.isPublic
+          ? user.roles.includes(UserPermissionRole.ADMIN)
+          : false;
+      const userId = user !== null && !user.isPublic ? user.id : null;
 
-        // Check ownership before updating
-        const existing = await db
-          .select({ userId: cronTasks.userId })
+      logger.debug(
+        `Updating task "${id}" (${Object.keys(updates).join(", ")})`,
+      );
+
+      // Build the WHERE clause:
+      // - system calls (user=null): match only on id
+      // - admin users: match only on id (can edit any task)
+      // - regular users: match on id AND userId (own tasks only)
+      const whereClause =
+        user === null || isAdmin
+          ? eq(cronTasks.id, id)
+          : and(eq(cronTasks.id, id), eq(cronTasks.userId, userId as string));
+
+      const [task] = await db
+        .update(cronTasks)
+        .set({ ...updates, updatedAt: new Date() })
+        .where(whereClause)
+        .returning();
+
+      if (!task) {
+        // Either the task doesn't exist or the user doesn't own it.
+        // Distinguish by checking existence without ownership constraint.
+        const [exists] = await db
+          .select({ id: cronTasks.id })
           .from(cronTasks)
           .where(eq(cronTasks.id, id))
           .limit(1);
 
-        if (!existing[0]) {
+        if (!exists) {
           return fail({
             message: t("errors.repositoryNotFound"),
             errorType: ErrorResponseTypes.NOT_FOUND,
           });
         }
-
-        if (!isAdmin && existing[0].userId !== userId) {
-          return fail({
-            message: t("errors.repositoryUpdateTaskForbidden"),
-            errorType: ErrorResponseTypes.FORBIDDEN,
-            messageParams: { taskId: id },
-          });
-        }
-      }
-
-      logger.debug(
-        `Updating task "${id}" (${Object.keys(updates).join(", ")})`,
-      );
-      const [task] = await db
-        .update(cronTasks)
-        .set({ ...updates, updatedAt: new Date() })
-        .where(eq(cronTasks.id, id))
-        .returning();
-
-      if (!task) {
         return fail({
-          message: t("errors.repositoryNotFound"),
-          errorType: ErrorResponseTypes.NOT_FOUND,
+          message: t("errors.repositoryUpdateTaskForbidden"),
+          errorType: ErrorResponseTypes.FORBIDDEN,
+          messageParams: { taskId: id },
         });
       }
 
@@ -537,7 +541,7 @@ export class CronTasksRepository {
       totalTasks: number;
       enabledTasks: number;
       disabledTasks: number;
-      averageExecutionTime: number;
+      averageExecutionTime: number | null;
     }>
   > {
     try {
@@ -555,7 +559,7 @@ export class CronTasksRepository {
         totalTasks: stats.totalTasks,
         enabledTasks: stats.enabledTasks,
         disabledTasks: stats.disabledTasks,
-        averageExecutionTime: stats.averageExecutionTime || 0,
+        averageExecutionTime: stats.averageExecutionTime ?? null,
       });
     } catch (error) {
       const parsedError = parseError(error);
@@ -616,6 +620,10 @@ export async function generateTasksSummary(params: {
 
   try {
     // Query 1: Task definitions with enriched fields
+    const { getLocalInstanceId } =
+      await import("@/app/api/[locale]/user/remote-connection/repository");
+    const instanceId = await getLocalInstanceId();
+
     const tasks = await db
       .select({
         id: cronTasks.id,
@@ -634,10 +642,10 @@ export async function generateTasksSummary(params: {
       .from(cronTasks)
       .where(
         // Include user's own tasks + tasks targeting this instance (e.g. delegated from prod)
-        env.INSTANCE_ID
+        instanceId
           ? or(
               eq(cronTasks.userId, userId),
-              eq(cronTasks.targetInstance, env.INSTANCE_ID),
+              eq(cronTasks.targetInstance, instanceId),
             )
           : eq(cronTasks.userId, userId),
       )

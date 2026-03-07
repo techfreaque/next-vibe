@@ -13,6 +13,7 @@
 import { z } from "zod";
 
 import {
+  getModelById,
   ModelId,
   ModelIdOptions,
 } from "@/app/api/[locale]/agent/models/models";
@@ -36,13 +37,14 @@ import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { DefaultFolderId } from "../../chat/config";
 import { scopedTranslation } from "../stream/i18n";
+import { AI_RUN_ALIAS } from "./constants";
 import { AiRunWidget } from "./widget";
 
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["agent", "ai-stream", "run"],
-  aliases: ["ai-run", "run-ai", "agent-run"],
+  aliases: [AI_RUN_ALIAS, "run-ai", "agent-run"],
   allowedRoles: [
     UserRole.ADMIN,
     UserRole.CUSTOMER,
@@ -57,9 +59,14 @@ const { POST } = createEndpoint({
         request.prompt.length > 40
           ? `${request.prompt.slice(0, 40)}...`
           : request.prompt;
+      const modelName = request.model
+        ? getModelById(request.model).name
+        : undefined;
+      const character = request.character ?? undefined;
+      const suffix = [modelName, character].filter(Boolean).join(" · ");
       return {
         message: "run.post.dynamicTitle" as const,
-        messageParams: { prompt },
+        messageParams: { prompt, suffix: suffix ? ` (${suffix})` : "" },
       };
     }
     return undefined;

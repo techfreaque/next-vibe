@@ -5,18 +5,31 @@
 
 import { envClient } from "@/config/env-client";
 
-import { CONTACT_FORM_ALIAS } from "../../contact/definition";
-import { aliasToPathMap } from "../../system/generated/endpoint";
+import { CHROME_ALIAS } from "../../browser/constants";
+import { CONTACT_FORM_ALIAS } from "../../contact/constants";
+import { SSH_EXEC_ALIAS } from "../../ssh/exec/constants";
+import { SSH_FILES_READ_ALIAS } from "../../ssh/files/read/constants";
+import { SSH_FILES_WRITE_ALIAS } from "../../ssh/files/write/constants";
+import { SQL_ALIAS } from "../../system/db/sql/constants";
 import { TOOL_HELP_ALIAS } from "../../system/help/constants";
+import { REBUILD_ALIAS } from "../../system/server/rebuild/constants";
 import { EXECUTE_TOOL_ALIAS } from "../../system/unified-interface/ai/execute-tool/constants";
-import { FETCH_URL_ALIAS } from "../fetch-url-content/definition";
-import { BRAVE_SEARCH_ALIAS } from "../search/brave/definition";
+import { COMPLETE_TASK_ALIAS } from "../../system/unified-interface/tasks/complete-task/constants";
+import { CRON_DASHBOARD_ALIAS } from "../../system/unified-interface/tasks/cron/dashboard/constants";
+import {
+  CRON_CREATE_ALIAS,
+  CRON_LIST_ALIAS,
+} from "../../system/unified-interface/tasks/cron/tasks/constants";
+import { AI_RUN_ALIAS } from "../ai-stream/run/constants";
+import { CLAUDE_CODE_ALIAS } from "../claude-code/constants";
+import { FETCH_URL_ALIAS } from "../fetch-url-content/constants";
+import { BRAVE_SEARCH_ALIAS } from "../search/brave/constants";
 import {
   MEMORY_DELETE_ALIAS,
   MEMORY_UPDATE_ALIAS,
-} from "./memories/[id]/definition";
-import { MEMORY_ADD_ALIAS } from "./memories/create/definition";
-import { MEMORY_LIST_ALIAS } from "./memories/definition";
+} from "./memories/[id]/constants";
+import { MEMORY_LIST_ALIAS } from "./memories/constants";
+import { MEMORY_ADD_ALIAS } from "./memories/create/constants";
 
 /**
  * Storage keys for localStorage persistence
@@ -49,28 +62,56 @@ export const AGENT_MESSAGE_LENGTH = 40000; // TODO find a better way and also be
  * These tools are enabled by default when creating a new chat or resetting tools
  */
 export const DEFAULT_TOOL_IDS = [
-  aliasToPathMap[TOOL_HELP_ALIAS],
-  aliasToPathMap[EXECUTE_TOOL_ALIAS],
-  aliasToPathMap[BRAVE_SEARCH_ALIAS],
-  aliasToPathMap[FETCH_URL_ALIAS],
-  aliasToPathMap[MEMORY_LIST_ALIAS],
-  aliasToPathMap[MEMORY_ADD_ALIAS],
-  aliasToPathMap[MEMORY_UPDATE_ALIAS],
-  aliasToPathMap[MEMORY_DELETE_ALIAS],
-  aliasToPathMap[CONTACT_FORM_ALIAS],
+  TOOL_HELP_ALIAS,
+  EXECUTE_TOOL_ALIAS,
+  BRAVE_SEARCH_ALIAS,
+  FETCH_URL_ALIAS,
+  MEMORY_LIST_ALIAS,
+  MEMORY_ADD_ALIAS,
+  MEMORY_UPDATE_ALIAS,
+  MEMORY_DELETE_ALIAS,
+  CONTACT_FORM_ALIAS,
+  AI_RUN_ALIAS,
 ] as const;
+
+/**
+ * Default remote tools made available (enabled) when a remote instance is connected.
+ * These are unprefixed tool IDs — the instanceId prefix (e.g. "hermes__") is added
+ * at connect time when writing into the user's allowedTools setting.
+ *
+ * Mirrors DEFAULT_TOOL_IDS: same pinned/available distinction, same reset-to-defaults
+ * behaviour. User can add/remove tools and promote any to pinned via the tool settings UI.
+ */
+export const DEFAULT_REMOTE_TOOL_IDS = [
+  CLAUDE_CODE_ALIAS,
+  CRON_LIST_ALIAS,
+  CRON_CREATE_ALIAS,
+  SSH_EXEC_ALIAS,
+  SSH_FILES_READ_ALIAS,
+  SSH_FILES_WRITE_ALIAS,
+  MEMORY_LIST_ALIAS,
+  MEMORY_ADD_ALIAS,
+] as const;
+
+/**
+ * Default remote tools pinned into the AI context window on connect.
+ * Empty by default — remote tools start as available-only (callable via execute-tool,
+ * shown in help, but not auto-loaded into every AI context).
+ * User can promote individual tools to pinned via the tool settings UI.
+ */
+export const DEFAULT_REMOTE_PINNED_IDS: readonly string[] = [];
 
 /**
  * Additional tools pinned for local/admin instances (Hermes).
  * These are appended to DEFAULT_TOOL_IDS when running in local mode.
  */
 const LOCAL_ADMIN_EXTRA_TOOL_IDS = [
-  aliasToPathMap["claude-code"],
-  aliasToPathMap["sql"],
-  aliasToPathMap["rebuild"],
-  aliasToPathMap["cron-dashboard"],
-  aliasToPathMap["chrome"],
-  aliasToPathMap["complete-task"],
+  CLAUDE_CODE_ALIAS,
+  SQL_ALIAS,
+  REBUILD_ALIAS,
+  CRON_DASHBOARD_ALIAS,
+  CHROME_ALIAS,
+  COMPLETE_TASK_ALIAS,
 ] as const;
 
 /**

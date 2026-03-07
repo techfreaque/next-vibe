@@ -67,6 +67,7 @@ export const translations = {
       referral: "Referral Program",
       help: "Help",
       about: "About",
+      admin: "Admin Dashboard",
     },
     confirmations: {
       deleteMessage: "Are you sure you want to delete this message?",
@@ -104,7 +105,7 @@ export const translations = {
           "Organize your chats in different folders, each with unique privacy settings:",
         private: {
           name: "Private",
-          suffix: "— encrypted, only you can see",
+          suffix: "— only you can see",
         },
         incognito: {
           name: "Incognito",
@@ -123,13 +124,13 @@ export const translations = {
         name: "Private",
         suffix: "Folder",
         description:
-          "Your private chats are encrypted and only visible to you. Perfect for sensitive topics.",
+          "Your private chats are only visible to you. Perfect for sensitive topics.",
       },
       incognitoFolder: {
         name: "Incognito",
         suffix: "Folder",
         description:
-          "Chat without saving history. When you close the session, all messages are gone.",
+          "Chat without saving history to the server. Messages are stored locally in your browser and persist until you clear them.",
         note: "No data is stored on our servers during incognito sessions.",
       },
       sharedFolder: {
@@ -148,20 +149,17 @@ export const translations = {
       newChatButton: {
         title: "Start a New Chat",
         description: "Click here to start a fresh conversation in any folder.",
-        tip: "You can also use keyboard shortcut Ctrl+K to quickly start a new chat.",
       },
       sidebarLogin: {
         title: "Sign In to Unlock More",
         description:
-          "Create a free account to access Private and Shared folders, sync across devices, and save your conversation history.",
-        tip: "It's free to sign up! You get 100 free credits to start.",
+          "Create a free account to access Private and Shared folders, sync your conversation history across devices, and let the AI remember things about you.",
+        tip: "It's free to sign up!",
       },
       subscriptionButton: {
         title: "Credits & Subscription",
         description:
-          "Get {{credits}} credits/month with a Pro subscription for just {{price}}.",
-        price: "$9.99",
-        tip: "Credits are used for AI model interactions. Free users get limited monthly credits.",
+          "Get {{credits}} credits/month with a subscription for just {{price}}/month. Free users get {{freeCredits}} credits/month.",
       },
       chatInput: {
         title: "Type Your Message",
@@ -193,7 +191,7 @@ export const translations = {
       authUnlocked: {
         unlocked: "Unlocked!",
         privateDescription:
-          "Your private folder is now available. All chats here are encrypted and only visible to you.",
+          "Your private folder is now available. All chats here are only visible to you.",
         privateNote:
           "Private chats sync across all your devices automatically.",
         sharedDescription:

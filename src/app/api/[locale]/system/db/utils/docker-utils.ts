@@ -175,9 +175,9 @@ export function executeDockerCommand(
 
     // Race between completion and timeout
     Promise.race([
-      new Promise<void>((resolve) => {
+      new Promise<void>((_resolve) => {
         child.on("close", () => {
-          resolve();
+          _resolve();
         });
       }),
       timeoutPromise,

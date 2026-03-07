@@ -507,14 +507,14 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
               return;
             }
 
-            const folders: ImapFolderInfo[] = [];
+            const folderList: ImapFolderInfo[] = [];
 
             const processBox = (
               box: ImapBoxInfo,
               name: string,
               path: string,
             ): void => {
-              folders.push({
+              folderList.push({
                 name,
                 displayName: box.displayName || name,
                 path,
@@ -546,7 +546,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
               processBox(boxes[boxName], boxName, boxName);
             });
 
-            resolve(folders);
+            resolve(folderList);
             imap.end();
           });
         });
@@ -633,13 +633,13 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
                   struct: true,
                 });
 
-                const messages: ImapMessageInfo[] = [];
+                const messageList: ImapMessageInfo[] = [];
                 let pendingCount = 0;
                 let fetchEnded = false;
 
                 const tryResolve = (): void => {
                   if (fetchEnded && pendingCount === 0) {
-                    resolve(messages);
+                    resolve(messageList);
                     imap.end();
                   }
                 };
@@ -681,7 +681,7 @@ export class ImapConnectionRepositoryImpl implements ImapConnectionRepository {
                             : String(value);
                         });
 
-                        messages.push({
+                        messageList.push({
                           uid: attributes.uid || 0,
                           messageId,
                           subject: parsed.subject || "",

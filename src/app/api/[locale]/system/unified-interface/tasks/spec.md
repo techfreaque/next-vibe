@@ -19,7 +19,7 @@ Renamed to **`routeId`**. It serves one purpose: tells the executor which regist
 
 `routeId` is resolved through two registries in order:
 
-1. **`aliasToPathMap`** (in `system/generated/endpoint.ts`) — resolves any endpoint alias or full path key (e.g. `"cron:stats"` → `"system_unified-interface_tasks_cron_stats_GET"`, or the full key verbatim). Use `getFullPath(routeId)` — if non-null, this is an API endpoint call.
+1. **`pathToAliasMap`** (in `system/generated/endpoint.ts`) — resolves any endpoint alias or full path key (e.g. `"cron:stats"` → `"system_unified-interface_tasks_cron_stats_GET"`, or the full key verbatim). Use `getFullPath(routeId)` — if non-null, this is an API endpoint call.
 
 2. **`taskRegistry.tasksByName`** (in `system/generated/tasks-index.ts`) — resolves registered cron task handler names (e.g. `"lead-email-campaigns"`, `"imap-sync"`). If found here, call the task's `run()` directly.
 
@@ -200,7 +200,7 @@ No special-casing per task type in the shell. The inner section is just `<RouteW
 - Add Step picker: `Call | AI Agent`
 - Ordered cards, drag/up-down to reorder, collapsible
 
-**Call card:** single searchable selector covering both registered task names (`tasksByName`) and endpoint aliases/paths (`aliasToPathMap`) — all resolved via `resolveRouteId()`. Once selected, arg editor auto-rendered from the resolved schema. Parallel toggle.
+**Call card:** single searchable selector covering both registered task names (`tasksByName`) and endpoint aliases/paths (`pathToAliasMap`) — all resolved via `resolveRouteId()`. Once selected, arg editor auto-rendered from the resolved schema. Parallel toggle.
 
 **AI Agent card:** model, character, prompt, pre-seeded calls (each: `routeId` + args + optional `$step_N_result` ref), tools whitelist, max turns, thread mode picker
 

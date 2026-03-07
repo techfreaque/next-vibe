@@ -81,9 +81,11 @@ function findCompactionIndices(path: ChatMessage[]): number[] {
 
 /**
  * Compute the render window start index based on compaction boundaries.
- * @param path Full message path
- * @param expansions How many compaction segments to expand backwards (0 = from last compaction)
- * @returns Start index into path for rendering
+ * Default: keep the last 2 compaction boundaries visible.
+ * Each "expansion" step reveals one more older compaction segment.
+ *
+ * e.g. 4 compaction points [0, 10, 40, 70], expansions=0 → startIndex=10 (shows last 2: idx 1..3)
+ *      expansions=1 → startIndex=0 (shows all)
  */
 function computeRenderWindowStart(
   path: ChatMessage[],
@@ -91,23 +93,24 @@ function computeRenderWindowStart(
 ): { startIndex: number; hasTrimmedMessages: boolean } {
   const compactionIndices = findCompactionIndices(path);
 
-  if (compactionIndices.length === 0) {
-    // No compaction points — render everything
+  // Keep 2 compactions visible by default. Each expansion adds one more.
+  const VISIBLE_COMPACTIONS = 2;
+
+  if (compactionIndices.length <= VISIBLE_COMPACTIONS) {
+    // Not enough compactions to trim anything
     return { startIndex: 0, hasTrimmedMessages: false };
   }
 
-  // Target compaction index: last one minus expansions
-  // e.g. 3 compaction points, 0 expansions → use index 2 (last), 1 expansion → index 1, etc.
-  const targetIdx = compactionIndices.length - 1 - expansions;
+  // How many compactions to hide: total - visible - extra expansions
+  const toHide = compactionIndices.length - VISIBLE_COMPACTIONS - expansions;
 
-  if (targetIdx <= 0) {
-    // Expanded past all compaction points — render everything
+  if (toHide <= 0) {
+    // Expanded to show everything
     return { startIndex: 0, hasTrimmedMessages: false };
   }
 
-  // Safety: clamp to valid range (targetIdx > 0 guaranteed by check above)
-  const clampedIdx = Math.min(targetIdx, compactionIndices.length - 1);
-  const startIndex = compactionIndices[clampedIdx];
+  // Start from the compaction at position toHide (0-indexed)
+  const startIndex = compactionIndices[toHide];
   return { startIndex, hasTrimmedMessages: startIndex > 0 };
 }
 
@@ -154,7 +157,6 @@ export function ChatMessages({
   const addMessage = useChatStore((s) => s.addMessage);
   const chatSetLoading = useChatStore((s) => s.setLoading);
   const chatGetThreadMessages = useChatStore((s) => s.getThreadMessages);
-  const chatGetBranchIndices = useChatStore((s) => s.getBranchIndices);
   const chatDeleteMessage = useChatStore((s) => s.deleteMessage);
   const chatUpdateMessage = useChatStore((s) => s.updateMessage);
 
@@ -241,7 +243,6 @@ export function ChatMessages({
       threads,
       setLoading: chatSetLoading,
       getThreadMessages: chatGetThreadMessages,
-      getBranchIndices: chatGetBranchIndices,
       deleteMessage: chatDeleteMessage,
       updateMessage: chatUpdateMessage,
     },
@@ -266,35 +267,43 @@ export function ChatMessages({
     voteMessage,
   } = messageOps;
 
-  // Branch management
-  const branchManagement = useBranchManagement({
-    activeThreadMessages,
-    threadId: activeThreadId || "",
-    logger,
-  });
-  const { branchIndices, handleSwitchBranch } = branchManagement;
+  // leafMessageId lives in the navigation store — seeded from server URL, updated by branch switches
+  const leafMessageId = useChatNavigationStore((s) => s.leafMessageId);
+  const setLeafMessageId = useChatNavigationStore((s) => s.setLeafMessageId);
 
-  // Lazy branch loader — pass SSR path data so no client fetch on hydration
+  // Lazy branch loader — fetches all messages in the branch window (path + siblings).
+  // Sentinel messages (BOUNDARY_OLDER / BOUNDARY_NEWER) are injected server-side and stored
+  // in the Zustand messages store — no client-side hasOlderHistory / hasNewerMessages state.
   const {
-    branchMeta,
     isLoadingBranch: rawIsLoadingBranch,
-    hasOlderHistory,
     isLoadingOlderHistory,
     loadOlderHistory,
+    isLoadingNewerHistory,
+    loadNewerHistory,
     invalidateThread,
   } = useLazyBranchLoader(
     locale,
     logger,
     activeThreadId,
     threads,
-    branchIndices,
+    leafMessageId,
     addMessage,
+    chatUpdateMessage,
     setThreadLoadMode,
     user,
     // Only use SSR path data for the thread we had at boot time
     activeThreadId === bootInitialThreadId ? initialPathData : null,
     currentRootFolderId,
+    setLeafMessageId,
   );
+
+  // Branch management — derives branchIndices from leafMessageId + loaded messages
+  const { branchIndices, handleSwitchBranch } = useBranchManagement({
+    activeThreadMessages,
+    leafMessageId,
+    threadId: activeThreadId || "",
+    logger,
+  });
 
   // Full load fallback for non-linear views
   const needsFullLoad =
@@ -340,6 +349,7 @@ export function ChatMessages({
       onStreamFinished: activeThreadId
         ? (): void => stopStream(activeThreadId, logger)
         : undefined,
+      ttsAutoplay: effectiveSettings.ttsAutoplay,
     },
   );
 
@@ -401,20 +411,16 @@ export function ChatMessages({
   const collapseState = useCollapseState();
   const messagesContainerRef = useRef<DivRefObject>(null);
   const messagesEndRef = useRef<DivRefObject>(null);
-  const [userScrolledUp, setUserScrolledUp] = useState(false);
   // Render window: number of compaction segments expanded backwards from the end.
   // 0 = show only from last compaction forward; 1 = include previous segment; etc.
   const [renderWindowExpansions, setRenderWindowExpansions] = useState(0);
   const renderWindowThreadRef = useRef<string | null>(null);
-  const lastMessageContentRef = useRef<string>("");
-  const wasAtBottomBeforeStreamingRef = useRef<boolean>(true);
-  const isStreamingRef = useRef<boolean>(false);
-  const scrollAnimationFrameRef = useRef<number | null>(null);
-  const lastScrollTimeRef = useRef<number>(0);
-  const userInteractingRef = useRef<boolean>(false);
-  const interactionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
+  // Sticky-bottom: true = we are pinned to the bottom and should stay there.
+  // Flipped to false the moment the user scrolls up; flipped back when they
+  // scroll back down to within BOTTOM_THRESHOLD px of the bottom.
+  const stickyBottomRef = useRef<boolean>(true);
+  // Whether user is actively touching (suppresses our instant-scroll during gesture)
+  const touchActiveRef = useRef<boolean>(false);
 
   // Get streaming messages from the messages store
   const streamingMessages = useStreamingMessagesStore(
@@ -466,7 +472,6 @@ export function ChatMessages({
           role: streamMsg.role,
           content: streamMsg.content,
           parentId: streamMsg.parentId,
-          depth: streamMsg.depth,
           model: streamMsg.model ?? null,
           character: streamMsg.character ?? null,
           createdAt: new Date(),
@@ -501,19 +506,22 @@ export function ChatMessages({
     return [...messageMap.values()];
   }, [activeThreadMessages, streamingMessages, activeThreadId]);
 
+  // All merged messages are real messages — no sentinel filtering needed.
+  const realMessages = mergedMessages;
+
   // Flat view: sorted messages by timestamp (memoized)
   const flatSortedMessages = useMemo(
     () =>
-      mergedMessages.toSorted(
+      realMessages.toSorted(
         (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
       ),
-    [mergedMessages],
+    [realMessages],
   );
 
   // Threaded view: memoized grouping, primary messages, and root messages
   const threadedMessageGroups = useMemo(
-    () => groupMessagesBySequence(mergedMessages),
-    [mergedMessages],
+    () => groupMessagesBySequence(realMessages),
+    [realMessages],
   );
 
   const threadedMessageToGroupMap = useMemo(() => {
@@ -529,11 +537,11 @@ export function ChatMessages({
 
   const threadedPrimaryMessages = useMemo(
     () =>
-      mergedMessages.filter((msg) => {
+      realMessages.filter((msg) => {
         const group = threadedMessageToGroupMap.get(msg.id);
         return !group || group.primary.id === msg.id;
       }),
-    [mergedMessages, threadedMessageToGroupMap],
+    [realMessages, threadedMessageToGroupMap],
   );
 
   const threadedRootMessages = useMemo(
@@ -544,16 +552,16 @@ export function ChatMessages({
   // Memoized callback: onStartRetry wrapper for linear view (looks up message by ID)
   const handleLinearStartRetry = useCallback(
     (messageId: string): void => {
-      const msg = mergedMessages.find((m) => m.id === messageId);
+      const msg = realMessages.find((m) => m.id === messageId);
       if (msg) {
         void startRetry(msg);
       }
     },
-    [mergedMessages, startRetry],
+    [realMessages, startRetry],
   );
 
   // Track compaction count to auto-reset render window when a new compaction appears during streaming
-  const compactionCount = mergedMessages.filter(
+  const compactionCount = realMessages.filter(
     (msg) => msg.metadata?.isCompacting === true,
   ).length;
   const prevCompactionCountRef = useRef(compactionCount);
@@ -565,224 +573,118 @@ export function ChatMessages({
     prevCompactionCountRef.current = compactionCount;
   }, [compactionCount]);
 
-  // Check if user is at bottom of scroll
-  const isAtBottom = useCallback((): boolean => {
-    const container = messagesContainerRef.current;
-    if (!container) {
-      return true;
-    }
-
-    const threshold = 50; // pixels from bottom - smaller threshold for more precise detection
-    const { scrollTop, scrollHeight, clientHeight } = container;
-    return scrollHeight - scrollTop - clientHeight < threshold;
-  }, []);
-
-  // Handle scroll events to detect user scrolling up
+  // Sticky-bottom scroll listener.
+  // On scroll: update stickyBottomRef + userScrolledUp state.
+  // Touch start/end: bracket the gesture so we never fight an in-progress swipe.
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (!container) {
       return;
     }
 
+    const BOTTOM_THRESHOLD = 80; // px — snap back to sticky when this close to bottom
+
     const handleScroll = (): void => {
-      const atBottom = isAtBottom();
-      const scrolledUp = !atBottom;
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const distFromBottom = scrollHeight - scrollTop - clientHeight;
+      const atBottom = distFromBottom < BOTTOM_THRESHOLD;
 
-      setUserScrolledUp(scrolledUp);
-
-      // If user scrolls back to bottom while streaming, re-enable auto-scroll
-      if (!scrolledUp && isStreamingRef.current) {
-        wasAtBottomBeforeStreamingRef.current = true;
-        userInteractingRef.current = false;
-      }
-      // If user scrolls up while streaming, disable auto-scroll
-      else if (scrolledUp && isStreamingRef.current) {
-        wasAtBottomBeforeStreamingRef.current = false;
-      }
+      stickyBottomRef.current = atBottom;
     };
 
-    // Detect user interaction (wheel, touch, keyboard)
-    const handleUserInteraction = (): void => {
-      userInteractingRef.current = true;
-
-      // Clear existing timeout
-      if (interactionTimeoutRef.current) {
-        clearTimeout(interactionTimeoutRef.current);
-      }
-
-      // Reset interaction flag after 150ms of no interaction
-      interactionTimeoutRef.current = setTimeout(() => {
-        userInteractingRef.current = false;
-      }, 150);
+    const handleTouchStart = (): void => {
+      touchActiveRef.current = true;
+    };
+    const handleTouchEnd = (): void => {
+      touchActiveRef.current = false;
     };
 
     container.addEventListener("scroll", handleScroll, { passive: true });
-    container.addEventListener("wheel", handleUserInteraction, {
+    container.addEventListener("touchstart", handleTouchStart, {
       passive: true,
     });
-    container.addEventListener("touchstart", handleUserInteraction, {
-      passive: true,
-    });
-    container.addEventListener("touchmove", handleUserInteraction, {
-      passive: true,
-    });
-    container.addEventListener("keydown", handleUserInteraction, {
+    container.addEventListener("touchend", handleTouchEnd, { passive: true });
+    container.addEventListener("touchcancel", handleTouchEnd, {
       passive: true,
     });
 
     return (): void => {
       container.removeEventListener("scroll", handleScroll);
-      container.removeEventListener("wheel", handleUserInteraction);
-      container.removeEventListener("touchstart", handleUserInteraction);
-      container.removeEventListener("touchmove", handleUserInteraction);
-      container.removeEventListener("keydown", handleUserInteraction);
-
-      if (interactionTimeoutRef.current) {
-        clearTimeout(interactionTimeoutRef.current);
-      }
+      container.removeEventListener("touchstart", handleTouchStart);
+      container.removeEventListener("touchend", handleTouchEnd);
+      container.removeEventListener("touchcancel", handleTouchEnd);
     };
-  }, [isAtBottom]);
+  }, []);
 
   // Track which threads have had their initial scroll-to-bottom performed.
   const initialScrollDoneRef = useRef<Set<string>>(new Set());
 
-  // Reset render window when thread changes
+  // Reset render window + sticky state when thread changes
   useEffect(() => {
     const currentThreadId = activeThread?.id ?? null;
     if (renderWindowThreadRef.current !== currentThreadId) {
       setRenderWindowExpansions(0);
       renderWindowThreadRef.current = currentThreadId;
+      // New thread: start sticky
+      stickyBottomRef.current = true;
     }
   }, [activeThread?.id]);
 
   const hasAnyMessages = activeThreadMessages.length > 0;
 
-  // Scroll to bottom on first render that has messages for this thread.
-  // useLayoutEffect fires synchronously after DOM commit, before paint —
-  // so scrollHeight already reflects the fully-rendered message list.
+  // Sticky-bottom: after every render, if we're pinned and not mid-touch, snap to bottom.
+  // useLayoutEffect fires synchronously after DOM commit so scrollHeight is up to date.
+  // This is the single source of truth for auto-scroll — no separate streaming detection.
   useLayoutEffect(() => {
+    // Initial scroll-to-bottom once per thread (not just during streaming)
     const currentThreadId = activeThread?.id ?? null;
-
-    if (currentThreadId && initialScrollDoneRef.current.has(currentThreadId)) {
-      return;
-    }
-    if (currentRootFolderId === "public") {
-      return;
-    }
-    if (!hasAnyMessages) {
-      return;
-    }
-
-    if (currentThreadId) {
+    if (
+      currentThreadId &&
+      !initialScrollDoneRef.current.has(currentThreadId) &&
+      hasAnyMessages &&
+      currentRootFolderId !== "public"
+    ) {
       initialScrollDoneRef.current.add(currentThreadId);
+      const container = messagesContainerRef.current;
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
+      return;
     }
 
+    // Ongoing sticky: snap to bottom instantly so streaming content feels responsive.
+    if (!stickyBottomRef.current || touchActiveRef.current) {
+      return;
+    }
     const container = messagesContainerRef.current;
     if (container) {
       container.scrollTop = container.scrollHeight;
     }
-  }, [activeThread?.id, hasAnyMessages, currentRootFolderId]);
-
-  // Smart auto-scroll: only during streaming, only if user was at bottom, respect user scroll
-  useEffect(() => {
-    // Get the last message
-    const allMessages = Object.values(activeThreadMessages);
-    const lastMessage = allMessages.at(-1);
-    if (!lastMessage) {
-      return;
-    }
-
-    // Check if content is actually changing (streaming)
-    const contentChanged =
-      lastMessage.content !== lastMessageContentRef.current;
-    const isCurrentlyStreaming = isLoading && contentChanged;
-
-    // Track streaming state changes
-    const wasStreaming = isStreamingRef.current;
-    isStreamingRef.current = isCurrentlyStreaming;
-
-    // When streaming starts, capture if user is at bottom
-    if (isCurrentlyStreaming && !wasStreaming) {
-      wasAtBottomBeforeStreamingRef.current = !userScrolledUp;
-    }
-
-    if (!isCurrentlyStreaming && wasStreaming) {
-      wasAtBottomBeforeStreamingRef.current = true;
-    }
-
-    lastMessageContentRef.current = lastMessage.content ?? "";
-
-    // Only auto-scroll if:
-    // 1. Currently streaming
-    // 2. User was at bottom when streaming started
-    // 3. User hasn't scrolled up since
-    // 4. User is not actively interacting with scroll
-    if (
-      isCurrentlyStreaming &&
-      wasAtBottomBeforeStreamingRef.current &&
-      !userScrolledUp &&
-      !userInteractingRef.current
-    ) {
-      // Cancel any pending scroll animation
-      if (scrollAnimationFrameRef.current !== null) {
-        cancelAnimationFrame(scrollAnimationFrameRef.current);
-      }
-
-      // Throttle scroll updates to smooth out fast and slow streams
-      const now = Date.now();
-      const timeSinceLastScroll = now - lastScrollTimeRef.current;
-      const minScrollInterval = 200; // Minimum 200ms between scrolls - increased for easier escape
-
-      if (timeSinceLastScroll >= minScrollInterval) {
-        // Scroll immediately if enough time has passed
-        const container = messagesContainerRef.current;
-        if (container) {
-          container.scrollTo({
-            top: container.scrollHeight,
-            behavior: "smooth",
-          });
-          lastScrollTimeRef.current = now;
-        }
-      } else {
-        // Schedule a scroll for later to avoid too frequent updates
-        scrollAnimationFrameRef.current = requestAnimationFrame(() => {
-          const container = messagesContainerRef.current;
-          if (container && !userInteractingRef.current) {
-            container.scrollTo({
-              top: container.scrollHeight,
-              behavior: "smooth",
-            });
-            lastScrollTimeRef.current = Date.now();
-          }
-          scrollAnimationFrameRef.current = null;
-        });
-      }
-    }
-
-    // Cleanup on unmount
-    return (): void => {
-      if (scrollAnimationFrameRef.current !== null) {
-        cancelAnimationFrame(scrollAnimationFrameRef.current);
-      }
-    };
-  }, [activeThreadMessages, isLoading, userScrolledUp]);
+  });
 
   // After older history inserts above (via button click): restore scroll position so the view doesn't jump.
-  // Runs after every render; the prevScrollHeightRef guard makes it a no-op normally.
-  const prevScrollHeightRef = useRef<number>(0);
+  // Captures both scrollTop and scrollHeight at click time; restores after messages render.
+  const prevScrollRef = useRef<{
+    scrollTop: number;
+    scrollHeight: number;
+  } | null>(null);
   useLayoutEffect(() => {
-    if (prevScrollHeightRef.current === 0) {
+    if (!prevScrollRef.current) {
       return;
     }
     const container = messagesContainerRef.current;
     if (!container) {
       return;
     }
-    const heightDiff = container.scrollHeight - prevScrollHeightRef.current;
+    const { scrollTop: prevScrollTop, scrollHeight: prevScrollHeight } =
+      prevScrollRef.current;
+    const heightDiff = container.scrollHeight - prevScrollHeight;
     if (heightDiff > 0) {
-      container.scrollTop += heightDiff;
+      // New content inserted above — shift scrollTop by the height increase
+      container.scrollTop = prevScrollTop + heightDiff;
+      prevScrollRef.current = null;
     }
-    prevScrollHeightRef.current = 0;
+    // If heightDiff <= 0, content not yet rendered — keep ref so next render can adjust.
   });
 
   return (
@@ -790,7 +692,7 @@ export function ChatMessages({
       ref={messagesContainerRef}
       id={DOM_IDS.MESSAGES_CONTAINER}
       className={cn(
-        "h-full overflow-y-auto scroll-smooth",
+        "h-full overflow-y-auto",
         "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-blue-400/30 hover:scrollbar-thumb-blue-500/50 scrollbar-thumb-rounded-full",
       )}
     >
@@ -798,7 +700,7 @@ export function ChatMessages({
       {/* Uses h-0 overflow-visible so it doesn't push content down on md+ (same line layout) */}
       {/* Below md: content has pt-20 to position below logo (separate line) */}
       {/* z-[1] so message editors (z-10+) appear above the logo */}
-      {showBranding && (
+      {showBranding && viewMode === ViewMode.LINEAR && (
         <Div className="sticky top-0 z-1 h-0 overflow-visible pointer-events-none">
           <Div className="max-w-3xl mx-auto px-4 sm:px-8 md:px-10 pt-15">
             <Div className="pointer-events-auto flex bg-background/20 backdrop-blur rounded-lg p-2 shadow-sm border border-border/20 w-fit">
@@ -831,44 +733,29 @@ export function ChatMessages({
         <Div
           className={cn(
             "max-w-3xl mx-auto px-4 sm:px-8 md:px-10 flex flex-col gap-5",
-            showBranding ? "pt-35 md:pt-15" : "pt-15",
+            showBranding && viewMode === ViewMode.LINEAR
+              ? "pt-35 md:pt-15"
+              : "pt-15",
           )}
         >
-          {/* Button to load older history (manual, no auto-fetch) */}
-          {(hasOlderHistory || isLoadingOlderHistory) && (
+          {/* Loading spinner for older history — shown while request is in-flight */}
+          {isLoadingOlderHistory && (
             <Div className="flex justify-center py-2">
-              {isLoadingOlderHistory ? (
-                <Div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
-                  <Span className="text-xs text-muted-foreground">
-                    {ts("loadingOlderMessages")}
-                  </Span>
-                </Div>
-              ) : (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                  onClick={(): void => {
-                    const container = messagesContainerRef.current;
-                    if (container) {
-                      prevScrollHeightRef.current = container.scrollHeight;
-                    }
-                    loadOlderHistory();
-                  }}
-                >
-                  {ts("showOlderMessages")}
-                </Button>
-              )}
+              <Div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+                <Span className="text-xs text-muted-foreground">
+                  {ts("loadingOlderMessages")}
+                </Span>
+              </Div>
             </Div>
           )}
-          {mergedMessages.length === 0 && !isLoading && !isLoadingBranch ? (
+          {realMessages.length === 0 && !isLoading && !isLoadingBranch ? (
             <Div style={{ minHeight: `${LAYOUT.SUGGESTIONS_MIN_HEIGHT}vh` }}>
               <Div className="flex items-center justify-center h-full">
                 {/* Empty state — no messages and not loading */}
               </Div>
             </Div>
-          ) : mergedMessages.length === 0 && (isLoading || isLoadingBranch) ? (
+          ) : realMessages.length === 0 && (isLoading || isLoadingBranch) ? (
             <Div style={{ minHeight: `${LAYOUT.SUGGESTIONS_MIN_HEIGHT}vh` }}>
               <Div className="flex items-center justify-center h-full">
                 <Div className="h-6 w-6 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
@@ -876,22 +763,19 @@ export function ChatMessages({
             </Div>
           ) : viewMode === ViewMode.FLAT ? (
             // Flat view (4chan style) - ALL messages in chronological order
-            activeThread ? (
-              <FlatMessageView
-                thread={activeThread}
-                messages={flatSortedMessages}
-                locale={locale}
-                logger={logger}
-                onMessageClick={handleFlatMessageClick}
-                onInsertQuote={handleInsertQuote}
-                currentUserId={currentUserId}
-                user={user}
-                onBranchMessage={branchMessage}
-                onRetryMessage={retryMessage}
-                onAnswerAsModel={answerAsAI}
-                onDeleteMessage={messageDeleteActions.handleDeleteMessage}
-              />
-            ) : null
+            <FlatMessageView
+              messages={flatSortedMessages}
+              locale={locale}
+              logger={logger}
+              onMessageClick={handleFlatMessageClick}
+              onInsertQuote={handleInsertQuote}
+              currentUserId={currentUserId}
+              user={user}
+              onBranchMessage={branchMessage}
+              onRetryMessage={retryMessage}
+              onAnswerAsModel={answerAsAI}
+              onDeleteMessage={messageDeleteActions.handleDeleteMessage}
+            />
           ) : viewMode === ViewMode.THREADED ? (
             // Threaded view (Reddit style) - Show ALL messages, not just current path
             threadedRootMessages.map((rootMessage) => (
@@ -925,51 +809,61 @@ export function ChatMessages({
           ) : (
             // Linear view (ChatGPT style) - Build path through message tree
             ((): JSX.Element => {
-              const { path, branchInfo } = buildMessagePath(
-                mergedMessages,
+              const { path: realPath, branchInfo } = buildMessagePath(
+                realMessages,
                 branchIndices,
+                leafMessageId,
               );
-
-              // With partial load, augment branchInfo with server-provided
-              // branchMeta for fork points whose siblings aren't loaded yet
-              const isPartiallyLoaded =
-                activeThreadId && threadLoadMode[activeThreadId] === "partial";
-
-              if (isPartiallyLoaded && branchMeta.length > 0) {
-                for (const meta of branchMeta) {
-                  // Only add if buildMessagePath didn't already find this fork point
-                  // (it wouldn't if siblings aren't in the store yet)
-                  if (!branchInfo[meta.parentId]) {
-                    // Create placeholder siblings — BranchNavigator only needs id and content
-                    const placeholderSiblings = [
-                      ...Array<number>(meta.siblingCount).keys(),
-                    ].map(
-                      (i) =>
-                        ({
-                          id: `lazy-placeholder-${meta.parentId}-${i}`,
-                          content: "",
-                        }) as ChatMessage,
-                    );
-                    branchInfo[meta.parentId] = {
-                      siblings: placeholderSiblings,
-                      currentIndex: meta.currentIndex,
-                    };
-                  }
-                }
-              }
 
               // Render window trimming: only render from last compaction boundary forward
               // to keep DOM size small in long sessions with multiple compactions.
               // Expands backwards compaction-by-compaction on scroll-up.
               const { startIndex, hasTrimmedMessages } =
-                computeRenderWindowStart(path, renderWindowExpansions);
+                computeRenderWindowStart(realPath, renderWindowExpansions);
 
               const visiblePath =
-                startIndex > 0 ? path.slice(startIndex) : path;
+                startIndex > 0 ? realPath.slice(startIndex) : realPath;
+
+              // The oldest loaded message ID for the "load older" request.
+              // When there are trimmed messages, the oldest LOADED message is realPath[0].
+              // When nothing is trimmed, it's realPath[0] as well.
+              const oldestLoadedId = realPath[0]?.id ?? null;
 
               return (
                 <>
-                  {/* Render window sentinel: expand backwards when scrolled to top */}
+                  {/* Load older history button — shown when oldest message has hasOlderHistory flag */}
+                  {realPath[0]?.metadata?.hasOlderHistory === true &&
+                    !isLoadingOlderHistory &&
+                    oldestLoadedId && (
+                      <Div className="flex justify-center py-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                          onClick={(): void => {
+                            // Anchor the current leaf before loading older history.
+                            if (!leafMessageId) {
+                              const currentLeaf = realPath.at(-1);
+                              if (currentLeaf) {
+                                setLeafMessageId(currentLeaf.id);
+                              }
+                            }
+                            const container = messagesContainerRef.current;
+                            if (container) {
+                              prevScrollRef.current = {
+                                scrollTop: container.scrollTop,
+                                scrollHeight: container.scrollHeight,
+                              };
+                            }
+                            loadOlderHistory(oldestLoadedId);
+                          }}
+                        >
+                          {ts("showOlderMessages")}
+                        </Button>
+                      </Div>
+                    )}
+
+                  {/* Render window expand button: expand already-loaded messages backwards */}
                   {hasTrimmedMessages && (
                     <Div className="flex justify-center py-2">
                       <Button
@@ -977,11 +871,12 @@ export function ChatMessages({
                         size="sm"
                         className="text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                         onClick={(): void => {
-                          // Capture scroll height before expansion for position preservation
                           const container = messagesContainerRef.current;
                           if (container) {
-                            prevScrollHeightRef.current =
-                              container.scrollHeight;
+                            prevScrollRef.current = {
+                              scrollTop: container.scrollTop,
+                              scrollHeight: container.scrollHeight,
+                            };
                           }
                           setRenderWindowExpansions((prev) => prev + 1);
                         }}
@@ -990,6 +885,7 @@ export function ChatMessages({
                       </Button>
                     </Div>
                   )}
+
                   <LinearMessageView
                     messages={visiblePath}
                     branchInfo={branchInfo}
@@ -1021,10 +917,24 @@ export function ChatMessages({
                     selectedModel={selectedModel}
                     sendMessage={sendMessage}
                     deductCredits={deductCredits}
+                    onLoadNewerHistory={loadNewerHistory}
+                    isLoadingNewerHistory={isLoadingNewerHistory}
                   />
                 </>
               );
             })()
+          )}
+
+          {/* Loading spinner for newer history — shown while request is in-flight */}
+          {isLoadingNewerHistory && (
+            <Div className="flex justify-center py-2">
+              <Div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Div className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+                <Span className="text-xs text-muted-foreground">
+                  {ts("loadingNewerMessages")}
+                </Span>
+              </Div>
+            </Div>
           )}
 
           <Div ref={messagesEndRef} />

@@ -89,6 +89,18 @@ export const translations: typeof enTranslations = {
       errors: {
         title: "Build-Fehler",
       },
+      steps: {
+        title: "Build-Schritte",
+      },
+      label: {
+        title: "Schritt",
+      },
+      ok: {
+        title: "Erfolgreich",
+      },
+      skipped: {
+        title: "Übersprungen",
+      },
     },
     errors: {
       validation: {

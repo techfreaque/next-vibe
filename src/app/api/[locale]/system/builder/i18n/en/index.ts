@@ -552,6 +552,12 @@ export const translations = {
         description: "Git repository URL",
         placeholder: "https://github.com/user/repo",
       },
+      packageOutputDir: {
+        title: "Output Directory",
+        description:
+          "Directory where package.json is written (defaults to dist/)",
+        placeholder: ".dist/checker",
+      },
       // Response fields
       success: {
         title: "Success",

@@ -4,74 +4,101 @@ export const translations = {
     vibeFrame: "Vibe Frame",
     embed: "Embed",
     widget: "Widget",
-    iframe: "Iframe",
+    config: "Config",
   },
-  get: {
-    title: "Mount Vibe Frame",
+  post: {
+    title: "Vibe Frame Config",
     description:
-      "Mount a next-vibe endpoint inside an isolated iframe for embedding on any website or native WebView",
+      "Returns iframe URLs for the requested integrations. Server reads real auth cookies (credentials: include) and mints short-lived exchange tokens so no secrets appear in URLs.",
     container: {
-      title: "Vibe Frame Mount",
-      description: "Configure and mount an endpoint frame",
+      title: "Vibe Frame Config",
+      description: "Request iframe URLs for one or more integrations",
     },
     fields: {
+      leadId: {
+        label: "Lead ID",
+        description:
+          "Visitor lead ID from the host page (cross-origin — cannot be read from cookies)",
+      },
+      authToken: {
+        label: "Auth Token",
+        description:
+          "JWT auth token from the host page session (for authenticated widgets)",
+      },
+      integrations: {
+        label: "Integrations",
+        description: "List of integrations to configure",
+      },
+      integration: {
+        label: "Integration",
+        description: "Single integration config",
+      },
+      id: {
+        label: "Integration ID",
+        description: "Unique identifier for this integration slot",
+        placeholder: "contact_POST",
+      },
       endpoint: {
         label: "Endpoint",
-        description:
-          "Endpoint identifier (e.g. contact_POST, agent_chat_threads_GET)",
-        placeholder: "Enter endpoint identifier...",
+        description: "Endpoint identifier override (defaults to id if not set)",
+        placeholder: "contact_POST",
       },
-      frameId: {
-        label: "Frame ID",
-        description: "Unique frame identifier for bridge communication",
-        placeholder: "Auto-generated",
+      hasRendered: {
+        label: "Has Rendered",
+        description:
+          "Set to true if this integration is already mounted — server can skip it",
+      },
+      theme: {
+        label: "Theme",
+        description: "Color theme for the frame",
       },
       urlPathParams: {
         label: "URL Path Params",
         description: "JSON-encoded URL path parameters",
-        placeholder: '{"id": "123"}',
+        placeholder: '{"id":"123"}',
       },
       data: {
         label: "Data",
-        description: "JSON-encoded pre-fill data for the form",
+        description: "JSON-encoded pre-fill data",
         placeholder: "{}",
       },
-      theme: {
-        label: "Theme",
-        description: "Color theme for the mounted frame",
+      widgets: {
+        label: "Widgets",
+        description: "Map of integration ID to widget config",
       },
-      authToken: {
-        label: "Auth Token",
-        description: "Authentication token for cross-origin embedding",
-        placeholder: "Bearer token...",
+      widget: {
+        label: "Widget",
+        description: "Widget config for one integration",
       },
-    },
-    response: {
-      html: {
-        title: "Rendered HTML",
-        description: "The complete HTML document for the iframe",
+      frameId: {
+        label: "Frame ID",
+        description: "Unique frame ID for bridge communication",
+      },
+      widgetUrl: {
+        label: "Widget URL",
+        description: "Iframe src URL with exchange token",
       },
     },
     errors: {
       validation: {
-        title: "Invalid mount parameters",
-        description: "The provided mount parameters are invalid",
+        title: "Invalid parameters",
+        description: "The provided parameters are invalid",
       },
       unauthorized: {
         title: "Unauthorized",
-        description: "Authentication required for this endpoint",
+        description: "Authentication required",
       },
       forbidden: {
         title: "Access forbidden",
-        description: "You do not have permission to mount this endpoint",
+        description: "You do not have permission",
       },
       notFound: {
         title: "Endpoint not found",
-        description: "The specified endpoint does not exist",
+        description: "One or more endpoints do not exist",
       },
       internal: {
-        title: "Mount failed",
-        description: "An error occurred while rendering the endpoint frame",
+        title: "Config failed",
+        description: "An error occurred while building the config response",
       },
       network: {
         title: "Network error",
@@ -79,7 +106,7 @@ export const translations = {
       },
       unknown: {
         title: "Unknown error",
-        description: "An unknown error occurred while mounting the frame",
+        description: "An unknown error occurred",
       },
       unsaved: {
         title: "Unsaved changes",
@@ -93,13 +120,14 @@ export const translations = {
     repository: {
       invalidUrlPathParams: "Invalid URL path parameters format",
       invalidData: "Invalid data format",
-      endpointNotFound: "The requested endpoint was not found",
-      mountFailed: "Failed to mount the vibe frame endpoint",
+      endpointNotFound: "Endpoint not found",
+      configFailed: "Failed to build frame config",
+      tokenMintFailed: "Failed to mint exchange token",
     },
     success: {
-      mounted: {
-        title: "Frame mounted",
-        description: "The endpoint has been mounted successfully",
+      configured: {
+        title: "Config ready",
+        description: "Iframe URLs generated successfully",
       },
     },
   },

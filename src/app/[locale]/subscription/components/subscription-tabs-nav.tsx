@@ -5,12 +5,10 @@ import Link from "next/link";
 import { cn } from "next-vibe/shared/utils/utils";
 import type { IconComponent } from "next-vibe-ui/lib/helper";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  History,
-  Link2,
-  ShoppingCart,
-  TrendingUp,
-} from "next-vibe-ui/ui/icons";
+import { History } from "next-vibe-ui/ui/icons/History";
+import { Link2 } from "next-vibe-ui/ui/icons/Link2";
+import { ShoppingCart } from "next-vibe-ui/ui/icons/ShoppingCart";
+import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import type { JSX } from "react";
 
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -18,14 +16,12 @@ import { simpleT } from "@/i18n/core/shared";
 
 interface SubscriptionTabsNavProps {
   locale: CountryLanguage;
-  activeTab?: string;
-  isCloud?: boolean;
+  activeTab: string;
 }
 
 export function SubscriptionTabsNav({
   locale,
   activeTab,
-  isCloud = false,
 }: SubscriptionTabsNavProps): JSX.Element {
   const { t } = simpleT(locale);
 
@@ -53,16 +49,12 @@ export function SubscriptionTabsNav({
       icon: History,
       label: t("app.subscription.subscription.tabs.history"),
     },
-    ...(!isCloud
-      ? [
-          {
-            value: "remote",
-            href: `/${locale}/subscription/remote` satisfies Route,
-            icon: Link2,
-            label: t("app.subscription.subscription.tabs.remote"),
-          },
-        ]
-      : []),
+    {
+      value: "remote",
+      href: `/${locale}/subscription/remote` satisfies Route,
+      icon: Link2,
+      label: t("app.subscription.subscription.tabs.remote"),
+    },
   ];
 
   return (

@@ -7,7 +7,8 @@
 import { useRouter } from "next/navigation";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
-import { Plus, Server } from "next-vibe-ui/ui/icons";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
+import { Server } from "next-vibe-ui/ui/icons/Server";
 import { Span } from "next-vibe-ui/ui/span";
 import { P } from "next-vibe-ui/ui/typography";
 import React from "react";

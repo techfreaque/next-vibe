@@ -114,7 +114,7 @@ export const translations: typeof enTranslations = {
           "Organisieren Sie Ihre Chats in verschiedenen Ordnern, jeder mit einzigartigen Datenschutzeinstellungen:",
         private: {
           name: "Privat",
-          suffix: "— verschlüsselt, nur Sie können es sehen",
+          suffix: "— nur Sie können es sehen",
         },
         incognito: {
           name: "Inkognito",
@@ -133,13 +133,13 @@ export const translations: typeof enTranslations = {
         name: "Privat",
         suffix: "Ordner",
         description:
-          "Ihre privaten Chats sind verschlüsselt und nur für Sie sichtbar. Perfekt für sensible Themen.",
+          "Ihre privaten Chats sind nur für Sie sichtbar. Perfekt für sensible Themen.",
       },
       incognitoFolder: {
         name: "Inkognito",
         suffix: "Ordner",
         description:
-          "Chatten Sie ohne Verlaufsspeicherung. Wenn Sie die Sitzung schließen, sind alle Nachrichten weg.",
+          "Chatten Sie ohne Speicherung auf dem Server. Nachrichten werden lokal in Ihrem Browser gespeichert und bleiben erhalten, bis Sie sie löschen.",
         note: "Während Inkognito-Sitzungen werden keine Daten auf unseren Servern gespeichert.",
       },
       sharedFolder: {
@@ -159,20 +159,17 @@ export const translations: typeof enTranslations = {
         title: "Einen neuen Chat starten",
         description:
           "Klicken Sie hier, um ein neues Gespräch in einem beliebigen Ordner zu starten.",
-        tip: "Sie können auch den Tastaturkürzel Strg+K verwenden, um schnell einen neuen Chat zu starten.",
       },
       sidebarLogin: {
         title: "Anmelden, um mehr freizuschalten",
         description:
-          "Erstellen Sie ein kostenloses Konto, um auf private und geteilte Ordner zuzugreifen, geräteübergreifend zu synchronisieren und Ihren Gesprächsverlauf zu speichern.",
-        tip: "Die Registrierung ist kostenlos! Sie erhalten 100 kostenlose Credits zum Starten.",
+          "Erstellen Sie ein kostenloses Konto, um auf private und geteilte Ordner zuzugreifen, geräteübergreifend zu synchronisieren und die KI Dinge über Sie merken zu lassen.",
+        tip: "Die Registrierung ist kostenlos!",
       },
       subscriptionButton: {
         title: "Credits & Abonnement",
         description:
-          "Erhalten Sie {{credits}} Credits/Monat mit einem Pro-Abonnement für nur {{price}}.",
-        price: "9,99 €",
-        tip: "Credits werden für KI-Modellinteraktionen verwendet. Kostenlose Benutzer erhalten begrenzte monatliche Credits.",
+          "Erhalten Sie {{credits}} Credits/Monat mit einem Abonnement für nur {{price}}/Monat. Kostenlose Nutzer erhalten {{freeCredits}} Credits/Monat.",
       },
       chatInput: {
         title: "Ihre Nachricht eingeben",
@@ -205,7 +202,7 @@ export const translations: typeof enTranslations = {
       authUnlocked: {
         unlocked: "Freigeschaltet!",
         privateDescription:
-          "Ihr privater Ordner ist jetzt verfügbar. Alle Chats hier sind verschlüsselt und nur für Sie sichtbar.",
+          "Ihr privater Ordner ist jetzt verfügbar. Alle Chats hier sind nur für Sie sichtbar.",
         privateNote:
           "Private Chats werden automatisch auf allen Ihren Geräten synchronisiert.",
         sharedDescription:
@@ -449,12 +446,24 @@ export const translations: typeof enTranslations = {
         "FreedomGPT Liberty - Unzensiertes KI-Modell mit Fokus auf freie Meinungsäußerung und kreative Inhalte",
       gabAiArya:
         "Gab AI Arya - Unzensiertes Konversations-KI-Modell mit freier Meinungsäußerung und kreativen Fähigkeiten",
+      gemini31ProPreviewCustomTools:
+        "Gemini 3.1 Pro Preview (Custom Tools) - Gemini-3.1-Pro-Variante mit verbesserter Werkzeugauswahl für Coding-Agenten und komplexe Multi-Tool-Workflows",
+      gemini31FlashLitePreview:
+        "Gemini 3.1 Flash Lite Preview - Googles hocheffizienztes Modell für Hochvolumen-Anwendungen mit Verbesserungen bei Audio, RAG-Ranking, Übersetzung und Code-Vervollständigung",
       gemini3Pro:
         "Google Gemini 3 Pro - Fortgeschrittenes multimodales KI-Modell mit großem Kontextfenster und leistungsstarken Reasoning-Fähigkeiten",
       gemini3Flash:
         "Google Gemini 3 Flash - Schnelles, effizientes multimodales KI-Modell optimiert für schnelle Antworten",
       deepseekV32:
         "DeepSeek V3.2 - Hochleistungs-Reasoning-Modell mit erweiterten Coding-Fähigkeiten",
+      gpt54Pro:
+        "GPT-5.4 Pro - OpenAIs fortschrittlichstes Modell mit erweitertem Reasoning, 1M+ Kontextfenster und überlegener Leistung für komplexe Aufgaben",
+      gpt54:
+        "GPT-5.4 - OpenAIs neuestes Frontier-Modell, das Codex und GPT vereint, mit 1M+ Kontextfenster für kontextreiche Analyse und Codierung",
+      gpt53Codex:
+        "GPT-5.3-Codex - OpenAIs fortschrittlichstes agentisches Coding-Modell für lang laufende Tool-Workflows und komplexe Entwicklungsaufgaben",
+      gpt53Chat:
+        "GPT-5.3 Chat - Aktualisiertes ChatGPT-Konversationsmodell mit präziseren Antworten und deutlich weniger unnötigen Einschränkungen",
       gpt52Pro:
         "GPT-5.2 Pro - Fortgeschrittenes OpenAI-Modell mit verbessertem Reasoning und Coding-Fähigkeiten",
       gpt52:

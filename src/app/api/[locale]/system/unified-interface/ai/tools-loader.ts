@@ -12,6 +12,7 @@ import { z } from "zod";
 
 import { scopedTranslation as aiStreamScopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { FieldUsage } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -19,7 +20,7 @@ import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CliRequestData } from "../cli/runtime/parsing";
-import { definitionsRegistry } from "../shared/endpoints/definitions/registry";
+import { permissionsRegistry } from "../shared/endpoints/permissions/registry";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Platform } from "../shared/types/platform";
 import { endpointToToolName, getPreferredToolName } from "../shared/utils/path";
@@ -207,6 +208,7 @@ export async function loadTools(params: {
   streamContext: ToolExecutionContext;
 }): Promise<{
   tools: Record<string, CoreTool> | undefined;
+  toolsMeta: Map<string, { requiresConfirmation: boolean; credits: number }>;
   systemPrompt: string;
 }> {
   // Empty array = explicitly no tools
@@ -215,56 +217,47 @@ export async function loadTools(params: {
     params.requestedTools.length === 0
   ) {
     params.logger.debug("Empty tools array, skipping tool loading");
-    return { tools: undefined, systemPrompt: params.systemPrompt };
+    return {
+      tools: undefined,
+      toolsMeta: new Map(),
+      systemPrompt: params.systemPrompt,
+    };
   }
 
   try {
-    // Get all endpoints for user (filtered by permissions using roles from JWT)
-    const allEndpoints = definitionsRegistry.getEndpointsForUser(
-      Platform.AI,
-      params.user,
+    // Load only the requested tools, check permissions on each
+    const toolNames = params.requestedTools ?? [];
+    const loaded = await Promise.all(toolNames.map((n) => getEndpoint(n)));
+    const enabledEndpoints = loaded.filter(
+      (e): e is CreateApiEndpointAny =>
+        e !== null &&
+        permissionsRegistry.filterEndpointsByPermissions(
+          [e],
+          params.user,
+          Platform.AI,
+        ).length > 0,
     );
 
-    // null/undefined = load ALL tools for user (agent mode / all-tools-enabled)
-    // string[] = load only specified tools
-    let enabledEndpoints: CreateApiEndpointAny[];
-
-    if (params.requestedTools === null || params.requestedTools === undefined) {
-      params.logger.debug("[Tools Loader] Loading ALL tools for user", {
-        allEndpointsCount: allEndpoints.length,
-      });
-      enabledEndpoints = allEndpoints;
-    } else {
-      // Filter by requested toolNames (full path with underscores or alias)
-      params.logger.debug("[Tools Loader] === FILTERING TOOLS ===", {
-        requestedTools: params.requestedTools,
-        allEndpointsCount: allEndpoints.length,
-      });
-
-      enabledEndpoints = allEndpoints.filter((e) => {
-        const fullPath = endpointToToolName(e);
-        const matchesByFullPath = params.requestedTools!.includes(fullPath);
-        const matchesByAlias = e.aliases
-          ? e.aliases.some((alias) => params.requestedTools!.includes(alias))
-          : false;
-        const matched = matchesByFullPath || matchesByAlias;
-        return matched;
-      });
-    }
-
-    params.logger.debug("Loaded tools", {
-      requestedCount: params.requestedTools?.length ?? "all",
-      loadedCount: enabledEndpoints.length,
-      enabledPaths: enabledEndpoints.map((e) => endpointToToolName(e)),
+    params.logger.debug("[Tools Loader] Loading requested tools", {
+      requested: toolNames.length,
+      loaded: enabledEndpoints.length,
     });
 
     if (enabledEndpoints.length === 0) {
-      return { tools: undefined, systemPrompt: params.systemPrompt };
+      return {
+        tools: undefined,
+        toolsMeta: new Map(),
+        systemPrompt: params.systemPrompt,
+      };
     }
 
     // Create AI SDK tools
     // AI SDK tool names must use full endpointToToolName format for proper lookup
     const toolsMap = new Map<string, CoreTool>();
+    const toolsMeta = new Map<
+      string,
+      { requiresConfirmation: boolean; credits: number }
+    >();
 
     for (const endpoint of enabledEndpoints) {
       // Internal name for lookups and execution (full path with method)
@@ -278,6 +271,7 @@ export async function loadTools(params: {
         const requiresConfirmation =
           params.toolConfirmationConfig?.get(preferredToolName) ??
           params.toolConfirmationConfig?.get(internalToolName) ??
+          endpoint.requiresConfirmation ??
           false;
 
         params.logger.debug("Creating tool", {
@@ -300,6 +294,10 @@ export async function loadTools(params: {
 
         // Register tool with preferred name (alias) for AI model to see
         toolsMap.set(preferredToolName, createdTool);
+        toolsMeta.set(preferredToolName, {
+          requiresConfirmation,
+          credits: endpoint.credits ?? 0,
+        });
 
         params.logger.debug("Tool created successfully", {
           internalToolName,
@@ -325,11 +323,15 @@ export async function loadTools(params: {
       preferredToolNames: [...toolsMap.keys()],
     });
 
-    return { tools, systemPrompt: params.systemPrompt };
+    return { tools, toolsMeta, systemPrompt: params.systemPrompt };
   } catch (error) {
     params.logger.error("Failed to load tools", {
       error: parseError(error).message,
     });
-    return { tools: undefined, systemPrompt: params.systemPrompt };
+    return {
+      tools: undefined,
+      toolsMeta: new Map(),
+      systemPrompt: params.systemPrompt,
+    };
   }
 }

@@ -39,7 +39,10 @@ export class StreamExecutionHandler {
     streamAbortController: AbortController;
     systemPrompt: string;
     tools: Record<string, CoreTool> | undefined;
-    toolsConfig: Map<string, { requiresConfirmation: boolean }>;
+    toolsConfig: Map<
+      string,
+      { requiresConfirmation: boolean; credits: number }
+    >;
     /** Set of tool names the model is allowed to execute. null = all allowed. */
     activeToolNames: Set<string> | null;
     ctx: StreamContext;

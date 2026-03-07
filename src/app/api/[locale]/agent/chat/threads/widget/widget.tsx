@@ -153,13 +153,13 @@ function ThreadRow({
         if (isFolderMove) {
           return success({
             ...old.data,
-            threads: old.data.threads.filter((t) => t.id !== thread.id),
+            threads: old.data.threads.filter((row) => row.id !== thread.id),
           });
         }
         return success({
           ...old.data,
-          threads: old.data.threads.map((t) =>
-            t.id === thread.id ? { ...t, ...updates } : t,
+          threads: old.data.threads.map((row) =>
+            row.id === thread.id ? { ...row, ...updates } : row,
           ),
         });
       },
@@ -252,7 +252,7 @@ function ThreadRow({
           }
           return success({
             ...old.data,
-            threads: old.data.threads.filter((t) => t.id !== thread.id),
+            threads: old.data.threads.filter((row) => row.id !== thread.id),
             totalCount: old.data.totalCount - 1,
           });
         },

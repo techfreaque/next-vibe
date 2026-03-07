@@ -10,18 +10,16 @@ import {
   CardTitle,
 } from "next-vibe-ui/ui/card";
 import { Div } from "next-vibe-ui/ui/div";
-import {
-  ArrowLeft,
-  Bitcoin,
-  Coins,
-  Gift,
-  Link2,
-  LogIn,
-  Plus,
-  Sparkles,
-  UserPlus,
-  Wallet,
-} from "next-vibe-ui/ui/icons";
+import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
+import { Bitcoin } from "next-vibe-ui/ui/icons/Bitcoin";
+import { Coins } from "next-vibe-ui/ui/icons/Coins";
+import { Gift } from "next-vibe-ui/ui/icons/Gift";
+import { Link2 } from "next-vibe-ui/ui/icons/Link2";
+import { LogIn } from "next-vibe-ui/ui/icons/LogIn";
+import { Plus } from "next-vibe-ui/ui/icons/Plus";
+import { Sparkles } from "next-vibe-ui/ui/icons/Sparkles";
+import { UserPlus } from "next-vibe-ui/ui/icons/UserPlus";
+import { Wallet } from "next-vibe-ui/ui/icons/Wallet";
 import { Link } from "next-vibe-ui/ui/link";
 import { H1, H2, H3, P } from "next-vibe-ui/ui/typography";
 import type { JSX } from "react";
@@ -55,7 +53,7 @@ export function ReferralPageClient({
       <Div className="container px-4 md:px-6 py-8 md:py-12 max-w-6xl mx-auto">
         {/* Back Button */}
         <Link
-          href={`/${locale}`}
+          href={`/${locale}/threads`}
           className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors mb-8"
         >
           <ArrowLeft className="h-4 w-4" />
