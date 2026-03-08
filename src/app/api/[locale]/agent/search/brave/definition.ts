@@ -36,7 +36,7 @@ const FRESHNESS_OPTIONS = [
   "past_year",
 ] as const;
 
-import { BRAVE_SEARCH_ALIAS, SEARCH_ALIAS } from "./constants";
+import { BRAVE_SEARCH_ALIAS } from "./constants";
 
 /**
  * GET /brave-search - Search the web
@@ -65,7 +65,7 @@ const { GET } = createEndpoint({
   allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   // CLI alias for better UX
-  aliases: [SEARCH_ALIAS, BRAVE_SEARCH_ALIAS] as const,
+  aliases: [BRAVE_SEARCH_ALIAS] as const,
   cli: {
     firstCliArgKey: "query",
   },

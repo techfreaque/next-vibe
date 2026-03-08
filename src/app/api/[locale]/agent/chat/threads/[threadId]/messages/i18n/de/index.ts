@@ -303,6 +303,8 @@ export const translations: typeof enTranslations = {
         tokens: "Tokens",
         tokensUsed: "Verwendete Tokens",
         deleteMessage: "Nachricht löschen",
+        upvote: "Upvote",
+        downvote: "Downvote",
       },
     },
     messages: {
@@ -314,7 +316,7 @@ export const translations: typeof enTranslations = {
         previous: "Vorherige Verzweigung",
         next: "Nächste Verzweigung",
       },
-      authorWithId: "{{author}} ({{id}})",
+      authorWithId: "{{name}} ({{id}})",
     },
     linearView: {
       answerModal: {
@@ -330,16 +332,21 @@ export const translations: typeof enTranslations = {
       },
     },
     threadedView: {
+      replyModal: {
+        title: "Antworten",
+        description: "Sende eine Nachricht als Antwort auf diesen Beitrag",
+        inputPlaceholder: "Schreibe deine Antwort...",
+        confirmLabel: "Antworten",
+      },
       actions: {
         reply: "Antworten",
         replyToMessage: "Auf diese Nachricht antworten",
-        edit: "Bearbeiten",
-        editMessage: "Nachricht bearbeiten",
+        branch: "Verzweigen",
+        branchMessage: "Bearbeiten & verzweigen",
         retry: "Wiederholen",
         retryWithDifferent: "Mit anderem Modell wiederholen",
         answerAsAI: "Als KI antworten",
         generateAIResponse: "KI-Antwort generieren",
-        respondToAI: "Auf KI antworten",
         cancelLoading: "Laden abbrechen",
         stop: "Stoppen",
         stopAudio: "Audio stoppen",
@@ -377,11 +384,17 @@ export const translations: typeof enTranslations = {
       continueThread: "Thread fortsetzen ({{count}} {{replyText}})",
     },
     flatView: {
+      replyModal: {
+        title: "Antworten",
+        description: "Sende eine Nachricht als Antwort auf diesen Beitrag",
+        inputPlaceholder: "Schreibe deine Antwort...",
+        confirmLabel: "Antworten",
+      },
       actions: {
         reply: "Antworten",
         replyToMessage: "Auf diese Nachricht antworten",
-        edit: "Bearbeiten",
-        editMessage: "Nachricht bearbeiten",
+        branch: "Verzweigen",
+        branchMessage: "Bearbeiten & verzweigen",
         retry: "Wiederholen",
         retryWithDifferent: "Mit anderem Modell wiederholen",
         answerAsAI: "Als KI antworten",
@@ -389,6 +402,8 @@ export const translations: typeof enTranslations = {
         delete: "Löschen",
         deleteMessage: "Nachricht löschen",
         copyReference: "Referenz kopieren",
+        upvote: "Upvote",
+        downvote: "Downvote",
       },
       answerModal: {
         title: "Als KI antworten",
@@ -428,10 +443,12 @@ export const translations: typeof enTranslations = {
     messageEditor: {
       titles: {
         branch: "Bearbeiten & verzweigen",
+        reply: "Antworten",
         cancel: "Abbrechen",
       },
       hint: {
         branch: "Bearbeiten erstellt eine neue Verzweigung",
+        reply: "Schreibe deine Antwort",
       },
     },
     input: {

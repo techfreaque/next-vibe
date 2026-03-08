@@ -55,6 +55,7 @@ import {
   scopedTranslation as tasksScopedTranslation,
 } from "../i18n";
 import { pushStatusToRemote } from "../task-sync/repository";
+import type { JsonValue } from "../unified-runner/types";
 import type {
   NewPulseExecution,
   NewPulseHealth,
@@ -620,7 +621,7 @@ export class PulseHealthRepository {
           // Fire-and-forget: notify remote that task is now RUNNING
           if (dbTask.targetInstance) {
             void pushStatusToRemote({
-              taskRouteId: dbTask.routeId,
+              taskId: dbTask.id,
               status: CronTaskStatus.RUNNING,
               summary: "",
               durationMs: null,
@@ -651,6 +652,7 @@ export class PulseHealthRepository {
             let finalMessage: string | null = null;
             let finalDurationMs = 0;
             let didLogHistory = false;
+            let finalOutput: Record<string, JsonValue> | null = null;
 
             for (let attempt = 0; attempt <= maxRetries; attempt++) {
               if (attempt > 0) {
@@ -681,9 +683,12 @@ export class PulseHealthRepository {
                       rootFolderId: DefaultFolderId.CRON,
                       threadId: undefined,
                       aiMessageId: undefined,
+                      currentToolMessageId: undefined,
                       characterId: undefined,
                       modelId: undefined,
+                      favoriteId: undefined,
                       headless: undefined,
+                      waitingForRemoteResult: undefined,
                     },
                   }),
                   new Promise<never>((...[, reject]) => {
@@ -773,6 +778,7 @@ export class PulseHealthRepository {
                 taskSucceeded = true;
                 finalStatus = CronTaskStatus.COMPLETED;
                 finalMessage = null;
+                finalOutput = typedResult.data ?? null;
                 break;
               }
 
@@ -826,7 +832,7 @@ export class PulseHealthRepository {
             // Fire-and-forget: push final status to remote
             if (dbTask.targetInstance) {
               void pushStatusToRemote({
-                taskRouteId: dbTask.routeId,
+                taskId: dbTask.id,
                 status: finalStatus,
                 summary: finalMessage ?? "",
                 durationMs: finalDurationMs,
@@ -835,6 +841,7 @@ export class PulseHealthRepository {
                 serverTimezone:
                   Intl.DateTimeFormat().resolvedOptions().timeZone,
                 executedByInstance: instanceId,
+                ...(finalOutput ? { output: finalOutput } : {}),
                 logger,
               }).catch((err) => {
                 logger.warn("pushStatusToRemote (final) failed", {
@@ -871,7 +878,7 @@ export class PulseHealthRepository {
             // Fire-and-forget: push FAILED to remote so it doesn't stay stuck on RUNNING
             if (dbTask.targetInstance) {
               void pushStatusToRemote({
-                taskRouteId: dbTask.routeId,
+                taskId: dbTask.id,
                 status: CronTaskStatus.FAILED,
                 summary: parseError(unexpectedError).message,
                 durationMs: null,

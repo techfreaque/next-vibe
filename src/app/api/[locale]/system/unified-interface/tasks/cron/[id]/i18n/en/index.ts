@@ -353,6 +353,9 @@ export const translations = {
       retryDelay: "Retry Delay",
     },
     lastExecutionError: "Last Error",
+    run: "Run Now",
+    runSuccess: "Task executed successfully",
+    running: "Running...",
     refresh: "Refresh",
     taskInput: {
       title: "Task Input",

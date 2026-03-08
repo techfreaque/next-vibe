@@ -69,6 +69,11 @@ export const translations: typeof enTranslations = {
     acceptTerms: {
       label: "Akceptuj regulamin",
       description: "Nasz regulamin szanuje Twoją wolność i prywatność.",
+      termsLink: "regulamin",
+      conditionsLink: "politykę prywatności",
+      descriptionPrefix: "Nasz",
+      descriptionAnd: "i",
+      descriptionSuffix: "szanują Twoją wolność i prywatność.",
       validation: {
         required: "Musisz zaakceptować regulamin, aby kontynuować",
       },
@@ -84,6 +89,9 @@ export const translations: typeof enTranslations = {
       description:
         "Masz znajomego na unbottled.ai? Wpisz jego kod, żeby go wesprzeć. Dostanie nagrodę za to, że Cię tu przyprowadził.",
       placeholder: "Wpisz kod polecający (opcjonalnie)",
+      labelPrefilled: "Kod polecający",
+      descriptionPrefilled:
+        "Twoj znajomy dostanie nagrodę, gdy założysz konto.",
     },
   },
   form: {

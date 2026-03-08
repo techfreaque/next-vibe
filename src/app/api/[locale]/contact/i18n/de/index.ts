@@ -1,9 +1,9 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
-  title: "Kontaktformular-Einreichung",
+  title: "Kontakt",
   description:
-    "Kontaktformular senden und E-Mail-Benachrichtigungen verarbeiten",
+    "Nachricht an das Team senden – für Fragen, Feedback, Support oder Partnerschaftsanfragen. Du erhältst eine Bestätigungs-E-Mail und wir antworten innerhalb von 24 Stunden.",
   category: "System",
   summary: "Kontaktformular-Einreichungen mit Lead-Tracking verarbeiten",
   tags: {

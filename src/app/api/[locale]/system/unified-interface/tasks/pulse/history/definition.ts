@@ -34,7 +34,7 @@ export const { GET } = createEndpoint({
   description: "get.description",
   icon: "activity",
   category: "app.endpointCategories.system",
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
   tags: ["tags.pulse" as const],
 
   fields: customWidgetObject({

@@ -774,7 +774,15 @@ export function ChatMessages({
               onBranchMessage={branchMessage}
               onRetryMessage={retryMessage}
               onAnswerAsModel={answerAsAI}
+              onReplyMessage={async (parentMessageId, content, attachments) => {
+                await sendMessage({
+                  content,
+                  parentId: parentMessageId,
+                  attachments,
+                });
+              }}
               onDeleteMessage={messageDeleteActions.handleDeleteMessage}
+              onVoteMessage={voteMessage}
             />
           ) : viewMode === ViewMode.THREADED ? (
             // Threaded view (Reddit style) - Show ALL messages, not just current path
@@ -797,6 +805,17 @@ export function ChatMessages({
                   onBranchMessage={branchMessage}
                   onRetryMessage={retryMessage}
                   onAnswerAsModel={answerAsAI}
+                  onReplyMessage={async (
+                    parentMessageId,
+                    content,
+                    attachments,
+                  ) => {
+                    await sendMessage({
+                      content,
+                      parentId: parentMessageId,
+                      attachments,
+                    });
+                  }}
                   onVoteMessage={voteMessage}
                   onDeleteMessage={messageDeleteActions.handleDeleteMessage}
                   user={user}
@@ -919,6 +938,7 @@ export function ChatMessages({
                     deductCredits={deductCredits}
                     onLoadNewerHistory={loadNewerHistory}
                     isLoadingNewerHistory={isLoadingNewerHistory}
+                    onVoteMessage={voteMessage}
                   />
                 </>
               );

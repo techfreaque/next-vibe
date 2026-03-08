@@ -30,16 +30,11 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["payment", "refund"],
-  allowedRoles: [
-    UserRole.CUSTOMER,
-    UserRole.ADMIN,
-    UserRole.PARTNER_ADMIN,
-    UserRole.PARTNER_EMPLOYEE,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
 
   title: "title" as const,
   description: "description" as const,
-  category: "app.endpointCategories.payment",
+  category: "app.endpointCategories.credits",
   icon: "refresh-ccw" as const,
   tags: ["tags.refund" as const, "tags.transaction" as const],
 

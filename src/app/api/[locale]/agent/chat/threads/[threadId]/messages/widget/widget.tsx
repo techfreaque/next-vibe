@@ -143,6 +143,7 @@ function ReadOnlyMessages({
         deductCredits={null}
         onLoadNewerHistory={null}
         isLoadingNewerHistory={false}
+        onVoteMessage={null}
       />
     </Div>
   );

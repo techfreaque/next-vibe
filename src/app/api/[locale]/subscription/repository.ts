@@ -1794,6 +1794,136 @@ export class SubscriptionRepository {
       });
     }
   }
+
+  /**
+   * Handle NOWPayments success redirect.
+   * Called from the subscription page when NP_id (payment_id) is present in the URL.
+   * Fetches payment status from NOWPayments, looks up stored invoice metadata,
+   * and processes the subscription checkout — idempotent via renewalSessionKey.
+   */
+  static async handleNowPaymentsSuccessRedirect(
+    npId: string,
+    userId: string,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      logger.info("Processing NOWPayments success redirect", { npId, userId });
+
+      const { NOWPaymentsProvider } =
+        await import("../payment/providers/nowpayments/repository");
+      const provider = new NOWPaymentsProvider();
+
+      // Fetch payment status to get the invoice_id
+      const statusResult = await provider.getPaymentStatus(
+        npId,
+        logger,
+        locale,
+      );
+
+      if (!statusResult.success) {
+        logger.warn("Could not fetch NOWPayments payment status", {
+          npId,
+          error: statusResult.message,
+        });
+        return;
+      }
+
+      const paymentStatus = statusResult.data;
+
+      logger.info("NOWPayments payment status on redirect", {
+        npId,
+        status: paymentStatus.payment_status,
+        orderId: paymentStatus.order_id,
+      });
+
+      // Only process finished payments
+      if (paymentStatus.payment_status !== "finished") {
+        logger.info("Payment not yet finished, skipping credit grant", {
+          npId,
+          status: paymentStatus.payment_status,
+        });
+        return;
+      }
+
+      // Extract userId from order_id as ownership check
+      const orderUserId = paymentStatus.order_id?.split("_")[0];
+      if (orderUserId !== userId) {
+        logger.warn(
+          "User mismatch on NOWPayments success redirect — ignoring",
+          { npId, orderUserId, requestUserId: userId },
+        );
+        return;
+      }
+
+      // Look up stored invoice metadata (contains planId, billingInterval, etc.)
+      // order_id = "userId_timestamp" — use the timestamp to find the right invoice.
+      const { paymentInvoices } = await import("../payment/db");
+
+      const orderTimestamp = parseInt(
+        paymentStatus.order_id?.split("_")[1] ?? "0",
+        10,
+      );
+
+      // Find invoices for this user created within 60 seconds of the order timestamp
+      const userInvoices = await db
+        .select()
+        .from(paymentInvoices)
+        .where(eq(paymentInvoices.userId, userId))
+        .orderBy(desc(paymentInvoices.createdAt))
+        .limit(10);
+
+      const matchedInvoice = userInvoices.find((inv) => {
+        if (!orderTimestamp) {
+          return true; // fallback: use most recent
+        }
+        const diff = Math.abs(inv.createdAt.getTime() - orderTimestamp);
+        return diff < 60_000; // within 60 seconds
+      });
+
+      if (!matchedInvoice?.metadata) {
+        logger.warn("No matching invoice found for NOWPayments payment", {
+          npId,
+          userId,
+          orderId: paymentStatus.order_id,
+        });
+        return;
+      }
+
+      const meta = matchedInvoice.metadata as Record<string, string>;
+
+      if (meta.type !== "subscription") {
+        logger.info(
+          "NOWPayments success redirect: not a subscription, skipping",
+          { npId, type: meta.type },
+        );
+        return;
+      }
+
+      // Build a WebhookData-compatible object so handleSubscriptionCheckout can process it
+      const webhookData = {
+        id: matchedInvoice.providerInvoiceId,
+        metadata: {
+          ...meta,
+          userId,
+        },
+      };
+
+      await this.handleSubscriptionCheckout(webhookData, logger, locale);
+
+      logger.info("NOWPayments success redirect processed", {
+        npId,
+        userId,
+        invoiceId: matchedInvoice.providerInvoiceId,
+      });
+    } catch (error) {
+      logger.error("Failed to process NOWPayments success redirect", {
+        error: parseError(error),
+        npId,
+        userId,
+      });
+    }
+  }
 }
 
 // Type for native repository type checking

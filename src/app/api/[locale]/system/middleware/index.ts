@@ -112,7 +112,29 @@ export async function middleware(
     });
   }
 
-  // Step 1: Handle language detection and redirection
+  // Step 1: Strip bare "/en/" prefix hallucinated by AI tools in local testing.
+  // Redirect to the path without it so normal locale detection takes over.
+  // Skipped in production — this only happens during local dev/testing.
+  if (env.NODE_ENV !== Environment.PRODUCTION) {
+    const pathParts = path.split("/").filter(Boolean);
+    const isApiRoute = pathParts[0] === "api";
+    const bareSegment = isApiRoute ? pathParts[1] : pathParts[0];
+    if (bareSegment === "en") {
+      let stripped: string;
+      if (isApiRoute) {
+        // /api/en/foo -> /api/foo
+        stripped = `/api/${pathParts.slice(2).join("/")}`;
+      } else {
+        // /en/foo -> /foo
+        stripped = `/${pathParts.slice(1).join("/")}`;
+      }
+      const redirectUrl = new URL(stripped || "/", request.url);
+      redirectUrl.search = request.nextUrl.search;
+      return NextResponseClass.redirect(redirectUrl);
+    }
+  }
+
+  // Step 2: Handle language detection and redirection
   const detectedLocale = detectLocale(request, options);
 
   // If we need to redirect for locale, do it now
@@ -133,7 +155,9 @@ export async function middleware(
       newPath = `/${detectedLocale}${path}`;
     }
 
-    return NextResponseClass.redirect(new URL(newPath, request.url));
+    const redirectUrl = new URL(newPath, request.url);
+    redirectUrl.search = request.nextUrl.search;
+    return NextResponseClass.redirect(redirectUrl);
   }
 
   // Step 2: Extract locale from path for leadId middleware

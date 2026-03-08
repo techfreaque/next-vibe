@@ -33,7 +33,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["system", "unified-interface", "tasks", "pulse", "execute"],
   aliases: [PULSE_EXECUTE_ALIAS, "pulse:execute"],
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
 
   title: "post.title",
   description: "post.description",

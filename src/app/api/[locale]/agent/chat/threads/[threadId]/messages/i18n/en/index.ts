@@ -301,6 +301,8 @@ export const translations = {
         tokens: "Tokens",
         tokensUsed: "Tokens used",
         deleteMessage: "Delete message",
+        upvote: "Upvote",
+        downvote: "Downvote",
       },
     },
     messages: {
@@ -312,7 +314,7 @@ export const translations = {
         previous: "Previous branch",
         next: "Next branch",
       },
-      authorWithId: "{{author}} ({{id}})",
+      authorWithId: "{{name}} ({{id}})",
     },
     linearView: {
       answerModal: {
@@ -328,16 +330,21 @@ export const translations = {
       },
     },
     threadedView: {
+      replyModal: {
+        title: "Reply",
+        description: "Send a message in reply to this post",
+        inputPlaceholder: "Write your reply...",
+        confirmLabel: "Reply",
+      },
       actions: {
         reply: "Reply",
         replyToMessage: "Reply to this message",
-        edit: "Edit",
-        editMessage: "Edit message",
+        branch: "Branch",
+        branchMessage: "Edit & branch",
         retry: "Retry",
         retryWithDifferent: "Retry with different model",
         answerAsAI: "Answer as AI",
         generateAIResponse: "Generate AI response",
-        respondToAI: "Respond to AI",
         cancelLoading: "Cancel loading",
         stop: "Stop",
         stopAudio: "Stop audio",
@@ -375,11 +382,17 @@ export const translations = {
       continueThread: "Continue thread ({{count}} {{replyText}})",
     },
     flatView: {
+      replyModal: {
+        title: "Reply",
+        description: "Send a message in reply to this post",
+        inputPlaceholder: "Write your reply...",
+        confirmLabel: "Reply",
+      },
       actions: {
         reply: "Reply",
         replyToMessage: "Reply to this message",
-        edit: "Edit",
-        editMessage: "Edit message",
+        branch: "Branch",
+        branchMessage: "Edit & branch",
         retry: "Retry",
         retryWithDifferent: "Retry with different model",
         answerAsAI: "Answer as AI",
@@ -387,6 +400,8 @@ export const translations = {
         delete: "Delete",
         deleteMessage: "Delete message",
         copyReference: "Copy reference",
+        upvote: "Upvote",
+        downvote: "Downvote",
       },
       answerModal: {
         title: "Answer as AI",
@@ -426,10 +441,12 @@ export const translations = {
     messageEditor: {
       titles: {
         branch: "Edit & branch",
+        reply: "Reply",
         cancel: "Cancel",
       },
       hint: {
         branch: "Editing creates a new branch",
+        reply: "Write your reply",
       },
     },
     input: {

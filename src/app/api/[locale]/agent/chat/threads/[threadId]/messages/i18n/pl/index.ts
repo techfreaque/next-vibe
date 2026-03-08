@@ -304,6 +304,8 @@ export const translations: typeof enTranslations = {
         tokens: "Tokeny",
         tokensUsed: "Użyte tokeny",
         deleteMessage: "Usuń wiadomość",
+        upvote: "Głosuj za",
+        downvote: "Głosuj przeciw",
       },
     },
     messages: {
@@ -315,7 +317,7 @@ export const translations: typeof enTranslations = {
         previous: "Poprzednie rozgałęzienie",
         next: "Następne rozgałęzienie",
       },
-      authorWithId: "{{author}} ({{id}})",
+      authorWithId: "{{name}} ({{id}})",
     },
     linearView: {
       answerModal: {
@@ -331,16 +333,21 @@ export const translations: typeof enTranslations = {
       },
     },
     threadedView: {
+      replyModal: {
+        title: "Odpowiedz",
+        description: "Wyślij wiadomość w odpowiedzi na ten post",
+        inputPlaceholder: "Napisz odpowiedź...",
+        confirmLabel: "Odpowiedz",
+      },
       actions: {
         reply: "Odpowiedz",
         replyToMessage: "Odpowiedz na tę wiadomość",
-        edit: "Edytuj",
-        editMessage: "Edytuj wiadomość",
+        branch: "Rozgałęź",
+        branchMessage: "Edytuj i rozgałęź",
         retry: "Ponów",
         retryWithDifferent: "Ponów z innym modelem",
         answerAsAI: "Odpowiedz jako AI",
         generateAIResponse: "Wygeneruj odpowiedź AI",
-        respondToAI: "Odpowiedz AI",
         cancelLoading: "Anuluj ładowanie",
         stop: "Zatrzymaj",
         stopAudio: "Zatrzymaj audio",
@@ -378,11 +385,17 @@ export const translations: typeof enTranslations = {
       continueThread: "Kontynuuj wątek ({{count}} {{replyText}})",
     },
     flatView: {
+      replyModal: {
+        title: "Odpowiedz",
+        description: "Wyślij wiadomość w odpowiedzi na ten post",
+        inputPlaceholder: "Napisz odpowiedź...",
+        confirmLabel: "Odpowiedz",
+      },
       actions: {
         reply: "Odpowiedz",
         replyToMessage: "Odpowiedz na tę wiadomość",
-        edit: "Edytuj",
-        editMessage: "Edytuj wiadomość",
+        branch: "Rozgałęź",
+        branchMessage: "Edytuj i rozgałęź",
         retry: "Ponów",
         retryWithDifferent: "Ponów z innym modelem",
         answerAsAI: "Odpowiedz jako AI",
@@ -390,6 +403,8 @@ export const translations: typeof enTranslations = {
         delete: "Usuń",
         deleteMessage: "Usuń wiadomość",
         copyReference: "Kopiuj referencję",
+        upvote: "Głosuj za",
+        downvote: "Głosuj przeciw",
       },
       answerModal: {
         title: "Odpowiedz jako AI",
@@ -429,10 +444,12 @@ export const translations: typeof enTranslations = {
     messageEditor: {
       titles: {
         branch: "Edytuj i rozgałęź",
+        reply: "Odpowiedz",
         cancel: "Anuluj",
       },
       hint: {
         branch: "Edycja tworzy nowe rozgałęzienie",
+        reply: "Napisz odpowiedź",
       },
     },
     input: {

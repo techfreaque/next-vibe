@@ -143,7 +143,7 @@ const { POST } = createEndpoint({
   category: "app.endpointCategories.credits",
   tags: ["tags.publicCap", "tags.admin"],
   icon: "shield",
-  allowedRoles: [UserRole.ADMIN] as const,
+  allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF] as const,
 
   method: Methods.POST,
   title: "post.title",

@@ -28,6 +28,7 @@ const errorLogsCleanupTask = createCronTask(definitions.POST, tools.POST, {
   schedule: CRON_SCHEDULES.DAILY_MIDNIGHT,
   category: TaskCategory.MAINTENANCE,
   enabled: true,
+  hidden: true,
   priority: CronTaskPriority.LOW,
   timeout: TASK_TIMEOUTS.SHORT,
   taskInput: undefined,

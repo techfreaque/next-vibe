@@ -356,10 +356,56 @@ export async function buildSystemPrompt(params: {
 
   // ─── Step 4: Build trailing system message and return ───────────────────
 
+  // Fetch completed background (task-done) results for this thread so the
+  // model is informed about async remote tasks that finished since last turn.
+  let completedTasksSummary = "";
+  if (threadId && userId && !isIncognito && !isExposedFolder) {
+    try {
+      const completedRows = await db
+        .select({
+          id: cronTasks.id,
+          displayName: cronTasks.displayName,
+          result: cronTaskExecutions.result,
+          taskInput: cronTasks.taskInput,
+        })
+        .from(cronTasks)
+        .innerJoin(
+          cronTaskExecutions,
+          eq(cronTaskExecutions.taskId, cronTasks.id),
+        )
+        .where(
+          sql`
+            ${cronTasks.userId} = ${userId}
+            AND ${cronTaskExecutions.status} = 'completed'
+            AND ${cronTasks.taskInput}->>'__callbackMode' = 'task-done'
+            AND ${cronTasks.taskInput}->>'__threadId' = ${threadId}
+            AND ${cronTaskExecutions.result} IS NOT NULL
+          `,
+        )
+        .limit(10);
+
+      if (completedRows.length > 0) {
+        const lines = completedRows.map((row) => {
+          const resultStr = row.result
+            ? JSON.stringify(row.result).slice(0, 500)
+            : "(no output)";
+          return `- **${row.displayName}** (id: ${row.id}): ${resultStr}`;
+        });
+        completedTasksSummary = `The following background tasks completed:\n\n${lines.join("\n")}`;
+      }
+    } catch (error) {
+      logger.debug("Failed to load completed background tasks", {
+        threadId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
   const trailingSystemMessage = buildTrailingSystemMessage({
     tasksSummary,
     memorySummary,
     favoritesSummary,
+    completedTasksSummary: completedTasksSummary || null,
     voiceTranscription,
   });
 

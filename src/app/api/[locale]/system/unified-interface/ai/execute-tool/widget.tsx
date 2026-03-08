@@ -14,6 +14,7 @@
 
 import type { AutocompleteOption } from "next-vibe-ui/ui/autocomplete-field";
 import { AutocompleteField } from "next-vibe-ui/ui/autocomplete-field";
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { FormField, FormItem, FormLabel } from "next-vibe-ui/ui/form/form";
 import { P } from "next-vibe-ui/ui/typography";
@@ -35,6 +36,8 @@ import {
   useWidgetForm,
   useWidgetLocale,
   useWidgetLogger,
+  useWidgetOnCancel,
+  useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
@@ -64,6 +67,8 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
   const logger = useWidgetLogger();
   const t = useWidgetTranslation<typeof definition.POST>();
   const disabled = useWidgetDisabled();
+  const onSubmit = useWidgetOnSubmit();
+  const onCancel = useWidgetOnCancel();
 
   // Get values from form (interactive mode) or field.value (read-only tool call display)
   const fieldValue =
@@ -302,6 +307,28 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
             disabled={disabled}
           />
         </NavigationStackProvider>
+      )}
+
+      {/* Confirmation mode: render Confirm / Cancel buttons when onSubmit/onCancel are provided */}
+      {(onSubmit ?? onCancel) && (
+        <Div className="flex gap-2 pt-2">
+          {onSubmit && form && (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={(): void => {
+                form.handleSubmit(onSubmit)();
+              }}
+            >
+              {t("executeTool.post.actions.confirm")}
+            </Button>
+          )}
+          {onCancel && (
+            <Button type="button" variant="ghost" onClick={onCancel}>
+              {t("executeTool.post.actions.cancel")}
+            </Button>
+          )}
+        </Div>
       )}
     </Div>
   );

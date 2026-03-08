@@ -138,7 +138,7 @@ function checkUserAccess(
       r !== ROLE_REMOTE_SKILL,
   );
   if (permRoles.length === 0) {
-    return true;
+    return false;
   }
   if (permRoles.includes(ROLE_PUBLIC)) {
     return true;
@@ -461,6 +461,9 @@ export class HelpRepository {
     if (platformFilter) {
       const mapped = mapFilterToPlatform(platformFilter as PlatformFilterValue);
       discoveryPlatform = mapped === "all" ? Platform.CLI : mapped;
+    } else if (!isAdmin && platform === Platform.NEXT_API) {
+      // Non-admin users on the web tools page see AI-relevant tools
+      discoveryPlatform = Platform.AI;
     } else {
       discoveryPlatform = Platform.CLI;
     }

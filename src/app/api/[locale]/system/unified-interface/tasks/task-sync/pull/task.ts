@@ -30,8 +30,10 @@ const syncTask = createCronTask(endpoints.POST, tools.POST, {
   description: "taskSync.description",
   schedule: CRON_SCHEDULES.EVERY_MINUTE,
   category: TaskCategory.SYSTEM,
-  enabled:
-    env.IS_PREVIEW_MODE || !!(env.THEA_REMOTE_URL && env.THEA_REMOTE_API_KEY),
+  // Always enabled — pullFromRemote skips when no active user connections exist,
+  // and skips outbound sync on VIBE_IS_CLOUD instances.
+  enabled: !env.VIBE_IS_CLOUD,
+  hidden: true,
   priority: CronTaskPriority.HIGH,
   timeout: TASK_TIMEOUTS.MEDIUM,
   taskInput: undefined,

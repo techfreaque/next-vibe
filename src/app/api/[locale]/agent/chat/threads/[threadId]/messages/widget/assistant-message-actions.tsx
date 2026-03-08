@@ -1,7 +1,10 @@
 "use client";
 
 import { cn } from "next-vibe/shared/utils";
+import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
+import { ArrowBigDown } from "next-vibe-ui/ui/icons/ArrowBigDown";
+import { ArrowBigUp } from "next-vibe-ui/ui/icons/ArrowBigUp";
 import { Bot } from "next-vibe-ui/ui/icons/Bot";
 import { Square } from "next-vibe-ui/ui/icons/Square";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
@@ -48,6 +51,10 @@ interface AssistantMessageActionsProps {
   user: JwtPayloadType;
   /** Credit deduction callback (null in read-only mode) */
   deductCredits: ((creditCost: number, feature: string) => void) | null;
+  /** Vote callback — null when voting is not available */
+  onVote: ((messageId: string, vote: 1 | -1 | 0) => Promise<void>) | null;
+  userVote: "up" | "down" | null;
+  voteScore: number;
 }
 
 export function AssistantMessageActions({
@@ -66,6 +73,9 @@ export function AssistantMessageActions({
   readOnly,
   user,
   deductCredits,
+  onVote,
+  userVote,
+  voteScore,
 }: AssistantMessageActionsProps): React.JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
   const isTouch = useTouchDevice();
@@ -126,6 +136,60 @@ export function AssistantMessageActions({
         className,
       )}
     >
+      {/* Voting buttons */}
+      {onVote && (
+        <Div className="flex items-center gap-0.5">
+          <Button
+            variant="ghost"
+            size="unset"
+            onClick={() => onVote(messageId, userVote === "up" ? 0 : 1)}
+            className={cn(
+              "flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-blue-500/10 transition-all",
+              userVote === "up"
+                ? "text-blue-400"
+                : "text-muted-foreground hover:text-blue-400",
+            )}
+            title={t("widget.common.assistantMessageActions.upvote")}
+            disabled={readOnly}
+          >
+            <ArrowBigUp
+              className={cn("h-3.5 w-3.5", userVote === "up" && "fill-current")}
+            />
+          </Button>
+          {voteScore !== 0 && (
+            <Span
+              className={cn(
+                "text-xs font-medium min-w-5 text-center",
+                voteScore > 0 && "text-blue-400",
+                voteScore < 0 && "text-red-400",
+              )}
+            >
+              {voteScore > 0 ? `+${voteScore}` : voteScore}
+            </Span>
+          )}
+          <Button
+            variant="ghost"
+            size="unset"
+            onClick={() => onVote(messageId, userVote === "down" ? 0 : -1)}
+            className={cn(
+              "flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-red-500/10 transition-all",
+              userVote === "down"
+                ? "text-red-400"
+                : "text-muted-foreground hover:text-red-400",
+            )}
+            title={t("widget.common.assistantMessageActions.downvote")}
+            disabled={readOnly}
+          >
+            <ArrowBigDown
+              className={cn(
+                "h-3.5 w-3.5",
+                userVote === "down" && "fill-current",
+              )}
+            />
+          </Button>
+        </Div>
+      )}
+
       <CopyButton
         content={content}
         contentMarkdown={contentMarkdown}

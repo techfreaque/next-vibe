@@ -38,6 +38,8 @@ export enum StreamEventType {
   THREAD_TITLE_UPDATED = "thread-title-updated",
   // Stream lifecycle event — unambiguous "stream is completely done" signal
   STREAM_FINISHED = "stream-finished",
+  // Async remote task completed — client should re-trigger AI stream to continue
+  TASK_COMPLETED = "task-completed",
 }
 
 /**
@@ -249,6 +251,22 @@ export interface StreamFinishedEventData {
 }
 
 /**
+ * Task completed event data
+ * Emitted when an async remote task finishes and the AI stream should resume.
+ * Client re-triggers the AI stream with operation:"answer-as-ai".
+ */
+export interface TaskCompletedEventData {
+  /** Thread ID the task was dispatched from */
+  threadId: string;
+  /** The cron task ID */
+  taskId: string;
+  /** Terminal status of the task */
+  status: "completed" | "failed" | "cancelled" | "timeout";
+  /** Last assistant message ID — client uses this as parentId for resume */
+  lastMessageId: string | null;
+}
+
+/**
  * Event type to data mapping
  */
 export interface StreamEventDataMap {
@@ -277,6 +295,8 @@ export interface StreamEventDataMap {
   [StreamEventType.THREAD_TITLE_UPDATED]: ThreadTitleUpdatedEventData;
   // Stream lifecycle
   [StreamEventType.STREAM_FINISHED]: StreamFinishedEventData;
+  // Async task completion — triggers AI stream resume
+  [StreamEventType.TASK_COMPLETED]: TaskCompletedEventData;
 }
 
 /**
@@ -413,6 +433,13 @@ export const createStreamEvent = {
     data: StreamFinishedEventData,
   ): StreamEvent<StreamEventType.STREAM_FINISHED> => ({
     type: StreamEventType.STREAM_FINISHED,
+    data,
+  }),
+
+  taskCompleted: (
+    data: TaskCompletedEventData,
+  ): StreamEvent<StreamEventType.TASK_COMPLETED> => ({
+    type: StreamEventType.TASK_COMPLETED,
     data,
   }),
 };

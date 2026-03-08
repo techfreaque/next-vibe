@@ -96,6 +96,15 @@ export const translations = {
       description: "Folder permissions retrieved successfully",
     },
   },
+  enums: {
+    userRole: {
+      public: "Public",
+      customer: "Customer",
+      partnerAdmin: "Partner Admin",
+      partnerEmployee: "Partner Employee",
+      admin: "Admin",
+    },
+  },
   patch: {
     title: "Update Folder Permissions",
     description: "Update the list of moderators for a specific folder",

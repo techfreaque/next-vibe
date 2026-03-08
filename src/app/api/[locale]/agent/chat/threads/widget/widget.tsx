@@ -59,8 +59,9 @@ import { useEndpoint } from "@/app/api/[locale]/system/unified-interface/react/h
 import { useWidgetContext } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useTouchDevice } from "@/hooks/use-touch-device";
+import { simpleT } from "@/i18n/core/shared";
 
-import { DefaultFolderId } from "../../config";
+import { DEFAULT_FOLDER_CONFIGS, DefaultFolderId } from "../../config";
 import type { ChatThread } from "../../db";
 import { useChatStore } from "../../hooks/store";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
@@ -484,7 +485,10 @@ function ThreadRow({
                             className="cursor-pointer"
                           >
                             <Icon icon="folder" className="h-4 w-4 mr-2" />
-                            {t("widget.actions.unfiled")}
+                            {simpleT(locale).t(
+                              DEFAULT_FOLDER_CONFIGS[thread.rootFolderId]
+                                .translationKey,
+                            )}
                           </DropdownMenuItem>
                         )}
                         {allFolders.map((folder) => (

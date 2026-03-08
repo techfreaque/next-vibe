@@ -5,7 +5,6 @@
 
 import { envClient } from "@/config/env-client";
 
-import { CHROME_ALIAS } from "../../browser/constants";
 import { CONTACT_FORM_ALIAS } from "../../contact/constants";
 import { SSH_EXEC_ALIAS } from "../../ssh/exec/constants";
 import { SSH_FILES_READ_ALIAS } from "../../ssh/files/read/constants";
@@ -20,10 +19,12 @@ import {
   CRON_CREATE_ALIAS,
   CRON_LIST_ALIAS,
 } from "../../system/unified-interface/tasks/cron/tasks/constants";
+import { WAIT_FOR_TASK_ALIAS } from "../../system/unified-interface/tasks/wait-for-task/constants";
 import { AI_RUN_ALIAS } from "../ai-stream/run/constants";
 import { CLAUDE_CODE_ALIAS } from "../claude-code/constants";
 import { FETCH_URL_ALIAS } from "../fetch-url-content/constants";
 import { BRAVE_SEARCH_ALIAS } from "../search/brave/constants";
+import { KAGI_ALIAS } from "../search/kagi/constants";
 import {
   MEMORY_DELETE_ALIAS,
   MEMORY_UPDATE_ALIAS,
@@ -65,6 +66,7 @@ export const DEFAULT_TOOL_IDS = [
   TOOL_HELP_ALIAS,
   EXECUTE_TOOL_ALIAS,
   BRAVE_SEARCH_ALIAS,
+  KAGI_ALIAS,
   FETCH_URL_ALIAS,
   MEMORY_LIST_ALIAS,
   MEMORY_ADD_ALIAS,
@@ -110,8 +112,8 @@ const LOCAL_ADMIN_EXTRA_TOOL_IDS = [
   SQL_ALIAS,
   REBUILD_ALIAS,
   CRON_DASHBOARD_ALIAS,
-  CHROME_ALIAS,
   COMPLETE_TASK_ALIAS,
+  WAIT_FOR_TASK_ALIAS,
 ] as const;
 
 /**

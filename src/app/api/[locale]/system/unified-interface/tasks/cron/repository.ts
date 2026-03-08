@@ -25,6 +25,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CronTaskStatus, TaskCategory, TaskCategoryDB } from "../enum";
 import type { scopedTranslation } from "../i18n";
+import type { JsonValue } from "../unified-runner/types";
 import type {
   CronTaskExecution,
   CronTaskRow,
@@ -85,6 +86,7 @@ export function serializeTask(
     schedule: task.schedule,
     timezone: task.timezone ?? null,
     enabled: task.enabled,
+    hidden: task.hidden,
     priority: task.priority,
     timeout: task.timeout ?? null,
     retries: task.retries ?? null,
@@ -589,7 +591,7 @@ function truncate(str: string, maxLen: number): string {
  * Summarise a task result JSONB value into a short human-readable string.
  */
 function summariseResult(
-  result: Record<string, string | number | boolean> | null,
+  result: Record<string, JsonValue> | null,
 ): string | null {
   if (!result) {
     return null;
@@ -641,13 +643,17 @@ export async function generateTasksSummary(params: {
       })
       .from(cronTasks)
       .where(
-        // Include user's own tasks + tasks targeting this instance (e.g. delegated from prod)
-        instanceId
-          ? or(
-              eq(cronTasks.userId, userId),
-              eq(cronTasks.targetInstance, instanceId),
-            )
-          : eq(cronTasks.userId, userId),
+        and(
+          // Never show hidden tasks to AI
+          eq(cronTasks.hidden, false),
+          // Include user's own tasks + tasks targeting this instance (e.g. delegated from prod)
+          instanceId
+            ? or(
+                eq(cronTasks.userId, userId),
+                eq(cronTasks.targetInstance, instanceId),
+              )
+            : eq(cronTasks.userId, userId),
+        ),
       )
       .orderBy(desc(cronTasks.updatedAt))
       .limit(50);

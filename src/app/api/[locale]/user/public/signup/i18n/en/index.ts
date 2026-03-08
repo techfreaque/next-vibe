@@ -77,6 +77,11 @@ export const translations = {
     acceptTerms: {
       label: "Accept Terms & Conditions",
       description: "Our terms and conditions respect your freedom and privacy.",
+      termsLink: "terms",
+      conditionsLink: "conditions",
+      descriptionPrefix: "Our",
+      descriptionAnd: "and",
+      descriptionSuffix: "respect your freedom and privacy.",
       validation: {
         required: "You must accept the terms and conditions to continue",
       },
@@ -86,6 +91,9 @@ export const translations = {
       description:
         "Have a friend on unbottled.ai? Enter their code to support them. They get rewarded for bringing you in.",
       placeholder: "Enter referral code (optional)",
+      labelPrefilled: "Referral code",
+      descriptionPrefilled:
+        "Your friend gets rewarded when you create your account.",
     },
   },
 

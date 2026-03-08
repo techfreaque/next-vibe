@@ -3,8 +3,9 @@
  */
 
 export const translations = {
-  title: "Contact Form Submission",
-  description: "Submit contact form and handle email notifications",
+  title: "Contact Us",
+  description:
+    "Send a message to the team — for questions, feedback, support requests, or partnership inquiries. You'll receive a confirmation email and we'll reply within 24 hours.",
   category: "System",
   summary: "Process contact form submissions with lead tracking",
   tags: {

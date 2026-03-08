@@ -321,9 +321,12 @@ export class UnifiedTaskRunnerRepositoryImpl {
           rootFolderId: DefaultFolderId.CRON,
           threadId: undefined,
           aiMessageId: undefined,
+          currentToolMessageId: undefined,
           characterId: undefined,
           modelId: undefined,
+          favoriteId: undefined,
           headless: undefined,
+          waitingForRemoteResult: undefined,
         },
       });
 

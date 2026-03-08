@@ -332,8 +332,15 @@ export function ToolCallRenderer({
     !Array.isArray(toolCall.result) &&
     "success" in toolCall.result &&
     toolCall.result.success === false;
-  const hasError = Boolean(toolCall.error) || resultIsError;
-  const isLoading = !hasResult && !hasError && !isWaitingForConfirmation;
+  // status="failed" counts as an error even with no result (e.g. remote task failed with no output)
+  const statusIsError = toolCall.status === "failed";
+  const hasError = Boolean(toolCall.error) || resultIsError || statusIsError;
+  // status="completed" or "failed" means the tool finished — don't show loading even if result is null
+  // (remote async tasks may complete with no result payload)
+  const isTerminalStatus =
+    toolCall.status === "completed" || toolCall.status === "failed";
+  const isLoading =
+    !hasResult && !hasError && !isWaitingForConfirmation && !isTerminalStatus;
 
   /** Extract a displayable error message from toolCall.error or toolCall.result (when it's an ErrorResponseType) */
   const getErrorMessage = (): string => {
@@ -618,11 +625,13 @@ export function ToolCallRenderer({
                   {t("widgets.toolCall.status.executing")}
                 </Span>
               )}
-              {hasResult && !hasError && !isWaitingForConfirmation && (
-                <Span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-500">
-                  {t("widgets.toolCall.status.complete")}
-                </Span>
-              )}
+              {(hasResult || isTerminalStatus) &&
+                !hasError &&
+                !isWaitingForConfirmation && (
+                  <Span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-500">
+                    {t("widgets.toolCall.status.complete")}
+                  </Span>
+                )}
             </Div>
           </Div>
         </CollapsibleTrigger>

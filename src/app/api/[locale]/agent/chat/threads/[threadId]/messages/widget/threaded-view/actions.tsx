@@ -6,6 +6,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { ArrowBigDown } from "next-vibe-ui/ui/icons/ArrowBigDown";
 import { ArrowBigUp } from "next-vibe-ui/ui/icons/ArrowBigUp";
 import { CornerDownRight } from "next-vibe-ui/ui/icons/CornerDownRight";
+import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
 import { MessageSquare } from "next-vibe-ui/ui/icons/MessageSquare";
 import { Share2 } from "next-vibe-ui/ui/icons/Share2";
 import { Square } from "next-vibe-ui/ui/icons/Square";
@@ -46,10 +47,13 @@ interface ThreadedMessageActionsProps {
   // Reply count
   replyCount: number;
   hasReplies: boolean;
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
   // State flags
   isEditing: boolean;
   isRetrying: boolean;
   isAnswering: boolean;
+  isReplying: boolean;
 }
 
 export function ThreadedMessageActions({
@@ -71,9 +75,12 @@ export function ThreadedMessageActions({
   onDeleteMessage,
   replyCount,
   hasReplies,
+  isCollapsed,
+  onToggleCollapse,
   isEditing,
   isRetrying,
   isAnswering,
+  isReplying,
 }: ThreadedMessageActionsProps): JSX.Element | null {
   const { t } = scopedTranslation.scopedT(locale);
   const { groupHover } = useMessageGroupName();
@@ -81,12 +88,33 @@ export function ThreadedMessageActions({
   // Editor actions from Zustand store
   const startEdit = useMessageEditorStore((s) => s.startEdit);
   const startAnswer = useMessageEditorStore((s) => s.startAnswer);
+  const startReply = useMessageEditorStore((s) => s.startReply);
 
   // Calculate TTS credit cost based on text length
   const ttsCreditCost = ttsText.length * FEATURE_COSTS.TTS;
 
-  // Don't show actions if in edit/retry/answer mode
-  if (isEditing || isRetrying || isAnswering) {
+  // When collapsed, only show the reply count badge (always visible, not gated by hover)
+  if (isCollapsed && hasReplies) {
+    return (
+      <Div className="flex items-center mt-3">
+        <Button
+          variant="ghost"
+          size="unset"
+          onClick={onToggleCollapse}
+          className="px-2 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold hover:bg-blue-500/20 transition-all"
+          title={t("widget.threadedView.expandReplies")}
+        >
+          {replyCount}{" "}
+          {replyCount === 1
+            ? t("widget.threadedView.reply")
+            : t("widget.threadedView.replies")}
+        </Button>
+      </Div>
+    );
+  }
+
+  // Don't show actions if in edit/retry/answer/reply mode
+  if (isEditing || isRetrying || isAnswering || isReplying) {
     return null;
   }
 
@@ -207,11 +235,11 @@ export function ThreadedMessageActions({
         </Button>
       )}
 
-      {/* Reply button - Creates a branch from this message */}
+      {/* Reply - sends a user message as child, then AI responds */}
       <Button
         variant="ghost"
         size="unset"
-        onClick={(): void => startEdit(message.id)}
+        onClick={(): void => startReply(message.id)}
         className="flex items-center gap-1 px-2 py-1 rounded hover:bg-blue-500/10 text-muted-foreground hover:text-blue-400 transition-all"
         title={t("widget.threadedView.actions.replyToMessage")}
       >
@@ -219,20 +247,21 @@ export function ThreadedMessageActions({
         <Span>{t("widget.threadedView.actions.reply")}</Span>
       </Button>
 
-      {/* Edit - For user messages */}
+      {/* Branch - For user messages: creates sibling with edited content */}
       {message.role === "user" && (
         <Button
           variant="ghost"
           size="unset"
           onClick={(): void => startEdit(message.id)}
           className="flex items-center gap-1 px-2 py-1 rounded hover:bg-green-500/10 text-muted-foreground hover:text-green-400 transition-all"
-          title={t("widget.threadedView.actions.editMessage")}
+          title={t("widget.threadedView.actions.branchMessage")}
         >
-          <Span>{t("widget.threadedView.actions.edit")}</Span>
+          <GitBranch className="h-3.5 w-3.5" />
+          <Span>{t("widget.threadedView.actions.branch")}</Span>
         </Button>
       )}
 
-      {/* Retry - For user messages */}
+      {/* Retry - For user messages: creates sibling with same content, different model */}
       {message.role === "user" && (
         <Button
           variant="ghost"
@@ -253,11 +282,7 @@ export function ThreadedMessageActions({
         size="unset"
         onClick={(): void => startAnswer(message.id)}
         className="flex items-center gap-1 px-2 py-1 rounded hover:bg-purple-500/10 text-muted-foreground hover:text-purple-400 transition-all"
-        title={
-          message.role === "assistant"
-            ? t("widget.threadedView.actions.respondToAI")
-            : t("widget.threadedView.actions.generateAIResponse")
-        }
+        title={t("widget.threadedView.actions.generateAIResponse")}
       >
         <Span>{t("widget.threadedView.actions.answerAsAI")}</Span>
       </Button>
@@ -317,11 +342,20 @@ export function ThreadedMessageActions({
         </Button>
       )}
 
-      {/* Reply count badge */}
+      {/* Reply count badge - clickable to collapse */}
       {hasReplies && (
-        <Div className="ml-1 px-2 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold">
-          {replyCount} {replyCount === 1 ? "reply" : "replies"}
-        </Div>
+        <Button
+          variant="ghost"
+          size="unset"
+          onClick={onToggleCollapse}
+          className="ml-1 px-2 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold hover:bg-blue-500/20 transition-all"
+          title={t("widget.threadedView.collapseReplies")}
+        >
+          {replyCount}{" "}
+          {replyCount === 1
+            ? t("widget.threadedView.reply")
+            : t("widget.threadedView.replies")}
+        </Button>
       )}
     </Div>
   );

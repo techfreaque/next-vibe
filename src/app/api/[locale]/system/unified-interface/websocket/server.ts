@@ -332,105 +332,124 @@ export function startWebSocketServer(
       // ── Proxy everything else to Next.js ─────────────────────────────────
       // Use a raw Node http pipe instead of fetch() — Bun's fetch auto-decompresses
       // responses which breaks streaming SSR and compressed assets.
-      return await new Promise<Response>((resolve) => {
-        const clientIp =
-          req.headers.get("x-forwarded-for") ??
-          req.headers.get("x-real-ip") ??
-          "127.0.0.1";
-
-        // Build raw headers object for Node http
-        const outHeaders: Record<string, string> = {};
-        req.headers.forEach((value, key) => {
-          outHeaders[key] = value;
-        });
-        outHeaders["host"] = `127.0.0.1:${String(nextPort)}`;
-        outHeaders["x-forwarded-for"] = clientIp;
-        outHeaders["x-forwarded-proto"] = url.protocol.replace(":", "");
-
-        const proxyReq = http.request(
-          {
-            hostname: "127.0.0.1",
-            port: nextPort,
-            path: `${url.pathname}${url.search}`,
-            method: req.method,
-            headers: outHeaders,
-          },
-          (proxyRes) => {
-            // Use Headers so Set-Cookie entries are appended individually
-            // (joining multiple Set-Cookie with ", " breaks them)
-            const resHeaders = new Headers();
-            for (const [key, value] of Object.entries(proxyRes.headers)) {
-              if (value === undefined) {
-                continue;
-              }
-              if (Array.isArray(value)) {
-                for (const v of value) {
-                  resHeaders.append(key, v);
-                }
-              } else {
-                resHeaders.set(key, value);
-              }
-            }
-
-            // Stream the raw (possibly compressed) body straight to the browser
-            const stream = new ReadableStream({
-              start(controller): void {
-                proxyRes.on("data", (chunk: Buffer) => {
-                  controller.enqueue(chunk);
-                });
-                proxyRes.on("end", () => {
-                  controller.close();
-                });
-                proxyRes.on("error", (err) => {
-                  controller.error(err);
-                });
-              },
-            });
-
-            resolve(
-              new Response(stream, {
-                status: proxyRes.statusCode ?? 200,
-                headers: resHeaders,
-              }),
-            );
-          },
-        );
-
-        proxyReq.on("error", (err) => {
-          // Suppress socket-closed errors during shutdown (expected when Next.js exits)
-          if (!shuttingDown) {
-            logger.error("[Proxy] Failed to reach Next.js", {
-              error: err.message,
-              path: url.pathname,
-            });
-          }
-          resolve(new Response("Bad Gateway", { status: 502 }));
-        });
-
-        // Pipe request body for POST/PUT/PATCH
-        if (req.body && req.method !== "GET" && req.method !== "HEAD") {
-          const reader = req.body.getReader();
-          const pump = (): void => {
-            reader
-              .read()
-              .then(({ done, value }) => {
-                if (done) {
-                  proxyReq.end();
-                  return undefined;
-                }
-                proxyReq.write(value);
-                pump();
-                return undefined;
-              })
-              .catch(() => {
-                proxyReq.end();
-              });
-          };
-          pump();
-        } else {
-          proxyReq.end();
-        }
+      // On ECONNREFUSED (Next.js restarting), retry with backoff so the browser
+      // gets a real response once Next.js recovers instead of a hard 502.
+      const clientIp =
+        req.headers.get("x-forwarded-for") ??
+        req.headers.get("x-real-ip") ??
+        "127.0.0.1";
+      const outHeaders: Record<string, string> = {};
+      req.headers.forEach((value, key) => {
+        outHeaders[key] = value;
       });
+      outHeaders["host"] = `127.0.0.1:${String(nextPort)}`;
+      outHeaders["x-forwarded-for"] = clientIp;
+      outHeaders["x-forwarded-proto"] = url.protocol.replace(":", "");
+
+      // Read body once before retry loop (body can only be consumed once)
+      const bodyBuffer =
+        req.body && req.method !== "GET" && req.method !== "HEAD"
+          ? Buffer.from(await req.arrayBuffer())
+          : null;
+
+      const PROXY_RETRY_DELAYS = [500, 1000, 2000, 4000, 8000];
+      let lastProxyError = "Unknown error";
+
+      for (let attempt = 0; attempt <= PROXY_RETRY_DELAYS.length; attempt++) {
+        const proxyResult = await new Promise<Response | null>((resolve) => {
+          const proxyReq = http.request(
+            {
+              hostname: "127.0.0.1",
+              port: nextPort,
+              path: `${url.pathname}${url.search}`,
+              method: req.method,
+              headers: outHeaders,
+            },
+            (proxyRes) => {
+              // Use Headers so Set-Cookie entries are appended individually
+              // (joining multiple Set-Cookie with ", " breaks them)
+              const resHeaders = new Headers();
+              for (const [key, value] of Object.entries(proxyRes.headers)) {
+                if (value === undefined) {
+                  continue;
+                }
+                if (Array.isArray(value)) {
+                  for (const v of value) {
+                    resHeaders.append(key, v);
+                  }
+                } else {
+                  resHeaders.set(key, value);
+                }
+              }
+
+              // Stream the raw (possibly compressed) body straight to the browser
+              const stream = new ReadableStream({
+                start(controller): void {
+                  proxyRes.on("data", (chunk: Buffer) => {
+                    controller.enqueue(chunk);
+                  });
+                  proxyRes.on("end", () => {
+                    controller.close();
+                  });
+                  proxyRes.on("error", (err) => {
+                    controller.error(err);
+                  });
+                },
+              });
+
+              resolve(
+                new Response(stream, {
+                  status: proxyRes.statusCode ?? 200,
+                  headers: resHeaders,
+                }),
+              );
+            },
+          );
+
+          proxyReq.on("error", (err) => {
+            // On ECONNREFUSED Next.js is restarting — signal retry via null
+            const isConnRefused =
+              (err as NodeJS.ErrnoException).code === "ECONNREFUSED";
+            if (isConnRefused && !shuttingDown) {
+              lastProxyError = err.message;
+              resolve(null); // null = retry
+              return;
+            }
+            if (!shuttingDown) {
+              logger.error("[Proxy] Failed to reach Next.js", {
+                error: err.message,
+                path: url.pathname,
+              });
+            }
+            resolve(new Response("Bad Gateway", { status: 502 }));
+          });
+
+          // Write buffered body
+          if (bodyBuffer) {
+            proxyReq.write(bodyBuffer);
+          }
+          proxyReq.end();
+        });
+
+        if (proxyResult !== null) {
+          return proxyResult;
+        }
+
+        // Next.js not ready yet — wait before retrying
+        const delay = PROXY_RETRY_DELAYS[attempt] ?? 8000;
+        if (!shuttingDown) {
+          logger.warn("[Proxy] Next.js not ready, retrying", {
+            attempt: attempt + 1,
+            delayMs: delay,
+            path: url.pathname,
+          });
+        }
+        await new Promise<void>((resolve) => {
+          setTimeout(resolve, delay);
+        });
+      }
+
+      return new Response(`Bad Gateway: ${lastProxyError}`, { status: 502 });
     },
 
     websocket: {

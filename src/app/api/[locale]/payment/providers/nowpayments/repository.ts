@@ -291,13 +291,21 @@ export class NOWPaymentsProvider implements PaymentProvider {
     const totalAmount = product.price * quantity;
     const totalCredits = product.credits * quantity;
 
+    // NOWPayments does not substitute {CHECKOUT_SESSION_ID} like Stripe does.
+    // Strip the Stripe-specific placeholder — NOWPayments appends its own
+    // NP_id query param to the success URL automatically.
+    const successUrlWithoutPlaceholder = params.successUrl.replace(
+      /[?&]session_id=\{CHECKOUT_SESSION_ID\}/,
+      "",
+    );
+
     const invoiceData = {
       price_amount: totalAmount,
       price_currency: product.currency,
       order_id: `${params.userId}_${Date.now()}`,
       order_description: `${params.productId} - ${totalCredits} credits`,
       ipn_callback_url: `${env.NEXT_PUBLIC_APP_URL}/api/${params.locale}/payment/providers/nowpayments/webhook`,
-      success_url: params.successUrl,
+      success_url: successUrlWithoutPlaceholder,
       cancel_url: params.cancelUrl,
       is_fee_paid_by_user: true,
     };
@@ -505,15 +513,18 @@ export class NOWPaymentsProvider implements PaymentProvider {
         }
       }
 
-      // Merge webhook payload metadata with stored metadata
+      // Merge webhook payload metadata with stored metadata.
+      // Stored metadata takes precedence for `type` — e.g. subscription purchases
+      // use one-time invoices so payload.subscription_id is absent, but the stored
+      // metadata already has type:"subscription" set at checkout creation time.
       const mergedMetadata = {
-        ...storedMetadata, // Stored metadata (includes quantity, totalCredits, etc.)
         userId: payload.order_id.split("_")[0], // Extract userId from order_id
         orderId: payload.order_id,
         paymentId: payload.payment_id,
         subscriptionId: payload.subscription_id?.toString(),
         subscriptionPlanId: payload.subscription_plan_id?.toString(),
         type: paymentType,
+        ...storedMetadata, // Stored metadata wins (preserves type, planId, billingInterval, etc.)
       };
 
       // Return standardized webhook event

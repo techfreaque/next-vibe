@@ -30,6 +30,7 @@ const newsletterUnsubscribeSyncTask = createCronTask(
     schedule: CRON_SCHEDULES.EVERY_6_HOURS,
     category: TaskCategory.MAINTENANCE,
     enabled: false,
+    hidden: true,
     priority: CronTaskPriority.LOW,
     timeout: TASK_TIMEOUTS.MEDIUM,
     taskInput: { dryRun: false, batchSize: 100 },

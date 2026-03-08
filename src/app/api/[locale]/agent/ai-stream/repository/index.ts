@@ -94,6 +94,7 @@ export class AiStreamRepository {
     t: AiStreamT;
     extraInstructions?: string;
     excludeMemories?: boolean;
+    favoriteIdOverride?: string;
   }): Promise<ResponseType<HeadlessAiStreamResult>>;
 
   /** Interactive overload — returns response output (events stream via WS) */
@@ -119,6 +120,7 @@ export class AiStreamRepository {
     t: aiStreamT,
     extraInstructions,
     excludeMemories,
+    favoriteIdOverride,
   }: {
     data: AiStreamPostRequestOutput;
     locale: CountryLanguage;
@@ -129,6 +131,7 @@ export class AiStreamRepository {
     t: AiStreamT;
     extraInstructions?: string;
     excludeMemories?: boolean;
+    favoriteIdOverride?: string;
   }): Promise<
     | ResponseType<AiStreamPostResponseOutput>
     | ResponseType<HeadlessAiStreamResult>
@@ -156,6 +159,7 @@ export class AiStreamRepository {
       headless,
       extraInstructions,
       excludeMemories,
+      favoriteIdOverride,
     });
 
     if (!setupResult.success) {

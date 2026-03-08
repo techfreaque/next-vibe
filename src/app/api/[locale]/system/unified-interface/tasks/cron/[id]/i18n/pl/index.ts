@@ -353,6 +353,9 @@ export const translations: typeof enTranslations = {
       retryDelay: "Opóźnienie ponowienia",
     },
     lastExecutionError: "Ostatni błąd",
+    run: "Uruchom teraz",
+    runSuccess: "Zadanie wykonane pomyślnie",
+    running: "Uruchamianie...",
     refresh: "Odśwież",
     taskInput: {
       title: "Dane wejściowe zadania",

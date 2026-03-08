@@ -182,7 +182,16 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   );
   const { t } = scopedTranslation.scopedT(locale);
 
-  const [searchQuery, setSearchQuery] = useState("");
+  const searchQuery = (form.watch("query") as string | undefined) ?? "";
+  const setSearchQuery = useCallback(
+    (value: string) => {
+      form.setValue("query", value);
+    },
+    [form],
+  );
+  const [statsFilter, setStatsFilter] = useState<"all" | "pinned" | "allowed">(
+    "pinned",
+  );
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set(),
   );
@@ -193,7 +202,6 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
     [response],
   );
   const totalCount = response?.totalCount ?? 0;
-  const matchedCount = response?.matchedCount ?? 0;
   const categories = response?.categories ?? [];
   const hint = response?.hint;
 
@@ -228,11 +236,21 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
   }, [enabledTools, availableTools]);
 
   const filteredTools = useMemo((): HelpToolMetadataSerialized[] => {
+    const enabledIds = new Set(effectiveEnabledTools.map((et) => et.id));
+    const pinnedIds = new Set(
+      effectiveEnabledTools.filter((et) => et.pinned).map((et) => et.id),
+    );
+    let tools = availableTools;
+    if (statsFilter === "pinned") {
+      tools = tools.filter((tool) => pinnedIds.has(tool.id));
+    } else if (statsFilter === "allowed") {
+      tools = tools.filter((tool) => enabledIds.has(tool.id));
+    }
     if (searchQuery.length === 0) {
-      return availableTools;
+      return tools;
     }
     const query = searchQuery.toLowerCase();
-    return availableTools.filter(
+    return tools.filter(
       (tool) =>
         tool.name.toLowerCase().includes(query) ||
         tool.description.toLowerCase().includes(query) ||
@@ -240,7 +258,7 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
         tool.aliases?.some((a) => a.toLowerCase().includes(query)) ||
         (tool.tags?.some((tag) => tag.toLowerCase().includes(query)) ?? false),
     );
-  }, [availableTools, searchQuery]);
+  }, [availableTools, searchQuery, statsFilter, effectiveEnabledTools]);
 
   const toolsByCategory = useMemo(() => {
     const grouped: Record<
@@ -611,51 +629,48 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
         </Div>
       )}
 
-      {/* Stats Bar */}
-      <Div className="flex gap-3 text-xs px-4 pt-4">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-primary/10 text-primary font-medium">
-                <Eye className="h-3.5 w-3.5" />
-                <Span>
-                  {stats.pinned} {t("aiTools.modal.pinnedLabel")}
-                </Span>
-              </Div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <P className="text-xs">{t("aiTools.modal.pinnedTooltip")}</P>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-muted text-muted-foreground font-medium">
-                <Shield className="h-3.5 w-3.5" />
-                <Span>
-                  {stats.enabled} {t("aiTools.modal.enabledLabel")}
-                </Span>
-              </Div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <P className="text-xs">{t("aiTools.modal.enabledTooltip")}</P>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-
-        <Div className="flex items-center gap-1.5 px-2.5 py-1.5 text-muted-foreground/60">
-          <Span>
-            {stats.total} {t("aiTools.modal.totalLabel")}
-          </Span>
-        </Div>
-
-        {matchedCount !== totalCount && (
-          <Div className="flex items-center gap-1.5 px-2.5 py-1.5 text-muted-foreground/60">
-            <Span>{matchedCount} matched</Span>
-          </Div>
-        )}
+      {/* Filter chips */}
+      <Div className="flex items-center gap-1.5 px-4 pt-4">
+        {(
+          [
+            {
+              key: "pinned",
+              icon: Eye,
+              label: t("aiTools.modal.pinnedLabel"),
+              count: stats.pinned,
+            },
+            {
+              key: "allowed",
+              icon: Shield,
+              label: t("aiTools.modal.enabledLabel"),
+              count: stats.enabled,
+            },
+            {
+              key: "all",
+              icon: null,
+              label: t("aiTools.modal.totalLabel"),
+              count: stats.total,
+            },
+          ] as const
+        ).map(({ key, icon: Icon, label, count }) => (
+          <Button
+            key={key}
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setStatsFilter(key)}
+            className={cn(
+              "h-7 px-2.5 gap-1.5 text-xs rounded-full transition-all border",
+              statsFilter === key
+                ? "bg-primary text-primary-foreground border-primary font-semibold hover:bg-primary/90 hover:text-primary-foreground"
+                : "border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 hover:bg-transparent",
+            )}
+          >
+            {Icon && <Icon className="h-3 w-3 shrink-0" />}
+            <Span className="tabular-nums font-bold">{count}</Span>
+            <Span className="capitalize">{label}</Span>
+          </Button>
+        ))}
       </Div>
 
       <Div className="flex gap-3 flex-col px-4 pb-4 pt-3">
@@ -672,64 +687,66 @@ export function HelpToolsWidget({ field }: CustomWidgetProps): JSX.Element {
             />
           </Div>
 
-          {filteredTools.length > 0 && (
-            <Div className="flex gap-2">
-              <Button
-                onClick={
-                  expandedCategories.size === 0
-                    ? () =>
-                        setExpandedCategories(
-                          new Set(Object.keys(toolsByCategory)),
-                        )
-                    : () => setExpandedCategories(new Set())
-                }
-                variant="outline"
-                size="sm"
-                className="flex-1 min-w-0"
-              >
-                <Span className="truncate">
-                  {expandedCategories.size === 0
-                    ? t("aiTools.modal.expandAll")
-                    : t("aiTools.modal.collapseAll")}
-                </Span>
-              </Button>
+          <Div className="flex gap-2">
+            {filteredTools.length > 0 && (
+              <>
+                <Button
+                  onClick={
+                    expandedCategories.size === 0
+                      ? () =>
+                          setExpandedCategories(
+                            new Set(Object.keys(toolsByCategory)),
+                          )
+                      : () => setExpandedCategories(new Set())
+                  }
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 min-w-0"
+                >
+                  <Span className="truncate">
+                    {expandedCategories.size === 0
+                      ? t("aiTools.modal.expandAll")
+                      : t("aiTools.modal.collapseAll")}
+                  </Span>
+                </Button>
 
-              <Button
-                onClick={handleEnableAll}
-                variant="outline"
-                size="sm"
-                className="flex-1 min-w-0"
-              >
-                {allVisibleEnabled ? (
-                  <>
-                    <X className="h-4 w-4 mr-1 shrink-0" />
-                    <Span className="truncate">
-                      {t("aiTools.modal.deselectAll")}
-                    </Span>
-                  </>
-                ) : (
-                  <>
-                    <Check className="h-4 w-4 mr-1 shrink-0" />
-                    <Span className="truncate">
-                      {t("aiTools.modal.selectAll")}
-                    </Span>
-                  </>
-                )}
-              </Button>
+                <Button
+                  onClick={handleEnableAll}
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 min-w-0"
+                >
+                  {allVisibleEnabled ? (
+                    <>
+                      <X className="h-4 w-4 mr-1 shrink-0" />
+                      <Span className="truncate">
+                        {t("aiTools.modal.deselectAll")}
+                      </Span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="h-4 w-4 mr-1 shrink-0" />
+                      <Span className="truncate">
+                        {t("aiTools.modal.selectAll")}
+                      </Span>
+                    </>
+                  )}
+                </Button>
+              </>
+            )}
 
-              <Button
-                onClick={handleResetToDefault}
-                variant="outline"
-                size="sm"
-                className="flex-1 min-w-0"
-              >
-                <RotateCcw className="h-3.5 w-3.5 mr-1 shrink-0" />
-                <Span className="truncate">
-                  {t("aiTools.modal.resetToDefault")}
-                </Span>
-              </Button>
-            </Div>
-          )}
+            <Button
+              onClick={handleResetToDefault}
+              variant="outline"
+              size="sm"
+              className="flex-1 min-w-0"
+            >
+              <RotateCcw className="h-3.5 w-3.5 mr-1 shrink-0" />
+              <Span className="truncate">
+                {t("aiTools.modal.resetToDefault")}
+              </Span>
+            </Button>
+          </Div>
         </Div>
 
         {/* Tools List */}

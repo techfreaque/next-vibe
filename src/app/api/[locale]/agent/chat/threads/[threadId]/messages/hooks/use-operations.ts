@@ -429,26 +429,11 @@ export function useMessageOperations(
         return;
       }
 
-      // Voting is only supported for server threads (not incognito)
-      const isIncognitoThread =
-        thread.rootFolderId === DefaultFolderId.INCOGNITO;
-
-      if (isIncognitoThread) {
-        logger.debug(
-          "Message operations: Voting not supported in incognito mode",
-          {
-            messageId,
-            rootFolderId: thread.rootFolderId,
-          },
-        );
-        return;
-      }
-
       const voteString = vote === 1 ? "up" : vote === -1 ? "down" : "remove";
 
       try {
         const result = await voteMutation.mutateAsync({
-          requestData: { vote: voteString },
+          requestData: { vote: voteString, rootFolderId: thread.rootFolderId },
           urlPathParams: { threadId: message.threadId, messageId },
         });
 
@@ -459,13 +444,34 @@ export function useMessageOperations(
           return;
         }
 
-        const updates: Partial<ChatMessage> = {};
-        if (vote === 1) {
-          updates.upvotes = (message.upvotes || 0) + 1;
-        } else if (vote === -1) {
-          updates.downvotes = (message.downvotes || 0) + 1;
+        // Update message with authoritative server counts and current user's vote in metadata
+        const userId = user?.id;
+        const currentVoteDetails = Array.isArray(message.metadata?.voteDetails)
+          ? message.metadata.voteDetails.filter((v) => v.userId !== userId)
+          : [];
+        if (result.data.userVote !== "none" && userId) {
+          currentVoteDetails.push({
+            userId,
+            vote: result.data.userVote,
+            timestamp: Date.now(),
+          });
         }
-        chatStore.updateMessage(messageId, updates);
+        const currentVoterIds = Array.isArray(message.metadata?.voterIds)
+          ? message.metadata.voterIds.filter((id) => id !== userId)
+          : [];
+        if (result.data.userVote !== "none" && userId) {
+          currentVoterIds.push(userId);
+        }
+
+        chatStore.updateMessage(messageId, {
+          upvotes: result.data.upvotes,
+          downvotes: result.data.downvotes,
+          metadata: {
+            ...message.metadata,
+            voteDetails: currentVoteDetails,
+            voterIds: currentVoterIds,
+          },
+        });
       } catch (error) {
         logger.error(
           "Message operations: Failed to vote on message",
@@ -473,7 +479,7 @@ export function useMessageOperations(
         );
       }
     },
-    [logger, chatStore, voteMutation],
+    [logger, chatStore, voteMutation, user?.id],
   );
 
   const stopGeneration = useCallback((): void => {

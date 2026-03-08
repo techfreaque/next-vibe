@@ -121,20 +121,33 @@ export function SidebarFooter({
           <Div className="px-2 py-2 flex flex-col gap-2 bg-muted/20 border-t border-border/50">
             {/* Account Section */}
             <Div className="flex flex-col gap-0.5">
-              {/* Login/Profile - Primary action (hidden in local mode: no self-signup) */}
+              {/* Login/Signup - shown when logged out (hidden in local mode: no self-signup) */}
               {!isLoggedIn && !envClient.NEXT_PUBLIC_LOCAL_MODE && (
-                <Link href={`/${locale}/user/login`}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-start"
-                    data-tour={TOUR_DATA_ATTRS.SIDEBAR_LOGIN}
-                    aria-label="Login to your account"
-                  >
-                    <User className="h-3.5 w-3.5 mr-2" />
-                    {t("components.sidebar.login")}
-                  </Button>
-                </Link>
+                <Div className="flex flex-row gap-1.5 py-1">
+                  <Link href={`/${locale}/user/login`} className="flex-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      data-tour={TOUR_DATA_ATTRS.SIDEBAR_LOGIN}
+                      aria-label="Login to your account"
+                    >
+                      <User className="h-3.5 w-3.5 mr-1.5" />
+                      {t("components.sidebar.login")}
+                    </Button>
+                  </Link>
+                  <Link href={`/${locale}/user/signup`} className="flex-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      aria-label="Create an account"
+                    >
+                      <User className="h-3.5 w-3.5 mr-1.5" />
+                      {t("components.sidebar.signup")}
+                    </Button>
+                  </Link>
+                </Div>
               )}
 
               {/* Subscription (hidden in local mode: payment disabled) */}

@@ -21,6 +21,7 @@ import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { CronTaskStatus } from "../../enum";
+import type { JsonValue } from "../../unified-runner/types";
 import { cronTaskExecutions, cronTasks } from "../db";
 import { serializeTask, translateTaskFields } from "../repository";
 import type {
@@ -45,7 +46,7 @@ function truncate(str: string, maxLen: number): string {
  * Summarise a task result JSONB value into a short readable string.
  */
 function summariseResult(
-  result: Record<string, string | number | boolean> | null,
+  result: Record<string, JsonValue> | null,
 ): string | null {
   if (!result) {
     return null;

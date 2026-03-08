@@ -23,8 +23,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import { users } from "@/app/api/[locale]/user/db";
 import type { CountryLanguage } from "@/i18n/core/config";
 
-import { leads } from "../leads/db";
-import { LeadStatus } from "../leads/enum";
 import type { CodesListGetResponseOutput } from "./codes/list/definition";
 import {
   leadReferrals,
@@ -143,17 +141,11 @@ export class ReferralRepository {
       const codesWithStats: CodesListGetResponseOutput["codes"] =
         await Promise.all(
           codes.map(async (code) => {
-            // Count signups: leads linked to this code that have signedUp status
+            // Count signups: users referred by this code (permanent, deduplicated)
             const [signupCount] = await db
               .select({ count: sql<number>`count(*)::int` })
-              .from(leadReferrals)
-              .innerJoin(leads, eq(leadReferrals.leadId, leads.id))
-              .where(
-                and(
-                  eq(leadReferrals.referralCodeId, code.id),
-                  eq(leads.status, LeadStatus.SIGNED_UP),
-                ),
-              );
+              .from(userReferrals)
+              .where(eq(userReferrals.referralCodeId, code.id));
 
             // Get earnings and revenue for this code from users referred by this code
             // Revenue = total amount paid by referred users (amountCents / POOL_PERCENTAGE)
@@ -346,6 +338,54 @@ export class ReferralRepository {
       });
     } catch (error) {
       logger.error("Failed to get latest referral code", parseError(error));
+      const { t } = scopedTranslation.scopedT(locale);
+      return fail({
+        message: t("errors.serverError.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+        messageParams: { error: parseError(error).message },
+      });
+    }
+  }
+
+  /**
+   * Get the latest referral code and label for a lead
+   * Returns both code and label of the most recently linked referral code
+   */
+  static async getLatestLeadReferralWithLabel(
+    leadId: string,
+    logger: EndpointLogger,
+    locale: CountryLanguage,
+  ): Promise<
+    ResponseType<{ referralCode: string | null; referralLabel: string | null }>
+  > {
+    try {
+      logger.debug("Getting latest referral code with label for lead", {
+        leadId,
+      });
+
+      const [latestReferral] = await db
+        .select({
+          code: referralCodes.code,
+          label: referralCodes.label,
+        })
+        .from(leadReferrals)
+        .innerJoin(
+          referralCodes,
+          eq(leadReferrals.referralCodeId, referralCodes.id),
+        )
+        .where(eq(leadReferrals.leadId, leadId))
+        .orderBy(desc(leadReferrals.createdAt))
+        .limit(1);
+
+      return success({
+        referralCode: latestReferral?.code ?? null,
+        referralLabel: latestReferral?.label ?? null,
+      });
+    } catch (error) {
+      logger.error(
+        "Failed to get latest referral code with label",
+        parseError(error),
+      );
       const { t } = scopedTranslation.scopedT(locale);
       return fail({
         message: t("errors.serverError.title"),

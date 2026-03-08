@@ -51,6 +51,11 @@ export const translations: typeof enTranslations = {
         description: "Filtruj według statusu włączenia",
         placeholder: "Wszystkie zadania",
       },
+      hidden: {
+        label: "Widoczność",
+        description: "Filtruj według widoczności (domyślnie: tylko widoczne)",
+        placeholder: "Widoczne zadania",
+      },
       limit: {
         label: "Limit",
         description: "Maksymalna liczba zadań do zwrócenia",
@@ -72,6 +77,7 @@ export const translations: typeof enTranslations = {
         taskDescription: "Opis",
         schedule: "Harmonogram",
         enabled: "Włączone",
+        hidden: "Ukryte",
         priority: "Priorytet",
         status: "Status",
         category: "Kategoria",

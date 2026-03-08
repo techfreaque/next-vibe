@@ -187,6 +187,11 @@ export class ProviderFactory {
           apiKey: agentEnv.OPENROUTER_API_KEY,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any -- OpenRouter expects typeof fetch but we need custom wrapper
           fetch: customFetch as any,
+          headers: {
+            "HTTP-Referer": "https://unbottled.ai",
+            "X-Title": "Unbottled AI",
+            "X-OpenRouter-Categories": "general-chat,roleplay,personal-agent",
+          },
         });
       }
     }

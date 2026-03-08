@@ -22,6 +22,10 @@ export const translations = {
       label: "Nachrichten-ID",
       description: "ID der zu bewertenden Nachricht",
     },
+    rootFolderId: {
+      label: "Stammordner",
+      description: "Stammordner des Threads (für Client-Routing)",
+    },
     vote: {
       label: "Bewertung",
       description:

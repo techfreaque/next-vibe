@@ -24,6 +24,11 @@ export const translations: typeof enTranslations = {
       label: "ID wiadomości",
       description: "ID wiadomości do głosowania",
     },
+    rootFolderId: {
+      label: "Folder główny",
+      description:
+        "Folder główny wątku (używany do routowania po stronie klienta)",
+    },
     vote: {
       label: "Głos",
       description: "Twój głos: za, przeciw lub usuń",

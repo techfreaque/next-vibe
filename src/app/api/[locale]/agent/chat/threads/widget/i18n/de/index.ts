@@ -55,6 +55,7 @@ export const translations: typeof enTranslations = {
   components: {
     sidebar: {
       login: "Anmelden",
+      signup: "Registrieren",
       logout: "Abmelden",
       footer: {
         account: "Konto",

@@ -371,6 +371,9 @@ function AutonomousVisual({
           }}
           sendMessage={null}
           deductCredits={null}
+          onVote={null}
+          userVote={null}
+          voteScore={0}
         />
       </Div>
     </MockChatProvider>

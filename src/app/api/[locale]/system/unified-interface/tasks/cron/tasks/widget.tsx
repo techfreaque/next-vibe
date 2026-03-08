@@ -16,6 +16,7 @@ import { Eye } from "next-vibe-ui/ui/icons/Eye";
 import { History } from "next-vibe-ui/ui/icons/History";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
+import { Play } from "next-vibe-ui/ui/icons/Play";
 import { Plus } from "next-vibe-ui/ui/icons/Plus";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Search } from "next-vibe-ui/ui/icons/Search";
@@ -190,6 +191,7 @@ function TaskRow({
   onEdit,
   onDelete,
   onHistory,
+  onRun,
   t,
   tTasks,
   isTouch,
@@ -199,6 +201,7 @@ function TaskRow({
   onEdit: (task: Task) => void;
   onDelete: (task: Task) => void;
   onHistory: (task: Task) => void;
+  onRun: (task: Task) => void;
   t: ReturnType<typeof useWidgetTranslation<typeof endpoints.GET>>;
   tTasks: ReturnType<typeof tasksScopedTranslation.scopedT>["t"];
   isTouch: boolean;
@@ -327,6 +330,16 @@ function TaskRow({
             : "opacity-0 group-hover:opacity-100 transition-opacity",
         )}
       >
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="h-7 w-7 p-0 text-green-600 hover:text-green-700 dark:text-green-400"
+          onClick={() => onRun(task)}
+          title={t("widget.action.runNow")}
+        >
+          <Play className="h-3.5 w-3.5" />
+        </Button>
         <Button
           type="button"
           variant="ghost"
@@ -717,6 +730,19 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
     [navigate],
   );
 
+  const handleRun = useCallback(
+    (task: Task): void => {
+      void (async (): Promise<void> => {
+        const m = await import("../../execute/definition");
+        navigate(m.default.POST, {
+          data: { taskId: task.id },
+          renderInModal: true,
+        });
+      })();
+    },
+    [navigate],
+  );
+
   const handleClearFilters = useCallback((): void => {
     setSearch("");
     setSort("name_asc");
@@ -957,6 +983,7 @@ export function CronTasksContainer({ field }: WidgetProps): React.JSX.Element {
               onEdit={handleEdit}
               onDelete={handleDelete}
               onHistory={handleTaskHistory}
+              onRun={handleRun}
               t={t}
               tTasks={tTasks}
               isTouch={isTouch}

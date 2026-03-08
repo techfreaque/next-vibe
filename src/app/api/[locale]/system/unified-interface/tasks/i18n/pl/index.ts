@@ -60,6 +60,11 @@ export const translations: typeof enTranslations = {
     enabled: "Włączone",
     disabled: "Wyłączone",
   },
+  hiddenFilter: {
+    visible: "Widoczne",
+    hidden: "Ukryte",
+    all: "Wszystkie",
+  },
   sort: {
     asc: "Rosnąco",
     desc: "Malejąco",
@@ -478,9 +483,9 @@ export const translations: typeof enTranslations = {
           title: "Klucz API",
           description: "Wspólny sekret do uwierzytelniania instancji.",
         },
-        taskRouteId: {
-          title: "ID trasy zadania",
-          description: "routeId ukończonego zadania.",
+        taskId: {
+          title: "ID zadania",
+          description: "Unikalny identyfikator ukończonego zadania.",
         },
         executionId: {
           title: "ID wykonania",
@@ -565,6 +570,64 @@ export const translations: typeof enTranslations = {
       success: {
         title: "Raport zaakceptowany",
         description: "Wynik wykonania zastosowany do rekordu zadania",
+      },
+    },
+  },
+  waitForTask: {
+    post: {
+      title: "Czekaj na zadanie",
+      description:
+        "Czeka na oczekujące zadanie w tle. Zwraca wynik natychmiast jeśli już ukończone, lub zatrzymuje strumień AI do czasu zakończenia zadania.",
+      fields: {
+        taskId: {
+          title: "ID zadania",
+          description: "ID zadania, na które ma czekać.",
+        },
+        status: {
+          title: "Status",
+          description: "Aktualny status zadania.",
+        },
+        result: {
+          title: "Wynik",
+          description: "Dane wynikowe zadania (obecne gdy ukończone).",
+        },
+        waiting: {
+          title: "Oczekiwanie",
+          description: "True gdy strumień jest zatrzymany czekając na zadanie.",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Błąd walidacji",
+          description: "Nieprawidłowe ID zadania",
+        },
+        unauthorized: {
+          title: "Nieautoryzowany",
+          description: "Wymagane uwierzytelnienie",
+        },
+        internal: {
+          title: "Błąd wewnętrzny",
+          description: "Nie udało się zarejestrować oczekującego",
+        },
+        forbidden: { title: "Zabroniony", description: "Odmowa dostępu" },
+        notFound: {
+          title: "Zadanie nie znalezione",
+          description: "Nie znaleziono zadania o tym ID",
+        },
+        network: { title: "Błąd sieci", description: "Wystąpił błąd sieci" },
+        unknown: {
+          title: "Nieznany błąd",
+          description: "Wystąpił nieoczekiwany błąd",
+        },
+        unsaved: {
+          title: "Niezapisane zmiany",
+          description: "Wykryto niezapisane zmiany",
+        },
+        conflict: { title: "Konflikt", description: "Wystąpił konflikt" },
+      },
+      success: {
+        title: "Wynik zadania gotowy",
+        description: "Zadanie ukończone lub oczekujący zarejestrowany",
       },
     },
   },

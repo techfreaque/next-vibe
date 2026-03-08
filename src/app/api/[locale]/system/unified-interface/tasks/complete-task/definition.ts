@@ -20,6 +20,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { taskInputSchema } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
@@ -70,9 +71,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         columns: 12,
-        schema: z
-          .record(z.string(), z.union([z.string(), z.number(), z.boolean()]))
-          .optional(),
+        schema: taskInputSchema.optional(),
       }),
 
       // Response

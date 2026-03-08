@@ -13,9 +13,15 @@ export const translations: typeof enTranslations = {
       placeholder: "Wprowadź ilość (1-10)",
     },
     provider: {
-      label: "Dostawca płatności",
-      description: "Wybierz sposób płatności",
+      label: "Wybierz metodę płatności",
+      description: "Wybierz sposób płatności za pakiet kredytów",
       placeholder: "Wybierz dostawcę płatności",
+      stripe: "Karta kredytowa / debetowa",
+      stripeDescription: "Zapłać bezpiecznie przez Stripe",
+      nowpayments: "Kryptowaluta",
+      nowpaymentsDescription: "Zapłać Bitcoinem, Ethereum i innymi",
+      cryptoMinimumDisabled:
+        "Minimum {{min}} pakietów wymagane dla płatności krypto",
     },
     checkoutUrl: {
       content: "URL płatności",

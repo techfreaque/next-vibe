@@ -31,7 +31,7 @@ const { POST } = createEndpoint({
   category: "app.endpointCategories.newsletter",
   icon: "refresh-cw",
   tags: ["unsubscribe.sync.tag"],
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

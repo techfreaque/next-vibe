@@ -23,14 +23,17 @@ interface SubscriptionPageProps {
     locale: CountryLanguage;
     tabId: string;
   }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 const BASE_TABS = ["overview", "buy", "history"];
 
 export default async function SubscriptionPage({
   params,
+  searchParams,
 }: SubscriptionPageProps): Promise<JSX.Element> {
   const { locale, tabId } = await params;
+  const query = await searchParams;
 
   const logger = createEndpointLogger(false, Date.now(), locale);
   const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
@@ -53,6 +56,33 @@ export default async function SubscriptionPage({
 
   if (env.NEXT_PUBLIC_LOCAL_MODE && !isAuthenticated) {
     redirect(`/${locale}/user/login`);
+  }
+
+  // Handle NOWPayments success redirect — NP_id is the payment_id appended by NOWPayments
+  const npId = typeof query.NP_id === "string" ? query.NP_id : undefined;
+  const paymentType = typeof query.type === "string" ? query.type : undefined;
+  const callbackToken =
+    typeof query.token === "string" ? query.token : undefined;
+
+  if (npId && isAuthenticated && query.payment === "success") {
+    if (paymentType === "credits" || callbackToken) {
+      // Credit pack purchase via NOWPayments
+      await CreditRepository.handleNowPaymentsCreditSuccessRedirect(
+        npId,
+        callbackToken,
+        user.id,
+        locale,
+        logger,
+      );
+    } else {
+      // Subscription purchase via NOWPayments
+      await SubscriptionRepository.handleNowPaymentsSuccessRedirect(
+        npId,
+        user.id,
+        locale,
+        logger,
+      );
+    }
   }
 
   // Fetch subscription data

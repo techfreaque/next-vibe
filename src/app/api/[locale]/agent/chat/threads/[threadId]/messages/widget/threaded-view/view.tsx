@@ -6,17 +6,16 @@ import { Div } from "next-vibe-ui/ui/div";
 import { ChevronDown } from "next-vibe-ui/ui/icons/ChevronDown";
 import { ChevronRight } from "next-vibe-ui/ui/icons/ChevronRight";
 import { CornerDownRight } from "next-vibe-ui/ui/icons/CornerDownRight";
-import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
 import React, { useCallback, useState } from "react";
 
 import { ErrorBoundary } from "@/app/[locale]/_components/error-boundary";
 import { LAYOUT } from "@/app/[locale]/chat/lib/config/constants";
 import { chatAnimations } from "@/app/[locale]/chat/lib/design-tokens";
-import { getVoteStatus } from "@/app/[locale]/chat/lib/utils/message-votes";
 import { getDirectReplies } from "@/app/[locale]/chat/lib/utils/thread-builder";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
+import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
 import { processMessageGroupForTTS } from "@/app/api/[locale]/agent/text-to-speech/content-processing";
 import type { TtsVoiceValue } from "@/app/api/[locale]/agent/text-to-speech/enum";
 import { useTTSAudio } from "@/app/api/[locale]/agent/text-to-speech/hooks";
@@ -35,6 +34,7 @@ import { useMessageGroupName } from "../embedded-context";
 import { MessageEditor } from "../message-editor";
 import type { groupMessagesBySequence } from "../message-grouping";
 import { ModelCharacterSelectorModal } from "../model-character-selector-modal";
+import { ReplyInput } from "../reply-input";
 import { UserProfileCard } from "../user-profile-card";
 import { ThreadedMessageActions } from "./actions";
 import { ThreadedMessageContent } from "./content";
@@ -68,6 +68,11 @@ interface ThreadedMessageProps {
     content: string,
     attachments: File[] | undefined,
   ) => Promise<void>;
+  onReplyMessage?: (
+    parentMessageId: string,
+    content: string,
+    attachments: File[],
+  ) => Promise<void>;
   onVoteMessage?: (messageId: string, vote: 1 | -1 | 0) => Promise<void>;
   onDeleteMessage: (messageId: string) => void;
   user: JwtPayloadType;
@@ -91,6 +96,7 @@ export function ThreadedMessage({
   onBranchMessage,
   onRetryMessage,
   onAnswerAsModel,
+  onReplyMessage,
   onVoteMessage,
   onDeleteMessage,
   user,
@@ -114,6 +120,9 @@ export function ThreadedMessage({
   const editingMessageId = useMessageEditorStore((s) => s.editingMessageId);
   const retryingMessageId = useMessageEditorStore((s) => s.retryingMessageId);
   const answeringMessageId = useMessageEditorStore((s) => s.answeringMessageId);
+  const replyingToMessageId = useMessageEditorStore(
+    (s) => s.replyingToMessageId,
+  );
   const answerContent = useMessageEditorStore((s) => s.answerContent);
   const editorAttachments = useMessageEditorStore((s) => s.editorAttachments);
   const cancelAction = useMessageEditorStore((s) => s.cancelAction);
@@ -128,6 +137,7 @@ export function ThreadedMessage({
   const clearEditing = useMessageEditorStore((s) => s.clearEditing);
   const clearRetrying = useMessageEditorStore((s) => s.clearRetrying);
   const clearAnswering = useMessageEditorStore((s) => s.clearAnswering);
+  const clearReplying = useMessageEditorStore((s) => s.clearReplying);
 
   // Async startRetry — loads attachments then sets retrying state
   const startRetry = useCallback(
@@ -238,6 +248,37 @@ export function ThreadedMessage({
     [logger, answerContent, editorAttachments, clearAnswering],
   );
 
+  const handleConfirmReply = useCallback(
+    async (
+      messageId: string,
+      onReply:
+        | ((
+            parentMessageId: string,
+            content: string,
+            attachments: File[],
+          ) => Promise<void>)
+        | undefined,
+      content: string,
+      attachments: File[],
+    ) => {
+      if (!onReply) {
+        return;
+      }
+      try {
+        await onReply(messageId, content, attachments);
+        clearReplying();
+      } catch (error) {
+        const errorObj =
+          error instanceof Error ? error : new Error(String(error));
+        logger.error(
+          "widget.messages.actions.handleConfirmReply.error",
+          errorObj,
+        );
+      }
+    },
+    [logger, clearReplying],
+  );
+
   // Detect touch device for proper action visibility
   const isTouch = useTouchDevice();
   const { group: messageGroupClass } = useMessageGroupName();
@@ -291,9 +332,10 @@ export function ThreadedMessage({
   const isEditing = editingMessageId === message.id;
   const isRetrying = retryingMessageId === message.id;
   const isAnswering = answeringMessageId === message.id;
+  const isReplying = replyingToMessageId === message.id;
 
   // Get vote status
-  const { userVote, voteScore } = getVoteStatus(message);
+  const { userVote, voteScore } = getVoteStatus(message, currentUserId);
 
   const characterHook = useCharacter(
     message.character || undefined,
@@ -394,19 +436,6 @@ export function ThreadedMessage({
             id={`thread-msg-${message.id}`}
             className={cn(messageGroupClass, "relative")}
           >
-            {/* Collapsed state indicator */}
-            {isCollapsed && hasReplies && (
-              <Div className="absolute -bottom-2 left-0 right-0 h-8 flex items-center justify-center">
-                <Div className="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs text-blue-400 font-medium flex items-center gap-2">
-                  <ChevronRight className="h-3 w-3" />
-                  <Span>
-                    {replies.length} hidden{" "}
-                    {replies.length === 1 ? "reply" : "replies"}
-                  </Span>
-                </Div>
-              </Div>
-            )}
-
             {isEditing ? (
               <Div
                 className={cn(
@@ -475,9 +504,12 @@ export function ThreadedMessage({
               onDeleteMessage={onDeleteMessage}
               replyCount={replies.length}
               hasReplies={hasReplies}
+              isCollapsed={isCollapsed}
+              onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
               isEditing={isEditing}
               isRetrying={isRetrying}
               isAnswering={isAnswering}
+              isReplying={isReplying}
             />
           </Div>
 
@@ -496,6 +528,27 @@ export function ThreadedMessage({
                 }
                 onCancel={cancelAction}
                 confirmLabelKey="widget.threadedView.answerModal.confirmLabel"
+                locale={locale}
+                logger={logger}
+                user={user}
+              />
+            </Div>
+          )}
+
+          {/* Show Reply input below the message */}
+          {isReplying && (
+            <Div className="mt-3">
+              <ReplyInput
+                parentMessageId={message.id}
+                onReply={async (parentId, content, attachments) => {
+                  await handleConfirmReply(
+                    parentId,
+                    onReplyMessage,
+                    content,
+                    attachments,
+                  );
+                }}
+                onCancel={cancelAction}
                 locale={locale}
                 logger={logger}
                 user={user}
@@ -525,6 +578,7 @@ export function ThreadedMessage({
                       onBranchMessage={onBranchMessage}
                       onRetryMessage={onRetryMessage}
                       onAnswerAsModel={onAnswerAsModel}
+                      onReplyMessage={onReplyMessage}
                       onVoteMessage={onVoteMessage}
                       onDeleteMessage={onDeleteMessage}
                       user={user}

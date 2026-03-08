@@ -26,10 +26,14 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import {
+  CronTaskStatus,
+  CronTaskStatusDB,
+} from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
 
 import { scopedTranslation } from "../i18n";
-import { EXECUTE_TOOL_ALIAS } from "./constants";
+import { CallbackMode, EXECUTE_TOOL_ALIAS } from "./constants";
 import { ExecuteToolWidget } from "./widget";
 
 const { POST } = createEndpoint({
@@ -105,9 +109,15 @@ const { POST } = createEndpoint({
         description: "executeTool.post.fields.callbackMode.description",
         columns: 12,
         schema: z
-          .enum(["wait", "task-done", "inject"])
+          .enum([
+            CallbackMode.WAIT,
+            CallbackMode.BACKGROUND,
+            CallbackMode.NO_LOOP,
+            CallbackMode.WAKE_UP,
+            CallbackMode.REQUIRES_CONFIRMATION,
+          ])
           .optional()
-          .default("task-done"),
+          .default(CallbackMode.WAIT),
       }),
 
       // ── Response fields ───────────────────────────────────────────────────
@@ -126,6 +136,12 @@ const { POST } = createEndpoint({
       }),
 
       status: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.enum(CronTaskStatusDB).optional(),
+      }),
+
+      hint: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         hidden: true,
         schema: z.string().optional(),
@@ -186,24 +202,24 @@ const { POST } = createEndpoint({
         toolName: "agent_chat_characters_GET",
         input: {},
       },
-      remoteExecution: {
+      remoteBackground: {
         toolName: "bash",
         input: { command: "echo hello" },
         instanceId: "hermes",
-        callbackMode: "task-done" as const,
+        callbackMode: CallbackMode.BACKGROUND,
       },
-      remoteInject: {
+      remoteWakeUp: {
         toolName: "bash",
         input: { command: "ls /tmp" },
         instanceId: "hermes",
-        callbackMode: "inject" as const,
+        callbackMode: CallbackMode.WAKE_UP,
       },
     },
     responses: {
       // Response is the target route's .data passed through in `result`
       default: { result: {} },
       // Remote execution returns a task ID (async)
-      remote: { taskId: "task-uuid-here", status: "pending" },
+      remote: { taskId: "task-uuid-here", status: CronTaskStatus.PENDING },
     },
   },
 });

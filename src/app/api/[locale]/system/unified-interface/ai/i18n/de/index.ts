@@ -78,6 +78,10 @@ export const translations: typeof enTranslations = {
         resolving: "Endpunkt wird aufgelöst…",
         unknownTool: "Unbekanntes Tool: {{toolName}}",
       },
+      actions: {
+        confirm: "Bestätigen",
+        cancel: "Abbrechen",
+      },
     },
   },
   tools: {

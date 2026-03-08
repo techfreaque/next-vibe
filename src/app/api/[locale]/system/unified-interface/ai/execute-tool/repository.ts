@@ -43,11 +43,14 @@ import {
   TaskCategory,
   TaskOutputMode,
 } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
+import { handleTaskCompletion } from "@/app/api/[locale]/system/unified-interface/tasks/task-completion-handler";
 import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/tasks/unified-runner/types";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { scopedTranslation } from "../i18n";
+import type { TaskRoutingContext } from "./constants";
+import { CallbackMode } from "./constants";
 import type {
   RouteExecuteRequestOutput,
   RouteExecuteResponseInput,
@@ -62,7 +65,7 @@ export class RouteExecuteRepository {
     locale: CountryLanguage,
     logger: EndpointLogger,
     t: ModuleT,
-    streamContext?: ToolExecutionContext,
+    streamContext: ToolExecutionContext,
   ): Promise<ResponseType<RouteExecuteResponseInput>> {
     try {
       // Split prefixed tool ID: "hermes__ssh_exec_POST" → instanceId="hermes", toolName="ssh_exec_POST"
@@ -90,11 +93,11 @@ export class RouteExecuteRepository {
         });
 
         // Validate toolName against stored capability snapshot
-        const { getCapabilities } =
+        const { getConnectionForInstance } =
           await import("@/app/api/[locale]/user/remote-connection/repository");
-        const capabilities = await getCapabilities(user.id, instanceId);
+        const connInfo = await getConnectionForInstance(user.id, instanceId);
 
-        if (capabilities === null) {
+        if (connInfo === null || connInfo.capabilities === null) {
           // Capability snapshot not yet synced — fail closed.
           // Allowing through would let any tool name pass before the first sync,
           // creating a window where an attacker could call arbitrary remote endpoints.
@@ -112,6 +115,12 @@ export class RouteExecuteRepository {
           });
         }
 
+        const { capabilities, remoteInstanceId } = connInfo;
+        // Use the remote's actual INSTANCE_ID for targetInstance so task-sync
+        // can route the task correctly (task-sync matches targetInstance = remoteInstanceId).
+        // Falls back to the raw instanceId if remoteInstanceId is not set.
+        const effectiveTargetInstance = remoteInstanceId ?? instanceId;
+
         const known = capabilities.some((c) => c.toolName === toolName);
         if (!known) {
           logger.warn("[RouteExecute] toolName not in capability snapshot", {
@@ -126,22 +135,22 @@ export class RouteExecuteRepository {
           });
         }
 
-        const { callbackMode } = data;
+        const callbackMode = data.callbackMode ?? CallbackMode.WAIT;
 
-        // Get threadId and messageId from streamContext (set by the calling AI stream)
+        // Get threadId and tool message ID from streamContext (set by the calling AI stream)
         const effectiveThreadId = streamContext?.threadId;
-        const effectiveMessageId = streamContext?.aiMessageId;
+        // currentToolMessageId is the TOOL call message DB row ID (set by stream-part-handler
+        // after tool-call event, before execute() runs). Falls back to aiMessageId if not set.
+        const effectiveToolMessageId =
+          streamContext?.currentToolMessageId ?? streamContext?.aiMessageId;
 
         const taskId = `remote-${instanceId}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-        // Merge routing metadata into taskInput so the remote instance can route the result
-        const taskInput: Record<string, JsonValue> = {
-          ...(input ?? {}),
-          // Routing fields — remote pulse handler uses these
-          __callbackMode: callbackMode ?? "task-done",
-          ...(effectiveThreadId ? { __threadId: effectiveThreadId } : {}),
-          ...(effectiveMessageId ? { __messageId: effectiveMessageId } : {}),
-        };
+        // Capture model + character + favoriteId from the originating stream so
+        // resume-stream can restart the AI turn with the same context.
+        const streamModelId = streamContext?.modelId;
+        const streamCharacterId = streamContext?.characterId;
+        const streamFavoriteId = streamContext?.favoriteId;
 
         await db.insert(cronTasks).values({
           id: taskId,
@@ -152,79 +161,286 @@ export class RouteExecuteRepository {
           priority: CronTaskPriority.HIGH,
           enabled: true,
           runOnce: true,
-          taskInput,
+          taskInput: {
+            ...((input ?? {}) as Record<string, JsonValue>),
+            // Routing context — read by handleTaskCompletion on completion.
+            ...({
+              callbackMode,
+              ...(effectiveThreadId ? { threadId: effectiveThreadId } : {}),
+              ...(effectiveToolMessageId
+                ? { toolMessageId: effectiveToolMessageId }
+                : {}),
+              // Resume context — used by handleTaskCompletion to spawn resume-stream task.
+              ...(streamModelId ? { modelId: streamModelId } : {}),
+              ...(streamCharacterId ? { characterId: streamCharacterId } : {}),
+              ...(streamFavoriteId ? { favoriteId: streamFavoriteId } : {}),
+            } satisfies TaskRoutingContext),
+          },
           outputMode: TaskOutputMode.STORE_ONLY,
           notificationTargets: [],
           tags: ["remote", instanceId],
-          targetInstance: instanceId,
+          targetInstance: effectiveTargetInstance,
           userId: user.id,
         });
 
-        // wait mode: long-poll task execution until complete or 60s timeout
-        if (callbackMode === "wait") {
-          const POLL_INTERVAL_MS = 3000;
-          const TIMEOUT_MS = 60_000;
-          const deadline = Date.now() + TIMEOUT_MS;
+        // Signal the stream to pause and wait when callbackMode=wait.
+        // finish-step-handler aborts after this tool step; /report resumes
+        // via headless stream when the remote result arrives.
+        if (callbackMode === CallbackMode.WAIT && streamContext) {
+          streamContext.waitingForRemoteResult = true;
+        }
 
-          while (Date.now() < deadline) {
-            await new Promise<void>((resolve) => {
-              setTimeout(resolve, POLL_INTERVAL_MS);
-            });
+        // All remote calls are async — return pending immediately.
+        // /report backfills the result into the tool message and starts a headless
+        // stream if callbackMode=wakeUp. TASK_COMPLETED WS event notifies the UI.
+        return success({
+          result: undefined,
+          taskId,
+          status: CronTaskStatus.PENDING,
+        });
+      }
 
-            const [execution] = await db
-              .select({
-                status: cronTaskExecutions.status,
-                result: cronTaskExecutions.result,
-                error: cronTaskExecutions.error,
-              })
-              .from(cronTaskExecutions)
-              .where(eq(cronTaskExecutions.taskId, taskId))
-              .limit(1);
+      const callbackMode = data.callbackMode ?? null;
 
-            if (!execution) {
-              // Task not yet started — keep polling
-              continue;
-            }
+      // Local background: execute inline, store result in task execution history,
+      // return { taskId, status: "pending" } to AI. handleTaskCompletion emits
+      // the TASK_COMPLETED WS event and inserts the deferred result message.
+      if (callbackMode === CallbackMode.BACKGROUND) {
+        const taskId = `local-bg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        const executionId = `exec-${taskId}`;
+        const startedAt = new Date();
 
-            const { status } = execution;
+        logger.info("[RouteExecute] Executing local background route", {
+          toolName,
+          taskId,
+        });
 
-            if (status === CronTaskStatus.COMPLETED) {
-              logger.info("[RouteExecute] wait: task completed", {
-                taskId,
-                instanceId,
-              });
-              return success({ result: execution.result ?? undefined, taskId });
-            }
+        const effectiveThreadId = streamContext.threadId;
+        const effectiveToolMessageId =
+          streamContext?.currentToolMessageId ?? streamContext?.aiMessageId;
 
-            if (
-              status === CronTaskStatus.FAILED ||
-              status === CronTaskStatus.ERROR ||
-              status === CronTaskStatus.TIMEOUT ||
-              status === CronTaskStatus.CANCELLED
-            ) {
-              logger.warn("[RouteExecute] wait: task failed", {
-                taskId,
-                instanceId,
-                status,
-              });
-              return success({
-                result: { error: execution.error ?? { status }, taskId },
-                taskId,
-              });
-            }
+        await db.insert(cronTasks).values({
+          id: taskId,
+          routeId: toolName,
+          displayName: `Background: ${toolName}`,
+          category: TaskCategory.SYSTEM,
+          schedule: "* * * * *",
+          priority: CronTaskPriority.HIGH,
+          enabled: false,
+          runOnce: true,
+          taskInput: {
+            ...(input ?? {}),
+            callbackMode: CallbackMode.BACKGROUND,
+            ...(effectiveThreadId ? { threadId: effectiveThreadId } : {}),
+            ...(effectiveToolMessageId
+              ? { toolMessageId: effectiveToolMessageId }
+              : {}),
+          },
+          outputMode: TaskOutputMode.STORE_ONLY,
+          notificationTargets: [],
+          tags: ["background", "local"],
+          userId: user.id,
+        });
 
-            // PENDING / RUNNING / SCHEDULED — keep polling
-          }
+        const result = await RouteExecutionExecutor.executeGenericHandler({
+          toolName,
+          data: input as CliRequestData,
+          user,
+          locale,
+          logger,
+          platform: Platform.MCP,
+          streamContext: {
+            rootFolderId: DefaultFolderId.CRON,
+            threadId: undefined,
+            aiMessageId: undefined,
+            currentToolMessageId: undefined,
+            characterId: undefined,
+            modelId: undefined,
+            favoriteId: undefined,
+            headless: undefined,
+            waitingForRemoteResult: undefined,
+          },
+        });
 
-          // Deadline exceeded
-          logger.warn("[RouteExecute] wait: timeout", { taskId, instanceId });
-          return success({ result: { error: "timeout", taskId }, taskId });
+        const completedAt = new Date();
+        const finalStatus = result.success
+          ? CronTaskStatus.COMPLETED
+          : CronTaskStatus.FAILED;
+        const finalResult =
+          result.success && result.data !== undefined
+            ? (result.data as Record<string, JsonValue>)
+            : null;
+
+        await db.insert(cronTaskExecutions).values({
+          taskId,
+          taskName: toolName,
+          executionId,
+          status: finalStatus,
+          priority: CronTaskPriority.HIGH,
+          startedAt,
+          completedAt,
+          durationMs: completedAt.getTime() - startedAt.getTime(),
+          result: finalResult ?? undefined,
+          triggeredBy: "background",
+          config: {},
+        });
+
+        // Update the cron task row with the final execution status so that
+        // wait-for-task can detect completion without polling cronTaskExecutions.
+        await db
+          .update(cronTasks)
+          .set({
+            lastExecutionStatus: finalStatus,
+            lastExecutedAt: completedAt,
+            lastExecutionDuration: completedAt.getTime() - startedAt.getTime(),
+            enabled: false,
+            updatedAt: completedAt,
+          })
+          .where(eq(cronTasks.id, taskId));
+
+        // Emit TASK_COMPLETED WS event + insert deferred result message so the UI
+        // updates the tool bubble and the result is visible even if the original
+        // message is later compacted.
+        if (effectiveToolMessageId && effectiveThreadId && !user.isPublic) {
+          await handleTaskCompletion({
+            toolMessageId: effectiveToolMessageId,
+            threadId: effectiveThreadId,
+            callbackMode: CallbackMode.BACKGROUND,
+            status: finalStatus,
+            output: finalResult,
+            taskId,
+            taskInput: null,
+            userId: user.id,
+            logger,
+          });
+        }
+
+        return success({
+          taskId,
+          status: finalStatus,
+          hint: "Task completed in the background. The result will appear as a separate message in this thread.",
+        });
+      }
+
+      // Local wakeUp: execute inline, backfill tool message + schedule resume-stream,
+      // pause stream (same as remote wait). AI continues via headless append.
+      if (callbackMode === CallbackMode.WAKE_UP) {
+        const taskId = `local-wu-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        const executionId = `exec-${taskId}`;
+        const startedAt = new Date();
+
+        logger.info("[RouteExecute] Executing local wakeUp route", {
+          toolName,
+          taskId,
+        });
+
+        await db.insert(cronTasks).values({
+          id: taskId,
+          routeId: toolName,
+          displayName: `WakeUp: ${toolName}`,
+          category: TaskCategory.SYSTEM,
+          schedule: "* * * * *",
+          priority: CronTaskPriority.HIGH,
+          enabled: false,
+          runOnce: true,
+          taskInput: (input ?? {}) as Record<string, JsonValue>,
+          outputMode: TaskOutputMode.STORE_ONLY,
+          notificationTargets: [],
+          tags: ["wakeup", "local"],
+          userId: user.id,
+        });
+
+        const result = await RouteExecutionExecutor.executeGenericHandler({
+          toolName,
+          data: input as CliRequestData,
+          user,
+          locale,
+          logger,
+          platform: Platform.MCP,
+          streamContext: {
+            rootFolderId: DefaultFolderId.CRON,
+            threadId: undefined,
+            aiMessageId: undefined,
+            currentToolMessageId: undefined,
+            characterId: undefined,
+            modelId: undefined,
+            favoriteId: undefined,
+            headless: undefined,
+            waitingForRemoteResult: undefined,
+          },
+        });
+
+        const completedAt = new Date();
+        const finalStatus = result.success
+          ? CronTaskStatus.COMPLETED
+          : CronTaskStatus.FAILED;
+        const finalResult =
+          result.success && result.data !== undefined
+            ? (result.data as Record<string, JsonValue>)
+            : null;
+
+        await db.insert(cronTaskExecutions).values({
+          taskId,
+          taskName: toolName,
+          executionId,
+          status: finalStatus,
+          priority: CronTaskPriority.HIGH,
+          startedAt,
+          completedAt,
+          durationMs: completedAt.getTime() - startedAt.getTime(),
+          result: finalResult ?? undefined,
+          triggeredBy: "wakeup",
+          config: {},
+        });
+
+        await db
+          .update(cronTasks)
+          .set({
+            lastExecutionStatus: finalStatus,
+            lastExecutedAt: completedAt,
+            lastExecutionDuration: completedAt.getTime() - startedAt.getTime(),
+            enabled: false,
+            updatedAt: completedAt,
+          })
+          .where(eq(cronTasks.id, taskId));
+
+        const effectiveThreadId = streamContext?.threadId;
+        const effectiveToolMessageId =
+          streamContext?.currentToolMessageId ?? streamContext?.aiMessageId;
+
+        if (effectiveThreadId && effectiveToolMessageId && user.id) {
+          await handleTaskCompletion({
+            toolMessageId: effectiveToolMessageId,
+            threadId: effectiveThreadId,
+            callbackMode: CallbackMode.WAKE_UP,
+            status: finalStatus,
+            output: finalResult,
+            taskId,
+            taskInput: {
+              ...(streamContext?.modelId
+                ? { modelId: streamContext.modelId }
+                : {}),
+              ...(streamContext?.characterId
+                ? { characterId: streamContext.characterId }
+                : {}),
+              ...(streamContext?.favoriteId
+                ? { favoriteId: streamContext.favoriteId }
+                : {}),
+            },
+            userId: user.id,
+            logger,
+          });
+        }
+
+        // Pause the stream — resume-stream will revive the thread
+        if (streamContext) {
+          streamContext.waitingForRemoteResult = true;
         }
 
         return success({
           result: undefined,
           taskId,
-          status: "pending",
+          status: CronTaskStatus.PENDING,
         });
       }
 
@@ -241,9 +457,12 @@ export class RouteExecuteRepository {
           rootFolderId: DefaultFolderId.CRON,
           threadId: undefined,
           aiMessageId: undefined,
+          currentToolMessageId: undefined,
           characterId: undefined,
           modelId: undefined,
+          favoriteId: undefined,
           headless: undefined,
+          waitingForRemoteResult: undefined,
         },
       });
 

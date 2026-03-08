@@ -67,6 +67,7 @@ import {
 } from "@/app/[locale]/chat/lib/utils/folder-utils";
 import { buildFolderUrl } from "@/app/[locale]/chat/lib/utils/navigation";
 import {
+  DEFAULT_FOLDER_CONFIGS,
   DefaultFolderId,
   isDefaultFolderId,
 } from "@/app/api/[locale]/agent/chat/config";
@@ -78,6 +79,7 @@ import { useWidgetContext } from "@/app/api/[locale]/system/unified-interface/un
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { useTouchDevice } from "@/hooks/use-touch-device";
+import { simpleT } from "@/i18n/core/shared";
 
 import type { ChatFolder } from "../../db";
 import createFolderDefinition from "../../folders/[rootFolderId]/create/definition";
@@ -85,7 +87,6 @@ import type { FolderListResponseOutput } from "../../folders/[rootFolderId]/defi
 import foldersDefinition from "../../folders/[rootFolderId]/definition";
 import { scopedTranslation as foldersScopedTranslation } from "../../folders/[rootFolderId]/i18n";
 import { FolderPermissionsDialog } from "../../folders/[rootFolderId]/widget/folder-permissions-dialog";
-import moveDefinitions from "../../folders/subfolders/[subFolderId]/move/definition";
 import renameDefinitions from "../../folders/subfolders/[subFolderId]/rename/definition";
 import { useChatBootContext } from "../../hooks/context";
 import { useChatNavigationStore } from "../../hooks/use-chat-navigation-store";
@@ -482,7 +483,10 @@ function ThreadRow({
                             className="cursor-pointer"
                           >
                             <Icon icon="folder" className="h-4 w-4 mr-2" />
-                            {t("widget.actions.unfiled")}
+                            {simpleT(locale).t(
+                              DEFAULT_FOLDER_CONFIGS[item.rootFolderId]
+                                .translationKey,
+                            )}
                           </DropdownMenuItem>
                         )}
                         {allFolders.map((folder) => (
@@ -576,9 +580,11 @@ function ThreadRow({
 function FolderRow({
   item,
   activeRootFolderId,
+  allFolders,
 }: {
   item: FolderContentsItem;
   activeRootFolderId: DefaultFolderId;
+  allFolders: FolderFromList[];
 }): React.JSX.Element {
   const isTouch = useTouchDevice();
   const { locale, logger, user } = useWidgetContext();
@@ -591,7 +597,6 @@ function FolderRow({
   const [isHovered, setIsHovered] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
-  const [moveDialogOpen, setMoveDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [permissionsDialogOpen, setPermissionsDialogOpen] = useState(false);
   const [newSubfolderDialogOpen, setNewSubfolderDialogOpen] = useState(false);
@@ -862,19 +867,6 @@ function FolderRow({
         <Span className="text-sm font-medium truncate flex-1 min-w-0">
           {folderDisplayName}
         </Span>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleToggleExpanded}
-          className="h-4 w-4 p-0 hover:bg-transparent shrink-0 ml-auto"
-        >
-          {isExpanded ? (
-            <ChevronDown className="h-3 w-3" />
-          ) : (
-            <ChevronRight className="h-3 w-3" />
-          )}
-        </Button>
-
         <Div
           style={{
             width: isHovered || isTouch ? "auto" : "0px",
@@ -972,18 +964,53 @@ function FolderRow({
                       {t("widget.folderList.renameFolder")}
                     </DropdownMenuItem>
                   )}
-                  {!isDefault && item.canManage && (
-                    <DropdownMenuItem
-                      onSelect={() => {
-                        setDropdownOpen(false);
-                        setMoveDialogOpen(true);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      <FolderInput className="h-4 w-4 mr-2" />
-                      {t("widget.folderList.moveToFolder")}
-                    </DropdownMenuItem>
-                  )}
+                  {!isDefault &&
+                    item.canManage &&
+                    (item.parentId !== null ||
+                      allFolders.some((f) => f.id !== item.id)) && (
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger className="cursor-pointer">
+                          <FolderInput className="h-4 w-4 mr-2" />
+                          {t("widget.folderList.moveToFolder")}
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent>
+                          {item.parentId !== null && (
+                            <DropdownMenuItem
+                              onSelect={() => {
+                                setDropdownOpen(false);
+                                void mutateFolder({ parentId: null });
+                              }}
+                              className="cursor-pointer"
+                            >
+                              <Icon icon="folder" className="h-4 w-4 mr-2" />
+                              {simpleT(locale).t(
+                                DEFAULT_FOLDER_CONFIGS[activeRootFolderId]
+                                  .translationKey,
+                              )}
+                            </DropdownMenuItem>
+                          )}
+                          {allFolders
+                            .filter((f) => f.id !== item.id)
+                            .map((folder) => (
+                              <DropdownMenuItem
+                                key={folder.id}
+                                onSelect={() => {
+                                  setDropdownOpen(false);
+                                  void mutateFolder({ parentId: folder.id });
+                                }}
+                                disabled={item.parentId === folder.id}
+                                className="cursor-pointer"
+                              >
+                                <Icon
+                                  icon={folder.icon ?? "folder"}
+                                  className="h-4 w-4 mr-2"
+                                />
+                                {folder.name}
+                              </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+                    )}
                   {!isDefault && item.canDelete && (
                     <DropdownMenuItem
                       onSelect={() => {
@@ -1001,6 +1028,18 @@ function FolderRow({
             )}
           </Div>
         </Div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleToggleExpanded}
+          className="h-4 w-4 p-0 hover:bg-transparent shrink-0"
+        >
+          {isExpanded ? (
+            <ChevronDown className="h-3 w-3" />
+          ) : (
+            <ChevronRight className="h-3 w-3" />
+          )}
+        </Button>
       </Div>
 
       {/* Child level via EndpointsPage when expanded */}
@@ -1052,35 +1091,6 @@ function FolderRow({
                     void mutateFolder({
                       name: (requestData as { name?: string }).name,
                       icon: (requestData as { icon?: IconKey | null }).icon,
-                    });
-                  },
-                },
-              },
-            }}
-          />
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={moveDialogOpen} onOpenChange={setMoveDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>{t("widget.moveFolder.title")}</DialogTitle>
-          </DialogHeader>
-          <EndpointsPage
-            endpoint={moveDefinitions}
-            locale={locale}
-            user={user}
-            endpointOptions={{
-              update: {
-                urlPathParams: { subFolderId: item.id },
-                initialState: { parentId: item.parentId ?? null },
-                formOptions: { persistForm: false },
-                mutationOptions: {
-                  onSuccess: ({ requestData }) => {
-                    setMoveDialogOpen(false);
-                    void mutateFolder({
-                      parentId: (requestData as { parentId?: string | null })
-                        .parentId,
                     });
                   },
                 },
@@ -1193,7 +1203,7 @@ function ItemSection({
   activeRootFolderId,
   allFolders,
 }: {
-  label: string;
+  label: string | undefined;
   items: FolderContentsItem[];
   activeRootFolderId: DefaultFolderId;
   allFolders: FolderFromList[];
@@ -1212,9 +1222,11 @@ function ItemSection({
   return (
     /* eslint-disable i18next/no-literal-string */
     <Div className="mb-1">
-      <Span className="block py-1 px-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-        {label}
-      </Span>
+      {label !== undefined && (
+        <Span className="block py-1 px-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+          {label}
+        </Span>
+      )}
       <Div className="flex flex-col gap-0.5 pl-2">
         {visible.map((item) => {
           if (item.type === "folder") {
@@ -1223,6 +1235,7 @@ function ItemSection({
                 key={item.id}
                 item={item}
                 activeRootFolderId={activeRootFolderId}
+                allFolders={allFolders}
               />
             );
           }
@@ -1298,8 +1311,24 @@ export function FolderContentsWidget({
     [foldersEndpoint.read?.response, activeRootFolderId],
   );
 
+  const isPublicFolder = activeRootFolderId === DefaultFolderId.PUBLIC;
+
   const grouped = useMemo(() => {
     const rawItems: FolderContentsItem[] = fieldItems ?? [];
+
+    if (isPublicFolder) {
+      const sorted = [...rawItems].toSorted(
+        (a, b) => a.sortOrder - b.sortOrder,
+      );
+      return {
+        pinned: [],
+        today: [],
+        lastWeek: [],
+        lastMonth: [],
+        older: sorted,
+      };
+    }
+
     const pinned: FolderContentsItem[] = [];
     const today: FolderContentsItem[] = [];
     const lastWeek: FolderContentsItem[] = [];
@@ -1324,7 +1353,7 @@ export function FolderContentsWidget({
     }
 
     return { pinned, today, lastWeek, lastMonth, older };
-  }, [fieldItems]);
+  }, [fieldItems, isPublicFolder]);
 
   if (!isDefaultFolderId(activeRootFolderId)) {
     return <Div />;
@@ -1356,26 +1385,30 @@ export function FolderContentsWidget({
         activeRootFolderId={activeRootFolderId}
         allFolders={allFolders}
       />
+      {!isPublicFolder && (
+        <>
+          <ItemSection
+            label={t("widget.folderList.today")}
+            items={grouped.today}
+            activeRootFolderId={activeRootFolderId}
+            allFolders={allFolders}
+          />
+          <ItemSection
+            label={t("widget.folderList.lastWeek")}
+            items={grouped.lastWeek}
+            activeRootFolderId={activeRootFolderId}
+            allFolders={allFolders}
+          />
+          <ItemSection
+            label={t("widget.folderList.lastMonth")}
+            items={grouped.lastMonth}
+            activeRootFolderId={activeRootFolderId}
+            allFolders={allFolders}
+          />
+        </>
+      )}
       <ItemSection
-        label={t("widget.folderList.today")}
-        items={grouped.today}
-        activeRootFolderId={activeRootFolderId}
-        allFolders={allFolders}
-      />
-      <ItemSection
-        label={t("widget.folderList.lastWeek")}
-        items={grouped.lastWeek}
-        activeRootFolderId={activeRootFolderId}
-        allFolders={allFolders}
-      />
-      <ItemSection
-        label={t("widget.folderList.lastMonth")}
-        items={grouped.lastMonth}
-        activeRootFolderId={activeRootFolderId}
-        allFolders={allFolders}
-      />
-      <ItemSection
-        label={t("widget.folderList.older")}
+        label={isPublicFolder ? undefined : t("widget.folderList.older")}
         items={grouped.older}
         activeRootFolderId={activeRootFolderId}
         allFolders={allFolders}

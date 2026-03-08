@@ -207,6 +207,44 @@ export function useMessagesSubscription(
           );
         },
 
+        // TASK_COMPLETED: background/noLoop task finished — add deferred result message to store
+        [StreamEventType.TASK_COMPLETED]: (e) => {
+          if (!e.deferredMessage) {
+            return;
+          }
+          const {
+            id,
+            threadId: msgThreadId,
+            parentId,
+            sequenceId,
+            toolCall,
+          } = e.deferredMessage;
+          useChatStore.getState().addMessage({
+            id,
+            threadId: msgThreadId,
+            role: ChatMessageRole.TOOL,
+            content: null,
+            parentId,
+            sequenceId,
+            authorId: "system",
+            authorName: null,
+            isAI: true,
+            model: null,
+            character: null,
+            errorType: null,
+            errorMessage: null,
+            errorCode: null,
+            metadata: { toolCall },
+            upvotes: 0,
+            downvotes: 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            searchVector: null,
+          });
+          // Update leaf so the path walker picks up the new message
+          useChatStore.getState().setLeafMessageId(msgThreadId, id);
+        },
+
         // STREAM_FINISHED: definitive "stream is over" signal
         [StreamEventType.STREAM_FINISHED]: () => {
           logger.info("[Messages] STREAM_FINISHED received", { threadId });

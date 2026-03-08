@@ -12,9 +12,15 @@ export const translations = {
       placeholder: "Enter quantity (1-10)",
     },
     provider: {
-      label: "Payment Provider",
-      description: "Choose how you want to pay",
+      label: "Choose Payment Method",
+      description: "Select how you want to pay for your credit pack",
       placeholder: "Select payment provider",
+      stripe: "Credit / Debit Card",
+      stripeDescription: "Pay securely with Stripe",
+      nowpayments: "Cryptocurrency",
+      nowpaymentsDescription: "Pay with Bitcoin, Ethereum, and more",
+      cryptoMinimumDisabled:
+        "Minimum {{min}} packs required for crypto payments",
     },
     checkoutUrl: {
       content: "Checkout URL",

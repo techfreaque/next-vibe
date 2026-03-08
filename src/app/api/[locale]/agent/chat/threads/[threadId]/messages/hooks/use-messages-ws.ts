@@ -148,6 +148,11 @@ export function subscribeToMessages(
       StreamEventType.STREAM_FINISHED,
       handlers[StreamEventType.STREAM_FINISHED],
     ),
+    sub(
+      channel,
+      StreamEventType.TASK_COMPLETED,
+      handlers[StreamEventType.TASK_COMPLETED],
+    ),
   ];
 
   return (): void => {

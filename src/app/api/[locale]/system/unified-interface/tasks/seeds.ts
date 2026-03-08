@@ -56,6 +56,7 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
     taskInput: task.taskInput ?? {},
     runOnce: task.runOnce ?? false,
     historyInterval: task.historyInterval ?? null,
+    hidden: task.hidden ?? false,
     // System tasks have no user owner (null userId)
     userId: null,
   }));
@@ -75,6 +76,7 @@ async function upsertTaskDefinitions(logger: EndpointLogger): Promise<void> {
           description: sql`excluded.description`,
           category: sql`excluded.category`,
           historyInterval: sql`excluded.history_interval`,
+          hidden: sql`excluded.hidden`,
           updatedAt: new Date(),
         },
       });

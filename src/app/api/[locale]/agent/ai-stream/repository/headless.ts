@@ -7,7 +7,7 @@
 
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import type { ResponseType } from "@/app/api/[locale]/shared/types/response.schema";
@@ -394,6 +394,22 @@ export async function runHeadlessAiStream(
       parentMessageIdForAi = lastToolMessageId;
     }
 
+    // For "append" mode with no preCalls, find the last message in the thread
+    // so we can use "answer-as-ai" (which continues from an existing message)
+    // instead of "send" (which would create a new user message with empty content).
+    if (threadMode === "append" && !parentMessageIdForAi && existingThreadId) {
+      const [lastMsg] = await db
+        .select({ id: chatMessages.id })
+        .from(chatMessages)
+        .where(eq(chatMessages.threadId, existingThreadId))
+        .orderBy(desc(chatMessages.createdAt))
+        .limit(1);
+
+      if (lastMsg) {
+        parentMessageIdForAi = lastMsg.id;
+      }
+    }
+
     const syntheticData: AiStreamPostRequestOutput = {
       operation: parentMessageIdForAi ? "answer-as-ai" : "send",
       rootFolderId,
@@ -426,6 +442,7 @@ export async function runHeadlessAiStream(
       headless: true,
       extraInstructions: headlessInstructions,
       excludeMemories,
+      favoriteIdOverride: favoriteId,
     });
 
     if (!result.success) {

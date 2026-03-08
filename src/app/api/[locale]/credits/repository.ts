@@ -58,6 +58,7 @@ import {
   userLeadLinks,
 } from "@/app/api/[locale]/leads/db";
 import { LeadSource, LeadStatus } from "@/app/api/[locale]/leads/enum";
+import { paymentInvoices } from "@/app/api/[locale]/payment/db";
 import type { CreditPackCheckoutSession } from "@/app/api/[locale]/payment/providers/types";
 import { parseError } from "@/app/api/[locale]/shared/utils/parse-error";
 import { subscriptions } from "@/app/api/[locale]/subscription/db";
@@ -3337,6 +3338,85 @@ export class CreditRepository {
       logger.error("Failed to handle credit pack purchase", {
         error: parseError(error),
         sessionId: session.id,
+      });
+    }
+  }
+
+  /**
+   * Handle NOWPayments success redirect for credit pack purchases.
+   * Called from the subscription page when NP_id is present and type=credits.
+   * Looks up invoice by callbackToken, verifies ownership, grants credits.
+   * Idempotent via providerInvoiceId.
+   */
+  static async handleNowPaymentsCreditSuccessRedirect(
+    npId: string,
+    token: string | undefined,
+    userId: string,
+    locale: CountryLanguage,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      const invoices = token
+        ? await db
+            .select()
+            .from(paymentInvoices)
+            .where(eq(paymentInvoices.callbackToken, token))
+            .limit(1)
+        : await db
+            .select()
+            .from(paymentInvoices)
+            .where(eq(paymentInvoices.userId, userId))
+            .orderBy(paymentInvoices.createdAt)
+            .limit(1);
+
+      const invoice = invoices[0];
+
+      if (!invoice?.metadata) {
+        logger.warn("No invoice found for NOWPayments credit redirect", {
+          npId,
+          token,
+          userId,
+        });
+        return;
+      }
+
+      const meta = invoice.metadata as Record<string, string>;
+
+      if (meta.type !== "credit_pack") {
+        logger.info("Invoice is not a credit_pack, skipping", {
+          type: meta.type,
+        });
+        return;
+      }
+
+      if (invoice.userId !== userId) {
+        logger.warn("User mismatch on NOWPayments credit redirect", {
+          invoiceUserId: invoice.userId,
+          requestUserId: userId,
+        });
+        return;
+      }
+
+      const { scopedTranslation: creditsScopedTranslation } =
+        await import("./i18n");
+      const { t } = creditsScopedTranslation.scopedT(locale);
+
+      await CreditRepository.handleCreditPackPurchase(
+        { id: invoice.providerInvoiceId, metadata: { ...meta, userId } },
+        logger,
+        t,
+      );
+
+      logger.info("NOWPayments credit pack processed on redirect", {
+        npId,
+        invoiceId: invoice.providerInvoiceId,
+        userId,
+      });
+    } catch (error) {
+      logger.error("Failed to process NOWPayments credit redirect", {
+        error: String(error),
+        npId,
+        userId,
       });
     }
   }

@@ -27,6 +27,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 import { cronTasks } from "../../cron/db";
 import {
   CronTaskEnabledFilter,
+  CronTaskHiddenFilter,
   CronTaskPriority,
   TaskCategory,
   TaskCategoryDB,
@@ -106,6 +107,7 @@ function formatTaskResponse(
     schedule: task.schedule,
     timezone: task.timezone ?? null,
     enabled: task.enabled,
+    hidden: task.hidden,
     priority: task.priority,
     timeout: task.timeout ?? null,
     retries: task.retries ?? null,
@@ -191,6 +193,14 @@ class CronTasksListRepositoryImpl implements ICronTasksListRepository {
         conditions.push(eq(cronTasks.enabled, false));
       }
       // CronTaskEnabledFilter.ALL or undefined → no filter
+
+      // Default: show only visible (non-hidden) tasks; admin can request hidden or all
+      if (data.hidden === CronTaskHiddenFilter.HIDDEN) {
+        conditions.push(eq(cronTasks.hidden, true));
+      } else if (!data.hidden || data.hidden === CronTaskHiddenFilter.VISIBLE) {
+        conditions.push(eq(cronTasks.hidden, false));
+      }
+      // CronTaskHiddenFilter.ALL → no filter (show everything)
 
       // status filter maps to lastExecutionStatus
       if (data.status && data.status.length > 0) {

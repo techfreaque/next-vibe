@@ -70,21 +70,27 @@ export class LogoutRepository {
         // Continue even if token deletion fails
       }
 
-      // Remove sessions from database
-      try {
-        await SessionRepository.deleteByUserId(userId, sessionT);
-        logger.debug("Deleted user sessions", { userId });
-      } catch (error) {
-        logger.error("Error deleting user sessions", parseError(error));
-        // Use a specific error for session deletion failure
-        return fail({
-          message: t("errors.session_deletion_failed.title"),
-          errorType: ErrorResponseTypes.INTERNAL_ERROR,
-          messageParams: {
-            resourceType: "user.sessions",
+      // Remove only the current session from database
+      const currentSession =
+        await SessionRepository.getCurrentSession(sessionT);
+      if (currentSession.success) {
+        const sessionFindResult = await SessionRepository.findByToken(
+          currentSession.data.token,
+          sessionT,
+        );
+        if (sessionFindResult.success) {
+          await SessionRepository.deleteById(
+            sessionFindResult.data.id,
+            sessionT,
+          );
+          logger.debug("Deleted current session", {
             userId,
-            error: parseError(error).message,
-          },
+            sessionId: sessionFindResult.data.id,
+          });
+        }
+      } else {
+        logger.debug("No current session cookie, skipping session deletion", {
+          userId,
         });
       }
 

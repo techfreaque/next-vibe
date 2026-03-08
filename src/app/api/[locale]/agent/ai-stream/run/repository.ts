@@ -154,11 +154,6 @@ export class AiStreamRunRepository {
             logger,
             {
               rootFolderId,
-              threadId: undefined,
-              aiMessageId: undefined,
-              characterId: undefined,
-              modelId: undefined,
-              headless: undefined,
             },
           );
           preCallResults.push({

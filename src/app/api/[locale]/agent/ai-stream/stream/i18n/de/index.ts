@@ -534,6 +534,79 @@ export const translations: typeof enTranslations = {
         "Favorit nicht gefunden oder gehört nicht diesem Benutzer",
     },
   },
+  resumeStream: {
+    post: {
+      title: "KI-Stream fortsetzen",
+      description:
+        "Setzt einen bestehenden Thread fort, indem ein headless KI-Schritt ausgeführt wird. Wird nach dem Abschluss eines asynchronen Remote-Tasks verwendet.",
+      fields: {
+        threadId: {
+          title: "Thread-ID",
+          description: "UUID des fortzusetzenden Threads.",
+        },
+        favoriteId: {
+          title: "Favoriten-ID",
+          description:
+            "UUID eines gespeicherten Favoriten zum Laden von Modell und Charakter.",
+        },
+        modelId: {
+          title: "Modell-ID",
+          description: "KI-Modell für den fortgesetzten Schritt.",
+        },
+        characterId: {
+          title: "Charakter-ID",
+          description: "Charakter/Persona für den fortgesetzten Schritt.",
+        },
+        resumed: {
+          title: "Fortgesetzt",
+          description: "Ob der Thread erfolgreich fortgesetzt wurde.",
+        },
+        lastAiMessageId: {
+          title: "Letzte KI-Nachrichten-ID",
+          description: "UUID der letzten generierten Assistentennachricht.",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Validierungsfehler",
+          description: "Ungültige Parameter",
+        },
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Authentifizierung erforderlich",
+        },
+        forbidden: { title: "Verboten", description: "Zugriff verweigert" },
+        notFound: {
+          title: "Nicht gefunden",
+          description: "Thread oder Modell nicht gefunden",
+        },
+        internal: {
+          title: "Serverfehler",
+          description: "Interner Fehler beim Fortsetzen des Streams",
+        },
+        network: {
+          title: "Netzwerkfehler",
+          description: "Netzwerkfehler aufgetreten",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten",
+        },
+        unsaved: {
+          title: "Nicht gespeicherte Änderungen",
+          description: "Konflikt bei nicht gespeicherten Änderungen",
+        },
+        conflict: {
+          title: "Konflikt",
+          description: "Ein Konflikt ist aufgetreten",
+        },
+      },
+      success: {
+        title: "Stream fortgesetzt",
+        description: "Der KI-Thread wurde erfolgreich fortgesetzt",
+      },
+    },
+  },
   providers: {
     uncensoredHandler: {
       errors: {

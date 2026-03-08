@@ -24,7 +24,7 @@ import { scopedTranslation } from "./i18n";
 const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
-  path: ["system", "generators", "generate-all"],
+  path: ["system", "generators", "generate-all", "codegen"],
   title: "post.title",
   description: "post.description",
   category: "app.endpointCategories.system",

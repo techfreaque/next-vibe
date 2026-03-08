@@ -24,6 +24,7 @@ import { Div } from "next-vibe-ui/ui/div";
 import { Bitcoin } from "next-vibe-ui/ui/icons/Bitcoin";
 import { Calendar } from "next-vibe-ui/ui/icons/Calendar";
 import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
+import { Info } from "next-vibe-ui/ui/icons/Info";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { Zap } from "next-vibe-ui/ui/icons/Zap";
 import { Link } from "next-vibe-ui/ui/link";
@@ -205,6 +206,12 @@ export function SubscriptionCreateContainer({
                 </Div>
               </Div>
             </Button>
+            {isCryptoDisabled && (
+              <Div className="flex items-start gap-2 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700 p-3 text-sm text-amber-700 dark:text-amber-300">
+                <Info className="h-4 w-4 mt-0.5 shrink-0" />
+                {t("buy.provider.cryptoMonthlyDisabled")}
+              </Div>
+            )}
           </Div>
         </DialogContent>
       </Dialog>

@@ -53,6 +53,7 @@ export const translations = {
   components: {
     sidebar: {
       login: "Login",
+      signup: "Sign up",
       logout: "Logout",
       footer: {
         account: "Account",

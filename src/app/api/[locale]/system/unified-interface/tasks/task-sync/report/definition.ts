@@ -19,9 +19,9 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { taskInputSchema } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import { CronTaskStatus } from "@/app/api/[locale]/system/unified-interface/tasks/enum";
 import { UserRole } from "@/app/api/[locale]/user/user-roles/enum";
-import { envClient } from "@/config/env-client";
 
 import { scopedTranslation } from "../../i18n";
 
@@ -34,9 +34,7 @@ const { POST } = createEndpoint({
   icon: "upload",
   category: "app.endpointCategories.system",
   tags: ["tags.tasks" as const],
-  allowedRoles: envClient.VIBE_IS_CLOUD
-    ? ([UserRole.ADMIN] as const)
-    : ([] as const),
+  allowedRoles: [UserRole.ADMIN] as const,
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,
@@ -45,7 +43,7 @@ const { POST } = createEndpoint({
     usage: { request: "data", response: true },
     children: {
       // Request
-      taskRouteId: scopedRequestField(scopedTranslation, {
+      taskId: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXT,
         columns: 6,
@@ -103,9 +101,7 @@ const { POST } = createEndpoint({
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.TEXTAREA,
         columns: 12,
-        schema: z
-          .record(z.string(), z.union([z.string(), z.number(), z.boolean()]))
-          .optional(),
+        schema: taskInputSchema.optional(),
       }),
       startedAt: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -169,7 +165,7 @@ const { POST } = createEndpoint({
   examples: {
     requests: {
       default: {
-        taskRouteId: "claude-code",
+        taskId: "claude-code",
         status: CronTaskStatus.COMPLETED,
         summary: "Task completed successfully.",
       },

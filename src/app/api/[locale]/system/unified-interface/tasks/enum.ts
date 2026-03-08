@@ -169,6 +169,25 @@ export const CronTaskEnabledFilterDB = [
 ] as const;
 
 /**
+ * Task Hidden Filter
+ * Tri-state filter: visible only (default) / hidden only / all
+ */
+export const {
+  enum: CronTaskHiddenFilter,
+  options: CronTaskHiddenFilterOptions,
+  Value: CronTaskHiddenFilterValue,
+} = createEnumOptions(scopedTranslation, {
+  VISIBLE: "hiddenFilter.visible" as const,
+  HIDDEN: "hiddenFilter.hidden" as const,
+  ALL: "hiddenFilter.all" as const,
+});
+export const CronTaskHiddenFilterDB = [
+  CronTaskHiddenFilter.VISIBLE,
+  CronTaskHiddenFilter.HIDDEN,
+  CronTaskHiddenFilter.ALL,
+] as const;
+
+/**
  * Sort Order
  */
 export const {

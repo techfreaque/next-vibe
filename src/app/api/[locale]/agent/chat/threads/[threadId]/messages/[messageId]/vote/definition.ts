@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 
+import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   scopedObjectFieldNew,
@@ -110,6 +111,14 @@ const { POST } = createEndpoint({
       }),
 
       // === REQUEST DATA ===
+      rootFolderId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "post.rootFolderId.label" as const,
+        description: "post.rootFolderId.description" as const,
+        columns: 6,
+        schema: z.enum(DefaultFolderId),
+      }),
       vote: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.SELECT,
@@ -156,6 +165,9 @@ const { POST } = createEndpoint({
     description: "post.success.description",
   },
 
+  // Route to client (localStorage) for incognito threads — voting is a no-op there
+  useClientRoute: ({ data }) => data.rootFolderId === DefaultFolderId.INCOGNITO,
+
   examples: {
     urlPathParams: {
       default: {
@@ -177,15 +189,19 @@ const { POST } = createEndpoint({
     },
     requests: {
       default: {
+        rootFolderId: DefaultFolderId.PRIVATE,
         vote: "up" as const,
       },
       upvote: {
+        rootFolderId: DefaultFolderId.PRIVATE,
         vote: "up" as const,
       },
       downvote: {
+        rootFolderId: DefaultFolderId.PRIVATE,
         vote: "down" as const,
       },
       removeVote: {
+        rootFolderId: DefaultFolderId.PRIVATE,
         vote: "remove" as const,
       },
     },

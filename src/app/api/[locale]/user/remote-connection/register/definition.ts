@@ -84,6 +84,11 @@ const { POST } = createEndpoint({
         hidden: true,
         schema: z.boolean(),
       }),
+      remoteInstanceId: scopedResponseField(scopedTranslation, {
+        type: WidgetType.TEXT,
+        hidden: true,
+        schema: z.string(),
+      }),
     },
   }),
 
@@ -141,6 +146,7 @@ const { POST } = createEndpoint({
     responses: {
       default: {
         registered: true,
+        remoteInstanceId: "thea",
       },
     },
   },

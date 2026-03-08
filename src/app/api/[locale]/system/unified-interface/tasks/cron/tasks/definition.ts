@@ -28,6 +28,9 @@ import {
   CronTaskEnabledFilter,
   CronTaskEnabledFilterDB,
   CronTaskEnabledFilterOptions,
+  CronTaskHiddenFilter,
+  CronTaskHiddenFilterDB,
+  CronTaskHiddenFilterOptions,
   CronTaskPriority,
   CronTaskPriorityDB,
   CronTaskPriorityOptions,
@@ -55,6 +58,7 @@ export const cronTaskResponseSchema = z.object({
   schedule: z.string(),
   timezone: z.string().nullable(),
   enabled: z.boolean(),
+  hidden: z.boolean(),
   priority: z.enum(CronTaskPriorityDB),
   timeout: z.number().nullable(),
   retries: z.number().nullable(),
@@ -95,7 +99,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["system", "unified-interface", "tasks", "cron", "tasks"],
-  aliases: [CRON_LIST_ALIAS, "cron-tasks"],
+  aliases: [CRON_LIST_ALIAS, "tasks", "cron-list", "cron-tasks"],
   title: "get.title",
   description: "get.description",
   icon: "clock",
@@ -156,6 +160,19 @@ const { GET } = createEndpoint({
           .enum(CronTaskEnabledFilterDB)
           .optional()
           .default(CronTaskEnabledFilter.ALL),
+      }),
+      hidden: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.SELECT,
+        label: "get.fields.hidden.label",
+        description: "get.fields.hidden.description",
+        placeholder: "get.fields.hidden.placeholder",
+        options: CronTaskHiddenFilterOptions,
+        columns: 6,
+        schema: z
+          .enum(CronTaskHiddenFilterDB)
+          .optional()
+          .default(CronTaskHiddenFilter.VISIBLE),
       }),
       limit: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
@@ -228,6 +245,11 @@ const { GET } = createEndpoint({
             enabled: scopedResponseField(scopedTranslation, {
               type: WidgetType.TEXT,
               content: "get.response.task.enabled",
+              schema: z.boolean(),
+            }),
+            hidden: scopedResponseField(scopedTranslation, {
+              type: WidgetType.TEXT,
+              content: "get.response.task.hidden",
               schema: z.boolean(),
             }),
             priority: scopedResponseField(scopedTranslation, {
@@ -625,6 +647,7 @@ const { POST } = createEndpoint({
           schedule: "0 0 * * *",
           timezone: "UTC",
           enabled: true,
+          hidden: false,
           priority: CronTaskPriority.MEDIUM,
           timeout: 300000,
           retries: 3,

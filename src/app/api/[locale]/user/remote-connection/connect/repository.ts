@@ -26,6 +26,7 @@ import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPrivatePayloadType } from "@/app/api/[locale]/user/auth/types";
 import { LEAD_ID_COOKIE_NAME } from "@/config/constants";
+import { env } from "@/config/env";
 import { envClient } from "@/config/env-client";
 import { defaultLocale } from "@/i18n/core/config";
 
@@ -48,7 +49,11 @@ async function registerOnRemote(params: {
   leadId: string;
   instanceId: string;
   logger: EndpointLogger;
-}): Promise<{ ok: boolean; conflict: boolean }> {
+}): Promise<{
+  ok: boolean;
+  conflict: boolean;
+  remoteInstanceId: string | null;
+}> {
   const { remoteUrl, token, leadId, instanceId, logger } = params;
   const localUrl = envClient.NEXT_PUBLIC_APP_URL ?? "";
   const registerUrl = `${remoteUrl}/api/${defaultLocale}/${registerEndpoints.POST.path.join("/")}`;
@@ -73,7 +78,7 @@ async function registerOnRemote(params: {
       logger.warn("[CONNECT] Instance ID already registered on remote", {
         instanceId,
       });
-      return { ok: false, conflict: true };
+      return { ok: false, conflict: true, remoteInstanceId: null };
     }
 
     if (!response.ok) {
@@ -81,13 +86,20 @@ async function registerOnRemote(params: {
         status: response.status,
         instanceId,
       });
-      return { ok: false, conflict: false };
+      return { ok: false, conflict: false, remoteInstanceId: null };
     }
 
-    return { ok: true, conflict: false };
+    const body = (await response.json()) as {
+      data?: { remoteInstanceId?: string };
+    };
+    return {
+      ok: true,
+      conflict: false,
+      remoteInstanceId: body.data?.remoteInstanceId ?? null,
+    };
   } catch (error) {
     logger.error(`[CONNECT] Remote registration error: ${String(error)}`);
-    return { ok: false, conflict: false };
+    return { ok: false, conflict: false, remoteInstanceId: null };
   }
 }
 
@@ -126,7 +138,7 @@ function validateRemoteUrl(rawUrl: string): string | null {
   }
   const host = parsed.hostname;
   // Allow loopback/private addresses in development (for local-to-local testing)
-  if (envClient.NODE_ENV !== "development") {
+  if (envClient.NODE_ENV !== "development" && env.NODE_ENV !== "development") {
     if (PRIVATE_IP_PATTERNS.some((re) => re.test(host))) {
       return "Remote URL must not point to a private or loopback address";
     }
@@ -224,6 +236,7 @@ export async function connectRemote(
     leadId: effectiveLeadId,
     instanceId,
     friendlyName: friendlyName ?? instanceId,
+    remoteInstanceId: registerResult.remoteInstanceId ?? undefined,
     logger,
   });
 
@@ -236,6 +249,27 @@ export async function connectRemote(
 
   // Invalidate cache so pulse/task-sync pick up the new instanceId immediately
   invalidateInstanceIdCache();
+
+  // ── Step 4b: Upsert local self-identity record (token="self") ──────────────
+  // This lets getLocalInstanceId() return our own instanceId even when no remote
+  // has registered here yet (e.g. outbound-only setups).
+  try {
+    await db
+      .insert(userRemoteConnections)
+      .values({
+        userId: user.id,
+        instanceId,
+        friendlyName: `${instanceId} (self)`,
+        remoteUrl: envClient.NEXT_PUBLIC_APP_URL ?? "",
+        localUrl: null,
+        token: "self",
+        isActive: true,
+        updatedAt: new Date(),
+      })
+      .onConflictDoNothing();
+  } catch {
+    // Non-fatal — self-record may already exist or conflict with the connection row
+  }
 
   // ── Step 5: Write default remote tools to user's allowedTools setting ───────
   try {

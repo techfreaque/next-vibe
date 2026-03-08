@@ -11,7 +11,9 @@ import { Info } from "next-vibe-ui/ui/icons/Info";
 import { Shield } from "next-vibe-ui/ui/icons/Shield";
 import { Span } from "next-vibe-ui/ui/span";
 
+import { withValue } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/field-helpers";
 import {
+  useWidgetForm,
   useWidgetLogger,
   useWidgetNavigation,
   useWidgetTranslation,
@@ -52,8 +54,9 @@ export function FolderPermissionsContainer({
 }: CustomWidgetProps): React.JSX.Element {
   const children = field.children;
   const t = useWidgetTranslation<typeof definition.GET>();
-  const { push: navigate } = useWidgetNavigation();
+  const navigation = useWidgetNavigation();
   const logger = useWidgetLogger();
+  const form = useWidgetForm<typeof definition.GET>();
 
   if (!field.value) {
     return (
@@ -103,18 +106,18 @@ export function FolderPermissionsContainer({
   ];
 
   const handleEdit = async (): Promise<void> => {
-    try {
-      const permissionsDef = await import("./definition");
-      navigate(permissionsDef.default.PATCH, {
-        prefillFromGet: true,
-        getEndpoint: permissionsDef.default.GET,
-        popNavigationOnSuccess: 1,
-      });
-    } catch (error) {
-      logger.error("Failed to navigate to edit permissions", {
-        error: String(error),
-      });
+    const subFolderId = form.getValues().subFolderId;
+    if (!subFolderId) {
+      logger.error("Cannot navigate to edit: missing subFolderId");
+      return;
     }
+    const permissionsDef = await import("./definition");
+    navigation.push(permissionsDef.default.PATCH, {
+      urlPathParams: { subFolderId },
+      prefillFromGet: true,
+      getEndpoint: permissionsDef.default.GET,
+      popNavigationOnSuccess: 1,
+    });
   };
 
   return (
@@ -128,7 +131,7 @@ export function FolderPermissionsContainer({
         <Button
           variant="default"
           size="sm"
-          onClick={handleEdit}
+          onClick={() => void handleEdit()}
           className="ml-auto"
         >
           {t("get.edit")}
@@ -187,7 +190,11 @@ export function FolderPermissionsContainer({
                       rolesArray.map((role, index) => (
                         <BadgeWidget
                           key={`${section.key}-${index}-${role}`}
-                          field={children[section.key].child}
+                          field={withValue(
+                            children[section.key].child,
+                            role,
+                            rolesArray,
+                          )}
                           fieldName={`${section.key}.${index}`}
                         />
                       ))

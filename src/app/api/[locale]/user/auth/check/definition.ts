@@ -34,6 +34,7 @@ const { GET } = createEndpoint({
     UserRole.ADMIN,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
+    UserRole.AI_TOOL_OFF,
   ] as const,
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

@@ -4,7 +4,7 @@
  *
  * locale: pl-PL
  * role: enums.userRole.public
- * entries: 44
+ * entries: 45
  */
 
 import type { RemoteToolCapability } from "@/app/api/[locale]/user/remote-connection/db";
@@ -19592,7 +19592,7 @@ export const remoteCapabilities: RemoteToolCapability[] = [
     instanceId: "local",
   },
   {
-    toolName: "web-search",
+    toolName: "brave-search",
     title: "Wyszukaj w sieci",
     description:
       "Przeszukuj internet w poszukiwaniu aktualnych informacji, wiadomości, faktów lub ostatnich wydarzeń. Użyj tego, gdy potrzebujesz aktualnych informacji lub chcesz zweryfikować fakty.",
@@ -19819,7 +19819,7 @@ export const remoteCapabilities: RemoteToolCapability[] = [
     instanceId: "local",
   },
   {
-    toolName: "kagi",
+    toolName: "kagi-search",
     title: "Wyszukaj z Kagi",
     description:
       "Przeszukuj internet lub uzyskaj odpowiedzi generowane przez AI za pomocą Kagi. Tryb FastGPT zapewnia kompleksowe odpowiedzi ze źródłami, podczas gdy tryb wyszukiwania zwraca bezpośrednie wyniki.",
@@ -20181,9 +20181,9 @@ export const remoteCapabilities: RemoteToolCapability[] = [
   },
   {
     toolName: "contact-form",
-    title: "Przesłanie formularza kontaktowego",
+    title: "Kontakt",
     description:
-      "Prześlij formularz kontaktowy i obsługuj powiadomienia e-mail",
+      "Wyślij wiadomość do zespołu – w sprawie pytań, opinii, wsparcia lub współpracy. Otrzymasz e-mail potwierdzający, a my odpowiemy w ciągu 24 godzin.",
     fields: {
       type: "container",
       title: "Formularz kontaktowy",
@@ -23088,6 +23088,60 @@ export const remoteCapabilities: RemoteToolCapability[] = [
     instanceId: "local",
   },
   {
+    toolName: "referral_lead_current_GET",
+    title: "Pobierz aktualny kod polecenia leada",
+    description:
+      "Zwraca kod polecenia powiązany z aktualnym leadem, jeśli istnieje",
+    fields: {
+      usage: { response: true },
+      children: {
+        referralCode: {
+          type: "text",
+          content: "Kod polecenia",
+          schema: {
+            def: {
+              type: "nullable",
+              innerType: {
+                def: { type: "string" },
+                type: "string",
+                format: null,
+                minLength: null,
+                maxLength: null,
+              },
+            },
+            type: "nullable",
+          },
+          usage: { response: true },
+          schemaType: "primitive",
+        },
+        referralLabel: {
+          type: "text",
+          content: "Etykieta polecenia",
+          schema: {
+            def: {
+              type: "nullable",
+              innerType: {
+                def: { type: "string" },
+                type: "string",
+                format: null,
+                minLength: null,
+                maxLength: null,
+              },
+            },
+            type: "nullable",
+          },
+          usage: { response: true },
+          schemaType: "primitive",
+        },
+      },
+      type: "custom-widget",
+      schemaType: "object",
+    },
+    executionMode: "via-execute-route",
+    isAsync: true,
+    instanceId: "local",
+  },
+  {
     toolName: "tool-help",
     title: "Pomoc narzędzi — odkryj dostępne narzędzia",
     description:
@@ -24523,22 +24577,32 @@ export const remoteCapabilities: RemoteToolCapability[] = [
                       type: "enum",
                       entries: {
                         wait: "wait",
-                        "task-done": "task-done",
-                        inject: "inject",
+                        background: "background",
+                        noLoop: "noLoop",
+                        wakeUp: "wakeUp",
+                        requiresConfirmation: "requiresConfirmation",
                       },
                     },
                     type: "enum",
                     enum: {
                       wait: "wait",
-                      "task-done": "task-done",
-                      inject: "inject",
+                      background: "background",
+                      noLoop: "noLoop",
+                      wakeUp: "wakeUp",
+                      requiresConfirmation: "requiresConfirmation",
                     },
-                    options: ["wait", "task-done", "inject"],
+                    options: [
+                      "wait",
+                      "background",
+                      "noLoop",
+                      "wakeUp",
+                      "requiresConfirmation",
+                    ],
                   },
                 },
                 type: "optional",
               },
-              defaultValue: "task-done",
+              defaultValue: "wait",
             },
             type: "default",
           },
@@ -24581,6 +24645,63 @@ export const remoteCapabilities: RemoteToolCapability[] = [
           schemaType: "primitive",
         },
         status: {
+          type: "text",
+          hidden: true,
+          schema: {
+            def: {
+              type: "optional",
+              innerType: {
+                def: {
+                  type: "enum",
+                  entries: {
+                    "status.pending": "status.pending",
+                    "status.running": "status.running",
+                    "status.completed": "status.completed",
+                    "status.failed": "status.failed",
+                    "status.timeout": "status.timeout",
+                    "status.cancelled": "status.cancelled",
+                    "status.skipped": "status.skipped",
+                    "status.blocked": "status.blocked",
+                    "status.scheduled": "status.scheduled",
+                    "status.stopped": "status.stopped",
+                    "status.error": "status.error",
+                  },
+                },
+                type: "enum",
+                enum: {
+                  "status.pending": "status.pending",
+                  "status.running": "status.running",
+                  "status.completed": "status.completed",
+                  "status.failed": "status.failed",
+                  "status.timeout": "status.timeout",
+                  "status.cancelled": "status.cancelled",
+                  "status.skipped": "status.skipped",
+                  "status.blocked": "status.blocked",
+                  "status.scheduled": "status.scheduled",
+                  "status.stopped": "status.stopped",
+                  "status.error": "status.error",
+                },
+                options: [
+                  "status.pending",
+                  "status.running",
+                  "status.completed",
+                  "status.failed",
+                  "status.timeout",
+                  "status.cancelled",
+                  "status.skipped",
+                  "status.blocked",
+                  "status.scheduled",
+                  "status.stopped",
+                  "status.error",
+                ],
+              },
+            },
+            type: "optional",
+          },
+          usage: { response: true },
+          schemaType: "primitive",
+        },
+        hint: {
           type: "text",
           hidden: true,
           schema: {
@@ -26499,27 +26620,9 @@ export const remoteCapabilities: RemoteToolCapability[] = [
     description:
       "Uzyskaj dostęp do niecenzurowanych modeli AI i historii rozmów.",
     fields: {
-      type: "container",
-      layoutType: "stacked",
-      gap: "4",
+      render: null,
       usage: { request: "data", response: true },
       children: {
-        title: {
-          schemaType: "widget",
-          type: "title",
-          content: "Witaj ponownie",
-          order: 0,
-          usage: { request: "data", response: true },
-        },
-        subtitle: {
-          schemaType: "widget",
-          type: "text",
-          content:
-            "Uzyskaj dostęp do niecenzurowanych modeli AI i historii rozmów.",
-          variant: "body-lg",
-          order: 1,
-          usage: { request: "data", response: true },
-        },
         email: {
           type: "form_field",
           fieldType: "email",
@@ -26727,6 +26830,7 @@ export const remoteCapabilities: RemoteToolCapability[] = [
           usage: { request: "data" },
         },
       },
+      type: "custom-widget",
       schemaType: "object",
     },
     executionMode: "via-execute-route",

@@ -171,6 +171,9 @@ export function createNextHandler<T extends CreateApiEndpointAny>(
           characterId: undefined,
           modelId: undefined,
           headless: undefined,
+          currentToolMessageId: undefined,
+          waitingForRemoteResult: undefined,
+          favoriteId: undefined,
         },
       });
 

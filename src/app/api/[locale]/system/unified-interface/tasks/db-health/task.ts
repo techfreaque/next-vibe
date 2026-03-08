@@ -30,6 +30,7 @@ const dbHealthTask = createCronTask(definitions.POST, tools.POST, {
   schedule: CRON_SCHEDULES.EVERY_MINUTE,
   category: TaskCategory.MONITORING,
   enabled: true,
+  hidden: true,
   priority: CronTaskPriority.LOW,
   timeout: TASK_TIMEOUTS.SHORT,
   historyInterval: HISTORY_INTERVALS.EVERY_30_MINUTES,

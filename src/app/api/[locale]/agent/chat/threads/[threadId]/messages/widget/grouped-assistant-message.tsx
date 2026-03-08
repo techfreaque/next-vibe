@@ -61,6 +61,10 @@ interface GroupedAssistantMessageProps {
   deductCredits: ((creditCost: number, feature: string) => void) | null;
   /** Extra class on root element */
   className?: string;
+  /** Vote callback — null when voting is not available */
+  onVote: ((messageId: string, vote: 1 | -1 | 0) => Promise<void>) | null;
+  userVote: "up" | "down" | null;
+  voteScore: number;
 }
 
 // ============================================================================
@@ -552,6 +556,9 @@ interface MessageActionsWrapperProps {
   readOnly: boolean;
   user: JwtPayloadType;
   deductCredits: ((creditCost: number, feature: string) => void) | null;
+  onVote: ((messageId: string, vote: 1 | -1 | 0) => Promise<void>) | null;
+  userVote: "up" | "down" | null;
+  voteScore: number;
 }
 
 const MessageActionsWrapper = memo(function MessageActionsWrapper({
@@ -567,6 +574,9 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
   readOnly,
   user,
   deductCredits,
+  onVote,
+  userVote,
+  voteScore,
 }: MessageActionsWrapperProps): JSX.Element {
   // Process content for actions - only runs in this component
   const [allContent, setAllContent] = useState<string>("");
@@ -628,6 +638,9 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
       readOnly={readOnly}
       user={user}
       deductCredits={deductCredits}
+      onVote={onVote}
+      userVote={userVote}
+      voteScore={voteScore}
     />
   );
 });
@@ -707,6 +720,9 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
   sendMessage,
   deductCredits,
   className: extraClassName,
+  onVote,
+  userVote,
+  voteScore,
 }: GroupedAssistantMessageProps): JSX.Element {
   const { primary, continuations } = group;
   const { group: hoverGroup } = useMessageGroupName();
@@ -781,6 +797,9 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
             readOnly={readOnly}
             user={user}
             deductCredits={deductCredits}
+            onVote={onVote}
+            userVote={userVote}
+            voteScore={voteScore}
           />
         </Div>
       </Div>

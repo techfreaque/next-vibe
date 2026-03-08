@@ -8,28 +8,30 @@ import { ErrorResponseTypes } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
+import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import { endpointsHandler } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/multi";
 import { Methods } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 
 import type { NewCronTask } from "../../cron/db";
 import { cronTaskExecutions, cronTasks } from "../../cron/db";
 import { CronTaskStatus } from "../../enum";
+import { handleTaskCompletion } from "../../task-completion-handler";
 import { endpoints } from "./definition";
 
 export const { POST, tools } = endpointsHandler({
   endpoint: endpoints,
   [Methods.POST]: {
     handler: async ({ data, logger, t }) => {
-      // Find the task by routeId
       const [task] = await db
         .select()
         .from(cronTasks)
-        .where(sql`${cronTasks.routeId} = ${data.taskRouteId}`)
+        .where(eq(cronTasks.id, data.taskId))
         .limit(1);
 
       if (!task) {
         logger.warn("Task report: task not found", {
-          routeId: data.taskRouteId,
+          taskId: data.taskId,
         });
         return {
           success: false as const,
@@ -135,6 +137,41 @@ export const { POST, tools } = endpointsHandler({
             executedBy: data.executedByInstance,
             serverTz: data.serverTimezone,
           });
+
+          const taskInput = task.taskInput ?? {};
+          const toolMessageId =
+            typeof taskInput.toolMessageId === "string"
+              ? taskInput.toolMessageId
+              : null;
+          const threadId =
+            typeof taskInput.threadId === "string" ? taskInput.threadId : null;
+          const rawCallbackMode = taskInput.callbackMode;
+          const callbackMode: CallbackModeValue | null =
+            rawCallbackMode === CallbackMode.WAIT
+              ? CallbackMode.WAIT
+              : rawCallbackMode === CallbackMode.BACKGROUND
+                ? CallbackMode.BACKGROUND
+                : rawCallbackMode === CallbackMode.NO_LOOP
+                  ? CallbackMode.NO_LOOP
+                  : rawCallbackMode === CallbackMode.WAKE_UP
+                    ? CallbackMode.WAKE_UP
+                    : rawCallbackMode === CallbackMode.REQUIRES_CONFIRMATION
+                      ? CallbackMode.REQUIRES_CONFIRMATION
+                      : null;
+
+          if ((toolMessageId ?? threadId) && task.userId) {
+            await handleTaskCompletion({
+              toolMessageId: toolMessageId ?? "",
+              threadId,
+              callbackMode,
+              status: finalStatus,
+              output: data.output ?? null,
+              taskId: task.id,
+              taskInput: task.taskInput,
+              userId: task.userId,
+              logger,
+            });
+          }
         }
 
         return {

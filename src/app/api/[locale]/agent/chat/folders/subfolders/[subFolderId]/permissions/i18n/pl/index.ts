@@ -99,6 +99,15 @@ export const translations: typeof enTranslations = {
       description: "Uprawnienia folderu zostały pomyślnie pobrane",
     },
   },
+  enums: {
+    userRole: {
+      public: "Publiczny",
+      customer: "Klient",
+      partnerAdmin: "Administrator partnera",
+      partnerEmployee: "Pracownik partnera",
+      admin: "Administrator",
+    },
+  },
   patch: {
     title: "Aktualizuj uprawnienia folderu",
     description: "Aktualizuj listę moderatorów dla konkretnego folderu",

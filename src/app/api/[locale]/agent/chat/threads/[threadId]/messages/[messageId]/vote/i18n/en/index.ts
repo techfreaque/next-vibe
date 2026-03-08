@@ -22,6 +22,10 @@ export const translations = {
       label: "Message ID",
       description: "ID of the message to vote on",
     },
+    rootFolderId: {
+      label: "Root Folder",
+      description: "Root folder of the thread (used for client routing)",
+    },
     vote: {
       label: "Vote",
       description: "Your vote: upvote, downvote, or remove",

@@ -60,6 +60,11 @@ export const translations: typeof enTranslations = {
     enabled: "Aktiviert",
     disabled: "Deaktiviert",
   },
+  hiddenFilter: {
+    visible: "Sichtbar",
+    hidden: "Versteckt",
+    all: "Alle",
+  },
   sort: {
     asc: "Aufsteigend",
     desc: "Absteigend",
@@ -479,9 +484,9 @@ export const translations: typeof enTranslations = {
           title: "API-Schlüssel",
           description: "Gemeinsamer Schlüssel zur Instanz-Authentifizierung.",
         },
-        taskRouteId: {
-          title: "Aufgaben-Route-ID",
-          description: "Die routeId der abgeschlossenen Aufgabe.",
+        taskId: {
+          title: "Aufgaben-ID",
+          description: "Die eindeutige ID der abgeschlossenen Aufgabe.",
         },
         executionId: {
           title: "Ausführungs-ID",
@@ -568,6 +573,72 @@ export const translations: typeof enTranslations = {
       success: {
         title: "Bericht akzeptiert",
         description: "Ausführungsergebnis auf den Aufgabendatensatz angewendet",
+      },
+    },
+  },
+  waitForTask: {
+    post: {
+      title: "Auf Aufgabe warten",
+      description:
+        "Wartet auf eine ausstehende Hintergrundaufgabe. Gibt das Ergebnis sofort zurück, falls bereits abgeschlossen, oder pausiert den KI-Stream bis die Aufgabe fertig ist.",
+      fields: {
+        taskId: {
+          title: "Aufgaben-ID",
+          description: "Die ID der Aufgabe, auf die gewartet werden soll.",
+        },
+        status: {
+          title: "Status",
+          description: "Aktueller Aufgabenstatus.",
+        },
+        result: {
+          title: "Ergebnis",
+          description:
+            "Ergebnis-Payload der Aufgabe (vorhanden wenn abgeschlossen).",
+        },
+        waiting: {
+          title: "Wartend",
+          description:
+            "True wenn der Stream pausiert und auf die Aufgabe wartet.",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Validierungsfehler",
+          description: "Ungültige Aufgaben-ID",
+        },
+        unauthorized: {
+          title: "Nicht autorisiert",
+          description: "Authentifizierung erforderlich",
+        },
+        internal: {
+          title: "Interner Fehler",
+          description: "Fehler beim Registrieren des Wartenden",
+        },
+        forbidden: { title: "Verboten", description: "Zugriff verweigert" },
+        notFound: {
+          title: "Aufgabe nicht gefunden",
+          description: "Keine Aufgabe mit dieser ID gefunden",
+        },
+        network: {
+          title: "Netzwerkfehler",
+          description: "Netzwerkfehler aufgetreten",
+        },
+        unknown: {
+          title: "Unbekannter Fehler",
+          description: "Ein unerwarteter Fehler ist aufgetreten",
+        },
+        unsaved: {
+          title: "Ungespeicherte Änderungen",
+          description: "Ungespeicherte Änderungen erkannt",
+        },
+        conflict: {
+          title: "Konflikt",
+          description: "Ein Konflikt ist aufgetreten",
+        },
+      },
+      success: {
+        title: "Aufgabenergebnis bereit",
+        description: "Aufgabe abgeschlossen oder Wartender registriert",
       },
     },
   },

@@ -102,6 +102,15 @@ export const translations: typeof enTranslations = {
       description: "Ordnerberechtigungen erfolgreich abgerufen",
     },
   },
+  enums: {
+    userRole: {
+      public: "Öffentlich",
+      customer: "Kunde",
+      partnerAdmin: "Partner-Administrator",
+      partnerEmployee: "Partner-Mitarbeiter",
+      admin: "Administrator",
+    },
+  },
   patch: {
     title: "Ordnerberechtigungen aktualisieren",
     description:

@@ -1,1 +1,1 @@
-export const KAGI_ALIAS = "kagi" as const;
+export const KAGI_ALIAS = "kagi-search" as const;

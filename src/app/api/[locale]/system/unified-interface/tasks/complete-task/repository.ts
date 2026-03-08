@@ -16,6 +16,8 @@ import {
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
 import { db } from "@/app/api/[locale]/system/db";
+import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
+import { CallbackMode } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { env } from "@/config/env";
 
@@ -23,6 +25,7 @@ import type { NewCronTask } from "../cron/db";
 import { cronTaskExecutions, cronTasks } from "../cron/db";
 import { CronTaskStatus } from "../enum";
 import type { scopedTranslation } from "../i18n";
+import { handleTaskCompletion } from "../task-completion-handler";
 import { pushStatusToRemote } from "../task-sync/repository";
 import type {
   CompleteTaskRequestOutput,
@@ -117,16 +120,52 @@ export async function completeTask(
     });
   }
 
+  // Backfill tool message + emit WS event + start headless stream if needed
+  const taskInputData = task.taskInput ?? {};
+  const toolMessageId =
+    typeof taskInputData.toolMessageId === "string"
+      ? taskInputData.toolMessageId
+      : null;
+  const threadId =
+    typeof taskInputData.threadId === "string" ? taskInputData.threadId : null;
+  const rawCallbackMode = taskInputData.callbackMode;
+  const callbackMode: CallbackModeValue | null =
+    rawCallbackMode === CallbackMode.WAIT
+      ? CallbackMode.WAIT
+      : rawCallbackMode === CallbackMode.BACKGROUND
+        ? CallbackMode.BACKGROUND
+        : rawCallbackMode === CallbackMode.NO_LOOP
+          ? CallbackMode.NO_LOOP
+          : rawCallbackMode === CallbackMode.WAKE_UP
+            ? CallbackMode.WAKE_UP
+            : rawCallbackMode === CallbackMode.REQUIRES_CONFIRMATION
+              ? CallbackMode.REQUIRES_CONFIRMATION
+              : null;
+
+  if (toolMessageId && task.userId) {
+    await handleTaskCompletion({
+      toolMessageId,
+      threadId,
+      callbackMode,
+      status,
+      output: output ?? null,
+      taskId,
+      taskInput: task.taskInput,
+      userId: task.userId,
+      logger,
+    });
+  }
+
   // Push to remote (fire-and-forget, but report result)
   let pushedToRemote = false;
   if (task.targetInstance) {
     const pushResult = await pushStatusToRemote({
-      taskRouteId: task.routeId,
+      taskId: task.id,
       status,
       summary,
       durationMs: null,
       executionId,
-      output: output,
+      output,
       startedAt: now.toISOString(),
       serverTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       executedByInstance: null,

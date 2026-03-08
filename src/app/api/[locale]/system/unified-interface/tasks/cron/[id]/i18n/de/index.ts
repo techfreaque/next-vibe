@@ -360,6 +360,9 @@ export const translations: typeof enTranslations = {
       retryDelay: "Wiederholungsverzögerung",
     },
     lastExecutionError: "Letzter Fehler",
+    run: "Jetzt ausführen",
+    runSuccess: "Aufgabe erfolgreich ausgeführt",
+    running: "Wird ausgeführt...",
     refresh: "Aktualisieren",
     taskInput: {
       title: "Aufgabeneingabe",

@@ -469,6 +469,24 @@ export class CreditRepository {
     throw new Error("getReferralTransactions is not implemented on native");
   }
 
+  static async handleNowPaymentsCreditSuccessRedirect(
+    // oxlint-disable-next-line no-unused-vars
+    _npId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _token: string | undefined,
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+  ): Promise<void> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error(
+      "handleNowPaymentsCreditSuccessRedirect is not implemented on native",
+    );
+  }
+
   static async deductCreditsForTTS(
     // oxlint-disable-next-line no-unused-vars
     _user: JwtPayloadType,

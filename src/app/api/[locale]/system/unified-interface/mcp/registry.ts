@@ -216,6 +216,9 @@ export class MCPRegistry {
           characterId: undefined,
           modelId: undefined,
           headless: undefined,
+          currentToolMessageId: undefined,
+          waitingForRemoteResult: undefined,
+          favoriteId: undefined,
         },
       });
 

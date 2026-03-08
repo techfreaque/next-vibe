@@ -291,6 +291,7 @@ export const translations = {
       enabledTooltip:
         "Allowed tools can be called on demand when help is enabled",
       totalLabel: "total",
+      totalTooltip: "Show all tools — click to clear filter",
       searchPlaceholder: "Search tools...",
       expandAll: "Expand All",
       collapseAll: "Collapse All",

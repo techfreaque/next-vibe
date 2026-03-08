@@ -534,6 +534,85 @@ export const translations = {
       favoriteNotFound: "Favorite not found or does not belong to this user",
     },
   },
+  resumeStream: {
+    post: {
+      title: "Resume AI Stream",
+      description:
+        "Continue an existing thread by running a headless AI turn. Used after an async remote task completes (callbackMode=wait or wakeUp). Pass favoriteId to load model+character in one shot, or set modelId+characterId explicitly.",
+      fields: {
+        threadId: {
+          title: "Thread ID",
+          description: "UUID of the existing thread to continue.",
+        },
+        favoriteId: {
+          title: "Favorite ID",
+          description:
+            "UUID of a saved favorite to load model and character from. Overrides modelId/characterId when both are set.",
+        },
+        modelId: {
+          title: "Model ID",
+          description:
+            "AI model to use for the resumed turn. Optional when favoriteId is provided.",
+        },
+        characterId: {
+          title: "Character ID",
+          description:
+            "Character/persona for the resumed turn. Optional when favoriteId is provided.",
+        },
+        resumed: {
+          title: "Resumed",
+          description: "Whether the thread was successfully continued.",
+        },
+        lastAiMessageId: {
+          title: "Last AI Message ID",
+          description:
+            "UUID of the final assistant message generated. Null if no message was produced.",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Validation Error",
+          description: "Invalid parameters — threadId must be a valid UUID",
+        },
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+        forbidden: {
+          title: "Forbidden",
+          description: "Access denied",
+        },
+        notFound: {
+          title: "Not Found",
+          description: "Thread or model not found",
+        },
+        internal: {
+          title: "Server Error",
+          description: "Internal error during stream resume",
+        },
+        network: {
+          title: "Network Error",
+          description: "Network error occurred",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unexpected error occurred",
+        },
+        unsaved: {
+          title: "Unsaved Changes",
+          description: "Unsaved changes conflict",
+        },
+        conflict: {
+          title: "Conflict",
+          description: "Conflict occurred",
+        },
+      },
+      success: {
+        title: "Stream Resumed",
+        description: "The AI thread was successfully continued",
+      },
+    },
+  },
   providers: {
     uncensoredHandler: {
       errors: {

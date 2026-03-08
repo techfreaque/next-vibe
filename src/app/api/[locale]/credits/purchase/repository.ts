@@ -189,8 +189,8 @@ export class CreditPurchaseRepository {
           interval: "one_time",
           country,
           locale,
-          successUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription?payment=success&type=credits&token=${callbackToken}`,
-          cancelUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription?payment=canceled&type=credits&token=${callbackToken}`,
+          successUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription/overview?payment=success&type=credits&token=${callbackToken}`,
+          cancelUrl: `${envClient.NEXT_PUBLIC_APP_URL}/${locale}/subscription/overview?payment=canceled&type=credits`,
           metadata: {
             userId,
             type: "credit_pack",

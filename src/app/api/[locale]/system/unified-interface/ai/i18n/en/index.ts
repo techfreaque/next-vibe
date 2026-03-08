@@ -76,6 +76,10 @@ export const translations = {
         resolving: "Resolving endpoint…",
         unknownTool: "Unknown tool: {{toolName}}",
       },
+      actions: {
+        confirm: "Confirm",
+        cancel: "Cancel",
+      },
     },
   },
   tools: {

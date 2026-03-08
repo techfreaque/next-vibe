@@ -252,6 +252,9 @@ export class RouteDelegationHandler {
                   characterId: undefined,
                   modelId: undefined,
                   headless: undefined,
+                  currentToolMessageId: undefined,
+                  waitingForRemoteResult: undefined,
+                  favoriteId: undefined,
                 },
               });
             return result;
@@ -393,6 +396,9 @@ export class RouteDelegationHandler {
             characterId: undefined,
             modelId: undefined,
             headless: undefined,
+            currentToolMessageId: undefined,
+            waitingForRemoteResult: undefined,
+            favoriteId: undefined,
           },
         });
 

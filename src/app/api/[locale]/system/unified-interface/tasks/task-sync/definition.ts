@@ -33,7 +33,11 @@ const { POST } = createEndpoint({
   category: "app.endpointCategories.system",
   tags: ["tags.tasks" as const],
   aliases: ["sync", "task-sync"] as const,
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+  allowedRoles: [
+    UserRole.CUSTOMER,
+    UserRole.ADMIN,
+    UserRole.AI_TOOL_OFF,
+  ] as const,
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,
@@ -76,6 +80,16 @@ const { POST } = createEndpoint({
         columns: 12,
         // ISO timestamp — return REMOTE_TOOL_CALL tasks created after this
         schema: z.string().datetime().optional(),
+      }),
+      outboundTasks: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXTAREA,
+        columns: 12,
+        // Tasks this local instance wants the remote to execute (JSON string or array).
+        // The request parser auto-deserialises JSON-looking strings, so accept both.
+        // Used for dev→cloud execution: dev creates a task targeting cloud's instanceId,
+        // then sends it here so cloud's pulse can pick it up.
+        schema: z.union([z.string(), z.array(z.any())]).optional(),
       }),
 
       // ── Response: remote returns only what local is missing ─────────────

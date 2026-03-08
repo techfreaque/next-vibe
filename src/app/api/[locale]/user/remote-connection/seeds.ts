@@ -175,3 +175,9 @@ export async function dev(
     logger.warn("Dev remote connection seed failed", { error: result.message });
   }
 }
+
+/**
+ * Prod seed: no-op
+ */
+// oxlint-disable-next-line no-empty-function
+export async function prod(): Promise<void> {}

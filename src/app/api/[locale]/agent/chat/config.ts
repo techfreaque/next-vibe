@@ -44,12 +44,28 @@ export interface ToolExecutionContext {
   threadId: string | undefined;
   /** The assistant message ID currently being generated */
   aiMessageId: string | undefined;
+  /**
+   * The active favorite ID — allows resume-stream to reload the exact same
+   * model + character config when restarting a dead stream after a remote tool result.
+   */
+  /**
+   * Mutable: the TOOL call message ID for the currently executing tool.
+   * Set by stream-part-handler when processing tool-call, before execute() runs.
+   * Used by remote tool execute() to store toolMessageId in taskInput.
+   */
+  currentToolMessageId: string | undefined;
+  favoriteId: string | undefined;
   /** The character/persona driving the conversation */
   characterId: string | undefined;
   /** The model being used (e.g. "claude-sonnet-4-6") */
   modelId: string | undefined;
   /** Whether this is a headless/cron invocation */
   headless: boolean | undefined;
+  /**
+   * Mutable signal set by remote tools with callbackMode=wait.
+   * Stream layer checks this after tool-result to pause and wait for /report.
+   */
+  waitingForRemoteResult: boolean | undefined;
 }
 
 /**

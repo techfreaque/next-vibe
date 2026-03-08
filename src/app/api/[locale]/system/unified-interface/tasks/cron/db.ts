@@ -50,6 +50,8 @@ export const cronTasks = pgTable("cron_tasks", {
   schedule: text("schedule").notNull(), // Cron expression
   timezone: text("timezone").default("UTC"),
   enabled: boolean("enabled").notNull().default(true),
+  /** When true, task is hidden from AI system prompt and default task list views */
+  hidden: boolean("hidden").notNull().default(false),
   priority: text("priority", { enum: CronTaskPriorityDB }).notNull(),
   timeout: integer("timeout").default(300000), // 5 minutes default
   retries: integer("retries").default(3),
@@ -139,7 +141,7 @@ export const cronTaskExecutions = pgTable("cron_task_executions", {
 
   // Configuration and results
   config: jsonb("config").notNull(),
-  result: jsonb("result").$type<Record<string, string | number | boolean>>(),
+  result: jsonb("result").$type<Record<string, JsonValue>>(),
   error: jsonb("error").$type<ErrorResponseType>(),
 
   // Execution context

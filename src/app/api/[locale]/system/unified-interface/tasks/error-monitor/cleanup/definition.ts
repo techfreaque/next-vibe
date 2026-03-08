@@ -31,7 +31,7 @@ const { POST } = createEndpoint({
   category: "app.endpointCategories.system",
   icon: "trash",
   tags: ["errorMonitor.tag" as const],
-  allowedRoles: [UserRole.ADMIN],
+  allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

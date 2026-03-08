@@ -29,6 +29,7 @@ const ALLOWED_ROLES = [
   UserRole.PARTNER_ADMIN,
   UserRole.PARTNER_EMPLOYEE,
   UserRole.REMOTE_SKILL,
+  UserRole.AI_TOOL_OFF,
 ] as const;
 
 // ── Shared error types ──────────────────────────────────────────────────────

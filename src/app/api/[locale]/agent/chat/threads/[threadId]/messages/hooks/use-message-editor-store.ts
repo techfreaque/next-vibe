@@ -13,6 +13,7 @@ interface MessageEditorState {
   editingMessageId: string | null;
   retryingMessageId: string | null;
   answeringMessageId: string | null;
+  replyingToMessageId: string | null;
   deletingMessageId: string | null;
   answerContent: string;
   editorAttachments: File[];
@@ -22,6 +23,7 @@ interface MessageEditorState {
   startEdit: (messageId: string) => void;
   setRetrying: (messageId: string) => void;
   startAnswer: (messageId: string) => void;
+  startReply: (messageId: string) => void;
   startDelete: (messageId: string) => void;
   setLoadingRetryAttachments: (loading: boolean) => void;
   setEditorAttachments: (
@@ -37,12 +39,15 @@ interface MessageEditorState {
   clearAnswering: () => void;
   /** Clear deleting state (after successful delete) */
   clearDeleting: () => void;
+  /** Clear replying state (after successful reply) */
+  clearReplying: () => void;
 }
 
 const INITIAL_STATE = {
   editingMessageId: null,
   retryingMessageId: null,
   answeringMessageId: null,
+  replyingToMessageId: null,
   deletingMessageId: null,
   answerContent: "",
   editorAttachments: [] as File[],
@@ -65,6 +70,9 @@ export const useMessageEditorStore = create<MessageEditorState>((set) => ({
 
   startAnswer: (messageId): void =>
     set({ ...INITIAL_STATE, answeringMessageId: messageId }),
+
+  startReply: (messageId): void =>
+    set({ ...INITIAL_STATE, replyingToMessageId: messageId }),
 
   startDelete: (messageId): void =>
     set({ ...INITIAL_STATE, deletingMessageId: messageId }),
@@ -98,4 +106,7 @@ export const useMessageEditorStore = create<MessageEditorState>((set) => ({
     }),
 
   clearDeleting: (): void => set({ deletingMessageId: null }),
+
+  clearReplying: (): void =>
+    set({ replyingToMessageId: null, editorAttachments: [] }),
 }));

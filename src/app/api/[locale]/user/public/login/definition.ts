@@ -9,12 +9,11 @@ import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shar
 import {
   EndpointErrorTypes,
   FieldDataType,
-  LayoutType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
 import {
-  scopedObjectFieldNew,
+  customWidgetObject,
   scopedRequestField,
   scopedResponseField,
   scopedWidgetField,
@@ -22,6 +21,7 @@ import {
 
 import { scopedTranslation } from "./i18n";
 import { UserRole } from "../../user-roles/enum";
+import { LoginFormContainer } from "./widget";
 
 const { POST } = createEndpoint({
   scopedTranslation,
@@ -38,25 +38,10 @@ const { POST } = createEndpoint({
     UserRole.REMOTE_SKILL,
   ] as const,
   aliases: ["login"],
-  fields: scopedObjectFieldNew(scopedTranslation, {
-    type: WidgetType.CONTAINER,
-    layoutType: LayoutType.STACKED,
-    gap: "4",
-    usage: { request: "data", response: true },
+  fields: customWidgetObject({
+    render: LoginFormContainer,
+    usage: { request: "data", response: true } as const,
     children: {
-      title: scopedWidgetField(scopedTranslation, {
-        type: WidgetType.TITLE,
-        content: "title",
-        order: 0,
-        usage: { request: "data", response: true },
-      }),
-      subtitle: scopedWidgetField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "description",
-        variant: "body-lg",
-        order: 1,
-        usage: { request: "data", response: true },
-      }),
       email: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,
         fieldType: FieldDataType.EMAIL,

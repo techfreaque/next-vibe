@@ -14,6 +14,7 @@ import { CheckCircle } from "next-vibe-ui/ui/icons/CheckCircle";
 import { Clock } from "next-vibe-ui/ui/icons/Clock";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Pencil } from "next-vibe-ui/ui/icons/Pencil";
+import { Play } from "next-vibe-ui/ui/icons/Play";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Trash2 } from "next-vibe-ui/ui/icons/Trash2";
 import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
@@ -573,6 +574,20 @@ export function CronTaskDetailContainer({
     })();
   }, [navigate, task]);
 
+  // ── Navigation: run task now ──
+  const handleRun = useCallback((): void => {
+    if (!task?.id) {
+      return;
+    }
+    void (async (): Promise<void> => {
+      const m = await import("../../../execute/definition");
+      navigate(m.default.POST, {
+        data: { taskId: task.id },
+        renderInModal: true,
+      });
+    })();
+  }, [navigate, task]);
+
   // ── Refresh ──
   const handleRefresh = useCallback((): void => {
     endpointMutations?.read?.refetch?.();
@@ -656,6 +671,16 @@ export function CronTaskDetailContainer({
             className="gap-1.5"
           >
             <RefreshCw className="h-4 w-4" />
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleRun}
+            className="gap-1.5 text-green-700 border-green-400/60 hover:bg-green-50 dark:text-green-400 dark:border-green-700/60 dark:hover:bg-green-900/20"
+          >
+            <Play className="h-4 w-4" />
+            {t("widget.run")}
           </Button>
           <Button
             type="button"
@@ -939,6 +964,16 @@ export function CronTaskDetailContainer({
 
         {/* ── Bottom action row ── */}
         <Div className="flex flex-wrap gap-2 pt-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleRun}
+            className="gap-1.5 text-green-700 border-green-400/60 hover:bg-green-50 dark:text-green-400 dark:border-green-700/60 dark:hover:bg-green-900/20"
+          >
+            <Play className="h-4 w-4" />
+            {t("widget.run")}
+          </Button>
           <Button
             type="button"
             variant="outline"

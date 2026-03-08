@@ -50,6 +50,12 @@ export const translations: typeof enTranslations = {
         description: "Nach Aktivierungsstatus filtern",
         placeholder: "Alle Aufgaben",
       },
+      hidden: {
+        label: "Sichtbarkeit",
+        description:
+          "Nach Sichtbarkeitsstatus filtern (Standard: nur sichtbare)",
+        placeholder: "Sichtbare Aufgaben",
+      },
       limit: {
         label: "Limit",
         description: "Maximale Anzahl der zurückzugebenden Aufgaben",
@@ -71,6 +77,7 @@ export const translations: typeof enTranslations = {
         taskDescription: "Beschreibung",
         schedule: "Zeitplan",
         enabled: "Aktiviert",
+        hidden: "Versteckt",
         priority: "Priorität",
         status: "Status",
         category: "Kategorie",

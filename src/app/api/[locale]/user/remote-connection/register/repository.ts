@@ -66,7 +66,7 @@ export async function registerLocalInstance(
   user: JwtPrivatePayloadType,
   logger: EndpointLogger,
   t: RemoteRegisterT,
-): Promise<ResponseType<{ registered: boolean }>> {
+): Promise<ResponseType<{ registered: boolean; remoteInstanceId: string }>> {
   const { instanceId, localUrl } = data;
 
   // Collision check: instanceId must be unique per user
@@ -92,7 +92,9 @@ export async function registerLocalInstance(
     });
   }
 
-  // Store cloud-side record: token=null (cloud never calls local), localUrl set
+  // Store cloud-side record: token=null (cloud never calls local), localUrl set.
+  // remoteInstanceId = instanceId: the connecting client's own identity, used by
+  // execute-tool to set targetInstance correctly when routing tasks back to this client.
   await db.insert(userRemoteConnections).values({
     userId: user.id,
     instanceId,
@@ -101,6 +103,7 @@ export async function registerLocalInstance(
     localUrl,
     token: null,
     isActive: true,
+    remoteInstanceId: instanceId,
     updatedAt: new Date(),
   });
 
@@ -133,5 +136,5 @@ export async function registerLocalInstance(
 
   invalidateInstanceIdCache();
 
-  return success({ registered: true });
+  return success({ registered: true, remoteInstanceId: selfInstanceId });
 }

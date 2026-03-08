@@ -179,9 +179,11 @@ export async function setupAiStream(params: {
   sttT: SttModuleT;
   maxDuration: number;
   request: NextRequest | undefined;
-  extraInstructions?: string;
-  headless?: boolean;
-  excludeMemories?: boolean;
+  extraInstructions: string | undefined;
+  headless: boolean | undefined;
+  excludeMemories: boolean | undefined;
+  /** Override the favoriteId stored in streamContext (used by headless runs with explicit favoriteId) */
+  favoriteIdOverride: string | undefined;
 }): Promise<ResponseType<StreamSetupResult>> {
   const {
     data,
@@ -242,11 +244,6 @@ export async function setupAiStream(params: {
       t: aiStreamT,
       streamContext: {
         rootFolderId: data.rootFolderId,
-        threadId: undefined,
-        aiMessageId: undefined,
-        characterId: undefined,
-        modelId: undefined,
-        headless: undefined,
       },
     });
 
@@ -405,8 +402,12 @@ export async function setupAiStream(params: {
     data.toolConfirmations && data.toolConfirmations.length > 0
   );
 
-  // Require userMessageId for all operations except answer-as-ai
-  if (!data.userMessageId && data.operation !== "answer-as-ai") {
+  // Require userMessageId for all operations except answer-as-ai and tool confirmations
+  if (
+    !data.userMessageId &&
+    data.operation !== "answer-as-ai" &&
+    !hasToolConfirmations
+  ) {
     logger.error(
       "User message ID must be provided by client",
       data.userMessageId,
@@ -672,6 +673,8 @@ export async function setupAiStream(params: {
     characterId: data.character,
     modelId: data.model,
     headless: params.headless,
+    // favoriteId: from headless override (run endpoint) — lets resume-stream reload full context
+    favoriteId: params.favoriteIdOverride,
   };
 
   logger.debug("Generated AI message ID", {

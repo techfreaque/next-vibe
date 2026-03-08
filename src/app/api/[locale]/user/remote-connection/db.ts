@@ -80,6 +80,10 @@ export const userRemoteConnections = pgTable(
     // URL of the local instance (cloud-side records only — so cloud knows where local lives)
     localUrl: text("local_url"),
 
+    // The instanceId that the remote uses to identify itself (returned by register endpoint).
+    // Dev stores cloud's instanceId here so the AI can call execute-tool(instanceId="hermes").
+    remoteInstanceId: text("remote_instance_id"),
+
     // Whether this connection is active
     isActive: boolean("is_active").notNull().default(true),
 

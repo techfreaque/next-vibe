@@ -190,6 +190,22 @@ export class SubscriptionRepository {
     // oxlint-disable-next-line restricted-syntax
     throw new Error("handleInvoicePaymentFailed is not implemented on native");
   }
+
+  static async handleNowPaymentsSuccessRedirect(
+    // oxlint-disable-next-line no-unused-vars
+    _npId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _userId: string,
+    // oxlint-disable-next-line no-unused-vars
+    _locale: CountryLanguage,
+    // oxlint-disable-next-line no-unused-vars
+    _logger: EndpointLogger,
+  ): Promise<void> {
+    // oxlint-disable-next-line restricted-syntax
+    throw new Error(
+      "handleNowPaymentsSuccessRedirect is not implemented on native",
+    );
+  }
 }
 
 // Compile-time type check

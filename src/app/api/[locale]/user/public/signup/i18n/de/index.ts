@@ -71,6 +71,11 @@ export const translations: typeof enTranslations = {
       label: "AGB akzeptieren",
       description:
         "Unsere Bedingungen respektieren deine Freiheit und Privatsphäre.",
+      termsLink: "AGB",
+      conditionsLink: "Datenschutz",
+      descriptionPrefix: "Unsere",
+      descriptionAnd: "und",
+      descriptionSuffix: "respektieren deine Freiheit und Privatsphäre.",
       validation: {
         required: "Du musst die AGB akzeptieren, um fortzufahren",
       },
@@ -86,6 +91,9 @@ export const translations: typeof enTranslations = {
       description:
         "Hast du einen Freund auf unbottled.ai? Gib seinen Code ein, um ihn zu unterstützen. Er wird dafür belohnt, dass er dich mitgebracht hat.",
       placeholder: "Empfehlungscode eingeben (optional)",
+      labelPrefilled: "Empfehlungscode",
+      descriptionPrefilled:
+        "Dein Freund wird belohnt, wenn du ein Konto erstellst.",
     },
   },
   form: {

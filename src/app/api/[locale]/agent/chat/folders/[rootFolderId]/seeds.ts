@@ -41,11 +41,30 @@ interface CategoryConfig {
  */
 const FORUM_CATEGORIES: CategoryConfig[] = [
   {
+    id: "d0e1f2a3-b4c5-4d0e-8f1a-2b3c4d5e6f7a",
+    name: "Announcements",
+    icon: "megaphone",
+    color: "#f97316", // orange
+    sortOrder: 0,
+    description:
+      "Platform news, changelogs, and updates from the team. Reply to share feedback.",
+    rolesView: [
+      UserPermissionRole.PUBLIC,
+      UserPermissionRole.CUSTOMER,
+      UserPermissionRole.ADMIN,
+    ],
+    rolesManage: [UserPermissionRole.ADMIN],
+    rolesCreateThread: [UserPermissionRole.ADMIN],
+    rolesPost: [UserPermissionRole.ADMIN],
+    rolesModerate: [UserPermissionRole.PARTNER_ADMIN, UserPermissionRole.ADMIN],
+    rolesAdmin: [UserPermissionRole.ADMIN],
+  },
+  {
     id: "a1b2c3d4-e5f6-4a1b-8c2d-3e4f5a6b7c8d",
     name: "Technology",
     icon: "cpu",
     color: "#3b82f6", // blue
-    sortOrder: 0,
+    sortOrder: 1,
     description: "Software, hardware, AI, and emerging tech",
     rolesView: [
       UserPermissionRole.PUBLIC,
@@ -63,7 +82,7 @@ const FORUM_CATEGORIES: CategoryConfig[] = [
     name: "Philosophy",
     icon: "brain",
     color: "#8b5cf6", // violet
-    sortOrder: 1,
+    sortOrder: 2,
     description: "Ethics, metaphysics, epistemology, and critical thinking",
     rolesView: [
       UserPermissionRole.PUBLIC,
@@ -81,7 +100,7 @@ const FORUM_CATEGORIES: CategoryConfig[] = [
     name: "Science",
     icon: "microscope",
     color: "#10b981", // emerald
-    sortOrder: 2,
+    sortOrder: 3,
     description: "Physics, biology, chemistry, mathematics, and research",
     rolesView: [
       UserPermissionRole.PUBLIC,
@@ -99,7 +118,7 @@ const FORUM_CATEGORIES: CategoryConfig[] = [
     name: "Politics",
     icon: "scale",
     color: "#ef4444", // red
-    sortOrder: 3,
+    sortOrder: 4,
     description: "Political theory, current events, and policy discussion",
     rolesView: [
       UserPermissionRole.PUBLIC,
@@ -117,7 +136,7 @@ const FORUM_CATEGORIES: CategoryConfig[] = [
     name: "Business",
     icon: "briefcase",
     color: "#f59e0b", // amber
-    sortOrder: 4,
+    sortOrder: 5,
     description: "Entrepreneurship, startups, finance, and economics",
     rolesView: [
       UserPermissionRole.PUBLIC,
@@ -135,7 +154,7 @@ const FORUM_CATEGORIES: CategoryConfig[] = [
     name: "Culture",
     icon: "palette",
     color: "#ec4899", // pink
-    sortOrder: 5,
+    sortOrder: 6,
     description: "Art, music, film, literature, and cultural analysis",
     rolesView: [
       UserPermissionRole.PUBLIC,
@@ -153,7 +172,7 @@ const FORUM_CATEGORIES: CategoryConfig[] = [
     name: "Health",
     icon: "heart",
     color: "#06b6d4", // cyan
-    sortOrder: 6,
+    sortOrder: 7,
     description: "Fitness, nutrition, mental health, and medicine",
     rolesView: [
       UserPermissionRole.PUBLIC,
@@ -171,7 +190,7 @@ const FORUM_CATEGORIES: CategoryConfig[] = [
     name: "Gaming",
     icon: "gamepad",
     color: "#a855f7", // purple
-    sortOrder: 7,
+    sortOrder: 8,
     description: "Video games, esports, game design, and gaming culture",
     rolesView: [
       UserPermissionRole.PUBLIC,
@@ -189,26 +208,8 @@ const FORUM_CATEGORIES: CategoryConfig[] = [
     name: "Education",
     icon: "graduation-cap",
     color: "#0ea5e9", // sky
-    sortOrder: 8,
-    description: "Learning, teaching, academia, and self-improvement",
-    rolesView: [
-      UserPermissionRole.PUBLIC,
-      UserPermissionRole.CUSTOMER,
-      UserPermissionRole.ADMIN,
-    ],
-    rolesManage: [UserPermissionRole.ADMIN],
-    rolesCreateThread: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
-    rolesPost: [UserPermissionRole.CUSTOMER, UserPermissionRole.ADMIN],
-    rolesModerate: [UserPermissionRole.PARTNER_ADMIN, UserPermissionRole.ADMIN],
-    rolesAdmin: [UserPermissionRole.ADMIN],
-  },
-  {
-    id: "d0e1f2a3-b4c5-4d0e-8f1a-2b3c4d5e6f7a",
-    name: "Meta",
-    icon: "message-square",
-    color: "#64748b", // slate
     sortOrder: 9,
-    description: "Discussion about this platform, feedback, and community",
+    description: "Learning, teaching, academia, and self-improvement",
     rolesView: [
       UserPermissionRole.PUBLIC,
       UserPermissionRole.CUSTOMER,

@@ -26,167 +26,6 @@ import { scopedTranslation } from "./i18n";
 import { FolderPermissionsContainer } from "./widget";
 
 /**
- * Get Folder Permissions Endpoint (GET)
- * Retrieves the list of moderator IDs for a folder
- */
-const { GET } = createEndpoint({
-  scopedTranslation,
-  method: Methods.GET,
-  path: [
-    "agent",
-    "chat",
-    "folders",
-    "subfolders",
-    "[subFolderId]",
-    "permissions",
-  ],
-  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
-
-  title: "get.title" as const,
-  description: "get.description" as const,
-  icon: "shield",
-  category: "app.endpointCategories.chat",
-  tags: ["tags.folders" as const, "tags.permissions" as const],
-
-  fields: customWidgetObject({
-    render: FolderPermissionsContainer,
-    usage: { response: true, request: "urlPathParams" } as const,
-    children: {
-      // === REQUEST URL PARAMS ===
-      subFolderId: scopedRequestUrlPathParamsField(scopedTranslation, {
-        type: WidgetType.FORM_FIELD,
-        fieldType: FieldDataType.UUID,
-        label: "get.id.label" as const,
-        description: "get.id.description" as const,
-        schema: z.uuid(),
-      }),
-
-      // === RESPONSE FIELDS ===
-      rolesView: responseArrayOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-        },
-        scopedResponseField(scopedTranslation, {
-          type: WidgetType.BADGE,
-          text: "get.response.rolesView.label" as const,
-          schema: z.enum(UserRoleDB),
-        }),
-      ),
-      rolesManage: responseArrayOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-        },
-        scopedResponseField(scopedTranslation, {
-          type: WidgetType.BADGE,
-          text: "get.response.rolesManage.label" as const,
-          schema: z.enum(UserRoleDB),
-        }),
-      ),
-      rolesCreateThread: responseArrayOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-        },
-        scopedResponseField(scopedTranslation, {
-          type: WidgetType.BADGE,
-          text: "get.response.rolesCreateThread.label" as const,
-          schema: z.enum(UserRoleDB),
-        }),
-      ),
-      rolesPost: responseArrayOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-        },
-        scopedResponseField(scopedTranslation, {
-          type: WidgetType.BADGE,
-          text: "get.response.rolesPost.label" as const,
-          schema: z.enum(UserRoleDB),
-        }),
-      ),
-      rolesModerate: responseArrayOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-        },
-        scopedResponseField(scopedTranslation, {
-          type: WidgetType.BADGE,
-          text: "get.response.rolesModerate.label" as const,
-          schema: z.enum(UserRoleDB),
-        }),
-      ),
-      rolesAdmin: responseArrayOptionalField(
-        {
-          type: WidgetType.CONTAINER,
-        },
-        scopedResponseField(scopedTranslation, {
-          type: WidgetType.BADGE,
-          text: "get.response.rolesAdmin.label" as const,
-          schema: z.enum(UserRoleDB),
-        }),
-      ),
-    },
-  }),
-
-  errorTypes: {
-    [EndpointErrorTypes.VALIDATION_FAILED]: {
-      title: "get.errors.validation.title" as const,
-      description: "get.errors.validation.description" as const,
-    },
-    [EndpointErrorTypes.NETWORK_ERROR]: {
-      title: "get.errors.network.title" as const,
-      description: "get.errors.network.description" as const,
-    },
-    [EndpointErrorTypes.UNAUTHORIZED]: {
-      title: "get.errors.unauthorized.title" as const,
-      description: "get.errors.unauthorized.description" as const,
-    },
-    [EndpointErrorTypes.FORBIDDEN]: {
-      title: "get.errors.forbidden.title" as const,
-      description: "get.errors.forbidden.description" as const,
-    },
-    [EndpointErrorTypes.NOT_FOUND]: {
-      title: "get.errors.notFound.title" as const,
-      description: "get.errors.notFound.description" as const,
-    },
-    [EndpointErrorTypes.SERVER_ERROR]: {
-      title: "get.errors.server.title" as const,
-      description: "get.errors.server.description" as const,
-    },
-    [EndpointErrorTypes.UNKNOWN_ERROR]: {
-      title: "get.errors.unknown.title" as const,
-      description: "get.errors.unknown.description" as const,
-    },
-    [EndpointErrorTypes.UNSAVED_CHANGES]: {
-      title: "get.errors.unsaved.title" as const,
-      description: "get.errors.unsaved.description" as const,
-    },
-    [EndpointErrorTypes.CONFLICT]: {
-      title: "get.errors.conflict.title" as const,
-      description: "get.errors.conflict.description" as const,
-    },
-  },
-
-  successTypes: {
-    title: "get.success.title" as const,
-    description: "get.success.description" as const,
-  },
-
-  examples: {
-    urlPathParams: {
-      default: { subFolderId: "123e4567-e89b-12d3-a456-426614174000" },
-    },
-    responses: {
-      default: {
-        rolesView: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
-        rolesManage: [UserRole.CUSTOMER, UserRole.ADMIN],
-        rolesCreateThread: [UserRole.CUSTOMER, UserRole.ADMIN],
-        rolesPost: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
-        rolesModerate: [UserRole.PARTNER_ADMIN, UserRole.ADMIN],
-        rolesAdmin: [UserRole.ADMIN],
-      },
-    },
-  },
-});
-
-/**
  * Update Folder Permissions Endpoint (PATCH)
  * Updates the list of moderator IDs for a folder
  */
@@ -399,6 +238,167 @@ const { PATCH } = createEndpoint({
         rolesPostResult: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
         rolesModerateResult: [UserRole.PARTNER_ADMIN, UserRole.ADMIN],
         rolesAdminResult: [UserRole.ADMIN],
+      },
+    },
+  },
+});
+
+/**
+ * Get Folder Permissions Endpoint (GET)
+ * Retrieves the list of moderator IDs for a folder
+ */
+const { GET } = createEndpoint({
+  scopedTranslation,
+  method: Methods.GET,
+  path: [
+    "agent",
+    "chat",
+    "folders",
+    "subfolders",
+    "[subFolderId]",
+    "permissions",
+  ],
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
+
+  title: "get.title" as const,
+  description: "get.description" as const,
+  icon: "shield",
+  category: "app.endpointCategories.chat",
+  tags: ["tags.folders" as const, "tags.permissions" as const],
+
+  fields: customWidgetObject({
+    render: FolderPermissionsContainer,
+    usage: { response: true, request: "urlPathParams" } as const,
+    children: {
+      // === REQUEST URL PARAMS ===
+      subFolderId: scopedRequestUrlPathParamsField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.UUID,
+        label: "get.id.label" as const,
+        description: "get.id.description" as const,
+        schema: z.uuid(),
+      }),
+
+      // === RESPONSE FIELDS ===
+      rolesView: responseArrayOptionalField(
+        {
+          type: WidgetType.CONTAINER,
+        },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.BADGE,
+          text: "get.response.rolesView.label" as const,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      rolesManage: responseArrayOptionalField(
+        {
+          type: WidgetType.CONTAINER,
+        },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.BADGE,
+          text: "get.response.rolesManage.label" as const,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      rolesCreateThread: responseArrayOptionalField(
+        {
+          type: WidgetType.CONTAINER,
+        },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.BADGE,
+          text: "get.response.rolesCreateThread.label" as const,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      rolesPost: responseArrayOptionalField(
+        {
+          type: WidgetType.CONTAINER,
+        },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.BADGE,
+          text: "get.response.rolesPost.label" as const,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      rolesModerate: responseArrayOptionalField(
+        {
+          type: WidgetType.CONTAINER,
+        },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.BADGE,
+          text: "get.response.rolesModerate.label" as const,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+      rolesAdmin: responseArrayOptionalField(
+        {
+          type: WidgetType.CONTAINER,
+        },
+        scopedResponseField(scopedTranslation, {
+          type: WidgetType.BADGE,
+          text: "get.response.rolesAdmin.label" as const,
+          schema: z.enum(UserRoleDB),
+        }),
+      ),
+    },
+  }),
+
+  errorTypes: {
+    [EndpointErrorTypes.VALIDATION_FAILED]: {
+      title: "get.errors.validation.title" as const,
+      description: "get.errors.validation.description" as const,
+    },
+    [EndpointErrorTypes.NETWORK_ERROR]: {
+      title: "get.errors.network.title" as const,
+      description: "get.errors.network.description" as const,
+    },
+    [EndpointErrorTypes.UNAUTHORIZED]: {
+      title: "get.errors.unauthorized.title" as const,
+      description: "get.errors.unauthorized.description" as const,
+    },
+    [EndpointErrorTypes.FORBIDDEN]: {
+      title: "get.errors.forbidden.title" as const,
+      description: "get.errors.forbidden.description" as const,
+    },
+    [EndpointErrorTypes.NOT_FOUND]: {
+      title: "get.errors.notFound.title" as const,
+      description: "get.errors.notFound.description" as const,
+    },
+    [EndpointErrorTypes.SERVER_ERROR]: {
+      title: "get.errors.server.title" as const,
+      description: "get.errors.server.description" as const,
+    },
+    [EndpointErrorTypes.UNKNOWN_ERROR]: {
+      title: "get.errors.unknown.title" as const,
+      description: "get.errors.unknown.description" as const,
+    },
+    [EndpointErrorTypes.UNSAVED_CHANGES]: {
+      title: "get.errors.unsaved.title" as const,
+      description: "get.errors.unsaved.description" as const,
+    },
+    [EndpointErrorTypes.CONFLICT]: {
+      title: "get.errors.conflict.title" as const,
+      description: "get.errors.conflict.description" as const,
+    },
+  },
+
+  successTypes: {
+    title: "get.success.title" as const,
+    description: "get.success.description" as const,
+  },
+
+  examples: {
+    urlPathParams: {
+      default: { subFolderId: "123e4567-e89b-12d3-a456-426614174000" },
+    },
+    responses: {
+      default: {
+        rolesView: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
+        rolesManage: [UserRole.CUSTOMER, UserRole.ADMIN],
+        rolesCreateThread: [UserRole.CUSTOMER, UserRole.ADMIN],
+        rolesPost: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN],
+        rolesModerate: [UserRole.PARTNER_ADMIN, UserRole.ADMIN],
+        rolesAdmin: [UserRole.ADMIN],
       },
     },
   },

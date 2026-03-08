@@ -198,6 +198,8 @@ export interface CronTask<TEndpointDefinition extends CreateApiEndpointAny> {
   runOnce?: boolean;
   /** Minimum interval (ms) between successful history records. null/undefined = log every run. Always logs errors. */
   historyInterval?: number;
+  /** When true, task is hidden from AI system prompt and default task list views (boring system maintenance) */
+  hidden?: boolean;
 }
 
 /**
@@ -227,6 +229,8 @@ export interface CronTaskAny {
   runOnce?: boolean;
   /** Minimum interval (ms) between successful history records. null/undefined = log every run. Always logs errors. */
   historyInterval?: number;
+  /** When true, task is hidden from AI system prompt and default task list views (boring system maintenance) */
+  hidden?: boolean;
 }
 
 /**
@@ -304,6 +308,8 @@ export function createCronTask<const T extends CreateApiEndpointAny>(
     runOnce?: boolean;
     /** Minimum interval (ms) between successful history records. null/undefined = log every run. Always logs errors. */
     historyInterval?: number;
+    /** When true, task is hidden from AI system prompt and default task list views (boring system maintenance) */
+    hidden?: boolean;
   },
 ): CronTaskAny {
   return {

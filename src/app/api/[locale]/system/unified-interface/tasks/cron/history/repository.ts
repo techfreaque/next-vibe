@@ -5,7 +5,18 @@
 
 import "server-only";
 
-import { and, avg, count, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
+import {
+  and,
+  avg,
+  count,
+  desc,
+  eq,
+  gte,
+  inArray,
+  lte,
+  or,
+  sql,
+} from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -65,6 +76,18 @@ export class CronHistoryRepository {
           );
         }
       }
+
+      // Hidden tasks are excluded from history, UNLESS they failed (so errors are never silently hidden)
+      conditions.push(
+        or(
+          eq(cronTasks.hidden, false),
+          inArray(cronTaskExecutions.status, [
+            CronTaskStatus.FAILED,
+            CronTaskStatus.TIMEOUT,
+            CronTaskStatus.ERROR,
+          ]),
+        ),
+      );
 
       if (data?.taskId) {
         conditions.push(eq(cronTaskExecutions.taskId, data.taskId));

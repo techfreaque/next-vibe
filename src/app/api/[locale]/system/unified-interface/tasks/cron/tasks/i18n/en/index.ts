@@ -47,6 +47,11 @@ export const translations = {
         description: "Filter by enabled status",
         placeholder: "All tasks",
       },
+      hidden: {
+        label: "Visibility",
+        description: "Filter by hidden status (default: visible only)",
+        placeholder: "Visible tasks",
+      },
       limit: {
         label: "Limit",
         description: "Maximum number of tasks to return",
@@ -68,6 +73,7 @@ export const translations = {
         taskDescription: "Description",
         schedule: "Schedule",
         enabled: "Enabled",
+        hidden: "Hidden",
         priority: "Priority",
         status: "Status",
         category: "Category",

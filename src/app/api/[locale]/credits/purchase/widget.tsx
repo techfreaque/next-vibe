@@ -13,8 +13,17 @@ import {
   CardHeader,
   CardTitle,
 } from "next-vibe-ui/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "next-vibe-ui/ui/dialog";
 import { Div } from "next-vibe-ui/ui/div";
 import { AlertCircle } from "next-vibe-ui/ui/icons/AlertCircle";
+import { Bitcoin } from "next-vibe-ui/ui/icons/Bitcoin";
+import { CreditCard } from "next-vibe-ui/ui/icons/CreditCard";
 import { ExternalLink } from "next-vibe-ui/ui/icons/ExternalLink";
 import { Info } from "next-vibe-ui/ui/icons/Info";
 import { Minus } from "next-vibe-ui/ui/icons/Minus";
@@ -24,8 +33,12 @@ import { TrendingUp } from "next-vibe-ui/ui/icons/TrendingUp";
 import { Link } from "next-vibe-ui/ui/link";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
+import {
+  PaymentProvider,
+  type PaymentProviderValue,
+} from "@/app/api/[locale]/payment/enum";
 import {
   ProductIds,
   productsRepository,
@@ -35,17 +48,18 @@ import { useSubscription } from "@/app/api/[locale]/subscription/hooks";
 import {
   useWidgetForm,
   useWidgetLogger,
+  useWidgetOnSubmit,
   useWidgetTranslation,
   useWidgetUser,
 } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
-import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/submit-button/react";
 import { useTranslation } from "@/i18n/core/client";
 
 import type definition from "./definition";
 import type { CreditsPurchasePostResponseOutput } from "./definition";
 
 const MIN_QTY = 1;
+const MIN_QTY_CRYPTO = 5;
 
 /**
  * Props for custom widget
@@ -79,6 +93,7 @@ export function CreditsPurchaseContainer({
   const logger = useWidgetLogger();
   const user = useWidgetUser();
   const form = useWidgetForm();
+  const onSubmit = useWidgetOnSubmit();
 
   const products = productsRepository.getProducts(locale);
   const packProduct = products[ProductIds.CREDIT_PACK];
@@ -94,9 +109,23 @@ export function CreditsPurchaseContainer({
   const totalPrice = packPrice * quantity;
   const totalCredits = packCredits * quantity;
 
+  const [isProviderModalOpen, setIsProviderModalOpen] = useState(false);
+
   function setQuantity(next: number): void {
     const clamped = Math.max(MIN_QTY, next);
     form?.setValue("quantity", clamped, { shouldValidate: true });
+  }
+
+  function handleBuy(): void {
+    setIsProviderModalOpen(true);
+  }
+
+  const isCryptoDisabled = quantity < MIN_QTY_CRYPTO;
+
+  function handleProviderSelect(provider: typeof PaymentProviderValue): void {
+    setIsProviderModalOpen(false);
+    form?.setValue("provider", provider);
+    onSubmit?.();
   }
 
   // Redirect to checkout URL on successful response
@@ -107,136 +136,191 @@ export function CreditsPurchaseContainer({
   }, [field.value?.checkoutUrl]);
 
   return (
-    <Card className="relative overflow-hidden">
-      <CardHeader>
-        <CardTitle className="text-2xl">{t("post.pack.title")}</CardTitle>
-        <CardDescription>{t("post.pack.description")}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-6">
-        {/* Pricing Display */}
-        <Div className="flex items-baseline gap-1">
-          <Div className="text-4xl font-bold">
-            {formatPrice(packPrice, locale, packProduct.currency)}
-          </Div>
-          <Div className="text-sm text-muted-foreground">
-            {t("post.pack.perPack")}
-          </Div>
-        </Div>
-
-        {/* Features */}
-        <Div className="flex flex-col gap-3 text-sm">
-          <Div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-green-600" />
-            <Span>
-              {t("post.pack.features.credits", {
-                count: packCredits,
-              })}
-            </Span>
-          </Div>
-          <Div className="flex items-center gap-2">
-            <AlertCircle className="h-4 w-4 text-green-600" />
-            <Span>{t("post.pack.features.expiry")}</Span>
-          </Div>
-          <Div className="flex items-center gap-2">
-            <TrendingUp className="h-4 w-4 text-blue-600" />
-            <Span>{t("post.pack.features.bestFor")}</Span>
-          </Div>
-        </Div>
-
-        {/* Purchase Form - Only for active subscribers */}
-        {hasActiveSubscription ? (
-          <Div className="flex flex-col gap-4">
-            <FormAlertWidget field={{}} />
-
-            {/* Quantity Stepper */}
-            <Div className="flex flex-col gap-2">
-              <Span className="text-sm font-medium text-muted-foreground">
-                {t("post.quantity.label")}
-              </Span>
-              <Div className="flex items-center gap-0 rounded-lg border border-border overflow-hidden">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="lg"
-                  className="h-14 w-14 rounded-none border-r border-border text-xl font-light flex-shrink-0"
-                  onClick={() => setQuantity(quantity - 1)}
-                  disabled={quantity <= MIN_QTY}
-                >
-                  <Minus className="h-5 w-5" />
-                </Button>
-                <Div className="flex-1 flex flex-col items-center justify-center h-14 select-none">
-                  <Span className="text-2xl font-bold tabular-nums">
-                    {quantity}
-                  </Span>
-                  <Span className="text-xs text-muted-foreground">
-                    {quantity === 1 ? "pack" : "packs"}
-                  </Span>
+    <>
+      {/* Payment Provider Selection Modal */}
+      <Dialog open={isProviderModalOpen} onOpenChange={setIsProviderModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("post.provider.label")}</DialogTitle>
+            <DialogDescription>
+              {t("post.provider.description")}
+            </DialogDescription>
+          </DialogHeader>
+          <Div className="grid gap-4 py-4">
+            <Button
+              type="button"
+              variant="outline"
+              className="h-auto p-4 justify-start"
+              onClick={() => handleProviderSelect(PaymentProvider.STRIPE)}
+            >
+              <CreditCard className="h-6 w-6 text-blue-600 mr-3" />
+              <Div className="text-left">
+                <Div className="font-semibold">{t("post.provider.stripe")}</Div>
+                <Div className="text-sm text-muted-foreground">
+                  {t("post.provider.stripeDescription")}
                 </Div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="lg"
-                  className="h-14 w-14 rounded-none border-l border-border text-xl font-light flex-shrink-0"
-                  onClick={() => setQuantity(quantity + 1)}
-                >
-                  <Plus className="h-5 w-5" />
-                </Button>
               </Div>
-
-              {/* Total summary */}
-              {quantity > 1 && (
-                <Div className="text-sm text-muted-foreground px-1">
-                  {t("post.pack.totalSummary", {
-                    totalCredits: totalCredits.toLocaleString(locale),
-                    totalPrice: formatPrice(
-                      totalPrice,
-                      locale,
-                      packProduct.currency,
-                    ),
-                  })}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-auto p-4 justify-start"
+              onClick={() => handleProviderSelect(PaymentProvider.NOWPAYMENTS)}
+              disabled={isCryptoDisabled}
+            >
+              <Bitcoin className="h-6 w-6 text-orange-500 mr-3" />
+              <Div className="text-left">
+                <Div className="font-semibold">
+                  {t("post.provider.nowpayments")}
                 </Div>
-              )}
-            </Div>
-
-            {/* Submit Button */}
-            <SubmitButtonWidget<typeof definition.POST>
-              field={{
-                text: "post.submit.text",
-                loadingText: "post.submit.loading",
-                icon: "credit-card",
-                variant: "default",
-              }}
-            />
-
-            {/* Response - Checkout Link (fallback if redirect doesn't work) */}
-            {field.value?.checkoutUrl && (
-              <Div className="mt-4 p-4 rounded-lg bg-primary/10 border border-primary/20">
-                <Div className="text-sm font-medium mb-2">
-                  {t("post.redirecting")}
+                <Div className="text-sm text-muted-foreground">
+                  {t("post.provider.nowpaymentsDescription")}
                 </Div>
-                <Button asChild variant="outline" className="w-full">
-                  <Link
-                    href={field.value.checkoutUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                    {t("post.openCheckout")}
-                  </Link>
-                </Button>
+              </Div>
+            </Button>
+            {isCryptoDisabled && (
+              <Div className="flex items-start gap-2 rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700 p-3 text-sm text-amber-700 dark:text-amber-300">
+                <Info className="h-4 w-4 mt-0.5 shrink-0" />
+                {t("post.provider.cryptoMinimumDisabled", {
+                  min: MIN_QTY_CRYPTO,
+                })}
               </Div>
             )}
           </Div>
-        ) : (
-          <Div className="mt-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
-            <Div className="text-sm text-amber-700 dark:text-amber-300">
-              <Info className="h-4 w-4 inline mr-2" />
-              {t("post.pack.requiresSubscription")}
+        </DialogContent>
+      </Dialog>
+
+      <Card className="relative overflow-hidden">
+        <CardHeader>
+          <CardTitle className="text-2xl">{t("post.pack.title")}</CardTitle>
+          <CardDescription>{t("post.pack.description")}</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-6">
+          {/* Pricing Display */}
+          <Div className="flex items-baseline gap-1">
+            <Div className="text-4xl font-bold">
+              {formatPrice(packPrice, locale, packProduct.currency)}
+            </Div>
+            <Div className="text-sm text-muted-foreground">
+              {t("post.pack.perPack")}
             </Div>
           </Div>
-        )}
-      </CardContent>
-    </Card>
+
+          {/* Features */}
+          <Div className="flex flex-col gap-3 text-sm">
+            <Div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-green-600" />
+              <Span>
+                {t("post.pack.features.credits", {
+                  count: packCredits,
+                })}
+              </Span>
+            </Div>
+            <Div className="flex items-center gap-2">
+              <AlertCircle className="h-4 w-4 text-green-600" />
+              <Span>{t("post.pack.features.expiry")}</Span>
+            </Div>
+            <Div className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-blue-600" />
+              <Span>{t("post.pack.features.bestFor")}</Span>
+            </Div>
+          </Div>
+
+          {/* Purchase Form - Only for active subscribers */}
+          {hasActiveSubscription ? (
+            <Div className="flex flex-col gap-4">
+              <FormAlertWidget field={{}} />
+
+              {/* Quantity Stepper */}
+              <Div className="flex flex-col gap-2">
+                <Span className="text-sm font-medium text-muted-foreground">
+                  {t("post.quantity.label")}
+                </Span>
+                <Div className="flex items-center gap-0 rounded-lg border border-border overflow-hidden">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="lg"
+                    className="h-14 w-14 rounded-none border-r border-border text-xl font-light flex-shrink-0"
+                    onClick={() => setQuantity(quantity - 1)}
+                    disabled={quantity <= MIN_QTY}
+                  >
+                    <Minus className="h-5 w-5" />
+                  </Button>
+                  <Div className="flex-1 flex flex-col items-center justify-center h-14 select-none">
+                    <Span className="text-2xl font-bold tabular-nums">
+                      {quantity}
+                    </Span>
+                    <Span className="text-xs text-muted-foreground">
+                      {quantity === 1 ? "pack" : "packs"}
+                    </Span>
+                  </Div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="lg"
+                    className="h-14 w-14 rounded-none border-l border-border text-xl font-light flex-shrink-0"
+                    onClick={() => setQuantity(quantity + 1)}
+                  >
+                    <Plus className="h-5 w-5" />
+                  </Button>
+                </Div>
+
+                {/* Total summary */}
+                {quantity > 1 && (
+                  <Div className="text-sm text-muted-foreground px-1">
+                    {t("post.pack.totalSummary", {
+                      totalCredits: totalCredits.toLocaleString(locale),
+                      totalPrice: formatPrice(
+                        totalPrice,
+                        locale,
+                        packProduct.currency,
+                      ),
+                    })}
+                  </Div>
+                )}
+              </Div>
+
+              {/* Buy Button — opens provider modal */}
+              <Button
+                type="button"
+                className="w-full"
+                size="lg"
+                onClick={handleBuy}
+              >
+                {t("post.submit.text")}
+              </Button>
+
+              {/* Response - Checkout Link (fallback if redirect doesn't work) */}
+              {field.value?.checkoutUrl && (
+                <Div className="mt-4 p-4 rounded-lg bg-primary/10 border border-primary/20">
+                  <Div className="text-sm font-medium mb-2">
+                    {t("post.redirecting")}
+                  </Div>
+                  <Button asChild variant="outline" className="w-full">
+                    <Link
+                      href={field.value.checkoutUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      {t("post.openCheckout")}
+                    </Link>
+                  </Button>
+                </Div>
+              )}
+            </Div>
+          ) : (
+            <Div className="mt-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+              <Div className="text-sm text-amber-700 dark:text-amber-300">
+                <Info className="h-4 w-4 inline mr-2" />
+                {t("post.pack.requiresSubscription")}
+              </Div>
+            </Div>
+          )}
+        </CardContent>
+      </Card>
+    </>
   );
 }

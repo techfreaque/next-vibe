@@ -53,6 +53,7 @@ export const translations: typeof enTranslations = {
         error: "Fehler",
         executing: "Wird ausgeführt...",
         complete: "Abgeschlossen",
+        background: "Hintergrund",
         waitingForConfirmation: "Wartet auf Bestätigung",
         pendingConfirmation: "Bestätigung ausstehend",
         pendingCancellation: "Stornierung ausstehend",
@@ -63,6 +64,7 @@ export const translations: typeof enTranslations = {
       },
       messages: {
         executingTool: "Tool wird ausgeführt...",
+        taskId: "Aufgaben-ID:",
         errorLabel: "Fehler:",
         noArguments: "Keine Argumente",
         noResult: "Kein Ergebnis",

@@ -31,15 +31,10 @@ const { POST } = createEndpoint({
   path: ["payment", "portal"],
   title: "post.title" as const,
   description: "post.description" as const,
-  category: "app.endpointCategories.payment",
+  category: "app.endpointCategories.credits",
   icon: "settings" as const,
   tags: ["post.title" as const, "post.title" as const, "post.title" as const],
-  allowedRoles: [
-    UserRole.CUSTOMER,
-    UserRole.ADMIN,
-    UserRole.PARTNER_ADMIN,
-    UserRole.PARTNER_EMPLOYEE,
-  ],
+  allowedRoles: [UserRole.ADMIN, UserRole.AI_TOOL_OFF],
 
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

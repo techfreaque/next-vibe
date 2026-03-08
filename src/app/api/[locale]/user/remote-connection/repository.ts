@@ -10,7 +10,7 @@ import {
   randomBytes,
 } from "node:crypto";
 
-import { and, eq, isNotNull, sql } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
 import {
   ErrorResponseTypes,
   fail,
@@ -145,6 +145,7 @@ export async function upsertRemoteConnection(params: {
   leadId?: string;
   instanceId?: string;
   friendlyName?: string;
+  remoteInstanceId?: string;
   logger: EndpointLogger;
 }): Promise<ResponseType<{ remoteUrl: string; isConnected: boolean }>> {
   const {
@@ -154,6 +155,7 @@ export async function upsertRemoteConnection(params: {
     leadId,
     instanceId = "hermes",
     friendlyName,
+    remoteInstanceId,
     logger,
   } = params;
 
@@ -168,6 +170,7 @@ export async function upsertRemoteConnection(params: {
       leadId: leadId ?? null,
       instanceId,
       friendlyName: friendlyName ?? instanceId,
+      remoteInstanceId: remoteInstanceId ?? null,
       isActive: true,
       updatedAt: new Date(),
     })
@@ -178,6 +181,7 @@ export async function upsertRemoteConnection(params: {
         token: encryptedToken,
         leadId: leadId ?? null,
         friendlyName: friendlyName ?? instanceId,
+        remoteInstanceId: remoteInstanceId ?? null,
         isActive: true,
         updatedAt: new Date(),
       },
@@ -285,6 +289,7 @@ export async function getAllActiveConnectionsForSync(): Promise<
     remoteMemoriesHash: string | null;
     capabilitiesVersion: string | null;
     taskCursor: string | null;
+    remoteInstanceId: string | null;
   }>
 > {
   const rows = await db
@@ -293,7 +298,9 @@ export async function getAllActiveConnectionsForSync(): Promise<
     .where(eq(userRemoteConnections.isActive, true));
 
   return rows
-    .filter((r): r is typeof r & { token: string } => !!r.token)
+    .filter(
+      (r): r is typeof r & { token: string } => !!r.token && r.token !== "self",
+    )
     .map((r) => ({
       userId: r.userId,
       remoteUrl: r.remoteUrl,
@@ -305,11 +312,14 @@ export async function getAllActiveConnectionsForSync(): Promise<
       remoteMemoriesHash: r.remoteMemoriesHash ?? null,
       capabilitiesVersion: r.capabilitiesVersion ?? null,
       taskCursor: r.taskCursor ?? null,
+      remoteInstanceId: r.remoteInstanceId ?? null,
     }));
 }
 
 /**
- * Get all active connections for a user — for task sync iteration
+ * Get all active connections for a user — for task sync iteration and system prompt.
+ * remoteInstanceId: the instanceId the remote uses to identify itself (from its self-record).
+ * The AI should pass remoteInstanceId to execute-tool/help so tasks target the right instance.
  */
 export async function getAllActiveConnections(userId: string): Promise<
   Array<{
@@ -318,6 +328,7 @@ export async function getAllActiveConnections(userId: string): Promise<
     leadId: string;
     instanceId: string;
     friendlyName: string;
+    remoteInstanceId: string | null;
   }>
 > {
   const rows = await db
@@ -331,13 +342,18 @@ export async function getAllActiveConnections(userId: string): Promise<
     );
 
   return rows
-    .filter((r): r is typeof r & { token: string } => !!r.token)
+    .filter(
+      // Exclude self-identity records (token="self") — these are not real remotes.
+      // Only include rows with actual JWT tokens (real remote connections).
+      (r): r is typeof r & { token: string } => !!r.token && r.token !== "self",
+    )
     .map((r) => ({
       remoteUrl: r.remoteUrl,
       token: decryptToken(r.token),
       leadId: r.leadId ?? "",
       instanceId: r.instanceId,
       friendlyName: r.friendlyName,
+      remoteInstanceId: r.remoteInstanceId ?? null,
     }));
 }
 
@@ -363,7 +379,7 @@ export async function getRemoteConnectionRecord(
     .from(userRemoteConnections)
     .where(and(...conditions));
 
-  if (!row || !row.isActive || !row.token) {
+  if (!row || !row.isActive || !row.token || row.token === "self") {
     return null;
   }
 
@@ -419,10 +435,10 @@ export async function touchLastSynced(
 
 /**
  * Get this instance's own ID from the DB.
- * Local-side rows have a token (they logged into the remote).
- * Cloud-side rows (registered by local) have token=null.
- * So local instanceId = the first active row where token IS NOT NULL.
- * Returns null if no connection has been configured yet.
+ * Self-identity row has token="self". This is the canonical record created by
+ * the register endpoint when a remote connects to us. Falls back to the first
+ * outbound connection row (token IS NOT NULL AND != 'self') when no self-record
+ * exists yet (e.g. the instance connected out but no remote has registered here).
  */
 let cachedInstanceId: string | null | undefined = undefined;
 
@@ -433,19 +449,38 @@ export async function getLocalInstanceId(): Promise<string | null> {
     return cachedInstanceId;
   }
 
-  const [row] = await db
+  // Prefer the explicit self-record (token="self") — this is the authoritative
+  // identity set when a remote instance registers here.
+  const [selfRow] = await db
     .select({ instanceId: userRemoteConnections.instanceId })
     .from(userRemoteConnections)
     .where(
       and(
         eq(userRemoteConnections.isActive, true),
-        isNotNull(userRemoteConnections.token),
-        sql`${userRemoteConnections.token} != ''`,
+        eq(userRemoteConnections.token, "self"),
       ),
     )
     .limit(1);
 
-  const id = row?.instanceId ?? null;
+  if (selfRow) {
+    cachedInstanceId = selfRow.instanceId;
+    return selfRow.instanceId;
+  }
+
+  // Fallback: use the instanceId from the first outbound connection row.
+  // This covers the case where we've connected out but haven't been registered by a remote yet.
+  const [connRow] = await db
+    .select({ instanceId: userRemoteConnections.instanceId })
+    .from(userRemoteConnections)
+    .where(
+      and(
+        eq(userRemoteConnections.isActive, true),
+        sql`${userRemoteConnections.token} IS NOT NULL AND ${userRemoteConnections.token} != '' AND ${userRemoteConnections.token} != 'self'`,
+      ),
+    )
+    .limit(1);
+
+  const id = connRow?.instanceId ?? null;
   if (id !== null) {
     cachedInstanceId = id; // Only cache when found — retry on next call if null
   }
@@ -460,22 +495,51 @@ export function invalidateInstanceIdCache(): void {
 }
 
 /**
- * Get capabilities snapshot for a specific connection (for help endpoint)
+ * Get capabilities snapshot for a connection identified by instanceId or remoteInstanceId.
+ * - Cloud looking up dev: matches by instanceId ("hermes") on cloud's connection row
+ * - Dev looking up cloud: matches by remoteInstanceId ("thea") on dev's connection row
  */
 export async function getCapabilities(
   userId: string,
   instanceId: string,
 ): Promise<RemoteToolCapability[] | null> {
+  const conn = await getConnectionForInstance(userId, instanceId);
+  return conn?.capabilities ?? null;
+}
+
+/**
+ * Get the connection row (capabilities + remoteInstanceId) for a given instanceId label.
+ * Matches by either instanceId (local label) or remoteInstanceId (what remote calls itself).
+ */
+export async function getConnectionForInstance(
+  userId: string,
+  instanceId: string,
+): Promise<{
+  capabilities: RemoteToolCapability[] | null;
+  remoteInstanceId: string | null;
+} | null> {
   const [row] = await db
-    .select({ capabilities: userRemoteConnections.capabilities })
+    .select({
+      capabilities: userRemoteConnections.capabilities,
+      remoteInstanceId: userRemoteConnections.remoteInstanceId,
+    })
     .from(userRemoteConnections)
     .where(
       and(
         eq(userRemoteConnections.userId, userId),
-        eq(userRemoteConnections.instanceId, instanceId),
         eq(userRemoteConnections.isActive, true),
+        or(
+          eq(userRemoteConnections.instanceId, instanceId),
+          eq(userRemoteConnections.remoteInstanceId, instanceId),
+        ),
       ),
     );
 
-  return row?.capabilities ?? null;
+  if (!row) {
+    return null;
+  }
+  return {
+    capabilities: row.capabilities,
+    remoteInstanceId: row.remoteInstanceId,
+  };
 }

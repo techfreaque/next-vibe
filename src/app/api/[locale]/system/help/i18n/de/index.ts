@@ -293,6 +293,7 @@ export const translations: typeof enTranslations = {
       enabledTooltip:
         "Erlaubte Tools können auf Anfrage aufgerufen werden, wenn Hilfe aktiviert ist",
       totalLabel: "gesamt",
+      totalTooltip: "Alle Tools anzeigen — klicken um Filter zu löschen",
       searchPlaceholder: "Tools suchen...",
       expandAll: "Alle erweitern",
       collapseAll: "Alle zusammenklappen",

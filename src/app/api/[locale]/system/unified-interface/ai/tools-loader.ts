@@ -10,7 +10,6 @@ import { jsonSchema, type JSONSchema7, tool } from "ai";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 import { z } from "zod";
 
-import { scopedTranslation as aiStreamScopedTranslation } from "@/app/api/[locale]/agent/ai-stream/stream/i18n";
 import type { ToolExecutionContext } from "@/app/api/[locale]/agent/chat/config";
 import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import { generateSchemaForUsage } from "@/app/api/[locale]/system/unified-interface/shared/field/utils";
@@ -24,6 +23,7 @@ import { permissionsRegistry } from "../shared/endpoints/permissions/registry";
 import type { CreateApiEndpointAny } from "../shared/types/endpoint-base";
 import { Platform } from "../shared/types/platform";
 import { endpointToToolName, getPreferredToolName } from "../shared/utils/path";
+import type { JsonValue } from "../tasks/unified-runner/types";
 
 /**
  * CoreTool type from AI SDK
@@ -128,15 +128,9 @@ function createToolFromEndpoint(
       });
 
       if (!result.success) {
-        // Throw error for AI SDK with translated message
-        const errorMessage = result.message
-          ? t(result.message, result.messageParams)
-          : aiStreamScopedTranslation
-              .scopedT(context.locale)
-              .t("errors.toolExecutionFailed");
         // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Tool error must be thrown for AI SDK
-        // eslint-disable-next-line @typescript-eslint/only-throw-error -- Tool error must be thrown for AI SDK
-        throw new Error(errorMessage);
+        // eslint-disable-next-line @typescript-eslint/only-throw-error -- Throwing ErrorResponseType so AI SDK marks isError=true with structured data
+        throw result;
       }
 
       // Return the data to AI SDK
@@ -194,6 +188,91 @@ function generateInputSchema(
 }
 
 /**
+ * Create an AI SDK CoreTool for a remote capability.
+ * The tool calls execute-tool locally which forwards the request to the remote.
+ */
+function createRemoteTool(params: {
+  toolName: string; // full prefixed name: "hermes__ssh_exec_POST"
+  cap: { title: string; description: string };
+  requiresConfirmation: boolean;
+  user: JwtPayloadType;
+  locale: CountryLanguage;
+  logger: EndpointLogger;
+  streamContext: ToolExecutionContext;
+}): CoreTool {
+  const { toolName, cap, user, locale, logger, streamContext } = params;
+
+  // Accept any JSON object as input — schema is opaque for remote tools
+  const inputSchema = jsonSchema(
+    {
+      type: "object",
+      additionalProperties: true,
+    } as JSONSchema7,
+    {
+      validate: (value) => ({
+        success: true,
+        value: value as Record<string, JsonValue>,
+      }),
+    },
+  );
+
+  return tool({
+    description: cap.description || cap.title,
+    inputSchema,
+    execute: async (input) => {
+      logger.debug("[Tools Loader] Remote tool execute called", { toolName });
+
+      // Delegate to execute-tool which routes to the remote
+      const { RouteExecuteRepository } =
+        await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/repository");
+      const { scopedTranslation: executeScopedT } =
+        await import("@/app/api/[locale]/system/unified-interface/ai/i18n");
+      const { t } = executeScopedT.scopedT(locale);
+
+      // Extract callbackMode from input if AI passed it; default to wait
+      const { callbackMode: inputCallbackMode, ...restInput } = (input ??
+        {}) as Record<string, JsonValue>;
+      const { CallbackMode: CM } =
+        await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants");
+      const callbackMode =
+        typeof inputCallbackMode === "string" &&
+        Object.values(CM).includes(inputCallbackMode as never)
+          ? (inputCallbackMode as (typeof CM)[keyof typeof CM])
+          : CM.WAIT;
+
+      const result = await RouteExecuteRepository.execute(
+        {
+          toolName,
+          input: restInput,
+          callbackMode,
+        },
+        user,
+        locale,
+        logger,
+        t,
+        streamContext,
+      );
+
+      if (!result.success) {
+        const errorMsg = result.message ?? "Remote tool execution failed";
+        // eslint-disable-next-line oxlint-plugin-restricted/restricted-syntax -- Tool error must be thrown for AI SDK
+        // eslint-disable-next-line @typescript-eslint/only-throw-error -- Tool error must be thrown for AI SDK
+        throw new Error(errorMsg);
+      }
+
+      // Signal the stream layer to pause when callbackMode=wait.
+      // Stream aborts after this step; /report resumes via headless stream (wakeUp)
+      // or the user sees the pending tool message and the stream ends (other modes).
+      if (callbackMode === CM.WAIT && streamContext) {
+        streamContext.waitingForRemoteResult = true;
+      }
+
+      return result.data;
+    },
+  });
+}
+
+/**
  * Load tools for AI streaming
  */
 export async function loadTools(params: {
@@ -225,9 +304,29 @@ export async function loadTools(params: {
   }
 
   try {
-    // Load only the requested tools, check permissions on each
     const toolNames = params.requestedTools ?? [];
-    const loaded = await Promise.all(toolNames.map((n) => getEndpoint(n)));
+
+    // Split into local and remote tool names
+    // Remote tools are prefixed: "instanceId__toolName"
+    const localToolNames: string[] = [];
+    const remoteToolNames: string[] = [];
+    for (const n of toolNames) {
+      if (n.includes("__")) {
+        remoteToolNames.push(n);
+      } else {
+        localToolNames.push(n);
+      }
+    }
+
+    // Create AI SDK tools map
+    const toolsMap = new Map<string, CoreTool>();
+    const toolsMeta = new Map<
+      string,
+      { requiresConfirmation: boolean; credits: number }
+    >();
+
+    // ── Local tools ──────────────────────────────────────────────────────────
+    const loaded = await Promise.all(localToolNames.map((n) => getEndpoint(n)));
     const enabledEndpoints = loaded.filter(
       (e): e is CreateApiEndpointAny =>
         e !== null &&
@@ -240,46 +339,20 @@ export async function loadTools(params: {
 
     params.logger.debug("[Tools Loader] Loading requested tools", {
       requested: toolNames.length,
-      loaded: enabledEndpoints.length,
+      local: enabledEndpoints.length,
+      remote: remoteToolNames.length,
     });
 
-    if (enabledEndpoints.length === 0) {
-      return {
-        tools: undefined,
-        toolsMeta: new Map(),
-        systemPrompt: params.systemPrompt,
-      };
-    }
-
-    // Create AI SDK tools
-    // AI SDK tool names must use full endpointToToolName format for proper lookup
-    const toolsMap = new Map<string, CoreTool>();
-    const toolsMeta = new Map<
-      string,
-      { requiresConfirmation: boolean; credits: number }
-    >();
-
     for (const endpoint of enabledEndpoints) {
-      // Internal name for lookups and execution (full path with method)
       const internalToolName = endpointToToolName(endpoint);
-      // Preferred name for AI model (first alias if available, otherwise internal name)
       const preferredToolName = getPreferredToolName(endpoint);
 
       try {
-        // Check if this tool requires confirmation from the API request config
-        // Check both preferred name and internal name for backwards compatibility
         const requiresConfirmation =
           params.toolConfirmationConfig?.get(preferredToolName) ??
           params.toolConfirmationConfig?.get(internalToolName) ??
           endpoint.requiresConfirmation ??
           false;
-
-        params.logger.debug("Creating tool", {
-          internalToolName,
-          preferredToolName,
-          endpoint: [...endpoint.path],
-          requiresConfirmation,
-        });
 
         const createdTool = createToolFromEndpoint(
           endpoint,
@@ -292,17 +365,10 @@ export async function loadTools(params: {
           requiresConfirmation,
         );
 
-        // Register tool with preferred name (alias) for AI model to see
         toolsMap.set(preferredToolName, createdTool);
         toolsMeta.set(preferredToolName, {
           requiresConfirmation,
           credits: endpoint.credits ?? 0,
-        });
-
-        params.logger.debug("Tool created successfully", {
-          internalToolName,
-          preferredToolName,
-          requiresConfirmation,
         });
       } catch (error) {
         const parsedError = parseError(error);
@@ -311,9 +377,80 @@ export async function loadTools(params: {
           preferredToolName,
           endpoint: [...endpoint.path],
           error: parsedError.message,
-          fullError: parsedError,
         });
       }
+    }
+
+    // ── Remote tools ─────────────────────────────────────────────────────────
+    if (remoteToolNames.length > 0 && !params.user.isPublic) {
+      // Group by instanceId so we fetch capabilities once per instance
+      const byInstance = new Map<string, string[]>();
+      for (const n of remoteToolNames) {
+        const sepIdx = n.indexOf("__");
+        const instanceId = n.slice(0, sepIdx);
+        const existing = byInstance.get(instanceId) ?? [];
+        existing.push(n);
+        byInstance.set(instanceId, existing);
+      }
+
+      const { getCapabilities } =
+        await import("@/app/api/[locale]/user/remote-connection/repository");
+
+      for (const [instanceId, names] of byInstance) {
+        const capabilities = await getCapabilities(params.user.id, instanceId);
+        if (!capabilities) {
+          params.logger.debug("[Tools Loader] No capabilities for instance", {
+            instanceId,
+          });
+          continue;
+        }
+
+        const capMap = new Map(capabilities.map((c) => [c.toolName, c]));
+
+        for (const fullName of names) {
+          // fullName = "hermes__ssh_exec_POST", toolName = "ssh_exec_POST"
+          const toolNamePart = fullName.slice(instanceId.length + 2);
+          const cap = capMap.get(toolNamePart);
+          if (!cap) {
+            params.logger.debug("[Tools Loader] Remote tool not in snapshot", {
+              fullName,
+              instanceId,
+            });
+            continue;
+          }
+
+          const requiresConfirmation =
+            params.toolConfirmationConfig?.get(fullName) ?? false;
+
+          try {
+            const remoteTool = createRemoteTool({
+              toolName: fullName,
+              cap,
+              requiresConfirmation,
+              user: params.user,
+              locale: params.locale,
+              logger: params.logger,
+              streamContext: params.streamContext,
+            });
+
+            toolsMap.set(fullName, remoteTool);
+            toolsMeta.set(fullName, { requiresConfirmation, credits: 1 });
+          } catch (error) {
+            params.logger.error("[Tools Loader] Failed to create remote tool", {
+              fullName,
+              error: parseError(error).message,
+            });
+          }
+        }
+      }
+    }
+
+    if (toolsMap.size === 0) {
+      return {
+        tools: undefined,
+        toolsMeta: new Map(),
+        systemPrompt: params.systemPrompt,
+      };
     }
 
     const tools = Object.fromEntries(toolsMap.entries());

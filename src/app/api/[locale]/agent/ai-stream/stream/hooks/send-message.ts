@@ -118,7 +118,7 @@ export async function sendMessage(
         threadMessages = chatStore.getThreadMessages(threadIdToUse);
       }
 
-      if (hasToolConfirmations && params.parentId) {
+      if (params.parentId) {
         parentMessageId = params.parentId;
       } else if (threadMessages.length > 0) {
         // leafMessageId is synced from URL ?message= by useBranchManagement.

@@ -52,6 +52,7 @@ export const translations = {
         error: "Error",
         executing: "Executing...",
         complete: "Complete",
+        background: "Background",
         waitingForConfirmation: "Waiting for confirmation",
         pendingConfirmation: "Pending Confirmation",
         pendingCancellation: "Pending Cancellation",
@@ -62,6 +63,7 @@ export const translations = {
       },
       messages: {
         executingTool: "Executing tool...",
+        taskId: "Task ID:",
         errorLabel: "Error:",
         noArguments: "No arguments",
         noResult: "No result",

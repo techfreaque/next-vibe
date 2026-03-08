@@ -59,6 +59,11 @@ export const translations = {
     enabled: "Enabled",
     disabled: "Disabled",
   },
+  hiddenFilter: {
+    visible: "Visible",
+    hidden: "Hidden",
+    all: "All",
+  },
   sort: {
     asc: "Ascending",
     desc: "Descending",
@@ -466,9 +471,9 @@ export const translations = {
           title: "API Key",
           description: "Shared secret for instance authentication.",
         },
-        taskRouteId: {
-          title: "Task Route ID",
-          description: "The routeId of the completed task.",
+        taskId: {
+          title: "Task ID",
+          description: "The unique id of the completed task.",
         },
         executionId: {
           title: "Execution ID",
@@ -553,6 +558,74 @@ export const translations = {
       success: {
         title: "Report Accepted",
         description: "Execution result applied to the task record",
+      },
+    },
+  },
+  waitForTask: {
+    post: {
+      title: "Wait for Task",
+      description:
+        "Wait on a pending background task. Returns the result immediately if already completed, or pauses the AI stream until the task finishes (wakeUp mechanism).",
+      fields: {
+        taskId: {
+          title: "Task ID",
+          description: "The ID of the task to wait on.",
+        },
+        status: {
+          title: "Status",
+          description: "Current task status.",
+        },
+        result: {
+          title: "Result",
+          description: "Task result payload (present when completed).",
+        },
+        waiting: {
+          title: "Waiting",
+          description:
+            "True when the stream is paused waiting for the task to complete.",
+        },
+      },
+      errors: {
+        validation: {
+          title: "Validation Error",
+          description: "Invalid taskId",
+        },
+        unauthorized: {
+          title: "Unauthorized",
+          description: "Authentication required",
+        },
+        internal: {
+          title: "Internal Error",
+          description: "Failed to register waiter on the task",
+        },
+        forbidden: {
+          title: "Forbidden",
+          description: "Access denied",
+        },
+        notFound: {
+          title: "Task Not Found",
+          description: "No task found with that ID",
+        },
+        network: {
+          title: "Network Error",
+          description: "Network error occurred",
+        },
+        unknown: {
+          title: "Unknown Error",
+          description: "An unexpected error occurred",
+        },
+        unsaved: {
+          title: "Unsaved Changes",
+          description: "Unsaved changes detected",
+        },
+        conflict: {
+          title: "Conflict",
+          description: "A conflict occurred",
+        },
+      },
+      success: {
+        title: "Task Result Ready",
+        description: "Task completed or waiter registered",
       },
     },
   },

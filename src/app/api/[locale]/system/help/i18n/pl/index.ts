@@ -291,6 +291,7 @@ export const translations: typeof enTranslations = {
       enabledTooltip:
         "Dozwolone narzędzia mogą być wywoływane na żądanie, gdy pomoc jest włączona",
       totalLabel: "łącznie",
+      totalTooltip: "Pokaż wszystkie narzędzia — kliknij aby wyczyścić filtr",
       searchPlaceholder: "Szukaj narzędzi...",
       expandAll: "Rozwiń wszystkie",
       collapseAll: "Zwiń wszystkie",

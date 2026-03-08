@@ -400,6 +400,22 @@ export async function pullFromRemote(
           body.capabilitiesJson = capabilitiesJson;
         }
 
+        // Collect tasks this instance created that target the remote (outbound tasks).
+        // remoteInstanceId = what the remote calls itself; targetInstance must match that
+        // so remote's pulse picks them up.
+        if (conn.remoteInstanceId) {
+          const outbound = await db
+            .select()
+            .from(cronTasks)
+            .where(
+              sql`${cronTasks.targetInstance} = ${conn.remoteInstanceId} AND ${cronTasks.lastExecutionStatus} IS NULL`,
+            )
+            .limit(50);
+          if (outbound.length > 0) {
+            body.outboundTasks = JSON.stringify(outbound.map(serializeForSync));
+          }
+        }
+
         const response = await fetch(syncUrl, {
           method: "POST",
           headers,
@@ -544,12 +560,13 @@ export async function pullFromRemote(
  * Cloud instances (VIBE_IS_CLOUD=true) skip outbound push.
  */
 export async function pushStatusToRemote(params: {
-  taskRouteId: string;
+  /** The task's unique id (e.g. "remote-hermes-dev-...") — used by /report to look up the exact task */
+  taskId: string;
   status: string;
   summary: string;
   durationMs: number | null;
   executionId?: string;
-  output?: Record<string, string | number | boolean>;
+  output?: Record<string, JsonValue>;
   startedAt?: string;
   serverTimezone: string;
   executedByInstance: string | null;
@@ -903,6 +920,28 @@ export async function syncTasks(
     }
   }
 
+  // ── 1b. Upsert inbound tasks from local instance (outbound push) ──────────
+  // Dev sends tasks targeting our instanceId — upsert them so our pulse picks them up.
+  if (data.outboundTasks) {
+    try {
+      const inboundTasks = parseSyncField<SyncedCronTask>(data.outboundTasks);
+      if (inboundTasks.length > 0) {
+        const upsertResult = await upsertRemoteTasks({
+          tasks: inboundTasks,
+          logger,
+        });
+        if (upsertResult.success) {
+          logger.info("Stored inbound outbound tasks from local", {
+            instanceId,
+            count: upsertResult.data.synced,
+          });
+        }
+      }
+    } catch (error) {
+      logger.warn("Failed to process outboundTasks", parseError(error));
+    }
+  }
+
   // ── 2. Compute our own memories hash and diff against local's ─────────────
   const ourMemoriesHash = await computeAndStoreMemoriesHash(user.id);
   const localMemoriesHash = data.memoriesHash;
@@ -982,7 +1021,7 @@ export async function syncTasks(
     .select()
     .from(cronTasks)
     .where(
-      sql`${cronTasks.targetInstance} = ${instanceId} AND ${cronTasks.createdAt} > ${cursor} AND ${cronTasks.lastExecutionStatus} IS NULL`,
+      sql`${cronTasks.targetInstance} = ${connRow?.remoteInstanceId ?? instanceId} AND ${cronTasks.createdAt} > ${cursor} AND ${cronTasks.lastExecutionStatus} IS NULL`,
     )
     .limit(50);
 
