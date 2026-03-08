@@ -127,9 +127,7 @@ export function ReleaseResultWidget({ field }: CustomWidgetProps): JSX.Element {
               <Badge variant="secondary" className="text-xs">
                 {pkg.registry}
               </Badge>
-              <Span className="text-xs font-mono">
-                {`${pkg.name}@${pkg.version}`}
-              </Span>
+              <Span className="text-xs font-mono">{`${pkg.name}@${pkg.version}`}</Span>
             </Div>
           ))}
         </Div>

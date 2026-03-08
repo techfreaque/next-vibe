@@ -42,7 +42,9 @@ export class FinishStepHandler {
     if (ctx.stepHasToolsAwaitingConfirmation) {
       logger.info(
         "[AI Stream] Step complete - tools require confirmation, aborting stream",
-        { toolCallsInStep: ctx.pendingToolMessages.size },
+        {
+          toolCallsInStep: ctx.pendingToolMessages.size,
+        },
       );
 
       streamAbortController.abort(new Error("Tool requires user confirmation"));

@@ -779,6 +779,17 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
       }
 
       // --- Start Next.js ---
+      const { existsSync: fsExistsSync } = await import("node:fs");
+      const distExists = fsExistsSync(".next-prod");
+      logger.info(
+        `Next.js dist dir: .next-prod (exists: ${String(distExists)})`,
+      );
+      if (!distExists) {
+        logger.error(
+          "No .next-prod build found — did 'vibe build' run during Docker build?",
+        );
+        return { success: false, message: "No .next-prod build found" };
+      }
       const nextProcess = spawn(
         "bun",
         ["run", "next", "start", "--port", String(nextPort)],
@@ -794,6 +805,25 @@ export class ServerStartRepositoryImpl implements ServerStartRepository {
         },
       );
       this.nextServerProcess = nextProcess;
+
+      // Pipe Next.js output so crashes are never silent
+      nextProcess.stdout?.on("data", (chunk: Buffer) => {
+        process.stdout.write(chunk);
+      });
+      nextProcess.stderr?.on("data", (chunk: Buffer) => {
+        process.stderr.write(chunk);
+      });
+      nextProcess.on("exit", (code, signal) => {
+        if (code !== 0 && code !== null) {
+          logger.error(
+            `Next.js exited unexpectedly with code ${code} — shutting down`,
+          );
+          process.exit(1);
+        } else if (signal && signal !== "SIGTERM") {
+          logger.error(`Next.js killed by signal ${signal} — shutting down`);
+          process.exit(1);
+        }
+      });
 
       // --- Start WS server (proxy or sidecar depending on mode) ---
       const wsHandle = startWebSocketServer({ port: wsPort, logger });

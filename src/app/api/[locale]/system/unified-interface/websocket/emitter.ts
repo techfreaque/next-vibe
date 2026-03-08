@@ -95,7 +95,9 @@ export function createEmitter<TEvents extends EventSchemas | never>(
     if (!result.success) {
       logger.warn(
         `[WS Emitter] Invalid payload for event "${event}" on channel "${channel}"`,
-        { errors: result.error.flatten().fieldErrors },
+        {
+          errors: result.error.flatten().fieldErrors,
+        },
       );
       return;
     }

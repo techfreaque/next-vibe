@@ -120,7 +120,9 @@ export async function electronBuildRepository(
     mkdirSync(stageAssetsDir, { recursive: true });
     execSync(
       `cp dist/electron/main.js dist/electron/preload.js ${stageElectronDir}/`,
-      { cwd: process.cwd() },
+      {
+        cwd: process.cwd(),
+      },
     );
     execSync(`cp ${ELECTRON_DIR}/assets/icon.png ${stageAssetsDir}/`, {
       cwd: process.cwd(),

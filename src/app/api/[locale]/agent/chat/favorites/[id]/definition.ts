@@ -421,7 +421,9 @@ const { PATCH } = createEndpoint({
                   const getEndpointData = apiClient.getEndpointData(
                     definitions.GET,
                     logger,
-                    { urlPathParams: { id: pathParams.id } },
+                    {
+                      urlPathParams: { id: pathParams.id },
+                    },
                   );
                   const characterModelSelection = getEndpointData?.success
                     ? getEndpointData.data.characterModelSelection

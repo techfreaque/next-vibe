@@ -121,7 +121,9 @@ export class ToolCallHandler {
 
         logger.info(
           "[AI Stream] ⏱️ Reasoning interrupted by tool call → </think>",
-          { messageId: currentAssistantMessageId },
+          {
+            messageId: currentAssistantMessageId,
+          },
         );
       }
 

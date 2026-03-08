@@ -223,7 +223,10 @@ export async function resolveFavorite(
 
   logger.warn(
     "[Headless AI] Favorite has no resolvable model — pass model explicitly",
-    { favoriteId, characterId: character },
+    {
+      favoriteId,
+      characterId: character,
+    },
   );
   return null;
 }

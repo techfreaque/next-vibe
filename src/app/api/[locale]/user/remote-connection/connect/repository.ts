@@ -304,7 +304,9 @@ export async function connectRemote(
       );
       logger.info(
         `[CONNECT] Added ${newTools.length.toString()} remote tools to allowedTools`,
-        { instanceId },
+        {
+          instanceId,
+        },
       );
     }
   } catch (toolWriteError) {

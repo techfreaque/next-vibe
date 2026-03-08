@@ -342,7 +342,9 @@ async function loadMetaForLocale(
 
   const mod = (await import(
     `@/app/api/[locale]/system/generated/endpoints-meta/${file}`
-  )) as { endpointsMeta: SkillEndpointInfo[] };
+  )) as {
+    endpointsMeta: SkillEndpointInfo[];
+  };
 
   return mod.endpointsMeta.filter(
     (ep) => !ep.allowedRoles.includes(ROLE_SKILL_OFF),

@@ -284,7 +284,9 @@ export async function processStreamingResponseWithToolCalls(
               logger.error(
                 `[${providerName}] Failed to parse SSE chunk`,
                 parseError(error),
-                { line },
+                {
+                  line,
+                },
               );
             }
           }

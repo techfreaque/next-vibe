@@ -120,7 +120,9 @@ export function useAddToFavorites({
         const cachedData = apiClient.getEndpointData(
           characterSingleDefinitions.GET,
           logger,
-          { urlPathParams: { id: characterId } },
+          {
+            urlPathParams: { id: characterId },
+          },
         );
 
         if (cachedData?.success) {

@@ -1058,7 +1058,9 @@ function CharacterFavoriteActions({
     const cachedData = apiClient.getEndpointData(
       characterSingleDefinitions.default.GET,
       logger,
-      { urlPathParams: { id: char.id } },
+      {
+        urlPathParams: { id: char.id },
+      },
     );
     let fullChar = cachedData?.success ? cachedData.data : undefined;
 

@@ -66,7 +66,7 @@ export async function sendMessage(
     rootFolderId: DefaultFolderId,
     subFolderId: string | null,
   ) => void,
-): Promise<void> {
+): Promise<{ success: boolean; createdThreadId: string | null }> {
   const {
     logger,
     aiStream,
@@ -308,8 +308,11 @@ export async function sendMessage(
 
     if (!finalThreadId) {
       logger.error("No thread ID available");
-      return;
+      return { success: false, createdThreadId: createdThreadIdForNewThread };
     }
+
+    // Snapshot URL before navigation — needed for revert on failure
+    const preNavigationUrl = window.location.href;
 
     // Navigate immediately BEFORE creating messages — only for new threads
     if (onThreadCreated && createdThreadIdForNewThread) {
@@ -317,7 +320,7 @@ export async function sendMessage(
     }
 
     // Use shared function for message creation and sending
-    await createAndSendUserMessage(
+    const streamStarted = await createAndSendUserMessage(
       {
         content,
         parentMessageId,
@@ -338,8 +341,70 @@ export async function sendMessage(
         setAttachments,
       },
     );
+
+    // If stream failed and we created a new thread optimistically, revert everything
+    if (!streamStarted && createdThreadIdForNewThread) {
+      logger.warn("Stream failed — reverting optimistic new thread", {
+        threadId: createdThreadIdForNewThread,
+      });
+
+      // Remove from chat store
+      useChatStore.getState().deleteThread(createdThreadIdForNewThread);
+
+      // Remove from threads sidebar cache
+      apiClient.updateEndpointData(
+        threadsDefinition.GET,
+        logger,
+        (oldData) => {
+          if (!oldData?.success) {
+            return oldData;
+          }
+          return success({
+            ...oldData.data,
+            threads: oldData.data.threads.filter(
+              (t) => t.id !== createdThreadIdForNewThread,
+            ),
+            totalCount: Math.max(0, oldData.data.totalCount - 1),
+          });
+        },
+        {
+          requestData: {
+            subFolderId: currentSubFolderId,
+            rootFolderId: currentRootFolderId,
+          },
+        },
+      );
+
+      // Remove from folder-contents cache
+      apiClient.updateEndpointData(
+        folderContentsDefinition.GET,
+        logger,
+        (old) => {
+          if (!old?.success) {
+            return old;
+          }
+          return success({
+            ...old.data,
+            items: old.data.items.filter(
+              (item) => item.id !== createdThreadIdForNewThread,
+            ),
+          });
+        },
+        {
+          urlPathParams: { rootFolderId: currentRootFolderId },
+          requestData: { subFolderId: currentSubFolderId },
+        },
+      );
+
+      // Revert navigation back to where the user was
+      window.history.replaceState(null, "", preNavigationUrl);
+      return { success: false, createdThreadId: createdThreadIdForNewThread };
+    }
+
+    return { success: true, createdThreadId: createdThreadIdForNewThread };
   } catch (error) {
     logger.error("Failed to send message", parseError(error));
+    return { success: false, createdThreadId: null };
   } finally {
     chatStore.setLoading(false);
   }

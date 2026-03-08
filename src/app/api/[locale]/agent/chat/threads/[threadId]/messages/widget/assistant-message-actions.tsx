@@ -311,7 +311,9 @@ export function AssistantMessageActions({
               <Span
                 title={t(
                   "widget.common.assistantMessageActions.cacheWriteTitle",
-                  { tokens: cacheWriteTokens.toLocaleString() },
+                  {
+                    tokens: cacheWriteTokens.toLocaleString(),
+                  },
                 )}
                 className="text-sky-500/70"
               >

@@ -435,11 +435,15 @@ type Field4_PlanIdOutput = z.output<Field4_PlanIdSchema>;
 type Field4_Output = z.output<Field4_Schema>;
 // Should be: { planId: "test-plan" }
 const _field4_output: AssertAssignable<Field4_Output, { planId: "test-plan" }> =
-  { planId: "test-plan" };
+  {
+    planId: "test-plan",
+  };
 const _field4_reverse: AssertAssignable<
   { planId: "test-plan" },
   Field4_Output
-> = { planId: "test-plan" };
+> = {
+  planId: "test-plan",
+};
 
 // Test Field 5: objectField with multiple request children
 const field5_objectWithMultipleRequestChildren = objectField(
@@ -637,11 +641,15 @@ type Test1_RequestOutput =
 const _test1_request: AssertAssignable<
   Test1_RequestOutput,
   { planId: "test-plan" }
-> = { planId: "test-plan" };
+> = {
+  planId: "test-plan",
+};
 const _test1_reverse: AssertAssignable<
   { planId: "test-plan" },
   Test1_RequestOutput
-> = { planId: "test-plan" };
+> = {
+  planId: "test-plan",
+};
 
 // Test 2: Single request field with z.enum
 const testSingleRequestEnum = createEndpoint({
@@ -718,11 +726,15 @@ type Test2_RequestOutput =
 const _test2_request: AssertAssignable<
   Test2_RequestOutput,
   { interval: "monthly" | "yearly" }
-> = { interval: "monthly" };
+> = {
+  interval: "monthly",
+};
 const _test2_reverse: AssertAssignable<
   { interval: "monthly" | "yearly" },
   Test2_RequestOutput
-> = { interval: "yearly" };
+> = {
+  interval: "yearly",
+};
 
 // Test 3: Single response field with z.string
 const testSingleResponseString = createEndpoint({
@@ -798,11 +810,15 @@ type Test3_ResponseOutput =
 const _test3_response: AssertAssignable<
   Test3_ResponseOutput,
   { message: string }
-> = { message: "hello" };
+> = {
+  message: "hello",
+};
 const _test3_reverse: AssertAssignable<
   { message: string },
   Test3_ResponseOutput
-> = { message: "world" };
+> = {
+  message: "world",
+};
 
 // Test 4: Multiple request fields mixed types
 const testMultipleRequestFields = createEndpoint({

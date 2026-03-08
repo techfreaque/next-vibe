@@ -353,7 +353,10 @@ export class StreamPartHandler {
           streamContext.waitingForRemoteResult = false;
           logger.info(
             "[AI Stream] Remote tool wait mode — will pause stream at finish-step",
-            { toolName: part.toolName, toolCallId: part.toolCallId },
+            {
+              toolName: part.toolName,
+              toolCallId: part.toolCallId,
+            },
           );
         }
       }

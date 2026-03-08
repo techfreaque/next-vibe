@@ -170,7 +170,11 @@ export class ResumeStreamRepository {
           if (!resolvedModel) {
             logger.error(
               "[ResumeStream] No model resolved — cannot revive stream",
-              { threadId, favoriteId, modelId },
+              {
+                threadId,
+                favoriteId,
+                modelId,
+              },
             );
             return fail({
               message: t("errors.unexpectedError", {
@@ -396,7 +400,10 @@ export class ResumeStreamRepository {
         } else {
           logger.warn(
             "[ResumeStream] toolMessageId provided but message/toolCall not found",
-            { threadId, toolMessageId },
+            {
+              threadId,
+              toolMessageId,
+            },
           );
         }
       }

@@ -48,7 +48,9 @@ export function SelectorContent({ locale }: SelectorContentProps): JSX.Element {
 
   const { favorites, isInitialLoading: favoritesLoading } = useChatFavorites(
     logger,
-    { activeFavoriteId: null },
+    {
+      activeFavoriteId: null,
+    },
   );
 
   // Local state

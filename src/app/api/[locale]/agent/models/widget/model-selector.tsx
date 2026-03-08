@@ -129,9 +129,7 @@ function ModelCard({
           >
             {model.name}
             {providerSuffix ? (
-              <Span className="text-muted-foreground font-normal">
-                {` (${providerSuffix})`}
-              </Span>
+              <Span className="text-muted-foreground font-normal">{` (${providerSuffix})`}</Span>
             ) : null}
           </Span>
           {isBest && (

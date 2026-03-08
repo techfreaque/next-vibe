@@ -250,7 +250,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       if (activeThreadId) {
         startStream(activeThreadId, logger);
       }
-      await messageOps.sendMessage(params, onNewThread);
+      return messageOps.sendMessage(params, onNewThread);
     },
     [activeThreadId, startStream, logger, messageOps],
   );

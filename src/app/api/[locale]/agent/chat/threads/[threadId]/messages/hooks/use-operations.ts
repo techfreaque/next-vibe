@@ -52,7 +52,7 @@ export interface MessageOperations {
       rootFolderId: DefaultFolderId,
       subFolderId: string | null,
     ) => void,
-  ) => Promise<void>;
+  ) => Promise<{ success: boolean; createdThreadId: string | null }>;
   retryMessage: (
     messageId: string,
     attachments: File[] | undefined,
@@ -157,8 +157,8 @@ export function useMessageOperations(
         rootFolderId: DefaultFolderId,
         subFolderId: string | null,
       ) => void,
-    ): Promise<void> => {
-      await sendMessageOp(
+    ): Promise<{ success: boolean; createdThreadId: string | null }> => {
+      return sendMessageOp(
         params,
         {
           logger,

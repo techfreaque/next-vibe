@@ -14,14 +14,18 @@ import {
 } from "next-vibe/shared/types/response.schema";
 
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+import { publishWsEvent } from "@/app/api/[locale]/system/unified-interface/websocket/emitter";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { ChatMessageRole } from "../../chat/enum";
+import { buildMessagesChannel } from "../../chat/threads/[threadId]/messages/channel";
 import {
   createMessagesEmitter,
   type WsEmitCallback,
 } from "../../chat/threads/[threadId]/messages/emitter";
 import { createStreamEvent } from "../../chat/threads/[threadId]/messages/events";
+import { createErrorMessage } from "../../chat/threads/[threadId]/messages/repository";
 import { scopedTranslation as sttScopedTranslation } from "../../speech-to-text/i18n";
 import type {
   AiStreamPostRequestOutput,
@@ -29,6 +33,7 @@ import type {
 } from "../stream/definition";
 import type { AiStreamT } from "../stream/i18n";
 import { clearStreamingState } from "./core/stream-registry";
+import { serializeError } from "./error-utils";
 import { CompactingHandler } from "./handlers/compacting-handler";
 import { InitialEventsHandler } from "./handlers/initial-events-handler";
 import { MessageContextBuilder } from "./handlers/message-context-builder";
@@ -167,6 +172,50 @@ export class AiStreamRepository {
     });
 
     if (!setupResult.success) {
+      // Emit error to chat thread if we have a threadId — setup failures (e.g. insufficient
+      // credits, bad model) should appear as error bubbles in the thread, not silently fail.
+      const threadId = data.threadId;
+      if (threadId && !user.isPublic && "id" in user) {
+        try {
+          const errorMessageId = crypto.randomUUID();
+          const errorContent = serializeError(setupResult);
+          const errorType = setupResult.errorType
+            ? `${setupResult.errorType.errorCode}`
+            : "SETUP_ERROR";
+          await createErrorMessage({
+            messageId: errorMessageId,
+            threadId,
+            content: errorContent,
+            errorType,
+            parentId: data.parentMessageId ?? null,
+            userId: user.id,
+            sequenceId: null,
+            logger,
+          });
+          publishWsEvent(
+            {
+              channel: buildMessagesChannel(threadId),
+              event: "message-created",
+              data: createStreamEvent.messageCreated({
+                messageId: errorMessageId,
+                threadId,
+                role: ChatMessageRole.ERROR,
+                content: errorContent,
+                parentId: data.parentMessageId ?? null,
+                sequenceId: null,
+                model: null,
+                character: null,
+              }).data,
+            },
+            logger,
+          );
+        } catch (emitErr) {
+          logger.warn("[AiStream] Failed to emit setup error to chat", {
+            threadId,
+            error: emitErr instanceof Error ? emitErr.message : String(emitErr),
+          });
+        }
+      }
       return setupResult;
     }
 

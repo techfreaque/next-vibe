@@ -29,14 +29,22 @@ fi
 echo "Starting new app container..."
 $COMPOSE up -d app
 
-# Wait for the new container to be healthy (up to 60s)
+# Wait for the new container to be healthy (up to 120s)
 echo "Waiting for new app to respond..."
 TRIES=0
-MAX_TRIES=30
-until curl -sf http://localhost:3000 > /dev/null 2>&1; do
+MAX_TRIES=60
+until $COMPOSE exec -T app bun -e "fetch('http://localhost:3000').then(r=>process.exit(r.ok||r.status===404?0:1)).catch(()=>process.exit(1))" > /dev/null 2>&1; do
+  # Bail early if container has already exited
+  STATUS=$($COMPOSE ps -q app | xargs docker inspect --format='{{.State.Status}}' 2>/dev/null || echo "missing")
+  if [ "$STATUS" = "exited" ] || [ "$STATUS" = "missing" ]; then
+    echo "ERROR: App container exited during startup. Check logs:"
+    echo "  $COMPOSE logs --tail=50 app"
+    exit 1
+  fi
   TRIES=$((TRIES + 1))
   if [ "$TRIES" -ge "$MAX_TRIES" ]; then
-    echo "WARNING: New app not responding after ${MAX_TRIES}s. Check logs:"
+    WAIT_SECS=$((MAX_TRIES * 2))
+    echo "ERROR: New app not responding after ${WAIT_SECS}s. Check logs:"
     echo "  $COMPOSE logs --tail=50 app"
     exit 1
   fi

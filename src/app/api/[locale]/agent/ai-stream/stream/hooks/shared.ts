@@ -60,7 +60,7 @@ export interface MessageOperationDeps {
 export async function createAndSendUserMessage(
   params: CreateMessageParams,
   deps: MessageOperationDeps,
-): Promise<void> {
+): Promise<boolean> {
   const {
     logger,
     aiStream,
@@ -207,7 +207,7 @@ export async function createAndSendUserMessage(
 
     // Start AI stream (same for all operations)
     // POST is fire-and-forget — WS events handled by useMessagesSubscription
-    await aiStream.startStream({
+    const streamStarted = await aiStream.startStream({
       operation,
       rootFolderId: currentRootFolderId,
       subFolderId: currentSubFolderId ?? null,
@@ -228,13 +228,24 @@ export async function createAndSendUserMessage(
       timezone,
     });
 
+    if (!streamStarted) {
+      // Revert optimistic user message — server rejected the request.
+      // Input is intentionally left untouched so the user can retry.
+      if (newMessageId) {
+        chatStore.deleteMessage(newMessageId);
+      }
+      return false;
+    }
+
     // Clear input after POST succeeds (server accepted the message)
     if (operation === "send") {
       setInput?.("");
       setAttachments?.([]);
     }
+    return true;
   } catch (error) {
     logger.error(`Failed to ${operation} message`, parseError(error));
+    return false;
   } finally {
     chatStore.setLoading(false);
   }

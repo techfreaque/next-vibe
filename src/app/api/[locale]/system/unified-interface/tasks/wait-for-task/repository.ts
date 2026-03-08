@@ -10,7 +10,7 @@
 
 import "server-only";
 
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import {
   ErrorResponseTypes,
@@ -93,6 +93,29 @@ export async function waitForTask(
         taskId,
         status: task.lastExecutionStatus,
       });
+
+      // Cancel any pending resume-stream task and delete the original wakeUp task row —
+      // the AI is handling the result inline so all context is now in the thread.
+      try {
+        await db
+          .delete(cronTasks)
+          .where(
+            sql`${cronTasks.tags} @> ${JSON.stringify([taskId])}::jsonb AND ${cronTasks.routeId} = 'resume-stream'`,
+          );
+        await db.delete(cronTasks).where(eq(cronTasks.id, taskId));
+        logger.info(
+          "[WaitForTask] Cleaned up wakeUp task and pending resume-stream",
+          { taskId },
+        );
+      } catch (cleanupErr) {
+        logger.warn("[WaitForTask] Cleanup failed (non-fatal)", {
+          taskId,
+          error:
+            cleanupErr instanceof Error
+              ? cleanupErr.message
+              : String(cleanupErr),
+        });
+      }
 
       return success({
         status: task.lastExecutionStatus,

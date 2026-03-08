@@ -1851,7 +1851,11 @@ export class SubscriptionRepository {
       if (orderUserId !== userId) {
         logger.warn(
           "User mismatch on NOWPayments success redirect — ignoring",
-          { npId, orderUserId, requestUserId: userId },
+          {
+            npId,
+            orderUserId,
+            requestUserId: userId,
+          },
         );
         return;
       }
@@ -1895,7 +1899,10 @@ export class SubscriptionRepository {
       if (meta.type !== "subscription") {
         logger.info(
           "NOWPayments success redirect: not a subscription, skipping",
-          { npId, type: meta.type },
+          {
+            npId,
+            type: meta.type,
+          },
         );
         return;
       }

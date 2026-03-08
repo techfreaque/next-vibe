@@ -126,8 +126,7 @@ export class RebuildRepositoryImpl implements RebuildRepositoryInterface {
       // Step 3: Next.js build to staging dir, then atomic swap
       const cwd = process.cwd();
       const stagingDir = ".next-rebuild";
-      // Production uses a separate dist dir so rebuilds don't destroy vibe dev's .next cache
-      const prodDir = [".next-prod"].join("");
+      const prodDir = ".next-prod";
       const oldDir = ".next-old";
 
       try {

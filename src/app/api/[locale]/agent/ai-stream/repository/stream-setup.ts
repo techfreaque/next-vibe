@@ -610,7 +610,9 @@ export async function setupAiStream(params: {
         if (defaultChar?.activeTools) {
           logger.debug(
             "[Setup] Tool config resolved from default character config",
-            { characterId: data.character },
+            {
+              characterId: data.character,
+            },
           );
           return {
             activeTools: normalizeToolConfig(defaultChar.activeTools),

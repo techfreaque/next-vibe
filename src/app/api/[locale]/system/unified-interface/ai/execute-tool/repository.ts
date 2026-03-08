@@ -303,21 +303,11 @@ export class RouteExecuteRepository {
           config: {},
         });
 
-        // Update the cron task row with the final execution status so that
-        // wait-for-task can detect completion without polling cronTaskExecutions.
-        await db
-          .update(cronTasks)
-          .set({
-            lastExecutionStatus: finalStatus,
-            lastExecutedAt: completedAt,
-            lastExecutionDuration: completedAt.getTime() - startedAt.getTime(),
-            enabled: false,
-            updatedAt: completedAt,
-          })
-          .where(eq(cronTasks.id, taskId));
-
         // detach: result stays in task history only — never injected into thread.
+        // Delete the cron task row immediately — nobody needs to poll it.
         // Emit TASK_COMPLETED WS so UI bubble updates, but no deferred message.
+        await db.delete(cronTasks).where(eq(cronTasks.id, taskId));
+
         if (effectiveToolMessageId && effectiveThreadId && !user.isPublic) {
           await handleTaskCompletion({
             toolMessageId: effectiveToolMessageId,

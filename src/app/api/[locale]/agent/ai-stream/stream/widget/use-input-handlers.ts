@@ -42,7 +42,7 @@ interface UseInputHandlersProps {
       rootFolderId: DefaultFolderId,
       subFolderId: string | null,
     ) => void,
-  ) => Promise<void>;
+  ) => Promise<{ success: boolean; createdThreadId: string | null }>;
   setInput: (input: string) => void;
   locale: CountryLanguage;
   logger: EndpointLogger;
@@ -72,6 +72,9 @@ export function useInputHandlers({
 }: UseInputHandlersProps): UseInputHandlersReturn {
   const setNavigation = useChatNavigationStore((s) => s.setNavigation);
   const setLeafMessageId = useChatNavigationStore((s) => s.setLeafMessageId);
+  const navActiveThreadId = useChatNavigationStore((s) => s.activeThreadId);
+  const navRootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
+  const navSubFolderId = useChatNavigationStore((s) => s.currentSubFolderId);
 
   const submitMessage = useCallback(async () => {
     logger.debug("Chat", "submitMessage called", {
@@ -83,7 +86,16 @@ export function useInputHandlers({
 
     if (isValidInput(input) && !isLoading) {
       logger.debug("Chat", "submitMessage calling sendMessage");
-      await sendMessage(
+
+      // Snapshot navigation state before sending — needed to revert on failure
+      // These closure values are captured at render time (pre-navigation state).
+      const preNavSnapshot = {
+        activeThreadId: navActiveThreadId,
+        currentRootFolderId: navRootFolderId,
+        currentSubFolderId: navSubFolderId,
+      };
+
+      const result = await sendMessage(
         { content: input, attachments },
         (threadId, rootFolderId, subFolderId) => {
           // Navigate to the newly created thread
@@ -112,10 +124,22 @@ export function useInputHandlers({
           window.history.replaceState(null, "", url);
         },
       );
+
+      // If the stream failed and a new thread was optimistically created, revert navigation store
+      if (!result.success && result.createdThreadId) {
+        setNavigation(preNavSnapshot);
+        logger.warn(
+          "Chat",
+          "Stream failed — reverted navigation store to pre-send state",
+        );
+      }
+
       // Clear the draft after successful send
-      logger.debug("Chat", "submitMessage completed, clearing draft");
-      await clearDraft(draftKey, logger);
-      logger.debug("Chat", "Draft cleared");
+      if (result.success) {
+        logger.debug("Chat", "submitMessage completed, clearing draft");
+        await clearDraft(draftKey, logger);
+        logger.debug("Chat", "Draft cleared");
+      }
     } else {
       logger.debug("Chat", "submitMessage blocked");
     }
@@ -129,6 +153,9 @@ export function useInputHandlers({
     draftKey,
     setNavigation,
     setLeafMessageId,
+    navActiveThreadId,
+    navRootFolderId,
+    navSubFolderId,
   ]);
 
   /**
@@ -147,7 +174,14 @@ export function useInputHandlers({
         logger.debug("Chat", "submitWithContent calling sendMessage");
         // Also update the input state for UI consistency
         setInput(content);
-        await sendMessage(
+
+        const preNavSnapshot = {
+          activeThreadId: navActiveThreadId,
+          currentRootFolderId: navRootFolderId,
+          currentSubFolderId: navSubFolderId,
+        };
+
+        const result = await sendMessage(
           { content, attachments },
           (threadId, rootFolderId, subFolderId) => {
             logger.debug("Chat", "Navigating to newly created thread", {
@@ -169,9 +203,16 @@ export function useInputHandlers({
             window.history.pushState(null, "", url);
           },
         );
-        await clearDraft(draftKey, logger);
-        // Clear input after send
-        setInput("");
+
+        if (!result.success && result.createdThreadId) {
+          setNavigation(preNavSnapshot);
+        }
+
+        if (result.success) {
+          await clearDraft(draftKey, logger);
+          // Clear input after send
+          setInput("");
+        }
       } else {
         logger.debug("Chat", "submitWithContent blocked", { isLoading });
       }
@@ -186,6 +227,9 @@ export function useInputHandlers({
       draftKey,
       setNavigation,
       setLeafMessageId,
+      navActiveThreadId,
+      navRootFolderId,
+      navSubFolderId,
     ],
   );
 
@@ -207,7 +251,14 @@ export function useInputHandlers({
       }
 
       logger.debug("Chat", "submitWithAudio calling sendMessage with audio");
-      await sendMessage(
+
+      const preNavSnapshot = {
+        activeThreadId: navActiveThreadId,
+        currentRootFolderId: navRootFolderId,
+        currentSubFolderId: navSubFolderId,
+      };
+
+      const result = await sendMessage(
         {
           content: "", // Server will use transcribed audio as content
           audioInput: { file: audioFile },
@@ -234,7 +285,13 @@ export function useInputHandlers({
           window.history.pushState(null, "", url);
         },
       );
-      await clearDraft(draftKey, logger);
+
+      if (!result.success && result.createdThreadId) {
+        setNavigation(preNavSnapshot);
+      }
+      if (result.success) {
+        await clearDraft(draftKey, logger);
+      }
     },
     [
       isLoading,
@@ -245,6 +302,9 @@ export function useInputHandlers({
       draftKey,
       setNavigation,
       setLeafMessageId,
+      navActiveThreadId,
+      navRootFolderId,
+      navSubFolderId,
     ],
   );
 

@@ -155,7 +155,9 @@ export function useTTSAudio({
 
       logger.debug(
         `TTS: Fetching chunk ${chunkIndex + 1}/${refs.chunks.length}`,
-        { chunkLength: chunkText.length },
+        {
+          chunkLength: chunkText.length,
+        },
       );
 
       // Create new AbortController for this chunk

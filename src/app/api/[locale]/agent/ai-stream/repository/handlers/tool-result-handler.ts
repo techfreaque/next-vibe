@@ -148,7 +148,10 @@ export class ToolResultHandler {
     if (!pendingToolMessage) {
       logger.error(
         "[AI Stream] Tool result received but no pending message found",
-        { toolCallId: part.toolCallId, toolName: part.toolName },
+        {
+          toolCallId: part.toolCallId,
+          toolName: part.toolName,
+        },
       );
       return null;
     }
@@ -300,7 +303,11 @@ export class ToolResultHandler {
         } catch (err) {
           logger.error(
             "[AI Stream] Failed to call handleTaskCompletion for background task",
-            { toolMessageId, bgTaskId, error: parseError(err).message },
+            {
+              toolMessageId,
+              bgTaskId,
+              error: parseError(err).message,
+            },
           );
         }
       })();

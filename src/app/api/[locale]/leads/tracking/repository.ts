@@ -899,7 +899,10 @@ export class LeadTrackingRepository {
           logger.error(
             "Failed to link referral code to lead",
             parseError(error).message,
-            { ref, leadId: currentLeadId },
+            {
+              ref,
+              leadId: currentLeadId,
+            },
           );
         }
       }

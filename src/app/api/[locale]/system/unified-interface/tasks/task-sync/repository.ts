@@ -307,7 +307,9 @@ export async function pullFromRemote(
     // Get local capabilities version (build-time constant)
     const { CAPABILITIES_VERSION } =
       await import("@/app/api/[locale]/system/generated/remote-capabilities/version").catch(
-        () => ({ CAPABILITIES_VERSION: "unknown" }),
+        () => ({
+          CAPABILITIES_VERSION: "unknown",
+        }),
       );
 
     let totalPulled = 0;
@@ -967,7 +969,9 @@ export async function syncTasks(
   let capabilitiesPayload: string | null = null;
   const { CAPABILITIES_VERSION } =
     await import("@/app/api/[locale]/system/generated/remote-capabilities/version").catch(
-      () => ({ CAPABILITIES_VERSION: "unknown" }),
+      () => ({
+        CAPABILITIES_VERSION: "unknown",
+      }),
     );
 
   const capVersionDiffers = data.capabilitiesVersion !== CAPABILITIES_VERSION;

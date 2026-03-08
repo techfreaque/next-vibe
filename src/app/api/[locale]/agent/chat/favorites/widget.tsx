@@ -362,7 +362,9 @@ const SortableVariantRow = React.memo(function SortableVariantRow({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: item.id });
+  } = useSortable({
+    id: item.id,
+  });
 
   const isActive = Boolean(item.activeBadge);
 
@@ -526,7 +528,9 @@ const SortableGroup = React.memo(function SortableGroup({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: group.id });
+  } = useSortable({
+    id: group.id,
+  });
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -933,7 +937,9 @@ function AddVariantButton({
       const cachedData = apiClient.getEndpointData(
         characterSingleDefinitions.default.GET,
         logger,
-        { urlPathParams: { id: characterId } },
+        {
+          urlPathParams: { id: characterId },
+        },
       );
 
       if (cachedData?.success) {

@@ -8,6 +8,7 @@
  * by useMessagesSubscription in the messages widget.
  */
 
+import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { toast } from "next-vibe-ui/hooks/use-toast";
 import { useCallback } from "react";
 
@@ -34,7 +35,7 @@ import { useAIStreamStore } from "./store";
  * Hook return type
  */
 export interface UseAIStreamReturn {
-  startStream: (data: AiStreamPostRequestOutput) => Promise<void>;
+  startStream: (data: AiStreamPostRequestOutput) => Promise<boolean>;
   cancelStream: (threadId: string) => Promise<void>;
   isStreaming: boolean;
   isStreamingThread: (threadId: string) => boolean;
@@ -69,7 +70,7 @@ export function useAIStream(): UseAIStreamReturn {
    * WS subscription is handled by useMessagesSubscription (always-on).
    */
   const startStream = useCallback(
-    async (data: AiStreamPostRequestOutput): Promise<void> => {
+    async (data: AiStreamPostRequestOutput): Promise<boolean> => {
       const threadId = data.threadId ?? "";
 
       // Reset audio queue to prevent old audio from playing
@@ -103,9 +104,36 @@ export function useAIStream(): UseAIStreamReturn {
         messageHistoryLength: data.messageHistory?.length ?? 0,
       });
 
-      const result = await streamMutation.mutateAsync({
-        requestData: data,
-      });
+      let result: Awaited<ReturnType<typeof streamMutation.mutateAsync>>;
+      try {
+        result = await streamMutation.mutateAsync({
+          requestData: data,
+        });
+      } catch (err) {
+        // mutateAsync throws the full ErrorResponseType on non-success responses
+        const failResult = err as ErrorResponseType;
+        logger.error("Stream request failed", { message: failResult.message });
+
+        const activeThreadId = data.threadId;
+        if (activeThreadId) {
+          addErrorMessageToChat(
+            activeThreadId,
+            serializeError(failResult),
+            "HTTP_ERROR",
+            null,
+          );
+        }
+
+        toast({
+          title: t("error.title"),
+          description: t(failResult.message as Parameters<typeof t>[0]),
+          variant: "destructive",
+          duration: Infinity,
+        });
+
+        store.stopStream(threadId);
+        return false;
+      }
 
       if (!result.success) {
         logger.error("Stream request failed", {
@@ -130,7 +158,7 @@ export function useAIStream(): UseAIStreamReturn {
         });
 
         store.stopStream(threadId);
-        return;
+        return false;
       }
 
       // POST returned successfully — stream is now running on the server.
@@ -138,6 +166,7 @@ export function useAIStream(): UseAIStreamReturn {
       logger.info("Stream triggered successfully (fire-and-forget)", {
         threadId,
       });
+      return true;
     },
     [logger, store, t, streamMutation],
   );
