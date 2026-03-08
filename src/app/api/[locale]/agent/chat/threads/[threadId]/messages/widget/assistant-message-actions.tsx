@@ -44,6 +44,9 @@ interface AssistantMessageActionsProps {
   logger: EndpointLogger;
   promptTokens: number | null;
   completionTokens: number | null;
+  cachedInputTokens: number | null;
+  cacheWriteTokens: number | null;
+  timeToFirstToken: number | null;
   creditCost: number | null;
   /** Hide TTS and interactive buttons. Used for read-only demos. */
   readOnly: boolean;
@@ -69,6 +72,9 @@ export function AssistantMessageActions({
   logger,
   promptTokens,
   completionTokens,
+  cachedInputTokens,
+  cacheWriteTokens,
+  timeToFirstToken,
   creditCost,
   readOnly,
   user,
@@ -264,12 +270,68 @@ export function AssistantMessageActions({
           )}
           {(promptTokens !== null || completionTokens !== null) && (
             <Span
-              title={t("widget.common.assistantMessageActions.tokensUsed")}
+              title={`${t("widget.common.assistantMessageActions.inputTokens")}: ${(promptTokens ?? 0).toLocaleString()} | ${t("widget.common.assistantMessageActions.outputTokens")}: ${(completionTokens ?? 0).toLocaleString()}${cachedInputTokens ? ` | ${t("widget.common.assistantMessageActions.cachedTokens")}: ${cachedInputTokens.toLocaleString()}` : ""}${cacheWriteTokens ? ` | ${t("widget.common.assistantMessageActions.cacheWriteTokens")}: ${cacheWriteTokens.toLocaleString()}` : ""}`}
               className="text-muted-foreground/70"
             >
               •{" "}
-              {((promptTokens ?? 0) + (completionTokens ?? 0)).toLocaleString()}{" "}
+              {(
+                (promptTokens ?? 0) +
+                (completionTokens ?? 0) +
+                (cacheWriteTokens ?? 0)
+              ).toLocaleString()}{" "}
               {t("widget.common.assistantMessageActions.tokens")}
+            </Span>
+          )}
+          {cachedInputTokens !== null &&
+            cachedInputTokens !== undefined &&
+            cachedInputTokens > 0 &&
+            promptTokens !== null &&
+            promptTokens > 0 &&
+            cachedInputTokens <= promptTokens && (
+              <Span
+                title={t(
+                  "widget.common.assistantMessageActions.cachedPercentTitle",
+                  {
+                    percent: Math.round(
+                      (cachedInputTokens / promptTokens) * 100,
+                    ),
+                  },
+                )}
+                className="text-emerald-500/70"
+              >
+                •{" "}
+                {t("widget.common.assistantMessageActions.cachedPercent", {
+                  percent: Math.round((cachedInputTokens / promptTokens) * 100),
+                })}
+              </Span>
+            )}
+          {cacheWriteTokens !== null &&
+            cacheWriteTokens !== undefined &&
+            cacheWriteTokens > 0 && (
+              <Span
+                title={t(
+                  "widget.common.assistantMessageActions.cacheWriteTitle",
+                  { tokens: cacheWriteTokens.toLocaleString() },
+                )}
+                className="text-sky-500/70"
+              >
+                •{" "}
+                {t("widget.common.assistantMessageActions.cacheWrite", {
+                  tokens: cacheWriteTokens.toLocaleString(),
+                })}
+              </Span>
+            )}
+          {timeToFirstToken !== null && timeToFirstToken !== undefined && (
+            <Span
+              title={t(
+                "widget.common.assistantMessageActions.timeToFirstTokenTitle",
+              )}
+              className="text-muted-foreground/70"
+            >
+              •{" "}
+              {t("widget.common.assistantMessageActions.timeToFirstToken", {
+                seconds: (timeToFirstToken / 1000).toFixed(1),
+              })}
             </Span>
           )}
         </Div>

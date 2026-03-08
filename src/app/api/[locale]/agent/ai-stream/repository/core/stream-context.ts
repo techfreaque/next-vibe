@@ -51,6 +51,9 @@ export class StreamContext {
   // Loop control - set to true when model requests to stop the tool loop
   shouldStopLoop = false;
 
+  // Time-to-first-token tracking: set when first text delta arrives
+  streamStartTime: number | null = null;
+
   // Parent chain
   currentParentId: string | null;
 

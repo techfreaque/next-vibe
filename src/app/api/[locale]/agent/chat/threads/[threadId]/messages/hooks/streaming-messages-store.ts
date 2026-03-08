@@ -33,6 +33,9 @@ export interface StreamingMessage {
   promptTokens?: number;
   completionTokens?: number;
   totalTokens?: number;
+  cachedInputTokens?: number;
+  cacheWriteTokens?: number;
+  timeToFirstToken?: number;
   finishReason?: string | null;
   creditCost?: number;
   isStreaming: boolean;
@@ -57,6 +60,9 @@ interface StreamingMessagesState {
     promptTokens: number,
     completionTokens: number,
     totalTokens: number,
+    cachedInputTokens: number,
+    cacheWriteTokens: number,
+    timeToFirstToken: number | null,
     creditCost: number,
     finishReason: string | null,
   ) => void;
@@ -115,6 +121,9 @@ export const useStreamingMessagesStore = create<StreamingMessagesState>(
       promptTokens: number,
       completionTokens: number,
       totalTokens: number,
+      cachedInputTokens: number,
+      cacheWriteTokens: number,
+      timeToFirstToken: number | null,
       creditCost: number,
       finishReason: string | null,
     ): void =>
@@ -131,6 +140,10 @@ export const useStreamingMessagesStore = create<StreamingMessagesState>(
               promptTokens,
               completionTokens,
               totalTokens,
+              cachedInputTokens,
+              cacheWriteTokens:
+                cacheWriteTokens > 0 ? cacheWriteTokens : undefined,
+              timeToFirstToken: timeToFirstToken ?? undefined,
               creditCost,
               finishReason,
             },

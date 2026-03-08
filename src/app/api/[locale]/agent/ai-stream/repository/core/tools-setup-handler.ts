@@ -9,6 +9,7 @@ import {
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
 
+import { WAIT_FOR_TASK_ALIAS } from "../../../../system/unified-interface/tasks/wait-for-task/constants";
 import type { ToolExecutionContext } from "../../../chat/config";
 import { getDefaultToolIds } from "../../../chat/constants";
 import type { ToolCall } from "../../../chat/db";
@@ -105,9 +106,20 @@ export class ToolsSetupHandler {
     // AI can discover other tools via tool-help and execute them via fallback.
     const isAgentMode = !params.visibleTools;
 
-    const visibleToolIds = params.visibleTools
+    // Build visible tool IDs from client request, or use defaults in agent mode.
+    // Always inject wait-for-task so AI can pause on background tasks regardless
+    // of the user's saved tool list (it may predate the tool being added to defaults).
+    const visibleToolIdsFromClient = params.visibleTools
       ? params.visibleTools.map((t) => getFullPath(t.toolId) ?? t.toolId)
       : [...getDefaultToolIds()]; // agent mode = default tool set
+
+    const waitForTaskFullPath =
+      getFullPath(WAIT_FOR_TASK_ALIAS) ?? WAIT_FOR_TASK_ALIAS;
+    const visibleToolIds =
+      visibleToolIdsFromClient.includes(waitForTaskFullPath) ||
+      visibleToolIdsFromClient.includes(WAIT_FOR_TASK_ALIAS)
+        ? visibleToolIdsFromClient
+        : [...visibleToolIdsFromClient, waitForTaskFullPath];
 
     const toolsResult = await loadTools({
       requestedTools: visibleToolIds,

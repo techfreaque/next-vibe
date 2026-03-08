@@ -44,6 +44,7 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 
 import { getRouteHandler } from "../../../generated/route-handlers";
+import type { CallbackModeValue } from "../../ai/execute-tool/constants";
 import { Platform } from "../../shared/types/platform";
 import { getFullPath } from "../../shared/utils/path";
 import { splitTaskArgs } from "../cron/arg-splitter";
@@ -54,6 +55,7 @@ import {
   scopedTranslation,
   scopedTranslation as tasksScopedTranslation,
 } from "../i18n";
+import { handleTaskCompletion } from "../task-completion-handler";
 import { pushStatusToRemote } from "../task-sync/repository";
 import type { JsonValue } from "../unified-runner/types";
 import type {
@@ -828,6 +830,37 @@ export class PulseHealthRepository {
                 updatedAt: new Date(),
               })
               .where(eq(cronTasksTable.id, dbTask.id));
+
+            // If task has callback context (set by wait-for-task or execute-tool AI path),
+            // emit TASK_COMPLETED WS event + backfill tool message + schedule resume-stream.
+            const taskCallbackMode =
+              (taskInput.callbackMode as CallbackModeValue | undefined) ?? null;
+            const taskThreadId =
+              (taskInput.threadId as string | undefined) ?? null;
+            const taskToolMessageId =
+              (taskInput.toolMessageId as string | undefined) ?? null;
+            const completionUserId = cronUser.id;
+
+            if (taskToolMessageId && completionUserId) {
+              void handleTaskCompletion({
+                toolMessageId: taskToolMessageId,
+                threadId: taskThreadId,
+                callbackMode: taskCallbackMode,
+                status: finalStatus,
+                output: taskSucceeded
+                  ? ((finalOutput as JsonValue) ?? null)
+                  : null,
+                taskId: dbTask.id,
+                taskInput: taskInput as Record<string, JsonValue>,
+                userId: completionUserId,
+                logger,
+              }).catch((completionErr: Error) => {
+                logger.error("handleTaskCompletion failed in pulse", {
+                  taskId: dbTask.id,
+                  error: completionErr.message,
+                });
+              });
+            }
 
             // Fire-and-forget: push final status to remote
             if (dbTask.targetInstance) {

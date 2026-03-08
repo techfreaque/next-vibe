@@ -47,27 +47,22 @@ export class VoteRepositoryClient {
         });
       }
 
-      // Current vote details, filtered to remove current incognito user's entry
-      const currentVoteDetails = Array.isArray(message.metadata?.voteDetails)
-        ? (
-            message.metadata.voteDetails as Array<{
-              userId: string;
-              vote: string;
-              timestamp: number;
-            }>
-          ).filter((v) => v.userId !== INCOGNITO_USER_ID)
+      interface VoteDetail {
+        userId: string;
+        vote: "up" | "down";
+        timestamp: number;
+      }
+      const rawDetails = Array.isArray(message.metadata?.voteDetails)
+        ? (message.metadata.voteDetails as VoteDetail[])
         : [];
 
+      // Current vote details, filtered to remove current incognito user's entry
+      const currentVoteDetails: VoteDetail[] = rawDetails.filter(
+        (v) => v.userId !== INCOGNITO_USER_ID,
+      );
+
       // Find previous vote to calculate delta
-      const prevDetail = Array.isArray(message.metadata?.voteDetails)
-        ? (
-            message.metadata.voteDetails as Array<{
-              userId: string;
-              vote: string;
-              timestamp: number;
-            }>
-          ).find((v) => v.userId === INCOGNITO_USER_ID)
-        : null;
+      const prevDetail = rawDetails.find((v) => v.userId === INCOGNITO_USER_ID);
 
       let upvotesDelta = 0;
       let downvotesDelta = 0;

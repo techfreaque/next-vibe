@@ -79,7 +79,7 @@ export const translations = {
       mcpOff: "MCP Disabled",
       mcpVisible: "MCP Visible",
       productionOff: "Production Disabled",
-      remoteSkill: "Remote Skill",
+      skillOff: "Skill Disabled",
     },
   },
 };

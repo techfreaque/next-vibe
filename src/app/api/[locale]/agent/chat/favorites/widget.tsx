@@ -58,6 +58,7 @@ import {
   Icon,
   type IconKey,
 } from "../../../system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
+import { NO_CHARACTER_ID } from "../characters/constants";
 import { ChatSettingsRepositoryClient } from "../settings/repository-client";
 import definition, {
   type FavoriteCard,
@@ -98,17 +99,20 @@ const GROUP_PREFIX = "group-";
 function groupByCharacter(favorites: FavoriteCard[]): CharacterGroup[] {
   const map = new Map<string, FavoriteCard[]>();
   for (const fav of favorites) {
-    const group = map.get(fav.characterId);
+    // Default (model-only) favorites are never grouped — each gets its own entry
+    const groupKey =
+      fav.characterId === NO_CHARACTER_ID ? fav.id : fav.characterId;
+    const group = map.get(groupKey);
     if (group) {
       group.push(fav);
     } else {
-      map.set(fav.characterId, [fav]);
+      map.set(groupKey, [fav]);
     }
   }
   return [...map.entries()]
-    .map(([characterId, items]) => ({
-      id: `${GROUP_PREFIX}${characterId}`,
-      characterId,
+    .map(([groupKey, items]) => ({
+      id: `${GROUP_PREFIX}${groupKey}`,
+      characterId: items[0].characterId,
       name: items[0].name,
       icon: items[0].icon,
       tagline: items[0].tagline,
@@ -309,13 +313,15 @@ const FullCard = React.memo(function FullCard({
             <Zap className="h-4 w-4" />
           </Button>
         )}
-        <AddVariantButton
-          characterId={item.characterId}
-          navigate={navigate}
-          logger={logger}
-          user={user}
-          locale={locale}
-        />
+        {item.characterId !== NO_CHARACTER_ID && (
+          <AddVariantButton
+            characterId={item.characterId}
+            navigate={navigate}
+            logger={logger}
+            user={user}
+            locale={locale}
+          />
+        )}
         <EditFavoriteButton item={item} navigate={navigate} />
       </Div>
     </Div>

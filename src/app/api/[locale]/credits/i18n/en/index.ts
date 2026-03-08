@@ -30,7 +30,7 @@ export const translations = {
       freeReset: "Free Reset",
       refund: "Refund",
       transfer: "Transfer",
-      otherDevices: "Spending from other devices",
+      otherDevices: "Spending from linked devices/sessions",
       referralEarning: "Referral Earning",
       referralPayout: "Referral Payout",
     },
@@ -136,24 +136,35 @@ export const translations = {
     },
     balance: {
       title: "Your Credit Balance",
+      adminTitle: "Spending Limit",
       description: "Use your credits across {{modelCount}} AI models",
+      adminDescription:
+        "Credits act as a spending cap — control how much AI usage is allowed. Use your own API keys to remove limits entirely.",
       credit: "{{count}} credit",
       credits: "{{count}} credits",
       expiring: {
         title: "Expiring Credits",
         description: "{{subCredits}} new credits per subscription cycle",
+        adminDescription: "Time-limited credits (subscription cycle)",
       },
       permanent: {
         title: "Permanent Credits",
         description: "Never expire — yours to keep",
+        adminDescription: "Permanent credits — never expire",
       },
       free: {
         title: "Free Credits",
         description: "{{count}} free credits refreshed monthly",
+        adminDescription:
+          "{{count}} free credits per pool/month (shared across devices)",
       },
       earned: {
         title: "Earned Credits",
         description: "Earned via referrals — click to invite friends",
+      },
+      spending: {
+        title: "Earned Credits",
+        adminDescription: "Credits earned via referrals",
       },
     },
     total: {

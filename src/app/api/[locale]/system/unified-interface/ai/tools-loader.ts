@@ -46,7 +46,6 @@ function createToolFromEndpoint(
     logger: EndpointLogger;
     streamContext: ToolExecutionContext;
   },
-  requiresConfirmation: boolean,
 ): CoreTool {
   const { t } = endpoint.scopedTranslation.scopedT(context.locale);
   // Generate description
@@ -98,9 +97,6 @@ function createToolFromEndpoint(
     },
   });
 
-  // Get tool names
-  // Internal name (full path): Used for internal tracking/debugging only
-  const internalToolName = endpointToToolName(endpoint);
   // Preferred name (alias if available): Used for AI SDK, execution, and all lookups
   const toolName = getPreferredToolName(endpoint);
 
@@ -108,13 +104,13 @@ function createToolFromEndpoint(
     description,
     inputSchema,
     execute: async (params) => {
-      context.logger.debug("[Tools Loader] Tool execute called", {
-        toolName,
-        internalToolName,
-        requiresConfirmation,
-      });
-
       // Execute using shared generic handler — it auto-splits urlPathParams from data
+      context.logger.debug("[ToolsLoader] CoreTool execute called", {
+        toolName,
+        threadId: context.streamContext?.threadId,
+        aiMessageId: context.streamContext?.aiMessageId,
+        streamContextRef: !!context.streamContext,
+      });
       const { RouteExecutionExecutor } =
         await import("@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor");
       const result = await RouteExecutionExecutor.executeGenericHandler({
@@ -220,8 +216,6 @@ function createRemoteTool(params: {
     description: cap.description || cap.title,
     inputSchema,
     execute: async (input) => {
-      logger.debug("[Tools Loader] Remote tool execute called", { toolName });
-
       // Delegate to execute-tool which routes to the remote
       const { RouteExecuteRepository } =
         await import("@/app/api/[locale]/system/unified-interface/ai/execute-tool/repository");
@@ -354,16 +348,12 @@ export async function loadTools(params: {
           endpoint.requiresConfirmation ??
           false;
 
-        const createdTool = createToolFromEndpoint(
-          endpoint,
-          {
-            user: params.user,
-            locale: params.locale,
-            logger: params.logger,
-            streamContext: params.streamContext,
-          },
-          requiresConfirmation,
-        );
+        const createdTool = createToolFromEndpoint(endpoint, {
+          user: params.user,
+          locale: params.locale,
+          logger: params.logger,
+          streamContext: params.streamContext,
+        });
 
         toolsMap.set(preferredToolName, createdTool);
         toolsMeta.set(preferredToolName, {

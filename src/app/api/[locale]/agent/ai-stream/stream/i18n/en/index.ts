@@ -492,6 +492,12 @@ export const translations = {
   error: {
     title: "Stream Error",
   },
+  wakeUp: {
+    revivalPrompt:
+      "The async task you dispatched has completed. The result is in the tool message above. Please summarise what the task returned for me.",
+    revivalInstructions:
+      "WAKE-UP REVIVAL MODE: An async task has completed and the result is in the thread. Respond to the user's last message by summarising the tool result — 1-3 sentences only. Do NOT call any tools. Do NOT re-execute the original user request.",
+  },
   info: {
     streamInterrupted:
       "Generation was stopped. Partial response has been saved.",
@@ -558,6 +564,11 @@ export const translations = {
           title: "Character ID",
           description:
             "Character/persona for the resumed turn. Optional when favoriteId is provided.",
+        },
+        wakeUpToolMessageId: {
+          title: "WakeUp Tool Message ID",
+          description:
+            "ID of the original wakeUp tool call message. When provided, a deferred result message is injected into the thread before the headless append.",
         },
         resumed: {
           title: "Resumed",

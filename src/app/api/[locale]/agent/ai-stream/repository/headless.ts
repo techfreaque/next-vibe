@@ -114,6 +114,20 @@ export interface HeadlessAiStreamParams {
    * Use for public bots and isolated tasks that should not inherit personal context.
    */
   excludeMemories?: boolean;
+  /**
+   * When true, use the "wakeup-resume" operation instead of "answer-as-ai".
+   * This loads DB history normally (walking parent chain from the last message)
+   * but does NOT inject CONTINUE_CONVERSATION_PROMPT — the AI sees the deferred
+   * tool result as the last context item and responds naturally.
+   * Used exclusively by resume-stream for wakeUp revival.
+   */
+  wakeUpRevival?: boolean;
+  /**
+   * Force a specific sequenceId for the revival AI message.
+   * Used by resume-stream so the revival response shares the same sequence
+   * as the synthetic assistant + deferred tool pair that precede it.
+   */
+  sequenceIdOverride?: string;
   /** System user context for execution */
   user: JwtPayloadType;
   /** Locale for i18n */
@@ -143,7 +157,7 @@ export interface HeadlessAiStreamResult {
  * Returns the model ID and character ID from the favorite's modelSelection.
  * Falls back to NO_CHARACTER_ID if the favorite has no character set.
  */
-async function resolveFavorite(
+export async function resolveFavorite(
   favoriteId: string,
   userId: string,
   user: JwtPayloadType,
@@ -231,6 +245,8 @@ export async function runHeadlessAiStream(
     rootFolderId: rootFolderIdOverride,
     preCalls,
     excludeMemories,
+    wakeUpRevival,
+    sequenceIdOverride,
     user,
     locale,
     logger,
@@ -395,8 +411,8 @@ export async function runHeadlessAiStream(
     }
 
     // For "append" mode with no preCalls, find the last message in the thread
-    // so we can use "answer-as-ai" (which continues from an existing message)
-    // instead of "send" (which would create a new user message with empty content).
+    // so we can use "answer-as-ai"/"wakeup-resume" (which continues from an existing
+    // message) instead of "send" (which would create a new user message with empty content).
     if (threadMode === "append" && !parentMessageIdForAi && existingThreadId) {
       const [lastMsg] = await db
         .select({ id: chatMessages.id })
@@ -410,8 +426,25 @@ export async function runHeadlessAiStream(
       }
     }
 
+    // wakeUpRevival uses "wakeup-resume" — same as answer-as-ai but without
+    // CONTINUE_CONVERSATION_PROMPT. The AI sees the deferred tool result as
+    // the last message and responds naturally.
+    const operation =
+      wakeUpRevival && parentMessageIdForAi
+        ? "wakeup-resume"
+        : parentMessageIdForAi
+          ? "answer-as-ai"
+          : "send";
+
+    logger.debug("[Headless] operation resolved", {
+      operation,
+      wakeUpRevival,
+      parentMessageIdForAi,
+      existingThreadId,
+    });
+
     const syntheticData: AiStreamPostRequestOutput = {
-      operation: parentMessageIdForAi ? "answer-as-ai" : "send",
+      operation,
       rootFolderId,
       subFolderId: subFolderId ?? null,
       threadId: effectiveThreadId,
@@ -443,6 +476,7 @@ export async function runHeadlessAiStream(
       extraInstructions: headlessInstructions,
       excludeMemories,
       favoriteIdOverride: favoriteId,
+      sequenceIdOverride,
     });
 
     if (!result.success) {

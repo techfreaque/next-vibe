@@ -303,6 +303,18 @@ export const translations: typeof enTranslations = {
         credits: "Kredyty",
         tokens: "Tokeny",
         tokensUsed: "Użyte tokeny",
+        inputTokens: "Wejście",
+        outputTokens: "Wyjście",
+        cachedTokens: "Cache",
+        cachedPercent: "{{percent}}% z cache",
+        cachedPercentTitle:
+          "{{percent}}% tokenów wejściowych pobrano z cache, co obniżyło koszt",
+        timeToFirstToken: "{{seconds}}s do pierwszego tokenu",
+        timeToFirstTokenTitle: "Czas od zapytania do pierwszego tokenu",
+        cacheWriteTokens: "Zapis do cache",
+        cacheWrite: "{{tokens}} zapisano do cache",
+        cacheWriteTitle:
+          "{{tokens}} tokenów zapisano do cache w tym żądaniu (rozliczane wg stawki zapisu cache)",
         deleteMessage: "Usuń wiadomość",
         upvote: "Głosuj za",
         downvote: "Głosuj przeciw",

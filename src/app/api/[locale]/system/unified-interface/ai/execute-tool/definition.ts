@@ -26,6 +26,7 @@ import {
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
+import { taskInputSchema } from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import {
   CronTaskStatus,
   CronTaskStatusDB,
@@ -90,7 +91,7 @@ const { POST } = createEndpoint({
         label: "executeTool.post.fields.input.label",
         description: "executeTool.post.fields.input.description",
         columns: 12,
-        schema: z.record(z.string(), z.unknown()).default({}),
+        schema: taskInputSchema.default({}),
       }),
 
       instanceId: scopedRequestField(scopedTranslation, {
@@ -111,10 +112,10 @@ const { POST } = createEndpoint({
         schema: z
           .enum([
             CallbackMode.WAIT,
-            CallbackMode.BACKGROUND,
-            CallbackMode.NO_LOOP,
+            CallbackMode.DETACH,
+            CallbackMode.END_LOOP,
             CallbackMode.WAKE_UP,
-            CallbackMode.REQUIRES_CONFIRMATION,
+            CallbackMode.APPROVE,
           ])
           .optional()
           .default(CallbackMode.WAIT),
@@ -206,7 +207,7 @@ const { POST } = createEndpoint({
         toolName: "bash",
         input: { command: "echo hello" },
         instanceId: "hermes",
-        callbackMode: CallbackMode.BACKGROUND,
+        callbackMode: CallbackMode.DETACH,
       },
       remoteWakeUp: {
         toolName: "bash",

@@ -14,15 +14,11 @@
 
 import "server-only";
 
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import { db } from "@/app/api/[locale]/system/db";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
-import {
-  cronTaskExecutions,
-  cronTasks,
-} from "@/app/api/[locale]/system/unified-interface/tasks/cron/db";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import { users as usersTable } from "@/app/api/[locale]/user/db";
 import { UserPermissionRole } from "@/app/api/[locale]/user/user-roles/enum";
@@ -79,7 +75,6 @@ export async function buildSystemPrompt(params: {
     extraInstructions,
     headless,
     excludeMemories,
-    threadId,
     voiceTranscription,
   } = params;
 
@@ -304,11 +299,15 @@ export async function buildSystemPrompt(params: {
       ]);
       instanceId = localId;
       if (connections.length > 0) {
-        knownInstanceIds = connections.map((c) => c.instanceId);
-        const lines = connections.map(
-          (c) =>
-            `- "${c.friendlyName}" (id: "${c.instanceId}") — use help(instanceId="${c.instanceId}") to discover tools, execute-tool(toolName, instanceId="${c.instanceId}", input) to run them`,
+        // Use remoteInstanceId (what the remote calls itself) as the id to pass to execute-tool/help.
+        // Falls back to instanceId (what we call ourselves on the remote) for unconnected legacy rows.
+        knownInstanceIds = connections.map(
+          (c) => c.remoteInstanceId ?? c.instanceId,
         );
+        const lines = connections.map((c) => {
+          const id = c.remoteInstanceId ?? c.instanceId;
+          return `- "${c.friendlyName}" (id: "${id}") — use help(instanceId="${id}") to discover tools, execute-tool(toolName, instanceId="${id}", input) to run them`;
+        });
         remoteInstancesContext = `## Remote Instances\n\nUser has ${connections.length} connected local instance${connections.length === 1 ? "" : "s"}:\n\n${lines.join("\n")}\n\nRemote tool results are async — you receive {taskId, status:"pending"}. Acknowledge and move on.`;
       }
     } catch (error) {
@@ -356,56 +355,10 @@ export async function buildSystemPrompt(params: {
 
   // ─── Step 4: Build trailing system message and return ───────────────────
 
-  // Fetch completed background (task-done) results for this thread so the
-  // model is informed about async remote tasks that finished since last turn.
-  let completedTasksSummary = "";
-  if (threadId && userId && !isIncognito && !isExposedFolder) {
-    try {
-      const completedRows = await db
-        .select({
-          id: cronTasks.id,
-          displayName: cronTasks.displayName,
-          result: cronTaskExecutions.result,
-          taskInput: cronTasks.taskInput,
-        })
-        .from(cronTasks)
-        .innerJoin(
-          cronTaskExecutions,
-          eq(cronTaskExecutions.taskId, cronTasks.id),
-        )
-        .where(
-          sql`
-            ${cronTasks.userId} = ${userId}
-            AND ${cronTaskExecutions.status} = 'completed'
-            AND ${cronTasks.taskInput}->>'__callbackMode' = 'task-done'
-            AND ${cronTasks.taskInput}->>'__threadId' = ${threadId}
-            AND ${cronTaskExecutions.result} IS NOT NULL
-          `,
-        )
-        .limit(10);
-
-      if (completedRows.length > 0) {
-        const lines = completedRows.map((row) => {
-          const resultStr = row.result
-            ? JSON.stringify(row.result).slice(0, 500)
-            : "(no output)";
-          return `- **${row.displayName}** (id: ${row.id}): ${resultStr}`;
-        });
-        completedTasksSummary = `The following background tasks completed:\n\n${lines.join("\n")}`;
-      }
-    } catch (error) {
-      logger.debug("Failed to load completed background tasks", {
-        threadId,
-        error: error instanceof Error ? error.message : String(error),
-      });
-    }
-  }
-
   const trailingSystemMessage = buildTrailingSystemMessage({
     tasksSummary,
     memorySummary,
     favoritesSummary,
-    completedTasksSummary: completedTasksSummary || null,
     voiceTranscription,
   });
 

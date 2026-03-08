@@ -41,12 +41,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["agent", "chat", "threads"],
-  allowedRoles: [
-    UserRole.PUBLIC,
-    UserRole.CUSTOMER,
-    UserRole.ADMIN,
-    UserRole.REMOTE_SKILL,
-  ] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "get.title" as const,
   description: "get.description" as const,
@@ -429,11 +424,7 @@ const { POST } = createEndpoint({
   scopedTranslation,
   method: Methods.POST,
   path: ["agent", "chat", "threads"],
-  allowedRoles: [
-    UserRole.CUSTOMER,
-    UserRole.ADMIN,
-    UserRole.REMOTE_SKILL,
-  ] as const,
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "post.title" as const,
   description: "post.description" as const,

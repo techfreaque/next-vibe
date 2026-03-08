@@ -214,12 +214,18 @@ export interface CreditsDeductedEventData {
 export interface TokensUpdatedEventData {
   /** Message ID */
   messageId: string;
-  /** Input/prompt tokens */
+  /** Input/prompt tokens (total, including cached) */
   promptTokens: number;
   /** Output/completion tokens */
   completionTokens: number;
   /** Total tokens */
   totalTokens: number;
+  /** Tokens served from cache (subset of promptTokens) */
+  cachedInputTokens: number;
+  /** Tokens written to cache this request */
+  cacheWriteTokens: number;
+  /** Time from stream start to first token in milliseconds */
+  timeToFirstToken: number | null;
   /** Finish reason */
   finishReason: string | null;
   /** Actual credit cost based on real token usage */
@@ -264,6 +270,14 @@ export interface TaskCompletedEventData {
   status: "completed" | "failed" | "cancelled" | "timeout";
   /** Last assistant message ID — client uses this as parentId for resume */
   lastMessageId: string | null;
+  /** For background/noLoop: the deferred result message to add to the store */
+  deferredMessage?: {
+    id: string;
+    threadId: string;
+    parentId: string | null;
+    sequenceId: string | null;
+    toolCall: ToolCall;
+  };
 }
 
 /**

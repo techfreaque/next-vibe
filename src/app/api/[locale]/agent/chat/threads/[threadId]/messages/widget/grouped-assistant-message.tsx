@@ -553,6 +553,11 @@ interface MessageActionsWrapperProps {
   model: ChatMessage["model"];
   promptTokens: number | null;
   completionTokens: number | null;
+  cachedInputTokens: number | null;
+  cacheWriteTokens: number | null;
+  timeToFirstToken: number | null;
+  /** Server-computed credit cost (preferred over client recalculation) */
+  serverCreditCost: number | null;
   readOnly: boolean;
   user: JwtPayloadType;
   deductCredits: ((creditCost: number, feature: string) => void) | null;
@@ -571,6 +576,10 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
   model,
   promptTokens,
   completionTokens,
+  cachedInputTokens,
+  cacheWriteTokens,
+  timeToFirstToken,
+  serverCreditCost,
   readOnly,
   user,
   deductCredits,
@@ -600,17 +609,22 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
     );
   }, [allMessages, locale, logger]);
 
-  // Calculate credit cost - only runs in this component
+  // Use server-computed credit cost when available (correctly accounts for cache pricing).
+  // Fall back to client-side calculation for older persisted messages that pre-date this feature.
   const creditCost = useMemo(() => {
+    if (serverCreditCost !== null) {
+      return serverCreditCost;
+    }
     if (!model || !promptTokens || !completionTokens) {
       return null;
     }
-
     try {
       return calculateCreditCost(
         getModelById(model),
         promptTokens,
         completionTokens,
+        cachedInputTokens ?? 0,
+        cacheWriteTokens ?? 0,
       );
     } catch (error) {
       logger.error(
@@ -619,7 +633,15 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
       );
       return null;
     }
-  }, [model, promptTokens, completionTokens, logger]);
+  }, [
+    serverCreditCost,
+    model,
+    promptTokens,
+    completionTokens,
+    cachedInputTokens,
+    cacheWriteTokens,
+    logger,
+  ]);
 
   return (
     <AssistantMessageActions
@@ -634,6 +656,9 @@ const MessageActionsWrapper = memo(function MessageActionsWrapper({
       logger={logger}
       promptTokens={promptTokens}
       completionTokens={completionTokens}
+      cachedInputTokens={cachedInputTokens}
+      cacheWriteTokens={cacheWriteTokens}
+      timeToFirstToken={timeToFirstToken}
       creditCost={creditCost}
       readOnly={readOnly}
       user={user}
@@ -736,20 +761,53 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
   const groupTotals = useMemo(() => {
     let totalPromptTokens = 0;
     let totalCompletionTokens = 0;
+    let totalCachedInputTokens = 0;
+    let totalCacheWriteTokens = 0;
+    let totalCreditCost = 0;
+    let timeToFirstToken: number | null = null;
+    let hasAnyTokens = false;
+    let hasAnyCreditCost = false;
 
     for (const msg of allMessages) {
       if (msg.metadata?.promptTokens) {
         totalPromptTokens += msg.metadata.promptTokens;
+        hasAnyTokens = true;
       }
       if (msg.metadata?.completionTokens) {
         totalCompletionTokens += msg.metadata.completionTokens;
+        hasAnyTokens = true;
+      }
+      // Only take cachedInputTokens from messages that also have promptTokens.
+      // In multi-step tool loops, finish-step messages have promptTokens=null but
+      // the final step's cachedInputTokens already covers the full cached context —
+      // summing across steps would inflate the cached count beyond the prompt count.
+      if (msg.metadata?.cachedInputTokens && msg.metadata.promptTokens) {
+        totalCachedInputTokens += msg.metadata.cachedInputTokens;
+      }
+      // cacheWriteTokens: sum across all steps — each step can write new tokens to cache
+      if (msg.metadata?.cacheWriteTokens) {
+        totalCacheWriteTokens += msg.metadata.cacheWriteTokens;
+      }
+      if (msg.metadata?.creditCost !== undefined) {
+        totalCreditCost += msg.metadata.creditCost;
+        hasAnyCreditCost = true;
+      }
+      // TTFT is only meaningful for the first message in the sequence
+      if (timeToFirstToken === null && msg.metadata?.timeToFirstToken) {
+        timeToFirstToken = msg.metadata.timeToFirstToken;
       }
     }
 
     return {
-      promptTokens: totalPromptTokens > 0 ? totalPromptTokens : null,
-      completionTokens:
-        totalCompletionTokens > 0 ? totalCompletionTokens : null,
+      promptTokens: hasAnyTokens ? totalPromptTokens : null,
+      completionTokens: hasAnyTokens ? totalCompletionTokens : null,
+      cachedInputTokens:
+        totalCachedInputTokens > 0 ? totalCachedInputTokens : null,
+      cacheWriteTokens:
+        totalCacheWriteTokens > 0 ? totalCacheWriteTokens : null,
+      // Server-computed credit cost (preferred — accounts for cache pricing correctly)
+      creditCost: hasAnyCreditCost ? totalCreditCost : null,
+      timeToFirstToken,
     };
   }, [allMessages]);
 
@@ -794,6 +852,10 @@ export const GroupedAssistantMessage = memo(function GroupedAssistantMessage({
             model={primary.model}
             promptTokens={groupTotals.promptTokens}
             completionTokens={groupTotals.completionTokens}
+            cachedInputTokens={groupTotals.cachedInputTokens}
+            cacheWriteTokens={groupTotals.cacheWriteTokens}
+            timeToFirstToken={groupTotals.timeToFirstToken}
+            serverCreditCost={groupTotals.creditCost}
             readOnly={readOnly}
             user={user}
             deductCredits={deductCredits}

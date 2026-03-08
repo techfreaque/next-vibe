@@ -36,11 +36,7 @@ const { POST } = createEndpoint({
   icon: "user-plus",
   category: "app.endpointCategories.userAuth",
   tags: ["tag"],
-  allowedRoles: [
-    UserRole.PUBLIC,
-    UserRole.AI_TOOL_OFF,
-    UserRole.REMOTE_SKILL,
-  ] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
   allowedLocalModeRoles: [UserRole.ADMIN] as const,
   fields: customWidgetObject({
     render: SignupFormContainer,

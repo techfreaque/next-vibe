@@ -8,6 +8,7 @@
 import { Command } from "commander";
 import { parseError } from "next-vibe/shared/utils/parse-error";
 
+import { pathToAliasMap } from "@/app/api/[locale]/system/generated/alias-map";
 import { DEFAULT_PROJECT_URL } from "@/config/constants";
 import { enableDebug, enableMcpSilentMode } from "@/config/debug";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -42,6 +43,61 @@ import {
 import { CliTarget, type CliTargetValue } from "./types/cli-target";
 
 export const binaryStartTime = Date.now();
+
+/**
+ * Attempt to resolve a file-system path to a canonical tool name.
+ *
+ * Accepts any of:
+ *   src/app/api/[locale]/agent/models/openrouter/route.ts
+ *   src/app/api/[locale]/agent/models/openrouter/definition.ts
+ *   src/app/api/[locale]/agent/models/openrouter/repository.ts
+ *   src/app/api/[locale]/agent/models/openrouter
+ *
+ * Returns { canonical, alias } on success, null if not a path or not found.
+ * Tries GET, POST, PUT, PATCH in that order.
+ */
+function resolveCommandFromPath(
+  input: string,
+): { canonical: string; alias: string } | null {
+  // Only attempt resolution if the input looks like a file path (contains /)
+  if (!input.includes("/")) {
+    return null;
+  }
+
+  // Strip known file suffixes
+  let normalized = input
+    .replace(/\/(route|definition|repository)\.ts$/, "")
+    .replace(/\.ts$/, "");
+
+  // Extract the part after [locale]/ if present
+  const localeMarker = "[locale]/";
+  const localeIdx = normalized.indexOf(localeMarker);
+  if (localeIdx !== -1) {
+    normalized = normalized.slice(localeIdx + localeMarker.length);
+  } else {
+    // Fallback: strip common prefix patterns like src/app/api/en/
+    normalized = normalized.replace(/^.*\/api\/[^/]+\//, "");
+  }
+
+  // Convert path separators and dynamic segments to underscores
+  // e.g. "agent/models/openrouter" → "agent_models_openrouter"
+  // e.g. "agent/chat/threads/[threadId]" → "agent_chat_threads_threadId"
+  const base = normalized
+    .split("/")
+    .map((seg) => seg.replaceAll(/\[|\]/g, ""))
+    .join("_");
+
+  const methods = ["GET", "POST", "PUT", "PATCH"] as const;
+  for (const method of methods) {
+    const canonical = `${base}_${method}`;
+    if (canonical in pathToAliasMap) {
+      const alias = pathToAliasMap[canonical as keyof typeof pathToAliasMap];
+      return { canonical, alias };
+    }
+  }
+
+  return null;
+}
 
 const environmentResult: EnvironmentResult = loadEnvironment();
 export const cliPlatform = environmentResult.platform;
@@ -93,9 +149,9 @@ export function runCli({
   // Uses the scoped alias-map to enumerate canonical paths, then resolves each via getEndpoint.
   const defRegistry: IDefinitionsRegistry | undefined = getEndpoint
     ? new DefinitionsRegistry(async () => {
-        const { pathToAliasMap } =
+        const { pathToAliasMap: scopedAliasMap } =
           await import("@/app/api/[locale]/system/generated/alias-map");
-        const canonical = new Set(Object.values(pathToAliasMap));
+        const canonical = new Set(Object.values(scopedAliasMap));
         const results = await Promise.all(
           [...canonical].map((path) => getEndpoint(path)),
         );
@@ -147,6 +203,22 @@ export function runCli({
         let command = rawCommand;
         if (!command && defaultEndpoint) {
           command = defaultEndpoint;
+        }
+
+        // If command looks like a file path, resolve it to a canonical tool name
+        if (command) {
+          const resolved = resolveCommandFromPath(command);
+          if (resolved) {
+            const hint =
+              resolved.alias !== resolved.canonical
+                ? `  vibe ${resolved.alias}`
+                : `  vibe ${resolved.canonical}`;
+            // Use process.stderr so it shows even in --output json mode
+            process.stderr.write(
+              `[hint] Resolved path to tool "${resolved.canonical}". Next time use:\n${hint}\n`,
+            );
+            command = resolved.canonical;
+          }
         }
 
         if (command === "mcp") {

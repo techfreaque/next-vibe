@@ -17,6 +17,7 @@ import {
 import { formatPostNumber } from "@/app/[locale]/chat/lib/utils/post-numbers";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { useChatNavigationStore } from "@/app/api/[locale]/agent/chat/hooks/use-chat-navigation-store";
+import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
 import { getModelById } from "@/app/api/[locale]/agent/models/models";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Icon } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
@@ -32,6 +33,7 @@ import { scopedTranslation } from "../../i18n";
 import { MessageEditor } from "../message-editor";
 import type { groupMessagesBySequence } from "../message-grouping";
 import { ModelCharacterSelectorModal } from "../model-character-selector-modal";
+import { ReplyInput } from "../reply-input";
 import { ToolDisplay } from "../tool-display";
 import { countPostsByUserId, countReplies, getDirectReplies } from "./helpers";
 
@@ -74,7 +76,13 @@ export interface FlatMessageProps {
     content: string,
     attachments: File[] | undefined,
   ) => Promise<void>;
+  onReplyMessage?: (
+    parentMessageId: string,
+    content: string,
+    attachments: File[],
+  ) => Promise<void>;
   onDeleteMessage: (messageId: string) => void;
+  onVoteMessage?: (messageId: string, vote: 1 | -1 | 0) => Promise<void>;
 }
 
 export const FlatMessage = memo(function FlatMessage({
@@ -90,11 +98,14 @@ export const FlatMessage = memo(function FlatMessage({
   onSetHoveredRef,
   onSetHoveredUserId,
   collapseState,
+  currentUserId,
   user,
   onBranchMessage,
   onRetryMessage,
   onAnswerAsModel,
+  onReplyMessage,
   onDeleteMessage,
+  onVoteMessage,
 }: FlatMessageProps): JSX.Element {
   // Navigation state from Zustand store directly
   const rootFolderId = useChatNavigationStore((s) => s.currentRootFolderId);
@@ -106,6 +117,9 @@ export const FlatMessage = memo(function FlatMessage({
   const editingMessageId = useMessageEditorStore((s) => s.editingMessageId);
   const retryingMessageId = useMessageEditorStore((s) => s.retryingMessageId);
   const answeringMessageId = useMessageEditorStore((s) => s.answeringMessageId);
+  const replyingToMessageId = useMessageEditorStore(
+    (s) => s.replyingToMessageId,
+  );
   const answerContent = useMessageEditorStore((s) => s.answerContent);
   const editorAttachments = useMessageEditorStore((s) => s.editorAttachments);
   const isLoadingRetryAttachments = useMessageEditorStore(
@@ -113,6 +127,7 @@ export const FlatMessage = memo(function FlatMessage({
   );
   const startEdit = useMessageEditorStore((s) => s.startEdit);
   const startAnswer = useMessageEditorStore((s) => s.startAnswer);
+  const startReply = useMessageEditorStore((s) => s.startReply);
   const cancelAction = useMessageEditorStore((s) => s.cancelAction);
   const setAnswerContent = useMessageEditorStore((s) => s.setAnswerContent);
   const setLoadingRetryAttachments = useMessageEditorStore(
@@ -125,6 +140,7 @@ export const FlatMessage = memo(function FlatMessage({
   const clearEditing = useMessageEditorStore((s) => s.clearEditing);
   const clearRetrying = useMessageEditorStore((s) => s.clearRetrying);
   const clearAnswering = useMessageEditorStore((s) => s.clearAnswering);
+  const clearReplying = useMessageEditorStore((s) => s.clearReplying);
 
   const startRetry = useCallback(
     async (msg: ChatMessage) => {
@@ -234,6 +250,37 @@ export const FlatMessage = memo(function FlatMessage({
     [logger, answerContent, editorAttachments, clearAnswering],
   );
 
+  const handleConfirmReply = useCallback(
+    async (
+      messageId: string,
+      onReply:
+        | ((
+            parentMessageId: string,
+            content: string,
+            attachments: File[],
+          ) => Promise<void>)
+        | undefined,
+      content: string,
+      attachments: File[],
+    ) => {
+      if (!onReply) {
+        return;
+      }
+      try {
+        await onReply(messageId, content, attachments);
+        clearReplying();
+      } catch (error) {
+        const errorObj =
+          error instanceof Error ? error : new Error(String(error));
+        logger.error(
+          "widget.messages.actions.handleConfirmReply.error",
+          errorObj,
+        );
+      }
+    },
+    [logger, clearReplying],
+  );
+
   const character = useCharacter(message.character || undefined, user, logger);
 
   // TTS support for assistant messages is handled by the message action buttons
@@ -294,6 +341,11 @@ export const FlatMessage = memo(function FlatMessage({
   const replyCount = countReplies(messages, message.id);
   const isHighlighted = hoveredRef === postNum.toString();
   const directReplies = getDirectReplies(messages, message.id);
+
+  // Vote state — only for non-incognito, signed-in users
+  const canVote =
+    onVoteMessage && currentUserId && rootFolderId !== "incognito";
+  const { userVote, voteScore } = getVoteStatus(message, currentUserId);
 
   return (
     <Div
@@ -363,7 +415,10 @@ export const FlatMessage = memo(function FlatMessage({
         </Div>
 
         {/* Timestamp */}
-        <Span className="text-muted-foreground/80 text-xs font-medium">
+        <Span
+          className="text-muted-foreground/80 text-xs font-medium"
+          suppressHydrationWarning
+        >
           {format4chanTimestamp(message.createdAt.getTime(), tGlobal)}
         </Span>
 
@@ -385,6 +440,59 @@ export const FlatMessage = memo(function FlatMessage({
           <Span className="px-2 py-0.5 rounded-full bg-primary/15 text-primary text-xs font-bold border border-primary/30">
             {replyCount} {replyCount === 1 ? "reply" : "replies"}
           </Span>
+        )}
+
+        {/* Vote score badge — always show if non-zero */}
+        {(voteScore !== 0 || canVote) && (
+          <Div className="flex items-center gap-0.5">
+            {canVote && (
+              <Button
+                variant="ghost"
+                size="unset"
+                onClick={() =>
+                  onVoteMessage(message.id, userVote === "up" ? 0 : 1)
+                }
+                className={cn(
+                  "px-1 py-0.5 rounded text-xs transition-colors",
+                  userVote === "up"
+                    ? "text-blue-400"
+                    : "text-muted-foreground/60 hover:text-blue-400",
+                )}
+                title={t("widget.flatView.actions.upvote")}
+              >
+                ▲
+              </Button>
+            )}
+            {voteScore !== 0 && (
+              <Span
+                className={cn(
+                  "text-xs font-bold",
+                  voteScore > 0 && "text-blue-400",
+                  voteScore < 0 && "text-red-400",
+                )}
+              >
+                {voteScore > 0 ? `+${voteScore}` : voteScore}
+              </Span>
+            )}
+            {canVote && (
+              <Button
+                variant="ghost"
+                size="unset"
+                onClick={() =>
+                  onVoteMessage(message.id, userVote === "down" ? 0 : -1)
+                }
+                className={cn(
+                  "px-1 py-0.5 rounded text-xs transition-colors",
+                  userVote === "down"
+                    ? "text-red-400"
+                    : "text-muted-foreground/60 hover:text-red-400",
+                )}
+                title={t("widget.flatView.actions.downvote")}
+              >
+                ▼
+              </Button>
+            )}
+          </Div>
         )}
 
         {/* Reply indicator - Arrow symbol is technical, not user-facing text */}
@@ -586,6 +694,27 @@ export const FlatMessage = memo(function FlatMessage({
         </Div>
       )}
 
+      {/* Show Reply input below the message */}
+      {replyingToMessageId === message.id && (
+        <Div className="my-3">
+          <ReplyInput
+            parentMessageId={message.id}
+            onReply={async (parentId, content, attachments) => {
+              await handleConfirmReply(
+                parentId,
+                onReplyMessage,
+                content,
+                attachments,
+              );
+            }}
+            onCancel={cancelAction}
+            locale={locale}
+            logger={logger}
+            user={user}
+          />
+        </Div>
+      )}
+
       {/* Show Answer-as-AI dialog below the message */}
       {answeringMessageId === message.id && (
         <Div className="my-3">
@@ -650,102 +779,100 @@ export const FlatMessage = memo(function FlatMessage({
       )}
 
       {/* Post Actions - 4chan-style text links */}
-      {!editingMessageId && !retryingMessageId && !answeringMessageId && (
-        <Div
-          className={cn(
-            "mt-3 flex items-center gap-3 text-xs flex-wrap",
-            "transition-opacity duration-200",
-            isTouch
-              ? "opacity-70 active:opacity-100"
-              : "opacity-0 group-hover/post:opacity-100 focus-within:opacity-100",
-          )}
-        >
-          {/* Reply */}
-          <Button
-            variant="ghost"
-            size="unset"
-            onClick={(): void => startEdit(message.id)}
-            className="text-primary hover:text-primary/80 hover:underline transition-colors"
-            title={t("widget.flatView.actions.replyToMessage")}
+      {!editingMessageId &&
+        !retryingMessageId &&
+        !answeringMessageId &&
+        !replyingToMessageId && (
+          <Div
+            className={cn(
+              "mt-3 flex items-center gap-3 text-xs flex-wrap",
+              "transition-opacity duration-200",
+              isTouch
+                ? "opacity-70 active:opacity-100"
+                : "opacity-0 group-hover/post:opacity-100 focus-within:opacity-100",
+            )}
           >
-            [{t("widget.flatView.actions.reply")}]
-          </Button>
+            {/* Reply - sends a user message as child, then AI responds */}
+            <Button
+              variant="ghost"
+              size="unset"
+              onClick={(): void => startReply(message.id)}
+              className="text-primary hover:text-primary/80 hover:underline transition-colors"
+              title={t("widget.flatView.actions.replyToMessage")}
+            >
+              [{t("widget.flatView.actions.reply")}]
+            </Button>
 
-          {/* Edit/Branch */}
-          {isUser && (
+            {/* Branch - user messages only: creates sibling with edited content */}
+            {isUser && (
+              <Button
+                variant="ghost"
+                size="unset"
+                onClick={(): void => {
+                  startEdit(message.id);
+                }}
+                className="text-foreground hover:text-foreground/80 hover:underline transition-colors"
+                title={t("widget.flatView.actions.branchMessage")}
+              >
+                [{t("widget.flatView.actions.branch")}]
+              </Button>
+            )}
+
+            {/* Retry - user messages only: creates sibling with same content, different model */}
+            {isUser && (
+              <Button
+                variant="ghost"
+                size="unset"
+                onClick={(): void => {
+                  void startRetry(message);
+                }}
+                className="text-foreground hover:text-foreground/80 hover:underline transition-colors"
+                title={t("widget.flatView.actions.retryWithDifferent")}
+              >
+                [{t("widget.flatView.actions.retry")}]
+              </Button>
+            )}
+
+            {/* Answer as AI */}
             <Button
               variant="ghost"
               size="unset"
               onClick={(): void => {
-                startEdit(message.id);
+                startAnswer(message.id);
               }}
-              className="text-foreground hover:text-foreground/80 hover:underline transition-colors"
-              title={t("widget.flatView.actions.editMessage")}
+              className="text-primary hover:text-primary/80 hover:underline transition-colors"
+              title={t("widget.flatView.actions.generateAIResponse")}
             >
-              [{t("widget.flatView.actions.edit")}]
+              [{t("widget.flatView.actions.answerAsAI")}]
             </Button>
-          )}
 
-          {/* Retry */}
-          {isUser && (
+            {/* Copy Link */}
             <Button
               variant="ghost"
               size="unset"
               onClick={(): void => {
-                void startRetry(message);
+                void navigator.clipboard.writeText(`>>${postNum}`);
               }}
-              className="text-foreground hover:text-foreground/80 hover:underline transition-colors"
-              title={t("widget.flatView.actions.retryWithDifferent")}
+              className="text-muted-foreground hover:text-foreground hover:underline transition-colors"
+              title={t("widget.flatView.actions.copyReference")}
             >
-              [{t("widget.flatView.actions.retry")}]
+              [{t("widget.flatView.actions.copyReference")}]
             </Button>
-          )}
 
-          {/* Answer as AI - For both user and assistant messages */}
-
-          <Button
-            variant="ghost"
-            size="unset"
-            onClick={(): void => {
-              startAnswer(message.id);
-            }}
-            className="text-primary hover:text-primary/80 hover:underline transition-colors"
-            title={
-              isAssistant
-                ? t("widget.threadedView.actions.respondToAI")
-                : t("widget.flatView.actions.generateAIResponse")
-            }
-          >
-            [{t("widget.flatView.actions.answerAsAI")}]
-          </Button>
-
-          {/* Copy Link */}
-          <Button
-            variant="ghost"
-            size="unset"
-            onClick={(): void => {
-              void navigator.clipboard.writeText(`>>${postNum}`);
-            }}
-            className="text-muted-foreground hover:text-foreground hover:underline transition-colors"
-            title={t("widget.flatView.actions.copyReference")}
-          >
-            [{t("widget.flatView.actions.copyReference")}]
-          </Button>
-
-          {/* Delete */}
-          <Button
-            variant="ghost"
-            size="unset"
-            onClick={(): void => {
-              onDeleteMessage(message.id);
-            }}
-            className="px-2 py-1 rounded bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive/80 transition-all"
-            title={t("widget.flatView.actions.deleteMessage")}
-          >
-            [{t("widget.flatView.actions.delete")}]
-          </Button>
-        </Div>
-      )}
+            {/* Delete */}
+            <Button
+              variant="ghost"
+              size="unset"
+              onClick={(): void => {
+                onDeleteMessage(message.id);
+              }}
+              className="px-2 py-1 rounded bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive/80 transition-all"
+              title={t("widget.flatView.actions.deleteMessage")}
+            >
+              [{t("widget.flatView.actions.delete")}]
+            </Button>
+          </Div>
+        )}
     </Div>
   );
 });

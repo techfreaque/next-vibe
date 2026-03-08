@@ -172,6 +172,8 @@ export class MessageDbWriter {
     totalTokens: number | null;
     promptTokens: number | null;
     completionTokens: number | null;
+    cachedInputTokens?: number;
+    timeToFirstToken?: number | null;
   }): Promise<void> {
     const {
       messageId,
@@ -180,6 +182,8 @@ export class MessageDbWriter {
       totalTokens,
       promptTokens,
       completionTokens,
+      cachedInputTokens,
+      timeToFirstToken,
     } = params;
 
     // SSE: CONTENT_DONE
@@ -201,6 +205,8 @@ export class MessageDbWriter {
         promptTokens: promptTokens ?? null,
         completionTokens: completionTokens ?? null,
         finishReason,
+        cachedInputTokens: cachedInputTokens ?? null,
+        timeToFirstToken: timeToFirstToken ?? null,
       });
     }
   }
@@ -213,6 +219,9 @@ export class MessageDbWriter {
     promptTokens: number;
     completionTokens: number;
     totalTokens: number;
+    cachedInputTokens: number;
+    cacheWriteTokens: number;
+    timeToFirstToken: number | null;
     finishReason: string | null;
     creditCost: number;
   }): void {
@@ -485,8 +494,10 @@ export class MessageDbWriter {
     });
     this.enqueue(toolMessageEvent);
 
-    // DB: update tool message with result/error
-    if (!this.isIncognito) {
+    // DB: update tool message with result/error.
+    // Skip for wakeUp: handleTaskCompletion already backfilled the real result inline
+    // (before execute-tool returned the stub). Writing the stub here would clobber it.
+    if (!this.isIncognito && toolCall.callbackMode !== "wakeUp") {
       const updateResult = await db
         .update(chatMessages)
         .set({ metadata: { toolCall }, updatedAt: new Date() })
@@ -840,6 +851,9 @@ export class MessageDbWriter {
       promptTokens: inputTokens,
       completionTokens: outputTokens,
       totalTokens,
+      cachedInputTokens: 0,
+      cacheWriteTokens: 0,
+      timeToFirstToken: null,
       finishReason: "stop",
       creditCost,
     });
@@ -1035,6 +1049,10 @@ export class MessageDbWriter {
       promptTokens: number | null;
       completionTokens: number | null;
       finishReason: string | null;
+      cachedInputTokens?: number | null;
+      cacheWriteTokens?: number | null;
+      timeToFirstToken?: number | null;
+      creditCost?: number | null;
     },
   ): Promise<void> {
     if (this.isIncognito) {
@@ -1050,6 +1068,28 @@ export class MessageDbWriter {
       }
       if (tokens.finishReason) {
         tokenMetadata.finishReason = tokens.finishReason;
+      }
+      if (
+        tokens.cachedInputTokens !== null &&
+        tokens.cachedInputTokens !== undefined
+      ) {
+        tokenMetadata.cachedInputTokens = tokens.cachedInputTokens;
+      }
+      if (
+        tokens.cacheWriteTokens !== null &&
+        tokens.cacheWriteTokens !== undefined &&
+        tokens.cacheWriteTokens > 0
+      ) {
+        tokenMetadata.cacheWriteTokens = tokens.cacheWriteTokens;
+      }
+      if (
+        tokens.timeToFirstToken !== null &&
+        tokens.timeToFirstToken !== undefined
+      ) {
+        tokenMetadata.timeToFirstToken = tokens.timeToFirstToken;
+      }
+      if (tokens.creditCost !== null && tokens.creditCost !== undefined) {
+        tokenMetadata.creditCost = tokens.creditCost;
       }
 
       if (Object.keys(tokenMetadata).length === 0) {
@@ -1084,6 +1124,10 @@ export class MessageDbWriter {
       promptTokens: number | null;
       completionTokens: number | null;
       finishReason: string | null;
+      cachedInputTokens?: number | null;
+      cacheWriteTokens?: number | null;
+      timeToFirstToken?: number | null;
+      creditCost?: number | null;
     },
   ): Promise<void> {
     if (this.isIncognito) {
@@ -1099,6 +1143,28 @@ export class MessageDbWriter {
       }
       if (tokens.finishReason) {
         tokenMetadata.finishReason = tokens.finishReason;
+      }
+      if (
+        tokens.cachedInputTokens !== null &&
+        tokens.cachedInputTokens !== undefined
+      ) {
+        tokenMetadata.cachedInputTokens = tokens.cachedInputTokens;
+      }
+      if (
+        tokens.cacheWriteTokens !== null &&
+        tokens.cacheWriteTokens !== undefined &&
+        tokens.cacheWriteTokens > 0
+      ) {
+        tokenMetadata.cacheWriteTokens = tokens.cacheWriteTokens;
+      }
+      if (
+        tokens.timeToFirstToken !== null &&
+        tokens.timeToFirstToken !== undefined
+      ) {
+        tokenMetadata.timeToFirstToken = tokens.timeToFirstToken;
+      }
+      if (tokens.creditCost !== null && tokens.creditCost !== undefined) {
+        tokenMetadata.creditCost = tokens.creditCost;
       }
 
       if (Object.keys(tokenMetadata).length > 0) {

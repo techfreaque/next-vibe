@@ -146,7 +146,7 @@ export const getPoolBalance = defineDbFunction({
 
     // ── Aggregation (wallet subquery) ─────────────────────────────────────
 
-    /** Full wallet rows for a user's pool */
+    /** Full wallet rows for a user's pool (includes current session lead even if not yet in userLeadLinks) */
     walletsForUser: db
       .select({
         id: creditWallets.id,
@@ -165,6 +165,9 @@ export const getPoolBalance = defineDbFunction({
             JOIN ${userLeadLinks} ull ON cw.lead_id = ull.lead_id
             WHERE ull.user_id = ${p.p_user_id}
           )`,
+          // Include current session's lead wallet even if not yet linked to user
+          // (new sessions create leads before the userLeadLinks record is established)
+          eq(creditWallets.leadId, p.p_lead_id),
         ),
       ),
 
@@ -332,7 +335,18 @@ export const getPoolBalance = defineDbFunction({
     }
 
     // ── Step 3: Load wallets and aggregate balances ───────────────────────
-    const wallets = isUserPool ? q.walletsForUser() : q.walletsForLead();
+    const allWallets = isUserPool ? q.walletsForUser() : q.walletsForLead();
+
+    // Deduplicate by wallet ID — the user pool OR conditions may return the same
+    // wallet twice if the current session lead is also already in userLeadLinks
+    const seenIds = new Set<string>();
+    const wallets = allWallets.filter((w) => {
+      if (seenIds.has(w.id)) {
+        return false;
+      }
+      seenIds.add(w.id);
+      return true;
+    });
 
     if (wallets.length === 0) {
       return {
@@ -382,46 +396,30 @@ export const getPoolBalance = defineDbFunction({
     }
 
     // ── Step 5: Calculate free credits spent this period ─────────────────
+    // Sum usage across ALL lead wallets in the pool using the current calendar period.
+    // Do NOT filter by latestFreeGrant — after a pool merge, each lead has its own
+    // FREE_GRANT timestamp and filtering by the latest one misses older leads' spending.
     let freeCreditsSpent = 0;
-    let activePeriodId: string | null = null;
-    let latestStart: Date | null = null;
-    let latestLeadWalletId: string | null = null;
+    const now = new Date();
+    const activePeriodId = `${String(now.getFullYear())}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
     for (const w of wallets) {
       if (w.leadId !== null) {
-        const fpStart = new Date(String(w.freePeriodStart));
-        if (latestStart === null || fpStart > latestStart) {
-          latestStart = fpStart;
-          activePeriodId = w.freePeriodId;
-          latestLeadWalletId = w.id;
-        }
-      }
-    }
+        // Fetch ALL usage transactions for this lead wallet in the current period
+        const usageRows = q.usageTransactions({
+          walletId: w.id,
+          periodId: activePeriodId,
+        });
 
-    if (latestLeadWalletId !== null && activePeriodId !== null) {
-      // Latest free grant — Drizzle-compiled, scalar params
-      const grants = q.latestFreeGrant({
-        walletId: latestLeadWalletId,
-        periodId: activePeriodId,
-      });
-
-      // Usage transactions — Drizzle-compiled + optional date filter via extra
-      const usageRows =
-        grants.length > 0
-          ? q.usageTransactions({
-              walletId: latestLeadWalletId,
-              periodId: activePeriodId,
-              afterDate: String(grants[0].createdAt),
-            })
-          : q.usageTransactions({
-              walletId: latestLeadWalletId,
-              periodId: activePeriodId,
-            });
-
-      for (const row of usageRows) {
-        const meta = row.metadata as { freeCreditsUsed?: number } | null;
-        if (meta !== null && typeof meta === "object" && meta.freeCreditsUsed) {
-          freeCreditsSpent += Number(meta.freeCreditsUsed) || 0;
+        for (const row of usageRows) {
+          const meta = row.metadata as { freeCreditsUsed?: number } | null;
+          if (
+            meta !== null &&
+            typeof meta === "object" &&
+            meta.freeCreditsUsed
+          ) {
+            freeCreditsSpent += Number(meta.freeCreditsUsed) || 0;
+          }
         }
       }
     }

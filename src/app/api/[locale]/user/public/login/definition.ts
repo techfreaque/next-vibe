@@ -32,11 +32,7 @@ const { POST } = createEndpoint({
   icon: "log-in",
   category: "app.endpointCategories.userAuth",
   tags: ["tag"],
-  allowedRoles: [
-    UserRole.PUBLIC,
-    UserRole.AI_TOOL_OFF,
-    UserRole.REMOTE_SKILL,
-  ] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
   aliases: ["login"],
   fields: customWidgetObject({
     render: LoginFormContainer,

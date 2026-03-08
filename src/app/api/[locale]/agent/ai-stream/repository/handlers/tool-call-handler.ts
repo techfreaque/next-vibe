@@ -5,6 +5,10 @@
 import type { JSONValue } from "ai";
 
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
+import {
+  CallbackMode,
+  CallbackModeDB,
+} from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 
 import type { ToolCall, ToolCallResult } from "../../../chat/db";
@@ -138,25 +142,44 @@ export class ToolCallHandler {
     // Get tool arguments from the AI SDK part.input
     const toolCallArgs = (part.input as ToolCallResult) || {};
 
-    // Check for noLoop parameter to stop the tool calling loop
-    if (
+    // Read callbackMode from tool args — any tool can pass this to control loop behavior
+    const callbackModeArg =
+      typeof toolCallArgs === "object" &&
+      toolCallArgs !== null &&
+      !Array.isArray(toolCallArgs) &&
+      "callbackMode" in toolCallArgs
+        ? (CallbackModeDB.find(
+            (m) => m === String(toolCallArgs["callbackMode"]),
+          ) ?? null)
+        : null;
+
+    // Legacy: noLoop param still works for backward compat
+    const hasLegacyNoLoop =
       typeof toolCallArgs === "object" &&
       toolCallArgs !== null &&
       !Array.isArray(toolCallArgs) &&
       NO_LOOP_PARAM in toolCallArgs &&
-      toolCallArgs[NO_LOOP_PARAM] === true
-    ) {
+      toolCallArgs[NO_LOOP_PARAM] === true;
+
+    if (callbackModeArg === CallbackMode.END_LOOP || hasLegacyNoLoop) {
       ctx.shouldStopLoop = true;
       logger.debug(
-        `[AI Stream] Model requested loop stop via ${NO_LOOP_PARAM} parameter`,
-        { toolName: part.toolName, toolCallId: part.toolCallId },
+        "[AI Stream] Model requested loop stop via callbackMode/noLoop parameter",
+        {
+          toolName: part.toolName,
+          toolCallId: part.toolCallId,
+          callbackMode: callbackModeArg,
+        },
       );
     }
 
     // All tool metadata comes from toolsConfig built during setup
     const toolConfig = toolsConfig.get(part.toolName);
     const creditCost = toolConfig?.credits ?? 0;
-    const requiresConfirmation = toolConfig?.requiresConfirmation ?? false;
+    // requiresConfirmation from toolsConfig takes precedence; callbackMode can also request it
+    const requiresConfirmation =
+      (toolConfig?.requiresConfirmation ?? false) ||
+      callbackModeArg === CallbackMode.APPROVE;
 
     const newCurrentParentId = currentParentId;
 
@@ -177,6 +200,7 @@ export class ToolCallHandler {
       requiresConfirmation,
       isConfirmed: false,
       waitingForConfirmation: requiresConfirmation,
+      ...(callbackModeArg ? { callbackMode: callbackModeArg } : {}),
     };
 
     const toolMessageId = crypto.randomUUID();

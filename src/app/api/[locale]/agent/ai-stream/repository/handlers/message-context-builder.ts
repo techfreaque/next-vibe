@@ -111,7 +111,7 @@ export class MessageContextBuilder {
    * Force recompile: 2026-01-01
    */
   static async buildMessageContext(params: {
-    operation: "send" | "retry" | "edit" | "answer-as-ai";
+    operation: "send" | "retry" | "edit" | "answer-as-ai" | "wakeup-resume";
     threadId: string | null | undefined;
     parentMessageId: string | null | undefined;
     locale: CountryLanguage;
@@ -204,8 +204,12 @@ export class MessageContextBuilder {
       );
     } else if (!params.isIncognito && params.threadId) {
       // Server: fetch message history from database
-      if (params.operation === "answer-as-ai" && params.parentMessageId) {
-        // For answer-as-ai: walk up parent chain (same as fetchMessageHistory)
+      if (
+        (params.operation === "answer-as-ai" ||
+          params.operation === "wakeup-resume") &&
+        params.parentMessageId
+      ) {
+        // For answer-as-ai/wakeup-resume: walk up parent chain (same as fetchMessageHistory)
         // to respect compacting boundaries.
         history = await fetchMessageHistory(
           params.threadId,
@@ -267,9 +271,10 @@ export class MessageContextBuilder {
 
     const contextMessages: ChatMessage[] = [...history];
 
-    // Add current user message to context (unless it's answer-as-ai or tool confirmations)
+    // Add current user message to context (unless it's answer-as-ai, wakeup-resume, or tool confirmations)
     const shouldAddCurrentMessage =
       params.operation !== "answer-as-ai" &&
+      params.operation !== "wakeup-resume" &&
       !params.hasToolConfirmations &&
       params.content.trim();
 
@@ -438,6 +443,8 @@ export class MessageContextBuilder {
         },
       );
     }
+    // wakeup-resume: no CONTINUE_CONVERSATION_PROMPT — AI sees the deferred tool result
+    // as the last message in the thread and responds naturally without extra prompting.
 
     // Build [Context:] line for the trailing messages
     let contextLine: string | null = null;

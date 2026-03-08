@@ -422,6 +422,9 @@ function handleTokensUpdated(
       e.promptTokens,
       e.completionTokens,
       e.totalTokens,
+      e.cachedInputTokens,
+      e.cacheWriteTokens,
+      e.timeToFirstToken,
       e.creditCost,
       e.finishReason,
     );

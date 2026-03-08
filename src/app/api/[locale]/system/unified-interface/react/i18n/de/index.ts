@@ -54,6 +54,7 @@ export const translations: typeof enTranslations = {
         executing: "Wird ausgeführt...",
         complete: "Abgeschlossen",
         background: "Hintergrund",
+        deferred: "Async-Ergebnis",
         waitingForConfirmation: "Wartet auf Bestätigung",
         pendingConfirmation: "Bestätigung ausstehend",
         pendingCancellation: "Stornierung ausstehend",
@@ -64,6 +65,8 @@ export const translations: typeof enTranslations = {
       },
       messages: {
         executingTool: "Tool wird ausgeführt...",
+        deferredResult:
+          "Dieses Ergebnis ist asynchron nach dem Ende des ursprünglichen Streams angekommen.",
         taskId: "Aufgaben-ID:",
         errorLabel: "Fehler:",
         noArguments: "Keine Argumente",

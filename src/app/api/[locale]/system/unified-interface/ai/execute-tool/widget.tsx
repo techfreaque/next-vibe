@@ -179,7 +179,7 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
   const endpointOptions = useMemo(():
     | UseEndpointOptions<EndpointMethods>
     | undefined => {
-    if (!hasInput || !method) {
+    if (!method) {
       return undefined;
     }
 
@@ -187,10 +187,18 @@ export function ExecuteToolWidget({ field }: CustomWidgetProps): JSX.Element {
     if (method === "GET") {
       return {
         read: {
-          urlPathParams: inputData as never,
+          ...(hasInput ? { urlPathParams: inputData as never } : {}),
+          // Never auto-fetch inside execute-tool — user triggers fetch explicitly
+          queryOptions: { enabled: false },
         },
       };
     }
+
+    if (!hasInput) {
+      return undefined;
+    }
+
+    // disabled mutations are no-ops — only GET needs the enabled flag
 
     if (method === "DELETE") {
       return {

@@ -45,15 +45,16 @@ export interface ToolExecutionContext {
   /** The assistant message ID currently being generated */
   aiMessageId: string | undefined;
   /**
+   * Mutable: the TOOL call message ID for the currently executing tool.
+   * Set by stream-part-handler when processing tool-call, before execute() runs.
+   * execute-tool/repository.ts polls this for up to 200ms at startup to
+   * handle the race where execute() starts concurrently with stream-part-handler.
+   */
+  currentToolMessageId: string | undefined;
+  /**
    * The active favorite ID — allows resume-stream to reload the exact same
    * model + character config when restarting a dead stream after a remote tool result.
    */
-  /**
-   * Mutable: the TOOL call message ID for the currently executing tool.
-   * Set by stream-part-handler when processing tool-call, before execute() runs.
-   * Used by remote tool execute() to store toolMessageId in taskInput.
-   */
-  currentToolMessageId: string | undefined;
   favoriteId: string | undefined;
   /** The character/persona driving the conversation */
   characterId: string | undefined;

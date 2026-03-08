@@ -34,12 +34,7 @@ const { GET } = createEndpoint({
   scopedTranslation,
   method: Methods.GET,
   path: ["agent", "chat", "threads", "[threadId]", "messages", "[messageId]"],
-  allowedRoles: [
-    UserRole.PUBLIC,
-    UserRole.CUSTOMER,
-    UserRole.ADMIN,
-    UserRole.REMOTE_SKILL,
-  ] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "get.title" as const,
   description: "get.description" as const,
@@ -204,12 +199,7 @@ const { PATCH } = createEndpoint({
   scopedTranslation,
   method: Methods.PATCH,
   path: ["agent", "chat", "threads", "[threadId]", "messages", "[messageId]"],
-  allowedRoles: [
-    UserRole.PUBLIC,
-    UserRole.CUSTOMER,
-    UserRole.ADMIN,
-    UserRole.REMOTE_SKILL,
-  ] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "patch.title" as const,
   description: "patch.description" as const,

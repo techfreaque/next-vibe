@@ -30,7 +30,7 @@ export const translations: typeof enTranslations = {
       freeReset: "Darmowe odnowienie",
       refund: "Zwrot",
       transfer: "Transfer",
-      otherDevices: "Wydatki z innych urządzeń",
+      otherDevices: "Wydatki z powiązanych urządzeń/sesji",
       referralEarning: "Zarobki z polecenia",
       referralPayout: "Wypłata z polecenia",
     },
@@ -140,25 +140,36 @@ export const translations: typeof enTranslations = {
     },
     balance: {
       title: "Twoje saldo kredytów",
+      adminTitle: "Limit wydatków",
       description: "Używaj kredytów w {{modelCount}} modelach AI",
+      adminDescription:
+        "Kredyty działają jako limit wydatków — kontroluj dozwolone użycie AI. Użyj własnych kluczy API, aby całkowicie usunąć limity.",
       credit: "{{count}} kredyt",
       credits: "{{count}} kredytów",
       expiring: {
         title: "Wygasające kredyty",
         description: "{{subCredits}} nowych kredytów na cykl subskrypcji",
+        adminDescription: "Kredyty z limitem czasowym (cykl subskrypcji)",
       },
       permanent: {
         title: "Stałe kredyty",
         description: "Nie wygasają — należą do Ciebie",
+        adminDescription: "Stałe kredyty — nie wygasają",
       },
       free: {
         title: "Darmowe kredyty",
         description: "{{count}} darmowych kredytów odnawiane co miesiąc",
+        adminDescription:
+          "{{count}} darmowych kredytów na pulę/miesiąc (wspólne dla urządzeń)",
       },
       earned: {
         title: "Zarobione kredyty",
         description:
           "Zarobione przez polecenia — kliknij, aby zaprosić znajomych",
+      },
+      spending: {
+        title: "Zarobione kredyty",
+        adminDescription: "Kredyty zarobione przez polecenia",
       },
     },
     total: {

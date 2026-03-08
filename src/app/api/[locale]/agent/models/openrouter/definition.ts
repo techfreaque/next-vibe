@@ -124,6 +124,18 @@ const { GET } = createEndpoint({
               columns: 4,
               schema: z.number(),
             }),
+            cacheReadTokenCost: scopedResponseField(scopedTranslation, {
+              type: WidgetType.STAT,
+              label: "get.response.models.model.cacheReadTokenCost" as const,
+              columns: 4,
+              schema: z.number().optional(),
+            }),
+            cacheWriteTokenCost: scopedResponseField(scopedTranslation, {
+              type: WidgetType.STAT,
+              label: "get.response.models.model.cacheWriteTokenCost" as const,
+              columns: 4,
+              schema: z.number().optional(),
+            }),
           },
         }),
       }),

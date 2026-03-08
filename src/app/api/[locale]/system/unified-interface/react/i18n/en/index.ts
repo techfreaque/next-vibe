@@ -53,6 +53,7 @@ export const translations = {
         executing: "Executing...",
         complete: "Complete",
         background: "Background",
+        deferred: "Async result",
         waitingForConfirmation: "Waiting for confirmation",
         pendingConfirmation: "Pending Confirmation",
         pendingCancellation: "Pending Cancellation",
@@ -63,6 +64,8 @@ export const translations = {
       },
       messages: {
         executingTool: "Executing tool...",
+        deferredResult:
+          "This result arrived asynchronously after the original stream ended.",
         taskId: "Task ID:",
         errorLabel: "Error:",
         noArguments: "No arguments",

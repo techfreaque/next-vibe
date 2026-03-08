@@ -289,6 +289,22 @@ export class MessageConverter {
   ): Promise<ModelMessage[]> {
     const result: ModelMessage[] = [];
 
+    // Pre-pass: collect toolCallIds that have been superseded by a deferred result message.
+    // When a background/noLoop result arrives late, a second TOOL message is inserted with
+    // originalToolCallId pointing back to the original pending call. The original pending
+    // call (no result) must be suppressed from AI context so the AI sees the deferred
+    // result message as the authoritative tool call+result pair.
+    const supersededToolCallIds = new Set<string>();
+    for (const msg of messages) {
+      if (
+        msg.role === ChatMessageRole.TOOL &&
+        "metadata" in msg &&
+        msg.metadata?.toolCall?.originalToolCallId
+      ) {
+        supersededToolCallIds.add(msg.metadata.toolCall.originalToolCallId);
+      }
+    }
+
     for (let i = 0; i < messages.length; i++) {
       const msg = messages[i];
 
@@ -339,6 +355,19 @@ export class MessageConverter {
         for (const toolMsg of toolMessages) {
           const toolCall = toolMsg.metadata!.toolCall!;
 
+          // Skip original pending calls that have been superseded by a deferred result message.
+          // The deferred message (with originalToolCallId set) replaces the original in AI context.
+          if (supersededToolCallIds.has(toolCall.toolCallId)) {
+            logger.info(
+              "[MessageConverter] Skipping superseded pending tool call — deferred result message takes over",
+              {
+                toolCallId: toolCall.toolCallId,
+                toolName: toolCall.toolName,
+              },
+            );
+            continue;
+          }
+
           // Skip duplicate toolCallIds — keep the first occurrence
           // Duplicates can occur when a tool call fails and is retried with the same ID
           if (seenToolCallIds.has(toolCall.toolCallId)) {
@@ -356,12 +385,19 @@ export class MessageConverter {
           }
           seenToolCallIds.add(toolCall.toolCallId);
 
-          // Add tool call to assistant message content
+          // Add tool call to assistant message content.
+          // wakeUp: suppress args from AI context — result may arrive days later,
+          // args could be stale or already compacted. Result is what matters.
+          const inputForAi =
+            toolCall.callbackMode === "wakeUp" &&
+            (toolCall.result || toolCall.error)
+              ? {}
+              : toolCall.args;
           toolCallContent.push({
             type: "tool-call",
             toolCallId: toolCall.toolCallId,
             toolName: toolCall.toolName,
-            input: toolCall.args,
+            input: inputForAi,
           });
 
           // If tool was executed, create separate tool result message

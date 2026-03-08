@@ -80,7 +80,7 @@ export class InitialEventsHandler {
   static emitUserMessage(params: {
     userMessageId: string;
     threadId: string;
-    operation: "send" | "retry" | "edit" | "answer-as-ai";
+    operation: "send" | "retry" | "edit" | "answer-as-ai" | "wakeup-resume";
     effectiveParentMessageId: string | null | undefined;
     effectiveContent: string;
     model: ModelId;
@@ -122,8 +122,8 @@ export class InitialEventsHandler {
       userMessageMetadata,
     } = params;
 
-    // No user message for answer-as-ai
-    if (operation === "answer-as-ai") {
+    // No user message for answer-as-ai or wakeup-resume
+    if (operation === "answer-as-ai" || operation === "wakeup-resume") {
       return;
     }
 

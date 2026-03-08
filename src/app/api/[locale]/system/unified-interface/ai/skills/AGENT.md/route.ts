@@ -10,6 +10,7 @@
  *   - AGENT.md              → this file (platform overview + links)
  *   - PUBLIC_USER_SKILL.md  → all tools for a signed-in user
  *   - USER_WITH_ACCOUNT_SKILL.md → account-required tools only
+ *   - [character-id]-skill.md → per-character focused skill manifests
  */
 
 import { parseError } from "next-vibe/shared/utils/parse-error";
@@ -18,12 +19,42 @@ import { env } from "@/config/env";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { defaultLocale } from "@/i18n/core/config";
 
-const CACHE_MAX_AGE = 3600; // 1 hour — this document is stable
+import { getListableCharacters } from "../markdown-generator";
 
-function generateGatewayMarkdown(locale: CountryLanguage): string {
+const CACHE_MAX_AGE = 300; // 5 minutes — now includes dynamic character list
+
+async function generateGatewayMarkdown(
+  locale: CountryLanguage,
+): Promise<string> {
   const baseUrl = env.NEXT_PUBLIC_APP_URL ?? "https://your-app.com";
   const skillsBase = `${baseUrl}/api/${locale}/system/unified-interface/ai/skills`;
   const now = new Date().toISOString();
+
+  const characters = await getListableCharacters(locale);
+
+  // Group characters by category for the listing
+  const charByCategory = new Map<string, typeof characters>();
+  for (const char of characters) {
+    const existing = charByCategory.get(char.category) ?? [];
+    existing.push(char);
+    charByCategory.set(char.category, existing);
+  }
+
+  const characterSection = [...charByCategory.entries()]
+    .map(([category, chars]) => {
+      const header = `| Character | Auth | HTTP Tools | AI Run |`;
+      const divider = `|-----------|------|------------|--------|`;
+      const rows = chars
+        .map((char) => {
+          const authIcon = char.requiresAuth ? "🔒" : "🌐";
+          const skillUrl = `${skillsBase}/${char.id}-skill.md`;
+          const aiRunUrl = `${skillsBase}/${char.id}-ai-run.md`;
+          return `| **${char.name}** — ${char.tagline} | ${authIcon} | [skill](${skillUrl}) | [ai-run](${aiRunUrl}) |`;
+        })
+        .join("\n");
+      return `### ${category}\n\n${header}\n${divider}\n${rows}`;
+    })
+    .join("\n\n");
 
   return `# Agent Gateway
 
@@ -42,16 +73,15 @@ Posting always requires identity. Every request must carry the \`lead_id\` cooki
 
 ---
 
-## Which skill file should you load?
+## Which file should you load?
 
-| Your state | Load this file | URL |
-|------------|---------------|-----|
-| **No account / not signed in** | \`PUBLIC_USER_SKILL.md\` | [link](${skillsBase}/PUBLIC_USER_SKILL.md) |
-| **Signed in (named session token)** | \`PUBLIC_USER_SKILL.md\` | [link](${skillsBase}/PUBLIC_USER_SKILL.md) |
-| **Want account-only tools only** | \`USER_WITH_ACCOUNT_SKILL.md\` | [link](${skillsBase}/USER_WITH_ACCOUNT_SKILL.md) |
+| Goal | HTTP reference | AI Run guide |
+|------|---------------|--------------|
+| Explore all available tools | [PUBLIC_USER_SKILL.md](${skillsBase}/PUBLIC_USER_SKILL.md) | [PUBLIC_USER_AI_RUN.md](${skillsBase}/PUBLIC_USER_AI_RUN.md) |
+| Account-required tools only | [USER_WITH_ACCOUNT_SKILL.md](${skillsBase}/USER_WITH_ACCOUNT_SKILL.md) | [USER_WITH_ACCOUNT_AI_RUN.md](${skillsBase}/USER_WITH_ACCOUNT_AI_RUN.md) |
+| Act as a specific character | \`[id]-skill.md\` (see below) | \`[id]-ai-run.md\` (see below) |
 
-**Start with \`PUBLIC_USER_SKILL.md\`** — it includes both public and authenticated tools in one document.
-Load \`USER_WITH_ACCOUNT_SKILL.md\` only if you need the narrower, account-required subset.
+**Start with \`PUBLIC_USER_SKILL.md\`** for tool discovery. Use the AI Run guides to delegate tasks.
 
 ---
 
@@ -99,10 +129,25 @@ The response sets an \`auth_token\` cookie automatically. Persist it alongside \
 
 ## Skill manifests
 
-| File | Tools | When to use |
-|------|-------|-------------|
-| [\`PUBLIC_USER_SKILL.md\`](${skillsBase}/PUBLIC_USER_SKILL.md) | Public + authenticated | Default — covers almost everything |
-| [\`USER_WITH_ACCOUNT_SKILL.md\`](${skillsBase}/USER_WITH_ACCOUNT_SKILL.md) | Authenticated only | When you only want account-required tools |
+Each tier has two companion files: an **HTTP reference** (tool schemas) and an **AI Run guide** (how to delegate tasks).
+
+| File | Type | Description |
+|------|------|-------------|
+| [\`PUBLIC_USER_SKILL.md\`](${skillsBase}/PUBLIC_USER_SKILL.md) | HTTP reference | All tools — public + authenticated |
+| [\`PUBLIC_USER_AI_RUN.md\`](${skillsBase}/PUBLIC_USER_AI_RUN.md) | AI Run guide | Delegate tasks without a specific character |
+| [\`USER_WITH_ACCOUNT_SKILL.md\`](${skillsBase}/USER_WITH_ACCOUNT_SKILL.md) | HTTP reference | Account-required tools only |
+| [\`USER_WITH_ACCOUNT_AI_RUN.md\`](${skillsBase}/USER_WITH_ACCOUNT_AI_RUN.md) | AI Run guide | Account-required tasks via AI Run |
+| \`[character-id]-skill.md\` | HTTP reference | Character-scoped tool listing |
+| \`[character-id]-ai-run.md\` | AI Run guide | Delegate tasks to a specific character |
+
+---
+
+## Available Characters
+
+Each character has a focused skill set. Load its skill file for the exact tools it uses.
+🔒 = requires authentication · 🌐 = public access
+
+${characterSection}
 
 ---
 
@@ -120,13 +165,13 @@ export async function GET(
   }));
 
   try {
-    const markdown = generateGatewayMarkdown(locale ?? defaultLocale);
+    const markdown = await generateGatewayMarkdown(locale ?? defaultLocale);
 
     return new Response(markdown, {
       status: 200,
       headers: {
         "Content-Type": "text/markdown; charset=utf-8",
-        "Cache-Control": `public, max-age=${CACHE_MAX_AGE}, stale-while-revalidate=300`,
+        "Cache-Control": `public, max-age=${CACHE_MAX_AGE}, stale-while-revalidate=60`,
         "X-Skill-Tier": "gateway",
         "X-Skill-File": "AGENT.md",
       },

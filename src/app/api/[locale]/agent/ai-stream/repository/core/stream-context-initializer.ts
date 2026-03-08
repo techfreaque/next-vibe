@@ -29,6 +29,8 @@ export class StreamContextInitializer {
     logger: EndpointLogger;
     locale: CountryLanguage;
     wsEmit?: WsEmitCallback | null;
+    /** Force a specific sequenceId — used by wakeUp revival to share sequence with deferred tool pair */
+    sequenceIdOverride?: string;
   }): StreamContext {
     const {
       userMessageId,
@@ -39,6 +41,7 @@ export class StreamContextInitializer {
       logger,
       locale,
       wsEmit,
+      sequenceIdOverride,
     } = params;
     const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
 
@@ -49,7 +52,10 @@ export class StreamContextInitializer {
     // Initialize stream context OUTSIDE try block so it's accessible in catch blocks
     const lastConfirmedTool =
       toolConfirmationResults[toolConfirmationResults.length - 1];
-    const sequenceId = lastConfirmedTool?.sequenceId ?? crypto.randomUUID();
+    const sequenceId =
+      sequenceIdOverride ??
+      lastConfirmedTool?.sequenceId ??
+      crypto.randomUUID();
     const initialParentForContext =
       lastConfirmedTool?.messageId ?? initialAiParentId;
 

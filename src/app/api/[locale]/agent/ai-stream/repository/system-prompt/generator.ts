@@ -10,6 +10,7 @@
 /* eslint-disable i18next/no-literal-string */
 
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import type { JsonValue } from "@/app/api/[locale]/system/unified-interface/shared/utils/error-types";
 import { languageConfig } from "@/i18n";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
@@ -759,6 +760,29 @@ Use plain, structured text. Markdown is fine for readability; avoid decorative f
 // ─── Trailing system message ──────────────────────────────────────────────────
 
 /**
+ * Format raw completed background task rows into the summary string.
+ * Kept in generator.ts so server and any future client path use identical output.
+ */
+export function formatCompletedTasksSummary(
+  rows: Array<{
+    id: string;
+    displayName: string;
+    result: Record<string, JsonValue> | null;
+  }>,
+): string | null {
+  if (rows.length === 0) {
+    return null;
+  }
+  const lines = rows.map((row) => {
+    const resultStr = row.result
+      ? JSON.stringify(row.result).slice(0, 500)
+      : "(no output)";
+    return `- **${row.displayName}** (id: ${row.id}): ${resultStr}`;
+  });
+  return `The following background tasks completed:\n\n${lines.join("\n")}`;
+}
+
+/**
  * Build the trailing system message string injected right before the [Context:] line.
  * Single DRY source of truth — used by both server (builder.ts) and client (hook.ts).
  *
@@ -797,9 +821,7 @@ export function buildTrailingSystemMessage(params: {
   }
 
   if (params.completedTasksSummary?.trim()) {
-    parts.push(
-      `[Background tasks completed since your last response]\n\n${params.completedTasksSummary.trim()}`,
-    );
+    parts.push(params.completedTasksSummary.trim());
   }
 
   if (params.tasksSummary?.trim()) {

@@ -95,6 +95,7 @@ export class AiStreamRepository {
     extraInstructions?: string;
     excludeMemories?: boolean;
     favoriteIdOverride?: string;
+    sequenceIdOverride?: string;
   }): Promise<ResponseType<HeadlessAiStreamResult>>;
 
   /** Interactive overload — returns response output (events stream via WS) */
@@ -108,6 +109,7 @@ export class AiStreamRepository {
     t: AiStreamT;
     extraInstructions?: string;
     excludeMemories?: boolean;
+    sequenceIdOverride?: string;
   }): Promise<ResponseType<AiStreamPostResponseOutput>>;
 
   static async createAiStream({
@@ -121,6 +123,7 @@ export class AiStreamRepository {
     extraInstructions,
     excludeMemories,
     favoriteIdOverride,
+    sequenceIdOverride,
   }: {
     data: AiStreamPostRequestOutput;
     locale: CountryLanguage;
@@ -132,6 +135,7 @@ export class AiStreamRepository {
     extraInstructions?: string;
     excludeMemories?: boolean;
     favoriteIdOverride?: string;
+    sequenceIdOverride?: string;
   }): Promise<
     | ResponseType<AiStreamPostResponseOutput>
     | ResponseType<HeadlessAiStreamResult>
@@ -224,6 +228,7 @@ export class AiStreamRepository {
             user,
             logger,
             wsEmit,
+            sequenceIdOverride,
           });
 
         try {
@@ -421,6 +426,7 @@ export class AiStreamRepository {
             messages,
             streamAbortController,
             systemPrompt,
+            trailingSystemMessage,
             tools,
             toolsConfig,
             activeToolNames,

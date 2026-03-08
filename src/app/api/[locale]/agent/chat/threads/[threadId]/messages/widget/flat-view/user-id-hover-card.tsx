@@ -117,7 +117,10 @@ export function UserIdHoverCard({
                 size="unset"
                 className="w-full text-left p-2 rounded hover:bg-accent transition-colors"
               >
-                <Div className="text-xs text-muted-foreground mb-1">
+                <Div
+                  className="text-xs text-muted-foreground mb-1"
+                  suppressHydrationWarning
+                >
                   {/* eslint-disable-next-line i18next/no-literal-string -- Technical post number and separator */}
                   {`Post #${idx + 1} • ${format4chanTimestamp(post.createdAt.getTime(), tGlobal)}`}
                 </Div>

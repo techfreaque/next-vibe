@@ -28,11 +28,11 @@ export const {
  *   AI_TOOL_OFF   — not available as an AI tool
  *   WEB_OFF       — not available on web (tRPC, Next.js pages/API)
  *   MCP_OFF       — not available on MCP specifically (in addition to CLI_OFF)
+ *   SKILL_OFF     — excluded from AI skill markdown files (AGENT.md, character skill files, etc.)
  *   PRODUCTION_OFF — disabled in production environment
  *
  * Opt-in markers: endpoint must explicitly include these to be accessible.
  *   MCP_VISIBLE   — endpoint appears in the MCP server's tool *discovery* list
- *   REMOTE_SKILL  — endpoint appears in AI skill markdown files (AGENT.md, etc.)
  *   CLI_AUTH_BYPASS — endpoint is accessible without auth for basic routes like check, dev, etc.
  */
 export const {
@@ -47,7 +47,7 @@ export const {
   MCP_OFF: "enums.userRole.mcpOff",
   MCP_VISIBLE: "enums.userRole.mcpVisible",
   PRODUCTION_OFF: "enums.userRole.productionOff",
-  REMOTE_SKILL: "enums.userRole.remoteSkill",
+  SKILL_OFF: "enums.userRole.skillOff",
 });
 
 /**
@@ -95,7 +95,7 @@ export function isPlatformMarker(
     role === PlatformMarker.MCP_VISIBLE ||
     role === PlatformMarker.PRODUCTION_OFF ||
     role === PlatformMarker.CLI_AUTH_BYPASS ||
-    role === PlatformMarker.REMOTE_SKILL
+    role === PlatformMarker.SKILL_OFF
   );
 }
 

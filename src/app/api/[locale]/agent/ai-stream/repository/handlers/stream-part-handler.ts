@@ -105,6 +105,10 @@ export class StreamPartHandler {
       if (result.wasCreated) {
         ctx.currentParentId = result.currentAssistantMessageId;
         ctx.lastParentId = result.currentAssistantMessageId;
+        // Record time-to-first-token on first message creation
+        if (ctx.streamStartTime === null) {
+          ctx.streamStartTime = Date.now();
+        }
       }
 
       return { shouldAbort: false };
@@ -231,6 +235,12 @@ export class StreamPartHandler {
         ctx.currentParentId = result.pendingToolMessage.messageId;
         ctx.lastParentId = result.pendingToolMessage.messageId;
 
+        // Expose the tool message ID to the tool's execute() via streamContext.
+        // execute-tool/repository.ts polls this for up to 200ms at startup to
+        // handle the race where execute() starts before stream-part-handler processes tool-call.
+        streamContext.currentToolMessageId =
+          result.pendingToolMessage.messageId;
+
         ctx.pendingToolMessages.set(part.toolCallId, result.pendingToolMessage);
       }
 
@@ -334,6 +344,18 @@ export class StreamPartHandler {
         ctx.currentAssistantMessageId = null;
         ctx.currentAssistantContent = "";
         ctx.isInReasoningBlock = false;
+
+        // Remote tool with callbackMode=wait: pause stream after this step.
+        // finish-step-handler will abort when stepHasToolsAwaitingConfirmation is set.
+        // /report resumes the thread server-side when the result arrives.
+        if (streamContext.waitingForRemoteResult) {
+          ctx.stepHasToolsAwaitingConfirmation = true;
+          streamContext.waitingForRemoteResult = false;
+          logger.info(
+            "[AI Stream] Remote tool wait mode — will pause stream at finish-step",
+            { toolName: part.toolName, toolCallId: part.toolCallId },
+          );
+        }
       }
 
       return { shouldAbort: false };

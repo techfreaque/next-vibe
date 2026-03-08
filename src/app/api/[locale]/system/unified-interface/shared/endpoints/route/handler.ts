@@ -70,7 +70,7 @@ type FilterPlatformMarkers<TRoles extends readonly UserRoleValue[]> = Exclude<
   | typeof UserRole.WEB_OFF
   | typeof UserRole.MCP_VISIBLE
   | typeof UserRole.PRODUCTION_OFF
-  | typeof UserRole.REMOTE_SKILL
+  | typeof UserRole.SKILL_OFF
 >;
 
 /**

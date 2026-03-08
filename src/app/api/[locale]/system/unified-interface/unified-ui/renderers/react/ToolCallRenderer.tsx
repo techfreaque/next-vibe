@@ -32,7 +32,7 @@ import { Copy } from "next-vibe-ui/ui/icons/Copy";
 import { Loader2 } from "next-vibe-ui/ui/icons/Loader2";
 import { Span } from "next-vibe-ui/ui/span";
 import type { JSX } from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { FieldValues } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
@@ -41,6 +41,7 @@ import type {
   ToolCall,
   ToolCallResult,
 } from "@/app/api/[locale]/agent/chat/db";
+import { pathToAliasMap } from "@/app/api/[locale]/system/generated/alias-map";
 import { definitionLoader } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/loader";
 import { type EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { CreateApiEndpointAny } from "@/app/api/[locale]/system/unified-interface/shared/types/endpoint-base";
@@ -249,78 +250,95 @@ export function ToolCallRenderer({
     hasValidated,
   ]);
 
+  /**
+   * Resolve a tool name (possibly with remote instanceId__ prefix) to a canonical
+   * alias using the generated alias-map, then load the endpoint definition.
+   *
+   * Resolution order:
+   * 1. Strip remote instanceId__ prefix (e.g. "hermes__agent_chat_threads_GET" → "agent_chat_threads_GET")
+   * 2. Look up in pathToAliasMap → canonical alias (e.g. "agent_chat_threads_GET")
+   * 3. Fall back to the stripped identifier if not in map
+   * 4. Fall back to the original identifier
+   */
+  const tryLoadIdentifier = useCallback(
+    async (identifier: string): ReturnType<typeof definitionLoader.load> => {
+      // Strip remote instanceId__ prefix
+      const stripped = identifier.includes("__")
+        ? identifier.slice(identifier.indexOf("__") + 2)
+        : identifier;
+
+      // Resolve via alias-map (may map to itself or to a short alias)
+      const canonical =
+        (pathToAliasMap as Record<string, string>)[stripped] ??
+        (pathToAliasMap as Record<string, string>)[identifier] ??
+        stripped;
+
+      // Try canonical alias first, then stripped, then original
+      const candidates = [...new Set([canonical, stripped, identifier])];
+
+      for (const candidate of candidates) {
+        const result = await definitionLoader.load({
+          identifier: candidate,
+          platform: loadPlatform,
+          user,
+          logger,
+          locale,
+        });
+        if (result.success) {
+          return result;
+        }
+      }
+
+      // Return final failure (last candidate)
+      return definitionLoader.load({
+        identifier: canonical,
+        platform: loadPlatform,
+        user,
+        logger,
+        locale,
+      });
+    },
+    [loadPlatform, user, logger, locale],
+  );
+
   useEffect(() => {
     // Skip if definition is already loaded
     if (definition) {
       return;
     }
 
-    const tryLoad = async (
-      identifier: string,
-    ): ReturnType<typeof definitionLoader.load> => {
-      let result = await definitionLoader.load({
-        identifier,
-        platform: loadPlatform,
-        user,
-        logger,
-        locale,
-      });
-
-      if (!result.success && identifier.includes("_")) {
-        result = await definitionLoader.load({
-          identifier: `${identifier.replaceAll("_", "/")}/GET`,
-          platform: loadPlatform,
-          user,
-          logger,
-          locale,
-        });
-      }
-
-      if (!result.success && identifier.includes("_")) {
-        result = await definitionLoader.load({
-          identifier: `${identifier.replaceAll("_", "/")}/POST`,
-          platform: loadPlatform,
-          user,
-          logger,
-          locale,
-        });
-      }
-
-      return result;
-    };
-
     const loadDef = async (): Promise<void> => {
-      const result = await tryLoad(toolCall.toolName);
-
+      const result = await tryLoadIdentifier(toolCall.toolName);
       if (result.success) {
         setDefinition(result.data);
-
-        // For execute-tool: also resolve the child endpoint's definition
-        if (result.data.aliases?.includes("execute-tool")) {
-          const args = toolCall.args;
-          const childToolName =
-            args && typeof args === "object" && "toolName" in args
-              ? (args as Record<string, string>).toolName
-              : undefined;
-          if (childToolName) {
-            const childResult = await tryLoad(childToolName);
-            if (childResult.success) {
-              setChildDefinition(childResult.data);
-            }
-          }
-        }
       }
     };
     void loadDef();
-  }, [
-    toolCall.toolName,
-    toolCall.args,
-    locale,
-    user,
-    definition,
-    loadPlatform,
-    logger,
-  ]);
+  }, [toolCall.toolName, definition, tryLoadIdentifier]);
+
+  // Separate effect: load child definition for execute-tool once parent + args are available.
+  // Runs whenever args change so it picks up toolName even if args arrived after definition.
+  useEffect(() => {
+    if (!definition?.aliases?.includes("execute-tool")) {
+      return;
+    }
+    const args = toolCall.args;
+    const childToolName =
+      args && typeof args === "object" && "toolName" in args
+        ? (args as Record<string, string>).toolName
+        : undefined;
+    if (!childToolName) {
+      return;
+    }
+
+    const loadChild = async (): Promise<void> => {
+      const childResult = await tryLoadIdentifier(childToolName);
+      if (childResult.success) {
+        setChildDefinition(childResult.data);
+      }
+    };
+    void loadChild();
+  }, [definition, toolCall.args, tryLoadIdentifier]);
 
   const hasResult = Boolean(toolCall.result);
   // Detect error: toolCall.error should be an ErrorResponseType (object with success=false).
@@ -339,8 +357,17 @@ export function ToolCallRenderer({
   // (remote async tasks may complete with no result payload)
   const isTerminalStatus =
     toolCall.status === "completed" || toolCall.status === "failed";
+  // detach: async fire-and-forget — this message stays pending forever, result arrives in task history
+  const isBackground =
+    toolCall.callbackMode === "detach" && toolCall.status === "pending";
+  // deferred: result arrived async after original stream ended (wakeUp/endLoop)
+  const isDeferred = Boolean(toolCall.isDeferred);
   const isLoading =
-    !hasResult && !hasError && !isWaitingForConfirmation && !isTerminalStatus;
+    !hasResult &&
+    !hasError &&
+    !isWaitingForConfirmation &&
+    !isTerminalStatus &&
+    !isBackground;
 
   /** Extract a displayable error message from toolCall.error or toolCall.result (when it's an ErrorResponseType) */
   const getErrorMessage = (): string => {
@@ -625,13 +652,24 @@ export function ToolCallRenderer({
                   {t("widgets.toolCall.status.executing")}
                 </Span>
               )}
+              {isBackground && (
+                <Span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                  {t("widgets.toolCall.status.background")}
+                </Span>
+              )}
               {(hasResult || isTerminalStatus) &&
                 !hasError &&
-                !isWaitingForConfirmation && (
+                !isWaitingForConfirmation &&
+                !isBackground && (
                   <Span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-500">
                     {t("widgets.toolCall.status.complete")}
                   </Span>
                 )}
+              {isDeferred && (
+                <Span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-500">
+                  {t("widgets.toolCall.status.deferred")}
+                </Span>
+              )}
             </Div>
           </Div>
         </CollapsibleTrigger>
@@ -639,6 +677,12 @@ export function ToolCallRenderer({
         {/* Content */}
         <CollapsibleContent>
           <Div className="border-t border-border/50 bg-card">
+            {/* Deferred result notice */}
+            {isDeferred && (
+              <Div className="flex items-center gap-2 px-3 py-2 text-xs text-purple-500 bg-purple-500/5 border-b border-purple-500/10">
+                <Span>{t("widgets.toolCall.messages.deferredResult")}</Span>
+              </Div>
+            )}
             {/* Loading State - show spinner, and endpoint with input data if available */}
             {isLoading && (
               <>

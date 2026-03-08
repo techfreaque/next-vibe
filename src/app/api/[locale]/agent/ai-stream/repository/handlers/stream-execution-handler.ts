@@ -38,6 +38,7 @@ export class StreamExecutionHandler {
     messages: ModelMessage[];
     streamAbortController: AbortController;
     systemPrompt: string;
+    trailingSystemMessage?: string;
     tools: Record<string, CoreTool> | undefined;
     toolsConfig: Map<
       string,
@@ -65,6 +66,7 @@ export class StreamExecutionHandler {
       messages,
       streamAbortController,
       systemPrompt,
+      trailingSystemMessage,
       tools,
       toolsConfig,
       activeToolNames,
@@ -181,6 +183,7 @@ export class StreamExecutionHandler {
           userId,
           model,
           systemPrompt,
+          trailingSystemMessage,
           messages,
           tools,
           user,
@@ -197,12 +200,25 @@ export class StreamExecutionHandler {
       throw streamError;
     }
 
-    const usageData = await streamResult.usage;
+    const [usageData, providerMeta] = await Promise.all([
+      streamResult.usage,
+      streamResult.providerMetadata,
+    ]);
     const inputTokens = usageData.inputTokens ?? 0;
     const outputTokens = usageData.outputTokens ?? 0;
     const cachedInputTokens =
       usageData.cachedInputTokens ??
       usageData.inputTokenDetails?.cacheReadTokens ??
+      0;
+    // cacheWriteTokens: prefer inputTokenDetails (OpenRouter/Anthropic native),
+    // fall back to providerMetadata for claude-code provider which emits it there
+    const cacheWriteTokens =
+      usageData.inputTokenDetails?.cacheWriteTokens ??
+      (
+        providerMeta?.["claude-code"] as
+          | { cacheWriteTokens?: number }
+          | undefined
+      )?.cacheWriteTokens ??
       0;
     const reasoningTokens =
       usageData.reasoningTokens ??
@@ -212,8 +228,10 @@ export class StreamExecutionHandler {
 
     const actualCreditCost = calculateCreditCost(
       modelConfig,
-      uncachedInputTokens,
+      inputTokens,
       outputTokens,
+      cachedInputTokens,
+      cacheWriteTokens,
     );
 
     const cachePercentage =
@@ -222,6 +240,7 @@ export class StreamExecutionHandler {
     logger.debug("[CACHE DEBUG] Token usage from AI response", {
       cachePercentage: `${cachePercentage}%`,
       cachedInputTokens,
+      cacheWriteTokens,
       uncachedInputTokens,
       inputTokens,
       outputTokens,
@@ -241,6 +260,8 @@ export class StreamExecutionHandler {
         inputTokens,
         outputTokens,
         totalTokens: usageData.totalTokens ?? 0,
+        cachedInputTokens,
+        cacheWriteTokens,
       },
       finishReason: finishReason ?? null,
       ttsHandler,

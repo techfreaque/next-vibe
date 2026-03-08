@@ -23,6 +23,7 @@ import type { SendMessageParams } from "@/app/api/[locale]/agent/ai-stream/strea
 import type { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
 import type { ChatMessage } from "@/app/api/[locale]/agent/chat/db";
 import { ChatMessageRole, ViewMode } from "@/app/api/[locale]/agent/chat/enum";
+import { getVoteStatus } from "@/app/api/[locale]/agent/chat/threads/[threadId]/messages/[messageId]/vote/utils";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 import type { CountryLanguage } from "@/i18n/core/config";
@@ -92,6 +93,10 @@ interface LinearMessageViewProps {
   onLoadNewerHistory: ((anchorId: string) => void) | null;
   /** Whether newer history is currently loading */
   isLoadingNewerHistory: boolean;
+  /** Vote callback — null when voting is not available */
+  onVoteMessage:
+    | ((messageId: string, vote: 1 | -1 | 0) => Promise<void>)
+    | null;
 }
 
 export const LinearMessageView = React.memo(function LinearMessageView({
@@ -127,6 +132,7 @@ export const LinearMessageView = React.memo(function LinearMessageView({
   deductCredits,
   onLoadNewerHistory,
   isLoadingNewerHistory,
+  onVoteMessage,
 }: LinearMessageViewProps): JSX.Element {
   const { t } = scopedTranslation.scopedT(locale);
 
@@ -355,6 +361,19 @@ export const LinearMessageView = React.memo(function LinearMessageView({
                           sendMessage={sendMessage}
                           deductCredits={deductCredits}
                           className={index === 0 ? "md:mt-10" : undefined}
+                          onVote={onVoteMessage}
+                          userVote={
+                            getVoteStatus(
+                              group.primary,
+                              currentUserId ?? undefined,
+                            ).userVote
+                          }
+                          voteScore={
+                            getVoteStatus(
+                              group.primary,
+                              currentUserId ?? undefined,
+                            ).voteScore
+                          }
                         />
                       )}
                     {message.role === "error" && (

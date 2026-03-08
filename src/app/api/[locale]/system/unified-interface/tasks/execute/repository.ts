@@ -230,6 +230,7 @@ export class TaskExecuteRepository {
     let finalMessage: string | null = null;
     let finalDurationMs = 0;
     let taskSucceeded = false;
+    let finalResult: JsonValue | null = null;
     let firstExecutionId: string | null = null;
     let didLogHistory = false;
 
@@ -339,6 +340,7 @@ export class TaskExecuteRepository {
         taskSucceeded = true;
         finalStatus = CronTaskStatus.COMPLETED;
         finalMessage = null;
+        finalResult = (typedResult.data as JsonValue) ?? null;
         break;
       }
 
@@ -379,12 +381,12 @@ export class TaskExecuteRepository {
     const completionUserId = taskUserContext?.user.id ?? currentUserId ?? null;
 
     if (taskToolMessageId && completionUserId) {
-      void handleTaskCompletion({
+      await handleTaskCompletion({
         toolMessageId: taskToolMessageId,
         threadId: taskThreadId,
         callbackMode: taskCallbackMode,
         status: finalStatus,
-        output: taskSucceeded ? ((task.taskInput ?? {}) as JsonValue) : null,
+        output: taskSucceeded ? finalResult : null,
         taskId: task.id,
         taskInput: taskInput as Record<string, JsonValue>,
         userId: completionUserId,

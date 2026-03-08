@@ -1,0 +1,1 @@
+ALTER TABLE "cron_tasks" ADD COLUMN "hidden" boolean DEFAULT false NOT NULL;

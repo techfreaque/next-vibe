@@ -29,6 +29,8 @@ export class StreamCompletionHandler {
       inputTokens: number;
       outputTokens: number;
       totalTokens: number;
+      cachedInputTokens: number;
+      cacheWriteTokens: number;
     };
     finishReason: string | null;
     ttsHandler: StreamingTTSHandler | null;
@@ -87,6 +89,9 @@ export class StreamCompletionHandler {
       ctx.lastAssistantMessageId || ctx.currentAssistantMessageId;
 
     if (messageIdForTokens) {
+      const timeToFirstToken =
+        ctx.streamStartTime !== null ? Date.now() - ctx.streamStartTime : null;
+
       // Write token metadata to DB. This is a no-op if finalizeAssistantMessage already wrote
       // it via writeContentAndTokens, but is essential when finalization was skipped (the common
       // case for multi-step streams where content was flushed via throttled writes).
@@ -94,6 +99,10 @@ export class StreamCompletionHandler {
         promptTokens: usage.inputTokens,
         completionTokens: usage.outputTokens,
         finishReason: finishReason ?? null,
+        cachedInputTokens: usage.cachedInputTokens,
+        cacheWriteTokens: usage.cacheWriteTokens,
+        timeToFirstToken,
+        creditCost: modelCost,
       });
 
       ctx.dbWriter.emitTokensUpdated({
@@ -101,6 +110,9 @@ export class StreamCompletionHandler {
         promptTokens: usage.inputTokens,
         completionTokens: usage.outputTokens,
         totalTokens: usage.totalTokens,
+        cachedInputTokens: usage.cachedInputTokens,
+        cacheWriteTokens: usage.cacheWriteTokens,
+        timeToFirstToken,
         finishReason: finishReason ?? null,
         creditCost: modelCost,
       });

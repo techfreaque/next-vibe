@@ -36,7 +36,6 @@ const { POST } = createEndpoint({
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
     UserRole.AI_TOOL_OFF,
-    UserRole.REMOTE_SKILL,
   ] as const,
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,

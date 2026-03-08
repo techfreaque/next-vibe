@@ -31,6 +31,8 @@ interface OpenRouterModel {
   pricing: {
     prompt: string;
     completion: string;
+    input_cache_read?: string;
+    input_cache_write?: string;
   };
 }
 
@@ -92,6 +94,8 @@ export class OpenRouterModelsRepository {
         contextLength: number;
         inputTokenCost: number;
         outputTokenCost: number;
+        cacheReadTokenCost?: number;
+        cacheWriteTokenCost?: number;
       }> = [];
 
       const updates: Array<{
@@ -101,6 +105,8 @@ export class OpenRouterModelsRepository {
         contextLength?: number;
         inputTokenCost?: number;
         outputTokenCost?: number;
+        cacheReadTokenCost?: number;
+        cacheWriteTokenCost?: number;
       }> = [];
 
       const nonOpenRouterProviders: Array<{
@@ -131,12 +137,25 @@ export class OpenRouterModelsRepository {
             const roundedInput = Math.round(inputTokenCost * 100) / 100;
             const roundedOutput = Math.round(outputTokenCost * 100) / 100;
 
+            const cacheReadTokenCost = model.pricing.input_cache_read
+              ? Math.round(
+                  parseFloat(model.pricing.input_cache_read) * 1_000_000 * 100,
+                ) / 100
+              : undefined;
+            const cacheWriteTokenCost = model.pricing.input_cache_write
+              ? Math.round(
+                  parseFloat(model.pricing.input_cache_write) * 1_000_000 * 100,
+                ) / 100
+              : undefined;
+
             models.push({
               id: providerConfig.id,
               name: model.name,
               contextLength: model.context_length,
               inputTokenCost: roundedInput,
               outputTokenCost: roundedOutput,
+              cacheReadTokenCost,
+              cacheWriteTokenCost,
             });
 
             updates.push({
@@ -146,6 +165,8 @@ export class OpenRouterModelsRepository {
               contextLength: model.context_length,
               inputTokenCost: roundedInput,
               outputTokenCost: roundedOutput,
+              cacheReadTokenCost,
+              cacheWriteTokenCost,
             });
           } else {
             updates.push({
@@ -239,6 +260,60 @@ export class OpenRouterModelsRepository {
             outputCostRegex,
             `$1${update.outputTokenCost}`,
           );
+        }
+
+        // cacheReadTokenCost: update existing value or insert after outputTokenCost
+        if (update.cacheReadTokenCost !== undefined) {
+          const cacheReadUpdateRegex = new RegExp(
+            `(providerModel:\\s*"${escapedOpenRouterId}"[\\s\\S]*?cacheReadTokenCost:\\s*)[\\d.]+`,
+          );
+          if (cacheReadUpdateRegex.test(content)) {
+            content = content.replace(
+              cacheReadUpdateRegex,
+              `$1${update.cacheReadTokenCost}`,
+            );
+          } else {
+            // Insert after outputTokenCost in this provider block
+            const insertAfterOutputRegex = new RegExp(
+              `(providerModel:\\s*"${escapedOpenRouterId}"[\\s\\S]*?outputTokenCost:\\s*[\\d.]+)(,?)`,
+            );
+            content = content.replace(
+              insertAfterOutputRegex,
+              `$1,\n        cacheReadTokenCost: ${update.cacheReadTokenCost}`,
+            );
+          }
+        }
+
+        // cacheWriteTokenCost: update existing value or insert after cacheReadTokenCost
+        if (update.cacheWriteTokenCost !== undefined) {
+          const cacheWriteUpdateRegex = new RegExp(
+            `(providerModel:\\s*"${escapedOpenRouterId}"[\\s\\S]*?cacheWriteTokenCost:\\s*)[\\d.]+`,
+          );
+          if (cacheWriteUpdateRegex.test(content)) {
+            content = content.replace(
+              cacheWriteUpdateRegex,
+              `$1${update.cacheWriteTokenCost}`,
+            );
+          } else {
+            // Insert after cacheReadTokenCost (if present) or outputTokenCost
+            const insertAfterCacheReadRegex = new RegExp(
+              `(providerModel:\\s*"${escapedOpenRouterId}"[\\s\\S]*?cacheReadTokenCost:\\s*[\\d.]+)(,?)`,
+            );
+            const insertAfterOutputRegex = new RegExp(
+              `(providerModel:\\s*"${escapedOpenRouterId}"[\\s\\S]*?outputTokenCost:\\s*[\\d.]+)(,?)`,
+            );
+            if (insertAfterCacheReadRegex.test(content)) {
+              content = content.replace(
+                insertAfterCacheReadRegex,
+                `$1,\n        cacheWriteTokenCost: ${update.cacheWriteTokenCost}`,
+              );
+            } else {
+              content = content.replace(
+                insertAfterOutputRegex,
+                `$1,\n        cacheWriteTokenCost: ${update.cacheWriteTokenCost}`,
+              );
+            }
+          }
         }
       }
 

@@ -45,6 +45,7 @@ import type { z } from "zod";
 import type { ModelId } from "@/app/api/[locale]/agent/models/models";
 import { leads } from "@/app/api/[locale]/leads/db";
 import type { ErrorResponseType } from "@/app/api/[locale]/shared/types/response.schema";
+import type { CallbackModeValue } from "@/app/api/[locale]/system/unified-interface/ai/execute-tool/constants";
 import type { IconKey } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/icon-field/icons";
 import { users } from "@/app/api/[locale]/user/db";
 import { type UserPermissionRoleValue } from "@/app/api/[locale]/user/user-roles/enum";
@@ -87,6 +88,25 @@ export interface ToolCall {
   requiresConfirmation?: boolean;
   isConfirmed?: boolean;
   waitingForConfirmation?: boolean; // True when stream is paused waiting for user confirmation
+  /** For async remote tools: pending until /report backfills the result */
+  status?: "pending" | "completed" | "failed";
+  /** taskId of the remote cron task — set for async remote tool calls */
+  remoteTaskId?: string;
+  /** callbackMode used for this tool call — determines continuation behavior */
+  callbackMode?: CallbackModeValue;
+  /**
+   * For deferred result messages (background/noLoop): the toolCallId of the
+   * original pending call that this message supersedes. The original message
+   * has no result; this message has both args (copied) and result. The AI
+   * sees this as a fresh tool call+result pair (new unique toolCallId) and
+   * the original pending call is suppressed from AI context.
+   */
+  originalToolCallId?: string;
+  /**
+   * True for deferred result messages — result arrived asynchronously after
+   * the original stream ended (wakeUp/endLoop). UI shows a distinct badge.
+   */
+  isDeferred?: boolean;
 }
 
 /**
@@ -127,6 +147,10 @@ export interface MessageMetadata {
   promptTokens?: number;
   completionTokens?: number;
   totalTokens?: number;
+  cachedInputTokens?: number;
+  cacheWriteTokens?: number;
+  timeToFirstToken?: number;
+  creditCost?: number;
   finishReason?: string;
   streamingTime?: number;
 

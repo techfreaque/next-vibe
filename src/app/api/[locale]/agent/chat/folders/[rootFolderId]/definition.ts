@@ -44,12 +44,7 @@ const { GET } = createEndpoint({
   method: Methods.GET,
   path: ["agent", "chat", "folders", "[rootFolderId]"],
   aliases: ["folders-list", "folders"] as const,
-  allowedRoles: [
-    UserRole.PUBLIC,
-    UserRole.CUSTOMER,
-    UserRole.ADMIN,
-    UserRole.REMOTE_SKILL,
-  ] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "get.title" as const,
   description: "get.description" as const,

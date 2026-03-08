@@ -54,6 +54,7 @@ export const translations: typeof enTranslations = {
         executing: "Wykonywanie...",
         complete: "Zakończono",
         background: "W tle",
+        deferred: "Wynik asynchroniczny",
         waitingForConfirmation: "Oczekiwanie na potwierdzenie",
         pendingConfirmation: "Oczekujące Potwierdzenie",
         pendingCancellation: "Oczekujące Anulowanie",
@@ -64,6 +65,8 @@ export const translations: typeof enTranslations = {
       },
       messages: {
         executingTool: "Wykonywanie narzędzia...",
+        deferredResult:
+          "Ten wynik dotarł asynchronicznie po zakończeniu oryginalnego strumienia.",
         taskId: "ID zadania:",
         errorLabel: "Błąd:",
         noArguments: "Brak argumentów",

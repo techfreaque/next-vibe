@@ -14,7 +14,6 @@ import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface
 import type { JwtPayloadType } from "@/app/api/[locale]/user/auth/types";
 
 import { chatMessages, chatThreads } from "../../../../../db";
-import { PermissionsRepositoryClient } from "../../../../../permissions/repository-client";
 import type {
   VotePostRequestOutput,
   VotePostResponseOutput,
@@ -84,7 +83,7 @@ export const voteRepository = {
       }
 
       // Check voting permissions - simplified
-      if (!PermissionsRepositoryClient.canVoteMessage(userId, message)) {
+      if (!userId) {
         return fail({
           message: t("post.errors.forbidden.title"),
           errorType: ErrorResponseTypes.FORBIDDEN,

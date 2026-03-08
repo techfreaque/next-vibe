@@ -1,0 +1,1 @@
+ALTER TABLE "user_remote_connections" ADD COLUMN "remote_instance_id" text;

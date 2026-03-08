@@ -35,11 +35,7 @@ const { POST } = createEndpoint({
   icon: "lock",
   category: "app.endpointCategories.userAuth",
   tags: ["request.tag"],
-  allowedRoles: [
-    UserRole.PUBLIC,
-    UserRole.AI_TOOL_OFF,
-    UserRole.REMOTE_SKILL,
-  ] as const,
+  allowedRoles: [UserRole.PUBLIC, UserRole.AI_TOOL_OFF] as const,
   fields: scopedObjectFieldNew(scopedTranslation, {
     type: WidgetType.CONTAINER,
     layoutType: LayoutType.STACKED,

@@ -798,28 +798,15 @@ export class CreditRepository {
     let freeCreditsSpentThisPeriod = 0;
 
     if (leadWallets.length > 0) {
-      // Get the period ID from the most recently reset wallet
-      const activePeriodId = leadWallets.reduce((newest, current) =>
-        current.freePeriodStart > newest.freePeriodStart ? current : newest,
-      ).freePeriodId;
+      // Use the current calendar period — all lead wallets in a pool share the
+      // same month after ensureMonthlyFreeCreditsForPool advances them together.
+      const activePeriodId = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
 
       const leadWalletIds = leadWallets.map((w) => w.id);
 
-      // Find the most recent FREE_GRANT for this period
-      const [latestGrant] = await db
-        .select()
-        .from(creditTransactions)
-        .where(
-          and(
-            inArray(creditTransactions.walletId, leadWalletIds),
-            eq(creditTransactions.freePeriodId, activePeriodId),
-            eq(creditTransactions.type, CreditTransactionType.FREE_GRANT),
-          ),
-        )
-        .orderBy(desc(creditTransactions.createdAt))
-        .limit(1);
-
-      // Only count USAGE after the most recent FREE_GRANT
+      // Count ALL free-credit USAGE in this period across all lead wallets.
+      // Do NOT filter by latestGrant cutoff — after a pool merge, each lead has
+      // its own FREE_GRANT timestamp and filtering would miss the older lead's spending.
       const usageTransactions = await db
         .select()
         .from(creditTransactions)
@@ -828,9 +815,6 @@ export class CreditRepository {
             inArray(creditTransactions.walletId, leadWalletIds),
             eq(creditTransactions.freePeriodId, activePeriodId),
             eq(creditTransactions.type, CreditTransactionType.USAGE),
-            latestGrant
-              ? gte(creditTransactions.createdAt, latestGrant.createdAt)
-              : sql`true`,
           ),
         );
 
@@ -1052,7 +1036,10 @@ export class CreditRepository {
     const initialCredits =
       poolFreeCredits >= maxFreeCreditsPerPool
         ? 0
-        : CreditRepository.getInitialFreeCredits(locale);
+        : Math.min(
+            CreditRepository.getInitialFreeCredits(locale),
+            maxFreeCreditsPerPool - poolFreeCredits,
+          );
 
     try {
       const newWallet = await withTransaction(logger, async (tx) => {
@@ -1871,8 +1858,11 @@ export class CreditRepository {
     locale: CountryLanguage,
     allowPartial = false, //  allow deducting less than requested
   ): Promise<ResponseType<void>> {
+    // Round amount to 6 decimal places to avoid floating point precision artifacts
+    const roundedAmount = Math.round(amount * 1_000_000) / 1_000_000;
+
     // Input validation
-    if (amount <= 0) {
+    if (roundedAmount <= 0) {
       return fail({
         message: t("errors.invalidAmount"),
         errorType: ErrorResponseTypes.BAD_REQUEST,
@@ -1885,6 +1875,9 @@ export class CreditRepository {
         errorType: ErrorResponseTypes.BAD_REQUEST,
       });
     }
+
+    // Use rounded amount for all further calculations
+    amount = roundedAmount;
 
     try {
       // Get pool for this identifier
@@ -1922,7 +1915,30 @@ export class CreditRepository {
         return poolResult;
       }
 
-      const pool = poolResult.data;
+      let pool = poolResult.data;
+
+      // For authenticated users: ensure the current session's lead wallet is included
+      // in the pool even if the lead isn't yet in userLeadLinks (e.g. new session
+      // before the link is established). Without this, each unlinked lead gets its own
+      // independent 20 free credits, bypassing the pool cap entirely.
+      if (identifier.userId && identifier.leadId) {
+        const currentLeadAlreadyInPool = pool.leadWallets.some(
+          (w) => w.leadId === identifier.leadId,
+        );
+        if (!currentLeadAlreadyInPool) {
+          const [currentLeadWallet] = await db
+            .select()
+            .from(creditWallets)
+            .where(eq(creditWallets.leadId, identifier.leadId))
+            .limit(1);
+          if (currentLeadWallet) {
+            pool = {
+              ...pool,
+              leadWallets: [...pool.leadWallets, currentLeadWallet],
+            };
+          }
+        }
+      }
 
       // AUTOMATIC EXPIRATION: Expire old credits before deducting
       const walletIds = [
@@ -2005,13 +2021,14 @@ export class CreditRepository {
             (sum, w) => sum + w.freeCreditsRemaining,
             0,
           );
-          // Use actual wallet balance capped at pool max.
-          // The wallet balance already reflects all past spending, so we don't
-          // need the transaction-history-based check (which breaks when excess
-          // initial grants push freeCreditsSpentThisPeriod above the cap).
+          // Cap uses BOTH wallet balance AND transaction history.
+          // After a pool merge, two leads may each have remaining free credits
+          // but their combined period spending already exceeds the pool limit.
+          // Example: lead A spent 15, lead B spent 15 → 30 spent total → 0 available,
+          // even though wallets still show freeCreditsRemaining > 0.
           const freeCreditsAvailableInPool = Math.min(
             actualFreeRemaining,
-            maxFreeCreditsPerPool,
+            Math.max(0, maxFreeCreditsPerPool - freeCreditsSpentThisPeriod),
           );
 
           logger.debug("Pool free credit limit check", {
@@ -2488,6 +2505,10 @@ export class CreditRepository {
         otherLeadsSpending += leadSpending;
       }
 
+      // Round to avoid floating point precision artifacts
+      otherLeadsSpending =
+        Math.round(otherLeadsSpending * 1_000_000) / 1_000_000;
+
       // Adjust offset and limit to account for synthetic summary entry on page 1
       const hasSummaryEntry = otherLeadsSpending > 0;
       const adjustedOffset =
@@ -2735,10 +2756,13 @@ export class CreditRepository {
             ),
           );
 
-        otherDevicesSpending = otherTransactions.reduce(
-          (sum, txn) => sum + Math.abs(txn.amount),
-          0,
-        );
+        otherDevicesSpending =
+          Math.round(
+            otherTransactions.reduce(
+              (sum, txn) => sum + Math.abs(txn.amount),
+              0,
+            ) * 1_000_000,
+          ) / 1_000_000;
       }
 
       // Adjust offset and limit to account for synthetic summary entry on page 1
@@ -3422,9 +3446,9 @@ export class CreditRepository {
   }
 
   /**
-   * Link lead wallets to user during signup/login
-   * NEW ARCHITECTURE: No credit redistribution - wallets stay separate
-   * Each wallet keeps its own balance, pool limit enforced at deduction time
+   * Link lead wallets to user during signup/login.
+   * Pool free-credit cap (20/period) is enforced at deduction time via
+   * transaction-history check, so no wallet surgery needed here.
    */
   static async mergePendingLeadWallets(
     userId: string,
@@ -3447,9 +3471,6 @@ export class CreditRepository {
         });
         return poolResult;
       }
-
-      // NO REDISTRIBUTION - wallets stay separate with their own balances
-      // Pool limit (max 20 free credits) enforced at DEDUCTION time, not here
 
       logger.debug("Lead wallets linked to user pool", {
         userId,

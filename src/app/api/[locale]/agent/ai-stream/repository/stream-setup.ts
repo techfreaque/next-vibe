@@ -244,6 +244,14 @@ export async function setupAiStream(params: {
       t: aiStreamT,
       streamContext: {
         rootFolderId: data.rootFolderId,
+        threadId: undefined,
+        aiMessageId: undefined,
+        currentToolMessageId: undefined,
+        characterId: undefined,
+        modelId: undefined,
+        favoriteId: undefined,
+        headless: undefined,
+        waitingForRemoteResult: undefined,
       },
     });
 
@@ -402,10 +410,11 @@ export async function setupAiStream(params: {
     data.toolConfirmations && data.toolConfirmations.length > 0
   );
 
-  // Require userMessageId for all operations except answer-as-ai and tool confirmations
+  // Require userMessageId for all operations except answer-as-ai, wakeup-resume, and tool confirmations
   if (
     !data.userMessageId &&
     data.operation !== "answer-as-ai" &&
+    data.operation !== "wakeup-resume" &&
     !hasToolConfirmations
   ) {
     logger.error(
@@ -418,10 +427,12 @@ export async function setupAiStream(params: {
     });
   }
 
-  // For "answer-as-ai", we don't create a user message, so userMessageId should be the parent message
-  // This ensures the AI message uses parentMessageId as its parent, not a non-existent userMessageId
+  // For "answer-as-ai" and "wakeup-resume", we don't create a user message
+  // The AI message uses parentMessageId as its parent
   const userMessageId =
-    data.operation === "answer-as-ai" ? null : data.userMessageId;
+    data.operation === "answer-as-ai" || data.operation === "wakeup-resume"
+      ? null
+      : data.userMessageId;
 
   // Create user message with attachments (if applicable)
   const userMessageResult =
@@ -675,6 +686,8 @@ export async function setupAiStream(params: {
     headless: params.headless,
     // favoriteId: from headless override (run endpoint) — lets resume-stream reload full context
     favoriteId: params.favoriteIdOverride,
+    currentToolMessageId: undefined,
+    waitingForRemoteResult: undefined,
   };
 
   logger.debug("Generated AI message ID", {

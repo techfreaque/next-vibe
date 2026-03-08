@@ -25,7 +25,7 @@ export class UserMessageHandler {
    */
   static async createUserMessageWithAttachments(params: {
     userMessageId: string | null;
-    operation: "send" | "retry" | "edit" | "answer-as-ai";
+    operation: "send" | "retry" | "edit" | "answer-as-ai" | "wakeup-resume";
     hasToolConfirmations: boolean;
     isIncognito: boolean;
     threadId: string;
@@ -75,11 +75,11 @@ export class UserMessageHandler {
       t,
     } = params;
 
-    // For "answer-as-ai", we don't create a user message
-    if (operation === "answer-as-ai") {
+    // For "answer-as-ai" and "wakeup-resume", we don't create a user message
+    if (operation === "answer-as-ai" || operation === "wakeup-resume") {
       logger.debug("[Setup] ✅ SKIPPING user message creation", {
         operation,
-        reason: "answer-as-ai operation",
+        reason: "no user message for this operation",
       });
       return success({ userMessageId: null });
     }

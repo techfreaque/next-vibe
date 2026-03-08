@@ -8,7 +8,7 @@
 
 import "server-only";
 
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, isNull, ne, or, sql } from "drizzle-orm";
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
 import { success } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
@@ -20,7 +20,7 @@ import { getLanguageAndCountryFromLocale } from "@/i18n/core/language-utils";
 
 import { scopedTranslation as creditsScopedTranslation } from "../../credits/i18n";
 import { CreditRepository } from "../../credits/repository";
-import { leads, userLeadLinks } from "../db";
+import { leadLeadLinks, leads, userLeadLinks } from "../db";
 import { LeadSource, LeadStatus } from "../enum";
 
 /**
@@ -289,7 +289,68 @@ export class LeadAuthRepository {
     const creditsT = creditsScopedTranslation.scopedT(locale).t;
     await CreditRepository.getLeadBalance(newLead.id, logger, creditsT, locale);
 
+    // Link to other anonymous leads with the same IP created this month
+    if (clientInfo.ipAddress) {
+      await LeadAuthRepository.linkLeadsByIp(
+        newLead.id,
+        clientInfo.ipAddress,
+        logger,
+      );
+    }
+
     return newLead.id;
+  }
+
+  /**
+   * Find other anonymous leads created this month with the same IP and link them.
+   * Inserts into leadLeadLinks with reason "ip_match". Uses onConflictDoNothing
+   * so concurrent requests and re-links are safe.
+   */
+  private static async linkLeadsByIp(
+    newLeadId: string,
+    ipAddress: string,
+    logger: EndpointLogger,
+  ): Promise<void> {
+    try {
+      const monthStart = new Date();
+      monthStart.setDate(1);
+      monthStart.setHours(0, 0, 0, 0);
+
+      const sameIpLeads = await db
+        .select({ id: leads.id })
+        .from(leads)
+        .where(
+          and(
+            ne(leads.id, newLeadId),
+            isNull(leads.email),
+            sql`${leads.metadata}->>'ipAddress' = ${ipAddress}`,
+            sql`${leads.createdAt} >= ${monthStart}`,
+          ),
+        );
+
+      if (sameIpLeads.length === 0) {
+        return;
+      }
+
+      await db
+        .insert(leadLeadLinks)
+        .values(
+          sameIpLeads.map((existing) => ({
+            leadId1: newLeadId,
+            leadId2: existing.id,
+            linkReason: "ip_match" as const,
+          })),
+        )
+        .onConflictDoNothing();
+
+      logger.debug("Linked new lead to same-IP leads", {
+        newLeadId,
+        linkedCount: sameIpLeads.length,
+      });
+    } catch (error) {
+      // Non-critical — don't fail lead creation if IP linking fails
+      logger.error("Failed to link leads by IP", parseError(error).message);
+    }
   }
 
   /**
@@ -391,6 +452,49 @@ export class LeadAuthRepository {
     logger.debug("Created lead for user", { userId, leadId: newLead.id });
 
     return newLead.id;
+  }
+
+  /**
+   * Get all leadIds reachable from a given leadId via the leadLeadLinks graph.
+   * Used at signup/login to merge all IP-linked lead wallets into the user pool.
+   */
+  static async getLinkedLeadIds(
+    leadId: string,
+    logger: EndpointLogger,
+  ): Promise<string[]> {
+    try {
+      // Traverse the undirected leadLeadLinks graph from this lead
+      const visited = new Set<string>([leadId]);
+      const queue = [leadId];
+
+      while (queue.length > 0) {
+        const current = queue.shift()!;
+        const neighbors = await db
+          .select({
+            other: sql<string>`CASE WHEN ${leadLeadLinks.leadId1} = ${current} THEN ${leadLeadLinks.leadId2} ELSE ${leadLeadLinks.leadId1} END`,
+          })
+          .from(leadLeadLinks)
+          .where(
+            or(
+              eq(leadLeadLinks.leadId1, current),
+              eq(leadLeadLinks.leadId2, current),
+            ),
+          );
+
+        for (const { other } of neighbors) {
+          if (!visited.has(other)) {
+            visited.add(other);
+            queue.push(other);
+          }
+        }
+      }
+
+      // Return all linked leads excluding the starting lead itself
+      return [...visited].filter((id) => id !== leadId);
+    } catch (error) {
+      logger.error("Failed to get linked lead IDs", parseError(error).message);
+      return [];
+    }
   }
 
   /**

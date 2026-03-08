@@ -149,14 +149,14 @@ export const { POST, tools } = endpointsHandler({
           const callbackMode: CallbackModeValue | null =
             rawCallbackMode === CallbackMode.WAIT
               ? CallbackMode.WAIT
-              : rawCallbackMode === CallbackMode.BACKGROUND
-                ? CallbackMode.BACKGROUND
-                : rawCallbackMode === CallbackMode.NO_LOOP
-                  ? CallbackMode.NO_LOOP
+              : rawCallbackMode === CallbackMode.DETACH
+                ? CallbackMode.DETACH
+                : rawCallbackMode === CallbackMode.END_LOOP
+                  ? CallbackMode.END_LOOP
                   : rawCallbackMode === CallbackMode.WAKE_UP
                     ? CallbackMode.WAKE_UP
-                    : rawCallbackMode === CallbackMode.REQUIRES_CONFIRMATION
-                      ? CallbackMode.REQUIRES_CONFIRMATION
+                    : rawCallbackMode === CallbackMode.APPROVE
+                      ? CallbackMode.APPROVE
                       : null;
 
           if ((toolMessageId ?? threadId) && task.userId) {

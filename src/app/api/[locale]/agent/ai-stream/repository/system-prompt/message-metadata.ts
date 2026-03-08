@@ -53,7 +53,11 @@ export function createMessageMetadata(
     (rootFolderId === "public" || rootFolderId === "shared") &&
     message.authorId
   ) {
-    parts.push(`Author:${message.authorId.slice(-8)}`);
+    const authorShortId = message.authorId.slice(-8);
+    const authorLabel = message.authorName
+      ? `${message.authorName}(${authorShortId})`
+      : authorShortId;
+    parts.push(`Author:${authorLabel}`);
   }
 
   // Votes (show if either upvotes or downvotes > 0)

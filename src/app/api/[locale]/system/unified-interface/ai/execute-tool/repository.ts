@@ -28,7 +28,6 @@ import {
   type ToolExecutionContext,
 } from "@/app/api/[locale]/agent/chat/config";
 import { db } from "@/app/api/[locale]/system/db";
-import type { CliRequestData } from "@/app/api/[locale]/system/unified-interface/cli/runtime/parsing";
 import { RouteExecutionExecutor } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/route/executor";
 import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
 import { Platform } from "@/app/api/[locale]/system/unified-interface/shared/types/platform";
@@ -68,6 +67,20 @@ export class RouteExecuteRepository {
     streamContext: ToolExecutionContext,
   ): Promise<ResponseType<RouteExecuteResponseInput>> {
     try {
+      // Wait for stream-part-handler to set currentToolMessageId.
+      // execute() starts concurrently with stream-part-handler's tool-call processing —
+      // poll up to 200ms to let stream-part-handler catch up and set the field.
+      if (streamContext && !streamContext.currentToolMessageId) {
+        for (let i = 0; i < 40; i++) {
+          await new Promise<void>((resolve) => {
+            setTimeout(resolve, 5);
+          });
+          if (streamContext.currentToolMessageId) {
+            break;
+          }
+        }
+      }
+
       // Split prefixed tool ID: "hermes__ssh_exec_POST" → instanceId="hermes", toolName="ssh_exec_POST"
       // Prefixed form takes precedence over explicit instanceId prop
       let toolName = data.toolName;
@@ -162,7 +175,7 @@ export class RouteExecuteRepository {
           enabled: true,
           runOnce: true,
           taskInput: {
-            ...((input ?? {}) as Record<string, JsonValue>),
+            ...(input ?? {}),
             // Routing context — read by handleTaskCompletion on completion.
             ...({
               callbackMode,
@@ -197,6 +210,11 @@ export class RouteExecuteRepository {
           result: undefined,
           taskId,
           status: CronTaskStatus.PENDING,
+          ...(callbackMode === CallbackMode.DETACH
+            ? {
+                hint: "Task detached. Use wait-for-task with this taskId if you need the result.",
+              }
+            : {}),
         });
       }
 
@@ -205,7 +223,7 @@ export class RouteExecuteRepository {
       // Local background: execute inline, store result in task execution history,
       // return { taskId, status: "pending" } to AI. handleTaskCompletion emits
       // the TASK_COMPLETED WS event and inserts the deferred result message.
-      if (callbackMode === CallbackMode.BACKGROUND) {
+      if (callbackMode === CallbackMode.DETACH) {
         const taskId = `local-bg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
         const executionId = `exec-${taskId}`;
         const startedAt = new Date();
@@ -230,7 +248,7 @@ export class RouteExecuteRepository {
           runOnce: true,
           taskInput: {
             ...(input ?? {}),
-            callbackMode: CallbackMode.BACKGROUND,
+            callbackMode: CallbackMode.DETACH,
             ...(effectiveThreadId ? { threadId: effectiveThreadId } : {}),
             ...(effectiveToolMessageId
               ? { toolMessageId: effectiveToolMessageId }
@@ -238,13 +256,15 @@ export class RouteExecuteRepository {
           },
           outputMode: TaskOutputMode.STORE_ONLY,
           notificationTargets: [],
-          tags: ["background", "local"],
+          tags: ["detach", "local"],
           userId: user.id,
         });
 
-        const result = await RouteExecutionExecutor.executeGenericHandler({
+        const result = await RouteExecutionExecutor.executeGenericHandler<
+          Record<string, JsonValue>
+        >({
           toolName,
-          data: input as CliRequestData,
+          data: input ?? {},
           user,
           locale,
           logger,
@@ -267,9 +287,7 @@ export class RouteExecuteRepository {
           ? CronTaskStatus.COMPLETED
           : CronTaskStatus.FAILED;
         const finalResult =
-          result.success && result.data !== undefined
-            ? (result.data as Record<string, JsonValue>)
-            : null;
+          result.success && result.data !== undefined ? result.data : null;
 
         await db.insert(cronTaskExecutions).values({
           taskId,
@@ -281,7 +299,7 @@ export class RouteExecuteRepository {
           completedAt,
           durationMs: completedAt.getTime() - startedAt.getTime(),
           result: finalResult ?? undefined,
-          triggeredBy: "background",
+          triggeredBy: "detach",
           config: {},
         });
 
@@ -298,16 +316,15 @@ export class RouteExecuteRepository {
           })
           .where(eq(cronTasks.id, taskId));
 
-        // Emit TASK_COMPLETED WS event + insert deferred result message so the UI
-        // updates the tool bubble and the result is visible even if the original
-        // message is later compacted.
+        // detach: result stays in task history only — never injected into thread.
+        // Emit TASK_COMPLETED WS so UI bubble updates, but no deferred message.
         if (effectiveToolMessageId && effectiveThreadId && !user.isPublic) {
           await handleTaskCompletion({
             toolMessageId: effectiveToolMessageId,
             threadId: effectiveThreadId,
-            callbackMode: CallbackMode.BACKGROUND,
+            callbackMode: null, // null = WS event + backfill only, no deferred message
             status: finalStatus,
-            output: finalResult,
+            output: null, // no result injected into thread
             taskId,
             taskInput: null,
             userId: user.id,
@@ -317,13 +334,15 @@ export class RouteExecuteRepository {
 
         return success({
           taskId,
-          status: finalStatus,
-          hint: "Task completed in the background. The result will appear as a separate message in this thread.",
+          hint: "Task detached. Use wait-for-task with this taskId if you need the result.",
         });
       }
 
-      // Local wakeUp: execute inline, backfill tool message + schedule resume-stream,
-      // pause stream (same as remote wait). AI continues via headless append.
+      // Local wakeUp: execute inline, backfill tool message + schedule resume-stream.
+      // Stream is NOT paused — AI continues naturally with the result.
+      // resume-stream is scheduled as a safety net: if the stream is still alive it
+      // no-ops (isStreaming=true check); if it has died (e.g. HTTP timeout, next turn
+      // was the last), interactive stream revives the thread when the async side signals done.
       if (callbackMode === CallbackMode.WAKE_UP) {
         const taskId = `local-wu-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
         const executionId = `exec-${taskId}`;
@@ -343,16 +362,18 @@ export class RouteExecuteRepository {
           priority: CronTaskPriority.HIGH,
           enabled: false,
           runOnce: true,
-          taskInput: (input ?? {}) as Record<string, JsonValue>,
+          taskInput: input ?? {},
           outputMode: TaskOutputMode.STORE_ONLY,
           notificationTargets: [],
           tags: ["wakeup", "local"],
           userId: user.id,
         });
 
-        const result = await RouteExecutionExecutor.executeGenericHandler({
+        const result = await RouteExecutionExecutor.executeGenericHandler<
+          Record<string, JsonValue>
+        >({
           toolName,
-          data: input as CliRequestData,
+          data: input ?? {},
           user,
           locale,
           logger,
@@ -375,9 +396,7 @@ export class RouteExecuteRepository {
           ? CronTaskStatus.COMPLETED
           : CronTaskStatus.FAILED;
         const finalResult =
-          result.success && result.data !== undefined
-            ? (result.data as Record<string, JsonValue>)
-            : null;
+          result.success && result.data !== undefined ? result.data : null;
 
         await db.insert(cronTaskExecutions).values({
           taskId,
@@ -432,28 +451,25 @@ export class RouteExecuteRepository {
           });
         }
 
-        // Pause the stream — resume-stream will revive the thread
-        if (streamContext) {
-          streamContext.waitingForRemoteResult = true;
-        }
-
+        // wakeUp: return taskId + hint only — result is delivered via resume-stream
+        // which injects a tool result message into the loop (live or revived).
+        // Args are suppressed from AI context on revival (callbackMode stored on tool message).
         return success({
-          result: undefined,
           taskId,
-          status: CronTaskStatus.PENDING,
+          hint: "Task running. Result will be injected into this thread when ready.",
         });
       }
 
-      logger.info("[RouteExecute] Executing route", { toolName });
+      logger.debug("[RouteExecute] Executing route", { toolName });
 
       const result = await RouteExecutionExecutor.executeGenericHandler({
         toolName,
-        data: input as CliRequestData,
+        data: input ?? {},
         user,
         locale,
         logger,
         platform: Platform.MCP,
-        streamContext: {
+        streamContext: streamContext ?? {
           rootFolderId: DefaultFolderId.CRON,
           threadId: undefined,
           aiMessageId: undefined,

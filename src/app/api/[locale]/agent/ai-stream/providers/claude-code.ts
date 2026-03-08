@@ -240,6 +240,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
         let totalInputTokens = 0;
         let totalOutputTokens = 0;
         let totalCachedTokens = 0;
+        let totalCacheWriteTokens = 0;
         let finishReason: LanguageModelV2FinishReason = "other";
         let textBlockId = 0;
         let hasStartedText = false;
@@ -248,6 +249,13 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
         /** Track current reasoning block id for emitting reasoning-end */
         let currentReasoningId = "";
         let isInReasoningBlock = false;
+
+        // Build env without CLAUDECODE / CLAUDE_CODE_ENTRYPOINT so the nested-session
+        // guard doesn't fire when running inside a Claude Code session.
+        // Must omit keys entirely — setting to undefined is ignored by the SDK merge.
+        const { CLAUDECODE, CLAUDE_CODE_ENTRYPOINT, ...agentEnv } = process.env;
+        void CLAUDECODE;
+        void CLAUDE_CODE_ENTRYPOINT;
 
         try {
           const agentQuery = query({
@@ -271,11 +279,7 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
               stderr: (data: string) => {
                 logger.warn("[AnthropicAgent] stderr", { data });
               },
-              env: {
-                ...process.env,
-                // Unset CLAUDECODE to allow spawning from within a Claude Code session
-                CLAUDECODE: undefined,
-              },
+              env: agentEnv,
             },
           });
 
@@ -336,13 +340,13 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
                 if (msg.usage) {
                   totalInputTokens += msg.usage.input_tokens;
                   totalOutputTokens += msg.usage.output_tokens;
-                  if ("cache_read_input_tokens" in msg.usage) {
-                    const { cache_read_input_tokens } =
-                      msg.usage as typeof msg.usage & {
-                        cache_read_input_tokens: number;
-                      };
-                    totalCachedTokens += cache_read_input_tokens ?? 0;
-                  }
+                  const extUsage = msg.usage as typeof msg.usage & {
+                    cache_read_input_tokens?: number;
+                    cache_creation_input_tokens?: number;
+                  };
+                  totalCachedTokens += extUsage.cache_read_input_tokens ?? 0;
+                  totalCacheWriteTokens +=
+                    extUsage.cache_creation_input_tokens ?? 0;
                 }
                 finishReason =
                   msg.stop_reason === "tool_use" ? "tool-calls" : "stop";
@@ -365,6 +369,8 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
                   totalOutputTokens = message.usage.output_tokens;
                   totalCachedTokens =
                     message.usage.cache_read_input_tokens ?? 0;
+                  totalCacheWriteTokens =
+                    message.usage.cache_creation_input_tokens ?? 0;
                 }
                 finishReason = message.subtype === "success" ? "stop" : "error";
                 break;
@@ -376,7 +382,8 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
             }
           }
 
-          // Emit finish
+          // Emit finish — include cache write tokens in providerMetadata
+          // since LanguageModelV2Usage doesn't have inputTokenDetails
           controller.enqueue({
             type: "finish",
             usage: {
@@ -386,6 +393,9 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
               cachedInputTokens: totalCachedTokens,
             },
             finishReason,
+            providerMetadata: {
+              "claude-code": { cacheWriteTokens: totalCacheWriteTokens },
+            },
           });
         } catch (error) {
           if (
@@ -402,6 +412,9 @@ class AnthropicAgentLanguageModel implements LanguageModelV2 {
                 cachedInputTokens: totalCachedTokens,
               },
               finishReason: "other",
+              providerMetadata: {
+                "claude-code": { cacheWriteTokens: totalCacheWriteTokens },
+              },
             });
           } else {
             logger.error("[AnthropicAgent] Stream error", {

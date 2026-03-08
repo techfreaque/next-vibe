@@ -26,6 +26,7 @@ import type { CountryLanguage } from "@/i18n/core/config";
 
 import type { CliRequestData } from "../../../cli/runtime/parsing";
 import type { CliCompatiblePlatform } from "../../../cli/runtime/route-executor";
+import type { JsonValue } from "../../../tasks/unified-runner/types";
 import type { EndpointLogger } from "../../logger/endpoint";
 import type { Platform } from "../../types/platform";
 import { splitArgs } from "../../utils/split-args";
@@ -56,9 +57,9 @@ export class RouteExecutionExecutor {
    */
   public static async executeGenericHandler<TResult>(params: {
     toolName: string;
-    data: CliRequestData;
+    data: CliRequestData | Record<string, JsonValue>;
     /** Pre-split URL path params. If omitted, auto-split from data. */
-    urlPathParams?: CliRequestData;
+    urlPathParams?: CliRequestData | Record<string, JsonValue>;
     user: JwtPayloadType;
     locale: CountryLanguage;
     logger: EndpointLogger;
@@ -79,11 +80,17 @@ export class RouteExecutionExecutor {
 
       // Split args: if urlPathParams was not provided by the caller, derive it
       // automatically from data using the endpoint schema.
-      let resolvedData: CliRequestData = params.data;
-      let resolvedUrlPathParams: CliRequestData = params.urlPathParams ?? {};
+      // Cast to CliRequestData at the boundary — both CliRequestData and
+      // Record<string, JsonValue> are structurally compatible at runtime.
+      let resolvedData: CliRequestData = params.data as CliRequestData;
+      let resolvedUrlPathParams: CliRequestData =
+        (params.urlPathParams as CliRequestData) ?? {};
 
       if (params.urlPathParams === undefined) {
-        const split = await splitArgs(params.toolName, params.data);
+        const split = await splitArgs(
+          params.toolName,
+          params.data as CliRequestData,
+        );
         resolvedData = split.data;
         resolvedUrlPathParams = split.urlPathParams;
       }

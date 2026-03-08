@@ -48,6 +48,20 @@ export async function waitForTask(
   const { taskId } = data;
 
   try {
+    // Wait for stream-part-handler to set currentToolMessageId.
+    // execute() starts concurrently with stream-part-handler's tool-call processing —
+    // poll up to 200ms to let stream-part-handler catch up and set the field.
+    if (streamContext && !streamContext.currentToolMessageId) {
+      for (let i = 0; i < 40; i++) {
+        await new Promise<void>((resolve) => {
+          setTimeout(resolve, 5);
+        });
+        if (streamContext.currentToolMessageId) {
+          break;
+        }
+      }
+    }
+
     const [task] = await db
       .select()
       .from(cronTasks)
@@ -95,6 +109,10 @@ export async function waitForTask(
       streamContext?.currentToolMessageId ?? streamContext?.aiMessageId;
 
     if (effectiveThreadId && effectiveToolMessageId) {
+      const streamModelId = streamContext?.modelId;
+      const streamCharacterId = streamContext?.characterId;
+      const streamFavoriteId = streamContext?.favoriteId;
+
       await db
         .update(cronTasks)
         .set({
@@ -105,8 +123,12 @@ export async function waitForTask(
               threadId: effectiveThreadId,
               toolMessageId: effectiveToolMessageId,
             } satisfies TaskRoutingContext),
+            ...(streamModelId ? { modelId: streamModelId } : {}),
+            ...(streamCharacterId ? { characterId: streamCharacterId } : {}),
+            ...(streamFavoriteId ? { favoriteId: streamFavoriteId } : {}),
           },
-          userId: task.userId ?? user.id,
+          // Use the calling user's ID so resume-stream runs as the stream owner
+          userId: !user.isPublic ? user.id : (task.userId ?? null),
           updatedAt: new Date(),
         })
         .where(eq(cronTasks.id, taskId));

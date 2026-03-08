@@ -30,7 +30,7 @@ export const translations: typeof enTranslations = {
       freeReset: "Kostenlose Zurücksetzung",
       refund: "Rückerstattung",
       transfer: "Übertragung",
-      otherDevices: "Verbrauch von anderen Geräten",
+      otherDevices: "Verbrauch von verknüpften Geräten/Sitzungen",
       referralEarning: "Empfehlungsverdienst",
       referralPayout: "Empfehlungsauszahlung",
     },
@@ -142,25 +142,36 @@ export const translations: typeof enTranslations = {
     },
     balance: {
       title: "Ihr Credit-Guthaben",
+      adminTitle: "Ausgabenlimit",
       description: "Nutzen Sie Ihre Credits bei {{modelCount}} KI-Modellen",
+      adminDescription:
+        "Credits wirken als Ausgabenlimit — kontrollieren Sie die erlaubte KI-Nutzung. Verwenden Sie eigene API-Schlüssel, um Limits vollständig aufzuheben.",
       credit: "{{count}} Credit",
       credits: "{{count}} Credits",
       expiring: {
         title: "Ablaufende Credits",
         description: "{{subCredits}} neue Credits pro Abonnementzyklus",
+        adminDescription: "Zeitlich begrenzte Credits (Abonnementzyklus)",
       },
       permanent: {
         title: "Permanente Credits",
         description: "Laufen nie ab – gehören Ihnen",
+        adminDescription: "Permanente Credits — laufen nie ab",
       },
       free: {
         title: "Kostenlose Credits",
         description: "{{count}} kostenlose Credits monatlich aufgefrischt",
+        adminDescription:
+          "{{count}} kostenlose Credits pro Pool/Monat (geteilt über Geräte)",
       },
       earned: {
         title: "Verdiente Credits",
         description:
           "Durch Empfehlungen verdient – klicken Sie, um Freunde einzuladen",
+      },
+      spending: {
+        title: "Verdiente Credits",
+        adminDescription: "Durch Empfehlungen verdiente Credits",
       },
     },
     total: {

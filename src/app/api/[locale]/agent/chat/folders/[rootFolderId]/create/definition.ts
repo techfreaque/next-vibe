@@ -37,11 +37,7 @@ const { POST } = createEndpoint({
   method: Methods.POST,
   path: ["agent", "chat", "folders", "[rootFolderId]", "create"],
   aliases: ["folder-create"] as const,
-  allowedRoles: [
-    UserRole.CUSTOMER,
-    UserRole.ADMIN,
-    UserRole.REMOTE_SKILL,
-  ] as const,
+  allowedRoles: [UserRole.CUSTOMER, UserRole.ADMIN] as const,
 
   title: "title" as const,
   description: "description" as const,

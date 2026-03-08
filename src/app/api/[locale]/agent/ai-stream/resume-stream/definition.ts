@@ -92,6 +92,35 @@ const { POST } = createEndpoint({
         schema: z.string().optional(),
       }),
 
+      // ── wakeUp: original tool message to inject deferred result from ─────
+      // Named wakeUpToolMessageId (not toolMessageId) to avoid being picked up
+      // by the cron executor's generic completion handler which reads taskInput.toolMessageId
+      // and would overwrite the original wakeUp tool message with the resume-stream result.
+      wakeUpToolMessageId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        columns: 12,
+        schema: z.string().optional(),
+      }),
+
+      // ── Cleanup: IDs of cron tasks to delete after revival completes ─────
+      // wakeUpTaskId: the originating wakeUp cron task
+      // resumeTaskId: this resume-stream task itself
+      // Both are deleted after the revival AI message is written.
+      wakeUpTaskId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        columns: 6,
+        schema: z.string().optional(),
+      }),
+
+      resumeTaskId: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        columns: 6,
+        schema: z.string().optional(),
+      }),
+
       // ── Response ────────────────────────────────────────────────────────
       resumed: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,

@@ -300,6 +300,18 @@ export const translations = {
         credits: "Credits",
         tokens: "Tokens",
         tokensUsed: "Tokens used",
+        inputTokens: "Input",
+        outputTokens: "Output",
+        cachedTokens: "Cached",
+        cachedPercent: "{{percent}}% cached",
+        cachedPercentTitle:
+          "{{percent}}% of input tokens were served from cache, reducing cost",
+        timeToFirstToken: "{{seconds}}s to first token",
+        timeToFirstTokenTitle: "Time from request to first token",
+        cacheWriteTokens: "Cache write",
+        cacheWrite: "{{tokens}} written to cache",
+        cacheWriteTitle:
+          "{{tokens}} tokens written to cache this request (billed at cache write rate)",
         deleteMessage: "Delete message",
         upvote: "Upvote",
         downvote: "Downvote",

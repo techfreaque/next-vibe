@@ -89,7 +89,7 @@ const ROLE_MCP_OFF = "enums.userRole.mcpOff";
 const ROLE_MCP_VISIBLE = "enums.userRole.mcpVisible";
 const ROLE_PRODUCTION_OFF = "enums.userRole.productionOff";
 const ROLE_CLI_AUTH_BYPASS = "enums.userRole.cliAuthBypass";
-const ROLE_REMOTE_SKILL = "enums.userRole.remoteSkill";
+const ROLE_SKILL_OFF = "enums.userRole.skillOff";
 const ROLE_PUBLIC = "enums.userRole.public";
 
 function checkPlatformAccess(roles: string[], platform: Platform): boolean {
@@ -109,7 +109,7 @@ function checkPlatformAccess(roles: string[], platform: Platform): boolean {
     case Platform.CRON:
       return !roles.includes(ROLE_AI_TOOL_OFF) && !roles.includes(ROLE_WEB_OFF);
     case Platform.REMOTE_SKILL:
-      return roles.includes(ROLE_REMOTE_SKILL);
+      return !roles.includes(ROLE_SKILL_OFF);
     case Platform.CLI_PACKAGE:
       return (
         !roles.includes(ROLE_CLI_OFF) && roles.includes(ROLE_CLI_AUTH_BYPASS)
@@ -135,7 +135,7 @@ function checkUserAccess(
       !r.endsWith("Off") &&
       !r.endsWith("Bypass") &&
       r !== ROLE_MCP_VISIBLE &&
-      r !== ROLE_REMOTE_SKILL,
+      r !== ROLE_SKILL_OFF,
   );
   if (permRoles.length === 0) {
     return false;

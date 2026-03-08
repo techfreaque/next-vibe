@@ -26,6 +26,8 @@ export const translations: typeof enTranslations = {
           contextLength: "Kontextlänge",
           inputTokenCost: "Eingabekosten ($/1M Token)",
           outputTokenCost: "Ausgabekosten ($/1M Token)",
+          cacheReadTokenCost: "Cache-Lesekosten ($/1M Token)",
+          cacheWriteTokenCost: "Cache-Schreibkosten ($/1M Token)",
         },
       },
       missingOpenRouterModels: {

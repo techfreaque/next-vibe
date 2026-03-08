@@ -244,7 +244,7 @@ export const leadLeadLinks = pgTable(
       .notNull()
       .references(() => leads.id, { onDelete: "cascade" }),
     linkReason: text("link_reason")
-      .$type<"track_page" | "referral" | "manual" | "test">()
+      .$type<"track_page" | "referral" | "manual" | "test" | "ip_match">()
       .notNull(),
     linkedAt: timestamp("linked_at").defaultNow().notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),

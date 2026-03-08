@@ -67,6 +67,8 @@ export class StreamStartHandler {
     user: JwtPayloadType;
     logger: EndpointLogger;
     wsEmit?: WsEmitCallback | null;
+    /** Force a specific sequenceId — used by wakeUp revival to share sequence with deferred tool pair */
+    sequenceIdOverride?: string;
   }): {
     ctx: StreamContext;
     ttsHandler: StreamingTTSHandler | null;
@@ -87,6 +89,7 @@ export class StreamStartHandler {
       user,
       logger,
       wsEmit,
+      sequenceIdOverride,
     } = params;
 
     // Initialize stream context (creates MessageDbWriter with controller + encoder)
@@ -99,6 +102,7 @@ export class StreamStartHandler {
       logger,
       locale,
       wsEmit,
+      sequenceIdOverride,
     });
 
     // Create streaming TTS handler if voice mode enabled

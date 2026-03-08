@@ -90,9 +90,13 @@ const { POST } = createEndpoint({
             value: "answer-as-ai",
             label: "post.operation.options.answerAsAi" as const,
           },
+          {
+            value: "wakeup-resume",
+            label: "post.operation.options.answerAsAi" as const, // internal, not shown in UI
+          },
         ],
         schema: z
-          .enum(["send", "retry", "edit", "answer-as-ai"])
+          .enum(["send", "retry", "edit", "answer-as-ai", "wakeup-resume"])
           .default("send"),
       }),
       rootFolderId: scopedRequestField(scopedTranslation, {

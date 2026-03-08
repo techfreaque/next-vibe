@@ -36,7 +36,6 @@ const { DELETE } = createEndpoint({
     UserRole.ADMIN,
     UserRole.PARTNER_ADMIN,
     UserRole.PARTNER_EMPLOYEE,
-    UserRole.REMOTE_SKILL,
     UserRole.AI_TOOL_OFF,
   ] as const,
   fields: scopedObjectFieldNew(scopedTranslation, {

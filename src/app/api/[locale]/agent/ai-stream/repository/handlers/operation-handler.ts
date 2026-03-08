@@ -134,6 +134,19 @@ export class OperationHandler {
           parentMessageId: data.parentMessageId,
         });
         break;
+
+      case "wakeup-resume":
+        operationResult = {
+          threadId: data.threadId,
+          parentMessageId: data.parentMessageId,
+          content: data.content,
+          role: data.role,
+        };
+        logger.debug("WakeUp-Resume operation", {
+          threadId: data.threadId,
+          parentMessageId: data.parentMessageId,
+        });
+        break;
     }
 
     return {

@@ -192,13 +192,18 @@ export class SignupRepositoryImpl implements SignupRepository {
       );
 
       // Merge lead wallet into user wallet immediately (not lazy)
-      // This ensures user gets their pre-signup credits right away
+      // This ensures user gets their pre-signup credits right away.
+      // Also include all IP-linked leads so their shared pool collapses into the user.
       const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
       const { CreditRepository } =
         await import("@/app/api/[locale]/credits/repository");
+      const linkedLeadIds = await LeadAuthRepository.getLinkedLeadIds(
+        user.leadId,
+        logger,
+      );
       const mergeResult = await CreditRepository.mergePendingLeadWallets(
         userData.id,
-        [user.leadId],
+        [user.leadId, ...linkedLeadIds],
         logger,
         creditsT,
       );

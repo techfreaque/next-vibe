@@ -359,12 +359,17 @@ export class LoginRepository {
       await LeadAuthRepository.linkLeadToUser(leadId, userId, logger);
 
       // Merge lead wallet into user wallet immediately
-      // This ensures user gets their pre-login credits
+      // This ensures user gets their pre-login credits.
+      // Also include all IP-linked leads so their shared pool collapses into the user.
       const { CreditRepository } = await import("../../../credits/repository");
       const { t: creditsT } = creditsScopedTranslation.scopedT(locale);
+      const linkedLeadIds = await LeadAuthRepository.getLinkedLeadIds(
+        leadId,
+        logger,
+      );
       const mergeResult = await CreditRepository.mergePendingLeadWallets(
         userId,
-        [leadId],
+        [leadId, ...linkedLeadIds],
         logger,
         creditsT,
       );

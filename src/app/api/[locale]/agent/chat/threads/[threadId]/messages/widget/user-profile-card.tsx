@@ -81,7 +81,10 @@ export function UserProfileCard({
                 onClick={() => onPostClick?.(post.id)}
                 className="w-full text-left p-2 rounded hover:bg-accent/50 transition-colors"
               >
-                <Div className="text-xs text-muted-foreground mb-1">
+                <Div
+                  className="text-xs text-muted-foreground mb-1"
+                  suppressHydrationWarning
+                >
                   {formatRelativeTime(post.createdAt.getTime(), locale)}
                 </Div>
                 <Div className="text-sm text-foreground/90 line-clamp-2">

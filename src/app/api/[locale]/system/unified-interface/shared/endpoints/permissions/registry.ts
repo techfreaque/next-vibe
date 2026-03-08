@@ -159,13 +159,13 @@ class PermissionsRegistry implements IPermissionsRegistry {
         break;
 
       case Platform.REMOTE_SKILL:
-        // REMOTE_SKILL uses opt-in model: only endpoints with REMOTE_SKILL marker are accessible
+        // REMOTE_SKILL uses opt-out model: all endpoints are accessible unless SKILL_OFF is set
         // These endpoints appear in AI-ready skill markdown files (AGENT.md, PUBLIC_USER_SKILL.md, etc.)
-        if (!platformMarkers.includes(PlatformMarker.REMOTE_SKILL)) {
+        if (platformMarkers.includes(PlatformMarker.SKILL_OFF)) {
           return {
             allowed: false,
-            reason: `Endpoint is not accessible via ${Platform.REMOTE_SKILL} platform (requires REMOTE_SKILL marker)`,
-            blockedByRole: PlatformMarker.REMOTE_SKILL,
+            reason: `Endpoint is excluded from ${Platform.REMOTE_SKILL} platform (has SKILL_OFF marker)`,
+            blockedByRole: PlatformMarker.SKILL_OFF,
           };
         }
         break;
@@ -191,7 +191,6 @@ class PermissionsRegistry implements IPermissionsRegistry {
         break;
 
       case Platform.AI:
-      case Platform.CRON:
         if (
           platformMarkers.includes(PlatformMarker.AI_TOOL_OFF) ||
           platformMarkers.includes(PlatformMarker.WEB_OFF)
@@ -202,6 +201,18 @@ class PermissionsRegistry implements IPermissionsRegistry {
             blockedByRole: platformMarkers.includes(PlatformMarker.AI_TOOL_OFF)
               ? PlatformMarker.AI_TOOL_OFF
               : PlatformMarker.WEB_OFF,
+          };
+        }
+        break;
+
+      case Platform.CRON:
+        // CRON is an internal executor — not blocked by AI_TOOL_OFF (which only prevents
+        // AI tool exposure). Only block if WEB_OFF is set (truly server-side-only endpoints).
+        if (platformMarkers.includes(PlatformMarker.WEB_OFF)) {
+          return {
+            allowed: false,
+            reason: "Endpoint is not accessible via cron platform",
+            blockedByRole: PlatformMarker.WEB_OFF,
           };
         }
         break;
@@ -671,7 +682,7 @@ class PermissionsRegistry implements IPermissionsRegistry {
     if (!endpoint.allowedRoles.includes(UserRole.AI_TOOL_OFF)) {
       platforms.push(Platform.AI);
     }
-    if (endpoint.allowedRoles.includes(PlatformMarker.REMOTE_SKILL)) {
+    if (!endpoint.allowedRoles.includes(PlatformMarker.SKILL_OFF)) {
       platforms.push(Platform.REMOTE_SKILL);
     }
     if (!endpoint.allowedRoles.includes(UserRole.WEB_OFF)) {

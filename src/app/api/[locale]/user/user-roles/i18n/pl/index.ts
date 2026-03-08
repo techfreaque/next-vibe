@@ -82,7 +82,7 @@ export const translations: typeof enTranslations = {
       mcpOff: "MCP Wyłączone",
       mcpVisible: "MCP Widoczne",
       productionOff: "Produkcja Wyłączona",
-      remoteSkill: "Zdalna Umiejętność",
+      skillOff: "Skill Wyłączony",
     },
   },
 };

@@ -118,6 +118,8 @@ export interface ModelProviderConfigTokenBased {
   creditCost: typeof calculateCreditCost;
   inputTokenCost: number;
   outputTokenCost: number;
+  cacheReadTokenCost?: number;
+  cacheWriteTokenCost?: number;
   adminOnly?: boolean;
 }
 export interface ModelProviderConfigCreditBased {
@@ -202,6 +204,8 @@ export interface ModelOptionTokenBased extends ModelOptionBase {
   creditCost: typeof calculateCreditCost;
   inputTokenCost: number;
   outputTokenCost: number;
+  cacheReadTokenCost?: number;
+  cacheWriteTokenCost?: number;
 }
 export interface ModelOptionCreditBased extends ModelOptionBase {
   creditCost: number;
@@ -498,6 +502,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1,
         outputTokenCost: 5,
+        cacheReadTokenCost: 0.1,
+        cacheWriteTokenCost: 1.25,
       },
       {
         id: ModelId.CLAUDE_CODE_HAIKU,
@@ -544,6 +550,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 5,
         outputTokenCost: 25,
+        cacheReadTokenCost: 0.5,
+        cacheWriteTokenCost: 6.25,
       },
     ],
 
@@ -572,7 +580,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     by: "anthropic",
     description: "chat.models.descriptions.claudeOpus46",
     parameterCount: undefined,
-    contextWindow: 200000,
+    contextWindow: 1000000,
     icon: "si-anthropic",
     providers: [
       {
@@ -582,6 +590,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 5,
         outputTokenCost: 25,
+        cacheReadTokenCost: 0.5,
+        cacheWriteTokenCost: 6.25,
       },
       {
         id: ModelId.CLAUDE_CODE_OPUS,
@@ -628,6 +638,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 3,
         outputTokenCost: 15,
+        cacheReadTokenCost: 0.3,
+        cacheWriteTokenCost: 3.75,
       },
     ],
 
@@ -666,6 +678,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 3,
         outputTokenCost: 15,
+        cacheReadTokenCost: 0.3,
+        cacheWriteTokenCost: 3.75,
       },
       {
         id: ModelId.CLAUDE_CODE_SONNET,
@@ -713,6 +727,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 3,
         outputTokenCost: 15,
+        cacheReadTokenCost: 0.75,
       },
     ],
 
@@ -743,6 +758,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.2,
         outputTokenCost: 0.5,
+        cacheReadTokenCost: 0.05,
       },
     ],
 
@@ -879,6 +895,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.25,
         outputTokenCost: 10,
+        cacheReadTokenCost: 0.13,
       },
     ],
 
@@ -910,6 +927,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.75,
         outputTokenCost: 14,
+        cacheReadTokenCost: 0.18,
       },
     ],
 
@@ -945,6 +963,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.25,
         outputTokenCost: 10,
+        cacheReadTokenCost: 0.13,
       },
     ],
 
@@ -981,6 +1000,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.25,
         outputTokenCost: 10,
+        cacheReadTokenCost: 0.13,
       },
     ],
 
@@ -1012,6 +1032,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2.5,
         outputTokenCost: 15,
+        cacheReadTokenCost: 0.25,
       },
     ],
 
@@ -1048,6 +1069,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.75,
         outputTokenCost: 14,
+        cacheReadTokenCost: 0.18,
       },
     ],
 
@@ -1084,6 +1106,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.75,
         outputTokenCost: 14,
+        cacheReadTokenCost: 0.18,
       },
     ],
 
@@ -1115,6 +1138,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.75,
         outputTokenCost: 14,
+        cacheReadTokenCost: 0.18,
       },
     ],
 
@@ -1153,6 +1177,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.25,
         outputTokenCost: 10,
+        cacheReadTokenCost: 0.13,
       },
     ],
 
@@ -1184,6 +1209,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.25,
         outputTokenCost: 2,
+        cacheReadTokenCost: 0.03,
       },
     ],
 
@@ -1215,6 +1241,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.05,
         outputTokenCost: 0.4,
+        cacheReadTokenCost: 0.01,
       },
     ],
 
@@ -1274,7 +1301,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         providerModel: "moonshotai/kimi-k2.5",
         creditCost: calculateCreditCost,
         inputTokenCost: 0.45,
-        outputTokenCost: 2.5,
+        outputTokenCost: 2.2,
+        cacheReadTokenCost: 0.22,
       },
     ],
 
@@ -1296,7 +1324,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     by: "moonshotAI",
     description: "chat.models.descriptions.kimiK2",
     parameterCount: 1000,
-    contextWindow: 262144,
+    contextWindow: 131072,
     icon: "moon",
     providers: [
       {
@@ -1304,8 +1332,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "moonshotai/kimi-k2-0905",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.39,
-        outputTokenCost: 1.9,
+        inputTokenCost: 0.4,
+        outputTokenCost: 2,
+        cacheReadTokenCost: 0.15,
       },
     ],
 
@@ -1328,7 +1357,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     by: "moonshotAI",
     description: "chat.models.descriptions.kimiK2Thinking",
     parameterCount: 1000,
-    contextWindow: 262144,
+    contextWindow: 131072,
     icon: "moon",
     providers: [
       {
@@ -1336,8 +1365,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "moonshotai/kimi-k2-thinking",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.4,
-        outputTokenCost: 1.75,
+        inputTokenCost: 0.47,
+        outputTokenCost: 2,
+        cacheReadTokenCost: 0.14,
       },
     ],
 
@@ -1361,7 +1391,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     by: "zAi",
     description: "chat.models.descriptions.glm5",
     parameterCount: undefined,
-    contextWindow: 205000,
+    contextWindow: 202752,
     icon: "si-zendesk",
     providers: [
       {
@@ -1369,8 +1399,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-5",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.3,
-        outputTokenCost: 2.55,
+        inputTokenCost: 0.8,
+        outputTokenCost: 2.56,
+        cacheReadTokenCost: 0.16,
       },
     ],
 
@@ -1399,8 +1430,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-4.7",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.4,
-        outputTokenCost: 1.5,
+        inputTokenCost: 0.38,
+        outputTokenCost: 1.98,
+        cacheReadTokenCost: 0.19,
       },
     ],
 
@@ -1421,7 +1453,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     by: "zAi",
     description: "chat.models.descriptions.glm47Flash",
     parameterCount: undefined,
-    contextWindow: 200000,
+    contextWindow: 202752,
     icon: "si-zendesk",
     providers: [
       {
@@ -1429,8 +1461,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-4.7-flash",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.07,
+        inputTokenCost: 0.06,
         outputTokenCost: 0.4,
+        cacheReadTokenCost: 0.01,
       },
     ],
 
@@ -1454,8 +1487,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-4.5-air",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.05,
-        outputTokenCost: 0.22,
+        inputTokenCost: 0.13,
+        outputTokenCost: 0.85,
+        cacheReadTokenCost: 0.03,
       },
     ],
 
@@ -1471,7 +1505,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     by: "zAi",
     description: "chat.models.descriptions.glm46",
     parameterCount: undefined,
-    contextWindow: 202752,
+    contextWindow: 204800,
     icon: "si-zendesk",
     providers: [
       {
@@ -1479,8 +1513,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "z-ai/glm-4.6",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.35,
-        outputTokenCost: 1.5,
+        inputTokenCost: 0.39,
+        outputTokenCost: 1.9,
       },
     ],
 
@@ -1511,6 +1545,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.6,
         outputTokenCost: 1.8,
+        cacheReadTokenCost: 0.11,
       },
     ],
 
@@ -1536,6 +1571,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.1,
         outputTokenCost: 0.4,
+        cacheReadTokenCost: 0.01,
+        cacheWriteTokenCost: 0.08,
       },
     ],
 
@@ -1566,6 +1603,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.3,
         outputTokenCost: 2.5,
+        cacheReadTokenCost: 0.03,
+        cacheWriteTokenCost: 0.08,
       },
     ],
 
@@ -1596,6 +1635,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 1.25,
         outputTokenCost: 10,
+        cacheReadTokenCost: 0.13,
+        cacheWriteTokenCost: 0.38,
       },
     ],
 
@@ -1626,6 +1667,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2,
         outputTokenCost: 12,
+        cacheReadTokenCost: 0.2,
+        cacheWriteTokenCost: 0.38,
       },
     ],
 
@@ -1660,6 +1703,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.25,
         outputTokenCost: 1.5,
+        cacheReadTokenCost: 0.03,
+        cacheWriteTokenCost: 0.08,
       },
     ],
 
@@ -1690,6 +1735,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 2,
         outputTokenCost: 12,
+        cacheReadTokenCost: 0.2,
+        cacheWriteTokenCost: 0.38,
       },
     ],
 
@@ -1725,6 +1772,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         creditCost: calculateCreditCost,
         inputTokenCost: 0.5,
         outputTokenCost: 3,
+        cacheReadTokenCost: 0.05,
+        cacheWriteTokenCost: 0.08,
       },
     ],
 
@@ -1774,7 +1823,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         providerModel: "deepseek/deepseek-v3.2",
         creditCost: calculateCreditCost,
         inputTokenCost: 0.25,
-        outputTokenCost: 0.38,
+        outputTokenCost: 0.4,
       },
     ],
 
@@ -1823,8 +1872,9 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "deepseek/deepseek-r1-0528",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.4,
-        outputTokenCost: 1.75,
+        inputTokenCost: 0.45,
+        outputTokenCost: 2.15,
+        cacheReadTokenCost: 0.22,
       },
     ],
 
@@ -1845,7 +1895,7 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
     by: "alibaba",
     description: "chat.models.descriptions.qwen3235bFree",
     parameterCount: 235,
-    contextWindow: 40960,
+    contextWindow: 131072,
     icon: "si-alibabadotcom",
     providers: [
       {
@@ -1853,8 +1903,8 @@ export const modelDefinitions: Record<string, ModelDefinition> = {
         apiProvider: ApiProvider.OPENROUTER,
         providerModel: "qwen/qwen3-235b-a22b",
         creditCost: calculateCreditCost,
-        inputTokenCost: 0.2,
-        outputTokenCost: 0.6,
+        inputTokenCost: 0.45,
+        outputTokenCost: 1.82,
       },
     ],
 
@@ -2061,28 +2111,46 @@ export function getCreditCostFromModel(
   model: ModelOption,
   actualInputTokens: number,
   actualOutputTokens: number,
+  cachedInputTokens = 0,
+  cacheWriteTokens = 0,
 ): number {
   return typeof model.creditCost === "number"
     ? model.creditCost
     : model.inputTokenCost !== undefined && model.outputTokenCost !== undefined
-      ? model.creditCost(model, actualInputTokens, actualOutputTokens)
+      ? model.creditCost(
+          model,
+          actualInputTokens,
+          actualOutputTokens,
+          cachedInputTokens,
+          cacheWriteTokens,
+        )
       : 0;
 }
 
 /**
  * Get credit cost for a specific model
  * @param modelId - The model identifier
- * @param actualInputTokens - Actual input tokens used (required)
+ * @param actualInputTokens - Total input tokens (including cached)
  * @param actualOutputTokens - Actual output tokens used (required)
+ * @param cachedInputTokens - Tokens served from cache (default 0)
+ * @param cacheWriteTokens - Tokens written to cache (default 0)
  * @returns Credit cost (defaults to 1 if model not found)
  */
 export function getModelCost(
   modelId: ModelId,
   actualInputTokens: number,
   actualOutputTokens: number,
+  cachedInputTokens = 0,
+  cacheWriteTokens = 0,
 ): number {
   const model = getModelById(modelId);
-  return getCreditCostFromModel(model, actualInputTokens, actualOutputTokens);
+  return getCreditCostFromModel(
+    model,
+    actualInputTokens,
+    actualOutputTokens,
+    cachedInputTokens,
+    cacheWriteTokens,
+  );
 }
 
 /**
@@ -2092,14 +2160,18 @@ export function getModelCost(
  * Calculate credit cost based on token pricing
  * 1 credit = $0.01 (1 cent)
  * @param modelOption - The model option with pricing information
- * @param actualInputTokens - Actual input tokens used (required)
- * @param actualOutputTokens - Actual output tokens used (required)
+ * @param actualInputTokens - Total input tokens (including cached)
+ * @param actualOutputTokens - Actual output tokens used
+ * @param cachedInputTokens - Tokens served from cache (subset of actualInputTokens, default 0)
+ * @param cacheWriteTokens - Tokens written to cache this request (default 0)
  * @returns Calculated credit cost (0 for models with 0 token costs)
  */
 export function calculateCreditCost(
   modelOption: ModelOption,
   actualInputTokens: number,
   actualOutputTokens: number,
+  cachedInputTokens = 0,
+  cacheWriteTokens = 0,
 ): number {
   // Handle credit-based models (fixed cost per message)
   if (typeof modelOption.creditCost === "number") {
@@ -2110,12 +2182,29 @@ export function calculateCreditCost(
   const tokenModel = modelOption as ModelOptionTokenBased;
   const DOLLARS_PER_CREDIT = 0.01; // 1 credit = $0.01 (1 cent)
 
-  // Calculate cost in USD per message
-  const inputCostPerMessage =
-    (tokenModel.inputTokenCost / 1_000_000) * actualInputTokens;
+  const uncachedInputTokens = actualInputTokens - cachedInputTokens;
+
+  // Uncached input tokens billed at full input rate
+  const uncachedInputCost =
+    (tokenModel.inputTokenCost / 1_000_000) * uncachedInputTokens;
+
+  // Cache reads: use cacheReadTokenCost if defined, otherwise fall back to full input rate
+  const effectiveCacheReadRate =
+    tokenModel.cacheReadTokenCost ?? tokenModel.inputTokenCost;
+  const cachedInputCost =
+    (effectiveCacheReadRate / 1_000_000) * cachedInputTokens;
+
+  // Cache writes: use cacheWriteTokenCost if defined, otherwise fall back to full input rate
+  const effectiveCacheWriteRate =
+    tokenModel.cacheWriteTokenCost ?? tokenModel.inputTokenCost;
+  const cacheWriteCost =
+    (effectiveCacheWriteRate / 1_000_000) * cacheWriteTokens;
+
   const outputCostPerMessage =
     (tokenModel.outputTokenCost / 1_000_000) * actualOutputTokens;
-  const totalCostPerMessage = inputCostPerMessage + outputCostPerMessage;
+
+  const totalCostPerMessage =
+    uncachedInputCost + cachedInputCost + cacheWriteCost + outputCostPerMessage;
 
   // Convert to credits (1 credit = $0.01)
   const credits =

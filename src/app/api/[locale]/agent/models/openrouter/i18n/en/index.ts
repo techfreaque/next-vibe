@@ -24,6 +24,8 @@ export const translations = {
           contextLength: "Context Length",
           inputTokenCost: "Input Cost ($/1M tokens)",
           outputTokenCost: "Output Cost ($/1M tokens)",
+          cacheReadTokenCost: "Cache Read Cost ($/1M tokens)",
+          cacheWriteTokenCost: "Cache Write Cost ($/1M tokens)",
         },
       },
       missingOpenRouterModels: {

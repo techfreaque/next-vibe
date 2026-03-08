@@ -515,6 +515,12 @@ export const translations: typeof enTranslations = {
     unexpectedError:
       "Wystąpił nieoczekiwany błąd: {{error}}. Spróbuj ponownie.",
   },
+  wakeUp: {
+    revivalPrompt:
+      "The async task you dispatched has completed. The result is in the tool message above. Please summarise what the task returned for me.",
+    revivalInstructions:
+      "WAKE-UP REVIVAL MODE: An async task has completed and the result is in the thread. Respond to the user's last message by summarising the tool result — 1-3 sentences only. Do NOT call any tools. Do NOT re-execute the original user request.",
+  },
   info: {
     streamInterrupted:
       "Generowanie zostało zatrzymane. Częściowa odpowiedź została zapisana.",
@@ -549,6 +555,11 @@ export const translations: typeof enTranslations = {
         characterId: {
           title: "ID postaci",
           description: "Postać/persona dla wznowionego kroku.",
+        },
+        wakeUpToolMessageId: {
+          title: "ID wiadomości narzędzia wakeUp",
+          description:
+            "ID oryginalnej wiadomości wywołania narzędzia wakeUp. Używane do wstrzyknięcia opóźnionej wiadomości z wynikiem.",
         },
         resumed: {
           title: "Wznowiony",

@@ -444,6 +444,34 @@ export function ChatMessages({
         continue;
       }
 
+      // Token fields from streaming store (available after TOKENS_UPDATED event)
+      const streamingTokenMetadata = {
+        ...(streamMsg.promptTokens !== undefined
+          ? { promptTokens: streamMsg.promptTokens }
+          : {}),
+        ...(streamMsg.completionTokens !== undefined
+          ? { completionTokens: streamMsg.completionTokens }
+          : {}),
+        ...(streamMsg.totalTokens !== undefined
+          ? { totalTokens: streamMsg.totalTokens }
+          : {}),
+        ...(streamMsg.cachedInputTokens !== undefined
+          ? { cachedInputTokens: streamMsg.cachedInputTokens }
+          : {}),
+        ...(streamMsg.cacheWriteTokens !== undefined
+          ? { cacheWriteTokens: streamMsg.cacheWriteTokens }
+          : {}),
+        ...(streamMsg.timeToFirstToken !== undefined
+          ? { timeToFirstToken: streamMsg.timeToFirstToken }
+          : {}),
+        ...(streamMsg.creditCost !== undefined
+          ? { creditCost: streamMsg.creditCost }
+          : {}),
+        ...(streamMsg.finishReason !== undefined
+          ? { finishReason: streamMsg.finishReason ?? undefined }
+          : {}),
+      };
+
       const existingMsg = messageMap.get(streamMsg.messageId);
       if (existingMsg) {
         // Update existing message with streaming content and metadata
@@ -452,6 +480,7 @@ export function ChatMessages({
           content: streamMsg.content,
           metadata: {
             ...existingMsg.metadata,
+            ...streamingTokenMetadata,
             ...(streamMsg.toolCall ? { toolCall: streamMsg.toolCall } : {}),
             ...(streamMsg.isCompacting !== undefined
               ? { isCompacting: streamMsg.isCompacting }
@@ -485,6 +514,7 @@ export function ChatMessages({
           errorMessage: null,
           errorCode: null,
           metadata: {
+            ...streamingTokenMetadata,
             ...(streamMsg.toolCall ? { toolCall: streamMsg.toolCall } : {}),
             ...(streamMsg.isCompacting !== undefined
               ? { isCompacting: streamMsg.isCompacting }

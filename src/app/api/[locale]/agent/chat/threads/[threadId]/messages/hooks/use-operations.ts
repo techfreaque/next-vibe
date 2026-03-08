@@ -420,20 +420,11 @@ export function useMessageOperations(
         return;
       }
 
-      const thread = chatStore.threads[message.threadId];
-      if (!thread) {
-        logger.error("Message operations: Thread not found for message", {
-          messageId,
-          threadId: message.threadId,
-        });
-        return;
-      }
-
       const voteString = vote === 1 ? "up" : vote === -1 ? "down" : "remove";
 
       try {
         const result = await voteMutation.mutateAsync({
-          requestData: { vote: voteString, rootFolderId: thread.rootFolderId },
+          requestData: { vote: voteString, rootFolderId: currentRootFolderId },
           urlPathParams: { threadId: message.threadId, messageId },
         });
 
@@ -479,7 +470,7 @@ export function useMessageOperations(
         );
       }
     },
-    [logger, chatStore, voteMutation, user?.id],
+    [logger, chatStore, voteMutation, user?.id, currentRootFolderId],
   );
 
   const stopGeneration = useCallback((): void => {

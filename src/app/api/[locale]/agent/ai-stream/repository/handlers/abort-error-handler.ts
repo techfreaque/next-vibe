@@ -151,6 +151,7 @@ export class AbortErrorHandler {
     userId: string | undefined;
     model: ModelId;
     systemPrompt?: string;
+    trailingSystemMessage?: string;
     messages?: ModelMessage[];
     tools?: Record<string, CoreTool>;
     user: JwtPayloadType;
@@ -165,6 +166,7 @@ export class AbortErrorHandler {
       userId,
       model,
       systemPrompt,
+      trailingSystemMessage,
       messages,
       tools,
       user,
@@ -214,8 +216,13 @@ export class AbortErrorHandler {
             contentLength: ctx.currentAssistantContent.length,
           });
 
+          const fullSystemPrompt =
+            [systemPrompt, trailingSystemMessage]
+              .filter(Boolean)
+              .join("\n\n") || undefined;
+
           const tokenEstimate = estimateTokensFromContext({
-            systemPrompt,
+            systemPrompt: fullSystemPrompt,
             messages,
             tools,
             aiResponse: ctx.currentAssistantContent,
@@ -266,6 +273,9 @@ export class AbortErrorHandler {
             promptTokens: tokenEstimate.promptTokens,
             completionTokens: tokenEstimate.completionTokens,
             totalTokens: tokenEstimate.totalTokens,
+            cachedInputTokens: 0,
+            cacheWriteTokens: 0,
+            timeToFirstToken: null,
             finishReason: "stop",
             creditCost: modelCreditCost,
           });

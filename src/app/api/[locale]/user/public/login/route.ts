@@ -18,7 +18,7 @@ export const { POST, tools } = endpointsHandler({
     handler: ({ data, user, request, logger, platform, locale, t }) =>
       LoginRepository.login(
         data,
-        user, // TODO handle  UserRole.REMOTE_SKILL in user inference wil fix this
+        user,
         locale,
         request,
         logger,

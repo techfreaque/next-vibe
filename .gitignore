@@ -8,12 +8,9 @@ dist
 .env
 .env.staging
 
-# Generated files
-postgres_data
-lint.config.js
-lint.config.js.map
-lint.config.d.ts
-lint.config.d.ts.map
+# Generated files - these are just to big and will generated before build anyways
+src/app/api/[locale]/system/generated/endpoints-meta
+src/app/api/[locale]/system/generated/remote-capabilities
 
 # TypeScript compilation artifacts (when accidentally generated)
 src/app/api/[locale]/system/check/oxlint/types.js

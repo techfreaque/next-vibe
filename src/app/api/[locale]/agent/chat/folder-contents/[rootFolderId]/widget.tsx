@@ -1311,12 +1311,16 @@ export function FolderContentsWidget({
     [foldersEndpoint.read?.response, activeRootFolderId],
   );
 
-  const isPublicFolder = activeRootFolderId === DefaultFolderId.PUBLIC;
+  const currentSubFolderId = useChatNavigationStore(
+    (s) => s.currentSubFolderId,
+  );
+  const isPublicRootLevel =
+    activeRootFolderId === DefaultFolderId.PUBLIC && !currentSubFolderId;
 
   const grouped = useMemo(() => {
     const rawItems: FolderContentsItem[] = fieldItems ?? [];
 
-    if (isPublicFolder) {
+    if (isPublicRootLevel) {
       const sorted = [...rawItems].toSorted(
         (a, b) => a.sortOrder - b.sortOrder,
       );
@@ -1353,7 +1357,7 @@ export function FolderContentsWidget({
     }
 
     return { pinned, today, lastWeek, lastMonth, older };
-  }, [fieldItems, isPublicFolder]);
+  }, [fieldItems, isPublicRootLevel]);
 
   if (!isDefaultFolderId(activeRootFolderId)) {
     return <Div />;
@@ -1385,7 +1389,7 @@ export function FolderContentsWidget({
         activeRootFolderId={activeRootFolderId}
         allFolders={allFolders}
       />
-      {!isPublicFolder && (
+      {!isPublicRootLevel && (
         <>
           <ItemSection
             label={t("widget.folderList.today")}
@@ -1408,7 +1412,7 @@ export function FolderContentsWidget({
         </>
       )}
       <ItemSection
-        label={isPublicFolder ? undefined : t("widget.folderList.older")}
+        label={isPublicRootLevel ? undefined : t("widget.folderList.older")}
         items={grouped.older}
         activeRootFolderId={activeRootFolderId}
         allFolders={allFolders}
