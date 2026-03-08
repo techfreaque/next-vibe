@@ -214,6 +214,7 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
   // Streaming state from navigation store
   const isStreaming = useChatNavigationStore((s) => s.isStreaming);
   const startStream = useChatNavigationStore((s) => s.startStream);
+  const stopStream = useChatNavigationStore((s) => s.stopStream);
 
   // Message operations
   const messageOps = useMessageOperations({
@@ -250,9 +251,14 @@ export function ChatInput({ className }: ChatInputProps): JSX.Element {
       if (activeThreadId) {
         startStream(activeThreadId, logger);
       }
-      return messageOps.sendMessage(params, onNewThread);
+      const result = await messageOps.sendMessage(params, onNewThread);
+      // If stream failed, reset nav store streaming state (STREAM_FINISHED won't arrive)
+      if (!result.success && activeThreadId) {
+        stopStream(activeThreadId, logger);
+      }
+      return result;
     },
-    [activeThreadId, startStream, logger, messageOps],
+    [activeThreadId, startStream, stopStream, logger, messageOps],
   );
 
   // Input handlers

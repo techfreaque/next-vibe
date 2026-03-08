@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-COMPOSE="docker compose -f docker-compose.prod.yml"
+compose() { docker compose -f docker-compose.prod.yml "$@" 2>/dev/null; }
+COMPOSE=compose
 
 git stash
 git pull
