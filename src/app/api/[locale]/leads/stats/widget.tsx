@@ -610,19 +610,37 @@ export function LeadsStatsContainer({
     })();
   }, [navigate]);
 
-  const handleNavigateToStatus = useCallback((): void => {
-    void (async (): Promise<void> => {
-      const listDef = await import("@/app/api/[locale]/leads/list/definition");
-      navigate(listDef.default.GET);
-    })();
-  }, [navigate]);
+  const handleNavigateToStatus = useCallback(
+    (category: LeadsTranslationKey): void => {
+      void (async (): Promise<void> => {
+        const listDef =
+          await import("@/app/api/[locale]/leads/list/definition");
+        // Map "enums.leadStatus.X" → "enums.leadStatusFilter.X"
+        const filterValue = category.replace(
+          "enums.leadStatus.",
+          "enums.leadStatusFilter.",
+        );
+        navigate(listDef.default.GET, {
+          data: { statusFilters: { status: [filterValue] } },
+        });
+      })();
+    },
+    [navigate],
+  );
 
-  const handleNavigateToSource = useCallback((): void => {
-    void (async (): Promise<void> => {
-      const listDef = await import("@/app/api/[locale]/leads/list/definition");
-      navigate(listDef.default.GET);
-    })();
-  }, [navigate]);
+  const handleNavigateToSource = useCallback(
+    (category: LeadsTranslationKey): void => {
+      void (async (): Promise<void> => {
+        const listDef =
+          await import("@/app/api/[locale]/leads/list/definition");
+        // LeadSourceFilter uses same values as LeadSource
+        navigate(listDef.default.GET, {
+          data: { statusFilters: { source: [category] } },
+        });
+      })();
+    },
+    [navigate],
+  );
 
   // ── Clickable By Status section ──────────────────────────────────────────
 
@@ -955,7 +973,7 @@ export function LeadsStatsContainer({
                       STATUS_BAR_COLORS[item.category] ?? "hsl(var(--primary))"
                     }
                     max={byStatusMax}
-                    onClick={() => handleNavigateToStatus()}
+                    onClick={() => handleNavigateToStatus(item.category)}
                     leadsT={leadsT}
                   />
                 ))}
@@ -985,7 +1003,7 @@ export function LeadsStatsContainer({
                       SOURCE_BAR_COLORS[item.category] ?? "hsl(var(--primary))"
                     }
                     max={bySourceMax}
-                    onClick={() => handleNavigateToSource()}
+                    onClick={() => handleNavigateToSource(item.category)}
                     leadsT={leadsT}
                   />
                 ))}
@@ -1069,7 +1087,7 @@ export function LeadsStatsContainer({
                   variant="ghost"
                   className="flex items-center gap-3 text-sm cursor-pointer hover:bg-muted/50 rounded px-1 py-0.5 transition-colors w-full justify-start h-auto"
                   onClick={() => {
-                    handleNavigateToSource();
+                    handleNavigateToSource(src.source as LeadsTranslationKey);
                   }}
                 >
                   <Span className="w-5 text-muted-foreground text-xs">

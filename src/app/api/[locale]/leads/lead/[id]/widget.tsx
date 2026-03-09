@@ -1020,11 +1020,18 @@ export function LeadDetailContainer({
   );
 
   const handleSendTestEmail = useCallback((): void => {
-    navigation.push(leadsSearchDefinitions.GET);
-  }, [navigation]);
+    void (async (): Promise<void> => {
+      const testMailDef =
+        await import("@/app/api/[locale]/leads/campaigns/emails/test-mail/definition");
+      navigation.push(testMailDef.default.POST, {
+        renderInModal: true,
+        data: leadId ? { leadId } : undefined,
+      });
+    })();
+  }, [navigation, leadId]);
 
   const handleViewInSearch = useCallback((): void => {
-    navigation.push(leadsListDefinitions.GET);
+    navigation.push(leadsSearchDefinitions.GET);
   }, [navigation]);
 
   if (!field.value) {

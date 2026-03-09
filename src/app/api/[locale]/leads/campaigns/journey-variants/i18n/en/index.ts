@@ -178,5 +178,6 @@ export const translations = {
     sourceFileLabel: "Source File",
     toggleActivate: "Activate",
     toggleDeactivate: "Deactivate",
+    checkErrorsLabel: "Check errors:",
   },
 };

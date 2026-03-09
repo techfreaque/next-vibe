@@ -188,5 +188,6 @@ export const translations = {
     sourceFileLabel: "Plik źródłowy",
     toggleActivate: "Aktywuj",
     toggleDeactivate: "Dezaktywuj",
+    checkErrorsLabel: "Błędy sprawdzania:",
   },
 };

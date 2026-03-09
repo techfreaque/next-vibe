@@ -5,7 +5,7 @@ FROM oven/bun:1.3.0-alpine AS base
 WORKDIR /app
 
 # Install Node.js for Next.js build compatibility
-RUN apk add --no-cache nodejs
+RUN apk add --no-cache nodejs python3 make g++
 
 # BEGIN_GENERATED_ENV_ARGS
 ARG NODE_ENV

@@ -11,6 +11,8 @@ import { Div } from "next-vibe-ui/ui/div";
 import { GitBranch } from "next-vibe-ui/ui/icons/GitBranch";
 import { RefreshCw } from "next-vibe-ui/ui/icons/RefreshCw";
 import { Span } from "next-vibe-ui/ui/span";
+import { Strong } from "next-vibe-ui/ui/strong";
+import { Code } from "next-vibe-ui/ui/typography";
 import React from "react";
 
 import {
@@ -93,18 +95,21 @@ export function JourneyVariantsWidget({
 
               <Div className="flex items-center gap-4 text-xs text-muted-foreground flex-wrap">
                 <Span>
-                  {t("widget.weightLabel")}: <strong>{item.weight}</strong>
+                  {t("widget.weightLabel")}:{" "}
+                  <Strong className="font-semibold">{item.weight}</Strong>
                 </Span>
                 {item.campaignType && (
                   <Span>
                     {t("widget.campaignTypeLabel")}:{" "}
-                    <strong>{item.campaignType}</strong>
+                    <Strong className="font-semibold">
+                      {item.campaignType}
+                    </Strong>
                   </Span>
                 )}
                 {item.sourceFilePath && (
                   <Span>
                     {t("widget.sourceFileLabel")}:{" "}
-                    <code className="text-xs">{item.sourceFilePath}</code>
+                    <Code className="text-xs">{item.sourceFilePath}</Code>
                   </Span>
                 )}
               </Div>
@@ -118,7 +123,7 @@ export function JourneyVariantsWidget({
               {item.checkErrors.length > 0 && (
                 <Div className="rounded bg-destructive/10 p-2">
                   <Span className="text-xs text-destructive font-semibold">
-                    Check errors:
+                    {t("widget.checkErrorsLabel")}
                   </Span>
                   {item.checkErrors.map((err, i) => (
                     <Span key={i} className="text-xs text-destructive block">
