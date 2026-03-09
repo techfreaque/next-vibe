@@ -62,7 +62,10 @@ export function killPreviousInstance(
   // Filter to only running processes
   const running = pids.filter(isProcessRunning);
   if (running.length === 0) {
-    logger.debug("Stale PID file found (no processes running), cleaning up", { pids, pidFile });
+    logger.debug("Stale PID file found (no processes running), cleaning up", {
+      pids,
+      pidFile,
+    });
     cleanupPidFile(pidFile);
     return;
   }
@@ -71,7 +74,11 @@ export function killPreviousInstance(
 
   // Send SIGTERM to all
   for (const pid of running) {
-    try { process.kill(pid, "SIGTERM"); } catch { /* already dead */ }
+    try {
+      process.kill(pid, "SIGTERM");
+    } catch {
+      /* already dead */
+    }
   }
 
   // Wait up to 5 seconds for all to exit
@@ -83,8 +90,14 @@ export function killPreviousInstance(
   // Force-kill any survivors
   for (const pid of running) {
     if (isProcessRunning(pid)) {
-      logger.warn("Previous instance did not exit gracefully, force killing", { pid });
-      try { process.kill(pid, "SIGKILL"); } catch { /* already dead */ }
+      logger.warn("Previous instance did not exit gracefully, force killing", {
+        pid,
+      });
+      try {
+        process.kill(pid, "SIGKILL");
+      } catch {
+        /* already dead */
+      }
     }
   }
 
@@ -119,7 +132,9 @@ export function writePidFile(
  */
 export function addPidToFile(pidFile: string, pid: number): void {
   try {
-    const existing = existsSync(pidFile) ? readFileSync(pidFile, "utf-8").trim() : String(process.pid);
+    const existing = existsSync(pidFile)
+      ? readFileSync(pidFile, "utf-8").trim()
+      : String(process.pid);
     const pids = new Set(existing.split("\n").map(Number).filter(Boolean));
     pids.add(pid);
     writeFileSync(pidFile, [...pids].join("\n"), "utf-8");
@@ -133,9 +148,14 @@ export function addPidToFile(pidFile: string, pid: number): void {
  */
 export function removePidFromFile(pidFile: string, pid: number): void {
   try {
-    if (!existsSync(pidFile)) {return;}
+    if (!existsSync(pidFile)) {
+      return;
+    }
     const existing = readFileSync(pidFile, "utf-8").trim();
-    const pids = existing.split("\n").map(Number).filter((p) => p > 0 && p !== pid);
+    const pids = existing
+      .split("\n")
+      .map(Number)
+      .filter((p) => p > 0 && p !== pid);
     writeFileSync(pidFile, pids.join("\n"), "utf-8");
   } catch {
     // Ignore — best-effort

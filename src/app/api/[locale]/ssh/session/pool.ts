@@ -50,7 +50,11 @@ if (!g.__ssh_session_pool_drain_registered__) {
   process.on("exit", () => {
     // Synchronous cleanup — clear all timers so the event loop can drain
     for (const session of g.__ssh_session_pool__.values()) {
-      try { clearTimeout(session.idleTimer); } catch { /* ignore */ }
+      try {
+        clearTimeout(session.idleTimer);
+      } catch {
+        /* ignore */
+      }
     }
   });
 }

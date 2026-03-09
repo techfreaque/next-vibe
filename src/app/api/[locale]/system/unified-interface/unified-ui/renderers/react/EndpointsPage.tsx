@@ -765,10 +765,10 @@ function StackEntryRenderer({
                 width: "400px",
                 maxWidth: "90vw",
                 maxHeight: "min(600px,calc(100dvh-100px))",
-                overflowY: "auto" as const,
+                overflow: "hidden" as const,
               }}
             >
-              <Div className="p-4 relative z-[101] bg-background border shadow-lg rounded-lg">
+              <Div className="relative z-[101] bg-background border shadow-lg rounded-lg overflow-y-auto">
                 {children}
               </Div>
             </Div>

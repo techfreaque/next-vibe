@@ -98,7 +98,7 @@ export class LinuxUserCreateRepository {
         await execAsync(useraddCmd);
       } else if (sudoPassword) {
         await new Promise<void>((resolve, reject) => {
-          const args = useraddCmd.split(" ");
+          const args = useraddCmd.split(" ").filter(Boolean);
           const proc = spawn("sudo", ["-S", ...args], {
             stdio: ["pipe", "pipe", "pipe"],
           });

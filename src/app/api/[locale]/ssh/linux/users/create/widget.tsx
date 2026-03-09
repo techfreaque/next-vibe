@@ -53,7 +53,7 @@ export function LinuxUserCreateContainer({
         />
       </Div>
 
-      <Div className="overflow-y-auto max-h-[min(500px,calc(100dvh-220px))] px-4 pb-4 flex flex-col gap-4">
+      <Div className="px-4 pb-4 flex flex-col gap-4">
         <FormAlertWidget field={emptyField} />
         <TextFieldWidget
           fieldName="connectionId"

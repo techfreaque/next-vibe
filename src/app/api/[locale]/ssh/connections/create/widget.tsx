@@ -55,7 +55,7 @@ export function ConnectionCreateContainer({
       </Div>
 
       {/* Scrollable form */}
-      <Div className="overflow-y-auto max-h-[min(600px,calc(100dvh-220px))] px-4 pb-4">
+      <Div className="px-4 pb-4">
         <FormAlertWidget field={emptyField} />
 
         <Div className="flex flex-col gap-4">
