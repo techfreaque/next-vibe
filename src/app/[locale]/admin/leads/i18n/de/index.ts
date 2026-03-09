@@ -250,6 +250,9 @@ export const translations: typeof enTranslations = {
         view_preview: "Vorschau anzeigen",
         total_templates: "Gesamt Vorlagen",
         templates: "Vorlagen",
+        variantRegistrations: "Journey-Varianten-Registrierungen",
+        variantRegistrationsDescription:
+          "Registriere und kontrolliere, welche Journey-Varianten aktiv sind. Hier registrierte Varianten können ohne erneutes Deployment aktiviert oder deaktiviert werden.",
         from: "Von",
         recipient: "An",
         subject: "Betreff",

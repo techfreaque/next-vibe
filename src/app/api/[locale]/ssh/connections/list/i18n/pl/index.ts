@@ -1,6 +1,14 @@
 export const translations = {
   category: "SSH",
 
+  enums: {
+    authType: {
+      password: "Hasło",
+      privateKey: "Klucz prywatny (PEM)",
+      keyAgent: "Agent SSH",
+    },
+  },
+
   get: {
     title: "Wylistuj połączenia SSH",
     description:

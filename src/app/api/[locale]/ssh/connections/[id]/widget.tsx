@@ -38,7 +38,7 @@ export function ConnectionDetailContainer({
           <Span className="text-muted-foreground">{t("widget.user")}</Span>
           <Span className="font-mono">{value.username}</Span>
           <Span className="text-muted-foreground">{t("widget.auth")}</Span>
-          <Span>{value.authType}</Span>
+          <Span>{t(value.authType)}</Span>
           {value.notes && (
             <>
               <Span className="text-muted-foreground">{t("widget.notes")}</Span>

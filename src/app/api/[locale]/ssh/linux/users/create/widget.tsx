@@ -10,8 +10,8 @@ import { useMemo } from "react";
 
 import { useWidgetForm } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/_shared/use-widget-context";
 import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
-import { TextArrayFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-array-field/react";
 import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
+import { TextArrayFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-array-field/react";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
@@ -59,7 +59,10 @@ export function LinuxUserCreateContainer({
         <Div className="flex flex-col gap-4">
           <TextFieldWidget fieldName="username" field={children.username} />
           <TextArrayFieldWidget fieldName="groups" field={children.groups} />
-          <SelectFieldWidget fieldName="loginShell" field={children.loginShell} />
+          <SelectFieldWidget
+            fieldName="loginShell"
+            field={children.loginShell}
+          />
           <TextFieldWidget fieldName="homeDir" field={children.homeDir} />
           <BooleanFieldWidget
             fieldName="sudoAccess"

@@ -353,7 +353,6 @@ export function PulseHistoryContainer({
   const children = field.children;
   const { endpointMutations } = useWidgetContext();
   const { push: navigate } = useWidgetNavigation();
-  const locale = useWidgetLocale();
   const form = useWidgetForm();
   const onSubmit = useWidgetOnSubmit();
 

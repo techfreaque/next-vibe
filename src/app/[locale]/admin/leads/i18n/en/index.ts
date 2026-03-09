@@ -238,6 +238,9 @@ export const translations = {
         view_preview: "View Preview",
         total_templates: "Total Templates",
         templates: "templates",
+        variantRegistrations: "Journey Variant Registrations",
+        variantRegistrationsDescription:
+          "Register and control which journey variants are active. Variants registered here can be activated or deactivated without redeploying.",
         from: "From",
         recipient: "To",
         subject: "Subject",

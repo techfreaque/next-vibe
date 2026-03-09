@@ -100,7 +100,7 @@ export function ConnectionsListContainer({
                 </Span>
               </Div>
               <Span className="text-xs text-muted-foreground">
-                {conn.authType}
+                {t(conn.authType)}
               </Span>
             </Div>
           ))}

@@ -71,7 +71,7 @@ export const { POST } = createEndpoint({
         label: "post.fields.shell.label",
         description: "post.fields.shell.description",
         options: LoginShellOptions,
-        schema: z.enum(LoginShellDB).optional().default(LoginShell.BASH),
+        schema: z.enum(LoginShellDB).default(LoginShell.BASH),
       }),
       homeDir: scopedRequestField(scopedTranslation, {
         type: WidgetType.FORM_FIELD,

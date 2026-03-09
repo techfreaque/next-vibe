@@ -1,6 +1,17 @@
 export const translations = {
   category: "SSH",
 
+  enums: {
+    shell: {
+      bash: "/bin/bash",
+      zsh: "/usr/bin/zsh",
+      sh: "/bin/sh",
+      fish: "/usr/bin/fish",
+      dash: "/bin/dash",
+      nologin: "Kein Login-Shell",
+    },
+  },
+
   errors: {
     localModeOnly: {
       title: "Nur im lokalen Modus verfügbar",

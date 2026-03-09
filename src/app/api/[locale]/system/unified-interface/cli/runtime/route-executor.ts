@@ -8,6 +8,7 @@ import type { ErrorResponseType } from "next-vibe/shared/types/response.schema";
 import { parseError } from "next-vibe/shared/utils";
 
 import { DefaultFolderId } from "@/app/api/[locale]/agent/chat/config";
+import { getEndpoint } from "@/app/api/[locale]/system/generated/endpoint";
 import type {
   JwtPayloadType,
   JWTPublicPayloadType,
@@ -15,6 +16,10 @@ import type {
 import {
   UserPermissionRole,
   type UserRoleValue,
+} from "@/app/api/[locale]/user/user-roles/enum";
+import {
+  filterPlatformMarkers,
+  PlatformMarker,
 } from "@/app/api/[locale]/user/user-roles/enum";
 import type { CountryLanguage } from "@/i18n/core/config";
 import type { TParams, TranslationKey } from "@/i18n/core/static-types";
@@ -34,7 +39,7 @@ import type { CreateApiEndpointAny } from "../../shared/types/endpoint-base";
 import type { Platform } from "../../shared/types/platform";
 import type { WidgetData } from "../../shared/widgets/widget-data";
 import { CliResultFormatter } from "../../unified-ui/renderers/cli/response/result-formatter";
-import { getCliUser } from "../auth/cli-user";
+import { createMockUser, getCliUser } from "../auth/cli-user";
 import { scopedTranslation as cliScopedTranslation } from "../i18n";
 import { CliTarget, type CliTargetValue } from "../types/cli-target";
 import {
@@ -181,20 +186,33 @@ export class RouteDelegationHandler {
     const resolvedCommand = command || `${TOOL_HELP_ALIAS} --interactive`;
 
     try {
-      // Get CLI user for authentication if not provided
+      // Get CLI user for authentication if not provided.
+      // If the endpoint has CLI_AUTH_BYPASS, skip DB entirely and use a synthetic admin.
       let cliUser: JwtPayloadType;
 
-      const cliUserResult = await getCliUser(logger, options.locale);
+      const peekedEndpoint = await getEndpoint(resolvedCommand);
+      const isCliAuthBypass =
+        peekedEndpoint !== null &&
+        peekedEndpoint !== undefined &&
+        filterPlatformMarkers(peekedEndpoint.allowedRoles).includes(
+          PlatformMarker.CLI_AUTH_BYPASS,
+        );
 
-      if (cliUserResult.success) {
-        cliUser = cliUserResult.data;
+      if (isCliAuthBypass) {
+        cliUser = createMockUser();
       } else {
-        logger.debug("Failed to get CLI user", cliUserResult);
-        cliUser = {
-          isPublic: true,
-          leadId: "temp-for-loading",
-          roles: [UserPermissionRole.PUBLIC],
-        } satisfies JWTPublicPayloadType;
+        const cliUserResult = await getCliUser(logger, options.locale);
+
+        if (cliUserResult.success) {
+          cliUser = cliUserResult.data;
+        } else {
+          logger.debug("Failed to get CLI user", cliUserResult);
+          cliUser = {
+            isPublic: true,
+            leadId: "temp-for-loading",
+            roles: [UserPermissionRole.PUBLIC],
+          } satisfies JWTPublicPayloadType;
+        }
       }
 
       // Get endpoint definition for CLI-specific features (interactive forms, arg parsing)

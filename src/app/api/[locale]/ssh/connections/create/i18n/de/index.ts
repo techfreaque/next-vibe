@@ -1,6 +1,14 @@
 export const translations = {
   category: "SSH",
 
+  enums: {
+    authType: {
+      password: "Passwort",
+      privateKey: "Privater Schlüssel (PEM)",
+      keyAgent: "SSH-Agent",
+    },
+  },
+
   errors: {
     sshSecretKeyNotSet:
       "SSH_SECRET_KEY Umgebungsvariable nicht gesetzt. Fügen Sie einen 32-Byte-Hex-Wert hinzu.",

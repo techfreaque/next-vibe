@@ -1,0 +1,90 @@
+/**
+ * Halt All Campaigns Repository
+ * Immediately halts all active email campaigns and cancels pending sends.
+ */
+
+import "server-only";
+
+import { count, eq } from "drizzle-orm";
+import type { ResponseType } from "next-vibe/shared/types/response.schema";
+import {
+  ErrorResponseTypes,
+  fail,
+  success,
+} from "next-vibe/shared/types/response.schema";
+import { parseError } from "next-vibe/shared/utils";
+
+import { EmailStatus } from "@/app/api/[locale]/emails/messages/enum";
+import { db } from "@/app/api/[locale]/system/db";
+import type { EndpointLogger } from "@/app/api/[locale]/system/unified-interface/shared/logger/endpoint";
+
+import { emailCampaigns, leads } from "../../db";
+import { LeadStatus } from "../../enum";
+import type {
+  HaltAllCampaignsPostRequestOutput,
+  HaltAllCampaignsPostResponseOutput,
+} from "./definition";
+import type { scopedTranslation } from "./i18n";
+
+type ModuleT = ReturnType<typeof scopedTranslation.scopedT>["t"];
+
+export class HaltAllCampaignsRepository {
+  static async haltAll(
+    data: HaltAllCampaignsPostRequestOutput,
+    logger: EndpointLogger,
+    t: ModuleT,
+  ): Promise<ResponseType<HaltAllCampaignsPostResponseOutput>> {
+    if (data.confirm !== true) {
+      return fail({
+        message: t("post.errors.validation.description"),
+        errorType: ErrorResponseTypes.VALIDATION_ERROR,
+      });
+    }
+
+    try {
+      // Count and cancel all pending email campaigns
+      const [pendingEmailsRow] = await db
+        .select({ count: count() })
+        .from(emailCampaigns)
+        .where(eq(emailCampaigns.status, EmailStatus.PENDING));
+
+      const emailsCancelled = pendingEmailsRow?.count ?? 0;
+
+      if (emailsCancelled > 0) {
+        await db
+          .update(emailCampaigns)
+          .set({ status: EmailStatus.FAILED })
+          .where(eq(emailCampaigns.status, EmailStatus.PENDING));
+      }
+
+      // Count and halt all leads with active campaigns
+      const [activeLeadsRow] = await db
+        .select({ count: count() })
+        .from(leads)
+        .where(eq(leads.status, LeadStatus.CAMPAIGN_RUNNING));
+
+      const halted = activeLeadsRow?.count ?? 0;
+
+      if (halted > 0) {
+        await db
+          .update(leads)
+          .set({ status: LeadStatus.PENDING })
+          .where(eq(leads.status, LeadStatus.CAMPAIGN_RUNNING));
+      }
+
+      logger.info("campaigns.haltAll.completed", {
+        halted,
+        emailsCancelled,
+        reason: data.reason,
+      });
+
+      return success({ halted, emailsCancelled });
+    } catch (error) {
+      logger.error("campaigns.haltAll.error", parseError(error));
+      return fail({
+        message: t("post.errors.server.title"),
+        errorType: ErrorResponseTypes.INTERNAL_ERROR,
+      });
+    }
+  }
+}

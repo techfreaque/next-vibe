@@ -1,6 +1,14 @@
 export const translations = {
   category: "SSH",
 
+  enums: {
+    authType: {
+      password: "Password",
+      privateKey: "Private Key (PEM)",
+      keyAgent: "SSH Agent",
+    },
+  },
+
   errors: {
     sshSecretKeyNotSet:
       "SSH_SECRET_KEY env var not set. Add a 32-byte hex value to enable SSH mode.",

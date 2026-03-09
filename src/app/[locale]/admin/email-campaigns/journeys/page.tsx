@@ -15,8 +15,11 @@ import type React from "react";
 
 import { emailService } from "@/app/api/[locale]/leads/campaigns/emails";
 import { scopedTranslation as leadsScopedTranslation } from "@/app/api/[locale]/leads/i18n";
+import { requireAdminUser } from "@/app/api/[locale]/user/auth/utils";
 import type { CountryLanguage } from "@/i18n/core/config";
 import { simpleT } from "@/i18n/core/shared";
+
+import { JourneyVariantsClient } from "./journey-variants-client";
 
 interface LeadsEmailsPageProps {
   params: Promise<{
@@ -30,6 +33,10 @@ export default async function LeadsEmailsPage({
   const { locale } = await params;
   const { t } = simpleT(locale);
   const { t: scopedT } = leadsScopedTranslation.scopedT(locale);
+  const user = await requireAdminUser(
+    locale,
+    `/${locale}/admin/email-campaigns/journeys`,
+  );
 
   // Get all available journeys and their stages server-side
   const availableJourneys = emailService.getAvailableJourneys();
@@ -62,7 +69,12 @@ export default async function LeadsEmailsPage({
         </CardHeader>
         <CardContent>
           <Tabs defaultValue={availableJourneys[0]} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList
+              className="grid w-full"
+              style={{
+                gridTemplateColumns: `repeat(${Math.min(journeyData.length, 6)}, minmax(0, 1fr))`,
+              }}
+            >
               {journeyData.map((journey) => (
                 <TabsTrigger key={journey.variant} value={journey.variant}>
                   {journey.info.name}
@@ -143,6 +155,23 @@ export default async function LeadsEmailsPage({
               </TabsContent>
             ))}
           </Tabs>
+        </CardContent>
+      </Card>
+
+      {/* Journey Variant Registration */}
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {t("app.admin.leads.leads.admin.emails.variantRegistrations")}
+          </CardTitle>
+          <P className="text-gray-600 dark:text-gray-400">
+            {t(
+              "app.admin.leads.leads.admin.emails.variantRegistrationsDescription",
+            )}
+          </P>
+        </CardHeader>
+        <CardContent>
+          <JourneyVariantsClient locale={locale} user={user} />
         </CardContent>
       </Card>
     </Div>

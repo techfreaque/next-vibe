@@ -1,4 +1,5 @@
 export const translations = {
+  manualControls: "Manual Controls",
   post: {
     title: "Campaign Starter",
     description: "Campaign Starter endpoint",

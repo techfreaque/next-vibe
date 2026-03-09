@@ -65,7 +65,10 @@ export function ConnectionCreateContainer({
           <TextFieldWidget fieldName="username" field={children.username} />
           <SelectFieldWidget fieldName="authType" field={children.authType} />
           <PasswordFieldWidget fieldName="secret" field={children.secret} />
-          <PasswordFieldWidget fieldName="passphrase" field={children.passphrase} />
+          <PasswordFieldWidget
+            fieldName="passphrase"
+            field={children.passphrase}
+          />
           <BooleanFieldWidget
             fieldName="isDefault"
             field={children.isDefault}

@@ -1,6 +1,14 @@
 export const translations = {
   category: "SSH",
 
+  enums: {
+    authType: {
+      password: "Passwort",
+      privateKey: "Privater Schlüssel (PEM)",
+      keyAgent: "SSH-Agent",
+    },
+  },
+
   errors: {
     connectionNotFound: "Verbindung nicht gefunden",
   },
@@ -8,6 +16,12 @@ export const translations = {
   get: {
     title: "SSH-Verbindung",
     description: "SSH-Verbindungsdetails anzeigen",
+    fields: {
+      id: {
+        label: "Verbindungs-ID",
+        description: "Die anzuzeigende Verbindung",
+      },
+    },
     errors: {
       validation: {
         title: "Validierungsfehler",

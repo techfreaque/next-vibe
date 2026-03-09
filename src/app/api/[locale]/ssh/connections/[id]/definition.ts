@@ -8,10 +8,12 @@ import { z } from "zod";
 import { createEndpoint } from "@/app/api/[locale]/system/unified-interface/shared/endpoints/definition/create";
 import {
   customWidgetObject,
+  scopedRequestUrlPathParamsField,
   scopedResponseField,
 } from "@/app/api/[locale]/system/unified-interface/shared/field/utils-new";
 import {
   EndpointErrorTypes,
+  FieldDataType,
   Methods,
   WidgetType,
 } from "@/app/api/[locale]/system/unified-interface/shared/types/enums";
@@ -34,12 +36,14 @@ export const { GET } = createEndpoint({
 
   fields: customWidgetObject({
     render: ConnectionDetailContainer,
-    usage: { request: "data", response: true } as const,
+    usage: { request: "data&urlPathParams", response: true } as const,
     children: {
-      id: scopedResponseField(scopedTranslation, {
-        type: WidgetType.TEXT,
-        content: "get.response.id.title",
-        schema: z.string(),
+      id: scopedRequestUrlPathParamsField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.TEXT,
+        schema: z.string().uuid(),
+        label: "get.fields.id.label",
+        description: "get.fields.id.description",
       }),
       label: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
@@ -133,10 +137,10 @@ export const { GET } = createEndpoint({
   },
 
   examples: {
+    urlPathParams: { default: { id: "00000000-0000-0000-0000-000000000000" } },
     requests: undefined,
     responses: {
       default: {
-        id: "uuid",
         label: "prod",
         host: "1.2.3.4",
         port: 22,

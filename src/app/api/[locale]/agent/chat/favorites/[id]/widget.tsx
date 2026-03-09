@@ -4,7 +4,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Button } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
 import { ArrowLeft } from "next-vibe-ui/ui/icons/ArrowLeft";
@@ -74,7 +73,6 @@ export function FavoriteEditContainer({
   const locale = useWidgetLocale();
 
   const navigation = useWidgetNavigation();
-  const router = useRouter();
   const isSubmitting = useWidgetIsSubmitting();
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
   const characterId = form?.watch("characterId");
@@ -141,11 +139,19 @@ export function FavoriteEditContainer({
   };
 
   const handleSignup = (): void => {
-    router.push(`/${locale}/user/signup`);
+    void (async (): Promise<void> => {
+      const def =
+        await import("@/app/api/[locale]/user/public/signup/definition");
+      navigation.push(def.default.POST);
+    })();
   };
 
   const handleLogin = (): void => {
-    router.push(`/${locale}/user/login`);
+    void (async (): Promise<void> => {
+      const def =
+        await import("@/app/api/[locale]/user/public/login/definition");
+      navigation.push(def.default.POST);
+    })();
   };
 
   const handleUseThisFavorite = async (): Promise<void> => {

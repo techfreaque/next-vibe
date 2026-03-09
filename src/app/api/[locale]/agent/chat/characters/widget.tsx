@@ -4,7 +4,6 @@
 
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Badge } from "next-vibe-ui/ui/badge";
 import { Button, type ButtonMouseEvent } from "next-vibe-ui/ui/button";
 import { Div } from "next-vibe-ui/ui/div";
@@ -79,7 +78,6 @@ export function CharactersListContainer({
   const isTouch = useTouchDevice();
   const isPublic = user.isPublic;
   const [showSignupPrompt, setShowSignupPrompt] = useState(false);
-  const router = useRouter();
   const { isOnboarding, companionCharacterId } = useSelectorOnboardingContext();
   const setModelSelectorOpen = useTourState(
     (state) => state.setModelSelectorOpen,
@@ -128,11 +126,19 @@ export function CharactersListContainer({
   };
 
   const handleSignup = (): void => {
-    router.push(`/${locale}/user/signup`);
+    void (async (): Promise<void> => {
+      const def =
+        await import("@/app/api/[locale]/user/public/signup/definition");
+      navigate(def.default.POST);
+    })();
   };
 
   const handleLogin = (): void => {
-    router.push(`/${locale}/user/login`);
+    void (async (): Promise<void> => {
+      const def =
+        await import("@/app/api/[locale]/user/public/login/definition");
+      navigate(def.default.POST);
+    })();
   };
 
   // Show signup prompt if public user clicked create

@@ -5,6 +5,7 @@
 
 import { relations } from "drizzle-orm";
 import {
+  boolean,
   index,
   integer,
   jsonb,
@@ -309,6 +310,33 @@ export const userLeadLinksRelations = relations(userLeadLinks, ({ one }) => ({
 }));
 
 /**
+ * Email Journey Variants Table
+ * Stores admin-registered journey variant metadata.
+ * Source code stays in /journeys/*.email.tsx — this table controls activation,
+ * weights, and display metadata without requiring a full deploy for config changes.
+ */
+export const emailJourneyVariants = pgTable(
+  "email_journey_variants",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    variantKey: text("variant_key").notNull().unique(),
+    displayName: text("display_name").notNull(),
+    description: text("description"),
+    weight: integer("weight").notNull().default(33),
+    active: boolean("active").notNull().default(true),
+    campaignType: text("campaign_type", { enum: CampaignTypeDB }),
+    sourceFilePath: text("source_file_path"),
+    checkErrors: jsonb("check_errors").$type<string[]>().notNull().default([]),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_email_journey_variants_variant_key").on(table.variantKey),
+    index("idx_email_journey_variants_active").on(table.active),
+  ],
+);
+
+/**
  * Zod Schemas
  */
 export const selectLeadSchema = createSelectSchema(leads);
@@ -321,6 +349,10 @@ export const selectLeadLeadLinkSchema = createSelectSchema(leadLeadLinks);
 export const insertLeadLeadLinkSchema = createInsertSchema(leadLeadLinks);
 export const selectUserLeadLinkSchema = createSelectSchema(userLeadLinks);
 export const insertUserLeadLinkSchema = createInsertSchema(userLeadLinks);
+export const selectEmailJourneyVariantSchema =
+  createSelectSchema(emailJourneyVariants);
+export const insertEmailJourneyVariantSchema =
+  createInsertSchema(emailJourneyVariants);
 
 /**
  * Types
@@ -335,3 +367,9 @@ export type LeadLeadLink = z.infer<typeof selectLeadLeadLinkSchema>;
 export type NewLeadLeadLink = z.infer<typeof insertLeadLeadLinkSchema>;
 export type UserLeadLink = z.infer<typeof selectUserLeadLinkSchema>;
 export type NewUserLeadLink = z.infer<typeof insertUserLeadLinkSchema>;
+export type EmailJourneyVariantRecord = z.infer<
+  typeof selectEmailJourneyVariantSchema
+>;
+export type NewEmailJourneyVariantRecord = z.infer<
+  typeof insertEmailJourneyVariantSchema
+>;

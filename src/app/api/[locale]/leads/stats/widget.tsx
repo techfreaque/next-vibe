@@ -1019,7 +1019,7 @@ export function LeadsStatsContainer({
                     {i + 1}.
                   </Span>
                   <Span className="flex-1 truncate">
-                    {campaign.campaignName}
+                    {leadsT(campaign.campaignName as LeadsTranslationKey)}
                   </Span>
                   {campaign.openRate !== null &&
                     campaign.openRate !== undefined && (

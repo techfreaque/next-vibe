@@ -314,7 +314,7 @@ export class EmailRendererService {
   }
 
   /**
-   * Get all available journey variants
+   * Get all available journey variants (hardcoded in JOURNEY_TEMPLATES)
    */
   getAvailableJourneys(): Array<
     (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant]
@@ -322,6 +322,31 @@ export class EmailRendererService {
     return Object.keys(JOURNEY_TEMPLATES) as Array<
       (typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant]
     >;
+  }
+
+  /**
+   * Get active journey variants, respecting DB-managed activation state.
+   *
+   * Rules:
+   *  - If a variant is registered in DB and active → included
+   *  - If a variant is registered in DB and inactive → excluded
+   *  - If a variant is not registered in DB (unmanaged) → included (default-on)
+   *
+   * @param allDbKeys   All variant keys present in email_journey_variants table
+   * @param activeDbKeys Subset of allDbKeys where active = true
+   */
+  getActiveJourneys(
+    allDbKeys: string[],
+    activeDbKeys: string[],
+  ): Array<(typeof EmailJourneyVariant)[keyof typeof EmailJourneyVariant]> {
+    const all = this.getAvailableJourneys();
+    const allDbSet = new Set(allDbKeys);
+    const activeDbSet = new Set(activeDbKeys);
+    return all.filter(
+      (v) =>
+        !allDbSet.has(v) || // unmanaged → include
+        activeDbSet.has(v), // managed and active → include
+    );
   }
 
   /**

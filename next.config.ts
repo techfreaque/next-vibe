@@ -118,6 +118,8 @@ const nextConfig: NextConfig = {
     "chalk",
     "supports-hyperlinks",
     "module",
+    // ssh2 uses native crypto bindings incompatible with ESM bundling
+    "ssh2",
   ],
 
   images: {

@@ -245,6 +245,9 @@ export const translations: typeof enTranslations = {
         view_preview: "Zobacz Podgląd",
         total_templates: "Łącznie Szablonów",
         templates: "szablonów",
+        variantRegistrations: "Rejestracje wariantów journey",
+        variantRegistrationsDescription:
+          "Rejestruj i kontroluj, które warianty journey są aktywne. Warianty zarejestrowane tutaj można aktywować lub dezaktywować bez ponownego wdrożenia.",
         from: "Od",
         recipient: "Do",
         subject: "Temat",

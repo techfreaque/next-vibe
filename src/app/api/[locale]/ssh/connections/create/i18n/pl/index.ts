@@ -1,6 +1,14 @@
 export const translations = {
   category: "SSH",
 
+  enums: {
+    authType: {
+      password: "Hasło",
+      privateKey: "Klucz prywatny (PEM)",
+      keyAgent: "Agent SSH",
+    },
+  },
+
   errors: {
     sshSecretKeyNotSet:
       "Zmienna SSH_SECRET_KEY nie jest ustawiona. Dodaj 32-bajtową wartość hex.",

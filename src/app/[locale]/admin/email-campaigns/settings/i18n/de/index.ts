@@ -1,6 +1,7 @@
 import type { translations as enTranslations } from "../en";
 
 export const translations: typeof enTranslations = {
+  manualControls: "Manuelle Steuerung",
   post: {
     title: "Titel",
     description: "Endpunkt-Beschreibung",
