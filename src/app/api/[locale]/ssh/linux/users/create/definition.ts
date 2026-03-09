@@ -88,6 +88,14 @@ export const { POST } = createEndpoint({
         description: "post.fields.sudoAccess.description",
         schema: z.boolean().optional(),
       }),
+      sudoPassword: scopedRequestField(scopedTranslation, {
+        type: WidgetType.FORM_FIELD,
+        fieldType: FieldDataType.PASSWORD,
+        label: "post.fields.sudoPassword.label",
+        description: "post.fields.sudoPassword.description",
+        placeholder: "post.fields.sudoPassword.placeholder",
+        schema: z.string().optional(),
+      }),
       ok: scopedResponseField(scopedTranslation, {
         type: WidgetType.TEXT,
         content: "post.response.ok.title",

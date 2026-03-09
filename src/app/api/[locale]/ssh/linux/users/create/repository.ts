@@ -4,7 +4,7 @@
 
 import "server-only";
 
-import { exec } from "node:child_process";
+import { exec, spawn } from "node:child_process";
 import { promisify } from "node:util";
 
 import type { ResponseType } from "next-vibe/shared/types/response.schema";
@@ -86,12 +86,39 @@ export class LinuxUserCreateRepository {
     }
 
     const groupsArg = groups.length > 0 ? `--groups ${groups.join(",")}` : "";
-    const cmd =
+    const useraddCmd =
       `useradd --create-home --shell ${shell} --home-dir ${homeDir} ${groupsArg} ${username}`.trim();
+    const isRoot = process.getuid?.() === 0;
+    const needsSudo = !isRoot;
+    const sudoPassword = data.sudoPassword;
 
     try {
       logger.info(`Creating Linux user: ${username}`);
-      await execAsync(cmd);
+      if (!needsSudo) {
+        await execAsync(useraddCmd);
+      } else if (sudoPassword) {
+        await new Promise<void>((resolve, reject) => {
+          const args = useraddCmd.split(" ");
+          const proc = spawn("sudo", ["-S", ...args], {
+            stdio: ["pipe", "pipe", "pipe"],
+          });
+          proc.stdin.write(`${sudoPassword}\n`);
+          proc.stdin.end();
+          let stderr = "";
+          proc.stderr.on("data", (d: Buffer) => {
+            stderr += d.toString();
+          });
+          proc.on("close", (code) => {
+            if (code === 0) {
+              resolve();
+            } else {
+              reject(new Error(stderr));
+            }
+          });
+        });
+      } else {
+        await execAsync(`sudo ${useraddCmd}`);
+      }
 
       // Get uid/gid
       const { stdout: idOut } = await execAsync(
@@ -109,17 +136,44 @@ export class LinuxUserCreateRepository {
         shellPath: shell,
       });
     } catch (error) {
-      const errMsg = String(parseError(error));
+      // Extract only stderr, never log the command itself (may contain password)
+      const raw = error instanceof Error ? error.message : String(error);
+      const stderr = raw
+        .split("\n")
+        .filter((l) => !l.startsWith("Command failed:"))
+        .join("\n");
       if (
-        errMsg.includes("already exists") ||
-        errMsg.includes("uid is already in use")
+        stderr.includes("already exists") ||
+        stderr.includes("uid is already in use")
       ) {
         return fail({
           message: t("errors.userAlreadyExists"),
           errorType: ErrorResponseTypes.CONFLICT,
         });
       }
-      logger.error("Failed to create Linux user", errMsg);
+      if (
+        stderr.includes("hat nicht funktioniert") ||
+        stderr.includes("Sorry, try again") ||
+        stderr.includes("incorrect password") ||
+        stderr.includes("is not allowed to execute")
+      ) {
+        return fail({
+          message:
+            "Sudo authentication failed — wrong password or insufficient sudo privileges",
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+      if (
+        stderr.includes("Permission denied") ||
+        stderr.includes("cannot lock")
+      ) {
+        return fail({
+          message:
+            "Permission denied: provide your sudo password to create OS users",
+          errorType: ErrorResponseTypes.FORBIDDEN,
+        });
+      }
+      logger.error("Failed to create Linux user", stderr.slice(0, 200));
       return fail({
         message: t("post.errors.server.title"),
         errorType: ErrorResponseTypes.INTERNAL_ERROR,
@@ -172,8 +226,12 @@ export class LinuxUserCreateRepository {
     }
 
     const groupsArg = groups.length > 0 ? `--groups ${groups.join(",")}` : "";
-    const cmd =
+    const useraddCmd =
       `useradd --create-home --shell ${shell} --home-dir ${homeDir} ${groupsArg} ${username}`.trim();
+    const sudoPassword = data.sudoPassword;
+    const cmd = sudoPassword
+      ? `echo ${JSON.stringify(sudoPassword)} | sudo -S ${useraddCmd}`
+      : `sudo ${useraddCmd}`;
 
     try {
       logger.info(
@@ -190,9 +248,21 @@ export class LinuxUserCreateRepository {
             errorType: ErrorResponseTypes.CONFLICT,
           });
         }
+        if (
+          stderr.includes("incorrect password") ||
+          stderr.includes("3 incorrect password") ||
+          stderr.includes("Sorry, try again") ||
+          stderr.includes("is not allowed to execute")
+        ) {
+          return fail({
+            message:
+              "Sudo authentication failed — wrong password or insufficient sudo privileges",
+            errorType: ErrorResponseTypes.FORBIDDEN,
+          });
+        }
         logger.error("useradd failed", stderr);
         return fail({
-          message: t("post.errors.server.title"),
+          message: stderr || t("post.errors.server.title"),
           errorType: ErrorResponseTypes.INTERNAL_ERROR,
         });
       }

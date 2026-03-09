@@ -39,8 +39,10 @@ import { scopedTranslation as dbUtilsScopedTranslation } from "../../db/utils/i1
 import { dbUtilsRepository } from "../../db/utils/repository";
 import { DEV_WATCHER_TASK_NAME } from "../../unified-interface/tasks/dev-watcher/task-runner";
 import {
+  addPidToFile,
   cleanupPidFile,
   killPreviousInstance,
+  removePidFromFile,
   VIBE_DEV_PID_FILE,
   writePidFile,
 } from "../pid";
@@ -809,6 +811,9 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         return;
       }
 
+      // Drop stale reference from previous run to allow GC
+      this.runningProcesses.delete("next");
+
       const profilingEnv = profile
         ? {
             NEXT_TURBOPACK_TRACING: "1",
@@ -821,9 +826,15 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
         {
           stdio: ["ignore", "pipe", "pipe"],
           env: { ...process.env, ...profilingEnv },
+          cwd: process.cwd(),
         },
       );
       this.runningProcesses.set("next", nextProcess);
+
+      // Track child PID in PID file so it gets killed on next startup too
+      if (nextProcess.pid) {
+        addPidToFile(VIBE_DEV_PID_FILE, nextProcess.pid);
+      }
 
       if (!disableProxy) {
         const rewritePort = (chunk: Buffer): void => {
@@ -839,12 +850,18 @@ export class DevRepositoryImpl implements DevRepositoryInterface {
       }
 
       nextProcess.on("exit", (code) => {
+        // Remove child PID from PID file immediately on exit
+        if (nextProcess.pid) {
+          removePidFromFile(VIBE_DEV_PID_FILE, nextProcess.pid);
+        }
+        // Free streams to allow GC
+        nextProcess.stdout?.destroy();
+        nextProcess.stderr?.destroy();
+        this.runningProcesses.delete("next");
+
         if (this.shuttingDown) {
           return; // Intentional shutdown — don't restart
         }
-
-        nextProcess.stdout?.destroy();
-        nextProcess.stderr?.destroy();
 
         if (code === 0) {
           // Clean exit (e.g. intentional stop) — don't restart

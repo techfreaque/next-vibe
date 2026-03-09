@@ -33,11 +33,8 @@ import { LeadsSearchContainer } from "./widget";
 const leadResponseSchema = z.object({
   id: z.uuid(),
   email: z.string().email(),
-  businessName: z.string().min(1).max(255),
-  phone: z
-    .string()
-    .regex(/^\+?[1-9]\d{1,14}$/)
-    .optional(),
+  businessName: z.string(),
+  phone: z.string().optional(),
   website: z.string().url().optional(),
   country: z.enum(Countries),
   language: z.enum(Languages),

@@ -48,71 +48,98 @@ export function killPreviousInstance(
   }
 
   const pidStr = readFileSync(pidFile, "utf-8").trim();
-  const pid = parseInt(pidStr, 10);
+  // Support multi-PID files (one per line) — kill all recorded processes
+  const pids = pidStr
+    .split("\n")
+    .map((s) => parseInt(s.trim(), 10))
+    .filter((p) => !isNaN(p) && p > 0 && p !== process.pid);
 
-  if (isNaN(pid) || pid <= 0) {
-    // Invalid PID file, just clean it up
+  if (pids.length === 0) {
     cleanupPidFile(pidFile);
     return;
   }
 
-  // Don't kill ourselves
-  if (pid === process.pid) {
-    return;
-  }
-
-  if (!isProcessRunning(pid)) {
-    logger.debug("Stale PID file found (process not running), cleaning up", {
-      pid,
-      pidFile,
-    });
+  // Filter to only running processes
+  const running = pids.filter(isProcessRunning);
+  if (running.length === 0) {
+    logger.debug("Stale PID file found (no processes running), cleaning up", { pids, pidFile });
     cleanupPidFile(pidFile);
     return;
   }
 
-  logger.debug("Killing previous vibe instance", { pid, pidFile });
+  logger.debug("Killing previous vibe instance(s)", { pids: running, pidFile });
 
-  try {
-    process.kill(pid, "SIGTERM");
+  // Send SIGTERM to all
+  for (const pid of running) {
+    try { process.kill(pid, "SIGTERM"); } catch { /* already dead */ }
+  }
 
-    // Wait up to 5 seconds for graceful shutdown
-    const deadline = Date.now() + 5000;
-    while (Date.now() < deadline && isProcessRunning(pid)) {
-      // Busy-wait with small delay (synchronous — this runs before server starts)
-      execSync("sleep 0.1");
-    }
+  // Wait up to 5 seconds for all to exit
+  const deadline = Date.now() + 5000;
+  while (Date.now() < deadline && running.some(isProcessRunning)) {
+    execSync("sleep 0.1");
+  }
 
-    // If still alive, force kill
+  // Force-kill any survivors
+  for (const pid of running) {
     if (isProcessRunning(pid)) {
-      logger.warn("Previous instance did not exit gracefully, force killing", {
-        pid,
-      });
-      try {
-        process.kill(pid, "SIGKILL");
-      } catch {
-        // Already dead
-      }
+      logger.warn("Previous instance did not exit gracefully, force killing", { pid });
+      try { process.kill(pid, "SIGKILL"); } catch { /* already dead */ }
     }
-
-    logger.debug("Previous vibe instance stopped", { pid });
-  } catch {
-    // Process may have died between check and kill
-    logger.debug("Previous instance already gone");
   }
 
+  logger.debug("Previous vibe instance(s) stopped", { pids: running });
   cleanupPidFile(pidFile);
 }
 
 /**
- * Write current process PID to the given PID file
+ * Write PIDs to the given PID file (main process + optional child PIDs).
+ * Format: one PID per line, first line is always the main process PID.
  */
-export function writePidFile(pidFile: string, logger: EndpointLogger): void {
+export function writePidFile(
+  pidFile: string,
+  logger: EndpointLogger,
+  extraPids: number[] = [],
+): void {
   const dir = dirname(pidFile);
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true });
   }
-  writeFileSync(pidFile, process.pid.toString(), "utf-8");
-  logger.debug("PID file written", { pid: process.pid, path: pidFile });
+  const allPids = [process.pid, ...extraPids].join("\n");
+  writeFileSync(pidFile, allPids, "utf-8");
+  logger.debug("PID file written", {
+    pid: process.pid,
+    extraPids,
+    path: pidFile,
+  });
+}
+
+/**
+ * Add a child PID to an existing PID file (e.g. when Next.js child spawns).
+ */
+export function addPidToFile(pidFile: string, pid: number): void {
+  try {
+    const existing = existsSync(pidFile) ? readFileSync(pidFile, "utf-8").trim() : String(process.pid);
+    const pids = new Set(existing.split("\n").map(Number).filter(Boolean));
+    pids.add(pid);
+    writeFileSync(pidFile, [...pids].join("\n"), "utf-8");
+  } catch {
+    // Ignore — best-effort
+  }
+}
+
+/**
+ * Remove a child PID from an existing PID file (e.g. when Next.js child exits).
+ */
+export function removePidFromFile(pidFile: string, pid: number): void {
+  try {
+    if (!existsSync(pidFile)) {return;}
+    const existing = readFileSync(pidFile, "utf-8").trim();
+    const pids = existing.split("\n").map(Number).filter((p) => p > 0 && p !== pid);
+    writeFileSync(pidFile, pids.join("\n"), "utf-8");
+  } catch {
+    // Ignore — best-effort
+  }
 }
 
 /**

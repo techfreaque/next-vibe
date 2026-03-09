@@ -12,6 +12,7 @@ import { useWidgetForm } from "@/app/api/[locale]/system/unified-interface/unifi
 import { BooleanFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/boolean-field/react";
 import { SelectFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/select-field/react";
 import { TextArrayFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-array-field/react";
+import { PasswordFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/password-field/react";
 import { TextFieldWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/form-fields/text-field/react";
 import { FormAlertWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/form-alert/react";
 import { NavigateButtonWidget } from "@/app/api/[locale]/system/unified-interface/unified-ui/widgets/interactive/navigate-button/react";
@@ -52,23 +53,24 @@ export function LinuxUserCreateContainer({
         />
       </Div>
 
-      {/* Scrollable form */}
-      <Div className="overflow-y-auto max-h-[min(500px,calc(100dvh-220px))] px-4 pb-4">
+      <Div className="overflow-y-auto max-h-[min(500px,calc(100dvh-220px))] px-4 pb-4 flex flex-col gap-4">
         <FormAlertWidget field={emptyField} />
-
-        <Div className="flex flex-col gap-4">
-          <TextFieldWidget fieldName="username" field={children.username} />
-          <TextArrayFieldWidget fieldName="groups" field={children.groups} />
-          <SelectFieldWidget
-            fieldName="loginShell"
-            field={children.loginShell}
-          />
-          <TextFieldWidget fieldName="homeDir" field={children.homeDir} />
-          <BooleanFieldWidget
-            fieldName="sudoAccess"
-            field={children.sudoAccess}
-          />
-        </Div>
+        <TextFieldWidget
+          fieldName="connectionId"
+          field={children.connectionId}
+        />
+        <TextFieldWidget fieldName="username" field={children.username} />
+        <TextArrayFieldWidget fieldName="groups" field={children.groups} />
+        <SelectFieldWidget fieldName="loginShell" field={children.loginShell} />
+        <TextFieldWidget fieldName="homeDir" field={children.homeDir} />
+        <BooleanFieldWidget
+          fieldName="sudoAccess"
+          field={children.sudoAccess}
+        />
+        <PasswordFieldWidget
+          fieldName="sudoPassword"
+          field={children.sudoPassword}
+        />
       </Div>
     </Div>
   );

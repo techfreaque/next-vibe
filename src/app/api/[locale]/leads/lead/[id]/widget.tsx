@@ -991,15 +991,33 @@ export function LeadDetailContainer({
   }, [navigation]);
 
   const handleEdit = useCallback((): void => {
-    if (!leadId) {
+    if (!leadId || !data) {
       return;
     }
     navigation.push(definition.PATCH, {
       urlPathParams: { id: leadId },
-      prefillFromGet: true,
-      getEndpoint: definition.GET,
+      data: {
+        id: data.basicInfo.id,
+        email: data.basicInfo.email ?? undefined,
+        businessName: data.basicInfo.businessName ?? undefined,
+        contactName: data.basicInfo.contactName ?? undefined,
+        status: data.basicInfo.status ?? undefined,
+        phone: data.contactDetails.phone ?? undefined,
+        website: data.contactDetails.website ?? undefined,
+        country: data.contactDetails.country ?? undefined,
+        language: data.contactDetails.language ?? undefined,
+        source: data.campaignTracking.source ?? undefined,
+        currentCampaignStage:
+          data.campaignTracking.currentCampaignStage ?? undefined,
+        notes: data.metadata.notes ?? undefined,
+        metadata: data.metadata.metadata ?? undefined,
+        convertedUserId: data.conversion.convertedUserId ?? undefined,
+        subscriptionConfirmedAt: data.conversion.subscriptionConfirmedAt
+          ? new Date(data.conversion.subscriptionConfirmedAt)
+          : undefined,
+      },
     });
-  }, [navigation, leadId]);
+  }, [navigation, leadId, data]);
 
   const handleDelete = useCallback((): void => {
     if (!leadId) {

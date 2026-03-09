@@ -67,6 +67,12 @@ export const translations = {
         description:
           "Add the user to the sudo group so they can run commands as root. Use with caution.",
       },
+      sudoPassword: {
+        label: "Sudo Password",
+        description:
+          "Your sudo password to run useradd with elevated privileges. Leave empty if passwordless sudo is configured.",
+        placeholder: "Enter sudo password…",
+      },
     },
     response: {
       ok: { title: "Success" },

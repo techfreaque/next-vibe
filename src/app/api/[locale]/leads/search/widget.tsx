@@ -36,6 +36,7 @@ import { SubmitButtonWidget } from "@/app/api/[locale]/system/unified-interface/
 import { useTouchDevice } from "@/hooks/use-touch-device";
 import { formatSimpleDate } from "@/i18n/core/localization-utils";
 
+import { LeadStatus } from "../enum";
 import type definition from "./definition";
 
 type GetResponseOutput = typeof definition.GET.types.ResponseOutput;
@@ -51,24 +52,28 @@ interface CustomWidgetProps {
 // ─── Colour maps ──────────────────────────────────────────────────────────────
 
 const STATUS_COLORS: Record<string, string> = {
-  NEW: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
-  PENDING:
+  [LeadStatus.NEW]:
+    "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+  [LeadStatus.PENDING]:
     "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
-  CAMPAIGN_RUNNING:
+  [LeadStatus.CAMPAIGN_RUNNING]:
     "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
-  WEBSITE_USER:
+  [LeadStatus.WEBSITE_USER]:
     "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
-  NEWSLETTER_SUBSCRIBER:
+  [LeadStatus.NEWSLETTER_SUBSCRIBER]:
     "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300",
-  IN_CONTACT:
+  [LeadStatus.IN_CONTACT]:
     "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300",
-  SIGNED_UP: "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
-  SUBSCRIPTION_CONFIRMED:
+  [LeadStatus.SIGNED_UP]:
+    "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300",
+  [LeadStatus.SUBSCRIPTION_CONFIRMED]:
     "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
-  UNSUBSCRIBED:
+  [LeadStatus.UNSUBSCRIBED]:
     "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300",
-  BOUNCED: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-  INVALID: "bg-red-200 text-red-900 dark:bg-red-900/50 dark:text-red-200",
+  [LeadStatus.BOUNCED]:
+    "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  [LeadStatus.INVALID]:
+    "bg-red-200 text-red-900 dark:bg-red-900/50 dark:text-red-200",
 };
 
 type SearchTranslationKey =
@@ -76,18 +81,30 @@ type SearchTranslationKey =
 
 // Status label i18n keys for filter chips (concise)
 const STATUS_LABEL_KEYS: Record<string, SearchTranslationKey> = {
-  NEW: "widget.statusNew",
-  PENDING: "widget.statusPending",
-  CAMPAIGN_RUNNING: "widget.statusCampaign",
-  WEBSITE_USER: "widget.statusWebUser",
-  NEWSLETTER_SUBSCRIBER: "widget.statusNewsletter",
-  IN_CONTACT: "widget.statusInContact",
-  SIGNED_UP: "widget.statusSignedUp",
-  SUBSCRIPTION_CONFIRMED: "widget.statusSubscribed",
-  UNSUBSCRIBED: "widget.statusUnsub",
-  BOUNCED: "widget.statusBounced",
-  INVALID: "widget.statusInvalid",
+  [LeadStatus.NEW]: "widget.statusNew",
+  [LeadStatus.PENDING]: "widget.statusPending",
+  [LeadStatus.CAMPAIGN_RUNNING]: "widget.statusCampaign",
+  [LeadStatus.WEBSITE_USER]: "widget.statusWebUser",
+  [LeadStatus.NEWSLETTER_SUBSCRIBER]: "widget.statusNewsletter",
+  [LeadStatus.IN_CONTACT]: "widget.statusInContact",
+  [LeadStatus.SIGNED_UP]: "widget.statusSignedUp",
+  [LeadStatus.SUBSCRIPTION_CONFIRMED]: "widget.statusSubscribed",
+  [LeadStatus.UNSUBSCRIBED]: "widget.statusUnsub",
+  [LeadStatus.BOUNCED]: "widget.statusBounced",
+  [LeadStatus.INVALID]: "widget.statusInvalid",
 };
+
+// ─── Format enum i18n key to readable label ───────────────────────────────────
+// e.g. "enums.leadSource.csvImport" → "CSV Import"
+
+function formatEnumKey(key: string): string {
+  const parts = key.split(".");
+  const last = parts[parts.length - 1] ?? key;
+  return last
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^\s/, "")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
 
 // ─── Bar colour helper ─────────────────────────────────────────────────────────
 
@@ -493,7 +510,7 @@ export function LeadsSearchContainer({
                         >
                           {lead.status && STATUS_LABEL_KEYS[lead.status]
                             ? t(STATUS_LABEL_KEYS[lead.status])
-                            : lead.status.replace(/_/g, " ")}
+                            : formatEnumKey(lead.status)}
                         </Span>
                       )}
 
@@ -508,7 +525,7 @@ export function LeadsSearchContainer({
                       {/* Campaign stage chip */}
                       {lead.currentCampaignStage && (
                         <Span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300 border border-violet-200 dark:border-violet-800">
-                          {lead.currentCampaignStage.replace(/_/g, " ")}
+                          {formatEnumKey(lead.currentCampaignStage)}
                         </Span>
                       )}
                     </Div>
@@ -522,9 +539,7 @@ export function LeadsSearchContainer({
                         />
                       )}
                       {lead.country && <Span>{lead.country}</Span>}
-                      {lead.source && (
-                        <Span>{lead.source.replace(/_/g, " ")}</Span>
-                      )}
+                      {lead.source && <Span>{formatEnumKey(lead.source)}</Span>}
                     </Div>
 
                     {/* Row 3 – created date */}

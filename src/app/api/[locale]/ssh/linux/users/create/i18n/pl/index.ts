@@ -67,6 +67,12 @@ export const translations = {
         description:
           "Dodaj użytkownika do grupy sudo, aby mógł uruchamiać polecenia jako root. Używaj ostrożnie.",
       },
+      sudoPassword: {
+        label: "Hasło sudo",
+        description:
+          "Twoje hasło sudo do uruchomienia useradd z podwyższonymi uprawnieniami. Pozostaw puste, jeśli skonfigurowano sudo bez hasła.",
+        placeholder: "Wprowadź hasło sudo…",
+      },
     },
     response: {
       ok: { title: "Sukces" },

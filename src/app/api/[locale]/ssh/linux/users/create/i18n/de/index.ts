@@ -67,6 +67,12 @@ export const translations = {
         description:
           "Benutzer zur sudo-Gruppe hinzufügen, damit er Befehle als Root ausführen kann. Mit Vorsicht verwenden.",
       },
+      sudoPassword: {
+        label: "Sudo-Passwort",
+        description:
+          "Ihr sudo-Passwort, um useradd mit erhöhten Rechten auszuführen. Leer lassen, wenn passwortloses sudo konfiguriert ist.",
+        placeholder: "Sudo-Passwort eingeben…",
+      },
     },
     response: {
       ok: { title: "Erfolgreich" },
